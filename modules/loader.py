@@ -15,48 +15,64 @@ vY = -1
 count = 0
 frame = 0
 countLimit = 1
-global image, draw
-global config
-global image2
 action = "play"
+gifPlaySpeed = 0.07
+bgFillColor = 0x000000
+imgHeight = 0
+
+global debug
+global draw
+global config
+global image
+
+debug = False
+
+def setUpNew():
+	global image
+	image = Image.new("RGBA", (128, 400))
 
 def loadImage(arg):
-	global image2
-	image2 = Image.new("RGBA", (40, 32))
-	image2 = Image.open(arg , "r")
-	image2.load()
-	#config.draw  = ImageDraw.Draw(image2)
-	#image2 = image2.resize((32,32))
+	global image, imgHeight
+	image = Image.open(arg , "r")
+	image.load()
+	imgHeight =  image.getbbox()[3]
 	return True
 	
 def panImage() :
-	global frame, count, xOffset, yOffset, vX, vY
-	for n in range (0, image2.size[1] - config.screenHeight):
+	global frame, count, xOffset, yOffset, vX, vY, image
+	rangeLimit = image.size[1] + config.screenHeight
+	gray = 175
+
+	draw = ImageDraw.Draw(image)
+	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
+	draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
+
+	for n in range (0, rangeLimit):
 		xOffset += vX;
-		yOffset += vY
-		# forces redraw of next frame  -- must fix this hack sometime ....
-		image2.rotate(0)
-		if(random.random() > .1) : config.matrix.Clear()
-		config.matrix.SetImage(image2.im.id, xOffset, yOffset)
-		time.sleep(.02)
-	#if (xOffset > config.image.size[0] -63 or xOffset < -config.image.size[0]+42) :
-		#vX *= -1
-	#config.matrix.SetImage(config.image.im.id, xOffset, yOffset)
+		yOffset -= vY
+		
+		#config.matrix.Fill(gray,gray,gray)
+		#config.matrix.SetImage(image.im.id, xOffset, yOffset)
+
+		config.render(image, xOffset, yOffset - 128)
+		time.sleep(.04)
+	debugMessage("done pan")
+
 		
 def fillColor() :
+	global bgFillColor
 	if(random.random() > .99) :
 		config.matrix.Fill(0xff0000)
 	else :
-		config.matrix.Fill(0x0000ff)
+		config.matrix.Fill(bgFillColor)
 		
 def rotateImage(angle) :
 	global image, matrix
-	image2 = config.image.resize((32,32))
-	image2 = image2.rotate(angle, Image.BICUBIC, 1);		
+	image = config.image.resize((32,32))
+	image = image.rotate(angle, Image.BICUBIC, 1);		
 	config.matrix.Clear()
-	config.matrix.SetImage(config.image2.im.id, -8, -8)
+	config.matrix.SetImage(config.image.im.id, -8, -8)
    
-		
 def testImage():
 	global image, matrix
 	count = 0
@@ -67,42 +83,37 @@ def testImage():
 		time.sleep(.02)
 
 def animate(randomizeTiming = False, frameLimit = 3) :
-	global frame, count, xOffset, yOffset, vX,image2, action
-	#config.matrix.Clear()
+	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight
 
 	fillColor()
-	config.matrix.SetImage(image2.im.id, xOffset, yOffset)
-	if(action == "play") : config.matrix.SetImage(image2.im.id, 60, yOffset)
 
+	config.render(image, 0, imgHeight - config.screenHeight)
+	
 	try:
-		image2.seek(frame)
+		image.seek(frame)
 	except EOFError:
-		image2.seek(0)
+		image.seek(0)
 		pass
 	
 	# forces redraw of next frame  -- must fix this hack sometime ....
-	image2.rotate(0)
+	image.rotate(0)
 	
 	if(randomizeTiming) :
 		time.sleep(random.uniform(.02,.08))
 		if(random.random() > .98) :
 			time.sleep(random.uniform(.05,2))
 	else :
-		time.sleep(.08)
+		time.sleep(gifPlaySpeed)
 
 	# Advance to next frame
-	frame = image2.tell() + 1
+	frame = image.tell() + 1
 
 	if (frame == frameLimit):
 		frame = 0
-
-#################################	
-
+	
 def playImage(randomizeTiming = False, frameLimit = 3):
 	animate(randomizeTiming, frameLimit)
 
-
-#################################	
 def init():
 	global action
 	count = 0
@@ -112,31 +123,42 @@ def init():
 				playImage(False, 30)
 			else : 
 				panImage()
-			#
+			
 			count += 1
 		except KeyboardInterrupt:
 			print "Stopping...."
+			exit()
 			break
-		
-################################
 
-def start():
-	global image2,frame, action,xOffset,yOffset
+def debugMessage(arg) :
+	
+	if(debug) : print(arg)		
+
+def start(img="", setvX = 0, setvY = -1):
+	global image,frame, action,xOffset,yOffset,vX,vY
 	frame = xOffset = yOffset = 0
+	yOffset = config.screenHeight
+	vX = setvX
+	vY = setvY
+
+	'''
 	img = "./imgs/shane3.gif"
 	img  = "./imgs/00united_states-onblu.gif"
 	img  = "./imgs/flame-blub.gif"
-
+	'''
+	
 	if (action == "play") : 
-		img  = "./imgs/flames-1b2.gif"
+		if(img=="") : img  = "./imgs/flames-1c.gif"
 	else :
-		img = "./imgs/206_thumbnail25.gif"
+		if(img=="") : img = "./imgs/206_thumbnail25.gif"
+
+	debugMessage("Trying to load " + img)	
 
 	if(loadImage(img)) :
-		print( img + " loaded")
+		debugMessage( img + " loaded")
 		init()
 	else:
-		print "could not load"
+		debugMessage ("could not load")
 	
 	
 ###############################	

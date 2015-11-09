@@ -41,9 +41,6 @@ def drawImg() :
                         config.draw.rectangle((xStart, yStart, xEnd, yEnd ),  outline=(r,g,b))
 
 
-
-# ################################################### #
-
 def redraw():
         global config
         global x,y,vx,vy
@@ -52,7 +49,10 @@ def redraw():
         # forces color animation
         changeColor()
         drawImg()
-        config.matrix.SetImage(config.id,x,y)
+
+        #config.matrix.SetImage(config.id,x,y)
+        config.render(config.image,x,y,config.screenWidth,config.screenHeight)
+
         if(random.random() > .93) : colorSwitch = True
                 
 

@@ -80,7 +80,7 @@ def stroopSequence() :
 def seq2() :
 	config.soliloquy(True)
 
-	choices = [18,20,6,7]
+	choices = [18,21,6,7]
 
 	while (True):
 		d = int(random.uniform(1,3))
@@ -90,7 +90,7 @@ def seq2() :
 		if (d == 3) : dir = "Bottom"
 		seq = int(random.uniform(0,30))
 		seq = choices[int(random.uniform(0,len(choices)))]
-		seq = 5
+		#seq = 5
 		#seq = 18
 
 		
@@ -131,6 +131,11 @@ def seq2() :
 			stroopSequence()
 		elif (seq == 14) :
 			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
+
+		elif (seq == 21) :
+			user.userAnimator(12)
+			actions.burst(20)
+			actions.explosion()
 		elif (seq == 20) :
 			user.userAnimator(12)
 			machine.machineAnimator(30)

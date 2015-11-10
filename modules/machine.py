@@ -5,8 +5,11 @@ import math
 
 vx = 1
 vy = 2
-x = y = 3
+x = 0
+y = 0
 r=g=b=125
+redrawSpeed = .015
+
 
 def drawMachine() :
         global config
@@ -18,9 +21,7 @@ def drawMachine() :
         screenWidth = config.screenWidth
         screenHeight = config.screenHeight
         
-        # x1, y1, x2, y2 of bounding box
-
-        # x1,y1 are inital face points
+        # x1, y1 are inital face points (left eye)
         x1 = 5
         y1 = 12
         # d is size of eye X
@@ -48,12 +49,10 @@ def drawMachine() :
                 b = 0
                 w = 2
 
-
+        # outline
         config.draw.rectangle((1,1,24,28), fill=(rf,gf,bf), outline=(r,g,b))
-
-        #r=g=b=0
-
-
+        
+        # eyes
         config.draw.line((x1,y1,x1+d,y1+d), fill=(r,g,b), width = w)
         config.draw.line((x1,y1+d,x1+d,y1), fill=(r,g,b), width = w)
 
@@ -69,6 +68,7 @@ def drawMachine() :
         config.draw.line((x1+3,y1+d2,x1+2,y1+d2 +1), fill=(r,g,b), width = w)
         config.draw.line((x1+4,y1+d2,x1+d2,y1+d2), fill=(r,g,b), width = w)
         config.draw.line((x1+d2+1,y1+d2,x1+d2 +2,y1+d2+1), fill=(r,g,b), width = w)
+      
 
 # ################################################### #
 
@@ -78,30 +78,32 @@ def redraw():
         speed = 1
 
         xMax = config.screenWidth - 12
-        yMax = 12
+        yMax = config.screenHeight - 12
 
         buffer = 12
         x = x + vx
         y = y + vy
 
         drawMachine()
-        config.matrix.SetImage(config.id,x,y)
+
+        config.render(config.image,x,y,26,30,False)
+
                 
         if (x > xMax + buffer):
                 vx = vx * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vx * 2 * random.random())
                 x = xMax +  buffer - 2
-        if (x < 0 - buffer):
+        if (x < 0 - 26 + buffer):
                 vx = vx * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vx * 2 * random.random())
-                x = 0 - buffer
+                x = -26 + buffer
         if (y > yMax + buffer):
                 vy = vy * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vy * 2 * random.random())
-                y = yMax + buffer + 2
+                y = yMax + buffer -  2
         if(y < 0 - buffer):
                 vy = vy * -1
                 changeColor()
@@ -128,11 +130,22 @@ def changeColor( rnd = False) :
 
 
 def machineAnimator(arg) :
+        global redrawSpeed, x, y, vx, vy
         config.image = config.Image.new("RGBA", (26, 30))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
+        x = int(random.random() * config.screenWidth)
+        y = int(random.random() * config.screenHeight)
+
         count = 0
+        '''
+        x = 80
+        y = 80
+        vx = -1
+        vy = -1
+        '''
+
         while (count < arg * 2) :
                 redraw()
                 count+=1
-                time.sleep(.025)
+                time.sleep(redrawSpeed)

@@ -38,8 +38,8 @@ motions = []
 def stroop(config, arg, clr, oppClr, speed = 1, direction = "Left"):
 
                 fontSize  = 72
-                font = ImageFont.truetype('/home/pi/rpi-rgb-led-matrix-master/fonts/freefont/FreeSansBold.ttf', fontSize)
-                font2 = ImageFont.truetype('/home/pi/rpi-rgb-led-matrix-master/fonts/freefont/FreeSansBold.ttf', fontSize)
+                font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf', fontSize)
+                font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf', fontSize)
                 pixLen = config.draw.textsize(arg, font = font)
 
                 yOffset = int((pixLen[1] - 26)/4)

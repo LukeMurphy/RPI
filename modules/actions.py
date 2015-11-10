@@ -74,12 +74,20 @@ def explosion():
                                 b = 255
 
                         #if (q ==0) : print (particles[q]['c'][0])
+                        xDisplayPos = ref['xpos']
+                        yDisplayPos = ref['ypos']
 
-                        config.matrix.SetPixel(int(ref['xpos']),int(ref['ypos']),r,g,b)
+                        if(xDisplayPos > 128) :
+                                xDisplayPos += 128
+
+                        if(yDisplayPos > 32) :
+                                yDisplayPos -=32
+                                xDisplayPos += 128
+
+                        config.matrix.SetPixel(int(xDisplayPos),int(yDisplayPos),r,g,b)
                         
                 time.sleep(0.015)
         if(random.random() > .1) : explosion()
-
 
 def burst(a=10) :
         config.matrix.Clear()
@@ -95,7 +103,7 @@ def burst(a=10) :
                                         r = int(random.uniform(0,255))
                                         g = int(random.uniform(0,255))
                                         b = int(random.uniform(0,255))
-                                        x = int(random.random()*config.screenWidth)
+                                        x = int(random.random()*config.screenWidth*config.panels)
                                         y = int(random.random()*31)
 
                                         rn = random.random()
@@ -120,8 +128,6 @@ def burst(a=10) :
                         time.sleep(.08)
                         count += 1
         if(random.random() > .5) : burst()
-
-
 
 
 def glitch(a=10) :
@@ -158,10 +164,10 @@ def setBlanks() :
         global config,blankPixels,cols,rows
         blankPixels = []
         count = 0
-        
+        # scatter horizontally
         for n in range (0, 10) :
-                x = int(random.random()*config.screenWidth)
-                y = int(random.random()*config.screenHeight)
+                x = int(random.random()*config.screenWidth*config.panels)
+                y = int(random.random()*config.screenHeight/config.panels)
                 blankPixels.append((x,y))
                 if(random.random() > .9):
                         cols = int(random.uniform(2,20))

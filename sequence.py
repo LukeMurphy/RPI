@@ -15,11 +15,11 @@ import math
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 4)
-image = Image.new("RGBA", (128, 32))
+matrix = Adafruit_RGBmatrix(32, 8)
+image = Image.new("RGBA", (128, 64))
 draw  = ImageDraw.Draw(image)
-id = image.im.id
-matrix.SetImage(id, 0, 0)
+iid = image.im.id
+matrix.SetImage(iid, 0, 0)
 
 config = utils
 config.matrix = matrix
@@ -31,6 +31,10 @@ config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 config.actions = actions
 
+config.imageTop = Image.new("RGBA", (28, 30))
+config.imageBottom = Image.new("RGBA", (28, 30))
+config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
+
 action = actions
 action.config = config
 scroll = scroll
@@ -41,20 +45,13 @@ bluescreen = bluescreen
 bluescreen.config = config
 user = user
 user.config = config
-
-config.matrix.Clear()
-
 imgLoader = loader
 imgLoader.config = config
-
 concentric = squares
 concentric.config = config
 
-concentric.colorSwitch = False
-#concentric.animator(60)
+#machine.machineAnimator(300)
 #exit()
-
-# 206_thumbnail25.jpg
 
 
 # ################################################### #
@@ -78,6 +75,8 @@ def seq2() :
 		if (d == 2) : dir = "Right"
 		if (d == 3) : dir = "Bottom"
 		seq = int(random.uniform(0,30))
+
+		#seq = 5
 
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
@@ -124,7 +123,7 @@ def seq2() :
 			actions.explosion()
 		elif (seq == 16) :
 			imgLoader.action = "pan"
-			imgLoader.countLimit = 2
+			imgLoader.countLimit = 1
 			imgLoader.start()
 		elif (seq == 17) :
 			imgLoader.action = "play"

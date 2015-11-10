@@ -77,6 +77,7 @@ def seq2() :
 		seq = int(random.uniform(0,30))
 
 		#seq = 5
+		#seq = 18
 
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
@@ -131,7 +132,7 @@ def seq2() :
 			imgLoader.start()
 		elif (seq == 18) :
 			concentric.colorSwitch = False
-			concentric.animator(30)
+			concentric.animator(60)
 
 
 #actions.explosion()

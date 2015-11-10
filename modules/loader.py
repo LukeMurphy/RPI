@@ -45,7 +45,7 @@ def panImage() :
 
 	draw = ImageDraw.Draw(image)
 	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
-	draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
+	if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
 	for n in range (0, rangeLimit):
 		xOffset += vX;
@@ -150,7 +150,7 @@ def start(img="", setvX = 0, setvY = -1):
 	if (action == "play") : 
 		if(img=="") : img  = "./imgs/flames-1c.gif"
 	else :
-		if(img=="") : img = "./imgs/206_thumbnail25.gif"
+		if(img=="") : img = "./imgs/drawings/206_thumbnail25.gif"
 
 	debugMessage("Trying to load " + img)	
 

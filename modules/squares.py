@@ -7,6 +7,7 @@ vx = 0
 vy = 0
 x = y = 0
 r=g=b=125
+pulseSpeed = .1
 
 colorSwitch = False
 
@@ -76,7 +77,7 @@ def changeColor( rnd = False) :
 
 
 def animator(arg) :
-        global rHeight,rWidth, numSquares, colorSwitch
+        global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed
 
         config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
         config.draw  = config.ImageDraw.Draw(config.image)
@@ -85,13 +86,18 @@ def animator(arg) :
         
         rHeight = config.screenHeight
         rWidth = config.screenWidth
+        countLimit = arg * 2
+        interval = countLimit / 5
+        i = 0
 
-        while (count < arg * 2) :
+        while (count < countLimit) :
                 redraw()
-                count+=1
-                if(random.random() > .97 and numSquares < 33) : 
+                count += 1
+                i += 1
+                if(i > interval and numSquares < 33) : 
+                        i = 0
                         colorSwitch = False
                         rWidth = rWidth/2
                         numSquares *=2
 
-                time.sleep(.125)
+                time.sleep(pulseSpeed)

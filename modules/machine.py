@@ -138,12 +138,6 @@ def machineAnimator(arg) :
         y = int(random.random() * config.screenHeight)
 
         count = 0
-        '''
-        x = 80
-        y = 80
-        vx = -1
-        vy = -1
-        '''
 
         while (count < arg * 2) :
                 redraw()

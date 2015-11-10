@@ -1,16 +1,37 @@
 import time
 import random
 import math
+import sys
 
 screenWidth =  128
 screenHeight = 64
 
+I = 0
+lastI = 1
+
 # for now, 2 panels means a stack of two 32x64 + 32x64
 # or, 4x2 x 32
 panels = 2
-
-
 path = "/home/pi/rpimain"
+
+
+
+msg = ["Infinite beatitude of existence! It is; and there is nothing else beside It.",
+"It fills all Space, and what It fills, It is." 
+"What It thinks, that It utters; and what It utters, that It hears; and It itself is Thinker, Utterer, Hearer, Thought, Word, Audition; "
+"it is the One, and yet the All in All. Ah, the happiness, ah, the happiness of Being! Ah, the joy, ah, the joy of Thought! "
+"What can It not achieve by thinking! Its own Thought coming to Itself, suggestive of its disparagement, thereby to enhance Its happiness! "
+"Sweet rebellion stirred up to result in triumph! Ah, the divine creative power of the All in One! Ah, the joy, the joy of Being!" 
+"Me me me I mine mine mine is"]
+
+msg = ["Infinite beatitude of existence! I am; and there is nothing else beside I.",
+"I fill all Space, and what I fill, I am.", 
+"What I think, that I utter; and what I utter, that I hear; and I itself is Thinker, Utterer, Hearer, Thought, Word, Audition; ",
+"it is the One, and yet the All in All.",
+"Ah, the happiness, ah, the happiness of Being! Ah, the joy, ah, the joy of Thought! "
+"What can I not achieve by thinking! My own Thought coming to myself, suggestive of my disparagement, thereby to enhance My happiness! ",
+"Sweet rebellion stirred up to result in triumph! Ah, the divine creative power of the All in One! Ah, the joy, the joy of Being!", 
+"Me me me I mine mine mine is"] 
 
 global imageTop,imageBottom,image
 
@@ -22,6 +43,19 @@ def opp((r,g,b)) :
     g = int((minmax - g) )
     b = int((minmax -b)  )
     return (r,g,b)
+
+
+def soliloquy(override = False) :
+    global I, lastI, msg
+    if(random.random() > .9 or override) :
+            I = int(random.random() *  len(msg))
+
+            while (I == lastI):
+                    I = int(random.random() *  len(msg))
+            sys.stdout.write(msg[I])
+            sys.stdout.flush()
+            #print(msg[I]),
+            lastI = I
 
 
 def test() :

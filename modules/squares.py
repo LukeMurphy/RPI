@@ -3,12 +3,13 @@ import time
 import random
 import math
 
+
 vx = 0
 vy = 0
 x = y = 0
 r=g=b=125
 pulseSpeed = .1
-
+msg = []
 colorSwitch = False
 
 '''
@@ -75,9 +76,9 @@ def changeColor( rnd = False) :
                                 b = int(random.uniform(0,255))
 
 
-
+# adapted to show Soliloguy of The Point
 def animator(arg) :
-        global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed
+        global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
 
         config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
         config.draw  = config.ImageDraw.Draw(config.image)
@@ -88,6 +89,7 @@ def animator(arg) :
         rWidth = config.screenWidth
         countLimit = arg * 2
         interval = countLimit / 5
+
         i = 0
 
         while (count < countLimit) :
@@ -99,5 +101,14 @@ def animator(arg) :
                         colorSwitch = False
                         rWidth = rWidth/2
                         numSquares *=2
-
+                config.soliloquy()
                 time.sleep(pulseSpeed)
+
+
+
+
+
+
+
+
+

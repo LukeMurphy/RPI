@@ -9,6 +9,8 @@ import math
 def explosion():
         global config
 
+        config.soliloquy(True)
+
         #image = Image.new("RGBA", (32, 32))
         #draw  = ImageDraw.Draw(image)
 

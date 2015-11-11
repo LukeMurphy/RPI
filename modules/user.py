@@ -76,6 +76,7 @@ def userAnimator(arg) :
         global config      
         image = config.Image.new("RGBA", (32, 32))
         config.draw  = config.ImageDraw.Draw(config.image)
+        config.draw.rectangle((0,0,32,32), fill= (0,0,0))
         config.id = image.im.id
         count = 0
         while (count < arg) :

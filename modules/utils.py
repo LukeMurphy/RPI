@@ -122,7 +122,7 @@ def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True, overlayBottom=False):
 
     if(overlayBottom) :
         renderImage = Image.new("RGBA", (w , h))
-        renderImage.paste(imageBottom)
+        renderImage.paste(imageTemp, (0,0))
         iid = renderImage.im.id
         idtemp = image.im.id
         matrix.SetImage(iid, xOffset + screenWidth, 0)

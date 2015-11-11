@@ -2,6 +2,8 @@
 import time
 import random
 import math
+import Image
+import sys
 
 
 vx = 0
@@ -9,7 +11,6 @@ vy = 0
 x = y = 0
 r=g=b=125
 pulseSpeed = .1
-msg = []
 colorSwitch = False
 
 '''
@@ -26,9 +27,9 @@ def drawImg() :
         global colorSwitch
         global rHeight,rWidth,numSquares
 
-        matrix = config.matrix
-        draw = config.draw
-        id = config.id
+        #matrix = config.matrix
+        #draw = config.draw
+        #id = config.id
 
         lines = rHeight/2
         for i in range(0, numSquares):
@@ -79,12 +80,13 @@ def changeColor( rnd = False) :
 # adapted to show Soliloguy of The Point
 def animator(arg) :
         global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
-
+        config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
         config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
+        config.matrix.Clear()
         count = 0
-        
+        numSquares = 1
         rHeight = config.screenHeight
         rWidth = config.screenWidth
         countLimit = arg * 2
@@ -96,13 +98,16 @@ def animator(arg) :
                 redraw()
                 count += 1
                 i += 1
-                if(i > interval and numSquares < 33) : 
+                if(i > interval and numSquares < 17) : 
                         i = 0
                         colorSwitch = False
                         rWidth = rWidth/2
                         numSquares *=2
                 config.soliloquy()
                 time.sleep(pulseSpeed)
+
+        config.matrix.Clear()
+        config.matrix.Fill(0)
 
 
 

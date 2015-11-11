@@ -84,6 +84,7 @@ def seq2() :
 	config.soliloquy(True)
 
 	choices = [30,29,28,27]
+	#choices = [27]
 
 	while (True):
 		d = int(random.uniform(1,3))
@@ -96,11 +97,7 @@ def seq2() :
 		#seq = 5
 		#seq = 18
 		#seq = 21
-		#actions.explosion()
-		actions.burst(10)
-		user.userAnimator(20)
 
-		exit()
 
 		if(seq == 0) : actions.burst(40)
 

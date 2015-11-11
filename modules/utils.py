@@ -23,7 +23,7 @@ msg = ["Infinite beatitude of existence! I am; and there is nothing else beside 
 "Sweet rebellion stirred up to result in triumph! Ah, the divine creative power of the All in One! Ah, the joy, the joy of Being!", 
 "Me me me I mine mine mine is"] 
 
-msg = [""]
+#msg = [""]
 
 global imageTop,imageBottom,image,config
 
@@ -36,7 +36,7 @@ def opp((r,g,b)) :
     b = int((minmax -b)  )
     return (r,g,b)
 
-def soliloquy(override = False) :
+def soliloquy(override = False,arg = "") :
     global I, lastI, msg
     length = len(msg)
     if(length > 1) :
@@ -45,7 +45,9 @@ def soliloquy(override = False) :
 
                 while (I == lastI):
                         I = int(random.random() * length)
-                sys.stdout.write(msg[I])
+                msgTxt  =  msg[I]
+		if(arg != "") : msgTxt = arg	
+		sys.stdout.write(msgTxt)
                 sys.stdout.flush()
                 #print(msg[I]),
                 lastI = I
@@ -136,7 +138,10 @@ def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True, overlayBottom=False):
     #time.sleep(10)
     #exit()
     # ************************************ #
-   
+    print(">>")
+    if(random.random() > .95) : soliloquy()
+
+       
 
 
 

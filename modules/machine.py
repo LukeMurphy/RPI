@@ -9,6 +9,8 @@ x = 0
 y = 0
 r=g=b=125
 redrawSpeed = .015
+boxHeight = 30
+boxWidth = 26
 
 
 def drawMachine() :
@@ -68,13 +70,10 @@ def drawMachine() :
         config.draw.line((x1+3,y1+d2,x1+2,y1+d2 +1), fill=(r,g,b), width = w)
         config.draw.line((x1+4,y1+d2,x1+d2,y1+d2), fill=(r,g,b), width = w)
         config.draw.line((x1+d2+1,y1+d2,x1+d2 +2,y1+d2+1), fill=(r,g,b), width = w)
-      
-
-# ################################################### #
 
 def redraw():
         global config
-        global x,y,vx,vy
+        global x,y,vx,vy, boxWidth, boxHeight
         speed = 1
 
         xMax = config.screenWidth - 12
@@ -86,7 +85,8 @@ def redraw():
 
         drawMachine()
 
-        config.render(config.image,x,y,26,30,False)
+        # Render using main render function - manages the matrix tiling
+        config.render(config.image,x,y,boxWidth,boxHeight,False)
 
                 
         if (x > xMax + buffer):
@@ -94,21 +94,21 @@ def redraw():
                 changeColor()
                 if(random.random() > .5): vx = int(vx * 2 * random.random())
                 x = xMax +  buffer - 2
-        if (x < 0 - 26 + buffer):
+        if (x < 0 - 26 + 1):
                 vx = vx * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vx * 2 * random.random())
-                x = -26 + buffer
+                x = -26 + 1
         if (y > yMax + buffer):
                 vy = vy * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vy * 2 * random.random())
                 y = yMax + buffer -  2
-        if(y < 0 - buffer):
+        if(y < 0 - boxHeight):
                 vy = vy * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vy * 2 * random.random())
-                y = 0 - buffer
+                y = 0 - boxHeight
 
 
 def changeColor( rnd = False) :
@@ -127,13 +127,12 @@ def changeColor( rnd = False) :
                                 g = int(random.uniform(0,255))
                                 b = int(random.uniform(0,255))
 
-
-
 def machineAnimator(arg) :
         global redrawSpeed, x, y, vx, vy
         config.image = config.Image.new("RGBA", (26, 30))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
+
         x = int(random.random() * config.screenWidth)
         y = int(random.random() * config.screenHeight)
 

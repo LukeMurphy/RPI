@@ -8,16 +8,16 @@ import math
 
 def drawUser() :
 
-        centerx = 64
-        centery = 32
+        centerx = 16 #config.screenWidth/2
+        centery = 0 #32
 
         offsety = 3
-        offsetx = 0
+        offsetx = -1
 
         dx = -5
         dy = 0
-        bw = 35
-        bh = 34
+        bw = 34
+        bh = 35
         bx1 = centerx - bw/2 + offsetx
         bx2 = bx1 + bw
         by1 = centery + bh /2 - 3 + offsety
@@ -62,11 +62,14 @@ def drawUser() :
                 draw.ellipse((mx1,my1- mh/2,mx2,my2 + mh/2),fill=(180,80,80,2), outline=1)
 
                 #matrix.SetImage(config.id, config.screenWidth/2 - centerx,centery)
-                config.render(config.image,  0, 0, config.screenWidth, config.screenHeight)
+                #config.render(config.image,  0, 0, config.screenWidth, config.screenHeight)
+                
         else :
                 draw.line((mx1, my1, mx1+mw, my2), fill=1)
                 #matrix.SetImage(id,config.screenWidth/2  - centerx,centery)
-                config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+                #config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+
+        config.render(config.image, 16, 32, 31, 32, False, True)      
 
 
 def userAnimator(arg) :

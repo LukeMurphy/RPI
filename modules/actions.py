@@ -79,12 +79,12 @@ def explosion():
                         xDisplayPos = ref['xpos']
                         yDisplayPos = ref['ypos']
 
-                        if(xDisplayPos > 128) :
-                                xDisplayPos += 128
+                        if(xDisplayPos > config.screenWidth) :
+                                xDisplayPos += config.screenWidth
 
                         if(yDisplayPos > 32) :
                                 yDisplayPos -=32
-                                xDisplayPos += 128
+                                xDisplayPos += config.screenWidth
 
                         config.matrix.SetPixel(int(xDisplayPos),int(yDisplayPos),r,g,b)
                         

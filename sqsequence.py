@@ -15,7 +15,7 @@ import math
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 2)
+matrix = Adafruit_RGBmatrix(32, 4)
 image = Image.new("RGBA", (64, 64))
 draw  = ImageDraw.Draw(image)
 iid = image.im.id
@@ -31,7 +31,7 @@ config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 config.actions = actions
 
-config.panels = 1
+config.panels = 2
 config.screenWidth = 64
 config.screenHeight = 64
 config.imageTop = Image.new("RGBA", (64, 32))
@@ -52,14 +52,17 @@ imgLoader = loader
 imgLoader.config = config
 concentric = squares
 concentric.config = config
+
+
+
 '''
-matrix = Adafruit_RGBmatrix(32, 2)
+#matrix = Adafruit_RGBmatrix(32, 2)
 renderImage = Image.new("RGBA", (64 , 64))
 draw = ImageDraw.Draw(renderImage)
 draw.rectangle((0, 0, 64, 64 ),  fill=(0,0,255), outline=(255,0,0))
 matrix.SetImage(renderImage.im.id, 0, 0)
 #matrix.SetPixel(65,10,220,120,0)
-time.sleep(2)
+time.sleep(5)
 #machine.machineAnimator(300)
 exit()
 '''
@@ -80,7 +83,7 @@ def stroopSequence() :
 def seq2() :
 	config.soliloquy(True)
 
-	choices = [18,21,6,7]
+	choices = [30,29,28,27]
 
 	while (True):
 		d = int(random.uniform(1,3))
@@ -92,10 +95,26 @@ def seq2() :
 		seq = choices[int(random.uniform(0,len(choices)))]
 		#seq = 5
 		#seq = 18
+		#seq = 21
+		#actions.explosion()
+		actions.burst(10)
+		user.userAnimator(20)
 
-		
+		exit()
 
 		if(seq == 0) : actions.burst(40)
+
+		elif(seq == 30) :
+			actions.burst(30)
+		elif(seq == 29) :
+			user.userAnimator(20)
+		elif(seq == 28) :
+			actions.explosion()
+		elif(seq == 27) :
+			concentric.colorSwitch = False
+			concentric.animator(int(random.uniform(10,30)))
+
+
 		elif(seq == 1) :
 			if(random.random() > .8) : actions.burst(20)
 			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
@@ -120,7 +139,7 @@ def seq2() :
 		elif(seq == 4) :
 			user.userAnimator(24)
 		elif(seq == 5) :
-			machine.machineAnimator(100)
+			machine.machineAnimator(800)
 		elif(seq == 6) :
 			bluescreen.draw()
 		elif(seq == 7) :

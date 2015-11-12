@@ -10,15 +10,18 @@ import random
 #matrix = Adafruit_RGBmatrix(32, 1)
 r=g=b=0
 xOffset = yOffset = 0
-vX = 0
+vX = 1
 vY = -1
 count = 0
 frame = 0
 countLimit = 1
 action = "play"
 gifPlaySpeed = 0.07
+scrollSpeed = .04
 bgFillColor = 0x000000
 imgHeight = 0
+panRangeLimit = 0
+useJitter = False
 
 global debug
 global draw
@@ -39,26 +42,43 @@ def loadImage(arg):
 	return True
 	
 def panImage() :
-	global frame, count, xOffset, yOffset, vX, vY, image
-	rangeLimit = image.size[1] + config.screenHeight
-	gray = 175
+	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter
 
+	jitter = False
+
+	# defaults for vertical image scrolling
+	if(panRangeLimit == 0) : 
+		rangeLimit = image.size[1] + config.screenHeight
+		yOffset = -config.screenHeight
+	else : 
+		rangeLimit = panRangeLimit
+
+	#gray = 175
 	draw = ImageDraw.Draw(image)
 	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
 	if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
+	xPos = 0
+	yPos = 0
 	for n in range (0, rangeLimit):
-		xOffset += vX;
-		yOffset -= vY
-		
+		if(useJitter):
+			if(random.random() > .99) : 
+				jitter = False
+				vY = 0
+				yPos = 0
+			if(random.random() > .99) : jitter = True
+			if(jitter) : vY = random.uniform(-.3,.3)
+		xPos -= vX;
+		yPos -= vY
+		# older methods
 		#config.matrix.Fill(gray,gray,gray)
 		#config.matrix.SetImage(image.im.id, xOffset, yOffset)
 
-		config.render(image, xOffset, yOffset - 128)
-		time.sleep(.04)
+		config.render(image, int(xOffset + xPos), int(yOffset + yPos))
+		time.sleep(scrollSpeed)
+
 	debugMessage("done pan")
 
-		
 def fillColor() :
 	global bgFillColor
 	if(random.random() > .99) :
@@ -121,7 +141,7 @@ def init():
 		try:
 			if(action == "play"):
 				playImage(False, 30)
-			else : 
+			elif(action == "pan") : 
 				panImage()
 			
 			count += 1
@@ -136,18 +156,13 @@ def debugMessage(arg) :
 
 def start(img="", setvX = 0, setvY = -1):
 	global image,frame, action,xOffset,yOffset,vX,vY
-	frame = xOffset = yOffset = 0
-	yOffset = config.screenHeight
+	frame = 0
+
 	vX = setvX
 	vY = setvY
-
-	'''
-	img = "./imgs/shane3.gif"
-	img  = "./imgs/00united_states-onblu.gif"
-	img  = "./imgs/flame-blub.gif"
-	'''
 	
 	if (action == "play") : 
+		xOffset = yOffset = 0
 		if(img=="") : img  = "./imgs/flames-1c.gif"
 	else :
 		if(img=="") : img = "./imgs/drawings/206_thumbnail25.gif"

@@ -42,7 +42,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
         
 
         # make a new image with the right size
-        config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , config.screenHeight))
+        config.renderImage = config.Image.new("RGBA", (config.screenWidth * config.panels , config.screenHeight))
         scrollImage = config.Image.new("RGBA", pixLen)
         draw  = config.ImageDraw.Draw(scrollImage)
         iid = scrollImage.im.id

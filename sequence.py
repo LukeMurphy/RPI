@@ -37,19 +37,24 @@ config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32)
 
 action = actions
 action.config = config
+
 scroll = scroll
 scroll.config = config
+
 machine = machine
 machine.config = config
+
 bluescreen = bluescreen
 bluescreen.config = config
+
 user = user
 user.config = config
 user.userCenterx = 48
 
-
 imgLoader = loader
 imgLoader.config = config
+imgLoader.yOffset = config.screenHeight
+
 concentric = squares
 concentric.config = config
 
@@ -72,6 +77,8 @@ def stroopSequence() :
 
 
 def seq2() :
+
+	machine.machineAnimator(130)
 
 	while True:
 		d = int(random.uniform(1,3))
@@ -110,7 +117,7 @@ def seq2() :
 		elif(seq == 4) :
 			user.userAnimator(24)
 		elif(seq == 5) :
-			machine.machineAnimator(100)
+			machine.machineAnimator(430)
 		elif(seq == 6) :
 			bluescreen.draw()
 		elif(seq == 7) :
@@ -123,9 +130,9 @@ def seq2() :
 			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
 		elif (seq == 20) :
 			user.userAnimator(12)
-			machine.machineAnimator(30)
+			machine.machineAnimator(80)
 			user.userAnimator(1)
-			machine.machineAnimator(30)
+			machine.machineAnimator(80)
 			actions.burst(20)
 			actions.explosion()
 		elif (seq == 16) :

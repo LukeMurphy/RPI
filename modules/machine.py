@@ -2,6 +2,7 @@
 import time
 import random
 import math
+import Image
 
 vx = 1
 vy = 2
@@ -129,6 +130,7 @@ def changeColor( rnd = False) :
 
 def machineAnimator(arg) :
         global redrawSpeed, x, y, vx, vy
+        config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , config.screenHeight))
         config.image = config.Image.new("RGBA", (26, 30))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id

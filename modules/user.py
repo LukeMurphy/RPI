@@ -4,15 +4,18 @@ import time
 import random
 import math
 
+centerx = 16 #config.screenWidth/2
+centery = 0 #32
 
+offsety = 3
+offsetx = -1
+
+userCenterx = 16
 
 def drawUser() :
 
-        centerx = 16 #config.screenWidth/2
-        centery = 0 #32
+        global centery, centery, offsetx, offsety, userCenterx
 
-        offsety = 3
-        offsetx = -1
 
         dx = -5
         dy = 0
@@ -69,7 +72,7 @@ def drawUser() :
                 #matrix.SetImage(id,config.screenWidth/2  - centerx,centery)
                 #config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
-        config.render(config.image, 16, 32, 31, 32, False, True)      
+        config.render(config.image, userCenterx, 32, 31, 32, False, True)      
 
 
 def userAnimator(arg) :

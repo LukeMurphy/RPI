@@ -13,6 +13,7 @@ lastI = 1
 # or, 4x2 x 32
 panels = 2
 path = "/home/pi/rpimain"
+
 msg = ["Infinite beatitude of existence! I am; and there is nothing else beside I.",
 "I fill all Space, and what I fill, I am.", 
 "What I think, that I utter; and what I utter, that I hear; and I itself is Thinker, Utterer, Hearer, Thought, Word, Audition; ",

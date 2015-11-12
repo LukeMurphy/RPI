@@ -45,10 +45,15 @@ bluescreen = bluescreen
 bluescreen.config = config
 user = user
 user.config = config
+user.userCenterx = 48
+
+
 imgLoader = loader
 imgLoader.config = config
 concentric = squares
 concentric.config = config
+
+config.path = "/home/pi/RPI1"
 
 #machine.machineAnimator(300)
 #exit()
@@ -76,6 +81,7 @@ def seq2() :
 		if (d == 3) : dir = "Bottom"
 		seq = int(random.uniform(0,30))
 
+		#seq =4
 		#seq = 5
 		#seq = 18
 

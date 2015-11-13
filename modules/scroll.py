@@ -8,7 +8,7 @@ import math
 #scroll speed and steps per cycle
 scrollSpeed = .0051
 steps = 6
-fontSize = 50
+fontSize = 80
 
 r=g=b=0
 
@@ -36,7 +36,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
         # draw the meassage to get its size
         font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',fontSize)
-        tempImage = config.Image.new("RGBA", (1200,64))
+        tempImage = config.Image.new("RGBA", (1200,128))
         draw  = config.ImageDraw.Draw(tempImage)
         pixLen = draw.textsize(arg, font = font)
         
@@ -133,7 +133,7 @@ def render(imageTemp,xOffset,yOffset,w,h):
     global imageTop, imageBottom
 
     # the rendered image is the screen size
-    renderImage = config.Image.new("RGBA", (config.screenWidth * config.panels , 32))
+    renderImage = config.Image.new("RGBA", (config.actualScreenWidth, 32))
 
     imageTop = imageTemp.crop((xOffset, yOffset, xOffset + 128, 32+yOffset))
     imageBottom = imageTemp.crop((xOffset, 32+yOffset, xOffset + 128, 64+yOffset))

@@ -16,41 +16,64 @@ import math
 # ################################################### #
 
 
-matrix = Adafruit_RGBmatrix(32, 8)
-imageTop = Image.new("RGBA", (256, 64))
-imageBottom = Image.new("RGBA", (256, 64))
-
-def render(imageTemp):
-	global imageTop,imageBottom
-	imageTop = imageTemp.crop((0,0,128,32))
-	imageBottom = imageTemp.crop((0,32,128,64))
-	imageTop.paste(imageBottom, (128,0))
-	imageTop.load()
-
-	id1 = imageTop.im.id
-	id2 = imageBottom.im.id
-
-	matrix.SetImage(id1, 0, 0)
-	matrix.SetImage(id2, 128, 0)
+matrix = Adafruit_RGBmatrix(32, 12)
 
 
+def render(imageToRender):
+	global matrix
 
-xOffset = 0
-yOffset = 0
-width = 127
-height = 50
+	tileSize = (32,64)
+	rows = 3
+	cols = 2
+	imageRows = [] * rows
+	
+	segmentImage = Image.new("RGBA", (tileSize[1]*cols*rows, 32))
+	print("Total segment", segmentImage)
 
-imageTemp = Image.new("RGBA", (256, 64))
-drawTemp  = ImageDraw.Draw(imageTemp)
-drawTemp.rectangle((0,0,31,31), fill=(255,0,0), outline=(0,255,0))
-drawTemp.rectangle((31,0,63,63), fill=(255,0,0), outline=(0,255,0))
+	for n in range(0,rows) :
+		segmentWidth = tileSize[1] * cols
+		segmentHeight = 32
+		xPos = n * segmentWidth
+		yPos = n * 32
+		segment =  imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
+		print(n, segment)
+		segmentImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
+
+	iid = segmentImage.im.id
+	matrix.SetImage(iid, 0, 0)
 
 
 
-render(imageTemp)
+# width , height
+imageToRender = Image.new("RGBA", (128, 96))
+draw  = ImageDraw.Draw(imageToRender)
+
+rows = 3
+cols = 4
+n = 0
+
+for r in range(0, rows ) :
+	for c in range(0, cols ) :
+		rSizeX = 31
+		xPos  = c * 32
+		yPos  = r * 32
+		xPos2 = xPos + rSizeX
+		yPos2 = 31 + yPos
+		draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(255,0,n * 15), outline=(0,255,0))
+		n += 1
+		print(n, xPos, yPos)
 
 
-time.sleep(20)
+iid = imageToRender.im.id
+matrix.SetImage(iid, 0, 0)
+print("imageToRender", imageToRender)
+
+#time.sleep(5)
+#exit()
+
+
+render(imageToRender)
+time.sleep(5)
 
 
 

@@ -6,6 +6,12 @@ import sys
 screenWidth =  128
 screenHeight = 64
 
+tileSize = (32,64)
+rows = 3
+cols = 2
+imageRows = [] * rows
+actualScreenWidth = tileSize[1]*cols*rows
+
 I = 0
 lastI = 1
 
@@ -23,7 +29,7 @@ msg = ["Infinite beatitude of existence! I am; and there is nothing else beside 
 "Sweet rebellion stirred up to result in triumph! Ah, the divine creative power of the All in One! Ah, the joy, the joy of Being!", 
 "Me me me I mine mine mine is"] 
 
-#msg = [""]
+msg = [""]
 
 global imageTop,imageBottom,image,config
 
@@ -74,14 +80,47 @@ def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True, overlayBottom=False):
 
     global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage
     yOffset2 = 0
+
+    global tileSize, rows, cols
     # the rendered image is the screen size
     #renderImage = Image.new("RGBA", (screenWidth * panels , 32))
+
+
     if(crop == True) :
+
+        #print("Total segment", segmentImage)
+        #imageToRender = imageTemp
+
+        for n in range(0,rows) :
+            segmentWidth = tileSize[1] * cols
+            segmentHeight = 32
+            xPos = n * segmentWidth - xOffset
+            yPos = n * 32 #- yOffset
+            segment =  imageTemp.crop((0, yPos, segmentWidth, segmentHeight + yPos))
+            #print(n, segment)
+            renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
+        '''
         imageTop = imageTemp.crop((xOffset, yOffset, xOffset + screenWidth, 32+yOffset))
         imageBottom = imageTemp.crop((xOffset, 32+yOffset, xOffset + screenWidth, 64+yOffset))
         renderImage.paste(imageTop, (0,0))
         renderImage.paste(imageBottom, (screenWidth,0))
-    else:
+
+
+        '''
+
+    elif (crop == False) :
+    
+        for n in range(0,rows) :
+            segmentWidth = tileSize[1] * cols
+            segmentHeight = 32
+            xPos = n * segmentWidth - xOffset
+            yPos = n * 32 #- yOffset
+            segment =  imageTemp.crop((0, yPos, segmentWidth, segmentHeight + yPos))
+            #print(n, segment)
+            renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
+
+
+    elif (crop == ""):
         # this is what I'd like to do ....
         # renderImage.paste(imageTemp, (xOffset, yOffset))
 
@@ -138,8 +177,9 @@ def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True, overlayBottom=False):
     #time.sleep(10)
     #exit()
     # ************************************ #
-    print(">>")
-    if(random.random() > .95) : soliloquy()
+
+    #print(">>")
+    #if(random.random() > .95) : soliloquy()
 
        
 

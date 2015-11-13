@@ -15,8 +15,8 @@ import math
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 8)
-image = Image.new("RGBA", (128, 64))
+matrix = Adafruit_RGBmatrix(32, 12)
+image = Image.new("RGBA", (128, 96))
 draw  = ImageDraw.Draw(image)
 iid = image.im.id
 matrix.SetImage(iid, 0, 0)
@@ -33,7 +33,8 @@ config.actions = actions
 
 config.imageTop = Image.new("RGBA", (28, 30))
 config.imageBottom = Image.new("RGBA", (28, 30))
-config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
+#config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
+config.renderImage = Image.new("RGBA", (config.tileSize[1]*config.cols*config.rows, 32))
 
 action = actions
 action.config = config
@@ -78,7 +79,7 @@ def stroopSequence() :
 
 def seq2() :
 
-	machine.machineAnimator(130)
+	#machine.machineAnimator(130)
 
 	while True:
 		d = int(random.uniform(1,3))
@@ -92,9 +93,11 @@ def seq2() :
 		#seq = 5
 		#seq = 18
 
+		seq = 1
+
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
-			if(random.random() > .8) : actions.burst(20)
+			if(random.random() > .9999) : actions.burst(20)
 			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()

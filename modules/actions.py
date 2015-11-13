@@ -82,9 +82,12 @@ def explosion():
                         if(xDisplayPos > config.screenWidth) :
                                 xDisplayPos += config.screenWidth
 
-                        if(yDisplayPos > 32) :
+                        if(yDisplayPos > 32 and yDisplayPos <64) :
                                 yDisplayPos -=32
                                 xDisplayPos += config.screenWidth
+                        if(yDisplayPos > 64) :
+                                yDisplayPos -=64
+                                xDisplayPos += config.screenWidth*2
 
                         config.matrix.SetPixel(int(xDisplayPos),int(yDisplayPos),r,g,b)
                         
@@ -96,6 +99,7 @@ def burst(a=10) :
         count = 0
         stars = False
         p = 50
+        actualScreenWidth = config.tileSize[1]*config.cols*config.rows
         if(random.random() > .5):
                         stars = True
                         p = 20
@@ -105,7 +109,7 @@ def burst(a=10) :
                                         r = int(random.uniform(0,255))
                                         g = int(random.uniform(0,255))
                                         b = int(random.uniform(0,255))
-                                        x = int(random.random()*config.screenWidth*config.panels)
+                                        x = int(random.random()*actualScreenWidth)
                                         y = int(random.random()*31)
 
                                         rn = random.random()

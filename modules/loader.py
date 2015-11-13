@@ -53,14 +53,13 @@ def panImage() :
 	else : 
 		rangeLimit = panRangeLimit
 
-	#gray = 175
 	draw = ImageDraw.Draw(image)
 	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
 	if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
 	xPos = 0
 	yPos = 0
-	for n in range (0, rangeLimit):
+	for n in range (0, rangeLimit + 64):
 		if(useJitter):
 			if(random.random() > .99) : 
 				jitter = False
@@ -68,13 +67,13 @@ def panImage() :
 				yPos = 0
 			if(random.random() > .99) : jitter = True
 			if(jitter) : vY = random.uniform(-.3,.3)
-		xPos -= vX;
-		yPos -= vY
+		xPos += vX;
+		yPos += vY
 		# older methods
 		#config.matrix.Fill(gray,gray,gray)
 		#config.matrix.SetImage(image.im.id, xOffset, yOffset)
-
-		config.render(image, int(xOffset + xPos), int(yOffset + yPos))
+		#print(image, int(xOffset + xPos), int(yOffset + yPos))
+		config.render(image, int(xOffset + xPos - 64), int(yOffset + yPos), 64,64, False)
 		time.sleep(scrollSpeed)
 
 	debugMessage("done pan")

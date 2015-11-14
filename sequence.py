@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares
+from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing
 import Image
 import ImageDraw
 import time
@@ -128,7 +128,7 @@ def seq2() :
 
 def main():
 	global group, groups
-	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
+	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage, flash
 
 	baseconfig = ConfigParser.ConfigParser()
 	baseconfig.read('/home/pi/RPI/config.cfg')
@@ -183,6 +183,9 @@ def main():
 	concentric = squares
 	concentric.config = config
 
+	flash = flashing
+	flash.config = config
+
 	signage = (1,2,3,11,12,13,10,8,9,17,14)
 	#signage = (3,3)
 	animations = (4,6,7,14,20,17,18)
@@ -220,6 +223,7 @@ def main():
 				scroll.scrollMessage(options, True, False, "Left")
 				exit()
 			elif(argument == "present") : 
+				# e.g. spy sequence.py present "AS IF" 1
 				if (options2 != "") : dur = int(options2)
 				actions.drawBlanksFlag = False
 				scroll.present(options,(), dur)
@@ -230,6 +234,10 @@ def main():
 			elif(argument == "squares") : 
 				concentric.colorSwitch = False
 				concentric.animator(60, "cols")
+				exit()
+			elif(argument == "flash") : 
+				flash.colorSwitch = False
+				flash.animator(100)
 				exit()
 			elif(argument == "blue") : 
 				bluescreen.draw()

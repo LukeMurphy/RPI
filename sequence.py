@@ -29,89 +29,101 @@ def seq2() :
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
 	#machine.machineAnimator(130)
 	lastAction  = 0
+	try:
+		while True:
+			d = int(random.uniform(1,3))
+			dir = "Left"
+			if (d == 1) : dir = "Left"
+			if (d == 2) : dir = "Right"
+			if (d == 3) : dir = "Bottom"
 
-	while True:
-		d = int(random.uniform(1,3))
-		dir = "Left"
-		if (d == 1) : dir = "Left"
-		if (d == 2) : dir = "Right"
-		if (d == 3) : dir = "Bottom"
-
-		seq = int(random.uniform(0,30))
-		while (seq not in group and seq != lastAction) : 
 			seq = int(random.uniform(0,30))
+			while (seq not in group and seq != lastAction) : 
+				seq = int(random.uniform(0,30))
 
-		#print (lastAction, seq)
-		lastAction = seq
-		#seq =4
-		#seq = 5
-		#concentric
-		#seq = 14
+			#print (lastAction, seq)
+			lastAction = seq
+			#seq = 8
 
-		if(seq == 0) : actions.burst(40)
-		elif(seq == 1) :
-			if(random.random() > .8) :actions.burst(10)
-			if(random.random() > .8) :scroll.scrollMessage("** PTGS * GIFS * JPEGS * PTGS * PTGS * CODE **", True, False, "Left")
-		elif(seq == 2) :
-			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
-		elif(seq == 3) :
-			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
-			if(random.random() > .8) :
-				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))), True, False, "Left")
+			if(seq == 0) : actions.burst(40)
+			elif(seq == 1) :
+				if(random.random() > .8) :actions.burst(10)
+				if(random.random() > .8) :scroll.scrollMessage("** PTGS * GIFS * JPEGS * PTGS * PTGS * CODE **", True, False, "Left")
+			elif(seq == 2) :
+				if(random.random() > .8) : actions.explosion()
+				if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
+			elif(seq == 3) :
+				if(random.random() > .8) : actions.explosion()
+				if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
+				if(random.random() > .8) :
+					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))), True, False, "Left")
+					actions.explosion()
+			elif(seq == 8) :
+				if(random.random() > .8) : 
+					actions.explosion()
+					dollars = ""
+					numDol= int(random.uniform(7,33))
+					for n in range (0, numDol) :
+						dollars += "$"
+						if (random.random() > .95) : dollars += "*"
+					scroll.scrollMessage(dollars, True, False, dir)
+					#scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
+			elif (seq == 9) :
+				stroopSequence()
+			elif(seq == 11) :
+				if(random.random() > .8) : actions.burst(10)
+				if(random.random() > .8) : scroll.scrollMessage("** ART ART ART **", True, False, dir)
+			elif(seq == 12) :
+				if(random.random() > .8) : actions.burst(10)
+				if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+			elif(seq == 13) :
+				if(random.random() > .8) : actions.explosion()
+				if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")
+			elif (seq == 10) :
+				if(random.random() > .8) : actions.burst(10)
+				if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
+
+
+
+			elif (seq == 14) :
+				if(random.random() > 0) :
+					smilies = ""
+					numSmilies = int(random.uniform(1,5))
+					for n in range (0, numSmilies) :
+						smilies += "  :)  "
+						if (random.random() > .9) : smilies += "  :o  "
+						if (random.random() > .95) : smilies += "  ;)  "
+					scroll.scrollMessage(smilies, True, True, "Left")
+
+			elif(seq == 4) :
+				user.userAnimator(24)
+			elif(seq == 5) :
+				machine.machineAnimator(430)
+			elif(seq == 6) :
+				bluescreen.draw()
+			elif(seq == 7) :
+				actions.glitch()
+			elif (seq == 20) :
+				user.userAnimator(20)
+				#machine.machineAnimator(80)
+				#user.userAnimator(1)
+				#machine.machineAnimator(80)
+				actions.burst(20)
 				actions.explosion()
-		elif(seq == 8) :
-			if(random.random() > .8) : 
-				actions.explosion()
-				scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
-		elif (seq == 9) :
-			stroopSequence()
-		elif(seq == 11) :
-			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) : scroll.scrollMessage("** ART ART ART **", True, False, dir)
-		elif(seq == 12) :
-			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
-		elif(seq == 13) :
-			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")
-		elif (seq == 10) :
-			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
-
-
-
-		elif (seq == 14) :
-			if(random.random() > 0) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Left")
-
-		elif(seq == 4) :
-			user.userAnimator(24)
-		elif(seq == 5) :
-			machine.machineAnimator(430)
-		elif(seq == 6) :
-			bluescreen.draw()
-		elif(seq == 7) :
-			actions.glitch()
-		elif (seq == 20) :
-			user.userAnimator(20)
-			#machine.machineAnimator(80)
-			#user.userAnimator(1)
-			#machine.machineAnimator(80)
-			actions.burst(20)
-			actions.explosion()
-		elif (seq == 16) :
-			imgLoader.action = "pan"
-			imgLoader.countLimit = 1
-			imgLoader.start()
-		elif (seq == 17) :
-			imgLoader.action = "play"
-			imgLoader.countLimit = 100
-			imgLoader.start()
-		elif (seq == 18) :
-			concentric.colorSwitch = False
-			concentric.animator(60)
-
+			elif (seq == 16) :
+				imgLoader.action = "pan"
+				imgLoader.countLimit = 1
+				imgLoader.start()
+			elif (seq == 17) :
+				imgLoader.action = "play"
+				imgLoader.countLimit = 100
+				imgLoader.start()
+			elif (seq == 18) :
+				concentric.colorSwitch = False
+				concentric.animator(60)
+        except KeyboardInterrupt:
+            #print "Stopping"
+            exit()    
 
 
 def main():
@@ -178,13 +190,15 @@ def main():
 	groups = [signage,animations]
 	group = groups[0]
 	group = groups[1]
+	options = options2 = ""
 
 	try:
 		args = sys.argv
-		options = ""
+		#print(args)
 		if(len(args) > 1):
 			argument =  args[1]
 			if(len(args) > 2) : options = args[2]
+			if(len(args) > 3) : options2 = args[3]
 			if(argument == "explosion") : 
 				actions.explosion()
 				exit()
@@ -201,7 +215,14 @@ def main():
 				actions.glitch()
 				exit()
 			elif(argument == "scroll") : 
+				if (options2 != "") : scroll.steps = int(options2)
+				actions.drawBlanksFlag = False
 				scroll.scrollMessage(options, True, False, "Left")
+				exit()
+			elif(argument == "present") : 
+				if (options2 != "") : dur = int(options2)
+				actions.drawBlanksFlag = False
+				scroll.present(options,(), dur)
 				exit()
 			elif(argument == "stroop") : 
 				stroopSequence()

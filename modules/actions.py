@@ -10,6 +10,7 @@ import messenger
 blankPixels = []
 cols = int(random.uniform(2,20))
 rows = int(random.uniform(2,20))
+drawBlanksFlag = True
 
 def explosion():
         global config
@@ -189,13 +190,13 @@ def setBlanks() :
                                         blankPixels.append((x+i,y + ii))
                 
 def drawBlanks() :
-        global config, blankPixels, rows, cols   
+        global config, blankPixels, rows, cols, drawBlanksFlag
         if (len(blankPixels) == 0): setBlanks()
         count = 0
         blankNum=len(blankPixels)
-             
-        for n in range (0, blankNum) :
-                config.matrix.SetPixel(blankPixels[n][0],blankPixels[n][1],0,0,0)
+        if(drawBlanksFlag) :
+                for n in range (0, blankNum) :
+                        config.matrix.SetPixel(blankPixels[n][0],blankPixels[n][1],0,0,0)
         
 def transition() :
         global config, blankPixels, rows, cols  

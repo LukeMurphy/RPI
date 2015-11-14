@@ -7,7 +7,7 @@ import math
 ########################
 #scroll speed and steps per cycle
 scrollSpeed = .0011
-steps = 6
+steps = 1
 fontSize = 14
 vOffset  = -1
 
@@ -30,8 +30,7 @@ def changeColor( rnd = False) :
                 b = int(random.uniform(0,255) * config.brightness)
 
 def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :	
-        global config, scrollSpeed, steps, fontSize, vOffset
-            
+        global config, scrollSpeed, steps, fontSize, vOffset  
         changeColor(clrChange)
 
         # draw the meassage to get its size
@@ -111,7 +110,8 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                 start = -end
                 end = config.screenWidth
 
-            for n in range(start,end):
+
+            for n in range(start,end, steps):
                 try :
                     if(direction == "Left") :
                             config.render(scrollImage, -n, vOffset, pixLen[0], fontHeight, False)
@@ -122,11 +122,46 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                             if(random.random() > 0.9998) :
                                             config.actions.glitch()
                                             break
+                    time.sleep(scrollSpeed)
                 except KeyboardInterrupt:
                             #print "Stopping"
                             break
+                            exit()
 
-                time.sleep(scrollSpeed)
+def present(arg, clr = (250,150,150), duration = 5) :
+        global config, scrollSpeed, steps, fontSize, vOffset
+        global r,g,b
+        try:
+            changeColor(False)
+            clr = tuple(int(a*config.brightness) for a in (clr))
+
+            # draw the meassage to get its size
+            font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',40)
+            font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',40)
+            pixLen = config.draw.textsize(arg, font = font)
+            fontHeight = int(pixLen[1] * 1.3)
+
+            # make a new image with the right size
+            config.renderImage = config.Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
+            scrollImage = config.Image.new("RGBA", pixLen)
+            draw = config.ImageDraw.Draw(scrollImage)
+            offRange = 1
+            #draw.text((int(random.uniform(-offRange,offRange)),int(random.uniform(-offRange,offRange))), arg,config.opp((r,g,b)), font=font2)
+            draw.text((-offRange,offRange), arg,config.opp((r,g,b)), font=font2)
+            draw.text((0,0), arg,(r,g,b), font=font)
+            scrollImage = scrollImage.resize((int(config.actualScreenWidth * .9) , int(config.screenHeight * 1.75)))
+
+            vOffset = -10
+            config.render(scrollImage, 0, vOffset, pixLen[0], fontHeight, False)
+            config.actions.drawBlanks()
+
+            time.sleep(duration)
+
+            present(arg, clr,  duration)
+
+        except KeyboardInterrupt:
+            #print "Stopping"
+            exit()     
 
 def stroop( arg, clr, direction = "Left") :
 

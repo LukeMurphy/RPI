@@ -15,8 +15,8 @@ import math
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 4)
-image = Image.new("RGBA", (64, 64))
+matrix = Adafruit_RGBmatrix(32, 12)
+image = Image.new("RGBA", (128, 96))
 draw  = ImageDraw.Draw(image)
 iid = image.im.id
 #matrix.SetImage(iid, 0, 0)
@@ -31,12 +31,9 @@ config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 config.actions = actions
 
-config.panels = 2
-config.screenWidth = 64
-config.screenHeight = 64
-config.imageTop = Image.new("RGBA", (64, 32))
-config.imageBottom = Image.new("RGBA", (64, 32))
-config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
+config.screenWidth = 128
+config.screenHeight = 96
+config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))
 
 action = actions
 action.config = config

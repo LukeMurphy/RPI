@@ -33,6 +33,9 @@ config.ImageFont = ImageFont
 config.actions = actions
 config.renderImage = Image.new("RGBA", (32*4*3,32))
 config.screenHeight = 96
+config.screenWidth  = 128
+config.actualScreenWidth = 32*4*3
+
 
 action = actions
 action.config = config
@@ -57,10 +60,10 @@ def seq() :
 	imageList = []
 
 	for f in rawList :
-		if os.path.isfile(os.path.join(path, f)) and not f.startswith("._") :
+		if os.path.isfile(os.path.join(path, f)) and not f.startswith("._") and not f.startswith(".") :
 			imageList.append(f)
 
-
+	print(imageList)
 	while True:
 		seq = int(random.uniform(0,30))
 
@@ -72,7 +75,7 @@ def seq() :
 			imgLoader.action = "pan"
 			imgLoader.countLimit = 1
 			img = int(random.random() *  len(imageList))
-			imgLoader.start(path + "/" + imageList[img], 0, 0)
+			imgLoader.start(path + "/" + imageList[img], 0, -1)
 		elif (seq == 17) :
 			imgLoader.action = "play"
 			imgLoader.countLimit = 100

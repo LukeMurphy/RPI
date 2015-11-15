@@ -135,35 +135,30 @@ def present(arg, clr = (250,150,150), duration = 5) :
         global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
         global r,g,b
         
+        vFactor = 1.2
 
         try:
             changeColor(False)
             clr = tuple(int(a*config.brightness) for a in (clr))
-
-            # draw the meassage to get its size
-            font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',fontSize)
-            font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',fontSize)
+            fSize = config.screenHeight
+            # draw the message to get its size - not very accurate for height tho...
+            font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf', fSize)
             pixLen = config.draw.textsize(arg, font = font)
-            fontHeight = int(pixLen[1] * 1.0)
 
             # make a new image with the right size
-            config.renderImage = config.Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
-            scrollImage = config.Image.new("RGBA", (config.screenWidth * 2,config.screenHeight))
+            scrollImage = config.Image.new("RGBA", pixLen)
             draw = config.ImageDraw.Draw(scrollImage)
-            offRange = 1
-            
-            draw.text((-offRange,offRange - 11), arg,config.opp((r,g,b)), font=font2)
-            draw.text((0,0 - 11), arg,(r,g,b), font=font)
+            xoffRange = 1
+            yOffRange = 2
+            draw.text((-xoffRange,yOffRange), arg,config.opp((r,g,b)), font=font)
+            draw.text((0,0 ), arg,(r,g,b), font=font)
 
-            # Scale the image to fit the full set of panels
-            scaledSize = (  int(float(config.screenWidth)/pixLen[0] * config.screenWidth * 2) , 
-                            int(float(config.screenHeight)/pixLen[1]  * config.screenHeight))
-            
+            # Scale the image to fit the full set of panels (using a rough formula for font offset)
+            scaledSize = (config.actualScreenWidth , int( vFactor * float(config.screenHeight * pixLen[1]) / fSize) + 8) 
             scrollImage = scrollImage.resize(scaledSize)
 
-            vOffset = 0 #-scaledSize[1]/8
-            #config.render(scrollImage, 0, vOffset, pixLen[0], fontHeight, False)
-            config.render(scrollImage, 0, vOffset,scaledSize[0],scaledSize[1])
+            vOffset = -scaledSize[1]/8
+            config.render(scrollImage, 0, vOffset, config.screenWidth, config.screenHeight - vOffset)
             config.actions.drawBlanks()
 
             time.sleep(duration)

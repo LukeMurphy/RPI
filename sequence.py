@@ -35,6 +35,8 @@ config.imageTop = Image.new("RGBA", (28, 30))
 config.imageBottom = Image.new("RGBA", (28, 30))
 #config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
 config.renderImage = Image.new("RGBA", (config.tileSize[1]*config.cols*config.rows, 32))
+config.screenHeight =  96
+config.screenWidth =  128
 
 action = actions
 action.config = config
@@ -93,11 +95,11 @@ def seq2() :
 		#seq = 5
 		#seq = 18
 
-		seq = 1
+		seq = 17
 
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
-			if(random.random() > .9999) : actions.burst(20)
+			if(random.random() > .8) : actions.burst(20)
 			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()

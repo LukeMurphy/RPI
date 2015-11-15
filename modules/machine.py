@@ -130,13 +130,18 @@ def changeColor( rnd = False) :
 
 def machineAnimator(arg) :
         global redrawSpeed, x, y, vx, vy
-        config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , config.screenHeight))
+        config.renderImage = Image.new("RGBA", (config.actualScreenWidth, config.screenHeight))
         config.image = config.Image.new("RGBA", (26, 30))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
 
         x = int(random.random() * config.screenWidth)
         y = int(random.random() * config.screenHeight)
+
+        x=50
+        y=50
+        #vx = 0
+        #vy = 0
 
         count = 0
 

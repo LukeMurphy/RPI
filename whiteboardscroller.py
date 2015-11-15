@@ -16,7 +16,7 @@ import os
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 8)
+matrix = Adafruit_RGBmatrix(32, 12)
 image = Image.new("RGBA", (128, 64))
 draw  = ImageDraw.Draw(image)
 iid = image.im.id
@@ -31,10 +31,8 @@ config.Image = Image
 config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 config.actions = actions
-
-config.imageTop = Image.new("RGBA", (28, 30))
-config.imageBottom = Image.new("RGBA", (28, 30))
-config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
+config.renderImage = Image.new("RGBA", (32*4*3,32))
+config.screenHeight = 96
 
 action = actions
 action.config = config
@@ -64,11 +62,6 @@ def seq() :
 
 
 	while True:
-		d = int(random.uniform(1,3))
-		dir = "Left"
-		if (d == 1) : dir = "Left"
-		if (d == 2) : dir = "Right"
-		if (d == 3) : dir = "Bottom"
 		seq = int(random.uniform(0,30))
 
 		#seq = 5
@@ -79,7 +72,7 @@ def seq() :
 			imgLoader.action = "pan"
 			imgLoader.countLimit = 1
 			img = int(random.random() *  len(imageList))
-			imgLoader.start(path + "/" + imageList[img])
+			imgLoader.start(path + "/" + imageList[img], 0, 0)
 		elif (seq == 17) :
 			imgLoader.action = "play"
 			imgLoader.countLimit = 100

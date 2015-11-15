@@ -10,7 +10,7 @@ import random
 #matrix = Adafruit_RGBmatrix(32, 1)
 r=g=b=0
 xOffset = yOffset = 0
-vX = 1
+vX = 0
 vY = -1
 count = 0
 frame = 0
@@ -49,9 +49,12 @@ def panImage() :
 	# defaults for vertical image scrolling
 	if(panRangeLimit == 0) : 
 		rangeLimit = image.size[1] + config.screenHeight
-		yOffset = -config.screenHeight
+		yOffset = config.screenHeight
+
+
 	else : 
-		rangeLimit = panRangeLimit
+		rangeLimit = panRangeLimit + image.size[1]
+		xOffset = -image.size[1]
 
 	draw = ImageDraw.Draw(image)
 	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
@@ -59,9 +62,10 @@ def panImage() :
 
 	xPos = 0
 	yPos = 0
-	for n in range (0, rangeLimit + 64):
+
+	for n in range (0, rangeLimit):
 		if(useJitter):
-			if(random.random() > .99) : 
+			if(random.random() > .7) : 
 				jitter = False
 				vY = 0
 				yPos = 0
@@ -69,19 +73,19 @@ def panImage() :
 			if(jitter) : vY = random.uniform(-.3,.3)
 		xPos += vX;
 		yPos += vY
-		# older methods
-		#config.matrix.Fill(gray,gray,gray)
-		#config.matrix.SetImage(image.im.id, xOffset, yOffset)
-		#print(image, int(xOffset + xPos), int(yOffset + yPos))
-		config.render(image, int(xOffset + xPos - 64), int(yOffset + yPos), 64,64, False)
+
+
+		config.render(image, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
 		time.sleep(scrollSpeed)
+		#time.sleep(5)
+		#exit()
 
 	debugMessage("done pan")
 
 def fillColor() :
 	global bgFillColor
-	if(random.random() > .99) :
-		config.matrix.Fill(0xff0000)
+	if(random.random() > 0) :
+		config.matrix.Fill(0x0000FF)
 	else :
 		config.matrix.Fill(bgFillColor)
 		
@@ -106,7 +110,10 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 
 	fillColor()
 
-	config.render(image, 0, imgHeight - config.screenHeight)
+	config.render(image, 0, config.screenHeight - imgHeight)
+
+	
+	#print(imgHeight, config.screenHeight)
 	
 	try:
 		image.seek(frame)
@@ -153,7 +160,7 @@ def debugMessage(arg) :
 	
 	if(debug) : print(arg)		
 
-def start(img="", setvX = 0, setvY = -1):
+def start(img="", setvX = 0, setvY = 0):
 	global image,frame, action,xOffset,yOffset,vX,vY
 	frame = 0
 

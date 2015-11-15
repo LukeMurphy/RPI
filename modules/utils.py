@@ -76,32 +76,31 @@ def changeColor(rnd = False) :
                                 g = int(random.uniform(0,255))
                                 b = int(random.uniform(0,255))
 
-def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True, overlayBottom=False):
+def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=False):
 
-    global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage
-    yOffset2 = 0
+    global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage, tileSize, rows, cols
 
-    global tileSize, rows, cols
+    segmentImage = []
+
     # the rendered image is the screen size
-    #renderImage = Image.new("RGBA", (screenWidth * panels , 32))
-
+    #renderImage = Image.new("RGBA", (screenWidth , 32))
 
     if(crop == True) :
 
         #print("Total segment", segmentImage)
-        #imageToRender = imageTemp
+        #imageToRender = imageToRender
 
         for n in range(0,rows) :
             segmentWidth = tileSize[1] * cols
             segmentHeight = 32
             xPos = n * segmentWidth - xOffset
             yPos = n * 32 #- yOffset
-            segment =  imageTemp.crop((0, yPos, segmentWidth, segmentHeight + yPos))
+            segment =  imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
             #print(n, segment)
             renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
         '''
-        imageTop = imageTemp.crop((xOffset, yOffset, xOffset + screenWidth, 32+yOffset))
-        imageBottom = imageTemp.crop((xOffset, 32+yOffset, xOffset + screenWidth, 64+yOffset))
+        imageTop = imageToRender.crop((xOffset, yOffset, xOffset + screenWidth, 32+yOffset))
+        imageBottom = imageToRender.crop((xOffset, 32+yOffset, xOffset + screenWidth, 64+yOffset))
         renderImage.paste(imageTop, (0,0))
         renderImage.paste(imageBottom, (screenWidth,0))
 
@@ -109,62 +108,54 @@ def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True, overlayBottom=False):
         '''
 
     elif (crop == False) :
-    
+        segmentWidth = tileSize[1] * cols
+        segmentHeight = 32
+
+        #yOffset = 10
+        #xOffset = 0
+        # Must crop exactly the overlap and position of the to-be-rendered image with each segment
+        #           ________________
+        #           |               |
+        #           |               |
+        #           |    |||||||||  |
+        #           -----|||||||||---
+        #           |    |||||||||  |
+        #           |    |||||||||  |
+
+        
+        cropP1 = [0,0]
+        cropP2 = [0,0]
+
         for n in range(0,rows) :
-            segmentWidth = tileSize[1] * cols
-            segmentHeight = 32
-            xPos = n * segmentWidth - xOffset
-            yPos = n * 32 #- yOffset
-            segment =  imageTemp.crop((0, yPos, segmentWidth, segmentHeight + yPos))
-            #print(n, segment)
-            renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
 
+            # Crop PLACEMENTS
+            a = max(0, xOffset) + segmentWidth*n
+            b = max(0, yOffset - segmentHeight * n)
+            c = min(segmentWidth, xOffset + w) + segmentWidth*n
+            d = min(segmentHeight, yOffset + h - segmentHeight*n)
 
-    elif (crop == ""):
-        # this is what I'd like to do ....
-        # renderImage.paste(imageTemp, (xOffset, yOffset))
+            # Cropping
+            cropP2 = [  cropP1[0] + c - xOffset, 
+                        cropP1[1] + min(32, d - yOffset + n * segmentHeight)]
 
-        # get the overlap of the retangle to be rendered with the size of the "top" panel
-        # draw the top "half" to the first set of panels then draw the bottom half
-        # to the second panels, offset by screenWidth and difference over 32 pix
+            cropP1 = [max(0 , 0 - xOffset),     max(0, n * segmentHeight - yOffset)]
+            cropP2 = [min(w , 128 - xOffset),   min(h, n * segmentHeight + 32 - yOffset)]
 
-        xOL = max(0, min(xOffset + w, screenWidth) - max(xOffset, 0));
-        yOL = max(0, min(yOffset + h, 32) - max(yOffset, 0));
-
-        p1x = 0
-        p1y = 0
-        p2x = xOL
-        p2y = yOL
-
-        if(xOffset < 0) : 
-            p1x = w - xOL
-            p2x = w
-        if(yOffset < 0) : 
-            p1y = h - yOL
-            p2y = h
-
-        p1Crop = (p1x, p1y, p2x, p2y)
-        p2Crop = (p1x, p2y, p2x, p2y + (h - yOL))
-
-        imageTop = imageTemp.crop(p1Crop)
-
-        if(imageTop.size[1] != 0) :
-            renderImage.paste(imageTop, (  xOffset + p1Crop[0], yOffset + p1Crop[1], 
-                                            xOffset + p1Crop[2], yOffset + p1Crop[3]))
-
-        # Only offset the bottom if its top is more than 32
-        if((yOffset+h) > 32) : 
-            yOffset2 = min(yOffset - 32, 0) 
-            if(yOffset > 32) : yOffset2 = yOffset - 32
-
-            imageBottom = imageTemp.crop(p2Crop)
-            renderImage.paste(imageBottom, (    xOffset + p2Crop[0] + screenWidth, yOffset2 + p2Crop[1], 
-                                                xOffset + p2Crop[2] + screenWidth, yOffset2 + p2Crop[3]))
+            pCrop  = cropP1 + cropP2
+            segmentImage.append(imageToRender.crop(pCrop))
+            
+            # Only render if needs be
+            if(pCrop[3] - pCrop[1] > 0 ) : 
+                if ( pCrop[2] - pCrop[0] > 0) :
+                    renderImage.paste( segmentImage[n], (a,b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
+                    #renderImage.load()
+     
+            cropP1[1] = cropP2[1]
 
 
     if(overlayBottom) :
         renderImage = Image.new("RGBA", (w , h))
-        renderImage.paste(imageTemp, (0,0))
+        renderImage.paste(imageToRender, (0,0))
         iid = renderImage.im.id
         idtemp = image.im.id
         matrix.SetImage(iid, xOffset + screenWidth, 0)

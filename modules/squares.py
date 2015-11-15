@@ -80,7 +80,7 @@ def changeColor( rnd = False) :
 # adapted to show Soliloguy of The Point
 def animator(arg) :
         global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
-        config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
+        config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))
         config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id

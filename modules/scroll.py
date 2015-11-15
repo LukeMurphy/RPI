@@ -42,7 +42,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
         
 
         # make a new image with the right size
-        config.renderImage = config.Image.new("RGBA", (config.screenWidth * config.panels , config.screenHeight))
+        config.renderImage = config.Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
         scrollImage = config.Image.new("RGBA", pixLen)
         draw  = config.ImageDraw.Draw(scrollImage)
         iid = scrollImage.im.id
@@ -73,7 +73,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
             
             for n in range(start,end):
                 #fix  config.matrix.SetImage(config.id,xOffset,-n)
-                render(scrollImage, xOffset, n, pixLen[0], pixLen[1])
+                config.render(scrollImage, xOffset, n, pixLen[0], pixLen[1])
                 time.sleep(scrollSpeed)
 
         elif(direction == "Top") :
@@ -89,7 +89,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                 xOffset =int(random.random()*(config.screenWidth - pixLen[1]))
 
                 for n in range(0,pixLen[0] + config.screenHeight):
-                    render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
+                    config.render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
                     time.sleep(.012)
 
 
@@ -111,13 +111,11 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
             for n in range(start,end):
                 try :
                     if(direction == "Left") :
-                            #fix  config.matrix.SetImage(config.id, -n, vOffset)
-                            render(scrollImage, n, vOffset, pixLen[0], pixLen[1])
+                            config.render(scrollImage, -n, vOffset,pixLen[0], pixLen[1], False)
                             config.actions.drawBlanks()
                     else :
-                            #fix  config.matrix.SetImage(config.id, n, vOffset)
-                            render(scrollImage, -n, vOffset, pixLen[0], pixLen[1])
                             config.actions.drawBlanks()
+                            config.render(scrollImage, n, vOffset,pixLen[0], pixLen[1], False)
                             if(random.random() > 0.9998) :
                                             config.actions.glitch()
                                             break
@@ -127,22 +125,6 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
                 time.sleep(scrollSpeed)
 
-
-def render(imageTemp,xOffset,yOffset,w,h):
-
-    global imageTop, imageBottom
-
-    # the rendered image is the screen size
-    renderImage = config.Image.new("RGBA", (config.actualScreenWidth, 32))
-
-    imageTop = imageTemp.crop((xOffset, yOffset, xOffset + 128, 32+yOffset))
-    imageBottom = imageTemp.crop((xOffset, 32+yOffset, xOffset + 128, 64+yOffset))
-
-    renderImage.paste(imageTop, (0,0))
-    renderImage.paste(imageBottom, (128,0))
-
-    iid = renderImage.im.id
-    config.matrix.SetImage(iid, 0, 0)
 
 def stroop( arg, clr, direction = "Left") :
 

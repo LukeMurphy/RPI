@@ -59,7 +59,7 @@ def seq() :
 		if os.path.isfile(os.path.join(path, f)) and f.startswith("plane") :
 			imageList.append(f)
 
-	imageList = ['plane-1.gif']
+	imageList = ['plane-2b.gif']
 
 	while True:
 
@@ -73,8 +73,8 @@ def seq() :
 			imgLoader.debug = True
 			imgLoader.action = "pan"
 			imgLoader.countLimit = 1
-			imgLoader.xOffset = 0
-			imgLoader.yOffset = 6
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 20
 			imgLoader.panRangeLimit = 0 + config.screenWidth
 			imgLoader.scrollSpeed = .01
 			imgLoader.useJitter =  True

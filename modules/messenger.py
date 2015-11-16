@@ -1,5 +1,7 @@
+from __future__ import print_function
 import random
 import sys
+
 
 
 I = 0
@@ -23,7 +25,10 @@ msg = ["Oh Infinite beatitude of existence me ",
 def soliloquy(override = False,arg = "") :
     global I, lastI, msg
 
-    print("called ...")
+    #print("me.")
+    print('me. ',end="")
+    if(random.random() > .8) : print("Oh ", end="")
+    if(random.random() > .9) : sys.stdout.flush()
     msgTxt = ""
     length = len(msg)
     if(length > 1) :

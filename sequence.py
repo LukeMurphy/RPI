@@ -234,7 +234,10 @@ def main():
 	# just emotis
 	emotiSeq = (10,)
 
-	groups = [signage,animations, stroopSeq, emotiSeq]
+	# just concentric squares
+	concentricRecs = (18,)
+
+	groups = [signage,animations, stroopSeq, emotiSeq, concentricRecs]
 	group = groups[0]
 	group = groups[1]
 	options = options2 = options3 = ""

@@ -8,7 +8,7 @@ import math
 #scroll speed and steps per cycle
 scrollSpeed = .0051
 steps = 6
-fontSize = 80
+fontSize = 14
 
 r=g=b=0
 

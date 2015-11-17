@@ -7,8 +7,8 @@ screenWidth =  128
 screenHeight = 64
 
 tileSize = (32,64)
-rows = 3
-cols = 2
+rows = 2
+cols = 1
 imageRows = [] * rows
 actualScreenWidth = tileSize[1]*cols*rows
 
@@ -20,16 +20,22 @@ lastI = 1
 panels = 2
 path = "/home/pi/rpimain"
 
-msg = ["Infinite beatitude of existence! I am; and there is nothing else beside I.",
-"I fill all Space, and what I fill, I am.", 
-"What I think, that I utter; and what I utter, that I hear; and I itself is Thinker, Utterer, Hearer, Thought, Word, Audition; ",
-"it is the One, and yet the All in All.",
-"Ah, the happiness, ah, the happiness of Being! Ah, the joy, ah, the joy of Thought! "
-"What can I not achieve by thinking! My own Thought coming to myself, suggestive of my disparagement, thereby to enhance My happiness! ",
-"Sweet rebellion stirred up to result in triumph! Ah, the divine creative power of the All in One! Ah, the joy, the joy of Being!", 
-"Me me me I mine mine mine is"] 
+msg = ["Oh Infinite beatitude of existence me ",
+"I am; and there is nothing else beside I that is me ",
+"I fill all Space, and what I fill, I am ", 
+"What I think, that I utter; and what I utter, that I hear ",
+"I itself is Thinker, Utterer, Hearer, Thought, Word, Audition ",
+"it is the One, and yet the All in All ",
+"Ah, the happiness, ah, the happiness of Being "
+"Ah, the joy, ah, the joy of Thought ",
+"Ah that is me all me by me "
+"What can I not achieve by thinking! My own Thought coming to myself ",
+"Ah, the joy, the joy of Being ", 
+"Me me me I mine mine mine is "
+"Me wonderful me that I am "
+] 
 
-msg = [""]
+#msg = [""]
 
 global imageTop,imageBottom,image,config
 
@@ -44,6 +50,7 @@ def opp((r,g,b)) :
 
 def soliloquy(override = False,arg = "") :
     global I, lastI, msg
+    msgTxt = ""
     length = len(msg)
     if(length > 1) :
         if(random.random() > .9 or override) :
@@ -52,11 +59,11 @@ def soliloquy(override = False,arg = "") :
                 while (I == lastI):
                         I = int(random.random() * length)
                 msgTxt  =  msg[I]
-		if(arg != "") : msgTxt = arg	
-		sys.stdout.write(msgTxt)
-                sys.stdout.flush()
-                #print(msg[I]),
-                lastI = I
+        if(arg != "") : msgTxt = arg    
+        sys.stdout.write(msgTxt)
+        sys.stdout.flush()
+        #print(msg[I]),
+        lastI = I
 
 def test() : matrix.Fill(244,255,0)                 
 
@@ -173,7 +180,4 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
     #if(random.random() > .95) : soliloquy()
 
        
-
-
-
 

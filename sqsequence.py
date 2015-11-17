@@ -15,8 +15,8 @@ import math
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 12)
-image = Image.new("RGBA", (128, 96))
+matrix = Adafruit_RGBmatrix(32, 4)
+image = Image.new("RGBA", (64, 64))
 draw  = ImageDraw.Draw(image)
 iid = image.im.id
 #matrix.SetImage(iid, 0, 0)
@@ -30,9 +30,13 @@ config.Image = Image
 config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 config.actions = actions
+config.tileSize = (32,64)
+config.rows = 2
+config.cols = 1
 
-config.screenWidth = 128
-config.screenHeight = 96
+config.screenWidth = 64
+config.screenHeight = 64
+config.actualScreenWidth = 128
 config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))
 
 action = actions
@@ -54,9 +58,9 @@ concentric.config = config
 
 '''
 #matrix = Adafruit_RGBmatrix(32, 2)
-renderImage = Image.new("RGBA", (64 , 64))
+renderImage = Image.new("RGBA", (32 , 32))
 draw = ImageDraw.Draw(renderImage)
-draw.rectangle((0, 0, 64, 64 ),  fill=(0,0,255), outline=(255,0,0))
+draw.rectangle((0, 0, 31, 31 ),  fill=(0,0,255), outline=(255,0,0))
 matrix.SetImage(renderImage.im.id, 0, 0)
 #matrix.SetPixel(65,10,220,120,0)
 time.sleep(5)
@@ -92,7 +96,7 @@ def seq2() :
 		seq = int(random.uniform(0,30))
 		seq = choices[int(random.uniform(0,len(choices)))]
 		#seq = 5
-		#seq = 18
+		seq = 18
 		#seq = 21
 
 
@@ -173,5 +177,4 @@ def seq2() :
 #stroop("M86 CROSSTOWN",(255,100,0, 100),"Left")
 #exit()
 seq2()
-
 

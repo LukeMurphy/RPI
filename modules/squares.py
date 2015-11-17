@@ -12,6 +12,7 @@ x = y = 0
 r=g=b=125
 pulseSpeed = .1
 colorSwitch = False
+columnLimit = 16
 
 '''
 make script to reduce from one square to 2 to 4 to 8 to 16...
@@ -20,8 +21,8 @@ make script to reduce from one square to 2 to 4 to 8 to 16...
 rHeight = 0
 rWidth = 0
 numSquares = 1
-rows  = 1
-cols = 1
+rows  = 2
+cols = 2
 
 def drawImg() :
         global config
@@ -82,7 +83,7 @@ def redraw():
         drawRects()
 
         #config.matrix.SetImage(config.id,x,y)
-        config.render(config.image,x,y,config.screenWidth,config.screenHeight)
+        config.render(config.image,x,y,config.screenWidth,config.screenHeight, False)
 
         if(random.random() > .93) : colorSwitch = True
                 
@@ -103,34 +104,35 @@ def changeColor( rnd = False) :
                                 b = int(random.uniform(0,255))
 
 # adapted to show Soliloguy of The Point
-def animator(arg) :
+def animator(arg, mode = "cols") :
         global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
-        global rows, cols
+        global rows, cols, columnLimit
 
-        rowMode = True
+        
         rows = 1
         cols = 1
 
+        # reseting render image size
         config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))
         config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
-        config.matrix.Clear()
+        #config.matrix.Clear()
 
         count = 0
         numSquares = 1
-        rHeight = config.screenHeight
         rWidth = config.screenWidth
-
+        rHeight = config.screenHeight
+        
         arg = 20
         pulseSpeed = .1
 
-        countLimit = arg * 4
+        countLimit = arg * 6
         interval = 4
 
         i = 0
 
-        if (rowMode) :
+        if (mode == "rows") :
                 rowIncrement = True
                 while (count < countLimit) :
                         redraw()
@@ -146,9 +148,26 @@ def animator(arg) :
                                 else :
                                         cols *= 2
                                         rowIncrement = True
-                        #config.soliloquy()
+                        config.soliloquy()
                         time.sleep(pulseSpeed)
-
+        if (mode == "cols") :
+                colIncrement = True
+                while (count < countLimit) :
+                        redraw()
+                        count += 1
+                        interval = arg - rows * 2 - cols
+                        i += 1
+                        if(i > interval and cols <= columnLimit) : 
+                                i = 0
+                                colorSwitch = False
+                                if(colIncrement) :
+                                        cols *= 2
+                                        colIncrement = False
+                                else :
+                                        rows *= 2
+                                        colIncrement = True
+                        config.soliloquy()
+                        time.sleep(pulseSpeed)
         else :
                 while (count < countLimit) :
                         redraw()

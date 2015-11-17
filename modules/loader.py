@@ -28,7 +28,7 @@ global draw
 global config
 global image
 
-debug = False
+debug = True
 
 def setUpNew():
 	global image
@@ -43,14 +43,12 @@ def loadImage(arg):
 	
 def panImage() :
 	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter
-
 	jitter = False
 
 	# defaults for vertical image scrolling
 	if(panRangeLimit == 0) : 
 		rangeLimit = image.size[1] + config.screenHeight
 		yOffset = config.screenHeight
-
 
 	else : 
 		rangeLimit = panRangeLimit + image.size[1]
@@ -69,7 +67,7 @@ def panImage() :
 				jitter = False
 				vY = 0
 				yPos = 0
-			if(random.random() > .99) : jitter = True
+			if(random.random() > .17) : jitter = True
 			if(jitter) : vY = random.uniform(-.3,.3)
 		xPos += vX;
 		yPos += vY
@@ -109,10 +107,7 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight
 
 	fillColor()
-
 	config.render(image, 0, config.screenHeight - imgHeight)
-
-	
 	#print(imgHeight, config.screenHeight)
 	
 	try:

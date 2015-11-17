@@ -2,7 +2,7 @@
 
 #import modules
 
-from modules import utils, actions,machine,scroll,user,bluescreen ,loader, squares
+from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares
 import Image
 import ImageDraw
 import time
@@ -12,11 +12,12 @@ import datetime
 import ImageFont
 import textwrap
 import math
+import sys, getopt
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 12)
-image = Image.new("RGBA", (128, 96))
+matrix = Adafruit_RGBmatrix(32, 8)
+image = Image.new("RGBA", (128, 64))
 draw  = ImageDraw.Draw(image)
 iid = image.im.id
 matrix.SetImage(iid, 0, 0)
@@ -31,18 +32,23 @@ config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 config.actions = actions
 
+config.tileSize = (32,64)
+config.rows = 2
+config.cols = 2
 config.imageTop = Image.new("RGBA", (28, 30))
 config.imageBottom = Image.new("RGBA", (28, 30))
 #config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
 config.renderImage = Image.new("RGBA", (config.tileSize[1]*config.cols*config.rows, 32))
-config.screenHeight =  96
+config.screenHeight =  64
 config.screenWidth =  128
+config.actualScreenWidth  = 256
 
 action = actions
 action.config = config
 
 scroll = scroll
 scroll.config = config
+scroll.fontSize = 70
 
 machine = machine
 machine.config = config
@@ -55,19 +61,22 @@ user.config = config
 user.userCenterx = 48
 
 imgLoader = loader
+imgLoader.debug = True
 imgLoader.config = config
-imgLoader.yOffset = config.screenHeight
+imgLoader.yOffset = 0 #config.screenHeight
 
 concentric = squares
 concentric.config = config
 
 config.path = "/home/pi/RPI1"
 
-#machine.machineAnimator(300)
-#exit()
+signage = (1,2,3,11,12,13,10,8,9,17)
+animations = (4,5,6,7,14,20,17)
 
+groups = [signage,animations]
+group = groups[0]
+group = groups[1]
 
-# ################################################### #
 
 
 def stroopSequence() :
@@ -80,8 +89,9 @@ def stroopSequence() :
 
 
 def seq2() :
-
+	global group, signs
 	#machine.machineAnimator(130)
+
 
 	while True:
 		d = int(random.uniform(1,3))
@@ -89,17 +99,20 @@ def seq2() :
 		if (d == 1) : dir = "Left"
 		if (d == 2) : dir = "Right"
 		if (d == 3) : dir = "Bottom"
+
 		seq = int(random.uniform(0,30))
+		while (seq not in group) : 
+			seq = int(random.uniform(0,30))
 
 		#seq =4
 		#seq = 5
+		#concentric
 		#seq = 18
 
-		seq = 17
-
+		#
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
-			if(random.random() > .8) : actions.burst(20)
+			if(random.random() > .8) :actions.burst(20)
 			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()
@@ -144,18 +157,70 @@ def seq2() :
 			imgLoader.action = "pan"
 			imgLoader.countLimit = 1
 			imgLoader.start()
+
 		elif (seq == 17) :
 			imgLoader.action = "play"
 			imgLoader.countLimit = 100
 			imgLoader.start()
+
 		elif (seq == 18) :
 			concentric.colorSwitch = False
 			concentric.animator(60)
 
+def main():
+	global group, groups
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "output="])
+		if(len(args) > 0):
+			argument =  args[0]
+			if(argument == "explosion") : 
+				actions.explosion()
+				exit()
+			elif(argument == "burst") : 
+				actions.burst()
+				exit()
+			elif(argument == "user") : 
+				user.userAnimator(10)
+				exit()        	
+			elif(argument == "cards") : 
+				machine.machineAnimator(80)
+				exit()
+			elif(argument == "glitch") : 
+				actions.glitch()
+				exit()
+			elif(argument == "scroll") : 
+				scroll.scrollMessage(args[1], True, False, "Left")
+				exit()
+			elif(argument == "stroop") : 
+				stroopSequence()
+				exit()
+			elif(argument == "squares") : 
+				concentric.colorSwitch = False
+				concentric.animator(60, "cols")
+				exit()
+			elif(argument == "blue") : 
+				bluescreen.draw()
+				exit()
+			elif(argument == "pan") : 
+				imgLoader.action = "pan"
+				imgLoader.countLimit = 1
+				imgLoader.start("",0,-1)
+				exit()	
+			elif(argument  == "play") :
+				imgLoader.action = "play"
+				imgLoader.countLimit = 100
+				imgLoader.start()
+			elif(argument  == "seq") :
+				group = groups[int(args[1])]
+				seq2()
 
-#actions.explosion()
-#stroop("M86 CROSSTOWN",(255,100,0, 100),"Left")
-#exit()
-seq2()
+		else : seq2()
+	except getopt.GetoptError as err:
+		# print help information and exit:
+		print str(err) # will print something like "option -a not recognized"
+
+if __name__ == "__main__":
+    main()
+
 
 

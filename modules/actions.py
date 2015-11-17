@@ -5,11 +5,13 @@ import time
 import random
 #from rgbmatrix import Adafruit_RGBmatrix
 import math
+import messenger
 
 def explosion():
         global config
 
-        config.soliloquy(True)
+        if(config.useMassager == True) : 
+                messenger.soliloquy(True)
 
         #image = Image.new("RGBA", (32, 32))
         #draw  = ImageDraw.Draw(image)
@@ -172,8 +174,8 @@ def setBlanks() :
         count = 0
         # scatter horizontally
         for n in range (0, 10) :
-                x = int(random.random()*config.screenWidth*config.panels)
-                y = int(random.random()*config.screenHeight/config.panels)
+                x = int(random.random()*config.actualScreenWidth)
+                y = int(random.random()*32)
                 blankPixels.append((x,y))
                 if(random.random() > .9):
                         cols = int(random.uniform(2,20))

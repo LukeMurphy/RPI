@@ -6,9 +6,10 @@ import math
 
 ########################
 #scroll speed and steps per cycle
-scrollSpeed = .0051
+scrollSpeed = .0011
 steps = 6
 fontSize = 14
+vOffset  = -1
 
 r=g=b=0
 
@@ -28,9 +29,8 @@ def changeColor( rnd = False) :
                 g = int(random.uniform(0,255))
                 b = int(random.uniform(0,255))
 
-
 def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :	
-        global config, scrollSpeed, steps, fontSize
+        global config, scrollSpeed, steps, fontSize, vOffset
             
         changeColor(clrChange)
 
@@ -106,7 +106,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                 start = -end
                 end = 128
 
-            vOffset  = -1
+            
 
             for n in range(start,end):
                 try :
@@ -124,7 +124,6 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                             break
 
                 time.sleep(scrollSpeed)
-
 
 def stroop( arg, clr, direction = "Left") :
 
@@ -181,6 +180,4 @@ def stroop( arg, clr, direction = "Left") :
                     else :
                             config.matrix.SetImage(config.id, n, -2)
                     time.sleep(0.01)
-
-# ################################################### #
 

@@ -42,6 +42,7 @@ config.renderImage = Image.new("RGBA", (config.tileSize[1]*config.cols*config.ro
 config.screenHeight =  64
 config.screenWidth =  128
 config.actualScreenWidth  = 256
+config.useMassager = True
 
 action = actions
 action.config = config
@@ -49,6 +50,7 @@ action.config = config
 scroll = scroll
 scroll.config = config
 scroll.fontSize = 70
+scroll.vOffset = -5
 
 machine = machine
 machine.config = config
@@ -70,7 +72,8 @@ concentric.config = config
 
 config.path = "/home/pi/RPI1"
 
-signage = (1,2,3,11,12,13,10,8,9,17)
+signage = (1,2,3,11,12,13,10,8,9,17,14)
+#signage = (3,3)
 animations = (4,5,6,7,14,20,17)
 
 groups = [signage,animations]
@@ -109,29 +112,40 @@ def seq2() :
 		#concentric
 		#seq = 18
 
-		#
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
-			if(random.random() > .8) :actions.burst(20)
+			if(random.random() > .8) :actions.burst(10)
 			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()
 			if(random.random() > .8) :scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
 		elif(seq == 3) :
 			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) :scroll.scrollMessage("** All USERS!! **", True, False, dir)
+			if(random.random() > .8) :scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
+			if(random.random() > .8) :
+				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))), True, False, "Left")
+				actions.explosion()
 		elif(seq == 11) :
-			if(random.random() > .8) : actions.burst(20)
+			if(random.random() > .8) : actions.burst(10)
 			if(random.random() > .8) :scroll.scrollMessage("** ART ART ART **", True, False, dir)
 		elif(seq == 12) :
-			if(random.random() > .8) : actions.burst(20)
-			if(random.random() > .9) :scroll.scrollMessage("** VAST POTENTIAL **", True, False, dir)
+			if(random.random() > .8) : actions.burst(10)
+			if(random.random() > .9) :scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
 		elif(seq == 13) :
 			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) :scroll.scrollMessage("% % % % % % % % HUGE PROBABILITIES % % % % % % % %", True, False, dir)
+			if(random.random() > .8) :scroll.scrollMessage("% % % % % % HUGE PROBABILITIES % % % % % %", True, False, "Left")
 		elif (seq == 10) :
-			if(random.random() > .8) : actions.burst(20)
-			if(random.random() > .8) :scroll.scrollMessage("> THOUSANDS of COLORS <", True, True, dir)
+			if(random.random() > .8) : actions.burst(10)
+			if(random.random() > .8) :scroll.scrollMessage("> THOUSANDS of COLORS <", True, True, "Left")
+		elif(seq == 8) :
+			if(random.random() > .8) : actions.explosion()
+			scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
+		elif (seq == 14) :
+			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
+		elif (seq == 9) :
+			stroopSequence()
+
+
 		elif(seq == 4) :
 			user.userAnimator(24)
 		elif(seq == 5) :
@@ -140,12 +154,6 @@ def seq2() :
 			bluescreen.draw()
 		elif(seq == 7) :
 			actions.glitch()
-		elif(seq == 8) :
-			scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
-		elif (seq == 9) :
-			stroopSequence()
-		elif (seq == 14) :
-			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
 		elif (seq == 20) :
 			user.userAnimator(12)
 			machine.machineAnimator(80)
@@ -157,22 +165,24 @@ def seq2() :
 			imgLoader.action = "pan"
 			imgLoader.countLimit = 1
 			imgLoader.start()
-
 		elif (seq == 17) :
 			imgLoader.action = "play"
 			imgLoader.countLimit = 100
 			imgLoader.start()
-
 		elif (seq == 18) :
 			concentric.colorSwitch = False
 			concentric.animator(60)
 
+
+
 def main():
 	global group, groups
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "ho:v", ["help", "output="])
-		if(len(args) > 0):
-			argument =  args[0]
+		args = sys.argv
+		options = ""
+		if(len(args) > 1):
+			argument =  args[1]
+			if(len(args) > 2) : options = args[2]
 			if(argument == "explosion") : 
 				actions.explosion()
 				exit()
@@ -189,7 +199,7 @@ def main():
 				actions.glitch()
 				exit()
 			elif(argument == "scroll") : 
-				scroll.scrollMessage(args[1], True, False, "Left")
+				scroll.scrollMessage(options, True, False, "Left")
 				exit()
 			elif(argument == "stroop") : 
 				stroopSequence()
@@ -211,7 +221,7 @@ def main():
 				imgLoader.countLimit = 100
 				imgLoader.start()
 			elif(argument  == "seq") :
-				group = groups[int(args[1])]
+				group = groups[int(options)]
 				seq2()
 
 		else : seq2()

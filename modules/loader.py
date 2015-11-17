@@ -80,9 +80,9 @@ def panImage() :
 
 	debugMessage("done pan")
 
-def fillColor() :
+def fillColor(force=False) :
 	global bgFillColor
-	if(random.random() > 0) :
+	if(random.random() > .8 or force) :
 		config.matrix.Fill(0x0000FF)
 	else :
 		config.matrix.Fill(bgFillColor)
@@ -93,21 +93,18 @@ def rotateImage(angle) :
 	image = image.rotate(angle, Image.BICUBIC, 1);		
 	config.matrix.Clear()
 	config.matrix.SetImage(config.image.im.id, -8, -8)
-   
-def testImage():
-	global image, matrix
-	count = 0
-	while (count < 700) :
-		#rotateImage(random.uniform(-180, 180))
-		rotateImage(count)
-		count+=2
-		time.sleep(.02)
 
 def animate(randomizeTiming = False, frameLimit = 3) :
 	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight
 
-	fillColor()
-	config.render(image, 0, config.screenHeight - imgHeight)
+	#fillColor(True)
+	#config.screenHeight - imgHeight'
+
+	#************************************#
+	### DRAW THE IMAGE ACROSS ALL PANELS
+	config.render(image, 0, 0)
+	config.actions.drawBlanks()
+	
 	#print(imgHeight, config.screenHeight)
 	
 	try:
@@ -138,6 +135,7 @@ def playImage(randomizeTiming = False, frameLimit = 3):
 def init():
 	global action
 	count = 0
+	fillColor(True)
 	while (count < countLimit):
 		try:
 			if(action == "play"):

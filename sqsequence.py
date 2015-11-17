@@ -33,6 +33,7 @@ config.actions = actions
 config.tileSize = (32,64)
 config.rows = 2
 config.cols = 1
+config.useMassager = True
 
 config.screenWidth = 64
 config.screenHeight = 64

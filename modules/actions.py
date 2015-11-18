@@ -40,9 +40,9 @@ def explosion():
                 f = random.random() * 4
                 vx = math.cos(angle * n) * f
                 vy = math.sin(angle * n) * f
-                r = int(random.uniform(0,255))
-                g = int(random.uniform(0,255))
-                b = int(random.uniform(0,255))
+                r = int(random.uniform(0,255)* config.brightness)
+                g = int(random.uniform(0,255)* config.brightness)
+                b = int(random.uniform(0,255)* config.brightness)
                 particles.append({'id':n,'xpos':x,'ypos':y,'vx':vx,'vy':vy, 'c':[r,g,b]})
 
         for i in range (0,50) :
@@ -76,10 +76,11 @@ def explosion():
                         g = particles[q]['c'][1]
                         b = particles[q]['c'][2]
 
+                        # Sparkles!!
                         if(random.random() > .9) :
-                                r = 220
-                                g = 220
-                                b = 255
+                                r = int(220 * config.brightness)
+                                g = int(220 * config.brightness)
+                                b = int(255 * config.brightness)
 
                         #if (q ==0) : print (particles[q]['c'][0])
                         xDisplayPos = ref['xpos']
@@ -105,50 +106,51 @@ def burst(a=10) :
         count = 0
         stars = False
         p = 50
-        actualScreenWidth = config.tileSize[1]*config.cols*config.rows
+        actualScreenWidth = config.actualScreenWidth
         if(random.random() > .5):
                         stars = True
                         p = 20
         while (count < a) :
-                        config.matrix.Clear()
-                        for n in range(0,p) :
-                                        r = int(random.uniform(0,255))
-                                        g = int(random.uniform(0,255))
-                                        b = int(random.uniform(0,255))
-                                        x = int(random.random()*actualScreenWidth)
-                                        y = int(random.random()*31)
+                        config.matrix.Clear
+                        for n in range(0, p) :
+                                r = int(random.uniform(0,255) * config.brightness)
+                                g = int(random.uniform(0,255) * config.brightness)
+                                b = int(random.uniform(0,255) * config.brightness)
+                                x = int(random.random()*actualScreenWidth)
+                                y = int(random.random()*31)
 
-                                        rn = random.random()
+                                rn = random.random()
 
-                                        if(rn > .3 and rn  < .6) :
-                                                        r = 0
-                                                        g = 0
-                                                        b = 200
-                                        elif (rn > .6 and rn < .9) :
-                                                        r = 255
-                                                        g = 0
-                                                        b = 0
-                                        else :
-                                                        True
+                                if(rn > .3 and rn  < .6) :
+                                        r = 0
+                                        g = 0
+                                        b = int(200 * config.brightness)
+                                elif (rn > .6 and rn < .9) :
+                                        r = int(255 * config.brightness)
+                                        g = 0
+                                        b = 0
+                                else :
+                                                True
 
-                                        config.matrix.SetPixel(x,y,r,g,b)
-                                        if(stars) :
-                                                        config.matrix.SetPixel(x+1,y,r,g,b)
-                                                        config.matrix.SetPixel(x-1,y,r,g,b)
-                                                        config.matrix.SetPixel(x,y+1,r,g,b)
-                                                        config.matrix.SetPixel(x,y-1,r,g,b)
+                                config.matrix.SetPixel(x,y,r,g,b)
+                                if(stars) :
+                                        config.matrix.SetPixel(x+1,y,r,g,b)
+                                        config.matrix.SetPixel(x-1,y,r,g,b)
+                                        config.matrix.SetPixel(x,y+1,r,g,b)
+                                        config.matrix.SetPixel(x,y-1,r,g,b)
                         time.sleep(.08)
                         count += 1
         if(random.random() > .5) : burst()
 
 def glitch(a=10) :
+        global config
         count = 0
         while (count < a) :
                 yStart = int(random.uniform(0,16))
                 for n in range(0,30) :
-                        r = int(random.uniform(0,255))
-                        g = int(random.uniform(0,255))
-                        b = int(random.uniform(0,255))
+                        r = int(random.uniform(0,255) * config.brightness)
+                        g = int(random.uniform(0,255) * config.brightness)
+                        b = int(random.uniform(0,255) * config.brightness)
                         x = int(random.random()*config.screenWidth)
 
                         yEnd = yStart + int(random.uniform(0,16))

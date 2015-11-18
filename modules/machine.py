@@ -39,15 +39,15 @@ def drawMachine() :
         w = 1
 
         if (r == 0 ):
-                rf = 255
+                rf = int(255 * config.brightness)
                 gf = 0
                 r = 0
-                g = 255
+                g = int(255 * config.brightness)
                 b = 0
         else :
                 rf = 0
-                gf = 255
-                r = 255
+                gf = int(255 * config.brightness)
+                r = int(255 * config.brightness)
                 g = 0
                 b = 0
                 w = 2

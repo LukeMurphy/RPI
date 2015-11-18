@@ -15,7 +15,7 @@ userCenterx = 16
 def drawUser() :
 
         global centery, centery, offsetx, offsety, userCenterx
-
+        global config
 
         dx = -5
         dy = 0
@@ -40,9 +40,9 @@ def drawUser() :
         my1 = centery + hw * 2/3 + offsety
         my2 = my1
 
-        r=g=b=124
-        b = 255
-        global config
+        r=g=b=int(124 * config.brightness)
+        b = int(255 * config.brightness)
+        
         matrix = config.matrix
         draw = config.draw
         id = config.id
@@ -55,14 +55,14 @@ def drawUser() :
         #### MOUTH
        
         if (random.random() > .8) :
-                r = int(random.uniform(0,255))
-                g = int(random.uniform(0,255))
-                b = int(random.uniform(0,255))
+                r = int(random.uniform(0,255) * config.brightness)
+                g = int(random.uniform(0,255) * config.brightness)
+                b = int(random.uniform(0,255) * config.brightness)
                 #### BODY
                 draw.ellipse((bx1,by1,bx2,by2),fill=(r,g,b,1), outline=1)
                 #### HEAD
                 draw.ellipse((hx1,hy1,hx2,hy2),fill=(r,g,b,1), outline=1)
-                draw.ellipse((mx1,my1- mh/2,mx2,my2 + mh/2),fill=(180,80,80,2), outline=1)
+                draw.ellipse((mx1,my1- mh/2,mx2,my2 + mh/2), fill=(int(180 * config.brightness),int(80 * config.brightness),int(80 * config.brightness),2), outline=1)
 
                 #matrix.SetImage(config.id, config.screenWidth/2 - centerx,centery)
                 #config.render(config.image,  0, 0, config.screenWidth, config.screenHeight)

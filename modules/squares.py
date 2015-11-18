@@ -90,18 +90,18 @@ def redraw():
 def changeColor( rnd = False) :
                 global r,g,b        
                 if (rnd == False) :
-                                if(r == 255) :
-                                                r = 0
-                                                g = 255
-                                                b = 0
-                                else :
-                                                g = 0
-                                                r = 255
-                                                b = 0
+                        if(r == int(255 * config.brightness)) :
+                                r = 0
+                                g = int(255 * config.brightness)
+                                b = 0
+                        else :
+                                g = 0
+                                r = int(255 * config.brightness)
+                                b = 0
                 else :
-                                r = int(random.uniform(0,255))
-                                g = int(random.uniform(0,255))
-                                b = int(random.uniform(0,255))
+                        r = int(random.uniform(0,255) * config.brightness)
+                        g = int(random.uniform(0,255) * config.brightness)
+                        b = int(random.uniform(0,255) * config.brightness)
 
 # adapted to show Soliloguy of The Point
 def animator(arg, mode = "cols") :

@@ -14,20 +14,20 @@ vOffset  = -1
 r=g=b=0
 
 def changeColor( rnd = False) :
-        global r,g,b
+        global r,g,b,config
         if (rnd == False) :
-                if(r == 255) :
+                if(r == int(255* config.brightness)) :
                         r = 0
-                        g = 255
+                        g = int(255* config.brightness)
                         b = 0
                 else :
                         g = 0
-                        r = 255
+                        r = int(255* config.brightness)
                         b = 0
         else :
-                r = int(random.uniform(0,255))
-                g = int(random.uniform(0,255))
-                b = int(random.uniform(0,255))
+                r = int(random.uniform(0,255) * config.brightness)
+                g = int(random.uniform(0,255) * config.brightness)
+                b = int(random.uniform(0,255) * config.brightness)
 
 def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :	
         global config, scrollSpeed, steps, fontSize, vOffset
@@ -127,7 +127,9 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
 def stroop( arg, clr, direction = "Left") :
 
-        global r,g,b
+        global r,g,b,config
+        clr = tuple(int(a*config.brightness) for a in (clr))
+
         #matrix.Clear()
         speed = .018
         font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)

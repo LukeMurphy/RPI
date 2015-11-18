@@ -17,16 +17,10 @@ import sys, getopt
 # ################################################### #
 
 
-
-
-
-
-
 config = utils
 config.matrix = Adafruit_RGBmatrix(32, 12)
 config.image = Image.new("RGBA", (192, 64))
 config.draw = ImageDraw.Draw(config.image)
-
 
 config.Image = Image
 config.ImageDraw = ImageDraw
@@ -41,7 +35,8 @@ config.screenWidth =  192
 config.actualScreenWidth  = 192 * 2
 config.useMassager = False
 config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
-
+config.brightness =  .25
+config.path = "/home/pi/RPI1"
 
 action = actions
 action.config = config
@@ -60,7 +55,7 @@ bluescreen.config = config
 
 user = user
 user.config = config
-user.userCenterx = 48
+user.userCenterx = 64
 
 imgLoader = loader
 imgLoader.debug = True
@@ -69,8 +64,6 @@ imgLoader.yOffset = 0 #config.screenHeight
 
 concentric = squares
 concentric.config = config
-
-config.path = "/home/pi/RPI1"
 
 signage = (1,2,3,11,12,13,10,8,9,17,14)
 #signage = (3,3)
@@ -138,7 +131,7 @@ def seq2() :
 			if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")
 		elif (seq == 10) :
 			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) : scroll.scrollMessage("> THOUSANDS of COLORS <", True, True, "Left")
+			if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
 		elif(seq == 8) :
 			if(random.random() > .8) : 
 				actions.explosion()

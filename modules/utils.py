@@ -14,34 +14,36 @@ imageRows = [] * rows
 actualScreenWidth = tileSize[1]*cols*rows
 path = "/home/pi/rpimain"
 useMassager = False
+brightness = 1
 
 
 global imageTop,imageBottom,image,config
 
 def opp((r,g,b)) :
+    global brightness
     minRGB = min(r,min(g,b))
     maxRGB = max(r,max(g,b))
     minmax = minRGB + maxRGB
-    r = int((minmax - r) )
-    g = int((minmax - g) )
-    b = int((minmax -b)  )
+    r = int((minmax - r) * brightness)
+    g = int((minmax - g) * brightness)
+    b = int((minmax - b) * brightness)
     return (r,g,b)              
 
 def changeColor(rnd = False) :
-                
-                if (rnd == False) :
-                                if(r == 255) :
-                                                r = 0
-                                                g = 255
-                                                b = 0
-                                else :
-                                                g = 0
-                                                r = 255
-                                                b = 0
-                else :
-                                r = int(random.uniform(0,255))
-                                g = int(random.uniform(0,255))
-                                b = int(random.uniform(0,255))
+    global brightness           
+    if (rnd == False) :
+                    if(r == 255) :
+                                    r = 0
+                                    g = 255
+                                    b = 0
+                    else :
+                                    g = 0
+                                    r = 255
+                                    b = 0
+    else :
+                    r = int(random.uniform(0,255) * brightness)
+                    g = int(random.uniform(0,255) * brightness)
+                    b = int(random.uniform(0,255) * brightness)
 
 def soliloquy(override = False,arg = "") :
     global useMassager

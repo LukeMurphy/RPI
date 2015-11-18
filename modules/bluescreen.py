@@ -12,7 +12,7 @@ def draw():
         global config
         config.image = config.Image.new("RGBA", (config.actualScreenWidth, 32))
         config.draw  = config.ImageDraw.Draw(config.image)
-        config.draw.rectangle((0,0,config.actualScreenWidth, 32),fill=(0,0,255))
+        config.draw.rectangle((0,0,config.actualScreenWidth, 32),fill=(0,0,int(255* config.brightness)))
         config.id = config.image.im.id
         config.matrix.SetImage(config.id, 1,1)
         #time.sleep(int(random.uniform(.1,4)))
@@ -33,7 +33,7 @@ def draw():
                         config.actions.drawBlanks()
                 if(random.random() > .8) : config.actions.drawBlanks()
                 y = 10 + int(random.random()*31)
-                config.matrix.SetPixel(x,y,220,120,0)
+                config.matrix.SetPixel(x,y,int(220 * config.brightness),int(120 * config.brightness),0)
                 time.sleep(0.25)
        
                 

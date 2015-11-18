@@ -16,25 +16,27 @@ import os
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 12)
-image = Image.new("RGBA", (128, 64))
-draw  = ImageDraw.Draw(image)
-iid = image.im.id
-matrix.SetImage(iid, 0, 0)
 
 config = utils
-config.matrix = matrix
-config.id = id
-config.draw = draw
-config.image = image
+config.matrix = Adafruit_RGBmatrix(32, 12)
+config.image = Image.new("RGBA", (192, 64))
+config.draw = ImageDraw.Draw(config.image)
+
 config.Image = Image
 config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
-config.actions = actions
-config.renderImage = Image.new("RGBA", (32*4*3,32))
-config.screenHeight = 96
-config.screenWidth  = 128
-config.actualScreenWidth = 32*4*3
+iid = config.image.im.id
+config.matrix.SetImage(iid, 0, 0)
+config.tileSize = (32,64)
+config.rows = 2
+config.cols = 3
+config.screenHeight =  64
+config.screenWidth =  192
+config.actualScreenWidth  = 192 * 2
+config.useMassager = False
+config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
+config.brightness =  .25
+config.path = "/home/pi/RPI1"
 
 
 action = actions
@@ -53,9 +55,9 @@ imgLoader.config = config
 
 
 def seq() :
-	
+	global config
 	# Get all files in the drawing folder
-	path = "./imgs/drawings"
+	path = config.path + "/imgs/drawings"
 	rawList = os.listdir(path)
 	imageList = []
 

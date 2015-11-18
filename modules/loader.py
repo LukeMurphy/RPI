@@ -162,9 +162,9 @@ def start(img="", setvX = 0, setvY = 0):
 	
 	if (action == "play") : 
 		xOffset = yOffset = 0
-		if(img=="") : img  = "./imgs/flames-1c.gif"
+		if(img=="") : img  = config.path + "/imgs/flames-1c.gif"
 	else :
-		if(img=="") : img = "./imgs/drawings/206_thumbnail25.gif"
+		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"
 
 	debugMessage("Trying to load " + img)	
 

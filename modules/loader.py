@@ -22,27 +22,31 @@ bgFillColor = 0x000000
 imgHeight = 0
 panRangeLimit = 0
 useJitter = False
+useBlink = False
 
 global debug
 global draw
 global config
-global image
+global image, imageCopy
 
 debug = True
 
 def setUpNew():
-	global image
+	global image, imageCopy
 	image = Image.new("RGBA", (128, 400))
+	imageCopy = Image.new("RGBA", (128, 400))
 
 def loadImage(arg):
-	global image, imgHeight
+	global image, imgHeight, imageCopy
 	image = Image.open(arg , "r")
 	image.load()
 	imgHeight =  image.getbbox()[3]
+	imageCopy = Image.new("RGBA", (image.size[0], image.size[1]))
+	imageCopy.paste(image)
 	return True
 	
 def panImage() :
-	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter
+	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy
 	jitter = False
 
 	# defaults for vertical image scrolling
@@ -55,11 +59,13 @@ def panImage() :
 		xOffset = -image.size[1]
 
 	draw = ImageDraw.Draw(image)
+
 	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
-	if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
+	#if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
 	xPos = 0
 	yPos = 0
+	
 
 	for n in range (0, rangeLimit):
 		if(useJitter):
@@ -72,8 +78,20 @@ def panImage() :
 		xPos += vX;
 		yPos += vY
 
-
-		config.render(image, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
+		if(useBlink == True and random.random() > .998) :
+			blink = False
+			for blk in range (0, 9) :
+				draw.rectangle((0,0, image.size[0] ,image.size[1]), fill = (0))
+				if(blink) :
+					config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
+					blink = False
+				else :
+					config.render(image, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
+					blink = True
+				time.sleep(.15)	
+			xPos += image.size[1]
+		else :
+			config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)	
 		time.sleep(scrollSpeed)
 		#time.sleep(5)
 		#exit()
@@ -83,7 +101,7 @@ def panImage() :
 def fillColor(force=False) :
 	global bgFillColor
 	if(random.random() > .8 or force) :
-		config.matrix.Fill(0x0000FF)
+		config.matrix.Fill(bgFillColor)
 	else :
 		config.matrix.Fill(bgFillColor)
 		

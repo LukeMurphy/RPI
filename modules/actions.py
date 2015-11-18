@@ -7,6 +7,10 @@ import random
 import math
 import messenger
 
+blankPixels = []
+cols = int(random.uniform(2,20))
+rows = int(random.uniform(2,20))
+
 def explosion():
         global config
 
@@ -137,7 +141,6 @@ def burst(a=10) :
                         count += 1
         if(random.random() > .5) : burst()
 
-
 def glitch(a=10) :
         count = 0
         while (count < a) :
@@ -161,12 +164,6 @@ def glitch(a=10) :
         time.sleep(int(random.uniform(.1,4)))
         #exit()
 
-
-# ################################################## #
-
-blankPixels = []
-cols = int(random.uniform(2,20))
-rows = int(random.uniform(2,20))
 def setBlanks() :
         #print("Setting Blanks")
         global config,blankPixels,cols,rows
@@ -186,7 +183,6 @@ def setBlanks() :
                                 for i in range (0,cols) :
                                         blankPixels.append((x+i,y + ii))
                 
-
 def drawBlanks() :
         global config, blankPixels, rows, cols   
         if (len(blankPixels) == 0): setBlanks()
@@ -196,5 +192,9 @@ def drawBlanks() :
         for n in range (0, blankNum) :
                 config.matrix.SetPixel(blankPixels[n][0],blankPixels[n][1],0,0,0)
         
+def transition() :
+        global config, blankPixels, rows, cols  
+        #TODO
+        # Create diamond transisitons
 
-
+        

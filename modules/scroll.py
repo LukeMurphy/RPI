@@ -79,7 +79,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
         elif(direction == "Top") :
                 imageHeight = pixLen[0]
 
-                print (pixLen, imageHeight)
+                #print (pixLen, imageHeight)
 
                 scrollImage = config.Image.new("RGBA", (imageHeight, pixLen[1]))
                 draw  = config.ImageDraw.Draw(scrollImage)
@@ -101,10 +101,10 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
             start = 0
             end = scrollImage.size[0]
-            start = -128
+            start = -config.screenWidth
             if(direction == "Right") : 
                 start = -end
-                end = 128
+                end = config.screenWidth
 
             
 

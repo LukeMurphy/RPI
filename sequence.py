@@ -16,36 +16,36 @@ import sys, getopt
 
 # ################################################### #
 
-matrix = Adafruit_RGBmatrix(32, 8)
-image = Image.new("RGBA", (128, 64))
-draw  = ImageDraw.Draw(image)
-iid = image.im.id
-matrix.SetImage(iid, 0, 0)
+
+
+
+
+
 
 config = utils
-config.matrix = matrix
-config.id = id
-config.draw = draw
-config.image = image
+config.matrix = Adafruit_RGBmatrix(32, 12)
+config.image = Image.new("RGBA", (192, 64))
+config.draw = ImageDraw.Draw(config.image)
+
+
 config.Image = Image
 config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
-config.actions = actions
-
+iid = config.image.im.id
+config.matrix.SetImage(iid, 0, 0)
 config.tileSize = (32,64)
 config.rows = 2
-config.cols = 2
-config.imageTop = Image.new("RGBA", (28, 30))
-config.imageBottom = Image.new("RGBA", (28, 30))
-#config.renderImage = Image.new("RGBA", (config.screenWidth * config.panels , 32))
-config.renderImage = Image.new("RGBA", (config.tileSize[1]*config.cols*config.rows, 32))
+config.cols = 3
 config.screenHeight =  64
-config.screenWidth =  128
-config.actualScreenWidth  = 256
-config.useMassager = True
+config.screenWidth =  192
+config.actualScreenWidth  = 192 * 2
+config.useMassager = False
+config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
+
 
 action = actions
 action.config = config
+config.actions = actions
 
 scroll = scroll
 scroll.config = config
@@ -94,7 +94,7 @@ def stroopSequence() :
 def seq2() :
 	global group, signs
 	#machine.machineAnimator(130)
-
+	lastAction  = 0
 
 	while True:
 		d = int(random.uniform(1,3))
@@ -104,9 +104,11 @@ def seq2() :
 		if (d == 3) : dir = "Bottom"
 
 		seq = int(random.uniform(0,30))
-		while (seq not in group) : 
+		while (seq not in group and seq != lastAction) : 
 			seq = int(random.uniform(0,30))
 
+		#print (lastAction, seq)
+		lastAction = seq
 		#seq =4
 		#seq = 5
 		#concentric
@@ -118,28 +120,29 @@ def seq2() :
 			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) :scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
+			if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
 		elif(seq == 3) :
 			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) :scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
+			if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
 			if(random.random() > .8) :
 				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))), True, False, "Left")
 				actions.explosion()
 		elif(seq == 11) :
 			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) :scroll.scrollMessage("** ART ART ART **", True, False, dir)
+			if(random.random() > .8) : scroll.scrollMessage("** ART ART ART **", True, False, dir)
 		elif(seq == 12) :
 			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .9) :scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+			if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
 		elif(seq == 13) :
 			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) :scroll.scrollMessage("% % % % % % HUGE PROBABILITIES % % % % % %", True, False, "Left")
+			if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")
 		elif (seq == 10) :
 			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) :scroll.scrollMessage("> THOUSANDS of COLORS <", True, True, "Left")
+			if(random.random() > .8) : scroll.scrollMessage("> THOUSANDS of COLORS <", True, True, "Left")
 		elif(seq == 8) :
-			if(random.random() > .8) : actions.explosion()
-			scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
+			if(random.random() > .8) : 
+				actions.explosion()
+				scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
 		elif (seq == 14) :
 			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
 		elif (seq == 9) :
@@ -193,7 +196,7 @@ def main():
 				user.userAnimator(10)
 				exit()        	
 			elif(argument == "cards") : 
-				machine.machineAnimator(80)
+				machine.machineAnimator(300)
 				exit()
 			elif(argument == "glitch") : 
 				actions.glitch()

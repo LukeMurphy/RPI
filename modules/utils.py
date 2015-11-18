@@ -51,6 +51,9 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
 
     global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage, tileSize, rows, cols
 
+    #w = screenWidth
+    #h = screenHeight
+
     segmentImage = []
 
     # the rendered image is the screen size
@@ -83,7 +86,7 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
         segmentHeight = 32
 
         #yOffset = 10
-        #xOffset = 0
+        #xOffset = 100
         # Must crop exactly the overlap and position of the to-be-rendered image with each segment
         #           ________________
         #           |               |
@@ -100,20 +103,22 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
         for n in range(0,rows) :
 
             # Crop PLACEMENTS
-            a = max(0, xOffset) + segmentWidth*n
+            a = max(0, xOffset) + segmentWidth * n
             b = max(0, yOffset - segmentHeight * n)
-            c = min(segmentWidth, xOffset + w) + segmentWidth*n
-            d = min(segmentHeight, yOffset + h - segmentHeight*n)
+            c = min(segmentWidth, xOffset + w) + segmentWidth * n
+            d = min(segmentHeight, yOffset + h - segmentHeight * n)
 
             # Cropping
             cropP2 = [  cropP1[0] + c - xOffset, 
                         cropP1[1] + min(32, d - yOffset + n * segmentHeight)]
 
             cropP1 = [max(0 , 0 - xOffset),     max(0, n * segmentHeight - yOffset)]
-            cropP2 = [min(w , 128 - xOffset),   min(h, n * segmentHeight + 32 - yOffset)]
+            cropP2 = [min(w , segmentWidth - xOffset),   min(h, n * segmentHeight + 32 - yOffset)]
 
             pCrop  = cropP1 + cropP2
             segmentImage.append(imageToRender.crop(pCrop))
+
+            #print(pCrop)
             
             # Only render if needs be
             if(pCrop[3] - pCrop[1] > 0 ) : 

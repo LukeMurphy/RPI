@@ -107,7 +107,6 @@ def changeColor( rnd = False) :
 def animator(arg, mode = "cols") :
         global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
         global rows, cols, columnLimit
-
         
         rows = 1
         cols = 1

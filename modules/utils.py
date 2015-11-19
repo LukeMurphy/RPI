@@ -104,7 +104,7 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
 
         for n in range(0,rows) :
 
-            # Crop PLACEMENTS
+            # Crop PLACEMENTS\
             a = max(0, xOffset) + segmentWidth * n
             b = max(0, yOffset - segmentHeight * n)
             c = min(segmentWidth, xOffset + w) + segmentWidth * n

@@ -1,7 +1,5 @@
 #!/usr/bin/python
-
 #import modules
-
 from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares
 import Image
 import ImageDraw
@@ -13,13 +11,17 @@ import ImageFont
 import textwrap
 import math
 import sys, getopt
+import ConfigParser, io
 
-# ################################################### #
 
+baseconfig = ConfigParser.ConfigParser()
+baseconfig.read('config.cfg')
 
 config = utils
-config.matrix = Adafruit_RGBmatrix(32, 12)
-config.image = Image.new("RGBA", (192, 64))
+config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))
+config.screenHeight = int(baseconfig.get("config", 'screenHeight'))
+config.screenWidth =  int(baseconfig.get("config", 'screenWidth'))
+config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 config.draw = ImageDraw.Draw(config.image)
 
 config.Image = Image
@@ -27,16 +29,15 @@ config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 iid = config.image.im.id
 config.matrix.SetImage(iid, 0, 0)
-config.tileSize = (32,64)
-config.rows = 2
-config.cols = 3
-config.screenHeight =  64
-config.screenWidth =  192
-config.actualScreenWidth  = 192 * 2
-config.useMassager = False
+config.tileSize = (int(baseconfig.get("config", 'tileSizeHeight')),int(baseconfig.get("config", 'tileSizeWidth')))
+config.rows = int(baseconfig.get("config", 'rows'))
+config.cols = int(baseconfig.get("config", 'cols'))
+
+config.actualScreenWidth  = int(baseconfig.get("config", 'actualScreenWidth'))
+config.useMassager = bool(baseconfig.get("config", 'useMassager'))
 config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
-config.brightness =  .25
-config.path = "/home/pi/RPI1"
+config.brightness =  float(baseconfig.get("config", 'brightness'))
+config.path = baseconfig.get("config", 'path')
 
 action = actions
 action.config = config
@@ -44,8 +45,8 @@ config.actions = actions
 
 scroll = scroll
 scroll.config = config
-scroll.fontSize = 70
-scroll.vOffset = -5
+scroll.fontSize = int(baseconfig.get("scroll", 'fontSize'))
+scroll.vOffset = int(baseconfig.get("scroll", 'vOffset'))
 
 machine = machine
 machine.config = config
@@ -55,12 +56,13 @@ bluescreen.config = config
 
 user = user
 user.config = config
-user.userCenterx = 64
+user.userCenterx = int(baseconfig.get("user", 'userCenterx'))
+user.userCentery = int(baseconfig.get("user", 'userCentery'))
 
 imgLoader = loader
 imgLoader.debug = True
 imgLoader.config = config
-imgLoader.yOffset = 0 #config.screenHeight
+imgLoader.yOffset = config.screenHeight
 
 concentric = squares
 concentric.config = config
@@ -72,7 +74,6 @@ animations = (4,5,6,7,14,20,17)
 groups = [signage,animations]
 group = groups[0]
 group = groups[1]
-
 
 
 def stroopSequence() :

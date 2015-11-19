@@ -1,0 +1,20 @@
+[config]
+matrixTiles = 12
+tileSizeHeight = 32
+tileSizeWidth = 64
+rows = 3
+cols = 2
+screenHeight =  96
+screenWidth =  128
+actualScreenWidth  = 384
+useMassager = False
+brightness =  .25
+path = /home/pi/RPI3
+
+[scroll]
+fontSize = 70
+vOffset = -5
+
+[user]
+userCenterx = 32
+userCentery = 64

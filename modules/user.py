@@ -11,10 +11,11 @@ offsety = 3
 offsetx = -1
 
 userCenterx = 16
+userCentery = 32
 
 def drawUser() :
 
-        global centery, centery, offsetx, offsety, userCenterx
+        global centery, centery, offsetx, offsety, userCenterx, userCentery
         global config
 
         dx = -5
@@ -72,7 +73,7 @@ def drawUser() :
                 #matrix.SetImage(id,config.screenWidth/2  - centerx,centery)
                 #config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
-        config.render(config.image, userCenterx, 32, 31, 32, False, True)      
+        config.render(config.image, userCenterx, userCentery, 31, 32, False)      
 
 
 def userAnimator(arg) :

@@ -23,8 +23,8 @@ def render(imageToRender):
 	global matrix
 
 	tileSize = (32,64)
-	rows = 2
-	cols = 3
+	rows = 3
+	cols = 2
 	imageRows = [] * rows
 	
 	segmentImage = Image.new("RGBA", (tileSize[1]*cols*rows, 32))
@@ -45,18 +45,17 @@ def render(imageToRender):
 
 
 # width , height
-imageToRender = Image.new("RGBA", (192, 64))
+imageToRender = Image.new("RGBA", (128, 96))
 draw  = ImageDraw.Draw(imageToRender)
 
-rows = 2
-cols = 6
+rows = 3
+cols = 4
 n = 0
 rSizeX = 31
 tile =  32
 
 for r in range(0, rows ) :
-	for c in range(0, cols ) :
-		
+	for c in range(0, cols ) :	
 		xPos  = c * tile
 		yPos  = r * 32
 		xPos2 = xPos + rSizeX

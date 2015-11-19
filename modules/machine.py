@@ -9,7 +9,7 @@ vy = 2
 x = 0
 y = 0
 r=g=b=125
-redrawSpeed = .015
+redrawSpeed = .01
 boxHeight = 30
 boxWidth = 26
 
@@ -115,13 +115,13 @@ def redraw():
 def changeColor( rnd = False) :
                 global r,g,b        
                 if (rnd == False) :
-                                if(r == 255) :
+                                if(r == int(255 * config.brightness)) :
                                                 r = 0
-                                                g = 255
+                                                g = int(255 * config.brightness)
                                                 b = 0
                                 else :
                                                 g = 0
-                                                r = 255
+                                                r = int(255 * config.brightness)
                                                 b = 0
                 else :
                                 r = int(random.uniform(0,255))

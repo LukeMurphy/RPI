@@ -12,14 +12,19 @@ import datetime
 import ImageFont
 import textwrap
 import math
-import os
+import sys, getopt, os
+import ConfigParser, io
 
 # ################################################### #
 
+baseconfig = ConfigParser.ConfigParser()
+baseconfig.read('/home/pi/RPI1/config.cfg')
 
 config = utils
-config.matrix = Adafruit_RGBmatrix(32, 12)
-config.image = Image.new("RGBA", (192, 64))
+config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))
+config.screenHeight = int(baseconfig.get("config", 'screenHeight'))
+config.screenWidth =  int(baseconfig.get("config", 'screenWidth'))
+config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 config.draw = ImageDraw.Draw(config.image)
 
 config.Image = Image
@@ -27,16 +32,15 @@ config.ImageDraw = ImageDraw
 config.ImageFont = ImageFont
 iid = config.image.im.id
 config.matrix.SetImage(iid, 0, 0)
-config.tileSize = (32,64)
-config.rows = 2
-config.cols = 3
-config.screenHeight =  64
-config.screenWidth =  192
-config.actualScreenWidth  = 192 * 2
-config.useMassager = False
+config.tileSize = (int(baseconfig.get("config", 'tileSizeHeight')),int(baseconfig.get("config", 'tileSizeWidth')))
+config.rows = int(baseconfig.get("config", 'rows'))
+config.cols = int(baseconfig.get("config", 'cols'))
+
+config.actualScreenWidth  = int(baseconfig.get("config", 'actualScreenWidth'))
+config.useMassager = bool(baseconfig.getboolean("config", 'useMassager'))
 config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
-config.brightness =  .25
-config.path = "/home/pi/RPI1"
+config.brightness =  float(baseconfig.get("config", 'brightness'))
+config.path = baseconfig.get("config", 'path')
 
 
 action = actions

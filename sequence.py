@@ -189,7 +189,7 @@ def main():
 				user.userAnimator(10)
 				exit()        	
 			elif(argument == "cards") : 
-				machine.machineAnimator(300)
+				machine.machineAnimator(10000)
 				exit()
 			elif(argument == "glitch") : 
 				actions.glitch()

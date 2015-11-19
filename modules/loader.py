@@ -78,9 +78,10 @@ def panImage() :
 		xPos += vX;
 		yPos += vY
 
-		if(useBlink == True and random.random() > .998) :
+		if(useBlink == True and random.random() > .9985) :
 			blink = False
-			for blk in range (0, 9) :
+			blinkNum = int(random.uniform(7,23))
+			for blk in range (0, blinkNum) :
 				draw.rectangle((0,0, image.size[0] ,image.size[1]), fill = (0))
 				if(blink) :
 					config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)

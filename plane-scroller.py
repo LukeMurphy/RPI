@@ -50,7 +50,7 @@ imgLoader.config = config
 def seq() :
 	
 	# Get all files in the drawing folder
-	path = "./imgs"
+	path = config.path  + "/imgs"
 	rawList = os.listdir(path)
 	imageList = []
 

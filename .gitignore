@@ -1,8 +1,8 @@
 *.pyc
-.DS_STORE
-.DS_Store
-._.DS_Store
-._.*
-._*
-.cfg
-.gitignore
+*.DS_STORE
+*.DS_Store
+*._.DS_Store
+*._.*
+*._*
+*.cfg
+*.gitignore

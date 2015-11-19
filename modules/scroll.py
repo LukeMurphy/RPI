@@ -36,10 +36,11 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
         # draw the meassage to get its size
         font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',fontSize)
-        tempImage = config.Image.new("RGBA", (1200,128))
+        tempImage = config.Image.new("RGBA", (1200,196))
         draw  = config.ImageDraw.Draw(tempImage)
         pixLen = draw.textsize(arg, font = font)
-        
+        # For some reason textsize is not getting full height !
+        fontHeight = int(pixLen[1] * 1.3)
 
         # make a new image with the right size
         config.renderImage = config.Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
@@ -73,7 +74,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
             
             for n in range(start,end):
                 #fix  config.matrix.SetImage(config.id,xOffset,-n)
-                config.render(scrollImage, xOffset, n, pixLen[0], pixLen[1])
+                config.render(scrollImage, xOffset, n, pixLen[0], fontHeight)
                 time.sleep(scrollSpeed)
 
         elif(direction == "Top") :
@@ -81,12 +82,12 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
                 #print (pixLen, imageHeight)
 
-                scrollImage = config.Image.new("RGBA", (imageHeight, pixLen[1]))
+                scrollImage = config.Image.new("RGBA", (imageHeight, fontHeight))
                 draw  = config.ImageDraw.Draw(scrollImage)
                 draw.text((0,0),arg,(r,g,b),font=font)
                 scrollImage = scrollImage.rotate(-90)
                 scrollImage.load()
-                xOffset =int(random.random()*(config.screenWidth - pixLen[1]))
+                xOffset =int(random.random()*(config.screenWidth - fontHeight))
 
                 for n in range(0,pixLen[0] + config.screenHeight):
                     config.render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
@@ -94,7 +95,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
 
         else :
-            scrollImage = config.Image.new("RGBA", pixLen)
+            scrollImage = config.Image.new("RGBA", (pixLen[0],fontHeight))
             draw  = config.ImageDraw.Draw(scrollImage)
             iid = scrollImage.im.id
             draw.text((0,0),arg,(r,g,b),font=font)
@@ -111,11 +112,11 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
             for n in range(start,end):
                 try :
                     if(direction == "Left") :
-                            config.render(scrollImage, -n, vOffset,pixLen[0], pixLen[1], False)
+                            config.render(scrollImage, -n, vOffset, pixLen[0], fontHeight, False)
                             config.actions.drawBlanks()
                     else :
                             config.actions.drawBlanks()
-                            config.render(scrollImage, n, vOffset,pixLen[0], pixLen[1], False)
+                            config.render(scrollImage, n, vOffset, pixLen[0], fontHeight, False)
                             if(random.random() > 0.9998) :
                                             config.actions.glitch()
                                             break

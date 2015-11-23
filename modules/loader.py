@@ -121,7 +121,7 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 
 	#************************************#
 	### DRAW THE IMAGE ACROSS ALL PANELS
-	config.render(image, 0, 0)
+	config.render(image, 0, 0, config.screenWidth, config.screenHeight)
 	config.actions.drawBlanks()
 	
 	#print(imgHeight, config.screenHeight)
@@ -181,7 +181,7 @@ def start(img="", setvX = 0, setvY = 0):
 	
 	if (action == "play") : 
 		xOffset = yOffset = 0
-		if(img=="") : img  = config.path + "/imgs/flames-1c.gif"
+		if(img=="") : img  = config.path + "/imgs/flames-1c2.gif"
 	else :
 		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"
 

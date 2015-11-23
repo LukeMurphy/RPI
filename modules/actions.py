@@ -102,14 +102,15 @@ def explosion():
         if(random.random() > .1) : explosion()
 
 def burst(a=10) :
+        global config
         config.matrix.Clear()
         count = 0
         stars = False
-        p = 50
+        p = 20
         actualScreenWidth = config.actualScreenWidth
         if(random.random() > .5):
                         stars = True
-                        p = 20
+                        p = 10
         while (count < a) :
                         config.matrix.Clear
                         for n in range(0, p) :
@@ -120,24 +121,26 @@ def burst(a=10) :
                                 y = int(random.random()*31)
 
                                 rn = random.random()
-
+                                v = int(200 * config.brightness)
                                 if(rn > .3 and rn  < .6) :
-                                        r = 0
-                                        g = 0
-                                        b = int(200 * config.brightness)
+                                        r = v
+                                        g = v
+                                        b = 0 #int(200 * config.brightness)
                                 elif (rn > .6 and rn < .9) :
-                                        r = int(255 * config.brightness)
-                                        g = 0
-                                        b = 0
+                                        r = 0 #int(255 * config.brightness)
+                                        g = v
+                                        b = v
                                 else :
-                                                True
+                                        True
+                                        #r = g = b = 0
 
                                 config.matrix.SetPixel(x,y,r,g,b)
                                 if(stars) :
-                                        config.matrix.SetPixel(x+1,y,r,g,b)
-                                        config.matrix.SetPixel(x-1,y,r,g,b)
-                                        config.matrix.SetPixel(x,y+1,r,g,b)
-                                        config.matrix.SetPixel(x,y-1,r,g,b)
+                                        (rx,gx,bx) =  config.opp((r,g,b))
+                                        config.matrix.SetPixel(x+1,y,rx,gx,bx)
+                                        config.matrix.SetPixel(x-1,y,rx,gx,bx)
+                                        config.matrix.SetPixel(x,y+1,rx,gx,bx)
+                                        config.matrix.SetPixel(x,y-1,rx,gx,bx)
                         time.sleep(.08)
                         count += 1
         if(random.random() > .5) : burst()

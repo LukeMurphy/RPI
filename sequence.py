@@ -46,12 +46,12 @@ def seq2() :
 		#seq =4
 		#seq = 5
 		#concentric
-		#seq = 18
+		#seq = 14
 
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
 			if(random.random() > .8) :actions.burst(10)
-			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
+			if(random.random() > .8) :scroll.scrollMessage("** PTGS * GIFS * JPEGS * PTGS * PTGS * CODE **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()
 			if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
@@ -61,6 +61,12 @@ def seq2() :
 			if(random.random() > .8) :
 				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))), True, False, "Left")
 				actions.explosion()
+		elif(seq == 8) :
+			if(random.random() > .8) : 
+				actions.explosion()
+				scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
+		elif (seq == 9) :
+			stroopSequence()
 		elif(seq == 11) :
 			if(random.random() > .8) : actions.burst(10)
 			if(random.random() > .8) : scroll.scrollMessage("** ART ART ART **", True, False, dir)
@@ -73,15 +79,11 @@ def seq2() :
 		elif (seq == 10) :
 			if(random.random() > .8) : actions.burst(10)
 			if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
-		elif(seq == 8) :
-			if(random.random() > .8) : 
-				actions.explosion()
-				scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
-		elif (seq == 14) :
-			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
-		elif (seq == 9) :
-			stroopSequence()
 
+
+
+		elif (seq == 14) :
+			if(random.random() > 0) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Left")
 
 		elif(seq == 4) :
 			user.userAnimator(24)
@@ -92,10 +94,10 @@ def seq2() :
 		elif(seq == 7) :
 			actions.glitch()
 		elif (seq == 20) :
-			user.userAnimator(12)
-			machine.machineAnimator(80)
-			user.userAnimator(1)
-			machine.machineAnimator(80)
+			user.userAnimator(20)
+			#machine.machineAnimator(80)
+			#user.userAnimator(1)
+			#machine.machineAnimator(80)
 			actions.burst(20)
 			actions.explosion()
 		elif (seq == 16) :
@@ -171,7 +173,7 @@ def main():
 
 	signage = (1,2,3,11,12,13,10,8,9,17,14)
 	#signage = (3,3)
-	animations = (4,5,6,7,14,20,17)
+	animations = (4,6,7,14,20,17,18)
 
 	groups = [signage,animations]
 	group = groups[0]

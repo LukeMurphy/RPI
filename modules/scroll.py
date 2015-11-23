@@ -80,14 +80,18 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
         elif(direction == "Top") :
                 imageHeight = pixLen[0]
 
-                #print (pixLen, imageHeight)
+                print (pixLen, imageHeight, fontHeight)
 
-                scrollImage = config.Image.new("RGBA", (imageHeight, fontHeight))
+                scrollImage = config.Image.new("RGBA", (imageHeight, imageHeight))
                 draw  = config.ImageDraw.Draw(scrollImage)
                 draw.text((0,0),arg,(r,g,b),font=font)
-                scrollImage = scrollImage.rotate(-90)
-                scrollImage.load()
+                #scrollImage = scrollImage.rotate(-90)
+                #scrollImage.load()
+
+                print(scrollImage.size)
+
                 xOffset =int(random.random()*(config.screenWidth - fontHeight))
+
 
                 for n in range(0,pixLen[0] + config.screenHeight):
                     config.render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
@@ -106,8 +110,6 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
             if(direction == "Right") : 
                 start = -end
                 end = config.screenWidth
-
-            
 
             for n in range(start,end):
                 try :

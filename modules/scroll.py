@@ -10,6 +10,7 @@ scrollSpeed = .0011
 steps = 6
 fontSize = 14
 vOffset  = -1
+opticalOpposites = True
 
 r=g=b=0
 
@@ -128,11 +129,13 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
 def stroop( arg, clr, direction = "Left") :
 
-        global r,g,b,config
+        global r,g,b,config, opticalOpposites
         clr = tuple(int(a*config.brightness) for a in (clr))
 
         #matrix.Clear()
         speed = .018
+
+        # Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
         font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)
         font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)
         pixLen = config.draw.textsize(arg, font = font)
@@ -141,7 +144,22 @@ def stroop( arg, clr, direction = "Left") :
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
 
-        config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill="blue")
+        # Draw Background Color
+        # Optical (RBY) or RGB opposites
+
+        if(opticalOpposites) :
+            if(arg == "RED") : bgColor = tuple(int(a*config.brightness) for a in ((255,0,0)))
+            if(arg == "GREEN") : bgColor = tuple(int(a*config.brightness) for a in ((0,255,0)))
+            if(arg == "BLUE") : bgColor = tuple(int(a*config.brightness) for a in ((0,0,255)))
+            if(arg == "YELLOW") : bgColor = tuple(int(a*config.brightness) for a in ((255,255,0)))
+            if(arg == "ORANGE") : bgColor = tuple(int(a*config.brightness) for a in ((255,125,0)))
+            if(arg == "VIOLET") : bgColor = tuple(int(a*config.brightness) for a in ((200,0,255)))
+        else:
+             bgColor = config.opp(clr)
+
+        config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill=bgColor)
+
+        # Draw the text with "borders"
         config.draw.text((-1,-1),arg,(0,0,0),font=font2)
         config.draw.text((1,1),arg,(0,0,0),font=font2)
         config.draw.text((0,0),arg,clr,font=font)

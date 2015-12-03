@@ -51,7 +51,7 @@ def seq2() :
 		if(seq == 0) : actions.burst(40)
 		elif(seq == 1) :
 			if(random.random() > .8) :actions.burst(10)
-			if(random.random() > .8) :scroll.scrollMessage("** PAINTINGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODE **", True, False, "Left")
+			if(random.random() > .8) :scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
 		elif(seq == 2) :
 			if(random.random() > .8) : actions.explosion()
 			if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
@@ -59,11 +59,11 @@ def seq2() :
 			if(random.random() > .8) : actions.explosion()
 			if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
 			if(random.random() > .8) :
-				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))), True, False, "Left")
+				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + asdfasdfasdsf, True, False, "Left")
 				actions.explosion()
 		elif(seq == 11) :
 			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) : scroll.scrollMessage("** ART ART ART **", True, False, dir)
+			if(random.random() > .8) : scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, dir)
 		elif(seq == 12) :
 			if(random.random() > .8) : actions.burst(10)
 			if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
@@ -76,13 +76,27 @@ def seq2() :
 		elif(seq == 8) :
 			if(random.random() > .8) : 
 				actions.explosion()
-				scroll.scrollMessage("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", True, False, dir)
+				numDolls = int(random.uniform(3,24))
+				strg = ""
+				for n in range (3,numDolls) : strg += "$"
+				scroll.scrollMessage(strg, True, False, dir)
 		elif (seq == 14) :
-			if(random.random() > .8) :scroll.scrollMessage(" :)     :)     :)     :)     :)     :)     :o ", True, True, "Top")
+			if(random.random() > .8) :
+				numDolls = int(random.uniform(2,6))
+				strg = ""
+				for n in range (2,numDolls) : 
+					strg += "     :)"
+					if (random.random() > .95) : strg += "     :o"
+					if (random.random() > .95) : strg += "     ;)"
+				scroll.scrollMessage(strg, True, True, "Top")
 		elif (seq == 9) :
-			stroopSequence()
-
-
+			numDolls = int(random.uniform(2,10))
+			for i in range(0,10) : 
+				if(scroll.opticalOpposites) : 
+					scroll.opticalOpposites = False
+				else : 
+					scroll.opticalOpposites = True
+				stroopSequence()
 		elif(seq == 4) :
 			user.userAnimator(24)
 		elif(seq == 5) :
@@ -202,7 +216,12 @@ def main():
 				scroll.scrollMessage(options, True, False, "Left")
 				exit()
 			elif(argument == "stroop") : 
-				stroopSequence()
+				for i in range(0,10) : 
+					if(scroll.opticalOpposites) : 
+						scroll.opticalOpposites = False
+					else : 
+						scroll.opticalOpposites = True
+					stroopSequence()
 				exit()
 			elif(argument == "squares") : 
 				concentric.colorSwitch = False

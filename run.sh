@@ -5,3 +5,4 @@ elif [ "$1" == "wb" ]; then
 else
 	sudo python /home/pi/RPI/sequence.py "$@"
 fi
+

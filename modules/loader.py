@@ -29,7 +29,7 @@ global draw
 global config
 global image, imageCopy
 
-debug = True
+debug = False
 
 def setUpNew():
 	global image, imageCopy
@@ -121,7 +121,7 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 
 	#************************************#
 	### DRAW THE IMAGE ACROSS ALL PANELS
-	config.render(image, 0, 0)
+	config.render(image, 0, 0, config.screenWidth, config.screenHeight )
 	config.actions.drawBlanks()
 	
 	#print(imgHeight, config.screenHeight)
@@ -181,7 +181,13 @@ def start(img="", setvX = 0, setvY = 0):
 	
 	if (action == "play") : 
 		xOffset = yOffset = 0
-		if(img=="") : img  = config.path + "/imgs/flames-1c.gif"
+		if(img=="") : 
+			if(config.screenWidth <= 128) :
+				img  = config.path + "/imgs/flames-128x64.gif"
+			elif(config.screenHeight == 96) :
+				img  = config.path + "/imgs/flames-tilt.gif"
+			elif(config.screenWidth >= 196) :
+				img  = config.path + "/imgs/flames-196x64.gif"
 	else :
 		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"
 

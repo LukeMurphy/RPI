@@ -20,32 +20,10 @@ make script to reduce from one square to 2 to 4 to 8 to 16...
 
 rHeight = 0
 rWidth = 0
-numSquares = 1
 rows  = 2
 cols = 2
 
-def drawImg() :
-        global config
-        global r,g,b
-        global colorSwitch
-        global rHeight,rWidth,numSquares
 
-        #matrix = config.matrix
-        #draw = config.draw
-        #id = config.id
-
-        lines = rHeight/2
-        for i in range(0, numSquares):
-                xOffset = i * rWidth
-                #changeColor(colorSwitch)
-                for n in range(0,lines):
-                        # Alternate Bands of Color
-                        changeColor(colorSwitch)
-                        xStart = xOffset + n
-                        xEnd = xOffset+rWidth-n-1
-                        yStart = n
-                        yEnd =rHeight-n-1
-                        config.draw.rectangle((xStart, yStart, xEnd, yEnd ),  outline=(r,g,b))
 def drawRects() :
         global config
         global r,g,b
@@ -119,13 +97,11 @@ def animator(arg, mode = "cols") :
         #config.matrix.Clear()
 
         count = 0
-        numSquares = 1
         rWidth = config.screenWidth
         rHeight = config.screenHeight
         
         arg = 20
         pulseSpeed = .1
-
         countLimit = arg * 6
         interval = 4
 

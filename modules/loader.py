@@ -121,7 +121,7 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 
 	#************************************#
 	### DRAW THE IMAGE ACROSS ALL PANELS
-	config.render(image, 0, 0, config.screenWidth, config.screenHeight )
+	config.render(image, 0, 0, config.screenWidth, config.screenHeight)
 	config.actions.drawBlanks()
 	
 	#print(imgHeight, config.screenHeight)

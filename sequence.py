@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares
+from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing
 import Image
 import ImageDraw
 import time
@@ -29,17 +29,17 @@ def seq2() :
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
 	#machine.machineAnimator(130)
 	lastAction  = 0
+	try:
+		while True:
+			d = int(random.uniform(1,3))
+			dir = "Left"
+			if (d == 1) : dir = "Left"
+			if (d == 2) : dir = "Right"
+			if (d == 3) : dir = "Bottom"
 
-	while True:
-		d = int(random.uniform(1,3))
-		dir = "Left"
-		if (d == 1) : dir = "Left"
-		if (d == 2) : dir = "Right"
-		if (d == 3) : dir = "Bottom"
-
-		seq = int(random.uniform(0,30))
-		while (seq not in group and seq != lastAction) : 
 			seq = int(random.uniform(0,30))
+			while (seq not in group and seq != lastAction) : 
+				seq = int(random.uniform(0,30))
 
 		#print (lastAction, seq)
 		lastAction = seq
@@ -123,12 +123,50 @@ def seq2() :
 		elif (seq == 18) :
 			concentric.colorSwitch = False
 			concentric.animator(60)
+		elif (seq == 14) :
+			if(random.random() > 0) :
+				smilies = ""
+				numSmilies = int(random.uniform(1,5))
+				for n in range (0, numSmilies) :
+					smilies += "  :)  "
+					if (random.random() > .9) : smilies += "  :o  "
+					if (random.random() > .95) : smilies += "  ;)  "
+				scroll.scrollMessage(smilies, True, True, "Left")
 
+		elif(seq == 4) :
+			user.userAnimator(24)
+		elif(seq == 5) :
+			machine.machineAnimator(430)
+		elif(seq == 6) :
+			bluescreen.draw()
+		elif(seq == 7) :
+			actions.glitch()
+		elif (seq == 20) :
+			user.userAnimator(20)
+			#machine.machineAnimator(80)
+			#user.userAnimator(1)
+			#machine.machineAnimator(80)
+			actions.burst(20)
+			actions.explosion()
+		elif (seq == 16) :
+			imgLoader.action = "pan"
+			imgLoader.countLimit = 1
+			imgLoader.start()
+		elif (seq == 17) :
+			imgLoader.action = "play"
+			imgLoader.countLimit = 100
+			imgLoader.start()
+		elif (seq == 18) :
+			concentric.colorSwitch = False
+			concentric.animator(60)
+    except KeyboardInterrupt:
+		#print "Stopping"
+        exit()    
 
 
 def main():
 	global group, groups
-	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
+	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage, flash
 
 	baseconfig = ConfigParser.ConfigParser()
 	baseconfig.read('/home/pi/RPI/config.cfg')
@@ -183,20 +221,25 @@ def main():
 	concentric = squares
 	concentric.config = config
 
+	flash = flashing
+	flash.config = config
+
 	signage = (1,2,3,11,12,13,10,8,9,17,14)
 	#signage = (3,3)
-	animations = (4,5,6,7,14,20,17)
+	animations = (4,6,7,14,20,17,18)
 
 	groups = [signage,animations]
 	group = groups[0]
 	group = groups[1]
+	options = options2 = ""
 
 	try:
 		args = sys.argv
-		options = ""
+		#print(args)
 		if(len(args) > 1):
 			argument =  args[1]
 			if(len(args) > 2) : options = args[2]
+			if(len(args) > 3) : options2 = args[3]
 			if(argument == "explosion") : 
 				actions.explosion()
 				exit()
@@ -213,7 +256,15 @@ def main():
 				actions.glitch()
 				exit()
 			elif(argument == "scroll") : 
+				if (options2 != "") : scroll.steps = int(options2)
+				actions.drawBlanksFlag = False
 				scroll.scrollMessage(options, True, False, "Left")
+				exit()
+			elif(argument == "present") : 
+				# e.g. spy sequence.py present "AS IF" 1
+				if (options2 != "") : dur = int(options2)
+				actions.drawBlanksFlag = False
+				scroll.present(options,(), dur)
 				exit()
 			elif(argument == "stroop") : 
 				for i in range(0,10) : 
@@ -226,6 +277,10 @@ def main():
 			elif(argument == "squares") : 
 				concentric.colorSwitch = False
 				concentric.animator(60, "cols")
+				exit()
+			elif(argument == "flash") : 
+				flash.colorSwitch = False
+				flash.animator(100)
 				exit()
 			elif(argument == "blue") : 
 				bluescreen.draw()

@@ -6,3 +6,5 @@
 *._*
 *.cfg
 *.gitignore
+log.*
+

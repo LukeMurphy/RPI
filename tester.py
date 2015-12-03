@@ -16,16 +16,13 @@ import math
 # ################################################### #
 
 
-matrix = Adafruit_RGBmatrix(32, 12)
+
 
 
 def render(imageToRender):
 	global matrix
+	global rows, cols, tileSize
 
-	tileSize = (32,64)
-	rows = 3
-	cols = 2
-	imageRows = [] * rows
 	
 	segmentImage = Image.new("RGBA", (tileSize[1]*cols*rows, 32))
 	print("Total segment", segmentImage)
@@ -45,28 +42,44 @@ def render(imageToRender):
 
 
 # width , height
-imageToRender = Image.new("RGBA", (128, 96))
+tileSize = (32,32)
+matrix = Adafruit_RGBmatrix(32, 2)
+imageToRender = Image.new("RGBA", (64, 32))
 draw  = ImageDraw.Draw(imageToRender)
 
-rows = 3
-cols = 4
+rows = 1
+cols = 2
 n = 0
-rSizeX = 31
-tile =  32
+sizeX = 31 
+sizeY = 31
+
+cName1 = (0,200,0)
+cName2 = utils.opp(cName1) #(0,200,0)
+
+
+imageRows = [] * rows
 
 for r in range(0, rows ) :
 	for c in range(0, cols ) :	
-		xPos  = c * tile
-		yPos  = r * 32
-		xPos2 = xPos + rSizeX
-		yPos2 = 31 + yPos
-		draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(255,0,n * 15), outline=(0,255,0))
+		xPos  = c * sizeX + c
+		yPos  = r * sizeY
+		xPos2 = xPos + sizeX
+		yPos2 = yPos + sizeY
+		b =  n + 1
+		b = 1
+		# draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(255,0,n * 15), outline=(0,255,0))
+		draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(int(cName1[0]/b),int(cName1[1]/b),int(cName1[2]/b)), outline=cName1)
 		n += 1
-		print(n, xPos, yPos)
-
+		print(n, xPos, yPos, xPos2, yPos2)
+		currentName = cName1
+		cName1 = cName2	
+		cName2 = currentName
+	currentName = cName1
+	cName1 = cName2	
+	cName2 = currentName
 
 iid = imageToRender.im.id
-matrix.SetImage(iid, 0, 0)
+#matrix.SetImage(iid, 0, 0)
 print("imageToRender", imageToRender)
 
 #time.sleep(5)

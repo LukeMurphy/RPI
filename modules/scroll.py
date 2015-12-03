@@ -11,6 +11,8 @@ steps = 1
 fontSize = 14
 vOffset  = -1
 opticalOpposites = True
+countLimit = 6
+count = 0
 
 r=g=b=0
 
@@ -130,35 +132,49 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                             exit()
 
 def present(arg, clr = (250,150,150), duration = 5) :
-        global config, scrollSpeed, steps, fontSize, vOffset
+        global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
         global r,g,b
+        
+
         try:
             changeColor(False)
             clr = tuple(int(a*config.brightness) for a in (clr))
 
             # draw the meassage to get its size
-            font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',40)
-            font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',40)
+            font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',fontSize)
+            font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',fontSize)
             pixLen = config.draw.textsize(arg, font = font)
-            fontHeight = int(pixLen[1] * 1.3)
+            fontHeight = int(pixLen[1] * 1.0)
 
             # make a new image with the right size
             config.renderImage = config.Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
-            scrollImage = config.Image.new("RGBA", pixLen)
+            scrollImage = config.Image.new("RGBA", (config.screenWidth * 2,config.screenHeight))
             draw = config.ImageDraw.Draw(scrollImage)
             offRange = 1
-            #draw.text((int(random.uniform(-offRange,offRange)),int(random.uniform(-offRange,offRange))), arg,config.opp((r,g,b)), font=font2)
-            draw.text((-offRange,offRange), arg,config.opp((r,g,b)), font=font2)
-            draw.text((0,0), arg,(r,g,b), font=font)
-            scrollImage = scrollImage.resize((int(config.actualScreenWidth * .9) , int(config.screenHeight * 1.75)))
+            
+            draw.text((-offRange,offRange - 11), arg,config.opp((r,g,b)), font=font2)
+            draw.text((0,0 - 11), arg,(r,g,b), font=font)
 
-            vOffset = -10
-            config.render(scrollImage, 0, vOffset, pixLen[0], fontHeight, False)
+            # Scale the image to fit the full set of panels
+            scaledSize = (  int(float(config.screenWidth)/pixLen[0] * config.screenWidth * 2) , 
+                            int(float(config.screenHeight)/pixLen[1]  * config.screenHeight))
+            
+            scrollImage = scrollImage.resize(scaledSize)
+
+            vOffset = 0 #-scaledSize[1]/8
+            #config.render(scrollImage, 0, vOffset, pixLen[0], fontHeight, False)
+            config.render(scrollImage, 0, vOffset,scaledSize[0],scaledSize[1])
             config.actions.drawBlanks()
 
             time.sleep(duration)
 
-            present(arg, clr,  duration)
+            if(count <= countLimit) :
+                count +=1
+
+                # if countLimit = 0 then assume go on forever ...
+                if(countLimit == 0) : count = 0
+                present(arg, clr,  duration)
+            else : exit()
 
         except KeyboardInterrupt:
             #print "Stopping"

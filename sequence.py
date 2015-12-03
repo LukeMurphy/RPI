@@ -23,145 +23,117 @@ def stroopSequence() :
 	if(random.random() > .7) :scroll.stroop("GREEN",(255,0,0),"Left")
 	if(random.random() > .7) :scroll.stroop("ORANGE",(0,0,200),"Right")
 
+def getDirection() :
+	d = int(random.uniform(1,3))
+	direction = "Left"
+	if (d == 1) : direction = "Left"
+	if (d == 2) : direction = "Right"
+	if (d == 3) : direction = "Bottom"
+	return direction
 
-def seq2() :
+def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
-	#machine.machineAnimator(130)
+
 	lastAction  = 0
+
+	print("running")
 	try:
 		while True:
-			d = int(random.uniform(1,3))
-			dir = "Left"
-			if (d == 1) : dir = "Left"
-			if (d == 2) : dir = "Right"
-			if (d == 3) : dir = "Bottom"
-
-			seq = int(random.uniform(0,30))
+			seq = int(random.uniform(1,30))
 			while (seq not in group and seq != lastAction) : 
-				seq = int(random.uniform(0,30))
+				seq = int(random.uniform(1,30))
 
-		#print (lastAction, seq)
-		lastAction = seq
-		#seq =4
-		#seq = 5
-		#concentric
-		#seq = 18
+			# try not to repeat
+			lastAction = seq
+			#seq = 18
 
-		if(seq == 0) : actions.burst(40)
-		elif(seq == 1) :
-			if(random.random() > .8) :actions.burst(10)
-			if(random.random() > .8) :scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
-		elif(seq == 2) :
-			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
-		elif(seq == 3) :
-			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
-			if(random.random() > .8) :
-				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + asdfasdfasdsf, True, False, "Left")
+			if(seq == 1) :
+				if(random.random() > .8) :actions.burst(10)
+				if(random.random() > .8) :scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
+			elif(seq == 2) :
+				if(random.random() > .8) : actions.explosion()
+				if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
+			elif(seq == 3) :
+				if(random.random() > .8) : actions.explosion()
+				if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
+				if(random.random() > .8) :
+					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + asdfasdfasdsf, True, False, "Left")
+					actions.explosion()
+			elif(seq == 4) :
+				if(random.random() > .8) : 
+					actions.explosion()
+					numDolls = int(random.uniform(3,24))
+					strg = ""
+					for n in range (3,numDolls) : strg += "$"
+					scroll.scrollMessage(strg, True, False, getDirection())
+			elif (seq == 5) :
+				numDolls = int(random.uniform(2,10))
+				for i in range(0,10) : 
+					if(scroll.opticalOpposites) : 
+						scroll.opticalOpposites = False
+					else : 
+						scroll.opticalOpposites = True
+					stroopSequence()
+			elif (seq == 6) :
+				if(random.random() > .8) : actions.burst(10)
+				if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
+			elif(seq == 7) :
+				if(random.random() > .8) : actions.burst(10)
+				if(random.random() > .8) : scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, getDirection())
+			elif(seq == 8) :
+				if(random.random() > .8) : actions.burst(10)
+				if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+			elif(seq == 9) :
+				if(random.random() > .8) : actions.explosion()
+				if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
+			elif (seq == 10) :
+				if(random.random() > .8) :
+					numDolls = int(random.uniform(2,6))
+					strg = ""
+					for n in range (2,numDolls) : 
+						strg += "     :)"
+						if (random.random() > .95) : strg += "     :o"
+						if (random.random() > .95) : strg += "     ;)"
+					scroll.scrollMessage(strg, True, True, "Left")
+			elif (seq == 11) :
+				if(random.random() > .8) :
+					scroll.countLimit = 5
+					scroll.present("ASIF",1)
+			
+
+			# Animation only modules
+
+			elif(seq == 14) :
+				user.userAnimator(24)
+			elif(seq == 15) :
+				machine.machineAnimator(430)
+			elif(seq == 16) :
+				bluescreen.draw()
+			elif(seq == 17) :
+				actions.glitch()
+			elif (seq == 18) :
+				imgLoader.action = "pan"
+				imgLoader.countLimit = 1
+				imgLoader.start()
+			elif (seq == 19) :
+				imgLoader.action = "play"
+				imgLoader.countLimit = 100
+				imgLoader.start()
+			elif (seq == 20) :
+				concentric.colorSwitch = False
+				concentric.animator(60)
+			elif (seq == 21) :
+				user.userAnimator(12)
+				machine.machineAnimator(80)
+				user.userAnimator(1)
+				machine.machineAnimator(80)
+				actions.burst(20)
 				actions.explosion()
-		elif(seq == 11) :
-			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) : scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, dir)
-		elif(seq == 12) :
-			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
-		elif(seq == 13) :
-			if(random.random() > .8) : actions.explosion()
-			if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")
-		elif (seq == 10) :
-			if(random.random() > .8) : actions.burst(10)
-			if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
-		elif(seq == 8) :
-			if(random.random() > .8) : 
-				actions.explosion()
-				numDolls = int(random.uniform(3,24))
-				strg = ""
-				for n in range (3,numDolls) : strg += "$"
-				scroll.scrollMessage(strg, True, False, dir)
-		elif (seq == 14) :
-			if(random.random() > .8) :
-				numDolls = int(random.uniform(2,6))
-				strg = ""
-				for n in range (2,numDolls) : 
-					strg += "     :)"
-					if (random.random() > .95) : strg += "     :o"
-					if (random.random() > .95) : strg += "     ;)"
-				scroll.scrollMessage(strg, True, True, "Top")
-		elif (seq == 9) :
-			numDolls = int(random.uniform(2,10))
-			for i in range(0,10) : 
-				if(scroll.opticalOpposites) : 
-					scroll.opticalOpposites = False
-				else : 
-					scroll.opticalOpposites = True
-				stroopSequence()
-		elif(seq == 4) :
-			user.userAnimator(24)
-		elif(seq == 5) :
-			machine.machineAnimator(430)
-		elif(seq == 6) :
-			bluescreen.draw()
-		elif(seq == 7) :
-			actions.glitch()
-		elif (seq == 20) :
-			user.userAnimator(12)
-			machine.machineAnimator(80)
-			user.userAnimator(1)
-			machine.machineAnimator(80)
-			actions.burst(20)
-			actions.explosion()
-		elif (seq == 16) :
-			imgLoader.action = "pan"
-			imgLoader.countLimit = 1
-			imgLoader.start()
-		elif (seq == 17) :
-			imgLoader.action = "play"
-			imgLoader.countLimit = 100
-			imgLoader.start()
-		elif (seq == 18) :
-			concentric.colorSwitch = False
-			concentric.animator(60)
-		elif (seq == 14) :
-			if(random.random() > 0) :
-				smilies = ""
-				numSmilies = int(random.uniform(1,5))
-				for n in range (0, numSmilies) :
-					smilies += "  :)  "
-					if (random.random() > .9) : smilies += "  :o  "
-					if (random.random() > .95) : smilies += "  ;)  "
-				scroll.scrollMessage(smilies, True, True, "Left")
-
-		elif(seq == 4) :
-			user.userAnimator(24)
-		elif(seq == 5) :
-			machine.machineAnimator(430)
-		elif(seq == 6) :
-			bluescreen.draw()
-		elif(seq == 7) :
-			actions.glitch()
-		elif (seq == 20) :
-			user.userAnimator(20)
-			#machine.machineAnimator(80)
-			#user.userAnimator(1)
-			#machine.machineAnimator(80)
-			actions.burst(20)
-			actions.explosion()
-		elif (seq == 16) :
-			imgLoader.action = "pan"
-			imgLoader.countLimit = 1
-			imgLoader.start()
-		elif (seq == 17) :
-			imgLoader.action = "play"
-			imgLoader.countLimit = 100
-			imgLoader.start()
-		elif (seq == 18) :
-			concentric.colorSwitch = False
-			concentric.animator(60)
-    except KeyboardInterrupt:
-		#print "Stopping"
-        exit()    
+	
+	except KeyboardInterrupt:
+		print "Stopping"
+		exit()    
 
 
 def main():
@@ -224,14 +196,15 @@ def main():
 	flash = flashing
 	flash.config = config
 
-	signage = (1,2,3,11,12,13,10,8,9,17,14)
-	#signage = (3,3)
-	animations = (4,6,7,14,20,17,18)
+
+	#*******  SETTING UP THE SEQUENCE GROUPS *********#
+	signage = (1,2,3,4,5,6,7,8,9,10,11,19)
+	animations = (14,15,16,17,18,19,20,21)
 
 	groups = [signage,animations]
 	group = groups[0]
 	group = groups[1]
-	options = options2 = ""
+	options = options2 = options3 = ""
 
 	try:
 		args = sys.argv
@@ -240,6 +213,7 @@ def main():
 			argument =  args[1]
 			if(len(args) > 2) : options = args[2]
 			if(len(args) > 3) : options2 = args[3]
+			if(len(args) > 4) : options3 = args[4]
 			if(argument == "explosion") : 
 				actions.explosion()
 				exit()
@@ -261,8 +235,9 @@ def main():
 				scroll.scrollMessage(options, True, False, "Left")
 				exit()
 			elif(argument == "present") : 
-				# e.g. spy sequence.py present "AS IF" 1
+				# e.g. spy sequence.py present "ASIF" 1 0
 				if (options2 != "") : dur = int(options2)
+				if (options3 != "") : scroll.countLimit = int(options3)
 				actions.drawBlanksFlag = False
 				scroll.present(options,(), dur)
 				exit()
@@ -296,12 +271,12 @@ def main():
 				imgLoader.start()
 			elif(argument  == "seq") :
 				group = groups[int(options)]
-				seq2()
+				runSequence()
 
-		else : seq2()
+		else : runSequence()
 	except getopt.GetoptError as err:
 		# print help information and exit:
-		print str(err) # will print something like "option -a not recognized"
+		print str(err)
 
 if __name__ == "__main__":
     main()

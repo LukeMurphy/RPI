@@ -182,7 +182,7 @@ def start(img="", setvX = 0, setvY = 0):
 	if (action == "play") : 
 		xOffset = yOffset = 0
 		if(img=="") : 
-			if(config.screenWidth <= 128) :
+			if(config.screenWidth <= 128 and config.screenHeight == 64) :
 				img  = config.path + "/imgs/flames-128x64.gif"
 			elif(config.screenHeight == 96) :
 				img  = config.path + "/imgs/flames-tilt.gif"

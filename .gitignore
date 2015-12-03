@@ -7,4 +7,5 @@
 *.cfg
 *.gitignore
 log.*
+*.bak
 

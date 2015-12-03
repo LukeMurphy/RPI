@@ -186,7 +186,7 @@ def start(img="", setvX = 0, setvY = 0):
 				img  = config.path + "/imgs/flames-128x64.gif"
 			elif(config.screenHeight == 96) :
 				img  = config.path + "/imgs/flames-tilt.gif"
-			elif(config.screenWidth >= 196) :
+			else  :
 				img  = config.path + "/imgs/flames-196x64.gif"
 	else :
 		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"

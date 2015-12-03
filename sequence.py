@@ -58,7 +58,7 @@ def runSequence() :
 				if(random.random() > .8) : actions.explosion()
 				if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
 				if(random.random() > .8) :
-					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + asdfasdfasdsf, True, False, "Left")
+					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + "asdfasdfasdsf", True, False, "Left")
 					actions.explosion()
 			elif(seq == 4) :
 				if(random.random() > .8) : 
@@ -68,8 +68,8 @@ def runSequence() :
 					for n in range (3,numDolls) : strg += "$"
 					scroll.scrollMessage(strg, True, False, getDirection())
 			elif (seq == 5) :
-				numDolls = int(random.uniform(2,10))
-				for i in range(0,10) : 
+				numDolls = int(random.uniform(2,6))
+				for i in range(0,numDolls) : 
 					if(scroll.opticalOpposites) : 
 						scroll.opticalOpposites = False
 					else : 

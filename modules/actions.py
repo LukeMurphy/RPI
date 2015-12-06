@@ -137,7 +137,7 @@ def burst(a=10) :
 
                                 config.matrix.SetPixel(x,y,r,g,b)
                                 if(stars) :
-                                        (rx,gx,bx) =  config.opp((r,g,b))
+                                        (rx,gx,bx) =  config.colorCompliment((r,g,b))
                                         config.matrix.SetPixel(x+1,y,rx,gx,bx)
                                         config.matrix.SetPixel(x-1,y,rx,gx,bx)
                                         config.matrix.SetPixel(x,y+1,rx,gx,bx)

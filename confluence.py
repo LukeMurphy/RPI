@@ -59,7 +59,7 @@ def stroop(arg, clr, oppClr, speed = 1, direction = "Left"):
     clr = tuple(int(a*config.brightness) for a in (clr))
 
     # If not passed in, make the background the "opposite" color - from the seqs directory
-    if(oppClr == ()) : oppClr  =  config.opp(clr)
+    if(oppClr == ()) : oppClr  =  config.colorCompliment(clr)
     draw.rectangle((0,0,image.size[0], max(32,pixLen[1])), fill=oppClr)
 
     # fudged shadow

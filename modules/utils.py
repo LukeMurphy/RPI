@@ -16,10 +16,11 @@ path = "/home/pi/rpimain"
 useMassager = False
 brightness = 1
 
+colorWheel = ["RED","VERMILLION","ORANGE","AMBER","YELLOW","CHARTREUSE","GREEN","TEAL","BLUE","VIOLET","PURPLE","MAGENTA"]
 
 global imageTop,imageBottom,image,config
 
-def opp((r,g,b)) :
+def colorCompliment((r,g,b)) :
     global brightness
     minRGB = min(r,min(g,b))
     maxRGB = max(r,max(g,b))
@@ -27,7 +28,43 @@ def opp((r,g,b)) :
     r = int((minmax - r) * brightness)
     g = int((minmax - g) * brightness)
     b = int((minmax - b) * brightness)
-    return (r,g,b)              
+    return (r,g,b)     
+
+
+def colorComplimentRBY((r,g,b)) :
+    global brightness
+    PI = math.pi
+    wheel = [   (0,255,0,0),
+                (1/3 * PI,255,126,0),
+                (2/3 * PI,255,255,0),
+                (PI,0,255,0),
+                (4/3 * PI,0,0,255),
+                (5/3 * PI, 126,0,255),
+    ]
+
+def subtractiveColors(arg) :
+    color = (0,0,0)
+    if(arg == "RED") : color = tuple(int(a*brightness) for a in ((255,2,2)))
+    if(arg == "VERMILLION") : color = tuple(int(a*brightness) for a in ((253,83,8)))
+    if(arg == "ORANGE") : color = tuple(int(a*brightness) for a in ((255,153,1)))
+    if(arg == "AMBER") : color = tuple(int(a*brightness) for a in ((250,188,2)))
+    if(arg == "YELLOW") : color = tuple(int(a*brightness) for a in ((255,255,0)))
+    if(arg == "CHARTREUSE") : color = tuple(int(a*brightness) for a in ((0,255,0)))
+    if(arg == "GREEN") : color = tuple(int(a*brightness) for a in ((0,125,0)))
+    if(arg == "TEAL") : color = tuple(int(a*brightness) for a in ((146,206,0)))
+    if(arg == "BLUE") : color = tuple(int(a*brightness) for a in ((0,0,255)))
+    if(arg == "VIOLET") : color = tuple(int(a*brightness) for a in ((65,0,165)))    
+    if(arg == "PURPLE") : color = tuple(int(a*brightness) for a in ((135,0,175)))    
+    if(arg == "MAGENTA") : color = tuple(int(a*brightness) for a in ((167,25,75)))    
+    return color
+    
+def colorComplimentRBY(arg) :
+    global colorWheel
+    l = len(colorWheel) / 2
+    indx = colorWheel.index(arg)
+    oppIndx  =  indx + l 
+    if(oppIndx > 11) : oppIndx -= (l*2)
+    return subtractiveColors(colorWheel[oppIndx])
 
 def changeColor(rnd = False) :
     global brightness           

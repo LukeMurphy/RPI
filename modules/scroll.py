@@ -14,6 +14,9 @@ opticalOpposites = True
 countLimit = 6
 count = 0
 
+# fcu present will start with the opposite
+paintColor = "GREEN"
+
 r=g=b=0
 
 def changeColor( rnd = False) :
@@ -133,13 +136,19 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
 def present(arg, clr = (250,150,150), duration = 5) :
         global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
-        global r,g,b
+        global r,g,b, paintColor
         
         vFactor = 1.2
 
         try:
-            changeColor(False)
-            clr = tuple(int(a*config.brightness) for a in (clr))
+            #changeColor(False)
+            if (paintColor == "RED") : 
+                paintColor = "GREEN"
+            else :
+                paintColor =  "RED"
+            #clr = tuple(int(a*config.brightness) for a in (clr))
+            paintColorRGB = config.subtractiveColors(paintColor)
+
             fSize = config.screenHeight
             # draw the message to get its size - not very accurate for height tho...
             font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf', fSize)
@@ -150,11 +159,15 @@ def present(arg, clr = (250,150,150), duration = 5) :
             draw = config.ImageDraw.Draw(scrollImage)
             xoffRange = 1
             yOffRange = 2
-            draw.text((-xoffRange,yOffRange), arg,config.opp((r,g,b)), font=font)
-            draw.text((0,0 ), arg,(r,g,b), font=font)
+
+            if(random.random() > .5) :
+                draw.text((-xoffRange,yOffRange), arg,config.colorCompliment(paintColorRGB), font=font)
+            else:
+                draw.text((-xoffRange,yOffRange), arg,config.colorComplimentRBY(paintColor), font=font)
+            draw.text((0,0 ), arg,paintColorRGB, font=font)
 
             # Scale the image to fit the full set of panels (using a rough formula for font offset)
-            scaledSize = (config.actualScreenWidth , int( vFactor * float(config.screenHeight * pixLen[1]) / fSize) + 8) 
+            scaledSize = (config.screenWidth , int( vFactor * float(config.screenHeight * pixLen[1]) / fSize) + 8) 
             scrollImage = scrollImage.resize(scaledSize)
 
             vOffset = -scaledSize[1]/8
@@ -165,10 +178,9 @@ def present(arg, clr = (250,150,150), duration = 5) :
 
             if(count <= countLimit) :
                 count +=1
-
                 # if countLimit = 0 then assume go on forever ...
                 if(countLimit == 0) : count = 0
-                present(arg, clr,  duration)
+                present(arg, paintColorRGB,  duration)
             else : exit()
 
         except KeyboardInterrupt:
@@ -203,7 +215,7 @@ def stroop( arg, clr, direction = "Left") :
             if(arg == "ORANGE") : bgColor = tuple(int(a*config.brightness) for a in ((255,125,0)))
             if(arg == "VIOLET") : bgColor = tuple(int(a*config.brightness) for a in ((200,0,255)))
         else:
-             bgColor = config.opp(clr)
+             bgColor = config.colorCompliment(clr)
 
         config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill=bgColor)
 

@@ -6,8 +6,8 @@ import math
 
 ########################
 #scroll speed and steps per cycle
-scrollSpeed = .0011
-steps = 1
+scrollSpeed = .0006
+steps = 2
 fontSize = 14
 vOffset  = -1
 opticalOpposites = True

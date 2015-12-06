@@ -107,7 +107,7 @@ def runSequence() :
 			elif(seq == 14) :
 				user.userAnimator(24)
 			elif(seq == 15) :
-				machine.machineAnimator(430)
+				machine.machineAnimator(430) # 430
 			elif(seq == 16) :
 				bluescreen.draw()
 			elif(seq == 17) :
@@ -115,7 +115,7 @@ def runSequence() :
 			elif (seq == 18) :
 				imgLoader.action = "pan"
 				imgLoader.countLimit = 1
-				imgLoader.start()
+				imgLoader.start("",0,-1)
 			elif (seq == 19) :
 				imgLoader.action = "play"
 				imgLoader.countLimit = 100
@@ -200,6 +200,11 @@ def main():
 	#*******  SETTING UP THE SEQUENCE GROUPS *********#
 	signage = (1,2,3,4,5,6,7,8,9,10,11,19)
 	animations = (14,15,16,17,18,19,20,21)
+
+	# no image panning
+	animations = (14,15,16,17,19,20,21)
+	#debug animations = (14,15)
+
 
 	groups = [signage,animations]
 	group = groups[0]

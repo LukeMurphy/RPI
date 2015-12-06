@@ -13,10 +13,15 @@ offsetx = -1
 userCenterx = 16
 userCentery = 32
 
-def drawUser() :
+userList = []
 
-        global centery, centery, offsetx, offsety, userCenterx, userCentery
+def drawUser(n = 0) :
+
+        global centery, centery, offsetx, offsety, userCenterx, userCentery, userList
         global config
+
+        userCenterx = userList[n][0]
+        userCentery = userList[n][1]
 
         dx = -5
         dy = 0
@@ -46,7 +51,7 @@ def drawUser() :
         
         matrix = config.matrix
         draw = config.draw
-        id = config.id
+        # id = config.id
         # x1, y1, x2, y2 of bounding box
         
         #### BODY
@@ -76,18 +81,27 @@ def drawUser() :
         config.render(config.image, userCenterx, userCentery, 31, 32, False)      
 
 
-def userAnimator(arg) :
-        global config      
-        image = config.Image.new("RGBA", (32, 32))
+def userAnimator(arg, numUsers=2) :
+        global config, userList, userCenterx, userCentery   
+
+
+        config.image = config.Image.new("RGBA", (32, 32))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.draw.rectangle((0,0,32,32), fill= (0,0,0))
-        config.id = image.im.id
+        #config.id = image.im.id
+        
+        numUsers = int(random.uniform(1,3))
+        userList = [[0,0]]*numUsers
+
+        for n in range(0,numUsers) :
+                userList[n] = [int(random.uniform(0,config.screenWidth)), userCentery]
+
         count = 0
         while (count < arg) :
-                drawUser()
+                for n in range(0,numUsers) : drawUser(n)
                 count+=1
                 time.sleep(.25)
-        #if(random.random() > .5) : burst(20)
+        if(random.random() > .5) :  userAnimator(arg)
 
 
 

@@ -160,6 +160,7 @@ def present(arg, clr = (250,150,150), duration = 5) :
             xoffRange = 1
             yOffRange = 2
 
+            # Either the 'optical ' RGB opposite or the RBY paint 'opposite/compliment'
             if(random.random() > .5) :
                 draw.text((-xoffRange,yOffRange), arg,config.colorCompliment(paintColorRGB), font=font)
             else:

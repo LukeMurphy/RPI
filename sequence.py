@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing
+from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender
 import Image
 import ImageDraw
 import time
@@ -196,6 +196,9 @@ def main():
 	flash = flashing
 	flash.config = config
 
+	blend = blender
+	blend.config = config
+
 
 	#*******  SETTING UP THE SEQUENCE GROUPS *********#
 	signage = (1,2,3,4,5,6,7,8,9,10,11,19)
@@ -261,6 +264,10 @@ def main():
 			elif(argument == "flash") : 
 				flash.colorSwitch = False
 				flash.animator(100)
+				exit()
+			elif(argument == "blend") : 
+				blend.colorSwitch = False
+				blend.animator(100)
 				exit()
 			elif(argument == "blue") : 
 				bluescreen.draw()

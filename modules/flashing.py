@@ -26,7 +26,7 @@ def clrAdjust(clr) :
 
 
 def drawRects() :
-        # Draw blacks of color on each panel
+        # Draw blocks of color on each panel
         # increace the lumens on each as if flashing lights - so 
         # increase is probably something like relates to a rate of
         # 2 Pi r or 

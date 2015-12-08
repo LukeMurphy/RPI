@@ -9,13 +9,15 @@ r=g=b=125
 pulseSpeed = .01
 
 # defaults
-boxWidth = 70
-boxHeight = 64
+boxWidth = 80
+boxHeight = 32
 
 theta = 0
 radius = 100
 PI = math.pi
 flashRate = 6
+probabilityOfAlternateResolution = .25
+probabilityOfAlternateResolutionHold = .5
 
 global rectangles, overLap, overLapColor,overLapInit, solidOverLapColor
 
@@ -55,7 +57,7 @@ def moveRects() :
         global config
         global theta, radius, PI, flashRate
         global colorSwitch, overLapInit, overLapInit, overLapColor, solidOverLapColor
-        global boxWidth, boxHeight, rectangles
+        global boxWidth, boxHeight, rectangles, probabilityOfAlternateResolution
 
         rLevel = int((math.cos(theta) * 255))
         bLevel = int((math.sin(theta) * 255))
@@ -82,19 +84,10 @@ def moveRects() :
 
                 ### Movement ###
                 rectangles[n][0] += rectangles[n][3]
-                if ((rectangles[n][0] >= (config.screenWidth - rectangles[n][4])) 
-                        or (rectangles[n][0] <= (0))) : 
+                if ((rectangles[n][0] >= (config.screenWidth - rectangles[n][4]/2)) 
+                        or (rectangles[n][0] <= (0 - rectangles[n][4]/2))) : 
                                 rectangles[n][3] = rectangles[n][3] * -1
 
-                                '''
-                                if(rectangles[n][3] < 0 ) : 
-                                        adjustedSpeed = -1
-                                else:
-                                        adjustedSpeed = 1
-                                if(random.random() > .8) :
-                                        rectangles[n][3] = int(rectangles[n][3] * random.uniform(1,3))
-                                        if (rectangles[n][3] > 5 or rectangles[n][3] < -5 or rectangles[n][3] == 0) : rectangles[n][3] = adjustedSpeed
-                                '''
 
         a = max(rectangles[0][0], rectangles[1][0])
         b = 0
@@ -108,7 +101,7 @@ def moveRects() :
 
                 if (overLapInit == True) :
                         overLapInit = False
-                        if(random.random() > .5) : 
+                        if(random.random() > probabilityOfAlternateResolution) : 
                                 overLapColor = True
                         else :
                                 overLapColor = False
@@ -139,9 +132,15 @@ def moveRects() :
                 else :
                         config.draw.rectangle((a, b, c , d ), fill=solidOverLapColor)
 
-                # DEBUG ********
+                # PAUSER
                 if (vlines >= boxWidth-2) : 
-                        if(random.random() > .9 and overLapColor==False) : time.sleep(2)
+                        if(random.random() > probabilityOfAlternateResolutionHold and overLapColor==False) : 
+                                config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight ),  fill=(0) )
+                                config.draw.rectangle((a, b, c , d ), fill=solidOverLapColor)
+                                config.render(config.image,0,0,config.screenWidth,config.screenHeight, False)
+                                time.sleep(random.uniform(1,4))
+                                # Flash of one color - red is most disturbing for some reason
+                                config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight ),  fill=(255,0,0) )
         else :
                 overLap = False
                 overLapInit = True
@@ -150,6 +149,7 @@ def redraw():
         global config
         #drawRects()
         moveRects() 
+        if(random.random() > .9) : config.brightness = random.random()
         config.render(config.image,0,0,config.screenWidth,config.screenHeight, False)
 
         
@@ -171,7 +171,7 @@ def animator(arg) :
         config.id = config.image.im.id
         #config.matrix.Clear()
 
-        config.brightness = .25
+        config.brightness = .165
 
         count = 0
         countLimit = arg * 160

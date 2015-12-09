@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender
+from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender, carousel
 import Image
 import ImageDraw
 import time
@@ -138,7 +138,7 @@ def runSequence() :
 
 def main():
 	global group, groups
-	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage, flash
+	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage, flash, carouselSign
 
 	baseconfig = ConfigParser.ConfigParser()
 	baseconfig.read('/home/pi/RPI/config.cfg')
@@ -198,6 +198,9 @@ def main():
 
 	blend = blender
 	blend.config = config
+
+	carouselSign = carousel
+	carouselSign.config = config
 
 
 	#*******  SETTING UP THE SEQUENCE GROUPS *********#
@@ -284,6 +287,8 @@ def main():
 			elif(argument  == "seq") :
 				group = groups[int(options)]
 				runSequence()
+			elif(argument  == "car") :
+				carouselSign.go()
 
 		else : runSequence()
 	except getopt.GetoptError as err:

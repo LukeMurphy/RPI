@@ -185,6 +185,11 @@ def main():
 	user.userCenterx = int(baseconfig.get("user", 'userCenterx'))
 	user.userCentery = int(baseconfig.get("user", 'userCentery'))
 
+	carouselSign = carousel
+	carouselSign.config = config
+	carouselSign.fontSize = int(baseconfig.get("scroll", 'fontSize'))
+	carouselSign.vOffset = int(baseconfig.get("scroll", 'vOffset'))
+
 	imgLoader = loader
 	imgLoader.debug = True
 	imgLoader.config = config
@@ -198,9 +203,6 @@ def main():
 
 	blend = blender
 	blend.config = config
-
-	carouselSign = carousel
-	carouselSign.config = config
 
 
 	#*******  SETTING UP THE SEQUENCE GROUPS *********#

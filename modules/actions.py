@@ -124,13 +124,13 @@ def burst(a=10) :
                                 rn = random.random()
                                 v = int(200 * config.brightness)
                                 if(rn > .3 and rn  < .6) :
-                                        r = v
-                                        g = v
-                                        b = 0 #int(200 * config.brightness)
+                                        r = 0
+                                        g = 0
+                                        b = v #int(200 * config.brightness)
                                 elif (rn > .6 and rn < .9) :
-                                        r = 0 #int(255 * config.brightness)
-                                        g = v
-                                        b = v
+                                        r = v #int(255 * config.brightness)
+                                        g = 0
+                                        b = 0
                                 else :
                                         True
                                         #r = g = b = 0
@@ -138,6 +138,7 @@ def burst(a=10) :
                                 config.matrix.SetPixel(x,y,r,g,b)
                                 if(stars) :
                                         (rx,gx,bx) =  config.colorCompliment((r,g,b))
+                                        if(random.random() > .5) :(rx,gx,bx) = (r,g,b)
                                         config.matrix.SetPixel(x+1,y,rx,gx,bx)
                                         config.matrix.SetPixel(x-1,y,rx,gx,bx)
                                         config.matrix.SetPixel(x,y+1,rx,gx,bx)

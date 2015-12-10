@@ -14,17 +14,19 @@ import sys, getopt
 
 print( "carousel loaded")
 
-global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth
+global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, fontSize
 
 
 dFactor  =  1.2
 numSegments = 38
 stepSize = 4
 clr = (150,0,0)
+fontSize = 60
+vOffset = 0
 
 
-def go(arg = "LOVE & PEACE OR !LOVE && !PEACE *** ") :
-	global offset
+def go(arg = "* * * LOVE & PEACE OR *** ") :
+	global offset, fontSize, vOffset
 	global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, stepSize, clr
 
 	# Generally this is set up for paneled screens 196x64
@@ -34,9 +36,9 @@ def go(arg = "LOVE & PEACE OR !LOVE && !PEACE *** ") :
 	imageToRender = Image.new("RGBA", (imageWrapLength, config.screenHeight))
 	warpedImage = Image.new("RGBA", (imageWrapLength, config.screenHeight))
 	draw  = ImageDraw.Draw(imageToRender)
-	font = ImageFont.truetype('./fonts/freefont/FreeSerifBold.ttf',60)
+	font = ImageFont.truetype('./fonts/freefont/FreeSerifBold.ttf',fontSize)
 
-	draw.text((0,0),arg,clr,font=font)
+	draw.text((0,vOffset),arg,clr,font=font)
 	pixLen = draw.textsize(arg, font = font)
 
 	# n * 2 * r * sin(theta) = curcumfrnace of polygon 

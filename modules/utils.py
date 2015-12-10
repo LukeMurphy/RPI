@@ -17,6 +17,7 @@ useMassager = False
 brightness = 1
 
 colorWheel = ["RED","VERMILLION","ORANGE","AMBER","YELLOW","CHARTREUSE","GREEN","TEAL","BLUE","VIOLET","PURPLE","MAGENTA"]
+wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146,206,0),(0,0,255),(65,0,165),(135,0,175),(167,25,75)]
 
 global imageTop,imageBottom,image,config
 
@@ -30,17 +31,18 @@ def colorCompliment((r,g,b)) :
     b = int((minmax - b) * brightness)
     return (r,g,b)     
 
+# Find the closest point 
+def closestRBYfromRGB((r,g,b)) :
+    global brightness, wheel
+    # d = sqrt( x2-x1 ^ 2 ....)
+    dMax = 0
+    dArray = []
+    for n in range (0, len(wheel)) :
+        d = int(math.sqrt( (r-wheel[n][0])**2 + (g-wheel[n][1])**2 + (b-wheel[n][2])**2 ))
+        dArray.append([n,d])
+    dArray = sorted(dArray, key=lambda n:n[1], reverse=False)
+    return wheel[dArray[0][0]]
 
-def colorComplimentRBY((r,g,b)) :
-    global brightness
-    PI = math.pi
-    wheel = [   (0,255,0,0),
-                (1/3 * PI,255,126,0),
-                (2/3 * PI,255,255,0),
-                (PI,0,255,0),
-                (4/3 * PI,0,0,255),
-                (5/3 * PI, 126,0,255),
-    ]
 
 def subtractiveColors(arg) :
     color = (0,0,0)

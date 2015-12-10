@@ -33,7 +33,7 @@ def render(imageToRender):
 		xPos = n * segmentWidth
 		yPos = n * 32
 		segment =  imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
-		print(n, segment)
+		#print(n, segment)
 		segmentImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
 
 	iid = segmentImage.im.id
@@ -43,15 +43,17 @@ def render(imageToRender):
 
 # width , height
 tileSize = (32, 64)
-matrix = Adafruit_RGBmatrix(32, 12)
-imageToRender = Image.new("RGBA", (384, 32))
+matrix = Adafruit_RGBmatrix(32, 4)
+imageToRender = Image.new("RGBA", (128, 32))
 draw  = ImageDraw.Draw(imageToRender)
 
-rows = 2
+rows = 1
 cols = 6
 n = clri = 0
-sizeX = 31 
+sizeX = 18
 sizeY = 31
+
+
 
  #(0,200,0)
 wheel = [   (255,0,0),
@@ -62,7 +64,8 @@ wheel = [   (255,0,0),
             (126,0,255),]
 
 cName1 = wheel[clri]
-cName2 = utils.colorComplimentRBY(cName1)
+cName2 = (utils.colorCompliment(cName1))
+
 
 imageRows = [] * rows
 
@@ -73,11 +76,13 @@ for c in range(0, cols * rows ) :
 	xPos2 = xPos + sizeX
 	yPos2 = yPos + sizeY
 	b =  n + 1
-	b = 4
+	b = 2
 	# draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(255,0,n * 15), outline=(0,255,0))
-	draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(int(cName1[0]/b),int(cName1[1]/b),int(cName1[2]/b)), outline=(int(cName2[0]/b),int(cName2[1]/b),int(cName2[2]/b)))
+	draw.rectangle((xPos,yPos,xPos2,yPos2), 
+		fill=(int(cName1[0]/b),int(cName1[1]/b),int(cName1[2]/b)), 
+		outline=(int(cName2[0]/b),int(cName2[1]/b),int(cName2[2]/b)))
 	n += 1
-	print(n, xPos, yPos, xPos2, yPos2)
+	#print(n, xPos, yPos, xPos2, yPos2)
 	currentName = cName1
 
 	if (clri < len(wheel)-1) :
@@ -86,15 +91,13 @@ for c in range(0, cols * rows ) :
 		clri = 0 
 
 	cName1 = wheel[clri]	
-	cName2 = currentName
+	cName2 = utils.closestRBYfromRGB(utils.colorCompliment(cName1))
 
-currentName = cName1
-cName1 = cName2	
-cName2 = currentName
+
 
 iid = imageToRender.im.id
 #matrix.SetImage(iid, 0, 0)
-print("imageToRender", imageToRender)
+#print("imageToRender", imageToRender)
 
 #time.sleep(5)
 #exit()

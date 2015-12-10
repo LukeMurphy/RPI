@@ -9,7 +9,7 @@ r=g=b=125
 pulseSpeed = .01
 
 # defaults
-boxWidth = 80
+boxWidth = 74
 boxHeight = 32
 
 theta = 0
@@ -136,7 +136,9 @@ def moveRects() :
                 if (vlines >= boxWidth-2) : 
                         if(random.random() > probabilityOfAlternateResolutionHold and overLapColor==False) : 
                                 config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight ),  fill=(0) )
-                                config.draw.rectangle((a, b, c , d ), fill=solidOverLapColor)
+                                config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight ),  fill=(0,0,255) )
+				config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight ),  fill=(0) )
+				config.draw.rectangle((a, b, c , d ), fill=solidOverLapColor)
                                 config.render(config.image,0,0,config.screenWidth,config.screenHeight, False)
                                 time.sleep(random.uniform(1,4))
                                 # Flash of one color - red is most disturbing for some reason

@@ -31,15 +31,15 @@ def go(arg = "* * * LOVE & PEACE OR *** ") :
 
 	# Generally this is set up for paneled screens 196x64
 	offset = 10
-	arg = "                   " + arg
+	argToUse = "          " + arg
 	imageWrapLength = config.screenWidth * 50
 	imageToRender = Image.new("RGBA", (imageWrapLength, config.screenHeight))
 	warpedImage = Image.new("RGBA", (imageWrapLength, config.screenHeight))
 	draw  = ImageDraw.Draw(imageToRender)
-	font = ImageFont.truetype('./fonts/freefont/FreeSerifBold.ttf',fontSize)
+	font = ImageFont.truetype('/home/pi/RPI/fonts/freefont/FreeSerifBold.ttf',fontSize)
 
-	draw.text((0,vOffset),arg,clr,font=font)
-	pixLen = draw.textsize(arg, font = font)
+	draw.text((0,vOffset),argToUse,clr,font=font)
+	pixLen = draw.textsize(argToUse, font = font)
 
 	# n * 2 * r * sin(theta) = curcumfrnace of polygon 
 	# where theta = 2 * PI/n  where n = number of faces
@@ -61,7 +61,7 @@ def go(arg = "* * * LOVE & PEACE OR *** ") :
 			time.sleep(.001)
 		except KeyboardInterrupt, e:
 			exit()
-	go()
+	go(arg)
 	
 
 

@@ -105,12 +105,16 @@ def runSequence() :
 			# Animation only modules
 
 			elif(seq == 14) :
+				actions.explosion()
 				user.userAnimator(24)
 			elif(seq == 15) :
-				machine.machineAnimator(430) # 430
+				actions.explosion()
+				machine.machineAnimator(830) # 430
 			elif(seq == 16) :
+				actions.explosion()
 				bluescreen.draw()
 			elif(seq == 17) :
+				actions.explosion()
 				actions.glitch()
 			elif (seq == 18) :
 				imgLoader.action = "pan"
@@ -124,11 +128,11 @@ def runSequence() :
 				concentric.colorSwitch = False
 				concentric.animator(60)
 			elif (seq == 21) :
+				actions.explosion()
 				user.userAnimator(12)
 				machine.machineAnimator(80)
-				user.userAnimator(1)
-				machine.machineAnimator(80)
-				actions.burst(20)
+				user.userAnimator(5)
+				machine.machineAnimator(220)
 				actions.explosion()
 	
 	except KeyboardInterrupt:
@@ -290,7 +294,7 @@ def main():
 				group = groups[int(options)]
 				runSequence()
 			elif(argument  == "car") :
-				carouselSign.go()
+				carouselSign.go(options)
 
 		else : runSequence()
 	except getopt.GetoptError as err:

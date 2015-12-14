@@ -35,7 +35,7 @@ def changeColor( rnd = False) :
                 g = int(random.uniform(0,255) * config.brightness)
                 b = int(random.uniform(0,255) * config.brightness)
 
-def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :	
+def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :   
         global config, scrollSpeed, steps, fontSize, vOffset  
         changeColor(clrChange)
 
@@ -149,26 +149,30 @@ def present(arg, clr = (250,150,150), duration = 5) :
             #clr = tuple(int(a*config.brightness) for a in (clr))
             paintColorRGB = config.subtractiveColors(paintColor)
 
-            fSize = config.screenHeight
+            fSize = int(config.screenHeight * vFactor)
+     
             # draw the message to get its size - not very accurate for height tho...
             font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf', fSize)
             pixLen = config.draw.textsize(arg, font = font)
 
             # make a new image with the right size
-            scrollImage = config.Image.new("RGBA", pixLen)
+            scrollImage = config.Image.new("RGBA", (pixLen[0],pixLen[1] + 20))
             draw = config.ImageDraw.Draw(scrollImage)
             xoffRange = 1
             yOffRange = 2
 
-            # Either the 'optical ' RGB opposite or the RBY paint 'opposite/compliment'
+            # Draw the 'shadow' - either the 'optical ' RGB opposite or the RBY paint 'opposite/compliment'
             if(random.random() > .5) :
                 draw.text((-xoffRange,yOffRange), arg,config.colorCompliment(paintColorRGB), font=font)
             else:
                 draw.text((-xoffRange,yOffRange), arg,config.colorComplimentRBY(paintColor), font=font)
+
+            # Draw the actual text    
             draw.text((0,0 ), arg,paintColorRGB, font=font)
 
             # Scale the image to fit the full set of panels (using a rough formula for font offset)
             scaledSize = (config.screenWidth , int( vFactor * float(config.screenHeight * pixLen[1]) / fSize) + 8) 
+            #scaledSize = (config.screenWidth , config.screenHeight) 
             scrollImage = scrollImage.resize(scaledSize)
 
             vOffset = -scaledSize[1]/8
@@ -197,8 +201,8 @@ def stroop( arg, clr, direction = "Left") :
         speed = .018
 
         # Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
-        font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)
-        font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)
+        font = ImageFont.truetype(config.path + '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
+        font2 = ImageFont.truetype(config.path + '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
         pixLen = config.draw.textsize(arg, font = font)
 
         config.image = config.Image.new("RGBA", pixLen)

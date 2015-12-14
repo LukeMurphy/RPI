@@ -35,15 +35,20 @@ def explosion():
         # initial center position
         x = int(random.random()*config.screenWidth)
         y = int(random.random()*16)
-        
+
+        brightness = config.brightness
+        sparkleBrightness = config.brightness
+        brightness = .9
+        sparkleBrightness = .8
+
         for n in range (0, p) :
                 # variation in initial velocity
                 f = random.random() * 4
                 vx = math.cos(angle * n) * f
                 vy = math.sin(angle * n) * f
-                r = int(random.uniform(0,255)* config.brightness)
-                g = int(random.uniform(0,255)* config.brightness)
-                b = int(random.uniform(0,255)* config.brightness)
+                r = int(random.uniform(0,255)* brightness)
+                g = int(random.uniform(0,255)* brightness)
+                b = int(random.uniform(0,255)* brightness)
                 particles.append({'id':n,'xpos':x,'ypos':y,'vx':vx,'vy':vy, 'c':[r,g,b]})
 
         for i in range (0,50) :
@@ -79,9 +84,9 @@ def explosion():
 
                         # Sparkles!!
                         if(random.random() > .9) :
-                                r = int(220 * config.brightness)
-                                g = int(220 * config.brightness)
-                                b = int(255 * config.brightness)
+                                r = int(220 * sparkleBrightness)
+                                g = int(220 * sparkleBrightness)
+                                b = int(255 * sparkleBrightness)
 
                         #if (q ==0) : print (particles[q]['c'][0])
                         xDisplayPos = ref['xpos']

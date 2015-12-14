@@ -2,13 +2,16 @@
 import time
 import random
 import math
+import Image
 
 vx = 1
 vy = 2
 x = 0
 y = 0
 r=g=b=125
-redrawSpeed = .015
+redrawSpeed = .01
+boxHeight = 30
+boxWidth = 26
 
 
 def drawMachine() :
@@ -36,15 +39,15 @@ def drawMachine() :
         w = 1
 
         if (r == 0 ):
-                rf = 255
+                rf = int(255 * config.brightness)
                 gf = 0
                 r = 0
-                g = 255
+                g = int(255 * config.brightness)
                 b = 0
         else :
                 rf = 0
-                gf = 255
-                r = 255
+                gf = int(255 * config.brightness)
+                r = int(255 * config.brightness)
                 g = 0
                 b = 0
                 w = 2
@@ -68,13 +71,10 @@ def drawMachine() :
         config.draw.line((x1+3,y1+d2,x1+2,y1+d2 +1), fill=(r,g,b), width = w)
         config.draw.line((x1+4,y1+d2,x1+d2,y1+d2), fill=(r,g,b), width = w)
         config.draw.line((x1+d2+1,y1+d2,x1+d2 +2,y1+d2+1), fill=(r,g,b), width = w)
-      
-
-# ################################################### #
 
 def redraw():
         global config
-        global x,y,vx,vy
+        global x,y,vx,vy, boxWidth, boxHeight
         speed = 1
 
         xMax = config.screenWidth - 12
@@ -86,7 +86,8 @@ def redraw():
 
         drawMachine()
 
-        config.render(config.image,x,y,26,30,False)
+        # Render using main render function - manages the matrix tiling
+        config.render(config.image,x,y,boxWidth,boxHeight,False)
 
                 
         if (x > xMax + buffer):
@@ -94,56 +95,55 @@ def redraw():
                 changeColor()
                 if(random.random() > .5): vx = int(vx * 2 * random.random())
                 x = xMax +  buffer - 2
-        if (x < 0 - 26 + buffer):
+        if (x < 0 - 26 + 1):
                 vx = vx * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vx * 2 * random.random())
-                x = -26 + buffer
+                x = -26 + 1
         if (y > yMax + buffer):
                 vy = vy * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vy * 2 * random.random())
                 y = yMax + buffer -  2
-        if(y < 0 - buffer):
+        if(y < 0 - boxHeight):
                 vy = vy * -1
                 changeColor()
                 if(random.random() > .5): vx = int(vy * 2 * random.random())
-                y = 0 - buffer
+                y = 0 - boxHeight
 
 
 def changeColor( rnd = False) :
                 global r,g,b        
                 if (rnd == False) :
-                                if(r == 255) :
+                                if(r == int(255 * config.brightness)) :
                                                 r = 0
-                                                g = 255
+                                                g = int(255 * config.brightness)
                                                 b = 0
                                 else :
                                                 g = 0
-                                                r = 255
+                                                r = int(255 * config.brightness)
                                                 b = 0
                 else :
                                 r = int(random.uniform(0,255))
                                 g = int(random.uniform(0,255))
                                 b = int(random.uniform(0,255))
 
-
-
 def machineAnimator(arg) :
         global redrawSpeed, x, y, vx, vy
+        config.renderImage = Image.new("RGBA", (config.actualScreenWidth, config.screenHeight))
         config.image = config.Image.new("RGBA", (26, 30))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
+
         x = int(random.random() * config.screenWidth)
         y = int(random.random() * config.screenHeight)
 
+        x=50
+        y=50
+        #vx = 0
+        #vy = 0
+
         count = 0
-        '''
-        x = 80
-        y = 80
-        vx = -1
-        vy = -1
-        '''
 
         while (count < arg * 2) :
                 redraw()

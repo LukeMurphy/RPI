@@ -6,42 +6,49 @@ import math
 
 ########################
 #scroll speed and steps per cycle
-scrollSpeed = .0051
-steps = 6
-fontSize = 50
+scrollSpeed = .0006
+steps = 2
+fontSize = 14
+vOffset  = -1
+opticalOpposites = True
+countLimit = 6
+count = 0
+
+# fcu present will start with the opposite
+paintColor = "GREEN"
 
 r=g=b=0
 
 def changeColor( rnd = False) :
-        global r,g,b
+        global r,g,b,config
         if (rnd == False) :
-                if(r == 255) :
+                if(r == int(255* config.brightness)) :
                         r = 0
-                        g = 255
+                        g = int(255* config.brightness)
                         b = 0
                 else :
                         g = 0
-                        r = 255
+                        r = int(255* config.brightness)
                         b = 0
         else :
-                r = int(random.uniform(0,255))
-                g = int(random.uniform(0,255))
-                b = int(random.uniform(0,255))
-
+                r = int(random.uniform(0,255) * config.brightness)
+                g = int(random.uniform(0,255) * config.brightness)
+                b = int(random.uniform(0,255) * config.brightness)
 
 def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :	
-        global config, scrollSpeed, steps, fontSize
-            
+        global config, scrollSpeed, steps, fontSize, vOffset  
         changeColor(clrChange)
 
         # draw the meassage to get its size
         font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',fontSize)
-        tempImage = config.Image.new("RGBA", (1200,64))
+        tempImage = config.Image.new("RGBA", (1200,196))
         draw  = config.ImageDraw.Draw(tempImage)
         pixLen = draw.textsize(arg, font = font)
-        
+        # For some reason textsize is not getting full height !
+        fontHeight = int(pixLen[1] * 1.3)
 
         # make a new image with the right size
+        config.renderImage = config.Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
         scrollImage = config.Image.new("RGBA", pixLen)
         draw  = config.ImageDraw.Draw(scrollImage)
         iid = scrollImage.im.id
@@ -72,82 +79,124 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
             
             for n in range(start,end):
                 #fix  config.matrix.SetImage(config.id,xOffset,-n)
-                render(scrollImage, xOffset, n, pixLen[0], pixLen[1])
+                config.render(scrollImage, xOffset, n, pixLen[0], fontHeight)
                 time.sleep(scrollSpeed)
 
         elif(direction == "Top") :
                 imageHeight = pixLen[0]
 
-                print (pixLen, imageHeight)
+                print (pixLen, imageHeight, fontHeight)
 
-                scrollImage = config.Image.new("RGBA", (imageHeight, pixLen[1]))
+                scrollImage = config.Image.new("RGBA", (imageHeight, imageHeight))
                 draw  = config.ImageDraw.Draw(scrollImage)
                 draw.text((0,0),arg,(r,g,b),font=font)
-                scrollImage = scrollImage.rotate(-90)
-                scrollImage.load()
-                xOffset =int(random.random()*(config.screenWidth - pixLen[1]))
+                #scrollImage = scrollImage.rotate(-90)
+                #scrollImage.load()
+
+                print(scrollImage.size)
+
+                xOffset =int(random.random()*(config.screenWidth - fontHeight))
+
 
                 for n in range(0,pixLen[0] + config.screenHeight):
-                    render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
+                    config.render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
                     time.sleep(.012)
 
 
         else :
-            scrollImage = config.Image.new("RGBA", pixLen)
+            scrollImage = config.Image.new("RGBA", (pixLen[0],fontHeight))
             draw  = config.ImageDraw.Draw(scrollImage)
             iid = scrollImage.im.id
             draw.text((0,0),arg,(r,g,b),font=font)
 
             start = 0
             end = scrollImage.size[0]
-            start = -128
+            start = -config.screenWidth
             if(direction == "Right") : 
                 start = -end
-                end = 128
+                end = config.screenWidth
 
-            vOffset  = -1
 
-            for n in range(start,end):
+            for n in range(start,end, steps):
                 try :
                     if(direction == "Left") :
-                            #fix  config.matrix.SetImage(config.id, -n, vOffset)
-                            render(scrollImage, n, vOffset, pixLen[0], pixLen[1])
+                            config.render(scrollImage, -n, vOffset, pixLen[0], fontHeight, False)
                             config.actions.drawBlanks()
                     else :
-                            #fix  config.matrix.SetImage(config.id, n, vOffset)
-                            render(scrollImage, -n, vOffset, pixLen[0], pixLen[1])
                             config.actions.drawBlanks()
+                            config.render(scrollImage, n, vOffset, pixLen[0], fontHeight, False)
                             if(random.random() > 0.9998) :
                                             config.actions.glitch()
                                             break
+                    time.sleep(scrollSpeed)
                 except KeyboardInterrupt:
                             #print "Stopping"
                             break
+                            exit()
 
-                time.sleep(scrollSpeed)
+def present(arg, clr = (250,150,150), duration = 5) :
+        global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
+        global r,g,b, paintColor
+        
+        vFactor = 1.2
 
+        try:
+            #changeColor(False)
+            if (paintColor == "RED") : 
+                paintColor = "GREEN"
+            else :
+                paintColor =  "RED"
+            #clr = tuple(int(a*config.brightness) for a in (clr))
+            paintColorRGB = config.subtractiveColors(paintColor)
 
-def render(imageTemp,xOffset,yOffset,w,h):
+            fSize = config.screenHeight
+            # draw the message to get its size - not very accurate for height tho...
+            font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf', fSize)
+            pixLen = config.draw.textsize(arg, font = font)
 
-    global imageTop, imageBottom
+            # make a new image with the right size
+            scrollImage = config.Image.new("RGBA", pixLen)
+            draw = config.ImageDraw.Draw(scrollImage)
+            xoffRange = 1
+            yOffRange = 2
 
-    # the rendered image is the screen size
-    renderImage = config.Image.new("RGBA", (config.screenWidth * config.panels , 32))
+            # Either the 'optical ' RGB opposite or the RBY paint 'opposite/compliment'
+            if(random.random() > .5) :
+                draw.text((-xoffRange,yOffRange), arg,config.colorCompliment(paintColorRGB), font=font)
+            else:
+                draw.text((-xoffRange,yOffRange), arg,config.colorComplimentRBY(paintColor), font=font)
+            draw.text((0,0 ), arg,paintColorRGB, font=font)
 
-    imageTop = imageTemp.crop((xOffset, yOffset, xOffset + 128, 32+yOffset))
-    imageBottom = imageTemp.crop((xOffset, 32+yOffset, xOffset + 128, 64+yOffset))
+            # Scale the image to fit the full set of panels (using a rough formula for font offset)
+            scaledSize = (config.screenWidth , int( vFactor * float(config.screenHeight * pixLen[1]) / fSize) + 8) 
+            scrollImage = scrollImage.resize(scaledSize)
 
-    renderImage.paste(imageTop, (0,0))
-    renderImage.paste(imageBottom, (128,0))
+            vOffset = -scaledSize[1]/8
+            config.render(scrollImage, 0, vOffset, config.screenWidth, config.screenHeight - vOffset)
+            config.actions.drawBlanks()
 
-    iid = renderImage.im.id
-    config.matrix.SetImage(iid, 0, 0)
+            time.sleep(duration)
+
+            if(count <= countLimit) :
+                count +=1
+                # if countLimit = 0 then assume go on forever ...
+                if(countLimit == 0) : count = 0
+                present(arg, paintColorRGB,  duration)
+            else : exit()
+
+        except KeyboardInterrupt:
+            #print "Stopping"
+            exit()     
 
 def stroop( arg, clr, direction = "Left") :
 
-        global r,g,b
+        global r,g,b,config, opticalOpposites
+        clr = tuple(int(a*config.brightness) for a in (clr))
+
         #matrix.Clear()
         speed = .018
+
+        # Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
         font = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)
         font2 = ImageFont.truetype(config.path + '/fonts/freefont/FreeSansBold.ttf',30)
         pixLen = config.draw.textsize(arg, font = font)
@@ -156,7 +205,22 @@ def stroop( arg, clr, direction = "Left") :
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
 
-        config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill="blue")
+        # Draw Background Color
+        # Optical (RBY) or RGB opposites
+
+        if(opticalOpposites) :
+            if(arg == "RED") : bgColor = tuple(int(a*config.brightness) for a in ((255,0,0)))
+            if(arg == "GREEN") : bgColor = tuple(int(a*config.brightness) for a in ((0,255,0)))
+            if(arg == "BLUE") : bgColor = tuple(int(a*config.brightness) for a in ((0,0,255)))
+            if(arg == "YELLOW") : bgColor = tuple(int(a*config.brightness) for a in ((255,255,0)))
+            if(arg == "ORANGE") : bgColor = tuple(int(a*config.brightness) for a in ((255,125,0)))
+            if(arg == "VIOLET") : bgColor = tuple(int(a*config.brightness) for a in ((200,0,255)))
+        else:
+             bgColor = config.colorCompliment(clr)
+
+        config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill=bgColor)
+
+        # Draw the text with "borders"
         config.draw.text((-1,-1),arg,(0,0,0),font=font2)
         config.draw.text((1,1),arg,(0,0,0),font=font2)
         config.draw.text((0,0),arg,clr,font=font)
@@ -198,6 +262,4 @@ def stroop( arg, clr, direction = "Left") :
                     else :
                             config.matrix.SetImage(config.id, n, -2)
                     time.sleep(0.01)
-
-# ################################################### #
 

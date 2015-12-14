@@ -5,9 +5,18 @@ import time
 import random
 #from rgbmatrix import Adafruit_RGBmatrix
 import math
+import messenger
+
+blankPixels = []
+cols = int(random.uniform(2,20))
+rows = int(random.uniform(2,20))
+drawBlanksFlag = True
 
 def explosion():
         global config
+
+        if(config.useMassager == True) : 
+                messenger.soliloquy(True)
 
         #image = Image.new("RGBA", (32, 32))
         #draw  = ImageDraw.Draw(image)
@@ -32,9 +41,9 @@ def explosion():
                 f = random.random() * 4
                 vx = math.cos(angle * n) * f
                 vy = math.sin(angle * n) * f
-                r = int(random.uniform(0,255))
-                g = int(random.uniform(0,255))
-                b = int(random.uniform(0,255))
+                r = int(random.uniform(0,255)* config.brightness)
+                g = int(random.uniform(0,255)* config.brightness)
+                b = int(random.uniform(0,255)* config.brightness)
                 particles.append({'id':n,'xpos':x,'ypos':y,'vx':vx,'vy':vy, 'c':[r,g,b]})
 
         for i in range (0,50) :
@@ -68,21 +77,25 @@ def explosion():
                         g = particles[q]['c'][1]
                         b = particles[q]['c'][2]
 
+                        # Sparkles!!
                         if(random.random() > .9) :
-                                r = 220
-                                g = 220
-                                b = 255
+                                r = int(220 * config.brightness)
+                                g = int(220 * config.brightness)
+                                b = int(255 * config.brightness)
 
                         #if (q ==0) : print (particles[q]['c'][0])
                         xDisplayPos = ref['xpos']
                         yDisplayPos = ref['ypos']
 
-                        if(xDisplayPos > 128) :
-                                xDisplayPos += 128
+                        if(xDisplayPos > config.screenWidth) :
+                                xDisplayPos += config.screenWidth
 
-                        if(yDisplayPos > 32) :
+                        if(yDisplayPos > 32 and yDisplayPos <64) :
                                 yDisplayPos -=32
-                                xDisplayPos += 128
+                                xDisplayPos += config.screenWidth
+                        if(yDisplayPos > 64) :
+                                yDisplayPos -=64
+                                xDisplayPos += config.screenWidth*2
 
                         config.matrix.SetPixel(int(xDisplayPos),int(yDisplayPos),r,g,b)
                         
@@ -90,54 +103,59 @@ def explosion():
         if(random.random() > .1) : explosion()
 
 def burst(a=10) :
+        global config
         config.matrix.Clear()
         count = 0
         stars = False
-        p = 50
+        p = 20
+        actualScreenWidth = config.actualScreenWidth
         if(random.random() > .5):
                         stars = True
-                        p = 20
+                        p = 10
         while (count < a) :
-                        config.matrix.Clear()
-                        for n in range(0,p) :
-                                        r = int(random.uniform(0,255))
-                                        g = int(random.uniform(0,255))
-                                        b = int(random.uniform(0,255))
-                                        x = int(random.random()*config.screenWidth*config.panels)
-                                        y = int(random.random()*31)
+                        config.matrix.Clear
+                        for n in range(0, p) :
+                                r = int(random.uniform(0,255) * config.brightness)
+                                g = int(random.uniform(0,255) * config.brightness)
+                                b = int(random.uniform(0,255) * config.brightness)
+                                x = int(random.random()*actualScreenWidth)
+                                y = int(random.random()*31)
 
-                                        rn = random.random()
+                                rn = random.random()
+                                v = int(200 * config.brightness)
+                                if(rn > .3 and rn  < .6) :
+                                        r = 0
+                                        g = 0
+                                        b = v #int(200 * config.brightness)
+                                elif (rn > .6 and rn < .9) :
+                                        r = v #int(255 * config.brightness)
+                                        g = 0
+                                        b = 0
+                                else :
+                                        True
+                                        #r = g = b = 0
 
-                                        if(rn > .3 and rn  < .6) :
-                                                        r = 0
-                                                        g = 0
-                                                        b = 200
-                                        elif (rn > .6 and rn < .9) :
-                                                        r = 255
-                                                        g = 0
-                                                        b = 0
-                                        else :
-                                                        True
-
-                                        config.matrix.SetPixel(x,y,r,g,b)
-                                        if(stars) :
-                                                        config.matrix.SetPixel(x+1,y,r,g,b)
-                                                        config.matrix.SetPixel(x-1,y,r,g,b)
-                                                        config.matrix.SetPixel(x,y+1,r,g,b)
-                                                        config.matrix.SetPixel(x,y-1,r,g,b)
+                                config.matrix.SetPixel(x,y,r,g,b)
+                                if(stars) :
+                                        (rx,gx,bx) =  config.colorCompliment((r,g,b))
+                                        if(random.random() > .5) :(rx,gx,bx) = (r,g,b)
+                                        config.matrix.SetPixel(x+1,y,rx,gx,bx)
+                                        config.matrix.SetPixel(x-1,y,rx,gx,bx)
+                                        config.matrix.SetPixel(x,y+1,rx,gx,bx)
+                                        config.matrix.SetPixel(x,y-1,rx,gx,bx)
                         time.sleep(.08)
                         count += 1
         if(random.random() > .5) : burst()
 
-
 def glitch(a=10) :
+        global config
         count = 0
         while (count < a) :
                 yStart = int(random.uniform(0,16))
                 for n in range(0,30) :
-                        r = int(random.uniform(0,255))
-                        g = int(random.uniform(0,255))
-                        b = int(random.uniform(0,255))
+                        r = int(random.uniform(0,255) * config.brightness)
+                        g = int(random.uniform(0,255) * config.brightness)
+                        b = int(random.uniform(0,255) * config.brightness)
                         x = int(random.random()*config.screenWidth)
 
                         yEnd = yStart + int(random.uniform(0,16))
@@ -153,12 +171,6 @@ def glitch(a=10) :
         time.sleep(int(random.uniform(.1,4)))
         #exit()
 
-
-# ################################################## #
-
-blankPixels = []
-cols = int(random.uniform(2,20))
-rows = int(random.uniform(2,20))
 def setBlanks() :
         #print("Setting Blanks")
         global config,blankPixels,cols,rows
@@ -166,8 +178,8 @@ def setBlanks() :
         count = 0
         # scatter horizontally
         for n in range (0, 10) :
-                x = int(random.random()*config.screenWidth*config.panels)
-                y = int(random.random()*config.screenHeight/config.panels)
+                x = int(random.random()*config.actualScreenWidth)
+                y = int(random.random()*32)
                 blankPixels.append((x,y))
                 if(random.random() > .9):
                         cols = int(random.uniform(2,20))
@@ -178,15 +190,18 @@ def setBlanks() :
                                 for i in range (0,cols) :
                                         blankPixels.append((x+i,y + ii))
                 
-
 def drawBlanks() :
-        global config, blankPixels, rows, cols   
+        global config, blankPixels, rows, cols, drawBlanksFlag
         if (len(blankPixels) == 0): setBlanks()
         count = 0
         blankNum=len(blankPixels)
-             
-        for n in range (0, blankNum) :
-                config.matrix.SetPixel(blankPixels[n][0],blankPixels[n][1],0,0,0)
+        if(drawBlanksFlag) :
+                for n in range (0, blankNum) :
+                        config.matrix.SetPixel(blankPixels[n][0],blankPixels[n][1],0,0,0)
         
+def transition() :
+        global config, blankPixels, rows, cols  
+        #TODO
+        # Create diamond transisitons
 
-
+        

@@ -1,93 +1,190 @@
 import time
 import random
 import math
+import sys
+import messenger
 
 screenWidth =  128
 screenHeight = 64
 
-# for now, 2 panels means a stack of two 32x64 + 32x64
-# or, 4x2 x 32
-panels = 2
-
-
+tileSize = (32,64)
+rows = 2
+cols = 1
+imageRows = [] * rows
+actualScreenWidth = tileSize[1]*cols*rows
 path = "/home/pi/rpimain"
+useMassager = False
+brightness = 1
 
-global imageTop,imageBottom,image
+colorWheel = ["RED","VERMILLION","ORANGE","AMBER","YELLOW","CHARTREUSE","GREEN","TEAL","BLUE","VIOLET","PURPLE","MAGENTA"]
+wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146,206,0),(0,0,255),(65,0,165),(135,0,175),(167,25,75)]
 
-def opp((r,g,b)) :
+global imageTop,imageBottom,image,config
+
+def colorCompliment((r,g,b)) :
+    global brightness
     minRGB = min(r,min(g,b))
     maxRGB = max(r,max(g,b))
     minmax = minRGB + maxRGB
-    r = int((minmax - r) )
-    g = int((minmax - g) )
-    b = int((minmax -b)  )
-    return (r,g,b)
+    r = int((minmax - r) * brightness)
+    g = int((minmax - g) * brightness)
+    b = int((minmax - b) * brightness)
+    return (r,g,b)     
+
+# Find the closest point 
+def closestRBYfromRGB((r,g,b)) :
+    global brightness, wheel
+    # d = sqrt( x2-x1 ^ 2 ....)
+    dMax = 0
+    dArray = []
+    for n in range (0, len(wheel)) :
+        d = int(math.sqrt( (r-wheel[n][0])**2 + (g-wheel[n][1])**2 + (b-wheel[n][2])**2 ))
+        dArray.append([n,d])
+    dArray = sorted(dArray, key=lambda n:n[1], reverse=False)
+    return wheel[dArray[0][0]]
 
 
-def test() :
-        matrix.Fill(244,255,0)
-
-def change() :
-        print("")                     
+def subtractiveColors(arg) :
+    color = (0,0,0)
+    if(arg == "RED") : color = tuple(int(a*brightness) for a in ((255,2,2)))
+    if(arg == "VERMILLION") : color = tuple(int(a*brightness) for a in ((253,83,8)))
+    if(arg == "ORANGE") : color = tuple(int(a*brightness) for a in ((255,153,1)))
+    if(arg == "AMBER") : color = tuple(int(a*brightness) for a in ((250,188,2)))
+    if(arg == "YELLOW") : color = tuple(int(a*brightness) for a in ((255,255,0)))
+    if(arg == "CHARTREUSE") : color = tuple(int(a*brightness) for a in ((0,255,0)))
+    if(arg == "GREEN") : color = tuple(int(a*brightness) for a in ((0,125,0)))
+    if(arg == "TEAL") : color = tuple(int(a*brightness) for a in ((146,206,0)))
+    if(arg == "BLUE") : color = tuple(int(a*brightness) for a in ((0,0,255)))
+    if(arg == "VIOLET") : color = tuple(int(a*brightness) for a in ((65,0,165)))    
+    if(arg == "PURPLE") : color = tuple(int(a*brightness) for a in ((135,0,175)))    
+    if(arg == "MAGENTA") : color = tuple(int(a*brightness) for a in ((167,25,75)))    
+    return color
+    
+def colorComplimentRBY(arg) :
+    global colorWheel
+    l = len(colorWheel) / 2
+    indx = colorWheel.index(arg)
+    oppIndx  =  indx + l 
+    if(oppIndx > 11) : oppIndx -= (l*2)
+    return subtractiveColors(colorWheel[oppIndx])
 
 def changeColor(rnd = False) :
-                
-                if (rnd == False) :
-                                if(r == 255) :
-                                                r = 0
-                                                g = 255
-                                                b = 0
-                                else :
-                                                g = 0
-                                                r = 255
-                                                b = 0
-                else :
-                                r = int(random.uniform(0,255))
-                                g = int(random.uniform(0,255))
-                                b = int(random.uniform(0,255))
+    global brightness           
+    if (rnd == False) :
+                    if(r == 255) :
+                                    r = 0
+                                    g = 255
+                                    b = 0
+                    else :
+                                    g = 0
+                                    r = 255
+                                    b = 0
+    else :
+                    r = int(random.uniform(0,255) * brightness)
+                    g = int(random.uniform(0,255) * brightness)
+                    b = int(random.uniform(0,255) * brightness)
 
+def soliloquy(override = False,arg = "") :
+    global useMassager
+    if (useMassager) : messenger.soliloquy(override,arg)
 
-def render(imageTemp,xOffset,yOffset,w=128,h=64,crop=True):
+def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=False):
 
-    global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage
+    global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage, tileSize, rows, cols
+
+    #w = screenWidth
+    #h = screenHeight
+
+    segmentImage = []
 
     # the rendered image is the screen size
-    #renderImage = Image.new("RGBA", (screenWidth * panels , 32))
+    #renderImage = Image.new("RGBA", (screenWidth , 32))
+
     if(crop == True) :
-        imageTop = imageTemp.crop((xOffset, yOffset, xOffset + 128, 32+yOffset))
-        imageBottom = imageTemp.crop((xOffset, 32+yOffset, xOffset + 128, 64+yOffset))
+
+        #print("Total segment", segmentImage)
+        #imageToRender = imageToRender
+
+        for n in range(0,rows) :
+            segmentWidth = tileSize[1] * cols
+            segmentHeight = 32
+            xPos = n * segmentWidth - xOffset
+            yPos = n * 32 #- yOffset
+            segment =  imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
+            #print(n, segment)
+            renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
+        '''
+        imageTop = imageToRender.crop((xOffset, yOffset, xOffset + screenWidth, 32+yOffset))
+        imageBottom = imageToRender.crop((xOffset, 32+yOffset, xOffset + screenWidth, 64+yOffset))
         renderImage.paste(imageTop, (0,0))
-        renderImage.paste(imageBottom, (128,0))
-    else:
-        # this is what I'd like to do ....
-        # renderImage.paste(imageTemp, (xOffset, yOffset))
+        renderImage.paste(imageBottom, (screenWidth,0))
 
-        # get the overlap of the retangle to be rendered with the size of the "top" panel
-        # draw the top "half" to the first set of panels then draw the bottom half
-        # to the second panels, offset by screenWidth and difference over 32 pix
-        xOL = max(0, min(xOffset + w, 128) - max(xOffset, 0));
-        yOL = max(0, min(yOffset + h, 32) - max(yOffset, 0));
+
+        '''
+
+    elif (crop == False) :
+        segmentWidth = tileSize[1] * cols
+        segmentHeight = 32
+
+        #yOffset = 10
+        #xOffset = 100
+        # Must crop exactly the overlap and position of the to-be-rendered image with each segment
+        #           ________________
+        #           |               |
+        #           |               |
+        #           |    |||||||||  |
+        #           -----|||||||||---
+        #           |    |||||||||  |
+        #           |    |||||||||  |
 
         
+        cropP1 = [0,0]
+        cropP2 = [0,0]
 
-        imageTop = imageTemp.crop((0, 0, xOL, yOL))
-        imageBottom = imageTemp.crop((0, yOL, xOL, h+1))
+        for n in range(0,rows) :
 
-        
-    
+            # Crop PLACEMENTS\
+            a = max(0, xOffset) + segmentWidth * n
+            b = max(0, yOffset - segmentHeight * n)
+            c = min(segmentWidth, xOffset + w) + segmentWidth * n
+            d = min(segmentHeight, yOffset + h - segmentHeight * n)
 
-        renderImage.paste(imageTop, (xOffset, yOffset,xOL + xOffset, yOL + yOffset))
+            # Cropping
+            cropP2 = [  cropP1[0] + c - xOffset, 
+                        cropP1[1] + min(32, d - yOffset + n * segmentHeight)]
 
-        # Only offset the bottom if its top is more than 32
-        if((yOffset+h) > 32) : 
-            yOffset2 = max(yOffset,32)
-            #print(imageBottom,xOL,yOL)
-            #print(xOffset + 128, yOffset2-32, xOffset + 128 + xOL, yOffset2-32 + h)
-            renderImage.paste(imageBottom, (xOffset + 128, yOffset2-32, xOffset + 128 + xOL, yOffset2-32 + h +1 - yOL))
+            cropP1 = [max(0 , 0 - xOffset),     max(0, n * segmentHeight - yOffset)]
+            cropP2 = [min(w , segmentWidth - xOffset),   min(h, n * segmentHeight + 32 - yOffset)]
+
+            pCrop  = cropP1 + cropP2
+            segmentImage.append(imageToRender.crop(pCrop))
+
+            #print(pCrop)
+            
+            # Only render if needs be
+            if(pCrop[3] - pCrop[1] > 0 ) : 
+                if ( pCrop[2] - pCrop[0] > 0) :
+                    renderImage.paste( segmentImage[n], (a,b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
+                    #renderImage.load()
+     
+            cropP1[1] = cropP2[1]
 
 
-    iid = renderImage.im.id
-    idtemp = image.im.id
+    if(overlayBottom) :
+        renderImage = Image.new("RGBA", (w , h))
+        renderImage.paste(imageToRender, (0,0))
+        iid = renderImage.im.id
+        idtemp = image.im.id
+        matrix.SetImage(iid, xOffset + screenWidth, 0)
+    else :
+        iid = renderImage.im.id
+        idtemp = image.im.id
+        matrix.SetImage(iid, 0, 0)
 
-    matrix.SetImage(iid, 0, 0)
+    # DEBUG .....
+    #time.sleep(10)
+    #exit()
+    # ************************************ #
 
+    #print(">>")
+    #if(random.random() > .95) : soliloquy()

@@ -165,6 +165,7 @@ def animator(arg) :
         overLapColor = False
         solidOverLapColor = "VIOLET"
         
+	boxHeight = config.screenHeight
 
         # reseting render image size
         config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))

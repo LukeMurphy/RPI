@@ -18,7 +18,7 @@ import ConfigParser, io
 # ################################################### #
 
 baseconfig = ConfigParser.ConfigParser()
-baseconfig.read('/home/pi/RPI1/config.cfg')
+baseconfig.read('/home/pi/RPI/config.cfg')
 
 config = utils
 config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))

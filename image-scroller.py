@@ -43,7 +43,10 @@ config.brightness =  float(baseconfig.get("config", 'brightness'))
 config.path = baseconfig.get("config", 'path')
 
 action = actions
+actions.drawBlanksFlag = False
 action.config = config
+# This is so not good .. so much for avoiding OOP ....
+config.actions =  actions
 
 imgLoader = loader
 imgLoader.config = config
@@ -57,25 +60,27 @@ def seq() :
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
 	
 	# Get all files in the drawing folder
-	path = config.path  + "/imgs"
+	path = config.path  + "/imgs/drawings"
 	rawList = os.listdir(path)
 	imageList = []
+	seq = 1
 
 	for f in rawList :
-		if os.path.isfile(os.path.join(path, f)) and f.startswith("plane") :
+		if os.path.isfile(os.path.join(path, f)) and not f.startswith("._") and not f.startswith(".") :
 			imageList.append(f)
 
-	imageList = ['plane-2b.gif']
+	args = sys.argv
+
+	if(len(args) > 1):
+		seq =  int(args[2])
+		#if(len(args) > 2) : options = args[2]
+		#if(len(args) > 3) : options2 = args[3]
+		#if(len(args) > 4) : options3 = args[4]
 
 	while True:
 
-		seq = int(random.uniform(0,30))
-
-		#seq = 5
-		#seq = 18
-		seq = 16
-
-		if (seq == 16) :
+		if (seq == 1) :
+			imageList = ['plane-2b.gif','paletter3c.gif'] 
 			imgLoader.debug = False
 			imgLoader.action = "pan"
 			imgLoader.countLimit = 1
@@ -85,7 +90,35 @@ def seq() :
 			imgLoader.scrollSpeed = .01
 			imgLoader.useJitter =  True
 			imgLoader.useBlink = True
-			imgLoader.start(path + "/" + imageList[0], 1 , 0)
+			imgLoader.start(config.path  + "/imgs/" + imageList[0], 1 , 0)
+
+		if (seq == 2) :
+			imageList = ['plane-2b.gif','paletter3c.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "play"
+			imgLoader.countLimit = 5
+			imgLoader.gifPlaySpeed = .08
+			imgLoader.brightnessFactor  = .2
+			imgLoader.brightnessFlux = True
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 0
+			imgLoader.panRangeLimit = 0 + config.screenWidth
+			imgLoader.scrollSpeed = .01
+			imgLoader.useJitter =  True
+			imgLoader.useBlink = True
+			imgLoader.start(config.path  + "/imgs/"  + imageList[1], 0 , 0)
+
+		if(seq == 3) :
+			imgLoader.debug = False
+			imgLoader.action = "pan"
+			imgLoader.countLimit = 2
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 0
+			imgLoader.panRangeLimit = 0 #+ config.screenWidth
+			imgLoader.scrollSpeed = .01
+			imgLoader.countLimit = 1
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img], 0, -1)
 
 seq()
 

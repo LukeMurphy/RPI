@@ -2,8 +2,11 @@
 
 import Image
 import ImageDraw
+import ImageMath
 import time
 import random
+import ImageEnhance
+import math
 #from rgbmatrix import Adafruit_RGBmatrix
 
 # Rows and chain length are both required parameters:
@@ -13,7 +16,7 @@ xOffset = yOffset = 0
 vX = 0
 vY = -1
 count = 0
-frame = 0
+frame = 1
 countLimit = 1
 action = "play"
 gifPlaySpeed = 0.07
@@ -23,6 +26,11 @@ imgHeight = 0
 panRangeLimit = 0
 useJitter = False
 useBlink = False
+presentTime =  10
+
+brightnessFlux = False
+brightnessFactor = .5
+rate = 0
 
 global debug
 global draw
@@ -44,9 +52,17 @@ def loadImage(arg):
 	imageCopy = Image.new("RGBA", (image.size[0], image.size[1]))
 	imageCopy.paste(image)
 	return True
+
+def presentImage() :
+	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, presentTime	
+	imageCopyTemp = imageCopy
+	enhancer = ImageEnhance.Brightness(imageCopyTemp)
+	imageCopyTemp = enhancer.enhance(brightnessFactor)
+	config.render(imageCopyTemp, int(xOffset), int(yOffset), imageCopy.size[0], imageCopy.size[1], False)
+	time.sleep(presentTime)
 	
 def panImage() :
-	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy
+	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, brightnessFactor
 	jitter = False
 
 	# defaults for vertical image scrolling
@@ -54,9 +70,16 @@ def panImage() :
 		rangeLimit = image.size[1] + config.screenHeight
 		yOffset = config.screenHeight
 
+		print(yOffset)
+
 	else : 
 		rangeLimit = panRangeLimit + image.size[1]
-		xOffset = -image.size[1]
+		if(vY ==0) : xOffset = -image.size[1]
+
+	if(vY != 0) : 
+		yOffset = config.screenHeight #-image.size[1]
+		#xOffset = int((config.screenWidth ) * random.random()) - 20
+		#xOffset = 0
 
 	draw = ImageDraw.Draw(image)
 
@@ -65,7 +88,6 @@ def panImage() :
 
 	xPos = 0
 	yPos = 0
-	
 
 	for n in range (0, rangeLimit):
 		if(useJitter):
@@ -75,6 +97,7 @@ def panImage() :
 				yPos = 0
 			if(random.random() > .17) : jitter = True
 			if(jitter) : vY = random.uniform(-.3,.3)
+
 		xPos += vX;
 		yPos += vY
 
@@ -92,10 +115,20 @@ def panImage() :
 				time.sleep(.15)	
 			xPos += image.size[1]
 		else :
-			config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)	
+			#imageTemp = imageCopy.rotate(2, expand=1)
+			#imageCopy.paste(imageTemp, (-5,0))
+
+			xF = int(xOffset + xPos)
+			yF = int(yOffset  + yPos)
+
+			imageCopyTemp = imageCopy
+			enhancer = ImageEnhance.Brightness(imageCopyTemp)
+			imageCopyTemp = enhancer.enhance(brightnessFactor)
+			config.render(imageCopyTemp, xF, yF, imageCopy.size[0], imageCopy.size[1], False)	
+		
 		time.sleep(scrollSpeed)
-		#time.sleep(5)
-		#exit()
+
+
 
 	debugMessage("done pan")
 
@@ -114,41 +147,52 @@ def rotateImage(angle) :
 	config.matrix.SetImage(config.image.im.id, -8, -8)
 
 def animate(randomizeTiming = False, frameLimit = 3) :
-	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight
+	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight, imageCopy, brightnessFactor, rate
+
+	# This needs fixing  - currently requires extra frame
+	# at end of gif  --
 
 	#fillColor(True)
 	#config.screenHeight - imgHeight'
-
+	skipTime = False
 	#************************************#
 	### DRAW THE IMAGE ACROSS ALL PANELS
-	config.render(image, 0, 0, config.screenWidth, config.screenHeight)
+	#imageCopy = image.point(lambda p: p * 0.19)
+	imageCopy.paste(image)
+	if(brightnessFlux) :
+		rate+=math.pi/8;
+		brightnessFactor = math.sin(rate) + .5
+		if(brightnessFactor > 1) : brightnessFactor = 1
+		if(brightnessFactor < 0) : brightnessFactor = .05
+	enhancer = ImageEnhance.Brightness(imageCopy)
+	imageCopy = enhancer.enhance(brightnessFactor)
+
+	config.render(imageCopy, 0, 0, config.screenWidth, config.screenHeight)
 	config.actions.drawBlanks()
 	
-	#print(imgHeight, config.screenHeight)
-	
 	try:
-		image.seek(frame)
+		image.seek(image.tell() + 1)
 	except EOFError:
-		image.seek(0)
+		#image.seek(0)
+		#print("fail", frame)
+		skipTime = True
 		pass
-	
-	# forces redraw of next frame  -- must fix this hack sometime ....
-	image.rotate(0)
-	
-	if(randomizeTiming) :
-		time.sleep(random.uniform(.02,.08))
-		if(random.random() > .98) :
-			time.sleep(random.uniform(.05,2))
-	else :
-		time.sleep(gifPlaySpeed)
 
-	# Advance to next frame
-	frame = image.tell() + 1
+	if(skipTime == False) :
+		if(randomizeTiming) :
+			time.sleep(random.uniform(.02,.08))
+			if(random.random() > .98) :
+				time.sleep(random.uniform(.05,2))
+		else :
+			time.sleep(gifPlaySpeed)
 
-	if (frame == frameLimit):
-		frame = 0
+
+
+
+	#if (frame == frameLimit):frame = 0
 	
 def playImage(randomizeTiming = False, frameLimit = 3):
+
 	animate(randomizeTiming, frameLimit)
 
 def init():
@@ -158,9 +202,11 @@ def init():
 	while (count < countLimit):
 		try:
 			if(action == "play"):
-				playImage(False, 30)
+				playImage(False, 5)
 			elif(action == "pan") : 
 				panImage()
+			elif(action == "present") :
+				presentImage()
 			
 			count += 1
 		except KeyboardInterrupt:
@@ -169,7 +215,7 @@ def init():
 			break
 
 def debugMessage(arg) :
-	
+
 	if(debug) : print(arg)		
 
 def start(img="", setvX = 0, setvY = 0):

@@ -117,6 +117,7 @@ def seq() :
 			imgLoader.panRangeLimit = 0 #+ config.screenWidth
 			imgLoader.scrollSpeed = .01
 			imgLoader.countLimit = 1
+			imgLoader.resizeToWidth = True
 			img = int(random.random() *  len(imageList))
 			imgLoader.start(path + "/" + imageList[img], 0, -1)
 

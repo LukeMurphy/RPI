@@ -3,34 +3,34 @@
 import Image
 import ImageDraw
 import ImageMath
-import time
-import random
 import ImageEnhance
-import math
-#from rgbmatrix import Adafruit_RGBmatrix
+# Import the essentials to everything
+import time, random, math
 
 # Rows and chain length are both required parameters:
-#matrix = Adafruit_RGBmatrix(32, 1)
 r=g=b=0
-xOffset = yOffset = 0
+xOffset = 0
+yOffset = 0
 vX = 0
 vY = -1
 count = 0
 frame = 1
 countLimit = 1
-action = "play"
-gifPlaySpeed = 0.07
-scrollSpeed = .04
-bgFillColor = 0x000000
+
 imgHeight = 0
 panRangeLimit = 0
 useJitter = False
 useBlink = False
 presentTime =  10
-
-brightnessFlux = False
 brightnessFactor = .5
 rate = 0
+gifPlaySpeed = 0.07
+scrollSpeed = .04
+bgFillColor = 0x000000
+
+action = "play"
+brightnessFlux = False
+resizeToWidth = False
 
 global debug
 global draw
@@ -45,12 +45,13 @@ def setUpNew():
 	imageCopy = Image.new("RGBA", (128, 400))
 
 def loadImage(arg):
-	global image, imgHeight, imageCopy
+	global image, imgHeight, imageCopy, resizeToWidth
 	image = Image.open(arg , "r")
+
+	#print("loading : ", arg)
 	image.load()
 	imgHeight =  image.getbbox()[3]
-	imageCopy = Image.new("RGBA", (image.size[0], image.size[1]))
-	imageCopy.paste(image)
+
 	return True
 
 def presentImage() :
@@ -67,14 +68,11 @@ def panImage() :
 
 	# defaults for vertical image scrolling
 	if(panRangeLimit == 0) : 
-		rangeLimit = image.size[1] + config.screenHeight
+		rangeLimit = imageCopy.size[1] + config.screenHeight
 		yOffset = config.screenHeight
-
-		print(yOffset)
-
 	else : 
-		rangeLimit = panRangeLimit + image.size[1]
-		if(vY ==0) : xOffset = -image.size[1]
+		rangeLimit = panRangeLimit + imageCopy.size[1]
+		if(vY ==0) : xOffset = -imageCopy.size[1]
 
 	if(vY != 0) : 
 		yOffset = config.screenHeight #-image.size[1]
@@ -89,7 +87,9 @@ def panImage() :
 	xPos = 0
 	yPos = 0
 
-	for n in range (0, rangeLimit):
+	stepSize = 1
+	if(abs(vY) > 1) : stepSize = abs(vY)
+	for n in range (0, rangeLimit, stepSize):
 		if(useJitter):
 			if(random.random() > .7) : 
 				jitter = False
@@ -127,8 +127,6 @@ def panImage() :
 			config.render(imageCopyTemp, xF, yF, imageCopy.size[0], imageCopy.size[1], False)	
 		
 		time.sleep(scrollSpeed)
-
-
 
 	debugMessage("done pan")
 
@@ -219,7 +217,7 @@ def debugMessage(arg) :
 	if(debug) : print(arg)		
 
 def start(img="", setvX = 0, setvY = 0):
-	global image,frame, action,xOffset,yOffset,vX,vY
+	global image,frame, action,xOffset,yOffset,vX,vY,imageCopy
 	frame = 0
 
 	vX = setvX
@@ -240,6 +238,13 @@ def start(img="", setvX = 0, setvY = 0):
 	debugMessage("Trying to load " + img)	
 
 	if(loadImage(img)) :
+		# scale to the WIDTH of the screen
+		if(image.size[0] != config.screenWidth and resizeToWidth) :
+			ratio = float(config.screenWidth)/ image.size[0]
+			image = image.resize((config.screenWidth,int(ratio * image.size[1])))
+		imageCopy = Image.new("RGBA", (image.size[0], image.size[1]))
+
+		imageCopy.paste(image, (0, 0))
 		debugMessage( img + " loaded")
 		init()
 	else:

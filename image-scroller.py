@@ -90,6 +90,7 @@ def seq() :
 			imgLoader.scrollSpeed = .01
 			imgLoader.useJitter =  True
 			imgLoader.useBlink = True
+			imgLoader.brightnessFactor = .8
 			imgLoader.start(config.path  + "/imgs/" + imageList[0], 1 , 0)
 
 		if (seq == 2) :

@@ -203,8 +203,8 @@ def main():
 	carouselSign.config = config
 	carouselSign.fontSize = int(baseconfig.get("scroll", 'fontSize'))
 	carouselSign.vOffset = int(baseconfig.get("scroll", 'vOffset'))
-	carouselSign.useColorFLicker = True
-	carouselSign.clt = (120,120,120)
+	carouselSign.useColorFLicker = bool(baseconfig.getboolean("scroll", 'useColorFLicker'))
+	#carouselSign.clr = (120,120,120)
 
 	imgLoader = loader
 	imgLoader.debug = True

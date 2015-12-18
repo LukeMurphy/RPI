@@ -8,5 +8,5 @@
 *.gitignore
 log.*
 *.bak
+.cfg.bak
 *.out
-

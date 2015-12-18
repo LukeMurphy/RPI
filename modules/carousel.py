@@ -28,7 +28,7 @@ useColorFLicker = False
 
 def go(arg = "* * * LOVE & PEACE OR *** ") :
 	global offset, fontSize, vOffset
-	global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, stepSize, clr
+	global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, stepSize, clr,useColorFLicker
 
 	# Generally this is set up for paneled screens 196x64
 	offset = 10
@@ -38,6 +38,9 @@ def go(arg = "* * * LOVE & PEACE OR *** ") :
 	warpedImage = Image.new("RGBA", (imageWrapLength, config.screenHeight))
 	draw  = ImageDraw.Draw(imageToRender)
 	font = ImageFont.truetype('/home/pi/RPI/fonts/freefont/FreeSerifBold.ttf',fontSize)
+
+	if(useColorFLicker!=True) : clr = config.getRandomRGB()
+
 
 	draw.text((0,vOffset),argToUse,clr,font=font)
 	pixLen = draw.textsize(argToUse, font = font)
@@ -68,7 +71,7 @@ def go(arg = "* * * LOVE & PEACE OR *** ") :
 
 def render():
 	global offset
-	global imageWrapLength, imageToRender, warpedImage, draw, numSegments, angle, segmentWidth
+	global imageWrapLength, imageToRender, warpedImage, draw, numSegments, angle, segmentWidth, useColorFLicker
 
 	placementx = 3
 

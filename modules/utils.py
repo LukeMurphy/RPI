@@ -21,14 +21,23 @@ wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146
 
 global imageTop,imageBottom,image,config
 
-def colorCompliment((r,g,b)) :
+def randomColor(brtns=1) :
     global brightness
+    if(brtns == 1) : brtns = brightness
+    r = int((random.uniform(0,255)) * brtns)
+    g = int((random.uniform(0,255)) * brtns)
+    b = int((random.uniform(0,255)) * brtns)
+    return (r,g,b) 
+
+def colorCompliment((r,g,b), brtns=1) :
+    global brightness
+    if(brtns == 1) : brtns = brightness
     minRGB = min(r,min(g,b))
     maxRGB = max(r,max(g,b))
     minmax = minRGB + maxRGB
-    r = int((minmax - r) * brightness)
-    g = int((minmax - g) * brightness)
-    b = int((minmax - b) * brightness)
+    r = int((minmax - r) * brtns)
+    g = int((minmax - g) * brtns)
+    b = int((minmax - b) * brtns)
     return (r,g,b)     
 
 # Find the closest point 

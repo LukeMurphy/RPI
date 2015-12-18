@@ -16,15 +16,16 @@ import ConfigParser, io
 def stroopSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
-	if(random.random() > .7) :scroll.stroop("YELLOW",(255,0,225),"Top")
-	if(random.random() > .7) :scroll.stroop("VIOLET",(230,225,0),"Right")
-	if(random.random() > .7) :scroll.stroop("RED",(0,255,0),"Left")
-	if(random.random() > .7) :scroll.stroop("BLUE",(225,100,0),"Top")
-	if(random.random() > .7) :scroll.stroop("GREEN",(255,0,0),"Left")
-	if(random.random() > .7) :scroll.stroop("ORANGE",(0,0,200),"Right")
+	directionStr = getDirection()
+	if(random.random() > .7) :scroll.stroop("YELLOW",(255,0,225),directionStr)
+	if(random.random() > .7) :scroll.stroop("VIOLET",(230,225,0),directionStr)
+	if(random.random() > .7) :scroll.stroop("RED",(0,255,0),directionStr)
+	if(random.random() > .7) :scroll.stroop("BLUE",(225,100,0),directionStr)
+	if(random.random() > .7) :scroll.stroop("GREEN",(255,0,0),directionStr)
+	if(random.random() > .7) :scroll.stroop("ORANGE",(0,0,200),directionStr)
 
 def getDirection() :
-	d = int(random.uniform(1,3))
+	d = int(random.uniform(1,4))
 	direction = "Left"
 	if (d == 1) : direction = "Left"
 	if (d == 2) : direction = "Right"
@@ -37,13 +38,16 @@ def runSequence() :
 
 	lastAction  = 0
 
-	print("running")
+	print("running", group)
 	try:
 		while True:
-			seq = int(random.uniform(1,30))
-			while (seq not in group and seq != lastAction) : 
-				seq = int(random.uniform(1,30))
 
+			if(len(group) > 1) :
+				seq = int(random.uniform(1,30))
+				while (seq not in group and seq != lastAction) : 
+					seq = int(random.uniform(1,30))
+			else : 
+					seq = group[0]
 			# try not to repeat
 			lastAction = seq
 			#seq = 18
@@ -56,7 +60,7 @@ def runSequence() :
 				if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
 			elif(seq == 3) :
 				if(random.random() > .8) : actions.explosion()
-				if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **** ALL USERS WELCOME **", True, False, "Left")
+				if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **", True, False, "Left")
 				if(random.random() > .8) :
 					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + "asdfasdfasdsf", True, False, "Left")
 					actions.explosion()
@@ -77,7 +81,7 @@ def runSequence() :
 					stroopSequence()
 			elif (seq == 6) :
 				if(random.random() > .8) : actions.burst(10)
-				if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <> VERY FRESH <>", True, True, "Left")
+				if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <>", True, True, "Left")
 			elif(seq == 7) :
 				if(random.random() > .8) : actions.burst(10)
 				if(random.random() > .8) : scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, getDirection())
@@ -103,7 +107,6 @@ def runSequence() :
 			
 
 			# Animation only modules
-
 			elif(seq == 14) :
 				actions.explosion()
 				user.userAnimator(24)
@@ -117,23 +120,30 @@ def runSequence() :
 				actions.explosion()
 				actions.glitch()
 			elif (seq == 18) :
-				imgLoader.action = "pan"
-				imgLoader.countLimit = 1
-				imgLoader.start("",0,-1)
-			elif (seq == 19) :
-				imgLoader.action = "play"
-				imgLoader.countLimit = 100
-				imgLoader.start()
-			elif (seq == 20) :
 				concentric.colorSwitch = False
 				concentric.animator(60)
-			elif (seq == 21) :
+			elif (seq == 19) :
 				actions.explosion()
 				user.userAnimator(12)
 				machine.machineAnimator(80)
 				user.userAnimator(5)
 				machine.machineAnimator(220)
 				actions.explosion()
+
+
+			# Image Loading Modules	
+			elif (seq == 20) :
+				imgLoader.action = "pan"
+				imgLoader.countLimit = 1
+				imgLoader.start("",0,-1)
+
+			elif (seq == 21) :
+				imgLoader.action = "play"
+				imgLoader.countLimit = 100
+				imgLoader.start()
+
+
+
 	
 	except KeyboardInterrupt:
 		print "Stopping"
@@ -193,6 +203,8 @@ def main():
 	carouselSign.config = config
 	carouselSign.fontSize = int(baseconfig.get("scroll", 'fontSize'))
 	carouselSign.vOffset = int(baseconfig.get("scroll", 'vOffset'))
+	carouselSign.useColorFLicker = True
+	carouselSign.clt = (120,120,120)
 
 	imgLoader = loader
 	imgLoader.debug = True
@@ -210,15 +222,16 @@ def main():
 
 
 	#*******  SETTING UP THE SEQUENCE GROUPS *********#
-	signage = (1,2,3,4,5,6,7,8,9,10,11,19)
-	animations = (14,15,16,17,18,19,20,21)
+	signage = (1,2,3,4,6,7,8,9,10,11,21)
 
 	# no image panning
-	animations = (14,15,16,17,19,20,21)
+	animations = (14,15,16,17,18,19,21)
 	#debug animations = (14,15)
 
+	stroopSeq = (5,)
 
-	groups = [signage,animations]
+
+	groups = [signage,animations, stroopSeq]
 	group = groups[0]
 	group = groups[1]
 	options = options2 = options3 = ""

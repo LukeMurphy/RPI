@@ -156,19 +156,19 @@ def present(arg, clr = (250,150,150), duration = 5) :
             pixLen = config.draw.textsize(arg, font = font)
 
             # make a new image with the right size
-            scrollImage = config.Image.new("RGBA", (pixLen[0],pixLen[1] + 20))
+            scrollImage = config.Image.new("RGBA", (pixLen[0], pixLen[1] + 20))
             draw = config.ImageDraw.Draw(scrollImage)
             xoffRange = 1
             yOffRange = 2
 
             # Draw the 'shadow' - either the 'optical ' RGB opposite or the RBY paint 'opposite/compliment'
             if(random.random() > .5) :
-                draw.text((-xoffRange,yOffRange), arg,config.colorCompliment(paintColorRGB), font=font)
+                draw.text((-xoffRange, yOffRange), arg,config.colorCompliment(paintColorRGB), font=font)
             else:
-                draw.text((-xoffRange,yOffRange), arg,config.colorComplimentRBY(paintColor), font=font)
+                draw.text((-xoffRange, yOffRange), arg,config.colorComplimentRBY(paintColor), font=font)
 
             # Draw the actual text    
-            draw.text((0,0 ), arg,paintColorRGB, font=font)
+            draw.text((0,0 ), arg, paintColorRGB, font=font)
 
             # Scale the image to fit the full set of panels (using a rough formula for font offset)
             scaledSize = (config.screenWidth , int( vFactor * float(config.screenHeight * pixLen[1]) / fSize) + 8) 
@@ -176,7 +176,7 @@ def present(arg, clr = (250,150,150), duration = 5) :
             scrollImage = scrollImage.resize(scaledSize)
 
             vOffset = -scaledSize[1]/8
-            config.render(scrollImage, 0, vOffset, config.screenWidth, config.screenHeight - vOffset)
+            config.render(scrollImage, 0, vOffset + 4, config.screenWidth, config.screenHeight - vOffset)
             config.actions.drawBlanks()
 
             time.sleep(duration)
@@ -186,7 +186,9 @@ def present(arg, clr = (250,150,150), duration = 5) :
                 # if countLimit = 0 then assume go on forever ...
                 if(countLimit == 0) : count = 0
                 present(arg, paintColorRGB,  duration)
-            else : exit()
+            #else : 
+                #pass
+                #exit()
 
         except KeyboardInterrupt:
             #print "Stopping"
@@ -195,14 +197,16 @@ def present(arg, clr = (250,150,150), duration = 5) :
 def stroop( arg, clr, direction = "Left") :
 
         global r,g,b,config, opticalOpposites
-        clr = tuple(int(a*config.brightness) for a in (clr))
 
-        #matrix.Clear()
-        speed = .018
+        brightness = config.brightness
+        brightness = random.random()
+
+        clr = tuple(int(a*brightness) for a in (clr))
+        stroopSpeed = 0.001
 
         # Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
-        font = ImageFont.truetype(config.path + '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
-        font2 = ImageFont.truetype(config.path + '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
+        font = ImageFont.truetype( '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
+        font2 = ImageFont.truetype('/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
         pixLen = config.draw.textsize(arg, font = font)
 
         config.image = config.Image.new("RGBA", pixLen)
@@ -212,15 +216,17 @@ def stroop( arg, clr, direction = "Left") :
         # Draw Background Color
         # Optical (RBY) or RGB opposites
 
+
+
         if(opticalOpposites) :
-            if(arg == "RED") : bgColor = tuple(int(a*config.brightness) for a in ((255,0,0)))
-            if(arg == "GREEN") : bgColor = tuple(int(a*config.brightness) for a in ((0,255,0)))
-            if(arg == "BLUE") : bgColor = tuple(int(a*config.brightness) for a in ((0,0,255)))
-            if(arg == "YELLOW") : bgColor = tuple(int(a*config.brightness) for a in ((255,255,0)))
-            if(arg == "ORANGE") : bgColor = tuple(int(a*config.brightness) for a in ((255,125,0)))
-            if(arg == "VIOLET") : bgColor = tuple(int(a*config.brightness) for a in ((200,0,255)))
+            if(arg == "RED") : bgColor = tuple(int(a*brightness) for a in ((255,0,0)))
+            if(arg == "GREEN") : bgColor = tuple(int(a*brightness) for a in ((0,255,0)))
+            if(arg == "BLUE") : bgColor = tuple(int(a*brightness) for a in ((0,0,255)))
+            if(arg == "YELLOW") : bgColor = tuple(int(a*brightness) for a in ((255,255,0)))
+            if(arg == "ORANGE") : bgColor = tuple(int(a*brightness) for a in ((255,125,0)))
+            if(arg == "VIOLET") : bgColor = tuple(int(a*brightness) for a in ((200,0,255)))
         else:
-             bgColor = config.colorCompliment(clr)
+             bgColor = config.colorCompliment(clr, brightness)
 
         config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill=bgColor)
 
@@ -233,37 +239,43 @@ def stroop( arg, clr, direction = "Left") :
         end = config.image.size[0]+32
         offset = int(random.uniform(1,config.screenWidth-20))
 
-        if(direction == "Right") :
-            start = -end
-            end = 0
 
-        if(direction == "Top") :
-            config.image = config.Image.new("RGBA", (pixLen[1],pixLen[0]*2))
+        if(direction == "Top" or direction == "Bottom") :
+            config.image = config.Image.new("RGBA", (pixLen[1], pixLen[0]*2))
             config.draw  = config.ImageDraw.Draw(config.image)
             config.id = config.image.im.id
             chars = list(arg)
             count = 0
+
             for letter in chars :
-                    config.draw.text((2,count* pixLen[1] * 3/4),letter,clr,font=font)
+                    config.draw.text((2,count * pixLen[1] * 3/4),letter,clr,font=font)
                     count += 1
             start = -end
             end = end
 
             for n in range(start,end):
-                    config.matrix.SetImage(config.id,offset,-n)
-                    time.sleep(0.01)
+                    config.render(config.image, offset, -n, pixLen[1], pixLen[0]*2)
+                    time.sleep(stroopSpeed)
 
-        else :
+        if(direction == "Left" or direction == "Right") :
             # Left Scroll
             start = 0
-            end = config.screenWidth + config.image.size[0]
-            #matrix.Fill(0,0,255)
+            end = config.screenWidth - int(random.uniform(0,config.image.size[0])) #+ config.image.size[0] 
+
+            if(direction == "Right") :
+                start = -end
+                end = 0
+
+            vOffset = -1
+            if(random.random()) > .50 : vOffset = 32
+
             for n in range(start,end):
                     if(direction == "Left") :
-
-                            config.matrix.SetImage(config.id, 0, -2)
-                            config.matrix.SetImage(config.id, config.screenWidth-n, -2)
+                            #config.matrix.SetImage(config.id, 0, -2)
+                            #config.matrix.SetImage(config.id, config.screenWidth-n, -2)
+                            config.render(config.image, config.screenWidth-n, vOffset, pixLen[0], pixLen[1])
                     else :
-                            config.matrix.SetImage(config.id, n, -2)
-                    time.sleep(0.01)
+                            #config.matrix.SetImage(config.id, n, -2)
+                            config.render(config.image, n, vOffset, pixLen[0], pixLen[1])
+                    time.sleep(stroopSpeed)
 

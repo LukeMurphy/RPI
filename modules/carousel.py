@@ -4,7 +4,7 @@ from PIL import ImageDraw
 from PIL import ImageFilter
 from PIL import ImageFont
 from PIL import ImageEnhance
-
+from PIL import ImageChops
 import time
 import random
 import datetime
@@ -14,15 +14,16 @@ import sys, getopt
 
 print( "carousel loaded")
 
-global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, fontSize
+global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, fontSize, useColorFLicker
 
 
 dFactor  =  1.2
 numSegments = 38
 stepSize = 4
-clr = (150,0,0)
+clr = (150,150,150)
 fontSize = 60
 vOffset = 0
+useColorFLicker = False
 
 
 def go(arg = "* * * LOVE & PEACE OR *** ") :
@@ -79,9 +80,17 @@ def render():
 	        croppedSegment = imageToRender.crop((pCropx,0, pCropx+ segmentWidth, config.screenHeight))
 	        segmentImage = croppedSegment.resize((projectedWidth,config.screenHeight))
 	        br = pWidth  / segmentWidth
+
+	        if(useColorFLicker) :
+		        segmentColorizer = Image.new("RGBA", (projectedWidth, config.screenHeight))
+		        draw = ImageDraw.Draw(segmentColorizer)
+		        draw.rectangle((0,0,projectedWidth,config.screenHeight), fill = config.randomColor())
+		        segmentImage = ImageChops.multiply(segmentImage, segmentColorizer)
+
 	        enhancer = ImageEnhance.Brightness(segmentImage)
 	        segmentImage = enhancer.enhance(br)
 	        #segmentImage = segmentImage.filter(ImageFilter.BLUR)
+	        #warpedImage.paste(segmentColorizer , (placementx,0))
 	        warpedImage.paste(segmentImage , (placementx,0))
 	        placementx += projectedWidth
 

@@ -150,7 +150,6 @@ def runSequence() :
 		print "Stopping"
 		exit()    
 
-
 def main():
 	global group, groups
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage, flash, carouselSign

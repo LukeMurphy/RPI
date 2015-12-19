@@ -54,23 +54,22 @@ def runSequence() :
 
 			if(seq == 1) :
 				if(random.random() > .8) :actions.burst(10)
-				if(random.random() > .8) :scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
+				scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
 			elif(seq == 2) :
 				if(random.random() > .8) : actions.explosion()
-				if(random.random() > .8) : scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
+				scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
 			elif(seq == 3) :
 				if(random.random() > .8) : actions.explosion()
-				if(random.random() > .8) : scroll.scrollMessage("** All USERS!! **", True, False, "Left")
+				scroll.scrollMessage("** All USERS!! **", True, False, "Left")
 				if(random.random() > .8) :
 					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + "asdfasdfasdsf", True, False, "Left")
 					actions.explosion()
 			elif(seq == 4) :
-				if(random.random() > .8) : 
-					actions.explosion()
-					numDolls = int(random.uniform(3,24))
-					strg = ""
-					for n in range (3,numDolls) : strg += "$"
-					scroll.scrollMessage(strg, True, False, getDirection())
+				if(random.random() > .8) : actions.explosion()
+				numDolls = int(random.uniform(3,24))
+				strg = ""
+				for n in range (3,numDolls) : strg += "$"
+				scroll.scrollMessage(strg, True, False, getDirection())
 			elif (seq == 5) :
 				numDolls = int(random.uniform(2,6))
 				for i in range(0,numDolls) : 
@@ -81,29 +80,31 @@ def runSequence() :
 					stroopSequence()
 			elif (seq == 6) :
 				if(random.random() > .8) : actions.burst(10)
-				if(random.random() > .8) : scroll.scrollMessage("<> THOUSANDS of COLORS <>", True, True, "Left")
+				scroll.scrollMessage("<> THOUSANDS of COLORS <>", True, True, "Left")
 			elif(seq == 7) :
 				if(random.random() > .8) : actions.burst(10)
-				if(random.random() > .8) : scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, getDirection())
+				scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, getDirection())
 			elif(seq == 8) :
 				if(random.random() > .8) : actions.burst(10)
-				if(random.random() > .9) : scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+				scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
 			elif(seq == 9) :
 				if(random.random() > .8) : actions.explosion()
-				if(random.random() > .8) : scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
+				scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
 			elif (seq == 10) :
-				if(random.random() > .8) :
-					numDolls = int(random.uniform(2,6))
-					strg = ""
-					for n in range (2,numDolls) : 
-						strg += "     :)"
-						if (random.random() > .95) : strg += "     :o"
-						if (random.random() > .95) : strg += "     ;)"
-					scroll.scrollMessage(strg, True, True, "Left")
+				if (random.random() > .5) : actions.setBlanks()
+				numDolls = int(random.uniform(30,60))
+				strg = ""
+				scroll.fontSize -= 6
+				space = "  "
+				for n in range (2, numDolls) : 
+					strg += ":)"+space
+					if (random.random() > .95) : strg += ":o"+space
+					if (random.random() > .95) : strg += ";)"+space
+				scroll.scrollMessage(strg, True, True, "Left")
+				scroll.fontSize += 6
 			elif (seq == 11) :
-				if(random.random() > .8) :
-					scroll.countLimit = 5
-					scroll.present("ASIF",1)
+				scroll.countLimit = 5
+				scroll.present("ASIF",1)
 			
 
 			# Animation only modules
@@ -187,6 +188,7 @@ def main():
 	scroll.config = config
 	scroll.fontSize = int(baseconfig.get("scroll", 'fontSize'))
 	scroll.vOffset = int(baseconfig.get("scroll", 'vOffset'))
+	scroll.scrollSpeed = float(baseconfig.get("scroll", 'scrollSpeed'))
 
 	machine = machine
 	machine.config = config
@@ -226,15 +228,21 @@ def main():
 
 	# no image panning
 	animations = (14,15,16,17,18,19,21)
-	#debug animations = (14,15)
 
+	# just Stroop / colors
 	stroopSeq = (5,)
 
+	# just emotis
+	emotiSeq = (10,)
 
-	groups = [signage,animations, stroopSeq]
+	groups = [signage,animations, stroopSeq, emotiSeq]
 	group = groups[0]
 	group = groups[1]
 	options = options2 = options3 = ""
+
+
+	### Below are used to run individual modules from command line
+	# eg ./run.sh explosion or ./run.sh scroll "TEST"
 
 	try:
 		args = sys.argv

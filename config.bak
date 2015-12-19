@@ -1,20 +1,22 @@
 [config]
-matrixTiles = 12
+matrixTiles = 4
 tileSizeHeight = 32
 tileSizeWidth = 64
-rows = 2
-cols = 3
-screenHeight =  64
-screenWidth =  192
-actualScreenWidth  = 384
+rows = 1
+cols = 2
+screenHeight =  32
+screenWidth =  128
+actualScreenWidth  = 128
 useMassager = False
-brightness =  .525
+brightness =  .25
 path = /home/pi/RPI
 
 [scroll]
-fontSize = 70
+fontSize = 48
 vOffset = -10
+useColorFLicker = True
+scrollSpeed = .025
 
 [user]
 userCenterx = 32
-userCentery = 32
+userCentery = 0

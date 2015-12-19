@@ -91,17 +91,22 @@ def runSequence() :
 				if(random.random() > .8) : actions.explosion()
 				scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
 			elif (seq == 10) :
+				# reset blanks
 				if (random.random() > .5) : actions.setBlanks()
 				numDolls = int(random.uniform(30,60))
 				strg = ""
 				scroll.fontSize -= 6
+				actions.drawCounterXOsFlag = True
 				space = "  "
 				for n in range (2, numDolls) : 
 					strg += ":)"+space
 					if (random.random() > .95) : strg += ":o"+space
 					if (random.random() > .95) : strg += ";)"+space
 				scroll.scrollMessage(strg, True, True, "Left")
+
+				# After completition reset for other runs
 				scroll.fontSize += 6
+				actions.drawCounterXOsFlag = False
 			elif (seq == 11) :
 				scroll.countLimit = 5
 				scroll.present("ASIF",1)

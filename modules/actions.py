@@ -8,9 +8,14 @@ import math
 import messenger
 
 blankPixels = []
+counterPixels = []
+
 cols = int(random.uniform(2,20))
 rows = int(random.uniform(2,20))
 drawBlanksFlag = True
+drawCounterXOsFlag = False
+counterXpos = 0
+totalCounterWidth = 0
 
 def explosion():
         global config
@@ -203,10 +208,61 @@ def drawBlanks() :
         if(drawBlanksFlag) :
                 for n in range (0, blankNum) :
                         config.matrix.SetPixel(blankPixels[n][0],blankPixels[n][1],0,0,0)
-        
+        if(drawBlanksFlag) : drawCounterX0()
+
 def transition() :
         global config, blankPixels, rows, cols  
         #TODO
         # Create diamond transisitons
 
-        
+# Creates primitive XOs to run counter to the LEFT direction of any scroll
+def setCounterXO() :
+        global config,counterPixels,totalCounterWidth
+        counterPixels = []
+        count = 0
+        # scatter horizontally
+        rng  = config.screenHeight
+        radi = rng/2.25
+        theta = 2 * math.pi/rng
+        lastx = 0
+        numXOs = int(random.uniform(2,5))
+        for XOs in range (0, numXOs) :
+                if(random.random() > .5 ):
+                        # Draw X
+                        for n in range (0, rng) :
+                                x = n + lastx
+                                y = n
+                                counterPixels.append((x,y))
+                                counterPixels.append((x+1,y))
+                                counterPixels.append((x,rng - y))
+                                counterPixels.append((x+1,rng - y))
+                        lastx += rng+1
+                else :
+                        # Draw O
+                        for n in range (0, rng) :
+                                x = int(math.cos(n * theta) * radi + radi) + lastx
+                                y = int(math.sin(n * theta) * radi) + config.screenHeight/2
+                                counterPixels.append((x,y))
+                                counterPixels.append((x+1,y))
+                                counterPixels.append((x-1,y))
+                                counterPixels.append((x,y+1))
+                                counterPixels.append((x,y-1))
+                        lastx += rng+1
+        totalCounterWidth = lastx
+
+def drawCounterX0():
+        global config, counterPixels , counterXpos, totalCounterWidth
+        if (len(counterPixels) == 0) :  
+                setCounterXO()
+                counterXpos = 0
+        count = 0
+        blankNum=len(counterPixels)
+        counterXpos += 1
+        if(drawCounterXOsFlag) :
+                for n in range (0, blankNum) :
+                        config.matrix.SetPixel(counterPixels[n][0] + counterXpos,counterPixels[n][1],int(255 * (config.brightness + .25)),0,0)
+
+        if(counterXpos > config.screenWidth) : 
+                counterXpos = -totalCounterWidth
+                if(random.random() > .2) : setCounterXO()
+

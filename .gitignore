@@ -4,9 +4,9 @@
 *._.DS_Store
 *._.*
 *._*
-*.cfg
+/*.cfg
 *.gitignore
 log.*
-*.bak
+/*.bak
 .cfg.bak
 *.out

@@ -271,9 +271,6 @@ def main():
 	group = groups[1]
 	options = options2 = options3 = ""
 
-
-
-
 	################  JUST FOR COMMAND LINE !!!!! ######################
 	### Below are used to run individual modules from command line
 	# eg ./run.sh explosion or ./run.sh scroll "TEST"

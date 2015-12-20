@@ -134,7 +134,7 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                             break
                             exit()
 
-def present(arg, clr = (250,150,150), duration = 5) :
+def present(arg, clr = (250,150,150), duration = 1, repeat = -1) :
         global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
         global r,g,b, paintColor
         
@@ -185,7 +185,12 @@ def present(arg, clr = (250,150,150), duration = 5) :
                 count +=1
                 # if countLimit = 0 then assume go on forever ...
                 if(countLimit == 0) : count = 0
-                present(arg, paintColorRGB,  duration)
+
+                if(repeat == -1) : present(arg, paintColorRGB,  duration, repeat)
+                if(repeat > 0 ) :  present(arg, paintColorRGB,  duration, repeat - 1)
+                if(repeat == 0) : pass
+    
+               
             #else : 
                 #pass
                 #exit()

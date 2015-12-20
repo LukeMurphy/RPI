@@ -171,7 +171,7 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 	try:
 		image.seek(image.tell() + 1)
 	except EOFError:
-		#image.seek(0)
+		image.seek(0)
 		#print("fail", frame)
 		skipTime = True
 		pass
@@ -184,9 +184,6 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 		else :
 			time.sleep(gifPlaySpeed)
 
-
-
-
 	#if (frame == frameLimit):frame = 0
 	
 def playImage(randomizeTiming = False, frameLimit = 3):
@@ -194,18 +191,19 @@ def playImage(randomizeTiming = False, frameLimit = 3):
 	animate(randomizeTiming, frameLimit)
 
 def init():
-	global action
+	global action, countLimit
+
+	print(countLimit)
 	count = 0
 	fillColor(True)
 	while (count < countLimit):
 		try:
 			if(action == "play"):
-				playImage(False, 5)
+				playImage(False, 7)
 			elif(action == "pan") : 
 				panImage()
 			elif(action == "present") :
-				presentImage()
-			
+				presentImage()		
 			count += 1
 		except KeyboardInterrupt:
 			print "Stopping...."

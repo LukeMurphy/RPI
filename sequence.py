@@ -34,8 +34,7 @@ def getDirection() :
 
 def runSequence() :
 	global group, groups
-	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
-
+	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
 	lastAction  = 0
 
 	print("running", group)
@@ -89,7 +88,7 @@ def runSequence() :
 			#******* SCROLL         ***************
 			elif(seq == 7) :
 				if(random.random() > .8) : actions.burst(10)
-				scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, getDirection())
+				scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, "Left")
 			#******* SCROLL         ***************
 			elif(seq == 8) :
 				if(random.random() > .8) : actions.burst(10)
@@ -120,7 +119,17 @@ def runSequence() :
 			elif (seq == 11) :
 				scroll.countLimit = 5
 				scroll.present("ASIF",1)
-			
+			#******* ASIF LOVE FEAR CAROUSEL *******	
+			elif(seq == 12) :
+				clrFlicker = carouselSign.useColorFLicker
+				carouselSign.useColorFLicker = False
+				carouselSign.go("    ****  ASIF * LOVE & FEAR ****", 0)
+				carouselSign.useColorFlicker = clrFlicker
+			#******* ASIF LOVE FEAR CAROUSEL noend *	
+			elif(seq == 13) :
+				if(random.random() > .5) : carouselSign.useColorFLicker = True
+				carouselSign.go("    ****  ASIF * LOVE & FEAR ****", -1)
+				carouselSign.useColorFlicker = False
 
 			# Animation only modules
 			#******* USER            ***************
@@ -131,16 +140,17 @@ def runSequence() :
 				machine.machineAnimator(830) # 430
 			#******* BLUE SCREEN     ***************
 			elif(seq == 16) :
-				actions.explosion()
 				bluescreen.draw()
 			#******* GLITCH SCREEN   ***************
 			elif(seq == 17) :
-				actions.explosion()
 				actions.glitch()
 			#******* CONCENTRICS     ***************
 			elif (seq == 18) :
 				concentric.colorSwitch = False
 				concentric.animator(60)
+			#******* EXLPOSIONS      ***************
+			elif (seq == 19) :
+				actions.explosion()
 
 			# Image Loading Modules	
 			#******* DEFAULT PAN     ***************
@@ -151,19 +161,17 @@ def runSequence() :
 			#******* DEFAULT PLAY (FLAMES) *********
 			elif (seq == 21) :
 				imgLoader.action = "play"
-				imgLoader.countLimit = 100
+				imgLoader.countLimit = 20
 				imgLoader.start()
 
 
-
-	
 	except KeyboardInterrupt:
 		print "Stopping"
 		exit()    
 
 def main():
-	global group, groups
-	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage, flash, carouselSign
+	global group, groups, config
+	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
 
 	baseconfig = ConfigParser.ConfigParser()
 	baseconfig.read('/home/pi/RPI/config.cfg')
@@ -233,11 +241,14 @@ def main():
 	blend.config = config
 	blend.boxWidth = 16
 
+
+
+
 	#*******  SETTING UP THE SEQUENCE GROUPS *********#
-	signage = (1,2,3,4,6,7,8,9,10,11,21)
+	signage = (1,2,3,4,6,7,8,9,11,12,21)
 
 	# no image panning
-	animations = (14,16,17,18,21)
+	animations = (14,16,17,18, 19, 21)
 
 	# just Stroop / colors
 	stroopSeq = (5,)
@@ -251,13 +262,19 @@ def main():
 	# just cards & user
 	cardsUsers = (14,15)
 
+	# Carousel Only
+	carouselSolo = (13,)
+
 	# start via cmd  sudo python /home/pi/RPI/sequence.py seq 5
-	groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers]
+	groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo]
 	group = groups[0]
 	group = groups[1]
 	options = options2 = options3 = ""
 
 
+
+
+	################  JUST FOR COMMAND LINE !!!!! ######################
 	### Below are used to run individual modules from command line
 	# eg ./run.sh explosion or ./run.sh scroll "TEST"
 

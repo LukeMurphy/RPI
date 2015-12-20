@@ -26,7 +26,7 @@ vOffset = 0
 useColorFLicker = False
 
 
-def go(arg = "* * * LOVE & PEACE OR *** ") :
+def go(arg = "* * * LOVE & PEACE OR *** ", repeat = -1) :
 	global offset, fontSize, vOffset
 	global imageWrapLength, imageToRender, warpedImage, draw, font, angle, segmentWidth, stepSize, clr,useColorFLicker
 
@@ -65,7 +65,12 @@ def go(arg = "* * * LOVE & PEACE OR *** ") :
 			time.sleep(.001)
 		except KeyboardInterrupt, e:
 			exit()
-	go(arg)
+	if(repeat == -1) : 
+		useColorFlicker = False
+		if(random.random() > .5) : useColorFlicker = True
+		go(arg)
+	if(repeat == 0) : pass
+	if(repeat > 0 ) : go(arg, repeat - 1)
 	
 
 

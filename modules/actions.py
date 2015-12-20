@@ -110,7 +110,7 @@ def explosion():
                         config.matrix.SetPixel(int(xDisplayPos),int(yDisplayPos),r,g,b)
                         
                 time.sleep(0.015)
-        if(random.random() > .1) : explosion()
+        if(random.random() > .8) : explosion()
 
 def burst(a=10) :
         global config

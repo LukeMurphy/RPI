@@ -1,2 +1,2 @@
 #
-ps -eaf | pgrep python | xargs sudo kill;
+ps -ef | pgrep python | xargs sudo kill;

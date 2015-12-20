@@ -1,4 +1,4 @@
 #
 ps -eaf | pgrep python | xargs sudo kill
 sleep 1
-/home/pi/RPI/cntrlscripts/run.sh seq 4
+sudo python /home/pi/RPI/sequence.py seq "$@"

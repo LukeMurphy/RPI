@@ -51,25 +51,29 @@ def runSequence() :
 			# try not to repeat
 			lastAction = seq
 			#seq = 18
-
+			#******* SCROLL         ***************
 			if(seq == 1) :
 				if(random.random() > .8) :actions.burst(10)
 				scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
+			#******* SCROLL         ***************
 			elif(seq == 2) :
 				if(random.random() > .8) : actions.explosion()
 				scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
+			#******* SCROLL         ***************
 			elif(seq == 3) :
 				if(random.random() > .8) : actions.explosion()
 				scroll.scrollMessage("** All USERS!! **", True, False, "Left")
 				if(random.random() > .8) :
 					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + "asdfasdfasdsf", True, False, "Left")
 					actions.explosion()
+			#******* SCROLL  $$$$   ***************
 			elif(seq == 4) :
 				if(random.random() > .8) : actions.explosion()
 				numDolls = int(random.uniform(3,24))
 				strg = ""
 				for n in range (3,numDolls) : strg += "$"
 				scroll.scrollMessage(strg, True, False, getDirection())
+			#******* STROOP STROOP  ***************
 			elif (seq == 5) :
 				numDolls = int(random.uniform(2,6))
 				for i in range(0,numDolls) : 
@@ -78,18 +82,23 @@ def runSequence() :
 					else : 
 						scroll.opticalOpposites = True
 					stroopSequence()
+			#******* SCROLL         ***************
 			elif (seq == 6) :
 				if(random.random() > .8) : actions.burst(10)
 				scroll.scrollMessage("<> THOUSANDS of COLORS <>", True, True, "Left")
+			#******* SCROLL         ***************
 			elif(seq == 7) :
 				if(random.random() > .8) : actions.burst(10)
 				scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, getDirection())
+			#******* SCROLL         ***************
 			elif(seq == 8) :
 				if(random.random() > .8) : actions.burst(10)
 				scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+			#******* SCROLL         ***************
 			elif(seq == 9) :
 				if(random.random() > .8) : actions.explosion()
 				scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
+			#******** EMOTIES       ***************
 			elif (seq == 10) :
 				# reset blanks
 				if (random.random() > .5) : actions.setBlanks()
@@ -107,42 +116,39 @@ def runSequence() :
 				# After completition reset for other runs
 				scroll.fontSize += 6
 				actions.drawCounterXOsFlag = False
+			#******* ASIF SCREEN     ***************
 			elif (seq == 11) :
 				scroll.countLimit = 5
 				scroll.present("ASIF",1)
 			
 
 			# Animation only modules
+			#******* USER            ***************
 			elif(seq == 14) :
-				actions.explosion()
 				user.userAnimator(24)
+			#******* CARDS / MACHINE ***************
 			elif(seq == 15) :
-				actions.explosion()
 				machine.machineAnimator(830) # 430
+			#******* BLUE SCREEN     ***************
 			elif(seq == 16) :
 				actions.explosion()
 				bluescreen.draw()
+			#******* GLITCH SCREEN   ***************
 			elif(seq == 17) :
 				actions.explosion()
 				actions.glitch()
+			#******* CONCENTRICS     ***************
 			elif (seq == 18) :
 				concentric.colorSwitch = False
 				concentric.animator(60)
-			elif (seq == 19) :
-				actions.explosion()
-				user.userAnimator(12)
-				machine.machineAnimator(80)
-				user.userAnimator(5)
-				machine.machineAnimator(220)
-				actions.explosion()
-
 
 			# Image Loading Modules	
+			#******* DEFAULT PAN     ***************
 			elif (seq == 20) :
 				imgLoader.action = "pan"
 				imgLoader.countLimit = 1
 				imgLoader.start("",0,-1)
-
+			#******* DEFAULT PLAY (FLAMES) *********
 			elif (seq == 21) :
 				imgLoader.action = "play"
 				imgLoader.countLimit = 100
@@ -231,7 +237,7 @@ def main():
 	signage = (1,2,3,4,6,7,8,9,10,11,21)
 
 	# no image panning
-	animations = (14,15,16,17,18,19,21)
+	animations = (14,16,17,18,21)
 
 	# just Stroop / colors
 	stroopSeq = (5,)
@@ -242,7 +248,11 @@ def main():
 	# just concentric squares
 	concentricRecs = (18,)
 
-	groups = [signage,animations, stroopSeq, emotiSeq, concentricRecs]
+	# just cards & user
+	cardsUsers = (14,15)
+
+	# start via cmd  sudo python /home/pi/RPI/sequence.py seq 5
+	groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers]
 	group = groups[0]
 	group = groups[1]
 	options = options2 = options3 = ""

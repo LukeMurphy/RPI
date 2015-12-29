@@ -138,6 +138,7 @@ def runSequence() :
 			#******* CARDS / MACHINE ***************
 			elif(seq == 15) :
 				machine.machineAnimator(830) # 430
+				if(random.random() > .9) : user.userAnimator(24)
 			#******* BLUE SCREEN     ***************
 			elif(seq == 16) :
 				bluescreen.draw()
@@ -260,7 +261,7 @@ def main():
 	concentricRecs = (18,)
 
 	# just cards & user
-	cardsUsers = (14,15)
+	cardsUsers = (15,)
 
 	# Carousel Only
 	carouselSolo = (13,)

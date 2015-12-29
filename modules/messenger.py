@@ -26,8 +26,11 @@ def soliloquy(override = False,arg = "") :
     global I, lastI, msg
 
     #print("me.")
-    print('me. ',end="")
-    if(random.random() > .8) : print("Oh ", end="")
+    if(random.random() > .5) :
+		print('Me. ',end="")
+    else :
+		print('<I> ', end="")
+    if(random.random() > .8) : print("O ", end="")
     if(random.random() > .9) : sys.stdout.flush()
     msgTxt = ""
     length = len(msg)
@@ -39,7 +42,11 @@ def soliloquy(override = False,arg = "") :
                         I = int(random.random() * length)
                 msgTxt  =  msg[I]
         if(arg != "") : msgTxt = arg    
-        sys.stdout.write(msgTxt)
+        if (random.random() > .85) :
+		 print(msgTxt)
+	else :
+		print(msgTxt,end="")
+	
         sys.stdout.flush()
         #print(msg[I]),
         lastI = I

@@ -177,7 +177,7 @@ def animator(arg) :
         config.brightness = .165
 
         count = 0
-        countLimit = arg * 160
+        countLimit = arg * 160 + 1
         interval = 4
 
         i = 0
@@ -190,7 +190,9 @@ def animator(arg) :
         while (count < countLimit) :
                 redraw()
                 count += 1
-                i += 1
+                # ----  if arg = 0 assume endless ---
+                if(arg == 0) : count = 0
+                #i += 1
                 time.sleep(pulseSpeed)
 
         config.matrix.Clear()

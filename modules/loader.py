@@ -193,7 +193,7 @@ def playImage(randomizeTiming = False, frameLimit = 3):
 def init():
 	global action, countLimit
 
-	print(countLimit)
+	#print(countLimit)
 	count = 0
 	fillColor(True)
 	while (count < countLimit):

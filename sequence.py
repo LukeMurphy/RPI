@@ -32,6 +32,73 @@ def getDirection() :
 	if (d == 3) : direction = "Bottom"
 	return direction
 
+def imageScrollSeq() :
+	global group, groups
+	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
+	
+	# Get all files in the drawing folder
+	path = config.path  + "/imgs/drawings"
+	rawList = os.listdir(path)
+	imageList = []
+	seq = 1
+
+	for f in rawList :
+		if os.path.isfile(os.path.join(path, f)) and not f.startswith("._") and not f.startswith(".") :
+			imageList.append(f)
+
+	args = sys.argv
+
+	if(len(args) > 1):
+		seq =  int(args[2])
+		#if(len(args) > 2) : options = args[2]
+		#if(len(args) > 3) : options2 = args[3]
+		#if(len(args) > 4) : options3 = args[4]
+
+	while True:
+
+		if (seq == 1) :
+			imageList = ['plane-2b.gif','paletter3c.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "pan"
+			imgLoader.countLimit = 1
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 0
+			imgLoader.panRangeLimit = 0 + config.screenWidth
+			imgLoader.scrollSpeed = .01
+			imgLoader.useJitter =  True
+			imgLoader.useBlink = True
+			imgLoader.brightnessFactor = .8
+			imgLoader.start(config.path  + "/imgs/" + imageList[0], 1 , 0)
+
+		if (seq == 2) :
+			imageList = ['plane-2b.gif','paletter3c.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "play"
+			imgLoader.countLimit = 5
+			imgLoader.gifPlaySpeed = .08
+			imgLoader.brightnessFactor  = .2
+			imgLoader.brightnessFlux = True
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 0
+			imgLoader.panRangeLimit = 0 + config.screenWidth
+			imgLoader.scrollSpeed = .01
+			imgLoader.useJitter =  True
+			imgLoader.useBlink = True
+			imgLoader.start(config.path  + "/imgs/"  + imageList[1], 0 , 0)
+
+		if(seq == 3) :
+			imgLoader.debug = False
+			imgLoader.action = "pan"
+			imgLoader.countLimit = 2
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 0
+			imgLoader.panRangeLimit = 0 #+ config.screenWidth
+			imgLoader.scrollSpeed = .01
+			imgLoader.countLimit = 1
+			imgLoader.resizeToWidth = True
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img], 0, -1)
+
 def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
@@ -164,6 +231,8 @@ def runSequence() :
 				imgLoader.action = "play"
 				imgLoader.countLimit = 20
 				imgLoader.start()
+			elif (seq == 22) :
+				imageScrollSeq()
 
 
 	except KeyboardInterrupt:
@@ -266,8 +335,11 @@ def main():
 	# Carousel Only
 	carouselSolo = (13,)
 
+	# plane scrolling
+	imageScroll = (22,)
+
 	# start via cmd  sudo python /home/pi/RPI/sequence.py seq 5
-	groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo]
+	groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo, imageScroll]
 	group = groups[0]
 	group = groups[1]
 	options = options2 = options3 = ""
@@ -343,11 +415,13 @@ def main():
 				imgLoader.action = "play"
 				imgLoader.countLimit = 100
 				imgLoader.start()
+			elif(argument  == "car") :
+				carouselSign.go(options)
+
+			# ----------  Play the group sequence  ---------- #
 			elif(argument  == "seq") :
 				group = groups[int(options)]
 				runSequence()
-			elif(argument  == "car") :
-				carouselSign.go(options)
 
 		else : runSequence()
 	except getopt.GetoptError as err:

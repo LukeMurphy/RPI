@@ -4,7 +4,7 @@ import urllib2
 from subprocess import call
 import sys, os
 
-urlToCheck = "http://192.168.0.4/projects/rpi-controls/banner-status-1.cfg"
+urlToCheck = "http://192.168.1.124/projects/rpi-controls/banner-status-2.cfg"
 #resp, content = httplib2.Http().request(urlToCheck)
 
 def checker() :

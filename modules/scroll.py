@@ -214,14 +214,15 @@ def stroop( arg, clr, direction = "Left") :
         font2 = ImageFont.truetype('/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
         pixLen = config.draw.textsize(arg, font = font)
 
-        config.image = config.Image.new("RGBA", pixLen)
+        dims = [pixLen[0],pixLen[1]]
+        if(dims[1] < 32) : dims[1] = 34
+
+        config.image = config.Image.new("RGBA", (dims[0],dims[1]))
         config.draw  = config.ImageDraw.Draw(config.image)
         config.id = config.image.im.id
 
         # Draw Background Color
         # Optical (RBY) or RGB opposites
-
-
 
         if(opticalOpposites) :
             if(arg == "RED") : bgColor = tuple(int(a*brightness) for a in ((255,0,0)))
@@ -233,7 +234,7 @@ def stroop( arg, clr, direction = "Left") :
         else:
              bgColor = config.colorCompliment(clr, brightness)
 
-        config.draw.rectangle((0,0,config.image.size[0]+32,config.screenHeight), fill=bgColor)
+        config.draw.rectangle((0,0,config.image.size[0]+32, config.screenHeight), fill=bgColor)
 
         # Draw the text with "borders"
         config.draw.text((-1,-1),arg,(0,0,0),font=font2)
@@ -244,22 +245,24 @@ def stroop( arg, clr, direction = "Left") :
         end = config.image.size[0]+32
         offset = int(random.uniform(1,config.screenWidth-20))
 
-
         if(direction == "Top" or direction == "Bottom") :
-            config.image = config.Image.new("RGBA", (pixLen[1], pixLen[0]*2))
+            config.image = config.Image.new("RGBA", (dims[1], dims[0]*2))
             config.draw  = config.ImageDraw.Draw(config.image)
             config.id = config.image.im.id
             chars = list(arg)
             count = 0
 
+            # Generate vertical text
             for letter in chars :
-                    config.draw.text((2,count * pixLen[1] * 3/4),letter,clr,font=font)
+                    # rough estimate to create vertical text
+                    config.draw.text((2,count * int(dims[1] * 3/4)),letter,clr,font=font)
                     count += 1
             start = -end
-            end = end
+            end = end - int(random.random() * config.screenHeight)
 
+            # Scroll vertical text UP
             for n in range(start,end):
-                    config.render(config.image, offset, -n, pixLen[1], pixLen[0]*2)
+                    config.render(config.image, offset, -n, dims[1], dims[0]*2)
                     time.sleep(stroopSpeed)
 
         if(direction == "Left" or direction == "Right") :
@@ -269,18 +272,19 @@ def stroop( arg, clr, direction = "Left") :
 
             if(direction == "Right") :
                 start = -end
-                end = 0
+                end = int(random.uniform(0,config.image.size[0]))
 
-            vOffset = -1
-            if(random.random()) > .50 : vOffset = 32
+            
+            #vOffset = -1
+            vOffset = int(random.uniform(0,config.rows)) * 32
 
             for n in range(start,end):
                     if(direction == "Left") :
                             #config.matrix.SetImage(config.id, 0, -2)
                             #config.matrix.SetImage(config.id, config.screenWidth-n, -2)
-                            config.render(config.image, config.screenWidth-n, vOffset, pixLen[0], pixLen[1])
+                            config.render(config.image, config.screenWidth-n, vOffset, dims[0], dims[1])
                     else :
                             #config.matrix.SetImage(config.id, n, -2)
-                            config.render(config.image, n, vOffset, pixLen[0], pixLen[1])
+                            config.render(config.image, n, vOffset, dims[0], dims[1])
                     time.sleep(stroopSpeed)
 

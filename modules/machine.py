@@ -31,6 +31,11 @@ def drawMachine() :
         d = 4
         # d2 is mouth / right eye
         d2 = 10
+        # m1 is left point start, mw is mouth width
+        m1 = 6
+        mw = 12
+        mDisplacey = 1
+        mDisplacex = 0
 
         # Fill colors
         rf = gf = bf = 0
@@ -38,6 +43,7 @@ def drawMachine() :
         # line width
         w = 1
 
+        # First state is  :[ second state is :]
         if (r == 0 ):
                 rf = int(255 * config.brightness)
                 gf = 0
@@ -51,6 +57,8 @@ def drawMachine() :
                 g = 0
                 b = 0
                 w = 2
+                mDisplacey = -1
+                mDisplacex = 0
 
         # outline
         config.draw.rectangle((1,1,24,28), fill=(rf,gf,bf), outline=(r,g,b))
@@ -68,9 +76,14 @@ def drawMachine() :
         x1 = x1 - d2
         y1 = y1 + -1
 
-        config.draw.line((x1+3,y1+d2,x1+2,y1+d2 +1), fill=(r,g,b), width = w)
-        config.draw.line((x1+4,y1+d2,x1+d2,y1+d2), fill=(r,g,b), width = w)
-        config.draw.line((x1+d2+1,y1+d2,x1+d2 +2,y1+d2+1), fill=(r,g,b), width = w)
+        #left corner
+        #config.draw.line((x1+3,y1+d2,x1+2,y1+d2 +1), fill=(r,g,b), width = w)
+        config.draw.line((m1 - mDisplacex, y1 + d2 + mDisplacey, m1, y1 + d2), fill=(r,g,b), width = w)
+        #center
+        config.draw.line((m1, y1 + d2, m1 + mw, y1 + d2), fill=(r,g,b), width = w)
+        #rigth corner
+        #config.draw.line((x1+d2+1,y1+d2,x1+d2 +2,y1+d2+1), fill=(r,g,b), width = w)
+        config.draw.line((m1 + mw, y1 + d2, m1 + mw + mDisplacex, y1 + d2 + mDisplacey), fill=(r,g,b), width = w)
 
 def redraw():
         global config
@@ -149,3 +162,4 @@ def machineAnimator(arg) :
                 redraw()
                 count+=1
                 time.sleep(redrawSpeed)
+

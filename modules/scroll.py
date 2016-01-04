@@ -92,11 +92,9 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                 draw.text((0,0),arg,(r,g,b),font=font)
                 #scrollImage = scrollImage.rotate(-90)
                 #scrollImage.load()
-
-                print(scrollImage.size)
+                #print(scrollImage.size)
 
                 xOffset =int(random.random()*(config.screenWidth - fontHeight))
-
 
                 for n in range(0,pixLen[0] + config.screenHeight):
                     config.render(scrollImage, xOffset, -n + pixLen[0] , 0,0)
@@ -118,21 +116,17 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
 
 
             for n in range(start,end, steps):
-                try :
-                    if(direction == "Left") :
-                            config.render(scrollImage, -n, vOffset, pixLen[0], fontHeight, False)
-                            config.actions.drawBlanks()
-                    else :
-                            config.actions.drawBlanks()
-                            config.render(scrollImage, n, vOffset, pixLen[0], fontHeight, False)
-                            if(random.random() > 0.9998) :
-                                            config.actions.glitch()
-                                            break
-                    time.sleep(scrollSpeed)
-                except KeyboardInterrupt:
-                            #print "Stopping"
-                            break
-                            exit()
+                if(direction == "Left") :
+                        config.render(scrollImage, -n, vOffset, pixLen[0], fontHeight, False)
+                        config.actions.drawBlanks()
+                else :
+                        config.actions.drawBlanks()
+                        config.render(scrollImage, n, vOffset, pixLen[0], fontHeight, False)
+                        if(random.random() > 0.9998) :
+                                        config.actions.glitch()
+                                        break
+                time.sleep(scrollSpeed)
+
 
 def present(arg, clr = (250,150,150), duration = 1, repeat = -1) :
         global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count

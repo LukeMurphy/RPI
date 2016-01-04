@@ -109,170 +109,170 @@ def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
 	lastAction  = 0
+	#print("running", group, len(group))
 
-	print("running", group)
 	try:
-		while True:
 
-			if(len(group) > 1) :
+		if(len(group) > 1) :
+			seq = int(random.uniform(1,30))
+			while (seq not in group and seq != lastAction) : 
 				seq = int(random.uniform(1,30))
-				while (seq not in group and seq != lastAction) : 
-					seq = int(random.uniform(1,30))
-			else : 
-					seq = group[0]
-			# try not to repeat
-			lastAction = seq
-			#seq = 18
-			
-			# -------  SCROLL         -------------
-			if(seq == 1) :
-				if(random.random() > .8) :actions.burst(10)
-				scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
-			
-			# -------  SCROLL         -------------
-			elif(seq == 2) :
-				if(random.random() > .8) : actions.explosion()
-				scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
-			
-			# -------  SCROLL         -------------
-			elif(seq == 3) :
-				if(random.random() > .8) : actions.explosion()
-				scroll.scrollMessage("** All USERS!! **", True, False, "Left")
-				if(random.random() > .8) :
-					scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + "asdfasdfasdsf", True, False, "Left")
-					actions.explosion()
-			
-			# -------  SCROLL  $$$$   -------------
-			elif(seq == 4) :
-				if(random.random() > .8) : actions.explosion()
-				numDolls = int(random.uniform(3,24))
-				strg = ""
-				for n in range (3,numDolls) : strg += "$"
-				scroll.scrollMessage(strg, True, False, getDirection())
-			
-			# -------  STROOP STROOP  -------------
-			elif (seq == 5) :
-				numDolls = int(random.uniform(2,6))
-				for i in range(0,numDolls) : 
-					if(scroll.opticalOpposites) : 
-						scroll.opticalOpposites = False
-					else : 
-						scroll.opticalOpposites = True
-					stroopSequence()
-			
-			# -------  SCROLL         -------------
-			elif (seq == 6) :
-				if(random.random() > .8) : actions.burst(10)
-				scroll.scrollMessage("<> THOUSANDS of COLORS <>", True, True, "Left")
-			
-			# -------  SCROLL         -------------
-			elif(seq == 7) :
-				if(random.random() > .8) : actions.burst(10)
-				scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, "Left")
-			
-			# -------  SCROLL         -------------
-			elif(seq == 8) :
-				if(random.random() > .8) : actions.burst(10)
-				scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
-			
-			# -------  SCROLL         -------------
-			elif(seq == 9) :
-				if(random.random() > .8) : actions.explosion()
-				scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
-			
-			# ------- * EMOTIES       -------------
-			elif (seq == 10) :
-				# reset blanks
-				if (random.random() > .5) : actions.setBlanks()
-				numDolls = int(random.uniform(30,60))
-				strg = ""
-				scroll.fontSize -= 6
-				actions.drawCounterXOsFlag = True
-				space = "  "
-				for n in range (2, numDolls) : 
-					strg += ":)"+space
-					if (random.random() > .95) : strg += ":o"+space
-					if (random.random() > .95) : strg += ";)"+space
-				scroll.scrollMessage(strg, True, True, "Left")
-
-				# After completition reset for other runs
-				scroll.fontSize += 6
-				actions.drawCounterXOsFlag = False
-			
-			# -------  ASIF SCREEN     -------------
-			elif (seq == 11) :
-				scroll.countLimit = 5
-				scroll.present("ASIF",1)
-			
-			# -------  ASIF LOVE FEAR CAROUSEL -------	
-			elif(seq == 12) :
-				clrFlicker = carouselSign.useColorFLicker
-				carouselSign.useColorFLicker = False
-				carouselSign.go("    ****  ASIF * LOVE & FEAR ****", 0)
-				carouselSign.useColorFlicker = clrFlicker
-			
-			# -------  ASIF LOVE FEAR CAROUSEL noend *	
-			elif(seq == 13) :
-				if(random.random() > .5) : carouselSign.useColorFLicker = True
-				carouselSign.go("    ****  ASIF * LOVE & FEAR ****", -1)
-				carouselSign.useColorFlicker = False
-
-			# Animation only modules
-			
-			# -------  USER            -------------
-			elif(seq == 14) :
-				user.userAnimator(24)
-			
-			# -------  CARDS / MACHINE -------------
-			elif(seq == 15) :
-				machine.machineAnimator(830) # 430
-				if(random.random() > .9) : user.userAnimator(24)
-			
-			# -------  BLUE SCREEN     -------------
-			elif(seq == 16) :
-				bluescreen.draw()
-			
-			# -------  GLITCH SCREEN   -------------
-			elif(seq == 17) :
-				actions.glitch()
-			
-			# -------  CONCENTRICS     -------------
-			elif (seq == 18) :
-				concentric.colorSwitch = False
-				concentric.animator(60)
-			
-			# -------  EXLPOSIONS      -------------
-			elif (seq == 19) :
+		else : 
+				seq = group[0]
+		# try not to repeat
+		lastAction = seq
+		#seq = 18
+		
+		# -------  SCROLL         -------------
+		if(seq == 1) :
+			if(random.random() > .8) :actions.burst(10)
+			scroll.scrollMessage("** PTGS ** GIFS ** JPEGS ** AVIs ** MOVs ** CODEZ ** CRACKS **", True, False, "Left")
+		
+		# -------  SCROLL         -------------
+		elif(seq == 2) :
+			if(random.random() > .8) : actions.explosion()
+			scroll.scrollMessage("** FIGURATIVE ** ABSTRACT ** NO SOFTWARE **", True, False, "Left")
+		
+		# -------  SCROLL         -------------
+		elif(seq == 3) :
+			if(random.random() > .8) : actions.explosion()
+			scroll.scrollMessage("** All USERS!! **", True, False, "Left")
+			if(random.random() > .8) :
+				scroll.scrollMessage("Hey there " + str(int(random.uniform(10000,99999))) + "asdfasdfasdsf", True, False, "Left")
 				actions.explosion()
+		
+		# -------  SCROLL  $$$$   -------------
+		elif(seq == 4) :
+			if(random.random() > .8) : actions.explosion()
+			numDolls = int(random.uniform(3,24))
+			strg = ""
+			for n in range (3,numDolls) : strg += "$"
+			scroll.scrollMessage(strg, True, False, getDirection())
+		
+		# -------  STROOP STROOP  -------------
+		elif (seq == 5) :
+			numRuns = int(random.uniform(2,6))
+			for i in range(0,numRuns) : 
+				if(scroll.opticalOpposites) : 
+					scroll.opticalOpposites = False
+				else : 
+					scroll.opticalOpposites = True
+				stroopSequence()
+		
+		# -------  SCROLL         -------------
+		elif (seq == 6) :
+			if(random.random() > .8) : actions.burst(10)
+			scroll.scrollMessage("<> THOUSANDS of COLORS <>", True, True, "Left")
+		
+		# -------  SCROLL         -------------
+		elif(seq == 7) :
+			if(random.random() > .8) : actions.burst(10)
+			scroll.scrollMessage("** PTGS PTGS PTGS **", True, False, "Left")
+		
+		# -------  SCROLL         -------------
+		elif(seq == 8) :
+			if(random.random() > .8) : actions.burst(10)
+			scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+		
+		# -------  SCROLL         -------------
+		elif(seq == 9) :
+			if(random.random() > .8) : actions.explosion()
+			scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
+		
+		# ------- * EMOTIES       -------------
+		elif (seq == 10) :
+			# reset blanks
+			if (random.random() > .5) : actions.setBlanks()
+			numDolls = int(random.uniform(30,60))
+			strg = ""
+			scroll.fontSize -= 6
+			actions.drawCounterXOsFlag = True
+			space = "  "
+			for n in range (2, numDolls) : 
+				strg += ":)"+space
+				if (random.random() > .95) : strg += ":o"+space
+				if (random.random() > .95) : strg += ";)"+space
+			scroll.scrollMessage(strg, True, True, "Left")
 
-			# -------  BLEND/FLASH     -------------
-			elif(seq == 23) : 
-				blend.colorSwitch = False
-				blend.animator(0)
+			# After completition reset for other runs
+			scroll.fontSize += 6
+			actions.drawCounterXOsFlag = False
+		
+		# -------  ASIF SCREEN     -------------
+		elif (seq == 11) :
+			scroll.countLimit = 5
+			scroll.present("ASIF",1)
+		
+		# -------  ASIF LOVE FEAR CAROUSEL -------	
+		elif(seq == 12) :
+			clrFlicker = carouselSign.useColorFLicker
+			carouselSign.useColorFLicker = False
+			carouselSign.go("    ****  ASIF * LOVE & FEAR ****", 0)
+			carouselSign.useColorFlicker = clrFlicker
+		
+		# -------  ASIF LOVE FEAR CAROUSEL noend *	
+		elif(seq == 13) :
+			if(random.random() > .5) : carouselSign.useColorFLicker = True
+			carouselSign.go("    ****  ASIF * LOVE & FEAR ****", -1)
+			carouselSign.useColorFlicker = False
+
+		# Animation only modules
+		
+		# -------  USER            -------------
+		elif(seq == 14) :
+			user.userAnimator(24)
+		
+		# -------  CARDS / MACHINE -------------
+		elif(seq == 15) :
+			machine.machineAnimator(830) # 430
+			if(random.random() > .9) : user.userAnimator(24)
+		
+		# -------  BLUE SCREEN     -------------
+		elif(seq == 16) :
+			bluescreen.draw()
+		
+		# -------  GLITCH SCREEN   -------------
+		elif(seq == 17) :
+			actions.glitch()
+		
+		# -------  CONCENTRICS     -------------
+		elif (seq == 18) :
+			concentric.colorSwitch = False
+			concentric.animator(60)
+		
+		# -------  EXLPOSIONS      -------------
+		elif (seq == 19) :
+			actions.explosion()
+
+		# -------  BLEND/FLASH     -------------
+		elif(seq == 23) : 
+			blend.colorSwitch = False
+			blend.animator(0)
 
 
-			# Image Loading Modules	
-			
-			# -------  DEFAULT PAN     -------------
-			elif (seq == 20) :
-				imgLoader.action = "pan"
-				imgLoader.countLimit = 1
-				imgLoader.start("",0,-1)
-			
-			# -------  DEFAULT PLAY (FLAMES) -------
-			elif (seq == 21) :
-				imgLoader.action = "play"
-				imgLoader.countLimit = 20
-				imgLoader.start()
-			
-			#------ Plane Scrolling --------
-			elif (seq == 22) :
-				imageScrollSeq()
-
+		# Image Loading Modules	
+		
+		# -------  DEFAULT PAN     -------------
+		elif (seq == 20) :
+			imgLoader.action = "pan"
+			imgLoader.countLimit = 1
+			imgLoader.start("",0,-1)
+		
+		# -------  DEFAULT PLAY (FLAMES) -------
+		elif (seq == 21) :
+			imgLoader.action = "play"
+			imgLoader.countLimit = 20
+			imgLoader.start()
+		
+		#------ Plane Scrolling --------
+		elif (seq == 22) :
+			imageScrollSeq()
 
 	except KeyboardInterrupt:
 		print "Stopping"
 		exit()    
+
+	runSequence()
 
 def configure() :
 	global group, groups, config

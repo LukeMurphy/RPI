@@ -4,18 +4,29 @@ import urllib2
 from subprocess import call
 import sys, os
 
-urlToCheck = "http://192.168.1.124/projects/rpi-controls/banner-status-4.cfg"
+base = "http://192.168.1.124"
+unit = "3"
+
+urlToCheck = base + "/projects/rpi-controls/banner-status-"+unit+".cfg"
+confirmUrl = base + "/projects/rpi-controls/confirm.php?rpiunit=" + unit
 #resp, content = httplib2.Http().request(urlToCheck)
 
 def checker() :
+	global urlToCheck, confirmUrl, base
 	res  = urllib2.urlopen(urlToCheck).read()
+	confirm = urllib2.urlopen(confirmUrl).read()
+
+	offAction = "/home/pi/RPI/cntrlscripts/off_signal.sh"
+	pauseAction = "/home/pi/RPI/cntrlscripts/off_pause.sh"
+	restartAction = "/home/pi/RPI/cntrlscripts/off_restarts.sh "
+
 	if(res == "off") :
 		# Turn off any running scripts and then shutdown
-		os.system("/home/pi/RPI/cntrlscripts/off_signal.sh")
+		os.system(offAction)
 	elif(res == "pause") :
-		os.system("/home/pi/RPI/cntrlscripts/off_pause.sh")
+		os.system(pauseAction)
 	elif(res != "") :
-		action = "/home/pi/RPI/cntrlscripts/off_restarts.sh " + res
+		action = restartAction + res
 		os.system(action)
 
 checker()

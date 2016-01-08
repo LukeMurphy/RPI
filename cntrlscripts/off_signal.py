@@ -5,7 +5,7 @@ from subprocess import call
 import sys, os
 
 base = "http://192.168.1.124"
-unit = "3"
+unit = "5"
 
 urlToCheck = base + "/projects/rpi-controls/banner-status-"+unit+".cfg"
 confirmUrl = base + "/projects/rpi-controls/confirm.php?rpiunit=" + unit

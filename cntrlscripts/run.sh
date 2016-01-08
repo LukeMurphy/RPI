@@ -1,3 +1,4 @@
+echo $@
 if [ "$1" == "image" ]; then 
 	sudo python /home/pi/RPI/image-scroller.py "$@"
 elif [ "$1" == "wb" ]; then 

@@ -303,6 +303,7 @@ def configure() :
 		config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
 		config.brightness =  float(baseconfig.get("config", 'brightness'))
 		config.path = baseconfig.get("config", 'path')
+		config.transWiring = bool(baseconfig.getboolean("config", 'transWiring'))
 
 		action = actions
 		action.config = config

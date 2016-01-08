@@ -3,6 +3,7 @@ import random
 import math
 import sys
 import messenger
+import ImageChops, ImageOps
 
 screenWidth =  128
 screenHeight = 64
@@ -22,8 +23,9 @@ wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146
 rgbColorWheel = ["RED","GREEN","BLUE","YELLOW","MAGENTA","CYAN"]
 rgbWheel = [(255,0,0),(0,255,0),(0,0,255),(255,255,0),(255,0,255),(0,255,255)]
 
-global imageTop,imageBottom,image,config
+global imageTop,imageBottom,image,config,transWiring
 
+transWiring = True
 
 def getRandomRGB(brtns=1) :
     global brightness, rgbColorWheel, rgbWheel
@@ -111,9 +113,9 @@ def soliloquy(override = False,arg = "") :
     global useMassager
     if (useMassager) : messenger.soliloquy(override,arg)
 
-def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=False):
+def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
 
-    global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage, tileSize, rows, cols
+    global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage, tileSize, rows, cols, transWiring
 
     #w = screenWidth
     #h = screenHeight
@@ -123,29 +125,16 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
     # the rendered image is the screen size
     #renderImage = Image.new("RGBA", (screenWidth , 32))
 
-    if(crop == True) :
-
-        #print("Total segment", segmentImage)
-        #imageToRender = imageToRender
-
+    if(nocrop == True) :
         for n in range(0,rows) :
             segmentWidth = tileSize[1] * cols
             segmentHeight = 32
             xPos = n * segmentWidth - xOffset
             yPos = n * 32 #- yOffset
             segment =  imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
-            #print(n, segment)
             renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
-        '''
-        imageTop = imageToRender.crop((xOffset, yOffset, xOffset + screenWidth, 32+yOffset))
-        imageBottom = imageToRender.crop((xOffset, 32+yOffset, xOffset + screenWidth, 64+yOffset))
-        renderImage.paste(imageTop, (0,0))
-        renderImage.paste(imageBottom, (screenWidth,0))
 
-
-        '''
-
-    elif (crop == False) :
+    elif (nocrop == False) :
         segmentWidth = tileSize[1] * cols
         segmentHeight = 32
 
@@ -180,15 +169,58 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,crop=False, overlayBottom=Fa
             cropP2 = [min(w , segmentWidth - xOffset),   min(h, n * segmentHeight + 32 - yOffset)]
 
             pCrop  = cropP1 + cropP2
+
+            if ((n==0 or n == 2 or n == 4) and (transWiring == False) ) : pCrop[1] = 0
             segmentImage.append(imageToRender.crop(pCrop))
 
-            #print(pCrop)
-            
+            #print(a,b,c,d,cropP1,cropP2)
+
+
+            # Depending on the cabling, either copy segment laterally - which I think
+            # is faster, or transform the segment each time to flip and mirror because
+            # the panels are upside down wrt the ones below them
+            # Wiring from BACK  **** = ribbon jumper cables
+            #           ________________
+            #           |               |
+            #           |        <--  * |
+            #           |           | * |
+            #           --------------*--
+            #           |             * |
+            #           |        ^    * |
+            #           |        |-->   |
+            #           ________________
+
+            #           ________________
+            #           |        ^      |
+            #           | *      |-->   |
+            #           |    *          |
+            #           --------*--------
+            #           |          *    |
+            #           |        ^    * |
+            #           |        |-->   |
+            #           ________________
+
+
             # Only render if needs be
             if(pCrop[3] - pCrop[1] > 0 ) : 
                 if ( pCrop[2] - pCrop[0] > 0) :
-                    renderImage.paste( segmentImage[n], (a,b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
-                    #renderImage.load()
+                    segImg = segmentImage[n]
+                    if ((n==0 or n == 2 or n == 4) and (transWiring == False) ) : 
+                        # This flips, reveses and places the segment when the row is "upside down" wrt
+                        # the previous row of panels - this is when transWiring == False - i.e no long transverse cable
+                        segImg = ImageOps.flip(segImg)
+                        segImg = ImageOps.mirror(segImg)
+
+                        an = segmentWidth - xOffset - w
+                        if(an < 0) : an = 0
+
+                        bn = segmentHeight - yOffset - h
+                        if(bn < 0) : bn = 0
+
+                        renderImage.paste( segImg, (an, bn, an + pCrop[2] - pCrop[0], bn + pCrop[3] - pCrop[1]))
+                    else:
+                        renderImage.paste( segImg, (a, b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
+
      
             cropP1[1] = cropP2[1]
 

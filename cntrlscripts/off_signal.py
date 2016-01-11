@@ -25,7 +25,7 @@ def checker() :
 		os.system(offAction)
 	elif(res == "pause") :
 		os.system(pauseAction)
-	elif(res == "restart") :
+	elif(res == "reboot") :
 		os.system(reboot)
 	elif(res != "") :
 		action = restartAction + res

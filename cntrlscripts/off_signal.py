@@ -19,12 +19,14 @@ def checker() :
 	offAction = "/home/pi/RPI/cntrlscripts/off_signal.sh"
 	pauseAction = "/home/pi/RPI/cntrlscripts/off_pause.sh"
 	restartAction = "/home/pi/RPI/cntrlscripts/off_restarts.sh "
-
+	reboot = "/home/pi/RPI/cntrlscripts/reboot.sh"
 	if(res == "off") :
 		# Turn off any running scripts and then shutdown
 		os.system(offAction)
 	elif(res == "pause") :
 		os.system(pauseAction)
+	elif(res == "restart") :
+		os.system(reboot)
 	elif(res != "") :
 		action = restartAction + res
 		os.system(action)

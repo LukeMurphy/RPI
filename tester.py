@@ -16,7 +16,7 @@ import ConfigParser, io
 # ################################################### #
 global matrix
 global rows, cols, tileSize
-
+global r,g,b,boxHeight,boxWidth
 global config
 
 
@@ -152,15 +152,15 @@ def testPatternBasic() :
 	global matrix
 	global rows, cols, tileSize
 
-	matrix = Adafruit_RGBmatrix(32, 12)
+	matrix = Adafruit_RGBmatrix(32, 1)
 	# cols, rows
 	tileSize = (32, 32)
-	rows = 3
-	cols = 4
+	rows = 1
+	cols = 1
 	n = clri = 0
 
 	# cols, rows
-	testGrid = (6, 3)
+	testGrid = (2, 2)
 	sizeX = int(cols * tileSize[0] / testGrid[0]) - 1
 	sizeY = int(rows * tileSize[1] / testGrid[1]) - 1
 
@@ -190,7 +190,7 @@ def testPatternBasic() :
 			xPos2 = xPos + sizeX
 			yPos2 = yPos + sizeY
 			b =  n + 1
-			b = 4
+			b = 1
 			# draw.rectangle((xPos,yPos,xPos2,yPos2), fill=(255,0,n * 15), outline=(0,255,0))
 			draw.rectangle((xPos,yPos,xPos2,yPos2), 
 				fill=(int(cName1[0]/b),int(cName1[1]/b),int(cName1[2]/b)), 
@@ -248,28 +248,31 @@ def testPatternUsingConfig() :
 
 	time.sleep(5)
 
+def testMachine() :
+	global r,g,b,boxHeight,boxWidth
+	r=g=b=125
+	boxHeight = 24
+	boxWidth = 28
+
+	drawMachine()
+	x = 0
+	y = 32
+	count = 32
+	while (count > 0) :
+		config.render(config.image,x,y,boxWidth,boxHeight,False)
+		time.sleep(1)
+		y += -2
+		x += 0
+		count -= 1
+		pass
+
+
+#testPatternBasic()
 
 configure()
 
-r=g=b=125
-boxHeight = 24
-boxWidth = 28
-
-
-drawMachine()
-x = 0
-y = 32
-count = 32
-while (count > 0) :
-	config.render(config.image,x,y,boxWidth,boxHeight,False)
-	time.sleep(1)
-	y += -2
-	x += 0
-	count -= 1
-	pass
-
-
-#testPatternUsingConfig()
+testPatternUsingConfig()
+testMachine() 
 #testPatternBasic()
 
 

@@ -4,8 +4,8 @@ import urllib2
 from subprocess import call
 import sys, os
 
-base = "http://192.168.1.124"
-unit = "5"
+base = "http://www.lukelab.com"
+unit = "6"
 
 urlToCheck = base + "/projects/rpi-controls/banner-status-"+unit+".cfg"
 confirmUrl = base + "/projects/rpi-controls/confirm.php?rpiunit=" + unit
@@ -27,7 +27,7 @@ def checker() :
 		os.system(pauseAction)
 	elif(res == "reboot") :
 		os.system(reboot)
-	elif(res != "") :
+	elif(res != "nochange" and res != "") :
 		action = restartAction + res
 		os.system(action)
 

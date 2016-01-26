@@ -6,8 +6,11 @@ import math
 
 ########################
 #scroll speed and steps per cycle
-scrollSpeed = .0006
+scrollSpeed = 0.0006
+stroopSpeed = 0.0001
 steps = 2
+stroopSteps = 3
+
 fontSize = 14
 vOffset  = -1
 opticalOpposites = True
@@ -127,7 +130,6 @@ def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Lef
                                         break
                 time.sleep(scrollSpeed)
 
-
 def present(arg, clr = (250,150,150), duration = 1, repeat = -1) :
         global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
         global r,g,b, paintColor
@@ -195,13 +197,12 @@ def present(arg, clr = (250,150,150), duration = 1, repeat = -1) :
 
 def stroop( arg, clr, direction = "Left") :
 
-        global r,g,b,config, opticalOpposites
+        global r,g,b,config, opticalOpposites, stroopSpeed, stroopSteps
 
         brightness = config.brightness
         brightness = random.random()
 
         clr = tuple(int(a*brightness) for a in (clr))
-        stroopSpeed = 0.001
 
         # Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
         font = ImageFont.truetype( '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
@@ -255,7 +256,7 @@ def stroop( arg, clr, direction = "Left") :
             end = end - int(random.random() * config.screenHeight)
 
             # Scroll vertical text UP
-            for n in range(start,end):
+            for n in range(start,end, stroopSteps):
                     config.render(config.image, offset, -n, dims[1], dims[0]*2)
                     time.sleep(stroopSpeed)
 
@@ -272,7 +273,7 @@ def stroop( arg, clr, direction = "Left") :
             #vOffset = -1
             vOffset = int(random.uniform(0,config.rows)) * 32
 
-            for n in range(start,end):
+            for n in range(start, end, stroopSteps):
                     if(direction == "Left") :
                             #config.matrix.SetImage(config.id, 0, -2)
                             #config.matrix.SetImage(config.id, config.screenWidth-n, -2)

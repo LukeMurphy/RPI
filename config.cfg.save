@@ -1,0 +1,23 @@
+[config]
+matrixTiles = 16
+tileSizeHeight = 32
+tileSizeWidth = 64
+rows = 2
+cols = 4
+screenHeight =  64
+screenWidth =  256False
+actualScreenWidth  = 256
+useMassager = True
+brightness =  .325
+path = /home/pi/RPI
+transWiring = False
+
+[scroll]
+fontSize = 48
+vOffset = -4
+scrollSpeed = .025
+useColorFlicker = True
+
+[user]
+userCenterx = 64
+userCentery = 0

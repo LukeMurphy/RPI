@@ -213,7 +213,7 @@ def runSequence() :
 		# -------  ASIF LOVE FEAR CAROUSEL noend *	
 		elif(seq == 13) :
 			if(random.random() > .5) : carouselSign.useColorFLicker = True
-			carouselSign.go("    ****  ASIF * LOVE & FEAR ****", -1)
+			carouselSign.go("       ****  ASIF * BEEF * CHICKEN * PORK * FISH * LAMB  ****", -1)
 			carouselSign.useColorFlicker = False
 
 		# Animation only modules

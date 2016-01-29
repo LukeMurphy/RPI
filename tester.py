@@ -139,7 +139,7 @@ def configure() :
 	config.tileSize = (int(baseconfig.get("config", 'tileSizeHeight')),int(baseconfig.get("config", 'tileSizeWidth')))
 	config.rows = int(baseconfig.get("config", 'rows'))
 	config.cols = int(baseconfig.get("config", 'cols'))
-
+	config.matrixTiles =  int(baseconfig.get("config","matrixTiles"))
 	config.actualScreenWidth  = int(baseconfig.get("config", 'actualScreenWidth'))
 	config.useMassager = bool(baseconfig.getboolean("config", 'useMassager'))
 	config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
@@ -272,7 +272,7 @@ def drawPanelNumbers() :
 	g = 0
 	b = 0
 	font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',30)
-	totalTiles = config.rows * config.cols
+	totalTiles = config.matrixTiles
 
 	config.image = Image.new("RGBA", (config.actualScreenWidth, 32))
 	config.draw = ImageDraw.Draw(config.image)
@@ -281,12 +281,14 @@ def drawPanelNumbers() :
 
 	count = 0
 	for n in range(0, totalTiles) :
+
 		xPos = count * 32
 		yPos = -5
 		tmpImage = Image.new("RGBA", (32, 32))
 		tmpDraw = ImageDraw.Draw(tmpImage)
 		tmpDraw.text((0 ,0), str(count), (r,g,b), font=font)
 		iid = tmpImage.im.id
+		print(count, xPos)
 		config.matrix.SetImage(iid, xPos, yPos)
 		count = count+1
 
@@ -299,6 +301,8 @@ def drawPanelNumbersConfig() :
 	b = 0
 	font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',30)
 	totalTiles = config.rows * config.cols
+
+	print ("total Tiles: " +  str(totalTiles))
 
 	testImage = Image.new("RGBA", (config.actualScreenWidth, 32))
 	draw = ImageDraw.Draw(testImage)
@@ -322,13 +326,14 @@ def drawPanelNumbersConfig() :
 	time.sleep(30)	
 
 configure()
+drawPanelNumbers()
 #drawPanelNumbersConfig()
 
 
 #time.sleep(30)
 #configure()
 #testPatternUsingConfig()
-testMachine() 
+#testMachine() 
 #testPatternBasic()
 
 

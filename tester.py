@@ -240,7 +240,7 @@ def testPatternUsingConfig() :
 		b = 0
 
 	x = 0
-	y = 1
+	y = 128
 	boxHeight = 38
 	boxWidth = 65
 	config.draw.rectangle((x,y,x+boxWidth,y+boxHeight), fill=(rf,gf,bf))
@@ -256,24 +256,81 @@ def testMachine() :
 
 	drawMachine()
 	x = 0
-	y = 32
-	count = 32
+	y = 0
+	count = 160
 	while (count > 0) :
 		config.render(config.image,x,y,boxWidth,boxHeight,False)
-		time.sleep(1)
-		y += -2
+		time.sleep(.05)
+		y += 2
 		x += 0
 		count -= 1
 		pass
 
+def drawPanelNumbers() :
+	global config,r,g,b
+	r = 100
+	g = 0
+	b = 0
+	font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',30)
+	totalTiles = config.rows * config.cols
 
-#testPatternBasic()
+	config.image = Image.new("RGBA", (config.actualScreenWidth, 32))
+	config.draw = ImageDraw.Draw(config.image)
+	iid = config.image.im.id
+	config.matrix.SetImage(iid, 0, 0)
+
+	count = 0
+	for n in range(0, totalTiles) :
+		xPos = count * 32
+		yPos = -5
+		tmpImage = Image.new("RGBA", (32, 32))
+		tmpDraw = ImageDraw.Draw(tmpImage)
+		tmpDraw.text((0 ,0), str(count), (r,g,b), font=font)
+		iid = tmpImage.im.id
+		config.matrix.SetImage(iid, xPos, yPos)
+		count = count+1
+
+	time.sleep(30)
+
+def drawPanelNumbersConfig() :
+	global config,r,g,b
+	r = 100
+	g = 0
+	b = 0
+	font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',30)
+	totalTiles = config.rows * config.cols
+
+	testImage = Image.new("RGBA", (config.actualScreenWidth, 32))
+	draw = ImageDraw.Draw(testImage)
+	iid = testImage.im.id
+	config.matrix.SetImage(iid, 0, 0)
+
+	count = 0
+	for n in range(0, totalTiles) :
+		xPos = count * 32
+		yPos = -5
+		tmpImage = Image.new("RGBA", (32, 32))
+		tmpDraw = ImageDraw.Draw(tmpImage)
+		tmpDraw.text((0 ,0), str(count), (r,g,b), font=font)
+		#iid = tmpImage.im.id
+		testImage.paste(tmpImage, (xPos,yPos,32+xPos,32+yPos))
+		count = count+1
+
+	config.render(testImage, 0, 0, 128, 160)
+	# This renders the image directly, so chained panels will be flipped etc
+	#config.matrix.SetImage(iid, 0, 0)
+	time.sleep(30)	
 
 configure()
+#drawPanelNumbersConfig()
 
-testPatternUsingConfig()
+
+#time.sleep(30)
+#configure()
+#testPatternUsingConfig()
 testMachine() 
 #testPatternBasic()
+
 
 
 

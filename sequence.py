@@ -261,7 +261,7 @@ def runSequence() :
 		# -------  DEFAULT PLAY (FLAMES) -------
 		elif (seq == 21) :
 			imgLoader.action = "play"
-			imgLoader.countLimit = 20
+			imgLoader.countLimit = 500
 			imgLoader.start()
 		
 		#------ Plane Scrolling --------

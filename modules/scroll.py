@@ -9,7 +9,7 @@ import math
 scrollSpeed = 0.0006
 stroopSpeed = 0.0001
 steps = 2
-stroopSteps = 3
+stroopSteps = 2
 
 fontSize = 14
 vOffset  = -1

@@ -5,7 +5,7 @@ from subprocess import call
 import sys, os
 
 base = "http://www.lukelab.com"
-unit = "6"
+unit = "4"
 
 urlToCheck = base + "/projects/rpi-controls/banner-status-"+unit+".cfg"
 confirmUrl = base + "/projects/rpi-controls/confirm.php?rpiunit=" + unit

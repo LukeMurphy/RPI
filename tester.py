@@ -146,7 +146,7 @@ def configure() :
 	config.brightness =  float(baseconfig.get("config", 'brightness'))
 	config.path = baseconfig.get("config", 'path')
 
-	config.transWiring = False
+	config.transWiring = bool(baseconfig.getboolean("config", 'transWiring'))
 
 def testPatternBasic() :
 	global matrix
@@ -292,50 +292,45 @@ def drawPanelNumbers() :
 		config.matrix.SetImage(iid, xPos, yPos)
 		count = count+1
 
-	time.sleep(30)
+	time.sleep(3)
 
 def drawPanelNumbersConfig() :
 	global config,r,g,b
 	r = 100
-	g = 0
+	g = 100
 	b = 0
 	font = config.ImageFont.truetype(config.path  + '/fonts/freefont/FreeSerifBold.ttf',30)
 	totalTiles = config.rows * config.cols
 
 	print ("total Tiles: " +  str(totalTiles))
 
-	testImage = Image.new("RGBA", (config.actualScreenWidth, 32))
-	draw = ImageDraw.Draw(testImage)
-	iid = testImage.im.id
+	config.image = Image.new("RGBA", (config.actualScreenWidth, 32))
+	config.draw = ImageDraw.Draw(config.image)
+	iid = config.image.im.id
 	config.matrix.SetImage(iid, 0, 0)
 
-	count = 0
-	for n in range(0, totalTiles) :
-		xPos = count * 32
-		yPos = -5
-		tmpImage = Image.new("RGBA", (32, 32))
-		tmpDraw = ImageDraw.Draw(tmpImage)
-		tmpDraw.text((0 ,0), str(count), (r,g,b), font=font)
-		#iid = tmpImage.im.id
-		testImage.paste(tmpImage, (xPos,yPos,32+xPos,32+yPos))
-		count = count+1
+	tmpImage = Image.new("RGBA", (128, 160))
+	tmpDraw = ImageDraw.Draw(tmpImage)
 
-	config.render(testImage, 0, 0, 128, 160)
-	# This renders the image directly, so chained panels will be flipped etc
-	#config.matrix.SetImage(iid, 0, 0)
-	time.sleep(30)	
+	count = 0
+	for n in range(0, config.rows) :
+		for nn in range(0, config.cols) :
+			xPos = nn * 32
+			yPos = -5 + 32 * n
+			tmpDraw.text((xPos ,yPos), str(count), (r,g,b), font=font)
+			print(count, xPos, yPos)
+			count = count+1
+
+	config.render(tmpImage, 0, 0, 128, 160)
+	time.sleep(5)	
 
 configure()
 drawPanelNumbers()
-#drawPanelNumbersConfig()
+drawPanelNumbersConfig()
 
 
 #time.sleep(30)
 #configure()
 #testPatternUsingConfig()
-#testMachine() 
+testMachine() 
 #testPatternBasic()
-
-
-
-

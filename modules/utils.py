@@ -243,3 +243,4 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 
     #print(">>")
     #if(random.random() > .95) : soliloquy()
+

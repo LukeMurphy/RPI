@@ -1,14 +1,19 @@
 #Checks for off signal
 import urllib2
+import sys, getopt, os
+import ConfigParser, io
+
 #import httplib2
 from subprocess import call
-import sys, os
 
-base = "http://www.lukelab.com"
-unit = "4"
+baseconfig = ConfigParser.ConfigParser()
+baseconfig.read('/home/pi/RPI/config.cfg')
 
-urlToCheck = base + "/projects/rpi-controls/banner-status-"+unit+".cfg"
-confirmUrl = base + "/projects/rpi-controls/confirm.php?rpiunit=" + unit
+base = baseconfig.get("config", 'controlUrl')
+unit = baseconfig.get("config", 'unitNumber')
+
+urlToCheck = base + "/banner-status-"+unit+".cfg"
+confirmUrl = base + "/confirm.php?rpiunit=" + unit
 #resp, content = httplib2.Http().request(urlToCheck)
 
 def checker() :

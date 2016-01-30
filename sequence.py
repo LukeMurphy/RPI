@@ -261,7 +261,7 @@ def runSequence() :
 		# -------  DEFAULT PLAY (FLAMES) -------
 		elif (seq == 21) :
 			imgLoader.action = "play"
-			imgLoader.countLimit = 20
+			imgLoader.countLimit = 500
 			imgLoader.start()
 		
 		#------ Plane Scrolling --------
@@ -354,7 +354,7 @@ def configure() :
 		signage = (1,2,3,4,6,7,8,9,11,12,21)
 
 		# no image panning
-		animations = (14,16,17,18, 19, 21)
+		animations = (16,17, 21)
 
 		# just Stroop / colors
 		stroopSeq = (5,)

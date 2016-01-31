@@ -39,7 +39,7 @@ def changeColor( rnd = False) :
                 b = int(random.uniform(0,255) * config.brightness)
 
 def scrollMessage( arg, clrChange = False, adjustLenth = False, direction = "Left") :   
-        global config, scrollSpeed, steps, fontSize, vOffset  
+        global config, scrollSpeed, stroopSpeed, steps, fontSize, vOffset  
         changeColor(clrChange)
 
         # draw the meassage to get its size

@@ -314,7 +314,9 @@ def configure() :
 		scroll.fontSize = int(baseconfig.get("scroll", 'fontSize'))
 		scroll.vOffset = int(baseconfig.get("scroll", 'vOffset'))
 		scroll.scrollSpeed = float(baseconfig.get("scroll", 'scrollSpeed'))
-
+		scroll.stroopSpeed = float(baseconfig.get("scroll", 'stroopSpeed'))
+		scroll.stroopSteps = int(baseconfig.get("scroll", 'stroopSteps'))
+		
 		machine = machine
 		machine.config = config
 

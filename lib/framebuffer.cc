@@ -258,6 +258,7 @@ void RGBMatrix::Framebuffer::DumpToMatrix(GPIO *io) {
       io->ClearBits(color_clk_mask.raw);    // clock back to normal.
 
       io->SetBits(strobe.raw);   // Strobe in the previously clocked in row.
+      io->SetBits(strobe.raw);   // Strobe in the previously clocked in row.
       io->ClearBits(strobe.raw);
 
       // Now switch on for the sleep time necessary for that bit-plane.

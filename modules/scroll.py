@@ -256,7 +256,7 @@ def stroop( arg, clr, direction = "Left") :
             end = end - int(random.random() * config.screenHeight)
 
             # Scroll vertical text UP
-            for n in range(start,end, stroopSteps):
+            for n in range(start,end, (stroopSteps)):
                     config.render(config.image, offset, -n, dims[1], dims[0]*2)
                     time.sleep(stroopSpeed)
 
@@ -273,7 +273,7 @@ def stroop( arg, clr, direction = "Left") :
             #vOffset = -1
             vOffset = int(random.uniform(0,config.rows)) * 32
 
-            for n in range(start, end, stroopSteps):
+            for n in range(start, end, (stroopSteps)):
                     if(direction == "Left") :
                             #config.matrix.SetImage(config.id, 0, -2)
                             #config.matrix.SetImage(config.id, config.screenWidth-n, -2)

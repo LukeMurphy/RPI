@@ -225,28 +225,18 @@ def testPatternBasic() :
 def testPatternUsingConfig() :
 	global config
 	r=g=b=0
-	rf=gf=bf=0
-	if (r == 0 ):
-		rf = int(255 * config.brightness)
-		gf = 0
-		r = 0
-		g = int(255 * config.brightness)
-		b = 0
-	else :
-		rf = 0
-		gf = int(255 * config.brightness)
-		r = int(255 * config.brightness)
-		g = 0
-		b = 0
-
-	x = 0
-	y = 128
-	boxHeight = 38
-	boxWidth = 65
-	config.draw.rectangle((x,y,x+boxWidth,y+boxHeight), fill=(rf,gf,bf))
-	config.render(config.image,x,y,boxWidth,boxHeight,False)
-
-	time.sleep(5)
+	clr = [(100,0,0),(0,100,0),(0,0,100),(100,100,0),(100,0,100),(0,100,100)]
+	tmpImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	tmpDraw = ImageDraw.Draw(tmpImage)
+	for n in range(0,6) :
+		x = 0
+		y = 0
+		boxHeight = config.screenHeight
+		boxWidth = config.screenWidth
+		print(boxHeight, boxWidth)
+		tmpDraw.rectangle((x,y,x+boxWidth,y+boxHeight), fill=clr[n])
+		config.render(tmpImage,x,y,boxWidth,boxHeight,False)
+		time.sleep(5)
 
 def testMachine() :
 	global r,g,b,boxHeight,boxWidth
@@ -292,7 +282,7 @@ def drawPanelNumbers() :
 		config.matrix.SetImage(iid, xPos, yPos)
 		count = count+1
 
-	time.sleep(3)
+	time.sleep(.4)
 
 def drawPanelNumbersConfig() :
 	global config,r,g,b
@@ -309,7 +299,7 @@ def drawPanelNumbersConfig() :
 	iid = config.image.im.id
 	config.matrix.SetImage(iid, 0, 0)
 
-	tmpImage = Image.new("RGBA", (128, 160))
+	tmpImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	tmpDraw = ImageDraw.Draw(tmpImage)
 
 	count = 0
@@ -322,7 +312,7 @@ def drawPanelNumbersConfig() :
 			count = count+1
 
 	config.render(tmpImage, 0, 0, 128, 160)
-	time.sleep(5)	
+	time.sleep(.4)	
 
 configure()
 drawPanelNumbers()
@@ -331,6 +321,6 @@ drawPanelNumbersConfig()
 
 #time.sleep(30)
 #configure()
-#testPatternUsingConfig()
-testMachine() 
+testPatternUsingConfig()
+#testMachine() 
 #testPatternBasic()

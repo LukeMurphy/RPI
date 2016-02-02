@@ -30,7 +30,10 @@ bgFillColor = 0x000000
 
 action = "play"
 brightnessFlux = False
+brightnessFluxRate  = 8 # As a factor or PI/brightnessFluxRate
 resizeToWidth = False
+
+lastPictureIndex = 0
 
 global debug
 global draw
@@ -145,7 +148,7 @@ def rotateImage(angle) :
 	config.matrix.SetImage(config.image.im.id, -8, -8)
 
 def animate(randomizeTiming = False, frameLimit = 3) :
-	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight, imageCopy, brightnessFactor, rate
+	global frame, count, xOffset, yOffset, vX,image, action, gifPlaySpeed, imgHeight, imageCopy, brightnessFactor, brightnessFluxRate, rate
 
 	# This needs fixing  - currently requires extra frame
 	# at end of gif  --
@@ -158,14 +161,14 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 	#imageCopy = image.point(lambda p: p * 0.19)
 	imageCopy.paste(image)
 	if(brightnessFlux) :
-		rate+=math.pi/8;
-		brightnessFactor = math.sin(rate) + .5
-		if(brightnessFactor > 1) : brightnessFactor = 1
-		if(brightnessFactor < 0) : brightnessFactor = .05
+		rate+=math.pi/brightnessFluxRate;
+		brightnessFactor = (math.sin(rate) + 1) / 2 + .01
+		#if(brightnessFactor > 1) : brightnessFactor = 1
+		#if(brightnessFactor < 0) : brightnessFactor = .00001
 	enhancer = ImageEnhance.Brightness(imageCopy)
 	imageCopy = enhancer.enhance(brightnessFactor)
-
-	config.render(imageCopy, 0, 0, config.screenWidth, config.screenHeight)
+	
+	config.render(imageCopy, xOffset, yOffset, config.screenWidth, config.screenHeight)
 	config.actions.drawBlanks()
 	
 	try:
@@ -215,14 +218,14 @@ def debugMessage(arg) :
 	if(debug) : print(arg)		
 
 def start(img="", setvX = 0, setvY = 0):
-	global image,frame, action,xOffset,yOffset,vX,vY,imageCopy
+	global image,frame, action, xOffset, yOffset, vX, vY, imageCopy
 	frame = 0
 
 	vX = setvX
 	vY = setvY
 	
 	if (action == "play") : 
-		xOffset = yOffset = 0
+		#xOffset = yOffset = 0
 		if(img=="") : 
 			if(config.screenWidth <= 128 and config.screenHeight == 64) :
 				img  = config.path + "/imgs/flames-128x64.gif"

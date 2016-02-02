@@ -50,6 +50,7 @@ config.actions =  actions
 
 imgLoader = loader
 imgLoader.config = config
+imgLoader.brightnessFactor = config.brightness
 
 
 # ################################################### #
@@ -119,8 +120,62 @@ def seq() :
 			imgLoader.scrollSpeed = .01
 			imgLoader.countLimit = 1
 			imgLoader.resizeToWidth = True
+			imgLoader.brightnessFactor = random.random()
 			img = int(random.random() *  len(imageList))
+			while (img == imgLoader.lastPictureIndex):
+				img = int(random.random() *  len(imageList))
+			imgLoader.lastPictureIndex = img
+			# start(image-path, vx, vy) for panning ...
 			imgLoader.start(path + "/" + imageList[img], 0, -1)
+
+		if (seq == 4) :
+			imageList = ['flames-tilt.gif','flames-196x64.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "play"
+			imgLoader.countLimit = 10
+			imgLoader.gifPlaySpeed = .08
+			imgLoader.brightnessFactor  = 1
+			imgLoader.brightnessFlux = False
+			imgLoader.brightnessFluxRate = 240
+			imgLoader.xOffset =  0
+			imgLoader.yOffset = 0
+			img = 0
+			path = config.path  + "/imgs"
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img])
+
+		if (seq == 5) :
+			imageList = ['badpixel.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "play"
+			imgLoader.countLimit = 100000
+			imgLoader.gifPlaySpeed = 100
+			imgLoader.brightnessFactor  = .5
+			imgLoader.brightnessFlux = True
+			imgLoader.brightnessFluxRate = 240
+			imgLoader.xOffset = 0
+			imgLoader.yOffset = 0
+			img = 0
+			path = config.path  + "/imgs"
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img],0,-1)
+
+
+		if (seq == 6) :
+			imageList = ['badpixel.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "present"
+			imgLoader.countLimit = 100000
+			imgLoader.gifPlaySpeed = 100
+			imgLoader.brightnessFactor  = .5
+			imgLoader.brightnessFlux = True
+			imgLoader.brightnessFluxRate = 240
+			imgLoader.xOffset = 0
+			imgLoader.yOffset = 0
+			img = 0
+			path = config.path  + "/imgs"
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img],0,-1)
 
 seq()
 

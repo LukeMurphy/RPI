@@ -129,12 +129,12 @@ def seq() :
 			imgLoader.start(path + "/" + imageList[img], 0, -1)
 
 		if (seq == 4) :
-			imageList = ['flames-tilt.gif','flames-196x64.gif'] 
+			imageList = ['flames-blk-128x128b.gif'] 
 			imgLoader.debug = False
 			imgLoader.action = "play"
-			imgLoader.countLimit = 10
-			imgLoader.gifPlaySpeed = .08
-			imgLoader.brightnessFactor  = 1
+			imgLoader.countLimit = 100000
+			imgLoader.gifPlaySpeed = .05
+			imgLoader.brightnessFactor  = .7
 			imgLoader.brightnessFlux = False
 			imgLoader.brightnessFluxRate = 240
 			imgLoader.xOffset =  0

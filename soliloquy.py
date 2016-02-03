@@ -1,13 +1,15 @@
 from __future__ import print_function
 import random, time
 import sys
+import threading
 
 
 
 class soliloquy() :
 
 
-    def __init__(self):
+    def __init__(self, arg=""):
+        self.name = arg
         self.I = 0
         self.lastI = 1
         self.msg = ["Oh Infinite beatitude of existence me ",
@@ -29,7 +31,13 @@ class soliloquy() :
 
     def soliloquy(self) :
         
-        #print("me.")
+        #print(self.name)
+        '''
+        delay = random.random() * 1
+        time.sleep(delay)
+        self.soliloquy()
+        '''
+
         if(random.random() > .2) :
             rnd = int(random.uniform(1,4))
             
@@ -53,12 +61,28 @@ class soliloquy() :
         if(random.random() > .5) : print(" ")
         self.lastI = self.I
         sys.stdout.flush()
+        
 
 
 #####################
-s = soliloquy()
+s1 = soliloquy("s-one")
+'''
+s1 = soliloquy("s-one")
+s2 = soliloquy("s=two")
+
+threads = []
+
+t = threading.Thread(target=s1.soliloquy)
+threads.append(t)
+t.start()
+
+t = threading.Thread(target=s2.soliloquy)
+threads.append(t)
+t.start()
+
+'''
 
 while True :
-    s.soliloquy()
+    s1.soliloquy()
     delay = random.random() * 1
     time.sleep(delay)

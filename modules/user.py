@@ -93,15 +93,18 @@ def userAnimator(arg, numUsers=2) :
         numUsers = int(random.uniform(1,3))
         userList = [[0,0]]*numUsers
 
+        xPosInit = 0
         for n in range(0,numUsers) :
-                userList[n] = [int(random.uniform(0,config.screenWidth)), userCentery]
+                xPos = int(random.uniform(xPosInit+2,(config.screenWidth-32) * 2/3))
+                userList[n] = [xPos + xPosInit, userCentery]
+                xPosInit =  xPos + 20
 
         count = 0
         while (count < arg) :
                 for n in range(0,numUsers) : drawUser(n)
                 count+=1
                 time.sleep(.25)
-        if(random.random() > .5) :  userAnimator(arg)
+        #if(random.random() > .5) :  userAnimator(arg)
 
 
 

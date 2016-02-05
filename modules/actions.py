@@ -160,20 +160,24 @@ def burst(a=10) :
 def glitch(a=10) :
         global config
         count = 0
+        setBlanks()
         while (count < a) :
-                yStart = int(random.uniform(0,16))
+                yStart = int(random.uniform(0,8))
                 for n in range(0,30) :
                         r = int(random.uniform(0,255) * config.brightness)
                         g = int(random.uniform(0,255) * config.brightness)
                         b = int(random.uniform(0,255) * config.brightness)
                         x = int(random.random()*config.screenWidth)
 
-                        yEnd = yStart + int(random.uniform(0,16))
+                        yEnd = yStart + int(random.uniform(24,42))
                         y = int(random.uniform(yStart,yEnd))
 
-                        lineLength = int(random.random()*30)
+                        lineStart = int(random.uniform(0,64))
+                        lineLength = int(random.random()*config.actualScreenWidth *2/3)
                         for xpos in range (0, lineLength) :
-                                config.matrix.SetPixel(x + xpos ,y,r,g,b)
+                                config.matrix.SetPixel(lineStart + xpos ,y, r,g,b)
+                        for xpos in range (lineLength, config.screenWidth) :
+                                config.matrix.SetPixel(xpos ,y, 0,0,0)
 
                 drawBlanks()
                 time.sleep(.01)

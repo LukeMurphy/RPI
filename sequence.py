@@ -105,6 +105,10 @@ def imageScrollSeq() :
 			img = int(random.random() *  len(imageList))
 			imgLoader.start(path + "/" + imageList[img], 0, -1)
 
+
+###################################################
+# -------   Runs the sequences             ------*#
+###################################################
 def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
@@ -268,12 +272,80 @@ def runSequence() :
 		elif (seq == 22) :
 			imageScrollSeq()
 
+		#------ Present Bad Pixel --------
+		elif (seq == 24 or seq == 25) :
+			imageList = ['badpixel.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "present"
+			imgLoader.countLimit = 1 #int(random.uniform(10,100))
+			imgLoader.gifPlaySpeed = int(random.uniform(50,250))
+			imgLoader.brightnessFactor  = random.uniform(.25,.75)
+			imgLoader.brightnessFlux = True
+			imgLoader.brightnessFluxRate = 240
+			imgLoader.xOffset = 0
+			imgLoader.yOffset = 0
+			img = 0
+			path = config.path  + "/imgs"
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img],0,-1)
+
 	except KeyboardInterrupt:
 		print "Stopping"
 		exit()    
 
 	runSequence()
 
+
+
+###################################################
+# -------   SETTING UP THE SEQUENCE GROUPS ------*#
+###################################################
+def setUpSequenceGroups() :
+		global group, groups, config
+		global action, scroll, machine, bluescreen, user, carouselSign
+		global imgLoader, concentric, flash, blend
+
+		signage = (1,2,3,4,6,7,8,9,11,12,21)
+
+		# no image panning
+		# 16 = blueScreen
+		# 17 = glitch
+		# 24 = bad pixel
+		animations = (17,24,25)
+
+		# just Stroop / colors
+		stroopSeq = (5,)
+
+		# just emotis
+		emotiSeq = (10,)
+
+		# just concentric squares
+		concentricRecs = (18,)
+
+		# just cards & user
+		cardsUsers = (15,)
+
+		# Carousel Only
+		carouselSolo = (13,)
+
+		# Blend / flashing lights
+		flashingBlend = (23,)
+
+		# plane scrolling
+		imageScroll = (22,)
+
+		# start via cmd  sudo python /home/pi/RPI/sequence.py seq 5
+		groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo, flashingBlend, imageScroll]
+		group = groups[0]
+		group = groups[1]
+		options = options2 = options3 = ""
+
+
+
+###################################################
+# -------   Reads configuration files and sets
+# -------   defaults                             *#
+###################################################
 def configure() :
 	global group, groups, config
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
@@ -351,39 +423,8 @@ def configure() :
 		blend.colorSwitch = False
 		blend.boxWidth = 16
 
-
-		# -------   SETTING UP THE SEQUENCE GROUPS ------*#
-		signage = (1,2,3,4,6,7,8,9,11,12,21)
-
-		# no image panning
-		animations = (16,17,21)
-
-		# just Stroop / colors
-		stroopSeq = (5,)
-
-		# just emotis
-		emotiSeq = (10,)
-
-		# just concentric squares
-		concentricRecs = (18,)
-
-		# just cards & user
-		cardsUsers = (15,)
-
-		# Carousel Only
-		carouselSolo = (13,)
-
-		# Blend / flashing lights
-		flashingBlend = (23,)
-
-		# plane scrolling
-		imageScroll = (22,)
-
-		# start via cmd  sudo python /home/pi/RPI/sequence.py seq 5
-		groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo, flashingBlend, imageScroll]
-		group = groups[0]
-		group = groups[1]
-		options = options2 = options3 = ""
+		# ---- Call the group-sequence config fcu -----#
+		setUpSequenceGroups()
 
 		return True
 
@@ -393,15 +434,19 @@ def configure() :
 		print ("Error:" + str(err))
 		return False
 
+
+
 def main():
 	global group, groups, config
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
+	
+	####################################################################
+	################  JUST FOR COMMAND LINE !!!!! ######################
+	### Below are used to run individual modules from command line
+	# eg ./run.sh explosion or ./run.sh scroll "TEST" 2
+	####################################################################
 
 	if(configure()) :
-		################  JUST FOR COMMAND LINE !!!!! ######################
-		### Below are used to run individual modules from command line
-		# eg ./run.sh explosion or ./run.sh scroll "TEST"
-
 		try:
 			args = sys.argv
 			#print(args)
@@ -472,7 +517,10 @@ def main():
 				elif(argument  == "car") :
 					carouselSign.go(options)
 
+				###################################################
 				# ----------  Play the group sequence  ---------- #
+				###################################################
+
 				elif(argument  == "seq") :
 					group = groups[int(options)]
 					runSequence()

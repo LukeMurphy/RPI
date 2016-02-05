@@ -15,7 +15,7 @@ TARGET=librgbmatrix.a
 # bit setting, or we get glitches in the display.  Uncomment this line
 # if you get glitching.
 #
-#DEFINES+=-DRGB_SLOWDOWN_GPIO
+DEFINES+=-DRGB_SLOWDOWN_GPIO
 
 DEFINES+=-DADAFRUIT_RGBMATRIX_HAT
 

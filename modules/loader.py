@@ -63,6 +63,7 @@ def presentImage() :
 	enhancer = ImageEnhance.Brightness(imageCopyTemp)
 	imageCopyTemp = enhancer.enhance(brightnessFactor)
 	config.render(imageCopyTemp, int(xOffset), int(yOffset), imageCopy.size[0], imageCopy.size[1], False)
+	config.actions.drawBlanks()
 	time.sleep(presentTime)
 	
 def panImage() :

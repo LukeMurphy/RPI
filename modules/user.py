@@ -56,9 +56,16 @@ def drawUser(n = 0) :
         # x1, y1, x2, y2 of bounding box
 
         #### BODY
+        
+        #draw.arc((10,25,200,200), 0, 135)
+        #draw.ellipse((bx1,by1,bx2,by2),fill=(r,g,b,1), outline=0)
+        #print(bx1,by1)
+    
         config.draw.ellipse((bx1,by1,bx2,by2),fill=(r,g,b,1), outline=1)
+        draw.arc((int(bx1-1),int(by1-1),int(bx2+1),int(by2+1)),180,360,fill=(0,0,0,1))
         #### HEAD
         config.draw.ellipse((hx1,hy1,hx2,hy2),fill=(r,g,b,1), outline=1)
+        draw.arc((int(hx1-1),int(hy1-1),int(hx2+1),int(hy2+1)),180,360,fill=(0,0,0,1))
         #### MOUTH
        
         if (random.random() > .8) :
@@ -67,8 +74,11 @@ def drawUser(n = 0) :
                 b = int(random.uniform(0,255) * config.brightness)
                 #### BODY
                 draw.ellipse((bx1,by1,bx2,by2),fill=(r,g,b,1), outline=1)
+                ## Cleanup
+                draw.arc((int(bx1-1),int(by1-1),int(bx2+1),int(by2+1)),180,360,fill=(0,0,0,1))
                 #### HEAD
                 draw.ellipse((hx1,hy1,hx2,hy2),fill=(r,g,b,1), outline=1)
+                draw.arc((int(hx1-1),int(hy1-1),int(hx2+1),int(hy2+1)),180,360,fill=(0,0,0,1))
                 draw.ellipse((mx1,my1- mh/2,mx2,my2 + mh/2), fill=(int(180 * config.brightness),int(80 * config.brightness),int(80 * config.brightness),2), outline=1)
 
                 #matrix.SetImage(config.id, config.screenWidth/2 - centerx,centery)

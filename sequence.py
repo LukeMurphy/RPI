@@ -399,6 +399,7 @@ def configure() :
 		user.config = config
 		user.userCenterx = int(baseconfig.get("user", 'userCenterx'))
 		user.userCentery = int(baseconfig.get("user", 'userCentery'))
+		user.scale = float(baseconfig.get("user", 'scale'))
 
 		carouselSign = carousel
 		carouselSign.config = config
@@ -462,7 +463,7 @@ def main():
 					actions.burst()
 					exit()
 				elif(argument == "user") : 
-					user.userAnimator(10)
+					user.userAnimator(250,2,True)
 					exit()        	
 				elif(argument == "cards") : 
 					machine.machineAnimator(10000)

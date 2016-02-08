@@ -41,7 +41,7 @@ config.actualScreenWidth  = 192 * 2
 config.useMassager = False
 config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
 config.brightness =  .125
-config.path = "/home/pi/RPI1"
+config.path = "/home/pi/RPI"
 
 motions = []
 

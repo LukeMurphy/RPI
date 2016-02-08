@@ -1,23 +1,27 @@
 [config]
-matrixTiles = 8
+unitNumber = 2
+controlUrl = http://www.lukelab.com/projects/rpi-controls/
+matrixTiles = 0
 tileSizeHeight = 32
-tileSizeWidth = 64
-rows = 2
-cols = 2
-screenHeight =  64
-screenWidth =  128
-actualScreenWidth  = 256
+tileSizeWidth = 32
+rows = 0
+cols = 0
+screenHeight = 0
+screenWidth = 0
+actualScreenWidth  = 0
 useMassager = True
-brightness =  .325
+brightness =  .4
 path = /home/pi/RPI
-transWiring = False
+transWiring = True
 
 [scroll]
-fontSize = 48
-vOffset = -4
-scrollSpeed = .025
+fontSize = 70
+vOffset = -10
+scrollSpeed = .006
+stroopSpeed = .004
+stroopSteps = 2
 useColorFlicker = True
 
 [user]
-userCenterx = 64
-userCentery = 0
+userCenterx = 32
+userCentery = 64

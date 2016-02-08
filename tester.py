@@ -236,7 +236,7 @@ def testPatternUsingConfig() :
 		print(boxHeight, boxWidth)
 		tmpDraw.rectangle((x,y,x+boxWidth,y+boxHeight), fill=clr[n])
 		config.render(tmpImage,x,y,boxWidth,boxHeight,False)
-		time.sleep(5)
+		time.sleep(1)
 
 def testMachine() :
 	global r,g,b,boxHeight,boxWidth
@@ -282,7 +282,7 @@ def drawPanelNumbers() :
 		config.matrix.SetImage(iid, xPos, yPos)
 		count = count+1
 
-	time.sleep(.4)
+	time.sleep(1)
 
 def drawPanelNumbersConfig() :
 	global config,r,g,b
@@ -312,7 +312,7 @@ def drawPanelNumbersConfig() :
 			count = count+1
 
 	config.render(tmpImage, 0, 0, 128, 160)
-	time.sleep(.4)	
+	time.sleep(1)	
 
 configure()
 drawPanelNumbers()

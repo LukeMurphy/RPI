@@ -113,7 +113,7 @@ def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
 	lastAction  = 0
-	#print("running", group, len(group))
+	
 
 	try:
 
@@ -126,7 +126,8 @@ def runSequence() :
 		# try not to repeat
 		lastAction = seq
 		#seq = 18
-		
+		#print("running", group, len(group))
+
 		# -------  SCROLL         -------------
 		if(seq == 1) :
 			if(random.random() > .8) :actions.burst(10)
@@ -224,7 +225,10 @@ def runSequence() :
 		
 		# -------  USER            -------------
 		elif(seq == 14) :
-			user.userAnimator(24)
+			fixed = False
+			duration = int(random.uniform(24,100))
+			if(random.random() > .4) : fixed = True
+			user.userAnimator(duration,2, fixed)
 		
 		# -------  CARDS / MACHINE -------------
 		elif(seq == 15) :
@@ -334,9 +338,11 @@ def setUpSequenceGroups() :
 		# plane scrolling
 		imageScroll = (22,)
 
+		# Users
+		users = (14,)
+
 		# start via cmd  sudo python /home/pi/RPI/sequence.py seq 5
-		groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo, flashingBlend, imageScroll]
-		group = groups[0]
+		groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo, flashingBlend, imageScroll, users]
 		group = groups[1]
 		options = options2 = options3 = ""
 

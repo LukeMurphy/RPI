@@ -49,16 +49,19 @@ def drawUser(n = 0) :
 
         r=g=b=int(124 * config.brightness)
         b = int(255 * config.brightness)
+
+        onColor = (240,0,2,1)
+        oColor  = (int(400 * config.brightness),int(400 * config.brightness),int(0 * config.brightness),1)
         
         matrix = config.matrix
         draw = config.draw
 
         #### BODY
         config.draw.ellipse((bx1,by1,bx2,by2),fill=(r,g,b,1), outline=1)
-        draw.arc((int(bx1-1),int(by1-1),int(bx2+1),int(by2+1)),180,360,fill=(0,0,0,1))
+        draw.arc((int(bx1-1),int(by1-1),int(bx2+1),int(by2+1)),180,360,fill=onColor)
         #### HEAD
         draw.ellipse((hx1,hy1,hx2,hy2),fill=(r,g,b,1), outline=1)
-        draw.arc((int(hx1-1),int(hy1-1),int(hx2+1),int(hy2+1)),180,360,fill=(0,0,0,1))
+        draw.arc((int(hx1-1),int(hy1-1),int(hx2+1),int(hy2+1)),130,420,fill=onColor)
         #### MOUTH
        
         if (random.random() > .8) :
@@ -68,10 +71,10 @@ def drawUser(n = 0) :
                 #### BODY
                 draw.ellipse((bx1,by1,bx2,by2),fill=(r,g,b,1), outline=1)
                 ## Cleanup
-                draw.arc((int(bx1-1),int(by1-1),int(bx2+1),int(by2+1)),180,360,fill=(0,0,0,1))
+                draw.arc((int(bx1-1),int(by1-1),int(bx2+1),int(by2+1)),180,360,fill=oColor)
                 #### HEAD
                 draw.ellipse((hx1,hy1,hx2,hy2),fill=(r,g,b,1), outline=1)
-                draw.arc((int(hx1-1),int(hy1-1),int(hx2+1),int(hy2+1)),180,360,fill=(0,0,0,1))
+                draw.arc((int(hx1-1),int(hy1-1),int(hx2+1),int(hy2+1)),130,420,fill=oColor)
                 draw.ellipse((mx1,my1- mh/2,mx2,my2 + mh/2), fill=(int(180 * config.brightness),int(80 * config.brightness),int(80 * config.brightness),2), outline=1)
                 
         else :
@@ -82,7 +85,7 @@ def userAnimator(arg, numUsers=-1, fixed = False) :
         global config, userList, userCenterx, userCentery , scale 
         config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
         config.draw  = config.ImageDraw.Draw(config.image)
-        config.draw.rectangle((0,0,int(32 * scale), int(32 * scale)), fill= (0,0,0))
+        #config.draw.rectangle((0,0,int(32 * scale), int(32 * scale)), fill= (0,0,0))
         #config.id = image.im.id
         
         if(numUsers == -1) : numUsers = int(random.uniform(1,3))
@@ -103,7 +106,8 @@ def userAnimator(arg, numUsers=-1, fixed = False) :
                 for n in range(0,numUsers) : drawUser(n)
                 config.render(config.image, 0, 0,128,128)
                 count+=1
-                time.sleep(.25)
+                t = random.uniform(.01,.3)
+                time.sleep(t)
         #if(random.random() > .5) :  userAnimator(arg)
 
 

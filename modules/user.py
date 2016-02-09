@@ -50,8 +50,8 @@ def drawUser(n = 0) :
         r=g=b=int(124 * config.brightness)
         b = int(255 * config.brightness)
 
-        onColor = (240,0,2,1)
-        oColor  = (int(400 * config.brightness),int(400 * config.brightness),int(0 * config.brightness),1)
+        onColor = (0,0,100,1)
+        oColor  = (int(400 * config.brightness),int(random.uniform(50,300) * config.brightness),int(0 * config.brightness),1)
         
         matrix = config.matrix
         draw = config.draw

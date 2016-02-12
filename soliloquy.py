@@ -254,7 +254,7 @@ o+`                                      o`      -+`                   s
 
 
 s1 = soliloquy("point-one")
-s1.tester()
+#s1.tester()
 #exit()
 
 

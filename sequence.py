@@ -14,6 +14,8 @@ import math
 import sys, getopt, os
 import ConfigParser, io
 from subprocess import call
+import threading
+global thrd
 
 T1 = 0
 T2 = 0
@@ -40,8 +42,8 @@ def getDirection() :
 def imageScrollSeq() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
+	global T1, T2
 
-	
 	# Get all files in the drawing folder
 	path = config.path  + "/imgs/drawings"
 	rawList = os.listdir(path)
@@ -71,7 +73,16 @@ def imageScrollSeq() :
 		# Force the checking of the status file  -- sometimes the cron does not run
 		# probably due to high CPU load etc ...
 		# --------------------------------------------------------------------------#
-		off_signal.checker()
+ 		T2 = time.time()
+                if((T2 - T1) > 15) :
+                        threads = []
+                        thrd = threading.Thread(target=off_signal.checker)
+                        threads.append(thrd)
+                        thrd.start()
+
+                        #print(threads)
+                        #off_signal.checker()
+                        T1 = time.time()		
 
 		if (seq == 1) :
 			imageList = ['plane-2b.gif','paletter3c.gif'] 
@@ -123,10 +134,10 @@ def imageScrollSeq() :
 def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
-	global T1,T2
+	global T1,T2,thrd
 	lastAction  = 0
 
-	try:
+ 	try:
 
 		# If there are more than one set of animations per group e.g. various
 		# text sequences, "randomize" the selection and try to avoid repeating
@@ -148,7 +159,13 @@ def runSequence() :
 		# --------------------------------------------------------------------------#
 		T2 = time.time()
 		if((T2 - T1) > 15) :
-			off_signal.checker()
+			threads = []
+			thrd = threading.Thread(target=off_signal.checker)
+			threads.append(thrd)
+			thrd.start()
+			
+			#print(threads)
+			#off_signal.checker()
 			T1 = time.time()
 
 		# -------  SCROLL         -------------

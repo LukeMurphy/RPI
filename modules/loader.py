@@ -200,6 +200,9 @@ def init():
 	#print(countLimit)
 	count = 0
 	fillColor(True)
+	# Constantly re-calls the requested action util 
+	# the count runs out - for long running plays
+	# the countlimit just gets reset 
 	while (count < countLimit):
 		try:
 			if(action == "play"):

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #import modules
 from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender, carousel
+from cntrlscripts import off_signal
 import Image
 import ImageDraw
 import time
@@ -12,6 +13,10 @@ import textwrap
 import math
 import sys, getopt, os
 import ConfigParser, io
+from subprocess import call
+
+T1 = 0
+T2 = 0
 
 def stroopSequence() :
 	global group, groups
@@ -35,6 +40,7 @@ def getDirection() :
 def imageScrollSeq() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, imgLoader, concentric, signage
+
 	
 	# Get all files in the drawing folder
 	path = config.path  + "/imgs/drawings"
@@ -61,6 +67,11 @@ def imageScrollSeq() :
 	'''
 
 	while True:
+		# --------------------------------------------------------------------------#
+		# Force the checking of the status file  -- sometimes the cron does not run
+		# probably due to high CPU load etc ...
+		# --------------------------------------------------------------------------#
+		off_signal.checker()
 
 		if (seq == 1) :
 			imageList = ['plane-2b.gif','paletter3c.gif'] 
@@ -112,21 +123,33 @@ def imageScrollSeq() :
 def runSequence() :
 	global group, groups
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
+	global T1,T2
 	lastAction  = 0
-	
 
 	try:
+
+		# If there are more than one set of animations per group e.g. various
+		# text sequences, "randomize" the selection and try to avoid repeating
+		# the exact same one twice in a row ...
 
 		if(len(group) > 1) :
 			seq = int(random.uniform(1,30))
 			while (seq not in group and seq != lastAction) : 
 				seq = int(random.uniform(1,30))
 		else : 
-				seq = group[0]
+			seq = group[0]
 		# try not to repeat
 		lastAction = seq
-		#seq = 18
 		#print("running", group, len(group))
+
+		# --------------------------------------------------------------------------#
+		# Force the checking of the status file  -- sometimes the cron does not run
+		# probably it seems due to higher CPU load etc ...
+		# --------------------------------------------------------------------------#
+		T2 = time.time()
+		if((T2 - T1) > 15) :
+			off_signal.checker()
+			T1 = time.time()
 
 		# -------  SCROLL         -------------
 		if(seq == 1) :
@@ -177,7 +200,8 @@ def runSequence() :
 		# -------  SCROLL         -------------
 		elif(seq == 8) :
 			if(random.random() > .8) : actions.burst(10)
-			scroll.scrollMessage("** VAST POTENTIAL **", True, False, "Left")
+			if(random.random() > .8) : actions.explosion()
+			scroll.scrollMessage("** COLD AND HOT **", True, False, "Left")
 		
 		# -------  SCROLL         -------------
 		elif(seq == 9) :
@@ -212,13 +236,13 @@ def runSequence() :
 		elif(seq == 12) :
 			clrFlicker = carouselSign.useColorFLicker
 			carouselSign.useColorFLicker = False
-			carouselSign.go("    ****  ASIF * LOVE & FEAR ****", 0)
+			carouselSign.go("    ****  ASIF * HOT & COLD ****", 0)
 			carouselSign.useColorFlicker = clrFlicker
 		
 		# -------  ASIF LOVE FEAR CAROUSEL noend *	
 		elif(seq == 13) :
 			if(random.random() > .5) : carouselSign.useColorFLicker = True
-			carouselSign.go("       ****  ASIF * BEEF * CHICKEN * PORK * FISH * LAMB  ****", -1)
+			carouselSign.go("       ***** BEEF * CHICKEN * PORK * FISH * LAMB  ****", -1)
 			carouselSign.useColorFlicker = False
 
 		# Animation only modules
@@ -228,7 +252,7 @@ def runSequence() :
 			fixed = False
 			duration = int(random.uniform(24,100))
 			if(random.random() > .4) : fixed = True
-			user.userAnimator(duration,2, fixed)
+			user.userAnimator(duration, 2, fixed)
 		
 		# -------  CARDS / MACHINE -------------
 		elif(seq == 15) :
@@ -293,10 +317,15 @@ def runSequence() :
 			img = int(random.random() *  len(imageList))
 			imgLoader.start(path + "/" + imageList[img],0,-1)
 
-	except KeyboardInterrupt:
-		print "Stopping"
-		exit()    
+	except Exception, e:
+		if(e == "KeyboardInterrupt") :
+			print("Stopping")
+			exit()
+		else :
+			# Weak....
+			pass  
 
+	time.sleep(.001)
 	runSequence()
 
 
@@ -345,7 +374,6 @@ def setUpSequenceGroups() :
 		groups = [signage, animations, stroopSeq, emotiSeq, concentricRecs, cardsUsers, carouselSolo, flashingBlend, imageScroll, users]
 		group = groups[1]
 		options = options2 = options3 = ""
-
 
 
 ###################################################

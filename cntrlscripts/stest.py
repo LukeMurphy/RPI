@@ -1,0 +1,15 @@
+#!/usr/bin/env python2.7
+import RPi.GPIO as GPIO
+import sys, getopt, os
+import ConfigParser, io
+
+GPIO.setmode(GPIO.BCM)
+
+# GPIO 18 set up as input. It is pulled up to stop false signals
+GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+try:
+    	GPIO.wait_for_edge(18, GPIO.FALLING)
+	os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")
+except KeyboardInterrupt:
+    	GPIO.cleanup()       # clean up GPIO on CTRL+C exit
+GPIO.cleanup()           # clean up GPIO on normal exit

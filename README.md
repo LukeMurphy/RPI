@@ -19,9 +19,11 @@ The crontab
 # -- Shut down at 8PM EST or 1AM UTC
 0 1 * * * /home/pi/RPI/cntrlscripts/shutdown.sh&
 
+# -- Run test for off-button
+@reboot sudo python /home/pi/RPI/cntrlscripts/stest.py&
+
 # -- Run default animation
 @reboot /home/pi/RPI/cntrlscripts/run.sh seq 3&
 
-# -- Run test for off-button
-@reboot sudo python /home/pi/RPI/cntrlscripts/stest.py&
+
 ```

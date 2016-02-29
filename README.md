@@ -8,6 +8,7 @@ No illusions
 ---
 The crontab
 
+```
 # -- Check if pause, change or shutdown is called from remote page
 */1 * * * * sudo python /home/pi/RPI/cntrlscripts/off_signal.py&
 
@@ -23,3 +24,4 @@ The crontab
 
 # -- Run test for off-button
 @reboot sudo python /home/pi/RPI/cntrlscripts/stest.py&
+```

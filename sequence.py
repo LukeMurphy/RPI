@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender, carousel
+from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender, carousel, squaresalt
 from cntrlscripts import off_signal
 import Image
 import ImageDraw
@@ -133,7 +133,7 @@ def imageScrollSeq() :
 ###################################################
 def runSequence() :
 	global group, groups
-	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
+	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 	global T1,T2,thrd
 	lastAction  = 0
 
@@ -353,7 +353,7 @@ def runSequence() :
 def setUpSequenceGroups() :
 		global group, groups, config
 		global action, scroll, machine, bluescreen, user, carouselSign
-		global imgLoader, concentric, flash, blend
+		global imgLoader, concentric, flash, blend, sqrs
 
 		signage = (1,2,3,4,6,7,8,9,11,12,21)
 
@@ -399,7 +399,7 @@ def setUpSequenceGroups() :
 ###################################################
 def configure() :
 	global group, groups, config
-	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
+	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 
 	try: 
 		baseconfig = ConfigParser.ConfigParser()
@@ -438,7 +438,7 @@ def configure() :
 		scroll.vOffset = int(baseconfig.get("scroll", 'vOffset'))
 		scroll.scrollSpeed = float(baseconfig.get("scroll", 'scrollSpeed'))
 		scroll.stroopSpeed = float(baseconfig.get("scroll", 'stroopSpeed'))
-		scroll.stroopSteps = int(baseconfig.get("scroll", 'stroopSteps'))
+		scroll.stroopSteps = float(baseconfig.get("scroll", 'stroopSteps'))
 		
 		machine = machine
 		machine.config = config
@@ -467,6 +467,9 @@ def configure() :
 		concentric = squares
 		concentric.config = config
 
+		sqrs = squaresalt
+		sqrs.config = config
+
 		flash = flashing
 		flash.config = config
 
@@ -490,7 +493,7 @@ def configure() :
 
 def main():
 	global group, groups, config
-	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend
+	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 	
 	####################################################################
 	################  JUST FOR COMMAND LINE !!!!! ######################
@@ -545,6 +548,10 @@ def main():
 				elif(argument == "squares") : 
 					concentric.colorSwitch = False
 					concentric.animator(60, "cols")
+					exit()
+				elif(argument == "sqrs") : 
+					sqrs.colorSwitch = False
+					sqrs.animator(60, "cols")
 					exit()
 				elif(argument == "flash") : 
 					flash.colorSwitch = False

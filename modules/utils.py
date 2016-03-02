@@ -18,7 +18,7 @@ useMassager = False
 brightness = 1
 
 colorWheel = ["RED","VERMILLION","ORANGE","AMBER","YELLOW","CHARTREUSE","GREEN","TEAL","BLUE","VIOLET","PURPLE","MAGENTA"]
-wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146,206,0),(0,0,255),(65,0,165),(135,0,175),(167,25,75)]
+wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146,206,0),(0,255,255),(0,0,255),(65,0,165),(135,0,175),(167,25,75)]
 
 rgbColorWheel = ["RED","GREEN","BLUE","YELLOW","MAGENTA","CYAN"]
 rgbWheel = [(255,0,0),(0,255,0),(0,0,255),(255,255,0),(255,0,255),(0,255,255)]
@@ -32,6 +32,16 @@ def getRandomRGB(brtns=1) :
 	if(brtns == 1) : brtns = brightness
 	indx = int(random.uniform(0,len(rgbWheel)))
 	clr = rgbWheel[indx]
+	r = int(clr[0] * brtns)
+	g = int(clr[1] * brtns)
+	b = int(clr[2] * brtns)
+	return (r,g,b)
+
+def getRandomColorWheel(brtns=1) :
+	global brightness, colorWheel, wheel
+	if(brtns == 1) : brtns = brightness
+	indx = int(random.uniform(0,len(colorWheel)))
+	clr = wheel[indx]
 	r = int(clr[0] * brtns)
 	g = int(clr[1] * brtns)
 	b = int(clr[2] * brtns)

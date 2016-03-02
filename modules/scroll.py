@@ -134,7 +134,7 @@ def present(arg, clr = (250,150,150), duration = 1, repeat = -1) :
         global config, scrollSpeed, steps, fontSize, vOffset, countLimit, count
         global r,g,b, paintColor
         
-        vFactor = 1.2
+        vFactor = 1.5
 
         try:
             #changeColor(False)

@@ -160,7 +160,10 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 	#************************************#
 	### DRAW THE IMAGE ACROSS ALL PANELS
 	#imageCopy = image.point(lambda p: p * 0.19)
+	
 	imageCopy.paste(image)
+	#print(imageCopy,image,xOffset,yOffset)
+
 	if(brightnessFlux) :
 		rate+=math.pi/brightnessFluxRate;
 		brightnessFactor = (math.sin(rate) + 1) / 2 + .01
@@ -222,7 +225,7 @@ def debugMessage(arg) :
 	if(debug) : print(arg)		
 
 def start(img="", setvX = 0, setvY = 0):
-	global image,frame, action, xOffset, yOffset, vX, vY, imageCopy
+	global image,frame, action, xOffset, yOffset, vX, vY, imageCopy, resizeToWidth
 	frame = 0
 
 	vX = setvX

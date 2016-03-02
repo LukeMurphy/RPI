@@ -252,9 +252,10 @@ def runSequence() :
 		# -------  ASIF LOVE FEAR CAROUSEL -------	
 		elif(seq == 12) :
 			clrFlicker = carouselSign.useColorFLicker
+			if(random.random() > .95) : carouselSign.useColorFLicker = True
+			carouselSign.go("    **** HOT & COLD ****", 0)
+			#carouselSign.useColorFlicker = clrFlicker
 			carouselSign.useColorFLicker = False
-			carouselSign.go("    ****  ASIF * HOT & COLD ****", 0)
-			carouselSign.useColorFlicker = clrFlicker
 		
 		# -------  ASIF LOVE FEAR CAROUSEL noend *	
 		elif(seq == 13) :
@@ -311,6 +312,8 @@ def runSequence() :
 		elif (seq == 21) :
 			imgLoader.action = "play"
 			imgLoader.countLimit = 500
+			imgLoader.xOffset = 0
+			imgLoader.yOffset = 0
 			imgLoader.start()
 		
 		#------ Plane Scrolling --------
@@ -355,7 +358,8 @@ def setUpSequenceGroups() :
 		global action, scroll, machine, bluescreen, user, carouselSign
 		global imgLoader, concentric, flash, blend, sqrs
 
-		signage = (1,2,3,4,6,7,8,9,11,12,21)
+		#signage = (1,2,3,4,6,7,8,9,11,12,21)
+		signage = (4,11,12,21)
 
 		# no image panning
 		# 16 = blueScreen
@@ -376,7 +380,7 @@ def setUpSequenceGroups() :
 		cardsUsers = (15,)
 
 		# Carousel Only
-		carouselSolo = (13,)
+		carouselSolo = (12,)
 
 		# Blend / flashing lights
 		flashingBlend = (23,)
@@ -572,6 +576,8 @@ def main():
 				elif(argument  == "play") :
 					imgLoader.action = "play"
 					imgLoader.countLimit = 100
+					imgLoader.xOffset = 0
+					imgLoader.yOffset = 0
 					imgLoader.start()
 				elif(argument  == "car") :
 					carouselSign.go(options)

@@ -27,26 +27,26 @@ def checker() :
 	restartAction = "/home/pi/RPI/cntrlscripts/off_restarts.sh "
 	reboot = "/home/pi/RPI/cntrlscripts/reboot.sh"
 	#print("checking ==> " + urlToCheck + " " + confirmUrl + " " + base)
+	res = "nochange"
 
 	try:
-		res  = urllib2.urlopen(urlToCheck).read()
-		confirm = urllib2.urlopen(confirmUrl).read()
+		res  = urllib2.urlopen(urlToCheck, timeout=1).read()
+		confirm = urllib2.urlopen(confirmUrl, timeout=1).read()
 		#print(res)
-
-		if(res == "off") :
-			# Turn off any running scripts and then shutdown
-			os.system(offAction)
-		elif(res == "pause") :
-			os.system(pauseAction)
-		elif(res == "reboot") :
-			os.system(reboot)
-		elif(res != "nochange" and res != "") :
-			action = restartAction + res
-			os.system(action)
-
 	except Exception, e:
 		res = "nochange"
-		print(e)
+		#print(e)
+
+	if(res == "off") :
+		# Turn off any running scripts and then shutdown
+		os.system(offAction)
+	elif(res == "pause") :
+		os.system(pauseAction)
+	elif(res == "reboot") :
+		os.system(reboot)
+	elif(res != "nochange" and res != "") :
+		action = restartAction + res
+		os.system(action)
 
 
 checker()

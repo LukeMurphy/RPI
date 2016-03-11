@@ -357,37 +357,46 @@ def setUpSequenceGroups() :
 		global group, groups, config
 		global action, scroll, machine, bluescreen, user, carouselSign
 		global imgLoader, concentric, flash, blend, sqrs
-
+		#**********  GROUP 0 *************************#
 		#signage = (1,2,3,4,6,7,8,9,11,12,21)
 		signage = (4,11,12,21)
 
+		#**********  GROUP 1 *************************#
 		# no image panning
 		# 16 = blueScreen
 		# 17 = glitch
 		# 24 = bad pixel
 		animations = (17,24,25)
 
+		#**********  GROUP 2 *************************#
 		# just Stroop / colors
 		stroopSeq = (5,)
 
+		#**********  GROUP 3 *************************#
 		# just emotis
 		emotiSeq = (10,)
 
+		#**********  GROUP 4 *************************#
 		# just concentric squares
 		concentricRecs = (18,)
 
+		#**********  GROUP 5 *************************#
 		# just cards & user
 		cardsUsers = (15,)
 
+		#**********  GROUP 6 *************************#
 		# Carousel Only
 		carouselSolo = (12,)
 
+		#**********  GROUP 7 *************************#
 		# Blend / flashing lights
 		flashingBlend = (23,)
 
+		#**********  GROUP 8 *************************#
 		# plane scrolling
 		imageScroll = (22,)
 
+		#**********  GROUP 9 *************************#
 		# Users
 		users = (14,)
 

@@ -72,8 +72,8 @@ def seq() :
 
 	args = sys.argv
 
-	if(len(args) > 1):
-		seq =  int(args[2])
+	if(len(args) >= 1):
+		seq =  int(args[1])
 		#if(len(args) > 2) : options = args[2]
 		#if(len(args) > 3) : options2 = args[3]
 		#if(len(args) > 4) : options3 = args[4]
@@ -168,6 +168,22 @@ def seq() :
 			imgLoader.countLimit = 100000
 			imgLoader.gifPlaySpeed = 100
 			imgLoader.brightnessFactor  = .5
+			imgLoader.brightnessFlux = True
+			imgLoader.brightnessFluxRate = 240
+			imgLoader.xOffset = 0
+			imgLoader.yOffset = 0
+			img = 0
+			path = config.path  + "/imgs"
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img],0,-1)
+
+		if (seq == 7) :
+			imageList = ['sunset.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "present"
+			imgLoader.countLimit = 100000
+			imgLoader.gifPlaySpeed = 100
+			imgLoader.brightnessFactor  = .95
 			imgLoader.brightnessFlux = True
 			imgLoader.brightnessFluxRate = 240
 			imgLoader.xOffset = 0

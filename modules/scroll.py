@@ -10,6 +10,7 @@ scrollSpeed = 0.0006
 stroopSpeed = 0.0001
 steps = 2
 stroopSteps = 2
+stroopFontSize = 30
 
 fontSize = 14
 vOffset  = -1
@@ -197,7 +198,7 @@ def present(arg, clr = (250,150,150), duration = 1, repeat = -1) :
 
 def stroop( arg, clr, direction = "Left") :
 
-        global r,g,b,config, opticalOpposites, stroopSpeed, stroopSteps
+        global r,g,b,config, opticalOpposites, stroopSpeed, stroopSteps, stroopFontSize
 
         brightness = config.brightness
         brightness = random.random()
@@ -205,8 +206,8 @@ def stroop( arg, clr, direction = "Left") :
         clr = tuple(int(a*brightness) for a in (clr))
 
         # Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
-        font = ImageFont.truetype( '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
-        font2 = ImageFont.truetype('/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',30)
+        font = ImageFont.truetype( '/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',stroopFontSize)
+        font2 = ImageFont.truetype('/home/pi/RPI/fonts/freefont/FreeSansBold.ttf',stroopFontSize)
         pixLen = config.draw.textsize(arg, font = font)
 
         dims = [pixLen[0],pixLen[1]]

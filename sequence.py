@@ -337,6 +337,23 @@ def runSequence() :
 			img = int(random.random() *  len(imageList))
 			imgLoader.start(path + "/" + imageList[img],0,-1)
 
+		#------ Present img --------
+		elif (seq == 26) :
+			imageList = ['sunset.gif'] 
+			imgLoader.debug = False
+			imgLoader.action = "present"
+			imgLoader.countLimit = 1 #int(random.uniform(10,100))
+			imgLoader.gifPlaySpeed = int(random.uniform(50,250))
+			imgLoader.brightnessFactor  = random.uniform(.25,.75)
+			imgLoader.brightnessFlux = True
+			imgLoader.brightnessFluxRate = 240
+			imgLoader.xOffset = 0
+			imgLoader.yOffset = 0
+			img = 0
+			path = config.path  + "/imgs"
+			img = int(random.random() *  len(imageList))
+			imgLoader.start(path + "/" + imageList[img],0,-1)
+
 	except Exception, e:
 		if(e == "KeyboardInterrupt") :
 			print("Stopping")
@@ -452,6 +469,7 @@ def configure() :
 		scroll.scrollSpeed = float(baseconfig.get("scroll", 'scrollSpeed'))
 		scroll.stroopSpeed = float(baseconfig.get("scroll", 'stroopSpeed'))
 		scroll.stroopSteps = float(baseconfig.get("scroll", 'stroopSteps'))
+		scroll.stroopFontSize = int(baseconfig.get("scroll", 'stroopFontSize'))
 		
 		machine = machine
 		machine.config = config
@@ -563,7 +581,7 @@ def main():
 					concentric.animator(60, "cols")
 					exit()
 				elif(argument == "sqrs") : 
-					sqrs.colorSwitch = False
+					sqrs.colorSwitch = True
 					sqrs.animator(60, "cols")
 					exit()
 				elif(argument == "flash") : 

@@ -3,7 +3,7 @@ import random
 import math
 import sys
 import messenger
-import ImageChops, ImageOps
+from PIL import ImageChops, ImageOps
 
 screenWidth =  128
 screenHeight = 64

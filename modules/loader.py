@@ -1,9 +1,6 @@
 #!/usr/bin/python
 
-import Image
-import ImageDraw
-import ImageMath
-import ImageEnhance
+from PIL import Image, ImageDraw,ImageMath, ImageEnhance
 # Import the essentials to everything
 import time, random, math
 

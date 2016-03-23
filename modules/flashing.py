@@ -2,7 +2,7 @@
 import time
 import random
 import math
-import Image
+from PIL import Image
 import sys
 
 r=g=b=125

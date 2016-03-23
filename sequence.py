@@ -2,13 +2,11 @@
 #import modules
 from modules import utils, actions, machine, scroll, user, bluescreen ,loader, squares, flashing, blender, carousel, squaresalt
 from cntrlscripts import off_signal
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import time
 import random
 from rgbmatrix import Adafruit_RGBmatrix
 import datetime
-import ImageFont
 import textwrap
 import math
 import sys, getopt, os
@@ -436,7 +434,18 @@ def configure() :
 		baseconfig.read('/home/pi/RPI/config.cfg')
 
 		config = utils
-		config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))
+
+		usingHub = false
+		try:
+			usingHub = bool(baseconfig.getboolean("config", 'useHub'))
+		except :
+			pass
+
+		if (usingHub) :
+			config.usingHub = True
+			matrix = {}
+		else :
+			config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))
 		config.screenHeight = int(baseconfig.get("config", 'screenHeight'))
 		config.screenWidth =  int(baseconfig.get("config", 'screenWidth'))
 		config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))

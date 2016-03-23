@@ -7,7 +7,10 @@ import ConfigParser, io
 from subprocess import call
 
 baseconfig = ConfigParser.ConfigParser()
-baseconfig.read('/home/pi/RPI/config.cfg')
+baseconfig.read('./config.cfg')
+
+print(baseconfig)
+
 
 base = baseconfig.get("config", 'controlUrl')
 unit = baseconfig.get("config", 'unitNumber')

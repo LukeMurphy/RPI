@@ -2,7 +2,7 @@
 import random
 import math
 import sys
-import ImageChops, ImageOps
+from PIL import ImageChops, ImageOps
 import operator
 
 colorWheel = ["RED","VERMILLION","ORANGE","AMBER","YELLOW","CHARTREUSE","GREEN","TEAL","BLUE","VIOLET","PURPLE","MAGENTA"]

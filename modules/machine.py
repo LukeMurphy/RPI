@@ -2,7 +2,7 @@
 import time
 import random
 import math
-import Image
+from PIL import Image
 
 vx = 1
 vy = 2

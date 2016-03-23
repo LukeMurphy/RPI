@@ -56,14 +56,15 @@ def startAnimation() :
 
 def runStroop() :
 	global config
-	numRuns = int(random.uniform(2,6))
-	numRuns =  1
-	for i in range(0,numRuns) : 
-		if(config.opticalOpposites) : 
-			config.opticalOpposites = False
-		else : 
-			config.opticalOpposites = True
-		stroopSequence()
+    	while True:
+    		numRuns = int(random.uniform(2,6))
+    		numRuns =  1
+    		for i in range(0,numRuns) : 
+    			if(config.opticalOpposites) : 
+    				config.opticalOpposites = False
+    			else : 
+    				config.opticalOpposites = True
+    			stroopSequence()
 
 def main() :
 	global config, workConfig

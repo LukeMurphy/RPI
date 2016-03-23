@@ -7,7 +7,7 @@ import ConfigParser, io
 from subprocess import call
 
 baseconfig = ConfigParser.ConfigParser()
-baseconfig.read('./config.cfg')
+baseconfig.read('/home/pi/RPI/configs/localconfig.cfg')
 
 print(baseconfig)
 

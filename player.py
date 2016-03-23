@@ -1,8 +1,9 @@
 #!/usr/bin/python
 #import modules
 from Tkinter import *
-import PIL.Image, PIL.ImageTk
-from PIL import ImageDraw, ImageFont
+import PIL.Image
+import PIL.ImageTk
+from PIL import Image, ImageTk, ImageDraw, ImageFont
 from subprocess import call
 
 from configs import configuration
@@ -44,7 +45,7 @@ def configure() :
 	global config
 	try: 
 		baseconfig = ConfigParser.ConfigParser()
-		baseconfig.read('./configs/localconfig.cfg')
+		baseconfig.read('/home/pi/RPI/configs/localconfig.cfg')
 		config = configuration
 
 		# Machine ID
@@ -56,7 +57,7 @@ def configure() :
 
 		# Load the default work
 		workconfig = ConfigParser.ConfigParser()
-		workconfig.read('./configs/works/' + config.WRKINID + ".cfg")
+		workconfig.read('/home/pi/RPI/configs/works/' + config.WRKINID + ".cfg")
 
 		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
@@ -79,15 +80,22 @@ def configure() :
 
 		if(config.rendering == "hub") :
 			root = Tk()
-			cnvs = Canvas(root, width=config.screenWidth, height=config.screenHeight)
+			w = config.screenWidth + 60
+			h = config.screenHeight  + 60
+			x = 1
+			y = 1
+
+			root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+			cnvs = Canvas(root, width=config.screenWidth + 8, height=config.screenHeight + 8)
 			config.cnvs = cnvs
 			config.cnvs.pack()
-			config.cnvs.create_rectangle(0, 0, config.screenWidth, config.screenHeight, fill="black")
+			config.cnvs.create_rectangle(0, 0, config.screenWidth + 4, config.screenHeight + 4, fill="black")
 			config.cnvs.update()
 
 		if(config.rendering == "hat") :
+			#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
 			from rgbmatrix import Adafruit_RGBmatrix
-			config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))
+			config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
 
 		# Load the work itself
 		work = importlib.import_module('modules.'+str(config.work))

@@ -83,15 +83,14 @@ def configure() :
 			root = Tk()
 			w = config.screenWidth + 8
 			h = config.screenHeight  + 8
-			x = 40
-			y = 40
-
+			x = 4
+			y = 4
 			root.overrideredirect(True)
 			root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-			cnvs = Canvas(root, width=config.screenWidth + 0, height=config.screenHeight + 0)
+			cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 			config.cnvs = cnvs
 			config.cnvs.pack()
-			config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
+			config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="red")
 			config.cnvs.update()
 
 		if(config.rendering == "hat") :

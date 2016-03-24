@@ -1,0 +1,5 @@
+path = "/home/pi/RPI"
+MID = "RPI11"
+WRKINID = "stroop-hub-1.2"
+unitNumber = "11"
+controlUrl = "http://192.168.1.124/projects/rpi-controls"

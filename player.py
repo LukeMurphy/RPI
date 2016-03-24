@@ -7,6 +7,7 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 from subprocess import call
 
 from configs import configuration
+from configs import localconfig
 #from cntrlscripts import off_signal
 
 import os, sys, getopt, time, random, math, datetime, textwrap
@@ -32,16 +33,19 @@ def configure() :
 	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 	global config, path
 	try: 
-		baseconfig = ConfigParser.ConfigParser()
-		baseconfig.read('localconfig.cfg')
+		baseconfig = localconfig
+		path = baseconfig.path
+
+		#baseconfig = ConfigParser.ConfigParser()
+		#baseconfig.read('localconfig.cfg')
 		config = configuration
 
 		# Machine ID
-		config.MID = baseconfig.get("config", 'MID')
+		config.MID = baseconfig.MID
 		# Default Work Instance ID
-		config.WRKINID = baseconfig.get("config", 'WRKINID')
+		config.WRKINID = baseconfig.WRKINID
 		# Default Local Path
-		config.path = baseconfig.get("config", 'path')
+		config.path = baseconfig.path
 
 		# Load the default work
 		workconfig = ConfigParser.ConfigParser()

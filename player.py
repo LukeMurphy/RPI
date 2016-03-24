@@ -27,7 +27,8 @@ rows = 2
 cols = 1
 imageRows = [] * rows
 actualScreenWidth = tileSize[1]*cols*rows
-path = "/home/pi/rpimain"
+path = "/home/pi/RPI/"
+path = "./"
 useMassager = False
 brightness = 1
 transWiring = True
@@ -42,10 +43,10 @@ transWiring = True
 def configure() :
 	#global group, groups, config
 	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
-	global config
+	global config, path
 	try: 
 		baseconfig = ConfigParser.ConfigParser()
-		baseconfig.read('/home/pi/RPI/configs/localconfig.cfg')
+		baseconfig.read(path + 'configs/localconfig.cfg')
 		config = configuration
 
 		# Machine ID
@@ -57,7 +58,7 @@ def configure() :
 
 		# Load the default work
 		workconfig = ConfigParser.ConfigParser()
-		workconfig.read('/home/pi/RPI/configs/works/' + config.WRKINID + ".cfg")
+		workconfig.read(path  + '/configs/works/' + config.WRKINID + ".cfg")
 
 		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
@@ -80,16 +81,17 @@ def configure() :
 
 		if(config.rendering == "hub") :
 			root = Tk()
-			w = config.screenWidth + 60
-			h = config.screenHeight  + 60
-			x = 1
-			y = 1
+			w = config.screenWidth + 8
+			h = config.screenHeight  + 8
+			x = 40
+			y = 40
 
+			root.overrideredirect(True)
 			root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-			cnvs = Canvas(root, width=config.screenWidth + 8, height=config.screenHeight + 8)
+			cnvs = Canvas(root, width=config.screenWidth + 0, height=config.screenHeight + 0)
 			config.cnvs = cnvs
 			config.cnvs.pack()
-			config.cnvs.create_rectangle(0, 0, config.screenWidth + 4, config.screenHeight + 4, fill="black")
+			config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
 			config.cnvs.update()
 
 		if(config.rendering == "hat") :
@@ -123,9 +125,9 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 def renderToHub( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
 	# Render to canvas
 	global config
-	config.renderImageFull.paste(imageToRender, (xOffset, yOffset + 2))
+	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 	temp = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(0, 0, image=temp, anchor='nw')
+	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=temp, anchor='nw')
 	config.cnvs.update()
 
 def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):

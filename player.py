@@ -7,7 +7,7 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 from subprocess import call
 
 from configs import configuration
-from cntrlscripts import off_signal
+#from cntrlscripts import off_signal
 
 import os, sys, getopt, time, random, math, datetime, textwrap
 import sys, getopt, os
@@ -19,19 +19,6 @@ from Tkinter import *
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
-
-screenWidth =  128
-screenHeight = 64
-tileSize = (32,64)
-rows = 2
-cols = 1
-imageRows = [] * rows
-actualScreenWidth = tileSize[1]*cols*rows
-path = "/home/pi/RPI/"
-path = "./"
-useMassager = False
-brightness = 1
-transWiring = True
 
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
@@ -46,7 +33,7 @@ def configure() :
 	global config, path
 	try: 
 		baseconfig = ConfigParser.ConfigParser()
-		baseconfig.read(path + 'configs/localconfig.cfg')
+		baseconfig.read('localconfig.cfg')
 		config = configuration
 
 		# Machine ID
@@ -58,7 +45,7 @@ def configure() :
 
 		# Load the default work
 		workconfig = ConfigParser.ConfigParser()
-		workconfig.read(path  + '/configs/works/' + config.WRKINID + ".cfg")
+		workconfig.read(config.path  + '/configs/works/' + config.WRKINID + ".cfg")
 
 		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
@@ -120,7 +107,6 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 	elif (config.rendering == "hat") :
 		renderToHat( imageToRender,xOffset,yOffset,w,h,nocrop, overlayBottom)
 
-
 def renderToHub( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
 	# Render to canvas
 	global config
@@ -166,7 +152,7 @@ def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBo
 		cropP1 = [0,0]
 		cropP2 = [0,0]
 
-		for n in range(0,rows) :
+		for n in range(0,config.rows) :
 
 			# Crop PLACEMENTS\
 			a = max(0, xOffset) + segmentWidth * n
@@ -183,7 +169,7 @@ def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBo
 
 			pCrop  = cropP1 + cropP2
 
-			if ((n==0 or n == 2 or n == 4) and (transWiring == False) ) : pCrop[1] = 0
+			if ((n==0 or n == 2 or n == 4) and (config.transWiring == False) ) : pCrop[1] = 0
 			segmentImage.append(imageToRender.crop(pCrop))
 
 			#print(a,b,c,d,cropP1,cropP2)
@@ -218,7 +204,7 @@ def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBo
 			if(pCrop[3] - pCrop[1] > 0 ) : 
 				if ( pCrop[2] - pCrop[0] > 0) :
 					segImg = segmentImage[n]
-					if ((n==0 or n == 2 or n == 4) and (transWiring == False) ) : 
+					if ((n==0 or n == 2 or n == 4) and (config.transWiring == False) ) : 
 						# This flips, reveses and places the segment when the row is "upside down" wrt
 						# the previous row of panels - this is when transWiring == False - i.e no long transverse cable
 						segImg = ImageOps.flip(segImg)
@@ -260,8 +246,5 @@ def main():
 			# print help information and exit:
 			print ("Error:" + str(err))
 
-
-
 if __name__ == "__main__":
 	main()
-

@@ -1,3 +1,8 @@
+################################
+# This file exists to create
+# an empty configuration object
+################################
+
 import time
 import random
 import math
@@ -18,9 +23,6 @@ brightness = 1
 transWiring = True
 
 #global imageTop,imageBottom,image,config,transWiring
-
-
-
 
 def configuration() :
 	pass

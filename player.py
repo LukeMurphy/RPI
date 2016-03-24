@@ -81,7 +81,7 @@ def configure() :
 			cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 			config.cnvs = cnvs
 			config.cnvs.pack()
-			config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="red")
+			config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
 			config.cnvs.update()
 
 		if(config.rendering == "hat") :
@@ -94,7 +94,6 @@ def configure() :
 		work.config = config
 		work.workConfig = workconfig
 		work.main()
-
 		return True
 
 

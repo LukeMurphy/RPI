@@ -2,7 +2,7 @@
 import time
 import random
 import math
-from PIL import Image
+from PIL import Image, ImageDraw
 
 vx = 1
 vy = 2
@@ -18,9 +18,8 @@ smile = -1
 def drawMachine(mDisplacey = -1) :
         global config
         global r,g,b
-        matrix = config.matrix
-        draw = config.draw
-        id = config.id
+        #draw = config.draw
+        #id = config.id
 
         screenWidth = config.screenWidth
         screenHeight = config.screenHeight
@@ -155,8 +154,8 @@ def changeColor( rnd = False) :
 def machineAnimator(arg) :
         global redrawSpeed, x, y, vx, vy
         config.renderImage = Image.new("RGBA", (config.actualScreenWidth, config.screenHeight))
-        config.image = config.Image.new("RGBA", (26, 30))
-        config.draw  = config.ImageDraw.Draw(config.image)
+        config.image = Image.new("RGBA", (26, 30))
+        config.draw  = ImageDraw.Draw(config.image)
         config.id = config.image.im.id
 
         x = int(random.random() * config.screenWidth)
@@ -174,3 +173,14 @@ def machineAnimator(arg) :
                 count+=1
                 time.sleep(redrawSpeed)
 
+def main() :
+        global config, workConfig
+        global fontSize,vOffset,scrollSpeed,stroopSpeed,stroopSteps,stroopFontSize,useColorFlicker
+        print("You Win!!! Loaded")
+        #[stroop]
+        while True:
+                machineAnimator(830) # 430
+                #if(random.random() > .9) : user.userAnimator(24)
+
+
+        

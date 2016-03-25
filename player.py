@@ -11,6 +11,7 @@ from configs import localconfig
 #from cntrlscripts import off_signal
 
 import os, sys, getopt, time, random, math, datetime, textwrap
+import gc
 import sys, getopt, os
 import ConfigParser, io
 import threading
@@ -20,6 +21,11 @@ from Tkinter import *
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
+
+inited = True
+
+import resource
+
 
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
@@ -31,8 +37,17 @@ global imageTop,imageBottom,image,config,transWiring
 def configure() :
 	#global group, groups, config
 	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
-	global config, path
+	global config, path, tempImage
+	gc.enable()
 	try: 
+
+		windowOffset = [4,4]
+		####
+		# Having trouble loading the local configuration file based on relative path
+		# so hacking things by loading from a Python file called localconfig.py
+		# Please fix me  ;(
+		## 
+
 		baseconfig = localconfig
 		path = baseconfig.path
 
@@ -47,7 +62,12 @@ def configure() :
 		# Default Local Path
 		config.path = baseconfig.path
 
+		if(config.MID == "studio-mac") : 
+			config.path = "./"
+			windowOffset = [38,38]
+
 		# Load the default work
+
 		workconfig = ConfigParser.ConfigParser()
 		workconfig.read(config.path  + '/configs/works/' + config.WRKINID + ".cfg")
 
@@ -63,26 +83,34 @@ def configure() :
 		config.work = workconfig.get("displayconfig", 'work')
 		config.rendering = workconfig.get("displayconfig", 'rendering')
 
+		# Create the image-canvas for the work
+
 		config.renderImage = PIL.Image.new("RGBA", (config.actualScreenWidth, 32))
 		config.renderImageFull = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		config.draw = ImageDraw.Draw(config.image)
 		config.render = render
 
+		# Setting up based on how the work is displayed
 
 		if(config.rendering == "hub") :
 			root = Tk()
 			w = config.screenWidth + 8
 			h = config.screenHeight  + 8
-			x = 4
-			y = 4
+			x = windowOffset[0]
+			y = windowOffset[1]
 			root.overrideredirect(True)
 			root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 			cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 			config.cnvs = cnvs
 			config.cnvs.pack()
 			config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
-			config.cnvs.update()
+			
+			tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
+			config.cnvs._image_id = config.cnvs.create_image(3, 3, image=tempImage, anchor='nw')
+
+			#config.cnvs.update()
+			config.cnvs.update_idletasks()
 
 		if(config.rendering == "hat") :
 			#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
@@ -95,7 +123,6 @@ def configure() :
 		work.workConfig = workconfig
 		work.main()
 		return True
-
 
 	except getopt.GetoptError as err:
 		# print help information and exit:
@@ -111,15 +138,37 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 		renderToHat( imageToRender,xOffset,yOffset,w,h,nocrop, overlayBottom)
 
 def renderToHub( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
+	global inited
 	# Render to canvas
-	global config
+	# This needs to be optomized !!!!!!
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	global config, tempImage
 	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
-	temp = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=temp, anchor='nw')
-	config.cnvs.update()
+	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
+	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=tempImage, anchor='nw')
+	if(inited) :
+		config.cnvs.update()
+	else :
+		config.cnvs.update_idletasks()
+		inited = False
+
+
+	print 'Memory usage: %s (mb)' % str(int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024)
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
+	#*******************************************************************************
 
 def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
-
 	#global imageTop, imageBottom, screenHeight, screenWidth, panels, 
 	#matrix, image, renderImage, tileSize, rows, cols, transWiring
 	global config

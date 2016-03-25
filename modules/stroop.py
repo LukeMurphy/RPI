@@ -117,11 +117,12 @@ def stroop( arg, clr, direction = "Left") :
 
         if(direction == "Top" or direction == "Bottom") :
             #config.image = config.Image.new("RGBA", (dims[1], dims[0]*2))
-            config.image = PIL.Image.new("RGBA", (dims[1],dims[0]+32))
+            vPadding = 42
+            config.image = PIL.Image.new("RGBA", (dims[1],dims[0]+vPadding))
             config.draw  = ImageDraw.Draw(config.image)
             config.id = config.image.im.id
             bgColorV = (0,0,0)
-            config.draw.rectangle((0,0,config.image.size[1], dims[0] + 32), fill=bgColorV)
+            config.draw.rectangle((0,0,config.image.size[1], dims[0] + vPadding), fill=bgColorV)
 
             chars = list(arg)
             end = config.image.size[1]+3
@@ -131,8 +132,8 @@ def stroop( arg, clr, direction = "Left") :
             for letter in chars :
                     # rough estimate to create vertical text
                     xD = 2
-                    # "kerning ..."
-                    if (letter == "I") : xD = 6
+                    # "kerning ... hahhaha ;) "
+                    if (letter == "I") : xD = 8
                     config.draw.text((xD, count * 28),letter,clr,font=font)
                     count += 1
             start = -end
@@ -176,5 +177,3 @@ def stroop( arg, clr, direction = "Left") :
                             #config.matrix.SetImage(config.id, n, -2)
                             config.render(config.image, n, vOffset, dims[0], dims[1])
                     time.sleep(stroopSpeed)
-
-

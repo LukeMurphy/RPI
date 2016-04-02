@@ -133,8 +133,8 @@ def stroop( arg, clr, direction = "Left") :
                     # rough estimate to create vertical text
                     xD = 2
                     # "kerning ... hahhaha ;) "
-                    if (letter == "I") : xD = 8
-                    config.draw.text((xD, count * 28),letter,clr,font=font)
+                    if (letter == "I") : xD = 7
+                    config.draw.text((xD, count * (stroopFontSize - 5)),letter,clr,font=font)
                     count += 1
             start = -end
             end = end - int(random.random() * config.screenHeight)

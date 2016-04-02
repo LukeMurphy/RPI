@@ -22,7 +22,9 @@ from Tkinter import *
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
 
+memoryUsage = 0
 inited = True
+debug = False
 
 import resource
 
@@ -37,7 +39,7 @@ import resource
 def configure() :
 	#global group, groups, config
 	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
-	global config, path, tempImage
+	global config, workconfig, path, tempImage
 	gc.enable()
 	try: 
 
@@ -99,8 +101,10 @@ def configure() :
 			h = config.screenHeight  + 8
 			x = windowOffset[0]
 			y = windowOffset[1]
-			root.overrideredirect(True)
+
+			#root.overrideredirect(True)
 			root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
 			cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 			config.cnvs = cnvs
 			config.cnvs.pack()
@@ -112,22 +116,29 @@ def configure() :
 			#config.cnvs.update()
 			config.cnvs.update_idletasks()
 
+			root.after(0, startWork)
+			root.mainloop() 
+
 		if(config.rendering == "hat") :
 			#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
 			from rgbmatrix import Adafruit_RGBmatrix
 			config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
 
-		# Load the work itself
-		work = importlib.import_module('modules.'+str(config.work))
-		work.config = config
-		work.workConfig = workconfig
-		work.main()
-		return True
+		#return True
 
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print ("Error:" + str(err))
 		return False
+
+def startWork() :
+	global config, workconfig
+	# Load the work itself
+	work = importlib.import_module('modules.'+str(config.work))
+	work.config = config
+	work.workConfig = workconfig
+	work.main()
+
 
 def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
 	global config
@@ -138,32 +149,26 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 		renderToHat( imageToRender,xOffset,yOffset,w,h,nocrop, overlayBottom)
 
 def renderToHub( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
-	global inited
+	global inited, memoryUsage
+	global config, debug
+
 	# Render to canvas
 	# This needs to be optomized !!!!!!
 	#*******************************************************************************
 	#*******************************************************************************
 	#*******************************************************************************
-	#*******************************************************************************
-	#*******************************************************************************
-	#*******************************************************************************
-	#*******************************************************************************
-	global config, tempImage
+	
 	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
-	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=tempImage, anchor='nw')
-	if(inited) :
-		config.cnvs.update()
-	else :
-		config.cnvs.update_idletasks()
-		inited = False
+	config.cnvs._image_tk = ImageTk.PhotoImage(config.renderImageFull)
+	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=config.cnvs._image_tk, anchor='nw')
+	config.cnvs.update()
 
+	mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
 
-	print 'Memory usage: %s (mb)' % str(int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024)
-	#*******************************************************************************
-	#*******************************************************************************
-	#*******************************************************************************
-	#*******************************************************************************
+	if mem > memoryUsage and debug :
+		memoryUsage = mem 
+		print 'Memory usage: %s (mb)' % str(memoryUsage)
+
 	#*******************************************************************************
 	#*******************************************************************************
 	#*******************************************************************************
@@ -289,14 +294,8 @@ def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBo
 
 def main():
 	global config
-	if(configure()) :
-		try:
-			args = sys.argv
+	configure()
 
-
-		except getopt.GetoptError as err:
-			# print help information and exit:
-			print ("Error:" + str(err))
 
 if __name__ == "__main__":
 	main()

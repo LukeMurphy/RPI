@@ -9,7 +9,7 @@ GPIO.setmode(GPIO.BCM)
 # GPIO 18 set up as input. It is pulled up to stop false signals
 GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 try:
-    	GPIO.wait_for_edge(18, GPIO.FALLING)
+    GPIO.wait_for_edge(18, GPIO.FALLING)
 	print("shutting down!")
 	time.sleep(1)
 	os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")

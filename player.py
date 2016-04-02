@@ -123,6 +123,7 @@ def configure() :
 			#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
 			from rgbmatrix import Adafruit_RGBmatrix
 			config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
+			startWork()
 
 		#return True
 

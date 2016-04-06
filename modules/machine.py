@@ -94,7 +94,6 @@ def drawMachine(mDisplacey = -1) :
 	#config.draw.line((x1+d2+1,y1+d2,x1+d2 +2,y1+d2+1), fill=(r,g,b), width = w)
 	config.draw.line((m1 + mw, y1 + d2, m1 + mw + mDisplacex, y1 + d2 + mDisplacey), fill=(r,g,b), width = w)
 
-
 def redraw():
 	global config
 	global x,y,vx,vy, boxWidth, boxHeight, smile
@@ -110,8 +109,8 @@ def redraw():
 	drawMachine(smile)
 
 	# Render using main render function - manages the matrix tiling
-	config.render(config.image,x,y,boxWidth,boxHeight,False)
-
+	# config.render(config.image,x,y,boxWidth,boxHeight,False)
+	sendToRender(config.image, x,y,boxWidth,boxHeight,False)
 		
 	if (x > xMax + buffer):
 		vx = vx * -1
@@ -162,7 +161,17 @@ def changeColor( rnd = False) :
 		g = int(random.uniform(0,255))
 		b = int(random.uniform(0,255))
 
-def machineAnimator(arg=-1) :
+def iterate(n=0):
+	global config,x,y
+	redraw()
+	#return(config.image,x,y)
+
+def sendToRender(img, xP, yP, wD, hT, c = False) :
+	global config, x, y, wd, ht
+	x ,y, wd, ht = xP, yP, wD, hT
+	config.render(img, xP, yP, wD, hT, c)
+
+def machineAnimator(run=True) :
 	global redrawSpeed, x, y, vx, vy
 	config.renderImage = Image.new("RGBA", (config.actualScreenWidth, config.screenHeight))
 	config.image = Image.new("RGBA", (26, 30))
@@ -174,7 +183,6 @@ def machineAnimator(arg=-1) :
 	config.draw  = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
 
-
 	x = int(random.random() * config.screenWidth)
 	y = int(random.random() * config.screenHeight)
 
@@ -185,19 +193,22 @@ def machineAnimator(arg=-1) :
 
 	count = 0
 
-	while (True) :
+	while (run) :
 		redraw()
 		count+=1
 		time.sleep(redrawSpeed)
 
-def main() :
+def main(run=True) :
 	global config, workConfig
 	global fontSize,vOffset,scrollSpeed,stroopSpeed,stroopSteps,stroopFontSize,useColorFlicker
 	print("You Win!!! Loaded")
 	#[stroop]
-	while True:
-		machineAnimator() # 430
+	while run:
+		machineAnimator(run) # 430
 		#if(random.random() > .9) : user.userAnimator(24)
+
+	if(run == False) :
+		machineAnimator(run)
 
 
 	

@@ -54,7 +54,7 @@ def drawUser(n = 0, fixed = False) :
 	onColor = (0,0,100,1)
 	oColor  = (int(400 * config.brightness),int(random.uniform(50,300) * config.brightness),int(0 * config.brightness),1)
 	
-	matrix = config.matrix
+	#matrix = config.matrix
 	draw = config.draw
 
 	#### BODY

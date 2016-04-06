@@ -9,3 +9,5 @@ log.*
 *.bak
 .cfg.bak
 *.out
+*/out
+out/

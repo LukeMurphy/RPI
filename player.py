@@ -1,23 +1,21 @@
 #!/usr/bin/python
 #import modules
-from Tkinter import *
 import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
+
+import numpy
+import os, sys, getopt, time, random, math, datetime, textwrap
+import gc
+import ConfigParser, io
+import threading
+import importlib 
+import resource
 from subprocess import call
 
 from configs import configuration
 from configs import localconfig
 #from cntrlscripts import off_signal
-
-import os, sys, getopt, time, random, math, datetime, textwrap
-import gc
-import sys, getopt, os
-import ConfigParser, io
-import threading
-import tkMessageBox
-import importlib 
-from Tkinter import *
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
@@ -26,8 +24,9 @@ memoryUsage = 0
 inited = True
 debug = False
 
-import resource
-
+mode = "video"
+duration = 20
+fps = 60
 
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
@@ -43,7 +42,6 @@ def configure() :
 	gc.enable()
 	try: 
 
-		windowOffset = [4,4]
 		####
 		# Having trouble loading the local configuration file based on relative path
 		# so hacking things by loading from a Python file called localconfig.py
@@ -67,8 +65,12 @@ def configure() :
 		if(config.MID == "studio-mac") : 
 			config.path = "./"
 			windowOffset = [38,38]
+		else :
+			windowOffset = [4,4]
 
 		# Load the default work
+
+		print("Loading " + config.WRKINID + " to run.")
 
 		workconfig = ConfigParser.ConfigParser()
 		workconfig.read(config.path  + '/configs/works/' + config.WRKINID + ".cfg")
@@ -96,6 +98,9 @@ def configure() :
 		# Setting up based on how the work is displayed
 
 		if(config.rendering == "hub") :
+			from Tkinter import *
+			import tkMessageBox
+
 			root = Tk()
 			w = config.screenWidth + 8
 			h = config.screenHeight  + 8
@@ -125,7 +130,15 @@ def configure() :
 			config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
 			startWork()
 
-		#return True
+		if(config.rendering == "out") :
+			import moviepy.editor as mpy
+			import moviepy.video.VideoClip as mpv
+			from moviepy.video import *
+
+			config.duration = int(workconfig.get("output", 'duration'))
+			config.fps = int(workconfig.get("output", 'fps'))
+
+			iterateWork()
 
 	except getopt.GetoptError as err:
 		# print help information and exit:
@@ -140,6 +153,85 @@ def startWork() :
 	work.workConfig = workconfig
 	work.main()
 
+def iterateWork() :
+	global config, workconfig, fps, duration, mode
+	# Load the work itself
+	work = importlib.import_module('modules.'+str(config.work))
+	work.config = config
+	work.workConfig = workconfig
+	work.main(False)
+	config.workRef = work
+
+	if(mode  == "avi"):
+		'''*************  PROBLEMS *****************'''
+		clip = mpy.VideoClip(clipMaker, duration=duration)
+		#clip.size = (config.screenWidth, config.screenHeight)
+		clip.write_videofile("test.avi", fps=fps, audio=None, codec="rawvideo")
+
+	elif(mode == "video"):
+		#clip = mpy.VideoClip(clipMaker, duration=duration)
+		#clip.write_videofile("test.mp4", fps=fps, audio=None, codec="mpeg4")
+		toVideo()
+
+	elif(mode == "gif"):
+		#** Make Gifs
+		clip = mpy.VideoClip(clipMaker, duration=duration)
+		clip.write_gif("test.gif", fps=fps)
+
+	exit()
+
+def clipMaker(t) :
+	global config
+	(imageToRender,xOffset,yOffset) = config.workRef.interate()
+	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
+	img = config.renderImageFull
+
+	#nArray = outputArray.reshape(img.size[1], img.size[0], 3)
+	#outputArray = numpy.array(numpy.rollaxis(outputArray,0,3))
+
+	outputArray = numpy.array(img)
+	return outputArray
+
+def videoClipMaker() :
+	global config
+	#(imageToRender,xOffset,yOffset) = config.workRef.interate()
+	config.workRef.iterate()
+
+	imageToRender = config.image
+	xOffset = config.workRef.x
+	yOffset = config.workRef.y	
+
+	# xOffset+config.workRef.wd, yOffset+config.workRef.ht
+	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
+
+	img = config.renderImageFull.resize((640,480))
+	return img
+
+def toVideo() :
+	global config, fps, duration
+	from subprocess import Popen, PIPE
+
+	config.workRef.iterate()
+
+	vcodecImg = "mjpeg"
+	vcodecImg = "png"
+	
+	vcodec = "rawvideo"
+	vcodec = "mpeg4"
+	vcodec = "h264"
+	#vcodec = "libxvid"
+
+	## Sends image data as PNG to FFMPEG
+	imgFormat = "PNG"
+
+	p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', vcodecImg, '-r', str(config.fps) , '-i', '-', 
+		'-vcodec', vcodec, '-qscale', str(config.duration) , '-r', str(config.fps) , 'video.avi'], stdin=PIPE)
+	for i in range(config.fps * config.duration):
+	    #im = Image.new("RGB", (640, 480), (i, 1, 1))
+	    im  = videoClipMaker()
+	    im.save(p.stdin, imgFormat)
+	p.stdin.close()
+	p.wait()
 
 def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
 	global config
@@ -148,6 +240,10 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 
 	elif (config.rendering == "hat") :
 		renderToHat( imageToRender,xOffset,yOffset,w,h,nocrop, overlayBottom)
+
+	elif (config.rendering == "out") :
+		#renderToFile( imageToRender,xOffset,yOffset,w,h,nocrop, overlayBottom)
+		pass
 
 def renderToHub( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
 	global inited, memoryUsage

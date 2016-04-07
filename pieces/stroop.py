@@ -1,4 +1,4 @@
-import time
+import time  
 import random
 import PIL.Image, PIL.ImageTk
 from PIL import ImageDraw, ImageFont
@@ -17,7 +17,7 @@ stroopFontSize = 30
 fontSize = 14
 vOffset  = -1
 opticalOpposites = True
-countLimit = 6
+#countLimit = 6
 count = 0
 
 # fcu present will start with the opposite
@@ -33,30 +33,36 @@ colorOfWord = (0,0,0)
 directionStr = "Left"
 
 
-def iterate(n = 0) :
+def callBack() :
+	global config
+	config.opticalOpposites = False if config.opticalOpposites == False else True
+	stroopSequence()
+	stroop()
+
+def iterate( n = 0) :
 	global config, x, y, wd, ht, dx, dx, start, end, steps, count
-	sendToRender(config.image,x, y, wd, ht)
+	config.render(config.image, x, y, wd, ht)
+
 	x += dx
 	y += dy
 
 	count+= steps
 
 	if(count > abs(end)) :
-		config.opticalOpposites = False if config.opticalOpposites == False else True
-		stroopSequence()
-		stroop()
+		callBack()
 		count = 0
 		# Done
-
-def sendToRender(img, xP, yP, wD, hT, c = False) :
-	global config, x, y, wd, ht
-	x, y, wd, ht = xP, yP, wD, hT
-	config.render(img, xP, yP, wD, hT)
 	
+def runWork():
+	global stroopSpeed
+	while True:
+		iterate()
+		time.sleep(stroopSpeed)
+
 def main(run = True) :
 	global config, workConfig
 	global fontSize,vOffset,scrollSpeed,stroopSpeed,stroopSteps,stroopFontSize,useColorFlicker
-	global config, x, y, wd, ht, dx, dx, start, end, steps, count
+	#global config, x, y, wd, ht, dx, dx, start, end, steps, count
 	print("Stroop Loaded")
 	#[stroop]
 
@@ -71,10 +77,8 @@ def main(run = True) :
 	stroopSequence() 
 	stroop()
 
-	if(run) :
-		while True:
-			iterate()
-			time.sleep(stroopSpeed)
+	if(run) : runWork()
+		
 
 # This sets up the color and direction
 def stroopSequence() :
@@ -110,7 +114,7 @@ def runStroop(run=True) :
 			stroopSequence()
 
 def stroop() :
-
+	global sprt
 	global  colorWord, colorOfWord, directionStr
 	global r,g,b,config, opticalOpposites, stroopSpeed, stroopSteps, stroopFontSize
 	global x, y, wd, ht, dx, dy, start, end, steps
@@ -153,10 +157,10 @@ def stroop() :
 		#config.image = config.Image.new("RGBA", (dims[1], dims[0]*2))
 		vPadding = 42
 		config.image = PIL.Image.new("RGBA", (dims[1],dims[0]+vPadding))
-		config.draw  = ImageDraw.Draw(config.image)
-		config.id = config.image.im.id
+		draw  = ImageDraw.Draw(config.image)
+		id = config.image.im.id
 		bgColorV = (0,0,0)
-		config.draw.rectangle((0,0,config.image.size[1], dims[0] + vPadding), fill=bgColorV)
+		draw.rectangle((0,0,config.image.size[1], dims[0] + vPadding), fill=bgColorV)
 
 		chars = list(colorWord)
 		end = config.image.size[1]
@@ -167,7 +171,7 @@ def stroop() :
 				xD = 2
 				# "kerning ... hahhaha ;) "
 				if (letter == "I") : xD = 7
-				config.draw.text((xD, counter * (stroopFontSize - 5)),letter,clr,font=font)
+				draw.text((xD, counter * (stroopFontSize - 5)),letter,clr,font=font)
 				counter += 1
 
 		offset = int(random.uniform(1,config.screenWidth-20))
@@ -191,14 +195,14 @@ def stroop() :
 	if(direction == "Left" or direction == "Right") :
 		# Left Scroll
 		config.image = PIL.Image.new("RGBA", (dims[0],dims[1]))
-		config.draw  = ImageDraw.Draw(config.image)
-		config.id = config.image.im.id
-		config.draw.rectangle((0,0,config.image.size[0]+32, config.screenHeight), fill=bgColor)
+		draw  = ImageDraw.Draw(config.image)
+		iid = config.image.im.id
+		draw.rectangle((0,0,config.image.size[0]+32, config.screenHeight), fill=bgColor)
 
 		# Draw the text with "borders"
-		config.draw.text((-1,-1),colorWord,(0,0,0),font=font2)
-		config.draw.text((1,1),colorWord,(0,0,0),font=font2)
-		config.draw.text((0,0),colorWord,clr,font=font)
+		draw.text((-1,-1),colorWord,(0,0,0),font=font2)
+		draw.text((1,1),colorWord,(0,0,0),font=font2)
+		draw.text((0,0),colorWord,clr,font=font)
 
 		offset = int(random.uniform(1,config.screenWidth-20))
 		vOffset = int(random.uniform(0,config.rows)) * 32

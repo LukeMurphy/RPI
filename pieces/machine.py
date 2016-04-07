@@ -13,7 +13,9 @@ redrawSpeed = .01
 boxHeight = 30
 boxWidth = 26
 smile = -1
-
+count = 0
+steps = 0
+end = 1
 
 def drawMachine(mDisplacey = -1) :
 	global config
@@ -110,7 +112,7 @@ def redraw():
 
 	# Render using main render function - manages the matrix tiling
 	# config.render(config.image,x,y,boxWidth,boxHeight,False)
-	sendToRender(config.image, x,y,boxWidth,boxHeight,False)
+	#sendToRender(config.image, x,y,boxWidth,boxHeight,False)
 		
 	if (x > xMax + buffer):
 		vx = vx * -1
@@ -161,54 +163,44 @@ def changeColor( rnd = False) :
 		g = int(random.uniform(0,255))
 		b = int(random.uniform(0,255))
 
-def iterate(n=0):
-	global config,x,y
+def callBack() :
+	global config
+	pass
+
+def runWork():
+	global redrawSpeed
+	while True:
+		iterate()
+		time.sleep(redrawSpeed)
+
+def iterate( n = 0) :
+	global config, x, y, wd, ht, dx, dx, start, end, steps, count, boxWidth, boxHeight
+	config.render(config.image, x, y, boxWidth, boxHeight)
 	redraw()
-	#return(config.image,x,y)
 
-def sendToRender(img, xP, yP, wD, hT, c = False) :
-	global config, x, y, wd, ht
-	x ,y, wd, ht = xP, yP, wD, hT
-	config.render(img, xP, yP, wD, hT, c)
+	count+= steps
 
-def machineAnimator(run=True) :
+	if(count > abs(end)) :
+		callBack()
+		count = 0
+		# Done
+
+def main(run = True) :
+	global config
 	global redrawSpeed, x, y, vx, vy
+	print("You Win!!! Loaded")
+
 	config.renderImage = Image.new("RGBA", (config.actualScreenWidth, config.screenHeight))
 	config.image = Image.new("RGBA", (26, 30))
 
-	# Used to draw directly onto a larger canvas, vs. sending
-	# just the little square to be pasted into the canvas
-	#config.image = Image.new("RGBA", (config.actualScreenWidth, config.screenHeight))
-	
 	config.draw  = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
 
 	x = int(random.random() * config.screenWidth)
 	y = int(random.random() * config.screenHeight)
 
-	#x=50
-	#y=50
-	#vx = 0
-	#vy = 0
 
-	count = 0
-
-	while (run) :
-		redraw()
-		count+=1
-		time.sleep(redrawSpeed)
-
-def main(run=True) :
-	global config, workConfig
-	global fontSize,vOffset,scrollSpeed,stroopSpeed,stroopSteps,stroopFontSize,useColorFlicker
-	print("You Win!!! Loaded")
-	#[stroop]
-	while run:
-		machineAnimator(run) # 430
-		#if(random.random() > .9) : user.userAnimator(24)
-
-	if(run == False) :
-		machineAnimator(run)
-
+	if(run) : runWork()
+		
 
 	

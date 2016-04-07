@@ -1,55 +1,31 @@
-import time
-import random
-import math
-import sys
-import messenger
-from PIL import ImageChops, ImageOps
-
-screenWidth =  128
-screenHeight = 64
-
-tileSize = (32,64)
-rows = 2
-cols = 1
-imageRows = [] * rows
-actualScreenWidth = tileSize[1]*cols*rows
-path = "/home/pi/rpimain"
-useMassager = False
-brightness = 1
+from rgbmatrix import Adafruit_RGBmatrix
+import PIL.Image
+from PIL import Image, ImageDraw, ImageFont
 
 
-global imageTop,imageBottom,image,config,transWiring
+def setUp():
+	#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
+	config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
 
-transWiring = True
-
-
-def soliloquy(override = False,arg = "") :
-	global useMassager
-	if (useMassager) : messenger.soliloquy(override,arg)
-
-def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
-
-	global imageTop, imageBottom, screenHeight, screenWidth, panels, matrix, image, renderImage, tileSize, rows, cols, transWiring
-
-	#w = screenWidth
-	#h = screenHeight
-
+def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
+	#global imageTop, imageBottom, screenHeight, screenWidth, panels, 
+	#matrix, image, renderImage, tileSize, rows, cols, transWiring
+	global config
 	segmentImage = []
 
 	# the rendered image is the screen size
 	#renderImage = Image.new("RGBA", (screenWidth , 32))
-
 	if(nocrop == True) :
 		for n in range(0,rows) :
-			segmentWidth = tileSize[1] * cols
+			segmentWidth = config.tileSize[1] * config.cols
 			segmentHeight = 32
 			xPos = n * segmentWidth - xOffset
 			yPos = n * 32 #- yOffset
 			segment =  imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
-			renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
+			config.renderImage.paste(segment, (xPos,0,segmentWidth + xPos,segmentHeight))
 
 	elif (nocrop == False) :
-		segmentWidth = tileSize[1] * cols
+		segmentWidth = config.tileSize[1] * config.cols
 		segmentHeight = 32
 
 		#yOffset = 10
@@ -67,7 +43,7 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 		cropP1 = [0,0]
 		cropP2 = [0,0]
 
-		for n in range(0,rows) :
+		for n in range(0,config.rows) :
 
 			# Crop PLACEMENTS\
 			a = max(0, xOffset) + segmentWidth * n
@@ -84,7 +60,7 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 
 			pCrop  = cropP1 + cropP2
 
-			if ((n==0 or n == 2 or n == 4) and (transWiring == False) ) : pCrop[1] = 0
+			if ((n==0 or n == 2 or n == 4) and (config.transWiring == False) ) : pCrop[1] = 0
 			segmentImage.append(imageToRender.crop(pCrop))
 
 			#print(a,b,c,d,cropP1,cropP2)
@@ -119,7 +95,7 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 			if(pCrop[3] - pCrop[1] > 0 ) : 
 				if ( pCrop[2] - pCrop[0] > 0) :
 					segImg = segmentImage[n]
-					if ((n==0 or n == 2 or n == 4) and (transWiring == False) ) : 
+					if ((n==0 or n == 2 or n == 4) and (config.transWiring == False) ) : 
 						# This flips, reveses and places the segment when the row is "upside down" wrt
 						# the previous row of panels - this is when transWiring == False - i.e no long transverse cable
 						segImg = ImageOps.flip(segImg)
@@ -131,31 +107,21 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 						bn = segmentHeight - yOffset - h
 						if(bn < 0) : bn = 0
 
-						renderImage.paste( segImg, (an, bn, an + pCrop[2] - pCrop[0], bn + pCrop[3] - pCrop[1]))
+						config.renderImage.paste( segImg, (an, bn, an + pCrop[2] - pCrop[0], bn + pCrop[3] - pCrop[1]))
 					else:
-						renderImage.paste( segImg, (a, b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
+						config.renderImage.paste( segImg, (a, b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
 
 	 
 			cropP1[1] = cropP2[1]
 
 
 	if(overlayBottom) :
-		renderImage = Image.new("RGBA", (w , h))
-		renderImage.paste(imageToRender, (0,0))
-		iid = renderImage.im.id
-		idtemp = image.im.id
-		matrix.SetImage(iid, xOffset + screenWidth, 0)
+		config.renderImage = Image.new("RGBA", (w , h))
+		config.renderImage.paste(imageToRender, (0,0))
+		iid = config.renderImage.im.id
+		idtemp = config.image.im.id
+		config.matrix.SetImage(iid, xOffset + screenWidth, 0)
 	else :
-		iid = renderImage.im.id
-		idtemp = image.im.id
-		matrix.SetImage(iid, 0, 0)
-
-
-	# DEBUG .....
-	#time.sleep(10)
-	#exit()
-	# ************************************ #
-
-	#print(">>")
-	#if(random.random() > .95) : soliloquy()
-
+		iid = config.renderImage.im.id
+		idtemp = config.image.im.id
+		config.matrix.SetImage(iid, 0, 0)

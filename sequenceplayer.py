@@ -1,8 +1,13 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, actions, scroll, bluescreen ,loader, squares, flashing, blender, carousel, squaresalt
-from cntrlscripts import off_signal
+from modules import utils
+from pieces import actions, scroll, bluescreen ,loader, squares, flashing, blender, carousel, squaresalt
+#from cntrlscripts import off_signal
+from modules import configuration
+from configs import localconfig
+
 from PIL import Image, ImageDraw, ImageFont
+import importlib
 import time
 import random
 from rgbmatrix import Adafruit_RGBmatrix
@@ -25,7 +30,7 @@ def imageScrollSeq() :
 	global T1, T2
 
 	# Get all files in the drawing folder
-	path = config.path  + "/imgs/drawings"
+	path = config.path  + "assets/imgs/drawings"
 	rawList = os.listdir(path)
 	imageList = []
 	seq = 1
@@ -391,46 +396,69 @@ def setUpSequenceGroups() :
 # -------   defaults                             *#
 ###################################################
 def configure() :
-	global group, groups, config
+	global group, groups, config, workconfig, path, tempImage
 	global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 
 	try: 
-		baseconfig = ConfigParser.ConfigParser()
-		baseconfig.read('/home/pi/RPI/config.cfg')
 
-		config = utils
+		####
+		# Having trouble loading the local configuration file based on relative path
+		# so hacking things by loading from a Python file called localconfig.py
+		# Please fix me  ;(
+		## 
 
-		usingHub = false
-		try:
-			usingHub = bool(baseconfig.getboolean("config", 'useHub'))
-		except :
-			pass
+		baseconfig = localconfig
+		path = baseconfig.path
 
-		if (usingHub) :
-			config.usingHub = True
-			matrix = {}
-		else :
-			config.matrix = Adafruit_RGBmatrix(32, int(baseconfig.get("config", 'matrixTiles')))
-		config.screenHeight = int(baseconfig.get("config", 'screenHeight'))
-		config.screenWidth =  int(baseconfig.get("config", 'screenWidth'))
-		config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-		config.draw = ImageDraw.Draw(config.image)
+		#baseconfig = ConfigParser.ConfigParser()
+		#baseconfig.read('localconfig.cfg')
+		config = configuration
 
+		# Machine ID
+		config.MID = baseconfig.MID
+		# Default Work Instance ID
+		config.WRKINID = baseconfig.WRKINID
+		# Default Local Path
+		config.path = baseconfig.path
+
+
+		# Load the default work
+
+		print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
+
+		workconfig = ConfigParser.ConfigParser()
+		workconfig.read(config.path  + '/configs/pieces/' + config.WRKINID + ".cfg")
+
+		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
+		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
+		config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
+		config.rows = int(workconfig.get("displayconfig", 'rows'))
+		config.cols = int(workconfig.get("displayconfig", 'cols'))
+		config.actualScreenWidth  = int(workconfig.get("displayconfig", 'actualScreenWidth'))
+		config.useMassager = bool(workconfig.getboolean("displayconfig", 'useMassager'))
+		config.brightness =  float(workconfig.get("displayconfig", 'brightness'))
+		config.transWiring = bool(workconfig.getboolean("displayconfig", 'transWiring'))
+		config.work = workconfig.get("displayconfig", 'work')
+		config.rendering = workconfig.get("displayconfig", 'rendering')
+
+		# Create the image-canvas for the work
+		config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
 		config.Image = Image
 		config.ImageDraw = ImageDraw
 		config.ImageFont = ImageFont
+
+		config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
+		config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+		config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+		config.draw = ImageDraw.Draw(config.image)
+
 		iid = config.image.im.id
 		config.matrix.SetImage(iid, 0, 0)
-		config.tileSize = (int(baseconfig.get("config", 'tileSizeHeight')),int(baseconfig.get("config", 'tileSizeWidth')))
-		config.rows = int(baseconfig.get("config", 'rows'))
-		config.cols = int(baseconfig.get("config", 'cols'))
+		#config.render = render
 
-		config.actualScreenWidth  = int(baseconfig.get("config", 'actualScreenWidth'))
-		config.useMassager = bool(baseconfig.getboolean("config", 'useMassager'))
-		config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
-		config.brightness =  float(baseconfig.get("config", 'brightness'))
-		config.path = baseconfig.get("config", 'path')
-		config.transWiring = bool(baseconfig.getboolean("config", 'transWiring'))
+		work = importlib.import_module('pieces.'+str(config.work))
+		work.config = config
+		work.workConfig = workconfig
 
 		action = actions
 		action.config = config
@@ -438,27 +466,18 @@ def configure() :
 
 		scroll = scroll
 		scroll.config = config
-		scroll.fontSize = int(baseconfig.get("scroll", 'fontSize'))
-		scroll.vOffset = int(baseconfig.get("scroll", 'vOffset'))
-		scroll.scrollSpeed = float(baseconfig.get("scroll", 'scrollSpeed'))
-		
-		machine = machine
-		machine.config = config
+		scroll.fontSize = int(workconfig.get("scroll", 'fontSize'))
+		scroll.vOffset = int(workconfig.get("scroll", 'vOffset'))
+		scroll.scrollSpeed = float(workconfig.get("scroll", 'scrollSpeed'))
 
 		bluescreen = bluescreen
 		bluescreen.config = config
 
-		user = user
-		user.config = config
-		user.userCenterx = int(baseconfig.get("user", 'userCenterx'))
-		user.userCentery = int(baseconfig.get("user", 'userCentery'))
-		user.scale = float(baseconfig.get("user", 'scale'))
-
 		carouselSign = carousel
 		carouselSign.config = config
-		carouselSign.fontSize = int(baseconfig.get("scroll", 'fontSize'))
-		carouselSign.vOffset = int(baseconfig.get("scroll", 'vOffset'))
-		carouselSign.useColorFLicker = bool(baseconfig.getboolean("scroll", 'useColorFLicker'))
+		carouselSign.fontSize = int(workconfig.get("scroll", 'fontSize'))
+		carouselSign.vOffset = int(workconfig.get("scroll", 'vOffset'))
+		carouselSign.useColorFLicker = bool(workconfig.getboolean("scroll", 'useColorFLicker'))
 		#carouselSign.clr = (120,120,120)
 
 		imgLoader = loader

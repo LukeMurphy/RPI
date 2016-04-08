@@ -35,7 +35,6 @@ directionStr = "Left"
 
 def callBack() :
 	global config
-	config.opticalOpposites = False if config.opticalOpposites == False else True
 	stroopSequence()
 	stroop()
 
@@ -46,12 +45,17 @@ def iterate( n = 0) :
 	x += dx
 	y += dy
 
-	count+= steps
+	#count += steps
 
-	if(count > abs(end)) :
+	if(dx == 0 and dy > 0 and y >= end) :
+	 	callBack()
+	if(dx == 0 and dy < 0 and y < end) :
+	 	callBack()
+	if(dy == 0 and dx > 0 and x >= end) :
 		callBack()
-		count = 0
-		# Done
+	if(dy == 0 and dx < 0 and x < end) :
+		callBack()
+
 	
 def runWork():
 	global stroopSpeed
@@ -78,20 +82,39 @@ def main(run = True) :
 	stroop()
 
 	if(run) : runWork()
-		
+
+def runStroop(run=True) :
+	global config, opticalOpposites
+	while run:
+		numRuns = int(random.uniform(2,6))
+		numRuns =  1
+		for i in range(0,numRuns) : 
+			opticalOpposites = False if (opticalOpposites == True) else True
+			stroopSequence()		
 
 # This sets up the color and direction
 def stroopSequence() :
-	global  colorWord, colorOfWord, directionStr
+	global  colorWord, colorOfWord, directionStr, opticalOpposites
 	directionStr = getDirection()
 	choice = int(random.uniform(0,7))
-	colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
+
+	opticalOpposites = False if (opticalOpposites == True) else True
+
+	#colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
+	#Default
 	if(choice <= 1) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
 	if(choice == 2) :colorWord, colorOfWord, directionStr = "VIOLET",(230,225,0),directionStr
 	if(choice == 3) :colorWord, colorOfWord, directionStr = "RED",(0,255,0),directionStr
 	if(choice == 4) :colorWord, colorOfWord, directionStr = "BLUE",(225,100,0),directionStr
 	if(choice == 5) :colorWord, colorOfWord, directionStr = "GREEN",(255,0,0),directionStr
 	if(choice == 6) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
+
+	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
+	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "VIOLET",(230,225,0),directionStr
+	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "RED",(0,255,0),directionStr
+	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "BLUE",(225,100,0),directionStr
+	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "GREEN",(255,0,0),directionStr
+	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
 
 def getDirection() :
 	d = int(random.uniform(1,4))
@@ -100,18 +123,6 @@ def getDirection() :
 	if (d == 2) : direction = "Right"
 	if (d == 3) : direction = "Bottom"
 	return direction
-
-def runStroop(run=True) :
-	global config
-	while run:
-		numRuns = int(random.uniform(2,6))
-		numRuns =  1
-		for i in range(0,numRuns) : 
-			if(config.opticalOpposites) : 
-				config.opticalOpposites = False
-			else : 
-				config.opticalOpposites = True
-			stroopSequence()
 
 def stroop() :
 	global sprt
@@ -140,6 +151,7 @@ def stroop() :
 	# Draw Background Color
 	# Optical (RBY) or RGB opposites
 
+
 	if(opticalOpposites) :
 		if(colorWord == "RED") : bgColor = tuple(int(a*brightness) for a in ((255,0,0)))
 		if(colorWord == "GREEN") : bgColor = tuple(int(a*brightness) for a in ((0,255,0)))
@@ -150,7 +162,7 @@ def stroop() :
 	else:
 		 bgColor = colorutils.colorCompliment(clr, brightness)
 
-	
+	config.draw.rectangle((0,0,config.image.size[0]+32, config.screenHeight), fill=bgColor)
 	counter =  0
 
 	if(direction == "Top" or direction == "Bottom") :
@@ -213,17 +225,33 @@ def stroop() :
 		wd = dims[0]
 		ht = dims[1]
 
+		if(direction == "Left") :
+			start = config.screenWidth
+			end  = config.screenWidth - int(random.uniform(-wd/2,wd)) #+ config.image.size[0] 
+			dx = -steps
+			x = start
+
+			#original values
+			start = config.screenWidth
+			end =  int(random.uniform(-4,wd))
+			dx = -steps
+			x = start
+
 		if(direction == "Right") :
 			start = -config.image.size[0]
 			end = int(random.uniform(config.screenWidth/2, wd + config.screenWidth))
 			dx = steps
 			x = start
 
-		if(direction == "Left") :
-			start = config.screenWidth
-			end  = config.screenWidth - int(random.uniform(-wd/2,wd)) #+ config.image.size[0] 
-			dx = -steps
+			#original values
+			start = -config.screenWidth + int(random.uniform(0,wd)) #+ config.image.size[0] 
+			end = int(random.uniform(0,wd))
+			dx = steps
 			x = start
+
+	#print(start,end,dx,dy,x,y)
+
+
 
 	
 #####################

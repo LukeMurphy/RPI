@@ -5,9 +5,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 def setUp():
 	#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
-	config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
+	config.matrix = Adafruit_RGBmatrix(32, config.matrixTiles)
 
-def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
+def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
 	#global imageTop, imageBottom, screenHeight, screenWidth, panels, 
 	#matrix, image, renderImage, tileSize, rows, cols, transWiring
 	global config
@@ -125,3 +125,8 @@ def renderToHat(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBo
 		iid = config.renderImage.im.id
 		idtemp = config.image.im.id
 		config.matrix.SetImage(iid, 0, 0)
+
+
+
+#############
+

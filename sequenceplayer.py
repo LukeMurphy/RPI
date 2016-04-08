@@ -2,11 +2,12 @@
 #import modules
 from modules import utils
 from pieces import actions, scroll, bluescreen ,loader, squares, flashing, blender, carousel, squaresalt
-from cntrlscripts import off_signal
+#from cntrlscripts import off_signal
 from modules import configuration
 from configs import localconfig
 
 from PIL import Image, ImageDraw, ImageFont
+import importlib
 import time
 import random
 from rgbmatrix import Adafruit_RGBmatrix
@@ -43,16 +44,16 @@ def imageScrollSeq() :
 		# Force the checking of the status file  -- sometimes the cron does not run
 		# probably due to high CPU load etc ...
 		# --------------------------------------------------------------------------#
- 		T2 = time.time()
-                if((T2 - T1) > 15) :
-                        threads = []
-                        thrd = threading.Thread(target=off_signal.checker)
-                        threads.append(thrd)
-                        thrd.start()
+		T2 = time.time()
+				if((T2 - T1) > 15) :
+						threads = []
+						thrd = threading.Thread(target=off_signal.checker)
+						threads.append(thrd)
+						thrd.start()
 
-                        #print(threads)
-                        #off_signal.checker()
-                        T1 = time.time()		
+						#print(threads)
+						#off_signal.checker()
+						T1 = time.time()		
 
 		if (seq == 1) :
 			imageList = ['plane-2b.gif','paletter3c.gif'] 
@@ -107,7 +108,7 @@ def runSequence() :
 	global T1,T2,thrd
 	lastAction  = 0
 
- 	try:
+	try:
 
 		# If there are more than one set of animations per group e.g. various
 		# text sequences, "randomize" the selection and try to avoid repeating
@@ -441,16 +442,18 @@ def configure() :
 		config.rendering = workconfig.get("displayconfig", 'rendering')
 
 		# Create the image-canvas for the work
-		config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("config", 'matrixTiles')))
+		config.matrix = Adafruit_RGBmatrix(32, int(workconfig.get("displayconfig", 'matrixTiles')))
 		config.Image = Image
 		config.ImageDraw = ImageDraw
 		config.ImageFont = ImageFont
+
+		config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
+		config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+		config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+		config.draw = ImageDraw.Draw(config.image)
+
 		iid = config.image.im.id
 		config.matrix.SetImage(iid, 0, 0)
-		config.renderImage = PIL.Image.new("RGBA", (config.actualScreenWidth, 32))
-		config.renderImageFull = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
-		config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
-		config.draw = ImageDraw.Draw(config.image)
 		#config.render = render
 
 		work = importlib.import_module('pieces.'+str(config.work))
@@ -596,7 +599,6 @@ def main():
 			print ("Error:" + str(err))
 
 if __name__ == "__main__":
-    main()
-
+	main()
 
 

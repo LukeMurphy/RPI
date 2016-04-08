@@ -91,7 +91,9 @@ def configure() :
 		if(config.rendering == "hat") :
 			from modules import rendertohat
 			r = rendertohat
+			config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
 			r.config = config
+			r.setUp()
 			config.render = r.render
 			work.main()
 

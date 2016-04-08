@@ -5,7 +5,6 @@ import time
 import random
 #from rgbmatrix import Adafruit_RGBmatrix
 import math
-import messenger
 
 blankPixels = []
 counterPixels = []

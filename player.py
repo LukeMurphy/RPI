@@ -68,10 +68,8 @@ def configure() :
 		config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
 		config.rows = int(workconfig.get("displayconfig", 'rows'))
 		config.cols = int(workconfig.get("displayconfig", 'cols'))
-		config.actualScreenWidth  = int(workconfig.get("displayconfig", 'actualScreenWidth'))
-		config.useMassager = bool(workconfig.getboolean("displayconfig", 'useMassager'))
 		config.brightness =  float(workconfig.get("displayconfig", 'brightness'))
-		config.transWiring = bool(workconfig.getboolean("displayconfig", 'transWiring'))
+		config.minBrightness  = float(workconfig.get("displayconfig", 'minBrightness'))
 		config.work = workconfig.get("displayconfig", 'work')
 		config.rendering = workconfig.get("displayconfig", 'rendering')
 
@@ -92,6 +90,8 @@ def configure() :
 			from modules import rendertohat
 			r = rendertohat
 			config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
+			config.transWiring = bool(workconfig.getboolean("displayconfig", 'transWiring'))
+			config.actualScreenWidth  = int(workconfig.get("displayconfig", 'actualScreenWidth'))
 			r.config = config
 			r.setUp()
 			config.render = r.render
@@ -99,6 +99,7 @@ def configure() :
 
 		if(config.rendering == "hub") :
 			from modules import rendertohub
+			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			r = rendertohub
 			r.config = config
 			r.work = work
@@ -108,6 +109,7 @@ def configure() :
 
 		if(config.rendering == "out") :
 			from modules import rendertofile
+			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			r = rendertofile
 			r.config = config
 			r.work = work

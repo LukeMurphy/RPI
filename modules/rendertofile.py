@@ -1,6 +1,8 @@
 import moviepy.editor as mpy
 import moviepy.video.VideoClip as mpv
 from moviepy.video import *
+from PIL import Image, ImageTk, ImageDraw, ImageFont
+from PIL import ImageFilter
 
 def setUp(mode) :
 	global config
@@ -50,8 +52,22 @@ def videoClipMaker() :
 	yOffset = work.y	
 
 	# xOffset+config.workRef.wd, yOffset+config.workRef.ht
-	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
-	img = config.renderImageFull.resize((640,480))
+	if(config.useFilters) :
+		'''------------------------------------------------------------------------'''
+		'''#######################    FILTERS               #######################'''
+
+		im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
+		im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100,threshold=2))
+
+		'''#######################    Paste to Render       #######################'''
+
+		config.renderImageFull.paste(im2, (xOffset, yOffset))
+	else :
+		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
+	
+	#img = config.renderImageFull.resize((640,480))
+	img = config.renderImageFull
+	#img = img.filter(ImageFilter.UnsharpMask(radius=10, percent=200,threshold=0))
 	return img
 
 def toVideo() :

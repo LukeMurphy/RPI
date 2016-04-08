@@ -3,6 +3,7 @@ import tkMessageBox
 import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
+from PIL import ImageFilter
 import numpy
 
 memoryUsage = 0
@@ -57,7 +58,27 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	#print(imageToRender.size,xOffset,yOffset)
 
-	config.renderImageFull.paste(config.image, (xOffset, yOffset))
+
+	if(config.useFilters) :
+		'''------------------------------------------------------------------------'''
+		'''              FILTERS                                                   '''
+
+		''' ugly hippy ...
+		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=1))
+		config.image = config.image.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
+		config.renderImageFull.paste(config.image, (xOffset, yOffset))
+		'''
+		im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
+		im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100,threshold=2))
+
+		'''             Paste to Render                                       '''
+
+		config.renderImageFull.paste(im2, (xOffset, yOffset))
+
+		'''------------------------------------------------------------------------'''
+
+	else :
+		config.renderImageFull.paste(config.image, (xOffset, yOffset))
 
 	## For testing ...
 	#draw1  = ImageDraw.Draw(config.renderImageFull)

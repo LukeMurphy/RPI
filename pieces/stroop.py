@@ -17,6 +17,9 @@ stroopFontSize = 30
 fontSize = 14
 vOffset  = -1
 opticalOpposites = True
+higherVariability = False
+verticalBg = False
+verticalBgColor = (0,0,0)
 #countLimit = 6
 count = 0
 
@@ -32,6 +35,7 @@ colorWord = "RED"
 colorOfWord = (0,0,0)
 directionStr = "Left"
 
+####################################################################
 
 def callBack() :
 	global config
@@ -65,7 +69,7 @@ def runWork():
 
 def main(run = True) :
 	global config, workConfig
-	global fontSize,vOffset,scrollSpeed,stroopSpeed,stroopSteps,stroopFontSize,useColorFlicker
+	global fontSize, vOffset, scrollSpeed, stroopSpeed, stroopSteps, stroopFontSize, higherVariability, verticalBg, shadowSize
 	#global config, x, y, wd, ht, dx, dx, start, end, steps, count
 	print("Stroop Loaded")
 	#[stroop]
@@ -76,6 +80,10 @@ def main(run = True) :
 	stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
 	stroopSteps = float(workConfig.get("stroop", 'stroopSteps'))
 	stroopFontSize = int(workConfig.get("stroop", 'stroopFontSize'))
+	shadowSize = int(workConfig.get("stroop", 'shadowSize'))
+	higherVariability = (workConfig.getboolean("stroop", 'higherVariability'))
+	verticalBg = (workConfig.getboolean("stroop", 'verticalBg'))
+
 	config.opticalOpposites = True
 
 	stroopSequence() 
@@ -96,25 +104,27 @@ def runStroop(run=True) :
 def stroopSequence() :
 	global  colorWord, colorOfWord, directionStr, opticalOpposites
 	directionStr = getDirection()
-	choice = int(random.uniform(0,7))
+	choice = int(random.uniform(1,7))
 
 	opticalOpposites = False if (opticalOpposites == True) else True
 
 	#colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
 	#Default
-	if(choice <= 1) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
+	if(choice == 1) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
 	if(choice == 2) :colorWord, colorOfWord, directionStr = "VIOLET",(230,225,0),directionStr
 	if(choice == 3) :colorWord, colorOfWord, directionStr = "RED",(0,255,0),directionStr
 	if(choice == 4) :colorWord, colorOfWord, directionStr = "BLUE",(225,100,0),directionStr
 	if(choice == 5) :colorWord, colorOfWord, directionStr = "GREEN",(255,0,0),directionStr
-	if(choice == 6) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
+	if(choice >= 6) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
 
+	'''
 	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
 	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "VIOLET",(230,225,0),directionStr
 	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "RED",(0,255,0),directionStr
 	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "BLUE",(225,100,0),directionStr
 	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "GREEN",(255,0,0),directionStr
 	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
+	'''
 
 def getDirection() :
 	d = int(random.uniform(1,4))
@@ -127,7 +137,7 @@ def getDirection() :
 def stroop() :
 	global sprt
 	global  colorWord, colorOfWord, directionStr
-	global r,g,b,config, opticalOpposites, stroopSpeed, stroopSteps, stroopFontSize
+	global r,g,b, config, opticalOpposites, stroopSpeed, stroopSteps, stroopFontSize, higherVariability, verticalBg, verticalBgColor, shadowSize
 	global x, y, wd, ht, dx, dy, start, end, steps
 
 	x = y = 0
@@ -136,7 +146,7 @@ def stroop() :
 	clr = colorOfWord
 
 	brightness = config.brightness
-	brightness = random.random()
+	brightness = random.uniform(config.minBrightness,1.1)
 
 	clr = tuple(int(a*brightness) for a in (clr))
 
@@ -146,7 +156,7 @@ def stroop() :
 	pixLen = config.draw.textsize(colorWord, font = font)
 
 	dims = [pixLen[0],pixLen[1]]
-	if(dims[1] < 32) : dims[1] = 34
+	if(dims[1] < config.tileSize[0]) : dims[1] = config.tileSize[0] + 2
 
 	# Draw Background Color
 	# Optical (RBY) or RGB opposites
@@ -162,16 +172,17 @@ def stroop() :
 	else:
 		 bgColor = colorutils.colorCompliment(clr, brightness)
 
-	config.draw.rectangle((0,0,config.image.size[0]+32, config.screenHeight), fill=bgColor)
+	#config.draw.rectangle((0,0,config.image.size[0]+config.tileSize[0], config.screenHeight), fill=bgColor)
 	counter =  0
 
 	if(direction == "Top" or direction == "Bottom") :
 		#config.image = config.Image.new("RGBA", (dims[1], dims[0]*2))
-		vPadding = 42
+		vPadding = int(2 * stroopFontSize)
 		config.image = PIL.Image.new("RGBA", (dims[1],dims[0]+vPadding))
 		draw  = ImageDraw.Draw(config.image)
 		id = config.image.im.id
-		bgColorV = (0,0,0)
+
+		bgColorV = bgColor if verticalBg == True else verticalBgColor
 		draw.rectangle((0,0,config.image.size[1], dims[0] + vPadding), fill=bgColorV)
 
 		chars = list(colorWord)
@@ -182,7 +193,14 @@ def stroop() :
 				# rough estimate to create vertical text
 				xD = 2
 				# "kerning ... hahhaha ;) "
-				if (letter == "I") : xD = 7
+				if (letter == "I") : xD = 6 * int(stroopFontSize/30)
+
+				# Draw the text with "borders"
+				indent = xD
+
+				for i in range(1,shadowSize) :
+					draw.text((indent + -i,-i + counter * (stroopFontSize - 5)),letter,(0,0,0),font=font2)
+					draw.text((indent + i,i + counter * (stroopFontSize - 5)),letter,(0,0,0),font=font2)
 				draw.text((xD, counter * (stroopFontSize - 5)),letter,clr,font=font)
 				counter += 1
 
@@ -196,28 +214,30 @@ def stroop() :
 
 		if(direction == "Bottom") :
 			start = config.screenHeight
-			end =  int(random.uniform( -ht/2 ,  -ht))
+			end =  int(random.uniform( config.tileSize[0]/2 ,  -ht/2))
 			dy = -steps
 			y = start
-
-			#print("==>", x, y, dx, dy, start, end, steps)
-
 
 
 	if(direction == "Left" or direction == "Right") :
 		# Left Scroll
-		config.image = PIL.Image.new("RGBA", (dims[0],dims[1]))
+		vPadding = int(.75 * config.tileSize[0])
+		config.image = PIL.Image.new("RGBA", (dims[0]+vPadding,dims[1]))
 		draw  = ImageDraw.Draw(config.image)
 		iid = config.image.im.id
-		draw.rectangle((0,0,config.image.size[0]+32, config.screenHeight), fill=bgColor)
+		draw.rectangle((0,0,config.image.size[0]+config.tileSize[0], config.screenHeight), fill=bgColor)
 
 		# Draw the text with "borders"
-		draw.text((-1,-1),colorWord,(0,0,0),font=font2)
-		draw.text((1,1),colorWord,(0,0,0),font=font2)
-		draw.text((0,0),colorWord,clr,font=font)
+		indent = int(.05 * config.tileSize[0])
+
+		for i in range(1,shadowSize) :
+			draw.text((indent + -i,-i),colorWord,(0,0,0),font=font2)
+			draw.text((indent + i,i),colorWord,(0,0,0),font=font2)
+		draw.text((indent + 0,0),colorWord,clr,font=font)
 
 		offset = int(random.uniform(1,config.screenWidth-20))
-		vOffset = int(random.uniform(0,config.rows)) * 32
+		vOffset = int(random.uniform(0,config.rows)) * config.tileSize[0] 
+		if(higherVariability) : vOffset += int(random.uniform(-config.tileSize[0]/8, config.tileSize[0]/8))
 
 		steps = int(stroopSteps)
 		dy = 0

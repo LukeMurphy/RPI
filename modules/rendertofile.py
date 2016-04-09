@@ -3,6 +3,7 @@ import moviepy.video.VideoClip as mpv
 from moviepy.video import *
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter
+import time, datetime
 
 def setUp(mode) :
 	global config
@@ -86,8 +87,12 @@ def toVideo() :
 	## Sends image data as PNG to FFMPEG
 	imgFormat = "PNG"
 
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d--%H-%M-%S')
+	name = config.WRKINID + "_" + st + "_video.avi"
+
 	p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', vcodecImg, '-r', str(fps) , '-i', '-', 
-		'-vcodec', vcodec, '-qscale', str(duration) , '-r', str(fps) , 'video.avi'], stdin=PIPE)
+		'-vcodec', vcodec, '-qscale', str(duration) , '-r', str(fps) , name], stdin=PIPE)
 	for i in range(fps * duration):
 	    #im = Image.new("RGB", (640, 480), (i, 1, 1))
 	    im  = videoClipMaker()

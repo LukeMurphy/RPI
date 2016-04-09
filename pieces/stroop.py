@@ -72,7 +72,6 @@ def main(run = True) :
 	global fontSize, vOffset, scrollSpeed, stroopSpeed, stroopSteps, stroopFontSize, higherVariability, verticalBg, shadowSize
 	#global config, x, y, wd, ht, dx, dx, start, end, steps, count
 	print("Stroop Loaded")
-	#[stroop]
 
 	fontSize = int(workConfig.get("stroop", 'fontSize'))
 	vOffset = int(workConfig.get("stroop", 'vOffset'))

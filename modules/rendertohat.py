@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 def setUp():
 	#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
 	config.matrix = Adafruit_RGBmatrix(32, config.matrixTiles)
+	#print(config.renderImage)
 
 def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
 	#global imageTop, imageBottom, screenHeight, screenWidth, panels, 

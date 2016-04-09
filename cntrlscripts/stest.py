@@ -14,5 +14,5 @@ try:
 	time.sleep(1)
 	os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")
 except KeyboardInterrupt:
-		GPIO.cleanup()       # clean up GPIO on CTRL+C exit
+	GPIO.cleanup()       # clean up GPIO on CTRL+C exit
 GPIO.cleanup()           # clean up GPIO on normal exit

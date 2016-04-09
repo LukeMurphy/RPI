@@ -74,7 +74,7 @@ def configure() :
 		config.rendering = workconfig.get("displayconfig", 'rendering')
 
 		# Create the image-canvas for the work
-		config.renderImage = PIL.Image.new("RGBA", (config.actualScreenWidth, 32))
+		config.renderImage = PIL.Image.new("RGBA", (config.screenWidth*config.rows, 32))
 		config.renderImageFull = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		config.draw = ImageDraw.Draw(config.image)

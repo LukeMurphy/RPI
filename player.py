@@ -104,6 +104,7 @@ def configure() :
 			r.config = config
 			r.work = work
 			config.render = r.render
+			config.updateCanvas = r.updateCanvas
 			work.main(False)
 			r.setUp()
 

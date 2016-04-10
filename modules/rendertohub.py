@@ -6,14 +6,15 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter
 import numpy
 
+global root
 memoryUsage = 0
 debug = False
 
 def setUp():
-
+	global root
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
-		windowOffset = [38,38]
+		windowOffset = [1900,124]
 	else :
 		windowOffset = [4,4]
 
@@ -29,7 +30,7 @@ def setUp():
 	cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 	config.cnvs = cnvs
 	config.cnvs.pack()
-	config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
+	config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="blue")
 	
 	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=tempImage, anchor='nw')
@@ -41,12 +42,27 @@ def setUp():
 	root.mainloop() 
 
 def startWork(*args) :
-	global config, work
+	global config, work, root
 	while True :
-		work.runWork()
+		try :
+			work.runWork()
+		except KeyboardInterrupt,e :
+			print(str(e))
+			root.destroy()
 
 
-def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
+def updateCanvas() :
+
+	## For testing ...
+	#draw1  = ImageDraw.Draw(config.renderImageFull)
+	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
+	config.cnvs._image_tk = ImageTk.PhotoImage(config.renderImageFull)
+	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=config.cnvs._image_tk, anchor='nw')
+
+	config.cnvs.update()
+
+
+def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
 	global memoryUsage
 	global config, debug
 
@@ -78,15 +94,12 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		'''------------------------------------------------------------------------'''
 
 	else :
-		config.renderImageFull.paste(config.image, (xOffset, yOffset))
+		#xOffset + imageToRender.size[0], yOffset + imageToRender.size[1])
+		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
-	## For testing ...
-	#draw1  = ImageDraw.Draw(config.renderImageFull)
-	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32+ 32, yOffset +32), fill=(255,0,0))
 
-	config.cnvs._image_tk = ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=config.cnvs._image_tk, anchor='nw')
-	config.cnvs.update()
+	if(updateCanvasCall) : updateCanvas() 
+
 
 
 	'''

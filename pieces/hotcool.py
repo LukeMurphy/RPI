@@ -1,19 +1,19 @@
 import time  
 import random
 import PIL.Image, PIL.ImageTk
-from PIL import ImageDraw, ImageFont
+from PIL import Image, ImageTk, ImageDraw, ImageFont
 import textwrap
 import math
 from modules import colorutils
+import gc
 
 ########################
 #scroll speed and steps per cycle
 scrollSpeed = 0.0006
-stroopSpeed = 0.0001
+stroopSpeed = 0.1
 steps = 2
 stroopSteps = 2
 stroopFontSize = 30
-
 fontSize = 14
 vOffset  = -1
 opticalOpposites = True
@@ -22,61 +22,206 @@ verticalBg = False
 verticalBgColor = (0,0,0)
 #countLimit = 6
 count = 0
-
-# fcu present will start with the opposite
-paintColor = "GREEN"
-
-r = g = b = 0
-x = y = wd = ht = 0
-dx = dy = 0
-start = end = count = 0
-
-colorWord = "RED"
-colorOfWord = (0,0,0)
-directionStr = "Left"
+blocks = []
+simulBlocks = 2
 
 ####################################################################
 
+class Block:
+
+	direction = "down"
+	word = "HOT"
+	color = (255,0,0)
+	bgColor = (0,255,255)
+	speed = 2
+	speedMultiplier = 1
+	x = 0
+	y = 0
+	dx = -1
+	dy = 0
+	startx = 0
+	starty = 0
+	endx = 0
+	endy = 0
+
+	reveal = 0
+	revealSpeed = 1
+	revealSpeedMax = 3
+
+	colorWord = "RED"
+	colorOfWord = (0,0,0)
+	directionStr = "Left"
+
+	setForRemoval = False
+
+	def __init__(self, iid=0) :
+		self.iid = iid
+		
+
+	def remove(self, arrayList) :
+		arrayList.remove(self)
+
+	def make(self) :
+
+		config = self.config
+		choice = int(random.uniform(1,10))
+		brightness = config.brightness
+		brightness = random.uniform(self.config.minBrightness,1.1)
+		opticalOpposites = False if (random.random() > .5) else True
+
+		#colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
+		#Default
+		if(choice == 1) :colorWord, colorOfWord = "YELLOW",(255,0,225)
+		if(choice == 2) :colorWord, colorOfWord = "VIOLET",(230,225,0)
+		if(choice == 3) :colorWord, colorOfWord = "RED",(0,255,0)
+		if(choice == 4) :colorWord, colorOfWord = "BLUE",(225,100,0)
+		if(choice == 5) :colorWord, colorOfWord = "GREEN",(255,0,0)
+		if(choice == 6) :colorWord, colorOfWord = "ORANGE",(0,0,200)
+		if(choice == 7) :colorWord, colorOfWord = "BLACK",(0,0,0)
+		if(choice == 8) :colorWord, colorOfWord = "WHITE",(250,250,250)
+		if(choice >= 9) :colorWord, colorOfWord = "GREY",(50,50,50)
+
+		clr = colorOfWord
+
+		# Draw Background Color
+		# Optical (RBY) or RGB opposites
+		if(opticalOpposites) :
+			if(colorWord == "RED") : bgColor = tuple(int(a*brightness) for a in ((255,0,0)))
+			if(colorWord == "GREEN") : bgColor = tuple(int(a*brightness) for a in ((0,255,0)))
+			if(colorWord == "BLUE") : bgColor = tuple(int(a*brightness) for a in ((0,0,255)))
+			if(colorWord == "YELLOW") : bgColor = tuple(int(a*brightness) for a in ((255,255,0)))
+			if(colorWord == "ORANGE") : bgColor = tuple(int(a*brightness) for a in ((255,125,0)))
+			if(colorWord == "VIOLET") : bgColor = tuple(int(a*brightness) for a in ((200,0,255)))
+			if(colorWord == "BLACK") : bgColor = tuple(int(a*brightness) for a in ((250,250,250)))
+			if(colorWord == "WHITE") : bgColor = tuple(int(a*brightness) for a in ((0,0,0)))
+			if(colorWord == "GREY") : bgColor = tuple(int(a*brightness) for a in ((200,200,200)))
+		else:
+			 bgColor = colorutils.colorCompliment(clr, brightness)
+
+		clr = tuple(int(a*brightness) for a in (clr))
+
+		# Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
+		font = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSansBold.ttf',self.fontSize)
+		font2 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSansBold.ttf',self.fontSize)
+		pixLen = config.draw.textsize(colorWord, font = font)
+
+		dims = [pixLen[0],pixLen[1]]
+		if(dims[1] < config.tileSize[0]) : dims[1] = config.tileSize[0] + 2
+
+		vPadding = int(.75 * config.tileSize[0])
+		self.presentationImage = PIL.Image.new("RGBA", (dims[0]+vPadding,dims[1]))
+		self.image = PIL.Image.new("RGBA", (dims[0]+vPadding,0))
+		draw  = ImageDraw.Draw(self.presentationImage)
+		iid = self.image.im.id
+		draw.rectangle((0,0,dims[0]+config.tileSize[0], dims[1]), fill=bgColor)
+
+		# Draw the text with "borders"
+		indent = int(.05 * config.tileSize[0])
+
+		for i in range(1, self.shadowSize) :
+			draw.text((indent + -i,-i),colorWord,(0,0,0),font=font2)
+			draw.text((indent + i,i),colorWord,(0,0,0),font=font2)
+		draw.text((indent + 0,0),colorWord,clr,font=font)
+
+		offset = int(random.uniform(1,config.screenWidth-20))
+		vOffset = int(random.uniform(0,config.rows)) * config.tileSize[0] 
+		if(higherVariability) : vOffset += int(random.uniform(-config.tileSize[0]/10, config.tileSize[0]/10))
+
+		self.wd = dims[0]
+		self.ht = dims[1]
+		
+		self.y = vOffset
+		#self.y = int(random.uniform(0,config.screenHeight))
+		self.x  = int(random.uniform(-self.wd,config.screenWidth + self.wd))
+		#self.x = config.screenWidth/2
+		
+		self.startx = self.x
+		self.starty = self.y
+
+		self.dx = int(random.uniform(-self.speed,self.speed)) * self.speedMultiplier
+		self.dy = int(random.uniform(-self.speed,self.speed)) * self.speedMultiplier
+		if(self.dx == 0) : self.dx = -1
+		if(self.dy == 0) : self.dy = -1
+
+		self.endx = -self.wd if self.dx < 0 else config.screenWidth
+		self.endy = -self.ht if self.dy < 0 else config.screenHeight
+
+		self.revealSpeed = int(random.uniform(1,self.revealSpeedMax))
+		#print(self.dx, self.end, self.x)
+
+	def callBack(self) :
+		self.setForRemoval = True
+		pass
+
+	def move(self) :
+		if(self.setForRemoval!=True) :
+			self.image.paste(self.presentationImage, (0,0))
+
+			self.x += self.dx
+			self.y += self.dy
+
+			if(self.dy > 0 and self.y >= self.endy) :
+				self.callBack()
+			if(self.dy < 0 and self.y < self.endy) :
+				self.callBack()
+			if(self.dx > 0 and self.x >= self.endx) :
+				self.callBack()
+			if(self.dx < 0 and self.x < self.endx) :
+				self.callBack()		
+
+	def appear(self) :
+		if(self.setForRemoval!=True) :
+
+			dims = self.presentationImage.size
+			self.reveal += self.revealSpeed
+			self.image = PIL.Image.new("RGBA", (dims[0],self.reveal))
+
+			dr = ImageDraw.Draw(self.image)
+			dr.rectangle((0,0,100,5), fill=(0,255,0))
+			
+			segment = self.presentationImage.crop((0,0,dims[0],self.reveal))
+			self.image.paste(segment, (0,0))
+
+
+			if (self.reveal  > dims[1]) : self.callBack()
+
+	def update(self) :
+		self.appear()
+		#self.move()
+
+
+####################################################################
+
+
 def callBack() :
 	global config
-	stroopSequence()
-	stroop()
+	pass
 
 def iterate( n = 0) :
-	global config, x, y, wd, ht, dx, dx, start, end, steps, count
-	config.render(config.image, x, y, wd, ht)
+	global config, blocks
+	for n in range (0, len(blocks)) :
+		block = blocks[n]
+		config.render(block.image, block.x, block.y, block.image.size[0], block.image.size[1], False, False, False)
+		block.update()
+		if(block.setForRemoval==True) : makeBlock()
 
-	x += dx
-	y += dy
+	# cleanup the list
+	blocks[:] = [block for block in blocks if block.setForRemoval!=True]
+	config.updateCanvas()
 
-	#count += steps
+	if len(blocks) == 0 : exit()
 
-	if(dx == 0 and dy > 0 and y >= end) :
-	 	callBack()
-	if(dx == 0 and dy < 0 and y < end) :
-	 	callBack()
-	if(dy == 0 and dx > 0 and x >= end) :
-		callBack()
-	if(dy == 0 and dx < 0 and x < end) :
-		callBack()
-
-	
 def runWork():
-	global stroopSpeed
+	global stroopSpeed, blocks, config
+	gc.enable()
 	while True:
 		iterate()
 		time.sleep(stroopSpeed)
 
-def main(run = True) :
-	global config, workConfig
-	global fontSize, vOffset, scrollSpeed, stroopSpeed, stroopSteps, stroopFontSize, higherVariability, verticalBg, shadowSize
-	#global config, x, y, wd, ht, dx, dx, start, end, steps, count
-	print("HotCool Loaded")
-	#[stroop]
-
+def makeBlock() :
+	global config, workConfig, blocks, stroopSpeed, stroopSteps
 	fontSize = int(workConfig.get("stroop", 'fontSize'))
 	vOffset = int(workConfig.get("stroop", 'vOffset'))
-	scrollSpeed = float(workConfig.get("stroop", 'scrollSpeed'))
 	stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
 	stroopSteps = float(workConfig.get("stroop", 'stroopSteps'))
 	stroopFontSize = int(workConfig.get("stroop", 'stroopFontSize'))
@@ -86,10 +231,25 @@ def main(run = True) :
 
 	config.opticalOpposites = True
 
-	stroopSequence() 
-	stroop()
+	block = Block()
+	block.config = config
+	block.fontSize = stroopFontSize
+	block.shadowSize = shadowSize
+	block.make()
+	block.blocksRef = blocks
+	blocks.append(block)
+	gc.collect()
+
+def main(run = True) :
+	global config, workConfig, blocks, simulBlocks
+	print("HotCool Loaded")
+	#[stroop]
+
+	blocks = []
+	for i in range (0,simulBlocks) : makeBlock()
 
 	if(run) : runWork()
+
 
 def runStroop(run=True) :
 	global config, opticalOpposites
@@ -100,31 +260,6 @@ def runStroop(run=True) :
 			opticalOpposites = False if (opticalOpposites == True) else True
 			stroopSequence()		
 
-# This sets up the color and direction
-def stroopSequence() :
-	global  colorWord, colorOfWord, directionStr, opticalOpposites
-	directionStr = getDirection()
-	choice = int(random.uniform(1,7))
-
-	opticalOpposites = False if (opticalOpposites == True) else True
-
-	#colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
-	#Default
-	if(choice == 1) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
-	if(choice == 2) :colorWord, colorOfWord, directionStr = "VIOLET",(230,225,0),directionStr
-	if(choice == 3) :colorWord, colorOfWord, directionStr = "RED",(0,255,0),directionStr
-	if(choice == 4) :colorWord, colorOfWord, directionStr = "BLUE",(225,100,0),directionStr
-	if(choice == 5) :colorWord, colorOfWord, directionStr = "GREEN",(255,0,0),directionStr
-	if(choice >= 6) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
-
-	'''
-	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "YELLOW",(255,0,225),directionStr
-	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "VIOLET",(230,225,0),directionStr
-	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "RED",(0,255,0),directionStr
-	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "BLUE",(225,100,0),directionStr
-	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "GREEN",(255,0,0),directionStr
-	if(random.random() > .7) :colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
-	'''
 
 def getDirection() :
 	d = int(random.uniform(1,4))
@@ -134,142 +269,12 @@ def getDirection() :
 	if (d == 3) : direction = "Bottom"
 	return direction
 
-def stroop() :
-	global sprt
-	global  colorWord, colorOfWord, directionStr
-	global r,g,b, config, opticalOpposites, stroopSpeed, stroopSteps, stroopFontSize, higherVariability, verticalBg, verticalBgColor, shadowSize
-	global x, y, wd, ht, dx, dy, start, end, steps
-
-	x = y = 0
-
-	direction = directionStr
-	clr = colorOfWord
-
-	brightness = config.brightness
-	brightness = random.uniform(config.minBrightness,1.1)
-
-	clr = tuple(int(a*brightness) for a in (clr))
-
-	# Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
-	font = ImageFont.truetype( config.path + '/assets/fonts/freefont/FreeSansBold.ttf',stroopFontSize)
-	font2 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSansBold.ttf',stroopFontSize)
-	pixLen = config.draw.textsize(colorWord, font = font)
-
-	dims = [pixLen[0],pixLen[1]]
-	if(dims[1] < config.tileSize[0]) : dims[1] = config.tileSize[0] + 2
-
-	# Draw Background Color
-	# Optical (RBY) or RGB opposites
 
 
-	if(opticalOpposites) :
-		if(colorWord == "RED") : bgColor = tuple(int(a*brightness) for a in ((255,0,0)))
-		if(colorWord == "GREEN") : bgColor = tuple(int(a*brightness) for a in ((0,255,0)))
-		if(colorWord == "BLUE") : bgColor = tuple(int(a*brightness) for a in ((0,0,255)))
-		if(colorWord == "YELLOW") : bgColor = tuple(int(a*brightness) for a in ((255,255,0)))
-		if(colorWord == "ORANGE") : bgColor = tuple(int(a*brightness) for a in ((255,125,0)))
-		if(colorWord == "VIOLET") : bgColor = tuple(int(a*brightness) for a in ((200,0,255)))
-	else:
-		 bgColor = colorutils.colorCompliment(clr, brightness)
-
-	#config.draw.rectangle((0,0,config.image.size[0]+config.tileSize[0], config.screenHeight), fill=bgColor)
-	counter =  0
-
-	if(direction == "Top" or direction == "Bottom") :
-		#config.image = config.Image.new("RGBA", (dims[1], dims[0]*2))
-		vPadding = int(2 * stroopFontSize)
-		config.image = PIL.Image.new("RGBA", (dims[1],dims[0]+vPadding))
-		draw  = ImageDraw.Draw(config.image)
-		id = config.image.im.id
-
-		bgColorV = bgColor if verticalBg == True else verticalBgColor
-		draw.rectangle((0,0,config.image.size[1], dims[0] + vPadding), fill=bgColorV)
-
-		chars = list(colorWord)
-		end = config.image.size[1]
-		
-		# Generate vertical text
-		for letter in chars :
-				# rough estimate to create vertical text
-				xD = 2
-				# "kerning ... hahhaha ;) "
-				if (letter == "I") : xD = 6 * int(stroopFontSize/30)
-
-				# Draw the text with "borders"
-				indent = xD
-
-				for i in range(1,shadowSize) :
-					draw.text((indent + -i,-i + counter * (stroopFontSize - 5)),letter,(0,0,0),font=font2)
-					draw.text((indent + i,i + counter * (stroopFontSize - 5)),letter,(0,0,0),font=font2)
-				draw.text((xD, counter * (stroopFontSize - 5)),letter,clr,font=font)
-				counter += 1
-
-		offset = int(random.uniform(1,config.screenWidth-20))
-		steps = int(stroopSteps)
-		x = offset
-		dx = 0
-
-		wd = dims[1]
-		ht = dims[0]*2
-
-		if(direction == "Bottom") :
-			start = config.screenHeight
-			end =  int(random.uniform( config.tileSize[0]/2 ,  -ht/2))
-			dy = -steps
-			y = start
 
 
-	if(direction == "Left" or direction == "Right") :
-		# Left Scroll
-		vPadding = int(.75 * config.tileSize[0])
-		config.image = PIL.Image.new("RGBA", (dims[0]+vPadding,dims[1]))
-		draw  = ImageDraw.Draw(config.image)
-		iid = config.image.im.id
-		draw.rectangle((0,0,config.image.size[0]+config.tileSize[0], config.screenHeight), fill=bgColor)
 
-		# Draw the text with "borders"
-		indent = int(.05 * config.tileSize[0])
 
-		for i in range(1,shadowSize) :
-			draw.text((indent + -i,-i),colorWord,(0,0,0),font=font2)
-			draw.text((indent + i,i),colorWord,(0,0,0),font=font2)
-		draw.text((indent + 0,0),colorWord,clr,font=font)
-
-		offset = int(random.uniform(1,config.screenWidth-20))
-		vOffset = int(random.uniform(0,config.rows)) * config.tileSize[0] 
-		if(higherVariability) : vOffset += int(random.uniform(-config.tileSize[0]/10, config.tileSize[0]/10))
-
-		steps = int(stroopSteps)
-		dy = 0
-		y = vOffset
-		wd = dims[0]
-		ht = dims[1]
-
-		if(direction == "Left") :
-			start = config.screenWidth
-			end  = config.screenWidth - int(random.uniform(-wd/2,wd)) #+ config.image.size[0] 
-			dx = -steps
-			x = start
-
-			#original values
-			start = config.screenWidth
-			end =  int(random.uniform(-4,wd))
-			dx = -steps
-			x = start
-
-		if(direction == "Right") :
-			start = -config.image.size[0]
-			end = int(random.uniform(config.screenWidth/2, wd + config.screenWidth))
-			dx = steps
-			x = start
-
-			#original values
-			start = -config.screenWidth + int(random.uniform(0,wd)) #+ config.image.size[0] 
-			end = int(random.uniform(0,wd))
-			dx = steps
-			x = start
-
-	#print(start,end,dx,dy,x,y)
 
 
 

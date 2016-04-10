@@ -55,6 +55,9 @@ class Block:
 
 	setForRemoval = False
 
+	## Options are reveal, revealmove, move
+	movementMode = "reveal"
+
 	def __init__(self, iid=0) :
 		self.iid = iid
 		
@@ -193,8 +196,8 @@ class Block:
 			if (self.reveal  > dims[1]) : self.callBack()
 
 	def update(self) :
-		self.appear()
-		self.move()
+		if(self.movementMode == "reveal" or self.movementMode == "revealmove") : self.appear()
+		if(self.movementMode == "move" or self.movementMode == "revealmove") : self.move()
 
 
 ####################################################################
@@ -236,6 +239,7 @@ def makeBlock() :
 	higherVariability = (workConfig.getboolean("stroop", 'higherVariability'))
 	verticalBg = (workConfig.getboolean("stroop", 'verticalBg'))
 	displayRows = int(workConfig.get("stroop", 'displayRows'))
+	movementMode = (workConfig.get("stroop", 'movementMode'))
 
 	config.opticalOpposites = True
 
@@ -244,6 +248,7 @@ def makeBlock() :
 	block.fontSize = stroopFontSize
 	block.shadowSize = shadowSize
 	block.displayRows = displayRows
+	block.movementMode = movementMode
 	block.make(colorMode)
 	block.blocksRef = blocks
 	blocks.append(block)

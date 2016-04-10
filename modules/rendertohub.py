@@ -30,7 +30,7 @@ def setUp():
 	cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 	config.cnvs = cnvs
 	config.cnvs.pack()
-	config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="blue")
+	config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
 	
 	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=tempImage, anchor='nw')

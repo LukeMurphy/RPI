@@ -24,6 +24,7 @@ verticalBgColor = (0,0,0)
 count = 0
 blocks = []
 simulBlocks = 2
+colorMode = True
 
 ####################################################################
 
@@ -61,25 +62,31 @@ class Block:
 	def remove(self, arrayList) :
 		arrayList.remove(self)
 
-	def make(self) :
+	def make(self, colorMode=True) :
 
 		config = self.config
-		choice = int(random.uniform(1,10))
+		choice = int(random.uniform(1,8))
 		brightness = config.brightness
 		brightness = random.uniform(self.config.minBrightness,1.1)
 		opticalOpposites = False if (random.random() > .5) else True
+		self.verticalTileSize = int(config.screenHeight/self.displayRows) if self.displayRows != config.rows else config.tileSize[1]
 
-		#colorWord, colorOfWord, directionStr = "ORANGE",(0,0,200),directionStr
-		#Default
+		if(colorMode != True) : choice = int(random.uniform(8,10))
+
+		#choice = 3 if (random.random() > .5) else 5
+		#choice = 4 if (random.random() > .5) else 6
+		#choice = 9
+
 		if(choice == 1) :colorWord, colorOfWord = "YELLOW",(255,0,225)
 		if(choice == 2) :colorWord, colorOfWord = "VIOLET",(230,225,0)
 		if(choice == 3) :colorWord, colorOfWord = "RED",(0,255,0)
 		if(choice == 4) :colorWord, colorOfWord = "BLUE",(225,100,0)
 		if(choice == 5) :colorWord, colorOfWord = "GREEN",(255,0,0)
 		if(choice == 6) :colorWord, colorOfWord = "ORANGE",(0,0,200)
-		if(choice == 7) :colorWord, colorOfWord = "BLACK",(0,0,0)
-		if(choice == 8) :colorWord, colorOfWord = "WHITE",(250,250,250)
-		if(choice >= 9) :colorWord, colorOfWord = "GREY",(50,50,50)
+		if(choice == 7) :colorWord, colorOfWord = "GRAY",(50,50,50)
+		if(choice == 8) :colorWord, colorOfWord = "BLACK",(0,0,0)
+		if(choice >= 9) :colorWord, colorOfWord = "WHITE",(250,250,250)
+		
 
 		clr = colorOfWord
 
@@ -94,7 +101,7 @@ class Block:
 			if(colorWord == "VIOLET") : bgColor = tuple(int(a*brightness) for a in ((200,0,255)))
 			if(colorWord == "BLACK") : bgColor = tuple(int(a*brightness) for a in ((250,250,250)))
 			if(colorWord == "WHITE") : bgColor = tuple(int(a*brightness) for a in ((0,0,0)))
-			if(colorWord == "GREY") : bgColor = tuple(int(a*brightness) for a in ((200,200,200)))
+			if(colorWord == "GRAY") : bgColor = tuple(int(a*brightness) for a in ((200,200,200)))
 		else:
 			 bgColor = colorutils.colorCompliment(clr, brightness)
 
@@ -106,7 +113,7 @@ class Block:
 		pixLen = config.draw.textsize(colorWord, font = font)
 
 		dims = [pixLen[0],pixLen[1]]
-		if(dims[1] < config.tileSize[0]) : dims[1] = config.tileSize[0] + 2
+		if(dims[1] < self.verticalTileSize) : dims[1] = self.verticalTileSize + 2
 
 		vPadding = int(.75 * config.tileSize[0])
 		self.presentationImage = PIL.Image.new("RGBA", (dims[0]+vPadding,dims[1]))
@@ -124,7 +131,7 @@ class Block:
 		draw.text((indent + 0,0),colorWord,clr,font=font)
 
 		offset = int(random.uniform(1,config.screenWidth-20))
-		vOffset = int(random.uniform(0,config.rows)) * config.tileSize[0] 
+		vOffset = int(random.uniform(0, self.displayRows)) * self.verticalTileSize
 		if(higherVariability) : vOffset += int(random.uniform(-config.tileSize[0]/10, config.tileSize[0]/10))
 
 		self.wd = dims[0]
@@ -187,7 +194,7 @@ class Block:
 
 	def update(self) :
 		self.appear()
-		#self.move()
+		self.move()
 
 
 ####################################################################
@@ -219,7 +226,7 @@ def runWork():
 		time.sleep(stroopSpeed)
 
 def makeBlock() :
-	global config, workConfig, blocks, stroopSpeed, stroopSteps
+	global config, workConfig, blocks, stroopSpeed, stroopSteps, displayRows, colorMode
 	fontSize = int(workConfig.get("stroop", 'fontSize'))
 	vOffset = int(workConfig.get("stroop", 'vOffset'))
 	stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
@@ -228,6 +235,7 @@ def makeBlock() :
 	shadowSize = int(workConfig.get("stroop", 'shadowSize'))
 	higherVariability = (workConfig.getboolean("stroop", 'higherVariability'))
 	verticalBg = (workConfig.getboolean("stroop", 'verticalBg'))
+	displayRows = int(workConfig.get("stroop", 'displayRows'))
 
 	config.opticalOpposites = True
 
@@ -235,10 +243,20 @@ def makeBlock() :
 	block.config = config
 	block.fontSize = stroopFontSize
 	block.shadowSize = shadowSize
-	block.make()
+	block.displayRows = displayRows
+	block.make(colorMode)
 	block.blocksRef = blocks
 	blocks.append(block)
 	gc.collect()
+
+	if(colorMode == False) :
+		if (random.random() > .982) :
+			colorMode = True
+			print("ColorMode changed back")
+	else :
+		if(random.random() > .985) :
+			colorMode = False
+			print("ColorMode change  to b/w")
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks

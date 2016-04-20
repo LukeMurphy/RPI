@@ -23,7 +23,7 @@ verticalBgColor = (0,0,0)
 #countLimit = 6
 count = 0
 blocks = []
-simulBlocks = 2
+simulBlocks = 6
 colorMode = True
 
 ####################################################################
@@ -35,7 +35,7 @@ class Block:
 	color = (255,0,0)
 	bgColor = (0,255,255)
 	speed = 2
-	speedMultiplier = 1
+	speedMultiplier = 2
 	x = 0
 	y = 0
 	dx = -1
@@ -68,7 +68,7 @@ class Block:
 	def make(self, colorMode=True) :
 
 		config = self.config
-		choice = int(random.uniform(1,8))
+		choice = int(random.uniform(1,7))
 		brightness = config.brightness
 		brightness = random.uniform(self.config.minBrightness,1.1)
 		opticalOpposites = False if (random.random() > .5) else True
@@ -87,8 +87,8 @@ class Block:
 		if(choice == 5) :colorWord, colorOfWord = "GREEN",(255,0,0)
 		if(choice == 6) :colorWord, colorOfWord = "ORANGE",(0,0,200)
 		if(choice == 7) :colorWord, colorOfWord = "GRAY",(50,50,50)
-		if(choice == 8) :colorWord, colorOfWord = "BLACK",(0,0,0)
-		if(choice >= 9) :colorWord, colorOfWord = "WHITE",(250,250,250)
+		if(choice == 8) :colorWord, colorOfWord = "BLACK",(255,255,255)
+		if(choice >= 9) :colorWord, colorOfWord = "WHITE",(0,0,0)
 		
 
 		clr = colorOfWord
@@ -102,8 +102,8 @@ class Block:
 			if(colorWord == "YELLOW") : bgColor = tuple(int(a*brightness) for a in ((255,255,0)))
 			if(colorWord == "ORANGE") : bgColor = tuple(int(a*brightness) for a in ((255,125,0)))
 			if(colorWord == "VIOLET") : bgColor = tuple(int(a*brightness) for a in ((200,0,255)))
-			if(colorWord == "BLACK") : bgColor = tuple(int(a*brightness) for a in ((250,250,250)))
-			if(colorWord == "WHITE") : bgColor = tuple(int(a*brightness) for a in ((0,0,0)))
+			if(colorWord == "BLACK") : bgColor = tuple(int(a*brightness) for a in ((0,0,0)))
+			if(colorWord == "WHITE") : bgColor = tuple(int(a*brightness) for a in ((250,250,250)))
 			if(colorWord == "GRAY") : bgColor = tuple(int(a*brightness) for a in ((200,200,200)))
 		else:
 			 bgColor = colorutils.colorCompliment(clr, brightness)
@@ -255,17 +255,18 @@ def makeBlock() :
 	gc.collect()
 
 	if(colorMode == False) :
-		if (random.random() > .982) :
+		if (random.random() > .92) :
 			colorMode = True
-			print("ColorMode changed back")
+			#print("ColorMode changed back")
 	else :
 		if(random.random() > .985) :
 			colorMode = False
-			print("ColorMode change  to b/w")
+			#print("ColorMode change  to b/w")
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks
 	print("HotCool Loaded")
+	simulBlocks  = int(workConfig.get("stroop", 'simulBlocks'))
 	#[stroop]
 
 	blocks = []

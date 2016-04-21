@@ -17,7 +17,7 @@ def setUp():
 		windowOffset = [1900,2]
 		#windowOffset = [4,4]
 	else :
-		windowOffset = [4,4]
+		windowOffset = [-1,13]
 
 	root = Tk()
 	w = config.screenWidth + 8
@@ -72,9 +72,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#*******************************************************************************
 	#*******************************************************************************
 	#*******************************************************************************
-
 	#print(imageToRender.size,xOffset,yOffset)
 
+	if(config.rotation != 0) : config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
 
 	if(config.useFilters) :
 		'''------------------------------------------------------------------------'''
@@ -96,8 +96,11 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	else :
 		#xOffset + imageToRender.size[0], yOffset + imageToRender.size[1])
+
+		# not working ..... imageToRender = imageToRender.rotate(-90)
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
+	if(config.rotation != 0) : config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
 	if(updateCanvasCall) : updateCanvas() 
 

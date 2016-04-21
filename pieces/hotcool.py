@@ -239,6 +239,7 @@ def makeBlock() :
 	higherVariability = (workConfig.getboolean("stroop", 'higherVariability'))
 	verticalBg = (workConfig.getboolean("stroop", 'verticalBg'))
 	displayRows = int(workConfig.get("stroop", 'displayRows'))
+	displayCols = int(workConfig.get("stroop", 'displayCols'))
 	movementMode = (workConfig.get("stroop", 'movementMode'))
 
 	config.opticalOpposites = True
@@ -248,6 +249,7 @@ def makeBlock() :
 	block.fontSize = stroopFontSize
 	block.shadowSize = shadowSize
 	block.displayRows = displayRows
+	block.displayCols = displayCols
 	block.movementMode = movementMode
 	block.make(colorMode)
 	block.blocksRef = blocks

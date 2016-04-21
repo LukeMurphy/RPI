@@ -100,6 +100,17 @@ def configure() :
 		if(config.rendering == "hub") :
 			from modules import rendertohub
 			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
+			config.rotation = float(workconfig.get("displayconfig", 'rotation'))
+			config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
+			config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
+			# Create the image-canvas for the work
+			# Because rotation is an option, recreate accordingly
+			
+			config.renderImage = PIL.Image.new("RGBA", (config.canvasWidth*config.rows, 32))
+			config.renderImageFull = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+			config.image = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+			config.draw = ImageDraw.Draw(config.image)
+
 			r = rendertohub
 			r.config = config
 			r.work = work

@@ -3,6 +3,7 @@
 import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
+from PIL import ImageChops
 
 import numpy
 import os, sys, getopt, time, random, math, datetime, textwrap
@@ -108,6 +109,7 @@ def configure() :
 			
 			config.renderImage = PIL.Image.new("RGBA", (config.canvasWidth*config.rows, 32))
 			config.renderImageFull = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+			config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40) 
 			config.image = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 			config.draw = ImageDraw.Draw(config.image)
 

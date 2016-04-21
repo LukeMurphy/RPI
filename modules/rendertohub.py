@@ -10,14 +10,21 @@ global root
 memoryUsage = 0
 debug = False
 
+canvasOffsetX = 3
+canvasOffsetY = 3
+
 def setUp():
-	global root
+	global root, canvasOffsetX, canvasOffsetY
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
 		windowOffset = [1900,2]
 		#windowOffset = [4,4]
 	else :
 		windowOffset = [-1,13]
+
+	# -----> this is somewhat arbitrary - just to get the things aligned
+	# after rotation
+	if(config.rotation == 90) : canvasOffsetY = -25
 
 	root = Tk()
 	w = config.screenWidth + 8
@@ -34,7 +41,7 @@ def setUp():
 	config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
 	
 	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=tempImage, anchor='nw')
+	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw')
 
 	#config.cnvs.update()
 	config.cnvs.update_idletasks()
@@ -53,12 +60,12 @@ def startWork(*args) :
 
 
 def updateCanvas() :
-
+	global canvasOffsetX, canvasOffsetY
 	## For testing ...
 	#draw1  = ImageDraw.Draw(config.renderImageFull)
 	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
 	config.cnvs._image_tk = ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(3, 3, image=config.cnvs._image_tk, anchor='nw')
+	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw')
 
 	config.cnvs.update()
 
@@ -74,7 +81,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#*******************************************************************************
 	#print(imageToRender.size,xOffset,yOffset)
 
-	if(config.rotation != 0) : config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
+	if(config.rotation != 0) : 
+		config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
+		#config.renderImageFull = ImageChops.offset(config.renderImageFull, -10, 0) 
 
 	if(config.useFilters) :
 		'''------------------------------------------------------------------------'''
@@ -100,7 +109,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		# not working ..... imageToRender = imageToRender.rotate(-90)
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
-	if(config.rotation != 0) : config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+	if(config.rotation != 0) : 
+		config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+		
 
 	if(updateCanvasCall) : updateCanvas() 
 

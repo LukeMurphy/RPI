@@ -23,8 +23,15 @@ verticalBgColor = (0,0,0)
 #countLimit = 6
 count = 0
 blocks = []
+
+# Number of blocks that can chage at once
 simulBlocks = 6
+
+# B/W or COLOR
 colorMode = True
+
+# To produce cascade effect
+nextRow = 0
 
 ####################################################################
 
@@ -61,11 +68,10 @@ class Block:
 	def __init__(self, iid=0) :
 		self.iid = iid
 		
-
 	def remove(self, arrayList) :
 		arrayList.remove(self)
 
-	def make(self, colorMode=True) :
+	def make(self, colorMode=True, nextRow = -1) :
 
 		config = self.config
 		choice = int(random.uniform(1,7))
@@ -133,8 +139,10 @@ class Block:
 			draw.text((indent + i,i),colorWord,(0,0,0),font=font2)
 		draw.text((indent + 0,0),colorWord,clr,font=font)
 
-		offset = int(random.uniform(1,config.screenWidth-20))
-		vOffset = int(random.uniform(0, self.displayRows)) * self.verticalTileSize
+		if(nextRow == -1) :
+			vOffset = int(random.uniform(0, self.displayRows)) * self.verticalTileSize
+		else :
+			vOffset = nextRow * self.verticalTileSize
 		if(higherVariability) : vOffset += int(random.uniform(-config.tileSize[0]/10, config.tileSize[0]/10))
 
 		self.wd = dims[0]
@@ -142,7 +150,7 @@ class Block:
 		
 		self.y = vOffset
 		#self.y = int(random.uniform(0,config.screenHeight))
-		self.x  = int(random.uniform(-self.wd,config.screenWidth + self.wd))
+		self.x  = int(random.uniform(-self.wd / 2,config.screenWidth - self.wd/2))
 		#self.x = config.screenWidth/2
 		
 		self.startx = self.x
@@ -192,7 +200,6 @@ class Block:
 			segment = self.presentationImage.crop((0,0,dims[0],self.reveal))
 			self.image.paste(segment, (0,0))
 
-
 			if (self.reveal  > dims[1]) : self.callBack()
 
 	def update(self) :
@@ -228,8 +235,13 @@ def runWork():
 		iterate()
 		time.sleep(stroopSpeed)
 
+# Create each display block and add to the global array of blocks
 def makeBlock() :
-	global config, workConfig, blocks, stroopSpeed, stroopSteps, displayRows, colorMode
+	global config, workConfig, blocks, stroopSpeed, stroopSteps, displayRows, colorMode, nextRow
+
+	# A little inefficient to read from the config each time a block is created, but probably
+	# the same as storing them all in global vars
+
 	fontSize = int(workConfig.get("stroop", 'fontSize'))
 	vOffset = int(workConfig.get("stroop", 'vOffset'))
 	stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
@@ -251,9 +263,15 @@ def makeBlock() :
 	block.displayRows = displayRows
 	block.displayCols = displayCols
 	block.movementMode = movementMode
-	block.make(colorMode)
+
+	block.make(colorMode, nextRow)
 	block.blocksRef = blocks
+
 	blocks.append(block)
+
+	nextRow = nextRow + 1 if (nextRow <= displayRows) else 0
+
+	# Not really sure the garbage collection works ...
 	gc.collect()
 
 	if(colorMode == False) :

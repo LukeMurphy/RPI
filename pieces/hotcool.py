@@ -42,7 +42,7 @@ class Block:
 	color = (255,0,0)
 	bgColor = (0,255,255)
 	speed = 2
-	speedMultiplier = 2
+	speedMultiplier = 4
 	x = 0
 	y = 0
 	dx = -1
@@ -206,7 +206,6 @@ class Block:
 		if(self.movementMode == "reveal" or self.movementMode == "revealmove") : self.appear()
 		if(self.movementMode == "move" or self.movementMode == "revealmove") : self.move()
 
-
 ####################################################################
 
 
@@ -229,47 +228,36 @@ def iterate( n = 0) :
 	if len(blocks) == 0 : exit()
 
 def runWork():
-	global stroopSpeed, blocks, config
+	global blocks, config
 	gc.enable()
 	while True:
 		iterate()
-		time.sleep(stroopSpeed)
+		time.sleep(config.stroopSpeed)
 
 # Create each display block and add to the global array of blocks
 def makeBlock() :
-	global config, workConfig, blocks, stroopSpeed, stroopSteps, displayRows, colorMode, nextRow
+	global config, workConfig, blocks, colorMode, nextRow
 
-	# A little inefficient to read from the config each time a block is created, but probably
-	# the same as storing them all in global vars
 
-	fontSize = int(workConfig.get("stroop", 'fontSize'))
-	vOffset = int(workConfig.get("stroop", 'vOffset'))
-	stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
-	stroopSteps = float(workConfig.get("stroop", 'stroopSteps'))
-	stroopFontSize = int(workConfig.get("stroop", 'stroopFontSize'))
-	shadowSize = int(workConfig.get("stroop", 'shadowSize'))
-	higherVariability = (workConfig.getboolean("stroop", 'higherVariability'))
-	verticalBg = (workConfig.getboolean("stroop", 'verticalBg'))
-	displayRows = int(workConfig.get("stroop", 'displayRows'))
-	displayCols = int(workConfig.get("stroop", 'displayCols'))
-	movementMode = (workConfig.get("stroop", 'movementMode'))
+	if(random.random() > .95) : config.movementMode = "revealmove"
+	if(random.random() > .95) : config.movementMode = "reveal"
 
 	config.opticalOpposites = True
 
 	block = Block()
 	block.config = config
-	block.fontSize = stroopFontSize
-	block.shadowSize = shadowSize
-	block.displayRows = displayRows
-	block.displayCols = displayCols
-	block.movementMode = movementMode
+	block.fontSize = config.stroopFontSize
+	block.shadowSize = config.shadowSize
+	block.displayRows = config.displayRows
+	block.displayCols = config.displayCols
+	block.movementMode = config.movementMode
 
 	block.make(colorMode, nextRow)
 	block.blocksRef = blocks
 
 	blocks.append(block)
 
-	nextRow = nextRow + 1 if (nextRow <= displayRows) else 0
+	nextRow = nextRow + 1 if (nextRow <= config.displayRows) else 0
 
 	# Not really sure the garbage collection works ...
 	gc.collect()
@@ -285,8 +273,24 @@ def makeBlock() :
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks
+
 	print("HotCool Loaded")
 	simulBlocks  = int(workConfig.get("stroop", 'simulBlocks'))
+
+	config.fontSize = int(workConfig.get("stroop", 'fontSize'))
+	config.vOffset = int(workConfig.get("stroop", 'vOffset'))
+	config.stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
+	config.stroopSteps = float(workConfig.get("stroop", 'stroopSteps'))
+	config.stroopFontSize = int(workConfig.get("stroop", 'stroopFontSize'))
+	config.shadowSize = int(workConfig.get("stroop", 'shadowSize'))
+	config.higherVariability = (workConfig.getboolean("stroop", 'higherVariability'))
+	config.verticalBg = (workConfig.getboolean("stroop", 'verticalBg'))
+	config.displayRows = int(workConfig.get("stroop", 'displayRows'))
+	config.displayCols = int(workConfig.get("stroop", 'displayCols'))
+	config.movementMode = (workConfig.get("stroop", 'movementMode'))
+
+	#for attr, value in config.__dict__.iteritems():print (attr, value)
+
 	#[stroop]
 
 	blocks = []

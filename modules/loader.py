@@ -10,6 +10,7 @@ xOffset = 0
 yOffset = 0
 vX = 0
 vY = -1
+xPos = yPos = 0
 count = 0
 frame = 1
 countLimit = 1
@@ -41,8 +42,8 @@ debug = False
 
 def setUpNew():
 	global image, imageCopy
-	image = Image.new("RGBA", (128, 400))
-	imageCopy = Image.new("RGBA", (128, 400))
+	image = Image.new("RGBA", (32, 32))
+	imageCopy = Image.new("RGBA", (32, 32))
 
 def loadImage(arg):
 	global image, imgHeight, imageCopy, resizeToWidth
@@ -64,7 +65,7 @@ def presentImage() :
 	time.sleep(presentTime)
 	
 def panImage() :
-	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, brightnessFactor
+	global frame, count, xOffset, yOffset, vX, vY, xPos, yPos, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, brightnessFactor, iid
 	jitter = False
 
 	# defaults for vertical image scrolling
@@ -85,51 +86,47 @@ def panImage() :
 	# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
 	#if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
-	xPos = 0
-	yPos = 0
-
 	stepSize = 1
 	if(abs(vY) > 1) : stepSize = abs(vY)
-	for n in range (0, rangeLimit, stepSize):
-		if(useJitter):
-			if(random.random() > .7) : 
-				jitter = False
-				vY = 0
-				yPos = 0
-			if(random.random() > .17) : jitter = True
-			if(jitter) : vY = random.uniform(-.3,.3)
 
-		xPos += vX;
-		yPos += vY
+	if(useJitter):
+		if(random.random() > .7) : 
+			jitter = False
+			vY = 0
+			yPos = 0
+		if(random.random() > .17) : jitter = True
+		if(jitter) : vY = random.uniform(-.3,.3)
 
-		if(useBlink == True and random.random() > .9985) :
-			blink = False
-			blinkNum = int(random.uniform(7,23))
-			for blk in range (0, blinkNum) :
-				draw.rectangle((0,0, image.size[0] ,image.size[1]), fill = (0))
-				if(blink) :
-					config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
-					blink = False
-				else :
-					config.render(image, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
-					blink = True
-				time.sleep(.15)	
-			xPos += image.size[1]
-		else :
-			#imageTemp = imageCopy.rotate(2, expand=1)
-			#imageCopy.paste(imageTemp, (-5,0))
+	xPos += vX;
+	yPos += vY
 
-			xF = int(xOffset + xPos)
-			yF = int(yOffset  + yPos)
+	if(useBlink == True and random.random() > .9985) :
+		blink = False
+		blinkNum = int(random.uniform(7,23))
+		for blk in range (0, blinkNum) :
+			draw.rectangle((0,0, image.size[0] ,image.size[1]), fill = (0))
+			if(blink) :
+				#config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
+				blink = False
+			else :
+				#config.render(image, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
+				blink = True
+			time.sleep(.15)	
+		xPos += image.size[1]
+	else :
+		imageCopyTemp = imageCopy
+		enhancer = ImageEnhance.Brightness(imageCopyTemp)
+		imageCopyTemp = enhancer.enhance(brightnessFactor)
+		imageCopy = imageCopyTemp
+		#config.render(imageCopyTemp, int(xOffset + xPos), int(yOffset + yPos), imageCopy.size[0], imageCopy.size[1], False)
 
-			imageCopyTemp = imageCopy
-			enhancer = ImageEnhance.Brightness(imageCopyTemp)
-			imageCopyTemp = enhancer.enhance(brightnessFactor)
-			config.render(imageCopyTemp, xF, yF, imageCopy.size[0], imageCopy.size[1], False)	
+
+	# For now, simple wrap-arounds
+	if (xPos > config.screenWidth) :
+		xPos = -imageCopy.size[0]
+	if (yPos > config.screenHeight) :
+		yPos = -imageCopy.size[1]
 		
-		time.sleep(scrollSpeed)
-
-	debugMessage("done pan")
 
 def fillColor(force=False) :
 	global bgFillColor
@@ -191,15 +188,18 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 	#if (frame == frameLimit):frame = 0
 	
 def playImage(randomizeTiming = False, frameLimit = 3):
-
+	global config
 	animate(randomizeTiming, frameLimit)
+
+def update() :
+	panImage()
 
 def init():
 	global action, countLimit
 
 	#print(countLimit)
 	count = 0
-	fillColor(True)
+	#fillColor(True)
 	# Constantly re-calls the requested action util 
 	# the count runs out - for long running plays
 	# the countlimit just gets reset 
@@ -222,12 +222,14 @@ def debugMessage(arg) :
 	if(debug) : print(arg)		
 
 def start(img="", setvX = 0, setvY = 0):
-	global image,frame, action, xOffset, yOffset, vX, vY, imageCopy, resizeToWidth
+
+	global config, image,frame, action, xOffset, yOffset, vX, vY, imageCopy, resizeToWidth
 	frame = 0
 
 	vX = setvX
 	vY = setvY
 	
+	'''
 	if (action == "play") : 
 		#xOffset = yOffset = 0
 		if(img=="") : 
@@ -239,6 +241,7 @@ def start(img="", setvX = 0, setvY = 0):
 				img  = config.path + "/imgs/flames-196x64.gif"
 	else :
 		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"
+	'''
 
 	debugMessage("Trying to load " + img)	
 
@@ -251,9 +254,15 @@ def start(img="", setvX = 0, setvY = 0):
 
 		imageCopy.paste(image, (0, 0))
 		debugMessage( img + " loaded")
-		init()
+		#init()
 	else:
 		debugMessage ("could not load")
+
+def main(*args) :
+	pass
+
+def runWork(*args) :
+	pass
 	
 	
 ###############################	

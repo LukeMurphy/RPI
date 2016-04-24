@@ -38,7 +38,6 @@ nextRow = 0
 class Block:
 
 	direction = "down"
-	word = "HOT"
 	color = (255,0,0)
 	bgColor = (0,255,255)
 	speed = 2
@@ -208,32 +207,6 @@ class Block:
 
 ####################################################################
 
-
-def callBack() :
-	global config
-	pass
-
-def iterate( n = 0) :
-	global config, blocks
-	for n in range (0, len(blocks)) :
-		block = blocks[n]
-		config.render(block.image, block.x, block.y, block.image.size[0], block.image.size[1], False, False, False)
-		block.update()
-		if(block.setForRemoval==True) : makeBlock()
-
-	# cleanup the list
-	blocks[:] = [block for block in blocks if block.setForRemoval!=True]
-	config.updateCanvas()
-
-	if len(blocks) == 0 : exit()
-
-def runWork():
-	global blocks, config
-	gc.enable()
-	while True:
-		iterate()
-		time.sleep(config.stroopSpeed)
-
 # Create each display block and add to the global array of blocks
 def makeBlock() :
 	global config, workConfig, blocks, colorMode, nextRow
@@ -271,12 +244,30 @@ def makeBlock() :
 			colorMode = False
 			#print("ColorMode change  to b/w")
 
+
+def runStroop(run=True) :
+	global config, opticalOpposites
+	while run:
+		numRuns = int(random.uniform(2,6))
+		numRuns =  1
+		for i in range(0,numRuns) : 
+			opticalOpposites = False if (opticalOpposites == True) else True
+			stroopSequence()		
+
+def getDirection() :
+	d = int(random.uniform(1,4))
+	direction = "Left"
+	if (d == 1) : direction = "Left"
+	if (d == 2) : direction = "Right"
+	if (d == 3) : direction = "Bottom"
+	return direction
+
+
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks
 
-	print("HotCool Loaded")
+	print("Stroop2 What Color Loaded")
 	simulBlocks  = int(workConfig.get("stroop", 'simulBlocks'))
-
 	config.fontSize = int(workConfig.get("stroop", 'fontSize'))
 	config.vOffset = int(workConfig.get("stroop", 'vOffset'))
 	config.stroopSpeed = float(workConfig.get("stroop", 'stroopSpeed'))
@@ -288,34 +279,37 @@ def main(run = True) :
 	config.displayRows = int(workConfig.get("stroop", 'displayRows'))
 	config.displayCols = int(workConfig.get("stroop", 'displayCols'))
 	config.movementMode = (workConfig.get("stroop", 'movementMode'))
-
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
-
-	#[stroop]
-
 	blocks = []
 	for i in range (0,simulBlocks) : makeBlock()
 
 	if(run) : runWork()
 
+def runWork():
+	global blocks, config
+	gc.enable()
+	while True:
+		iterate()
+		time.sleep(config.stroopSpeed)	
 
-def runStroop(run=True) :
-	global config, opticalOpposites
-	while run:
-		numRuns = int(random.uniform(2,6))
-		numRuns =  1
-		for i in range(0,numRuns) : 
-			opticalOpposites = False if (opticalOpposites == True) else True
-			stroopSequence()		
+def iterate( n = 0) :
+	global config, blocks
+	for n in range (0, len(blocks)) :
+		block = blocks[n]
+		config.render(block.image, block.x, block.y, block.image.size[0], block.image.size[1], False, False, False)
+		block.update()
+		if(block.setForRemoval==True) : makeBlock()
 
+	# cleanup the list
+	blocks[:] = [block for block in blocks if block.setForRemoval!=True]
+	config.updateCanvas()
 
-def getDirection() :
-	d = int(random.uniform(1,4))
-	direction = "Left"
-	if (d == 1) : direction = "Left"
-	if (d == 2) : direction = "Right"
-	if (d == 3) : direction = "Bottom"
-	return direction
+	if len(blocks) == 0 : exit()
+
+def callBack() :
+	global config
+	pass
+
 
 
 

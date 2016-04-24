@@ -107,7 +107,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		#xOffset + imageToRender.size[0], yOffset + imageToRender.size[1])
 
 		# not working ..... imageToRender = imageToRender.rotate(-90)
-		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
+
+		if(updateCanvasCall) : config.renderDraw.rectangle((0, 0, config.screenWidth + 8, config.screenHeight + 8), fill=(0,0,0))
+		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
 	if(config.rotation != 0) : 
 		config.renderImageFull = config.renderImageFull.rotate(config.rotation)

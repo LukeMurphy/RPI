@@ -21,7 +21,6 @@ from configs import localconfig
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
 
-
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
 
@@ -79,6 +78,7 @@ def configure() :
 		config.renderImageFull = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		config.draw = ImageDraw.Draw(config.image)
+		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 		#config.render = render
 
 		work = importlib.import_module('pieces.'+str(config.work))
@@ -112,6 +112,7 @@ def configure() :
 			config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40) 
 			config.image = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 			config.draw = ImageDraw.Draw(config.image)
+			config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
 			r = rendertohub
 			r.config = config

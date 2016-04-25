@@ -1,9 +1,9 @@
 #!/usr/bin/python
 #import modules
 import PIL.Image
-import PIL.ImageTk
-from PIL import Image, ImageTk, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
+
 
 import numpy
 import os, sys, getopt, time, random, math, datetime, textwrap
@@ -57,7 +57,6 @@ def configure() :
 
 
 		# Load the default work
-
 		print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
 
 		workconfig = ConfigParser.ConfigParser()
@@ -96,6 +95,7 @@ def configure() :
 			r.config = config
 			r.setUp()
 			config.render = r.render
+			config.updateCanvas = r.updateCanvas
 			work.main()
 
 		if(config.rendering == "hub") :

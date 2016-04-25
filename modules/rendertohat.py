@@ -8,7 +8,10 @@ def setUp():
 	config.matrix = Adafruit_RGBmatrix(32, config.matrixTiles)
 	#print(config.renderImage)
 
-def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False):
+def updateCanvas(*args) :
+	return True
+
+def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True):
 	#global imageTop, imageBottom, screenHeight, screenWidth, panels, 
 	#matrix, image, renderImage, tileSize, rows, cols, transWiring
 	global config

@@ -1,5 +1,8 @@
 #!/usr/bin/python
-from PIL import Image, ImageDraw,ImageMath, ImageEnhance
+import PIL.Image
+from PIL import Image, ImageDraw, ImageMath, ImageEnhance
+from PIL import ImageChops
+from modules import colorutils
 # Import the essentials to everything
 import time, random, math
 
@@ -8,8 +11,8 @@ class ImageSprite :
 	bgColor = (0,255,255)
 	speed = 2
 	speedMultiplier = 4
-	x = 0
-	y = 0
+	x = xPos = 0
+	y = yPos = 0
 	dX = -1
 	dY = 0
 	startX = 0
@@ -29,11 +32,17 @@ class ImageSprite :
 	count = 0
 	frame = 1
 	countLimit = 1
+	clrIndex = 0
 
 	imgHeight = 0
 	panRangeLimit = 0
 	useJitter = False
 	useBlink = False
+	blink = False
+	blinkNum = 0
+	blinkCount = 0
+	blinkStationary = True
+
 	presentTime =  10
 	brightnessFactor = .5
 	rate = 0
@@ -54,9 +63,17 @@ class ImageSprite :
 	def __init__(self, config, iid=0) :
 		self.iid = iid
 		self.config = config
+
+		self.clrUtils = colorutils
+		self.clrUtils.brightness = self.config.brightness
 		pass
 		
-	def callBack(self, pos, newPos) :
+	def callBack(self, *args) :
+
+		if(args[0] == True) :
+			self.image = self.imageOriginal.copy()
+			self.process()
+
 		return True
 		
 
@@ -66,6 +83,9 @@ class ImageSprite :
 		self.dX = setvX
 		self.dY = setvY
 
+		if (random.random()> .5) : 
+			self.dX *= -1
+
 		self.debugMessage("Trying to load " + img)	
 
 		if(self.loadImage(img)) :
@@ -74,15 +94,57 @@ class ImageSprite :
 				self.ratio = float(config.screenWidth)/ image.size[0]
 				self.image = self.image.resize((self.config.screenWidth,int(self.ratio * self.image.size[1])))
 
+			if(self.dX < 0) :
+				# Reverse image
+				self.image = self.image.rotate(-180)
+
+			self.imageOriginal = self.image.copy()
+			self.process()
+
+			self.debugMessage( img + " loaded")
+			#init()
+		else:
+			self.debugMessage ("could not load")
+
+	def process(self) :
+			change = random.uniform(.1,1.2)
+			newSizeX = change * self.image.size[0]
+			newSizeY = change * self.image.size[1]
+			self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
+
+			#Colorize via overlay etc
+			clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
+			clrBlockDraw = ImageDraw.Draw(clrBlock)
+			r = int(random.uniform(100,255))
+			g = int(random.uniform(0,255))
+			b = int(random.uniform(0,255))
+
+			brt = random.random()
+
+			clr = self.clrUtils.getRandomColorWheel(brt)
+			#clr = self.clrUtils.getRandomRGB(brt)
+
+			clrIndex = int(random.random() * 4)
+
+			if (self.dX < 0) : clrIndex  = int(random.uniform(6,9))
+
+			clr = self.clrUtils.wheel[clrIndex]
+			self.clrIndex += 1
+			if(self.clrIndex == len(self.clrUtils.wheel)) :
+				self.clrIndex = 0
+
+			clrBlockDraw.rectangle((0,0,self.image.size[0], self.image.size[1]), fill=clr)
+			self.image =  ImageChops.multiply(clrBlock, self.image)
+
 			self.imageCopy = Image.new("RGBA", (self.image.size[0], self.image.size[1]))
 			self.imageCopy.paste(self.image, (0, 0), self.image)
 
 			enhancer = ImageEnhance.Brightness(self.imageCopy)
 			self.image = enhancer.enhance(self.brightnessFactor)
-			self.debugMessage( img + " loaded")
-			#init()
-		else:
-			self.debugMessage ("could not load")
+			self.imageCopy = enhancer.enhance(self.brightnessFactor)
+			self.draw = ImageDraw.Draw(self.image)
+
+			self.yOffset =  int(random.uniform(-40 * change,40) )
 
 	def remove(self, arrayList) :
 		arrayList.remove(self)
@@ -92,24 +154,27 @@ class ImageSprite :
 		if(self.setForRemoval!=True) :
 			#self.image.paste(self.presentationImage, (0,0))
 
-			self.x += self.dX
-			self.y += self.dY
+			self.xPos += self.dX
+			self.yPos += self.dY
 
-			if(self.dY > 0 and self.y >= self.endY) :
-				self.callBack(self.y, -self.image.size[1])
-				#self.y = -self.image.size[1]
+			if(self.dY > 0 and self.yPos >= self.endY) :
+				self.callBack(self.yPos, -self.image.size[1])
+				#self.yPos = -self.image.size[1]
 
-			if(self.dY < 0 and self.y < self.endY) :
-				self.callBack(self.y, self.endY)
-				#self.y = self.endY
+			if(self.dY < 0 and self.yPos < 0) :
+				self.callBack(self.yPos, self.endY)
+				#self.yPos = self.endY
 
-			if(self.dX > 0 and self.x >= self.endX) :
-				self.callBack(self.x, -self.image.size[0])
-				self.x = -self.image.size[0]
+			if(self.dX > 0 and self.xPos >= self.endX) :
+				self.callBack(True, self.xPos, -self.image.size[0])
+				self.xPos = -self.image.size[0]
 
-			if(self.dX < 0 and self.x < self.endX) :
-				self.callBack(self.x, self.endX)
-				self.x = self.endX
+			if(self.dX < 0 and self.xPos < -self.image.size[0]) :
+				self.callBack(True, self.xPos, self.endX)
+				self.xPos = self.endX
+
+			self.x = self.xPos + self.xOffset
+			self.y = self.yPos + self.yOffset
 
 	def loadImage(self,arg):
 		self.image = Image.open(arg , "r")
@@ -144,9 +209,6 @@ class ImageSprite :
 			#xOffset = int((config.screenWidth ) * random.random()) - 20
 			#xOffset = 0
 		'''
-
-		self.draw = ImageDraw.Draw(self.image)
-
 		# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
 		#if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
@@ -154,35 +216,14 @@ class ImageSprite :
 		if(abs(self.dY) > 1) : self.stepSize = abs(self.dY)
 
 		if(self.useJitter):
-			if(random.random() > .7) : 
+			if(random.random() > .5) : 
 				self.jitter = False
 				self.dY = 0
-				self.y = 0
-			if(random.random() > .17) : self.jitter = True
+				self.yPos = 0
+			if(random.random() > .97) : self.jitter = True
 			if(self.jitter) : self.dY = random.uniform(-.3,.3)
 
 		self.move()
-
-		if(self.useBlink == True and random.random() > .9985) :
-			self.blink = False
-			self.blinkNum = int(random.uniform(7,23))
-			for blk in range (0, self.blinkNum) :
-				self.imageCopy  = self.image
-				self.draw.rectangle((0,0, self.image.size[0] ,self.image.size[1]), fill = (0))
-				if(self.blink) :
-					#config.render(imageCopy, int(xOffset + x), int(yOffset  + y), image.size[0], image.size[1], False)
-					self.blink = False
-				else :
-					#config.render(image, int(xOffset + x), int(yOffset  + y), image.size[0], image.size[1], False)
-					self.blink = True
-				time.sleep(.15)	
-			self.x += self.image.size[1]
-		#else :
-			#imageCopyTemp = self.image
-			#enhancer = ImageEnhance.Brightness(imageCopyTemp)
-			#imageCopyTemp = enhancer.enhance(self.brightnessFactor)
-			#self.imageCopy = imageCopyTemp
-			#self.config.render(self.image, int(xOffset + x), int(yOffset + y), imageCopy.size[0], imageCopy.size[1], False)
 	
 	def fillColor(self,force=False) :
 		global bgFillColor
@@ -248,8 +289,35 @@ class ImageSprite :
 		animate(randomizeTiming, frameLimit)
 
 	def update(self) :
-		self.panImage()
-		pass
+		if(self.useBlink == True) :
+			if(random.random() > .9998 and self.blink == False) :
+				self.blink = True
+				self.blinkNum = int(random.uniform(32,256))
+				self.blinkCount = 0
+				self.blinkStationary = True if (random.random() > .15) else False
+
+			if(self.blink) :
+				self.blinkCount += 1
+				#self.x -= self.dX
+				if(self.blinkCount%8 == 0) :
+					self.draw.rectangle((0,0, self.image.size[0] ,self.image.size[1]), fill = (0))
+					#self.y = -100
+				elif (self.blinkCount%4 == 0) : 
+					#self.y = 0
+					self.image.paste(self.imageCopy, (0 ,0), self.imageCopy)
+
+				if (self.blinkCount >= self.blinkNum) :
+					self.image.paste(self.imageCopy, (0 ,0), self.imageCopy)
+					if(random.random() > .5 ) : 
+						self.x += self.image.size[1]
+					self.blink = False
+
+			if(self.blinkStationary == False) :
+				self.panImage()
+			elif(random.random() > .995) : 
+				self.blinkStationary =  False
+
+		else : self.panImage()
 
 	def init(self):
 		global action, countLimit

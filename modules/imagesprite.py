@@ -41,7 +41,7 @@ class ImageSprite :
 	blink = False
 	blinkNum = 0
 	blinkCount = 0
-	blinkStationary = True
+	blinkStationary = False
 
 	presentTime =  10
 	brightnessFactor = .5

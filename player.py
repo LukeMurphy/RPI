@@ -16,7 +16,7 @@ from subprocess import call
 
 from modules import configuration
 from configs import localconfig
-#from cntrlscripts import off_signal
+from cntrlscripts import stest
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
@@ -145,7 +145,19 @@ def configure() :
 
 def main():
 	global config
-	configure()
+
+	threads = []
+	
+	thrd = threading.Thread(target=stest.__main__)
+	threads.append(thrd)
+	thrd.start()
+
+
+	thrd = threading.Thread(target=configure)
+	threads.append(thrd)
+	thrd.start()
+
+	
 
 if __name__ == "__main__":
 	main()

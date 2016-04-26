@@ -1,8 +1,6 @@
 #!/bin/bash
-if [ "$1" == "image" ]; then 
-	setsid sudo python /home/pi/RPI/image-scroller.py "$@" ; 
-elif [ "$1" == "wb" ]; then 
-	setsid sudo python /home/pi/RPI/whiteboardscroller.py ; 
+if [ "$1" != "" ]; then 
+	setsid sudo python /home/pi/RPI/sequenceplayer.py "$@" & 
 else 
-	setsid sudo python /home/pi/RPI/sequence.py "$@" ; 
+	setsid sudo python /home/pi/RPI/player.py&
 fi

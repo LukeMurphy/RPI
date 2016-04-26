@@ -72,26 +72,19 @@ def iterate( n = 0) :
 		block.update()
 		updateCanvasCall = True if n == 0 else True
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
+		#config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
 		pos = int(block.x + block.image.size[0])
 
-		'''
-		if (  pos == xPos or pos == xPos-1 or pos == xPos-2 or pos == xPos+1 ) : 
-			block.blink =  True
-			block.blinkNum = int(random.uniform(8,128))
-			block.blinkCount = 0
-			block.blinkStationary = True if (random.random() > .75) else False
-		#config.render(block.image, int(block.x) + block.xOffset, int(block.y) + block.yOffset, block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
-		'''
+	#config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, updateCanvasCall)
 
-
-
-	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, updateCanvasCall)
+	'''
 	if(random.random() > 1.99) : 
 		config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 		config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
+	'''
 
-	redrawBackGround()
-	drawVLine()
+	#redrawBackGround()
+	#drawVLine()
 	#if(block.setForRemoval==True) : makeBlock()
 
 	# cleanup the list

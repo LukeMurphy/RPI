@@ -244,7 +244,6 @@ def makeBlock() :
 			colorMode = False
 			#print("ColorMode change  to b/w")
 
-
 def runStroop(run=True) :
 	global config, opticalOpposites
 	while run:

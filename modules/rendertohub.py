@@ -77,38 +77,26 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	# Render to canvas
 	# This needs to be optomized !!!!!!
 	#*******************************************************************************
-	#*******************************************************************************
-	#*******************************************************************************
-	#print(imageToRender.size,xOffset,yOffset)
 
 	if(config.rotation != 0) : 
 		config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
 		#config.renderImageFull = ImageChops.offset(config.renderImageFull, -10, 0) 
 
 	if(config.useFilters) :
-		'''------------------------------------------------------------------------'''
-		'''              FILTERS                                                   '''
-
-		''' ugly hippy ...
-		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=1))
-		config.image = config.image.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
-		config.renderImageFull.paste(config.image, (xOffset, yOffset))
-		'''
-		im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
-		im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100,threshold=2))
-
-		'''             Paste to Render                                       '''
-
+		#'''------------------------------------------------------------------------'''
+		#'''              FILTERS                                                   '''
+		#''' ugly hippy ...
+		#config.image = config.image.filter(ImageFilter.GaussianBlur(radius=1))
+		#config.image = config.image.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
+		#config.renderImageFull.paste(config.image, (xOffset, yOffset))
+		#'''
+		#im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
+		#im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100,threshold=2))
+		#'''             Paste to Render                                       '''
 		config.renderImageFull.paste(im2, (xOffset, yOffset))
 
-		'''------------------------------------------------------------------------'''
-
 	else :
-		#xOffset + imageToRender.size[0], yOffset + imageToRender.size[1])
-
-		# not working ..... imageToRender = imageToRender.rotate(-90)
-
-		if(updateCanvasCall) : config.renderDraw.rectangle((0, 0, config.screenWidth + 8, config.screenHeight + 8), fill=(0,0,0))
+		#if(updateCanvasCall) : config.renderDraw.rectangle((0, 0, config.screenWidth + 8, config.screenHeight + 8), fill=(0,0,0))
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
 	if(config.rotation != 0) : 
@@ -117,16 +105,11 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	if(updateCanvasCall) : updateCanvas() 
 
+	#mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
+	#if mem > memoryUsage and debug :
+	#	memoryUsage = mem 
+	#	print 'Memory usage: %s (mb)' % str(memoryUsage)
 
-
-	'''
-
-	mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
-
-	if mem > memoryUsage and debug :
-		memoryUsage = mem 
-		print 'Memory usage: %s (mb)' % str(memoryUsage)
-	'''
 
 	#*******************************************************************************
 	#*******************************************************************************

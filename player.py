@@ -32,7 +32,7 @@ def configure() :
 	#global group, groups, config
 	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 	global config, workconfig, path, tempImage
-	gc.enable()
+	#gc.enable()
 	try: 
 
 		####
@@ -152,11 +152,9 @@ def main():
 	threads.append(thrd)
 	thrd.start()
 
-
 	thrd = threading.Thread(target=configure)
 	threads.append(thrd)
 	thrd.start()
-
 	
 
 if __name__ == "__main__":

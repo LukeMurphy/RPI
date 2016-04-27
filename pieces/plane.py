@@ -15,6 +15,7 @@ import textwrap
 import math
 import sys, getopt, os
 import ConfigParser, io
+import gc
 from subprocess import call
 
 xPos = 320
@@ -23,6 +24,7 @@ yPos = 0
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks
+	gc.enable()
 
 	print("Plane Loaded")
 
@@ -67,9 +69,9 @@ def iterate( n = 0) :
 	global xPos, yPos
 
 	# Clear the background and redraw all planes
-
 	if(random.random() > .998) : shuffle(blocks)
 	redrawBackGround()
+
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
 		block.update()
@@ -111,7 +113,8 @@ def drawVLine() :
 
 def redrawBackGround() :	
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
-	if(random.random() > 1.9) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	#if(random.random() > .99) : gc.collect()
+	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	return True
 
 def callBack() :

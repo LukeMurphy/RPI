@@ -2,17 +2,17 @@
 import time
 import random
 import math
-from PIL import Image
+import PIL.Image
+from PIL import Image, ImageDraw
 import sys
+from modules import colorutils
 
-
-vx = 0
-vy = 0
 x = y = 0
-r=g=b=125
+r=255
+g=b=0
 pulseSpeed = .1
 colorSwitch = False
-columnLimit = 16
+countLimit = 16
 
 '''
 make script to reduce from one square to 2 to 4 to 8 to 16...
@@ -20,8 +20,14 @@ make script to reduce from one square to 2 to 4 to 8 to 16...
 
 rHeight = 0
 rWidth = 0
-rows  = 2
-cols = 2
+rows  = 1
+cols = 1
+
+lineWidth = 1
+
+divisionOfSquares = [1,1,2,2,4,4,8,8,16,16,32,32,64,64]
+divisionPosition = 0
+colorutil = colorutils
 
 
 def drawRects() :
@@ -29,132 +35,128 @@ def drawRects() :
 	global r,g,b
 	global colorSwitch
 	global rHeight,rWidth,numSquares
-	global rows, cols
+	global rows, cols, lineWidth
 
 	changeColor(colorSwitch)
+
+	# For single square dividing, rows = cols all the time
+	# But for double square, start with rows, divide columns
+	# then divide rows, then repeat
+
+
 	for row in range(0, rows):
-		rHeight = int(config.screenHeight / (rows))
+		rHeight = int(config.screenHeight / rows)
 		yOffset = int(row * rHeight)
-		lines = int(rHeight/2)
-		#changeColor(colorSwitch)
+		squaresToDraw = int(rHeight / 2)
+
 		for col in range(0, cols):
-			rWidth = int(config.screenWidth / (cols))
-			xOffset = int(col * rWidth)
-			#changeColor(colorSwitch)
-			for n in range(0,lines):
-				# Alternate Bands of Color
-				changeColor(colorSwitch)
+			rWidth = int(config.screenWidth / cols)
+			xOffset = int(col* rWidth)
+			colorSwitchMode = int(random.uniform(1,4))
+
+			for n in range(0, squaresToDraw, lineWidth):
+				# --------------------------------------------------------------#
+				# Alternate Bands of Color, keep to one scheme per set of squares
+				changeColor(colorSwitch, colorSwitchMode)
+
 				xStart = n + xOffset
-				xEnd = rWidth - n - 1 + xOffset
+				xEnd = xOffset + rWidth - n - 1
+
 				yStart = n + yOffset
-				yEnd = rHeight - n - 1 + yOffset
-				config.draw.rectangle((xStart, yStart, xEnd, yEnd ),  outline=(r,g,b))
+				yEnd = yOffset + rHeight - n - 1
 
-def redraw():
-	global config
-	global x,y,vx,vy
-	global colorSwitch
-	
-	# forces color animation
-	# changeColor()
-	#drawImg()
-	drawRects()
+				#config.draw.rectangle((xStart, yStart, xEnd, yEnd), outline=(r,g,b))
 
-	#config.matrix.SetImage(config.id,x,y)
-	config.render(config.image,x,y,config.screenWidth,config.screenHeight, False)
-
-	if(random.random() > .93) : colorSwitch = True
+				for l in range(0,lineWidth) :
+					config.draw.rectangle((xStart+l, yStart+l, xEnd - l, yEnd - l ), outline=(r,g,b))
 		
-def changeColor( rnd = False) :
-		global r,g,b        
-		if (rnd == False) :
-			if(r == int(255 * config.brightness)) :
-				r = 0
-				g = int(255 * config.brightness)
-				b = 0
-			else :
-				g = 0
-				r = int(255 * config.brightness)
-				b = 0
-		else :
-			r = int(random.uniform(0,255) * config.brightness)
-			g = int(random.uniform(0,255) * config.brightness)
-			b = int(random.uniform(0,255) * config.brightness)
+def changeColor( rnd = False, choice = 3) :
+	global r,g,b, colorutil       
+	if (rnd == False) :
+		val  = int(255 * config.brightness)
+		if(r == val) :
+			r = 0
+			g = val
+			b = 0
+			# Add variant that we pulse red/blue not just red/greeen
+			# red/blue makes for pink afterimage so more about excitement
+			# than red/green making yellow after image, which feels like it's
+			# more about food ...
 
-# adapted to show Soliloguy of The Point
-def animator(arg, mode = "cols") :
+			if(random.random() > .5) :
+				b = val
+				g = 0
+		else :
+			r = val
+			g = 0
+			b = 0
+
+	else :
+		choice = int(random.uniform(1,8))
+		#choice = 3
+		if(choice == 1) : clr = colorutil.getRandomColorWheel(config.brightness)
+		if(choice == 2) : clr = colorutil.getRandomRGB(config.brightness)
+		if(choice >= 3) : clr = colorutil.randomColor(config.brightness)
+		r = clr[0]
+		g = clr[1]
+		b = clr[2]	
+
+def animator() :
 	global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
-	global rows, cols, columnLimit
+	global rows, cols, columnLimit, count, mode
+
+	mode = "cols"
+
+	count = 0
+	pulseSpeed = .1
+	countLimit = 16
+	interval = 4
+	rWidth = config.screenWidth
+	rHeight = config.screenHeight
 	
 	rows = 1
 	cols = 1
 
 	# reseting render image size
 	config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))
-	config.image = config.Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	config.draw  = config.ImageDraw.Draw(config.image)
+	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.draw  = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
-	#config.matrix.Clear()
 
-	count = 0
-	rWidth = config.screenWidth
-	rHeight = config.screenHeight
-	
-	arg = 20
-	pulseSpeed = .1
-	countLimit = arg * 6
-	interval = 4
+def callBack() :
+	global config
+	#animator()
 
-	i = 0
+def runWork():
+	while True:
+		iterate()
+		time.sleep(.1)
 
-	if (mode == "rows") :
-		rowIncrement = True
-		while (count < countLimit) :
-			redraw()
-			count += 1
-			interval = arg - rows * 2 - cols
-			i += 1
-			if(i > interval and cols <= 8) : 
-				i = 0
-				colorSwitch = False
-				if(rowIncrement) :
-					rows *= 2
-					rowIncrement = False
-				else :
-					cols *= 2
-					rowIncrement = True
-			config.soliloquy()
-			time.sleep(pulseSpeed)
-	if (mode == "cols") :
-		colIncrement = True
-		while (count < countLimit) :
-			redraw()
-			count += 1
-			interval = arg - rows * 2 - cols
-			i += 1
-			if(i > interval and cols <= columnLimit) : 
-				i = 0
-				colorSwitch = False
-				if(colIncrement) :
-					cols *= 2
-					colIncrement = False
-				else :
-					rows *= 2
-					colIncrement = True
-			config.soliloquy()
-			time.sleep(pulseSpeed)
-	else :
-		while (count < countLimit) :
-			redraw()
-			count += 1
-			i += 1
-			if(i > interval and numSquares < 17) : 
-				i = 0
-				colorSwitch = False
-				rWidth = rWidth/2
-				numSquares *=2
-			config.soliloquy()
-			time.sleep(pulseSpeed)
+def iterate() :
+	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares
+	global rows, cols
+	drawRects()
+	if(random.random() > .7) : colorSwitch = True
+	if(random.random() > .9) : colorSwitch = False
+	count += 1
 
-	config.matrix.Clear()
-	config.matrix.Fill(0)
+	if (count >= countLimit) :
+		divisionPosition += 1
+
+		if(divisionPosition >= len(divisionOfSquares)-1) :
+				divisionPosition = 0
+
+		cols = divisionOfSquares[divisionPosition+1]
+		rows = divisionOfSquares[divisionPosition]
+		count = 0
+
+		countLimit = int(16  *  (2 / rows)) + int(random.uniform(2,10))
+		if(random.random() > .7) : colorSwitch = False
+
+
+	config.render(config.image, 0, 0,128,64)
+
+def main(run = True) :
+	global config, workConfig
+	animator()
+	if(run) : runWork()

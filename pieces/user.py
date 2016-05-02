@@ -135,7 +135,7 @@ def runWork():
 		time.sleep(t)
 
 def iterate( n = 0) :
-	global config, userList, numUsers
+	global config, userList, numUsers, userCenterx , userCentery 
 	global start, end, steps, count, boxWidth, boxHeight
 
 	for n in range(0,numUsers) : 
@@ -152,7 +152,8 @@ def iterate( n = 0) :
 def main(run = True) :
 	global config, workConfig, scale, userCenterx , userCentery 
 	scale = float(workConfig.get("user", 'scale'))
-
+	userCenterx = int(workConfig.get("user", 'userCenterx'))
+	userCentery = int(workConfig.get("user", 'userCentery'))
 	userAnimator()
 	if(run) : runWork()
 		

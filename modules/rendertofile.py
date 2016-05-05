@@ -14,6 +14,9 @@ def setUp(mode) :
 def render(*args):
 	pass
 
+def updateCanvas(*args) :
+	pass
+
 def iterateWork(mode):
 	if(mode  == "avi"):
 		'''*************  PROBLEMS *****************'''
@@ -63,6 +66,10 @@ def videoClipMaker() :
 		'''#######################    Paste to Render       #######################'''
 
 		config.renderImageFull.paste(im2, (xOffset, yOffset))
+		newimage = Image.new('P', config.renderImageFull.size)
+		newimage = config.renderImageFull.convert("P", colors = 64)
+		config.renderImageFull =  newimage.convert("RGB")
+
 	else :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 	
@@ -83,7 +90,8 @@ def toVideo() :
 	#vcodec = "mpeg4"
 	vcodec = "h264"
 	#vcodec = "libxvid"
-
+	#vcodec = "prores"
+	# -c:v prores -profile:v 3
 	## Sends image data as PNG to FFMPEG
 	imgFormat = "PNG"
 
@@ -91,8 +99,14 @@ def toVideo() :
 	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d--%H-%M-%S')
 	name = config.WRKINID + "_" + st + "_video.avi"
 
+	'''
 	p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', vcodecImg, '-r', str(fps) , '-i', '-', 
 		'-vcodec', vcodec, '-qscale', str(duration) , '-r', str(fps) , name], stdin=PIPE)
+	'''
+
+	p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', vcodecImg, '-r', str(fps) , '-i', '-', 
+		'-vcodec', vcodec, '-qscale', str(duration) , '-r', str(fps) , name], stdin=PIPE)
+
 	for i in range(fps * duration):
 	    #im = Image.new("RGB", (640, 480), (i, 1, 1))
 	    im  = videoClipMaker()

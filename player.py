@@ -16,7 +16,6 @@ from subprocess import call
 
 from modules import configuration
 from configs import localconfig
-from cntrlscripts import stest
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
@@ -88,6 +87,7 @@ def configure() :
 
 		if(config.rendering == "hat") :
 			from modules import rendertohat
+			from cntrlscripts import stest
 			r = rendertohat
 			config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
 			config.transWiring = bool(workconfig.getboolean("displayconfig", 'transWiring'))
@@ -131,7 +131,12 @@ def configure() :
 			r.fps = int(workconfig.get("output", 'fps'))
 			r.duration = int(workconfig.get("output", 'duration'))
 
+
+			# Test white rectangle on main rendering image
+			#config.renderDraw.rectangle((0,0,400,300), fill=(255,255,255))
+
 			config.render = r.render
+			config.updateCanvas = r.updateCanvas
 			work.main(False)
 			
 			r.setUp("video")
@@ -148,9 +153,12 @@ def main():
 
 	threads = []
 	
-	thrd = threading.Thread(target=stest.__main__)
-	threads.append(thrd)
-	thrd.start()
+	'''
+	if(config.rendering == "hat") :
+		thrd = threading.Thread(target=stest.__main__)
+		threads.append(thrd)
+		thrd.start()
+	'''
 
 	thrd = threading.Thread(target=configure)
 	threads.append(thrd)

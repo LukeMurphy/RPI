@@ -82,22 +82,31 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
 		#config.renderImageFull = ImageChops.offset(config.renderImageFull, -10, 0) 
 
+	'''
 	if(config.useFilters) :
-		#'''------------------------------------------------------------------------'''
-		#'''              FILTERS                                                   '''
-		#''' ugly hippy ...
+		#------------------------------------------------------------------------
+		#              FILTERS                                                   
+		# ugly hippy 
 		#config.image = config.image.filter(ImageFilter.GaussianBlur(radius=1))
 		#config.image = config.image.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 		#config.renderImageFull.paste(config.image, (xOffset, yOffset))
-		#'''
+		#
 		#im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
 		#im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100,threshold=2))
-		#'''             Paste to Render                                       '''
+		#         Paste to Render                                       
 		config.renderImageFull.paste(im2, (xOffset, yOffset))
 
 	else :
 		#if(updateCanvasCall) : config.renderDraw.rectangle((0, 0, config.screenWidth + 8, config.screenHeight + 8), fill=(0,0,0))
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+	'''
+	
+	config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+
+	if(config.useFilters) :
+		newimage = Image.new('P', config.renderImageFull.size)
+		newimage = config.renderImageFull.convert("P", colors = 64)
+		config.renderImageFull =  newimage.convert("RGB")
 
 	if(config.rotation != 0) : 
 		config.renderImageFull = config.renderImageFull.rotate(config.rotation)

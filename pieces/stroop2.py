@@ -33,7 +33,10 @@ colorMode = True
 # To produce cascade effect
 nextRow = 0
 
-####################################################################
+# For video out
+x = y = 0
+
+########################
 
 class Block:
 
@@ -78,7 +81,7 @@ class Block:
 		brightness = random.uniform(self.config.minBrightness,1.1)
 		opticalOpposites = False if (random.random() > .5) else True
 		self.verticalTileSize = int(config.screenHeight/self.displayRows) if self.displayRows != config.rows else config.tileSize[1]
-
+		
 		if(colorMode != True) : choice = int(random.uniform(8,10))
 
 		#choice = 3 if (random.random() > .5) else 5
@@ -95,6 +98,7 @@ class Block:
 		if(choice == 8) :colorWord, colorOfWord = "BLACK",(255,255,255)
 		if(choice >= 9) :colorWord, colorOfWord = "WHITE",(0,0,0)
 		
+		self.colorWord = colorWord
 
 		clr = colorOfWord
 
@@ -125,7 +129,7 @@ class Block:
 
 		vPadding = int(.75 * config.tileSize[0])
 		self.presentationImage = PIL.Image.new("RGBA", (dims[0]+vPadding,dims[1]))
-		self.image = PIL.Image.new("RGBA", (dims[0]+vPadding,0))
+		self.image = PIL.Image.new("RGBA", (dims[0]+vPadding,1))
 		draw  = ImageDraw.Draw(self.presentationImage)
 		iid = self.image.im.id
 		draw.rectangle((0,0,dims[0]+config.tileSize[0], dims[1]), fill=bgColor)
@@ -164,7 +168,7 @@ class Block:
 		self.endy = -self.ht if self.dy < 0 else config.screenHeight
 
 		self.revealSpeed = int(random.uniform(1,self.revealSpeedMax))
-		#print(self.dx, self.end, self.x)
+
 
 	def callBack(self) :
 		self.setForRemoval = True
@@ -193,26 +197,27 @@ class Block:
 			self.reveal += self.revealSpeed
 			self.image = PIL.Image.new("RGBA", (dims[0],self.reveal))
 
-			dr = ImageDraw.Draw(self.image)
-			dr.rectangle((0,0,100,5), fill=(0,255,0))
+			#dr = ImageDraw.Draw(self.image)
+			#dr.rectangle((0,0,100,5), fill=(0,255,0))
 			
 			segment = self.presentationImage.crop((0,0,dims[0],self.reveal))
-			self.image.paste(segment, (0,0))
+			self.image.paste(segment, (0,0), segment)
 
-			if (self.reveal  > dims[1]) : self.callBack()
+			if (self.reveal  > dims[1]) : 
+				self.callBack()
+				#print(self.colorWord, self.reveal, self.revealSpeed, self.image.size, dims)
 
 	def update(self) :
 		if(self.movementMode == "reveal" or self.movementMode == "revealmove") : self.appear()
 		if(self.movementMode == "move" or self.movementMode == "revealmove") : self.move()
 
-####################################################################
+########################
 
 # Create each display block and add to the global array of blocks
 def makeBlock() :
 	global config, workConfig, blocks, colorMode, nextRow
 
-
-	if(random.random() > .95) : config.movementMode = "revealmove"
+	if(random.random() > .99) : config.movementMode = "revealmove"
 	if(random.random() > .95) : config.movementMode = "reveal"
 
 	config.opticalOpposites = True
@@ -224,7 +229,7 @@ def makeBlock() :
 	block.displayRows = config.displayRows
 	block.displayCols = config.displayCols
 	block.movementMode = config.movementMode
-
+	block.revealSpeedMax = config.stroopSteps
 	block.make(colorMode, nextRow)
 	block.blocksRef = blocks
 
@@ -292,10 +297,17 @@ def runWork():
 		time.sleep(config.stroopSpeed)	
 
 def iterate( n = 0) :
-	global config, blocks
+	global config, blocks, x, y
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
 		config.render(block.image, block.x, block.y, block.image.size[0], block.image.size[1], False, False, False)
+
+		config.image = block.image.copy()
+		#config.image = PIL.Image.new("RGBA", (block.image.size[0], block.image.size[1]))
+		#config.image.paste(block.image, (0,0), block.image)
+		x = block.x
+		y = block.y
+
 		block.update()
 		if(block.setForRemoval==True) : makeBlock()
 
@@ -320,6 +332,6 @@ def callBack() :
 
 
 	
-#####################
+########################
 
 

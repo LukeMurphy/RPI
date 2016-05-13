@@ -77,7 +77,7 @@ class ImageSprite :
 		return True
 		
 
-	def make(self, img="", setvX = 0, setvY = 0):
+	def make(self, img="", setvX = 0, setvY = 0, processImage = True):
 
 		self.frame = 0
 		self.dX = setvX
@@ -99,7 +99,7 @@ class ImageSprite :
 				self.image = self.image.rotate(-180)
 
 			self.imageOriginal = self.image.copy()
-			self.process()
+			if(processImage) : self.process()
 
 			self.debugMessage( img + " loaded")
 			#init()

@@ -4,6 +4,7 @@ import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter
+import random
 import numpy
 
 global root
@@ -69,7 +70,6 @@ def updateCanvas() :
 
 	config.cnvs.update()
 
-
 def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
 	global memoryUsage
 	global config, debug
@@ -104,9 +104,43 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
 	if(config.useFilters) :
+		
 		newimage = Image.new('P', config.renderImageFull.size)
 		newimage = config.renderImageFull.convert("P", colors = 64)
 		config.renderImageFull =  newimage.convert("RGB")
+
+
+		'''
+		# Random bright pixel patches -- of limited value aesthetically
+		d = -50
+		for t in range(100) :
+			xp = int(random.uniform(1,config.screenWidth-4))
+			yp = int(random.uniform(1,config.screenHeight-4))
+			vr,vg,vb = config.renderImageFull.getpixel((xp,yp))
+			if(vr == 0 and vg ==0 and vb == 0) :
+				pass
+			else :
+				config.renderImageFull.putpixel((xp,yp),(vr-d,vg-d,vb-d))
+				config.renderImageFull.putpixel((xp+1,yp),(vr-d,vg-d,vb-d))
+				config.renderImageFull.putpixel((xp+1,yp+1),(vr-d,vg-d,vb-d))
+				config.renderImageFull.putpixel((xp,yp+1),(vr-d,vg-d,vb-d))
+		'''
+
+		'''
+		arr = numpy.array(config.renderImageFull)
+		config.renderImageFull = Image.fromarray(arr)
+		'''
+
+		'''
+		# Produces an ordered dithering - looks good for movement but not so good
+		# on still images 
+		im = config.renderImageFull.convert('CMYK').split()
+
+		for ch in im:
+			ordered_dithering(ch.load(), ch.size, gen_matrix(1)[0])
+		im = Image.merge("CMYK",im).convert("RGB")
+		config.renderImageFull = im
+		'''
 
 	if(config.rotation != 0) : 
 		config.renderImageFull = config.renderImageFull.rotate(config.rotation)
@@ -121,5 +155,42 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 
 	#*******************************************************************************
+
+def gen_matrix( e ):
+	''' Generating new matrix.
+	@param e The width and height of the matrix is 2^e.
+	@return New 2x2 to 2^e x 2^e matrix list.
+	'''
+	if e < 1: return None
+	m_list = [ [[1,2],[3,0]] ]
+	_b = m_list[0]
+	for n in xrange(1, e):
+		m = m_list[ n - 1 ]
+		m_list.append( [
+		[4*i+_b[0][0] for i in m[0]] + [4*i+_b[0][1] for i in m[0]],
+		[4*i+_b[0][0] for i in m[1]] + [4*i+_b[0][1] for i in m[1]],
+		[4*i+_b[1][0] for i in m[0]] + [4*i+_b[1][1] for i in m[0]],
+		[4*i+_b[1][0] for i in m[1]] + [4*i+_b[1][1] for i in m[1]],
+		] )
+	return m_list
+
+
+def ordered_dithering( pixel, size, matrix ):
+	""" Dithering on a single channel.
+	  @param pixel PIL PixelAccess object.
+	  @param size A tuple to represent the size of pixel.
+	  @param matrix Must be NxN, and N == 2^e where e>=1
+	"""
+	X, Y = size
+	N = len(matrix)
+
+	T = [[255*(matrix[x][y]+0.01)/N/N for x in xrange(N)] for y in xrange(N)]
+
+	#print(T)
+
+	for y in xrange(0, Y):
+		for x in xrange(0, X):
+			pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
+
 	#*******************************************************************************
 	#*******************************************************************************

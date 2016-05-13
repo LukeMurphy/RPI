@@ -9,7 +9,7 @@ vy = 2
 x = 0
 y = 0
 r=g=b=125
-redrawSpeed = .01
+redrawSpeed = .0041
 boxHeight = 30
 boxWidth = 26
 smile = -1

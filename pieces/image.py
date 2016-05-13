@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #import modules
 from modules import utils, configuration
+from pieces import actions
 from modules.imagesprite import ImageSprite
 from configs import localconfig
 
@@ -21,9 +22,11 @@ from subprocess import call
 xPos = 320
 yPos = 0
 
+act = actions
+
 
 def main(run = True) :
-	global config, workConfig, blocks, simulBlocks
+	global config, workConfig, blocks, simulBlocks, act
 	gc.enable()
 
 	print("Plane Loaded")
@@ -40,6 +43,9 @@ def main(run = True) :
 	path = config.path  + "/assets/imgs/"
 	imageList = ['robert-indiana-love.png'] 
 
+	act.config = config
+	act.setBlanks()
+
 	for i in range (0,1) :
 		imgLoader = ImageSprite(config)
 		imgLoader.debug = True
@@ -52,16 +58,20 @@ def main(run = True) :
 		imgLoader.useBlink = True
 		imgLoader.brightnessFactor = .9
 		imgLoader.config = config
-		imgLoader.make(path + imageList[0], 0 , 0, False)
+		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
+		imgLoader.make(path + imageList[0], 0 , 0, False, False, False, False)
 		blocks.append(imgLoader)
 
 	if(run) : runWork()
 
 def runWork():
-	global blocks, config
+	global blocks, config, act
 	#gc.enable()
 	while True:
+
 		iterate()
+		act.drawBlanks()
+		if(random.random() > .9) : act.setBlanks()
 		time.sleep(config.speed)	
 
 def iterate( n = 0) :

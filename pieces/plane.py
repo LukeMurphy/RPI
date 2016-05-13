@@ -40,19 +40,21 @@ def main(run = True) :
 	path = config.path  + "/assets/imgs/"
 	imageList = ['plane-2b.gif','plane-2tw.png','plane-2tg.png','plane-2t.png'] 
 
-	for i in range (0,8) :
+	for i in range (0,14) :
 		imgLoader = ImageSprite(config)
 		imgLoader.debug = True
 		imgLoader.action = "pan"
 		imgLoader.xOffset = 0
-		imgLoader.yOffset = 0
+		imgLoader.yOffsetFactor = 100
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
 		imgLoader.useJitter =  True
 		imgLoader.useBlink = True
-		imgLoader.brightnessFactor = .9
+		imgLoader.brightnessFactor = config.brightness * random.random()
 		imgLoader.config = config
-		imgLoader.make(path + imageList[1], random.uniform(1,2) , 0)
+		#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
+		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
+		imgLoader.make(path + imageList[1], 1 , 0, True, True, True, False)
 		blocks.append(imgLoader)
 
 	if(run) : runWork()

@@ -28,6 +28,7 @@ class ImageSprite :
 	r=g=b=0
 	xOffset = 0
 	yOffset = 0
+	yOffsetFactor = 40
 
 	count = 0
 	frame = 1
@@ -57,6 +58,12 @@ class ImageSprite :
 	brightnessFluxRate  = 8 # As a factor or PI/brightnessFluxRate
 	resizeToWidth = False
 
+	
+	processImage = True
+	resizeImage = True
+	randomizeColor = False
+	randomizeDirection = True
+
 	lastPictureIndex = 0
 	debug = False
 
@@ -77,13 +84,18 @@ class ImageSprite :
 		return True
 		
 
-	def make(self, img="", setvX = 0, setvY = 0, processImage = True):
+	def make(self, img="", setvX = 0, setvY = 0, processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True):
 
 		self.frame = 0
 		self.dX = setvX
 		self.dY = setvY
 
-		if (random.random()> .5) : 
+		self.processImage = processImage
+		self.resizeImage = resizeImage
+		self.randomizeColor = randomizeColor
+		self.randomizeDirection = randomizeDirection
+
+		if (random.random()> .5 and randomizeDirection) : 
 			self.dX *= -1
 
 		self.debugMessage("Trying to load " + img)	
@@ -99,7 +111,7 @@ class ImageSprite :
 				self.image = self.image.rotate(-180)
 
 			self.imageOriginal = self.image.copy()
-			if(processImage) : self.process()
+			self.process()
 
 			self.debugMessage( img + " loaded")
 			#init()
@@ -107,31 +119,36 @@ class ImageSprite :
 			self.debugMessage ("could not load")
 
 	def process(self) :
-			change = random.uniform(.1,1.2)
-			newSizeX = change * self.image.size[0]
-			newSizeY = change * self.image.size[1]
-			self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
+		if(self.processImage) :
+			if(self.resizeImage) :
+				change = random.uniform(.1,1.2)
+				newSizeX = change * self.image.size[0]
+				newSizeY = change * self.image.size[1]
+				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
 
 			#Colorize via overlay etc
 			clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
 			clrBlockDraw = ImageDraw.Draw(clrBlock)
-			r = int(random.uniform(100,255))
-			g = int(random.uniform(0,255))
-			b = int(random.uniform(0,255))
 
 			brt = random.random()
 
-			clr = self.clrUtils.getRandomColorWheel(brt)
-			#clr = self.clrUtils.getRandomRGB(brt)
+			if(self.randomizeColor) :
+				r = int(random.uniform(200,255))
+				g = int(random.uniform(0,255))
+				b = int(random.uniform(0,255))
+				clr = self.clrUtils.getRandomColorWheel(brt)
+				clrIndex = int(random.random() * 4)
 
-			clrIndex = int(random.random() * 4)
-
-			if (self.dX < 0) : clrIndex  = int(random.uniform(6,9))
-
-			clr = self.clrUtils.wheel[clrIndex]
-			self.clrIndex += 1
-			if(self.clrIndex == len(self.clrUtils.wheel)) :
-				self.clrIndex = 0
+				if (self.dX < 0) : clrIndex  = int(random.uniform(6,9))
+				clr = self.clrUtils.wheel[clrIndex]
+				self.clrIndex += 1
+				if(self.clrIndex == len(self.clrUtils.wheel)) :
+					self.clrIndex = 0
+			else :
+				r = int(random.uniform(200,255))
+				g = int(random.uniform(0,255))
+				b = int(random.uniform(0,10))
+				clr = (r,g,b)
 
 			clrBlockDraw.rectangle((0,0,self.image.size[0], self.image.size[1]), fill=clr)
 			self.image =  ImageChops.multiply(clrBlock, self.image)
@@ -144,7 +161,7 @@ class ImageSprite :
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
 
-			self.yOffset =  int(random.uniform(-40 * change,40) )
+			if(self.processImage) : self.yOffset =  int(random.uniform(-self.yOffsetFactor * change, self.yOffsetFactor) )
 
 	def remove(self, arrayList) :
 		arrayList.remove(self)

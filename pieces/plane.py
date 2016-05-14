@@ -20,10 +20,11 @@ from subprocess import call
 
 xPos = 320
 yPos = 0
+colorModeDirectional = False
 
 
 def main(run = True) :
-	global config, workConfig, blocks, simulBlocks
+	global config, workConfig, blocks, simulBlocks, colorModeDirectional
 	gc.enable()
 
 	print("Plane Loaded")
@@ -52,9 +53,11 @@ def main(run = True) :
 		imgLoader.useBlink = True
 		imgLoader.brightnessFactor = config.brightness * random.random()
 		imgLoader.config = config
+		imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
+		imgLoader.colorModeDirectional = colorModeDirectional
 		#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-		imgLoader.make(path + imageList[1], 1 , 0, True, True, True, False)
+		imgLoader.make(path + imageList[1], 1 , 0, True, True, True, True)
 		blocks.append(imgLoader)
 
 	if(run) : runWork()
@@ -67,16 +70,19 @@ def runWork():
 		time.sleep(config.speed)	
 
 def iterate( n = 0) :
-	global config, blocks
+	global config, blocks, colorModeDirectional
 	global xPos, yPos
 
 	# Clear the background and redraw all planes
 	if(random.random() > .998) : shuffle(blocks)
+	if(random.random() > .9985) : colorModeDirectional = False if colorModeDirectional == True else True
+
 	redrawBackGround()
 
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
 		block.update()
+		block.colorModeDirectional = colorModeDirectional
 		updateCanvasCall = True if n == 0 else True
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 		# Never really want to do this as it force sends to the renderer for EACH item - big slowdowns etc

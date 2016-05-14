@@ -8,8 +8,11 @@ import operator
 colorWheel = ["RED","VERMILLION","ORANGE","AMBER","YELLOW","CHARTREUSE","GREEN","TEAL","BLUE","VIOLET","PURPLE","MAGENTA"]
 wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146,206,0),(0,255,255),(0,0,255),(65,0,165),(135,0,175),(167,25,75)]
 
-rgbColorWheel = ["RED","GREEN","BLUE","YELLOW","MAGENTA","CYAN"]
-rgbWheel = [(255,0,0),(0,255,0),(0,0,255),(255,255,0),(255,0,255),(0,255,255)]
+#rgbColorWheel = ["RED","GREEN","BLUE","YELLOW","MAGENTA","CYAN"]
+#rgbWheel = [(255,0,0),(0,255,0),(0,0,255),(255,255,0),(255,0,255),(0,255,255)]
+
+rgbColorWheel = ["RED","YELLOW","GREEN","CYAN","BLUE","MAGENTA"]
+rgbWheel = [(255,0,0),(255,255,0),(0,255,0),(0,255,255),(0,0,255),(255,0,255)]
 
 sunset = dict(drk1=(57,36,25),drk2=(124,77,56),
 	drk3=(153,95,56),mid1=(177,177,78),mid2=(173,104,51),yellow=(218,172,71),ltyellow=(246,232,171),

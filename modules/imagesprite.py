@@ -57,12 +57,13 @@ class ImageSprite :
 	brightnessFlux = False
 	brightnessFluxRate  = 8 # As a factor or PI/brightnessFluxRate
 	resizeToWidth = False
-
 	
 	processImage = True
 	resizeImage = True
 	randomizeColor = False
 	randomizeDirection = True
+	colorMode = "random" 
+	colorModeDirectional = True
 
 	lastPictureIndex = 0
 	debug = False
@@ -132,21 +133,45 @@ class ImageSprite :
 
 			brt = random.random()
 
+			# This was really just set up for the multiple-planes piece
 			if(self.randomizeColor) :
-				r = int(random.uniform(200,255))
-				g = int(random.uniform(0,255))
-				b = int(random.uniform(0,255))
-				clr = self.clrUtils.getRandomColorWheel(brt)
-				clrIndex = int(random.random() * 4)
 
-				if (self.dX < 0) : clrIndex  = int(random.uniform(6,9))
-				clr = self.clrUtils.wheel[clrIndex]
+				# "Optical" or RBY Color Wheel
+				if(self.colorMode == "colorWheel") : 
+					clrIndex = int(random.random() * len(self.clrUtils.colorWheel))
+					if(self.colorModeDirectional) :
+						# Ones from LEFT are different
+						if (self.dX < 0) : 
+							clrIndex  = int(random.uniform(6,len(self.clrUtils.colorWheel)))
+						else :
+							clrIndex  = int(random.uniform(0,5))
+					clr = self.clrUtils.wheel[clrIndex]
+
+				# RGB Color Wheel
+				if(self.colorMode == "colorRGB") : 
+					clrIndex = int(random.random() * len(self.clrUtils.rgbColorWheel))
+					if(self.colorModeDirectional) :
+						# Ones from LEFT are different
+						if (self.dX < 0) : 
+							clrIndex  = int(random.uniform(3,len(self.clrUtils.rgbColorWheel)))
+						else :
+							clrIndex  = int(random.uniform(0,3))
+					clr = self.clrUtils.rgbWheel[clrIndex]
+
+				'''
+				# Progressive color change - not used
 				self.clrIndex += 1
 				if(self.clrIndex == len(self.clrUtils.wheel)) :
 					self.clrIndex = 0
+				'''
+
+				# Any RGB color
+				if(self.colorMode == "random") : 
+					clr = self.clrUtils.randomColor(brt)
+
 			else :
 				r = int(random.uniform(200,255))
-				g = int(random.uniform(0,255))
+				g = int(random.uniform(0,100))
 				b = int(random.uniform(0,10))
 				clr = (r,g,b)
 
@@ -161,7 +186,7 @@ class ImageSprite :
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
 
-			if(self.processImage) : self.yOffset =  int(random.uniform(-self.yOffsetFactor * change, self.yOffsetFactor) )
+			if(self.processImage) : self.yOffset = int(random.uniform(-self.yOffsetFactor * change, self.yOffsetFactor) )
 
 	def remove(self, arrayList) :
 		arrayList.remove(self)

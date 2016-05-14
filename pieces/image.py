@@ -1,7 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, configuration
-from pieces import actions
+from modules import utils, configuration, badpixels
 from modules.imagesprite import ImageSprite
 from configs import localconfig
 
@@ -22,11 +21,11 @@ from subprocess import call
 xPos = 320
 yPos = 0
 
-act = actions
+bads = badpixels
 
 
 def main(run = True) :
-	global config, workConfig, blocks, simulBlocks, act
+	global config, workConfig, blocks, simulBlocks, bads
 	gc.enable()
 
 	print("Plane Loaded")
@@ -35,16 +34,20 @@ def main(run = True) :
 	config.speed = float(workConfig.get("scroll", 'scrollSpeed'))
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
+	config.imageToLoad = (workConfig.get("images", 'i1'))
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	#for i in range (0,simulBlocks) : makeBlock()
 
 	path = config.path  + "/assets/imgs/"
-	imageList = ['robert-indiana-love.png'] 
+	imageList = [config.imageToLoad] 
 
-	act.config = config
-	act.setBlanks()
+	bads.config = config
+	bads.setBlanks = bads.setBlanksOnImage
+	bads.numberOfDeadPixels = 200
+	bads.probabilityOfBlockBlanks = .99
+	bads.setBlanks()
 
 	for i in range (0,1) :
 		imgLoader = ImageSprite(config)
@@ -65,13 +68,10 @@ def main(run = True) :
 	if(run) : runWork()
 
 def runWork():
-	global blocks, config, act
+	global blocks, config, bads
 	#gc.enable()
 	while True:
-
 		iterate()
-		act.drawBlanks()
-		if(random.random() > .9) : act.setBlanks()
 		time.sleep(config.speed)	
 
 def iterate( n = 0) :
@@ -84,6 +84,9 @@ def iterate( n = 0) :
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	config.renderImageFull.paste(blocks[0].image)
+
+	#bads.drawBlanks(None, False)
+	if(random.random() > .2) : bads.setBlanks()
 	
 	# Render the final full image
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False)

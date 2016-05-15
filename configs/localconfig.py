@@ -1,19 +1,19 @@
 path = "/home/pi/RPI"
-path = "."
+#path = "."
 
 MID = "RPI10"
-MID = "studio-mac"
-
+#MID = "studio-mac"
 
 #WRKINID = "users-hat-1.0"
 
+#WRKINID = "machine-hub-1.1"
+#WRKINID = "machine-hat-1.1"
 
-WRKINID = "machine-hub-1.1"
 #WRKINID = "squares-hat-1.0"
 
 #WRKINID = "plane-hub-1.0"
 #WRKINID = "plane-hat-1.0"
-#WRKINID = "plane-hat-1.0.b"
+WRKINID = "plane-hat-1.0.b"
 #WRKINID = "plane-hub-1.0.b"
 
 #WRKINID = "stroop-hubout-1.0"

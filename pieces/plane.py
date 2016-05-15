@@ -51,7 +51,7 @@ def main(run = True) :
 		imgLoader.endY = config.screenHeight + 32
 		imgLoader.useJitter =  True
 		imgLoader.useBlink = True
-		imgLoader.brightnessFactor = 1 #config.brightness * random.random()
+		imgLoader.brightnessFactor = config.brightness * random.random()
 		imgLoader.config = config
 		imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
 		imgLoader.colorModeDirectional = colorModeDirectional
@@ -120,7 +120,7 @@ def drawVLine() :
 	if(xPos <0):xPos = config.screenWidth
 
 def redrawBackGround() :	
-	#config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
+	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
 	#if(random.random() > .99) : gc.collect()
 	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	return True

@@ -85,7 +85,7 @@ def iterate( n = 0) :
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	config.renderImageFull.paste(blocks[0].image)
 
-	#bads.drawBlanks(None, False)
+	bads.drawBlanks(None, False)
 	if(random.random() > .2) : bads.setBlanks()
 	
 	# Render the final full image

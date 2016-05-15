@@ -101,7 +101,16 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 	'''
 	
+
+	'''#******** NOTES ***************'''
 	config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+
+	''' 
+	# For planes, only this works - has to do with transparency of repeated pasting of
+	# PNG's I think
+	
+	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
+	'''
 
 	if(config.useFilters) :
 		

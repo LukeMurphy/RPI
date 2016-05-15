@@ -46,12 +46,12 @@ def main(run = True) :
 		imgLoader.debug = True
 		imgLoader.action = "pan"
 		imgLoader.xOffset = 0
-		imgLoader.yOffsetFactor = 100
+		imgLoader.yOffsetFactor = 200
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
 		imgLoader.useJitter =  True
 		imgLoader.useBlink = True
-		imgLoader.brightnessFactor = config.brightness * random.random()
+		imgLoader.brightnessFactor = 1 #config.brightness * random.random()
 		imgLoader.config = config
 		imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
 		imgLoader.colorModeDirectional = colorModeDirectional
@@ -86,7 +86,7 @@ def iterate( n = 0) :
 		updateCanvasCall = True if n == 0 else True
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 		# Never really want to do this as it force sends to the renderer for EACH item - big slowdowns etc
-		#config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
+		#\config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
 		pos = int(block.x + block.image.size[0])
 
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
@@ -120,7 +120,7 @@ def drawVLine() :
 	if(xPos <0):xPos = config.screenWidth
 
 def redrawBackGround() :	
-	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
+	#config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
 	#if(random.random() > .99) : gc.collect()
 	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	return True

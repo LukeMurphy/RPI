@@ -19,6 +19,9 @@ class ImageSprite :
 	startY = 0
 	endX = 0
 	endY = 0
+	xOffset = 0
+	yOffset = 0
+	yOffsetFactor = 40
 
 	reveal = 0
 	revealSpeed = 1
@@ -26,10 +29,6 @@ class ImageSprite :
 	setForRemoval = False
 
 	r=g=b=0
-	xOffset = 0
-	yOffset = 0
-	yOffsetFactor = 40
-
 	count = 0
 	frame = 1
 	countLimit = 1
@@ -186,7 +185,9 @@ class ImageSprite :
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
 
-			if(self.processImage) : self.yOffset = int(random.uniform(-self.yOffsetFactor * change, self.yOffsetFactor) )
+			# Not so great - yOffset is rendered useless by this  ....
+			if(self.processImage) : 
+				self.yOffset = int(random.uniform(self.config.screenHeight/2-self.yOffsetFactor * change, self.config.screenHeight/2 + self.yOffsetFactor) )
 
 	def remove(self, arrayList) :
 		arrayList.remove(self)

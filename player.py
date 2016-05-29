@@ -4,7 +4,6 @@ import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
 
-
 import numpy
 import os, sys, getopt, time, random, math, datetime, textwrap
 import gc
@@ -163,9 +162,12 @@ def configure() :
 
 def main():
 	global config, threads
+	configure()
+	'''
 	thrd = threading.Thread(target=configure)
 	threads.append(thrd)
 	thrd.start()
+	'''
 	
 
 if __name__ == "__main__":

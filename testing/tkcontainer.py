@@ -9,8 +9,8 @@ global thrd
 
 
 #from cntrlscripts import off_signal
-from modules import scroll
-from modules import colorutils
+#from modules import scroll
+#from modules import colorutils
 import gc
 
 
@@ -24,21 +24,20 @@ class App():
 
 	## Create a blank dummy object container for now
 	config = type('', (object,), {})()
-	scrollObj = scroll
+	#scrollObj = scroll
 
 	def __init__(self):
 		self.root = Tk()
 		#self.root.overrideredirect(1)
-		'''
+		
 		self.frame = Frame(self.root, width=128, height=128,
 						   borderwidth=0, padx=0, pady=0)
 		self.frame.pack_propagate(False)
 		self.frame.pack()
 		
-		'''
-		self.bQuit = Button(self.root, text="Quit",
-							command=self.root.quit)
-		self.bQuit.pack(padx=1,pady=6)
+		''''''
+		Button(self.root, text="Quit",command=self.root.quit).pack()
+
 		
 		self.config.screenWidth = 200
 		self.config.screenHeight =  200
@@ -48,7 +47,7 @@ class App():
 		self.cnvs.create_rectangle(0, 0, self.config.screenWidth, self.config.screenHeight, fill="black")
 		self.cnvs.update()
 
-
+		
 		self.root.after(0, self.startAnimation)
 		self.root.mainloop()     
 

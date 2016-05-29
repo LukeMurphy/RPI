@@ -5,7 +5,7 @@ import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter
 import random
-import numpy
+import numpy, time
 
 global root
 memoryUsage = 0
@@ -33,8 +33,12 @@ def setUp():
 	x = windowOffset[0]
 	y = windowOffset[1]
 
-	#root.overrideredirect(True)
+	root.overrideredirect(False)
 	root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+	#root.protocol("WM_DELETE_WINDOW", on_closing)
+
+	#Button(root, text="Quit", command=root.quit).pack(side="bottom")
+	root.lift()
 
 	cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
 	config.cnvs = cnvs
@@ -48,17 +52,24 @@ def setUp():
 	config.cnvs.update_idletasks()
 
 	root.after(0, startWork)
-	root.mainloop() 
+	root.call('wm', 'attributes', '.', '-topmost', '1')
+	root.mainloop()
+
+def on_closing():
+	global root
+
 
 def startWork(*args) :
 	global config, work, root
 	while True :
 		try :
 			work.runWork()
-		except KeyboardInterrupt,e :
+		except Exception,e :
 			print(str(e))
+			#work.runWork(False)
+			root.quit()
+			sys.exit()
 			root.destroy()
-
 
 def updateCanvas() :
 	global canvasOffsetX, canvasOffsetY

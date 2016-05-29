@@ -18,8 +18,8 @@ def setUp():
 	global root, canvasOffsetX, canvasOffsetY
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
-		windowOffset = [1900,2]
-		#windowOffset = [4,4]
+		windowOffset = [1900,20]
+		#windowOffset = [4,45]
 	else :
 		windowOffset = [-1,13]
 
@@ -67,7 +67,6 @@ def updateCanvas() :
 	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
 	config.cnvs._image_tk = ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw')
-
 	config.cnvs.update()
 
 def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
@@ -103,15 +102,27 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	
 
 	'''#******** NOTES ***************'''
-	config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+	try :
+		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+		config.renderImageFull =  config.renderImageFull.convert("RGB")
+	except  :
+		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
+		config.renderImageFull =  config.renderImageFull.convert("RGB")
 
 	''' 
 	# For planes, only this works - has to do with transparency of repeated pasting of
 	# PNG's I think
-	
-	config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 	'''
+	
 
+	
+	#newimage = Image.new('RGBA', config.renderImageFull.size)
+	#newimage.paste(config.renderImageFull, (0, 0))
+	#config.renderImageFull =  newimage.convert("RGB")
+	
+	''' -------------------------------'''
+
+	
 	if(config.useFilters) :
 		
 		newimage = Image.new('P', config.renderImageFull.size)

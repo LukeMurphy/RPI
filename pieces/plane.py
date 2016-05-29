@@ -33,6 +33,7 @@ def main(run = True) :
 	config.speed = float(workConfig.get("scroll", 'scrollSpeed'))
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
+	config.scalingFactor  = float(workConfig.get("displayconfig", 'scalingFactor'))
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
@@ -49,6 +50,7 @@ def main(run = True) :
 		imgLoader.yOffsetFactor = 200
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
+		imgLoader.scalingFactor = config.scalingFactor
 		imgLoader.useJitter =  True
 		imgLoader.useBlink = True
 		imgLoader.brightnessFactor = config.brightness * random.random()
@@ -57,7 +59,7 @@ def main(run = True) :
 		imgLoader.colorModeDirectional = colorModeDirectional
 		#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-		imgLoader.make(path + imageList[1], 1 , 0, True, True, True, True)
+		imgLoader.make(path + imageList[1], 1 * config.scalingFactor * 2 , 0, True, True, True, True)
 		blocks.append(imgLoader)
 
 	if(run) : runWork()
@@ -65,6 +67,7 @@ def main(run = True) :
 def runWork():
 	global blocks, config
 	#gc.enable()
+	print("running work.")
 	while True:
 		iterate()
 		time.sleep(config.speed)	

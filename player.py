@@ -19,6 +19,7 @@ from configs import localconfig
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
+threads = []
 
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
@@ -30,8 +31,9 @@ global imageTop,imageBottom,image,config,transWiring
 def configure() :
 	#global group, groups, config
 	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
-	global config, workconfig, path, tempImage
+	global config, workconfig, path, tempImage, threads, thrd
 	#gc.enable()
+
 	try: 
 
 		####
@@ -40,6 +42,9 @@ def configure() :
 		# Please fix me  ;(
 		## 
 
+		args = sys.argv
+		print(args)
+
 		baseconfig = localconfig
 		path = baseconfig.path
 
@@ -47,19 +52,23 @@ def configure() :
 		#baseconfig.read('localconfig.cfg')
 		config = configuration
 
-		# Machine ID
-		config.MID = baseconfig.MID
-		# Default Work Instance ID
-		config.WRKINID = baseconfig.WRKINID
-		# Default Local Path
-		config.path = baseconfig.path
-
-
 		# Load the default work
-		print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
-
 		workconfig = ConfigParser.ConfigParser()
-		workconfig.read(config.path  + '/configs/pieces/' + config.WRKINID + ".cfg")
+
+		if(len(args) > 1):
+			config.path  =  args[2]
+			argument =  args[3]
+			config.MID =  args[1]
+			workconfig.read(argument)
+		else :
+			# Machine ID
+			config.MID = baseconfig.MID
+			# Default Work Instance ID
+			config.WRKINID = baseconfig.WRKINID
+			# Default Local Path
+			config.path = baseconfig.path
+			print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
+			workconfig.read(config.path  + '/configs/pieces/' + config.WRKINID + ".cfg")
 
 		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
@@ -88,6 +97,10 @@ def configure() :
 		if(config.rendering == "hat") :
 			from modules import rendertohat
 			from cntrlscripts import stest
+			thrd = threading.Thread(target=stest.__main__)
+			threads.append(thrd)
+			thrd.start()
+
 			r = rendertohat
 			config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
 			config.transWiring = bool(workconfig.getboolean("displayconfig", 'transWiring'))
@@ -149,17 +162,7 @@ def configure() :
 
 
 def main():
-	global config
-
-	threads = []
-	
-	'''
-	if(config.rendering == "hat") :
-		thrd = threading.Thread(target=stest.__main__)
-		threads.append(thrd)
-		thrd.start()
-	'''
-
+	global config, threads
 	thrd = threading.Thread(target=configure)
 	threads.append(thrd)
 	thrd.start()

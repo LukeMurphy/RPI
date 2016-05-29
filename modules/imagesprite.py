@@ -121,7 +121,7 @@ class ImageSprite :
 	def process(self) :
 		if(self.processImage) :
 			if(self.resizeImage) :
-				change = random.uniform(.1,1.2)
+				change = random.uniform(.1,1.2) * self.scalingFactor
 				newSizeX = change * self.image.size[0]
 				newSizeY = change * self.image.size[1]
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
@@ -174,6 +174,7 @@ class ImageSprite :
 				b = int(random.uniform(0,10))
 				clr = (r,g,b)
 
+			# Color overlay on b/w PNG sprite
 			clrBlockDraw.rectangle((0,0,self.image.size[0], self.image.size[1]), fill=clr)
 			self.image =  ImageChops.multiply(clrBlock, self.image)
 

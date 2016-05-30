@@ -113,19 +113,20 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	
 
 	'''#******** NOTES ***************'''
+
 	try :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
-		config.renderImageFull =  config.renderImageFull.convert("RGB")
+		config.renderImageFull = config.renderImageFull.convert("RGB")
+		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 	except  :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
-		config.renderImageFull =  config.renderImageFull.convert("RGB")
+		config.renderImageFull = config.renderImageFull.convert("RGB")
+		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
 	''' 
 	# For planes, only this works - has to do with transparency of repeated pasting of
 	# PNG's I think
 	'''
-	
-
 	
 	#newimage = Image.new('RGBA', config.renderImageFull.size)
 	#newimage.paste(config.renderImageFull, (0, 0))

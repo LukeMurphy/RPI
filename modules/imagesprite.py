@@ -56,6 +56,7 @@ class ImageSprite :
 	brightnessFlux = False
 	brightnessFluxRate  = 8 # As a factor or PI/brightnessFluxRate
 	resizeToWidth = False
+	resizeToHeight = False
 	
 	processImage = True
 	resizeImage = True
@@ -63,6 +64,7 @@ class ImageSprite :
 	randomizeDirection = True
 	colorMode = "random" 
 	colorModeDirectional = True
+	yOffsetChange = True
 
 	lastPictureIndex = 0
 	debug = False
@@ -103,8 +105,12 @@ class ImageSprite :
 		if(self.loadImage(img)) :
 			# scale to the WIDTH of the screen
 			if(self.image.size[0] != self.config.screenWidth and self.resizeToWidth) :
-				self.ratio = float(config.screenWidth)/ image.size[0]
-				self.image = self.image.resize((self.config.screenWidth,int(self.ratio * self.image.size[1])))
+				self.ratio = float(self.config.screenWidth) / self.image.size[0]
+				self.image = self.image.resize((self.config.screenWidth, int(self.ratio * self.image.size[1])))
+
+			if(self.image.size[1] != self.config.screenHeight and self.resizeToHeight) :
+				self.ratio = float(self.config.screenHeight) / self.image.size[1]
+				self.image = self.image.resize((int(self.ratio * self.image.size[0]), self.config.screenHeight))
 
 			if(self.dX < 0) :
 				# Reverse image
@@ -119,6 +125,8 @@ class ImageSprite :
 			self.debugMessage ("could not load")
 
 	def process(self) :
+		change = 1
+
 		if(self.processImage) :
 			if(self.resizeImage) :
 				change = random.uniform(.1,1.2) * self.scalingFactor
@@ -126,9 +134,6 @@ class ImageSprite :
 				newSizeY = change * self.image.size[1]
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
 
-			#Colorize via overlay etc
-			clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
-			clrBlockDraw = ImageDraw.Draw(clrBlock)
 
 			brt = random.random()
 
@@ -174,6 +179,18 @@ class ImageSprite :
 				b = int(random.uniform(0,10))
 				clr = (r,g,b)
 
+			self.colorize(clr)
+
+			# Not so great - yOffset is rendered useless by this  ....
+			if(self.processImage and self.yOffsetChange) : 
+				self.yOffset = int(random.uniform(self.config.screenHeight/2-self.yOffsetFactor * change, self.config.screenHeight/2 + self.yOffsetFactor) )
+
+	def colorize(self, clr) :
+
+			#Colorize via overlay etc
+			clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
+			clrBlockDraw = ImageDraw.Draw(clrBlock)
+
 			# Color overlay on b/w PNG sprite
 			clrBlockDraw.rectangle((0,0,self.image.size[0], self.image.size[1]), fill=clr)
 			self.image =  ImageChops.multiply(clrBlock, self.image)
@@ -185,10 +202,6 @@ class ImageSprite :
 			self.image = enhancer.enhance(self.brightnessFactor)
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
-
-			# Not so great - yOffset is rendered useless by this  ....
-			if(self.processImage) : 
-				self.yOffset = int(random.uniform(self.config.screenHeight/2-self.yOffsetFactor * change, self.config.screenHeight/2 + self.yOffsetFactor) )
 
 	def remove(self, arrayList) :
 		arrayList.remove(self)

@@ -29,11 +29,16 @@ def main(run = True) :
 
 	print("Plane Loaded")
 
-	config.vOffset = int(workConfig.get("scroll", 'vOffset'))
-	config.speed = float(workConfig.get("scroll", 'scrollSpeed'))
-	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
-	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
-	config.scalingFactor  = float(workConfig.get("displayconfig", 'scalingFactor'))
+	config.vOffset = int(workConfig.get("plane", 'vOffset'))
+	config.speed = float(workConfig.get("plane", 'scrollSpeed'))
+	config.displayRows = int(workConfig.get("plane", 'displayRows'))
+	config.displayCols = int(workConfig.get("plane", 'displayCols'))
+	config.unitCount = int(workConfig.get("plane", 'unitCount'))
+	config.scalingFactor  = float(workConfig.get("plane", 'scalingFactor'))
+	config.useJitter  = bool(workConfig.get("plane", 'useJitter'))
+	config.useBlink  = bool(workConfig.get("plane", 'useBlink'))
+	config.noTrails  = bool(workConfig.get("plane", 'noTrails'))
+
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
@@ -42,7 +47,7 @@ def main(run = True) :
 	path = config.path  + "/assets/imgs/"
 	imageList = ['plane-2b.gif','plane-2tw.png','plane-2tg.png','plane-2t.png'] 
 
-	for i in range (0,14) :
+	for i in range (0,config.unitCount) :
 		imgLoader = ImageSprite(config)
 		imgLoader.debug = True
 		imgLoader.action = "pan"
@@ -50,17 +55,33 @@ def main(run = True) :
 		imgLoader.yOffsetFactor = 200
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
-		imgLoader.scalingFactor = config.scalingFactor
-		imgLoader.useJitter =  True
-		imgLoader.useBlink = True
-		imgLoader.brightnessFactor = config.brightness * random.random()
-		imgLoader.config = config
-		imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
-		imgLoader.colorModeDirectional = colorModeDirectional
-		#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
-		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-		imgLoader.make(path + imageList[1], 1 * config.scalingFactor * 2 , 0, True, True, True, True)
+		if(config.unitCount == 1) :
+			imgLoader.scalingFactor = config.scalingFactor
+			imgLoader.useJitter =  config.useJitter
+			imgLoader.useBlink = config.useBlink
+			imgLoader.brightnessFactor = config.brightness * random.random()
+			imgLoader.config = config
+			imgLoader.colorMode = "fixed" #colorWheel #random #colorRGB
+			imgLoader.colorModeDirectional = False
+			imgLoader.resizeToHeight = False
+			imgLoader.yOffsetChange = False
+			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
+			imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
+
+		else :
+			imgLoader.scalingFactor = config.scalingFactor
+			imgLoader.useJitter =  config.useJitter
+			imgLoader.useBlink = config.useBlink
+			imgLoader.brightnessFactor = config.brightness * random.random()
+			imgLoader.config = config
+			imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
+			imgLoader.colorModeDirectional = colorModeDirectional
+			#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
+			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
+			imgLoader.make(path + imageList[1], 1 * config.scalingFactor * 2 , 0, True, True, True, True)
 		blocks.append(imgLoader)
+	# Assume single plane type display
+
 
 	if(run) : runWork()
 
@@ -80,7 +101,7 @@ def iterate( n = 0) :
 	if(random.random() > .998) : shuffle(blocks)
 	if(random.random() > .9985) : colorModeDirectional = False if colorModeDirectional == True else True
 
-	redrawBackGround()
+	if(config.noTrails) : redrawBackGround()
 
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
@@ -89,7 +110,7 @@ def iterate( n = 0) :
 		updateCanvasCall = True if n == 0 else True
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 		# Never really want to do this as it force sends to the renderer for EACH item - big slowdowns etc
-		#\config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
+		#config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
 		pos = int(block.x + block.image.size[0])
 
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
@@ -122,8 +143,9 @@ def drawVLine() :
 	xPos -= 1
 	if(xPos <0):xPos = config.screenWidth
 
-def redrawBackGround() :	
+def redrawBackGround() :
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
+	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
 	#if(random.random() > .99) : gc.collect()
 	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	return True

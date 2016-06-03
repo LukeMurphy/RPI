@@ -102,7 +102,7 @@ def configure() :
 
 			r = rendertohat
 			config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
-			config.transWiring = bool(workconfig.getboolean("displayconfig", 'transWiring'))
+			config.transWiring = (workconfig.getboolean("displayconfig", 'transWiring'))
 			config.actualScreenWidth  = int(workconfig.get("displayconfig", 'actualScreenWidth'))
 			r.config = config
 			r.setUp()
@@ -114,6 +114,8 @@ def configure() :
 			from modules import rendertohub
 			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			config.rotation = float(workconfig.get("displayconfig", 'rotation'))
+			config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
+			config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
 			config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
 			config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
 			# Create the image-canvas for the work
@@ -137,9 +139,13 @@ def configure() :
 		if(config.rendering == "out") :
 			from modules import rendertofile
 			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
+			config.rotation = float(workconfig.get("displayconfig", 'rotation'))
+			config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
+			config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
 			r = rendertofile
 			r.config = config
 			r.work = work
+			r.work.x = r.work.y = 0
 			r.fps = int(workconfig.get("output", 'fps'))
 			r.duration = int(workconfig.get("output", 'duration'))
 

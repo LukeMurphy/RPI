@@ -120,7 +120,9 @@ def iterate( n = 0) :
 	#if(block.setForRemoval==True) : makeBlock()
 	
 	# Render the final full image
+	config.image = config.renderImageFull
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, updateCanvasCall)
+
 
 	# cleanup the list
 	#blocks[:] = [block for block in blocks if block.setForRemoval!=True]

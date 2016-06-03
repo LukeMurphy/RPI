@@ -56,6 +56,11 @@ def videoClipMaker() :
 	yOffset = work.y	
 
 	# xOffset+config.workRef.wd, yOffset+config.workRef.ht
+	if(config.rotation != 0) : 
+		if(config.fullRotation == False) : 
+			imageToRender = imageToRender.rotate(-config.rotation)
+		else :
+			config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
 	if(config.useFilters) :
 		'''------------------------------------------------------------------------'''
 		'''#######################    FILTERS               #######################'''
@@ -106,6 +111,11 @@ def videoClipMaker() :
 	else :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 	
+	if(config.rotation != 0) : 
+		if(config.fullRotation == False) : 
+			imageToRender = imageToRender.rotate(config.rotation)
+		else :
+			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 	#img = config.renderImageFull.resize((640,480))
 	img = config.renderImageFull
 	#img = img.filter(ImageFilter.UnsharpMask(radius=10, percent=200,threshold=0))
@@ -130,7 +140,7 @@ def toVideo() :
 
 	ts = time.time()
 	st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d--%H-%M-%S')
-	name = config.WRKINID + "_" + st + "_video.avi"
+	name = config.work + "_" + st + "_video.avi"
 
 	'''
 	p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', vcodecImg, '-r', str(fps) , '-i', '-', 

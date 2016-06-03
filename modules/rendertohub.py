@@ -89,7 +89,10 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#*******************************************************************************
 
 	if(config.rotation != 0) : 
-		config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
+		if(config.fullRotation == False) : 
+			imageToRender = imageToRender.rotate(-config.rotation)
+		else :
+			config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
 		#config.renderImageFull = ImageChops.offset(config.renderImageFull, -10, 0) 
 
 	'''
@@ -116,12 +119,14 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	try :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
-		config.renderImageFull = config.renderImageFull.convert("RGB")
-		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 	except  :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
-		config.renderImageFull = config.renderImageFull.convert("RGB")
-		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
+
+	#if(config.rotation != 0 and config.rotationTrailing==False) : 
+	#	config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+
+	config.renderImageFull = config.renderImageFull.convert("RGB")
+	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
 	''' 
 	# For planes, only this works - has to do with transparency of repeated pasting of
@@ -175,7 +180,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		'''
 
 	if(config.rotation != 0) : 
-		config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+		if(config.rotationTrailing or config.fullRotation) : 
+			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 		
 
 	if(updateCanvasCall) : updateCanvas() 

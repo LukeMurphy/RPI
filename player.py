@@ -131,6 +131,7 @@ def configure() :
 			r = rendertohub
 			r.config = config
 			r.work = work
+			config.drawBeforeConversion = r.drawBeforeConversion
 			config.render = r.render
 			config.updateCanvas = r.updateCanvas
 			work.main(False)

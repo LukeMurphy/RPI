@@ -86,7 +86,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	# Render to canvas
 	# This needs to be optomized !!!!!!
-	#*******************************************************************************
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	if(config.rotation != 0) : 
 		if(config.fullRotation == False) : 
@@ -97,7 +97,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	'''
 	if(config.useFilters) :
-		#------------------------------------------------------------------------
+		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		#              FILTERS                                                   
 		# ugly hippy 
 		#config.image = config.image.filter(ImageFilter.GaussianBlur(radius=1))
@@ -125,6 +125,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#if(config.rotation != 0 and config.rotationTrailing==False) : 
 	#	config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
+	config.drawBeforeConversion()
+
 	config.renderImageFull = config.renderImageFull.convert("RGB")
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
@@ -137,7 +139,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#newimage.paste(config.renderImageFull, (0, 0))
 	#config.renderImageFull =  newimage.convert("RGB")
 	
-	''' -------------------------------'''
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	
 	if(config.useFilters) :
@@ -183,7 +185,6 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		if(config.rotationTrailing or config.fullRotation) : 
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 		
-
 	if(updateCanvasCall) : updateCanvas() 
 
 	#mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
@@ -192,7 +193,10 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#	print 'Memory usage: %s (mb)' % str(memoryUsage)
 
 
-	#*******************************************************************************
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def drawBeforeConversion() :
+	return True
 
 def gen_matrix( e ):
 	''' Generating new matrix.
@@ -230,5 +234,7 @@ def ordered_dithering( pixel, size, matrix ):
 		for x in xrange(0, X):
 			pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
 
-	#*******************************************************************************
-	#*******************************************************************************
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+

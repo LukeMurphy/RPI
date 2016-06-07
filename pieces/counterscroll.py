@@ -2,7 +2,7 @@ import time
 import random
 import textwrap
 import math
-from PIL import ImageFont, Image, ImageDraw
+from PIL import ImageFont, Image, ImageDraw, ImageOps
 from modules import colorutils, badpixels
 
 
@@ -20,10 +20,10 @@ class ScrollMessage :
 		self.messageString = messageString
 		self.direction = direction
 
-		config.fontSize = int(workConfig.get("stroop", 'fontSize'))
+		config.fontSize = int(workConfig.get("scroll", 'fontSize'))
 		config.vOffset = int(workConfig.get("scroll", 'vOffset'))
 		config.scrollSpeed = float(workConfig.get("scroll", 'scrollSpeed'))
-		config.shadowSize = int(workConfig.get("stroop", 'shadowSize'))
+		config.shadowSize = int(workConfig.get("scroll", 'shadowSize'))
 
 		self.config = config
 		self.clr = colorutils.getRandomRGB()
@@ -90,7 +90,8 @@ class XOx :
 	def drawCounterXO(self) :
 		## Try with drawing xo's first then by pasting block ..
 
-		draw  = ImageDraw.Draw(self.config.renderImageFull)
+		#draw  = ImageDraw.Draw(self.config.renderImageFull)
+		draw  = ImageDraw.Draw(self.config.canvasImage)
 
 		for n in range (0, len(self.xoString)):
 			startX = self.xPos + n * self.xsWidth + 8
@@ -117,7 +118,7 @@ def callBack() :
 		if(random.random() > .8 ) :
 			XOs.xoString = XOs.makeBlock()
 		else :
-			XOs.xPos = config.screenWidth + XOs.bufferSpacing
+			XOs.xPos = config.canvasImageWidth  + XOs.bufferSpacing
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -128,25 +129,46 @@ def makeBlock() :
 	num = int(random.uniform(2,10))
 	for n in range (0, num) : 
 		strg += ":)"+space
-		if (random.random() > .95) : strg += ":o"+space
+		if (random.random() > .5) : strg += ":o"+space
 		if (random.random() > .95) : strg += ";)"+space
 	return strg
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def blank() :
+	pass
+
 def main(run = True) :
 	global config, scroll, XOs
-
+	print("---------------------\n")
 	print("CounterScroll Loaded")
 	colorutils.brightness = config.brightness
 	badpixels.config = config
+
+	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
+	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
+	config.canvasImageWidth = config.canvasWidth * config.displayRows
+	config.canvasImageHeight = config.canvasHeight
+
+	# Used to composite XO's and message text
+	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , int(config.screenHeight / config.displayRows)))
+	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
+
+	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
+	config.canvasImageFinal = Image.new("RGBA", (config.screenWidth , config.screenHeight))
+
+	print("---------------------\n")
+	print(config.canvasImage)
+	print("---------------------\n")
+
 	XOs = XOx("RIGHT", config)
 
-	print (config.render)
 	config.drawBeforeConversion = callBack
+	config.drawBeforeConversion = blank
 
 	setUp()
+
 	if(run) : runWork()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -158,11 +180,13 @@ def setUp():
 
 	scroll = ScrollMessage(makeBlock(),"LEFT",config)
 	scroll.end = config.screenWidth #+ scroll.scrollImage.size[0]
+	scroll.end = config.screenWidth * config.displayRows 
 	scroll.start = -scroll.scrollImage.size[0]
 
 	if(scroll.direction == "Right") : 
 		scroll.start = -end
-		scroll.end = config.screenWidth
+		#scroll.end = config.screenWidth
+		#scroll.end = config.screenWidth * config.rows
 
 	scroll.xPos = scroll.start
 
@@ -183,9 +207,34 @@ def iterate() :
 		scroll.xPos -= scroll.steps
 	else :
 		scroll.xPos += scroll.steps
+
 	draw  = ImageDraw.Draw(config.renderImageFull)
 	draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = 0)
-	config.render(scroll.scrollImage, scroll.xPos, config.vOffset, scroll.pixLen[0], scroll.fontHeight, False)
+
+	draw  = ImageDraw.Draw(config.canvasImage)
+	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = 0)
+
+	# move the scrollImage and paste into the canvasImage - but eventually chop and flip
+	config.canvasImage.paste(scroll.scrollImage, (scroll.xPos, config.vOffset))
+	# Add the counter XO's
+	callBack()
+
+	#config.render(config.canvasImage, 0, 0, 192, 80, False)
+	for n in range(0, config.displayRows) :
+		segmentHeight = int(config.screenHeight / config.displayRows)
+		segmentWidth = config.screenWidth
+		segment =  config.canvasImage.crop((n * config.screenWidth, 0, segmentWidth + n * config.screenWidth, segmentHeight))
+		if (n == 1) :
+			segment = ImageOps.flip(segment)
+			segment = ImageOps.mirror(segment)
+		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
+		#config.canvasImageFinal.paste(config.canvasImage, (0,n * int(config.screenHeight / config.displayRows)))
+
+	config.render(config.canvasImageFinal , 0, 0, 192, 192, False)
+
+	# This moves the scrollImage, which is then pasted into the main renderImage
+	#config.render(scroll.scrollImage, scroll.xPos, config.vOffset, scroll.pixLen[0], scroll.fontHeight, False)
+
 	badpixels.drawBlanks()
 	#config.updateCanvas()
 	

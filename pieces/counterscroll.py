@@ -5,6 +5,8 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps
 from modules import colorutils, badpixels
 
+blocks = []
+XOsBlocks = []
 
 class ScrollMessage :
 
@@ -13,7 +15,6 @@ class ScrollMessage :
 	scrollSpeed = 0.0006
 	steps = 4
 	fontSize = 14
-
 
 	def __init__(self, messageString, direction, config) :
 		#print ("init: " + messageString)
@@ -27,6 +28,8 @@ class ScrollMessage :
 
 		self.config = config
 		self.clr = colorutils.getRandomRGB()
+
+		#self.clr = (0,0,0)
 
 		# draw the message to get its size
 		font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSerifBold.ttf', config.fontSize)
@@ -50,6 +53,17 @@ class ScrollMessage :
 		self.xPos = 0
 		self.yPos = config.vOffset
 
+		self.end = config.screenWidth * config.displayRows
+
+	def scroll(self) :
+		if(self.direction == "Left") :
+			self.xPos -= self.steps
+		else :
+			self.xPos += self.steps
+
+		#if(self.xPos > self.end) :
+		#	self.xPos = self.start = -self.scrollImage.size[0]
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 class XOx :
@@ -58,9 +72,9 @@ class XOx :
 	#scroll speed and steps per cycle
 	scrollSpeed = 0.0006
 	steps = 4
-	lineThickness = 8
+	lineThickness = 4
 	bufferSpacing = 40
-	xsWidth = 75
+	xsWidth = 54
 
 	def __init__(self, direction, config) :
 		#print ("init: " + messageString)
@@ -79,11 +93,12 @@ class XOx :
 		self.yPos = 0
 
 		num = int(random.uniform(3,10))
+		num = 4
 		for n in range (0, num) : 
 			if (random.random() > .5) : strg += "X"
 			else  : strg += "O"
 
-		self.messageLength = n * self.xsWidth + self.bufferSpacing
+		self.messageLength = n * (self.xsWidth + 8)
 
 		return strg
 
@@ -92,7 +107,7 @@ class XOx :
 
 		#draw  = ImageDraw.Draw(self.config.renderImageFull)
 		draw  = ImageDraw.Draw(self.config.canvasImage)
-
+		leng = 0 
 		for n in range (0, len(self.xoString)):
 			startX = self.xPos + n * self.xsWidth + 8
 			endX = self.xPos + n * self.xsWidth + self.xsWidth
@@ -106,20 +121,17 @@ class XOx :
 				draw.ellipse((startX, startY, endX, endY),  outline=self.clr)
 				draw.ellipse((startX +1, startY+1, endX-1, endY-1),  outline=self.clr)
 
-		self.xPos -= 4
+			leng += endX - startX
+	
+		self.xPos -= 2
 
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def callBack() :
-	global config, XOs, scroll
-	XOs.drawCounterXO()
-	if(XOs.xPos < -XOs.messageLength - XOs.bufferSpacing) :
-		if(random.random() > .8 ) :
-			XOs.xoString = XOs.makeBlock()
-		else :
-			XOs.xPos = config.canvasImageWidth  + XOs.bufferSpacing
-
+		'''
+		if(self.xPos < -self.messageLength - self.bufferSpacing) :
+			if(random.random() > .8 ) :
+				self.xoString = self.makeBlock()
+			else :
+				self.xPos = config.canvasImageWidth  + self.bufferSpacing
+		'''
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -131,17 +143,14 @@ def makeBlock() :
 		strg += ":)"+space
 		if (random.random() > .5) : strg += ":o"+space
 		if (random.random() > .95) : strg += ";)"+space
+	#strg ="| oTESTx |"
 	return strg
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def blank() :
-	pass
-
 def main(run = True) :
-	global config, scroll, XOs
-	print("---------------------\n")
+	global config
+	print("---------------------")
 	print("CounterScroll Loaded")
 	colorutils.brightness = config.brightness
 	badpixels.config = config
@@ -158,14 +167,11 @@ def main(run = True) :
 	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
 	config.canvasImageFinal = Image.new("RGBA", (config.screenWidth , config.screenHeight))
 
-	print("---------------------\n")
+	print("---------------------")
 	print(config.canvasImage)
 	print("---------------------\n")
 
-	XOs = XOx("RIGHT", config)
-
-	config.drawBeforeConversion = callBack
-	config.drawBeforeConversion = blank
+	#config.drawBeforeConversion = callBack
 
 	setUp()
 
@@ -174,52 +180,82 @@ def main(run = True) :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
-	global config, scroll, XOs, overlayImage
+	global config, XOsBlocks, overlayImage, blocks
 
 	#overlayImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
+	lastWidth = 0
+	for n in range (0, 3) :
+		scroll = ScrollMessage(makeBlock(),"LEFT",config)
+		#scroll.end = config.screenWidth * config.displayRows
+		scroll.start = -scroll.scrollImage.size[0] - lastWidth
 
-	scroll = ScrollMessage(makeBlock(),"LEFT",config)
-	scroll.end = config.screenWidth #+ scroll.scrollImage.size[0]
-	scroll.end = config.screenWidth * config.displayRows 
-	scroll.start = -scroll.scrollImage.size[0]
+		if(scroll.direction == "Right") : 
+			scroll.start = -end
+			#scroll.end = config.screenWidth * config.rows
+		lastWidth += scroll.scrollImage.size[0]
+		scroll.xPos = scroll.start
+		blocks.append(scroll)
 
-	if(scroll.direction == "Right") : 
-		scroll.start = -end
-		#scroll.end = config.screenWidth
-		#scroll.end = config.screenWidth * config.rows
-
-	scroll.xPos = scroll.start
+	lastWidth = 0
+	for n in range (0, 3) :
+		XOs = XOx("RIGHT", config)
+		XOs.xPos = XOs.start = config.canvasImageWidth + lastWidth
+		lastWidth += XOs.messageLength + 40
+		XOsBlocks.append(XOs)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def runWork():
-	global blocks, config, scroll, XOs
+	global blocks, config, XOs
 	#gc.enable()
 	while True:
 		iterate()
-		time.sleep(scroll.scrollSpeed)  
+		time.sleep(config.scrollSpeed)  
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate() :
-	global config, blocks, x, y, scroll
-	if(scroll.direction == "Left") :
-		scroll.xPos -= scroll.steps
-	else :
-		scroll.xPos += scroll.steps
+	global config, blocks, x, y, XOsBlocks
 
+	# Blank out canvases
 	draw  = ImageDraw.Draw(config.renderImageFull)
 	draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = 0)
 
 	draw  = ImageDraw.Draw(config.canvasImage)
 	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = 0)
 
-	# move the scrollImage and paste into the canvasImage - but eventually chop and flip
-	config.canvasImage.paste(scroll.scrollImage, (scroll.xPos, config.vOffset))
-	# Add the counter XO's
-	callBack()
+	# Scroll message
+	for n in range (0, 3) :
+		scroll = blocks[n]
+		scroll.scroll()
+		# paste scrollImage into the canvasImage - but eventually chop and flip
+		config.canvasImage.paste(scroll.scrollImage, (scroll.xPos, config.vOffset))
 
-	#config.render(config.canvasImage, 0, 0, 192, 80, False)
+		# previous block
+		p = n -1 if (n != 0) else 2
+
+		# a block moves off-screen, possibly change message, then move to back of queue
+		if(scroll.xPos > scroll.end) :
+			if(random.random() > .5) :
+				blocks[n] = ScrollMessage(makeBlock(),"LEFT",config)
+				scroll = blocks[n]
+			scroll.xPos = scroll.start = -scroll.scrollImage.size[0] + blocks[p].xPos 
+
+	# Add the counter XO's
+	for n in range (0, 3) :
+		XOs = XOsBlocks[n]
+		XOs.drawCounterXO()
+
+		# previous block
+		p = n -1 if (n != 0) else 2
+
+		if(XOs.xPos < -XOs.messageLength) :
+			if(random.random() > .9998 ) :
+				XOsBlocks[n] = XOs.makeBlock()
+				XOs = XOsBlocks[n]
+			XOs.xPos = XOsBlocks[p].xPos + XOsBlocks[p].messageLength if (XOsBlocks[p].xPos + XOsBlocks[p].messageLength >= config.canvasImageWidth) else config.canvasImageWidth
+
+	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
 		segmentHeight = int(config.screenHeight / config.displayRows)
 		segmentWidth = config.screenWidth
@@ -228,24 +264,21 @@ def iterate() :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
-		#config.canvasImageFinal.paste(config.canvasImage, (0,n * int(config.screenHeight / config.displayRows)))
 
 	config.render(config.canvasImageFinal , 0, 0, 192, 192, False)
 
-	# This moves the scrollImage, which is then pasted into the main renderImage
-	#config.render(scroll.scrollImage, scroll.xPos, config.vOffset, scroll.pixLen[0], scroll.fontHeight, False)
-
 	badpixels.drawBlanks()
 	#config.updateCanvas()
-	
-	if(scroll.xPos > scroll.end) :
-		if(random.random() > .5) :
-			setUp()
-		else :
-			scroll.xPos = scroll.start = -scroll.scrollImage.size[0]
 
+	#time.sleep(1)
+	
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def callBack() :
+	global config, XOs
+	return True
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
 

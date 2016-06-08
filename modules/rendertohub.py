@@ -125,7 +125,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#if(config.rotation != 0 and config.rotationTrailing==False) : 
 	#	config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
-	config.drawBeforeConversion()
+	#config.drawBeforeConversion()
 
 	config.renderImageFull = config.renderImageFull.convert("RGB")
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)

@@ -23,6 +23,8 @@ threads = []
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 ###################################################
 # -------   Reads configuration files and sets
 # -------   defaults                             *#
@@ -118,19 +120,21 @@ def configure() :
 			config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
 			config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
 			config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
+			
 			# Create the image-canvas for the work
 			# Because rotation is an option, recreate accordingly
-			
-			config.renderImage = PIL.Image.new("RGBA", (config.canvasWidth*config.rows, 32))
+			# And to be sure, make the renderImageFull bigger than necessary - 		
+			config.renderImage = PIL.Image.new("RGBA", (config.canvasWidth * config.rows, 32))
 			config.renderImageFull = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-			config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40) 
+			config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 			config.image = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 			config.draw = ImageDraw.Draw(config.image)
-			config.renderDraw = ImageDraw.Draw(config.renderImageFull)
-
+			
 			r = rendertohub
 			r.config = config
 			r.work = work
+			r.canvasOffsetX = int(workconfig.get("displayconfig", 'canvasOffsetX'))
+			r.canvasOffsetY = int(workconfig.get("displayconfig", 'canvasOffsetY'))
 			config.drawBeforeConversion = r.drawBeforeConversion
 			config.render = r.render
 			config.updateCanvas = r.updateCanvas
@@ -166,6 +170,8 @@ def configure() :
 		print ("Error:" + str(err))
 		return False
 
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main():
 	global config, threads

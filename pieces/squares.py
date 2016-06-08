@@ -7,17 +7,15 @@ from PIL import Image, ImageDraw
 import sys
 from modules import colorutils
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#make script to reduce from one square to 2 to 4 to 8 to 16...
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 x = y = 0
 r=255
 g=b=0
 pulseSpeed = .1
 colorSwitch = False
 countLimit = 16
-
-'''
-make script to reduce from one square to 2 to 4 to 8 to 16...
-'''
-
 rHeight = 0
 rWidth = 0
 rows  = 1
@@ -29,6 +27,7 @@ divisionOfSquares = [1,1,2,2,4,4,8,8,16,16,32,32,64,64]
 divisionPosition = 0
 colorutil = colorutils
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def drawRects() :
 	global config
@@ -70,6 +69,8 @@ def drawRects() :
 				for l in range(0,lineWidth) :
 					config.draw.rectangle((xStart+l, yStart+l, xEnd - l, yEnd - l ), outline=(r,g,b))
 		
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def changeColor( rnd = False, choice = 3) :
 	global r,g,b, colorutil       
 	if (rnd == False) :
@@ -101,6 +102,8 @@ def changeColor( rnd = False, choice = 3) :
 		g = clr[1]
 		b = clr[2]	
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def animator() :
 	global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
 	global rows, cols, columnLimit, count, mode
@@ -123,14 +126,27 @@ def animator() :
 	config.draw  = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
 
-def callBack() :
-	global config
-	#animator()
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def main(run = True) :
+	global config, workConfig
+	setUp()
+	if(run) : runWork()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def setUp() :
+	animator()
+	retrun True
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def runWork():
 	while True:
 		iterate()
 		time.sleep(.1)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate() :
 	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares
@@ -156,7 +172,10 @@ def iterate() :
 
 	config.render(config.image, 0, 0,128,64)
 
-def main(run = True) :
-	global config, workConfig
-	animator()
-	if(run) : runWork()
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def callBack() :
+	global config
+	#animator()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

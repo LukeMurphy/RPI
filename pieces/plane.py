@@ -18,10 +18,39 @@ import ConfigParser, io
 import gc
 from subprocess import call
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 xPos = 320
 yPos = 0
 colorModeDirectional = False
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def drawVLine() :
+	global xPos, yPos
+	if(random.random() > .998) :
+		pass
+		#xPos = int(random.uniform(0,config.screenWidth))
+		#yPos = 0 #int(random.uniform(0,config.screenHeight))
+	r = 0
+	g = 0
+	b = 0
+	if(random.random() > .0) : 
+		config.renderDraw.rectangle((xPos,yPos,xPos, config.screenHeight/2-1), fill = (r,g,b))
+		config.renderDraw.rectangle((xPos+1,config.screenHeight/2,xPos+1, config.screenHeight), fill = (r,g,b))
+	xPos -= 1
+	if(xPos <0):xPos = config.screenWidth
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def redrawBackGround() :
+	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
+	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
+	#if(random.random() > .99) : gc.collect()
+	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	return True
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks, colorModeDirectional
@@ -85,6 +114,8 @@ def main(run = True) :
 
 	if(run) : runWork()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def runWork():
 	global blocks, config
 	#gc.enable()
@@ -92,6 +123,8 @@ def runWork():
 	while True:
 		iterate()
 		time.sleep(config.speed)	
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate( n = 0) :
 	global config, blocks, colorModeDirectional
@@ -130,41 +163,10 @@ def iterate( n = 0) :
 
 	if len(blocks) == 0 : exit()
 
-def drawVLine() :
-	global xPos, yPos
-	if(random.random() > .998) :
-		pass
-		#xPos = int(random.uniform(0,config.screenWidth))
-		#yPos = 0 #int(random.uniform(0,config.screenHeight))
-	r = 0
-	g = 0
-	b = 0
-	if(random.random() > .0) : 
-		config.renderDraw.rectangle((xPos,yPos,xPos, config.screenHeight/2-1), fill = (r,g,b))
-		config.renderDraw.rectangle((xPos+1,config.screenHeight/2,xPos+1, config.screenHeight), fill = (r,g,b))
-	xPos -= 1
-	if(xPos <0):xPos = config.screenWidth
-
-def redrawBackGround() :
-	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
-	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
-	#if(random.random() > .99) : gc.collect()
-	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	return True
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def callBack() :
 	global config
 	pass
 
-
-
-
-
-
-
-
-
-
-
-	
-#####################
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -3,16 +3,20 @@ import tkMessageBox
 import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
-from PIL import ImageFilter
+from PIL import ImageFilter, ImageChops
 import random
 import numpy, time
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 global root
 memoryUsage = 0
 debug = False
 
-canvasOffsetX = 3
-canvasOffsetY = 3
+canvasOffsetX = 4
+canvasOffsetY = 7
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
 	global root, canvasOffsetX, canvasOffsetY
@@ -25,11 +29,13 @@ def setUp():
 
 	# -----> this is somewhat arbitrary - just to get the things aligned
 	# after rotation
-	if(config.rotation == 90) : canvasOffsetY = -25
+	#if(config.rotation == 90) : canvasOffsetY = -25
+
+	buff  =  8
 
 	root = Tk()
-	w = config.screenWidth + 8
-	h = config.screenHeight  + 8
+	w = config.screenWidth + buff
+	h = config.screenHeight  + buff
 	x = windowOffset[0]
 	y = windowOffset[1]
 
@@ -40,10 +46,10 @@ def setUp():
 	#Button(root, text="Quit", command=root.quit).pack(side="bottom")
 	root.lift()
 
-	cnvs = Canvas(root, width=config.screenWidth + 4, height=config.screenHeight + 4)
+	cnvs = Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff)
 	config.cnvs = cnvs
 	config.cnvs.pack()
-	config.cnvs.create_rectangle(0, 0, config.screenWidth + 8, config.screenHeight + 8, fill="black")
+	config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
 	
 	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw')
@@ -55,9 +61,13 @@ def setUp():
 	root.call('wm', 'attributes', '.', '-topmost', '1')
 	root.mainloop()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def on_closing():
 	global root
+	return True
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def startWork(*args) :
 	global config, work, root
@@ -71,6 +81,8 @@ def startWork(*args) :
 			sys.exit()
 			root.destroy()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def updateCanvas() :
 	global canvasOffsetX, canvasOffsetY
 	## For testing ...
@@ -80,95 +92,47 @@ def updateCanvas() :
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw')
 	config.cnvs.update()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
 	global memoryUsage
 	global config, debug
 
 	# Render to canvas
 	# This needs to be optomized !!!!!!
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	if(config.rotation != 0) : 
-		if(config.fullRotation == False) : 
+		if(config.fullRotation == False) :
+			# This rotates the image sent to be rendered
 			imageToRender = imageToRender.rotate(-config.rotation)
+			#imageToRender = ImageChops.offset(imageToRender, -40, 40) 
 		else :
+			# This rotates the image that is painted i.e. after pasting-in the image sent
 			config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
-		#config.renderImageFull = ImageChops.offset(config.renderImageFull, -10, 0) 
-
-	'''
-	if(config.useFilters) :
-		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-		#              FILTERS                                                   
-		# ugly hippy 
-		#config.image = config.image.filter(ImageFilter.GaussianBlur(radius=1))
-		#config.image = config.image.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
-		#config.renderImageFull.paste(config.image, (xOffset, yOffset))
-		#
-		#im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
-		#im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100,threshold=2))
-		#         Paste to Render                                       
-		config.renderImageFull.paste(im2, (xOffset, yOffset))
-
-	else :
-		#if(updateCanvasCall) : config.renderDraw.rectangle((0, 0, config.screenWidth + 8, config.screenHeight + 8), fill=(0,0,0))
-		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
-	'''
-	
-
-	'''#******** NOTES ***************'''
 
 	try :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 	except  :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
-	#if(config.rotation != 0 and config.rotationTrailing==False) : 
-	#	config.renderImageFull = config.renderImageFull.rotate(config.rotation)
-
 	#config.drawBeforeConversion()
 
 	config.renderImageFull = config.renderImageFull.convert("RGB")
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
-	''' 
+	#config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40) 
+
 	# For planes, only this works - has to do with transparency of repeated pasting of
 	# PNG's I think
-	'''
-	
 	#newimage = Image.new('RGBA', config.renderImageFull.size)
 	#newimage.paste(config.renderImageFull, (0, 0))
 	#config.renderImageFull =  newimage.convert("RGB")
-	
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 	
 	if(config.useFilters) :
 		
 		newimage = Image.new('P', config.renderImageFull.size)
 		newimage = config.renderImageFull.convert("P", colors = 64)
 		config.renderImageFull =  newimage.convert("RGB")
-
-
-		'''
-		# Random bright pixel patches -- of limited value aesthetically
-		d = -50
-		for t in range(100) :
-			xp = int(random.uniform(1,config.screenWidth-4))
-			yp = int(random.uniform(1,config.screenHeight-4))
-			vr,vg,vb = config.renderImageFull.getpixel((xp,yp))
-			if(vr == 0 and vg ==0 and vb == 0) :
-				pass
-			else :
-				config.renderImageFull.putpixel((xp,yp),(vr-d,vg-d,vb-d))
-				config.renderImageFull.putpixel((xp+1,yp),(vr-d,vg-d,vb-d))
-				config.renderImageFull.putpixel((xp+1,yp+1),(vr-d,vg-d,vb-d))
-				config.renderImageFull.putpixel((xp,yp+1),(vr-d,vg-d,vb-d))
-		'''
-
-		'''
-		arr = numpy.array(config.renderImageFull)
-		config.renderImageFull = Image.fromarray(arr)
-		'''
 
 		'''
 		# Produces an ordered dithering - looks good for movement but not so good
@@ -183,6 +147,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	if(config.rotation != 0) : 
 		if(config.rotationTrailing or config.fullRotation) : 
+			# This rotates the image that is painted back to where it was
+			# basically same thing as rotating the image to be pasted in
+			# except in some cases, more trailing is created
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 		
 	if(updateCanvasCall) : updateCanvas() 
@@ -197,6 +164,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 def drawBeforeConversion() :
 	return True
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def gen_matrix( e ):
 	''' Generating new matrix.
@@ -216,6 +185,7 @@ def gen_matrix( e ):
 		] )
 	return m_list
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def ordered_dithering( pixel, size, matrix ):
 	""" Dithering on a single channel.
@@ -233,7 +203,6 @@ def ordered_dithering( pixel, size, matrix ):
 	for y in xrange(0, Y):
 		for x in xrange(0, X):
 			pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
-
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -6,6 +6,8 @@ from PIL import ImageChops
 # Import the essentials to everything
 import time, random, math
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 class Lsys :
 	
 	n = 5
@@ -169,6 +171,9 @@ class Lsys :
 				
 				incrStart += incrRange
 				incrEnd = incrStart +  incrRange
-	
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 
 l = Lsys()

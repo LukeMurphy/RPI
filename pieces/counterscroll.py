@@ -8,6 +8,8 @@ from modules import colorutils, badpixels
 blocks = []
 XOsBlocks = []
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 class ScrollMessage :
 
 	########################
@@ -21,14 +23,8 @@ class ScrollMessage :
 		self.messageString = messageString
 		self.direction = direction
 
-		config.fontSize = int(workConfig.get("scroll", 'fontSize'))
-		config.vOffset = int(workConfig.get("scroll", 'vOffset'))
-		config.scrollSpeed = float(workConfig.get("scroll", 'scrollSpeed'))
-		config.shadowSize = int(workConfig.get("scroll", 'shadowSize'))
-
 		self.config = config
 		self.clr = colorutils.getRandomRGB()
-
 		#self.clr = (0,0,0)
 
 		# draw the message to get its size
@@ -40,7 +36,7 @@ class ScrollMessage :
 		self.fontHeight = int(self.pixLen[1] * 1.3)
 
 		# make a new image with the right size
-		self.config.renderImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
+		#self.config.renderImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
 		#self.scrollImage = Image.new("RGBA", pixLen)
 
 		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 , self.fontHeight))
@@ -72,9 +68,10 @@ class XOx :
 	#scroll speed and steps per cycle
 	scrollSpeed = 0.0006
 	steps = 4
-	lineThickness = 4
+	lineThickness = 2
 	bufferSpacing = 40
 	xsWidth = 54
+	maxNumXOs = 10
 
 	def __init__(self, direction, config) :
 		#print ("init: " + messageString)
@@ -83,7 +80,10 @@ class XOx :
 		config.scrollSpeed = float(workConfig.get("scroll", 'scrollSpeed'))
 
 		self.config = config
-		self.clr = (255,0,0)
+		self.clr = (int(255*config.brightness),0,0)
+
+		self.xsWidth = int(.85 * config.fontSize)
+		self.maxNumXOs = int(self.xsWidth / 2)
 
 		self.xoString =  self.makeBlock()
 
@@ -92,8 +92,8 @@ class XOx :
 		self.xPos = config.screenWidth + self.bufferSpacing
 		self.yPos = 0
 
-		num = int(random.uniform(3,10))
-		num = 4
+		num = int(random.uniform(3,self.maxNumXOs))
+		
 		for n in range (0, num) : 
 			if (random.random() > .5) : strg += "X"
 			else  : strg += "O"
@@ -136,9 +136,11 @@ class XOx :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def makeBlock() :
+	global config
 	space = "  "
 	strg = ""
-	num = int(random.uniform(2,10))
+	maxNums = int(config.fontSize / 2)
+	num = int(random.uniform(3,maxNums))
 	for n in range (0, num) : 
 		strg += ":)"+space
 		if (random.random() > .5) : strg += ":o"+space
@@ -153,25 +155,30 @@ def main(run = True) :
 	print("---------------------")
 	print("CounterScroll Loaded")
 	colorutils.brightness = config.brightness
-	badpixels.config = config
 
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
 	config.canvasImageWidth = config.canvasWidth * config.displayRows
 	config.canvasImageHeight = config.canvasHeight
 
+	config.fontSize = int(workConfig.get("scroll", 'fontSize'))
+	config.vOffset = int(workConfig.get("scroll", 'vOffset'))
+	config.scrollSpeed = float(workConfig.get("scroll", 'scrollSpeed'))
+	config.shadowSize = int(workConfig.get("scroll", 'shadowSize'))
+
 	# Used to composite XO's and message text
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , int(config.screenHeight / config.displayRows)))
+	#config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , int(config.screenHeight / config.displayRows)))
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
-	config.canvasImageFinal = Image.new("RGBA", (config.screenWidth , config.screenHeight))
-
-	print("---------------------")
-	print(config.canvasImage)
-	print("---------------------\n")
+	config.canvasImageFinal = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
 
 	#config.drawBeforeConversion = callBack
+	config.actualScreenWidth = config.canvasImage.size[0]
+	badpixels.numberOfDeadPixels = 50
+	badpixels.size = config.canvasImage.size
+	badpixels.config = config
+	badpixels.setBlanksOnScreen() 
 
 	setUp()
 
@@ -200,7 +207,7 @@ def setUp():
 	for n in range (0, 3) :
 		XOs = XOx("RIGHT", config)
 		XOs.xPos = XOs.start = config.canvasImageWidth + lastWidth
-		lastWidth += XOs.messageLength + 40
+		lastWidth += XOs.messageLength + XOs.bufferSpacing
 		XOsBlocks.append(XOs)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -241,6 +248,10 @@ def iterate() :
 				scroll = blocks[n]
 			scroll.xPos = scroll.start = -scroll.scrollImage.size[0] + blocks[p].xPos 
 
+
+	badpixels.drawBlanks(config.canvasImage, False)
+	if(random.random() > .998) : badpixels.setBlanksOnScreen() 
+
 	# Add the counter XO's
 	for n in range (0, 3) :
 		XOs = XOsBlocks[n]
@@ -250,24 +261,33 @@ def iterate() :
 		p = n -1 if (n != 0) else 2
 
 		if(XOs.xPos < -XOs.messageLength) :
-			if(random.random() > .9998 ) :
-				XOsBlocks[n] = XOs.makeBlock()
-				XOs = XOsBlocks[n]
-			XOs.xPos = XOsBlocks[p].xPos + XOsBlocks[p].messageLength if (XOsBlocks[p].xPos + XOsBlocks[p].messageLength >= config.canvasImageWidth) else config.canvasImageWidth
+			if(random.random() > .5 ) :
+				XOsBlocks[n].xoString = XOs.makeBlock()
+			XOs.xPos = XOsBlocks[p].xPos + XOsBlocks[p].messageLength + XOs.bufferSpacing if (XOsBlocks[p].xPos + XOsBlocks[p].messageLength >= config.canvasImageWidth) else config.canvasImageWidth
 
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
-		segmentHeight = int(config.screenHeight / config.displayRows)
-		segmentWidth = config.screenWidth
+		segmentHeight = int(config.canvasHeight / config.displayRows)
+		segmentWidth = config.canvasWidth
 		segment =  config.canvasImage.crop((n * config.screenWidth, 0, segmentWidth + n * config.screenWidth, segmentHeight))
-		if (n == 1) :
+		
+		# At some point go to modulo for even/odd ... but for now not more than 5 rows
+		if (n == 1 or n == 3) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
 
-	config.render(config.canvasImageFinal , 0, 0, 192, 192, False)
+	# Debug geometry for rotation
+	#tS = config.canvasImageFinal.size
+	#tDraw = ImageDraw.Draw(config.canvasImageFinal)
+	#tDraw.rectangle((0,0,tS[0],tS[1]), fill = None, outline=(0,255,0))
 
-	badpixels.drawBlanks()
+	config.render(config.canvasImageFinal, 0, 0, config.canvasWidth  , config.canvasHeight, False)
+
+
+	'''''''''''''' #FIX THIS !!!!
+	#badpixels.drawBlanks()
+
 	#config.updateCanvas()
 
 	#time.sleep(1)

@@ -7,7 +7,9 @@ import math
 from modules import colorutils
 import gc
 
-########################
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 #scroll speed and steps per cycle
 scrollSpeed = 0.0006
 stroopSpeed = 0.1
@@ -36,7 +38,7 @@ nextRow = 0
 # For video out
 x = y = 0
 
-########################
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 class Block:
 
@@ -211,7 +213,8 @@ class Block:
 		if(self.movementMode == "reveal" or self.movementMode == "revealmove") : self.appear()
 		if(self.movementMode == "move" or self.movementMode == "revealmove") : self.move()
 
-########################
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 # Create each display block and add to the global array of blocks
 def makeBlock() :
@@ -249,6 +252,8 @@ def makeBlock() :
 			colorMode = False
 			#print("ColorMode change  to b/w")
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def runStroop(run=True) :
 	global config, opticalOpposites
 	while run:
@@ -258,6 +263,8 @@ def runStroop(run=True) :
 			opticalOpposites = False if (opticalOpposites == True) else True
 			stroopSequence()		
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def getDirection() :
 	d = int(random.uniform(1,4))
 	direction = "Left"
@@ -266,6 +273,7 @@ def getDirection() :
 	if (d == 3) : direction = "Bottom"
 	return direction
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks
@@ -289,12 +297,16 @@ def main(run = True) :
 
 	if(run) : runWork()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def runWork():
 	global blocks, config
 	gc.enable()
 	while True:
 		iterate()
 		time.sleep(config.stroopSpeed)	
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate( n = 0) :
 	global config, blocks, x, y
@@ -317,21 +329,12 @@ def iterate( n = 0) :
 
 	if len(blocks) == 0 : exit()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def callBack() :
 	global config
 	pass
 
-
-
-
-
-
-
-
-
-
-
-	
-########################
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 

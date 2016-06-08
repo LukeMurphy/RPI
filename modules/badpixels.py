@@ -45,7 +45,7 @@ def setBlanksOnScreen() :
 	# scatter horizontally
 	for n in range (0, numberOfDeadPixels) :
 		x = int(random.random()*config.actualScreenWidth)
-		y = int(random.random()*32)
+		y = int(random.random()*48)
 		blankPixels.append((x,y))
 		if(random.random() > probabilityOfBlockBlanks):
 			cols = int(random.uniform(2,20))

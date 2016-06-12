@@ -14,8 +14,8 @@ class ScrollMessage :
 
 	########################
 	#scroll speed and steps per cycle
-	scrollSpeed = 0.0006
-	steps = 4
+	scrollSpeed = 0.004
+	steps = 1
 	fontSize = 14
 
 	def __init__(self, messageString, direction, config) :
@@ -25,10 +25,14 @@ class ScrollMessage :
 
 		self.config = config
 		self.clr = colorutils.getRandomRGB()
+		self.clr = colorutils.randomColor()
 		#self.clr = (0,0,0)
 
 		# draw the message to get its size
-		font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSerifBold.ttf', config.fontSize)
+		if(config.sansSerif) : 
+			font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
+		else :
+			font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSerifBold.ttf', config.fontSize)
 		tempImage = Image.new("RGBA", (1200,196))
 		draw  = ImageDraw.Draw(tempImage)
 		self.pixLen = draw.textsize(self.messageString, font = font)
@@ -44,18 +48,26 @@ class ScrollMessage :
 		self.iid = self.scrollImage.im.id
 		
 		#self.draw.rectangle((0,0,self.pixLen[0]+4, self.pixLen[1]), fill = (0,0,0))
+		# Draw the text with "borders"
+		indent = int(.05 * config.tileSize[0])
+		for i in range(1, config.shadowSize) :
+			self.draw.text((indent + -i,-i),self.messageString,(0,0,0),font=font)
+			self.draw.text((indent + i,i),self.messageString,(0,0,0),font=font)
 		self.draw.text((2,0),self.messageString, self.clr ,font=font)
+
+
+
 
 		self.xPos = 0
 		self.yPos = config.vOffset
 
-		self.end = config.screenWidth * config.displayRows
+		#self.end = config.screenWidth * config.displayRows
 
 	def scroll(self) :
-		if(self.direction == "Left") :
-			self.xPos -= self.steps
-		else :
+		if(self.direction == "LEFT") :
 			self.xPos += self.steps
+		else :
+			self.xPos -= self.steps
 
 		#if(self.xPos > self.end) :
 		#	self.xPos = self.start = -self.scrollImage.size[0]
@@ -66,8 +78,8 @@ class XOx :
 
 	########################
 	#scroll speed and steps per cycle
-	scrollSpeed = 0.0006
-	steps = 4
+	scrollSpeed = 0.004
+	steps = 1
 	lineThickness = 2
 	bufferSpacing = 40
 	xsWidth = 54
@@ -123,7 +135,7 @@ class XOx :
 
 			leng += endX - startX
 	
-		self.xPos -= 2
+		self.xPos -= config.steps
 
 		'''
 		if(self.xPos < -self.messageLength - self.bufferSpacing) :
@@ -135,18 +147,22 @@ class XOx :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def makeBlock() :
+def makeBlock(emotis=False, arg = " FEEL BAD ") :
 	global config
 	space = "  "
 	strg = ""
-	maxNums = int(config.fontSize / 2)
-	num = int(random.uniform(3,maxNums))
-	for n in range (0, num) : 
-		strg += ":)"+space
-		if (random.random() > .5) : strg += ":o"+space
-		if (random.random() > .95) : strg += ";)"+space
-	#strg ="| oTESTx |"
+	if(emotis) :
+		maxNums = int(config.fontSize / 2)
+		num = int(random.uniform(3,maxNums))
+		for n in range (0, num) : 
+			strg += ":)"+space
+			if (random.random() > .5) : strg += ":o"+space
+			if (random.random() > .95) : strg += ";)"+space
+		#strg ="| oTESTx |"
+	else :
+		strg = arg
 	return strg
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -164,7 +180,14 @@ def main(run = True) :
 	config.fontSize = int(workConfig.get("scroll", 'fontSize'))
 	config.vOffset = int(workConfig.get("scroll", 'vOffset'))
 	config.scrollSpeed = float(workConfig.get("scroll", 'scrollSpeed'))
+	config.steps = int(workConfig.get("scroll", 'steps'))
 	config.shadowSize = int(workConfig.get("scroll", 'shadowSize'))
+
+	config.usingEmoties = (workConfig.getboolean("scroll", 'usingEmoties'))
+	config.useXOs = (workConfig.getboolean("scroll", 'useXOs'))
+	config.sansSerif = (workConfig.getboolean("scroll", 'sansSerif'))
+	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
+	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
 
 	# Used to composite XO's and message text
 	#config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , int(config.screenHeight / config.displayRows)))
@@ -187,28 +210,39 @@ def main(run = True) :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
-	global config, XOsBlocks, overlayImage, blocks
+	global config, XOsBlocks, overlayImage, blocks, usingEmoties
 
 	#overlayImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
 	lastWidth = 0
-	for n in range (0, 3) :
-		scroll = ScrollMessage(makeBlock(),"LEFT",config)
-		#scroll.end = config.screenWidth * config.displayRows
-		scroll.start = -scroll.scrollImage.size[0] - lastWidth
+	direction = "LEFT"
+	rng = 3 if config.usingEmoties == True else 6
+	for n in range (0, rng) :
+		#scroll = ScrollMessage(makeBlock(),"LEFT",config)
+		strg = config.txt1 if n in[1,3,5] else config.txt2
+		if n == 3 :
+			direction = "RIGHT"
+			lastWidth = 0
+		scroll = ScrollMessage(makeBlock(config.usingEmoties, strg), direction ,config)
+	
+		if(scroll.direction == "RIGHT") : 
+			scroll.start = lastWidth + config.canvasImageWidth
+			scroll.end = -config.screenWidth * config.displayRows
+		else :
+			scroll.start = -scroll.scrollImage.size[0] - lastWidth
+			scroll.end = config.screenWidth * config.displayRows
 
-		if(scroll.direction == "Right") : 
-			scroll.start = -end
-			#scroll.end = config.screenWidth * config.rows
 		lastWidth += scroll.scrollImage.size[0]
 		scroll.xPos = scroll.start
 		blocks.append(scroll)
 
 	lastWidth = 0
-	for n in range (0, 3) :
-		XOs = XOx("RIGHT", config)
-		XOs.xPos = XOs.start = config.canvasImageWidth + lastWidth
-		lastWidth += XOs.messageLength + XOs.bufferSpacing
-		XOsBlocks.append(XOs)
+
+	if(config.useXOs) :
+		for n in range (0, 3) :
+			XOs = XOx("RIGHT", config)
+			XOs.xPos = XOs.start = config.canvasImageWidth + lastWidth
+			lastWidth += XOs.messageLength + XOs.bufferSpacing
+			XOsBlocks.append(XOs)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -222,7 +256,7 @@ def runWork():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate() :
-	global config, blocks, x, y, XOsBlocks
+	global config, blocks, x, y, XOsBlocks, usingEmoties
 
 	# Blank out canvases
 	draw  = ImageDraw.Draw(config.renderImageFull)
@@ -232,38 +266,46 @@ def iterate() :
 	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = 0)
 
 	# Scroll message
-	for n in range (0, 3) :
+	rng = 3 if config.usingEmoties == True else 6
+	for n in range (0, rng) :
 		scroll = blocks[n]
 		scroll.scroll()
 		# paste scrollImage into the canvasImage - but eventually chop and flip
-		config.canvasImage.paste(scroll.scrollImage, (scroll.xPos, config.vOffset))
+		config.canvasImage.paste(scroll.scrollImage, (scroll.xPos, config.vOffset), scroll.scrollImage)
 
 		# previous block
 		p = n -1 if (n != 0) else 2
 
 		# a block moves off-screen, possibly change message, then move to back of queue
-		if(scroll.xPos > scroll.end) :
+		if(scroll.xPos > scroll.end and scroll.direction== "LEFT" ) :
 			if(random.random() > .5) :
-				blocks[n] = ScrollMessage(makeBlock(),"LEFT",config)
+				strg = config.txt1 if n in[1,3,5] else config.txt2
+				direction = blocks[n].direction
+				blocks[n] = ScrollMessage(makeBlock(config.usingEmoties, strg), direction,config)
 				scroll = blocks[n]
-			scroll.xPos = scroll.start = -scroll.scrollImage.size[0] + blocks[p].xPos 
+			scroll.xPos = scroll.start = -scroll.scrollImage.size[0] + blocks[p].xPos
+			scroll.end = config.screenWidth * config.displayRows
+		if(scroll.xPos < scroll.end and scroll.direction== "RIGHT" )  :
+			scroll.xPos = scroll.start = scroll.scrollImage.size[0] + config.screenWidth
+			scroll.end = -config.screenWidth * config.displayRows
 
 
 	badpixels.drawBlanks(config.canvasImage, False)
 	if(random.random() > .998) : badpixels.setBlanksOnScreen() 
 
-	# Add the counter XO's
-	for n in range (0, 3) :
-		XOs = XOsBlocks[n]
-		XOs.drawCounterXO()
+	if(config.useXOs) :
+		# Add the counter XO's
+		for n in range (0, 3) :
+			XOs = XOsBlocks[n]
+			XOs.drawCounterXO()
 
-		# previous block
-		p = n -1 if (n != 0) else 2
+			# previous block
+			p = n -1 if (n != 0) else 2
 
-		if(XOs.xPos < -XOs.messageLength) :
-			if(random.random() > .5 ) :
-				XOsBlocks[n].xoString = XOs.makeBlock()
-			XOs.xPos = XOsBlocks[p].xPos + XOsBlocks[p].messageLength + XOs.bufferSpacing if (XOsBlocks[p].xPos + XOsBlocks[p].messageLength >= config.canvasImageWidth) else config.canvasImageWidth
+			if(XOs.xPos < -XOs.messageLength) :
+				if(random.random() > .5 ) :
+					XOsBlocks[n].xoString = XOs.makeBlock()
+				XOs.xPos = XOsBlocks[p].xPos + XOsBlocks[p].messageLength + XOs.bufferSpacing if (XOsBlocks[p].xPos + XOsBlocks[p].messageLength >= config.canvasImageWidth) else config.canvasImageWidth
 
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
@@ -275,6 +317,7 @@ def iterate() :
 		if (n == 1 or n == 3) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
+
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
 
 	# Debug geometry for rotation

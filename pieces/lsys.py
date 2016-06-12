@@ -7,6 +7,16 @@ from PIL import ImageChops
 import time, random, math
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+canvasBase =  dict(width=160,height=160)
+origin = [0,0]
+pos = 0
+lastCoord = [400,200]
+nextCoord = [0,0]
+v = [0,0]
+angle = math.pi/2
+currentAngle = 0
+runRun = True
+d = 3
 
 class Lsys :
 	
@@ -14,9 +24,18 @@ class Lsys :
 	c = 0
 	recursionLimit = 5
 	strg = ""
-	AxiomSelected = "F"
-	PatternSetSelected = "F+F-F-F"
+	AxiomSelected = "FBF--FF--FF"
+	PatternSetSelected = "FF"
+	PatternSetSelected2 = "--FBF++FBF++FBF--"	
+
+	AxiomSelected = "F-F-F-F"
+	PatternSetSelected = "F-F+F+F-F"
 	PatternSetSelected2 = ""
+
+	AxiomSelected = "F"
+	PatternSetSelected = "F-[F+F]"
+	PatternSetSelected2 = ""
+
 	useRandom = True
 	foliage = False
 	incrRange = 6
@@ -36,26 +55,15 @@ class Lsys :
 	branchPoint = []
 	branch = 0
 
-	canvasBase =  dict(width=160,height=160)
-
-	
 	#nodeSpriteContainer:Sprite
 	
-
-			
 	def __init__(self) :
 		print("Init Lsys")
 		incrRange = 100
 		incrEnd = 100
 		incrStart = 0
-		origin = {"xPos":self.canvasBase["width"]/2,"yPos":self.canvasBase["height"]-5}
 		self.setUpNewDrawingParameters()
 		
-			
-	def restore(self):
-		canvasBaseHolder.x = 0
-		canvasBaseHolder.y = 0
-	
 	
 	def setUpNewDrawingParameters(self) :
 		self.c = 0
@@ -63,19 +71,6 @@ class Lsys :
 		if (self.PatternSetSelected2 == ""): self.PatternSetSelected2 = "B"
 		self.strg = self.parse(self.AxiomSelected)
 		print(self.strg)
-		#self.setupDrawing()
-			
-	def stopBuild(self) :
-		if (ti) :
-			ti.stop()
-			ti = null
-		self.xPos = self.origin['xPos']
-		self.yPos = self.origin['yPos']
-		self.branchPoint = []
-		self.dFactor = 1
-		self.a = 0
-		self.incrStart = 0
-		self.incrEnd = 100
 			
 	def setupDrawing(self) :
 		self.branchPoint = []
@@ -94,23 +89,15 @@ class Lsys :
 		if (incrStart < strg.length-incrRange) :
 			performAction()
 		
-	
-	def parse(self, A):
-		finalString = A
+	def parse(self, arg):
+		finalString = arg
 		self.c+=1
+		l = len(self.PatternSetSelected2 )
 		if (self.c<self.recursionLimit) :
-			for i in range(0, len(A)) :
-				if (A == "F")  :
-					finalString += self.PatternSetSelected;
-				elif (A == "B") :
-					finalString += self.PatternSetSelected2;
-				else :
-					finalString += A[i];
-			return self.parse(finalString)
-		else :
-			return A	
-		return finalString
-	
+			arg = arg.replace("F", self.PatternSetSelected)
+			arg = arg.replace("B", self.PatternSetSelected2)
+			return self.parse(arg)
+		return arg
 		
 	def performAction(self) :
 		for incr in range(incrStart, incrEnd) :
@@ -174,6 +161,86 @@ class Lsys :
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''
+def drawBasic(self):
+	listStrg = list(strg)
+	for i in range(len(self.strg)):
+
+'''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
-l = Lsys()
+def drawLines(arg) :
+	
+	global config, L, lastCoord, nextCoord, angle, currentAngle, v, d
+
+	pi = math.pi
+	
+	#print(v)
+	if (arg == "F") :
+		v = [d * math.sin(currentAngle), d * math.cos(currentAngle)]
+		nextCoord[0] = lastCoord[0] + v[0]
+		nextCoord[1] = lastCoord[1] + v[1]
+		config.draw.line((lastCoord[0],lastCoord[1], nextCoord[0] ,nextCoord[1]), fill=(255,0,0))
+		lastCoord[0] = nextCoord[0]
+		lastCoord[1] = nextCoord[1]
+		#print(lastCoord, nextCoord)
+
+	if (arg == "-") :
+		currentAngle -= angle
+
+	if (arg == "+") :
+		currentAngle += angle
+
+	# reseting render image size
+	#print (nextCoord)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def main(run = True) :
+	global config, workConfig
+	setUp()
+	if(run) : runWork()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def setUp() :
+	global L, config
+	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.draw  = ImageDraw.Draw(config.image)
+	config.id = config.image.im.id
+	L = Lsys()
+	return  True
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def runWork():
+	global runRun
+	while True:
+		iterate()
+		time.sleep(.0001)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def iterate() :
+	global config, L, pos, runRun
+	r = 50
+	if pos < len(L.strg) :
+		for i in range (pos, pos+r) :
+			if i < len(L.strg) : drawLines(L.strg[i])
+		pos += r
+	else :
+		if(runRun) : print("Done!")
+		runRun = False
+	config.render(config.image, 0, 0,192,192)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def callBack() :
+	global config
+	pass
+	#animator()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+

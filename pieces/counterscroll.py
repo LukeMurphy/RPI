@@ -97,21 +97,22 @@ class XOx :
 		self.xsWidth = int(.85 * config.fontSize)
 		self.maxNumXOs = int(self.xsWidth / 2)
 
-		self.xoString =  self.makeBlock()
+		self.xoString =  self.makeBlock(config.useArrows)
 
-	def makeBlock(self) :
+	def makeBlock(self, dash=False) :
 		strg = ""
 		self.xPos = config.screenWidth + self.bufferSpacing
 		self.yPos = 0
-
 		num = int(random.uniform(3,self.maxNumXOs))
 		
 		for n in range (0, num) : 
-			if (random.random() > .5) : strg += "X"
-			else  : strg += "O"
+			if (dash) :
+				strg += "-"
+			else : 
+				if (random.random() > .5) : strg += "X"
+				else  : strg += "O"
 
 		self.messageLength = n * (self.xsWidth + 8)
-
 		return strg
 
 	def drawCounterXO(self) :
@@ -129,10 +130,17 @@ class XOx :
 			if (self.xoString[n]) ==  "X" :
 				draw.line((startX, startY, endX, endY), fill = self.clr, width = self.lineThickness)
 				draw.line((endX, startY, startX, endY), fill = self.clr, width = self.lineThickness)
-			else :
+			elif (self.xoString[n]) ==  "O" :
 				draw.ellipse((startX, startY, endX, endY),  outline=self.clr)
 				draw.ellipse((startX +1, startY+1, endX-1, endY-1),  outline=self.clr)
+			else : 
+				y0 = startY + self.xsWidth/2
+				yA = self.xsWidth/4 
+				xA = startX + yA * math.tan(math.pi/4)
 
+				draw.line((startX, y0, endX, y0), fill = self.clr, width = self.lineThickness)
+				draw.line((xA, yA, startX, y0), fill = self.clr, width = self.lineThickness)
+				draw.line((xA, yA + self.xsWidth/2 , startX, y0), fill = self.clr, width = self.lineThickness)
 			leng += endX - startX
 	
 		self.xPos -= config.steps
@@ -184,7 +192,8 @@ def main(run = True) :
 	config.shadowSize = int(workConfig.get("scroll", 'shadowSize'))
 
 	config.usingEmoties = (workConfig.getboolean("scroll", 'usingEmoties'))
-	config.useXOs = (workConfig.getboolean("scroll", 'useXOs'))
+	config.useXOs = (workConfig.getboolean("scroll", 'useXOs')) 
+	config.useArrows = (workConfig.getboolean("scroll", 'useArrows')) 
 	config.sansSerif = (workConfig.getboolean("scroll", 'sansSerif'))
 	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
 	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
@@ -304,7 +313,7 @@ def iterate() :
 
 			if(XOs.xPos < -XOs.messageLength) :
 				if(random.random() > .5 ) :
-					XOsBlocks[n].xoString = XOs.makeBlock()
+					XOsBlocks[n].xoString = XOs.makeBlock(config.useArrows)
 				XOs.xPos = XOsBlocks[p].xPos + XOsBlocks[p].messageLength + XOs.bufferSpacing if (XOsBlocks[p].xPos + XOsBlocks[p].messageLength >= config.canvasImageWidth) else config.canvasImageWidth
 
 	# Chop up the scrollImage into "rows"

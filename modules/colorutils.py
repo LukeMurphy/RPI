@@ -66,7 +66,7 @@ def randomColor(brtns=1) :
 def randomBaseColor(brtns=1) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
-	b = int((random.uniform(00,255)) * brtns)
+	b = int((random.uniform(0,255)) * brtns)
 	r = int((random.uniform(0,100)) * brtns)
 	g = int((random.uniform(0,100)) * brtns)
 	return (r,g,b) 

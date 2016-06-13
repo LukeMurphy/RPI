@@ -25,7 +25,8 @@ class ScrollMessage :
 
 		self.config = config
 		self.clr = colorutils.getRandomRGB()
-		self.clr = colorutils.randomColor()
+		#self.clr = colorutils.randomColor()
+		#self.clr = colorutils.getSunsetColors()
 		#self.clr = (0,0,0)
 
 		# draw the message to get its size
@@ -192,9 +193,11 @@ def main(run = True) :
 	config.shadowSize = int(workConfig.get("scroll", 'shadowSize'))
 
 	config.usingEmoties = (workConfig.getboolean("scroll", 'usingEmoties'))
+	config.counterScrollText = (workConfig.getboolean("scroll", 'counterScrollText'))
 	config.useXOs = (workConfig.getboolean("scroll", 'useXOs')) 
 	config.useArrows = (workConfig.getboolean("scroll", 'useArrows')) 
 	config.sansSerif = (workConfig.getboolean("scroll", 'sansSerif'))
+	config.useBlanks = (workConfig.getboolean("scroll", 'useBlanks'))
 	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
 	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
 
@@ -207,10 +210,12 @@ def main(run = True) :
 
 	#config.drawBeforeConversion = callBack
 	config.actualScreenWidth = config.canvasImage.size[0]
-	badpixels.numberOfDeadPixels = 50
-	badpixels.size = config.canvasImage.size
-	badpixels.config = config
-	badpixels.setBlanksOnScreen() 
+
+	if(config.useBlanks) :
+		badpixels.numberOfDeadPixels = 50
+		badpixels.size = config.canvasImage.size
+		badpixels.config = config
+		badpixels.setBlanksOnScreen() 
 
 	setUp()
 
@@ -224,7 +229,7 @@ def setUp():
 	#overlayImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
 	lastWidth = 0
 	direction = "LEFT"
-	rng = 3 if config.usingEmoties == True else 6
+	rng = 3 if (config.usingEmoties == True or config.counterScrollText == False) else 6
 	for n in range (0, rng) :
 		#scroll = ScrollMessage(makeBlock(),"LEFT",config)
 		strg = config.txt1 if n in[1,3,5] else config.txt2
@@ -275,7 +280,7 @@ def iterate() :
 	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = 0)
 
 	# Scroll message
-	rng = 3 if config.usingEmoties == True else 6
+	rng = 3 if config.usingEmoties == True or config.counterScrollText == False else 6
 	for n in range (0, rng) :
 		scroll = blocks[n]
 		scroll.scroll()
@@ -299,8 +304,8 @@ def iterate() :
 			scroll.end = -config.screenWidth * config.displayRows
 
 
-	badpixels.drawBlanks(config.canvasImage, False)
-	if(random.random() > .998) : badpixels.setBlanksOnScreen() 
+	if(config.useBlanks) : badpixels.drawBlanks(config.canvasImage, False)
+	if(random.random() > .998 and (config.useBlanks)) : badpixels.setBlanksOnScreen() 
 
 	if(config.useXOs) :
 		# Add the counter XO's

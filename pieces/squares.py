@@ -137,7 +137,7 @@ def main(run = True) :
 
 def setUp() :
 	animator()
-	retrun True
+	return True
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

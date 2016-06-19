@@ -2,11 +2,15 @@ import time
 import random
 import textwrap
 import math
-from PIL import ImageFont, Image, ImageDraw, ImageOps
+from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils, badpixels
 
 blocks = []
 XOsBlocks = []
+
+# LEFT means text or icon moves to the left (i.e. comes from the right)
+# RIGHT means text or icon moves to the right (i.e. comes from the left)
+directionOrder = ["LEFT","RIGHT"]
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -56,9 +60,6 @@ class ScrollMessage :
 			self.draw.text((indent + i,i),self.messageString,(0,0,0),font=font)
 		self.draw.text((2,0),self.messageString, self.clr ,font=font)
 
-
-
-
 		self.xPos = 0
 		self.yPos = config.vOffset
 
@@ -85,6 +86,9 @@ class XOx :
 	bufferSpacing = 40
 	xsWidth = 54
 	maxNumXOs = 10
+	XColor = [255,0,0]
+	OColor = [255,0,0] 
+	ArrowColor = [0,255,0] 
 
 	def __init__(self, direction, config) :
 		#print ("init: " + messageString)
@@ -102,7 +106,10 @@ class XOx :
 
 	def makeBlock(self, dash=False) :
 		strg = ""
-		self.xPos = config.screenWidth + self.bufferSpacing
+		if(self.direction == "RIGHT") :
+			self.xPos = config.screenWidth + self.bufferSpacing
+		else :
+			self.xPos = 0
 		self.yPos = 0
 		num = int(random.uniform(3,self.maxNumXOs))
 		
@@ -123,28 +130,39 @@ class XOx :
 		draw  = ImageDraw.Draw(self.config.canvasImage)
 		leng = 0 
 		for n in range (0, len(self.xoString)):
-			startX = self.xPos + n * self.xsWidth + 8
-			endX = self.xPos + n * self.xsWidth + self.xsWidth
+			if(self.direction == "RIGHT") : 
+				startX = self.xPos + n * self.xsWidth + 8
+				endX = self.xPos + n * self.xsWidth + self.xsWidth
+			else :
+				startX = self.xPos + n * self.xsWidth + 8
+				endX = self.xPos + n * self.xsWidth + self.xsWidth				
+
 			startY = 0
 			endY = self.xsWidth
 
 			if (self.xoString[n]) ==  "X" :
-				draw.line((startX, startY, endX, endY), fill = self.clr, width = self.lineThickness)
-				draw.line((endX, startY, startX, endY), fill = self.clr, width = self.lineThickness)
+				clr  = (int(self.XColor[0] * config.brightness), int(self.XColor[1] * config.brightness), int(self.XColor[2] * config.brightness))
+				draw.line((startX, startY, endX, endY), fill = clr, width = self.lineThickness)
+				draw.line((endX, startY, startX, endY), fill = clr, width = self.lineThickness)
 			elif (self.xoString[n]) ==  "O" :
-				draw.ellipse((startX, startY, endX, endY),  outline=self.clr)
-				draw.ellipse((startX +1, startY+1, endX-1, endY-1),  outline=self.clr)
+				clr  = (int(self.OColor[0] * config.brightness), int(self.OColor[1] * config.brightness), int(self.OColor[2] * config.brightness))
+				draw.ellipse((startX, startY, endX, endY),  outline=clr)
+				draw.ellipse((startX +1, startY+1, endX-1, endY-1),  outline=clr)
 			else : 
+				clr  = (int(self.ArrowColor[0] * config.brightness), int(self.ArrowColor[1] * config.brightness), int(self.ArrowColor[2] * config.brightness))
 				y0 = startY + self.xsWidth/2
 				yA = self.xsWidth/4 
 				xA = startX + yA * math.tan(math.pi/4)
 
-				draw.line((startX, y0, endX, y0), fill = self.clr, width = self.lineThickness)
-				draw.line((xA, yA, startX, y0), fill = self.clr, width = self.lineThickness)
-				draw.line((xA, yA + self.xsWidth/2 , startX, y0), fill = self.clr, width = self.lineThickness)
+				draw.line((startX, y0, endX, y0), fill = clr, width = self.lineThickness)
+				draw.line((xA, yA, startX, y0), fill = clr, width = self.lineThickness)
+				draw.line((xA, yA + self.xsWidth/2 , startX, y0), fill = clr, width = self.lineThickness)
 			leng += endX - startX
 	
-		self.xPos -= config.steps
+		if(self.direction == "RIGHT") : 
+			self.xPos -= config.steps
+		else :
+			self.xPos += config.steps
 
 		'''
 		if(self.xPos < -self.messageLength - self.bufferSpacing) :
@@ -176,7 +194,7 @@ def makeBlock(emotis=False, arg = " FEEL BAD ") :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
-	global config
+	global config, directionOrder
 	print("---------------------")
 	print("CounterScroll Loaded")
 	colorutils.brightness = config.brightness
@@ -198,6 +216,7 @@ def main(run = True) :
 	config.useArrows = (workConfig.getboolean("scroll", 'useArrows')) 
 	config.sansSerif = (workConfig.getboolean("scroll", 'sansSerif'))
 	config.useBlanks = (workConfig.getboolean("scroll", 'useBlanks'))
+	config.useThreeD = (workConfig.getboolean("scroll", 'useThreeD'))
 	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
 	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
 
@@ -211,11 +230,20 @@ def main(run = True) :
 	#config.drawBeforeConversion = callBack
 	config.actualScreenWidth = config.canvasImage.size[0]
 
+	imageWrapLength = config.screenWidth * 50
+	config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenHeight))
+
+	if(config.rotation == -90) :
+		imageWrapLength = config.screenWidth * 50
+		config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenWidth))
+
 	if(config.useBlanks) :
 		badpixels.numberOfDeadPixels = 50
 		badpixels.size = config.canvasImage.size
 		badpixels.config = config
 		badpixels.setBlanksOnScreen() 
+
+	#directionOrder = ["RIGHT","LEFT"]
 
 	setUp()
 
@@ -224,17 +252,20 @@ def main(run = True) :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
-	global config, XOsBlocks, overlayImage, blocks, usingEmoties
+	global config, XOsBlocks, overlayImage, blocks, usingEmoties, directionOrder
 
 	#overlayImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
 	lastWidth = 0
-	direction = "LEFT"
+	direction = directionOrder[0]
+
+	# Used if there are 2 text statements running against eachother
 	rng = 3 if (config.usingEmoties == True or config.counterScrollText == False) else 6
+
 	for n in range (0, rng) :
 		#scroll = ScrollMessage(makeBlock(),"LEFT",config)
 		strg = config.txt1 if n in[1,3,5] else config.txt2
 		if n == 3 :
-			direction = "RIGHT"
+			direction = directionOrder[1]
 			lastWidth = 0
 		scroll = ScrollMessage(makeBlock(config.usingEmoties, strg), direction ,config)
 	
@@ -253,7 +284,7 @@ def setUp():
 
 	if(config.useXOs) :
 		for n in range (0, 3) :
-			XOs = XOx("RIGHT", config)
+			XOs = XOx(directionOrder[1], config)
 			XOs.xPos = XOs.start = config.canvasImageWidth + lastWidth
 			lastWidth += XOs.messageLength + XOs.bufferSpacing
 			XOsBlocks.append(XOs)
@@ -339,17 +370,60 @@ def iterate() :
 	#tDraw = ImageDraw.Draw(config.canvasImageFinal)
 	#tDraw.rectangle((0,0,tS[0],tS[1]), fill = None, outline=(0,255,0))
 
-	config.render(config.canvasImageFinal, 0, 0, config.canvasWidth  , config.canvasHeight, False)
+	if(config.useThreeD) :
+		ThreeD(config.canvasImageFinal)
+		config.render(config.warpedImage, 0, 0, config.canvasWidth  , config.canvasHeight, False)
+	else : 
+		config.render(config.canvasImageFinal, 0, 0, config.canvasWidth  , config.canvasHeight, False)
 
-
-	'''''''''''''' #FIX THIS !!!!
-	#badpixels.drawBlanks()
-
-	#config.updateCanvas()
-
-	#time.sleep(1)
+	
 	
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def ThreeD(imageToRender) :
+	numSegments = 64
+	dFactor =  1.334
+	offset = 0
+	angle =  math.pi  / numSegments
+	if(config.rotation == -90) :
+		numSegments = 32
+		dFactor =  1.4
+		angle =  math.pi  / numSegments
+		width  = config.screenHeight
+		height = config.screenWidth
+	else: 
+		width  = config.screenWidth
+		height = config.screenHeight
+	segmentWidth = int((width) * math.sin(angle) /3 )
+	#stepRange = int(pixLen[0] / stepSize)
+	useColorFLicker = False
+	placementx = 1
+
+	for n in range(0,numSegments) :
+		pCropx = n * segmentWidth + offset
+		pWidth  = math.fabs(dFactor * segmentWidth * math.sin(angle * n/1)) + 1
+		projectedWidth = int(pWidth)
+
+		segmentImage  = Image.new("RGBA", (projectedWidth, height))
+		croppedSegment = imageToRender.crop((pCropx,0, pCropx + segmentWidth, height))
+		segmentImage = croppedSegment.resize((projectedWidth,height))
+		br = pWidth  / segmentWidth
+
+		if(useColorFLicker) :
+			segmentColorizer = Image.new("RGBA", (projectedWidth, height))
+			draw = ImageDraw.Draw(segmentColorizer)
+			draw.rectangle((0,0,projectedWidth,height), fill = config.randomColor())
+			segmentImage = ImageChops.multiply(segmentImage, segmentColorizer)
+
+		enhancer = ImageEnhance.Brightness(segmentImage)
+		segmentImage = enhancer.enhance(br)
+		#segmentImage = segmentImage.filter(ImageFilter.BLUR)
+		#warpedImage.paste(segmentColorizer , (placementx,0))
+		config.warpedImage.paste(segmentImage , (placementx,0))
+		placementx += projectedWidth
+
+	#config.render(warpedImage,0,0, config.screenWidth, config.screenHeight)
+
 
 def callBack() :
 	global config, XOs

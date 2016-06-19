@@ -10,7 +10,7 @@ import time, random, math
 canvasBase =  dict(width=160,height=160)
 origin = [0,0]
 pos = 0
-lastCoord = [400,200]
+lastCoord = [100,50]
 nextCoord = [0,0]
 v = [0,0]
 angle = math.pi/2
@@ -31,10 +31,11 @@ class Lsys :
 	AxiomSelected = "F-F-F-F"
 	PatternSetSelected = "F-F+F+F-F"
 	PatternSetSelected2 = ""
-
+	
 	AxiomSelected = "F"
 	PatternSetSelected = "F-[F+F]"
 	PatternSetSelected2 = ""
+	
 
 	useRandom = True
 	foliage = False

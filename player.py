@@ -106,6 +106,11 @@ def configure() :
 			config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
 			config.transWiring = (workconfig.getboolean("displayconfig", 'transWiring'))
 			config.actualScreenWidth  = int(workconfig.get("displayconfig", 'actualScreenWidth'))
+			config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
+			config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
+			config.rotation = float(workconfig.get("displayconfig", 'rotation'))
+			config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
+			config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
 			r.config = config
 			r.setUp()
 			config.render = r.render

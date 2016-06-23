@@ -408,7 +408,7 @@ def iterate() :
 		segment =  config.canvasImage.crop((n * config.screenWidth, 0, segmentWidth + n * config.screenWidth, segmentHeight))
 		
 		# At some point go to modulo for even/odd ... but for now not more than 5 rows
-		if (n == 1 or n == 3) :
+		if (n == 0 or n == 2) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
 

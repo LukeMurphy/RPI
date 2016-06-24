@@ -76,16 +76,28 @@ class ImageSprite :
 		self.clrUtils = colorutils
 		self.clrUtils.brightness = self.config.brightness
 		pass
-		
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''	
+	## This is called every time an object moves off the screen
+	## can update color, size etc
 	def callBack(self, *args) :
 
 		if(args[0] == True) :
 			self.image = self.imageOriginal.copy()
 			self.process()
 
+			# This turns out to be less interesting - somehow the uniformity of speed
+			# is a better counter point to the randomness of color and scale - 6-24-16
+			'''
+			if(random.random() > .8) : 
+				speedMultiplier = random.uniform(1,10)
+				self.dX *= speedMultiplier 
+			'''
+
 		return True
 		
-
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def make(self, img="", setvX = 0, setvY = 0, processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True):
 
 		self.frame = 0
@@ -123,7 +135,9 @@ class ImageSprite :
 			#init()
 		else:
 			self.debugMessage ("could not load")
-
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def process(self) :
 		change = 1
 
@@ -133,7 +147,6 @@ class ImageSprite :
 				newSizeX = change * self.image.size[0]
 				newSizeY = change * self.image.size[1]
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
-
 
 			brt = random.random()
 
@@ -184,7 +197,9 @@ class ImageSprite :
 			# Not so great - yOffset is rendered useless by this  ....
 			if(self.processImage and self.yOffsetChange) : 
 				self.yOffset = int(random.uniform(self.config.screenHeight/2-self.yOffsetFactor * change, self.config.screenHeight/2 + self.yOffsetFactor) )
-
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def colorize(self, clr) :
 
 			#Colorize via overlay etc
@@ -202,11 +217,15 @@ class ImageSprite :
 			self.image = enhancer.enhance(self.brightnessFactor)
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
-
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def remove(self, arrayList) :
 		arrayList.remove(self)
 		pass
-
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def move(self) :
 		if(self.setForRemoval!=True) :
 			#self.image.paste(self.presentationImage, (0,0))
@@ -232,13 +251,81 @@ class ImageSprite :
 
 			self.x = self.xPos + self.xOffset
 			self.y = self.yPos + self.yOffset
-
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def loadImage(self,arg):
 		self.image = Image.open(arg , "r")
 		self.image.load()
 		self.imgHeight =  self.image.getbbox()[3]
 		return True
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+	def update(self) :
+		if(self.useBlink == True) :
+			if(random.random() > .9998 and self.blink == False) :
+				self.blink = True
+				self.blinkNum = int(random.uniform(32,256))
+				self.blinkCount = 0
+				self.blinkStationary = True if (random.random() > .15) else False
+
+			if(self.blink) :
+				self.blinkCount += 1
+				#self.x -= self.dX
+				if(self.blinkCount%8 == 0) :
+					self.draw.rectangle((0,0, self.image.size[0] ,self.image.size[1]), fill = (0))
+					#self.y = -100
+				elif (self.blinkCount%4 == 0) : 
+					#self.y = 0
+					self.image.paste(self.imageCopy, (0 ,0), self.imageCopy)
+
+				if (self.blinkCount >= self.blinkNum) :
+					self.image.paste(self.imageCopy, (0 ,0), self.imageCopy)
+					if(random.random() > .5 ) : 
+						self.x += self.image.size[1]
+					self.blink = False
+
+			if(self.blinkStationary == False) :
+				self.panImage()
+			elif(random.random() > .995) : 
+				self.blinkStationary =  False
+
+		else : self.panImage()
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	def init(self):
+		global action, countLimit
+
+		#print(countLimit)
+		count = 0
+		#fillColor(True)
+		# Constantly re-calls the requested action util 
+		# the count runs out - for long running plays
+		# the countlimit just gets reset 
+		while (count < countLimit):
+			try:
+				if(action == "play"):
+					playImage(False, 7)
+				elif(action == "pan") : 
+					panImage()
+				elif(action == "present") :
+					presentImage()		
+				count += 1
+			except KeyboardInterrupt:
+				print "Stopping...."
+				exit()
+				break
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	def debugMessage(self,arg) :
+
+		if(self.debug) : print(arg)		
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def presentImage(self) :
 		global frame, count, xOffset, yOffset, dX, dY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, presentTime	
 		imageCopyTemp = imageCopy
@@ -247,7 +334,9 @@ class ImageSprite :
 		config.render(imageCopyTemp, int(xOffset), int(yOffset), imageCopy.size[0], imageCopy.size[1], False)
 		config.actions.drawBlanks()
 		time.sleep(presentTime)
-		
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 	def panImage(self) :
 
 		self.jitter = False
@@ -281,6 +370,8 @@ class ImageSprite :
 			if(self.jitter) : self.dY = random.uniform(-.3,.3)
 
 		self.move()
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 	def fillColor(self,force=False) :
 		global bgFillColor
@@ -344,64 +435,6 @@ class ImageSprite :
 	def playImage(self, randomizeTiming = False, frameLimit = 3):
 		global config
 		animate(randomizeTiming, frameLimit)
-
-	def update(self) :
-		if(self.useBlink == True) :
-			if(random.random() > .9998 and self.blink == False) :
-				self.blink = True
-				self.blinkNum = int(random.uniform(32,256))
-				self.blinkCount = 0
-				self.blinkStationary = True if (random.random() > .15) else False
-
-			if(self.blink) :
-				self.blinkCount += 1
-				#self.x -= self.dX
-				if(self.blinkCount%8 == 0) :
-					self.draw.rectangle((0,0, self.image.size[0] ,self.image.size[1]), fill = (0))
-					#self.y = -100
-				elif (self.blinkCount%4 == 0) : 
-					#self.y = 0
-					self.image.paste(self.imageCopy, (0 ,0), self.imageCopy)
-
-				if (self.blinkCount >= self.blinkNum) :
-					self.image.paste(self.imageCopy, (0 ,0), self.imageCopy)
-					if(random.random() > .5 ) : 
-						self.x += self.image.size[1]
-					self.blink = False
-
-			if(self.blinkStationary == False) :
-				self.panImage()
-			elif(random.random() > .995) : 
-				self.blinkStationary =  False
-
-		else : self.panImage()
-
-	def init(self):
-		global action, countLimit
-
-		#print(countLimit)
-		count = 0
-		#fillColor(True)
-		# Constantly re-calls the requested action util 
-		# the count runs out - for long running plays
-		# the countlimit just gets reset 
-		while (count < countLimit):
-			try:
-				if(action == "play"):
-					playImage(False, 7)
-				elif(action == "pan") : 
-					panImage()
-				elif(action == "present") :
-					presentImage()		
-				count += 1
-			except KeyboardInterrupt:
-				print "Stopping...."
-				exit()
-				break
-
-	def debugMessage(self,arg) :
-
-		if(self.debug) : print(arg)		
 
 	
 	

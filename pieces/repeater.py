@@ -26,23 +26,6 @@ colorModeDirectional = False
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def drawVLine() :
-	global xPos, yPos
-	if(random.random() > .998) :
-		pass
-		#xPos = int(random.uniform(0,config.screenWidth))
-		#yPos = 0 #int(random.uniform(0,config.screenHeight))
-	r = 0
-	g = 0
-	b = 0
-	if(random.random() > .0) : 
-		config.renderDraw.rectangle((xPos,yPos,xPos, config.screenHeight/2-1), fill = (r,g,b))
-		config.renderDraw.rectangle((xPos+1,config.screenHeight/2,xPos+1, config.screenHeight), fill = (r,g,b))
-	xPos -= 1
-	if(xPos <0):xPos = config.screenWidth
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 def redrawBackGround() :
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
@@ -56,17 +39,19 @@ def main(run = True) :
 	global config, workConfig, blocks, simulBlocks, colorModeDirectional
 	gc.enable()
 
-	print("Plane Loaded")
+	print("REPEATER Loaded")
 
-	config.vOffset = int(workConfig.get("plane", 'vOffset'))
-	config.speed = float(workConfig.get("plane", 'scrollSpeed'))
-	config.displayRows = int(workConfig.get("plane", 'displayRows'))
-	config.displayCols = int(workConfig.get("plane", 'displayCols'))
-	config.unitCount = int(workConfig.get("plane", 'unitCount'))
-	config.scalingFactor  = float(workConfig.get("plane", 'scalingFactor'))
-	config.useJitter  = (workConfig.getboolean("plane", 'useJitter'))
-	config.useBlink  = (workConfig.getboolean("plane", 'useBlink'))
-	config.noTrails  = (workConfig.getboolean("plane", 'noTrails'))
+	config.vOffset = int(workConfig.get("repeater", 'vOffset'))
+	config.speed = float(workConfig.get("repeater", 'scrollSpeed'))
+	config.displayRows = int(workConfig.get("repeater", 'displayRows'))
+	config.displayCols = int(workConfig.get("repeater", 'displayCols'))
+	config.unitCount = int(workConfig.get("repeater", 'unitCount'))
+	config.scalingFactor  = float(workConfig.get("repeater", 'scalingFactor'))
+	config.speedFactor  = float(workConfig.get("repeater", 'speedFactor'))
+	config.useJitter  = (workConfig.getboolean("repeater", 'useJitter'))
+	config.useBlink  = (workConfig.getboolean("repeater", 'useBlink'))
+	config.noTrails  = (workConfig.getboolean("repeater", 'noTrails'))
+	config.imageList  = (workConfig.get("repeater", 'imageList'))
 
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
@@ -74,11 +59,11 @@ def main(run = True) :
 	#for i in range (0,simulBlocks) : makeBlock()
 
 	path = config.path  + "/assets/imgs/"
-	imageList = ['plane-2b.gif','plane-2tw.png','plane-2tg.png','plane-2t.png'] 
+	imageList = [config.imageList] 
 
 	for i in range (0,config.unitCount) :
 		imgLoader = ImageSprite(config)
-		imgLoader.debug = True
+		imgLoader.debug = False
 		imgLoader.action = "pan"
 		imgLoader.xOffset = 0
 		imgLoader.yOffsetFactor = 200
@@ -95,8 +80,6 @@ def main(run = True) :
 			imgLoader.resizeToHeight = False
 			imgLoader.yOffsetChange = False
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-			imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
-
 		else :
 			imgLoader.scalingFactor = config.scalingFactor
 			imgLoader.useJitter =  config.useJitter
@@ -107,9 +90,19 @@ def main(run = True) :
 			imgLoader.colorModeDirectional = colorModeDirectional
 			#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-			imgLoader.make(path + imageList[1], 1 * config.scalingFactor * 2 , 0, True, True, True, True)
+			''' Speed '''
+			vX = 1 * config.scalingFactor * 2/config.speedFactor
+			
+
+			#imgLoader.make(path + imageList[0], vX, 0, True, True, True, True)
+			imgLoader.make(path + imageList[0], vX, 0, True, True, True, True)
+			#imgLoader.x = imgLoader.xPos = 0 #config.screenWidth/4 * random.random()
+			#imgLoader.y = imgLoader.yPos = 10 + i * 10 #config.screenWidth/4 * random.random()
+			#print (imgLoader.x, imgLoader.xPos, imgLoader.y, imgLoader.dX, imgLoader.dY)
+
+
 		blocks.append(imgLoader)
-	# Assume single plane type display
+	# Assume single item type display
 
 
 	if(run) : runWork()
@@ -131,7 +124,7 @@ def iterate( n = 0) :
 	global xPos, yPos
 
 	# Clear the background and redraw all planes
-	if(random.random() > .998) : shuffle(blocks)
+	if(random.random() > .9985) : shuffle(blocks)
 	if(random.random() > .9985) : colorModeDirectional = False if colorModeDirectional == True else True
 
 	if(config.noTrails) : redrawBackGround()
@@ -149,7 +142,6 @@ def iterate( n = 0) :
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	
-	#drawVLine()
 	#if(block.setForRemoval==True) : makeBlock()
 	
 	# Render the final full image

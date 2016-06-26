@@ -88,7 +88,7 @@ class XOx :
 	maxNumXOs = 10
 	XColor = [255,0,0]
 	OColor = [255,0,0] 
-	ArrowColor = [0,255,0] 
+	ArrowColor = [255,2,0] 
 
 	def __init__(self, direction, config, n, rng) :
 		#print ("init: " + messageString)
@@ -381,6 +381,7 @@ def iterate() :
 			block.xPos = block.start = blocks[block.prvBlock].xPos + blocks[block.prvBlock].width + block.bufferSpacing
 			block.end = -block.scrollImage.size[0] - 8
 
+
 	if(config.useBlanks) : badpixels.drawBlanks(config.canvasImage, False)
 	if(random.random() > .998 and (config.useBlanks)) : badpixels.setBlanksOnScreen() 
 
@@ -408,10 +409,9 @@ def iterate() :
 		segment =  config.canvasImage.crop((n * config.screenWidth, 0, segmentWidth + n * config.screenWidth, segmentHeight))
 		
 		# At some point go to modulo for even/odd ... but for now not more than 5 rows
-		if (n == 0 or n == 2) :
+		if ((n == 0 or n == 2) and (config.displayRows >  1) ) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
-
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
 
 	# Debug geometry for rotation

@@ -2,7 +2,6 @@
 #import modules
 from modules import utils, configuration
 from modules.imagesprite import ImageSprite
-from configs import localconfig
 
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageFilter

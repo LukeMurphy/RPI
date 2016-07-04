@@ -1,8 +1,5 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, configuration
-from modules.imagesprite import ImageSprite
-from configs import localconfig
 
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageFilter
@@ -17,6 +14,9 @@ import sys, getopt, os
 import ConfigParser, io
 import gc
 from subprocess import call
+
+from modules import utils, configuration
+from modules.imagesprite import ImageSprite
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

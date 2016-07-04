@@ -15,7 +15,7 @@ r=255
 g=b=0
 pulseSpeed = .1
 colorSwitch = False
-countLimit = 16
+countLimit = 4
 rHeight = 0
 rWidth = 0
 rows  = 1
@@ -23,7 +23,9 @@ cols = 1
 
 lineWidth = 1
 
+# rows, cols
 divisionOfSquares = [1,1,2,2,4,4,8,8,16,16,32,32,64,64]
+
 divisionPosition = 0
 colorutil = colorutils
 
@@ -42,11 +44,19 @@ def drawRects() :
 	# But for double square, start with rows, divide columns
 	# then divide rows, then repeat
 
+	#if (rows * lineWidth) < config.screenHeight : rows = int(config.screenHeight/lineWidth)
+	rHeight = int(config.screenHeight / rows)
+	squaresToDraw = int(rHeight / 2 )
 
-	for row in range(0, rows):
-		rHeight = int(config.screenHeight / rows)
+	#if(rows*lineWidth < config.screenHeight)
+	additionalRows = 0
+	rowDiff = config.screenHeight - rows * rHeight
+
+	if( rowDiff > lineWidth + 1) : additionalRows = rowDiff
+	for row in range(0, rows + additionalRows):
+		
 		yOffset = int(row * rHeight)
-		squaresToDraw = int(rHeight / 2)
+		
 
 		for col in range(0, cols):
 			rWidth = int(config.screenWidth / cols)
@@ -106,14 +116,8 @@ def changeColor( rnd = False, choice = 3) :
 
 def animator() :
 	global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
-	global rows, cols, columnLimit, count, mode
-
-	mode = "cols"
-
+	global rows, cols, columnLimit, count, mode, lineWidth
 	count = 0
-	pulseSpeed = .1
-	countLimit = 16
-	interval = 4
 	rWidth = config.screenWidth
 	rHeight = config.screenHeight
 	
@@ -125,6 +129,12 @@ def animator() :
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
+
+	lineWidth = config.lineWidth = int(workConfig.get("squares", 'lineWidth'))
+	pulseSpeed = config.pulseSpeed = float(workConfig.get("squares", 'pulseSpeed'))
+	mode = config.mode = (workConfig.get("squares", 'mode'))
+	countLimit = config.countLimit = int(workConfig.get("squares", 'countLimit'))
+	
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -148,10 +158,20 @@ def runWork():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def reset() :
+	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
+	divisionPosition = 0
+	lineWidth = int( random.uniform(1,9))
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def iterate() :
-	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares
+	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
 	global rows, cols
+
 	drawRects()
+
 	if(random.random() > .7) : colorSwitch = True
 	if(random.random() > .9) : colorSwitch = False
 	count += 1
@@ -159,18 +179,19 @@ def iterate() :
 	if (count >= countLimit) :
 		divisionPosition += 1
 
-		if(divisionPosition >= len(divisionOfSquares)-1) :
-				divisionPosition = 0
+		if(divisionPosition >= len(divisionOfSquares)-1) : reset()	
+		if(int(config.screenHeight /divisionOfSquares[divisionPosition])) <= lineWidth : reset()
 
 		cols = divisionOfSquares[divisionPosition+1]
 		rows = divisionOfSquares[divisionPosition]
 		count = 0
 
-		countLimit = int(16  *  (2 / rows)) + int(random.uniform(2,10))
+		countLimit = int(config.countLimit  *  (2 / rows)) + int(random.uniform(2,10))
+
 		if(random.random() > .7) : colorSwitch = False
 
 
-	config.render(config.image, 0, 0,128,64)
+	config.render(config.image, 0, 0,config.screenWidth,config.screenHeight)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

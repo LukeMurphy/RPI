@@ -28,7 +28,7 @@ def main(run = True) :
 	global config, workConfig, blocks, simulBlocks, bads
 	gc.enable()
 
-	print("Plane Loaded")
+	print("Image Loaded")
 
 	config.vOffset = int(workConfig.get("scroll", 'vOffset'))
 	config.speed = float(workConfig.get("scroll", 'scrollSpeed'))

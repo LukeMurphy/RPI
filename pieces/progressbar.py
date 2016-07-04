@@ -9,26 +9,24 @@ redrawSpeed = .001
 
 class ProgressBar :
 
-	outlineColor = (200,200,200)
-	barColor = (0,0,255)
+	outlineColor = (100,100,100)
+	barColor = (0,0,200)
 	xPos = 0
 	yPos = 0
 	boxHeight = 0
 	boxWidth = 0
 	status = 0
 	boxMax = 0
-	rate = 1
-	pauses = 3
+	rate = 2
+	pauses = 300
 	pauseCount = 0
-
-
 
 	def __init__(self, config):
 		print ("init PB")
 		
 		self.boxMax = config.screenWidth - 2
-		self.boxHeight = config.screenHeight - 6
-		self.holderColor = (50,50,50)
+		self.boxHeight = config.screenHeight - 3
+		self.holderColor = (5,5,5)
 		self.xPos = 1
 		self.yPos = 1
 
@@ -56,30 +54,40 @@ class ProgressBar :
 
 	def reDraw(self) :
 
-		if(random.random() > .9 and self.pauseCount < self.pauses) : 
+		self.boxWidth += self.rate
+		percentage  =  (float(self.boxWidth)/float(self.boxMax)*100)
+		pauseProbability = math.exp(percentage/10) / 40000
+
+		displayPercentage  = int(math.ceil(percentage))
+		self.messageString = str(displayPercentage) + "%"
+
+		
+		if(random.random() < pauseProbability and self.pauseCount < self.pauses) : 
 			self.rate = 0
 			self.pauseCount += 1
-		if(random.random() > .95) : self.rate = 1
-		self.boxWidth += self.rate
-		percentage  =  float(self.boxWidth)/float(self.boxMax)*100.0
-		self.messageString = str(int(percentage)) + "%"
+		
 
+		if(random.random() > .95) : self.rate = random.random()
+		
 		indent  =  0
-		if(self.boxWidth <= self.boxMax) :
-			config.draw.rectangle((self.xPos-1, self.yPos-1, self.boxMax+1, self.boxHeight+self.yPos+1), 
-				outline=(self.outlineColor), fill=(self.holderColor) )
-			config.draw.rectangle((self.xPos, self.yPos, self.boxWidth+self.xPos-1, self.boxHeight+self.yPos), 
-				 fill=(self.barColor) )
+		# draw box container
+		config.draw.rectangle((self.xPos-1, self.yPos-1, self.boxMax+1, self.boxHeight+self.yPos+1), 
+			outline=(self.outlineColor), fill=(self.holderColor) )
+		# draw bar
+		config.draw.rectangle((self.xPos, self.yPos, self.boxWidth+self.xPos, self.boxHeight+self.yPos), 
+			 fill=(self.barColor) )
 
-			#self.txtdraw.rectangle((0,0,self.scrollImage.width, self.scrollImage.height), fill=(0,0,0))
-			self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 , self.fontHeight))
-			self.txtdraw  = ImageDraw.Draw(self.scrollImage)
-			for i in range(1, self.config.shadowSize + 1) :
-				self.txtdraw.text((indent + -i,-i),self.messageString,(0,0,0),font=self.font)
-				self.txtdraw.text((indent + i,i),self.messageString,(0,0,0),font=self.font)
-				self.txtdraw.text((0,0),self.messageString, self.clr ,font=self.font)
-			config.image.paste(self.scrollImage, (20,20), self.scrollImage)
-		else :
+		#self.txtdraw.rectangle((0,0,self.scrollImage.width, self.scrollImage.height), fill=(0,0,0))
+		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 , self.fontHeight))
+		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
+		for i in range(1, self.config.shadowSize + 1) :
+			self.txtdraw.text((indent + -i,-i),self.messageString,(0,0,0),font=self.font)
+			self.txtdraw.text((indent + i,i),self.messageString,(0,0,0),font=self.font)
+			self.txtdraw.text((0,0),self.messageString, self.clr ,font=self.font)
+		config.image.paste(self.scrollImage, (self.boxMax - self.pixLen[0] - 4,24), self.scrollImage)
+
+		if(percentage >= 100) :
+			time.sleep(int(random.random() * 10))
 			self.done()
 
 	def drawBar(self) :
@@ -88,9 +96,8 @@ class ProgressBar :
 
 	def done(self):
 		self.pauseCount = 0
-		self.boxWidth = 0
-		self.rate = 0
-
+		self.boxWidth = 1
+		self.rate = 2
 
 def drawElement() :
 	global config
@@ -135,15 +142,8 @@ def main(run = True) :
 	pBar = ProgressBar(config)
 
 	print("Template Loaded")
-
-	config.renderImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-
 	config.draw  = ImageDraw.Draw(config.image)
-	config.id = config.image.im.id
-
-
-
 	if(run) : runWork()
 		
 

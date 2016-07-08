@@ -118,8 +118,11 @@ class ProgressBar :
 
 		if(self.percentage >= 100 and self.goPast != True) : 
 			self.boxWidth = self.boxMax - 1
-			self.complete = True
-			if(random.random() > .0) : self.barColor = (0,200,0)
+			# If it gets to 100%, just drain away the happiness
+			#self.complete = True
+			self.rate *= -1
+			if(random.random() > .80) : 
+				self.barColor = (0,200,0)
 		elif(self.percentage >= 100 and self.goPast and self.boxWidth >= self.boxMaxAlt) :
 			self.complete = True
 		elif(self.percentage >= 100 and self.goPast) :

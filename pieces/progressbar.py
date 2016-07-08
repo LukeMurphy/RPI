@@ -11,13 +11,16 @@ class ProgressBar :
 
 	outlineColor = (1,1,1)
 	barColor = (0,0,200)
+	holderColor = (0,0,0)
+	messageClr = (255,255,255)
+
 	xPos = 1
 	yPos = 1
 	boxHeight = 0
 	boxWidth = 0
 	status = 0
 	boxMax = 0
-	rate = 2
+	rate = 1 * random.random()
 	percentage = 0
 	boxMaxAlt = 0 
 
@@ -28,7 +31,7 @@ class ProgressBar :
 	hasPaused = False
 	pausePoint = 50
 
-	goBack = False
+	goBack = True
 	goPast = False
 	messageOverride = True
 	messageOverrideActive = False
@@ -43,7 +46,6 @@ class ProgressBar :
 		self.boxMax = config.screenWidth - 2
 		self.boxMaxAlt = self.boxMax + int(random.uniform(1,3) * config.screenWidth)
 		self.boxHeight = config.screenHeight - 3
-		self.holderColor = (5,5,5)
 
 		config.fontSize = int(workConfig.get("progressbar", 'fontSize'))
 		config.vOffset = int(workConfig.get("progressbar", 'vOffset'))
@@ -68,7 +70,7 @@ class ProgressBar :
 		self.fontHeight = int(self.pixLen[1] * 1.3)
 		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 , self.fontHeight))
 		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
-		self.clr = (255,255,255)
+		
 
 	def reDraw(self) :
 		'''
@@ -77,10 +79,8 @@ class ProgressBar :
 		if(random.random() < pauseProbability  and self.rate != 0) : #and self.pauseCount < self.pauses
 			self.rate = 0
 			self.pauseCount += 1
-		
-		if(self.goBack and random.random() > .98) :
-			self.rate *= -1
 		'''
+		
 
 		if(random.random() > .998 ) : 
 			self.rate = random.random() * 2
@@ -88,6 +88,9 @@ class ProgressBar :
 			if(self.hasPaused == True):
 				self.paused = False
 				#("releasing")
+
+				# It might go backwards!
+				if(self.goBack and random.random() > .2) : self.rate *= -1
 				# chance there will be yet another pause ....
 				if(random.random() > .8) :
 					timeLeft = 100 - self.pausePoint
@@ -119,6 +122,15 @@ class ProgressBar :
 			if(random.random() > .0) : self.barColor = (0,200,0)
 		elif(self.percentage >= 100 and self.goPast and self.boxWidth >= self.boxMaxAlt) :
 			self.complete = True
+		elif(self.percentage >= 100 and self.goPast) :
+			self.rate = 4
+
+		if(self.rate < 0 and self.percentage <= 0) :
+			self.complete = True
+			self.rate = 0
+			self.percentage = 0
+			self.boxWidth = 1
+			self.barColor = (255,0,0)
 
 		self.displayPercentage = int(math.floor(self.percentage))
 
@@ -157,7 +169,7 @@ class ProgressBar :
 		for i in range(1, self.config.shadowSize ) :
 			self.txtdraw.text((indent + -i,-i),self.messageString,(0,0,0),font=self.font)
 			self.txtdraw.text((indent + i,i),self.messageString,(0,0,0),font=self.font)
-		self.txtdraw.text((0,0),self.messageString, self.clr ,font=self.font)
+		self.txtdraw.text((0,0),self.messageString, self.messageClr ,font=self.font)
 
 		numXPos = self.boxMax - self.pixLen[0] - 4
 		numXPos = 32
@@ -173,11 +185,11 @@ class ProgressBar :
 	def done(self):
 		self.pauseCount = 0
 		self.boxWidth = 1
-		self.rate = 2 * random.random()
+		self.rate = 1 * random.random()
 		self.lastPause = False
 		self.complete = False
 
-		self.goBack = True if (random.random() > .9) else False
+		#self.goBack = True if (random.random() > .9) else False
 		self.goPast = True if (random.random() > .9) else False
 		self.messageOverride = True if (random.random() > .9) else False
 		self.messageOverrideActive = False

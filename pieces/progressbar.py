@@ -13,8 +13,8 @@ class ProgressBar :
 	outlineColor = (1,1,1)
 	barColor = (0,0,200)
 	holderColor = (0,0,0)
-	messageClr = (0,0,0)
-	shadowColor = (0,0,200)
+	messageClr = (200,200,200)
+	shadowColor = (0,0,50)
 
 	xPos = 1
 	yPos = 1
@@ -73,7 +73,7 @@ class ProgressBar :
 		config.vOffset = int(workConfig.get("progressbar", 'vOffset'))
 		config.scrollSpeed = float(workConfig.get("progressbar", 'scrollSpeed'))
 		config.steps = int(workConfig.get("progressbar", 'steps'))
-		config.shadowSize = 0 #int(workConfig.get("progressbar", 'shadowSize'))
+		config.shadowSize = int(workConfig.get("progressbar", 'shadowSize'))
 		config.sansSerif = (workConfig.getboolean("progressbar", 'sansSerif'))
 
 		self.pausePoint = int(random.random() * 100)

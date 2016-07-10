@@ -13,7 +13,8 @@ class ProgressBar :
 	outlineColor = (1,1,1)
 	barColor = (0,0,200)
 	holderColor = (0,0,0)
-	messageClr = (255,255,255)
+	messageClr = (0,0,0)
+	shadowColor = (0,0,200)
 
 	xPos = 1
 	yPos = 1
@@ -48,6 +49,8 @@ class ProgressBar :
 	complete = False
 	paused = False
 	hasPaused = False
+	gradient = False
+	gradientLevel = 2
 	pausePoint = 50
 
 	goBack = True
@@ -70,7 +73,7 @@ class ProgressBar :
 		config.vOffset = int(workConfig.get("progressbar", 'vOffset'))
 		config.scrollSpeed = float(workConfig.get("progressbar", 'scrollSpeed'))
 		config.steps = int(workConfig.get("progressbar", 'steps'))
-		config.shadowSize = int(workConfig.get("progressbar", 'shadowSize'))
+		config.shadowSize = 0 #int(workConfig.get("progressbar", 'shadowSize'))
 		config.sansSerif = (workConfig.getboolean("progressbar", 'sansSerif'))
 
 		self.pausePoint = int(random.random() * 100)
@@ -206,27 +209,35 @@ class ProgressBar :
 		xPos2 = self.boxWidthDisplay+self.xPos
 		yPos1 = self.yPos
 		yPos2 = self.boxHeight+self.yPos
+
 		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(self.barColor) )
 		lines = config.screenHeight-2
-		arc = math.pi / lines * .6
-		for n in range(0, lines) :
-			yPos = yPos1 + n
-			b = math.sin(arc * n)
-			barColor = (int(self.barColor[0] * b), int(self.barColor[1] * b), int(self.barColor[2] * b))
-			config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColor) )
+		
+
+		if (self.gradientLevel == 1) : arc = math.pi / lines * .6 
+		else : arc = math.pi / lines 
+
+		if(self.gradient):
+			for n in range(0, lines) :
+				yPos = yPos1 + n
+				b = math.sin(arc * n)
+				barColor = (int(self.barColor[0] * b), int(self.barColor[1] * b), int(self.barColor[2] * b))
+				config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColor) )
 
 
 		#self.txtdraw.rectangle((0,0,self.scrollImage.width, self.scrollImage.height), fill=(0,0,0))
 		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 , self.fontHeight))
 		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
 		for i in range(1, self.config.shadowSize ) :
-			self.txtdraw.text((indent + -i,-i),self.messageString,(0,0,0),font=self.font)
-			self.txtdraw.text((indent + i,i),self.messageString,(0,0,0),font=self.font)
+			self.txtdraw.text((indent + -i,-i),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + i,i),self.messageString,self.shadowColor,font=self.font)
 		self.txtdraw.text((0,0),self.messageString, self.messageClr ,font=self.font)
 
-		numXPos = self.boxMax - self.pixLen[0] - 4
+		#numXPos = config.screenWidth - self.pixLen[0] - 4
+		#
 		numXPos = 32
 		numYPos = 24
+		#numXPos = int(xPos2 - 40)
 
 		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
 
@@ -294,7 +305,7 @@ def iterate() :
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	if(pBar.rate != lastRate) :
-		print (pBar.rate)
+		#print (pBar.rate)
 		lastRate = pBar.rate
 
 	if(pBar.firstRun) :

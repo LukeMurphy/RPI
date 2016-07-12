@@ -12,7 +12,7 @@ import textwrap
 import math
 import sys, getopt, os
 import ConfigParser, io
-import gc
+
 from subprocess import call
 
 from modules import utils, configuration
@@ -23,6 +23,7 @@ from modules.imagesprite import ImageSprite
 xPos = 320
 yPos = 0
 colorModeDirectional = False
+counter = 0
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -37,7 +38,7 @@ def redrawBackGround() :
 
 def main(run = True) :
 	global config, workConfig, blocks, simulBlocks, colorModeDirectional
-	gc.enable()
+	
 
 	print("REPEATER Loaded")
 
@@ -123,6 +124,7 @@ def iterate( n = 0) :
 	global config, blocks, colorModeDirectional
 	global xPos, yPos
 
+
 	# Clear the background and redraw all planes
 	if(random.random() > .9985) : shuffle(blocks)
 	if(random.random() > .9985) : colorModeDirectional = False if colorModeDirectional == True else True
@@ -151,7 +153,7 @@ def iterate( n = 0) :
 
 	# cleanup the list
 	#blocks[:] = [block for block in blocks if block.setForRemoval!=True]
-	#config.updateCanvas()
+	config.updateCanvas()
 
 	if len(blocks) == 0 : exit()
 

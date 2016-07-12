@@ -6,20 +6,24 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter, ImageChops
 import random
 import numpy, time
+import gc
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 global root
 memoryUsage = 0
 debug = False
+counter = 0
 
 canvasOffsetX = 4
 canvasOffsetY = 7
+buff  =  8
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
-	global root, canvasOffsetX, canvasOffsetY
+	global root, canvasOffsetX, canvasOffsetY, buff
+	gc.enable()
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
 		windowOffset = [1900,20]
@@ -31,7 +35,7 @@ def setUp():
 	# after rotation
 	#if(config.rotation == 90) : canvasOffsetY = -25
 
-	buff  =  8
+	
 
 	root = Tk()
 	w = config.screenWidth + buff
@@ -52,12 +56,12 @@ def setUp():
 	config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
 	
 	tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw')
+	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw', tag="mainer")
 
 	#config.cnvs.update()
-	config.cnvs.update_idletasks()
+	#config.cnvs.update_idletasks()
 
-	root.after(0, startWork)
+	root.after(1000, startWork)
 	root.call('wm', 'attributes', '.', '-topmost', '1')
 	root.mainloop()
 
@@ -70,27 +74,50 @@ def on_closing():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def startWork(*args) :
-	global config, work, root
+	global config, work, root, counter
+
+	work.runWork()
+	'''
+
 	while True :
 		try :
 			work.runWork()
+
+			count++1
+			print(count)
+			if (count > 1000) :
+				count = 0
+				root.quit()
 		except Exception,e :
 			print(str(e))
 			#work.runWork(False)
 			root.quit()
 			sys.exit()
 			root.destroy()
+	'''
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def updateCanvas() :
-	global canvasOffsetX, canvasOffsetY
+	global canvasOffsetX, canvasOffsetY, root, counter, buff
 	## For testing ...
 	#draw1  = ImageDraw.Draw(config.renderImageFull)
 	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
-	config.cnvs._image_tk = ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw')
-	config.cnvs.update()
+	counter +=1
+	if(counter > 1000) :
+		#print(gc.get_count())
+		# I don't know if this really really helps
+		gc.collect()
+		counter = 0
+
+	# This significantly helped performance !!
+	config.cnvs.delete("main")
+	config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
+	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw', tag="main")
+	#config.cnvs.update()
+	# This *should* be more efficient 
+	config.cnvs.update_idletasks()
+	#root.update()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

@@ -151,7 +151,7 @@ def iterate( n = 0) :
 
 	# cleanup the list
 	#blocks[:] = [block for block in blocks if block.setForRemoval!=True]
-	config.updateCanvas()
+	#config.updateCanvas()
 
 	if len(blocks) == 0 : exit()
 

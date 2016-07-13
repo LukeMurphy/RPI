@@ -114,9 +114,9 @@ def updateCanvas() :
 	config.cnvs.delete("main")
 	config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw', tag="main")
-	#config.cnvs.update()
+	config.cnvs.update()
 	# This *should* be more efficient 
-	config.cnvs.update_idletasks()
+	#config.cnvs.update_idletasks()
 	#root.update()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

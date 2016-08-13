@@ -55,25 +55,29 @@ class Fludd :
 
 
 	def reDraw(self) :
+		var = 10
 
-		xPos1 = 0
-		yPos1 = 100
-		xPos2 = 0
-		yPos2 = 100
+		xPos1 = random.random() * var
+		yPos1 = random.random() * var
+		xPos2 = random.uniform(self.boxMax-var,self.boxMax+var)
+		yPos2 = random.random() * var		
+		xPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
+		yPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
+		xPos4 = random.random() * var
+		yPos4 = random.uniform(self.boxMax-var,self.boxMax+var)
 
-		# Draw single left-most black line
-		config.draw.rectangle((0, yPos1, 1, yPos2), fill=(0,0,0) )
+		grayLevel = int(random.random() * 0)
+		gray = (grayLevel,grayLevel,grayLevel)
+
+
+		config.draw.rectangle((0,0,self.boxMax,self.boxMax), fill = (255,255,255))
+		config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray) )
 		
-		# draw flat box progress bar - default
-		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(200,0,0) )
+
 
 		# Finally composite full image
-		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
+		#config.image.paste(self.mainImage, (numXPos, numYPos), self.scrollImage)
 
-
-	def drawBar(self) :
-		config = self.config
-		config.draw.rectangle((self.xPos,self.yPos,self.boxWidth+self.xPos,self.boxHeight+self.yPos), outline=(self.outlineColor), fill=(self.barColor) )
 
 	def done(self): 
 		return True
@@ -120,7 +124,7 @@ def main(run = True) :
 	global redrawSpeed
 	global fluddSquare
 
-	fluddSquare = ProgressBar(config)
+	fluddSquare = Fludd(config)
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 	if(run) : runWork()

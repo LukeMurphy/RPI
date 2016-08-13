@@ -30,7 +30,7 @@ class ProgressBar :
 	boxWidthDisplay = 0
 	status = 0
 	boxMax = 0
-	rateMultiplier = .1
+	rateMultiplier = 1.1
 	rate = rateMultiplier * random.random()
 	numRate = rate
 	percentage = 0

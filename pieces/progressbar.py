@@ -11,10 +11,13 @@ lastRate  = 0
 class ProgressBar :
 
 	outlineColor = (1,1,1)
-	barColor = (0,0,200)
+	barColor = (200,200,000)
+	barColorStart = (0,200,200)
 	holderColor = (0,0,0)
-	messageClr = (200,200,200)
-	shadowColor = (0,0,50)
+	messageClr = (200,0,0)
+	shadowColor = (0,0,0)
+
+	cyclicalBrightnessPhase = 0
 
 	xPos = 1
 	yPos = 1
@@ -75,8 +78,11 @@ class ProgressBar :
 		config.steps = int(workConfig.get("progressbar", 'steps'))
 		config.shadowSize = int(workConfig.get("progressbar", 'shadowSize'))
 		config.sansSerif = (workConfig.getboolean("progressbar", 'sansSerif'))
-
+		self.gradient = (workConfig.getboolean("progressbar", 'useThreeD'))
 		self.pausePoint = int(random.random() * 100)
+
+		self.cyclicalArc = 4 * math.pi / self.boxMax
+		self.cyclicalBrightnessPhase = 0
 
 		if(config.sansSerif) : 
 			self.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
@@ -84,7 +90,7 @@ class ProgressBar :
 			self.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSerifBold.ttf', config.fontSize)
 		self.config = config
 
-		self.messageString = "PLEASE WAIT. UPDATING"
+		self.messageString = self.altStringMessage
 		tempImage = Image.new("RGBA", (1200,196))
 		draw  = ImageDraw.Draw(tempImage)
 		self.pixLen = draw.textsize(self.messageString, font = self.font)
@@ -189,6 +195,8 @@ class ProgressBar :
 			self.barColor = (255,0,0)
 
 		# Get the percentage to display	
+		#self.messageClr = (200, int(200 * self.percentage/100), int(200 * self.percentage/100))
+		if(self.percentage >= 2) : self.messageClr = (200,200,200)
 		self.displayPercentage = int(math.floor(self.percentage))
 
 		#if(self.complete) : print(self.percentage, self.complete)
@@ -197,48 +205,84 @@ class ProgressBar :
 		if(self.messageOverrideActive != True) : 
 			self.messageString = str(self.displayPercentage) + "%"
 
-		indent  =  0
+		
 		# draw box container
 		config.draw.rectangle((self.xPos-1, self.yPos-1, self.boxMax+1, self.boxHeight+self.yPos+1), 
 			outline=(self.outlineColor), fill=(self.holderColor) )
 		# draw bar
 		
-		# draw "gradient"
+		# draw flat box progress bar
 		if(self.drawBarFill) : self.boxWidthDisplay = self.boxWidth
 		xPos1 = self.xPos
 		xPos2 = self.boxWidthDisplay+self.xPos
 		yPos1 = self.yPos
 		yPos2 = self.boxHeight+self.yPos
 
-		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(self.barColor) )
-		lines = config.screenHeight-2
+		ellipseDiameter = 17
+		ellipseYOffset = 4
+		ellipseXOffset = self.boxMax - ellipseDiameter/2 #20
+		ellipseStart = [ellipseXOffset, self.boxHeight /2 - ellipseDiameter/2 + ellipseYOffset]
+		ellipseEnd = [ellipseXOffset + ellipseDiameter, self.boxHeight /2 + ellipseDiameter/2+ ellipseYOffset]
+		#config.draw.ellipse((ellipseStart[0], ellipseStart[1], ellipseEnd[0], ellipseEnd[1]),  fill=self.barColor, outline=(0,0,0))
+		config.draw.rectangle((0, yPos1, 1, yPos2), fill=(0,0,0) )
 		
+		# draw flat box progress bar - default
+		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(200,0,0) )
 
+		lines = config.screenHeight-2
 		if (self.gradientLevel == 1) : arc = math.pi / lines * .6 
 		else : arc = math.pi / lines 
 
+		# Draw horizontal color gradient bar
+		vLines = int(xPos2 - xPos1)
+		dR = ((self.barColor[0] - self.barColorStart[0])/(vLines+1))
+		dG = ((self.barColor[1] - self.barColorStart[1])/(vLines+1))
+		dB = ((self.barColor[2] - self.barColorStart[2])/(vLines+1))
+		
 		if(self.gradient):
-			for n in range(0, lines) :
-				yPos = yPos1 + n
-				b = math.sin(arc * n)
-				barColor = (int(self.barColor[0] * b), int(self.barColor[1] * b), int(self.barColor[2] * b))
-				config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColor) )
+			for p in range (0, vLines) :
+				xPos1p = xPos1 + p
+				xPos2p = xPos1p + 1
+				cyclicalBrightness = abs(math.sin(self.cyclicalArc * self.cyclicalBrightnessPhase * self.boxMax/vLines))+.1
+				cyclicalBrightness = 1
+				#print(cyclicalBrightness)
+				rV = int(self.barColorStart[0] + p * dR )
+				gV = int(self.barColorStart[1] + p * dG )
+				bV = int(self.barColorStart[2] + p * dB )
 
+				# Draw vertical shading gradient "3D!"
+				for n in range(0, lines) :
+					yPos = yPos1 + n
+					b = math.sin(arc * n) * cyclicalBrightness
+					#b = cyclicalBrightness
+					rVd = int(rV * b)
+					gVd = int(gV * b)
+					bVd = int(bV * b)
+					barColor = (rVd, gVd, bVd)
+					config.draw.rectangle((xPos1p, yPos, xPos2p, yPos), fill=(barColor) )
 
-		#self.txtdraw.rectangle((0,0,self.scrollImage.width, self.scrollImage.height), fill=(0,0,0))
-		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 , self.fontHeight))
+		# Draw the message percentage
+
+		indent  =  4
+		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 * indent , self.fontHeight + 2 * indent))
 		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
 		for i in range(1, self.config.shadowSize ) :
 			self.txtdraw.text((indent + -i,-i),self.messageString,self.shadowColor,font=self.font)
 			self.txtdraw.text((indent + i,i),self.messageString,self.shadowColor,font=self.font)
-		self.txtdraw.text((0,0),self.messageString, self.messageClr ,font=self.font)
+		self.txtdraw.text((indent,0),self.messageString, self.messageClr ,font=self.font)
 
-		#numXPos = config.screenWidth - self.pixLen[0] - 4
-		#
-		numXPos = 32
-		numYPos = 24
 		#numXPos = int(xPos2 - 40)
+		self.pixLen = config.draw.textsize(self.messageString, font = self.font)
+		if (self.messageString != self.altStringMessage) :
+			numXPos = self.boxMax - self.pixLen[0] - 8
+		else :
+			numXPos = self.boxMax - self.pixLen[0] - 8
+		#numXPos = 32
+		numYPos = 24
 
+		
+		#self.txtdraw.rectangle((0,0,self.pixLen[0]+indent+2, self.pixLen[1] + indent-1), outline=(0,100,0))
+		
 		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
 
 
@@ -274,11 +318,9 @@ def drawElement() :
 	global config
 	return True
 
-
 def redraw():
 	global config, pBar
 	pBar.reDraw()
-
 
 def changeColor() :
 	pass

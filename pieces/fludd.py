@@ -36,6 +36,9 @@ class Fludd :
 	percentage = 0
 	boxMaxAlt = 0
 
+	nothingLevel = 10
+	nothingChangeProbability = .02
+
 
 	def __init__(self, config):
 		print ("init PB")
@@ -46,7 +49,7 @@ class Fludd :
 		self.spinnerCenter = (self.boxMax - 60, self.boxHeight/2 + 4)
 		self.config = config
 
-		tempImage = Image.new("RGBA", (1200,196))
+		tempImage = Image.new("RGBA", (640,640))
 		draw  = ImageDraw.Draw(tempImage)
 		self.mainImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		
@@ -56,22 +59,24 @@ class Fludd :
 
 	def reDraw(self) :
 		var = 10
-
-		xPos1 = random.random() * var
-		yPos1 = random.random() * var
+		xPos1 = random.uniform(-var/2,var)
+		yPos1 = random.uniform(-var/2,var)
 		xPos2 = random.uniform(self.boxMax-var,self.boxMax+var)
-		yPos2 = random.random() * var		
+		yPos2 = random.uniform(-var/2,var)		
 		xPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
 		yPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
-		xPos4 = random.random() * var
+		xPos4 = random.uniform(-var/2,var)
 		yPos4 = random.uniform(self.boxMax-var,self.boxMax+var)
 
-		grayLevel = int(random.random() * 0)
-		gray = (grayLevel,grayLevel,grayLevel)
+		gray = int(random.random() * 0)
+		brightness = self.config.brightness * random.random()
+		light = int(brightness*self.nothingLevel)
 
+		config.draw.rectangle((0,0,self.boxMax,self.boxMax), fill = (0,0,0))
+		config.draw.rectangle((0,0,self.boxMax,self.boxMax), fill = (light,light,light))
+		config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
 
-		config.draw.rectangle((0,0,self.boxMax,self.boxMax), fill = (255,255,255))
-		config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray) )
+		if(random.random() < self.nothingChangeProbability) : self.nothingLevel = random.uniform(0,255)
 		
 
 

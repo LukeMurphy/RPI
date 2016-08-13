@@ -17,7 +17,11 @@ class ProgressBar :
 	messageClr = (200,0,0)
 	shadowColor = (0,0,0)
 
-	cyclicalBrightnessPhase = 0
+	spinnerAngle = 0
+	spinnerAngleSteps = 16
+	spinnerCenter = (0,0)
+	spinnerRadius = 8
+	spinnerInnerRadius = 5
 
 	xPos = 1
 	yPos = 1
@@ -83,6 +87,7 @@ class ProgressBar :
 
 		self.cyclicalArc = 4 * math.pi / self.boxMax
 		self.cyclicalBrightnessPhase = 0
+		self.spinnerCenter = (self.boxMax - 60, self.boxHeight/2 + 4)
 
 		if(config.sansSerif) : 
 			self.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
@@ -205,7 +210,6 @@ class ProgressBar :
 		if(self.messageOverrideActive != True) : 
 			self.messageString = str(self.displayPercentage) + "%"
 
-		
 		# draw box container
 		config.draw.rectangle((self.xPos-1, self.yPos-1, self.boxMax+1, self.boxHeight+self.yPos+1), 
 			outline=(self.outlineColor), fill=(self.holderColor) )
@@ -218,12 +222,18 @@ class ProgressBar :
 		yPos1 = self.yPos
 		yPos2 = self.boxHeight+self.yPos
 
+		
+		# Draw a circle marker
+		'''
 		ellipseDiameter = 17
 		ellipseYOffset = 4
 		ellipseXOffset = self.boxMax - ellipseDiameter/2 #20
 		ellipseStart = [ellipseXOffset, self.boxHeight /2 - ellipseDiameter/2 + ellipseYOffset]
 		ellipseEnd = [ellipseXOffset + ellipseDiameter, self.boxHeight /2 + ellipseDiameter/2+ ellipseYOffset]
-		#config.draw.ellipse((ellipseStart[0], ellipseStart[1], ellipseEnd[0], ellipseEnd[1]),  fill=self.barColor, outline=(0,0,0))
+		config.draw.ellipse((ellipseStart[0], ellipseStart[1], ellipseEnd[0], ellipseEnd[1]),  fill=self.barColor, outline=(0,0,0))
+		'''
+		
+		# Draw single left-most black line
 		config.draw.rectangle((0, yPos1, 1, yPos2), fill=(0,0,0) )
 		
 		# draw flat box progress bar - default
@@ -243,8 +253,8 @@ class ProgressBar :
 			for p in range (0, vLines) :
 				xPos1p = xPos1 + p
 				xPos2p = xPos1p + 1
-				cyclicalBrightness = abs(math.sin(self.cyclicalArc * self.cyclicalBrightnessPhase * self.boxMax/vLines))+.1
-				cyclicalBrightness = 1
+				#cyclicalBrightness = abs(math.sin(self.cyclicalArc * self.cyclicalBrightnessPhase * self.boxMax/vLines))+.1
+				#cyclicalBrightness = 1
 				#print(cyclicalBrightness)
 				rV = int(self.barColorStart[0] + p * dR )
 				gV = int(self.barColorStart[1] + p * dG )
@@ -253,7 +263,7 @@ class ProgressBar :
 				# Draw vertical shading gradient "3D!"
 				for n in range(0, lines) :
 					yPos = yPos1 + n
-					b = math.sin(arc * n) * cyclicalBrightness
+					b = math.sin(arc * n)
 					#b = cyclicalBrightness
 					rVd = int(rV * b)
 					gVd = int(gV * b)
@@ -262,7 +272,6 @@ class ProgressBar :
 					config.draw.rectangle((xPos1p, yPos, xPos2p, yPos), fill=(barColor) )
 
 		# Draw the message percentage
-
 		indent  =  4
 		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 * indent , self.fontHeight + 2 * indent))
 		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
@@ -271,6 +280,7 @@ class ProgressBar :
 			self.txtdraw.text((indent + i,i),self.messageString,self.shadowColor,font=self.font)
 		self.txtdraw.text((indent,0),self.messageString, self.messageClr ,font=self.font)
 
+		# Draw a box around message display
 		#numXPos = int(xPos2 - 40)
 		self.pixLen = config.draw.textsize(self.messageString, font = self.font)
 		if (self.messageString != self.altStringMessage) :
@@ -279,10 +289,23 @@ class ProgressBar :
 			numXPos = self.boxMax - self.pixLen[0] - 8
 		#numXPos = 32
 		numYPos = 24
-
-		
 		#self.txtdraw.rectangle((0,0,self.pixLen[0]+indent+2, self.pixLen[1] + indent-1), outline=(0,100,0))
-		
+
+		# Draw a spinner
+		self.spinnerAngle += math.pi / self.spinnerAngleSteps
+		if(self.spinnerAngle > 2 * math.pi) : self.spinnerAngle = 0
+
+		for s in range (0, self.spinnerAngleSteps) :
+			angle  = s * math.pi / self.spinnerAngleSteps + self.spinnerAngle
+			sX0 = self.spinnerInnerRadius * math.sin(angle) + self.spinnerCenter[0]
+			sX = self.spinnerRadius * math.sin(angle) + self.spinnerCenter[0]
+			sY0 = self.spinnerInnerRadius * math.cos(angle) + self.spinnerCenter[1]
+			sY = self.spinnerRadius * math.cos(angle) + self.spinnerCenter[1]
+			b = float(s)/float(self.spinnerAngleSteps)
+			config.draw.line((sX0, sY0, sX, sY), fill=(int(b * 200),int(b * 200),0) )
+
+
+		# Finally composite full image
 		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
 
 

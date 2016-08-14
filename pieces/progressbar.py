@@ -20,8 +20,8 @@ class ProgressBar :
 	spinnerAngle = 0
 	spinnerAngleSteps = 16
 	spinnerCenter = (0,0)
-	spinnerRadius = 8
-	spinnerInnerRadius = 5
+	spinnerRadius = 9
+	spinnerInnerRadius = 7
 
 	xPos = 1
 	yPos = 1
@@ -30,13 +30,13 @@ class ProgressBar :
 	boxWidthDisplay = 0
 	status = 0
 	boxMax = 0
-	rateMultiplier = 1.1
-	rate = rateMultiplier * random.random()
-	numRate = rate
+
 	percentage = 0
 	boxMaxAlt = 0
 	target = 99
-
+	rateMultiplier = .3
+	rate = rateMultiplier * random.random()
+	numRate = rate
 	completeProbability = 0.1
 	completeProbabilityBase = 0.3
 	multiplePauseProb = 0.33
@@ -57,7 +57,7 @@ class ProgressBar :
 	paused = False
 	hasPaused = False
 	gradient = False
-	gradientLevel = 2
+	gradientLevel = 1
 	pausePoint = 50
 
 	goBack = True
@@ -82,6 +82,7 @@ class ProgressBar :
 		config.steps = int(workConfig.get("progressbar", 'steps'))
 		config.shadowSize = int(workConfig.get("progressbar", 'shadowSize'))
 		config.sansSerif = (workConfig.getboolean("progressbar", 'sansSerif'))
+		self.colorGradient = (workConfig.getboolean("progressbar", 'useColorGradient'))
 		self.gradient = (workConfig.getboolean("progressbar", 'useThreeD'))
 		self.pausePoint = int(random.random() * 100)
 
@@ -240,7 +241,7 @@ class ProgressBar :
 		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(200,0,0) )
 
 		lines = config.screenHeight-2
-		if (self.gradientLevel == 1) : arc = math.pi / lines * .6 
+		if (self.gradientLevel == 1) : arc = math.pi / lines * .4
 		else : arc = math.pi / lines 
 
 		# Draw horizontal color gradient bar
@@ -248,8 +249,20 @@ class ProgressBar :
 		dR = ((self.barColor[0] - self.barColorStart[0])/(vLines+1))
 		dG = ((self.barColor[1] - self.barColorStart[1])/(vLines+1))
 		dB = ((self.barColor[2] - self.barColorStart[2])/(vLines+1))
+
+		if(self.gradient) :
+		# Draw vertical shading gradient "3D!"
+			for n in range(0, lines) :
+				yPos = yPos1 + n
+				b = math.cos(arc * n)
+				#b = cyclicalBrightness
+				rVd = int(self.barColorStart[0] * b)
+				gVd = int(self.barColorStart[1] * b)
+				bVd = int(self.barColorStart[2] * b)
+				barColor = (rVd, gVd, bVd)
+				config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColor) )
 		
-		if(self.gradient):
+		elif(self.colorGradient):
 			for p in range (0, vLines) :
 				xPos1p = xPos1 + p
 				xPos2p = xPos1p + 1
@@ -270,6 +283,8 @@ class ProgressBar :
 					bVd = int(bV * b)
 					barColor = (rVd, gVd, bVd)
 					config.draw.rectangle((xPos1p, yPos, xPos2p, yPos), fill=(barColor) )
+
+
 
 		# Draw the message percentage
 		indent  =  4
@@ -296,13 +311,15 @@ class ProgressBar :
 		if(self.spinnerAngle > 2 * math.pi) : self.spinnerAngle = 0
 
 		for s in range (0, self.spinnerAngleSteps) :
-			angle  = s * math.pi / self.spinnerAngleSteps + self.spinnerAngle
+			angle  = s * 2 * math.pi / self.spinnerAngleSteps + self.spinnerAngle
 			sX0 = self.spinnerInnerRadius * math.sin(angle) + self.spinnerCenter[0]
 			sX = self.spinnerRadius * math.sin(angle) + self.spinnerCenter[0]
 			sY0 = self.spinnerInnerRadius * math.cos(angle) + self.spinnerCenter[1]
 			sY = self.spinnerRadius * math.cos(angle) + self.spinnerCenter[1]
 			b = float(s)/float(self.spinnerAngleSteps)
-			config.draw.line((sX0, sY0, sX, sY), fill=(int(b * 200),int(b * 200),0) )
+			fillColor = (int(b * 200),int(b * 200),0)
+			#if (b <=.01) : fillColor = barColor
+			config.draw.line((sX0, sY0, sX, sY), fill=fillColor )
 
 
 		# Finally composite full image

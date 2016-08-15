@@ -11,15 +11,16 @@ lastRate  = 0
 class ProgressBar :
 
 	outlineColor = (1,1,1)
-	barColor = (200,200,000)
+	barColorEnd = (200,200,0)
 	barColorStart = (0,200,200)
+	barColorBase = (200,0,0)
 	holderColor = (0,0,0)
 	messageClr = (200,0,0)
 	shadowColor = (0,0,0)
 
 	spinnerAngle = 0
 	spinnerAngleSteps = 16
-	spinnerCenter = (0,0)
+	spinnerCenter = (9,0)
 	spinnerRadius = 9
 	spinnerInnerRadius = 7
 
@@ -34,16 +35,20 @@ class ProgressBar :
 	percentage = 0
 	boxMaxAlt = 0
 	target = 99
-	rateMultiplier = .3
+
+	#### This really controls the progress bar rate
+	rateMultiplier = .1
 	rate = rateMultiplier * random.random()
 	numRate = rate
+
 	completeProbability = 0.1
 	completeProbabilityBase = 0.3
 	multiplePauseProb = 0.33
 	changeProbability = 0.002
 	goBackwardsProb = 1
 	goFwdProb = 0.5
-	overrideMessagProb = 0.001
+	overrideMessagProb = 0.01
+	messageOverrideProbability = .1
 	noBarProb = 0.1
 	noDoneProb = 0.3
 
@@ -88,7 +93,7 @@ class ProgressBar :
 
 		self.cyclicalArc = 4 * math.pi / self.boxMax
 		self.cyclicalBrightnessPhase = 0
-		self.spinnerCenter = (self.boxMax - 60, self.boxHeight/2 + 4)
+		self.spinnerCenter = (self.boxMax - 57, self.boxHeight/2 + 3)
 
 		if(config.sansSerif) : 
 			self.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
@@ -168,7 +173,7 @@ class ProgressBar :
 				self.pauseCount += 1
 
 			# Chance the message will say something besides the percentage
-			if(random.random() > .9 and self.messageOverride) :
+			if(random.random() < self.messageOverrideProbability and self.messageOverride) :
 				self.messageString = self.altStringMessage
 				self.messageOverrideActive = True
 
@@ -198,11 +203,17 @@ class ProgressBar :
 			self.rate = 0
 			self.percentage = 0
 			self.boxWidth = 1
-			self.barColor = (255,0,0)
+			barColor = (255,0,0)
 
 		# Get the percentage to display	
 		#self.messageClr = (200, int(200 * self.percentage/100), int(200 * self.percentage/100))
-		if(self.percentage >= 2) : self.messageClr = (200,200,200)
+		if(self.percentage >= 2) : 
+			self.messageClr = (200,200,200)
+			barColor = self.barColorStart
+		else :
+			self.messageClr = (200,0,0)
+			barColor = (200,0,0)
+
 		self.displayPercentage = int(math.floor(self.percentage))
 
 		#if(self.complete) : print(self.percentage, self.complete)
@@ -210,6 +221,9 @@ class ProgressBar :
 		# Set the message to be the % to go
 		if(self.messageOverrideActive != True) : 
 			self.messageString = str(self.displayPercentage) + "%"
+
+
+		'''''''''''''''''' ''' BOX AND BAR '''''''''''''''''''''''''''''''''	
 
 		# draw box container
 		config.draw.rectangle((self.xPos-1, self.yPos-1, self.boxMax+1, self.boxHeight+self.yPos+1), 
@@ -222,17 +236,6 @@ class ProgressBar :
 		xPos2 = self.boxWidthDisplay+self.xPos
 		yPos1 = self.yPos
 		yPos2 = self.boxHeight+self.yPos
-
-		
-		# Draw a circle marker
-		'''
-		ellipseDiameter = 17
-		ellipseYOffset = 4
-		ellipseXOffset = self.boxMax - ellipseDiameter/2 #20
-		ellipseStart = [ellipseXOffset, self.boxHeight /2 - ellipseDiameter/2 + ellipseYOffset]
-		ellipseEnd = [ellipseXOffset + ellipseDiameter, self.boxHeight /2 + ellipseDiameter/2+ ellipseYOffset]
-		config.draw.ellipse((ellipseStart[0], ellipseStart[1], ellipseEnd[0], ellipseEnd[1]),  fill=self.barColor, outline=(0,0,0))
-		'''
 		
 		# Draw single left-most black line
 		config.draw.rectangle((0, yPos1, 1, yPos2), fill=(0,0,0) )
@@ -244,25 +247,24 @@ class ProgressBar :
 		if (self.gradientLevel == 1) : arc = math.pi / lines * .4
 		else : arc = math.pi / lines 
 
-		# Draw horizontal color gradient bar
-		vLines = int(xPos2 - xPos1)
-		dR = ((self.barColor[0] - self.barColorStart[0])/(vLines+1))
-		dG = ((self.barColor[1] - self.barColorStart[1])/(vLines+1))
-		dB = ((self.barColor[2] - self.barColorStart[2])/(vLines+1))
-
 		if(self.gradient) :
 		# Draw vertical shading gradient "3D!"
 			for n in range(0, lines) :
 				yPos = yPos1 + n
 				b = math.cos(arc * n)
 				#b = cyclicalBrightness
-				rVd = int(self.barColorStart[0] * b)
-				gVd = int(self.barColorStart[1] * b)
-				bVd = int(self.barColorStart[2] * b)
-				barColor = (rVd, gVd, bVd)
-				config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColor) )
+				rVd = int(barColor[0] * b)
+				gVd = int(barColor[1] * b)
+				bVd = int(barColor[2] * b)
+				barColorDisplay = (rVd, gVd, bVd)
+				config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColorDisplay) )
 		
 		elif(self.colorGradient):
+			# Draw horizontal color gradient bar
+			vLines = int(xPos2 - xPos1)
+			dR = ((self.barColorEnd[0] - self.barColorStart[0])/(vLines+1))
+			dG = ((self.barColorEnd[1] - self.barColorStart[1])/(vLines+1))
+			dB = ((self.barColorEnd[2] - self.barColorStart[2])/(vLines+1))
 			for p in range (0, vLines) :
 				xPos1p = xPos1 + p
 				xPos2p = xPos1p + 1
@@ -285,7 +287,7 @@ class ProgressBar :
 					config.draw.rectangle((xPos1p, yPos, xPos2p, yPos), fill=(barColor) )
 
 
-
+		'''''''''''''''''' ''' TEXT MESSAGE '''''''''''''''''''''''''''''''''
 		# Draw the message percentage
 		indent  =  4
 		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 * indent , self.fontHeight + 2 * indent))
@@ -305,7 +307,9 @@ class ProgressBar :
 		#numXPos = 32
 		numYPos = 24
 		#self.txtdraw.rectangle((0,0,self.pixLen[0]+indent+2, self.pixLen[1] + indent-1), outline=(0,100,0))
+		
 
+		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''	
 		# Draw a spinner
 		self.spinnerAngle += math.pi / self.spinnerAngleSteps
 		if(self.spinnerAngle > 2 * math.pi) : self.spinnerAngle = 0

@@ -43,9 +43,9 @@ class Fludd :
 	def __init__(self, config):
 		print ("init PB")
 		
-		self.boxMax = config.screenWidth - 2
+		self.boxMax = config.screenWidth - 1
 		self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
-		self.boxHeight = config.screenHeight - 3
+		self.boxHeight = config.screenHeight - 2
 		self.spinnerCenter = (self.boxMax - 60, self.boxHeight/2 + 4)
 		self.config = config
 

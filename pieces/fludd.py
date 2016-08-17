@@ -61,24 +61,25 @@ class Fludd :
 		var = 10
 		xPos1 = random.uniform(-var/2,var)
 		yPos1 = random.uniform(-var/2,var)
+
 		xPos2 = random.uniform(self.boxMax-var,self.boxMax+var)
-		yPos2 = random.uniform(-var/2,var)		
+		yPos2 = random.uniform(-var/2,var)	
+
 		xPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
-		yPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
+		yPos3 = random.uniform(self.boxHeight-var,self.boxHeight+var)
+
 		xPos4 = random.uniform(-var/2,var)
-		yPos4 = random.uniform(self.boxMax-var,self.boxMax+var)
+		yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
 
 		gray = int(random.random() * 0)
 		brightness = self.config.brightness * random.random()
 		light = int(brightness*self.nothingLevel)
 
-		config.draw.rectangle((0,0,self.boxMax,self.boxMax), fill = (0,0,0))
-		config.draw.rectangle((0,0,self.boxMax,self.boxMax), fill = (light,light,light))
+		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0))
+		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
 		config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
 
 		if(random.random() < self.nothingChangeProbability) : self.nothingLevel = random.uniform(0,255)
-		
-
 
 		# Finally composite full image
 		#config.image.paste(self.mainImage, (numXPos, numYPos), self.scrollImage)

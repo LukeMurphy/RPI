@@ -20,7 +20,7 @@ class ProgressBar :
 
 	spinnerAngle = 0
 	spinnerAngleSteps = 16
-	spinnerCenter = (9,0)
+	spinnerCenter = (11,0)
 	spinnerRadius = 9
 	spinnerInnerRadius = 7
 
@@ -37,7 +37,7 @@ class ProgressBar :
 	target = 99
 
 	#### This really controls the progress bar rate
-	rateMultiplier = 1.5
+	rateMultiplier = .8
 	rate = rateMultiplier * random.random()
 	numRate = rate
 
@@ -97,7 +97,7 @@ class ProgressBar :
 
 		self.cyclicalArc = 4 * math.pi / self.boxMax
 		self.cyclicalBrightnessPhase = 0
-		self.spinnerCenter = (self.boxMax - 57, self.boxHeight/2 + 3)
+		self.spinnerCenter = (self.boxMax - 54, self.boxHeight/2 + 3)
 
 		if(config.sansSerif) : 
 			self.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)

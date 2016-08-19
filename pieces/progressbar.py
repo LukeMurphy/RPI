@@ -37,7 +37,7 @@ class ProgressBar :
 	target = 99
 
 	#### This really controls the progress bar rate
-	rateMultiplier = .1
+	rateMultiplier = 1.5
 	rate = rateMultiplier * random.random()
 	numRate = rate
 
@@ -47,8 +47,9 @@ class ProgressBar :
 	changeProbability = 0.002
 	goBackwardsProb = 1
 	goFwdProb = 0.5
-	overrideMessagProb = 0.01
-	messageOverrideProbability = .1
+	
+	overrideMessagProb = 0.04
+	messageOverrideProbability = .2
 	noBarProb = 0.1
 	noDoneProb = 0.3
 
@@ -73,6 +74,9 @@ class ProgressBar :
 	lastPause = False
 
 	altStringMessage = "PLEASE WAIT"
+	colorutils.brightness = 1
+
+
 
 	def __init__(self, config):
 		print ("init PB")
@@ -147,7 +151,7 @@ class ProgressBar :
 			self.rate = 0
 			self.pauseCount += 1
 		'''
-		
+
 		# Chance that someting changes
 		if(random.random() < self.changeProbability) : 
 			self.changeAction()
@@ -286,8 +290,13 @@ class ProgressBar :
 					barColor = (rVd, gVd, bVd)
 					config.draw.rectangle((xPos1p, yPos, xPos2p, yPos), fill=(barColor) )
 
+		'''''''''''''''''' ''' TEXT MESSAGE '''''''''''''''''''''''''''
+		self.drawMessageText()
 
-		'''''''''''''''''' ''' TEXT MESSAGE '''''''''''''''''''''''''''''''''
+		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''
+		self.drawSpinner()
+			
+	def drawMessageText(self) :
 		# Draw the message percentage
 		indent  =  4
 		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 * indent , self.fontHeight + 2 * indent))
@@ -307,7 +316,9 @@ class ProgressBar :
 		#numXPos = 32
 		numYPos = 24
 		#self.txtdraw.rectangle((0,0,self.pixLen[0]+indent+2, self.pixLen[1] + indent-1), outline=(0,100,0))
+		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
 		
+	def drawSpinner(self) :
 
 		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''	
 		# Draw a spinner
@@ -325,15 +336,10 @@ class ProgressBar :
 			#if (b <=.01) : fillColor = barColor
 			config.draw.line((sX0, sY0, sX, sY), fill=fillColor )
 
-
-		# Finally composite full image
-		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
-
-
 	def drawBar(self) :
 		config = self.config
 		config.draw.rectangle((self.xPos,self.yPos,self.boxWidth+self.xPos,self.boxHeight+self.yPos), outline=(self.outlineColor), fill=(self.barColor) )
-
+	
 	def done(self):
 		self.pauseCount = 0
 		self.boxWidth = 1
@@ -350,11 +356,14 @@ class ProgressBar :
 		self.goPast = True if (random.random() > .98) else False
 		self.messageOverride = True if (random.random() < .1) else False
 		self.messageOverrideActive = False
-		self.altStringMessage = "PLEASE WAIT" if (random.random() > .5) else "UPDATING"
+		self.altStringMessage = "PLEASE WAIT" 
+		if (random.random() > .05) :
+			self.altStringMessage = "RESTARTING..." if (random.random() > .5) else "UPDATING"
 		self.pausePoint = int(random.random() * 100)
 		self.hasPaused = False
 		self.paused = False
 		self.barColor = (0,0,200)
+		self.barColorStart = colorutils.getRandomRGB(1)
 		if(self.goPast) : self.goBack = False
 
 

@@ -37,7 +37,7 @@ class ProgressBar :
 	target = 99
 
 	#### This really controls the progress bar rate
-	rateMultiplier = 1.5
+	rateMultiplier = 1.0plan
 	rate = rateMultiplier * random.random()
 	numRate = rate
 
@@ -47,7 +47,7 @@ class ProgressBar :
 	changeProbability = 0.002
 	goBackwardsProb = 1
 	goFwdProb = 0.5
-	
+
 	overrideMessagProb = 0.04
 	messageOverrideProbability = .2
 	noBarProb = 0.1

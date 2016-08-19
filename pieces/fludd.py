@@ -7,6 +7,7 @@ from modules import colorutils
 
 redrawSpeed = .005
 lastRate  = 0 
+colorutils.brightness =  1
 
 class Fludd :
 
@@ -39,6 +40,8 @@ class Fludd :
 	nothingLevel = 10
 	nothingChangeProbability = .02
 
+	borderModel = "prism"
+
 
 	def __init__(self, config):
 		print ("init PB")
@@ -49,9 +52,12 @@ class Fludd :
 		self.spinnerCenter = (self.boxMax - 60, self.boxHeight/2 + 4)
 		self.config = config
 
+		self.borderModel = workConfig.get("fludd", 'borderModel')
+
 		tempImage = Image.new("RGBA", (640,640))
 		draw  = ImageDraw.Draw(tempImage)
 		self.mainImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+
 		
 	def changeAction(self):
 		return False
@@ -76,7 +82,13 @@ class Fludd :
 		light = int(brightness*self.nothingLevel)
 
 		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0))
-		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
+		#config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
+		if(self.borderModel == "prism"):
+			outerBorder = colorutils.randomColor(.15)
+		else :
+			outerBorder = (light,light,light)
+
+		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = outerBorder)
 		config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
 
 		if(random.random() < self.nothingChangeProbability) : self.nothingLevel = random.uniform(0,255)

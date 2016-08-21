@@ -1,6 +1,7 @@
 import time
 import random
 import math
+import threading
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 

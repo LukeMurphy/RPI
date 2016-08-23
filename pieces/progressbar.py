@@ -248,14 +248,14 @@ class ProgressBar :
 		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(200,0,0) )
 
 		lines = config.screenHeight-2
-		if (self.gradientLevel == 1) : arc = math.pi / lines * .4
+		if (self.gradientLevel == 1) : arc = math.pi / lines * .8
 		else : arc = math.pi / lines 
 
 		if(self.gradient) :
 		# Draw vertical shading gradient "3D!"
 			for n in range(0, lines) :
 				yPos = yPos1 + n
-				b = math.cos(arc * n)
+				b = math.sin(arc * n)
 				#b = cyclicalBrightness
 				rVd = int(barColor[0] * b)
 				gVd = int(barColor[1] * b)

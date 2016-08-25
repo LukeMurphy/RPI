@@ -73,7 +73,8 @@ def configure() :
 
 		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
-		config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
+		#config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
+		config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeWidth')),int(workconfig.get("displayconfig", 'tileSizeHeight')))
 		config.rows = int(workconfig.get("displayconfig", 'rows'))
 		config.cols = int(workconfig.get("displayconfig", 'cols'))
 		config.brightness =  float(workconfig.get("displayconfig", 'brightness'))

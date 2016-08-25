@@ -57,8 +57,9 @@ class Block:
 	endy = 0
 
 	reveal = 0
-	revealSpeed = 1
-	revealSpeedMax = 3
+	revealSpeed = 3
+	revealSpeedMax = 6
+	revealSpeedMin = 6
 
 	colorWord = "RED"
 	colorOfWord = (0,0,0)
@@ -129,7 +130,7 @@ class Block:
 		dims = [pixLen[0],pixLen[1]]
 		if(dims[1] < self.verticalTileSize) : dims[1] = self.verticalTileSize + 2
 
-		vPadding = int(.75 * config.tileSize[0])
+		vPadding = int(.75 * config.tileSize[1])
 		self.presentationImage = PIL.Image.new("RGBA", (dims[0]+vPadding,dims[1]))
 		self.image = PIL.Image.new("RGBA", (dims[0]+vPadding,1))
 		draw  = ImageDraw.Draw(self.presentationImage)
@@ -163,13 +164,14 @@ class Block:
 
 		self.dx = int(random.uniform(-self.speed,self.speed)) * self.speedMultiplier
 		self.dy = int(random.uniform(-self.speed,self.speed)) * self.speedMultiplier
+
 		if(self.dx == 0) : self.dx = -1
 		if(self.dy == 0) : self.dy = -1
 
 		self.endx = -self.wd if self.dx < 0 else config.screenWidth
 		self.endy = -self.ht if self.dy < 0 else config.screenHeight
 
-		self.revealSpeed = int(random.uniform(1,self.revealSpeedMax))
+		self.revealSpeed = int(random.uniform(self.revealSpeedMin,self.revealSpeedMax))
 
 
 	def callBack(self) :
@@ -193,9 +195,8 @@ class Block:
 				self.callBack()		
 
 	def appear(self) :
+		dims = self.presentationImage.size
 		if(self.setForRemoval!=True) :
-
-			dims = self.presentationImage.size
 			self.reveal += self.revealSpeed
 			self.image = PIL.Image.new("RGBA", (dims[0],self.reveal))
 
@@ -220,7 +221,7 @@ class Block:
 def makeBlock() :
 	global config, workConfig, blocks, colorMode, nextRow
 
-	if(random.random() > .99) : config.movementMode = "revealmove"
+	if(random.random() < config.moveProbability) : config.movementMode = "revealmove"
 	if(random.random() > .95) : config.movementMode = "reveal"
 
 	config.opticalOpposites = True
@@ -232,7 +233,9 @@ def makeBlock() :
 	block.displayRows = config.displayRows
 	block.displayCols = config.displayCols
 	block.movementMode = config.movementMode
-	block.revealSpeedMax = config.stroopSteps
+	block.speedMultiplier = config.speedMultiplier
+	block.revealSpeedMin = config.revealSpeedMin
+	block.revealSpeedMax = config.revealSpeedMax
 	block.make(colorMode, nextRow)
 	block.blocksRef = blocks
 
@@ -244,11 +247,11 @@ def makeBlock() :
 	gc.collect()
 
 	if(colorMode == False) :
-		if (random.random() > .92) :
+		if (random.random() < config.colorProbabilityReturn) : #.92
 			colorMode = True
 			#print("ColorMode changed back")
 	else :
-		if(random.random() > .985) :
+		if(random.random() < config.colorProbability) : #.985
 			colorMode = False
 			#print("ColorMode change  to b/w")
 
@@ -291,6 +294,13 @@ def main(run = True) :
 	config.displayRows = int(workConfig.get("stroop", 'displayRows'))
 	config.displayCols = int(workConfig.get("stroop", 'displayCols'))
 	config.movementMode = (workConfig.get("stroop", 'movementMode'))
+	config.speedMultiplier = int(workConfig.get("stroop", 'speedMultiplier'))
+	config.revealSpeedMax = int(workConfig.get("stroop", 'revealSpeedMax'))
+	config.revealSpeedMin = int(workConfig.get("stroop", 'revealSpeedMin'))
+	config.moveProbability = float(workConfig.get("stroop", 'moveProbability'))
+	config.colorProbability = float(workConfig.get("stroop", 'colorProbability'))
+	config.colorProbabilityReturn = float(workConfig.get("stroop", 'colorProbabilityReturn'))
+
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	for i in range (0,simulBlocks) : makeBlock()
@@ -314,18 +324,27 @@ def iterate( n = 0) :
 		block = blocks[n]
 		config.render(block.image, block.x, block.y, block.image.size[0], block.image.size[1], False, False, False)
 
-		config.image = block.image.copy()
+		if(config.rendering == "out") : 
+			#config.image = block.image.copy()
+			try :
+				config.image.paste(block.image, (block.x, block.y), block.image)
+			except  :
+				config.image.paste(block.image, (block.x, block.y))
+
 		#config.image = PIL.Image.new("RGBA", (block.image.size[0], block.image.size[1]))
 		#config.image.paste(block.image, (0,0), block.image)
-		x = block.x
-		y = block.y
+		#x = block.x
+		#y = block.y
 
 		block.update()
-		if(block.setForRemoval==True) : makeBlock()
+		if(block.setForRemoval==True) : 
+			block.update()
+			makeBlock()
 
 	# cleanup the list
 	blocks[:] = [block for block in blocks if block.setForRemoval!=True]
-	config.updateCanvas()
+	if(config.rendering== "hub") : config.updateCanvas()
+	#if(config.rendering == "out") : config.image = config.renderImageFull.copy()
 
 	if len(blocks) == 0 : exit()
 

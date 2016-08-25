@@ -50,6 +50,8 @@ def setUp():
 	#Button(root, text="Quit", command=root.quit).pack(side="bottom")
 	root.lift()
 
+	config.root = root
+
 	cnvs = Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff)
 	config.cnvs = cnvs
 	config.cnvs.pack()

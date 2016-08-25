@@ -8,6 +8,11 @@ from modules import colorutils
 redrawSpeed = .005
 lastRate  = 0 
 
+firstRunCount = 0
+completeCount = 0
+firstRunCountLim = 0
+completeCountLim = 0
+
 class ProgressBar :
 
 	outlineColor = (1,1,1)
@@ -248,14 +253,14 @@ class ProgressBar :
 		config.draw.rectangle((xPos1, yPos1, xPos2, yPos2), fill=(200,0,0) )
 
 		lines = config.screenHeight-2
-		if (self.gradientLevel == 1) : arc = math.pi / lines * .8
+		if (self.gradientLevel == 1) : arc = math.pi / lines * 1
 		else : arc = math.pi / lines 
 
 		if(self.gradient) :
 		# Draw vertical shading gradient "3D!"
 			for n in range(0, lines) :
 				yPos = yPos1 + n
-				b = math.sin(arc * n)
+				b = math.sin(arc * n) * 1.2
 				#b = cyclicalBrightness
 				rVd = int(barColor[0] * b)
 				gVd = int(barColor[1] * b)
@@ -389,13 +394,21 @@ def callBack() :
 
 def runWork():
 	global redrawSpeed
+	setUpDelays()
 	while True:
 		iterate()
 		time.sleep(redrawSpeed)
 
+def setUpDelays() :
+	global firstRunCount, completeCount, firstRunCountLim, completeCountLim
+	firstRunCountLim = int(random.uniform(pBar.minSleep,pBar.maxSleep))
+	completeCountLim = int(random.uniform(pBar.minSleep,pBar.maxSleep))
+	firstRunCount = 0
+	completeCount = 0
+
 def iterate() :
 	global config, pBar, lastRate
-	
+	global firstRunCount, completeCount, firstRunCountLim, completeCountLim
 	redraw()
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
@@ -404,12 +417,18 @@ def iterate() :
 		lastRate = pBar.rate
 
 	if(pBar.firstRun) :
-		time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
-		pBar.firstRun = False
+		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
+		firstRunCount+=config.scrollSpeed
+		if(firstRunCount > firstRunCountLim) :
+			pBar.firstRun = False
+
 
 	if(pBar.complete) : 
-		time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
-		pBar.done()
+		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
+		completeCount+=config.scrollSpeed
+		if(completeCount > completeCountLim) :
+			pBar.done()
+			setUpDelays()
 
 	callBack()
 	count = 0

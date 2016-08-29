@@ -52,14 +52,14 @@ class ProgressBar :
 	changeProbability = 0.002
 	goBackwardsProb = 1
 	goFwdProb = 0.5
-
 	overrideMessagProb = 0.04
-	messageOverrideProbability = .2
+	messageOverrideProbability = .32
 	noBarProb = 0.1
 	noDoneProb = 0.3
 
-	minSleep = 2
-	maxSleep = 6
+
+	minSleep = 10
+	maxSleep = 12
 
 	pauses = 3
 	pauseCount = 0

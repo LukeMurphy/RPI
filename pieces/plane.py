@@ -63,9 +63,12 @@ def main(run = True) :
 	config.displayCols = int(workConfig.get("plane", 'displayCols'))
 	config.unitCount = int(workConfig.get("plane", 'unitCount'))
 	config.scalingFactor  = float(workConfig.get("plane", 'scalingFactor'))
+	config.speedFactor  = float(workConfig.get("plane", 'speedFactor'))
 	config.useJitter  = (workConfig.getboolean("plane", 'useJitter'))
 	config.useBlink  = (workConfig.getboolean("plane", 'useBlink'))
 	config.noTrails  = (workConfig.getboolean("plane", 'noTrails'))
+	config.imageList  = (workConfig.get("repeater", 'imageList'))
+	config.colorMode  = (workConfig.get("plane", 'colorMode'))
 
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
@@ -73,7 +76,8 @@ def main(run = True) :
 	#for i in range (0,simulBlocks) : makeBlock()
 
 	path = config.path  + "/assets/imgs/"
-	imageList = ['plane-2b.gif','plane-2tw.png','plane-2tg.png','plane-2t.png'] 
+	imageList = ['plane-2b.gif','plane-2tw.png','plane-2tg.png','plane-2t.png','plane-2tw-lrg.png'] 
+	imageList = config.imageList
 
 	for i in range (0,config.unitCount) :
 		imgLoader = ImageSprite(config)
@@ -94,7 +98,8 @@ def main(run = True) :
 			imgLoader.resizeToHeight = False
 			imgLoader.yOffsetChange = False
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-			imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
+			imgLoader.make(path + imageList, 1 * config.scalingFactor * 2 * config.speedFactor , 0, True, False, False, False)
+			#imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
 
 		else :
 			imgLoader.scalingFactor = config.scalingFactor
@@ -102,11 +107,12 @@ def main(run = True) :
 			imgLoader.useBlink = config.useBlink
 			imgLoader.brightnessFactor = config.brightness * random.random()
 			imgLoader.config = config
-			imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
+			imgLoader.colorMode = config.colorMode #"colorRGB" #colorWheel #random #colorRGB
 			imgLoader.colorModeDirectional = colorModeDirectional
 			#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-			imgLoader.make(path + imageList[1], 1 * config.scalingFactor * 2 , 0, True, True, True, True)
+			imgLoader.make(path + imageList, 1 * config.scalingFactor * 2 , 0, True, True, True, True)
+			#imgLoader.make(path + imageList[1], 1 * config.scalingFactor * 2 , 0, True, True, True, True)
 		blocks.append(imgLoader)
 	# Assume single plane type display
 

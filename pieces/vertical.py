@@ -42,7 +42,7 @@ class Vertical :
 		self.unitImage = Image.new("RGBA", (config.screenWidth,self.h))
 		self.draw  = ImageDraw.Draw(self.unitImage)
 
-		self.CenterWidth = int(self.boxMax * .06)
+		self.CenterWidth = int(self.boxMax * config.widthPercentage)
 		self.BorderWidth = 2
 		self.OuterWidth = int(self.boxMax/2 - self.CenterWidth/2 - self.BorderWidth)
 
@@ -126,6 +126,7 @@ def main(run = True) :
 	config.draw  = ImageDraw.Draw(config.image)
 	config.blockHeight = 8
 	config.vOffset = int(workConfig.get("vertical", 'vOffset'))
+	config.widthPercentage = float(workConfig.get("vertical", 'widthPercentage'))
 
 	layers = int(config.screenHeight / config.blockHeight)
 	for i in range (0,layers):

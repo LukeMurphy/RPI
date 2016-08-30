@@ -102,7 +102,7 @@ class ProgressBar :
 	def changeAction(self):
 		self.rate = random.random() * self.rateMultiplier
 
-		print ("New rate", self.rate)
+		if(self.config.debug ) : print ("New rate", self.rate)
 		# Chance that the rate changes and things start moving again
 		#if(self.hasPaused == True):
 		self.paused = False
@@ -120,9 +120,10 @@ class ProgressBar :
 
 		# Chance bar will stop being displayed
 		if(random.random() < self.noBarProb) :
+			if(self.config.debug ) : print ("No bar movement", self.rate)
 			self.drawBarFill = False
 			self.target = 100
-			self.rate = 2 * random.random()
+			self.rate = 2 * random.random() + 1
 
 		# Chance that it will never get any further
 		c = random.uniform(.001,1)
@@ -150,7 +151,7 @@ class ProgressBar :
 			# Enact the pause
 			if(self.percentage >= self.pausePoint and self.paused == False and random.random() < self.pauseProbability) :
 				self.paused = True
-				print("Pausing ......")
+				if(self.config.debug ) : print("Pausing ......")
 				self.rate = 0
 				self.pauseCount += 1
 
@@ -250,12 +251,12 @@ class ProgressBar :
 		# Draw a spinner
 		self.spinnerAngle += math.pi / self.spinnerAngleSteps
 		if(self.spinnerAngle > 2 * math.pi) : self.spinnerAngle = 0
-		cwidth = (self.spinnerRadius-self.spinnerInnerRadius) + 1
-		for n in range (0,cwidth) :
-			r = self.spinnerRadius - n
+		cwidth = (self.spinnerRadius-self.spinnerInnerRadius) + 4
+		for n in range (0,0) :
+			r = self.spinnerRadius - n + 2
 			config.draw.ellipse((self.spinnerCenter[0]-r,self.spinnerCenter[1]-r,
 				self.spinnerCenter[0]+r,self.spinnerCenter[1]+r),
-				outline=(0,0,0) )
+				outline=(10,10,10,40) )
 
 		for s in range (0, self.spinnerAngleSteps) :
 			angle  = s * 2 * math.pi / self.spinnerAngleSteps + self.spinnerAngle
@@ -264,7 +265,7 @@ class ProgressBar :
 			sY0 = self.spinnerInnerRadius * math.cos(angle) + self.spinnerCenter[1]
 			sY = self.spinnerRadius * math.cos(angle) + self.spinnerCenter[1]
 			b = float(s)/float(self.spinnerAngleSteps)
-			fillColor = (int(b * 200),int(b * 200),0)
+			fillColor = (int(b * 250),int(b * 200),0,200)
 			#if (b <=.01) : fillColor = barColor
 			config.draw.line((sX0, sY0, sX, sY), fill=fillColor )
 
@@ -401,9 +402,9 @@ def iterate() :
 		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
 		pBar.paused = True
 		firstRunCount+=config.scrollSpeed
-		print("pausing before STARTING")
+		if(config.debug ) : print("pausing before STARTING")
 		if(firstRunCount > firstRunCountLim) :
-			print("start now???")
+			if(config.debug ) : print("start now???")
 			pBar.firstRun = False
 			pBar.paused = False
 
@@ -411,9 +412,9 @@ def iterate() :
 		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
 		completeCount+=config.scrollSpeed
 		pBar.paused = True
-		print("Pausing before restart....")
+		if(config.debug ) : print("Pausing before restart....")
 		if(completeCount > completeCountLim) :
-			print("Done!")
+			if(config.debug ) : print("Done!")
 			pBar.done()
 			setUpDelays()
 			
@@ -425,6 +426,8 @@ def main(run = True) :
 	global config
 	global redrawSpeed
 	global pBar
+
+	config.debug = True
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
@@ -449,6 +452,21 @@ def main(run = True) :
 	pBar.cyclicalBrightnessPhase = 0
 	pBar.spinnerCenter = [pBar.boxMax - 54, pBar.boxHeight/2 + 3]
 	redrawSpeed = config.redrawSpeed
+
+	pBar.pauseProbability = float(workConfig.get("progressbar", 'pauseProbability'))
+	pBar.completeProbability = float(workConfig.get("progressbar", 'completeProbability'))
+	pBar.completeProbabilityBase = float(workConfig.get("progressbar", 'completeProbabilityBase'))
+	pBar.changeProbability = float(workConfig.get("progressbar", 'changeProbability'))
+	pBar.goBackwardsProb = float(workConfig.get("progressbar", 'goBackwardsProb'))
+	pBar.goFwdProb = float(workConfig.get("progressbar", 'goFwdProb'))
+	
+	# chance that a message shows instead of %
+	pBar.messageOverrideProbability = float(workConfig.get("progressbar", 'messageOverrideProbability'))
+	# chance different message is shown, when shown
+	pBar.overrideMessagProb = float(workConfig.get("progressbar", 'overrideMessagProb'))
+	pBar.noBarProb = float(workConfig.get("progressbar", 'noBarProb'))
+	pBar.noDoneProb = float(workConfig.get("progressbar", 'noDoneProb'))
+
 	setUpDelays()
 	if(run) : runWork()
 		

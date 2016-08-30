@@ -124,7 +124,7 @@ def main(run = True) :
 	vertArray = []
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
-	config.blockHeight = 8
+	config.blockHeight = int(workConfig.get("vertical", 'blockHeight'))
 	config.vOffset = int(workConfig.get("vertical", 'vOffset'))
 	config.widthPercentage = float(workConfig.get("vertical", 'widthPercentage'))
 

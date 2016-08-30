@@ -25,7 +25,7 @@ class ProgressBar :
 
 	spinnerAngle = 0
 	spinnerAngleSteps = 16
-	spinnerCenter = (11,0)
+	spinnerCenter = [11,0]
 	spinnerRadius = 9
 	spinnerInnerRadius = 7
 
@@ -43,20 +43,21 @@ class ProgressBar :
 
 	#### This really controls the progress bar rate
 	rateMultiplier = .8
-	rate = rateMultiplier * random.random()
-	numRate = rate
+	rate = .4
 
+	pauseProbability = .002
 	completeProbability = 0.1
-	completeProbabilityBase = 0.3
-	multiplePauseProb = 0.33
+	completeProbabilityBase = 0.1
 	changeProbability = 0.002
 	goBackwardsProb = 1
 	goFwdProb = 0.5
-	overrideMessagProb = 0.04
+	
+	# chance that a message shows instead of %
 	messageOverrideProbability = .32
+	# chance different message is shown, when shown
+	overrideMessagProb = 0.04
 	noBarProb = 0.1
 	noDoneProb = 0.3
-
 
 	minSleep = 10
 	maxSleep = 12
@@ -65,7 +66,7 @@ class ProgressBar :
 	pauseCount = 0
 	firstRun = True
 	complete = False
-	paused = False
+	paused = True
 	hasPaused = False
 	gradient = False
 	gradientLevel = 1
@@ -81,29 +82,8 @@ class ProgressBar :
 	altStringMessage = "PLEASE WAIT"
 	colorutils.brightness = 1
 
-
-
 	def __init__(self, config):
-		print ("init PB")
-		
-		self.boxMax = config.screenWidth - 2
-		self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
-		self.boxHeight = config.screenHeight - 3
-
-		config.fontSize = int(workConfig.get("progressbar", 'fontSize'))
-		config.vOffset = int(workConfig.get("progressbar", 'vOffset'))
-		config.scrollSpeed = float(workConfig.get("progressbar", 'scrollSpeed'))
-		config.steps = int(workConfig.get("progressbar", 'steps'))
-		config.shadowSize = int(workConfig.get("progressbar", 'shadowSize'))
-		config.sansSerif = (workConfig.getboolean("progressbar", 'sansSerif'))
-		self.colorGradient = (workConfig.getboolean("progressbar", 'useColorGradient'))
-		self.gradient = (workConfig.getboolean("progressbar", 'useThreeD'))
-		self.pausePoint = int(random.random() * 100)
-
-		self.cyclicalArc = 4 * math.pi / self.boxMax
-		self.cyclicalBrightnessPhase = 0
-		self.spinnerCenter = (self.boxMax - 54, self.boxHeight/2 + 3)
-
+		print ("init Progress Bar")
 		if(config.sansSerif) : 
 			self.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 		else :
@@ -121,119 +101,174 @@ class ProgressBar :
 		
 	def changeAction(self):
 		self.rate = random.random() * self.rateMultiplier
+
+		print ("New rate", self.rate)
 		# Chance that the rate changes and things start moving again
-		if(self.hasPaused == True):
-			self.paused = False
+		#if(self.hasPaused == True):
+		self.paused = False
 
-			# Chance things might go backwards
-			if(self.goBack and random.random() < self.goBackwardsProb) : 
-				self.rate *= -1
+		# Chance things might go backwards
+		if(self.goBack and random.random() < self.goBackwardsProb) : 
+			self.rate *= -1
 
-			# chance there will be yet another pause ....
-			if(random.random() < self.multiplePauseProb) :
-				timeLeft = 100 - self.pausePoint
-				if (timeLeft >=1) :
-					self.hasPaused = False
-					self.pausePoint = self.pausePoint + int(random.uniform(1,timeLeft-1))
+		# chance there will be yet another pause ....
+		if(random.random() < self.pauseProbability) :
+			timeLeft = 100 - self.pausePoint
+			if (timeLeft >=1) :
+				self.hasPaused = False
+				self.pausePoint = self.pausePoint + int(random.uniform(1,timeLeft-1))
 
-			# Chance bar will stop being displayed
-			if(random.random() < self.noBarProb) :
-				self.drawBarFill = False
-				self.target = 100
-				self.rate = 2 * random.random()
+		# Chance bar will stop being displayed
+		if(random.random() < self.noBarProb) :
+			self.drawBarFill = False
+			self.target = 100
+			self.rate = 2 * random.random()
 
-			# Chance that it will never get any further
-			c = random.uniform(.001,1)
-			if(c < self.completeProbability):
-				#print("setting complete1", c, self.completeProbability)
-				self.complete = True
+		# Chance that it will never get any further
+		c = random.uniform(.001,1)
+		if(c < self.completeProbability):
+			#print("setting complete1", c, self.completeProbability)
+			self.complete = True
 
 	def reDraw(self) :
-		'''
-		pauseProbability = math.exp(self.percentage/10) / 40000
-		pauseProbability = .99 if (pauseProbability < .7) else pauseProbability
-		if(random.random() < pauseProbability  and self.rate != 0) : #and self.pauseCount < self.pauses
-			self.rate = 0
-			self.pauseCount += 1
-		'''
+		if(self.complete != True) :
+			# Chance that someting changes
+			if(random.random() < self.changeProbability) : 
+				self.changeAction()
 
-		# Chance that someting changes
-		if(random.random() < self.changeProbability) : 
-			self.changeAction()
+			# will not go backwards for long
+			if(self.rate < 0 and random.random() < self.goFwdProb) :
+				self.rate = random.random() * self.rateMultiplier + .01
+				#self.completeProbability = .9
 
-		# will not go backwards for long
-		if(self.rate < 0 and random.random() < self.goFwdProb) :
-			self.rate = random.random() * self.rateMultiplier
-			#self.completeProbability = .9
+			# Increment the bar width
+			if(self.paused != True) :
+				self.boxWidth += self.rate
+				self.percentage  =  (float(self.boxWidth)/float(self.boxMax)*100)
+				self.messageOverrideActive = False
 
-		# Increment the bar width
-		if(self.paused != True) :
-			self.boxWidth += self.rate
-			self.percentage  =  (float(self.boxWidth)/float(self.boxMax)*100)
-
-		# Enact the pause
-		if(self.percentage >= self.pausePoint and self.hasPaused == False) :
-			self.paused = True
-			
-			if(self.pauseCount >= self.pauses) :
-				self.hasPaused = True
-			else :
+			# Enact the pause
+			if(self.percentage >= self.pausePoint and self.paused == False and random.random() < self.pauseProbability) :
+				self.paused = True
+				print("Pausing ......")
 				self.rate = 0
 				self.pauseCount += 1
 
-			# Chance the message will say something besides the percentage
-			if(random.random() < self.messageOverrideProbability and self.messageOverride) :
-				self.messageString = self.altStringMessage
-				self.messageOverrideActive = True
+				# Chance the message will say something besides the percentage
+				if(random.random() < self.messageOverrideProbability and self.messageOverride) :
+					self.messageString = self.altStringMessage
+					self.messageOverrideActive = True
 
-		# Things have gone as far as they are going to go
-		if(self.percentage >= self.target and self.goPast != True) : 
-			if(random.random() < self.noDoneProb) :
-				#print("not done...")
-				self.changeAction()
-			else :
+			# Things have gone as far as they are going to go
+			if(self.percentage >= self.target and self.goPast != True and self.complete != True) : 
+				#if(random.random() < self.noDoneProb) :
+					#print("not done...")
+					#self.changeAction()
+
 				self.boxWidth = self.boxMax - 2
-				#print("setting complete2")
+				#print("setting complete")
 				self.complete = True
-			# Chance the bar changes color
-			if(random.random() > .80) : 
-				self.barColor = (0,200,0)
-		# If it goes past
-		elif(self.percentage >= 100 and self.goPast and self.boxWidth >= self.boxMaxAlt) :
-			#print("setting complete3")
-			self.complete = True
-		elif(self.percentage >= 100 and self.goPast) :
-			self.rate = 10
+				# Chance the bar changes color
+				if(random.random() > .90) : 
+					self.barColor = (0,200,0)
 
-		# At or below zero
-		if(self.rate < 0 and self.percentage <= 0 and self.paused != True) :
-			#print("setting complete4")
-			self.complete = True
-			self.rate = 0
-			self.percentage = 0
-			self.boxWidth = 1
-			barColor = (255,0,0)
+			# If it goes past
+			if(self.percentage >= 100 and self.goPast and self.boxWidth >= self.boxMaxAlt) :
+				#print("setting complete3")
+				self.complete = True
+			elif(self.percentage >= 100 and self.goPast) :
+				self.rate = 10
+			
+			# At or below zero
+			if(self.rate < 0 and self.percentage <= 0 and self.paused != True) :
+				#print("setting complete4")
+				self.complete = True
+				self.rate = 0
+				self.percentage = 0
+				self.boxWidth = 1
+				self.barColor = (255,0,0)
 
-		# Get the percentage to display	
-		#self.messageClr = (200, int(200 * self.percentage/100), int(200 * self.percentage/100))
-		if(self.percentage >= 2) : 
-			self.messageClr = (200,200,200)
-			barColor = self.barColorStart
-		else :
-			self.messageClr = (200,0,0)
-			barColor = (200,0,0)
+			# Get the percentage to display	
+			#self.messageClr = (200, int(200 * self.percentage/100), int(200 * self.percentage/100))
+			if(self.percentage >= 2) : 
+				self.messageClr = (200,200,200)
+				self.barColor = self.barColorStart
+			else :
+				self.messageClr = (200,0,0)
+				self.barColor = (200,0,0)
 
-		self.displayPercentage = int(math.floor(self.percentage))
-
-		#if(self.complete) : print(self.percentage, self.complete)
+			self.displayPercentage = int(math.floor(self.percentage))
 
 		# Set the message to be the % to go
 		if(self.messageOverrideActive != True) : 
 			self.messageString = str(self.displayPercentage) + "%"
 
-
 		'''''''''''''''''' ''' BOX AND BAR '''''''''''''''''''''''''''''''''	
+		self.drawBar()
 
+		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''
+		self.drawSpinner()
+
+		'''''''''''''''''' ''' TEXT MESSAGE '''''''''''''''''''''''''''
+		self.drawMessageText()
+
+
+			
+	def drawMessageText(self) :
+		# Draw the message percentage
+		indent  =  4
+		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 * indent , self.fontHeight + 2 * indent))
+		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
+		for i in range(1, self.config.shadowSize ) :
+			self.txtdraw.text((indent - i,-i),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent - i, 0),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent - i, +i),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + 0, -i),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + 0, 0),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + 0, +i),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + i, -i),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + i, 0),self.messageString,self.shadowColor,font=self.font)
+			self.txtdraw.text((indent + i, +i),self.messageString,self.shadowColor,font=self.font)
+		self.txtdraw.text((indent,0),self.messageString, self.messageClr ,font=self.font)
+
+		# Draw a box around message display
+		#numXPos = int(xPos2 - 40)
+		self.pixLen = config.draw.textsize(self.messageString, font = self.font)
+		if (self.messageString != self.altStringMessage) :
+			numXPos = self.boxMax - self.pixLen[0] - 8
+		else :
+			numXPos = self.boxMax - self.pixLen[0] - 8
+		#numXPos = 32
+		numYPos = 24
+		self.spinnerCenter[0] = numXPos - self.spinnerRadius - 0
+		#self.txtdraw.rectangle((0,0,self.pixLen[0]+indent+2, self.pixLen[1] + indent-1), outline=(0,100,0))
+		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
+		
+	def drawSpinner(self) :
+
+		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''	
+		# Draw a spinner
+		self.spinnerAngle += math.pi / self.spinnerAngleSteps
+		if(self.spinnerAngle > 2 * math.pi) : self.spinnerAngle = 0
+		cwidth = (self.spinnerRadius-self.spinnerInnerRadius) + 1
+		for n in range (0,cwidth) :
+			r = self.spinnerRadius - n
+			config.draw.ellipse((self.spinnerCenter[0]-r,self.spinnerCenter[1]-r,
+				self.spinnerCenter[0]+r,self.spinnerCenter[1]+r),
+				outline=(0,0,0) )
+
+		for s in range (0, self.spinnerAngleSteps) :
+			angle  = s * 2 * math.pi / self.spinnerAngleSteps + self.spinnerAngle
+			sX0 = self.spinnerInnerRadius * math.sin(angle) + self.spinnerCenter[0]
+			sX = self.spinnerRadius * math.sin(angle) + self.spinnerCenter[0]
+			sY0 = self.spinnerInnerRadius * math.cos(angle) + self.spinnerCenter[1]
+			sY = self.spinnerRadius * math.cos(angle) + self.spinnerCenter[1]
+			b = float(s)/float(self.spinnerAngleSteps)
+			fillColor = (int(b * 200),int(b * 200),0)
+			#if (b <=.01) : fillColor = barColor
+			config.draw.line((sX0, sY0, sX, sY), fill=fillColor )
+
+	def drawBar(self) :
 		# draw box container
 		config.draw.rectangle((self.xPos-1, self.yPos-1, self.boxMax+1, self.boxHeight+self.yPos+1), 
 			outline=(self.outlineColor), fill=(self.holderColor) )
@@ -262,9 +297,9 @@ class ProgressBar :
 				yPos = yPos1 + n
 				b = math.sin(arc * n) * 1.2
 				#b = cyclicalBrightness
-				rVd = int(barColor[0] * b)
-				gVd = int(barColor[1] * b)
-				bVd = int(barColor[2] * b)
+				rVd = int(self.barColor[0] * b)
+				gVd = int(self.barColor[1] * b)
+				bVd = int(self.barColor[2] * b)
 				barColorDisplay = (rVd, gVd, bVd)
 				config.draw.rectangle((xPos1, yPos, xPos2, yPos), fill=(barColorDisplay) )
 		
@@ -294,62 +329,12 @@ class ProgressBar :
 					bVd = int(bV * b)
 					barColor = (rVd, gVd, bVd)
 					config.draw.rectangle((xPos1p, yPos, xPos2p, yPos), fill=(barColor) )
-
-		'''''''''''''''''' ''' TEXT MESSAGE '''''''''''''''''''''''''''
-		self.drawMessageText()
-
-		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''
-		self.drawSpinner()
-			
-	def drawMessageText(self) :
-		# Draw the message percentage
-		indent  =  4
-		self.scrollImage = Image.new("RGBA", (self.pixLen[0] + 2 * indent , self.fontHeight + 2 * indent))
-		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
-		for i in range(1, self.config.shadowSize ) :
-			self.txtdraw.text((indent + -i,-i),self.messageString,self.shadowColor,font=self.font)
-			self.txtdraw.text((indent + i,i),self.messageString,self.shadowColor,font=self.font)
-		self.txtdraw.text((indent,0),self.messageString, self.messageClr ,font=self.font)
-
-		# Draw a box around message display
-		#numXPos = int(xPos2 - 40)
-		self.pixLen = config.draw.textsize(self.messageString, font = self.font)
-		if (self.messageString != self.altStringMessage) :
-			numXPos = self.boxMax - self.pixLen[0] - 8
-		else :
-			numXPos = self.boxMax - self.pixLen[0] - 8
-		#numXPos = 32
-		numYPos = 24
-		#self.txtdraw.rectangle((0,0,self.pixLen[0]+indent+2, self.pixLen[1] + indent-1), outline=(0,100,0))
-		config.image.paste(self.scrollImage, (numXPos, numYPos), self.scrollImage)
-		
-	def drawSpinner(self) :
-
-		'''''''''''''''''' ''' SPINNER '''''''''''''''''''''''''''''''''	
-		# Draw a spinner
-		self.spinnerAngle += math.pi / self.spinnerAngleSteps
-		if(self.spinnerAngle > 2 * math.pi) : self.spinnerAngle = 0
-
-		for s in range (0, self.spinnerAngleSteps) :
-			angle  = s * 2 * math.pi / self.spinnerAngleSteps + self.spinnerAngle
-			sX0 = self.spinnerInnerRadius * math.sin(angle) + self.spinnerCenter[0]
-			sX = self.spinnerRadius * math.sin(angle) + self.spinnerCenter[0]
-			sY0 = self.spinnerInnerRadius * math.cos(angle) + self.spinnerCenter[1]
-			sY = self.spinnerRadius * math.cos(angle) + self.spinnerCenter[1]
-			b = float(s)/float(self.spinnerAngleSteps)
-			fillColor = (int(b * 200),int(b * 200),0)
-			#if (b <=.01) : fillColor = barColor
-			config.draw.line((sX0, sY0, sX, sY), fill=fillColor )
-
-	def drawBar(self) :
-		config = self.config
-		config.draw.rectangle((self.xPos,self.yPos,self.boxWidth+self.xPos,self.boxHeight+self.yPos), outline=(self.outlineColor), fill=(self.barColor) )
 	
 	def done(self):
 		self.pauseCount = 0
 		self.boxWidth = 1
-		self.rate = self.rateMultiplier * random.random()
-		self.numRate = self.rate
+		self.rate = self.rateMultiplier * random.random() + .01
+		#self.rate = .4
 		self.firstRun = True
 		self.lastPause = False
 		self.complete = False
@@ -359,7 +344,9 @@ class ProgressBar :
 
 		self.goBack = True if (random.random() > .9) else False
 		self.goPast = True if (random.random() > .98) else False
-		self.messageOverride = True if (random.random() < .1) else False
+		if(self.goPast) : self.goBack = False
+
+		#self.messageOverride = True if (random.random() < .1) else False
 		self.messageOverrideActive = False
 		self.altStringMessage = "PLEASE WAIT" 
 		if (random.random() > .05) :
@@ -369,8 +356,7 @@ class ProgressBar :
 		self.paused = False
 		self.barColor = (0,0,200)
 		self.barColorStart = colorutils.getRandomRGB(1)
-		if(self.goPast) : self.goBack = False
-
+		
 
 def drawElement() :
 	global config
@@ -394,7 +380,6 @@ def callBack() :
 
 def runWork():
 	global redrawSpeed
-	setUpDelays()
 	while True:
 		iterate()
 		time.sleep(redrawSpeed)
@@ -409,27 +394,29 @@ def setUpDelays() :
 def iterate() :
 	global config, pBar, lastRate
 	global firstRunCount, completeCount, firstRunCountLim, completeCountLim
-	redraw()
+	pBar.reDraw()
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
-	if(pBar.rate != lastRate) :
-		#print (pBar.rate)
-		lastRate = pBar.rate
-
-	if(pBar.firstRun) :
+	if(pBar.firstRun and pBar.complete == False) :
 		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
+		pBar.paused = True
 		firstRunCount+=config.scrollSpeed
+		print("pausing before STARTING")
 		if(firstRunCount > firstRunCountLim) :
+			print("start now???")
 			pBar.firstRun = False
-
+			pBar.paused = False
 
 	if(pBar.complete) : 
 		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
 		completeCount+=config.scrollSpeed
+		pBar.paused = True
+		print("Pausing before restart....")
 		if(completeCount > completeCountLim) :
+			print("Done!")
 			pBar.done()
 			setUpDelays()
-
+			
 	callBack()
 	count = 0
 	# Done
@@ -439,9 +426,30 @@ def main(run = True) :
 	global redrawSpeed
 	global pBar
 
-	pBar = ProgressBar(config)
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
+	config.fontSize = int(workConfig.get("progressbar", 'fontSize'))
+	config.vOffset = int(workConfig.get("progressbar", 'vOffset'))
+	config.steps = int(workConfig.get("progressbar", 'steps'))
+	config.redrawSpeed = float(workConfig.get("progressbar", 'redrawSpeed'))
+	config.scrollSpeed = float(workConfig.get("progressbar", 'scrollSpeed'))
+	config.shadowSize = int(workConfig.get("progressbar", 'shadowSize'))
+	config.sansSerif = (workConfig.getboolean("progressbar", 'sansSerif'))
+
+	pBar = ProgressBar(config)
+	pBar.colorGradient = (workConfig.getboolean("progressbar", 'useColorGradient'))
+	pBar.gradient = (workConfig.getboolean("progressbar", 'useThreeD'))
+	pBar.minSleep = int(workConfig.get("progressbar", 'minSleep'))
+	pBar.maxSleep = int(workConfig.get("progressbar", 'maxSleep'))
+	pBar.boxMax = config.screenWidth - 2
+	pBar.boxMaxAlt = pBar.boxMax + int(random.uniform(10,30) * config.screenWidth)
+	pBar.boxHeight = config.screenHeight - 3
+	pBar.pausePoint = int(random.random() * 100)
+	pBar.cyclicalArc = 4 * math.pi / pBar.boxMax
+	pBar.cyclicalBrightnessPhase = 0
+	pBar.spinnerCenter = [pBar.boxMax - 54, pBar.boxHeight/2 + 3]
+	redrawSpeed = config.redrawSpeed
+	setUpDelays()
 	if(run) : runWork()
 		
 

@@ -55,9 +55,9 @@ class ProgressBar :
 	# chance that a message shows instead of %
 	messageOverrideProbability = .32
 	# chance different message is shown, when shown
-	overrideMessagProb = 0.04
-	noBarProb = 0.1
-	noDoneProb = 0.3
+	overrideMessagProb = 0.0
+	noBarProb = 0.0
+	noDoneProb = 0.0
 
 	minSleep = 10
 	maxSleep = 12
@@ -128,6 +128,7 @@ class ProgressBar :
 		# Chance that it will never get any further
 		c = random.uniform(.001,1)
 		if(c < self.completeProbability):
+			if(config.debug ) : print("Completing early!!!")
 			#print("setting complete1", c, self.completeProbability)
 			self.complete = True
 
@@ -143,7 +144,7 @@ class ProgressBar :
 				#self.completeProbability = .9
 
 			# Increment the bar width
-			if(self.paused != True) :
+			if(self.paused == False) :
 				self.boxWidth += self.rate
 				self.percentage  =  (float(self.boxWidth)/float(self.boxMax)*100)
 				self.messageOverrideActive = False
@@ -158,6 +159,7 @@ class ProgressBar :
 				# Chance the message will say something besides the percentage
 				if(random.random() < self.messageOverrideProbability and self.messageOverride) :
 					self.messageString = self.altStringMessage
+					if(self.config.debug ) : print("Alt message set " + self.altStringMessage)
 					self.messageOverrideActive = True
 
 			# Things have gone as far as they are going to go
@@ -165,7 +167,7 @@ class ProgressBar :
 				#if(random.random() < self.noDoneProb) :
 					#print("not done...")
 					#self.changeAction()
-
+				if(self.config.debug ) : print("Target Met ... completing")
 				self.boxWidth = self.boxMax - 2
 				#print("setting complete")
 				self.complete = True
@@ -350,7 +352,7 @@ class ProgressBar :
 		#self.messageOverride = True if (random.random() < .1) else False
 		self.messageOverrideActive = False
 		self.altStringMessage = "PLEASE WAIT" 
-		if (random.random() > .05) :
+		if (random.random() < self.overrideMessagProb) :
 			self.altStringMessage = "RESTARTING..." if (random.random() > .5) else "UPDATING"
 		self.pausePoint = int(random.random() * 100)
 		self.hasPaused = False
@@ -402,9 +404,9 @@ def iterate() :
 		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
 		pBar.paused = True
 		firstRunCount+=config.scrollSpeed
-		if(config.debug ) : print("pausing before STARTING")
+		#if(config.debug ) : print("pausing before STARTING")
 		if(firstRunCount > firstRunCountLim) :
-			if(config.debug ) : print("start now???")
+			if(config.debug ) : print("Starting Progress Bar")
 			pBar.firstRun = False
 			pBar.paused = False
 
@@ -412,7 +414,7 @@ def iterate() :
 		#time.sleep(int(random.uniform(pBar.minSleep,pBar.maxSleep)))
 		completeCount+=config.scrollSpeed
 		pBar.paused = True
-		if(config.debug ) : print("Pausing before restart....")
+		#if(config.debug ) : print("Pausing before restart....")
 		if(completeCount > completeCountLim) :
 			if(config.debug ) : print("Done!")
 			pBar.done()

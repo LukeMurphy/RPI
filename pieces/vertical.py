@@ -13,7 +13,7 @@ blockHeight = 8
 class Vertical :
 
 	outerColor = (0,0,50)
-	innerColor = (180,50,000)
+	innerColor = (180,20,000)
 	borderColor = (50,0,0)
 
 	xPos = 0
@@ -28,11 +28,16 @@ class Vertical :
 	rate = rateMultiplier * random.random()
 	h = 8
 	var = 2
+	reduceRate = .998
+	multiplier = .998
+	incrRate = 1.1
+	inMotion = False
+	inMotionProbability = .0005
 
 	def __init__(self, config):
 
 		self.boxMax = config.screenWidth - 1
-		self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
+		#self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
 		self.boxHeight = config.screenHeight - 2
 		self.config = config
 		self.h = config.blockHeight
@@ -41,13 +46,26 @@ class Vertical :
 
 		self.unitImage = Image.new("RGBA", (config.screenWidth,self.h))
 		self.draw  = ImageDraw.Draw(self.unitImage)
-
-		self.CenterWidth = int(self.boxMax * config.widthPercentage)
 		self.BorderWidth = 2
-		self.OuterWidth = int(self.boxMax/2 - self.CenterWidth/2 - self.BorderWidth)
+		self.changeAction()
+
 
 	def changeAction(self):
-		return False
+		self.CenterWidth = int(self.boxMax * config.widthPercentage)
+		self.OuterWidth = int(self.boxMax/2 - self.CenterWidth/2 - self.BorderWidth)
+		if random.random() < self.inMotionProbability : self.inMotion = True 
+
+		if(config.widthPercentage <.01) :
+			self.multiplier = self.incrRate
+
+		if(config.widthPercentage > .79) :
+			self.multiplier = self.reduceRate
+		
+		if(self.inMotion) : 
+			config.widthPercentage = config.widthPercentage * self.multiplier
+			if random.random() < self.inMotionProbability : self.inMotion = False 
+
+		return True
 
 	def make(self):
 		self.outer1 = (self.xPos,self.yPos, int(random.uniform(-self.var,+self.var) + self.OuterWidth) + 1, self.yPos + self.h)
@@ -78,14 +96,22 @@ def redraw():
 	for i in range(0,len(vertArray)):
 		vert = vertArray[i]
 		vert.reDraw()
+	# This function does the motion and creates
+	# new blocks
 	reArraynge()
 
 def reArraynge():
 	global config, vertArray
+	# Pop the last one off the array
 	lastElement = vertArray.pop()
+	# generate a replacement
+	lastElement.changeAction()
 	lastElement.make()
+	# instert it at the start of the array
 	vertArray.insert(0,lastElement)
 	layers = int(config.screenHeight / config.blockHeight)
+	# run through the array and reset each blocks new postition
+	# to produce motion animation effect
 	for i in range (0,layers):
 		vertArray[i].vOffset = i * config.blockHeight
 

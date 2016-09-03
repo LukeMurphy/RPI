@@ -5,10 +5,10 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 
-redrawSpeed = .005
-lastRate  = 0 
+
 colorutils.brightness =  1
-blockHeight = 8 
+
+
 
 class Vertical :
 
@@ -24,15 +24,8 @@ class Vertical :
 	boxWidthDisplay = 0
 	status = 0
 	boxMax = 0
-	rateMultiplier = .1
-	rate = rateMultiplier * random.random()
-	h = 8
-	var = 2
-	reduceRate = .998
-	multiplier = .998
-	incrRate = 1.1
 	inMotion = False
-	inMotionProbability = .0005
+
 
 	def __init__(self, config):
 
@@ -41,7 +34,7 @@ class Vertical :
 		self.boxHeight = config.screenHeight - 2
 		self.config = config
 		self.h = config.blockHeight
-
+		self.var = config.var
 		#self.borderModel = workConfig.get("fludd", 'borderModel')
 
 		self.unitImage = Image.new("RGBA", (config.screenWidth,self.h))
@@ -53,21 +46,9 @@ class Vertical :
 	def changeAction(self):
 		self.CenterWidth = int(self.boxMax * config.widthPercentage)
 		self.OuterWidth = int(self.boxMax/2 - self.CenterWidth/2 - self.BorderWidth)
-		if random.random() < self.inMotionProbability : self.inMotion = True 
-
-		if(config.widthPercentage <.01) :
-			self.multiplier = self.incrRate
-
-		if(config.widthPercentage > .79) :
-			self.multiplier = self.reduceRate
-		
-		if(self.inMotion) : 
-			config.widthPercentage = config.widthPercentage * self.multiplier
-			if random.random() < self.inMotionProbability : self.inMotion = False 
-
-		return True
 
 	def make(self):
+		self.changeAction()
 		self.outer1 = (self.xPos,self.yPos, int(random.uniform(-self.var,+self.var) + self.OuterWidth) + 1, self.yPos + self.h)
 		self.border1 = (self.outer1[2],self.yPos, self.outer1[2] + int(random.uniform(-1,1) + self.BorderWidth) + 1, self.yPos + self.h)
 		self.cntr = (self.border1[2],self.yPos, self.border1[2] + int(random.uniform(-self.var,+self.var) + self.CenterWidth)  + 1, self.yPos + self.h)
@@ -102,18 +83,41 @@ def redraw():
 
 def reArraynge():
 	global config, vertArray
+	# set the current width
+	changeWidth()
+
 	# Pop the last one off the array
 	lastElement = vertArray.pop()
+
 	# generate a replacement
 	lastElement.changeAction()
 	lastElement.make()
+
 	# instert it at the start of the array
 	vertArray.insert(0,lastElement)
 	layers = int(config.screenHeight / config.blockHeight)
+
 	# run through the array and reset each blocks new postition
 	# to produce motion animation effect
 	for i in range (0,layers):
 		vertArray[i].vOffset = i * config.blockHeight
+
+def changeWidth():
+	if(config.inMotion == True) :
+		if(config.widthPercentage <= config.destinationPercentage) :
+			config.multiplier = config.incrRate
+		else :
+			config.multiplier = config.reduceRate
+		config.widthPercentage = config.widthPercentage * config.multiplier
+
+	if (abs((config.widthPercentage-config.destinationPercentage)/config.destinationPercentage) <= .01 and config.inMotion == True) : 
+		config.inMotion = False 
+		#print("done")
+
+	if (random.random() <  config.inMotionProbability and config.inMotion == False) :
+		config.destinationPercentage = random.uniform(0.0001,.79)
+		config.inMotion = True
+		#print ("==>", config.destinationPercentage, config.widthPercentage)
 
 def changeColor() :
 	pass
@@ -131,7 +135,7 @@ def runWork():
 	global redrawSpeed
 	while True:
 		iterate()
-		time.sleep(redrawSpeed)
+		time.sleep(config.redrawSpeed)
 
 def iterate() :
 	global config, vert, lastRate
@@ -153,6 +157,20 @@ def main(run = True) :
 	config.blockHeight = int(workConfig.get("vertical", 'blockHeight'))
 	config.vOffset = int(workConfig.get("vertical", 'vOffset'))
 	config.widthPercentage = float(workConfig.get("vertical", 'widthPercentage'))
+	config.redrawSpeed = .005
+	config.blockHeight = 8 
+	config.rateMultiplier = .1
+	config.rate = config.rateMultiplier * random.random()
+	config.h = 8
+	config.var = 2
+
+	config.destinationPercentage = .25
+	config.widthPercentage = .20
+	config.multiplier = .998
+	config.incrRate = 1.01
+	config.reduceRate = .998
+	config.inMotionProbability = .001
+	config.inMotion = False
 
 	layers = int(config.screenHeight / config.blockHeight)
 	for i in range (0,layers):

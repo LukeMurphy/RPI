@@ -13,7 +13,7 @@ colorutils.brightness =  1
 class Vertical :
 
 	outerColor = (0,0,50)
-	innerColor = (180,20,000)
+	innerColor = (130,30,0)
 	borderColor = (50,0,0)
 
 	xPos = 0

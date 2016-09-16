@@ -32,6 +32,8 @@ class Sparkles :
 
 		self.decr = 20
 		self.decr = int(random.uniform(1,10))  
+		self.deacelleration = random.uniform(.9,.999)
+		self.gravity = random.uniform(.03,.1)
 
 	def explosion(self):
 		for n in range (0, self.p) :
@@ -61,11 +63,11 @@ class Sparkles :
 			ref['ypos'] = ref['vy'] + ref['ypos']
 
 			# deacelleration
-			ref['vy'] = ref['vy'] * .9
+			ref['vy'] = ref['vy'] * self.deacelleration
 			ref['vx'] = ref['vx'] * .9
 
 			# pseudo gravity
-			ref['vy'] = ref['vy'] + .1
+			ref['vy'] = ref['vy'] + self.gravity
 
 			self.particles[q]['c'][0] = self.particles[q]['c'][0] - self.decr
 			self.particles[q]['c'][1] = self.particles[q]['c'][1] - self.decr
@@ -114,7 +116,7 @@ def changeCall() :
 
 def callBack() :
 	global config, sprkl, traces
-	if(random.random() > .98) : traces = True
+	if(random.random() > .986) : traces = True
 	#if(random.random() > .99) : traces = False
 	if (sprkl.done == True) :
 		sprkl = Sparkles(config)

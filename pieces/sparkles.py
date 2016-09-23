@@ -23,7 +23,7 @@ class Sparkles :
 
 		# initial center position
 		self.x = int(random.random()*self.config.screenWidth)
-		self.y = int(random.random()*16)
+		self.y = int(self.config.screenHeight/2 - random.random()*self.config.screenHeight)
 
 		self.brightness = self.config.brightness
 		self.sparkleBrightness = self.config.brightness
@@ -39,7 +39,7 @@ class Sparkles :
 		for n in range (0, self.p) :
 			# variation in initial velocity
 			f = random.random() * 4
-			vx = math.cos(self.angle * n) * f
+			vx = math.cos(self.angle * n) * f * 1.3
 			vy = math.sin(self.angle * n) * f
 			r = int(random.uniform(0,255)* self.brightness)
 			g = int(random.uniform(0,255)* self.brightness)
@@ -116,7 +116,7 @@ def changeCall() :
 
 def callBack() :
 	global config, sprkl, traces
-	if(random.random() > .986) : traces = True
+	if(random.random() > .988) : traces = True
 	#if(random.random() > .99) : traces = False
 	if (sprkl.done == True) :
 		sprkl = Sparkles(config)

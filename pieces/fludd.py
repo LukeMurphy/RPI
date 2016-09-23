@@ -18,11 +18,6 @@ class Fludd :
 	messageClr = (200,0,0)
 	shadowColor = (0,0,0)
 
-	spinnerAngle = 0
-	spinnerAngleSteps = 16
-	spinnerCenter = (0,0)
-	spinnerRadius = 8
-	spinnerInnerRadius = 5
 
 	xPos = 1
 	yPos = 1
@@ -36,6 +31,7 @@ class Fludd :
 	numRate = rate
 	percentage = 0
 	boxMaxAlt = 0
+	var = 10
 
 	nothingLevel = 10
 	nothingChangeProbability = .02
@@ -49,10 +45,7 @@ class Fludd :
 		self.boxMax = config.screenWidth - 1
 		self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
 		self.boxHeight = config.screenHeight - 2
-		self.spinnerCenter = (self.boxMax - 60, self.boxHeight/2 + 4)
 		self.config = config
-
-		self.borderModel = workConfig.get("fludd", 'borderModel')
 
 		tempImage = Image.new("RGBA", (640,640))
 		draw  = ImageDraw.Draw(tempImage)
@@ -64,7 +57,7 @@ class Fludd :
 
 
 	def reDraw(self) :
-		var = 10
+		var = self.var
 		xPos1 = random.uniform(-var/2,var)
 		yPos1 = random.uniform(-var/2,var)
 
@@ -141,10 +134,21 @@ def main(run = True) :
 	global config
 	global redrawSpeed
 	global fluddSquare
-
-	fluddSquare = Fludd(config)
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
+	fluddSquare = Fludd(config)
+	# Prism is all colors, Plenum is white
+	fluddSquare.borderModel  = workConfig.get("fludd", 'borderModel')
+	# var sets the points offset from the corners - i.e. the larger var is, the wider the borders
+	'''
+	************
+	*           *
+	 *           *
+	  *          * 
+	   ***********
+        
+	'''
+	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
 	if(run) : runWork()
 		
 

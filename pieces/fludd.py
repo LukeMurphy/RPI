@@ -37,6 +37,7 @@ class Fludd :
 	nothingChangeProbability = .02
 
 	borderModel = "prism"
+	nothing = "void"
 
 
 	def __init__(self, config):
@@ -70,9 +71,16 @@ class Fludd :
 		xPos4 = random.uniform(-var/2,var)
 		yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
 
-		gray = int(random.random() * 0)
+		gray = 126
 		brightness = self.config.brightness * random.random()
 		light = int(brightness*self.nothingLevel)
+
+		if self.nothing == "void" :
+			gray = 0
+		else :
+			gray = int(self.config.brightness * random.random()*self.nothingLevel/2)
+			light = 0
+
 
 		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0))
 		#config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
@@ -139,6 +147,9 @@ def main(run = True) :
 	fluddSquare = Fludd(config)
 	# Prism is all colors, Plenum is white
 	fluddSquare.borderModel  = workConfig.get("fludd", 'borderModel')
+	fluddSquare.nothing  = workConfig.get("fludd", 'nothing')
+	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
+
 	# var sets the points offset from the corners - i.e. the larger var is, the wider the borders
 	'''
 	************
@@ -148,7 +159,7 @@ def main(run = True) :
 	   ***********
         
 	'''
-	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
+	
 	if(run) : runWork()
 		
 

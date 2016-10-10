@@ -27,6 +27,7 @@ def setUp():
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
 		windowOffset = [1900,20]
+		windowOffset = [2560,20]
 		#windowOffset = [4,45]
 	else :
 		windowOffset = [-1,13]

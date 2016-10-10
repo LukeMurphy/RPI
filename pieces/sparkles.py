@@ -33,6 +33,7 @@ class Sparkles :
 		self.decr = 20
 		self.decr = int(random.uniform(1,10))  
 		self.deacelleration = random.uniform(.9,.999)
+		self.deacellerationx = random.uniform(.91,.95)
 		self.gravity = random.uniform(.03,.1)
 
 	def explosion(self):
@@ -64,7 +65,7 @@ class Sparkles :
 
 			# deacelleration
 			ref['vy'] = ref['vy'] * self.deacelleration
-			ref['vx'] = ref['vx'] * .9
+			ref['vx'] = ref['vx'] * self.deacellerationx
 
 			# pseudo gravity
 			ref['vy'] = ref['vy'] + self.gravity

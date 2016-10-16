@@ -38,6 +38,8 @@ class Fludd :
 
 	borderModel = "prism"
 	nothing = "void"
+	varianceMode = "independent"
+	prisimBrightness = .5
 
 
 	def __init__(self, config):
@@ -59,17 +61,6 @@ class Fludd :
 
 	def reDraw(self) :
 		var = self.var
-		xPos1 = random.uniform(-var/2,var)
-		yPos1 = random.uniform(-var/2,var)
-
-		xPos2 = random.uniform(self.boxMax-var,self.boxMax+var)
-		yPos2 = random.uniform(-var/2,var)	
-
-		xPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
-		yPos3 = random.uniform(self.boxHeight-var,self.boxHeight+var)
-
-		xPos4 = random.uniform(-var/2,var)
-		yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
 
 		gray = 126
 		brightness = self.config.brightness * random.random()
@@ -85,12 +76,43 @@ class Fludd :
 		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0))
 		#config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
 		if(self.borderModel == "prism"):
-			outerBorder = colorutils.randomColor(.15)
+			outerBorder = colorutils.randomColor(self.prisimBrightness)
 		else :
 			outerBorder = (light,light,light)
 
 		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = outerBorder)
-		config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
+
+		if(self.varianceMode == "independent") : 
+			xPos1 = random.uniform(-var/2,var)
+			yPos1 = random.uniform(-var/2,var)
+
+			xPos2 = random.uniform(self.boxMax-var,self.boxMax+var)
+			yPos2 = random.uniform(-var/2,var)	
+
+			xPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
+			yPos3 = random.uniform(self.boxHeight-var,self.boxHeight+var)
+
+			xPos4 = random.uniform(-var/2,var)
+			yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
+
+			config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
+
+		elif(self.varianceMode == "symmetrical"):
+			svar = random.uniform(0, var)
+			symBoxWidth = self.boxMax - svar
+			symBoxHeight = self.boxHeight - svar
+			xy0 = svar
+			
+			config.draw.rectangle((xy0,xy0,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) )
+	
+		elif(self.varianceMode == "asymmetrical"):
+			svarw = random.uniform(0, var)
+			svarh = random.uniform(0, var)
+			symBoxWidth = self.boxMax - svarw
+			symBoxHeight = self.boxHeight - svarh
+			xPos1 = (self.boxMax - symBoxWidth)
+			yPos1 = (self.boxHeight  - symBoxHeight)
+			config.draw.rectangle((xPos1,yPos1,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) )
 
 		if(random.random() < self.nothingChangeProbability) : self.nothingLevel = random.uniform(0,255)
 
@@ -149,6 +171,8 @@ def main(run = True) :
 	fluddSquare.borderModel  = workConfig.get("fludd", 'borderModel')
 	fluddSquare.nothing  = workConfig.get("fludd", 'nothing')
 	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
+	fluddSquare.varianceMode  = workConfig.get("fludd", 'varianceMode')
+	fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness'))
 
 	# var sets the points offset from the corners - i.e. the larger var is, the wider the borders
 	'''

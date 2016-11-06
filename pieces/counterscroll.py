@@ -355,7 +355,15 @@ def iterate() :
 
 	# Scroll message
 	rng = 3 if config.usingEmoties == True or config.counterScrollText == False else 6
-	for n in range (0, rng) :
+	for i in range (0, rng) :
+
+		## This reverses the pasting so the text scrolling from right to left is on top
+		## Right to Left scrolling is the normal for readability ....
+		if(rng != 3) :
+			n = (rng - 1) - i
+		else: 
+			n = i
+
 		block = blocks[n]
 		block.scroll()
 
@@ -409,7 +417,7 @@ def iterate() :
 		segment =  config.canvasImage.crop((n * config.screenWidth, 0, segmentWidth + n * config.screenWidth, segmentHeight))
 		
 		# At some point go to modulo for even/odd ... but for now not more than 5 rows
-		if ((n == 0 or n == 2) and (config.displayRows >  1) ) :
+		if ((n == 0 or n == 2 or n == 4) and (config.displayRows >  1) ) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))

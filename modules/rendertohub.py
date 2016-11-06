@@ -22,15 +22,17 @@ buff  =  8
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
-	global root, canvasOffsetX, canvasOffsetY, buff
+	global root, canvasOffsetX, canvasOffsetY, buff, config
 	gc.enable()
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
 		windowOffset = [1900,20]
-		windowOffset = [2560,20]
+		windowOffset = [2560,24]
+		windowOffset = [config.windowXOffset, config.windowYOffset]
 		#windowOffset = [4,45]
 	else :
 		windowOffset = [-1,13]
+		windowOffset = [config.windowXOffset, config.windowYOffset]
 
 	# -----> this is somewhat arbitrary - just to get the things aligned
 	# after rotation

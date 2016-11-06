@@ -141,6 +141,9 @@ def configure() :
 			r.work = work
 			r.canvasOffsetX = int(workconfig.get("displayconfig", 'canvasOffsetX'))
 			r.canvasOffsetY = int(workconfig.get("displayconfig", 'canvasOffsetY'))
+			config.windowXOffset = int(workconfig.get("displayconfig", 'windowXOffset'))
+			config.windowYOffset = int(workconfig.get("displayconfig", 'windowYOffset'))
+
 			config.drawBeforeConversion = r.drawBeforeConversion
 			config.render = r.render
 			config.updateCanvas = r.updateCanvas

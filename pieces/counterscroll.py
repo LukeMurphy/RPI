@@ -22,13 +22,17 @@ class ScrollMessage :
 	steps = 1
 	fontSize = 14
 
-	def __init__(self, messageString, direction, config) :
+	def __init__(self, messageString, direction, config, clr='') :
 		#print ("init: " + messageString)
 		self.messageString = messageString
 		self.direction = direction
 
 		self.config = config
-		self.clr = colorutils.getRandomRGB()
+		if (clr == '') :
+			if(config.colorMode == "getRandomRGB") : self.clr = colorutils.getRandomRGB()
+			if(config.colorMode == "randomColor") : self.clr = colorutils.randomColor()
+			if(config.colorMode == "getRandomColorWheel") : self.clr = colorutils.getRandomColorWheel()
+		else: self.clr = clr
 		#self.clr = colorutils.randomColor()
 		#self.clr = colorutils.getSunsetColors()
 		#self.clr = (0,0,0)
@@ -81,11 +85,12 @@ class XOx :
 	########################
 	#scroll speed and steps per cycle
 	scrollSpeed = 0.004
-	steps = 1
+	steps = 1.5
 	lineThickness = 2
 	bufferSpacing = 40
 	xsWidth = 54
-	maxNumXOs = 10
+	maxNumXOs = 12
+	minNumXOs = 5
 	XColor = [255,0,0]
 	OColor = [255,0,0] 
 	ArrowColor = [255,2,0] 
@@ -104,22 +109,20 @@ class XOx :
 
 		prv = n - 1
 		nxt = n + 1
-		if (prv < 0) : prv = rng - 1
-		if (nxt == rng) : nxt = 0
+		if n < 3 :
+			if (prv < 0) : prv = 3 - 1
+			if (nxt == 3) : nxt = 0
+		else :
+			if (prv < 3) : prv = rng - 1
+			if (nxt == rng) : nxt = 3
 
 		self.prvBlock = prv
 		self.nxtBlock = nxt
 
-
 	def makeBlock(self, dash=False) :
 		strg = ""
-		if(self.direction == "RIGHT") :
-			self.xPos = config.screenWidth + self.bufferSpacing
-		else :
-			self.xPos = 0
-		self.yPos = 0
 
-		num = int(random.uniform(3,self.maxNumXOs))
+		num = int(random.uniform(self.minNumXOs,self.maxNumXOs))
 		
 		for n in range (0, num) : 
 			if (dash) :
@@ -129,6 +132,15 @@ class XOx :
 				else  : strg += "O"
 
 		self.width = n * (self.xsWidth + 8)
+
+		if(self.direction == "RIGHT") :
+			self.xPos = self.config.screenWidth + self.config.bufferSpacing
+			self.end = - self.width
+		else :
+			self.xPos = 0
+			self.end = self.config.screenWidth * self.config.displayRows
+		self.yPos = 0
+		
 		return strg
 
 	def drawCounterXO(self) :
@@ -176,11 +188,9 @@ class XOx :
 			leng += endX - startX
 	
 		if(self.direction == "RIGHT") : 
-			self.xPos -= config.steps
+			self.xPos -= self.steps
 		else :
-			self.xPos += config.steps
-
-		#self.messageLength = leng
+			self.xPos += self.steps
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -211,6 +221,7 @@ def main(run = True) :
 	config.directionOrder = (workConfig.get("scroll", 'directionOrder'))
 	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
 	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
+	config.colorMode = (workConfig.get("scroll", 'colorMode')) 
 
 	# Used to composite XO's and message text
 	#config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , int(config.screenHeight / config.displayRows)))
@@ -248,17 +259,26 @@ def makeBlock(n, rng = 3, direction = "LEFT", strgArg="") :
 	strg = strgArg
 
 	if(strgArg == "") : 
-		if n in[1,3,5] :
+		#if n in[1,3,5] :
+		if n < 3:
 			strg = config.txt1 
 		else : 
 			strg = config.txt2
-	
+
+	clrseq = ((100,0,0),(0,100,0),(0,0,100))
+	c = n if n <3 else n-3
+
+	#block = ScrollMessage(makeText(config.usingEmoties, strg), direction ,config, clrseq[c])
 	block = ScrollMessage(makeText(config.usingEmoties, strg), direction ,config)
 
 	prv = n - 1
 	nxt = n + 1
-	if (prv < 0) : prv = rng - 1
-	if (nxt == rng) : nxt = 0
+	if n < 3 :
+		if (prv < 0) : prv = 3 - 1
+		if (nxt == 3) : nxt = 0
+	else :
+		if (prv < 3) : prv = rng - 1
+		if (nxt == rng) : nxt = 3
 
 	block.prvBlock = prv
 	block.nxtBlock = nxt
@@ -292,7 +312,7 @@ def setUp():
 	global config, XOsBlocks, overlayImage, blocks, usingEmoties, directionOrder
 
 	#overlayImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
-	lastWidth = 0
+	lastWidth = config.canvasImageWidth
 	direction = directionOrder[0]
 
 	# Used if there are 2 text statements running against eachother
@@ -300,27 +320,28 @@ def setUp():
 
 	for n in range (0, rng) :
 
-		if n == 3 :
-			direction = directionOrder[1]
-			lastWidth = 0
-
+		if n >= 3 : direction = directionOrder[1]
+		if n == 3 : lastWidth = 0
+		
 		block = makeBlock(n, rng, direction)
 
 		if(block.direction == "RIGHT") : 
-			block.start = lastWidth + config.canvasImageWidth
-			block.end = -block.width - lastWidth
-		else :
+			block.start = lastWidth
+			block.end = - block.width #- lastWidth -config.screenWidth * config.displayRows 
+		elif(block.direction == "LEFT")  :
 			block.start = -block.width - lastWidth
 			block.end = config.screenWidth * config.displayRows
-
+		
 		lastWidth += block.width
 		block.xPos = block.start
 		blocks.append(block)
 
-	lastWidth = 0
-	direction = directionOrder[1]
+	#lastWidth = 0
+	#direction = directionOrder[1]
 
 	if(config.useXOs) :
+		lastWidth = 0
+		direction = directionOrder[1]
 		for n in range (0, 3) :
 			XOs = XOx(direction, config, n, 3)
 			if(XOs.direction == "RIGHT") : 
@@ -351,10 +372,13 @@ def iterate() :
 	draw  = ImageDraw.Draw(config.canvasImage)
 	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = 0)
 
+	displayWidth = config.screenWidth * config.displayRows
+
 	''''''''''''
 
 	# Scroll message
 	rng = 3 if config.usingEmoties == True or config.counterScrollText == False else 6
+
 	for i in range (0, rng) :
 
 		## This reverses the pasting so the text scrolling from right to left is on top
@@ -370,24 +394,32 @@ def iterate() :
 		# paste scrollImage into the canvasImage - but eventually chop and flip
 		config.canvasImage.paste(block.scrollImage, (block.xPos, config.vOffset), block.scrollImage)
 
-		if(block.xPos > config.screenWidth * config.displayRows and block.direction== "LEFT" ) :
+		if(block.xPos > displayWidth and block.direction== "LEFT" ) :
 			# a block moves off-screen, possibly change message, then move to back of queue
 			if(random.random() > .5 ) :
 				strg = config.txt1 if random.random() > .5 else config.txt2
 				blocks[n] = makeBlock(n , rng, block.direction, strg)
 				block = blocks[n]
+				block.end = displayWidth
 
-			block.xPos = block.start = blocks[block.prvBlock].xPos - block.width - block.bufferSpacing
-			block.end = config.screenWidth * config.displayRows
+			nxtBlockStartPoint = blocks[block.prvBlock].xPos
+			if ((nxtBlockStartPoint - block.width ) > 0 ):
+				block.xPos =  -block.width
+			else :
+				block.xPos = nxtBlockStartPoint - block.width 
 
-		if(block.xPos < -block.width and block.direction== "RIGHT" )  :
+		if(block.xPos < block.end and block.direction== "RIGHT" )  :
 			if(random.random() > .5 ) :
 				strg = config.txt1 if random.random() > .5 else config.txt2
 				blocks[n] = makeBlock(n , rng, block.direction, strg)
 				block = blocks[n]
-
-			block.xPos = block.start = blocks[block.prvBlock].xPos + blocks[block.prvBlock].width + block.bufferSpacing
-			block.end = -block.scrollImage.size[0] - 8
+				block.end = - block.width
+	
+			prevBlockEndPoint = blocks[block.prvBlock].xPos + blocks[block.prvBlock].width
+			if (prevBlockEndPoint < displayWidth ):
+				block.xPos = config.canvasImageWidth + block.width
+			else :
+				block.xPos = prevBlockEndPoint + block.bufferSpacing 
 
 
 	if(config.useBlanks) : badpixels.drawBlanks(config.canvasImage, False)
@@ -397,16 +429,38 @@ def iterate() :
 
 	if(config.useXOs) :
 		# Add the counter XO's
+		
 		for n in range (0, 3) :
-			XOsBlocks[n].drawCounterXO()
+			XOsBlock = XOsBlocks[n]
+			XOsBlock.drawCounterXO()
 
-			if (XOsBlocks[n].xPos  > config.screenWidth * config.displayRows and XOsBlocks[n].direction == "LEFT") :
-				if(random.random() > .5 ) : XOsBlocks[n].xoString = XOsBlocks[n].makeBlock(config.useArrows)
-				XOsBlocks[n].xPos = XOsBlocks[n].start =  XOsBlocks[XOsBlocks[n].prvBlock].xPos - XOsBlocks[n].width - XOsBlocks[n].bufferSpacing
+			if (XOsBlock.xPos  > displayWidth and XOsBlock.direction == "LEFT") :
+				if(random.random() > .5 ) : 
+					XOsBlocks[n].xoString = XOsBlocks[n].makeBlock(config.useArrows)
+					XOsBlock.end = displayWidth
+
+				nxtBlockStartPoint = XOsBlocks[XOsBlock.prvBlock].xPos
+				if ((nxtBlockStartPoint - XOsBlock.width ) > 0 ):
+					XOsBlock.xPos =  -XOsBlock.width
+				else :
+					XOsBlock.xPos = nxtBlockStartPoint - XOsBlock.width 
+
+				#print (n,XOsBlock.xPos,XOsBlock.end, XOsBlock.width)
+				#XOsBlocks[n].xPos = XOsBlocks[n].start =  XOsBlocks[XOsBlock.prvBlock].xPos - XOsBlock.width - XOsBlock.bufferSpacing
+				
 
 			elif(XOsBlocks[n].xPos < -XOsBlocks[n].width and XOsBlocks[n].direction == "RIGHT") :	
-				if(random.random() > .5 ) : XOsBlocks[n].xoString = XOsBlocks[n].makeBlock(config.useArrows)
-				XOsBlocks[n].xPos = XOsBlocks[n].start = XOsBlocks[XOsBlocks[n].prvBlock].xPos + XOsBlocks[XOsBlocks[n].prvBlock].width + XOsBlocks[n].bufferSpacing
+				if(random.random() > .5 ) : 
+					XOsBlock.xoString = XOsBlock.makeBlock(config.useArrows)
+					XOsBlock.end  = -XOsBlock.width
+
+				prevBlockEndPoint = XOsBlocks[XOsBlock.prvBlock].xPos + XOsBlocks[XOsBlock.prvBlock].width
+				if (prevBlockEndPoint < displayWidth ):
+					XOsBlock.xPos = config.canvasImageWidth + XOsBlock.width
+				else :
+					XOsBlock.xPos = prevBlockEndPoint + XOsBlock.bufferSpacing 
+				#XOsBlock.xPos = XOsBlock.start = XOsBlocks[XOsBlock.prvBlock].xPos + XOsBlocks[XOsBlock.prvBlock].width + XOsBlock.bufferSpacing
+				
 
 	''''''''''''
 

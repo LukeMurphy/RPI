@@ -241,7 +241,7 @@ def main(run = True) :
 		config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenWidth))
 
 	if(config.useBlanks) :
-		badpixels.numberOfDeadPixels = 50
+		badpixels.numberOfDeadPixels = 20
 		badpixels.size = config.canvasImage.size
 		badpixels.config = config
 		badpixels.setBlanksOnScreen() 

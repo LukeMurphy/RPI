@@ -23,6 +23,9 @@ class Sparkles :
 
 		# initial center position
 		self.x = int(random.random()*self.config.screenWidth)
+		if (config.rotation !=0) : 
+			approxVisibleArea = self.config.screenWidth * .75
+			self.x = int(self.config.screenWidth - 2 * random.random() * approxVisibleArea)
 		self.y = int(self.config.screenHeight/2 - random.random()*self.config.screenHeight)
 
 		self.brightness = self.config.brightness
@@ -98,8 +101,6 @@ class Sparkles :
 				self.particles[q]['d'] = 1
 
 
-
-
 def drawElement() :
 	global config
 	return True
@@ -120,6 +121,8 @@ def callBack() :
 	if(random.random() > .988) : traces = True
 	#if(random.random() > .99) : traces = False
 	if (sprkl.done == True) :
+		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
+		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 		sprkl = Sparkles(config)
 		traces = False
 
@@ -139,7 +142,7 @@ def setUpDelays() :
 def iterate() :
 	global config
 	global sprkl, traces
-	if(traces != True) : config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=0)
+	if(traces != True) : config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
 	sprkl.explosion()
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 	callBack()

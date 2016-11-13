@@ -498,7 +498,7 @@ def ThreeD(imageToRender) :
 
 	if(config.rotation == -90) :
 		numSegments = 32
-		dFactor =  1.4
+		dFactor =  1.415
 		angle =  math.pi  / numSegments
 		width  = config.screenHeight
 		height = config.screenWidth

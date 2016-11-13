@@ -492,9 +492,10 @@ def iterate() :
 
 def ThreeD(imageToRender) :
 	numSegments = 64
-	dFactor =  1.334
+	dFactor =  1.34
 	offset = 0
 	angle =  math.pi  / numSegments
+
 	if(config.rotation == -90) :
 		numSegments = 32
 		dFactor =  1.4
@@ -504,10 +505,10 @@ def ThreeD(imageToRender) :
 	else: 
 		width  = config.screenWidth
 		height = config.screenHeight
-	segmentWidth = int((width) * math.sin(angle) /3 )
-	#stepRange = int(pixLen[0] / stepSize)
+
+	segmentWidth = int((width) * math.sin(angle) / 3 )
 	useColorFLicker = False
-	placementx = 1
+	placementx = 0
 
 	for n in range(0,numSegments) :
 		pCropx = n * segmentWidth + offset
@@ -531,6 +532,10 @@ def ThreeD(imageToRender) :
 		#warpedImage.paste(segmentColorizer , (placementx,0))
 		config.warpedImage.paste(segmentImage , (placementx,0))
 		placementx += projectedWidth
+
+	# debug 
+	#draw = ImageDraw.Draw(config.warpedImage)
+	#draw.rectangle((0,0,config.screenWidth,config.screenHeight), outline=(0,0,255))
 
 	#config.render(warpedImage,0,0, config.screenWidth, config.screenHeight)
 

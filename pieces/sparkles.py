@@ -24,9 +24,9 @@ class Sparkles :
 		# initial center position
 		self.x = int(random.random()*self.config.screenWidth)
 		if (config.rotation !=0) : 
-			approxVisibleArea = self.config.screenWidth * .75
+			approxVisibleArea = self.config.screenWidth * .5
 			self.x = int(self.config.screenWidth - 2 * random.random() * approxVisibleArea)
-		self.y = int(self.config.screenHeight/2 - random.random()*self.config.screenHeight)
+		self.y = int(self.config.screenHeight/2 - random.random()*self.config.screenHeight/2)
 
 		self.brightness = self.config.brightness
 		self.sparkleBrightness = self.config.brightness
@@ -34,9 +34,16 @@ class Sparkles :
 		self.sparkleBrightness = .8
 
 		self.decr = 20
-		self.decr = int(random.uniform(1,10))  
-		self.deacelleration = random.uniform(.9,.999)
-		self.deacellerationx = random.uniform(.91,.95)
+		# speed that each light fades to black / sparkle
+		self.decr = int(random.uniform(1,5))  
+
+		# vertical deacelleration
+		self.deacelleration = random.uniform(.8,.99)
+
+		# horizontal deacelleration
+		self.deacellerationx = random.uniform(.8,.95)
+
+		# pseudo gravity deacelleration
 		self.gravity = random.uniform(.03,.1)
 
 	def explosion(self):

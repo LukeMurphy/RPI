@@ -18,7 +18,7 @@ class Sparkles :
 		self.done = False
 
 		# Number of sparks
-		self.p = int(50 + (random.uniform(20,190)))
+		self.p = int(5 + (random.uniform(8,190)))
 		self.angle = 2 * math.pi/self.p
 
 		# initial center position
@@ -44,19 +44,22 @@ class Sparkles :
 		self.deacellerationx = random.uniform(.8,.95)
 
 		# pseudo gravity deacelleration
-		self.gravity = random.uniform(.03,.1)
+		self.gravity = random.uniform(.08,.12)
 
-	def explosion(self):
 		for n in range (0, self.p) :
 			# variation in initial velocity
-			f = random.random() * 4
-			vx = math.cos(self.angle * n) * f * 1.3
-			vy = math.sin(self.angle * n) * f
+			fx = random.random() * 4
+			fy = random.random() * 4
+			vx = math.cos(self.angle * n) * fx
+			vy = math.sin(self.angle * n) * fy
 			r = int(random.uniform(0,255)* self.brightness)
 			g = int(random.uniform(0,255)* self.brightness)
 			b = int(random.uniform(0,255)* self.brightness)
 			self.particles.append({'id':n,'xpos':self.x,'ypos':self.y,'vx':vx,'vy':vy, 'c':[r,g,b], 'd':0})
-		
+
+
+	def explosion(self):
+
 		'''
 		if(self.traces == False) : self.config.matrix.Clear()
 		'''
@@ -126,7 +129,7 @@ def changeCall() :
 def callBack() :
 	global config, sprkl, traces
 	if(random.random() > .988) : traces = True
-	#if(random.random() > .99) : traces = False
+	if(random.random() > .998) : traces = False
 	if (sprkl.done == True) :
 		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
 		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)

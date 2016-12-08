@@ -46,7 +46,7 @@ class ImageSprite :
 	presentTime =  10
 	brightnessFactor = .5
 	rate = 0
-	gifPlaySpeed = 0.07
+	gifPlaySpeed = 0.03
 	scrollSpeed = .04
 	bgFillColor = 0x000000
 
@@ -109,6 +109,8 @@ class ImageSprite :
 		self.randomizeColor = randomizeColor
 		self.randomizeDirection = randomizeDirection
 
+		
+
 		if (random.random()> .5 and randomizeDirection) : 
 			self.dX *= -1
 
@@ -130,6 +132,9 @@ class ImageSprite :
 
 			self.imageOriginal = self.image.copy()
 			self.process()
+
+			self.imageCopy = Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
+			self.imageCopy.paste(self.image, (0, 0))
 
 			self.debugMessage( img + " loaded")
 			#init()
@@ -388,36 +393,31 @@ class ImageSprite :
 		config.matrix.SetImage(config.image.im.id, -8, -8)
 
 	def animate(self, randomizeTiming = False, frameLimit = 3) :
-		global frame, count, xOffset, yOffset, dX,image, action, gifPlaySpeed, imgHeight, imageCopy, brightnessFactor, brightnessFluxRate, rate
 
 		# This needs fixing  - currently requires extra frame
 		# at end of gif  --
 
-		#fillColor(True)
-		#config.screenHeight - imgHeight'
 		skipTime = False
 		#************************************#
 		### DRAW THE IMAGE ACROSS ALL PANELS
 		#imageCopy = image.point(lambda p: p * 0.19)
-		
-		imageCopy.paste(image)
+		'''
+		self.imageCopy.paste(self.image)
 		#print(imageCopy,image,xOffset,yOffset)
 
-		if(brightnessFlux) :
-			rate+=math.pi/brightnessFluxRate;
+		if(self.brightnessFlux) :
+			rate+=math.pi/self.brightnessFluxRate;
 			brightnessFactor = (math.sin(rate) + 1) / 2 + .01
 			#if(brightnessFactor > 1) : brightnessFactor = 1
 			#if(brightnessFactor < 0) : brightnessFactor = .00001
-		enhancer = ImageEnhance.Brightness(imageCopy)
-		imageCopy = enhancer.enhance(brightnessFactor)
-		
-		config.render(imageCopy, xOffset, yOffset, config.screenWidth, config.screenHeight)
-		config.actions.drawBlanks()
+		enhancer = ImageEnhance.Brightness(self.imageCopy)
+		imageCopy = enhancer.enhance(self.brightnessFactor)
+		'''
 		
 		try:
-			image.seek(image.tell() + 1)
+			self.image.seek(self.image.tell() + 1)
 		except EOFError:
-			image.seek(0)
+			self.image.seek(0)
 			#print("fail", frame)
 			skipTime = True
 			pass
@@ -428,7 +428,7 @@ class ImageSprite :
 				if(random.random() > .98) :
 					time.sleep(random.uniform(.05,2))
 			else :
-				time.sleep(gifPlaySpeed)
+				time.sleep(self.gifPlaySpeed)
 
 		#if (frame == frameLimit):frame = 0
 		

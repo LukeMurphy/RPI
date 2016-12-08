@@ -19,6 +19,9 @@ canvasOffsetX = 4
 canvasOffsetY = 7
 buff  =  8
 
+lev = 0
+levdiff  = 1
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
@@ -144,7 +147,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	try :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+
 	except  :
+
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
 	#config.drawBeforeConversion()
@@ -161,10 +166,33 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#config.renderImageFull =  newimage.convert("RGB")
 	
 	if(config.useFilters) :
-		
+
+		global lev, levdiff
+
+		lev += levdiff
+
+		if(lev >= 120) : 
+			levdiff = -1
+		if(lev <= 20) : 
+			levdiff = 1
+
+		nc = int(random.uniform(2,128))
+
+		im1 = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=0))
+		im2 = im1.filter(ImageFilter.UnsharpMask(radius=lev, percent=50,threshold=2))
+
+		#print(lev, levdiff)
+
+		'''#######################    Paste to Render       #######################'''
+
+		config.renderImageFull.paste(im2, (xOffset, yOffset))
+
 		newimage = Image.new('P', config.renderImageFull.size)
-		newimage = config.renderImageFull.convert("P", colors = 64)
+
+		nc = int(random.uniform(2,128))
+		newimage = config.renderImageFull.convert("P", colors = nc)
 		config.renderImageFull =  newimage.convert("RGB")
+
 
 		'''
 		# Produces an ordered dithering - looks good for movement but not so good

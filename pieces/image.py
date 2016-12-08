@@ -45,14 +45,14 @@ def main(run = True) :
 
 	bads.config = config
 	bads.setBlanks = bads.setBlanksOnImage
-	bads.numberOfDeadPixels = 200
+	bads.numberOfDeadPixels = 50
 	bads.probabilityOfBlockBlanks = .99
 	bads.setBlanks()
 
 	for i in range (0,1) :
 		imgLoader = ImageSprite(config)
 		imgLoader.debug = True
-		imgLoader.action = "present"
+		imgLoader.action = "play"
 		imgLoader.xOffset = 0
 		imgLoader.yOffset = 0
 		imgLoader.endX = config.screenWidth
@@ -78,15 +78,21 @@ def iterate( n = 0) :
 	global config, blocks
 	global xPos, yPos
 
+	if (blocks[0].action == "play") : blocks[0].animate()
+
 	# Clear the background and redraw all planes
 	#redrawBackGround()
 
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
-	config.renderImageFull.paste(blocks[0].image)
+	x, y = config.renderImageFull.size
+	x1, y1  = blocks[0].image.size
+
+
+	config.renderImageFull.paste(blocks[0].image, (0,0,x,y))
 
 	bads.drawBlanks(None, False)
-	if(random.random() > .2) : bads.setBlanks()
+	if(random.random() > .99) : bads.setBlanks()
 	
 	# Render the final full image
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False)

@@ -11,3 +11,5 @@ log.*
 *.out
 */out
 out/
+*.psd
+

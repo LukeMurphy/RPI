@@ -422,6 +422,7 @@ class ImageSprite :
 			skipTime = True
 			pass
 
+		'''
 		if(skipTime == False) :
 			if(randomizeTiming) :
 				time.sleep(random.uniform(.02,.08))
@@ -429,7 +430,7 @@ class ImageSprite :
 					time.sleep(random.uniform(.05,2))
 			else :
 				time.sleep(self.gifPlaySpeed)
-
+		'''
 		#if (frame == frameLimit):frame = 0
 		
 	def playImage(self, randomizeTiming = False, frameLimit = 3):

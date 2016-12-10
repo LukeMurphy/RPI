@@ -80,6 +80,15 @@ def colorCompliment((r,g,b), brtns=1) :
 	r = int((minmax - r) * brtns)
 	g = int((minmax - g) * brtns)
 	b = int((minmax - b) * brtns)
+	return (r,g,b)    
+
+def randomGray(brtns=1) :
+	global brightness
+	if(brtns == 1) : brtns = brightness
+	grey = int((random.uniform(0,255)) * brtns)
+	r = grey
+	g = grey
+	b = grey
 	return (r,g,b)     
 
 # Find the closest point 

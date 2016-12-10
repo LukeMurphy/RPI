@@ -29,12 +29,14 @@ divisionOfSquares = [1,1,2,2,4,4,8,8,16,16,32,32,64,64]
 divisionPosition = 0
 colorutil = colorutils
 
+grayMode = False
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def drawRects() :
 	global config
 	global r,g,b
-	global colorSwitch
+	global colorSwitch, grayMode
 	global rHeight,rWidth,numSquares
 	global rows, cols, lineWidth
 
@@ -82,7 +84,7 @@ def drawRects() :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def changeColor( rnd = False, choice = 3) :
-	global r,g,b, colorutil       
+	global r,g,b, colorutil, grayMode      
 	if (rnd == False) :
 		val  = int(255 * config.brightness)
 		if(r == val) :
@@ -108,6 +110,8 @@ def changeColor( rnd = False, choice = 3) :
 		if(choice == 1) : clr = colorutil.getRandomColorWheel(config.brightness)
 		if(choice == 2) : clr = colorutil.getRandomRGB(config.brightness)
 		if(choice >= 3) : clr = colorutil.randomColor(config.brightness)
+
+		if(grayMode) : clr = colorutil.randomGray(config.brightness)
 		r = clr[0]
 		g = clr[1]
 		b = clr[2]	
@@ -161,6 +165,7 @@ def runWork():
 def reset() :
 	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
 	divisionPosition = 0
+	countLimit = 4
 	lineWidth = int( random.uniform(1,9))
 
 
@@ -168,19 +173,28 @@ def reset() :
 
 def iterate() :
 	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
-	global rows, cols
+	global rows, cols, grayMode
 
 	drawRects()
 
 	if(random.random() > .7) : colorSwitch = True
 	if(random.random() > .9) : colorSwitch = False
+
+	if(random.random() > .96) : grayMode = False
+	if(random.random() > .97) : grayMode = True
+
 	count += 1
 
 	if (count >= countLimit) :
 		divisionPosition += 1
 
-		if(divisionPosition >= len(divisionOfSquares)-1) : reset()	
-		if(int(config.screenHeight /divisionOfSquares[divisionPosition])) <= lineWidth : reset()
+		if(divisionPosition >= len(divisionOfSquares)-1) : 
+			reset()
+			divisionOfSquares = list(reversed(divisionOfSquares))
+			if(divisionOfSquares[0] == 1) : 
+				divisionPosition = 2
+				countLimit = 1
+		#if(int(config.screenHeight /divisionOfSquares[divisionPosition])) <= lineWidth : reset()
 
 		cols = divisionOfSquares[divisionPosition+1]
 		rows = divisionOfSquares[divisionPosition]

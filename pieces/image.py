@@ -35,6 +35,7 @@ def main(run = True) :
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
 	config.imageToLoad = (workConfig.get("images", 'i1'))
+	config.useBlanks = (workConfig.getboolean("images", 'useBlanks'))
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
@@ -43,11 +44,12 @@ def main(run = True) :
 	path = config.path  + "/assets/imgs/"
 	imageList = [config.imageToLoad] 
 
-	bads.config = config
-	bads.setBlanks = bads.setBlanksOnImage
-	bads.numberOfDeadPixels = 50
-	bads.probabilityOfBlockBlanks = .99
-	bads.setBlanks()
+	if(config.useBlanks) :
+		bads.config = config
+		bads.setBlanks = bads.setBlanksOnImage
+		bads.numberOfDeadPixels = 50
+		bads.probabilityOfBlockBlanks = .99
+		bads.setBlanks()
 
 	for i in range (0,1) :
 		imgLoader = ImageSprite(config)
@@ -91,8 +93,9 @@ def iterate( n = 0) :
 
 	config.renderImageFull.paste(blocks[0].image, (0,0,x,y))
 
-	bads.drawBlanks(None, False)
-	if(random.random() > .99) : bads.setBlanks()
+	if(config.useBlanks) :
+		bads.drawBlanks(None, False)
+		if(random.random() > .99) : bads.setBlanks()
 	
 	# Render the final full image
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False)

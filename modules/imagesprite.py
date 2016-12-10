@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import PIL.Image
 from PIL import Image, ImageDraw, ImageMath, ImageEnhance
-from PIL import ImageChops
+from PIL import ImageChops, ImageFilter
 from modules import colorutils
 # Import the essentials to everything
 import time, random, math
@@ -109,12 +109,12 @@ class ImageSprite :
 		self.randomizeColor = randomizeColor
 		self.randomizeDirection = randomizeDirection
 
-		
 
 		if (random.random()> .5 and randomizeDirection) : 
 			self.dX *= -1
-
-		self.debugMessage("Trying to load " + img)	
+		print("-----------\n")
+		self.debugMessage("Trying to load " + img + "\n\n")	
+		print("-----------\n")
 
 		if(self.loadImage(img)) :
 			# scale to the WIDTH of the screen
@@ -129,6 +129,9 @@ class ImageSprite :
 			if(self.dX < 0) :
 				# Reverse image
 				self.image = self.image.rotate(-180)
+			print("-----------\n")
+			print(self.image.info)
+			print("-----------\n")
 
 			self.imageOriginal = self.image.copy()
 			self.process()
@@ -223,6 +226,70 @@ class ImageSprite :
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
 	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	def filterize(self) :
+		
+
+		# Create a box and crop
+		''''''''''''''''''''''''''''''
+		lines = 160
+		boxHeight = 1
+		boxWidth = 190
+
+		xPos1 = 0
+		yPosBase = 0
+
+		for n in range(0,lines,boxHeight) :
+			
+			yPos1 = yPosBase + n
+			xPos2 = xPos1 + boxWidth
+			yPos2 = yPos1 + boxHeight
+			box = (xPos1, yPos1, xPos2, yPos2)
+			region = self.image.crop(box)
+
+			# Do geometry manips HERE
+			''''''''''''''''''''''''''''''
+			#region = region.transpose(Image.ROTATE_180)
+			
+			''''''''''''''''''''''''''''''
+			##############################
+			#region = region.convert("P")
+			##############################
+
+			# Do RGB Things HERE
+			''''''''''''''''''''''''''''''
+			#r, g, b, a = region.split()
+			#region = Image.merge("RGBA", (r, g, b, a))
+			#region = region.filter(ImageFilter.BLUR)
+			#region = region.filter(ImageFilter.EDGE_ENHANCE_MORE)
+			#region = region.filter(ImageFilter.MinFilter(size=3))
+
+			'''
+			self.image.copy()
+			sharpener = ImageEnhance.Sharpness(self.image)
+			sharpened = sharpener.enhance(2.0)
+			# PIL.ImageFilter.ModeFilter(size=3)
+			#im1 = self.image.filter(ImageFilter.BLUR)
+			#f = self.image.ImageFilter.ModeFilter(size=3)
+			'''
+
+			#enh = ImageEnhance.Color(region)
+			#enh = enh.enhance(0.0)
+			if(random.random() > .7) :
+				ran = random.random() * 20 + 200 * random.random()
+				#ran = 206.5
+				region = region.point(lambda i: i - ran if (i > 100 and i < 320) else i)
+
+				#exit()
+
+			''''''''''''''''''''''''''''''
+			#region = region.convert("P")
+			self.image.paste(region, box)
+
+
+
+		
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 	def remove(self, arrayList) :
@@ -384,7 +451,9 @@ class ImageSprite :
 			config.matrix.Fill(bgFillColor)
 		else :
 			config.matrix.Fill(bgFillColor)
-			
+	
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 	def rotateImage(self,angle) :
 		global image, matrix
 		image = config.image.resize((32,32))
@@ -392,6 +461,8 @@ class ImageSprite :
 		config.matrix.Clear()
 		config.matrix.SetImage(config.image.im.id, -8, -8)
 
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 	def animate(self, randomizeTiming = False, frameLimit = 3) :
 
 		# This needs fixing  - currently requires extra frame
@@ -421,6 +492,8 @@ class ImageSprite :
 			#print("fail", frame)
 			skipTime = True
 			pass
+
+		self.filterize()
 
 		'''
 		if(skipTime == False) :

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import PIL.Image
 from PIL import Image, ImageDraw, ImageMath, ImageEnhance
-from PIL import ImageChops, ImageFilter
+from PIL import ImageChops, ImageFilter, ImagePalette
 from modules import colorutils
 # Import the essentials to everything
 import time, random, math
@@ -68,6 +68,9 @@ class ImageSprite :
 
 	lastPictureIndex = 0
 	debug = False
+
+	tempClrCount = 60
+	frameCount = 1
 
 	def __init__(self, config, iid=0) :
 		self.iid = iid
@@ -232,12 +235,13 @@ class ImageSprite :
 
 		# Create a box and crop
 		''''''''''''''''''''''''''''''
-		lines = 160
+		lines = 32
 		boxHeight = 1
-		boxWidth = 190
-
+		boxWidth = 192 
 		xPos1 = 0
 		yPosBase = 0
+
+		targetClrs = [70,91,96,104,112,95]
 
 		for n in range(0,lines,boxHeight) :
 			
@@ -253,7 +257,7 @@ class ImageSprite :
 			
 			''''''''''''''''''''''''''''''
 			##############################
-			#region = region.convert("P")
+			#region = region.convert("RGB")
 			##############################
 
 			# Do RGB Things HERE
@@ -275,20 +279,31 @@ class ImageSprite :
 
 			#enh = ImageEnhance.Color(region)
 			#enh = enh.enhance(0.0)
-			if(random.random() > .7) :
-				ran = random.random() * 20 + 200 * random.random()
+
+			#print(list(region.getdata()))
+
+			
+			if(random.random() > 0.3) :
+				ran = random.random() * 64
 				#ran = 206.5
-				region = region.point(lambda i: i - ran if (i > 100 and i < 320) else i)
-
+				region = region.point(lambda i: i - ran if (i > 64 and i < 128) else i)
+				
 				#exit()
-
+			if(random.random() > 0.80) :
+				tartClr = targetClrs[int(random.random()*6)]
+				#print(tartClr)
+				region = region.point(lambda i: tartClr  if (i >= 0 and i < 10 ) else i)
 			''''''''''''''''''''''''''''''
 			#region = region.convert("P")
 			self.image.paste(region, box)
 
 
 
-		
+	def augment(self) :
+			if(self.frameCount > 39) :
+				#print(self.tempClrCount)
+				self.tempClrCount += 1
+				self.frameCount = 0
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
@@ -493,7 +508,9 @@ class ImageSprite :
 			skipTime = True
 			pass
 
+		self.frameCount += 1
 		self.filterize()
+		self.augment()
 
 		'''
 		if(skipTime == False) :

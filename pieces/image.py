@@ -34,8 +34,19 @@ def main(run = True) :
 	config.speed = float(workConfig.get("scroll", 'scrollSpeed'))
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
+
 	config.imageToLoad = (workConfig.get("images", 'i1'))
 	config.useBlanks = (workConfig.getboolean("images", 'useBlanks'))
+	config.useImageFilter = (workConfig.getboolean("images", 'useImageFilter'))
+	config.playSpeed = float(workConfig.get("images", 'playSpeed'))
+
+	config.lines = int(workConfig.get("filter", 'lines'))
+	config.boxHeight = int(workConfig.get("filter", 'boxHeight'))
+	config.boxWidth = int(workConfig.get("filter", 'boxWidth')) 
+	config.xPos1 = int(workConfig.get("filter", 'xPos1'))
+	config.yPosBase = int(workConfig.get("filter", 'yPosBase'))
+	config.targetClrs = ((workConfig.get("filter", 'targetClrs')).split(','))
+	config.targetClrs = map(lambda x: int(x) ,config.targetClrs)
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
@@ -74,7 +85,7 @@ def runWork():
 	#gc.enable()
 	while True:
 		iterate()
-		time.sleep(config.speed)	
+		time.sleep(config.playSpeed)	
 
 def iterate( n = 0) :
 	global config, blocks

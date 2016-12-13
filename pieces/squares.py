@@ -15,7 +15,7 @@ r=255
 g=b=0
 pulseSpeed = .1
 colorSwitch = False
-countLimit = 4
+countLimit = 10
 rHeight = 0
 rWidth = 0
 rows  = 1
@@ -135,9 +135,10 @@ def animator() :
 	config.id = config.image.im.id
 
 	lineWidth = config.lineWidth = int(workConfig.get("squares", 'lineWidth'))
-	pulseSpeed = config.pulseSpeed = float(workConfig.get("squares", 'pulseSpeed'))
+	config.pulseSpeed = float(workConfig.get("squares", 'pulseSpeed'))
 	mode = config.mode = (workConfig.get("squares", 'mode'))
-	countLimit = config.countLimit = int(workConfig.get("squares", 'countLimit'))
+	config.countLimit = int(workConfig.get("squares", 'countLimit'))
+	countLimit = config.countLimit
 	
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -156,16 +157,17 @@ def setUp() :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def runWork():
+	global config
 	while True:
 		iterate()
-		time.sleep(.1)
+		time.sleep(config.pulseSpeed)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def reset() :
 	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
 	divisionPosition = 0
-	countLimit = 4
+	countLimit = config.countLimit
 	lineWidth = int( random.uniform(1,9))
 
 

@@ -132,9 +132,9 @@ class ImageSprite :
 			if(self.dX < 0) :
 				# Reverse image
 				self.image = self.image.rotate(-180)
-			print("-----------\n")
-			print(self.image.info)
-			print("-----------\n")
+			#print("-----------\n")
+			#print(self.image.info)
+			#print("-----------\n")
 
 			self.imageOriginal = self.image.copy()
 			self.process()
@@ -235,13 +235,12 @@ class ImageSprite :
 
 		# Create a box and crop
 		''''''''''''''''''''''''''''''
-		lines = 32
-		boxHeight = 1
-		boxWidth = 192 
-		xPos1 = 0
-		yPosBase = 0
-
-		targetClrs = [70,91,96,104,112,95]
+		lines = self.config.lines
+		boxHeight = self.config.boxHeight
+		boxWidth = self.config.boxWidth
+		xPos1 = self.config.xPos1
+		yPosBase = self.config.yPosBase
+		targetClrs = self.config.targetClrs
 
 		for n in range(0,lines,boxHeight) :
 			
@@ -286,7 +285,7 @@ class ImageSprite :
 			if(random.random() > 0.3) :
 				ran = random.random() * 64
 				#ran = 206.5
-				region = region.point(lambda i: i - ran if (i > 64 and i < 128) else i)
+				region = region.point(lambda i: i - ran if (i > 116 and i < 128) else i)
 				
 				#exit()
 			if(random.random() > 0.80) :
@@ -509,7 +508,8 @@ class ImageSprite :
 			pass
 
 		self.frameCount += 1
-		self.filterize()
+
+		if (self.config.useImageFilter) : self.filterize()
 		self.augment()
 
 		'''

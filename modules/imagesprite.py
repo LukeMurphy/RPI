@@ -241,6 +241,8 @@ class ImageSprite :
 		xPos1 = self.config.xPos1
 		yPosBase = self.config.yPosBase
 		targetClrs = self.config.targetClrs
+		imageFilterProb = self.config.imageFilterProb
+		bgFilterProb = self.config.bgFilterProb
 
 		for n in range(0,lines,boxHeight) :
 			
@@ -282,13 +284,13 @@ class ImageSprite :
 			#print(list(region.getdata()))
 
 			
-			if(random.random() > 0.3) :
+			if(random.random() > imageFilterProb) :
 				ran = random.random() * 64
 				#ran = 206.5
 				region = region.point(lambda i: i - ran if (i > 116 and i < 128) else i)
 				
 				#exit()
-			if(random.random() > 0.80) :
+			if(random.random() > bgFilterProb) :
 				tartClr = targetClrs[int(random.random()*6)]
 				#print(tartClr)
 				region = region.point(lambda i: tartClr  if (i >= 0 and i < 10 ) else i)

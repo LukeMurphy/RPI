@@ -47,6 +47,8 @@ def main(run = True) :
 	config.yPosBase = int(workConfig.get("filter", 'yPosBase'))
 	config.targetClrs = ((workConfig.get("filter", 'targetClrs')).split(','))
 	config.targetClrs = map(lambda x: int(x) ,config.targetClrs)
+	config.imageFilterProb = float(workConfig.get("filter", 'imageFilterProb'))
+	config.bgFilterProb = float(workConfig.get("filter", 'bgFilterProb'))
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []

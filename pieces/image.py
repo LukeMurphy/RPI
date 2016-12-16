@@ -49,6 +49,7 @@ def main(run = True) :
 	config.targetClrs = map(lambda x: int(x) ,config.targetClrs)
 	config.imageFilterProb = float(workConfig.get("filter", 'imageFilterProb'))
 	config.bgFilterProb = float(workConfig.get("filter", 'bgFilterProb'))
+	config.targetPalette = (workConfig.get("filter", 'targetPalette'))
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []

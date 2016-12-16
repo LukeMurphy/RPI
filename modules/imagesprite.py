@@ -243,6 +243,8 @@ class ImageSprite :
 		targetClrs = self.config.targetClrs
 		imageFilterProb = self.config.imageFilterProb
 		bgFilterProb = self.config.bgFilterProb
+		numTargetColors =  len(targetClrs)
+		targetPalette = self.config.targetPalette
 
 		for n in range(0,lines,boxHeight) :
 			
@@ -291,7 +293,11 @@ class ImageSprite :
 				
 				#exit()
 			if(random.random() > bgFilterProb) :
-				tartClr = targetClrs[int(random.random()*6)]
+				if (targetPalette == "selective") :
+					tartClr = targetClrs[int(random.random()*numTargetColors)]
+				else :
+					tartClr = int(random.uniform(1,128))
+
 				#print(tartClr)
 				region = region.point(lambda i: tartClr  if (i >= 0 and i < 10 ) else i)
 			''''''''''''''''''''''''''''''

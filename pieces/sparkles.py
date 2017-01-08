@@ -5,11 +5,9 @@ import threading
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 
-traces = False
-vx = 0
+
 
 class Sparkles :
-
 
 	def __init__(self, config):
 		self.config = config
@@ -36,7 +34,7 @@ class Sparkles :
 
 		self.decr = 20
 		# speed that each light fades to black / sparkle
-		self.decr = int(random.uniform(1,5))  
+		self.decr = int(random.uniform(0,5))  
 
 		# vertical deacelleration
 		self.deacelleration = random.uniform(.8,.99)
@@ -56,11 +54,9 @@ class Sparkles :
 			r = int(random.uniform(0,255)* self.brightness)
 			g = int(random.uniform(0,255)* self.brightness)
 			b = int(random.uniform(0,255)* self.brightness)
-			self.particles.append({'id':n,'xpos':self.x,'ypos':self.y,'vx':vx,'vy':vy, 'c':[r,g,b], 'd':0})
+			self.particles.append({'id':n,'xpos':self.x,'ypos':self.y,'vx':vx,'vy':vy, 'c':[r,g,b], 'd':0, 'gravity' : random.uniform(.08,.12)})
 
-
-	def explosion(self, useSideWind = False, vx = 0):
-
+	def explosion(self):
 		'''
 		if(self.traces == False) : self.config.matrix.Clear()
 		'''
@@ -71,7 +67,9 @@ class Sparkles :
 		if(sumOfDone >= self.p-1) :
 			self.done = True
 
-		if(random.random() > .8 ) : vx = round(2 - random.random() * 4)
+		if(random.random() > .3 and self.config.sideWind == True) : 
+			config.vx  = round(2 - random.random() * 4)
+			#useSideWind = True
 
 		for q in range (0, self.p) :
 			ref = self.particles[q]
@@ -83,7 +81,7 @@ class Sparkles :
 			ref['vx'] = ref['vx'] * self.deacellerationx
 
 			# pseudo gravity
-			ref['vy'] = ref['vy'] + self.gravity
+			ref['vy'] = ref['vy'] + ref['gravity'] #self.gravity
 
 			self.particles[q]['c'][0] = self.particles[q]['c'][0] - self.decr
 			self.particles[q]['c'][1] = self.particles[q]['c'][1] - self.decr
@@ -100,8 +98,13 @@ class Sparkles :
 			sumOfClrs  = self.particles[q]['c'][0] + self.particles[q]['c'][1] + self.particles[q]['c'][2]
 
 			# a pixel wind changes the cascade
-			if (useSideWind  and sumOfClrs > 100) : 
-				ref['vx'] = vx
+			if (self.config.sideWind  and sumOfClrs > 100) : 
+				config.vx  = round(2 - random.random() * 4)
+				ref['vx'] = config.vx 
+				self.deacellerationx = .75
+
+			if(sumOfClrs < 10 and random.random() > .95) :
+				self.config.traces = False
 
 			# Sparkles!!
 			if(random.random() > .9) :
@@ -113,8 +116,9 @@ class Sparkles :
 			xDisplayPos = ref['xpos']
 			yDisplayPos = ref['ypos']
 
-			if(xDisplayPos <= self.config.screenWidth and xDisplayPos >= 0 and yDisplayPos >= 0 and yDisplayPos <= config.screenHeight) :
+			if(xDisplayPos < self.config.screenWidth and xDisplayPos > 0 and yDisplayPos > 0 and yDisplayPos <= config.screenHeight) :
 				config.image.putpixel((int(xDisplayPos),int(yDisplayPos)), (r,g,b))
+
 			if(xDisplayPos < 0 or xDisplayPos > config.screenWidth or yDisplayPos > config.screenHeight) :
 				self.particles[q]['d'] = 1
 
@@ -124,6 +128,7 @@ def drawElement() :
 	return True
 
 def redraw():
+	#
 	global config
 
 def changeColor() :
@@ -135,18 +140,16 @@ def changeCall() :
 	return True
 
 def callBack() :
-	global config, sprkl, traces, vx
+	global config, sprkl
 	
-	if(random.random() > .98) : traces = True
-	if(random.random() > .998) : traces = False
+	if(random.random() > .8) : config.traces = True
+	if(random.random() > .9998) : config.traces = False
 	if (sprkl.done == True) :
-		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
+		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,20))
 		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 		sprkl = Sparkles(config)
-		traces = False
-		vx = round(2 - random.random() * 4)
-
-
+		config.traces = False
+		config.sideWind = False
 
 def runWork():
 	global redrawSpeed
@@ -158,19 +161,21 @@ def runWork():
 
 def setUpDelays() :
 	global config
-
+	##
 
 def iterate() :
 	global config
-	global sprkl, traces, vx
-	useSideWind = False
+	global sprkl
+	config.vx = 0
 
-	if (random.random() > .5 and traces == True) : 
-		useSideWind = True
-		# vx = round(2 - random.random() * 4)
-	if(traces != True) : 
-		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
-	sprkl.explosion(useSideWind, vx)
+	if (random.random() > .9 and config.traces == True) : 
+		config.sideWind = True
+		
+	if(config.traces != True) : 
+		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,8))
+		config.sideWind = False
+		config.vx  = 0
+	sprkl.explosion()
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 	callBack()
 	count = 0
@@ -180,6 +185,9 @@ def main(run = True) :
 	global config
 	global redrawSpeed
 	global sprkl
+
+	config.traces = False
+	config.sideWind = False
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)

@@ -6,6 +6,7 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 
 traces = False
+vx = 0
 
 class Sparkles :
 
@@ -58,12 +59,11 @@ class Sparkles :
 			self.particles.append({'id':n,'xpos':self.x,'ypos':self.y,'vx':vx,'vy':vy, 'c':[r,g,b], 'd':0})
 
 
-	def explosion(self):
+	def explosion(self, useSideWind = False, vx = 0):
 
 		'''
 		if(self.traces == False) : self.config.matrix.Clear()
 		'''
-
 		sumOfDone = 0  
 		for q in range (0, self.p) :
 			sumOfDone += self.particles[q]['d'] 
@@ -71,12 +71,14 @@ class Sparkles :
 		if(sumOfDone >= self.p-1) :
 			self.done = True
 
+		if(random.random() > .8 ) : vx = round(2 - random.random() * 4)
+
 		for q in range (0, self.p) :
 			ref = self.particles[q]
 			ref['xpos'] = ref['vx'] + ref['xpos']
 			ref['ypos'] = ref['vy'] + ref['ypos']
 
-			# deacelleration
+			# deacelleration / damping
 			ref['vy'] = ref['vy'] * self.deacelleration
 			ref['vx'] = ref['vx'] * self.deacellerationx
 
@@ -94,6 +96,12 @@ class Sparkles :
 			r = self.particles[q]['c'][0]
 			g = self.particles[q]['c'][1]
 			b = self.particles[q]['c'][2]
+
+			sumOfClrs  = self.particles[q]['c'][0] + self.particles[q]['c'][1] + self.particles[q]['c'][2]
+
+			# a pixel wind changes the cascade
+			if (useSideWind  and sumOfClrs > 100) : 
+				ref['vx'] = vx
 
 			# Sparkles!!
 			if(random.random() > .9) :
@@ -127,14 +135,17 @@ def changeCall() :
 	return True
 
 def callBack() :
-	global config, sprkl, traces
-	if(random.random() > .988) : traces = True
+	global config, sprkl, traces, vx
+	
+	if(random.random() > .98) : traces = True
 	if(random.random() > .998) : traces = False
 	if (sprkl.done == True) :
 		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
 		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 		sprkl = Sparkles(config)
 		traces = False
+		vx = round(2 - random.random() * 4)
+
 
 
 def runWork():
@@ -151,9 +162,15 @@ def setUpDelays() :
 
 def iterate() :
 	global config
-	global sprkl, traces
-	if(traces != True) : config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
-	sprkl.explosion()
+	global sprkl, traces, vx
+	useSideWind = False
+
+	if (random.random() > .5 and traces == True) : 
+		useSideWind = True
+		# vx = round(2 - random.random() * 4)
+	if(traces != True) : 
+		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0))
+	sprkl.explosion(useSideWind, vx)
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 	callBack()
 	count = 0

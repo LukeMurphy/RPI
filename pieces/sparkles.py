@@ -67,7 +67,7 @@ class Sparkles :
 		if(sumOfDone >= self.p-1) :
 			self.done = True
 
-		if(random.random() > .3 and self.config.sideWind == True) : 
+		if(random.random() > .9 and self.config.sideWind == True) : 
 			config.vx  = round(2 - random.random() * 4)
 			#useSideWind = True
 
@@ -143,13 +143,16 @@ def callBack() :
 	global config, sprkl
 	
 	if(random.random() > .8) : config.traces = True
-	if(random.random() > .9998) : config.traces = False
+	if(random.random() > .99) : config.traces = False
 	if (sprkl.done == True) :
 		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,20))
+		if(random.random() >  .5) :
+			config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
 		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 		sprkl = Sparkles(config)
 		config.traces = False
 		config.sideWind = False
+
 
 def runWork():
 	global redrawSpeed
@@ -172,7 +175,7 @@ def iterate() :
 		config.sideWind = True
 		
 	if(config.traces != True) : 
-		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,8))
+		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,config.fadeRate))
 		config.sideWind = False
 		config.vx  = 0
 	sprkl.explosion()
@@ -188,6 +191,7 @@ def main(run = True) :
 
 	config.traces = False
 	config.sideWind = False
+	config.fadeRate = 5
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)

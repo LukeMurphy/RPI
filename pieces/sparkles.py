@@ -181,6 +181,7 @@ def iterate() :
 	if (random.random() > .99 and config.traces == True) : 
 		config.sideWind = True
 		
+	# Fade out the sparkle	
 	if(config.traces != True) : 
 		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,config.fadeRate))
 		config.sideWind = False

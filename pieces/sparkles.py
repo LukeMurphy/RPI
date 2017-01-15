@@ -20,12 +20,19 @@ class Sparkles :
 		self.p = int(5 + (random.uniform(8,190)))
 		self.angle = 2 * math.pi/self.p
 
+		# Speed factor
+		self.fFactor = int(random.uniform(4,15))
+
 		# initial center position
 		self.x = int(random.random()*self.config.screenWidth)
 		if (config.rotation !=0) : 
-			approxVisibleArea = self.config.screenWidth * .5
-			self.x = int(self.config.screenWidth - 2 * random.random() * approxVisibleArea)
+			approxVisibleArea = self.config.screenWidth * .6
+			ran = random.random() * approxVisibleArea
+			ran = 64 + random.uniform(-96,96)
+			self.x = int( ran + self.config.screenWidth/2)
 		self.y = int(self.config.screenHeight/2 - random.random()*self.config.screenHeight/2)
+
+		#print (int(self.config.screenWidth/2 + approxVisibleArea/2), self.x)
 
 		self.brightness = self.config.brightness
 		self.sparkleBrightness = self.config.brightness
@@ -47,8 +54,8 @@ class Sparkles :
 
 		for n in range (0, self.p) :
 			# variation in initial velocity
-			fx = random.random() * 4
-			fy = random.random() * 4
+			fx = random.random() * self.fFactor
+			fy = random.random() * self.fFactor
 			vx = math.cos(self.angle * n) * fx
 			vy = math.sin(self.angle * n) * fy
 			r = int(random.uniform(0,255)* self.brightness)
@@ -67,7 +74,7 @@ class Sparkles :
 		if(sumOfDone >= self.p-1) :
 			self.done = True
 
-		if(random.random() > .9 and self.config.sideWind == True) : 
+		if(random.random() > .99 and self.config.sideWind == True) : 
 			config.vx  = round(2 - random.random() * 4)
 			#useSideWind = True
 
@@ -171,7 +178,7 @@ def iterate() :
 	global sprkl
 	config.vx = 0
 
-	if (random.random() > .9 and config.traces == True) : 
+	if (random.random() > .99 and config.traces == True) : 
 		config.sideWind = True
 		
 	if(config.traces != True) : 
@@ -191,7 +198,7 @@ def main(run = True) :
 
 	config.traces = False
 	config.sideWind = False
-	config.fadeRate = 5
+	config.fadeRate = 15
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)

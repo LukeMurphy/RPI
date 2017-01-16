@@ -22,6 +22,7 @@ from subprocess import call
 xPos = 320
 yPos = 0
 colorModeDirectional = False
+colorModes = ["colorWheel","random","colorRGB"]
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -69,6 +70,7 @@ def main(run = True) :
 	config.noTrails  = (workConfig.getboolean("plane", 'noTrails'))
 	config.imageList  = (workConfig.get("repeater", 'imageList'))
 	config.colorMode  = (workConfig.get("plane", 'colorMode'))
+	config.randomColorMode  = (workConfig.getboolean("plane", 'randomColorMode'))
 
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
@@ -132,7 +134,7 @@ def runWork():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate( n = 0) :
-	global config, blocks, colorModeDirectional
+	global config, blocks, colorModeDirectional, colorModes
 	global xPos, yPos
 
 	# Clear the background and redraw all planes
@@ -141,8 +143,13 @@ def iterate( n = 0) :
 
 	if(config.noTrails) : redrawBackGround()
 
+	if(random.random() > .9 and config.randomColorMode == True) :
+		index = int(random.uniform(0,3))
+		config.colorMode = colorModes[index]
+
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
+		block.colorMode = config.colorMode
 		block.update()
 		block.colorModeDirectional = colorModeDirectional
 		updateCanvasCall = True if n == 0 else True

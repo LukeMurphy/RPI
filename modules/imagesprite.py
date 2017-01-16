@@ -72,6 +72,8 @@ class ImageSprite :
 	tempClrCount = 60
 	frameCount = 1
 
+	colorModes = ["colorWheel","random","colorRGB"]
+
 	def __init__(self, config, iid=0) :
 		self.iid = iid
 		self.config = config
@@ -87,6 +89,7 @@ class ImageSprite :
 
 		if(args[0] == True) :
 			self.image = self.imageOriginal.copy()
+
 			self.process()
 
 			# This turns out to be less interesting - somehow the uniformity of speed

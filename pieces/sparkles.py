@@ -74,7 +74,7 @@ class Sparkles :
 		if(sumOfDone >= self.p-1) :
 			self.done = True
 
-		if(random.random() > .99 and self.config.sideWind == True) : 
+		if(random.random() > .996 and self.config.sideWind == True) : 
 			config.vx  = round(2 - random.random() * 4)
 			#useSideWind = True
 
@@ -178,7 +178,7 @@ def iterate() :
 	global sprkl
 	config.vx = 0
 
-	if (random.random() > .99 and config.traces == True) : 
+	if (random.random() > .995 and config.traces == True) : 
 		config.sideWind = True
 		
 	# Fade out the sparkle	

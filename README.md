@@ -2,28 +2,18 @@
 
 --
 RPI LED Matrix driving -- the new neon
---- borrowing authority of lumens and color -
----
-No illusions
----
-The crontab
 
-```
-# -- Check if pause, change or shutdown is called from remote page
-*/1 * * * * sudo python /home/pi/RPI/cntrlscripts/off_signal.py&
 
-# -- RTC not running yet so times are UTC...
-# -- Regular reboot every hour
-0 15,16,17,18,19,20,21,22,23,0 * * * /home/pi/RPI/cntrlscripts/reboot.sh&
+Works are started with running the player.py 
 
-# -- Shut down at 8PM EST or 1AM UTC
-0 1 * * * /home/pi/RPI/cntrlscripts/shutdown.sh&
+e.g. sudo python ./RPI/player.py studio-mac ./ configs/fludd.cfg&
+player.py takes 3 arguments:
+1 - device name
+2 - local path to where files are (can ./ if run from inside RPI)
+3 - the configuration to load in the form [config directory]/[config file name]
 
-# -- Run test for off-button
-@reboot sudo python /home/pi/RPI/cntrlscripts/stest.py&
-
-# -- Run default animation
-@reboot /home/pi/RPI/cntrlscripts/run.sh seq 3&
+Config files specify which work to play. 
+"Works" are located in the /pieces/ directory
 
 
 ```

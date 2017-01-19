@@ -118,9 +118,9 @@ class ImageSprite :
 
 		if (random.random()> .5 and randomizeDirection) : 
 			self.dX *= -1
-		print("-----------\n")
-		self.debugMessage("Trying to load " + img + "\n\n")	
-		print("-----------\n")
+		print("-----------")
+		self.debugMessage("Trying to load " + img + "")	
+		#print("-----------")
 
 		if(self.loadImage(img)) :
 			# scale to the WIDTH of the screen

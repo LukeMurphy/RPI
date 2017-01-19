@@ -1,1 +1,0 @@
-print("cntrlscripts dir loaded")

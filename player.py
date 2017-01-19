@@ -14,7 +14,7 @@ import resource
 from subprocess import call
 
 from modules import configuration
-from configs import localconfig
+#from configs import localconfig
 
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
@@ -23,43 +23,40 @@ threads = []
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-###################################################
-# -------   Reads configuration files and sets
-# -------   defaults                             *#
-###################################################
+######################################################################################################
+#
+#
+# -------   Reads configuration files and sets defaults    
+# -------   Piece is initiated by command line: e.g.                     
+# sudo python /Users/lamshell/Documents/Dev/LED-MATRIX-RPI/RPI/player.py studio-mac ./ configs/fludd.cfg &
+#
+#
+######################################################################################################
 def configure() :
-	#global group, groups, config
-	#global action, scroll, machine, bluescreen, user, carouselSign, imgLoader, concentric, flash, blend, sqrs
 	global config, workconfig, path, tempImage, threads, thrd
 	#gc.enable()
 
 	try: 
 
-		####
-		# Having trouble loading the local configuration file based on relative path
-		# so hacking things by loading from a Python file called localconfig.py
-		# Please fix me  ;(
-		## 
+		###
+		# Expects 3 arguments:
+		#		name-of-machine
+		#       the local path
+		#		the config file to load
 
 		args = sys.argv
+		print("Arguments passed to player.py:")
 		print(args)
 
-		baseconfig = localconfig
-		path = baseconfig.path
-
-		#baseconfig = ConfigParser.ConfigParser()
-		#baseconfig.read('localconfig.cfg')
 		config = configuration
 
 		# Load the default work
 		workconfig = ConfigParser.ConfigParser()
 
 		if(len(args) > 1):
-			config.path  =  args[2]
-			argument =  args[3]
-			config.MID =  args[1]
+			config.MID = args[1]
+			config.path = args[2]
+			argument = args[3]
 			workconfig.read(argument)
 		else :
 			# Machine ID
@@ -97,7 +94,9 @@ def configure() :
 		# Setting up based on how the work is displayed
 
 		if(config.rendering == "hat") :
+			# The AdaFruit specific LED matrix HAT
 			from modules import rendertohat
+			# this tests for the power-down RPI switch
 			from cntrlscripts import stest
 			thrd = threading.Thread(target=stest.__main__)
 			threads.append(thrd)
@@ -186,11 +185,12 @@ def main():
 	global config, threads
 	configure()
 	'''
+	# Threading now handled by renderer - e.g. see modules/rendertohub.py
 	thrd = threading.Thread(target=configure)
 	threads.append(thrd)
 	thrd.start()
 	'''
 	
-
+### Kick off .......
 if __name__ == "__main__":
 	main()

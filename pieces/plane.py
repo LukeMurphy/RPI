@@ -77,7 +77,7 @@ def main(run = True) :
 	blocks = []
 	#for i in range (0,simulBlocks) : makeBlock()
 
-	path = config.path  + "/assets/imgs/"
+	path = config.path  + "assets/imgs/"
 	imageList = ['plane-2b.gif','plane-2tw.png','plane-2tg.png','plane-2t.png','plane-2tw-lrg.png'] 
 	imageList = config.imageList
 

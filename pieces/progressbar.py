@@ -100,16 +100,13 @@ class ProgressBar :
 		self.txtdraw  = ImageDraw.Draw(self.scrollImage)
 		
 	def changeAction(self):
-		self.rate = random.random() * self.rateMultiplier
 
-		if(self.config.debug ) : print ("New rate", self.rate)
-		# Chance that the rate changes and things start moving again
-		#if(self.hasPaused == True):
-		self.paused = False
-
-		# Chance things might go backwards
-		if(self.goBack and random.random() < self.goBackwardsProb) : 
-			self.rate *= -1
+		if(random.random() < self.changeRateProbability) :
+			self.rate = random.random() * self.rateMultiplier
+			if(self.config.debug ) : print ("New rate", self.rate)
+			# Chance that the rate changes and things start moving again
+			#if(self.hasPaused == True):
+			self.paused = False
 
 		# chance there will be yet another pause ....
 		if(random.random() < self.pauseProbability) :
@@ -132,6 +129,11 @@ class ProgressBar :
 			#print("setting complete1", c, self.completeProbability)
 			self.complete = True
 
+		# Chance things might go backwards
+		if(self.goBack and random.random() < self.goBackwardsProb) : 
+			if(self.config.debug ) : print ("back???")
+			self.rate *= -1
+
 	def reDraw(self) :
 		if(self.complete != True) :
 			# Chance that someting changes
@@ -140,7 +142,9 @@ class ProgressBar :
 
 			# will not go backwards for long
 			if(self.rate < 0 and random.random() < self.goFwdProb) :
-				self.rate = random.random() * self.rateMultiplier + .01
+				print("--")
+				self.rate *= -1
+				#self.rate = random.random() * self.rateMultiplier + .01
 				#self.completeProbability = .9
 
 			# Increment the bar width
@@ -168,6 +172,9 @@ class ProgressBar :
 					#print("not done...")
 					#self.changeAction()
 				if(self.config.debug ) : print("Target Met ... completing")
+				self.messageString = "NEED TO RESTART :( "
+				self.messageOverrideActive = True
+
 				self.boxWidth = self.boxMax - 2
 				#print("setting complete")
 				self.complete = True
@@ -461,6 +468,7 @@ def main(run = True) :
 	pBar.changeProbability = float(workConfig.get("progressbar", 'changeProbability'))
 	pBar.goBackwardsProb = float(workConfig.get("progressbar", 'goBackwardsProb'))
 	pBar.goFwdProb = float(workConfig.get("progressbar", 'goFwdProb'))
+	pBar.changeRateProbability = float(workConfig.get("progressbar", 'changeRateProbability'))
 	
 	# chance that a message shows instead of %
 	pBar.messageOverrideProbability = float(workConfig.get("progressbar", 'messageOverrideProbability'))

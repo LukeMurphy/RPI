@@ -173,21 +173,23 @@ def decisions():
 			if(config.debug ) : print("Changing rate...")
 
 			if(config.percentage < 0) :
-				print("pause on back")
-				config.percentageIncrement = (1 + 10 * random.random()) * config.calibratedCycleRate
-				startPause(random.uniform(5.0,5.0))
+				if(config.debug ) : print("pause on back")
+				changeRate(1.0,4.0)
+				startPause(random.uniform(2.0,8.0))
 			else :
-				config.percentageIncrement = (1 + 10 * random.random()) * config.calibratedCycleRate
+				changeRate(1.0,3.0)
 			# don't need to multiply the prob by the calibrated cycle rate as it "inherits" probablity
 			# from above
 			if(random.random() < config.goBackwardsProb and config.hasGoneBack == False) :
-				config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
+				#config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
+				changeRate(1.0,2.0)
+				config.percentageIncrement *= -1
 				config.hasGoneBack = True
 				config.messageOverrideActive = True
 
 		if(random.random() < config.noDoneProb * config.calibratedCycleRate) :
 			if(config.debug ) : 
-				print("Done Early")
+				if(config.debug ) : print("Done Early")
 			config.altStringMessage = "RESTARTING"
 			config.completed = True
 			startPause(random.uniform(5.0,5.0))
@@ -205,12 +207,10 @@ def checkPause() :
 		else : 
 			config.messageOverrideActive = False
 
-
 		config.messageOverrideActive = True
 
 		#if(config.completed and random.random() < 0) :
 		#	config.messageOverrideActive = False
-
 
 		if (tD >= config.timeToPause) :
 			if(config.completed == True) :
@@ -221,11 +221,11 @@ def checkPause() :
 				# sometimes even the mesaging breaks..
 				#if(random.random() > .1) : config.messageOverrideActive = False
 				# generally crawls out....
-				config.percentageIncrement = (.5 * random.random()) * config.calibratedCycleRate
+				changeRate(0.1,0.4)
 
 def startPause(timeToPause) :
 	if((config.pauseCount < config.pauses and config.paused == False) or ( config.completed == True )) :
-		if(config.debug ) : print("pausing... for:", timeToPause, config.pauseCount,"- out of -- ",config.pauses)
+		if(config.debug and config.completed == True) : print("pausing... for:", timeToPause, config.pauseCount,"- out of -- ",config.pauses)
 		if(config.completed != True) : 
 			config.pauseCount += 1
 			if(config.debug ) : print("pausing... for:", timeToPause, config.pauseCount,"- out of -- ",config.pauses)
@@ -240,7 +240,14 @@ def doSomething():
 	global config
 	advanceBar()
 
+def changeRate(a=0.5,b=4.0) :
+	global config
+	temp = config.percentageIncrement
+	config.percentageIncrement = (a + b * random.random()) * config.calibratedCycleRate
+	if(config.debug ) : print("RATE changed from: ", temp, " to: ", config.percentageIncrement)
+
 def advanceBar() :
+	global config
 	if(config.paused != True) : 
 		config.percentage += config.percentageIncrement
 		# make sure the % progress shows back up
@@ -249,7 +256,7 @@ def advanceBar() :
 	if(config.percentage >= config.target and config.firstRun != True and config.completed != True) :
 		config.t2  = time.time()
 		timeToComplete  = config.t2  - config.t1
-		config.percentageIncrement = (0.1 + 5 * random.random()) * config.calibratedCycleRate
+		#config.percentageIncrement = (0.1 + 5 * random.random()) * config.calibratedCycleRate
 		config.completed = True
 		#config.messageOverrideActive = False
 		if(config.debug ) : print("Completed progress as far as ")
@@ -289,7 +296,7 @@ def calibration() :
 			config.calibratedCycleRate = config.redrawRate * config.processorFactor 
 
 			config.percentageIncrement = config.calibrationTest/10  * config.calibratedCycleRate
-			if(config.debug ) : print("=====>  ", timeToComplete , timeItShouldHaveTaken, config.cycleCount, "Processor factor:", config.processorFactor)
+			if(config.debug ) : print("\n=====>  ", timeToComplete , timeItShouldHaveTaken, config.cycleCount, "Processor factor:", config.processorFactor, "\n")
 			config.cycleCount = 0
 			config.t1  = time.time()
 			config.t2  = time.time()
@@ -297,7 +304,7 @@ def calibration() :
 			config.firstRun = False
 			done()
 
-			if(config.debug ) : print(config.overrideMessagProb * config.calibratedCycleRate)
+			#if(config.debug ) : print(config.overrideMessagProb * config.calibratedCycleRate)
 			#exit()
 
 def runWork():
@@ -478,7 +485,8 @@ def done():
 	config.hasGoneBack = False
 	if(config.goPast) : config.goBack = False
 	config.pausePoint = int(random.random() * 100)
-	
+	changeRate()
+
 def callBack() :
 	global config
 	pass

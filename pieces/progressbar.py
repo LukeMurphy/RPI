@@ -54,7 +54,7 @@ def drawMessageText() :
 
 	# Draw a box around message display
 	#numXPos = int(xPos2 - 40)
-	pixLen = config.draw.textsize(messageString, font = font)
+	config.pixLen = config.draw.textsize(messageString, font = font)
 	if (messageString != config.altStringMessage) :
 		numXPos = config.boxMax - config.pixLen[0] - 8
 	else :

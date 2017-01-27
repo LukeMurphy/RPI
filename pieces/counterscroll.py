@@ -221,6 +221,12 @@ def main(run = True) :
 	config.directionOrder = (workConfig.get("scroll", 'directionOrder'))
 	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
 	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
+	config.txtfile = ""
+	try :
+		config.txtfile = (workConfig.get("scroll", 'txtfile')) 
+	except Exception as e: 
+		print (str(e))
+	
 	config.colorMode = (workConfig.get("scroll", 'colorMode')) 
 
 	# Used to composite XO's and message text
@@ -247,6 +253,24 @@ def main(run = True) :
 		badpixels.setBlanksOnScreen() 
 
 	if(config.directionOrder == "RIGHT-LEFT") : directionOrder = ["RIGHT","LEFT"]
+
+	if(config.txtfile != "") :
+		config.textArray = []
+		fh = open('./configs/'+config.txtfile,'r')
+		lines = fh.readlines()
+		config.txt1 = "*  "
+
+		# not really necessary but maybe need some scrubs
+		for text in lines :
+			#text = fh.readline()
+			config.textArray.append(text.replace('\n', ''))
+			config.txt1 = config.txt1 + "  *   " + text.replace('\n', '')
+
+		#print(config.textArray)
+		#config.txt1 = config.textArray[0] + config.textArray[1] + config.textArray[2] + config.textArray[3]
+		config.txt2 = config.txt1
+
+
 
 	setUp()
 

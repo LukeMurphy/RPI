@@ -1,25 +1,25 @@
-Cisco default on hold music  Mt Sinai Medical Center  https://www.youtube.com/watch?v=6g4dkBF5anU
-Becherem Teyman (Al Tifchadi Tamar)   Ofra Haza   Unitied Health     https://www.youtube.com/watch?v=a6AE9q1qB9Y
-Waltz op.40     Tchaikovsky, Waltz No 8. Op40     NYU Benefits     
-Days Gone By   Network Music Essemble     Animal Kind     
-Playa del Cura (Original Mix)     Kiilto     Spring OBGYN     212-219-1187
-Late Arrival   Marshall Guild (Gilkes)     The New Musuem     212-219-1222 x555
-Lavender Skies     Gary Lamb     Best Pet Rx     212-348-1800
-White Flag     First Dallas Student Choir     United Airlines     1-800-864-8331
-The Stars are Sleeping     Oppressed by the Line     Virgin Atlantic     1-800-862-8621
-Love to Give     Halls     Oregon Jewish Museum     503-226-3600
-Black Waters     Stephen V. Star     Novotel     1-800-221-4542
-Ping Island     Mark Mothersbaugh     Maharam Textiles     212-319-4789(NY), +81 3 6895 1931 (Tokyo), 616-451-9711 (Grand Rapids)
-Coming Back     Frank Josephs     Motorola     1-800-331-6456,1-800-734-5870 
-A Walk in the Rain     Yanni     McAfee AntiVirus     866-622-3911
-Daydream     William Aura     Microsoft for Mac technical support     866-474-4882
-Sonata for flute violoncello in A Major     Carl Phllip Bach     Not sure of source (my own notes!!)     Not sure
-Soul Deep     Tahiti 80     JetBlue     1 (800) 538-2583
-Forever     Haim     JetBlue     
-Quisiera Amarte Menos     Juan Valentin     Mexicana Car Service     
-Esclavo y Amo     Vicente Fernandez, Javier Solis     Mexicana Car Service     
-Tú y las Nubes     José Alfredo Jiménez     Mexicana Car Service     
-Black Russian     Incognito     Motorola     
-Background Music Soundscape          Urban Auto Classics NEW on hold music     
-Lessons in Love     Level 42     American Airlines     
-Waiting for You     Seal     American Airlines     
+Cisco default on hold music,    Mt Sinai Medical Center,   https://www.youtube.com/watch?v=6g4dkBF5anU
+Becherem Teyman (Al Tifchadi Tamar),   Ofra Haza,   Unitied Health,   https://www.youtube.com/watch?v=a6AE9q1qB9Y
+Waltz op.40,   Tchaikovsky,    Waltz No 8. Op40,   NYU Benefits     
+Days Gone By,   Network Music Essemble,   Animal Kind     
+Playa del Cura (Original Mix),   Kiilto Spring OBGYN,   212-219-1187
+Late Arrival,   Marshall Guild (Gilkes),   The New Musuem,   212-219-1222 x555
+Lavender Skies,   Gary Lamb,   Best Pet Rx,   212-348-1800
+White Flag,   First Dallas Student Choir,   United Airlines,   1-800-864-8331
+The Stars are Sleeping,   Oppressed by the Line,   Virgin Atlantic,   1-800-862-8621
+Love to Give,   Halls,   Oregon Jewish Museum,   503-226-3600
+Black Waters,   Stephen V. Star,   Novotel,   1-800-221-4542
+Ping Island,   Mark Mothersbaugh,   Maharam Textiles,   212-319-4789(NY),    +81 3 6895 1931 (Tokyo),    616-451-9711 (Grand Rapids)
+Coming Back,   Frank Josephs,   Motorola,   1-800-331-6456,   1-800-734-5870 
+A Walk in the Rain,   Yanni,   McAfee AntiVirus,   866-622-3911
+Daydream,   William Aura,   Microsoft for Mac technical support,   866-474-4882
+Sonata for flute violoncello in A Major,   Carl Phllip Bach,   Not sure of source (my own notes!!),   Not sure
+Soul Deep,   Tahiti 80,   JetBlue,   1 (800) 538-2583
+Forever,   Haim,   JetBlue     
+Quisiera Amarte Menos,   Juan Valentin,   Mexicana Car Service     
+Esclavo y Amo,   Vicente Fernandez,    Javier Solis,   Mexicana Car Service     
+Tú y las Nubes,   José Alfredo Jiménez,   Mexicana Car Service     
+Black Russian,   Incognito,   Motorola     
+Background Music Soundscape,   Urban Auto Classics NEW on hold music     
+Lessons in Love,   Level 42,   American Airlines     
+Waiting for You,   Seal,   American Airlines     

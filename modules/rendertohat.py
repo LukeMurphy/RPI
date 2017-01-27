@@ -113,7 +113,12 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 
 						config.renderImage.paste( segImg, (an, bn, an + pCrop[2] - pCrop[0], bn + pCrop[3] - pCrop[1]))
 					else:
-						config.renderImage.paste( segImg, (a, b, a + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
+						
+						## Adding "n" -- because there starts to be a lag as scrolling happens where the top row
+						## looks like it's off by one or more pixels, just adding it helps correct
+						## only for transwired fast moving things though
+						config.renderImage.paste( segImg, (a+n, b, a+n + pCrop[2] - pCrop[0], b + pCrop[3] - pCrop[1]))
+
 
 	 
 			cropP1[1] = cropP2[1]

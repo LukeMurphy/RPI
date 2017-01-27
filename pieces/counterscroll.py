@@ -264,7 +264,7 @@ def main(run = True) :
 		for text in lines :
 			#text = fh.readline()
 			config.textArray.append(text.replace('\n', ''))
-			config.txt1 = config.txt1 + "  *   " + text.replace('\n', '')
+			config.txt1 = config.txt1 + " *** " + text.replace('\n', '')
 
 		#print(config.textArray)
 		#config.txt1 = config.textArray[0] + config.textArray[1] + config.textArray[2] + config.textArray[3]

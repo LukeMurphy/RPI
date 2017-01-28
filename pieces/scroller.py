@@ -37,7 +37,7 @@ class ScrollMessage :
 		else: self.clr = clr
 		#self.clr = colorutils.randomColor()
 		#self.clr = colorutils.getSunsetColors()
-		if(config.colorOverlay == True) : self.clr = (200,200,200)
+		self.clr = (200,200,200)
 
 		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		# draw the message to get its size
@@ -255,15 +255,12 @@ def main(run = True) :
 		print (str(e))
 	
 	config.colorMode = (workConfig.get("scroll", 'colorMode')) 
-	config.colorOverlay = (workConfig.getboolean("scroll", 'colorOverlay'))
 
-	
-	if (config.colorOverlay == True) :
-		config.colorA = colorutils.randomColor()
-		config.colorB = colorutils.randomColor()
-		config.currentColor = config.colorA
+	config.colorA = colorutils.randomColor()
+	config.colorB = colorutils.randomColor()
+	config.currentColor = config.colorA
 
-		colorTransitionSetup()
+	colorTransitionSetup()
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# Used to composite XO's and message text
@@ -498,31 +495,30 @@ def iterate() :
 	if(random.random() > .998 and (config.useBlanks)) : badpixels.setBlanksOnScreen() 
 
 
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	### Colorizing filter that transitions from colorA to colorB ###
 
-	if(config.colorOverlay == True) :
+	projectedWidth = config.screenWidth
+	segmentColorizer = Image.new("RGBA", (projectedWidth, config.screenHeight))
+	draw = ImageDraw.Draw(segmentColorizer)
 
-		projectedWidth = config.screenWidth
-		segmentColorizer = Image.new("RGBA", (projectedWidth, config.screenHeight))
-		draw = ImageDraw.Draw(segmentColorizer)
+	config.currentColor = [
+	(config.currentColor[0] + config.rateOfColorChange[0]),
+	(config.currentColor[1] + config.rateOfColorChange[1]),
+	(config.currentColor[2] + config.rateOfColorChange[2])
+	]
 
-		config.currentColor = [
-		(config.currentColor[0] + config.rateOfColorChange[0]),
-		(config.currentColor[1] + config.rateOfColorChange[1]),
-		(config.currentColor[2] + config.rateOfColorChange[2])
-		]
+	draw.rectangle((0,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.currentColor] ))
+	config.canvasImage = ImageChops.multiply(config.canvasImage, segmentColorizer)
 
-		draw.rectangle((0,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.currentColor] ))
-		config.canvasImage = ImageChops.multiply(config.canvasImage, segmentColorizer)
+	for i in range (0,3):
+		if (config.currentColor[i] - abs(config.rateOfColorChange[i])) <= config.colorB[i] <= (config.currentColor[i] + abs(config.rateOfColorChange[i])) : 
+			config.rateOfColorChange[i] = 0	
 
-		for i in range (0,3):
-			if (config.currentColor[i] - abs(config.rateOfColorChange[i])) <= config.colorB[i] <= (config.currentColor[i] + abs(config.rateOfColorChange[i])) : 
-				config.rateOfColorChange[i] = 0	
-
-		#if(config.rateOfColorChange[0] == 0 and config.rateOfColorChange[1] == 0 and config.rateOfColorChange[2] == 0) : colorTransitionSetup()
-		#if(random.random() < .01) : colorTransitionSetup()
+	#if(config.rateOfColorChange[0] == 0 and config.rateOfColorChange[1] == 0 and config.rateOfColorChange[2] == 0) : colorTransitionSetup()
+	#if(random.random() < .01) : colorTransitionSetup()
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -614,7 +610,7 @@ def ThreeD(imageToRender) :
 
 	for n in range(0,numSegments) :
 		pCropx = n * segmentWidth + offset
-		pWidth  = math.fabs(dFactor * segmentWidth * math.sin(angle * n/.98)) + 2
+		pWidth  = math.fabs(dFactor * segmentWidth * math.sin(angle * n/1)) + 1
 		projectedWidth = int(pWidth)
 
 		segmentImage  = Image.new("RGBA", (projectedWidth, height))

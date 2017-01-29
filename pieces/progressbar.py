@@ -221,7 +221,7 @@ def checkPause() :
 				# sometimes even the mesaging breaks..
 				#if(random.random() > .1) : config.messageOverrideActive = False
 				# generally crawls out....
-				changeRate(0.1,0.4)
+				changeRate(0.01,0.03)
 
 def startPause(timeToPause) :
 	if((config.pauseCount < config.pauses and config.paused == False) or ( config.completed == True )) :
@@ -240,11 +240,11 @@ def doSomething():
 	global config
 	advanceBar()
 
-def changeRate(a=0.5,b=4.0) :
+def changeRate(a=0.05,b=1.0) :
 	global config
 	temp = config.percentageIncrement
 	config.percentageIncrement = (a + b * random.random()) * config.calibratedCycleRate
-	if(config.debug ) : print("RATE changed from: ", temp, " to: ", config.percentageIncrement)
+	if(config.debug ) : print("RATE changed from: ", temp, " to: ", config.percentageIncrement, config.target)
 
 def advanceBar() :
 	global config
@@ -363,9 +363,6 @@ def main(run = True) :
 	config.spinnerCenter = [config.boxMax - 54, config.boxHeight/2 + 3]
 
 	config.pauseProbability = float(workConfig.get("progressbar", 'pauseProbability')) / 100
-	config.completeProbability = float(workConfig.get("progressbar", 'completeProbability'))/ 100
-	config.completeProbabilityBase = float(workConfig.get("progressbar", 'completeProbabilityBase'))/ 100
-	config.changeProbability = float(workConfig.get("progressbar", 'changeProbability'))/ 100
 	config.goBackwardsProb = float(workConfig.get("progressbar", 'goBackwardsProb'))/ 100
 	config.goFwdProb = float(workConfig.get("progressbar", 'goFwdProb'))/ 100
 	config.changeRateProbability = float(workConfig.get("progressbar", 'changeRateProbability'))/ 100
@@ -476,9 +473,8 @@ def done():
 	config.pauseCount = 0
 	config.boxWidth = 1
 	config.completed = False
-	config.completeProbability = config.completeProbabilityBase
 	config.drawBarFill = True
-	config.target = round(random.uniform(95,99))
+	config.target = (random.uniform(95,99))
 
 	config.goBack = True if (random.random() < config.goBackwardsProb) else False
 	config.goPast = True if (random.random() < config.goPastProb) else False

@@ -163,6 +163,24 @@ def drawBar() :
 def decisions():
 	global config
 
+	if(config.percentage >= config.target and config.firstRun != True and config.completed != True and config.goPast != True) :
+		config.t2  = time.time()
+		timeToComplete  = config.t2  - config.t1
+		#config.percentageIncrement = (0.1 + 5 * random.random()) * config.calibratedCycleRate
+		config.completed = True
+		#config.messageOverrideActive = False
+		if(config.debug ) : print("Completed progress as far as ")
+		startPause(random.uniform(1,12))
+
+	if(config.goPast == True and config.percentage > 150) :
+		if(random.random() < .01) :
+			config.completed = True
+			if(config.debug ) : print("Completed beyond ")	
+
+	if(config.goPast == True and config.percentage < 100 and config.percentage > 50) :
+		if(random.random() < .1) : changeRate(3,8)
+			#startPause(random.uniform(1,12))
+
 	if(config.paused == False and config.firstRun == False) :
 
 		if(random.random() < (config.pauseProbability * config.calibratedCycleRate) and config.firstRun == False and config.percentage >= config.pausePoint) :
@@ -177,24 +195,25 @@ def decisions():
 				changeRate(1.0,4.0)
 				startPause(random.uniform(2.0,8.0))
 			else :
-				changeRate(1.0,3.0)
+				changeRate()
 			# don't need to multiply the prob by the calibrated cycle rate as it "inherits" probablity
 			# from above
 			if(random.random() < config.goBackwardsProb and config.hasGoneBack == False) :
 				#config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
+				if(config.debug ) : print("Going back")
 				changeRate(1.0,2.0)
 				config.percentageIncrement *= -1
 				config.hasGoneBack = True
 				config.messageOverrideActive = True
 
 		if(random.random() < config.noDoneProb * config.calibratedCycleRate) :
-			if(config.debug ) : 
-				if(config.debug ) : print("Done Early")
+			if(config.debug ) : print("Done Early")
 			config.altStringMessage = "RESTARTING"
 			config.completed = True
 			startPause(random.uniform(5.0,5.0))
 			
 		elif(config.completed == True) :
+			if(config.debug ) : print("Completed")
 			done()
 
 def checkPause() :
@@ -253,19 +272,10 @@ def advanceBar() :
 		# make sure the % progress shows back up
 		if(random.random() > .94) : config.messageOverrideActive = False
 
-	if(config.percentage >= config.target and config.firstRun != True and config.completed != True) :
-		config.t2  = time.time()
-		timeToComplete  = config.t2  - config.t1
-		#config.percentageIncrement = (0.1 + 5 * random.random()) * config.calibratedCycleRate
-		config.completed = True
-		#config.messageOverrideActive = False
-		if(config.debug ) : print("Completed progress as far as ")
-		startPause(random.uniform(1,12))
-
 	if(config.percentage <= 1) :
 		config.messageClr = (255,0,0)
 
-	if(config.percentage > 2) :
+	if(config.percentage > 2) :	
 		config.messageClr = config.messageClrBase
 
 	if(config.percentage >= config.target) :
@@ -364,7 +374,6 @@ def main(run = True) :
 
 	config.pauseProbability = float(workConfig.get("progressbar", 'pauseProbability')) / 100
 	config.goBackwardsProb = float(workConfig.get("progressbar", 'goBackwardsProb'))/ 100
-	config.goFwdProb = float(workConfig.get("progressbar", 'goFwdProb'))/ 100
 	config.changeRateProbability = float(workConfig.get("progressbar", 'changeRateProbability'))/ 100
 	config.goPastProb = float(workConfig.get("progressbar", 'goPastProb'))/ 100
 	
@@ -467,7 +476,7 @@ def done():
 
 	config.percentage = 0 
 	#config.barColorStart = config.barColor = colorutils.getRandomRGB(1)
-	config.barColorStart = config.barColor = colorutils.randomColor(1)
+	config.barColorStart = config.barColor = colorutils.randomColor(.75)
 	config.hasPaused = False
 	config.paused == False
 	config.pauseCount = 0

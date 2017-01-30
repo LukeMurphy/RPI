@@ -3,7 +3,7 @@ import random
 import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from modules import colorutils, badpixels
+from modules import colorutils, badpixels, coloroverlay
 
 blocks = []
 XOsBlocks = []
@@ -200,26 +200,6 @@ class XOx :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def colorTransitionSetup():
-
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	#### Setting up for color transitions
-	config.colorDelta = [0,0,0]
-	config.rateOfColorChange = [0,0,0]
-
-	config.colorA = config.colorB
-	config.currentColor = config.colorA
-	config.colorB = colorutils.randomColor()
-
-	#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
-	from operator import sub
-	config.colorDelta = map(sub, config.colorB, config.colorA)
-	test = [abs(a) for a in config.colorDelta]
-	steps = random.uniform(10.0,500.0)
-	config.rateOfColorChange = [ a/steps for a in config.colorDelta]
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
 	global config, directionOrder
@@ -246,6 +226,8 @@ def main(run = True) :
 	config.useBlanks = (workConfig.getboolean("scroll", 'useBlanks'))
 	config.useThreeD = (workConfig.getboolean("scroll", 'useThreeD'))
 	config.directionOrder = (workConfig.get("scroll", 'directionOrder'))
+	config.bgColorVals = ((workConfig.get("scroll", 'bgColor')).split(','))
+	config.bgColor = tuple(map(lambda x: int(x) , config.bgColorVals))
 	config.txt1 = " " + (workConfig.get("scroll", 'txt1')) + " " 
 	config.txt2 = " " + (workConfig.get("scroll", 'txt2')) + " " 
 	config.txtfile = ""
@@ -259,11 +241,14 @@ def main(run = True) :
 
 	
 	if (config.colorOverlay == True) :
-		config.colorA = colorutils.randomColor()
-		config.colorB = colorutils.randomColor()
-		config.currentColor = config.colorA
 
-		colorTransitionSetup()
+		config.colorOverlayObjA = coloroverlay.ColorOverlay()
+		config.colorOverlayObjB = coloroverlay.ColorOverlay()
+		#config.colorA = colorutils.randomColor()
+		#config.colorB = colorutils.randomColor()
+		#config.currentColor = config.colorA
+
+		#colorTransitionSetup()
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# Used to composite XO's and message text
@@ -432,10 +417,10 @@ def iterate() :
 
 	# Blank out canvases
 	draw  = ImageDraw.Draw(config.renderImageFull)
-	draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = 0)
+	draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
 
 	draw  = ImageDraw.Draw(config.canvasImage)
-	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = 0)
+	draw.rectangle((0,0,config.canvasImageWidth , config.screenHeight), fill = (config.bgColor))
 
 	displayWidth = config.screenWidth * config.displayRows
 
@@ -503,26 +488,15 @@ def iterate() :
 	### Colorizing filter that transitions from colorA to colorB ###
 
 	if(config.colorOverlay == True) :
+		config.colorOverlayObjA.stepTransition()
+		config.colorOverlayObjB.stepTransition()
 
 		projectedWidth = config.screenWidth
 		segmentColorizer = Image.new("RGBA", (projectedWidth, config.screenHeight))
 		draw = ImageDraw.Draw(segmentColorizer)
-
-		config.currentColor = [
-		(config.currentColor[0] + config.rateOfColorChange[0]),
-		(config.currentColor[1] + config.rateOfColorChange[1]),
-		(config.currentColor[2] + config.rateOfColorChange[2])
-		]
-
-		draw.rectangle((0,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.currentColor] ))
-		config.canvasImage = ImageChops.multiply(config.canvasImage, segmentColorizer)
-
-		for i in range (0,3):
-			if (config.currentColor[i] - abs(config.rateOfColorChange[i])) <= config.colorB[i] <= (config.currentColor[i] + abs(config.rateOfColorChange[i])) : 
-				config.rateOfColorChange[i] = 0	
-
-		#if(config.rateOfColorChange[0] == 0 and config.rateOfColorChange[1] == 0 and config.rateOfColorChange[2] == 0) : colorTransitionSetup()
-		#if(random.random() < .01) : colorTransitionSetup()
+		draw.rectangle((0,0,projectedWidth/2,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjA.currentColor] ))
+		draw.rectangle((projectedWidth/2,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjB.currentColor] ))
+		config.canvasImage = ImageChops.multiply(config.canvasImage, segmentColorizer)		
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

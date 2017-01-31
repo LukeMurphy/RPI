@@ -5,7 +5,6 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 
-redrawSpeed = .005
 lastRate  = 0 
 colorutils.brightness =  1
 
@@ -120,6 +119,20 @@ class Fludd :
 		#config.image.paste(self.mainImage, (numXPos, numYPos), self.scrollImage)
 
 
+	def change(self) :
+		if (self.varianceMode == "independent") :
+			self.varianceMode = "symmetrical"
+		elif(self.varianceMode == "symmetrical") :
+			self.varianceMode = "asymmetrical"		
+		elif(self.varianceMode == "asymmetrical") :
+			self.varianceMode = "independent"
+
+		if (self.borderModel == "prism") :
+			self.borderModel = "plenum"
+		else : self.borderModel = "prism"
+
+		if(self.config.demoMode != 0) : print(self.varianceMode, self.borderModel)
+
 	def done(self): 
 		return True
 
@@ -129,7 +142,7 @@ def drawElement() :
 	return True
 
 def redraw():
-	global config, pBar
+	global config, fluddSquare
 	fluddSquare.reDraw()
 
 def changeColor() :
@@ -145,10 +158,10 @@ def callBack() :
 	pass
 
 def runWork():
-	global redrawSpeed
+	global config
 	while True:
 		iterate()
-		time.sleep(redrawSpeed)
+		time.sleep(config.redrawSpeed)
 
 def iterate() :
 	global config, fluddSquare, lastRate
@@ -157,12 +170,18 @@ def iterate() :
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	callBack()
-	count = 0
+
+	if(config.demoMode != 0) :
+		config.count += 1
+
+		if(config.count > config.countMax) :
+			config.count = 0 
+			fluddSquare.change()
+
 	# Done
 
 def main(run = True) :
 	global config
-	global redrawSpeed
 	global fluddSquare
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
@@ -172,7 +191,20 @@ def main(run = True) :
 	fluddSquare.nothing  = workConfig.get("fludd", 'nothing')
 	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
 	fluddSquare.varianceMode  = workConfig.get("fludd", 'varianceMode')
-	fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness'))
+	fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness')) 
+	config.redrawSpeed  = float(workConfig.get("fludd", 'redrawSpeed')) 
+
+
+	## -----------------------------------------------------------------------
+	## Demo mode means the piece cycles through its 6 base
+	## variation plenum | prism  X  independent | asymmetrical | symmetrical
+	## -----------------------------------------------------------------------
+
+	config.demoMode  = float(workConfig.get("fludd", 'demoMode')) 
+
+
+	config.count =  0
+	config.countMax = config.demoMode / config.redrawSpeed
 
 	# var sets the points offset from the corners - i.e. the larger var is, the wider the borders
 	'''

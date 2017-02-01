@@ -8,6 +8,11 @@ from modules import colorutils
 lastRate  = 0 
 colorutils.brightness =  1
 
+# Really no need for a class here - it's always a singleton and besides
+# with Python everthing is an object already .... some kind of OOP
+# holdover anxiety I guess
+
+
 class Fludd :
 
 	outlineColor = (1,1,1)
@@ -164,19 +169,44 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 
 def iterate() :
-	global config, fluddSquare, lastRate
+	global config, fluddSquare, lastRate, calibrated, cycleCount
 	
-	redraw()
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+	if(config.calibrated == True) :
+		redraw()
+		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
-	callBack()
+		callBack()
 
-	if(config.demoMode != 0) :
-		config.count += 1
+		if(config.demoMode != 0) :
+			config.count += 1
 
-		if(config.count > config.countMax) :
-			config.count = 0 
-			fluddSquare.change()
+			if(config.count > config.countMax) :
+				config.count = 0 
+				config.t2  = time.time()
+				config.timeToComplete  = config.t2  - config.t1
+				print (config.timeToComplete)
+				config.t1  = time.time()
+				config.t2  = time.time()
+				fluddSquare.change()
+	else :
+		config.cycleCount += 1
+		redraw()
+		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+		if (config.cycleCount > config.calibrationCount) :
+			config.t2  = time.time()
+			config.timeToComplete  = config.t2  - config.t1
+			config.timeItShouldHaveTaken =  config.calibrationCount * config.redrawSpeed
+
+			config.cycleTiming = config.timeToComplete / config.timeItShouldHaveTaken
+			
+			config.countMax = config.demoMode * config.calibrationCount / config.timeToComplete 
+			config.calibrated = True
+
+			print(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax )
+
+			config.t1  = time.time()
+			config.t2  = time.time()
+
 
 	# Done
 
@@ -193,7 +223,14 @@ def main(run = True) :
 	fluddSquare.varianceMode  = workConfig.get("fludd", 'varianceMode')
 	fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness')) 
 	config.redrawSpeed  = float(workConfig.get("fludd", 'redrawSpeed')) 
+	
+	config.cycleTiming = 1
+	config.t1  = time.time()
+	config.t2  = time.time()
 
+	config.calibrated = False
+	config.cycleCount = 0
+	config.calibrationCount = 500
 
 	## -----------------------------------------------------------------------
 	## Demo mode means the piece cycles through its 6 base
@@ -201,10 +238,8 @@ def main(run = True) :
 	## -----------------------------------------------------------------------
 
 	config.demoMode  = float(workConfig.get("fludd", 'demoMode')) 
-
-
 	config.count =  0
-	config.countMax = config.demoMode / config.redrawSpeed
+	
 
 	# var sets the points offset from the corners - i.e. the larger var is, the wider the borders
 	'''

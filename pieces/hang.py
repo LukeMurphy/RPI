@@ -62,11 +62,17 @@ def guess():
 			config.found.append(char)
 			config.clr = (255,0,0)
 			config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', 20)
-			drawText(config.textPosX + pos * 10,config.textPosY, char)
+			#drawText(config.textPosX + pos * 10,config.textPosY, char)
+			drawText(config.textPosX + pos * 10,config.textPosY, "*")
+
 			if(len(config.found) == len(config.word)) :
 				config.wordNotFound = False
 				config.lost = False
 				config.done = True
+
+				drawText(30, 5, "Computer Wins!", False)
+
+
 		else :
 			## Incorrect - draw letter & part scaffold
 			config.guessed.append(char)
@@ -74,8 +80,9 @@ def guess():
 			config.fontSize = int(random.uniform(10,30))
 			config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 
-			xPos = random.random() * config.screenWidth * 2/3 + config.screenWidth/3
-			yPos = random.random() * config.screenHeight * 2/3 + config.screenHeight/3
+			xPos = random.random() * config.screenWidth * 1/3 + config.screenWidth/2
+			yPos = random.random() * config.screenHeight * 1/3 + config.screenHeight/2
+
 			drawText(xPos, yPos, char, True)
 
 			if(len(config.guessed) <= len(config.scaffolding)) : 
@@ -99,6 +106,7 @@ def guess():
 		if(len(config.guessed) >= 17) :
 			config.lost = True
 			config.done = True
+			drawText(32, 5, "You Lose!", False)
 
 
 def drawElement() :
@@ -153,8 +161,8 @@ def main(run = True) :
 	config.shadowSize = int(workConfig.get("hang", 'shadowSize'))
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	config.clr = (255,0,0)
-	config.textPosY = 145
-	config.textPosX = 80
+	config.textPosY = 40
+	config.textPosX = 120
 
 	config.alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 	config.word = "FEAR"
@@ -162,7 +170,7 @@ def main(run = True) :
 	config.messageString = config.word
 	config.xOffset = 15
 	# (0,10,2,6) (4,10,2,6)
-	config.scaffolding = [(2,10,2,6),(2,6,2,2),(2,2,2,0),(2,2,4,0),(2,0,5,0),(5,0,5,1)]
+	config.scaffolding = [(2,15,2,10),(2,10,2,6),(2,6,2,2),(2,2,2,0),(2,2,4,0),(2,0,5,0),(5,0,5,1)]
 	config.body = [(4,1,6,2),(5,2,5,3),(5,3,5,5),(5,3,3,3),(5,3,7,3),(5,5,4,7),(5,5,6,7),(5,5,5,6),(5,5,4,4),(5,5,6,6)]
 
 

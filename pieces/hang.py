@@ -29,7 +29,7 @@ def init() :
 	]
 
 
-	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,200))
+	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(20,20,20,200))
 
 	gap = 0
 	for i in range(0, len(config.word)) :

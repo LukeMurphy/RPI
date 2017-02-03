@@ -111,21 +111,23 @@ def guess():
 
 			drawText(xPos, yPos, char, False)
 
+			# Draw the scaffold / gallows
 			if(len(config.guessed) <= len(config.scaffolding)) : 
 				coords = config.scaffolding[len(config.guessed) - 1]
 				config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(10,10,10))
 
+			# Draw the body
 			elif(len(config.guessed) <= (len(config.scaffolding) + len(config.body))) :
 				coords = config.body[len(config.guessed) - len(config.scaffolding) - 1]
 
 				index  = len(config.guessed) - len(config.scaffolding) - 1
 
 				if( index == 0 ) :
-					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(200,0,0))
+					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(255,0,0))
 				elif (index >= 8) :
-					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(200,0,0))
+					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(255,0,0))
 				else :
-					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(200,0,0))
+					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(255,0,0))
 
 		config.alphabetLeft.remove(char)
 

@@ -34,7 +34,7 @@ def init() :
 	]
 
 
-	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(15,15,30,15))
+	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(15,15,30,5))
 
 	gap = 0
 	for i in range(0, len(config.word)) :
@@ -83,7 +83,7 @@ def guess():
 
 
 			xPos = 3 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
-			yPos = random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
+			yPos = 32 + random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
 
 			drawText(xPos, yPos, char.upper(), True)
 
@@ -99,14 +99,14 @@ def guess():
 			## Incorrect - draw letter & part scaffold
 			config.guessed.append(char)
 			config.clr = colorutils.randomColor(1)
-			config.fontSize = int(random.uniform(10,30))
+			config.fontSize = int(random.uniform(10,50))
 			config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 
 			xPos = random.random() * config.screenWidth #* 1/3 + config.screenWidth/2
 			yPos = random.random() * config.screenHeight #* 1/3 + config.screenHeight/2
 
 
-			xPos = 3 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
+			xPos = 80 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
 			yPos = random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
 
 			drawText(xPos, yPos, char, False)
@@ -114,7 +114,10 @@ def guess():
 			# Draw the scaffold / gallows
 			if(len(config.guessed) <= len(config.scaffolding)) : 
 				coords = config.scaffolding[len(config.guessed) - 1]
-				config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(10,10,10))
+				config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(50,50,50))
+
+				if(len(config.guessed) >= len(config.scaffolding)) :
+					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(100,100,100))
 
 			# Draw the body
 			elif(len(config.guessed) <= (len(config.scaffolding) + len(config.body))) :
@@ -173,7 +176,7 @@ def iterate() :
 
 	if(config.done == True) :
 		init()
-		time.sleep(.02)
+		time.sleep(config.redrawSpeed)
 
 
 

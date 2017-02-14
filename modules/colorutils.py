@@ -21,6 +21,8 @@ sky = dict(coolblue=(254,254,248),ltblue=(190,200,202),grayblue=(182,186,182))
 #sorted_sunset = {k: (sum(v)/3) for k, v in sunset.iteritems()}
 sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), key=operator.itemgetter(1))
 
+brightness = 1
+
 
 
 def getSunsetColors(brtns=1) :

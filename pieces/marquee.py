@@ -19,23 +19,24 @@ def init() :
 	config.lost = False
 	config.done = False
 	angle = random.random() * 22/7
-	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(15,15,30,5))
+	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
 
+
+	w = config.screenWidth
+	h = config.screenHeight
 
 	config.perimeter = []
 
-	for i in range (0,config.screenWidth) : config.perimeter.append([i,0])
 
-	for i in range (1,config.screenHeight) : config.perimeter.append([config.screenWidth-1,i])
+	for i in range (0, w) : config.perimeter.append([i, 0])
+	for i in range (0, h) : config.perimeter.append([w - 1 - config.marqueeWidth, i])
+	for i in range (w - 1, 0, -1) : config.perimeter.append([i, h - 1 - config.marqueeWidth])
+	for i in range (h - 1, config.marqueeWidth, -1) : config.perimeter.append([0, i])
 
-	for i in range (config.screenWidth-1,0,-1) : config.perimeter.append([i,config.screenHeight-1])
 	
-	for i in range (config.screenHeight,1,-1) : config.perimeter.append([0,i])
 
-	config.pattern = [0,0,0,0,0,0,0,0,0,0,1,1,1,1]
-
+	config.pattern = [1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0]
 	config.offset = 0
-
 
 	gap = 0
 	for i in range(0, len(config.word)) :
@@ -60,7 +61,8 @@ def drawText(xPos=0, yPos=0, messageString = "", crossout=False) :
 			yPos + config.fontSize/1.5) , fill=config.clr)
 
 def drawMarquee() :
-	drawText(10, 10, "TEST", False)
+	global config
+	drawText(10, 10, str(config.offset))
 	pass
 
 def drawElement() :
@@ -69,29 +71,38 @@ def drawElement() :
 
 def redraw():
 	global config
-	drawText(10, 10, "TEST", False)
+	#drawText(10, 10, "TEST", False)
+	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
+	
 
+	#config.offset = 1
 
-	patternA = config.pattern[config.offset:]
-	patternB = config.pattern[:config.offset]
-	config.pattern = patternA + patternB
+	l = len(config.pattern)
 
+	patternA = config.pattern[0 : (l - config.offset)]
+	patternB = config.pattern[(l - config.offset): l ]
+	pattern = patternB + patternA
 
+	#print(patternA)
+	#print(patternB)
+	#drawText(10, 10, str(config.offset) + str(pattern), False)
+
+	#exit()
 
 	count = 0
-
 	for p in config.perimeter :
-		if(config.pattern[count] == 1) :
-			config.draw.rectangle((p[0],p[1],p[0]+2,p[1]+2), fill=(255,0,0))
+		if(pattern[count] == 1) :
+			config.draw.rectangle((p[0],p[1],p[0] + config.marqueeWidth, p[1] + config.marqueeWidth), fill=(255,0,0))
 		else:
-			config.draw.rectangle((p[0],p[1],p[0]+2,p[1]+2), fill=(0,0,0))
+			config.draw.rectangle((p[0],p[1],p[0] + config.marqueeWidth, p[1] + config.marqueeWidth), fill=(0,255,0))
 		count += 1
 		if(count >= len(config.pattern)) :
 			count = 0
 
+	
 	config.offset += 1
 	if(config.offset >= len(config.pattern)) : 
-		config.offset =  0
+		config.offset =  0 #int(len(config.pattern)/2) 
 		#config.pattern = config.pattern[:-1]
 
 	#drawText(10,10, config.messageString)
@@ -113,7 +124,7 @@ def runWork():
 	global config
 	while True:
 		iterate()
-		time.sleep(.01)
+		time.sleep(.003)
 		#time.sleep(random.random() * config.redrawSpeed)
 
 def iterate() :
@@ -123,8 +134,9 @@ def iterate() :
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	if(config.done == True) :
-		init()
-		time.sleep(config.redrawSpeed)
+		#init()
+		#time.sleep(config.redrawSpeed)
+		pass
 
 def main(run = True) :
 	global config
@@ -140,6 +152,7 @@ def main(run = True) :
 
 	config.clr = colorutils.randomColor(1)
 	config.fontSize = int(random.uniform(10,50))
+	config.fontSize = 10
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 
 	config.alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
@@ -147,6 +160,8 @@ def main(run = True) :
 	colorutils.brightness =  1
 	config.messageString = config.word
 	config.xOffset = 15
+
+	config.marqueeWidth = 3
 
 	init()
 	

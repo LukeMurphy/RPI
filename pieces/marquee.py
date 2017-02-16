@@ -3,15 +3,15 @@ import time
 import random
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
-from modules import colorutils
+from modules import colorutils, coloroverlay
 
 
 def makeMarquee(p,w,h):
 	perimeter = []
 	for i in range (p[0], p[0] + w) : perimeter.append([i, p[1]])
 	for i in range (p[1], p[1] + h) : perimeter.append([p[0] + w, i])
-	for i in range (p[0] + w - 1, p[0], -1) : perimeter.append([i, p[1] + h])
-	for i in range (p[1] + h - 1, p[1], -1) : perimeter.append([p[0], i])
+	for i in range (p[0] + w , p[0], -1) : perimeter.append([i, p[1] + h])
+	for i in range (p[1] + h , p[1]-1, -1) : perimeter.append([p[0], i])
 	return (perimeter)
 
 
@@ -27,36 +27,67 @@ def init() :
 	config.done = False
 	angle = random.random() * 22/7
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
-
+	config.bgColor = coloroverlay.ColorOverlay()
 
 	config.marquees = []
-	offset = 0
-	marqueeWidth = 6
+
+	marqueeWidth = 10
 	w = config.screenWidth - marqueeWidth
 	h = config.screenHeight - marqueeWidth
+	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	p0 = [0,0]
+	innerWidth = w
+	innerHeight = h
+	gap = 1
+	decrement = 1
+	mw = marqueeWidth
+	mwPrev = marqueeWidth
 
-	pattern = [1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0]
-	clrs = [(255,0,0),(0,255,0)]
-	config.marquees.append([0, pattern, makeMarquee((0,0),w,h), marqueeWidth , clrs])
-	pattern = [0,0,0,0,0,0,0,0,1,1,1,1,1,1]
-	clrs = [(255,0,0),(0,255,0)]
-	config.marquees.append([0, pattern, makeMarquee((marqueeWidth,marqueeWidth),w-marqueeWidth * 2,h-marqueeWidth * 2), marqueeWidth, clrs ])
-	
-	
-	pattern = [1,1,1,0,0,0,0,0]
-	clrs = [(0,0,255),(255,255,0)]
-	config.marquees.append([0, pattern, makeMarquee((marqueeWidth * 2,marqueeWidth * 2),w-marqueeWidth * 4,h-marqueeWidth * 4), marqueeWidth, clrs ])
-	pattern = [1,1,1,1,0,0,0]
-	clrs = [(255,0,255),(0,255,0)]
-	config.marquees.append([0, pattern, makeMarquee((marqueeWidth * 3,marqueeWidth * 3),w-marqueeWidth * 6,h-marqueeWidth * 6), marqueeWidth, clrs ])
-	
+	for i in range (0,15):
+		clrs = [colorutils.randomColor(),colorutils.getRandomRGB()]
+		colOverlayA = coloroverlay.ColorOverlay()
+		colOverlayB = coloroverlay.ColorOverlay()
 
-	gap = 0
+		#if(i%2 == 0) : mw = mwPrev - decrement
 
-	for i in range(0, len(config.word)) :
-		startX = config.textPosX + 10 * i
-		endX = startX + 8
-		#config.draw.line((startX, config.textPosY + 20 , endX, config.textPosY + 20), fill=config.clr)
+		if (i != 0) : mw = mwPrev - decrement
+		if(mw <= 2) : mw = 2
+
+		print(i, p0, mw, mwPrev, innerWidth, innerHeight)
+
+		config.marquees.append([
+			0, 
+			pattern, 
+			makeMarquee(
+				(p0[0], p0[1]),
+				innerWidth , innerHeight  
+				), 
+			mw, 
+			clrs,
+			colOverlayA,
+			colOverlayB
+			 ])
+
+		p0[0] += (mw + gap) 
+		p0[1] += (mw + gap) 
+		mwPrev = mw
+
+		innerWidth = innerWidth - 2 * (mw ) - gap + decrement
+		innerHeight = innerHeight - 2 * (mw ) - gap + decrement
+
+		if (gap > 0) :
+			innerWidth -=decrement
+			innerHeight -=decrement
+
+
+		if(mw == 2) :
+			innerWidth -=1
+			innerHeight -=1
+
+
+		if(len(pattern) >= 4 and random.random() > .1) :
+			pattern = pattern[1:]
+			pattern = pattern[0:len(pattern)-1]
 
 
 def drawText(xPos=0, yPos=0, messageString = "", crossout=False) :
@@ -85,7 +116,12 @@ def drawElement() :
 
 def redraw():
 	global config
-	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
+
+	bgColor = tuple(int(c) for c in config.bgColor.currentColor)
+	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=bgColor)
+
+	config.bgColor.stepTransition()
+
 	mcount  = 0
 	for m in config.marquees :
 
@@ -98,18 +134,26 @@ def redraw():
 		patternA = pattern[0 : (l - offset)]
 		patternB = pattern[(l - offset): l ]
 		pattern = patternB + patternA
+
 		clrA = m[4][0]
 		clrB = m[4][1]
+		
+		colOverlayA = m[5]
+		colOverlayB = m[6]
+
+		clrA = colOverlayA.currentColor
+		clrB = colOverlayB.currentColor
+
 		count = 0
 
 		perim = perimeter
-		if(mcount == 1 or mcount == 3) :perim = reversed(perimeter)
+		if(mcount%2 > 0 and random.random() > .002) : perim = reversed(perimeter)
 
 		for p in (perim):
 			if(pattern[count] == 1) :
-				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth, p[1] + marqueeWidth), fill=clrA)
+				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth - 1, p[1] + marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrA))
 			else:
-				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth, p[1] + marqueeWidth), fill=clrB)
+				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth - 1, p[1] + marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrB))
 			count += 1
 			if(count >= len(pattern)) :
 				count = 0
@@ -117,6 +161,18 @@ def redraw():
 		m[0] += 1
 		if(m[0] >= len(pattern)) : m[0] =  0 
 		mcount += 1
+
+		colOverlayA.stepTransition()
+		colOverlayB.stepTransition()
+
+	'''
+	cord = 0
+	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)	
+	cord = 9
+	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)	
+	cord = 18
+	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)
+	'''
 
 
 def changeColor() :

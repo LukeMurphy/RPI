@@ -19,6 +19,7 @@ class ColorOverlay:
 		self.colorTransitionSetup()
 		self.colorA = colorutils.randomColor()
 		self.colorB = colorutils.randomColor()
+		self.colorB = colorutils.getRandomRGB()
 
 
 	def colorTransitionSetup(self,steps=0):
@@ -31,6 +32,7 @@ class ColorOverlay:
 		self.colorA = self.colorB
 		self.currentColor = self.colorA
 		self.colorB = colorutils.randomColor()
+		if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		from operator import sub
@@ -53,7 +55,6 @@ class ColorOverlay:
 		for i in range (0,3):
 			if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
 				self.rateOfColorChange[i] = 0
-
 
 		
 		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 

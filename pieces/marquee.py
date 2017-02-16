@@ -6,13 +6,14 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils, coloroverlay
 
 
-def makeMarquee(p,w,h,mw):
+def makeMarquee(p,w,h,mw,step=1):
 	perimeter = []
-	mw=0
-	for i in range (p[0], p[0] + w + 1) : perimeter.append([i, p[1]])
-	for i in range (p[1] + mw, p[1] + h + 1) : perimeter.append([p[0] + w, i])
-	for i in range (p[0] + w - mw, p[0] - 1, -1) : perimeter.append([i, p[1] + h])
-	for i in range (p[1] + h - mw, p[1] - 1, -1) : perimeter.append([p[0], i])
+	#mw=0
+	o = 0
+	for i in range (p[1] + 0, p[1] + h + o, step) : perimeter.append([p[0] + w, i])
+	for i in range (p[0] + w , p[0] - o, -step) : perimeter.append([i, p[1] + h])
+	for i in range (p[1] + h , p[1] - o, -step) : perimeter.append([p[0], i])
+	for i in range (p[0] + 0, p[0] + w + step/2, step) : perimeter.append([i, p[1]])
 	return (perimeter)
 
 
@@ -28,18 +29,23 @@ def init() :
 	config.done = False
 	angle = random.random() * 22/7
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
-	config.bgColor = coloroverlay.ColorOverlay()
 
+	config.bgColor = coloroverlay.ColorOverlay()
+	config.bgColor.randomRange = (10.0,config.randomRange/2)
 	config.marquees = []
 
 	marqueeWidth = config.marqueeWidth
 	w = config.screenWidth - marqueeWidth
 	h = config.screenHeight - marqueeWidth
-	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	if(config.step > 1) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	#pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
+	#pattern = [1,1,1,0,0,0]
 	p0 = [0,0]
 	innerWidth = w
 	innerHeight = h
 	gap = config.gap 
+	step = config.step
 	decrement = config.decrement
 	mw = marqueeWidth
 	mwPrev = marqueeWidth
@@ -49,25 +55,33 @@ def init() :
 		colOverlayA = coloroverlay.ColorOverlay()
 		colOverlayB = coloroverlay.ColorOverlay()
 
+		colOverlayA.randomRange = (10.0,config.randomRange)
+		colOverlayB.randomRange = (10.0,config.randomRange)
+
 		#if(i%2 == 0) : mw = mwPrev - decrement
 
 		if (i != 0) : mw = mwPrev - decrement
 		if(mw <= 2) : mw = 2
 
-		print(i, p0, mw, mwPrev, innerWidth, innerHeight)
+		#print(i, p0, mw, mwPrev, innerWidth, innerHeight)
+
+		if(innerWidth < 32 or i > 6) :
+			step = 1
 
 		config.marquees.append([
 			0, 
 			pattern, 
 			makeMarquee(
 				(p0[0], p0[1]),
-				innerWidth , innerHeight, mw
+				innerWidth , innerHeight, mw, step
 				), 
 			mw, 
 			clrs,
 			colOverlayA,
 			colOverlayB
 			 ])
+
+		#print (config.marquees[i][2])
 
 		p0[0] += (mw + gap) 
 		p0[1] += (mw + gap) 
@@ -120,7 +134,6 @@ def redraw():
 
 	bgColor = tuple(int(c) for c in config.bgColor.currentColor)
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=bgColor)
-
 	config.bgColor.stepTransition()
 
 	mcount  = 0
@@ -135,9 +148,6 @@ def redraw():
 		patternA = pattern[0 : (l - offset)]
 		patternB = pattern[(l - offset): l ]
 		pattern = patternB + patternA
-
-		clrA = m[4][0]
-		clrB = m[4][1]
 		
 		colOverlayA = m[5]
 		colOverlayB = m[6]
@@ -145,12 +155,22 @@ def redraw():
 		clrA = colOverlayA.currentColor
 		clrB = colOverlayB.currentColor
 
+		#clrA = [255,0,0]
+		#clrB = [0,0,0]
+
 		count = 0
 
 		perim = perimeter
 		if(mcount%2 > 0 and random.random() > .002) : perim = reversed(perimeter)
 
-		for p in (perim):
+		#print(pattern)
+		'''
+		if(mcount == len(config.marquees)-1) :
+			clrA = [0,0,0]
+			clrB = [20,20,20]
+		'''
+
+		for p in (perim ):
 			if(pattern[count] == 1) :
 				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth - 1, p[1] + marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrA))
 			else:
@@ -211,9 +231,11 @@ def main(run = True) :
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 	config.redrawSpeed  = float(workConfig.get("marquee", 'redrawSpeed')) 
+	config.randomRange  = float(workConfig.get("marquee", 'randomRange')) 
 	config.fontSize = int(workConfig.get("marquee", 'fontSize'))
 	config.marqueeWidth = int(workConfig.get("marquee", 'marqueeWidth'))
 	config.gap = int(workConfig.get("marquee", 'gap'))
+	config.step = int(workConfig.get("marquee", 'step'))
 	config.decrement = int(workConfig.get("marquee", 'decrement'))
 	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
 	config.shadowSize = int(workConfig.get("marquee", 'shadowSize'))

@@ -13,6 +13,7 @@ class ColorOverlay:
 	rateOfColorChange = 0
 	colorA = colorB = [0,0,0]
 	complete =  False
+	randomRange = (10.0,500.0)
 
 
 	def __init__(self): 
@@ -38,7 +39,7 @@ class ColorOverlay:
 		from operator import sub
 		self.colorDelta = map(sub, self.colorB, self.colorA)
 		test = [abs(a) for a in self.colorDelta]
-		if(steps == 0) : steps = random.uniform(10.0,500.0)
+		if(steps == 0) : steps = random.uniform(self.randomRange[0],self.randomRange[1])
 		self.rateOfColorChange = [ a/steps for a in self.colorDelta]
 		self.complete =  False
 

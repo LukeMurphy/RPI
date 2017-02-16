@@ -38,7 +38,7 @@ def init() :
 	w = config.screenWidth - marqueeWidth
 	h = config.screenHeight - marqueeWidth
 	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	if(config.step > 1) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	#pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
 	#pattern = [1,1,1,0,0,0]
 	p0 = [0,0]

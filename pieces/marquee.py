@@ -6,12 +6,13 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils, coloroverlay
 
 
-def makeMarquee(p,w,h):
+def makeMarquee(p,w,h,mw):
 	perimeter = []
-	for i in range (p[0], p[0] + w) : perimeter.append([i, p[1]])
-	for i in range (p[1], p[1] + h) : perimeter.append([p[0] + w, i])
-	for i in range (p[0] + w , p[0], -1) : perimeter.append([i, p[1] + h])
-	for i in range (p[1] + h , p[1]-1, -1) : perimeter.append([p[0], i])
+	mw=0
+	for i in range (p[0], p[0] + w + 1) : perimeter.append([i, p[1]])
+	for i in range (p[1] + mw, p[1] + h + 1) : perimeter.append([p[0] + w, i])
+	for i in range (p[0] + w - mw, p[0] - 1, -1) : perimeter.append([i, p[1] + h])
+	for i in range (p[1] + h - mw, p[1] - 1, -1) : perimeter.append([p[0], i])
 	return (perimeter)
 
 
@@ -31,19 +32,19 @@ def init() :
 
 	config.marquees = []
 
-	marqueeWidth = 10
+	marqueeWidth = config.marqueeWidth
 	w = config.screenWidth - marqueeWidth
 	h = config.screenHeight - marqueeWidth
-	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	p0 = [0,0]
 	innerWidth = w
 	innerHeight = h
-	gap = 1
-	decrement = 1
+	gap = config.gap 
+	decrement = config.decrement
 	mw = marqueeWidth
 	mwPrev = marqueeWidth
 
-	for i in range (0,15):
+	for i in range (0,config.marqueeNum):
 		clrs = [colorutils.randomColor(),colorutils.getRandomRGB()]
 		colOverlayA = coloroverlay.ColorOverlay()
 		colOverlayB = coloroverlay.ColorOverlay()
@@ -60,7 +61,7 @@ def init() :
 			pattern, 
 			makeMarquee(
 				(p0[0], p0[1]),
-				innerWidth , innerHeight  
+				innerWidth , innerHeight, mw
 				), 
 			mw, 
 			clrs,
@@ -191,7 +192,7 @@ def runWork():
 	global config
 	while True:
 		iterate()
-		time.sleep(.005)
+		time.sleep(config.redrawSpeed)
 		#time.sleep(random.random() * config.redrawSpeed)
 
 def iterate() :
@@ -209,9 +210,13 @@ def main(run = True) :
 	global config
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
-	config.redrawSpeed  = float(workConfig.get("hang", 'redrawSpeed')) 
-	config.fontSize = int(workConfig.get("hang", 'fontSize'))
-	config.shadowSize = int(workConfig.get("hang", 'shadowSize'))
+	config.redrawSpeed  = float(workConfig.get("marquee", 'redrawSpeed')) 
+	config.fontSize = int(workConfig.get("marquee", 'fontSize'))
+	config.marqueeWidth = int(workConfig.get("marquee", 'marqueeWidth'))
+	config.gap = int(workConfig.get("marquee", 'gap'))
+	config.decrement = int(workConfig.get("marquee", 'decrement'))
+	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
+	config.shadowSize = int(workConfig.get("marquee", 'shadowSize'))
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	config.clr = (255,0,0)
 	config.textPosY = 40
@@ -227,8 +232,6 @@ def main(run = True) :
 	colorutils.brightness =  1
 	config.messageString = config.word
 	config.xOffset = 15
-
-	config.marqueeWidth = 3
 
 	init()
 	

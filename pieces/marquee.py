@@ -86,7 +86,7 @@ def drawElement() :
 def redraw():
 	global config
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
-
+	mcount  = 0
 	for m in config.marquees :
 
 		offset = m[0]
@@ -100,10 +100,12 @@ def redraw():
 		pattern = patternB + patternA
 		clrA = m[4][0]
 		clrB = m[4][1]
-
 		count = 0
 
-		for p in reversed(perimeter):
+		perim = perimeter
+		if(mcount == 1 or mcount == 3) :perim = reversed(perimeter)
+
+		for p in (perim):
 			if(pattern[count] == 1) :
 				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth, p[1] + marqueeWidth), fill=clrA)
 			else:
@@ -114,6 +116,7 @@ def redraw():
 
 		m[0] += 1
 		if(m[0] >= len(pattern)) : m[0] =  0 
+		mcount += 1
 
 
 def changeColor() :

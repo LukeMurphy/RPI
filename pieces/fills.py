@@ -30,10 +30,14 @@ class Fill :
 	blueRange = [190,300]
 	speedFactor = 250
 
+
 	hue = 0
-	hueTarget = 300
-	sat = .3
-	val = .3
+	hueTarget = 359
+	sat = 1
+	val = 1
+	hueRate = 0
+	hueRateBase = 0
+	
 
 	import colorsys
 
@@ -69,21 +73,38 @@ class Fill :
 		self.targetColor = tuple(int(i) for i in self.getRandomColorList())
 		self.displayCurrentColor = tuple(int(i) for i in self.currentColor)
 		
-		rate = (.01 + random.random()) / self.speedFactor
+		rate = (.01 * random.random()) / self.speedFactor
 		delta = tuple(self.targetColor[i] - self.currentColor[i] for i in range(0,3))
 		self.rateOfChange = tuple(i * rate for i in delta)
 
-		rate = .01
-		self.hueRate = rate * (self.hueTarget - self.hue)
+		#rate = .01
+		rate = random.uniform(.2,.5) #/ self.speedFactor
+		delta = self.hueTarget - self.hue
+		
+		fx = 1 #math.exp(math.pow(deltaFromAvg/200,3))/1
+
+		self.hueRateBase = rate * delta * .01
+		self.hueRate = self.hueRateBase
+
+		#print(delta,deltaFromAvg,fx,self.config.avgHue,self.hueRate)
+		#print(self.hueRate)
 
 
 	def update(self) :
 
-		#for i in range(0,3): self.currentColor[i] += self.rateOfChange[i]
-
 		self.hue += self.hueRate
 
-		if(self.hue >= 360 or self.hue <= 0) : 
+
+		deltaFromAvg = self.config.avgHue - self.hue
+		if(abs(deltaFromAvg) > 120 and abs(self.hueRateBase) > .001) : 
+			delta = self.hueTarget - self.hue
+			self.hueRate = .02 * delta
+		else :
+			self.hueRate = self.hueRateBase
+
+		#print(self.hue, self.hueRate, deltaFromAvg)
+
+		if(self.hue >= 359 or self.hue <= 0 or abs(deltaFromAvg) >= 358) : 
 			self.hue = 0
 			self.make()
 
@@ -161,6 +182,7 @@ def main(run = True) :
 	config.models =["red","green","blue"]
 	config.clr = "blue"
 	config.transitioning = False
+	config.avgHue = 0
 
 	c = int(random.uniform(0, 3))
 	c = 2
@@ -198,8 +220,14 @@ def iterate() :
 
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,100))
 	numBlocks = len(config.fill)
+	avgHue = 0
 	for i in range (0,numBlocks) :
 		config.fill[i].update()
+		avgHue += config.fill[i].hue
+
+	#config.avgHue = avgHue / numBlocks
+
+	
 
 	im = config.image.filter(ImageFilter.GaussianBlur(config.blurLevel))
 	#im2 = im.filter(ImageFilter.MinFilter(3))

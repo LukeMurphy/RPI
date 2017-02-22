@@ -50,7 +50,7 @@ class Fill :
 		#val = random.uniform(self.rangeOfVals[0], self.rangeOfVals[1])
 		#self.currentColor = [val,val,val]
 		self.speedFactor = self.config.speedFactor
-		self.currentColor = self.getRandomColorList()
+		#self.currentColor = self.getRandomColorList()
 
 	def getRandomColorList(self) :
 		col = []
@@ -66,78 +66,29 @@ class Fill :
 		self.height = random.random() * 100 + 5
 
 	def make(self):
-		self.redRange = self.config.redRange
-		self.greenRange = self.config.greenRange
-		self.blueRange = self.config.blueRange
 
-		self.targetColor = tuple(int(i) for i in self.getRandomColorList())
-		self.displayCurrentColor = tuple(int(i) for i in self.currentColor)
-		
-		rate = (.01 * random.random()) / self.speedFactor
-		delta = tuple(self.targetColor[i] - self.currentColor[i] for i in range(0,3))
-		self.rateOfChange = tuple(i * rate for i in delta)
+		rate = random.uniform(.1,.75) #/ self.speedFactor
+		rangeOfSpread = 20
+		self.hueTarget = random.uniform(self.config.targetHue-rangeOfSpread,self.config.targetHue+rangeOfSpread)
+		self.delta = self.hueTarget - self.hue
 
-		#rate = .01
-		rate = random.uniform(.2,.5) #/ self.speedFactor
-		delta = self.hueTarget - self.hue
-		
-		fx = 1 #math.exp(math.pow(deltaFromAvg/200,3))/1
-
-		self.hueRateBase = rate * delta * .01
+		self.hueRateBase = rate * self.delta * .01
 		self.hueRate = self.hueRateBase
 
-		#print(delta,deltaFromAvg,fx,self.config.avgHue,self.hueRate)
-		#print(self.hueRate)
+		#print(self.hue, self.hueTarget, self.hueRate, self.delta)
 
 
 	def update(self) :
 
 		self.hue += self.hueRate
-
-
-		deltaFromAvg = self.config.avgHue - self.hue
-		if(abs(deltaFromAvg) > 120 and abs(self.hueRateBase) > .001) : 
-			delta = self.hueTarget - self.hue
-			self.hueRate = .02 * delta
-		else :
-			self.hueRate = self.hueRateBase
-
-		#print(self.hue, self.hueRate, deltaFromAvg)
-
-		if(self.hue >= 359 or self.hue <= 0 or abs(deltaFromAvg) >= 358) : 
-			self.hue = 0
-			self.make()
-
-		#self.currentColor = colorutils.hsv_to_rgb(self.hue, self.sat, self.val)
+		self.delta = self.hueTarget - self.hue
 		self.currentColor = list(colorutils.HSVToRGB(self.hue, self.sat, self.val))
-
-		'''
-		if(sum(self.displayCurrentColor) > 1000) :
-			self.currentColor[0] = self.targetColor[0]
-			self.currentColor[1] = self.targetColor[1]
-			self.currentColor[2] = self.targetColor[2]
-
-		if( self.displayCurrentColor[0] <= self.targetColor[0] and self.rateOfChange[0] < 0 ) or (self.displayCurrentColor[0] >= self.targetColor[0]  and  self.rateOfChange[0] > 0) or (self.displayCurrentColor[0] == self.targetColor[0]) :
-			self.rateOfChange = (0,self.rateOfChange[1],self.rateOfChange[2])
-			self.currentColor[0] = self.targetColor[0]
-
-		if ( self.displayCurrentColor[1] <= self.targetColor[1] and self.rateOfChange[1] < 0 ) or (self.displayCurrentColor[1] >= self.targetColor[1]  and  self.rateOfChange[1] > 0) or (self.displayCurrentColor[1] == self.targetColor[1]) :
-			self.rateOfChange = (self.rateOfChange[0],0,self.rateOfChange[2])
-			self.currentColor[1] = self.targetColor[1]
-
-		if ( self.displayCurrentColor[2] <= self.targetColor[0] and self.rateOfChange[2] < 0 ) or (self.displayCurrentColor[2] >= self.targetColor[2]  and  self.rateOfChange[2] > 0) or (self.displayCurrentColor[2] == self.targetColor[2]) :
-			self.rateOfChange = (self.rateOfChange[0],self.rateOfChange[1],0)
-			self.currentColor[2] = self.targetColor[2]
-
-		'''
 		self.displayCurrentColor = tuple(int(i) for i in self.currentColor)
-
 		self.config.draw.rectangle((self.x, self.y, self.width + self.x, self.height + self.y), fill = self.displayCurrentColor)
 
-		# ah, nifty Python tricks.....
-		if(all(v == 0 for v in self.rateOfChange)) :
+		if(abs(self.delta) <= 1) : 
+			#self.hue = 0
 			self.make()
-
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -183,6 +134,7 @@ def main(run = True) :
 	config.clr = "blue"
 	config.transitioning = False
 	config.avgHue = 0
+	config.targetHue = 70
 
 	c = int(random.uniform(0, 3))
 	c = 2
@@ -225,13 +177,22 @@ def iterate() :
 		config.fill[i].update()
 		avgHue += config.fill[i].hue
 
-	#config.avgHue = avgHue / numBlocks
+	config.avgHue = avgHue / numBlocks
 
 	
 
 	im = config.image.filter(ImageFilter.GaussianBlur(config.blurLevel))
 	#im2 = im.filter(ImageFilter.MinFilter(3))
 	config.render(im, 0, 0,config.screenWidth,config.screenHeight)
+
+
+	if (config.avgHue <= config.targetHue + 1 and config.avgHue >= config.targetHue - 1) :
+		config.targetHue = int(round(random.uniform(0,359)))
+		print("new target", config.targetHue)
+		for i in range (0,numBlocks) :
+			config.fill[i].make()
+
+
 
 	'''
 

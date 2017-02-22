@@ -3,10 +3,10 @@ import time
 import random
 import math
 import PIL.Image
+import colorsys
+import sys
 from PIL import Image, ImageDraw
 from PIL import ImageFilter, ImageOps, ImageEnhance
-
-import sys
 from modules import colorutils
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -25,10 +25,17 @@ class Fill :
 	targetColor = [80,80,80]
 	rangeOfVals = [50,80]
 	rateOfChange = 0
-	redRange = [80,80]
-	greenRange = [80,80]
-	blueRange = [80,80]
+	redRange = [0,60]
+	greenRange = [60,120]
+	blueRange = [190,300]
 	speedFactor = 250
+
+	hue = 0
+	hueTarget = 300
+	sat = .3
+	val = .3
+
+	import colorsys
 
 	def __init__(self, config, x= 0 , y =0, width = 32, height = 32) :
 		self.config = config
@@ -66,18 +73,28 @@ class Fill :
 		delta = tuple(self.targetColor[i] - self.currentColor[i] for i in range(0,3))
 		self.rateOfChange = tuple(i * rate for i in delta)
 
+		rate = .01
+		self.hueRate = rate * (self.hueTarget - self.hue)
+
 
 	def update(self) :
 
-		for i in range(0,3):
-			self.currentColor[i] += self.rateOfChange[i]
+		#for i in range(0,3): self.currentColor[i] += self.rateOfChange[i]
 
+		self.hue += self.hueRate
+
+		if(self.hue >= 360 or self.hue <= 0) : 
+			self.hue = 0
+			self.make()
+
+		#self.currentColor = colorutils.hsv_to_rgb(self.hue, self.sat, self.val)
+		self.currentColor = list(colorutils.HSVToRGB(self.hue, self.sat, self.val))
+
+		'''
 		if(sum(self.displayCurrentColor) > 1000) :
 			self.currentColor[0] = self.targetColor[0]
 			self.currentColor[1] = self.targetColor[1]
 			self.currentColor[2] = self.targetColor[2]
-
-
 
 		if( self.displayCurrentColor[0] <= self.targetColor[0] and self.rateOfChange[0] < 0 ) or (self.displayCurrentColor[0] >= self.targetColor[0]  and  self.rateOfChange[0] > 0) or (self.displayCurrentColor[0] == self.targetColor[0]) :
 			self.rateOfChange = (0,self.rateOfChange[1],self.rateOfChange[2])
@@ -91,6 +108,7 @@ class Fill :
 			self.rateOfChange = (self.rateOfChange[0],self.rateOfChange[1],0)
 			self.currentColor[2] = self.targetColor[2]
 
+		'''
 		self.displayCurrentColor = tuple(int(i) for i in self.currentColor)
 
 		self.config.draw.rectangle((self.x, self.y, self.width + self.x, self.height + self.y), fill = self.displayCurrentColor)
@@ -102,6 +120,9 @@ class Fill :
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
 
 def setColor(clr="blue", dominant=False) :
 	print(clr)
@@ -123,6 +144,8 @@ def setColor(clr="blue", dominant=False) :
 
 def main(run = True) :
 	global config
+
+
 	config.redrawRate = float(workConfig.get("fills", 'redrawRate'))
 	config.mode = (workConfig.get("fills", 'mode'))
 
@@ -182,6 +205,7 @@ def iterate() :
 	#im2 = im.filter(ImageFilter.MinFilter(3))
 	config.render(im, 0, 0,config.screenWidth,config.screenHeight)
 
+	'''
 
 	# Change dominant color
 	if(random.random() < .0005 and config.fill[0].speedFactor != 20) :
@@ -200,7 +224,7 @@ def iterate() :
 		for i in range (0,numBlocks) :
 			config.fill[i].speedFactor = config.speedFactor
 			config.fill[i].make()
-
+	'''
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

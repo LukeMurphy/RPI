@@ -121,6 +121,22 @@ def HSVToRGB(h,s,v,a=255) :
 	rgbCol = tuple(int(round(i * 255)) for i in rgb)
 	return rgbCol
 
+def HCLToRGB(h,c,l,a=255) :
+	huex = h / 60.0
+	x = c * ( 1 - abs(huex%2 - 1))
+	r1=g1=b1=0
+	if huex <= 1 and huex >= 0 : (r1,g1,b1) = (c,x,0)
+	if huex <= 2 and huex >= 1 : (r1,g1,b1) = (x,c,0) 
+	if huex <= 3 and huex >= 2 : (r1,g1,b1) = (0,c,x) 
+	if huex <= 4 and huex >= 3 : (r1,g1,b1) = (0,x,c) 
+	if huex <= 5 and huex >= 4 : (r1,g1,b1) = (x,0,c) 
+	if huex <= 6 and huex >= 5 : (r1,g1,b1) = (c,0,x) 
+	m = l - (.3 * r1 + .59 * g1 + .11 * b1)
+	rgb  = [r1 + m, g1 + m, b1 + m, a]
+
+	rgbCol = tuple(int(round(i * 255)) for i in rgb)
+	return rgbCol
+
 
 def subtractiveColors(arg) :
 	color = (0,0,0)

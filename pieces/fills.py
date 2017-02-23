@@ -86,7 +86,12 @@ class Fill :
 			self.hue = 360
 
 		self.delta = self.hueTarget - self.hue
-		self.currentColor = list(colorutils.HSVToRGB(self.hue, self.sat, self.val))
+
+		# Hue, Saturation, Value
+		#self.currentColor = list(colorutils.HSVToRGB(self.hue, self.sat, self.val))
+
+		# Hue, Chroma, Luma
+		self.currentColor = list(colorutils.HCLToRGB(self.hue, self.sat, self.val))
 		self.displayCurrentColor = tuple(int(i) for i in self.currentColor)
 		self.config.draw.rectangle((self.x, self.y, self.width + self.x, self.height + self.y), fill = self.displayCurrentColor)
 
@@ -111,6 +116,8 @@ def main(run = True) :
 	config.rangeOfSpread = int(workConfig.get("fills", 'rangeOfSpread'))
 	config.rateOfChange = (workConfig.get("fills", 'rateOfChange').split(","))
 	config.rateOfChange = [float(i) for i in config.rateOfChange]
+	config.vignette = (workConfig.getboolean("fills", 'vignette'))
+	config.crossbar = (workConfig.getboolean("fills", 'crossbar'))
 
 	config.transitioning = False
 	config.avgHue = 0
@@ -164,9 +171,10 @@ def iterate() :
 	config.avgHue = avgHue / numBlocks
 
 	# draw the "vignette"
-	config.draw.rectangle((0, 0, config.screenWidth-1, config.screenHeight-1), outline=(50,50,50,100))
-	config.draw.rectangle((config.screenWidth/2, 0, config.screenWidth/2 + 2, config.screenHeight), fill=(50,50,50,100))
-	#config.draw.rectangle((10,10,60,60), fill= (255,0,0,0), outline=(0,0,0,0))
+	if(config.vignette) :
+		config.draw.rectangle((0, 0, config.screenWidth-1, config.screenHeight-1), outline=(50,50,50,100))
+	if(config.crossbar) :
+		config.draw.rectangle((config.screenWidth/2, 0, config.screenWidth/2 + 2, config.screenHeight), fill=(50,50,50,100))
 
 	# Do the blur
 	im = config.image.filter(ImageFilter.GaussianBlur(config.blurLevel))

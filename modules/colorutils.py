@@ -14,9 +14,7 @@ wheel = [(255,2,2),(253,83,8),(255,153,1),(250,188,2),(255,255,0),(0,125,0),(146
 rgbColorWheel = ["RED","YELLOW","GREEN","CYAN","BLUE","MAGENTA"]
 rgbWheel = [(255,0,0),(255,255,0),(0,255,0),(0,255,255),(0,0,255),(255,0,255)]
 
-sunset = dict(drk1=(57,36,25),drk2=(124,77,56),
-	drk3=(153,95,56),mid1=(177,177,78),mid2=(173,104,51),yellow=(218,172,71),ltyellow=(246,232,171),
-	ltorange=(221,144,82),warmwht=(255,255,238) )
+sunset = dict(drk1=(57,36,25),drk2=(124,77,56),drk3=(153,95,56),mid1=(177,177,78),mid2=(173,104,51),yellow=(218,172,71),ltyellow=(246,232,171),ltorange=(221,144,82),warmwht=(255,255,238) )
 sky = dict(coolblue=(254,254,248),ltblue=(190,200,202),grayblue=(182,186,182))
 #sorted_sunset = {k: (sum(v)/3) for k, v in sunset.iteritems()}
 sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), key=operator.itemgetter(1))
@@ -106,7 +104,7 @@ def closestRBYfromRGB((r,g,b)) :
 	return wheel[dArray[0][0]]
 
 
-def HSVToRGB(h,s,v) :
+def HSVToRGB(h,s,v,a=255) :
 	c = v * s
 	huex = h / 60.0
 	x = c * ( 1 - abs(huex%2 - 1))
@@ -118,7 +116,7 @@ def HSVToRGB(h,s,v) :
 	if huex <= 5 and huex >= 4 : (r1,g1,b1) = (x,0,c) 
 	if huex <= 6 and huex >= 5 : (r1,g1,b1) = (c,0,x) 
 	m = v - c
-	rgb  = [r1 + m, g1 + m, b1 + m]
+	rgb  = [r1 + m, g1 + m, b1 + m, a]
 
 	rgbCol = tuple(int(round(i * 255)) for i in rgb)
 	return rgbCol

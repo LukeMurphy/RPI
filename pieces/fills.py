@@ -9,6 +9,13 @@ from PIL import Image, ImageDraw
 from PIL import ImageFilter, ImageOps, ImageEnhance
 from modules import colorutils
 
+
+
+import cv2
+import numpy as np
+
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #make script to subtly shift blue color rectangles slowly
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -31,10 +38,10 @@ class Fill :
 	speedFactor = 250
 
 
-	hue = 0
-	hueTarget = 359
-	sat = 1
-	val = 1
+	hue = 120
+	hueTarget = 220
+	sat = .4
+	val = .4
 	hueRate = 0
 	hueRateBase = 0
 	
@@ -67,7 +74,7 @@ class Fill :
 
 	def make(self):
 
-		rate = random.uniform(.1,.75) #/ self.speedFactor
+		rate = random.uniform(.05,.2) #/ self.speedFactor
 		rangeOfSpread = 20
 		self.hueTarget = random.uniform(self.config.targetHue-rangeOfSpread,self.config.targetHue+rangeOfSpread)
 		self.delta = self.hueTarget - self.hue
@@ -94,8 +101,6 @@ class Fill :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
-
-
 def setColor(clr="blue", dominant=False) :
 	print(clr)
 	global config
@@ -117,7 +122,6 @@ def setColor(clr="blue", dominant=False) :
 def main(run = True) :
 	global config
 
-
 	config.redrawRate = float(workConfig.get("fills", 'redrawRate'))
 	config.mode = (workConfig.get("fills", 'mode'))
 
@@ -134,7 +138,7 @@ def main(run = True) :
 	config.clr = "blue"
 	config.transitioning = False
 	config.avgHue = 0
-	config.targetHue = 70
+	config.targetHue = 220
 
 	c = int(random.uniform(0, 3))
 	c = 2
@@ -147,9 +151,15 @@ def main(run = True) :
 	config.id = config.image.im.id
 
 	config.fill = []
-	for col in range (0,config.cols) :
-		for row in range (0,config.rows) :
-			f  = Fill(config, col * 32, row * 32)
+
+	rows = config.rows / 5
+	cols = config.cols * 2
+
+	colWidth = config.screenWidth / cols
+	rowHeight = config.screenHeight / rows
+	for col in range (0,cols) :
+		for row in range (0,rows) :
+			f  = Fill(config, col * colWidth, row * rowHeight, colWidth, rowHeight)
 			f.make()
 			config.fill.append(f)
 
@@ -179,41 +189,37 @@ def iterate() :
 
 	config.avgHue = avgHue / numBlocks
 
-	
+
+
+	config.draw.rectangle((0,0,config.screenWidth-1,config.screenHeight-1), outline=(0,0,0,100))
 
 	im = config.image.filter(ImageFilter.GaussianBlur(config.blurLevel))
-	#im2 = im.filter(ImageFilter.MinFilter(3))
+
 	config.render(im, 0, 0,config.screenWidth,config.screenHeight)
 
+	var  = 10
+	if (config.avgHue <= config.targetHue + var and config.avgHue >= config.targetHue - var) :
+		
+		#config.targetHue = int(round(random.uniform(0,359)))
 
-	if (config.avgHue <= config.targetHue + 1 and config.avgHue >= config.targetHue - 1) :
-		config.targetHue = int(round(random.uniform(0,359)))
+		change = int(round(random.uniform(-60,60)))
+
+
+		if(config.targetHue != 200) : 
+			config.targetHue = 200
+		else :
+			config.targetHue = config.avgHue + change
+
+
+		if(config.targetHue >= 360) :
+			config.targetHue = config.targetHue - 360
+		if(config.targetHue < 0) :
+			config.targetHue = config.targetHue + 360
+
 		print("new target", config.targetHue)
 		for i in range (0,numBlocks) :
 			config.fill[i].make()
 
-
-
-	'''
-
-	# Change dominant color
-	if(random.random() < .0005 and config.fill[0].speedFactor != 20) :
-		c = int(random.uniform(0, 3))
-		if config.models[c] != config.clr :
-			setColor(config.models[c], True)
-			config.transitioning = True
-			for i in range (0,numBlocks) :
-				config.fill[i].speedFactor = 20
-				config.fill[i].make()
-
-	# After the transition is complete, normal slow variations
-	if(config.fill[0].speedFactor == 20 and random.random() < .01 and config.transitioning == True) :
-		setColor(config.clr)
-		config.transitioning = False
-		for i in range (0,numBlocks) :
-			config.fill[i].speedFactor = config.speedFactor
-			config.fill[i].make()
-	'''
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

@@ -114,6 +114,7 @@ def main(run = True) :
 	config.FillCols = int(workConfig.get("fills", 'FillCols'))
 	config.hueBase = int(workConfig.get("fills", 'hueBase'))
 	config.rangeOfSpread = int(workConfig.get("fills", 'rangeOfSpread'))
+	config.vval = int(workConfig.get("fills", 'vval'))
 	config.rateOfChange = (workConfig.get("fills", 'rateOfChange').split(","))
 	config.rateOfChange = [float(i) for i in config.rateOfChange]
 	config.vignette = (workConfig.getboolean("fills", 'vignette'))
@@ -172,9 +173,9 @@ def iterate() :
 
 	# draw the "vignette"
 	if(config.vignette) :
-		config.draw.rectangle((0, 0, config.screenWidth-1, config.screenHeight-1), outline=(50,50,50,100))
+		config.draw.rectangle((0, 0, config.screenWidth-1, config.screenHeight-1), outline=(config.vval,config.vval,config.vval,100))
 	if(config.crossbar) :
-		config.draw.rectangle((config.screenWidth/2, 0, config.screenWidth/2 + 2, config.screenHeight), fill=(50,50,50,100))
+		config.draw.rectangle((config.screenWidth/2, 0, config.screenWidth/2 + 2, config.screenHeight), fill=(config.vval,config.vval,config.vval,100))
 
 	# Do the blur
 	im = config.image.filter(ImageFilter.GaussianBlur(config.blurLevel))

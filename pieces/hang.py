@@ -33,8 +33,7 @@ def init() :
 	(5,5,4,(random.uniform(7,9))),(5,5,6,(random.uniform(7,9)))
 	]
 
-
-	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(15,15,30,5))
+	config.draw.rectangle((0,0, config.screenWidth + abs(config.imageXOffset) ,config.screenHeight + abs(config.imageYOffset)), fill=(15,15,30,5))
 
 	gap = 0
 	for i in range(0, len(config.word)) :
@@ -64,7 +63,6 @@ def guess():
 	vBuffer = 33
 	hBuffer = 30
 
-
 	if (len(config.alphabetLeft) > 0 and config.wordNotFound == True) :
 		ran = int(random.uniform(0,len(config.alphabetLeft)))
 		char = config.alphabetLeft[ran]
@@ -80,8 +78,6 @@ def guess():
 			#drawText(config.textPosX + pos * 10,config.textPosY, char)
 			#drawText(config.textPosX + pos * 10,config.textPosY, "*")
 
-
-
 			xPos = 3 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
 			yPos = 32 + random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
 
@@ -91,9 +87,7 @@ def guess():
 				config.wordNotFound = False
 				config.lost = False
 				config.done = True
-
 				#drawText(30, 5, "Computer Wins!", False)
-
 
 		else :
 			## Incorrect - draw letter & part scaffold
@@ -104,7 +98,6 @@ def guess():
 
 			xPos = random.random() * config.screenWidth #* 1/3 + config.screenWidth/2
 			yPos = random.random() * config.screenHeight #* 1/3 + config.screenHeight/2
-
 
 			xPos = 80 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
 			yPos = random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
@@ -172,25 +165,26 @@ def iterate() :
 	redraw()
 	guess()
 
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+	#config.render(config.image, config.imageXOffset, config.imageYOffset,  config.imageXOffset + config.screenWidth, config.imageYOffset + config.screenHeight)
+	config.render(config.image, config.imageXOffset, config.imageYOffset,  config.screenWidth, config.screenHeight)
 
 	if(config.done == True) :
 		init()
 		time.sleep(config.redrawSpeed)
 
 
-
-
-
-
 def main(run = True) :
 	global config
-	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	config.draw  = ImageDraw.Draw(config.image)
 	config.redrawSpeed  = float(workConfig.get("hang", 'redrawSpeed')) 
 	config.fontSize = int(workConfig.get("hang", 'fontSize'))
 	config.shadowSize = int(workConfig.get("hang", 'shadowSize'))
+	config.vOffset = int(workConfig.get("hang", 'vOffset'))
+	config.xOffset = int(workConfig.get("hang", 'xOffset'))
+	config.imageXOffset = int(workConfig.get("hang", 'imageXOffset'))
+	config.imageYOffset = int(workConfig.get("hang", 'imageYOffset'))
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
+	config.image = Image.new("RGBA", (config.screenWidth + abs(config.imageXOffset), config.screenHeight + abs(config.imageYOffset)))
+	config.draw  = ImageDraw.Draw(config.image)
 	config.clr = (255,0,0)
 	config.textPosY = 40
 	config.textPosX = 120
@@ -199,12 +193,11 @@ def main(run = True) :
 	config.word = "FEAR"
 	colorutils.brightness =  1
 	config.messageString = config.word
-	config.xOffset = 15
+	
 	# (0,10,2,6) (4,10,2,6)
 	config.scaffolding = [(2,15,2,10),(2,10,2,6),(2,6,2,2),(2,2,2,0),(2,2,4,0),(2,0,5,0),(5,0,5,1)]
 	#config.body = [(4,1,6,2),(5,2,5,3),(5,3,5,5),(5,3,3,3),(5,3,7,3),(5,5,4,7),(5,5,6,7),(5,5,5,6),(5,5,4,4),(5,5,6,6)]
 	config.body = [(4,1,6,2),(5,2,5,3),(5,3,5,5),(5,3,3,3),(5,3,7,3),(5,5,4,7),(5,5,6,7)]
-
 
 	init()
 	

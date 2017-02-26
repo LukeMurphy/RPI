@@ -33,7 +33,12 @@ def init() :
 	(5,5,4,(random.uniform(7,9))),(5,5,6,(random.uniform(7,9)))
 	]
 
+<<<<<<< HEAD
 	config.draw.rectangle((0,0, config.screenWidth + abs(config.imageXOffset) ,config.screenHeight + abs(config.imageYOffset)), fill=(5,5,10,5))
+=======
+	config.draw.rectangle((0,0, config.screenWidth + abs(config.imageXOffset) ,config.screenHeight + abs(config.imageYOffset)), fill=(5,5,5 + int(round(random.random() * 10)),int(round(random.random() * 10))))
+	#if(random.random() < .02) :config.draw.rectangle((0,0, config.screenWidth + abs(config.imageXOffset) ,config.screenHeight + abs(config.imageYOffset)), fill=(15,15,35,6))
+>>>>>>> a01c5b0dd642b9a01cf60859b5dbe393fb75a23e
 
 	gap = 0
 	for i in range(0, len(config.word)) :
@@ -62,6 +67,8 @@ def guess():
 
 	#vBuffer = 33
 	#hBuffer = 30
+
+	#config.draw.rectangle((0,0, config.screenWidth + abs(config.imageXOffset) ,config.screenHeight + abs(config.imageYOffset)), fill=(15,15,30,5))
 
 	if (len(config.alphabetLeft) > 0 and config.wordNotFound == True) :
 		ran = int(random.uniform(0,len(config.alphabetLeft)))
@@ -187,6 +194,7 @@ def main(run = True) :
 	config.guessyOffset = int(workConfig.get("hang", 'guessyOffset'))	
 	config.letterxOffset = int(workConfig.get("hang", 'letterxOffset'))
 	config.letteryOffset = int(workConfig.get("hang", 'letteryOffset'))
+	
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	config.image = Image.new("RGBA", (config.screenWidth + abs(config.imageXOffset), config.screenHeight + abs(config.imageYOffset)))
 	config.draw  = ImageDraw.Draw(config.image)
@@ -196,7 +204,7 @@ def main(run = True) :
 
 	config.alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 	config.word = "FEAR"
-	colorutils.brightness =  1
+	colorutils.brightness =  .9
 	config.messageString = config.word
 	
 	# (0,10,2,6) (4,10,2,6)

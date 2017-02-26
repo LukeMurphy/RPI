@@ -60,8 +60,8 @@ def drawText(xPos=0, yPos=0, messageString = "", crossout=False) :
 def guess():
 	global config
 
-	vBuffer = 33
-	hBuffer = 30
+	#vBuffer = 33
+	#hBuffer = 30
 
 	if (len(config.alphabetLeft) > 0 and config.wordNotFound == True) :
 		ran = int(random.uniform(0,len(config.alphabetLeft)))
@@ -78,8 +78,8 @@ def guess():
 			#drawText(config.textPosX + pos * 10,config.textPosY, char)
 			#drawText(config.textPosX + pos * 10,config.textPosY, "*")
 
-			xPos = 3 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
-			yPos = 32 + random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
+			xPos = config.letterxOffset + random.uniform(config.hBuffer,config.screenWidth-config.hBuffer) 
+			yPos = config.letteryOffset + + random.uniform(config.vBuffer/3,config.screenHeight-config.vBuffer) 
 
 			drawText(xPos, yPos, char.upper(), True)
 
@@ -96,11 +96,11 @@ def guess():
 			config.fontSize = int(random.uniform(10,50))
 			config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 
-			xPos = random.random() * config.screenWidth #* 1/3 + config.screenWidth/2
-			yPos = random.random() * config.screenHeight #* 1/3 + config.screenHeight/2
+			#xPos = random.random() * config.screenWidth #* 1/3 + config.screenWidth/2
+			#yPos = random.random() * config.screenHeight #* 1/3 + config.screenHeight/2
 
-			xPos = 80 + random.uniform(hBuffer,config.screenWidth-hBuffer) 
-			yPos = random.uniform(vBuffer/3,config.screenHeight-vBuffer) 
+			xPos = config.guessxOffset + random.uniform(config.hBuffer,config.screenWidth-config.hBuffer) 
+			yPos = config.guessyOffset + random.uniform(config.vBuffer/3,config.screenHeight-config.vBuffer) 
 
 			drawText(xPos, yPos, char, False)
 
@@ -178,10 +178,15 @@ def main(run = True) :
 	config.redrawSpeed  = float(workConfig.get("hang", 'redrawSpeed')) 
 	config.fontSize = int(workConfig.get("hang", 'fontSize'))
 	config.shadowSize = int(workConfig.get("hang", 'shadowSize'))
-	config.vOffset = int(workConfig.get("hang", 'vOffset'))
 	config.xOffset = int(workConfig.get("hang", 'xOffset'))
 	config.imageXOffset = int(workConfig.get("hang", 'imageXOffset'))
 	config.imageYOffset = int(workConfig.get("hang", 'imageYOffset'))
+	config.hBuffer = int(workConfig.get("hang", 'hBuffer'))
+	config.vBuffer = int(workConfig.get("hang", 'vBuffer'))
+	config.guessxOffset = int(workConfig.get("hang", 'guessxOffset'))
+	config.guessyOffset = int(workConfig.get("hang", 'guessyOffset'))	
+	config.letterxOffset = int(workConfig.get("hang", 'letterxOffset'))
+	config.letteryOffset = int(workConfig.get("hang", 'letteryOffset'))
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	config.image = Image.new("RGBA", (config.screenWidth + abs(config.imageXOffset), config.screenHeight + abs(config.imageYOffset)))
 	config.draw  = ImageDraw.Draw(config.image)

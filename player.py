@@ -119,6 +119,7 @@ def configure() :
 
 		if(config.rendering == "hub") :
 			from modules import rendertohub
+
 			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			config.rotation = float(workconfig.get("displayconfig", 'rotation'))
 			config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))

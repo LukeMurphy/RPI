@@ -22,14 +22,14 @@ class Fill :
 	rows  = 1
 	cols = 1
 	x = y = 0
-	currentColor = [80,80,80,255]
-	targetColor = [80,80,80,255]
+	currentColor = [0,0,0,255]
+	targetColor = [0,0,0,255]
 	rangeOfVals = [50,80]
 	rateOfChange = 0
 
-	hue = 200
-	hueBase = 240
-	hueTarget = 240
+	hue = 180
+	hueBase = 180
+	hueTarget = 1
 	sat = .4
 	val = .4
 	hueRate = 0
@@ -38,7 +38,7 @@ class Fill :
 
 	import colorsys
 
-	def __init__(self, config, x= 0 , y =0, width = 32, height = 32) :
+	def __init__(self, config, col, row, x=0 , y=0, width = 32, height = 32) :
 
 		self.config = config
 		self.x = x
@@ -50,8 +50,10 @@ class Fill :
 		self.rangeOfSpread = self.config.rangeOfSpread
 		self.rateOfChange = self.config.rateOfChange
 		self.hueBase = self.config.hueBase
+		self.col = col
+		self.row = row
 
-	def random(self) :
+	def randomize(self) :
 		self.x  = random.random() *  self.config.screenWidth
 		self.y  = random.random() *  self.config.screenHeight
 		self.width = random.random() * 100 + 5
@@ -62,6 +64,8 @@ class Fill :
 		rate = random.uniform(self.rateOfChange[0]/1000,self.rateOfChange[1]/1000) 
 		self.hueTarget = random.uniform( (self.config.targetHue - self.rangeOfSpread) , (self.config.targetHue + self.rangeOfSpread))
 
+		#self.hueTarget = 0
+
 		if(self.hueTarget > 360) : self.hueTarget -= 360
 		if(self.hueTarget < 0) : self.hueTarget += 360
 
@@ -70,32 +74,39 @@ class Fill :
 		if (self.delta > 180 ) : self.delta -= 360
 		if (self.delta < -180 ) : self.delta += 360
 
+		# this makes the rate proportional to the delta
 		self.hueRateBase = rate * self.delta
-		self.hueRate = self.hueRateBase
+		self.hueRate = self.hueRateBase	
+
+		#rate *= 20
+		#if(self.hueTarget - self.hue < 0) : rate = -rate
+		#self.hueRateBase = rate
+		#self.hueRate = self.hueRateBase
 
 		#print(self.config.targetHue, self.rangeOfSpread)
-		#print(self.hue, self.hueTarget , self.hueRate)
+		#print(self.row, self.col, self.hue, self.hueTarget , self.hueRate)
 
 	def update(self) :
 
 		self.hue += self.hueRate
+		self.delta = self.hueTarget - self.hue
 
 		if (self.hue > 360) :
-			self.hue = 0
+			self.hue -= 360
 		if(self.hue < 0) :
-			self.hue = 360
+			self.hue += 360
 
-		self.delta = self.hueTarget - self.hue
 
 		# Hue, Saturation, Value
 		#self.currentColor = list(colorutils.HSVToRGB(self.hue, self.sat, self.val))
 
 		# Hue, Chroma, Luma
-		self.currentColor = list(colorutils.HCLToRGB(self.hue, self.sat, self.val))
-		self.displayCurrentColor = tuple(int(i) for i in self.currentColor)
+		self.currentColor = list(colorutils.HSLToRGB(self.hue, self.sat, self.val))
+		self.displayCurrentColor = tuple((int(i)) for i in self.currentColor)
+		#if (self.row == 0  and self.col == 0) : print(self.hue, self.displayCurrentColor)
 		self.config.draw.rectangle((self.x, self.y, self.width + self.x, self.height + self.y), fill = self.displayCurrentColor)
 
-		if(abs(self.delta) <= 1) : 
+		if(abs(self.delta) < 1) : 
 			#self.hue = 0
 			self.make()
 
@@ -135,13 +146,19 @@ def main(run = True) :
 	rows = config.FillRows
 	cols = config.FillCols
 
-	colWidth = config.screenWidth / cols
-	rowHeight = config.screenHeight / rows
+	colWidth = round(config.screenWidth / cols)
+	rowHeight = round(config.screenHeight / rows)
+	print(colWidth,rowHeight)
 	for col in range (0,cols) :
 		for row in range (0,rows) :
-			f  = Fill(config, col * colWidth, row * rowHeight, colWidth, rowHeight)
+			f  = Fill(config, col, row, col * colWidth, row * rowHeight, colWidth, rowHeight)
 			f.make()
 			config.fill.append(f)
+
+
+	config.timerTime = time.time()
+	config.timerDelay = 10
+	config.timeoutTime = config.timerTime + config.timerDelay
 
 
 	if(run) : runWork()
@@ -156,6 +173,25 @@ def runWork():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def changeTargetHue() :
+	change = int(round(random.uniform(-180,180)))
+
+	config.targetHue = round(config.avgHue + change)
+
+	# the randge has to be 0 - 360
+	if(config.targetHue > 360) :
+		config.targetHue = config.targetHue - 360
+	if(config.targetHue < 0) :
+		config.targetHue = config.targetHue + 360
+
+	print("new target", config.targetHue)
+
+	# Update all the blocks with their new "target hue"
+	numBlocks = len(config.fill)
+	for i in range (0,numBlocks) :
+		config.fill[i].make()
+
 
 def iterate() :
 	global config
@@ -184,31 +220,18 @@ def iterate() :
 	config.render(im, 0, 0,config.screenWidth,config.screenHeight)
 
 	# Decide if the primary target color should shift
-	var  = 1
-	if (config.avgHue <= config.targetHue + var and config.avgHue >= config.targetHue - var) :
-		
-		change = int(round(random.uniform(-180,180)))
+	
+	var  = 0
+	#if (config.avgHue <= config.targetHue + var and config.avgHue >= config.targetHue - var) :
+	#	changeTargetHue()
 
-		'''
-		if(config.targetHue != config.hueBase) : 
-			config.targetHue = config.hueBase
-		else :
-			config.targetHue = config.avgHue + change
-		'''
 
-		config.targetHue = round(config.avgHue + change)
+	if (time.time() >= config.timeoutTime) :
+		config.timerTime = time.time()
+		config.timerDelay = 10
+		config.timeoutTime = config.timerTime +  config.timerDelay
+		changeTargetHue()
 
-		# the randge has to be 0 - 360
-		if(config.targetHue > 360) :
-			config.targetHue = config.targetHue - 360
-		if(config.targetHue < 0) :
-			config.targetHue = config.targetHue + 360
-
-		print("new target", config.targetHue)
-
-		# Update all the blocks with their new "target hue"
-		for i in range (0,numBlocks) :
-			config.fill[i].make()
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

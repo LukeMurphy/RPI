@@ -119,6 +119,10 @@ def configure() :
 
 		if(config.rendering == "hub") :
 			from modules import rendertohub
+                        from cntrlscripts import stest
+                        thrd = threading.Thread(target=stest.__main__)
+                        threads.append(thrd)
+                        thrd.start()
 
 			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			config.rotation = float(workconfig.get("displayconfig", 'rotation'))

@@ -16,6 +16,6 @@ power=$(cat /sys/class/gpio/gpio$GPIOpin1/value)
 if [ $power = 0 ]; then
 sleep 1
 else
-sudo poweroff
+echo "turning offfff"
 fi
 done

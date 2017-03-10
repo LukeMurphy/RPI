@@ -15,8 +15,11 @@ def __main__():
 		GPIO.wait_for_edge(18, GPIO.FALLING)
 		print("shutting down!")
 		time.sleep(1)
-		os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")
+		os.system("./shutdown.sh")
 	except KeyboardInterrupt:
 		GPIO.cleanup()       # clean up GPIO on CTRL+C exit
 	GPIO.cleanup()           # clean up GPIO on normal exit
+
+
+
 

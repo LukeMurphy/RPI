@@ -119,10 +119,6 @@ def configure() :
 
 		if(config.rendering == "hub") :
 			from modules import rendertohub
-                        from cntrlscripts import stest
-                        thrd = threading.Thread(target=stest.__main__)
-                        threads.append(thrd)
-                        thrd.start()
 
 			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			config.rotation = float(workconfig.get("displayconfig", 'rotation'))
@@ -130,6 +126,19 @@ def configure() :
 			config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
 			config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
 			config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
+
+			config.isRPI = False
+
+			try :
+				config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
+			except Exception as e: 
+				print (str(e))
+
+			if(config.isRPI) : 
+				from cntrlscripts import stest
+				thrd = threading.Thread(target=stest.__main__)
+				threads.append(thrd)
+				thrd.start()
 			
 			# Create the image-canvas for the work
 			# Because rotation is an option, recreate accordingly

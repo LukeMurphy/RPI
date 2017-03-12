@@ -5,11 +5,10 @@ import math
 import threading
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
-from cntrlscripts import stest
+#from cntrlscripts import stest
+#threads = []
 
-threads = []
 global thrd, config
-
 
 def guess():
 	pass
@@ -186,12 +185,14 @@ def iterate() :
 def main(run = True) :
 	global config, threads, thrd
 
+	'''
 	# this tests for the power-down RPI switch
 	from cntrlscripts import stest
 	thrd = threading.Thread(target=stest.__main__)
 	threads.append(thrd)
 	thrd.start()
-
+	'''
+	
 
 	config.redrawSpeed  = float(workConfig.get("hang", 'redrawSpeed')) 
 	config.fontSize = int(workConfig.get("hang", 'fontSize'))

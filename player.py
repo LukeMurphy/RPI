@@ -134,7 +134,7 @@ def configure() :
 			except Exception as e: 
 				print (str(e))
 
-			if(config.isRPI) : 
+			if(config.isRPI == True) : 
 				from cntrlscripts import stest
 				thrd = threading.Thread(target=stest.__main__)
 				threads.append(thrd)

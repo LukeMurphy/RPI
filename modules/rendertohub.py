@@ -137,13 +137,13 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	# This needs to be optomized !!!!!!
 
 	if(config.rotation != 0) : 
-		if(config.fullRotation == False) :
+		if(config.fullRotation == True) :
+			# This rotates the image that is painted i.e. after pasting-in the image sent
+			config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
+		else :
 			# This rotates the image sent to be rendered
 			imageToRender = imageToRender.rotate(-config.rotation)
 			#imageToRender = ImageChops.offset(imageToRender, -40, 40) 
-		else :
-			# This rotates the image that is painted i.e. after pasting-in the image sent
-			config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
 
 	try :
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)

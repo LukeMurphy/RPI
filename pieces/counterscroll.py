@@ -209,8 +209,9 @@ def main(run = True) :
 
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
+
 	config.canvasImageWidth = config.canvasWidth * config.displayRows
-	config.canvasImageHeight = config.canvasHeight
+	config.canvasImageHeight = config.canvasHeight / config.displayRows
 
 	config.fontSize = int(workConfig.get("scroll", 'fontSize'))
 	config.vOffset = int(workConfig.get("scroll", 'vOffset'))
@@ -252,13 +253,21 @@ def main(run = True) :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# Used to composite XO's and message text
-	#config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , int(config.screenHeight / config.displayRows)))
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
+	#config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, int(config.screenHeight / config.displayRows)))
+	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
-	config.canvasImageFinal = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
+	config.canvasImageFinal = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
+
+	'''
+	if(abs(config.rotation) == 90) :
+		#config.canvasImageWidth = config.canvasWidth * config.displayRows	
+		config.canvasImageFinal = Image.new("RGBA", (config.canvasHeight, config.canvasWidth))
+		cw = config.canvasWidth
+		ch = config.canvasHeight
+	'''
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	#config.drawBeforeConversion = callBack
@@ -538,11 +547,12 @@ def iterate() :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+	
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
 		segmentHeight = int(config.canvasHeight / config.displayRows)
 		segmentWidth = config.canvasWidth
-		segment =  config.canvasImage.crop((n * config.screenWidth, 0, segmentWidth + n * config.screenWidth, segmentHeight))
+		segment =  config.canvasImage.crop((n * config.canvasWidth, 0, segmentWidth + n * config.canvasWidth, segmentHeight))
 		
 		# At some point go to modulo for even/odd ... but for now not more than 5 rows
 		if ((n == 0 or n == 2 or n == 4) and (config.displayRows >  1) ) :
@@ -550,6 +560,10 @@ def iterate() :
 			segment = ImageOps.mirror(segment)
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
 
+
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# Debug geometry for rotation
 	#tS = config.canvasImageFinal.size
@@ -558,10 +572,15 @@ def iterate() :
 
 	if(config.useThreeD) :
 		ThreeD(config.canvasImageFinal)
+		#drw = ImageDraw.Draw(config.warpedImage)
+		#drw.rectangle((0,0, config.canvasWidth -4 , config.canvasHeight - 2), fill = None, outline=(222,100,0))
 		config.render(config.warpedImage, 0, 0, config.canvasWidth  , config.canvasHeight, False)
 	else : 
 		config.render(config.canvasImageFinal, 0, 0, config.canvasWidth  , config.canvasHeight, False)
 
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -572,12 +591,13 @@ def ThreeD(imageToRender) :
 	offset = 0
 	angle =  math.pi  / numSegments
 
-	if(config.rotation == -90) :
+	if(abs(config.rotation) == 90) :
 		numSegments = 32
 		dFactor =  1.415
 		angle =  math.pi  / numSegments
-		width  = config.screenHeight
-		height = config.screenWidth
+		width  = config.screenHeight * .8
+		height = config.canvasWidth
+
 	else: 
 		width  = config.screenWidth
 		height = config.screenHeight

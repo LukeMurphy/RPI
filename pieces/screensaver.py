@@ -40,15 +40,15 @@ def main(run = True) :
 	config.yMax = int(workConfig.get("txtdisplay", 'yMax'))
 
 	config.txtBoxHtMultuiplier = float(workConfig.get("txtdisplay", 'txtBoxHtMultuiplier'))
-	config.txtStringL1 = (workConfig.get("txtdisplay", 'txt1'))
-	config.txtStringL2 = (workConfig.get("txtdisplay", 'txt2'))
-	config.txtStringL3 = (workConfig.get("txtdisplay", 'txt3'))
+	config.txtStringL1 = (workConfig.get("txtdisplay", 'txt1')).replace("'","")
+	config.txtStringL2 = (workConfig.get("txtdisplay", 'txt2')).replace("'","")
+	config.txtStringL3 = (workConfig.get("txtdisplay", 'txt3')).replace("'","")
 	config.crawlText = (workConfig.get("txtdisplay", 'crawlText'))
 
 	config.xPos  =  0
 	config.yPos = 0
-	config.vx = 2
-	config.vy = 1
+	config.vx = 0
+	config.vy = 0
 
 	config.crawlPosx = 0 
 	config.crawlPosy = 0 
@@ -110,12 +110,18 @@ def runWork():
 		time.sleep(config.playSpeed)	
 
 def randomizeVelocities() :
-	if(random.random() > .5): config.vx = int(5 * random.random())
+	if(random.random() > .5): config.vx = int(10 * random.random())
 	if(random.random() > .5): config.vy = int(5 * random.random())
 	
 
 def iterate( n = 0) :
 	global config
+
+	if(config.vx >= 0) : 
+		config.vx += .12
+	else :
+		config.vx += .12
+
 
 	config.xPos += config.vx
 	config.yPos += config.vy
@@ -125,6 +131,7 @@ def iterate( n = 0) :
 
 	if(config.vx == 0 and config.vy == 0) : randomizeVelocities() 
 	if(config.vy == 0) : randomizeVelocities() 
+
 	change = False
 
 	if (config.xPos + config.xbuffer  > config.xMax ):
@@ -157,12 +164,12 @@ def iterate( n = 0) :
 
 
 	###### the higher the alpha value, the less messy the trails are - more black 
-	config.textDraw.rectangle((0,32,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,120))
+	config.textDraw.rectangle((0,32,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,10))
 
 	#config.textDraw.text((3,0), str(config.xPos), (255,200,0,200), font=config.font2)
 	#config.textDraw.text((29,0), str(config.yPos), (255,200,200), font=config.font2)
 
-	fontToUse = config.font2
+	fontToUse = config.font1
 
 	config.textDraw.text((1,32), config.txtStringL1, (0,0,0), font=fontToUse)
 	config.textDraw.text((1,46), config.txtStringL2, (0,0,0), font=fontToUse)
@@ -184,10 +191,10 @@ def iterate( n = 0) :
 
 	fontToUse = config.font3
 	config.crawlDraw.rectangle((0,0,config.screenHeight,16), fill=(0,0,10,120))
-	config.crawlDraw.text((config.crawlPosx,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)
-	config.crawlDraw.text((config.crawlPosx + 1 ,config.crawlPosy), config.crawlText, (0,0,0), font=fontToUse)
-	config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
-	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, (255,0,0,255), font=fontToUse)
+	#config.crawlDraw.text((config.crawlPosx,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)
+	#config.crawlDraw.text((config.crawlPosx + 1 ,config.crawlPosy), config.crawlText, (0,0,0), font=fontToUse)
+	#config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
+	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, (100,100,100,255), font=fontToUse)
 	imgCrawl = config.textCrawl.rotate(90)
 	
 	config.crawlPosx -= 1
@@ -200,10 +207,10 @@ def iterate( n = 0) :
 	config.renderImage.paste(config.iconImage , (0,60), config.iconImage)
 	###### Paste in rotated text
 	config.renderImage.paste(imgText, (0,0), imgText)	
-	config.image.paste(config.renderImage, (config.xPos, config.yPos), config.renderImage)
+	config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
 	
 	###### Paste in crawl
-	config.image.paste(imgCrawl,(0,0), imgCrawl)
+	#config.image.paste(imgCrawl,(0,0), imgCrawl)
 	
 	###### Render the final full image
 	#config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)

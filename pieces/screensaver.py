@@ -43,19 +43,30 @@ def main(run = True) :
 	config.txtStringL1 = (workConfig.get("txtdisplay", 'txt1'))
 	config.txtStringL2 = (workConfig.get("txtdisplay", 'txt2'))
 	config.txtStringL3 = (workConfig.get("txtdisplay", 'txt3'))
+	config.crawlText = (workConfig.get("txtdisplay", 'crawlText'))
 
 	config.xPos  =  0
 	config.yPos = 0
 	config.vx = 2
 	config.vy = 1
 
+	config.crawlPosx = 0 
+	config.crawlPosy = 0 
+
 	path = config.path  + "/assets/imgs/"
 	imageList = [config.imageToLoad] 
 
+	config.image = Image.new("RGB", (config.screenWidth, config.screenHeight))
+	config.draw = ImageDraw.Draw(config.renderImage)
+
 	config.renderImage = Image.new("RGBA", (128, 128))
 	config.renderDraw = ImageDraw.Draw(config.renderImage)
+
 	config.textImage = Image.new("RGBA", (128, 128))
 	config.textDraw = ImageDraw.Draw(config.textImage)
+
+	config.textCrawl = Image.new("RGBA", (config.screenHeight, config.screenHeight))
+	config.crawlDraw = ImageDraw.Draw(config.textCrawl)
 	
 	config.iconImage = Image.open((path + imageList[0]) , "r")
 	config.iconImage.load()
@@ -76,6 +87,7 @@ def main(run = True) :
 	config.txtBoxWd = config.pixLen[0]
 	config.txtBoxHt = config.pixLen[1] * config.txtBoxHtMultuiplier
 
+	config.crawlLen = config.crawlDraw.textsize(config.crawlText, font = config.font3)
 	###### These will be "reversed" if the images are rotated - e.g. verical screen
 	'''
 	config.xbuffer = config.pixLen[1]
@@ -112,6 +124,7 @@ def iterate( n = 0) :
 	if(random.random() > .98) : config.txtColor = colorutils.getRandomRGB()
 
 	if(config.vx == 0 and config.vy == 0) : randomizeVelocities() 
+	if(config.vy == 0) : randomizeVelocities() 
 	change = False
 
 	if (config.xPos + config.xbuffer  > config.xMax ):
@@ -143,9 +156,8 @@ def iterate( n = 0) :
 
 
 
-
 	###### the higher the alpha value, the less messy the trails are - more black 
-	config.textDraw.rectangle((0,32,config.txtBoxWd,config.txtBoxHt), fill=(0,0,0,120))
+	config.textDraw.rectangle((0,32,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,120))
 
 	#config.textDraw.text((3,0), str(config.xPos), (255,200,0,200), font=config.font2)
 	#config.textDraw.text((29,0), str(config.yPos), (255,200,200), font=config.font2)
@@ -164,20 +176,38 @@ def iterate( n = 0) :
 	config.textDraw.text((0,46 + 1), config.txtStringL2, (0,0,0), font=fontToUse)
 	config.textDraw.text((0,56 + 1), config.txtStringL3, (0,0,0), font=fontToUse)	
 
-
 	config.textDraw.text((0,32), config.txtStringL1, config.txtColor, font=fontToUse)
 	config.textDraw.text((0,46), config.txtStringL2, config.txtColor, font=fontToUse)
 	config.textDraw.text((0,56), config.txtStringL3, config.txtColor, font=fontToUse)
 
 	imgText = config.textImage.rotate(90)
 
+	fontToUse = config.font3
+	config.crawlDraw.rectangle((0,0,config.screenHeight,16), fill=(0,0,10,120))
+	config.crawlDraw.text((config.crawlPosx,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)
+	config.crawlDraw.text((config.crawlPosx + 1 ,config.crawlPosy), config.crawlText, (0,0,0), font=fontToUse)
+	config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
+	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, (255,0,0,255), font=fontToUse)
+	imgCrawl = config.textCrawl.rotate(90)
+	
+	config.crawlPosx -= 1
+
+	if(config.crawlPosx < -config.crawlLen[0]) :
+		config.crawlPosx = config.screenHeight
+
+
 	###### Paste in image
 	config.renderImage.paste(config.iconImage , (0,60), config.iconImage)
 	###### Paste in rotated text
-	config.renderImage.paste(imgText, (0,0), imgText)
+	config.renderImage.paste(imgText, (0,0), imgText)	
+	config.image.paste(config.renderImage, (config.xPos, config.yPos), config.renderImage)
+	
+	###### Paste in crawl
+	config.image.paste(imgCrawl,(0,0), imgCrawl)
 	
 	###### Render the final full image
-	config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)
+	#config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)
+	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight, True, False)
 
 
 	config.updateCanvas()

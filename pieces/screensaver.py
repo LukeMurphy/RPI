@@ -112,6 +112,7 @@ def runWork():
 def randomizeVelocities() :
 	if(random.random() > .5): config.vx = int(10 * random.random())
 	if(random.random() > .5): config.vy = int(5 * random.random())
+	if(random.random() > .95): config.xPos = -32
 	
 
 def iterate( n = 0) :
@@ -119,8 +120,10 @@ def iterate( n = 0) :
 
 	if(config.vx >= 0) : 
 		config.vx += .12
+		config.vx *= 1.04
 	else :
 		config.vx += .12
+		config.vx *= .96
 
 
 	config.xPos += config.vx

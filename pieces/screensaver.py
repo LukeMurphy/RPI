@@ -2,7 +2,7 @@
 #import modules
 from modules import utils, configuration, colorutils
 from modules.imagesprite import ImageSprite
-from configs import localconfig
+#from configs import localconfig
 
 from PIL import Image, ImageDraw, ImageMath, ImageEnhance, ImageFont
 from PIL import ImageChops, ImageFilter, ImagePalette
@@ -29,6 +29,13 @@ def main(run = True) :
 	config.imageToLoad = (workConfig.get("images", 'i1'))
 	config.playSpeed = float(workConfig.get("images", 'playspeed'))
 	config.fontSize = int(workConfig.get("txtdisplay", 'fontSize'))
+	
+	## Often the presentation is on a set of panels or screen that is sideways
+	## so that the whole piece needs to be rotated - so the orientation of the 
+	## display may mean the work has to be also oriented that way
+	
+	config.windowOrientation = "vertical"
+	
 
 	config.xbuffer = int(workConfig.get("txtdisplay", 'xbuffer'))
 	config.ybuffer = int(workConfig.get("txtdisplay", 'ybuffer'))
@@ -52,6 +59,9 @@ def main(run = True) :
 
 	config.crawlPosx = 0 
 	config.crawlPosy = 0 
+	
+	config.imageXOffset = 0
+	config.imageYOffset = 0  #60
 
 	path = config.path  + "/assets/imgs/"
 	imageList = [config.imageToLoad] 
@@ -71,13 +81,14 @@ def main(run = True) :
 	config.iconImage = Image.open((path + imageList[0]) , "r")
 	config.iconImage.load()
 	config.iconImage = config.iconImage.resize((48,48))
-	config.iconImage = config.iconImage.rotate(90,expand=True)
+	if (config.windowOrientation == "horizontal"):
+		config.iconImage = config.iconImage.rotate(90,expand=True)
 	config.iconImageHeight =  config.iconImage.getbbox()[3]
 
 
 	# Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
 	config.font1 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSerifBold.ttf',config.fontSize )
-	config.font2 = ImageFont.truetype(config.path + '/assets/fonts/freefont/Comic Sans MS Bold.ttf',config.fontSize )
+	config.font2 = ImageFont.truetype(config.path + '/assets/fonts/freefont/ComicSansMSBold.ttf',config.fontSize )
 	config.font3 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSansBold.ttf',config.fontSize )
 	config.pixLen = config.textDraw.textsize(config.txtStringL1, font = config.font2)
 
@@ -89,6 +100,12 @@ def main(run = True) :
 
 	config.crawlLen = config.crawlDraw.textsize(config.crawlText, font = config.font3)
 	###### These will be "reversed" if the images are rotated - e.g. verical screen
+	
+	config.xVelocityRange = 15
+	config.yVelocityRange = 5
+	
+	
+	
 	'''
 	config.xbuffer = config.pixLen[1]
 	config.ybuffer = config.pixLen[1] * 4
@@ -110,20 +127,28 @@ def runWork():
 		time.sleep(config.playSpeed)	
 
 def randomizeVelocities() :
-	if(random.random() > .5): config.vx = int(10 * random.random())
-	if(random.random() > .5): config.vy = int(5 * random.random())
+	if(random.random() > .5): config.vx = int(config.xVelocityRange * random.random())
+	if(random.random() > .5): config.vy = int(config.yVelocityRange * random.random())
 	if(random.random() > .95): config.xPos = -32
 	
 
 def iterate( n = 0) :
 	global config
-
-	if(config.vx >= 0) : 
-		config.vx += .12
-		config.vx *= 1.04
+	
+	if(config.windowOrientation == "horizontal"):
+		if(config.vx >= 0) : 
+			config.vx += .12
+			config.vx *= 1.04
+		else :
+			config.vx += .12
+			config.vx *= .96
 	else :
-		config.vx += .12
-		config.vx *= .96
+		if(config.vy >= 0) : 
+			config.vy += .12
+			config.vy *= 1.04
+		else :
+			config.vy += .12
+			config.vy *= .96
 
 
 	config.xPos += config.vx
@@ -190,7 +215,10 @@ def iterate( n = 0) :
 	config.textDraw.text((0,46), config.txtStringL2, config.txtColor, font=fontToUse)
 	config.textDraw.text((0,56), config.txtStringL3, config.txtColor, font=fontToUse)
 
-	imgText = config.textImage.rotate(90)
+	if (config.windowOrientation=="horizontal"):
+		imgText = config.textImage.rotate(90)
+	else :
+		imgText = config.textImage
 
 	fontToUse = config.font3
 	config.crawlDraw.rectangle((0,0,config.screenHeight,16), fill=(0,0,10,120))
@@ -198,7 +226,9 @@ def iterate( n = 0) :
 	#config.crawlDraw.text((config.crawlPosx + 1 ,config.crawlPosy), config.crawlText, (0,0,0), font=fontToUse)
 	#config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
 	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, (100,100,100,255), font=fontToUse)
-	imgCrawl = config.textCrawl.rotate(90)
+	
+	if(config.windowOrientation == "horizontal"):
+		imgCrawl = config.textCrawl.rotate(90)
 	
 	config.crawlPosx -= 1
 
@@ -207,7 +237,8 @@ def iterate( n = 0) :
 
 
 	###### Paste in image
-	config.renderImage.paste(config.iconImage , (0,60), config.iconImage)
+	config.renderImage.paste(config.iconImage , (config.imageXOffset,config.imageYOffset), config.iconImage)
+	
 	###### Paste in rotated text
 	config.renderImage.paste(imgText, (0,0), imgText)	
 	config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
@@ -218,7 +249,6 @@ def iterate( n = 0) :
 	###### Render the final full image
 	#config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight, True, False)
-
 
 	config.updateCanvas()
 

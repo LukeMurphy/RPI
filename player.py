@@ -87,6 +87,7 @@ def configure() :
 		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 		#config.render = render
 
+		print("Loading:", str(config.work))
 		work = importlib.import_module('pieces.'+str(config.work))
 		work.config = config
 		work.workConfig = workconfig

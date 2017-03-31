@@ -34,7 +34,8 @@ def main(run = True) :
 	## so that the whole piece needs to be rotated - so the orientation of the 
 	## display may mean the work has to be also oriented that way
 	
-	config.windowOrientation = "vertical"
+
+	config.windowOrientation = (workConfig.get("displayconfig", 'windowOrientation'))
 	
 
 	config.xbuffer = int(workConfig.get("txtdisplay", 'xbuffer'))
@@ -240,7 +241,7 @@ def iterate( n = 0) :
 	config.renderImage.paste(config.iconImage , (config.imageXOffset,config.imageYOffset), config.iconImage)
 	
 	###### Paste in rotated text
-	config.renderImage.paste(imgText, (0,0), imgText)	
+	config.renderImage.paste(imgText, (-10,-85), imgText)	
 	config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
 	
 	###### Paste in crawl

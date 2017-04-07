@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo python /home/pi/RPI/player.py RPI ./ configs/"$@".cfg & 
+sudo python /home/pi/Documents/RPI/player.py RPI ./ configs/"$@".cfg & 

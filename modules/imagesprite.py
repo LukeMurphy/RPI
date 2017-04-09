@@ -37,6 +37,7 @@ class ImageSprite :
 	imgHeight = 0
 	panRangeLimit = 0
 	useJitter = False
+	jitterRate = .05
 	useBlink = False
 	blink = False
 	blinkNum = 0
@@ -162,7 +163,7 @@ class ImageSprite :
 				newSizeY = change * self.image.size[1]
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
 
-			brt = random.random() + .05
+			brt = random.random() + self.config.minBrightness
 
 			# This was really just set up for the multiple-planes piece
 			if(self.randomizeColor) :
@@ -463,7 +464,7 @@ class ImageSprite :
 				self.jitter = False
 				self.dY = 0
 				self.yPos = 0
-			if(random.random() > .97) : self.jitter = True
+			if(random.random() < self.jitterRate) : self.jitter = True
 			if(self.jitter) : self.dY = random.uniform(-.3,.3)
 
 		self.move()

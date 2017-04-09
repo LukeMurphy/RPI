@@ -209,9 +209,9 @@ class ImageSprite :
 				r = int(random.uniform(200,255))
 				g = int(random.uniform(0,100))
 				b = int(random.uniform(0,10))
-
-				r = int(random.uniform(0,100))
-				b = int(random.uniform(200,255))
+				if (random.random() > .5) :
+					r = int(random.uniform(0,100))
+					b = int(random.uniform(200,255))
 				clr = (r,g,b)
 
 			self.colorize(clr)

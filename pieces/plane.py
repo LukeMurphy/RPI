@@ -66,6 +66,16 @@ def main(run = True) :
 	config.scalingFactor  = float(workConfig.get("plane", 'scalingFactor'))
 	config.speedFactor  = float(workConfig.get("plane", 'speedFactor'))
 	config.useJitter  = (workConfig.getboolean("plane", 'useJitter'))
+	try :
+		config.jitterRate = float(workConfig.get("plane", 'jitterRate'))
+	except Exception as e: 
+		print (str(e))
+		config.jitterRate = .03	
+	try :
+		config.jitterResetRate = float(workConfig.get("plane", 'jitterResetRate'))
+	except Exception as e: 
+		print (str(e))
+		config.jitterResetRate = .25
 	config.useBlink  = (workConfig.getboolean("plane", 'useBlink'))
 	config.noTrails  = (workConfig.getboolean("plane", 'noTrails'))
 	config.imageList  = (workConfig.get("repeater", 'imageList'))
@@ -93,14 +103,30 @@ def main(run = True) :
 			imgLoader.scalingFactor = config.scalingFactor
 			imgLoader.useJitter =  config.useJitter
 			imgLoader.useBlink = config.useBlink
-			imgLoader.brightnessFactor = config.brightness * random.random()
+			imgLoader.jitterResetRate = config.jitterResetRate
+			imgLoader.jitterRate = config.jitterRate
 			imgLoader.config = config
 			imgLoader.colorMode = "fixed" #colorWheel #random #colorRGB
 			imgLoader.colorModeDirectional = False
 			imgLoader.resizeToHeight = True
 			imgLoader.yOffsetChange = False
-			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-			imgLoader.make(path + imageList, 1 * config.scalingFactor * 2 * config.speedFactor , 0, True, False, False, False)
+			'''
+			make(self, 
+			img="", 
+			setvX = 0, 
+			setvY = 0, 
+			processImage = True, 
+			resizeImage = True, 
+			randomizeDirection = True, 
+			randomizeColor = True):
+			'''
+			imgLoader.make(path + imageList, 
+				1 * config.scalingFactor * 2 * config.speedFactor , 
+				0, 
+				True, 
+				False, 
+				False, 
+				False)
 			#imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
 
 		else :

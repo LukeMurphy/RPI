@@ -38,6 +38,8 @@ class ImageSprite :
 	panRangeLimit = 0
 	useJitter = False
 	jitterRate = .05
+	jitterResetRate = .25
+
 	useBlink = False
 	blink = False
 	blinkNum = 0
@@ -81,6 +83,8 @@ class ImageSprite :
 
 		self.clrUtils = colorutils
 		self.clrUtils.brightness = self.config.brightness
+
+		self.brightnessFactor = config.minBrightness
 		pass
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''	
@@ -460,11 +464,14 @@ class ImageSprite :
 		if(abs(self.dY) > 1) : self.stepSize = abs(self.dY)
 
 		if(self.useJitter):
-			if(random.random() > .5) : 
+			# Correct jitter
+			if(random.random() < self.jitterResetRate) : 
 				self.jitter = False
 				self.dY = 0
 				self.yPos = 0
+			# Allow jitter
 			if(random.random() < self.jitterRate) : self.jitter = True
+			# Do jitter
 			if(self.jitter) : self.dY = random.uniform(-.3,.3)
 
 		self.move()

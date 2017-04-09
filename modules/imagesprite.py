@@ -162,7 +162,7 @@ class ImageSprite :
 				newSizeY = change * self.image.size[1]
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
 
-			brt = random.random()
+			brt = random.random() + .05
 
 			# This was really just set up for the multiple-planes piece
 			if(self.randomizeColor) :

@@ -97,7 +97,7 @@ def main(run = True) :
 			imgLoader.config = config
 			imgLoader.colorMode = "fixed" #colorWheel #random #colorRGB
 			imgLoader.colorModeDirectional = False
-			imgLoader.resizeToHeight = False
+			imgLoader.resizeToHeight = True
 			imgLoader.yOffsetChange = False
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
 			imgLoader.make(path + imageList, 1 * config.scalingFactor * 2 * config.speedFactor , 0, True, False, False, False)

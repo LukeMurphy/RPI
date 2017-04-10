@@ -14,7 +14,7 @@ def main(run = True) :
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
 	
-	config.delay = .02
+	config.delay = .01
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -28,6 +28,8 @@ def main(run = True) :
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	#config.drawBeforeConversion = callBack
+	
+	'''
 	config.actualScreenWidth = config.canvasImage.size[0]
 
 	imageWrapLength = config.screenWidth * 50
@@ -36,13 +38,16 @@ def main(run = True) :
 	if(config.rotation == -90) :
 		imageWrapLength = config.screenWidth * 50
 		config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenWidth))
-
 		
+	'''
 	
 	config.xPos = 0
 	config.yPos = 0
 	config.xPosR = 0
 	config.yPosR = 0
+	
+	config.dx = 1
+	config.dy = 0
 	
 
 	setUp()
@@ -85,7 +90,7 @@ def iterate() :
 
 	draw  = ImageDraw.Draw(config.canvasImageFinal)
 	#draw.rectangle((config.xPos,config.yPos,191 + config.xPos,50 + config.yPos), fill=(200,20,0), outline=(0,200,0))
-	draw.rectangle((0,0,50,50), fill=(50,0,100), outline=(200,200,0))
+	draw.rectangle((0,0,20,20), fill=(50,0,200), outline=(200,200,0))
 	
 	#draw.rectangle((0,0,192,160), fill=None, outline=(0,255,255))
 	
@@ -95,16 +100,34 @@ def iterate() :
 	#draw.point((192,160), fill=(0,255,255))
 	#draw.point((191,159), fill=(0,255,255))
 
-	config.xPos += 1
-	config.yPos += 1
+	config.xPos += config.dx
+	config.yPos += config.dy
 	
-	config.xPosR += 1
-	config.yPosR += 3
+	config.xPosR += config.dx
+	config.yPosR += config.dy
 
-	if(config.xPosR > config.screenWidth) : config.xPosR = -10
-	if(config.yPosR > config.screenWidth) : config.yPosR = -10
+	if(config.xPosR > config.screenWidth) : 
+		config.xPosR = config.screenWidth
+		config.xPos = config.screenWidth
+		config.dx *= -1
+	if(config.yPosR > config.screenHeight) : 
+		config.yPosR = config.screenHeight
+		config.yPos = config.screenHeight
+		config.dy *= -1
+	if(config.xPosR < 0) : 
+		config.xPosR = 0
+		config.xPos = 0
+		config.dx*= -1
+	if(config.yPosR < 0) : 
+		config.yPosR = 0
+		config.yPos = 0
+		config.dy *= -1
 	
-	config.render(config.canvasImageFinal, config.xPosR, config.yPosR, 500, 500)
+	
+	config.render(config.canvasImageFinal, config.xPosR, config.yPosR)
+	
+	print (config.xPosR)
+	#config.render(config.canvasImageFinal, 0,0, 500, 500)
 
 
 

@@ -189,7 +189,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 		newimage = Image.new('P', config.renderImageFull.size)
 
-		nc = int(random.uniform(2,128))
+		nc = int(random.uniform(2,255))
+
 		newimage = config.renderImageFull.convert("P", colors = nc)
 		config.renderImageFull =  newimage.convert("RGB")
 

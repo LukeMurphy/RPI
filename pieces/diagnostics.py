@@ -11,10 +11,15 @@ def main(run = True) :
 	print("Diag Loaded")
 	colorutils.brightness = config.brightness
 
+
+
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
+	config.canvasImageWidth -= 4
+	config.canvasImageHeight -= 4
 	
 	config.delay = .01
+	config.objWidth = 20
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -22,9 +27,12 @@ def main(run = True) :
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
-	config.canvasImageFinal = Image.new("RGBA", (config.screenWidth , config.screenHeight))
+	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and 
+	# reordered to fit
+	config.canvasImageFinal = Image.new("RGBA", (100 , 100))
 
+	config.fillColor = colorutils.getRandomRGB()
+	config.outlineColor = colorutils.getRandomRGB()
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	#config.drawBeforeConversion = callBack
@@ -47,7 +55,7 @@ def main(run = True) :
 	config.yPosR = 0
 	
 	config.dx = 1
-	config.dy = 0
+	config.dy = 2
 	
 
 	setUp()
@@ -90,7 +98,11 @@ def iterate() :
 
 	draw  = ImageDraw.Draw(config.canvasImageFinal)
 	#draw.rectangle((config.xPos,config.yPos,191 + config.xPos,50 + config.yPos), fill=(200,20,0), outline=(0,200,0))
-	draw.rectangle((0,0,20,20), fill=(50,0,200), outline=(200,200,0))
+
+	xPos = int(config.xPosR)
+	yPos = int(config.yPosR)
+
+	config.draw.rectangle((xPos, yPos,xPos+ config.objWidth , yPos +config.objWidth ), fill=config.fillColor, outline=config.outlineColor)
 	
 	#draw.rectangle((0,0,192,160), fill=None, outline=(0,255,255))
 	
@@ -106,30 +118,44 @@ def iterate() :
 	config.xPosR += config.dx
 	config.yPosR += config.dy
 
-	if(config.xPosR > config.screenWidth) : 
-		config.xPosR = config.screenWidth
-		config.xPos = config.screenWidth
+	if(config.xPosR + config.objWidth > config.screenWidth) : 
+		config.xPosR = config.screenWidth - config.objWidth 
+		config.xPos = config.screenWidth - config.objWidth 
+		changeColor()
 		config.dx *= -1
-	if(config.yPosR > config.screenHeight) : 
-		config.yPosR = config.screenHeight
-		config.yPos = config.screenHeight
+	if(config.yPosR + config.objWidth> config.screenHeight) : 
+		config.yPosR = config.screenHeight-config.objWidth 
+		config.yPos = config.screenHeight-config.objWidth 
+		changeColor()
 		config.dy *= -1
 	if(config.xPosR < 0) : 
 		config.xPosR = 0
 		config.xPos = 0
+		changeColor()
 		config.dx*= -1
 	if(config.yPosR < 0) : 
 		config.yPosR = 0
 		config.yPos = 0
+		changeColor()
 		config.dy *= -1
+
+	if(config.dx == 0 and config.dy == 0 ):
+		if(random.random() > .5): config.dx = (2 * random.random())
+		if(random.random() > .5): config.dy = (2 * random.random())
 	
-	
-	config.render(config.canvasImageFinal, config.xPosR, config.yPosR)
-	
-	print (config.xPosR)
+
+
+	config.render(config.image, 0,0)
+		
+	#print (config.xPosR)
 	#config.render(config.canvasImageFinal, 0,0, 500, 500)
 
-
+def changeColor():
+	config.fillColor = colorutils.randomColor(random.random())
+	config.outlineColor = colorutils.getRandomRGB()
+	if(random.random() > .5): config.dx = (4 * random.random() + 2)
+	if(random.random() > .5): config.dy = (4 * random.random() + 2)
+	if(random.random() > .5): config.objWidth = int(random.uniform(17,23))
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

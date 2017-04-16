@@ -61,7 +61,7 @@ class unit:
 			self.changeColor()
 			self.dy *= -1
 
-		if(self.dx == 0 and self.dy == 0 ):
+		if(self.dx == 0 or self.dy == 0 ):
 			if(random.random() > .5): self.dx = (2 * random.random())
 			if(random.random() > .5): self.dy = (2 * random.random())
 
@@ -109,9 +109,10 @@ class unit:
 	def changeColor(self):
 		self.fillColor = colorutils.randomColor(random.random())
 		self.outlineColor = colorutils.getRandomRGB()
-		if(random.random() > .5): self.dx = (4 * random.random() + 2)
-		if(random.random() > .5): self.dy = (4 * random.random() + 2)
-		if(random.random() > .75): 
+		if(random.random() > .5): self.dx = random.uniform(-self.speedRange,self.speedRange) 
+		if(random.random() > .5): self.dy = random.uniform(-self.speedRange,self.speedRange) 
+
+		if(random.random() > .95 and self.imageRotation not in [0,180,-90,90]): 
 			if(random.random() > .5): 
 				if(random.random() > .5): 
 					self.imageRotation = 0
@@ -122,8 +123,11 @@ class unit:
 					self.imageRotation = 90
 				else:
 					self.imageRotation = -90
-		elif(random.random() > .85): 
-			self.imageRotation = int(random.uniform(0,60))
+		elif(random.random() > .97): 
+			self.imageRotation = int(random.uniform(-60,60))
+
+		if(self.imageRotation  in [-90]):
+			self.fillColor = (0,0,0)
 
 
 
@@ -156,6 +160,7 @@ def main(run = True) :
 		config.handleWidth = int(workConfig.get("repaint", 'handleWidth')) 
 		config.holeWidth = int(workConfig.get("repaint", 'holeWidth')) 
 		config.holeHeight = int(workConfig.get("repaint", 'holeHeight')) 
+		config.speedRange = float(workConfig.get("repaint", 'speedRange')) 
 
 	except Exception as e: 
 		print (str(e))
@@ -176,10 +181,7 @@ def main(run = True) :
 		obj.handleWidth = config.handleWidth
 		obj.holeWidth = config.holeWidth
 		obj.holeHeight = config.holeHeight
-
-
-
-
+		obj.speedRange = config.speedRange
 		config.unitArrray.append(obj)
 
 	setUp()

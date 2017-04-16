@@ -94,7 +94,7 @@ class unit:
 					]
 
 		# the brush outline
-		self.draw.polygon(shape, fill=(0,0,0), outline=self.outlineColor)
+		self.draw.polygon(shape, fill=self.fillColor, outline=self.outlineColor)
 		# the bristles
 		self.draw.rectangle(((xPos, yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule + self.bristle)), fill=self.fillColor, outline=None)
 		# Line demarking bristles

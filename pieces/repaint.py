@@ -62,7 +62,36 @@ class unit:
 	def render(self):
 		xPos = int(self.xPosR)
 		yPos = int(self.yPosR)
-		self.config.draw.rectangle((xPos, yPos,xPos+ self.objWidth , yPos +self.objWidth ), fill=self.fillColor, outline=self.outlineColor)
+		'''
+		ferrule = 14
+		bristle = 19
+		handle = 24
+		brushWidth = 24
+		handleWidth = 6
+		holeWidth = 2
+		holeHeight = 3
+		'''
+		shape = [	
+					xPos, yPos,
+					xPos, yPos + self.ferrule,
+					xPos, yPos + self.ferrule + self.bristle,
+					xPos + self.brushWidth, yPos + self.ferrule + self.bristle,
+					xPos + self.brushWidth, yPos,
+					xPos + self.brushWidth/2 + self.handleWidth/2, yPos,
+					xPos + self.brushWidth/2 + self.handleWidth/2, yPos - self.handle,
+					xPos + self.brushWidth/2 - self.handleWidth/2, yPos - self.handle,
+					xPos + self.brushWidth/2 - self.handleWidth/2, yPos,
+					xPos,yPos
+					]
+
+		# the brush outline
+		self.config.draw.polygon(shape, fill=(0,0,0), outline=self.outlineColor)
+		# the bristles
+		self.config.draw.rectangle(((xPos, yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule + self.bristle)), fill=self.fillColor, outline=None)
+		# Line demarking bristles
+		self.config.draw.line(((xPos,yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule)), fill=self.outlineColor, width=1)
+		# hangling hole
+		self.config.draw.rectangle((xPos + self.brushWidth/2 - self.holeWidth/2, yPos - self.handle + 3, xPos + self.brushWidth/2 + self.holeWidth/2 , yPos - self.handle + 3 + self.holeHeight), fill=(0,0,0), outline=self.outlineColor)
 
 
 	def changeColor(self):
@@ -72,9 +101,13 @@ class unit:
 		if(random.random() > .5): self.dy = (4 * random.random() + 2)
 		if(random.random() > .5): self.objWidth = int(random.uniform(self.objWidthMin,self.objWidthMax))
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
-	global config, directionOrder
+	global config, directionOrder,workConfig
 	print("---------------------")
 	print("Diag Loaded")
 	colorutils.brightness = config.brightness
@@ -82,8 +115,23 @@ def main(run = True) :
 	config.canvasImageHeight = config.screenHeight
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
-	config.delay = .02
-	config.numUnits  = 1
+
+
+
+	try :
+		config.delay = float(workConfig.get("repaint", 'repaintDelay')) 
+		config.numUnits = int(workConfig.get("repaint", 'numBrushes')) 
+		config.ferrule = int(workConfig.get("repaint", 'ferrule')) 
+		config.bristle = int(workConfig.get("repaint", 'bristle')) 
+		config.handle = int(workConfig.get("repaint", 'handle')) 
+		config.brushWidth = int(workConfig.get("repaint", 'brushWidth')) 
+		config.handleWidth = int(workConfig.get("repaint", 'handleWidth')) 
+		config.holeWidth = int(workConfig.get("repaint", 'holeWidth')) 
+		config.holeHeight = int(workConfig.get("repaint", 'holeHeight')) 
+
+	except Exception as e: 
+		print (str(e))
+
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -93,10 +141,17 @@ def main(run = True) :
 	config.unitArrray = []
 	for i in range(0,config.numUnits):
 		obj = unit(config)
-		#obj.move = False
-		obj.objWidth = 5
-		obj.objWidthMax = 4
-		obj.objWidthMin = 3
+		obj.ferrule = config.ferrule
+		obj.bristle = config.bristle
+		obj.handle = config.handle
+		obj.brushWidth = config.brushWidth
+		obj.handleWidth = config.handleWidth
+		obj.holeWidth = config.holeWidth
+		obj.holeHeight = config.holeHeight
+
+
+
+
 		config.unitArrray.append(obj)
 
 	setUp()
@@ -104,6 +159,9 @@ def main(run = True) :
 	if(run) : runWork()
 
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
@@ -125,12 +183,15 @@ def runWork():
 
 def iterate() :
 	global config
-	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
+
+	## No trails 
+	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 
 	for i in range(0,config.numUnits):
 		obj = 	config.unitArrray[i]
 		if(obj.move ==True) : obj.update()
 		obj.render()
+
 
 	config.render(config.image, 0,0)
 		
@@ -143,6 +204,3 @@ def callBack() :
 	return True
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-

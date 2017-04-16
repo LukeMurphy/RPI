@@ -108,11 +108,11 @@ class unit:
 
 	def changeColor(self):
 		self.fillColor = colorutils.randomColor(random.random())
-		self.outlineColor = colorutils.getRandomRGB()
+		self.outlineColor = colorutils.getRandomRGB(random.uniform(.2,1))
 		if(random.random() > .5): self.dx = random.uniform(-self.speedRange,self.speedRange) 
 		if(random.random() > .5): self.dy = random.uniform(-self.speedRange,self.speedRange) 
 
-		if(random.random() > .95 and self.imageRotation not in [0,180,-90,90]): 
+		if(random.random() < self.orthoProbability and self.imageRotation not in [0,180,-90,90]): 
 			if(random.random() > .5): 
 				if(random.random() > .5): 
 					self.imageRotation = 0
@@ -123,7 +123,7 @@ class unit:
 					self.imageRotation = 90
 				else:
 					self.imageRotation = -90
-		elif(random.random() > .97): 
+		elif(random.random() < self.rotationProbability): 
 			self.imageRotation = int(random.uniform(-60,60))
 
 		if(self.imageRotation  in [-90]):
@@ -141,7 +141,7 @@ class unit:
 def main(run = True) :
 	global config, directionOrder,workConfig
 	print("---------------------")
-	print("Diag Loaded")
+	print("RE:PAINT Loaded")
 	colorutils.brightness = config.brightness
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
@@ -161,6 +161,9 @@ def main(run = True) :
 		config.holeWidth = int(workConfig.get("repaint", 'holeWidth')) 
 		config.holeHeight = int(workConfig.get("repaint", 'holeHeight')) 
 		config.speedRange = float(workConfig.get("repaint", 'speedRange')) 
+		config.rotationProbability = float(workConfig.get("repaint", 'rotationProbability')) 
+		config.orthoProbability = float(workConfig.get("repaint", 'orthoProbability')) 
+		config.rectifyProbability = float(workConfig.get("repaint", 'rectifyProbability')) 
 
 	except Exception as e: 
 		print (str(e))
@@ -182,7 +185,11 @@ def main(run = True) :
 		obj.holeWidth = config.holeWidth
 		obj.holeHeight = config.holeHeight
 		obj.speedRange = config.speedRange
+		obj.rotationProbability = config.rotationProbability
+		obj.orthoProbability = config.orthoProbability
 		config.unitArrray.append(obj)
+
+	config.rectify = True
 
 	setUp()
 
@@ -217,8 +224,20 @@ def iterate() :
 	## No trails 
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 
+	if (random.random() < config.rectifyProbability) :
+		config.rectify = True
+
+	if (random.random() < config.rectifyProbability) :
+		config.rectify = False
+
+
+
 	for i in range(0,config.numUnits):
 		obj = 	config.unitArrray[i]
+		if(config.rectify == True) :
+			obj.orthoProbability = .99
+		else:
+			obj.orthoProbability = config.orthoProbability
 		if(obj.move ==True) : obj.update()
 		obj.render()
 

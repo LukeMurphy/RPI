@@ -17,14 +17,18 @@ class unit:
 		self.dx = random.uniform(-3,3)
 		self.dy = random.uniform(-3,3)
 
-		self.image = Image.new("RGBA", (100 , 100))
+		self.image = Image.new("RGBA", (60 , 60))
+		self.imageRotation = int(random.uniform(0,60))
+		self.draw  = ImageDraw.Draw(self.image)
+
 		self.fillColor = colorutils.getRandomRGB()
 		self.outlineColor = colorutils.getRandomRGB()
 		self.objWidth = 20
 		self.objWidthMax = 26
 		self.objWidthMin = 13
 
-		self.draw  = ImageDraw.Draw(self.image)
+		self.xBoundry = 16
+		self.yBoundry = 54 
 
 	def update(self):
 		self.xPos += self.dx
@@ -33,24 +37,27 @@ class unit:
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
-		if(self.xPosR + self.objWidth > self.config.screenWidth) : 
-			self.xPosR = self.config.screenWidth - self.objWidth 
-			self.xPos = self.config.screenWidth - self.objWidth 
+		self.objWidth = self.image.width
+		#print(self.image.width)
+
+		if(self.xPosR + self.xBoundry > self.config.screenWidth) : 
+			self.xPosR = self.config.screenWidth - self.xBoundry 
+			self.xPos = self.config.screenWidth - self.xBoundry 
 			self.changeColor()
 			self.dx *= -1
-		if(self.yPosR + self.objWidth> self.config.screenHeight) : 
-			self.yPosR = self.config.screenHeight-self.objWidth 
-			self.yPos = self.config.screenHeight-self.objWidth 
+		if(self.yPosR + self.yBoundry > self.config.screenHeight) : 
+			self.yPosR = self.config.screenHeight-self.yBoundry
+			self.yPos = self.config.screenHeight-self.yBoundry
 			self.changeColor()
 			self.dy *= -1
-		if(self.xPosR < 0) : 
-			self.xPosR = 0
-			self.xPos = 0
+		if(self.xPosR < -self.xBoundry) : 
+			self.xPosR = -self.xBoundry
+			self.xPos = -self.xBoundry
 			self.changeColor()
 			self.dx*= -1
-		if(self.yPosR < 0) : 
-			self.yPosR = 0
-			self.yPos = 0
+		if(self.yPosR < -self.yBoundry) : 
+			self.yPosR = -self.yBoundry
+			self.yPos = -self.yBoundry
 			self.changeColor()
 			self.dy *= -1
 
@@ -60,8 +67,10 @@ class unit:
 
 	
 	def render(self):
-		xPos = int(self.xPosR)
-		yPos = int(self.yPosR)
+		xPos = 0
+		yPos = self.handle
+		xPosFinal = int(self.xPosR)
+		yPosFinal = int(self.yPosR)
 		'''
 		ferrule = 14
 		bristle = 19
@@ -85,21 +94,33 @@ class unit:
 					]
 
 		# the brush outline
-		self.config.draw.polygon(shape, fill=(0,0,0), outline=self.outlineColor)
+		self.draw.polygon(shape, fill=(0,0,0), outline=self.outlineColor)
 		# the bristles
-		self.config.draw.rectangle(((xPos, yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule + self.bristle)), fill=self.fillColor, outline=None)
+		self.draw.rectangle(((xPos, yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule + self.bristle)), fill=self.fillColor, outline=None)
 		# Line demarking bristles
-		self.config.draw.line(((xPos,yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule)), fill=self.outlineColor, width=1)
+		self.draw.line(((xPos,yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule)), fill=self.outlineColor, width=1)
 		# hangling hole
-		self.config.draw.rectangle((xPos + self.brushWidth/2 - self.holeWidth/2, yPos - self.handle + 3, xPos + self.brushWidth/2 + self.holeWidth/2 , yPos - self.handle + 3 + self.holeHeight), fill=(0,0,0), outline=self.outlineColor)
+		self.draw.rectangle((xPos + self.brushWidth/2 - self.holeWidth/2, yPos - self.handle + 3, xPos + self.brushWidth/2 + self.holeWidth/2 , yPos - self.handle + 3 + self.holeHeight), fill=(0,0,0), outline=self.outlineColor)
 
+		img = self.image.rotate(self.imageRotation, expand=True)
+		self.config.image.paste(img, (xPosFinal,yPosFinal), img)
 
 	def changeColor(self):
 		self.fillColor = colorutils.randomColor(random.random())
 		self.outlineColor = colorutils.getRandomRGB()
 		if(random.random() > .5): self.dx = (4 * random.random() + 2)
 		if(random.random() > .5): self.dy = (4 * random.random() + 2)
-		if(random.random() > .5): self.objWidth = int(random.uniform(self.objWidthMin,self.objWidthMax))
+		if(random.random() > .75): 
+			if(random.random() > .5): 
+				self.imageRotation = 0
+			else:
+				self.imageRotation = 90
+		elif(random.random() > .85): 
+			self.imageRotation = int(random.uniform(0,60))
+
+
+
+		#if(random.random() > .5): self.objWidth = int(random.uniform(self.objWidthMin,self.objWidthMax))
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

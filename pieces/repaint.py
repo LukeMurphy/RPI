@@ -37,7 +37,7 @@ class unit:
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
-		self.objWidth = self.image.width
+		#self.objWidth = self.image.width
 		#print(self.image.width)
 
 		if(self.xPosR + self.xBoundry > self.config.screenWidth) : 

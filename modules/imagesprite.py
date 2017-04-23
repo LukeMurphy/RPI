@@ -39,6 +39,7 @@ class ImageSprite :
 	useJitter = False
 	jitterRate = .05
 	jitterResetRate = .25
+	jitterRange = .3
 
 	useBlink = False
 	blink = False
@@ -222,7 +223,7 @@ class ImageSprite :
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
-	def colorize(self, clr) :
+	def colorize(self, clr, recolorize = False) :
 
 			#Colorize via overlay etc
 			clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
@@ -230,7 +231,10 @@ class ImageSprite :
 
 			# Color overlay on b/w PNG sprite
 			clrBlockDraw.rectangle((0,0,self.image.size[0], self.image.size[1]), fill=clr)
-			self.image =  ImageChops.multiply(clrBlock, self.image)
+			if(recolorize == True) :
+				self.image =  ImageChops.multiply(clrBlock, self.imageOriginal)
+			else:
+				self.image =  ImageChops.multiply(clrBlock, self.image)
 
 			self.imageCopy = Image.new("RGBA", (self.image.size[0], self.image.size[1]))
 			self.imageCopy.paste(self.image, (0, 0), self.image)
@@ -239,7 +243,8 @@ class ImageSprite :
 			self.image = enhancer.enhance(self.brightnessFactor)
 			self.imageCopy = enhancer.enhance(self.brightnessFactor)
 			self.draw = ImageDraw.Draw(self.image)
-	
+
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	def filterize(self) :
 		
@@ -475,7 +480,7 @@ class ImageSprite :
 			# Allow jitter
 			if(random.random() < self.jitterRate) : self.jitter = True
 			# Do jitter
-			if(self.jitter) : self.dY = random.uniform(-.3,.3)
+			if(self.jitter) : self.dY = random.uniform(-self.jitterRange,self.jitterRange)
 
 		self.move()
 	

@@ -73,6 +73,8 @@ def main(run = True) :
 		config.jitterRange = float(workConfig.get("images", 'jitterRange'))
 		config.jitterResetRate = float(workConfig.get("images", 'jitterResetRate'))
 		config.jitterModeRate = float(workConfig.get("images", 'jitterModeRate'))
+		config.colorChage = float(workConfig.get("images", 'colorChage'))
+		config.colorBGChage = float(workConfig.get("images", 'colorBGChage'))
 		config.useBlink  = (workConfig.getboolean("images", 'useBlink'))
 		config.noTrails  = (workConfig.getboolean("images", 'noTrails'))
 		config.imageList  = (workConfig.get("images", 'imageList')).split(',')
@@ -132,6 +134,8 @@ def runWork():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def dance(): 
+	global blocks
+
 	# Jitter a/o glitch 
 	# everything is sideways ... width is height etc
 	#
@@ -143,24 +147,38 @@ def dance():
 	# ------------------
 	#
 	#
-	apparentWidth = blocks[1].image.height
-	apparentHeight = blocks[1].image.width
-	dy = int(random.uniform(-10,10))
-	dx = int(random.uniform(1,apparentWidth-2))
-	dx = 0
 
-	# really doing "vertical" or y-axis glitching
-	# block height is uniform but width is variable
+	if(len(blocks) > 1) :
+		apparentWidth = blocks[1].image.height
+		apparentHeight = blocks[1].image.width
+		dy = int(random.uniform(-10,10))
+		dx = int(random.uniform(1,apparentWidth-2))
+		dx = 0
 
-	sectionWidth = int(random.uniform(2,apparentHeight - dx))
-	sectionHeight = apparentWidth
+		# really doing "vertical" or y-axis glitching
+		# block height is uniform but width is variable
 
-	cp1 = blocks[1].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
-	config.renderImageFull.paste( cp1, (int(blocks[1].x + dx), int(blocks[1].y + dy)), cp1)	
+		sectionWidth = int(random.uniform(2,apparentHeight - dx))
+		sectionHeight = apparentWidth
 
-	cp2 = blocks[2].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
-	config.renderImageFull.paste( cp2, (int(blocks[2].x + dx), int(blocks[2].y - dy)), cp2)
-	
+		# 95% of the time they dance together as mirrors
+		if(random.random() < .97) :
+			cp1 = blocks[1].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+			config.renderImageFull.paste( cp1, (int(blocks[1].x + dx), int(blocks[1].y + dy)), cp1)	
+
+		if(random.random() < .97) :
+			cp2 = blocks[2].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+			config.renderImageFull.paste( cp2, (int(blocks[2].x + dx), int(blocks[2].y - dy)), cp2)
+
+		if(random.random() < .25) :
+			clr = colorutils.randomColor(random.uniform(.1,1))
+			blocks[0].colorize(clr, True)
+		if(random.random() < .1) :
+			clr = colorutils.randomColor(random.uniform(.1,1))
+			blocks[1].colorize(clr, True)
+			clr = colorutils.randomColor(random.uniform(.1,1))
+			blocks[2].colorize(clr, True)
+		
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate( n = 0) :
@@ -184,18 +202,17 @@ def iterate( n = 0) :
 		block.colorMode = config.colorMode
  		block.update()
 		block.colorModeDirectional = colorModeDirectional
-		if(random.random() < .001 and n > 0) : 
-			clr = colorutils.randomColor(random.random() + .2)
+		if(random.random() < config.colorChage and n > 0) : 
+			clr = colorutils.randomColor(random.uniform(.1,1))
 			block.colorize(clr, True)
-		if(random.random() < .001 and n == 0) : 
-			clr = colorutils.randomColor(random.random() + .2)
+		if(random.random() < config.colorBGChage and n == 0) : 
+			clr = colorutils.randomColor(random.uniform(.4,1))
 			block.colorize(clr, True)
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 
 
 	if(random.random() < config.jitterResetRate) : jitterRate = config.jitterRate
 	if(random.random() < config.jitterModeRate) : jitterRate = .5
-
 	if(random.random() < jitterRate) : dance()
 
 	# Render the final full image

@@ -69,6 +69,8 @@ def main(run = True) :
 		config.speedFactor  = float(workConfig.get("images", 'speedFactor'))
 		config.useJitter  = (workConfig.getboolean("images", 'useJitter'))
 		config.jitterRate = float(workConfig.get("images", 'jitterRate'))
+		config.jitterRange = float(workConfig.get("images", 'jitterRange'))
+		config.jitterResetRate = float(workConfig.get("images", 'jitterResetRate'))
 		config.useBlink  = (workConfig.getboolean("images", 'useBlink'))
 		config.noTrails  = (workConfig.getboolean("images", 'noTrails'))
 		config.imageList  = (workConfig.get("images", 'imageList')).split(',')
@@ -102,13 +104,13 @@ def main(run = True) :
 		imgLoader.config = config
 		imgLoader.colorMode = config.colorMode #"colorRGB" #colorWheel #random #colorRGB
 		imgLoader.colorModeDirectional = colorModeDirectional
-		if(i == 0) : dx = 0
+		if(i == 2) : dx = 0
 		# def make(self, img="", setvX = 0, setvY = 0, processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True):
 		imgLoader.make(path + imageList[i], dx, 0, True, False, False, True)
 		imgLoader.yOffsetChange = False
 		imgLoader.yOffset = 0
 		if(i == 1) : imgLoader.yOffset = 80
-		imgLoader.jitterRange = .02
+		imgLoader.jitterRange = config.jitterRange
 		blocks.append(imgLoader)
 
 
@@ -139,10 +141,20 @@ def iterate( n = 0) :
 		index = int(random.uniform(0,3))
 		config.colorMode = colorModes[index]
 
+	if(random.random() < config.jitterRate) :
+		dY = random.uniform(-config.jitterRange,config.jitterRange)
+	else :
+		dY = 0
+
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
 		block.colorMode = config.colorMode
-		block.update()
+		blocks[1].dY = dY
+		blocks[2].dY = -dY
+		if(random.random() < config.jitterResetRate) :
+			blocks[1].dY = blocks[2].dY = 0
+			blocks[1].y = blocks[2].y = 0
+ 		block.update()
 		block.colorModeDirectional = colorModeDirectional
 		updateCanvasCall = True if n == 0 else True
 		if(random.random() < .001 and n > 0) : 
@@ -151,6 +163,8 @@ def iterate( n = 0) :
 		if(random.random() < .001 and n == 0) : 
 			clr = colorutils.randomColor(random.random() + .2)
 			block.colorize(clr, True)
+
+
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 
 

@@ -24,6 +24,7 @@ xPos = 320
 yPos = 0
 colorModeDirectional = False
 colorModes = ["colorWheel","random","colorRGB"]
+jitterRate = .1
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -54,7 +55,7 @@ def redrawBackGround() :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
-	global config, workConfig, blocks, simulBlocks, colorModeDirectional
+	global config, workConfig, blocks, simulBlocks, colorModeDirectional, jitterRate
 	gc.enable()
 
 	print("Plane Loaded")
@@ -71,6 +72,7 @@ def main(run = True) :
 		config.jitterRate = float(workConfig.get("images", 'jitterRate'))
 		config.jitterRange = float(workConfig.get("images", 'jitterRange'))
 		config.jitterResetRate = float(workConfig.get("images", 'jitterResetRate'))
+		config.jitterModeRate = float(workConfig.get("images", 'jitterModeRate'))
 		config.useBlink  = (workConfig.getboolean("images", 'useBlink'))
 		config.noTrails  = (workConfig.getboolean("images", 'noTrails'))
 		config.imageList  = (workConfig.get("images", 'imageList')).split(',')
@@ -86,6 +88,7 @@ def main(run = True) :
 
 	path = config.path  + "assets/imgs/"
 	imageList = config.imageList
+	jitterRate = config.jitterRate
 
 	for i in range (0,config.unitCount) :
 		dx = 0
@@ -128,13 +131,43 @@ def runWork():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def dance(): 
+	# Jitter a/o glitch 
+	# everything is sideways ... width is height etc
+	#
+	#       "apparentHeight" = width
+	# ------------------
+	# |                |
+	# |                | "apparentWidth"  == height
+	# |                |
+	# ------------------
+	#
+	#
+	apparentWidth = blocks[1].image.height
+	apparentHeight = blocks[1].image.width
+	dy = int(random.uniform(-10,10))
+	dx = int(random.uniform(1,apparentWidth-2))
+	dx = 0
+
+	# really doing "vertical" or y-axis glitching
+	# block height is uniform but width is variable
+
+	sectionWidth = int(random.uniform(2,apparentHeight - dx))
+	sectionHeight = apparentWidth
+
+	cp1 = blocks[1].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+	config.renderImageFull.paste( cp1, (int(blocks[1].x + dx), int(blocks[1].y + dy)), cp1)	
+
+	cp2 = blocks[2].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+	config.renderImageFull.paste( cp2, (int(blocks[2].x + dx), int(blocks[2].y - dy)), cp2)
+	
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def iterate( n = 0) :
 	global config, blocks, colorModeDirectional, colorModes
-	global xPos, yPos
+	global jitterRate
 
 	# Clear the background and redraw all planes
-
-
 	if(config.noTrails) : redrawBackGround()
 
 	if(random.random() > .9 and config.randomColorMode == True) :
@@ -149,28 +182,25 @@ def iterate( n = 0) :
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
 		block.colorMode = config.colorMode
-		blocks[1].dY = dY
-		blocks[2].dY = -dY
-		if(random.random() < config.jitterResetRate) :
-			blocks[1].dY = blocks[2].dY = 0
-			blocks[1].y = blocks[2].y = 0
  		block.update()
 		block.colorModeDirectional = colorModeDirectional
-		updateCanvasCall = True if n == 0 else True
 		if(random.random() < .001 and n > 0) : 
 			clr = colorutils.randomColor(random.random() + .2)
 			block.colorize(clr, True)
 		if(random.random() < .001 and n == 0) : 
 			clr = colorutils.randomColor(random.random() + .2)
 			block.colorize(clr, True)
-
-
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 
 
+	if(random.random() < config.jitterResetRate) : jitterRate = config.jitterRate
+	if(random.random() < config.jitterModeRate) : jitterRate = .5
+
+	if(random.random() < jitterRate) : dance()
+
 	# Render the final full image
 	config.image = config.renderImageFull
-	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, updateCanvasCall)
+	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, True)
 
 	# cleanup the list
 	#blocks[:] = [block for block in blocks if block.setForRemoval!=True]

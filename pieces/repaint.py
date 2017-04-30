@@ -152,6 +152,7 @@ def main(run = True) :
 
 	try :
 		config.delay = float(workConfig.get("repaint", 'repaintDelay')) 
+		config.randomBrushWidth = (workConfig.getboolean("repaint", 'randomBrushWidth')) 
 		config.numUnits = int(workConfig.get("repaint", 'numBrushes')) 
 		config.ferrule = int(workConfig.get("repaint", 'ferrule')) 
 		config.bristle = int(workConfig.get("repaint", 'bristle')) 
@@ -180,8 +181,11 @@ def main(run = True) :
 		obj.ferrule = config.ferrule
 		obj.bristle = config.bristle
 		obj.handle = config.handle
-		obj.brushWidth = config.brushWidth
 		obj.handleWidth = config.handleWidth
+		if (config.randomBrushWidth == True) :
+			obj.brushWidth = int(random.uniform(config.handleWidth, config.brushWidth))  
+		else : 
+			obj.brushWidth = config.brushWidth
 		obj.holeWidth = config.holeWidth
 		obj.holeHeight = config.holeHeight
 		obj.speedRange = config.speedRange

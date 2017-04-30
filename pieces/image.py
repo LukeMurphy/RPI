@@ -1,11 +1,10 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, configuration, badpixels
+from modules import utils, configuration, badpixels, colorutils
 from modules.imagesprite import ImageSprite
-from configs import localconfig
 
-from PIL import Image, ImageDraw, ImageFont
-from PIL import ImageFilter
+from PIL import Image, ImageDraw, ImageMath, ImageEnhance
+from PIL import ImageChops, ImageFilter, ImagePalette
 import importlib
 import time
 import random
@@ -51,6 +50,15 @@ def main(run = True) :
 	config.bgFilterProb = float(workConfig.get("filter", 'bgFilterProb'))
 	config.targetPalette = (workConfig.get("filter", 'targetPalette'))
 
+
+	config.clrBlkWidth = int(workConfig.get("filter", 'clrBlkWidth')) 
+	config.clrBlkHeight = int(workConfig.get("filter", 'clrBlkHeight')) 
+	config.overlayxPos = int(workConfig.get("filter", 'overlayxPos')) 
+	config.overlayyPos = int(workConfig.get("filter", 'overlayyPos')) 
+	config.overlayChangeProb = float(workConfig.get("filter", 'overlayChangeProb')) 
+
+	config.colorOverlay  = (255,0,255)
+
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	#for i in range (0,simulBlocks) : makeBlock()
@@ -61,8 +69,10 @@ def main(run = True) :
 	if(config.useBlanks) :
 		bads.config = config
 		bads.setBlanks = bads.setBlanksOnImage
-		bads.numberOfDeadPixels = 50
-		bads.probabilityOfBlockBlanks = .99
+		bads.numberOfDeadPixels = 5
+		bads.probabilityOfBlockBlanks = .8
+		bads.colsRange = (5,40)
+		bads.rowsRange = (5,40)
 		bads.setBlanks()
 
 	for i in range (0,1) :
@@ -107,10 +117,17 @@ def iterate( n = 0) :
 
 	config.renderImageFull.paste(blocks[0].image, (0,0,x,y))
 
+	if(random.random() < config.overlayChangeProb ) :
+		config.colorOverlay = colorutils.getRandomRGB()
+		#config.colorOverlay = colorutils.getRandomColorWheel()
+	colorize(config.colorOverlay)
+
+
 	if(config.useBlanks) :
 		bads.drawBlanks(None, False)
 		if(random.random() > .99) : bads.setBlanks()
 	
+
 	# Render the final full image
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False)
 
@@ -134,6 +151,33 @@ def drawVLine() :
 		config.renderDraw.rectangle((xPos+1,config.screenHeight/2,xPos+1, config.screenHeight), fill = (r,g,b))
 	xPos -= 1
 	if(xPos <0):xPos = config.screenWidth
+
+def colorize(clr = (250,0,250), recolorize = False) :
+
+		#Colorize via overlay etc
+		w = config.renderImageFull.size[0]
+		h = config.renderImageFull.size[1]
+		clrBlock = Image.new(config.renderImageFull.mode, (w, h))
+		clrBlockDraw = ImageDraw.Draw(clrBlock)
+
+		# Color overlay on b/w PNG sprite
+		clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
+		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, config.clrBlkHeight + config.overlayyPos), fill=clr)
+		#config.renderImageFull.paste(clrBlock, (0,0))
+
+		try :
+			config.renderImageFull = ImageChops.multiply(clrBlock, config.renderImageFull)
+			#imgTemp = imgTemp.convert(config.renderImageFull.mode)
+			#print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
+			#config.renderImageFull.paste(imgTemp,(0,0,w,h))
+
+		except Exception as e: 
+			print(e, clrBlock.mode, config.renderImageFull.mode)
+			pass
+
+
+
+
 
 def redrawBackGround() :	
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))

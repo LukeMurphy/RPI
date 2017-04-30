@@ -6,7 +6,7 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter, ImageChops
 import random
 import numpy, time
-import gc
+import gc, os
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -123,9 +123,30 @@ def updateCanvas() :
 	config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw', tag="main")
 	config.cnvs.update()
+	
 	# This *should* be more efficient 
 	#config.cnvs.update_idletasks()
 	#root.update()
+
+	############################################################
+	######  Check if config file has changed and reload    #####
+	############################################################
+
+	if(config.checkForConfigChanges == True) :
+		currentTime = time.time()
+		f = os.path.getmtime(config.fileName )
+		config.delta = ((currentTime - f ))
+
+		if(config.delta <= 1) : 
+			if(config.reloadConfig == False) :
+				print ("LAST MODIFIED DELTA: ", config.delta)
+				config.doingReload = True
+				config.loadFromArguments(True)
+			config.reloadConfig = True
+		else :
+			config.reloadConfig = False
+
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

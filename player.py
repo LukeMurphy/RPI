@@ -19,6 +19,7 @@ from modules import configuration
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
 threads = []
+workconfig = ConfigParser.ConfigParser()
 
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
@@ -32,41 +33,75 @@ threads = []
 #
 #
 ######################################################################################################
+
+def loadFromArguments(reloading=False):
+	global config, workconfig, path, tempImage, threads, thrd
+
+	if(reloading == False) :
+		try: 
+			###
+			# Expects 3 arguments:
+			#		name-of-machine
+			#       the local path
+			#		the config file to load
+
+			args = sys.argv
+			print("Arguments passed to player.py:")
+			print(args)
+
+			config = configuration
+
+			# Load the default work
+			
+
+			if(len(args) > 1):
+				config.MID = args[1]
+				config.path = args[2]
+				argument = args[3]
+				workconfig.read(argument)
+
+				config.startTime = time.time()
+				config.currentTime = time.time()
+				config.reloadConfig = False
+				config.doingReload = False
+				config.checkForConfigChanges =  False
+				config.loadFromArguments = loadFromArguments
+				config.fileName = argument
+				f = os.path.getmtime(argument)
+				config.delta = int((config.startTime - f ))
+				print (argument, "LAST MODIFIED DELTA: ", config.delta)
+			else :
+				# Machine ID
+				config.MID = baseconfig.MID
+				# Default Work Instance ID
+				config.WRKINID = baseconfig.WRKINID
+				# Default Local Path
+				config.path = baseconfig.path
+				print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
+				workconfig.read(config.path  + '/configs/pieces/' + config.WRKINID + ".cfg")
+
+			configure()
+
+		except getopt.GetoptError as err:
+			# print help information and exit:
+			print ("Error:" + str(err))
+	else :
+		workconfig.read(config.fileName)
+		configure()
+
+
 def configure() :
 	global config, workconfig, path, tempImage, threads, thrd
 	#gc.enable()
 
+	### Sets up for testing live config chages
+	try:
+		config.checkForConfigChanges = (workconfig.getboolean("displayconfig", 'checkForConfigChanges'))
+	except  Exception as e: 
+		print (str(e))
+		config.checkForConfigChanges = False
+
 	try: 
-
-		###
-		# Expects 3 arguments:
-		#		name-of-machine
-		#       the local path
-		#		the config file to load
-
-		args = sys.argv
-		print("Arguments passed to player.py:")
-		print(args)
-
-		config = configuration
-
-		# Load the default work
-		workconfig = ConfigParser.ConfigParser()
-
-		if(len(args) > 1):
-			config.MID = args[1]
-			config.path = args[2]
-			argument = args[3]
-			workconfig.read(argument)
-		else :
-			# Machine ID
-			config.MID = baseconfig.MID
-			# Default Work Instance ID
-			config.WRKINID = baseconfig.WRKINID
-			# Default Local Path
-			config.path = baseconfig.path
-			print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
-			workconfig.read(config.path  + '/configs/pieces/' + config.WRKINID + ".cfg")
 
 		config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 		config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
@@ -162,7 +197,9 @@ def configure() :
 			config.render = r.render
 			config.updateCanvas = r.updateCanvas
 			work.main(False)
-			r.setUp()
+
+			print("Setting Up", config.doingReload)
+			if(config.doingReload == False) : r.setUp()
 
 		if(config.rendering == "out") :
 			from modules import rendertofile
@@ -198,7 +235,7 @@ def configure() :
 
 def main():
 	global config, threads
-	configure()
+	loadFromArguments()
 	'''
 	# Threading now handled by renderer - e.g. see modules/rendertohub.py
 	thrd = threading.Thread(target=configure)

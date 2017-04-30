@@ -24,7 +24,7 @@ xPos = 320
 yPos = 0
 colorModeDirectional = False
 colorModes = ["colorWheel","random","colorRGB"]
-jitterRate = .1
+glitchRate = .1
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -55,7 +55,7 @@ def redrawBackGround() :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :
-	global config, workConfig, blocks, simulBlocks, colorModeDirectional, jitterRate
+	global config, workConfig, blocks, simulBlocks, colorModeDirectional, glitchRate
 	gc.enable()
 
 	print("Plane Loaded")
@@ -69,10 +69,10 @@ def main(run = True) :
 		config.scalingFactor  = float(workConfig.get("images", 'scalingFactor'))
 		config.speedFactor  = float(workConfig.get("images", 'speedFactor'))
 		config.useJitter  = (workConfig.getboolean("images", 'useJitter'))
-		config.jitterRate = float(workConfig.get("images", 'jitterRate'))
+		config.glitchRate = float(workConfig.get("images", 'glitchRate'))
 		config.jitterRange = float(workConfig.get("images", 'jitterRange'))
-		config.jitterResetRate = float(workConfig.get("images", 'jitterResetRate'))
-		config.jitterModeRate = float(workConfig.get("images", 'jitterModeRate'))
+		config.glitchResetRate = float(workConfig.get("images", 'glitchResetRate'))
+		config.glitchModeRate = float(workConfig.get("images", 'glitchModeRate'))
 		config.colorChage = float(workConfig.get("images", 'colorChage'))
 		config.colorBGChage = float(workConfig.get("images", 'colorBGChage'))
 		config.useBlink  = (workConfig.getboolean("images", 'useBlink'))
@@ -90,7 +90,7 @@ def main(run = True) :
 
 	path = config.path  + "assets/imgs/"
 	imageList = config.imageList
-	jitterRate = config.jitterRate
+	glitchRate = config.glitchRate
 
 	for i in range (0,config.unitCount) :
 		dx = 0
@@ -183,7 +183,7 @@ def dance():
 
 def iterate( n = 0) :
 	global config, blocks, colorModeDirectional, colorModes
-	global jitterRate
+	global glitchRate
 
 	# Clear the background and redraw all planes
 	if(config.noTrails) : redrawBackGround()
@@ -192,7 +192,7 @@ def iterate( n = 0) :
 		index = int(random.uniform(0,3))
 		config.colorMode = colorModes[index]
 
-	if(random.random() < config.jitterRate) :
+	if(random.random() < config.glitchRate) :
 		dY = random.uniform(-config.jitterRange,config.jitterRange)
 	else :
 		dY = 0
@@ -211,9 +211,9 @@ def iterate( n = 0) :
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 
 
-	if(random.random() < config.jitterResetRate) : jitterRate = config.jitterRate
-	if(random.random() < config.jitterModeRate) : jitterRate = .5
-	if(random.random() < jitterRate) : dance()
+	if(random.random() < config.glitchResetRate) : glitchRate = config.glitchRate
+	if(random.random() < config.glitchModeRate) : glitchRate = .5
+	if(random.random() < glitchRate) : dance()
 
 	# Render the final full image
 	config.image = config.renderImageFull

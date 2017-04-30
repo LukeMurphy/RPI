@@ -6,8 +6,8 @@ import math
 blankPixels = []
 counterPixels = []
 
-cols = int(random.uniform(2,20))
-rows = int(random.uniform(2,20))
+colsRange = (2,20)
+rowsRange = (2,20)
 
 size = ()
 
@@ -19,7 +19,8 @@ def setBlanks() : return None
 
 def setBlanksOnImage() :
 	#print("Setting Blanks")
-	global config,blankPixels,cols,rows, size, numberOfDeadPixels, probabilityOfBlockBlanks
+	global config,blankPixels, size, numberOfDeadPixels, probabilityOfBlockBlanks
+	global colsRange, rowsRange
 	blankPixels = []
 	count = 0
 	size = config.renderImageFull.size
@@ -29,8 +30,8 @@ def setBlanksOnImage() :
 		y = int(random.random()*size[1])
 		blankPixels.append((x,y))
 		if(random.random() > probabilityOfBlockBlanks):
-			cols = int(random.uniform(2,20))
-			rows = int(random.uniform(2,20))
+			cols = int(random.uniform(colsRange[0],colsRange[1]))
+			rows = int(random.uniform(rowsRange[0],rowsRange[1]))
 
 			for ii in range(0,rows):
 				blankPixels.append((x,y + ii))
@@ -39,7 +40,8 @@ def setBlanksOnImage() :
 
 def setBlanksOnScreen() :
 	#print("Setting Blanks")
-	global config,blankPixels,cols,rows,numberOfDeadPixels, probabilityOfBlockBlanks
+	global config,blankPixels,numberOfDeadPixels, probabilityOfBlockBlanks
+	global colsRange, rowsRange
 	blankPixels = []
 	count = 0
 	# scatter horizontally
@@ -48,8 +50,8 @@ def setBlanksOnScreen() :
 		y = int(random.random()*48)
 		blankPixels.append((x,y))
 		if(random.random() > probabilityOfBlockBlanks):
-			cols = int(random.uniform(2,20))
-			rows = int(random.uniform(2,20))
+			cols = int(random.uniform(colsRange[0],colsRange[1]))
+			rows = int(random.uniform(rowsRange[0],rowsRange[1]))
 
 			for ii in range(0,rows):
 				blankPixels.append((x,y + ii))
@@ -57,7 +59,8 @@ def setBlanksOnScreen() :
 					blankPixels.append((x+i,y + ii))
 		
 def drawBlanks(target=None, direct = True) :
-	global config, blankPixels, rows, cols, drawBlanksFlag, size
+	global config, blankPixels,drawBlanksFlag, size
+	global colsRange, rowsRange
 	if(target==None) : target = config.renderImageFull
 	if (len(blankPixels) == 0): setBlanks()
 	count = 0

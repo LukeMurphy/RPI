@@ -191,7 +191,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 		nc = int(random.uniform(2,255))
 
-		newimage = config.renderImageFull.convert("P", colors = nc)
+		newimage = config.renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors = nc)
+		#newimage = config.renderImageFull.convert("P", palette=Image.WEB)
 		config.renderImageFull =  newimage.convert("RGB")
 
 

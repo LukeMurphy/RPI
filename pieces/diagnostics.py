@@ -2,6 +2,7 @@ import time
 import random
 import textwrap
 import math
+import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
@@ -89,6 +90,10 @@ def main(run = True) :
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
+	config.fontSize = 14
+	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
+	
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	config.unitArrray = []
 	for i in range(0,config.numUnits):
@@ -108,6 +113,14 @@ def main(run = True) :
 
 def setUp():
 	global config
+
+	'''
+	arg = "./assets/imgs/"
+	testImage = Image.open(arg , "r")
+		self.image.load()
+		self.imgHeight =  self.image.getbbox()[3]
+	'''
+
 	pass
 
 
@@ -125,13 +138,20 @@ def runWork():
 
 def iterate() :
 	global config
-	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
+	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
+	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=(255,0,0))
+	config.draw.text((10,10),"TOP",(0,200,20),font=config.font)
+	tm = datetime.datetime.now()
+	tm = time.ctime()
+	config.draw.text((10,24),tm,(0,200,20),font=config.font)
 
+
+	
 	for i in range(0,config.numUnits):
 		obj = 	config.unitArrray[i]
 		if(obj.move ==True) : obj.update()
 		obj.render()
-
+	
 	config.render(config.image, 0,0)
 		
 

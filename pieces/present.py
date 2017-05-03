@@ -149,8 +149,8 @@ def dance():
 	#
 
 	if(len(blocks) > 1) :
-		apparentWidth = blocks[1].image.height
-		apparentHeight = blocks[1].image.width
+		apparentWidth = blocks[1].image.size[1]
+		apparentHeight = blocks[1].image.size[0]
 		dy = int(random.uniform(-10,10))
 		dx = int(random.uniform(1,apparentWidth-2))
 		dx = 0

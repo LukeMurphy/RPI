@@ -113,8 +113,10 @@ def iterate( n = 0) :
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	x, y = config.renderImageFull.size
 	x1, y1  = blocks[0].image.size
+	
 
-
+	#blocks[0].image = blocks[0].image.convert(config.renderImageFull.mode)
+	
 	config.renderImageFull.paste(blocks[0].image, (0,0,x,y))
 
 	if(random.random() < config.overlayChangeProb ) :

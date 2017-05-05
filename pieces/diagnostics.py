@@ -86,10 +86,15 @@ def main(run = True) :
 	config.delay = .02
 	config.numUnits  = 1
 
+	config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
+	config.fontColor = tuple(map(lambda x: int(x) , config.fontColorVals))
+	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
+	config.outlineColor = tuple(map(lambda x: int(x) , config.outlineColorVals))
+
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
-
 	config.fontSize = 14
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	
@@ -139,11 +144,11 @@ def runWork():
 def iterate() :
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
-	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=(255,0,0))
-	config.draw.text((10,10),"TOP",(0,200,20),font=config.font)
+	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
+	config.draw.text((10,10),"TOP",config.fontColor,font=config.font)
 	tm = datetime.datetime.now()
 	tm = time.ctime()
-	config.draw.text((10,24),tm,(0,200,20),font=config.font)
+	config.draw.text((10,24),tm,config.fontColor,font=config.font)
 
 
 	

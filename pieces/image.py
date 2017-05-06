@@ -58,6 +58,8 @@ def main(run = True) :
 	config.overlayChangeProb = float(workConfig.get("filter", 'overlayChangeProb')) 
 
 	config.animateProb = float(workConfig.get("filter", 'animateProb')) 
+	config.imageGlitchProb = float(workConfig.get("filter", 'imageGlitchProb')) 
+	config.imageGlitchSize = float(workConfig.get("filter", 'imageGlitchSize')) 
 
 	config.colorOverlay  = (255,0,255)
 
@@ -121,6 +123,9 @@ def iterate( n = 0) :
 	x, y = config.renderImageFull.size
 	x1, y1  = blocks[0].image.size
 	
+	if(random.random() < config.imageGlitchProb ) :
+		blocks[0].glitchBox()
+
 
 	#blocks[0].image = blocks[0].image.convert(config.renderImageFull.mode)
 	

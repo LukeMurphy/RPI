@@ -282,6 +282,25 @@ class ImageSprite :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+	def glitchBox(self) :
+		apparentWidth = self.image.size[1]
+		apparentHeight = self.image.size[0]
+		dy = int(random.uniform(-10,10))
+		dx = int(random.uniform(1,self.config.imageGlitchSize))
+		dx = 0
+
+		# really doing "vertical" or y-axis glitching
+		# block height is uniform but width is variable
+
+		sectionWidth = int(random.uniform(2, apparentHeight - dx))
+		sectionHeight = apparentWidth
+
+		# 95% of the time they dance together as mirrors
+		if(random.random() < .97) :
+			cp1 = self.image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+			self.image.paste( cp1, (int(0 + dx), int(0 + dy)))	
+
+
 	def augment(self) :
 			if(self.frameCount > 39) :
 				#print(self.tempClrCount)
@@ -475,6 +494,7 @@ class ImageSprite :
 		try:
 			if(holdAnimation != True):
 				self.image.seek(self.image.tell() + 1)
+				#for i in range(0,10) : self.glitchBox()
 		except EOFError:
 			self.image.seek(0)
 			#print("fail", frame)
@@ -482,6 +502,11 @@ class ImageSprite :
 			pass
 
 		self.frameCount += 1
+
+		r = int(random.uniform(2,10))
+		for i in range(0,r) :
+			self.glitchBox()
+
 
 		if (self.config.useImageFilter) : self.filterize()
 		self.augment()

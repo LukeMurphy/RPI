@@ -173,6 +173,7 @@ def dance():
 		if(random.random() < .25) :
 			clr = colorutils.randomColor(random.uniform(.1,1))
 			blocks[0].colorize(clr, True)
+			
 		if(random.random() < .1) :
 			clr = colorutils.randomColor(random.uniform(.1,1))
 			blocks[1].colorize(clr, True)

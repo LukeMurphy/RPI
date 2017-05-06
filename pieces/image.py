@@ -57,6 +57,8 @@ def main(run = True) :
 	config.overlayyPos = int(workConfig.get("filter", 'overlayyPos')) 
 	config.overlayChangeProb = float(workConfig.get("filter", 'overlayChangeProb')) 
 
+	config.animateProb = float(workConfig.get("filter", 'animateProb')) 
+
 	config.colorOverlay  = (255,0,255)
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
@@ -104,7 +106,12 @@ def iterate( n = 0) :
 	global config, blocks
 	global xPos, yPos
 
-	if (blocks[0].action == "play") : blocks[0].animate()
+	if (blocks[0].action == "play") : 
+		if(random.random() < config.animateProb ) :
+			## holdAnimation
+			blocks[0].animate(False)
+		else: 
+			blocks[0].animate(True)
 
 	# Clear the background and redraw all planes
 	#redrawBackGround()

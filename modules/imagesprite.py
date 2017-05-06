@@ -141,9 +141,6 @@ class ImageSprite :
 			if(self.dX < 0) :
 				# Reverse image
 				self.image = self.image.rotate(-180)
-			#print("-----------\n")
-			#print(self.image.info)
-			#print("-----------\n")
 
 			self.imageOriginal = self.image.copy()
 			self.process()
@@ -195,12 +192,6 @@ class ImageSprite :
 							clrIndex  = int(random.uniform(0,3))
 					clr = self.clrUtils.rgbWheel[clrIndex]
 
-				'''
-				# Progressive color change - not used
-				self.clrIndex += 1
-				if(self.clrIndex == len(self.clrUtils.wheel)) :
-					self.clrIndex = 0
-				'''
 
 				# Any RGB color
 				if(self.colorMode == "random") : 
@@ -262,53 +253,22 @@ class ImageSprite :
 		numTargetColors =  len(targetClrs)
 		targetPalette = self.config.targetPalette
 
-		for n in range(0,lines,boxHeight) :
+		for n in range(0, lines, boxHeight) :
 			
 			yPos1 = yPosBase + n
 			xPos2 = xPos1 + boxWidth
-			yPos2 = yPos1 + boxHeight
+			# Randomize the width of the box -- when image is NOT rotated this needs to be changed 
+			yPos2 = yPos1 + int(random.uniform(1,boxHeight))
 			box = (xPos1, yPos1, xPos2, yPos2)
 			region = self.image.crop(box)
-
-			# Do geometry manips HERE
-			''''''''''''''''''''''''''''''
-			#region = region.transpose(Image.ROTATE_180)
 			
-			''''''''''''''''''''''''''''''
-			##############################
-			#region = region.convert("RGB")
-			##############################
-
-			# Do RGB Things HERE
-			''''''''''''''''''''''''''''''
-			#r, g, b, a = region.split()
-			#region = Image.merge("RGBA", (r, g, b, a))
-			#region = region.filter(ImageFilter.BLUR)
-			#region = region.filter(ImageFilter.EDGE_ENHANCE_MORE)
-			#region = region.filter(ImageFilter.MinFilter(size=3))
-
-			'''
-			self.image.copy()
-			sharpener = ImageEnhance.Sharpness(self.image)
-			sharpened = sharpener.enhance(2.0)
-			# PIL.ImageFilter.ModeFilter(size=3)
-			#im1 = self.image.filter(ImageFilter.BLUR)
-			#f = self.image.ImageFilter.ModeFilter(size=3)
-			'''
-
-			#enh = ImageEnhance.Color(region)
-			#enh = enh.enhance(0.0)
-
-			#print(list(region.getdata()))
-
-			
-			if(random.random() > imageFilterProb) :
+			if(random.random() < imageFilterProb) :
 				ran = random.random() * 64
 				#ran = 206.5
 				region = region.point(lambda i: i - ran if (i > 116 and i < 128) else i)
 				
 				#exit()
-			if(random.random() > bgFilterProb) :
+			if(random.random() < bgFilterProb) :
 				if (targetPalette == "selective") :
 					tartClr = targetClrs[int(random.random()*numTargetColors)]
 				else :
@@ -316,11 +276,11 @@ class ImageSprite :
 
 				#print(tartClr)
 				region = region.point(lambda i: tartClr  if (i >= 0 and i < 10 ) else i)
-			''''''''''''''''''''''''''''''
+		
 			#region = region.convert("P")
 			self.image.paste(region, box)
 
-
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	def augment(self) :
 			if(self.frameCount > 39) :
@@ -451,20 +411,6 @@ class ImageSprite :
 
 		self.jitter = False
 
-		'''
-		# defaults for vertical image scrolling
-		if(self.panRangeLimit == 0) : 
-			self.rangeLimit = self.imageCopy.size[1] + self.config.screenHeight
-			self.yOffset = self.config.screenHeight
-		else : 
-			self.rangeLimit = self.panRangeLimit + self.imageCopy.size[1]
-			if(self.dY ==0) : self.xOffset = -self.imageCopy.size[1]
-
-		if(self.dY != 0) : 
-			self.yOffset = self.config.screenHeight #-image.size[1]
-			#xOffset = int((config.screenWidth ) * random.random()) - 20
-			#xOffset = 0
-		'''
 		# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
 		#if(random.random() > .9) : draw.rectangle((0,image.size[1] -10,32,image.size[1] + config.screenHeight), fill = (12), outline = (0))
 
@@ -504,7 +450,7 @@ class ImageSprite :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
-	def animate(self, randomizeTiming = False, frameLimit = 3) :
+	def animate(self, holdAnimation = False) :
 
 		# This needs fixing  - currently requires extra frame
 		# at end of gif  --
@@ -527,7 +473,8 @@ class ImageSprite :
 		'''
 		
 		try:
-			self.image.seek(self.image.tell() + 1)
+			if(holdAnimation != True):
+				self.image.seek(self.image.tell() + 1)
 		except EOFError:
 			self.image.seek(0)
 			#print("fail", frame)
@@ -539,16 +486,7 @@ class ImageSprite :
 		if (self.config.useImageFilter) : self.filterize()
 		self.augment()
 
-		'''
-		if(skipTime == False) :
-			if(randomizeTiming) :
-				time.sleep(random.uniform(.02,.08))
-				if(random.random() > .98) :
-					time.sleep(random.uniform(.05,2))
-			else :
-				time.sleep(self.gifPlaySpeed)
-		'''
-		#if (frame == frameLimit):frame = 0
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		
 	def playImage(self, randomizeTiming = False, frameLimit = 3):
 		global config

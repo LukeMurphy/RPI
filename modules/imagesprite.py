@@ -282,7 +282,7 @@ class ImageSprite :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-	def glitchBox(self, r1 = -10, r2 = 10) :
+	def glitchBox(self, r1 = -1, r2 = 1) :
 		apparentWidth = self.image.size[1]
 		apparentHeight = self.image.size[0]
 		dy = int(random.uniform(r1,r2))
@@ -506,7 +506,7 @@ class ImageSprite :
 
 		r = int(random.uniform(2,10))
 		for i in range(0,r) :
-			self.glitchBox()
+			self.glitchBox(-self.config.imageGlitchDisplacement, self.config.imageGlitchDisplacement)
 
 
 		if (self.config.useImageFilter) : self.filterize()

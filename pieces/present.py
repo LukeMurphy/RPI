@@ -73,6 +73,7 @@ def main(run = True) :
 		config.jitterRange = float(workConfig.get("images", 'jitterRange'))
 		config.glitchResetRate = float(workConfig.get("images", 'glitchResetRate'))
 		config.glitchModeRate = float(workConfig.get("images", 'glitchModeRate'))
+		config.imageGlitchSize = int(workConfig.get("images", 'imageGlitchSize'))
 		config.colorChage = float(workConfig.get("images", 'colorChage'))
 		config.colorBGChage = float(workConfig.get("images", 'colorBGChage'))
 		config.useBlink  = (workConfig.getboolean("images", 'useBlink'))
@@ -114,7 +115,7 @@ def main(run = True) :
 		imgLoader.make(path + imageList[i], dx, 0, True, False, False, True)
 		imgLoader.yOffsetChange = False
 		imgLoader.yOffset = 0
-		if(i == 1) : imgLoader.yOffset = 80
+		#if(i == 1) : imgLoader.yOffset = 80
 		imgLoader.jitterRange = config.jitterRange
 		blocks.append(imgLoader)
 
@@ -170,6 +171,8 @@ def dance():
 			cp2 = blocks[2].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
 			config.renderImageFull.paste( cp2, (int(blocks[2].x + dx), int(blocks[2].y - dy)), cp2)
 
+		'''	
+		# Not sure if this is a useful variation
 		if(random.random() < .25) :
 			clr = colorutils.randomColor(random.uniform(.1,1))
 			blocks[0].colorize(clr, True)
@@ -179,7 +182,29 @@ def dance():
 			blocks[1].colorize(clr, True)
 			clr = colorutils.randomColor(random.uniform(.1,1))
 			blocks[2].colorize(clr, True)
-		
+		'''
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def glitchBox(img, r1 = -10, r2 = 10) :
+	apparentWidth = img.size[1]
+	apparentHeight = img.size[0]
+	dy = int(random.uniform(r1,r2))
+	dx = int(random.uniform(1, config.imageGlitchSize))
+	dx = 0
+
+	# really doing "vertical" or y-axis glitching
+	# block height is uniform but width is variable
+
+	sectionWidth = int(random.uniform(2, apparentHeight - dx))
+	sectionHeight = apparentWidth
+
+	# 95% of the time they dance together as mirrors
+	if(random.random() < .97) :
+		cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
+		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def iterate( n = 0) :
@@ -187,7 +212,9 @@ def iterate( n = 0) :
 	global glitchRate
 
 	# Clear the background and redraw all planes
-	if(config.noTrails) : redrawBackGround()
+	#if(config.noTrails) : redrawBackGround()
+	colorBGChaged = False
+	colorChaged = False
 
 	if(random.random() > .9 and config.randomColorMode == True) :
 		index = int(random.uniform(0,3))
@@ -201,23 +228,51 @@ def iterate( n = 0) :
 	for n in range (0, len(blocks)) :
 		block = blocks[n]
 		block.colorMode = config.colorMode
- 		block.update()
 		block.colorModeDirectional = colorModeDirectional
+
+ 		block.update()
+ 		
+		
 		if(random.random() < config.colorChage and n > 0) : 
 			clr = colorutils.randomColor(random.uniform(.1,1))
 			block.colorize(clr, True)
+			colorBGChaged = True
+			for i in range(0,10) : block.glitchBox()
+			#config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
+
 		if(random.random() < config.colorBGChage and n == 0) : 
 			clr = colorutils.randomColor(random.uniform(.4,1))
 			block.colorize(clr, True)
+			colorBGChaged = True
+			for i in range(0,10) : block.glitchBox()
+			#config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
+		
+		if(random.random() < .51) : 
+			if(n==1) : block.glitchBox(-2,3)
+			if(n==2) : block.glitchBox(-3,2)
+
 		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 
 
-	if(random.random() < config.glitchResetRate) : glitchRate = config.glitchRate
-	if(random.random() < config.glitchModeRate) : glitchRate = .5
-	if(random.random() < glitchRate) : dance()
+	if(random.random() < config.glitchResetRate) : 
+		glitchRate = config.glitchRate
+
+	if(random.random() < config.glitchModeRate) : 
+		glitchRate = .5
+
+	if (random.random() < .1 and colorBGChaged == True):
+		for i in range(0,100) : 
+			glitchBox(config.renderImageFull,-2,2)
+
+	if(random.random() < glitchRate) : 
+		dance()
 
 	# Render the final full image
-	config.image = config.renderImageFull
+	#config.image = config.renderImageFull
+
+
+
+
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, True)
 
 	# cleanup the list

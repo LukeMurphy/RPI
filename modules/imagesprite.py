@@ -282,10 +282,10 @@ class ImageSprite :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-	def glitchBox(self) :
+	def glitchBox(self, r1 = -10, r2 = 10) :
 		apparentWidth = self.image.size[1]
 		apparentHeight = self.image.size[0]
-		dy = int(random.uniform(-10,10))
+		dy = int(random.uniform(r1,r2))
 		dx = int(random.uniform(1,self.config.imageGlitchSize))
 		dx = 0
 
@@ -300,6 +300,7 @@ class ImageSprite :
 			cp1 = self.image.crop((dx, 0, dx + sectionWidth, sectionHeight))
 			self.image.paste( cp1, (int(0 + dx), int(0 + dy)))	
 
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	def augment(self) :
 			if(self.frameCount > 39) :

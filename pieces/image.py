@@ -176,7 +176,8 @@ def colorize(clr = (250,0,250), recolorize = False) :
 
 		# Color overlay on b/w PNG sprite
 		clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
-		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, config.clrBlkHeight + config.overlayyPos), fill=clr)
+		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, 
+								config.clrBlkHeight + config.overlayyPos), fill=clr)
 		#config.renderImageFull.paste(clrBlock, (0,0))
 
 		try :

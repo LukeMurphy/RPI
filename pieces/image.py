@@ -177,6 +177,14 @@ def colorize(clr = (250,0,250), recolorize = False) :
 		clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
 		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, 
 								config.clrBlkHeight + config.overlayyPos), fill=clr)
+		'''
+
+		ptA = (config.overlayxPos + 10, config.overlayyPos + 20)
+		ptB = (config.overlayxPos + config.clrBlkWidth , config.overlayyPos)
+		ptC = (config.overlayxPos + config.clrBlkWidth , config.overlayyPos + config.clrBlkHeight + 20)
+		ptD = (config.overlayxPos, config.clrBlkHeight + config.overlayyPos)
+		clrBlockDraw.polygon([ptA,ptB,ptC,ptD], fill=clr)
+		'''
 		#config.renderImageFull.paste(clrBlock, (0,0))
 
 		try :

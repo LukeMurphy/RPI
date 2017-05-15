@@ -470,7 +470,7 @@ class ImageSprite :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
-	def animate(self, holdAnimation = False) :
+	def animate(self, holdAnimation = False, forceGlitch=False) :
 
 		# This needs fixing  - currently requires extra frame
 		# at end of gif  --
@@ -504,12 +504,15 @@ class ImageSprite :
 
 		self.frameCount += 1
 
-		r = int(random.uniform(2,10))
-		for i in range(0,r) :
-			self.glitchBox(-self.config.imageGlitchDisplacement, self.config.imageGlitchDisplacement)
+		if(random.random() < self.config.imageGlitchProb or forceGlitch) :
+			r = int(random.uniform(2,10))
+			for i in range(0,r) :
+				self.glitchBox(-self.config.imageGlitchDisplacement, self.config.imageGlitchDisplacement)
 
 
-		if (self.config.useImageFilter) : self.filterize()
+		if (self.config.useImageFilter) : 
+			if(random.random() < self.config.imageFilterProb):
+				self.filterize()
 		self.augment()
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

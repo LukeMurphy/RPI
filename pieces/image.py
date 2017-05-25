@@ -137,8 +137,8 @@ def iterate( n = 0) :
 		config.colorOverlay = colorutils.getRandomRGB()
 		#config.colorOverlay = colorutils.getRandomColorWheel()
 		if(random.random() < config.overlayChangePosProb ) :
-			config.overlayyPos = 0
-		else:
+			config.overlayyPos = 100
+		if(random.random() < config.overlayChangePosProb ) :
 			config.overlayxPos = config.overlayxPosOrig
 			config.overlayyPos = config.overlayyPosOrig
 	colorize(config.colorOverlay)

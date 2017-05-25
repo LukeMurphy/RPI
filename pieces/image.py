@@ -53,9 +53,12 @@ def main(run = True) :
 
 	config.clrBlkWidth = int(workConfig.get("filter", 'clrBlkWidth')) 
 	config.clrBlkHeight = int(workConfig.get("filter", 'clrBlkHeight')) 
+	config.overlayxPosOrig = int(workConfig.get("filter", 'overlayxPos')) 
+	config.overlayyPosOrig = int(workConfig.get("filter", 'overlayyPos')) 	
 	config.overlayxPos = int(workConfig.get("filter", 'overlayxPos')) 
 	config.overlayyPos = int(workConfig.get("filter", 'overlayyPos')) 
 	config.overlayChangeProb = float(workConfig.get("filter", 'overlayChangeProb')) 
+	config.overlayChangePosProb = float(workConfig.get("filter", 'overlayChangePosProb')) 
 
 	config.animateProb = float(workConfig.get("filter", 'animateProb')) 
 	config.imageGlitchProb = float(workConfig.get("filter", 'imageGlitchProb')) 
@@ -133,6 +136,11 @@ def iterate( n = 0) :
 	if(random.random() < config.overlayChangeProb ) :
 		config.colorOverlay = colorutils.getRandomRGB()
 		#config.colorOverlay = colorutils.getRandomColorWheel()
+		if(random.random() < config.overlayChangePosProb ) :
+			config.overlayyPos = 0
+		else:
+			config.overlayxPos = config.overlayxPosOrig
+			config.overlayyPos = config.overlayyPosOrig
 	colorize(config.colorOverlay)
 
 

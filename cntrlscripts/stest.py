@@ -3,6 +3,7 @@ import RPi.GPIO as GPIO
 import sys, getopt, os
 import ConfigParser, io
 import time
+import subprocess
 
 GPIO.setmode(GPIO.BCM)
 
@@ -16,10 +17,12 @@ def __main__():
 		print("shutting down!")
 		time.sleep(1)
 		try:
-			os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")
-		except e:
-			print(e)
-			os.system("/home/pi/Documents/RPI/cntrlscripts/shutdown.sh")
+			#os.system("/home/pi/Documents/RPI/cntrlscripts/shutdown.sh")
+			subprocess.call(['/home/pi/Documents/RPI/cntrlscripts/shutdown.sh'])
+		except OSError:
+			print(OSError)
+			subprocess.call(['/home/pi//RPI/cntrlscripts/shutdown.sh'])
+			#os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")
 	except KeyboardInterrupt:
 		GPIO.cleanup()       # clean up GPIO on CTRL+C exit
 	GPIO.cleanup()           # clean up GPIO on normal exit

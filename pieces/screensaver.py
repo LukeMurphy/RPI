@@ -82,8 +82,10 @@ def main(run = True) :
 	config.iconImage = Image.open((path + imageList[0]) , "r")
 	config.iconImage.load()
 	config.iconImage = config.iconImage.resize((48,48))
+
 	if (config.windowOrientation == "horizontal"):
 		config.iconImage = config.iconImage.rotate(90,expand=True)
+
 	config.iconImageHeight =  config.iconImage.getbbox()[3]
 
 
@@ -245,7 +247,7 @@ def iterate( n = 0) :
 	config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
 	
 	###### Paste in crawl
-	#config.image.paste(imgCrawl,(0,0), imgCrawl)
+	config.image.paste(imgCrawl,(0,0), imgCrawl)
 	
 	###### Render the final full image
 	#config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)

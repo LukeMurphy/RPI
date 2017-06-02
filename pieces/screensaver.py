@@ -62,13 +62,22 @@ def main(run = True) :
 	config.crawlPosy = 0 
 	
 	config.imageXOffset = 0
-	config.imageYOffset = 0  #60
+	config.imageYOffset = 0
 
 	path = config.path  + "/assets/imgs/"
 	imageList = [config.imageToLoad] 
 
-	config.image = Image.new("RGB", (config.screenWidth, config.screenHeight))
-	config.draw = ImageDraw.Draw(config.renderImage)
+	dim1 = config.screenWidth
+	dim2 = config.screenHeight
+
+	if(config.screenWidth > config.screenHeight) : 
+		config.screenHeight = config.screenWidth
+	else : 
+		config.screenWidth = config.screenHeight
+
+
+	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.draw = ImageDraw.Draw(config.image)
 
 	config.renderImage = Image.new("RGBA", (128, 128))
 	config.renderDraw = ImageDraw.Draw(config.renderImage)
@@ -81,10 +90,8 @@ def main(run = True) :
 	
 	config.iconImage = Image.open((path + imageList[0]) , "r")
 	config.iconImage.load()
-	config.iconImage = config.iconImage.resize((48,48))
-
-	if (config.windowOrientation == "horizontal"):
-		config.iconImage = config.iconImage.rotate(90,expand=True)
+	
+	#config.iconImage = config.iconImage.resize((48,48))
 
 	config.iconImageHeight =  config.iconImage.getbbox()[3]
 
@@ -93,18 +100,18 @@ def main(run = True) :
 	config.font1 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSerifBold.ttf',config.fontSize )
 	config.font2 = ImageFont.truetype(config.path + '/assets/fonts/freefont/ComicSansMSBold.ttf',config.fontSize )
 	config.font3 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSansBold.ttf',config.fontSize )
-	config.pixLen = config.textDraw.textsize(config.txtStringL1, font = config.font2)
+	config.pixLen = config.textDraw.textsize(config.txtStringL1, font = config.font3)
 
 	print(config.pixLen)
 
 	config.txtColor = (255,200,0)
-	config.txtBoxWd = config.pixLen[0]
-	config.txtBoxHt = config.pixLen[1] * config.txtBoxHtMultuiplier
+	config.txtBoxWd = config.pixLen[0] + 5
+	config.txtBoxHt = config.pixLen[1] * config.txtBoxHtMultuiplier +2
 
 	config.crawlLen = config.crawlDraw.textsize(config.crawlText, font = config.font3)
 	###### These will be "reversed" if the images are rotated - e.g. verical screen
 	
-	config.xVelocityRange = 15
+	config.xVelocityRange = 5
 	config.yVelocityRange = 5
 	
 	
@@ -137,7 +144,10 @@ def randomizeVelocities() :
 
 def iterate( n = 0) :
 	global config
-	
+
+	'''
+	### pseudo gravity
+
 	if(config.windowOrientation == "horizontal"):
 		if(config.vx >= 0) : 
 			config.vx += .12
@@ -152,7 +162,7 @@ def iterate( n = 0) :
 		else :
 			config.vy += .12
 			config.vy *= .96
-
+	'''
 
 	config.xPos += config.vx
 	config.yPos += config.vy
@@ -195,13 +205,14 @@ def iterate( n = 0) :
 
 
 	###### the higher the alpha value, the less messy the trails are - more black 
-	config.textDraw.rectangle((0,32,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,10))
+	config.textDraw.rectangle((0,64,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,10))
 
 	#config.textDraw.text((3,0), str(config.xPos), (255,200,0,200), font=config.font2)
 	#config.textDraw.text((29,0), str(config.yPos), (255,200,200), font=config.font2)
 
-	fontToUse = config.font1
+	fontToUse = config.font3
 
+	'''
 	config.textDraw.text((1,32), config.txtStringL1, (0,0,0), font=fontToUse)
 	config.textDraw.text((1,46), config.txtStringL2, (0,0,0), font=fontToUse)
 	config.textDraw.text((1,56), config.txtStringL3, (0,0,0), font=fontToUse)	
@@ -213,15 +224,14 @@ def iterate( n = 0) :
 	config.textDraw.text((0,32 + 1), config.txtStringL1, (0,0,0), font=fontToUse)
 	config.textDraw.text((0,46 + 1), config.txtStringL2, (0,0,0), font=fontToUse)
 	config.textDraw.text((0,56 + 1), config.txtStringL3, (0,0,0), font=fontToUse)	
+	'''
 
-	config.textDraw.text((0,32), config.txtStringL1, config.txtColor, font=fontToUse)
-	config.textDraw.text((0,46), config.txtStringL2, config.txtColor, font=fontToUse)
-	config.textDraw.text((0,56), config.txtStringL3, config.txtColor, font=fontToUse)
+	config.textDraw.text((0,0), config.txtStringL1, config.txtColor, font=fontToUse)
+	config.textDraw.text((0,14), config.txtStringL2, config.txtColor, font=fontToUse)
+	config.textDraw.text((0,28), config.txtStringL3, config.txtColor, font=fontToUse)
 
-	if (config.windowOrientation=="horizontal"):
-		imgText = config.textImage.rotate(90)
-	else :
-		imgText = config.textImage
+
+	imgText = config.textImage
 
 	fontToUse = config.font3
 	config.crawlDraw.rectangle((0,0,config.screenHeight,16), fill=(0,0,10,120))
@@ -230,20 +240,21 @@ def iterate( n = 0) :
 	#config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
 	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, (100,100,100,255), font=fontToUse)
 	
-	if(config.windowOrientation == "horizontal"):
-		imgCrawl = config.textCrawl.rotate(90)
+	imgCrawl = config.textCrawl
 	
 	config.crawlPosx -= 1
 
 	if(config.crawlPosx < -config.crawlLen[0]) :
 		config.crawlPosx = config.screenHeight
 
+	# background fill and fade
+	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0,0,0,10))
 
 	###### Paste in image
 	config.renderImage.paste(config.iconImage , (config.imageXOffset,config.imageYOffset), config.iconImage)
 	
 	###### Paste in rotated text
-	config.renderImage.paste(imgText, (-10,-85), imgText)	
+	config.renderImage.paste(imgText, (0,0), imgText)	
 	config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
 	
 	###### Paste in crawl
@@ -251,14 +262,18 @@ def iterate( n = 0) :
 	
 	###### Render the final full image
 	#config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight, True, False)
+
+	if (config.windowOrientation == "horizontal"):
+		img = config.image.rotate(90, expand=True)
+
+	config.render(img, 0, -32, config.screenWidth, config.screenHeight, True, False)
 
 	config.updateCanvas()
 
 
 
 def redrawBackGround() :	
-	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0,10))
+	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,200,10))
 	#config.renderDraw.rectangle((0,0,4,2), fill=(255,0,0))
 	#if(random.random() > .99) : gc.collect()
 	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))

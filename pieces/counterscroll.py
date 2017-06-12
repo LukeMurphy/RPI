@@ -37,7 +37,8 @@ class ScrollMessage :
 		else: self.clr = clr
 		#self.clr = colorutils.randomColor()
 		#self.clr = colorutils.getSunsetColors()
-		if(config.colorOverlay == True) : self.clr = (200,200,200)
+		
+		#if(config.colorOverlay == True) : self.clr = (200,200,200)
 
 		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		# draw the message to get its size
@@ -173,18 +174,18 @@ class XOx :
 				draw.ellipse((startX +1, startY+1, endX-1, endY-1),  outline=clr)
 			else : 
 				clr  = (int(self.ArrowColor[0] * config.brightness), int(self.ArrowColor[1] * config.brightness), int(self.ArrowColor[2] * config.brightness))
-				y0 = startY + self.xsWidth/2
-				yA = self.xsWidth/4
+				y0 = startY + self.xsWidth/2 + config.arrowOffset
+				yA = self.xsWidth/4 + config.arrowOffset
 
 				if(self.direction == "RIGHT") :
-					xA = startX + yA * math.tan(math.pi/4)
+					xA = startX + (yA - config.arrowOffset) * math.tan(math.pi/4)
 					# the horizontal
 					draw.line((startX, y0, endX, y0), fill = clr, width = self.lineThickness)
 					# the blades
 					draw.line((xA, yA, startX, y0), fill = clr, width = self.lineThickness)
 					draw.line((xA, yA + self.xsWidth/2 , startX, y0), fill = clr, width = self.lineThickness)				
 				else :
-					xA = endX - yA * math.tan(math.pi/4)
+					xA = endX - (yA - config.arrowOffset) * math.tan(math.pi/4)
 					# the horizontal
 					draw.line((startX, y0, endX, y0), fill = clr, width = self.lineThickness)
 					# the blades
@@ -223,6 +224,23 @@ def main(run = True) :
 	config.counterScrollText = (workConfig.getboolean("scroll", 'counterScrollText'))
 	config.useXOs = (workConfig.getboolean("scroll", 'useXOs')) 
 	config.useArrows = (workConfig.getboolean("scroll", 'useArrows')) 
+	try:
+		config.numberOfDeadPixels = int(workConfig.get("scroll", 'numberOfDeadPixels'))
+		config.arrowOffset = int(workConfig.get("scroll", 'arrowOffset'))
+		config.overlayX = int(workConfig.get("scroll", 'overlayX'))
+		config.overlayY = int(workConfig.get("scroll", 'overlayY'))
+		config.overlayWidth = int(workConfig.get("scroll", 'overlayWidth'))
+		config.overlayHeight = int(workConfig.get("scroll", 'overlayHeight'))
+
+	except Exception as e: 
+		print (str(e))
+		config.numberOfDeadPixels = 20
+		config.arrowOffset = 0
+		config.overlayX = 0
+		config.overlayY = 0
+		config.overlayWidth = config.screenWidth
+		config.overlayHeight = config.screenHeight
+
 	config.sansSerif = (workConfig.getboolean("scroll", 'sansSerif'))
 	config.useBlanks = (workConfig.getboolean("scroll", 'useBlanks'))
 	config.useThreeD = (workConfig.getboolean("scroll", 'useThreeD'))
@@ -281,7 +299,7 @@ def main(run = True) :
 		config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenWidth))
 
 	if(config.useBlanks) :
-		badpixels.numberOfDeadPixels = 20
+		badpixels.numberOfDeadPixels = config.numberOfDeadPixels
 		badpixels.size = config.canvasImage.size
 		badpixels.config = config
 		badpixels.setBlanksOnScreen() 
@@ -494,22 +512,6 @@ def iterate() :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-	### Colorizing filter that transitions from colorA to colorB ###
-
-	if(config.colorOverlay == True) :
-		config.colorOverlayObjA.stepTransition()
-		config.colorOverlayObjB.stepTransition()
-
-		projectedWidth = config.screenWidth
-		segmentColorizer = Image.new("RGBA", (projectedWidth, config.screenHeight))
-		draw = ImageDraw.Draw(segmentColorizer)
-		draw.rectangle((0,0,projectedWidth/2,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjA.currentColor] ))
-		draw.rectangle((projectedWidth/2,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjB.currentColor] ))
-		config.canvasImage = ImageChops.multiply(config.canvasImage, segmentColorizer)		
-
-
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 	if(config.useXOs) :
 		# Add the counter XO's
 		
@@ -545,8 +547,9 @@ def iterate() :
 				#XOsBlock.xPos = XOsBlock.start = XOsBlocks[XOsBlock.prvBlock].xPos + XOsBlocks[XOsBlock.prvBlock].width + XOsBlock.bufferSpacing
 				
 
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	
 
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
@@ -559,6 +562,22 @@ def iterate() :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
 		config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	### Colorizing filter that transitions from colorA to colorB ###
+
+	if(config.colorOverlay == True) :
+		config.colorOverlayObjA.stepTransition()
+		config.colorOverlayObjB.stepTransition()
+
+		segmentColorizer = Image.new("RGBA", (config.overlayWidth, config.overlayHeight))
+
+		draw = ImageDraw.Draw(segmentColorizer)
+		draw.rectangle((config.overlayX,config.overlayY,config.overlayWidth + config.overlayX, config.overlayHeight + config.overlayY), fill = tuple( [int(a) for a in config.colorOverlayObjA.currentColor] ))
+		#draw.rectangle((projectedWidth/2,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjB.currentColor] ))
+		temp = ImageChops.multiply(config.canvasImageFinal, segmentColorizer)	
+		config.canvasImageFinal.paste(temp,(0,0),temp)
 
 
 

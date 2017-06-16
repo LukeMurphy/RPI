@@ -126,7 +126,7 @@ class ImageSprite :
 			self.dX *= -1
 		print("-----------")
 		self.debugMessage("Trying to load " + img + "")	
-		#print("-----------")
+		print("-----------")
 
 		if(self.loadImage(img)) :
 			# scale to the WIDTH of the screen
@@ -157,6 +157,8 @@ class ImageSprite :
 	
 	def process(self) :
 		change = 1
+		print("Processing....")
+		print("-----------")
 
 		if(self.processImage) :
 			if(self.resizeImage) :
@@ -201,11 +203,14 @@ class ImageSprite :
 				r = int(random.uniform(200,255))
 				g = int(random.uniform(0,100))
 				b = int(random.uniform(0,10))
+				a = 255
 				if (random.random() > .5) :
 					r = int(random.uniform(0,100))
 					b = int(random.uniform(200,255))
-				clr = (r,g,b)
+				clr = (r,g,b,a)
 
+			print("Colorizing ....")
+			print("-----------")
 			self.colorize(clr)
 
 			# Not so great - yOffset is rendered useless by this  ....
@@ -220,7 +225,12 @@ class ImageSprite :
 			clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
 			clrBlockDraw = ImageDraw.Draw(clrBlock)
 
+			#print("self.image",self.image)
+			#print("self.imageOriginal", self.imageOriginal)
+			#print("clrBlock",clrBlock)
+
 			# Color overlay on b/w PNG sprite
+			# EVERYTHING HAS TO BE PNG  / have ALPHA 
 			clrBlockDraw.rectangle((0,0,self.image.size[0], self.image.size[1]), fill=clr)
 			if(recolorize == True) :
 				self.image =  ImageChops.multiply(clrBlock, self.imageOriginal)

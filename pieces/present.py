@@ -58,7 +58,7 @@ def main(run = True) :
 	global config, workConfig, blocks, simulBlocks, colorModeDirectional, glitchRate
 	gc.enable()
 
-	print("Plane Loaded")
+	print("Present Loaded")
 
 	try :
 		config.vOffset = int(workConfig.get("images", 'vOffset'))
@@ -120,6 +120,7 @@ def main(run = True) :
 		blocks.append(imgLoader)
 
 
+	print("Running Work...")
 	if(run) : runWork()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -167,9 +168,10 @@ def dance():
 			cp1 = blocks[1].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
 			config.renderImageFull.paste( cp1, (int(blocks[1].x + dx), int(blocks[1].y + dy)), cp1)	
 
-		if(random.random() < .97) :
-			cp2 = blocks[2].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
-			config.renderImageFull.paste( cp2, (int(blocks[2].x + dx), int(blocks[2].y - dy)), cp2)
+		if(len(blocks) >= 3) :
+			if(random.random() < .97) :
+				cp2 = blocks[2].image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+				config.renderImageFull.paste( cp2, (int(blocks[2].x + dx), int(blocks[2].y - dy)), cp2)
 
 		'''	
 		# Not sure if this is a useful variation

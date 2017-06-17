@@ -11,17 +11,18 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 def __main__():
-	print("started testing")
+	print("Started testing GPIO for off signal")
 	try:
 		GPIO.wait_for_edge(18, GPIO.FALLING)
 		print("shutting down!")
-		time.sleep(1)
+		time.sleep(.1)
 		try:
+			print("shutdown call")
 			#os.system("/home/pi/Documents/RPI/cntrlscripts/shutdown.sh")
 			subprocess.call(['/home/pi/Documents/RPI/cntrlscripts/shutdown.sh'])
 		except OSError:
 			print(OSError)
-			subprocess.call(['/home/pi//RPI/cntrlscripts/shutdown.sh'])
+			subprocess.call(['/home/pi/RPI/cntrlscripts/shutdown.sh'])
 			#os.system("/home/pi/RPI/cntrlscripts/shutdown.sh")
 	except KeyboardInterrupt:
 		GPIO.cleanup()       # clean up GPIO on CTRL+C exit

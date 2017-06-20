@@ -5,7 +5,7 @@ from modules.imagesprite import ImageSprite
 from modules import colorutils
 
 from PIL import Image, ImageDraw, ImageFont
-from PIL import ImageFilter
+from PIL import ImageChops, ImageFilter, ImagePalette
 import importlib
 import time
 import random
@@ -81,6 +81,17 @@ def main(run = True) :
 		config.imageList  = (workConfig.get("images", 'imageList')).split(',')
 		config.colorMode  = (workConfig.get("images", 'colorMode'))
 		config.randomColorMode  = (workConfig.getboolean("images", 'randomColorMode'))
+
+		config.clrBlkWidth = int(workConfig.get("filter", 'clrBlkWidth')) 
+		config.clrBlkHeight = int(workConfig.get("filter", 'clrBlkHeight')) 
+		config.overlayxPosOrig = int(workConfig.get("filter", 'overlayxPos')) 
+		config.overlayyPosOrig = int(workConfig.get("filter", 'overlayyPos')) 	
+		config.overlayxPos = int(workConfig.get("filter", 'overlayxPos')) 
+		config.overlayyPos = int(workConfig.get("filter", 'overlayyPos')) 
+		config.overlayChangeProb = float(workConfig.get("filter", 'overlayChangeProb')) 
+		config.overlayChangePosProb = float(workConfig.get("filter", 'overlayChangePosProb')) 
+		config.colorOverlay  = (255,0,255)
+
 	except Exception as e: 
 		print (str(e))
 
@@ -234,7 +245,7 @@ def iterate( n = 0) :
 
  		block.update()
  		
-		
+		### Change the color of the figures
 		if(random.random() < config.colorChage and n > 0) : 
 			clr = colorutils.randomColor(random.uniform(.1,1))
 			block.colorize(clr, True)
@@ -242,6 +253,7 @@ def iterate( n = 0) :
 			for i in range(0,10) : block.glitchBox()
 			#config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
 
+		### Change the color of the Background -- in configs, BG is first
 		if(random.random() < config.colorBGChage and n == 0) : 
 			clr = colorutils.randomColor(random.uniform(.4,1))
 			block.colorize(clr, True)
@@ -272,10 +284,17 @@ def iterate( n = 0) :
 	# Render the final full image
 	#config.image = config.renderImageFull
 
-
-
-
+	if(random.random() < config.overlayChangeProb ) :
+		config.colorOverlay = colorutils.getRandomRGB()
+		#config.colorOverlay = colorutils.getRandomColorWheel()
+	if(random.random() < config.overlayChangePosProb ) :
+		config.overlayyPos = 100
+	if(random.random() < config.overlayChangePosProb ) :
+		config.overlayxPos = config.overlayxPosOrig
+		config.overlayyPos = config.overlayyPosOrig
+	colorize(config.colorOverlay)
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, True)
+
 
 	# cleanup the list
 	#blocks[:] = [block for block in blocks if block.setForRemoval!=True]
@@ -284,6 +303,37 @@ def iterate( n = 0) :
 	if len(blocks) == 0 : exit()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def colorize(clr = (250,0,250), recolorize = False) :
+
+		#Colorize via overlay etc
+		w = config.renderImageFull.size[0]
+		h = config.renderImageFull.size[1]
+		clrBlock = Image.new(config.renderImageFull.mode, (w, h))
+		clrBlockDraw = ImageDraw.Draw(clrBlock)
+
+		# Color overlay on b/w PNG sprite
+		clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
+		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, 
+								config.clrBlkHeight + config.overlayyPos), fill=clr)
+		'''
+
+		ptA = (config.overlayxPos + 10, config.overlayyPos + 20)
+		ptB = (config.overlayxPos + config.clrBlkWidth , config.overlayyPos)
+		ptC = (config.overlayxPos + config.clrBlkWidth , config.overlayyPos + config.clrBlkHeight + 20)
+		ptD = (config.overlayxPos, config.clrBlkHeight + config.overlayyPos)
+		clrBlockDraw.polygon([ptA,ptB,ptC,ptD], fill=clr)
+		'''
+		#config.renderImageFull.paste(clrBlock, (0,0))
+
+		try :
+			config.renderImageFull = ImageChops.multiply(clrBlock, config.renderImageFull)
+			#imgTemp = imgTemp.convert(config.renderImageFull.mode)
+			#print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
+			#config.renderImageFull.paste(imgTemp,(0,0,w,h))
+
+		except Exception as e: 
+			print(e, clrBlock.mode, config.renderImageFull.mode)
+			pass
 
 def callBack() :
 	global config

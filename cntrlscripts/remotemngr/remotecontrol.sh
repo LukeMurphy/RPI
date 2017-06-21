@@ -62,6 +62,11 @@ if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
     if test  $remotevalue = "XOs"
     then
         config="XOs.cfg"
+    fi    
+
+    if test  $remotevalue = "counter"
+    then
+        config="counter.cfg"
     fi
 
     execString=$path"player.py "$machine" "$path" "$path$configGroup$config

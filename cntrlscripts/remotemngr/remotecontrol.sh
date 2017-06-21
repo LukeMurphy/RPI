@@ -54,6 +54,16 @@ if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
         config="hang.cfg"
     fi
 
+    if test  $remotevalue = "stroop2"
+    then
+        config="stroop2.cfg"
+    fi
+
+    if test  $remotevalue = "XOs"
+    then
+        config="XOs.cfg"
+    fi
+
     execString=$path"player.py "$machine" "$path" "$path$configGroup$config
     #echo $execString
 

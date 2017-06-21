@@ -44,6 +44,16 @@ if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
         config="img-hub.cfg"
     fi
 
+    if test  $remotevalue = "machine"
+    then
+        config="machine.cfg"
+    fi
+
+    if test  $remotevalue = "hang"
+    then
+        config="hang.cfg"
+    fi
+
     execString=$path"player.py "$machine" "$path" "$path$configGroup$config
     #echo $execString
 

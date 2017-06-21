@@ -1,9 +1,9 @@
 #!/bin/sh
 #!/bin/bash
-startingup=0
+startingup="0"
 if test $1 = "startup"
 then
-    startingup=1
+    startingup="1"
 fi
 
 path="/home/lukr/Documents/RPI/"
@@ -20,7 +20,7 @@ echo $localvalue
 echo "----"
 
 
-if [ $remotevalue != $localvalue ] || [ $startingup == 1 ]
+if [ $remotevalue != $localvalue ] || [ $startingup == "1" ]
 then
     echo "NOT THE SAME or STARTING UP"
     echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"

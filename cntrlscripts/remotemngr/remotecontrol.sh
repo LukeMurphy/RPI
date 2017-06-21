@@ -1,9 +1,12 @@
 #!/bin/sh
 
 startingup="0"
-if test $1 = "startup"
-then
-    startingup="1"
+if [ $# -neq 0 ]
+    then
+    if test $1 = "startup"
+    then
+        startingup="1"
+    fi
 fi
 
 path="/home/lukr/Documents/RPI/"

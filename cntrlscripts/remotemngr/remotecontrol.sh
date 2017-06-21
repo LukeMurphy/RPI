@@ -1,18 +1,29 @@
 #!/bin/sh
 #!/bin/bash
-# Remote reader
+startingup=0
+if test $1 = "startup"
+then
+    startingup=1
+fi
+
 path="/home/lukr/Documents/RPI/"
+#path="/Users/lukemurphy/Documents/DEVTEMP/RPI/"
 configGroup="configs/p4-4x4/"
 machine="daemon4"
 
 remotevalue=$(curl -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/daemon4-status.cfg")
-localvalue=$(cat /home/lukr/Documents/RPI/cntrlscripts/remotemngr/localvalue.cfg)
+localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
+echo "----"
 echo $remotevalue
+echo "----"
 echo $localvalue
-if [ $remotevalue != $localvalue ]
+echo "----"
+
+
+if [ $remotevalue != $localvalue ] || [ $startingup == 1 ]
 then
-    echo "NOT THE SAME"
-    echo -n $remotevalue > /home/lukr/Documents/RPI/cntrlscripts/remotemngr/localvalue.cfg
+    echo "NOT THE SAME or STARTING UP"
+    echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
 
     ps -ef | pgrep python | xargs sudo kill -9;
 

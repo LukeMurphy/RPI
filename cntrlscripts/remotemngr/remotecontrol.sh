@@ -1,7 +1,7 @@
 #!/bin/sh
 
 startingup="0"
-if [ $# -neq 0 ]
+if [ $# -ne 0 ]
     then
     if test $1 = "startup"
     then

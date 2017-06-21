@@ -1,5 +1,5 @@
 #!/bin/sh
-#!/bin/bash
+
 startingup="0"
 if test $1 = "startup"
 then
@@ -13,15 +13,9 @@ machine="daemon4"
 
 remotevalue=$(curl -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/daemon4-status.cfg")
 localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
-echo "----"
-echo $remotevalue
-echo "----"
-echo $localvalue
-echo "----"
 
+if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
 
-if [ $remotevalue != $localvalue ] || [ $startingup == "1" ]
-then
     echo "NOT THE SAME or STARTING UP"
     echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
 
@@ -48,7 +42,7 @@ then
     fi
 
     execString=$path"player.py "$machine" "$path" "$path$configGroup$config
-    echo $execString
+    #echo $execString
 
     DISPLAY=:0 python $execString&
 fi

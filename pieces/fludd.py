@@ -136,7 +136,7 @@ class Fludd :
 			self.borderModel = "plenum"
 		else : self.borderModel = "prism"
 
-		if(self.config.demoMode != 0) : print(self.varianceMode, self.borderModel)
+		#if(self.config.demoMode != 0) : print(self.varianceMode, self.borderModel)
 
 	def done(self): 
 		return True
@@ -184,7 +184,7 @@ def iterate() :
 				config.count = 0 
 				config.t2  = time.time()
 				config.timeToComplete  = config.t2  - config.t1
-				print (config.timeToComplete)
+				#print (config.timeToComplete)
 				config.t1  = time.time()
 				config.t2  = time.time()
 				fluddSquare.change()
@@ -202,7 +202,7 @@ def iterate() :
 			config.countMax = config.demoMode * config.calibrationCount / config.timeToComplete 
 			config.calibrated = True
 
-			print(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax )
+			#print(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax )
 
 			config.t1  = time.time()
 			config.t2  = time.time()

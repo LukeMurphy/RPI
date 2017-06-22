@@ -20,13 +20,15 @@ localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
 
 # set the remote to be a default
 remotevalue="fludd"
-remotecurlvalue=$(curl -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/daemon4-status.cfg")
+remotecurlvalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/daemon4-status.cfg")
 status=$?
 
 # if curl is ok, set the remote value
-if [ $status -eq 1 ]
+if [ $status -eq 0 ]
 then
-        remotevalue="$remotecurlvalue"
+        echo "OK -- CHANGING..."
+        remotevalue=$remotecurlvalue
+        echo $remotevalue
 fi
 
 # choose the piece to play

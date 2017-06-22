@@ -9,14 +9,27 @@ if [ $# -ne 0 ]
     fi
 fi
 
+# Changes based on machine setup
 path="/home/lukr/Documents/RPI/"
 #path="/Users/lukemurphy/Documents/DEVTEMP/RPI/"
 configGroup="configs/p4-4x4/"
 machine="daemon4"
 
-remotevalue=$(curl -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/daemon4-status.cfg")
+# Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
 localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
 
+# set the remote to be a default
+remotevalue="fludd"
+remotecurlvalue=$(curl -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/daemon4-status.cfg")
+status=$?
+
+# if curl is ok, set the remote value
+if [ $status -eq 1 ]
+then
+        remotevalue="$remotecurlvalue"
+fi
+
+# choose the piece to play
 if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
 
     echo "NOT THE SAME or STARTING UP"

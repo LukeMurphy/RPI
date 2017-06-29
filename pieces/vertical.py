@@ -16,6 +16,7 @@ class Vertical :
 	innerColor = (130,30,0)
 	borderColor = (50,0,0)
 
+
 	xPos = 0
 	yPos = 0
 	vOffset = 0
@@ -29,15 +30,9 @@ class Vertical :
 
 	def __init__(self, config):
 
-		self.boxMax = config.screenWidth - 1
-		#self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
-		self.boxHeight = config.screenHeight - 2
 		self.config = config
-		self.h = config.blockHeight
-		self.var = config.var
-		#self.borderModel = workConfig.get("fludd", 'borderModel')
-
-		self.unitImage = Image.new("RGBA", (config.screenWidth,self.h))
+		self.boxMax = config.canvasWidth
+		self.unitImage = Image.new("RGBA", (config.screenWidth,self.config.h))
 		self.draw  = ImageDraw.Draw(self.unitImage)
 		self.BorderWidth = 2
 		self.changeAction()
@@ -49,18 +44,18 @@ class Vertical :
 
 	def make(self):
 		self.changeAction()
-		self.outer1 = (self.xPos,self.yPos, int(random.uniform(-self.var,+self.var) + self.OuterWidth) + 1, self.yPos + self.h)
-		self.border1 = (self.outer1[2],self.yPos, self.outer1[2] + int(random.uniform(-1,1) + self.BorderWidth) + 1, self.yPos + self.h)
-		self.cntr = (self.border1[2],self.yPos, self.border1[2] + int(random.uniform(-self.var,+self.var) + self.CenterWidth)  + 1, self.yPos + self.h)
-		self.border2 = (self.cntr[2],self.yPos, self.cntr[2] + int(random.uniform(0,2) + self.BorderWidth) + 1, self.yPos + self.h)
-		self.outer2= (self.border2[2],self.yPos, self.boxMax, self.yPos + self.h)
+		self.outer1 = (self.xPos, self.yPos, int(random.uniform(-self.config.var, self.config.var) + self.OuterWidth) + 1, self.yPos + self.config.h)
+		self.border1 = (self.outer1[2], self.yPos, self.outer1[2] + int(random.uniform(-1,1) + self.BorderWidth) + 1, self.yPos + self.config.h)
+		self.cntr = (self.border1[2], self.yPos, self.border1[2] + int(random.uniform(-self.config.var,+self.config.var) + self.CenterWidth)  + 1, self.yPos + self.config.h)
+		self.border2 = (self.cntr[2], self.yPos, self.cntr[2] + int(random.uniform(0,2) + self.BorderWidth) + 1, self.yPos + self.config.h)
+		self.outer2= (self.border2[2], self.yPos, self.boxMax, self.yPos + self.config.h)
 
 	def reDraw(self) :
-		self.draw.rectangle(self.outer1, fill = self.outerColor)
-		self.draw.rectangle(self.border1, fill = self.borderColor)
-		self.draw.rectangle(self.cntr, fill = self.innerColor)
-		self.draw.rectangle(self.border2, fill = self.borderColor)
-		self.draw.rectangle(self.outer2, fill = self.outerColor)
+		self.draw.rectangle(self.outer1, fill = self.config.outerColor)
+		self.draw.rectangle(self.border1, fill = self.config.borderColor)
+		self.draw.rectangle(self.cntr, fill = self.config.innerColor)
+		self.draw.rectangle(self.border2, fill = self.config.borderColor)
+		self.draw.rectangle(self.outer2, fill = self.config.outerColor)
 		config.image.paste(self.unitImage, (0, self.vOffset), self.unitImage )
 
 
@@ -95,7 +90,7 @@ def reArraynge():
 
 	# instert it at the start of the array
 	vertArray.insert(0,lastElement)
-	layers = int(config.screenHeight / config.blockHeight)
+	layers = int(config.canvasHeight / config.blockHeight) 
 
 	# run through the array and reset each blocks new postition
 	# to produce motion animation effect
@@ -104,11 +99,18 @@ def reArraynge():
 
 def changeWidth():
 	if(config.inMotion == True) :
+
 		if(config.widthPercentage <= config.destinationPercentage) :
+			config.var = config.varMulitplierWhenChangingUp * config.varBase
 			config.multiplier = config.incrRate
+
 		else :
+			config.var = config.varMulitplierWhenChangingDown * config.varBase
 			config.multiplier = config.reduceRate
+
 		config.widthPercentage = config.widthPercentage * config.multiplier
+	else:
+		config.var = config.varBase
 
 	if (abs((config.widthPercentage-config.destinationPercentage)/config.destinationPercentage) <= .01 and config.inMotion == True) : 
 		config.inMotion = False 
@@ -141,6 +143,10 @@ def iterate() :
 	global config, vert, lastRate
 	
 	redraw()
+
+	#draw = ImageDraw.Draw(config.image)
+	#draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1),fill=None, outline=(0,255,0))
+
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	callBack()
@@ -154,29 +160,45 @@ def main(run = True) :
 	vertArray = []
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
-	config.blockHeight = int(workConfig.get("vertical", 'blockHeight'))
 	config.vOffset = int(workConfig.get("vertical", 'vOffset'))
-	config.widthPercentage = float(workConfig.get("vertical", 'widthPercentage'))
-	config.redrawSpeed = .005
-	config.blockHeight = 8 
-	config.rateMultiplier = .1
-	config.rate = config.rateMultiplier * random.random()
-	config.h = 8
-	config.var = 2
 
-	config.destinationPercentage = .25
-	config.widthPercentage = .20
-	config.multiplier = .998
-	config.incrRate = 1.01
-	config.reduceRate = .998
-	config.inMotionProbability = .001
+	config.redrawSpeed = float(workConfig.get("vertical", 'redrawSpeed'))
+	config.blockHeight = int(workConfig.get("vertical", 'blockHeight'))
+	config.rateMultiplier = float(workConfig.get("vertical", 'rateMultiplier'))
+	config.rate = config.rateMultiplier * random.random()
+	config.h = int(workConfig.get("vertical", 'h'))
+	config.var = int(workConfig.get("vertical", 'var'))
+	config.varBase = int(workConfig.get("vertical", 'var'))
+	config.varMulitplierWhenChangingUp = int(workConfig.get("vertical", 'varMulitplierWhenChangingUp'))
+	config.varMulitplierWhenChangingDown = int(workConfig.get("vertical", 'varMulitplierWhenChangingDown'))
+
+	config.destinationPercentage = float(workConfig.get("vertical", 'destinationPercentage'))
+	config.widthPercentage = float(workConfig.get("vertical", 'widthPercentage'))
+	config.multiplier = float(workConfig.get("vertical", 'multiplier'))
+	config.incrRate = float(workConfig.get("vertical", 'incrRate'))
+	config.reduceRate =float(workConfig.get("vertical", 'reduceRate'))
+	config.inMotionProbability = float(workConfig.get("vertical", 'inMotionProbability'))
+	config.brightness = float(workConfig.get("vertical", 'brightness'))
+
+	config.outerColor = ((workConfig.get("vertical", 'outerColor')).split(','))
+	config.outerColor = tuple(map(lambda x: int(int(x) * config.brightness) ,config.outerColor))
+
+	config.innerColor = ((workConfig.get("vertical", 'innerColor')).split(','))
+	config.innerColor = tuple(map(lambda x: int(int(x) * config.brightness) ,config.innerColor))
+
+	config.borderColor = ((workConfig.get("vertical", 'borderColor')).split(','))
+	config.borderColor = tuple(map(lambda x: int(int(x) * config.brightness) ,config.borderColor))
+
 	config.inMotion = False
 
-	layers = int(config.screenHeight / config.blockHeight)
+	layers = int(config.canvasHeight / config.blockHeight) 
+
+	#print(layers)
 	for i in range (0,layers):
 		vert = Vertical(config)
 		vert.make()
 		vert.vOffset = i * config.blockHeight
+		#print(vert.vOffset, config.blockHeight)
 		vertArray.append(vert)
 	if(run) : runWork()
 		

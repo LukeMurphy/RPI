@@ -147,7 +147,6 @@ def updateCanvas() :
 			config.reloadConfig = False
 
 
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :

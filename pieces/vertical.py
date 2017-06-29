@@ -117,7 +117,7 @@ def changeWidth():
 		#print("done")
 
 	if (random.random() <  config.inMotionProbability and config.inMotion == False) :
-		config.destinationPercentage = random.uniform(0.0001,.79)
+		config.destinationPercentage = random.uniform(config.minPercentWidth, config.maxPercentWidth)
 		config.inMotion = True
 		#print ("==>", config.destinationPercentage, config.widthPercentage)
 
@@ -179,6 +179,8 @@ def main(run = True) :
 	config.reduceRate =float(workConfig.get("vertical", 'reduceRate'))
 	config.inMotionProbability = float(workConfig.get("vertical", 'inMotionProbability'))
 	config.brightness = float(workConfig.get("vertical", 'brightness'))
+	config.minPercentWidth = float(workConfig.get("vertical", 'minPercentWidth'))
+	config.maxPercentWidth = float(workConfig.get("vertical", 'maxPercentWidth'))
 
 	config.outerColor = ((workConfig.get("vertical", 'outerColor')).split(','))
 	config.outerColor = tuple(map(lambda x: int(int(x) * config.brightness) ,config.outerColor))

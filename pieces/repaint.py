@@ -95,14 +95,19 @@ class unit:
 
 		# the brush outline
 		self.draw.polygon(shape, fill=self.fillColor, outline=self.outlineColor)
+		
 		# the bristles
 		self.draw.rectangle(((xPos, yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule + self.bristle)), fill=self.fillColor, outline=None)
+
 		# Line demarking bristles
 		#self.draw.line(((xPos,yPos + self.ferrule), (xPos + self.brushWidth, yPos + self.ferrule)), fill=self.outlineColor, width=1)
+
 		# hangling hole
 		#self.draw.rectangle((xPos + self.brushWidth/2 - self.holeWidth/2, yPos - self.handle + 3, xPos + self.brushWidth/2 + self.holeWidth/2 , yPos - self.handle + 3 + self.holeHeight), fill=(0,0,0), outline=self.outlineColor)
+		
 		# rotate brush
 		img = self.image.rotate(self.imageRotation, expand=True)
+		
 		# paste into image that is final render
 		self.config.image.paste(img, (xPosFinal,yPosFinal), img)
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+## Set crontab -e to */1 * * * * /Documents/RPI/cntrlscripts/remotemngr/remotecontrol.sh
+
 startingup="0"
 if [ $# -ne 0 ]
     then
@@ -37,7 +39,7 @@ if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
     echo "NOT THE SAME or STARTING UP"
     echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
 
-    ps -ef | pgrep python | xargs sudo kill -9;
+    ps -ef | pgrep python | xargs kill -9;
 
     if test $remotevalue = "fludd"
     then

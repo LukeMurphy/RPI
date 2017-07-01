@@ -12,8 +12,8 @@ if [ $# -ne 0 ]
 fi
 
 # Changes based on machine setup
-path="/home/lukr/Documents/RPI/"
-#path="/Users/lukemurphy/Documents/DEVTEMP/RPI/"
+#path="/home/lukr/Documents/RPI/"
+path="/Users/lukemurphy/Documents/DEVTEMP/RPI/"
 configGroup="configs/p4-4x4/"
 machine="daemon4"
 
@@ -22,7 +22,7 @@ localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
 
 # set the remote to be a default
 remotevalue=$localvalue
-remotecurlvalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/lukr.cfg")
+remotecurlvalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/")
 status=$?
 
 echo $status

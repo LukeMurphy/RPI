@@ -308,7 +308,7 @@ def main(run = True) :
 
 	if(config.txtfile != "") :
 		config.textArray = []
-		fh = open('./configs/'+config.txtfile,'r')
+		fh = open(''+config.txtfile,'r')
 		lines = fh.readlines()
 		config.txt1 = "  "
 

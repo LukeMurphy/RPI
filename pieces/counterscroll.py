@@ -318,10 +318,10 @@ def main(run = True) :
 		for text in lines :
 			#text = fh.readline()
 			config.textArray.append(text.replace('\n', ''))
-			config.txt1 = config.txt1 + " --> " + text.replace('\n', '')
+			config.txt1 = config.txt1 + " -- " + text.replace('\n', '')
 
 		config.txt2 = config.txt1
-		config.breaksArray = [i for i, ltr in enumerate(config.txt1) if ltr == ">"]
+		config.breaksArray = [i for i, ltr in enumerate(config.txt1) if ltr == "-"]
 
 
 

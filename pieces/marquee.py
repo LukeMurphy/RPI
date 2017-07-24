@@ -50,13 +50,13 @@ def init() :
 	mw = marqueeWidth
 	mwPrev = marqueeWidth
 
-	for i in range (0,config.marqueeNum):
+	for i in range (0, config.marqueeNum):
 		clrs = [colorutils.randomColor(),colorutils.getRandomRGB()]
 		colOverlayA = coloroverlay.ColorOverlay()
 		colOverlayB = coloroverlay.ColorOverlay()
 
-		colOverlayA.randomRange = (10.0,config.randomRange)
-		colOverlayB.randomRange = (10.0,config.randomRange)
+		colOverlayA.randomRange = (10.0, config.randomRange)
+		colOverlayB.randomRange = (10.0, config.randomRange)
 
 		#if(i%2 == 0) : mw = mwPrev - decrement
 
@@ -251,7 +251,7 @@ def main(run = True) :
 
 	config.alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 	config.word = "FEAR"
-	colorutils.brightness =  1
+	colorutils.brightness =  float(workConfig.get("displayconfig", 'brightness')) 
 	config.messageString = config.word
 	config.xOffset = 15
 

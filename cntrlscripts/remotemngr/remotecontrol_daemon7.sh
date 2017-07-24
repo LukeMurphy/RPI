@@ -38,7 +38,7 @@ if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] ; then
     echo "NOT THE SAME or STARTING UP"
     echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
 
-    ps -ef | pgrep python | xargs sudo kill -9;
+    ps -ef | pgrep python | xargs kill -9;
 
     if test $remotevalue = "fludd"
     then

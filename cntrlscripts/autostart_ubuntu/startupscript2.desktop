@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=startupscript2
+Comment=startupscript2
+Icon=gnome-info
+Exec=python /home/daemon8/Documents/RPI/player.py dem8 /home/daemon8/Documents/RPI/ /home/daemon8/Documents/RPI/configs/p4-2x20/plane-hub-1.1.cfg
+Terminal=false
+Type=Application
+Categories=
+
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=3

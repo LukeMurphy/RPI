@@ -72,6 +72,11 @@ def guess():
 
 	#config.draw.rectangle((0,0, config.screenWidth + abs(config.imageXOffset) ,config.screenHeight + abs(config.imageYOffset)), fill=(15,15,30,5))
 
+
+	gray1 = int(50 * config.brightness)
+	gray2 = int(100 * config.brightness)
+	red = int(255 * config.brightness)
+
 	if (len(config.alphabetLeft) > 0 and config.wordNotFound == True) :
 		ran = int(random.uniform(0,len(config.alphabetLeft)))
 		char = config.alphabetLeft[ran]
@@ -101,7 +106,7 @@ def guess():
 		else :
 			## Incorrect - draw letter & part scaffold
 			config.guessed.append(char)
-			config.clr = colorutils.randomColor(1)
+			config.clr = colorutils.randomColor()
 			config.fontSize = int(random.uniform(10,50))
 			config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 
@@ -116,10 +121,10 @@ def guess():
 			# Draw the scaffold / gallows
 			if(len(config.guessed) <= len(config.scaffolding)) : 
 				coords = config.scaffolding[len(config.guessed) - 1]
-				config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(50,50,50))
+				config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(gray1,gray1,gray1))
 
 				if(len(config.guessed) >= len(config.scaffolding)) :
-					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(100,100,100))
+					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(gray2,gray2,gray2))
 
 			# Draw the body
 			elif(len(config.guessed) <= (len(config.scaffolding) + len(config.body))) :
@@ -128,11 +133,11 @@ def guess():
 				index  = len(config.guessed) - len(config.scaffolding) - 1
 
 				if( index == 0 ) :
-					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(255,0,0))
+					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(red,0,0))
 				elif (index >= 8) :
-					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(255,0,0))
+					config.draw.arc((tuple(15 * x + config.xOffset for x in coords)),0,360,fill=(red,0,0))
 				else :
-					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(255,0,0))
+					config.draw.line( tuple(15 * x + config.xOffset for x in coords), fill=(red,0,0))
 
 		config.alphabetLeft.remove(char)
 
@@ -216,7 +221,7 @@ def main(run = True) :
 
 	config.alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 	config.word = "FEAR"
-	colorutils.brightness =  .9
+	colorutils.brightness = float(workConfig.get("displayconfig", 'brightness')) 
 	config.messageString = config.word
 	
 	# (0,10,2,6) (4,10,2,6)

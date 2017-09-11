@@ -81,7 +81,7 @@ class Block:
 		config = self.config
 		choice = int(random.uniform(1,7))
 		brightness = config.brightness
-		brightness = random.uniform(self.config.minBrightness,1.1)
+		brightness = random.uniform(self.config.minBrightness,self.config.brightness+.1)
 		opticalOpposites = False if (random.random() > .5) else True
 		self.verticalTileSize = int(config.screenHeight/self.displayRows) if self.displayRows != config.rows else config.tileSize[1]
 		

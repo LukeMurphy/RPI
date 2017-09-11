@@ -112,8 +112,8 @@ class unit:
 		self.config.image.paste(img, (xPosFinal,yPosFinal), img)
 
 	def changeColor(self):
-		self.fillColor = colorutils.randomColor(random.random())
-		self.outlineColor = colorutils.getRandomRGB(random.uniform(.2,1))
+		self.fillColor = colorutils.randomColor(random.uniform(.2,config.brightness))
+		self.outlineColor = colorutils.getRandomRGB(random.uniform(.2,config.brightness))
 		if(random.random() > .5): self.dx = random.uniform(-self.speedRange,self.speedRange) 
 		if(random.random() > .5): self.dy = random.uniform(-self.speedRange,self.speedRange) 
 

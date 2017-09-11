@@ -58,6 +58,7 @@ def loadFromArguments(reloading=False):
 				config.MID = args[1]
 				config.path = args[2]
 				argument = args[3]
+
 				workconfig.read(argument)
 
 				config.startTime = time.time()
@@ -67,6 +68,11 @@ def loadFromArguments(reloading=False):
 				config.checkForConfigChanges =  False
 				config.loadFromArguments = loadFromArguments
 				config.fileName = argument
+
+				if(len(args) > 4):
+					brightnessOverride = args[4]
+					config.brightness = float(float(brightnessOverride)/100)
+
 				f = os.path.getmtime(argument)
 				config.delta = int((config.startTime - f ))
 				print (argument, "LAST MODIFIED DELTA: ", config.delta)

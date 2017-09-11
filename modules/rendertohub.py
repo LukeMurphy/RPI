@@ -3,7 +3,7 @@ import tkMessageBox
 import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
-from PIL import ImageFilter, ImageChops
+from PIL import ImageFilter, ImageChops, ImageEnhance
 import random
 import numpy, time
 import gc, os

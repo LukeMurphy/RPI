@@ -221,7 +221,9 @@ def main(run = True) :
 	fluddSquare.nothing  = workConfig.get("fludd", 'nothing')
 	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
 	fluddSquare.varianceMode  = workConfig.get("fludd", 'varianceMode')
-	fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness')) 
+	#fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness')) 
+	# More uniform brightness control
+	fluddSquare.prisimBrightness  = float(workConfig.get("displayconfig", 'brightness')) 
 	config.redrawSpeed  = float(workConfig.get("fludd", 'redrawSpeed')) 
 	
 	config.cycleTiming = 1

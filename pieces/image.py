@@ -150,6 +150,10 @@ def iterate( n = 0) :
 	
 
 	# Render the final full image
+
+	en = ImageEnhance.Brightness(config.renderImageFull)
+	config.renderImageFull = en.enhance(config.brightness)
+	config.renderImageFull.paste(config.renderImageFull)
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False)
 
 	# cleanup the list

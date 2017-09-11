@@ -24,7 +24,7 @@ remotevalue=$localvalue
 remotecurlvalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/lukr-status.cfg")
 
 remotevalueControl=$localvalueControl
-remotecurlvalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/lukr-statuscontrol.cfg")
+remotecurlvalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/lukr-controlstatus.cfg")
 status=$?
 
 echo $status
@@ -38,7 +38,8 @@ then
 fi
 
 # choose the piece to play
-if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ]  || [ $remotevalueControl != $remotecurlvalueControl ]; then
+if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ]  || [ $remotevalueControl != $remotecurlvalueControl ]
+then
 
     echo "NOT THE SAME or STARTING UP"
     echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
@@ -90,8 +91,7 @@ if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ]  || [ $remoteval
         config="counter.cfg"
     fi
 
-    execString=$path"player.py "$machine" "$path" "$path$configGroup$config" "$remotevalueControl
-    #echo $execString
-
-    DISPLAY=:0 python $execString&
+execString=$path"player.py "$machine" "$path" "$path$configGroup$config" "$remotevalueControl
+#echo $execString
+DISPLAY=:0 python $execString&
 fi

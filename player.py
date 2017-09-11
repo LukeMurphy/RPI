@@ -68,10 +68,12 @@ def loadFromArguments(reloading=False):
 				config.checkForConfigChanges =  False
 				config.loadFromArguments = loadFromArguments
 				config.fileName = argument
+				config.brightnessOverride = config.brightness
 
 				if(len(args) > 4):
 					brightnessOverride = args[4]
 					config.brightness = float(float(brightnessOverride)/100)
+					config.brightnessOverride = float(float(brightnessOverride)/100)
 
 				f = os.path.getmtime(argument)
 				config.delta = int((config.startTime - f ))
@@ -85,6 +87,7 @@ def loadFromArguments(reloading=False):
 				config.path = baseconfig.path
 				print("Loading " + config.path  + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run.")
 				workconfig.read(config.path  + '/configs/pieces/' + config.WRKINID + ".cfg")
+
 
 			configure()
 
@@ -116,6 +119,8 @@ def configure() :
 		config.rows = int(workconfig.get("displayconfig", 'rows'))
 		config.cols = int(workconfig.get("displayconfig", 'cols'))
 		config.brightness =  float(workconfig.get("displayconfig", 'brightness'))
+
+		if(config.brightnessOverride is not None) : config.brightness = config.brightnessOverride
 		config.minBrightness  = float(workconfig.get("displayconfig", 'minBrightness'))
 		config.work = workconfig.get("displayconfig", 'work')
 		config.rendering = workconfig.get("displayconfig", 'rendering')

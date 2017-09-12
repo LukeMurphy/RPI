@@ -93,6 +93,7 @@ then
     if test  $remotevalue = "counter"
     then
         config="counter.cfg"
+    fi
     
     if test  $remotevalue = "repeater"
     then
@@ -100,6 +101,6 @@ then
     fi
 
 execString=$path"player.py "$machine" "$path" "$path$configGroup$config" "$remotevalueControl
-echo $execString
+#echo $execString
 DISPLAY=:0 python $execString&
 fi

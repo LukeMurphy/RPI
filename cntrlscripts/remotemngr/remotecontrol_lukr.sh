@@ -14,36 +14,40 @@ path="/home/lukr/Documents/RPI/"
 #path="/Users/lukemurphy/Documents/DEVTEMP/RPI/"
 configGroup="configs/p4-4x4/"
 machine="daemon4"
+pieceFileName="http://www.lukelab.com/projects/rpi-controls/lukr-status.cfg"
+brightnessFile="http://www.lukelab.com/projects/rpi-controls/lukr-controlstatus.cfg"
 
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
 localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
 localvalueControl=$(cat $path"cntrlscripts/remotemngr/localvaluecontrol.cfg")
 
 # set the remote to be a default
-remotevalue=$localvalue
-remotecurlvalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/lukr-status.cfg")
+remotevalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $pieceFileName)
+remotevalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $brightnessFile)
 
-remotevalueControl=$localvalueControl
-remotecurlvalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "http://www.lukelab.com/projects/rpi-controls/lukr-controlstatus.cfg")
 status=$?
 
 echo $status
 # if curl is ok, set the remote value
 if [ $status -eq 0 ]
 then
-        echo "OK -- CHANGING..."
-        remotevalue=$remotecurlvalue
-        remotevalueControl=$remotecurlvalueControl
-        echo $remotevalue
+        echo "OK -- CHECKINGs..."
+        #remotevalue=$remotecurlvalue
+        #remotevalueControl=$remotecurlvalueControl
+        echo $remotevalue	
+        echo $localvalue
+        echo $remotevalueControl
+        echo $localvalueControl
 fi
 
 # choose the piece to play
-if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ]  || [ $remotevalueControl != $remotecurlvalueControl ]
+if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] || [ $remotevalueControl != $localvalueControl ]
 then
 
     echo "NOT THE SAME or STARTING UP"
     echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
-
+	echo $remotevalueControl > $path"cntrlscripts/remotemngr/localvaluecontrol.cfg"
+	
     ps -ef | pgrep python | xargs kill -9;
 
     if test $remotevalue = "fludd"
@@ -89,9 +93,13 @@ then
     if test  $remotevalue = "counter"
     then
         config="counter.cfg"
+    
+    if test  $remotevalue = "repeater"
+    then
+        config="repeater.cfg"
     fi
 
 execString=$path"player.py "$machine" "$path" "$path$configGroup$config" "$remotevalueControl
-#echo $execString
+echo $execString
 DISPLAY=:0 python $execString&
 fi

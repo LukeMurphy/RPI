@@ -50,7 +50,6 @@ def main(run = True) :
 	config.bgFilterProb = float(workConfig.get("filter", 'bgFilterProb'))
 	config.targetPalette = (workConfig.get("filter", 'targetPalette'))
 
-
 	config.clrBlkWidth = int(workConfig.get("filter", 'clrBlkWidth')) 
 	config.clrBlkHeight = int(workConfig.get("filter", 'clrBlkHeight')) 
 	config.overlayxPosOrig = int(workConfig.get("filter", 'overlayxPos')) 
@@ -64,6 +63,13 @@ def main(run = True) :
 	config.imageGlitchProb = float(workConfig.get("filter", 'imageGlitchProb')) 
 	config.imageGlitchSize = float(workConfig.get("filter", 'imageGlitchSize')) 
 	config.imageGlitchDisplacement = int(workConfig.get("filter", 'imageGlitchDisplacement')) 
+
+	try:
+		config.forceGlitchFrameCount = int(workConfig.get("filter", 'forceGlitchFrameCount')) 
+	except Exception as e:
+		config.forceGlitchFrameCount = 220 
+
+	
 
 	config.colorOverlay  = (255,0,255)
 
@@ -111,6 +117,7 @@ def runWork():
 def iterate( n = 0) :
 	global config, blocks
 	global xPos, yPos
+
 
 	if (blocks[0].action == "play") : 
 		if(random.random() < config.animateProb ) :

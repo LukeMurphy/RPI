@@ -76,6 +76,9 @@ class ImageSprite :
 	tempClrCount = 60
 	frameCount = 1
 
+	# Helps with lousy looping gifs 
+	forceGlitchFrameCount = 300
+
 	colorModes = ["colorWheel","random","colorRGB"]
 
 	def __init__(self, config, iid=0) :
@@ -501,10 +504,14 @@ class ImageSprite :
 		enhancer = ImageEnhance.Brightness(self.imageCopy)
 		imageCopy = enhancer.enhance(self.brightnessFactor)
 		'''
-		
+		realFrame = 0
 		try:
 			if(holdAnimation != True):
 				self.image.seek(self.image.tell() + 1)
+				realFrame = self.image.tell()
+
+				if(realFrame > self.config.forceGlitchFrameCount) : 
+					forceGlitch = True
 				#for i in range(0,10) : self.glitchBox()
 		except EOFError:
 			self.image.seek(0)
@@ -523,6 +530,7 @@ class ImageSprite :
 		if (self.config.useImageFilter) : 
 			if(random.random() < self.config.imageFilterProb):
 				self.filterize()
+
 		self.augment()
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -301,6 +301,9 @@ def main(run = True) :
 	config.colorProbability = float(workConfig.get("stroop", 'colorProbability'))
 	config.colorProbabilityReturn = float(workConfig.get("stroop", 'colorProbabilityReturn'))
 
+	config.brightness =  float(workConfig.get("displayconfig", 'brightness')) 
+	config.minBrightness =  float(workConfig.get("displayconfig", 'minBrightness')) 
+
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	for i in range (0,simulBlocks) : makeBlock()

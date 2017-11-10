@@ -22,6 +22,7 @@ class unit:
 		self.changeColor = True
 		self.speedRange = 1
 
+
 	def update(self):
 		pass
 		self.changeColorFill()
@@ -56,11 +57,16 @@ def main(run = True) :
 	global config, directionOrder,workConfig
 	print("---------------------")
 	print("QUILT Loaded")
+
+
+	config.brightness = float(workConfig.get("displayconfig", 'brightness')) 
 	colorutils.brightness = config.brightness
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
+
+	print(config.brightness)
 
 
 	try :
@@ -81,6 +87,7 @@ def main(run = True) :
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	cntr = [0,0]
+	reds = [(255,0,0),(180,0,0),(120,0,0),(50,5,5),(100,20,20)]
 
 	config.unitArrray = []
 
@@ -95,7 +102,7 @@ def main(run = True) :
 			obj.blockLength = config.blockLength
 			obj.blockHeight = config.blockHeight
 			obj.speedRange = config.speedRange
-			obj.fillColor = (255,0,0)
+			obj.fillColor = tuple(int(a*config.brightness) for a in (reds[0]))
 			obj.outlineColor = (100,100,0)
 			obj.changeColor = False
 			config.unitArrray.append(obj)
@@ -107,7 +114,7 @@ def main(run = True) :
 				obj.blockLength = config.blockLength * (i + 1) * 2
 				obj.blockHeight = config.blockHeight
 				obj.speedRange = config.speedRange
-				obj.fillColor = (150,0,0)
+				obj.fillColor = tuple(int(a*config.brightness) for a in (reds[1]))
 				obj.outlineColor = (100,0,0)
 				obj.changeColor = False
 				config.unitArrray.append(obj)
@@ -119,7 +126,7 @@ def main(run = True) :
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
 				obj.speedRange = config.speedRange
-				obj.fillColor = (120,0,0)
+				obj.fillColor = tuple(int(a*config.brightness) for a in (reds[3]))
 				obj.outlineColor = (100,0,0)
 				obj.changeColor = False
 				config.unitArrray.append(obj)

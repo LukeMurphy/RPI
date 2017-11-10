@@ -10,19 +10,21 @@ class unit:
 		self.config = config
 		self.xPos = 0
 		self.yPos = 0
+		self.redraw = False
 
 		self.image = Image.new("RGBA", (200 , 200))
 		self.imageRotation = 0 #int(random.uniform(0,60))
-		self.draw  = ImageDraw.Draw(self.image)
+		self.draw  = ImageDraw.Draw(config.image)
 
 		self.fillColor = colorutils.getRandomRGB()
 		self.outlineColor = colorutils.getRandomRGB()
 		self.objWidth = 20
-
+		self.changeColor = True
 		self.speedRange = 1
 
 	def update(self):
 		pass
+		self.changeColorFill()
 
 	
 	def render(self):
@@ -30,17 +32,19 @@ class unit:
 		xPosFinal = self.xPos
 		yPosFinal = self.yPos
 
-		self.draw.rectangle(((0, 0), (self.blockLength, self.blockHeight)), fill=self.fillColor, outline=None)
+		self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
+			, fill=self.fillColor, outline=self.outlineColor)
 
 		# rotate brush
-		img = self.image.rotate(self.imageRotation, expand=True)
+		#img = self.image.rotate(self.imageRotation, expand=True)
 		
 		# paste into image that is final render
-		self.config.image.paste(img, (xPosFinal,yPosFinal), img)
+		#self.config.image.paste(img, (xPosFinal,yPosFinal), img)
 
-	def changeColor(self):
-		self.fillColor = colorutils.randomColor(random.uniform(.2,config.brightness))
-		self.outlineColor = colorutils.getRandomRGB(random.uniform(.2,config.brightness))
+	def changeColorFill(self):
+		if(self.changeColor == True) :
+			self.fillColor = colorutils.randomColor(random.uniform(.2,config.brightness))
+			self.outlineColor = colorutils.getRandomRGB(random.uniform(.2,config.brightness))
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -75,26 +79,74 @@ def main(run = True) :
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	config.unitArrray = []
-	for i in range(0,config.numUnits):
-		obj = unit(config)
-		obj.xPos = 0
-		obj.yPos = i * config.blockLength
-		obj.imageRotation = 0
-		obj.blockLength = config.blockLength * (i + 1)
-		obj.blockHeight = config.blockHeight
-		obj.speedRange = config.speedRange
-		config.unitArrray.append(obj)
 
-	for i in range(0,config.numUnits):
-		obj = unit(config)
-		obj.xPos = i * config.blockLength
-		obj.yPos = 0
-		obj.imageRotation = 90
-		obj.blockLength = config.blockLength * (i + 1)
-		obj.blockHeight = config.blockHeight
-		obj.speedRange = config.speedRange
-		config.unitArrray.append(obj)
+	cntr = [0,0]
+
+	config.unitArrray = []
+
+	for rows in range (0,6) :
+		for cols in range (0,6) :
+			delta = config.numUnits * config.blockHeight * 2
+			cntr = [rows * delta, cols * delta]		
+
+			obj = unit(config)
+			obj.xPos = cntr[0]
+			obj.yPos = cntr[1]
+			obj.blockLength = config.blockLength
+			obj.blockHeight = config.blockHeight
+			obj.speedRange = config.speedRange
+			obj.fillColor = (255,0,0)
+			obj.outlineColor = (100,100,0)
+			obj.changeColor = False
+			config.unitArrray.append(obj)
+
+			for i in range(0,config.numUnits):
+				obj = unit(config)
+				obj.xPos = cntr[0] - (i) * config.blockLength
+				obj.yPos = cntr[1] - (i + 1) * config.blockLength
+				obj.blockLength = config.blockLength * (i + 1) * 2
+				obj.blockHeight = config.blockHeight
+				obj.speedRange = config.speedRange
+				obj.fillColor = (150,0,0)
+				obj.outlineColor = (100,0,0)
+				obj.changeColor = False
+				config.unitArrray.append(obj)
+
+			for i in range(0,config.numUnits):
+				obj = unit(config)
+				obj.xPos = cntr[0] + config.blockLength * (i + 1)
+				obj.yPos = cntr[1] - (i ) * config.blockLength
+				obj.blockLength = config.blockLength 
+				obj.blockHeight = config.blockHeight * (i + 1) * 2
+				obj.speedRange = config.speedRange
+				obj.fillColor = (120,0,0)
+				obj.outlineColor = (100,0,0)
+				obj.changeColor = False
+				config.unitArrray.append(obj)
+
+			for i in range(0,config.numUnits):
+				obj = unit(config)
+				obj.xPos = cntr[0] - config.blockLength * (i + 1 )
+				obj.yPos = cntr[1] + (i + 1) * config.blockLength
+				obj.blockLength = config.blockLength * (i + 1) * 2
+				obj.blockHeight = config.blockHeight
+				obj.speedRange = config.speedRange
+				#obj.fillColor = (200,0,0)
+				obj.outlineColor = (100,0,0)
+				config.unitArrray.append(obj)
+
+			for i in range(0,config.numUnits):
+				obj = unit(config)
+				obj.xPos = cntr[0] - config.blockLength * (i + 1)
+				obj.yPos = cntr[1] - (i + 1) * config.blockLength
+				obj.blockLength = config.blockLength 
+				obj.blockHeight = config.blockHeight * (i + 1) * 2
+				obj.speedRange = config.speedRange
+				obj.outlineColor = (100,0,0)
+				config.unitArrray.append(obj)
+
+
+
 	config.rectify = True
 
 	setUp()
@@ -131,7 +183,7 @@ def iterate() :
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 
 
-	for i in range(0,config.numUnits):
+	for i in range(0,len(config.unitArrray)):
 		obj = 	config.unitArrray[i]
 		obj.update()
 		obj.render()

@@ -146,7 +146,9 @@ def iterate() :
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
 	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,220))
-	config.draw.text((10,10),"TOP",config.fontColor,font=config.font)
+	config.draw.text((1,10),"TOP",config.fontColor,font=config.font)
+	config.draw.text((1,config.screenHeight-10),"BOTTOM",config.fontColor,font=config.font)
+
 	tm = datetime.datetime.now()
 	tm = time.ctime()
 	config.draw.text((10,24),tm,config.fontColor,font=config.font)

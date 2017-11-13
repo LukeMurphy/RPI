@@ -12,8 +12,9 @@ class unit:
 		self.yPos = 0
 		self.redraw = False
 
-		self.image = Image.new("RGBA", (200 , 200))
-		self.imageRotation = 0 #int(random.uniform(0,60))
+		#self.image = Image.new("RGBA", (200 , 200))
+		#self.imageRotation = 0 #int(random.uniform(0,60))
+
 		self.draw  = ImageDraw.Draw(config.image)
 
 		self.fillColor = colorutils.getRandomRGB()
@@ -89,8 +90,6 @@ def main(run = True) :
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
 
-	print(config.brightness)
-
 
 	try :
 		config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
@@ -99,6 +98,8 @@ def main(run = True) :
 		config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
 		config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
 		config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
+		config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
+		config.cntrOffsetY = int(workConfig.get("quilt", 'cntrOffsetY')) 
 		config.delay = float(workConfig.get("quilt", 'delay')) 
 
 	except Exception as e: 
@@ -111,15 +112,15 @@ def main(run = True) :
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-	cntr = [0,0]
+	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 	reds = [(255,0,0),(180,0,0),(120,0,0),(50,5,5),(100,20,20)]
 
 	config.unitArrray = []
 
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :
-			delta = config.numUnits * config.blockHeight * 2
-			cntr = [rows * delta, cols * delta]		
+			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength
+			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]		
 
 			obj = unit(config)
 			obj.xPos = cntr[0]
@@ -135,7 +136,7 @@ def main(run = True) :
 
 
 			# RIGHT
-			for i in range(0,config.numUnits-1):
+			for i in range(0,config.numUnits):
 				obj = unit(config)
 				obj.xPos = cntr[0] - (i) * config.blockLength
 				obj.yPos = cntr[1] - (i + 1) * config.blockLength
@@ -149,7 +150,7 @@ def main(run = True) :
 				config.unitArrray.append(obj)
 
 			# BOTTOM
-			for i in range(0,config.numUnits-1):
+			for i in range(0,config.numUnits):
 				obj = unit(config)
 				obj.xPos = cntr[0] + config.blockLength * (i + 1)
 				obj.yPos = cntr[1] - (i ) * config.blockLength

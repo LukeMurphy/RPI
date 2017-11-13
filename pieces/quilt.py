@@ -19,12 +19,25 @@ class unit:
 		self.fillColor = colorutils.getRandomRGB()
 		self.outlineColor = colorutils.getRandomRGB()
 		self.objWidth = 20
-		self.changeColor = True
 		self.speedRange = 1
 
+		blueFactor  =  10
+		self.redRange = [(250,0,blueFactor),(200,0,blueFactor),(150,0,blueFactor),(100,0,blueFactor),(50,0,blueFactor),(20,0,blueFactor)]
+		self.brightness = 1
+		self.fillColorMode = "random"
+		self.lineColorMode = "red"
+		self.changeColor = True
 
+	def setUp(self, n = 0) :
+
+		self.brightness *= self.config.brightness
+		if(n!=0):
+			n = int(math.floor(random.uniform(0,len(self.redRange))))
+		self.fillColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+		self.outlineColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+
+		
 	def update(self):
-		pass
 		self.changeColorFill()
 
 	
@@ -44,8 +57,18 @@ class unit:
 
 	def changeColorFill(self):
 		if(self.changeColor == True) :
-			self.fillColor = colorutils.randomColor(random.uniform(.2,config.brightness))
-			self.outlineColor = colorutils.getRandomRGB(random.uniform(.2,config.brightness))
+			if(self.fillColorMode == "random") :
+				self.fillColor = colorutils.randomColor(random.uniform(.01,self.brightness))
+				if(self.lineColorMode == "red") :
+					n = int(math.floor(random.uniform(0,len(self.redRange))))
+					self.outlineColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+				else :	
+					self.outlineColor = colorutils.getRandomRGB(random.uniform(.01,self.brightness))
+			else:
+				n = int(math.floor(random.uniform(0,len(self.redRange))))
+				self.fillColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+				n = int(math.floor(random.uniform(0,len(self.redRange))))
+				self.outlineColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -74,6 +97,8 @@ def main(run = True) :
 		config.speedRange = int(workConfig.get("quilt", 'speedRange')) 
 		config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
 		config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
+		config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
+		config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
 		config.delay = float(workConfig.get("quilt", 'delay')) 
 
 	except Exception as e: 
@@ -91,8 +116,8 @@ def main(run = True) :
 
 	config.unitArrray = []
 
-	for rows in range (0,6) :
-		for cols in range (0,6) :
+	for rows in range (0,config.blockRows) :
+		for cols in range (0,config.blockCols) :
 			delta = config.numUnits * config.blockHeight * 2
 			cntr = [rows * delta, cols * delta]		
 
@@ -102,35 +127,42 @@ def main(run = True) :
 			obj.blockLength = config.blockLength
 			obj.blockHeight = config.blockHeight
 			obj.speedRange = config.speedRange
-			obj.fillColor = tuple(int(a*config.brightness) for a in (reds[0]))
-			obj.outlineColor = (100,100,0)
+			obj.colorMode = "red"
+			obj.brightness = 1.0
 			obj.changeColor = False
+			obj.setUp()
 			config.unitArrray.append(obj)
 
-			for i in range(0,config.numUnits):
+
+			# RIGHT
+			for i in range(0,config.numUnits-1):
 				obj = unit(config)
 				obj.xPos = cntr[0] - (i) * config.blockLength
 				obj.yPos = cntr[1] - (i + 1) * config.blockLength
 				obj.blockLength = config.blockLength * (i + 1) * 2
 				obj.blockHeight = config.blockHeight
 				obj.speedRange = config.speedRange
-				obj.fillColor = tuple(int(a*config.brightness) for a in (reds[1]))
-				obj.outlineColor = (100,0,0)
-				obj.changeColor = False
+				obj.fillColorMode = "red"
+				obj.brightness = .4
+				obj.changeColor = True
+				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
-			for i in range(0,config.numUnits):
+			# BOTTOM
+			for i in range(0,config.numUnits-1):
 				obj = unit(config)
 				obj.xPos = cntr[0] + config.blockLength * (i + 1)
 				obj.yPos = cntr[1] - (i ) * config.blockLength
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
 				obj.speedRange = config.speedRange
-				obj.fillColor = tuple(int(a*config.brightness) for a in (reds[3]))
-				obj.outlineColor = (100,0,0)
-				obj.changeColor = False
+				obj.fillColorMode = "red"
+				obj.brightness = .8
+				obj.changeColor = True
+				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
+			# LEFT
 			for i in range(0,config.numUnits):
 				obj = unit(config)
 				obj.xPos = cntr[0] - config.blockLength * (i + 1 )
@@ -138,10 +170,13 @@ def main(run = True) :
 				obj.blockLength = config.blockLength * (i + 1) * 2
 				obj.blockHeight = config.blockHeight
 				obj.speedRange = config.speedRange
-				#obj.fillColor = (200,0,0)
-				obj.outlineColor = (100,0,0)
+				obj.fillColorMode = "random"
+				obj.brightness = .99
+				obj.changeColor = True
+				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
+			# TOP
 			for i in range(0,config.numUnits):
 				obj = unit(config)
 				obj.xPos = cntr[0] - config.blockLength * (i + 1)
@@ -149,7 +184,10 @@ def main(run = True) :
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
 				obj.speedRange = config.speedRange
-				obj.outlineColor = (100,0,0)
+				obj.fillColorMode = "random"
+				obj.brightness = .4
+				obj.changeColor = True
+				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
 

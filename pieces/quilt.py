@@ -22,12 +22,14 @@ class unit:
 		self.objWidth = 20
 		self.speedRange = 1
 
-		blueFactor  =  10
-		self.redRange = [(250,0,blueFactor),(200,0,blueFactor),(150,0,blueFactor),(100,0,blueFactor),(50,0,blueFactor),(20,0,blueFactor)]
+		blueFactor  =  config.blueFactor
+		greenFactor  =  config.greenFactor
+		self.redRange = [(250,greenFactor,blueFactor),(200,greenFactor,blueFactor),(150,greenFactor,blueFactor),(100,greenFactor,blueFactor),(50,greenFactor,blueFactor),(20,greenFactor,blueFactor)]
 		self.brightness = 1
 		self.fillColorMode = "random"
 		self.lineColorMode = "red"
 		self.changeColor = True
+		self.lines = config.lines
 
 	def setUp(self, n = 0) :
 
@@ -47,8 +49,13 @@ class unit:
 		xPosFinal = self.xPos
 		yPosFinal = self.yPos
 
-		self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
+		if(self.lines == True) :
+
+			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
 			, fill=self.fillColor, outline=self.outlineColor)
+		else:
+			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
+			, fill=self.fillColor, outline=None)
 
 		# rotate brush
 		#img = self.image.rotate(self.imageRotation, expand=True)
@@ -100,7 +107,10 @@ def main(run = True) :
 		config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
 		config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
 		config.cntrOffsetY = int(workConfig.get("quilt", 'cntrOffsetY')) 
-		config.delay = float(workConfig.get("quilt", 'delay')) 
+		config.blueFactor = int(workConfig.get("quilt", 'blueFactor')) 
+		config.greenFactor = int(workConfig.get("quilt", 'greenFactor')) 
+		config.delay = float(workConfig.get("quilt", 'delay'))
+		config.lines  = (workConfig.getboolean("quilt", 'lines'))
 
 	except Exception as e: 
 		print (str(e))
@@ -113,7 +123,6 @@ def main(run = True) :
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-	reds = [(255,0,0),(180,0,0),(120,0,0),(50,5,5),(100,20,20)]
 
 	config.unitArrray = []
 
@@ -144,7 +153,7 @@ def main(run = True) :
 				obj.blockHeight = config.blockHeight
 				obj.speedRange = config.speedRange
 				obj.fillColorMode = "red"
-				obj.brightness = .4
+				obj.brightness = .8
 				obj.changeColor = True
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
@@ -157,8 +166,8 @@ def main(run = True) :
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
 				obj.speedRange = config.speedRange
-				obj.fillColorMode = "red"
-				obj.brightness = .8
+				obj.fillColorMode = "random"
+				obj.brightness = .99
 				obj.changeColor = True
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
@@ -172,7 +181,7 @@ def main(run = True) :
 				obj.blockHeight = config.blockHeight
 				obj.speedRange = config.speedRange
 				obj.fillColorMode = "random"
-				obj.brightness = .99
+				obj.brightness = .4
 				obj.changeColor = True
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
@@ -185,7 +194,7 @@ def main(run = True) :
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
 				obj.speedRange = config.speedRange
-				obj.fillColorMode = "random"
+				obj.fillColorMode = "red"
 				obj.brightness = .4
 				obj.changeColor = True
 				obj.setUp(-1)

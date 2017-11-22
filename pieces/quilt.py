@@ -12,27 +12,30 @@ class unit:
 		self.yPos = 0
 		self.redraw = False
 
-		#self.image = Image.new("RGBA", (200 , 200))
-		#self.imageRotation = 0 #int(random.uniform(0,60))
-
 		self.draw  = ImageDraw.Draw(config.image)
 
-		self.fillColor = colorutils.getRandomRGB()
+		#self.fillColor = colorutils.getRandomRGB()
+		#self.outlineColor = colorutils.getRandomRGB()
 
+		#### Sets up color transitions
 		self.colOverlay = coloroverlay.ColorOverlay()
+
 		### This is the speed range of transitions in color
-		self.colOverlay.randomRange = (10.0,25.0)
+		### Higher numbers means more possible steps so slower
+		### transitions - 1,10 very blinky, 10,200 very slow
+		self.colOverlay.randomRange = (5.0,30.0)
+
 		### This changes each cycle - incrementing towards next target color
 		self.fillColor = self.colOverlay.currentColor
 		
-
-		self.outlineColor = colorutils.getRandomRGB()
+		## Like the "stiching" color and affects the overall "tone" of the piece
+		self.outlineColor = config.outlineColorObj.currentColor
 		self.objWidth = 20
-		self.speedRange = 1
 
 		blueFactor  =  config.blueFactor
 		greenFactor  =  config.greenFactor
 		self.redRange = [(250,greenFactor,blueFactor),(200,greenFactor,blueFactor),(150,greenFactor,blueFactor),(100,greenFactor,blueFactor),(50,greenFactor,blueFactor),(20,greenFactor,blueFactor)]
+		self.outlineRange = [(20,20,250)]
 		self.brightness = 1
 		self.fillColorMode = "random"
 		self.lineColorMode = "red"
@@ -47,37 +50,47 @@ class unit:
 		self.fillColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
 
 		self.colOverlay.colorA = tuple(int(a*self.brightness) for a in (self.redRange[n]))
-		self.outlineColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+		self.colOverlay.colorB = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+
+		#n = int(math.floor(random.uniform(0,len(self.outlineRange))))
+		#self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineRange[n]))
+		self.outlineColor = tuple(int(a*self.brightness) for a in (self.config.outlineColorObj.currentColor))
+
+		if (self.fillColorMode == "red") :
+			self.colOverlay.getNewColor = self.getNewColor
+
+	def getNewColor(self):
+		n = int(math.floor(random.uniform(0,len(self.redRange))))
+		self.colOverlay.colorB = tuple(int(a*self.brightness) for a in (self.redRange[n]))
 
 		
 	def update(self):
-		#
-		#if(self.fillColorMode == "random") :
-		self.colOverlay.stepTransition()
-		self.fillColor = tuple(int (a * self.brightness ) for a in self.colOverlay.currentColor)
-		#else :
-		#	self.changeColorFill()
+		#self.fillColorMode == "random" or 
+		if(random.random() > config.colorPopProb) :
+			self.colOverlay.stepTransition()
+			self.fillColor = tuple(int (a * self.brightness ) for a in self.colOverlay.currentColor)
+		else :
+			self.changeColorFill()
 
 	
 	def render(self):
 
-		xPosFinal = self.xPos
-		yPosFinal = self.yPos
+		if (self.fillColorMode == "red") : 
+			brightnessFactor = self.config.brightnessFactorDark
+		else:
+			brightnessFactor = self.config.brightnessFactorLight
+
+		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.config.outlineColorObj.currentColor)
 
 		if(self.lines == True) :
-
 			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
 			, fill=self.fillColor, outline=self.outlineColor)
 		else:
 			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
 			, fill=self.fillColor, outline=None)
 
-		# rotate brush
-		#img = self.image.rotate(self.imageRotation, expand=True)
-		
-		# paste into image that is final render
-		#self.config.image.paste(img, (xPosFinal,yPosFinal), img)
 
+	## Straight color change - deprecated - too blinky
 	def changeColorFill(self):
 		if(self.changeColor == True) :
 			if(self.fillColorMode == "random") :
@@ -90,8 +103,8 @@ class unit:
 			else:
 				n = int(math.floor(random.uniform(0,len(self.redRange))))
 				self.fillColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
-				n = int(math.floor(random.uniform(0,len(self.redRange))))
-				self.outlineColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+				#n = int(math.floor(random.uniform(0,len(self.outlineRange))))
+				#self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineRange[n]))
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -112,10 +125,12 @@ def main(run = True) :
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
 
+	config.outlineColorObj = coloroverlay.ColorOverlay()
+	config.outlineColorObj.randomRange = (5.0,30.0)
+
 
 	try :
 		config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
-		config.speedRange = int(workConfig.get("quilt", 'speedRange')) 
 		config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
 		config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
 		config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
@@ -125,6 +140,9 @@ def main(run = True) :
 		config.blueFactor = int(workConfig.get("quilt", 'blueFactor')) 
 		config.greenFactor = int(workConfig.get("quilt", 'greenFactor')) 
 		config.delay = float(workConfig.get("quilt", 'delay'))
+		config.colorPopProb = float(workConfig.get("quilt", 'colorPopProb'))
+		config.brightnessFactorDark = float(workConfig.get("quilt", 'brightnessFactorDark'))
+		config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
 		config.lines  = (workConfig.getboolean("quilt", 'lines'))
 
 	except Exception as e: 
@@ -151,8 +169,7 @@ def main(run = True) :
 			obj.yPos = cntr[1]
 			obj.blockLength = config.blockLength
 			obj.blockHeight = config.blockHeight
-			obj.speedRange = config.speedRange
-			obj.colorMode = "red"
+			obj.fillColorMode = "red"
 			obj.brightness = 1.0
 			obj.changeColor = False
 			obj.setUp()
@@ -166,7 +183,6 @@ def main(run = True) :
 				obj.yPos = cntr[1] - (i + 1) * config.blockLength
 				obj.blockLength = config.blockLength * (i + 1) * 2
 				obj.blockHeight = config.blockHeight
-				obj.speedRange = config.speedRange
 				obj.fillColorMode = "red"
 				obj.brightness = .8
 				obj.changeColor = True
@@ -180,7 +196,6 @@ def main(run = True) :
 				obj.yPos = cntr[1] - (i ) * config.blockLength
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
-				obj.speedRange = config.speedRange
 				obj.fillColorMode = "random"
 				obj.brightness = .99
 				obj.changeColor = True
@@ -194,7 +209,6 @@ def main(run = True) :
 				obj.yPos = cntr[1] + (i + 1) * config.blockLength
 				obj.blockLength = config.blockLength * (i + 1) * 2
 				obj.blockHeight = config.blockHeight
-				obj.speedRange = config.speedRange
 				obj.fillColorMode = "random"
 				obj.brightness = .4
 				obj.changeColor = True
@@ -208,7 +222,6 @@ def main(run = True) :
 				obj.yPos = cntr[1] - (i + 1) * config.blockLength
 				obj.blockLength = config.blockLength 
 				obj.blockHeight = config.blockHeight * (i + 1) * 2
-				obj.speedRange = config.speedRange
 				obj.fillColorMode = "red"
 				obj.brightness = .4
 				obj.changeColor = True
@@ -248,10 +261,7 @@ def runWork():
 
 def iterate() :
 	global config
-
-	## No trails 
-	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
-
+	config.outlineColorObj.stepTransition()
 
 	for i in range(0,len(config.unitArrray)):
 		obj = 	config.unitArrray[i]

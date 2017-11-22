@@ -18,6 +18,14 @@ class unit:
 		self.draw  = ImageDraw.Draw(config.image)
 
 		self.fillColor = colorutils.getRandomRGB()
+
+		self.colOverlay = coloroverlay.ColorOverlay()
+		### This is the speed range of transitions in color
+		self.colOverlay.randomRange = (10.0,25.0)
+		### This changes each cycle - incrementing towards next target color
+		self.fillColor = self.colOverlay.currentColor
+		
+
 		self.outlineColor = colorutils.getRandomRGB()
 		self.objWidth = 20
 		self.speedRange = 1
@@ -37,11 +45,18 @@ class unit:
 		if(n!=0):
 			n = int(math.floor(random.uniform(0,len(self.redRange))))
 		self.fillColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
+
+		self.colOverlay.colorA = tuple(int(a*self.brightness) for a in (self.redRange[n]))
 		self.outlineColor = tuple(int(a*self.brightness) for a in (self.redRange[n]))
 
 		
 	def update(self):
-		self.changeColorFill()
+		#
+		#if(self.fillColorMode == "random") :
+		self.colOverlay.stepTransition()
+		self.fillColor = tuple(int (a * self.brightness ) for a in self.colOverlay.currentColor)
+		#else :
+		#	self.changeColorFill()
 
 	
 	def render(self):

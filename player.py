@@ -4,7 +4,7 @@ import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
 
-import numpy
+#import numpy
 import os, sys, getopt, time, random, math, datetime, textwrap
 import gc
 import ConfigParser, io

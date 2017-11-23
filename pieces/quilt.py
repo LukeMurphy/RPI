@@ -54,7 +54,7 @@ class unit:
 
 		#n = int(math.floor(random.uniform(0,len(self.outlineRange))))
 		#self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineRange[n]))
-		self.outlineColor = tuple(int(a*self.brightness) for a in (self.config.outlineColorObj.currentColor))
+		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 
 		if (self.fillColorMode == "red") :
 			self.colOverlay.getNewColor = self.getNewColor
@@ -80,7 +80,7 @@ class unit:
 		else:
 			brightnessFactor = self.config.brightnessFactorLight
 
-		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.config.outlineColorObj.currentColor)
+		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
 
 		if(self.lines == True) :
 			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
@@ -162,7 +162,9 @@ def main(run = True) :
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :
 			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength
-			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]		
+			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]	
+			outlineColorObj = coloroverlay.ColorOverlay()
+			outlineColorObj.randomRange = (5.0,30.0)
 
 			obj = unit(config)
 			obj.xPos = cntr[0]
@@ -172,6 +174,7 @@ def main(run = True) :
 			obj.fillColorMode = "red"
 			obj.brightness = 1.0
 			obj.changeColor = False
+			obj.outlineColorObj	= outlineColorObj
 			obj.setUp()
 			config.unitArrray.append(obj)
 
@@ -186,6 +189,7 @@ def main(run = True) :
 				obj.fillColorMode = "red"
 				obj.brightness = .8
 				obj.changeColor = True
+				obj.outlineColorObj	= outlineColorObj
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
@@ -199,6 +203,7 @@ def main(run = True) :
 				obj.fillColorMode = "random"
 				obj.brightness = .99
 				obj.changeColor = True
+				obj.outlineColorObj	= outlineColorObj
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
@@ -212,6 +217,7 @@ def main(run = True) :
 				obj.fillColorMode = "random"
 				obj.brightness = .4
 				obj.changeColor = True
+				obj.outlineColorObj	= outlineColorObj
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
@@ -225,6 +231,7 @@ def main(run = True) :
 				obj.fillColorMode = "red"
 				obj.brightness = .4
 				obj.changeColor = True
+				obj.outlineColorObj	= outlineColorObj
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
@@ -264,7 +271,8 @@ def iterate() :
 	config.outlineColorObj.stepTransition()
 
 	for i in range(0,len(config.unitArrray)):
-		obj = 	config.unitArrray[i]
+		obj = config.unitArrray[i]
+		if(random.random() > .98) :obj.outlineColorObj.stepTransition()
 		obj.update()
 		obj.render()
 

@@ -131,6 +131,8 @@ def main(run = True) :
 
 	try :
 		config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
+		config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
+		config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
 		config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
 		config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
 		config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
@@ -144,7 +146,11 @@ def main(run = True) :
 		config.brightnessFactorDark = float(workConfig.get("quilt", 'brightnessFactorDark'))
 		config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
 		config.lines  = (workConfig.getboolean("quilt", 'lines'))
+		config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
 
+		# for now, all squares 
+		config.blockLength = config.blockSize
+		config.blockHeight = config.blockSize
 	except Exception as e: 
 		print (str(e))
 
@@ -159,9 +165,16 @@ def main(run = True) :
 
 	config.unitArrray = []
 
+	
+	## Jinky odds/evens alignment setup
+	sizeAdjustor = 0
+	## Alignment perfect setup
+	if(config.patternPrecision == True): sizeAdjustor = 1
+
+
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :
-			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength
+			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength + config.gapSize
 			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]	
 			outlineColorObj = coloroverlay.ColorOverlay()
 			outlineColorObj.randomRange = (5.0,30.0)
@@ -169,8 +182,8 @@ def main(run = True) :
 			obj = unit(config)
 			obj.xPos = cntr[0]
 			obj.yPos = cntr[1]
-			obj.blockLength = config.blockLength
-			obj.blockHeight = config.blockHeight
+			obj.blockLength = config.blockLength - sizeAdjustor
+			obj.blockHeight = config.blockHeight - sizeAdjustor
 			obj.fillColorMode = "red"
 			obj.brightness = 1.0
 			obj.changeColor = False
@@ -178,14 +191,13 @@ def main(run = True) :
 			obj.setUp()
 			config.unitArrray.append(obj)
 
-
 			# RIGHT
 			for i in range(0,config.numUnits):
 				obj = unit(config)
 				obj.xPos = cntr[0] - (i) * config.blockLength
 				obj.yPos = cntr[1] - (i + 1) * config.blockLength
-				obj.blockLength = config.blockLength * (i + 1) * 2
-				obj.blockHeight = config.blockHeight
+				obj.blockLength = config.blockLength * (i + 1) * 2 - sizeAdjustor
+				obj.blockHeight = config.blockHeight - 1
 				obj.fillColorMode = "red"
 				obj.brightness = .8
 				obj.changeColor = True
@@ -198,8 +210,8 @@ def main(run = True) :
 				obj = unit(config)
 				obj.xPos = cntr[0] + config.blockLength * (i + 1)
 				obj.yPos = cntr[1] - (i ) * config.blockLength
-				obj.blockLength = config.blockLength 
-				obj.blockHeight = config.blockHeight * (i + 1) * 2
+				obj.blockLength = config.blockLength - sizeAdjustor
+				obj.blockHeight = config.blockHeight * (i + 1) * 2 - sizeAdjustor
 				obj.fillColorMode = "random"
 				obj.brightness = .99
 				obj.changeColor = True
@@ -210,10 +222,10 @@ def main(run = True) :
 			# LEFT
 			for i in range(0,config.numUnits):
 				obj = unit(config)
-				obj.xPos = cntr[0] - config.blockLength * (i + 1 )
+				obj.xPos = cntr[0] - config.blockLength * (i + 1 ) 
 				obj.yPos = cntr[1] + (i + 1) * config.blockLength
-				obj.blockLength = config.blockLength * (i + 1) * 2
-				obj.blockHeight = config.blockHeight
+				obj.blockLength = config.blockLength * (i + 1) * 2 - sizeAdjustor
+				obj.blockHeight = config.blockHeight - sizeAdjustor
 				obj.fillColorMode = "random"
 				obj.brightness = .4
 				obj.changeColor = True
@@ -225,9 +237,9 @@ def main(run = True) :
 			for i in range(0,config.numUnits):
 				obj = unit(config)
 				obj.xPos = cntr[0] - config.blockLength * (i + 1)
-				obj.yPos = cntr[1] - (i + 1) * config.blockLength
-				obj.blockLength = config.blockLength 
-				obj.blockHeight = config.blockHeight * (i + 1) * 2
+				obj.yPos = cntr[1] - (i + 1) * config.blockLength 
+				obj.blockLength = config.blockLength - sizeAdjustor
+				obj.blockHeight = config.blockHeight * (i + 1) * 2 - sizeAdjustor
 				obj.fillColorMode = "red"
 				obj.brightness = .4
 				obj.changeColor = True
@@ -237,7 +249,10 @@ def main(run = True) :
 
 
 
-	config.rectify = True
+
+
+
+	
 
 	setUp()
 

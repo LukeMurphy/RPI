@@ -22,7 +22,7 @@ from modules.imagesprite import ImageSprite
 
 xPos = 320
 yPos = 0
-colorModeDirectional = False
+colorModeDirectional = True
 counter = 0
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -87,7 +87,10 @@ def main(run = True) :
 			imgLoader.useBlink = config.useBlink
 			imgLoader.brightnessFactor = config.brightness * random.random()
 			imgLoader.config = config
-			imgLoader.colorMode = "colorRGB" #colorWheel #random #colorRGB
+			imgLoader.colorMode = "random" 
+			if(random.random() < .5) :
+				imgLoader.colorMode = "colorRGB" 
+			#colorRGB" #colorWheel #random #colorRGB
 			imgLoader.colorModeDirectional = colorModeDirectional
 			#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True

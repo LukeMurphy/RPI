@@ -8,6 +8,8 @@ import random
 import numpy, time
 import gc, os
 
+from modules.filters import *
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 global root
@@ -18,9 +20,6 @@ counter = 0
 canvasOffsetX = 4
 canvasOffsetY = 7
 buff  =  8
-
-lev = 0
-levdiff  = 1
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -186,46 +185,11 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#config.renderImageFull =  newimage.convert("RGB")
 	
 	if(config.useFilters) :
-
-		global lev, levdiff
-
-		lev += levdiff
-
-		if(lev >= 120) : 
-			levdiff = -1
-		if(lev <= 20) : 
-			levdiff = 1
-
-		nc = int(random.uniform(2,128))
-
-		im1 = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=0))
-		im2 = im1.filter(ImageFilter.UnsharpMask(radius=lev, percent=50,threshold=2))
-
-		#print(lev, levdiff)
-
-		'''#######################    Paste to Render       #######################'''
-
-		config.renderImageFull.paste(im2, (xOffset, yOffset))
-
-		newimage = Image.new('P', config.renderImageFull.size)
-
-		nc = int(random.uniform(2,255))
-
-		newimage = config.renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors = nc)
-		#newimage = config.renderImageFull.convert("P", palette=Image.WEB)
-		config.renderImageFull =  newimage.convert("RGB")
+		#enhancer = ImageEnhance.Brightness(config.renderImageFull)
+		#config.renderImageFull = enhancer.enhance(.75)
+		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset,config.unsharpMaskPercent, config.blurRadius)
 
 
-		'''
-		# Produces an ordered dithering - looks good for movement but not so good
-		# on still images 
-		im = config.renderImageFull.convert('CMYK').split()
-
-		for ch in im:
-			ordered_dithering(ch.load(), ch.size, gen_matrix(1)[0])
-		im = Image.merge("CMYK",im).convert("RGB")
-		config.renderImageFull = im
-		'''
 
 	if(config.rotation != 0) : 
 		if(config.rotationTrailing or config.fullRotation) : 
@@ -249,43 +213,5 @@ def drawBeforeConversion() :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def gen_matrix( e ):
-	''' Generating new matrix.
-	@param e The width and height of the matrix is 2^e.
-	@return New 2x2 to 2^e x 2^e matrix list.
-	'''
-	if e < 1: return None
-	m_list = [ [[1,2],[3,0]] ]
-	_b = m_list[0]
-	for n in xrange(1, e):
-		m = m_list[ n - 1 ]
-		m_list.append( [
-		[4*i+_b[0][0] for i in m[0]] + [4*i+_b[0][1] for i in m[0]],
-		[4*i+_b[0][0] for i in m[1]] + [4*i+_b[0][1] for i in m[1]],
-		[4*i+_b[1][0] for i in m[0]] + [4*i+_b[1][1] for i in m[0]],
-		[4*i+_b[1][0] for i in m[1]] + [4*i+_b[1][1] for i in m[1]],
-		] )
-	return m_list
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def ordered_dithering( pixel, size, matrix ):
-	""" Dithering on a single channel.
-	  @param pixel PIL PixelAccess object.
-	  @param size A tuple to represent the size of pixel.
-	  @param matrix Must be NxN, and N == 2^e where e>=1
-	"""
-	X, Y = size
-	N = len(matrix)
-
-	T = [[255*(matrix[x][y]+0.01)/N/N for x in xrange(N)] for y in xrange(N)]
-
-	#print(T)
-
-	for y in xrange(0, Y):
-		for x in xrange(0, X):
-			pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

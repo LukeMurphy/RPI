@@ -147,12 +147,6 @@ def main(run = True) :
 	global config, directionOrder,workConfig
 	print("---------------------")
 	print("RE:PAINT Loaded")
-	colorutils.brightness = config.brightness
-	config.canvasImageWidth = config.screenWidth
-	config.canvasImageHeight = config.screenHeight
-	config.canvasImageWidth -= 4
-	config.canvasImageHeight -= 4
-
 
 
 	try :
@@ -174,6 +168,11 @@ def main(run = True) :
 	except Exception as e: 
 		print (str(e))
 
+	colorutils.brightness = config.brightness
+	config.canvasImageWidth = config.screenWidth
+	config.canvasImageHeight = config.screenHeight
+	config.canvasImageWidth -= 4
+	config.canvasImageHeight -= 4
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

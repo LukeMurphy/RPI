@@ -127,7 +127,10 @@ def configure() :
 		config.pixSortgap  = int(workconfig.get("displayconfig", 'pixSortgap'))
 		config.pixSortprobDraw  = float(workconfig.get("displayconfig", 'pixSortprobDraw'))
 		config.pixSortprobGetNextColor  = float(workconfig.get("displayconfig", 'pixSortprobGetNextColor'))
-		config.pixSortdecriment  = float(workconfig.get("displayconfig", 'pixSortdecriment'))
+		config.pixSortProbDecriment  = float(workconfig.get("displayconfig", 'pixSortProbDecriment'))
+		config.pixSortSizeDecriment  = float(workconfig.get("displayconfig", 'pixSortSizeDecriment'))
+		config.pixSortSampleVariance  = int(workconfig.get("displayconfig", 'pixSortSampleVariance'))
+		config.pixSortDrawVariance  = int(workconfig.get("displayconfig", 'pixSortDrawVariance'))
 	except Exception as e:
 		print (str(e))
 		config.usePixelSort = False
@@ -140,7 +143,10 @@ def configure() :
 		config.pixSortgap = 2
 		config.pixSortprobDraw = .5
 		config.pixSortprobGetNextColor = .2
-		config.pixSortdecriment = .5
+		config.pixSortSizeDecriment = .5
+		config.pixSortProbDecriment = .5
+		config.pixSortSampleVariance = 10
+		config.pixSortDrawVariance = 10
 
 	
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))

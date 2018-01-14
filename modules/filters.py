@@ -7,6 +7,8 @@ import random
 import numpy, time
 import gc, os
 
+from modules import colorutils
+
 lev = 0
 levdiff  = 1
 unsharpMaskPercent = 100
@@ -65,16 +67,7 @@ def ditherGlitch(renderImageFull,xOffset, yOffset, config):
 	return renderImageFull
 
 def pixelSort(renderImageFull, config):
-	'''
-	pixSortxStart = 0
-	pixSortyStart = 0
-	pixSortboxHeight = 40
-	pixSortboxWidth = 96
-	pixSortgap = 2
-	pixSortprobDraw = .5
-	pixSortprobGetNextColor = .2
-	pixSortdecriment = .5
-	'''
+	
 	pixSortxStart = config.pixSortxStart
 	pixSortyStart = config.pixSortyStart
 	pixSortboxHeight = config.pixSortboxHeight
@@ -82,27 +75,50 @@ def pixelSort(renderImageFull, config):
 	pixSortgap = config.pixSortgap
 	pixSortprobDraw = config.pixSortprobDraw
 	pixSortprobGetNextColor = config.pixSortprobGetNextColor
-	pixSortdecriment = config.pixSortdecriment
+	pixSortSampleVariance = config.pixSortSampleVariance
+	pixSortDrawVariance = config.pixSortDrawVariance
+	pixSortProbDecriment = config.pixSortProbDecriment
+	pixSortSizeDecriment = config.pixSortSizeDecriment
 
 
 	tempDraw = ImageDraw.Draw(renderImageFull)
+	# For now draw 4 layers 
 	for col in range(0,4):
 		if (col > 0) : 
 			pixSortxStart += pixSortboxWidth
-			pixSortboxWidth *= pixSortdecriment
-			pixSortprobDraw *= pixSortdecriment
+			pixSortboxWidth *= pixSortSizeDecriment
+			pixSortprobDraw *= pixSortProbDecriment
+		# Each layer is made up of 4 blocks separated by a variable gap
 		for b in range(0,4):
 			pixSortyStart = b * pixSortboxHeight
-			if (b>0) : pixSortyStart += pixSortgap * b
-			varx = int(random.uniform(0,10))
+			if (b > 0) : pixSortyStart += pixSortgap * b * random.random()
+			varx = int(random.uniform(-pixSortDrawVariance,pixSortDrawVariance))
+			# In each block, sample the color at the end of the block and either
+			# draw a line in that color from the start to the end, or a variable difference to the end
+			# or repeat the same color. If the probability to sample is low (pixSortprobGetNextColor)
+			# then there is a tendancy to draw solid blocks of color repeatedly. This is closer to the 
+			# condition when a single LED panel is totally whacked vs a line of LEDS is whacked ;)
+
 			for i in range(pixSortboxHeight) :
-				var = int(random.uniform(0,10))
+				var = int(random.uniform(0,pixSortSampleVariance))
 				if(random.random() < pixSortprobGetNextColor or i == 0) : 
+					# take a sample point color
 					samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+
+					# Just make sure the sample point is actually within the bounds of the image
 					if(samplePoint[0] < renderImageFull.size[0] and samplePoint[1] < renderImageFull.size[1]):
-						r, g, b = renderImageFull.getpixel(samplePoint)
+						colorSample = renderImageFull.getpixel(samplePoint)
+						#randomize brightness a little
+						colorSampleColor = tuple(int(round(c * random.uniform(.8,1))) for c in colorSample)
+
+
+				# Once in a little while, the color is just random
+				if(random.random() < .003) : colorSampleColor = colorutils.getRandomRGB(random.random())
+
+				# Variable probability that the line will even draw. Lower probability means more
+				# glitchy lines
 				if(random.random() < pixSortprobDraw) :
-					tempDraw.line((+ pixSortxStart ,i + pixSortyStart, pixSortboxWidth - varx + pixSortxStart, i + pixSortyStart), fill = (r,g,b))
+					tempDraw.line((+ pixSortxStart ,i + pixSortyStart, pixSortboxWidth - varx + pixSortxStart, i + pixSortyStart), fill = colorSampleColor)
 	return renderImageFull
 
 

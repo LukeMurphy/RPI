@@ -107,18 +107,40 @@ def configure() :
 	global config, workconfig, path, tempImage, threads, thrd
 	#gc.enable()
 
+	print("setting config values")
+
 	### Sets up for testing live config chages
 	try:
 		config.checkForConfigChanges = (workconfig.getboolean("displayconfig", 'checkForConfigChanges'))
 	except  Exception as e: 
 		print (str(e))
 		config.checkForConfigChanges = False
+
 	try :
+		config.usePixelSort  = (workconfig.getboolean("displayconfig", 'usePixelSort'))
 		config.unsharpMaskPercent  = int(workconfig.get("displayconfig", 'unsharpMaskPercent'))
 		config.blurRadius  = int(workconfig.get("displayconfig", 'blurRadius'))
+		config.pixSortxStart  = int(workconfig.get("displayconfig", 'pixSortxStart'))
+		config.pixSortyStart  = int(workconfig.get("displayconfig", 'pixSortyStart'))
+		config.pixSortboxHeight  = int(workconfig.get("displayconfig", 'pixSortboxHeight'))
+		config.pixSortboxWidth  = int(workconfig.get("displayconfig", 'pixSortboxWidth'))
+		config.pixSortgap  = int(workconfig.get("displayconfig", 'pixSortgap'))
+		config.pixSortprobDraw  = float(workconfig.get("displayconfig", 'pixSortprobDraw'))
+		config.pixSortprobGetNextColor  = float(workconfig.get("displayconfig", 'pixSortprobGetNextColor'))
+		config.pixSortdecriment  = float(workconfig.get("displayconfig", 'pixSortdecriment'))
 	except Exception as e:
 		print (str(e))
+		config.usePixelSort = False
 		config.unsharpMaskPercent  = 50
+		config.blurRadius  = 0
+		config.pixSortxStart = 0
+		config.pixSortyStart = 0
+		config.pixSortboxHeight = 40
+		config.pixSortboxWidth = 96
+		config.pixSortgap = 2
+		config.pixSortprobDraw = .5
+		config.pixSortprobGetNextColor = .2
+		config.pixSortdecriment = .5
 
 	
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
@@ -188,8 +210,10 @@ def configure() :
 		config.isRPI = False
 
 		try :
+			config.usePixeSort  = (workconfig.getboolean("displayconfig", 'usePixeSort'))
 			config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
 		except Exception as e: 
+			config.usePixSort = False
 			print (str(e))
 
 		if(config.isRPI == True) : 
@@ -226,6 +250,7 @@ def configure() :
 	if(config.rendering == "out") :
 		from modules import rendertofile
 		config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
+		config.usePixelSort  = (workconfig.getboolean("displayconfig", 'usePixelSort'))
 		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
 		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
 		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))

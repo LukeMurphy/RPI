@@ -11,12 +11,13 @@ lev = 0
 levdiff  = 1
 unsharpMaskPercent = 100
 
-def ditherFilter(renderImageFull,xOffset, yOffset, unsharpMaskPercent = 50, blurRadius = 0):
+def ditherFilter(renderImageFull,xOffset, yOffset, config):
 	#return orderedDither(renderImageFull,xOffset, yOffset)
-	return dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent, blurRadius)
+	#return dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent, blurRadius)
+	return ditherGlitch(renderImageFull,xOffset, yOffset, config)
 
 
-def dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent = 50, blurRadius = 0):
+def dither(renderImageFull,xOffset, yOffset, config):
 	global lev, levdiff
 	lev += levdiff
 
@@ -25,7 +26,7 @@ def dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent = 50, blurRadius
 	if(lev <= 20) : 
 		levdiff = 1
 
-	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=blurRadius))
+	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.blurRadius))
 	im2 = im1.filter(ImageFilter.UnsharpMask(radius=lev, percent=unsharpMaskPercent,threshold=2))
 
 	'''#######################    Paste to Render       #######################'''
@@ -37,6 +38,71 @@ def dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent = 50, blurRadius
 	newimage = renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors = nc)
 	renderImageFull =  newimage.convert("RGB")
 
+	return renderImageFull
+
+def ditherGlitch(renderImageFull,xOffset, yOffset, config):
+	global lev, levdiff
+	lev += levdiff
+
+	if(lev >= 120) : 
+		levdiff = -1
+	if(lev <= 20) : 
+		levdiff = 1
+
+	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.blurRadius))
+	im2 = im1.filter(ImageFilter.UnsharpMask(radius=lev, percent=config.unsharpMaskPercent,threshold=2))
+
+	'''#######################    Paste to Render       #######################'''
+
+	renderImageFull.paste(im2, (xOffset, yOffset))
+	nc = int(random.uniform(2,255))
+
+
+	#newimage = renderImageFull.convert("P", palette=Image.WEB, colors = nc)
+	newimage = renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors = nc)
+
+	renderImageFull =  newimage.convert("RGB")
+	return renderImageFull
+
+def pixelSort(renderImageFull, config):
+	'''
+	pixSortxStart = 0
+	pixSortyStart = 0
+	pixSortboxHeight = 40
+	pixSortboxWidth = 96
+	pixSortgap = 2
+	pixSortprobDraw = .5
+	pixSortprobGetNextColor = .2
+	pixSortdecriment = .5
+	'''
+	pixSortxStart = config.pixSortxStart
+	pixSortyStart = config.pixSortyStart
+	pixSortboxHeight = config.pixSortboxHeight
+	pixSortboxWidth = config.pixSortboxWidth
+	pixSortgap = config.pixSortgap
+	pixSortprobDraw = config.pixSortprobDraw
+	pixSortprobGetNextColor = config.pixSortprobGetNextColor
+	pixSortdecriment = config.pixSortdecriment
+
+
+	tempDraw = ImageDraw.Draw(renderImageFull)
+	for col in range(0,4):
+		if (col > 0) : 
+			pixSortxStart += pixSortboxWidth
+			pixSortboxWidth *= pixSortdecriment
+			pixSortprobDraw *= pixSortdecriment
+		for b in range(0,4):
+			pixSortyStart = b * pixSortboxHeight
+			if (b>0) : pixSortyStart += pixSortgap * b
+			varx = int(random.uniform(0,10))
+			for i in range(pixSortboxHeight) :
+				var = int(random.uniform(0,10))
+				if(random.random() < pixSortprobGetNextColor or i == 0) : 
+					samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+					if(samplePoint[0] < renderImageFull.size[0] and samplePoint[1] < renderImageFull.size[1]):
+						r, g, b = renderImageFull.getpixel(samplePoint)
+				if(random.random() < pixSortprobDraw) :
+					tempDraw.line((+ pixSortxStart ,i + pixSortyStart, pixSortboxWidth - varx + pixSortxStart, i + pixSortyStart), fill = (r,g,b))
 	return renderImageFull
 
 

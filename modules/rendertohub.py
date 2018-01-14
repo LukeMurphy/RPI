@@ -40,8 +40,6 @@ def setUp():
 	# after rotation
 	#if(config.rotation == 90) : canvasOffsetY = -25
 
-	
-
 	root = Tk()
 	w = config.screenWidth + buff
 	h = config.screenHeight  + buff
@@ -184,12 +182,14 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#newimage.paste(config.renderImageFull, (0, 0))
 	#config.renderImageFull =  newimage.convert("RGB")
 	
+	#enhancer = ImageEnhance.Brightness(config.renderImageFull)
+	#config.renderImageFull = enhancer.enhance(.75)
+
 	if(config.useFilters) :
-		#enhancer = ImageEnhance.Brightness(config.renderImageFull)
-		#config.renderImageFull = enhancer.enhance(.75)
-		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset,config.unsharpMaskPercent, config.blurRadius)
+		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
 
-
+	if(config.usePixelSort) :
+		config.renderImageFull = pixelSort(config.renderImageFull, config)
 
 	if(config.rotation != 0) : 
 		if(config.rotationTrailing or config.fullRotation) : 

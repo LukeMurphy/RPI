@@ -17,7 +17,7 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 	global config
 
 	if(config.useFilters) :
-		config.imageToRender = ditherFilter(config.imageToRender,xOffset, yOffset, config)
+		if(random.random() < .2):imageToRender = ditherFilter(imageToRender,xOffset, yOffset, config)
 		
 	segmentImage = []
 

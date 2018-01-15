@@ -99,9 +99,9 @@ def pixelSort(renderImageFull, config):
 			# then there is a tendancy to draw solid blocks of color repeatedly. This is closer to the 
 			# condition when a single LED panel is totally whacked vs a line of LEDS is whacked ;)
 
+			colorSampleColor = (10,10,10) #colorutils.getRandomRGB(random.random())
 			for i in range(pixSortboxHeight) :
 
-				colorSampleColor = (10,10,10) #colorutils.getRandomRGB(random.random())
 
 				var = int(random.uniform(0,pixSortSampleVariance))
 

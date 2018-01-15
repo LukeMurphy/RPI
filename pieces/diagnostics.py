@@ -20,7 +20,7 @@ class unit:
 
 		self.image = Image.new("RGBA", (100 , 100))
 		self.fillColor = colorutils.getRandomRGB()
-		self.outlineColor = colorutils.getRandomRGB()
+		self.outlineColor = colorutils.getRandomRGB(config.brightness)
 		self.objWidth = 20
 		self.objWidthMax = 26
 		self.objWidthMin = 13
@@ -87,9 +87,9 @@ def main(run = True) :
 	config.numUnits  = 1
 
 	config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
-	config.fontColor = tuple(map(lambda x: int(x) , config.fontColorVals))
+	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
 	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
-	config.outlineColor = tuple(map(lambda x: int(x) , config.outlineColorVals))
+	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -145,7 +145,7 @@ def iterate() :
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
-	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,220))
+	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
 	config.draw.text((1,0),"TOP",config.fontColor,font=config.font)
 	config.draw.text((1,config.screenHeight-15),"BOTTOM",config.fontColor,font=config.font)
 
@@ -157,34 +157,22 @@ def iterate() :
 	h = 24
 	xp = 10
 	yp = 40
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(255,0,0), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(0,255,0), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(0,0,255), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(0,255,255), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(255,0,255), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(255,255,0), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(255,255,255), outline=0)
+
+	rgbWheel = [(255,0,0),(255,255,0),(0,255,0),(0,255,255),(0,0,255),(255,0,255),(255,255,255)]
+
+
+	for i in range(0,len(rgbWheel)):
+		colorBlock = tuple(map(lambda x: int(int(x)  * config.brightness), rgbWheel[i]))
+		config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
+		xp += w
+
 	yp+=h 
 	xp = 10
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(125,0,0), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(0,125,0), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(0,0,125), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(0,125,125), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(125,0,125), outline=0)
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(125,125,0), outline=0)	
-	xp+=w 
-	config.draw.rectangle((xp,yp,xp+w,yp+h), fill=(125,125,125), outline=0)
+
+	for i in range(0,len(rgbWheel)):
+		colorBlock = tuple(map(lambda x: int(int(x)  * config.brightness * .5), rgbWheel[i]))
+		config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
+		xp += w
 
 	
 	for i in range(0,config.numUnits):

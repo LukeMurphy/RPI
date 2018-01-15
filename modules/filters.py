@@ -79,20 +79,33 @@ def pixelSort(renderImageFull, config):
 	pixSortDrawVariance = config.pixSortDrawVariance
 	pixSortProbDecriment = config.pixSortProbDecriment
 	pixSortSizeDecriment = config.pixSortSizeDecriment
-
+	pixSortDirection = config.pixSortDirection
 
 	tempDraw = ImageDraw.Draw(renderImageFull)
+
 	# For now draw 4 layers 
 	for col in range(0,4):
 		if (col > 0) : 
-			pixSortxStart += pixSortboxWidth
-			pixSortboxWidth *= pixSortSizeDecriment
+			if pixSortDirection == "lateral":
+				pixSortxStart += pixSortboxWidth
+				pixSortboxWidth *= pixSortSizeDecriment
+			else :
+				pixSortyStart += pixSortboxHeight
+				pixSortboxHeight *= pixSortSizeDecriment
+
 			pixSortprobDraw *= pixSortProbDecriment
+
 		# Each layer is made up of 4 blocks separated by a variable gap
 		for b in range(0,4):
-			pixSortyStart = b * pixSortboxHeight
-			if (b > 0) : pixSortyStart += pixSortgap * b * random.random()
+			if pixSortDirection == "lateral":
+				pixSortyStart = b * pixSortboxHeight
+				if (b > 0) : pixSortyStart += pixSortgap * b * random.random()
+			else:
+				pixSortxStart = b * pixSortboxWidth
+				if (b > 0) : pixSortxStart += pixSortgap * b * random.random()
+
 			varx = int(random.uniform(-pixSortDrawVariance,pixSortDrawVariance))
+
 			# In each block, sample the color at the end of the block and either
 			# draw a line in that color from the start to the end, or a variable difference to the end
 			# or repeat the same color. If the probability to sample is low (pixSortprobGetNextColor)
@@ -100,14 +113,23 @@ def pixelSort(renderImageFull, config):
 			# condition when a single LED panel is totally whacked vs a line of LEDS is whacked ;)
 
 			colorSampleColor = (10,10,10) #colorutils.getRandomRGB(random.random())
-			for i in range(pixSortboxHeight) :
+			if pixSortDirection == "lateral":
+				## i.e. draw horizontal lines
+				boxRange = pixSortboxHeight
+			else:
+				## i.e. draw vertical lines
+				boxRange = pixSortboxWidth
 
+			for i in range(boxRange) :
 
 				var = int(random.uniform(0,pixSortSampleVariance))
 
 				if(random.random() < pixSortprobGetNextColor or i == 0) : 
 					# take a sample point color
-					samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+					if pixSortDirection == "lateral":
+						samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+					else:
+						samplePoint = (pixSortxStart + i, pixSortboxHeight + var + pixSortyStart)
 
 					#print(samplePoint,renderImageFull.size[0],renderImageFull.size[1])
 
@@ -123,7 +145,21 @@ def pixelSort(renderImageFull, config):
 				# Variable probability that the line will even draw. Lower probability means more
 				# glitchy lines
 				if(random.random() < pixSortprobDraw) :
-					tempDraw.line((+ pixSortxStart ,i + pixSortyStart, pixSortboxWidth - varx + pixSortxStart, i + pixSortyStart), fill = colorSampleColor)
+					if pixSortDirection == "lateral":
+						tempDraw.line((
+							pixSortxStart ,
+							i + pixSortyStart, 
+							pixSortboxWidth - varx + pixSortxStart, 
+							i + pixSortyStart), 
+						fill = colorSampleColor)
+					else :
+						tempDraw.line((
+							i + pixSortxStart ,
+							pixSortyStart, 
+							i  + pixSortxStart, 
+							pixSortyStart - varx + pixSortboxHeight), 
+						fill = colorSampleColor)
+
 	return renderImageFull
 
 

@@ -131,6 +131,8 @@ def configure() :
 		config.pixSortSizeDecriment  = float(workconfig.get("displayconfig", 'pixSortSizeDecriment'))
 		config.pixSortSampleVariance  = int(workconfig.get("displayconfig", 'pixSortSampleVariance'))
 		config.pixSortDrawVariance  = int(workconfig.get("displayconfig", 'pixSortDrawVariance'))
+		config.pixSortDirection = str(workconfig.get("displayconfig", 'pixSortDirection'))
+
 	except Exception as e:
 		print (str(e))
 		config.usePixelSort = False
@@ -147,6 +149,7 @@ def configure() :
 		config.pixSortProbDecriment = .5
 		config.pixSortSampleVariance = 10
 		config.pixSortDrawVariance = 10
+		config.pixSortDirection = 'lateral'
 
 	
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
@@ -197,9 +200,9 @@ def configure() :
 		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
 		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
 		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
+		config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 
 		try :
-			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
 			config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
 		except Exception as e: 
 			config.useFilters = False
@@ -227,10 +230,7 @@ def configure() :
 		config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
 		config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
 
-		config.isRPI = False
-
 		try :
-			config.usePixeSort  = (workconfig.getboolean("displayconfig", 'usePixeSort'))
 			config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
 		except Exception as e: 
 			config.usePixSort = False

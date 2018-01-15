@@ -197,7 +197,13 @@ def configure() :
 		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
 		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
 		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
+		
 		r.config = config
+		r.work = work
+		r.canvasOffsetX = int(workconfig.get("displayconfig", 'canvasOffsetX'))
+		r.canvasOffsetY = int(workconfig.get("displayconfig", 'canvasOffsetY'))
+		config.windowXOffset = int(workconfig.get("displayconfig", 'windowXOffset'))
+		config.windowYOffset = int(workconfig.get("displayconfig", 'windowYOffset'))
 		r.setUp()
 		config.render = r.render
 		config.updateCanvas = r.updateCanvas

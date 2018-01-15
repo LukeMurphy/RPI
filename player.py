@@ -197,6 +197,14 @@ def configure() :
 		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
 		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
 		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
+
+		try :
+			config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
+			config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
+		except Exception as e: 
+			config.useFilters = False
+			config.isRPI = True
+			print (str(e))
 		
 		r.config = config
 		r.work = work

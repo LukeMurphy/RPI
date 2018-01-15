@@ -1,7 +1,7 @@
 from rgbmatrix import Adafruit_RGBmatrix
 import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
-
+from modules.filters import *
 
 def setUp():
 	#importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
@@ -15,6 +15,10 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 	#global imageTop, imageBottom, screenHeight, screenWidth, panels, 
 	#matrix, image, renderImage, tileSize, rows, cols, transWiring
 	global config
+
+	if(config.useFilters) :
+		config.imageToRender = ditherFilter(config.imageToRender,xOffset, yOffset, config)
+		
 	segmentImage = []
 
 	# the rendered image is the screen size

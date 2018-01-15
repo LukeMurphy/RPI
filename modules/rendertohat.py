@@ -18,6 +18,9 @@ def render(imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=
 
 	if(config.useFilters) :
 		if(random.random() < .2):imageToRender = ditherFilter(imageToRender,xOffset, yOffset, config)
+
+	if(config.usePixelSort) :
+		imageToRender = pixelSort(imageToRender, config)
 		
 	segmentImage = []
 

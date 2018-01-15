@@ -100,17 +100,22 @@ def pixelSort(renderImageFull, config):
 			# condition when a single LED panel is totally whacked vs a line of LEDS is whacked ;)
 
 			for i in range(pixSortboxHeight) :
+
+				colorSampleColor = (10,10,10) #colorutils.getRandomRGB(random.random())
+
 				var = int(random.uniform(0,pixSortSampleVariance))
+
 				if(random.random() < pixSortprobGetNextColor or i == 0) : 
 					# take a sample point color
 					samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+
+					#print(samplePoint,renderImageFull.size[0],renderImageFull.size[1])
 
 					# Just make sure the sample point is actually within the bounds of the image
 					if(samplePoint[0] < renderImageFull.size[0] and samplePoint[1] < renderImageFull.size[1]):
 						colorSample = renderImageFull.getpixel(samplePoint)
 						#randomize brightness a little
 						colorSampleColor = tuple(int(round(c * random.uniform(.8,1))) for c in colorSample)
-
 
 				# Once in a little while, the color is just random
 				if(random.random() < .003) : colorSampleColor = colorutils.getRandomRGB(random.random())

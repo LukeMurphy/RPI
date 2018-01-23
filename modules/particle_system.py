@@ -2,23 +2,25 @@
 import math
 class ParticleSystem(object):
 
+	unitArray = []
+	boundries = ()
+
 	xGravity = +.0
 	yGravity = +0
 	damping = 1
-	unitArray = []
-
-	boundries = ()
-
-	borderCollisions = True
-
-	cohesionDistance = 20
+	borderCollisions = False
+	cohesionDistance = 10
 	repelDistance = 1
 	repelFactor = 1
 	distanceFactor = 1
 	clumpingFactor = 8
+	cohesionFactor =1
+	cohesionDegrades = 1
 
 	minDx  = 2
 	minDy  = 2
+
+	numUnits = 2
 
 	
 

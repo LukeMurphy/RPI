@@ -33,15 +33,15 @@ class Particle(object):
 		self.xPos = 0
 		self.yPos = 0
 
-		self.xPosR = self.ps.config.screenWidth/2
-		self.yPosR = self.ps.config.screenHeight/2
+		self.xPosR = 0 #self.ps.config.screenWidth/2
+		self.yPosR = 0 #self.ps.config.screenHeight/2
 		self.move = True
 		
-		self.dx = random.uniform(-3,3)
-		self.dy = random.uniform(-3,3)
+		self.dx = 0
+		self.dy = 0
 
 		self.v = random.uniform(1,3)
-		self.direction = random.uniform(math.pi + math.pi/2 - math.pi/4, math.pi + math.pi/2 + math.pi/4)
+		self.direction = 0
 
 		self.objWidth = 2
 		self.objHeight = 5
@@ -55,7 +55,7 @@ class Particle(object):
 
 	def update(self):
 
-		self.direction += self.directionIncrement
+		self.direction += self.directionIncrement * self.ps.clumpingFactor
 
 		self.dx = self.v * math.sin(self.direction)
 		self.dy = self.v * math.cos(self.direction)
@@ -66,7 +66,7 @@ class Particle(object):
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
-		self.directionIncrement *= .9
+		#self.directionIncrement *= self.ps.cohesionDegrades
 		
 
 		if(self.ps.borderCollisions ==  True) :
@@ -154,12 +154,11 @@ class Particle(object):
 		directionTotal = self.direction
 		count = 1
 		ps = self.ps
-		distance = ps.distanceFactor
-
+		distance = 0
 		centerX = self.xPosR
 		centerY = self.yPosR
 
-		for pal in ps.unitArray :
+		for pal in (ps.unitArray):
 			if self != pal :
 				dx  = self.xPosR - pal.xPosR
 				dy  = self.yPosR - pal.yPosR
@@ -168,22 +167,23 @@ class Particle(object):
 					## Find center of pals
 					centerX += pal.xPosR
 					centerY += pal.yPosR
-
-
-				## Get your pals average direction
-				if(distance < ps.cohesionDistance and distance > ps.repelDistance) :
-					directionTotal += pal.direction
 					count += 1
-				## Get your pals average direction but back off 
-				if(distance < ps.cohesionDistance and distance < ps.repelDistance) :
-					directionTotal -= pal.direction
-					count += 1
+					distianceProportion = 1 #( distance/ps.cohesionDistance) 
+					## Get your pals average direction
+					if(distance < ps.cohesionDistance and distance > ps.repelDistance) :
+						directionTotal += pal.direction * distianceProportion
+					## Get your pals average direction but back off 
+					if(distance < ps.cohesionDistance and distance < ps.repelDistance ) :
+						directionTotal -= pal.direction * distianceProportion * ps.repelFactor
 
 		if(count > 1) :
 			directionTotal = directionTotal / count
-			self.directionIncrement = (directionTotal - self.direction) / ps.clumpingFactor
+			self.directionIncrement = (directionTotal - self.direction) 
 
-		if(count > 15) :
+		if(count == 1) :
+			self.directionIncrement *= ps.cohesionDegrades
+
+		if(count > 5) :
 			dx = self.xPosR - centerX / count
 			dy = self.yPosR - centerY / count
 

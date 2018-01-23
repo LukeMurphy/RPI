@@ -27,8 +27,7 @@ def main(run = True) :
 	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
 	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
-	'''
-	'''
+
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -40,11 +39,32 @@ def main(run = True) :
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	ps = ParticleSystem(config)
+	ps.unitArray = []
 
-	for i in range(0,config.numUnits):
+	ps.xGravity = float(workConfig.get("particleSystem", 'xGravity'))
+	ps.yGravity = float(workConfig.get("particleSystem", 'yGravity'))
+	ps.damping = float(workConfig.get("particleSystem", 'damping'))
+	ps.borderCollisions = (workConfig.getboolean("particleSystem", 'borderCollisions'))
+	ps.cohesionDistance = float(workConfig.get("particleSystem", 'cohesionDistance'))
+	ps.repelDistance = float(workConfig.get("particleSystem", 'repelDistance'))
+
+	ps.distanceFactor = float(workConfig.get("particleSystem", 'distanceFactor'))
+	ps.clumpingFactor = float(workConfig.get("particleSystem", 'clumpingFactor'))
+	ps.repelFactor = float(workConfig.get("particleSystem", 'repelFactor'))
+
+	ps.cohesionDegrades = float(workConfig.get("particleSystem", 'cohesionDegrades'))
+	ps.speedMin = float(workConfig.get("particleSystem", 'speedMin'))
+	ps.speedMax = float(workConfig.get("particleSystem", 'speedMax'))
+	ps.numUnits = int(workConfig.get("particleSystem", 'numUnits'))
+	config.trailingFade = int(workConfig.get("particleSystem", 'trailingFade'))
+
+	for i in range(0,ps.numUnits):
 		p = Particle(ps)
-		p.xPosR = random.random() * config.screenWidth
-		p.yPosR = random.random() * config.screenHeight
+		p.xPosR = config.screenWidth - 40
+		p.yPosR = config.screenHeight/2 + random.uniform(-40,40)
+		variance = math.pi/3
+		p.direction = random.uniform(math.pi + math.pi/2 - variance, math.pi + math.pi/2 + variance)
+		p.v = random.uniform(ps.speedMin,ps.speedMax)
 		ps.unitArray.append(p)
 
 	setUp()
@@ -72,15 +92,16 @@ def runWork():
 def iterate() :
 	global config, ps
 	## Fade trails or not...
-	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(2,5,5,100), outline=None)
+	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0,config.trailingFade), outline=None)
 
 	for p in ps.unitArray:
 		p.update()
 		p.render()
 
-	if random.random() < .005 :
-		ps.cohesionDistance = random.uniform(8,30)
+	if random.random() < .0005 :
+		#ps.cohesionDistance = random.uniform(8,30)
 		print(ps.cohesionDistance)
+		print(config.trailingFade)
 
 	config.render(config.image, 0,0)
 		

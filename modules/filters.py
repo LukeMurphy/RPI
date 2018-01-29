@@ -68,10 +68,12 @@ def ditherGlitch(renderImageFull,xOffset, yOffset, config):
 
 def pixelSort(renderImageFull, config):
 	
-	pixSortxStart = config.pixSortxStart
-	pixSortyStart = config.pixSortyStart
+	pixSortXOffset = config.pixSortXOffset
+	pixSortYOffset = config.pixSortYOffset
+
 	pixSortboxHeight = config.pixSortboxHeight
 	pixSortboxWidth = config.pixSortboxWidth
+
 	pixSortgap = config.pixSortgap
 	pixSortprobDraw = config.pixSortprobDraw
 	pixSortprobGetNextColor = config.pixSortprobGetNextColor
@@ -80,8 +82,14 @@ def pixelSort(renderImageFull, config):
 	pixSortProbDecriment = config.pixSortProbDecriment
 	pixSortSizeDecriment = config.pixSortSizeDecriment
 	pixSortDirection = config.pixSortDirection
+	randomColorProbabilty = config.randomColorProbabilty
+	brightnessVarLow = config.brightnessVarLow
+	brightnessVarHi = config.brightnessVarHi
 
 	tempDraw = ImageDraw.Draw(renderImageFull)
+
+	pixSortxStart = 0
+	pixSortyStart = 0
 
 	# For now draw 4 layers 
 	for col in range(0,4):
@@ -95,13 +103,14 @@ def pixelSort(renderImageFull, config):
 
 			pixSortprobDraw *= pixSortProbDecriment
 
+
 		# Each layer is made up of 4 blocks separated by a variable gap
 		for b in range(0,4):
 			if pixSortDirection == "lateral":
-				pixSortyStart = b * pixSortboxHeight
+				pixSortyStart = b * pixSortboxHeight 
 				if (b > 0) : pixSortyStart += pixSortgap * b * random.random()
 			else:
-				pixSortxStart = b * pixSortboxWidth
+				pixSortxStart = b * pixSortboxWidth 
 				if (b > 0) : pixSortxStart += pixSortgap * b * random.random()
 
 			varx = int(random.uniform(-pixSortDrawVariance,pixSortDrawVariance))
@@ -115,10 +124,12 @@ def pixelSort(renderImageFull, config):
 			colorSampleColor = (10,10,10) #colorutils.getRandomRGB(random.random())
 			if pixSortDirection == "lateral":
 				## i.e. draw horizontal lines
-				boxRange = pixSortboxHeight
+				boxRange = int(pixSortboxHeight)
 			else:
 				## i.e. draw vertical lines
-				boxRange = pixSortboxWidth
+				boxRange = int(pixSortboxWidth)
+
+		
 
 			for i in range(boxRange) :
 
@@ -127,38 +138,39 @@ def pixelSort(renderImageFull, config):
 				if(random.random() < pixSortprobGetNextColor or i == 0) : 
 					# take a sample point color
 					if pixSortDirection == "lateral":
-						samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+						### Sample UP
+						#samplePoint = (pixSortboxWidth + var + pixSortxStart, i + pixSortyStart)
+						### Smaple DOWN
+						samplePoint = (var + pixSortxStart + pixSortXOffset, i + pixSortyStart + pixSortYOffset)
 					else:
-						samplePoint = (pixSortxStart + i, pixSortboxHeight + var + pixSortyStart)
+						#samplePoint = (pixSortxStart + i, pixSortboxHeight + var + pixSortyStart)
+						samplePoint = (pixSortxStart + i + pixSortXOffset,  var + pixSortyStart + pixSortYOffset)
 
 					#print(samplePoint,renderImageFull.size[0],renderImageFull.size[1])
 
 					# Just make sure the sample point is actually within the bounds of the image
 					if(samplePoint[0] < renderImageFull.size[0] and samplePoint[1] < renderImageFull.size[1]):
 						colorSample = renderImageFull.getpixel(samplePoint)
+
 						#randomize brightness a little
-						colorSampleColor = tuple(int(round(c * random.uniform(.8,1))) for c in colorSample)
+						colorSampleColor = tuple(int(round(c * random.uniform(brightnessVarLow,brightnessVarHi))) for c in colorSample)
 
 				# Once in a little while, the color is just random
-				if(random.random() < .003) : colorSampleColor = colorutils.getRandomRGB(random.random())
+				if(random.random() < randomColorProbabilty) : colorSampleColor = colorutils.getRandomRGB(random.random())
 
 				# Variable probability that the line will even draw. Lower probability means more
 				# glitchy lines
-				if(random.random() < pixSortprobDraw) :
+				if(random.random() < pixSortprobDraw and colorSampleColor != (0,0,0)) :
 					if pixSortDirection == "lateral":
 						tempDraw.line((
-							pixSortxStart ,
-							i + pixSortyStart, 
-							pixSortboxWidth - varx + pixSortxStart, 
-							i + pixSortyStart), 
-						fill = colorSampleColor)
+							pixSortxStart + pixSortXOffset- varx, 							i + pixSortyStart + pixSortYOffset, 
+							pixSortboxWidth - varx + pixSortxStart +  pixSortXOffset, 	i + pixSortyStart + pixSortYOffset) , 
+							fill = colorSampleColor)
 					else :
 						tempDraw.line((
-							i + pixSortxStart ,
-							pixSortyStart, 
-							i  + pixSortxStart, 
-							pixSortyStart - varx + pixSortboxHeight), 
-						fill = colorSampleColor)
+							i + pixSortxStart + pixSortXOffset, 		pixSortyStart + pixSortYOffset - varx, 
+							i + pixSortxStart + pixSortXOffset, 		pixSortyStart - varx + pixSortboxHeight + pixSortYOffset), 
+							fill = colorSampleColor)
 
 	return renderImageFull
 

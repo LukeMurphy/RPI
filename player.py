@@ -120,8 +120,8 @@ def configure() :
 		config.usePixelSort  = (workconfig.getboolean("displayconfig", 'usePixelSort'))
 		config.unsharpMaskPercent  = int(workconfig.get("displayconfig", 'unsharpMaskPercent'))
 		config.blurRadius  = int(workconfig.get("displayconfig", 'blurRadius'))
-		config.pixSortxStart  = int(workconfig.get("displayconfig", 'pixSortxStart'))
-		config.pixSortyStart  = int(workconfig.get("displayconfig", 'pixSortyStart'))
+		config.pixSortXOffset  = int(workconfig.get("displayconfig", 'pixSortXOffset'))
+		config.pixSortYOffset  = int(workconfig.get("displayconfig", 'pixSortYOffset'))
 		config.pixSortboxHeight  = int(workconfig.get("displayconfig", 'pixSortboxHeight'))
 		config.pixSortboxWidth  = int(workconfig.get("displayconfig", 'pixSortboxWidth'))
 		config.pixSortgap  = int(workconfig.get("displayconfig", 'pixSortgap'))
@@ -132,14 +132,17 @@ def configure() :
 		config.pixSortSampleVariance  = int(workconfig.get("displayconfig", 'pixSortSampleVariance'))
 		config.pixSortDrawVariance  = int(workconfig.get("displayconfig", 'pixSortDrawVariance'))
 		config.pixSortDirection = str(workconfig.get("displayconfig", 'pixSortDirection'))
+		config.randomColorProbabilty = float(workconfig.get("displayconfig", 'randomColorProbabilty'))
+		config.brightnessVarLow = float(workconfig.get("displayconfig", 'brightnessVarLow'))
+		config.brightnessVarHi = float(workconfig.get("displayconfig", 'brightnessVarHi'))
 
 	except Exception as e:
 		print (str(e))
 		config.usePixelSort = False
 		config.unsharpMaskPercent  = 50
 		config.blurRadius  = 0
-		config.pixSortxStart = 0
-		config.pixSortyStart = 0
+		config.pixSortXOffset = 0
+		config.pixSortYOffset = 0
 		config.pixSortboxHeight = 40
 		config.pixSortboxWidth = 96
 		config.pixSortgap = 2
@@ -150,6 +153,10 @@ def configure() :
 		config.pixSortSampleVariance = 10
 		config.pixSortDrawVariance = 10
 		config.pixSortDirection = 'lateral'
+		config.randomColorProbabilty = .002
+
+		config.brightnessVarLow = .8
+		config.brightnessVarHi = 1
 
 	
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))

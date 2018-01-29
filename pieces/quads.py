@@ -111,7 +111,7 @@ def makeAnimal():
 		numSquarePairs = len(quadBlocks)
 
 		#renderImage = Image.new("RGBA", (imgWidth, imgHeight))
-		
+	
 		config.draw.rectangle((0,0,imgWidth,imgHeight), fill=(0,0,0,config.fade))
 
 		# Choose seam x point  -- ideally about 1/3 from left
@@ -208,7 +208,7 @@ def makeAnimal():
 			y2 = quadBlocks[quad]["coords"][3]
 
 
-			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex])
+			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex], outline =(0,0,0))
 			temp = ScaleRotateTranslate(temp,angleRotation, None, None, None, True)
 			config.workImage.paste(temp, temp)
 			n += 1

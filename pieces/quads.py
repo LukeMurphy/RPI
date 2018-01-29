@@ -208,7 +208,7 @@ def makeAnimal():
 			y2 = quadBlocks[quad]["coords"][3]
 
 
-			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex], outline =(0,0,0))
+			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex])
 			temp = ScaleRotateTranslate(temp,angleRotation, None, None, None, True)
 			config.workImage.paste(temp, temp)
 			n += 1

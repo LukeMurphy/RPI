@@ -23,9 +23,14 @@ def init() :
 	config.xVariance = float(workConfig.get("animals", 'xVariance')) 
 	config.flip = workConfig.getboolean("animals", 'flip')
 	config.blockWidth = int(workConfig.get("animals", 'blockWidth')) 
+	config.carcasBlockWidth = int(workConfig.get("animals", 'carcasBlockWidth')) 
 	config.l1Variance = float(workConfig.get("animals", 'l1Variance')) 
-	config.yOffset = int(workConfig.get("animals", 'yOffset')) 
+	config.carcas_pixSortYOffset = int(workConfig.get("animals", 'carcas_pixSortYOffset')) 
+	config.base_pixSortYOffset = int(workConfig.get("animals", 'base_pixSortYOffset')) 
 	config.xOffset = int(workConfig.get("animals", 'xOffset')) 
+	config.yOffset = int(workConfig.get("animals", 'yOffset')) 
+	config.carcasXOffset = int(workConfig.get("animals", 'carcasXOffset')) 
+	config.carcasYOffset = int(workConfig.get("animals", 'carcasYOffset')) 
 	config.fade = int(workConfig.get("animals", 'fade')) 
 	config.redShift = int(workConfig.get("animals", 'redShift')) 
 	config.greyLevel = int(workConfig.get("animals", 'greyLevel')) 
@@ -48,8 +53,13 @@ def runWork():
 
 def iterate() :
 	global config
-	#makeAnimal()
-	makeCarcas()
+
+	if(random.random() < .5) :
+		config.pixSortYOffset = config.base_pixSortYOffset
+		makeAnimal()
+	else :
+		config.pixSortYOffset = config.carcas_pixSortYOffset
+		makeCarcas()
 
 	config.image = config.workImage
 
@@ -124,15 +134,15 @@ def makeCarcas():
 		xVariance = config.xVariance
 		flip = config.flip
 		
-		blockWidth = config.blockWidth
+		blockWidth = config.carcasBlockWidth
 		wVariance = [imgWidth/6, imgWidth/3]
 		hVariance = [imgHeight/6, imgHeight/2]
 		wFactor = 1
 		hFactor = 2
 		l1Variance = config.l1Variance
 
-		yStart = yPos = config.yOffset
-		xStart = xPos = imgWidth/2 - config.xOffset
+		yStart = yPos = config.carcasYOffset
+		xStart = xPos = imgWidth/2 - config.carcasXOffset
 		bodyEnd = 0
 		bodyStart = 0
 		tiedToBottom = 0 if random.random() < .5 else 2

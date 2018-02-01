@@ -34,6 +34,9 @@ def init() :
 	config.fade = int(workConfig.get("animals", 'fade')) 
 	config.redShift = int(workConfig.get("animals", 'redShift')) 
 	config.greyLevel = int(workConfig.get("animals", 'greyLevel')) 
+	config.bgR = int(workConfig.get("animals", 'bgR')) 
+	config.bgG = int(workConfig.get("animals", 'bgG')) 
+	config.bgB = int(workConfig.get("animals", 'bgB'))
 	config.angleRotationRange = float(workConfig.get("animals", 'angleRotationRange')) 
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.workImage)
@@ -128,7 +131,7 @@ def makeCarcas():
 
 		#renderImage = Image.new("RGBA", (imgWidth, imgHeight))
 	
-		config.draw.rectangle((0,0,imgWidth,imgHeight), fill=(0,0,0,config.fade))
+		config.draw.rectangle((0,0,imgWidth,imgHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
 
 		# Choose seam x point  -- ideally about 1/3 from left
 		xVariance = config.xVariance

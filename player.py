@@ -135,6 +135,7 @@ def configure() :
 		config.randomColorProbabilty = float(workconfig.get("displayconfig", 'randomColorProbabilty'))
 		config.brightnessVarLow = float(workconfig.get("displayconfig", 'brightnessVarLow'))
 		config.brightnessVarHi = float(workconfig.get("displayconfig", 'brightnessVarHi'))
+		config.pixelSortAppearanceProb = float(workconfig.get("displayconfig", 'pixelSortAppearanceProb'))
 
 	except Exception as e:
 		print (str(e))
@@ -154,6 +155,7 @@ def configure() :
 		config.pixSortDrawVariance = 10
 		config.pixSortDirection = 'lateral'
 		config.randomColorProbabilty = .002
+		config.pixelSortAppearanceProb = 1
 
 		config.brightnessVarLow = .8
 		config.brightnessVarHi = 1

@@ -189,7 +189,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
 
 	if(config.usePixelSort) :
-		config.renderImageFull = pixelSort(config.renderImageFull, config)
+		if(random.random()< config.pixelSortAppearanceProb) :
+			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
 	if(config.rotation != 0) : 
 		if(config.rotationTrailing or config.fullRotation) : 

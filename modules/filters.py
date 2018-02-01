@@ -129,7 +129,6 @@ def pixelSort(renderImageFull, config):
 				## i.e. draw vertical lines
 				boxRange = int(pixSortboxWidth)
 
-		
 
 			for i in range(boxRange) :
 

@@ -37,11 +37,92 @@ def init() :
 	config.bgR = int(workConfig.get("animals", 'bgR')) 
 	config.bgG = int(workConfig.get("animals", 'bgG')) 
 	config.bgB = int(workConfig.get("animals", 'bgB'))
-	config.angleRotationRange = float(workConfig.get("animals", 'angleRotationRange')) 
-	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.draw = ImageDraw.Draw(config.workImage)
 
+	config.patternRows = int(workConfig.get("animals", 'patternRows'))
+	config.patternCols = int(workConfig.get("animals", 'patternCols'))
+	config.patternRowsOffset = int(workConfig.get("animals", 'patternRowsOffset'))
+	config.patternColsOffset = int(workConfig.get("animals", 'patternColsOffset'))
+	config.bgYStepSpeed = int(workConfig.get("animals", 'bgYStepSpeed'))
+	config.bgXStepSpeed = int(workConfig.get("animals", 'bgXStepSpeed'))
+	config.alpha = int(workConfig.get("animals", 'alpha'))
+
+	config.bgBackGroundColor = (workConfig.get("animals", 'bgBackGroundColor').split(","))
+	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
+	config.bgForeGroundColor = (workConfig.get("animals", 'bgForeGroundColor').split(","))
+	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
+
+	config.angleRotationRange = float(workConfig.get("animals", 'angleRotationRange')) 
 	config.pixSortXOffsetVal = config.pixSortXOffset
+
+
+	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.workImageDraw = ImageDraw.Draw(config.workImage)
+	
+	config.imageLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.imageLayerDraw = ImageDraw.Draw(config.imageLayer)
+	
+	config.bgImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.bg1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.bg2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.bg1Draw = ImageDraw.Draw(config.bg1)
+	config.bg2Draw = ImageDraw.Draw(config.bg2)
+	config.bgDraw = ImageDraw.Draw(config.bgImage)
+
+	config.bg1Draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.bgBackGroundColor)
+	config.bg2Draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.bgBackGroundColor)
+	makeBackGround(config.bg1Draw, 1)
+	makeBackGround(config.bg2Draw, 2)
+	config.leadBG = config.bg1
+	config.followBG = config.bg2
+
+	config.bgImage.paste(config.bg1)
+	config.bgImage.paste(config.bg2,(0,config.canvasHeight))
+	config.bgXpos = 0
+	config.bgYpos = 0
+
+
+def makeBackGround(drawRef, n = 1):
+	rows = config.patternRows
+	cols = config.patternCols
+
+	xDiv = config.canvasWidth / cols - config.patternColsOffset
+	yDiv = config.canvasHeight / rows - config.patternRowsOffset
+
+	xStart = 0
+	yStart = 0
+
+	## Chevron pattern
+	for r in range (0, rows) : 
+		for c in range (0, cols) : 
+			poly = []
+			poly.append((xStart, yStart + yDiv))
+			poly.append((xStart + xDiv, yStart))
+			poly.append((xStart + xDiv + xDiv, yStart + yDiv))
+			poly.append((xStart + xDiv, yStart + yDiv + yDiv))
+			#if(n ==2) : color = (100,200,0,255)
+			drawRef.polygon(poly, fill = config.bgForeGroundColor)
+			xStart += 2 * xDiv
+		xStart = 0
+		yStart += 2 * yDiv
+
+
+def drawBackGround():
+	global config
+
+	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+	config.workImage.paste(config.bg1, (config.bgXpos,config.bgYpos))
+	config.workImage.paste(config.bg2, (config.bgXpos,config.bgYpos - config.canvasHeight))
+	config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
+
+	config.bgYpos += config.bgYStepSpeed
+	config.bgXpos += config.bgXStepSpeed
+
+	if (config.bgXpos > config.canvasWidth) : config.bgXpos = -config.canvasWidth
+	if (config.bgYpos > config.canvasHeight) : 
+		config.workImage.paste(config.leadBG, (config.bgXpos, -config.canvasHeight))
+		config.leadBG = config.followBG
+
+		config.bgYpos = 0
 
 def callBack() :
 	global config
@@ -57,6 +138,8 @@ def runWork():
 def iterate() :
 	global config
 
+	config.blank = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	
 	if(random.random() < .5) :
 		config.pixSortYOffset = config.base_pixSortYOffset
 		makeAnimal()
@@ -64,18 +147,17 @@ def iterate() :
 		config.pixSortYOffset = config.carcas_pixSortYOffset
 		makeCarcas()
 
+	drawBackGround()
+
 	config.image = config.workImage
 
 	config.render(config.image, 0,0)
-
-
 
 def main(run = True) :
 	global config, threads, thrd
 	init()
 	
 	if(run) : runWork()
-
 
 def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
 	if center is None:
@@ -100,7 +182,11 @@ def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale =
 def makeCarcas():
 	global config
 
+
 	if random.random() < config.redrawProbablility :
+		
+		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+		config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
 		config.pixSortXOffset = config.pixSortXOffsetVal 
 
 		imgWidth = config.canvasWidth
@@ -130,8 +216,9 @@ def makeCarcas():
 		numSquarePairs = len(quadBlocks)
 
 		#renderImage = Image.new("RGBA", (imgWidth, imgHeight))
-	
-		config.draw.rectangle((0,0,imgWidth,imgHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+
+		#drawBackGround()
+
 
 		# Choose seam x point  -- ideally about 1/3 from left
 		xVariance = config.xVariance
@@ -259,10 +346,11 @@ def makeCarcas():
 
 			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex])
 			temp = ScaleRotateTranslate(temp,angleRotation, None, None, None, True)
-			config.workImage.paste(temp, temp)
+			#config.workImage.paste(temp, temp)
+			config.imageLayer.paste(temp, temp)
 			n += 1
 
-		config.workImage.paste(temp, temp)
+		#config.workImage.paste(temp, temp)
 
 		if(random.random() < 0) : flip = True
 		
@@ -274,12 +362,12 @@ def makeCarcas():
 
 	else: return False
 
-
 def makeAnimal():
 	global config
 
 
 	if random.random() < config.redrawProbablility :
+		config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
 		config.pixSortXOffset = config.pixSortXOffsetVal 
 
 		imgWidth = config.canvasWidth
@@ -302,8 +390,8 @@ def makeAnimal():
 		numSquarePairs = len(quadBlocks)
 
 		#renderImage = Image.new("RGBA", (imgWidth, imgHeight))
-	
-		config.draw.rectangle((0,0,imgWidth,imgHeight), fill=(0,0,0,config.fade))
+
+		drawBackGround()
 
 		# Choose seam x point  -- ideally about 1/3 from left
 		xVariance = config.xVariance
@@ -401,10 +489,11 @@ def makeAnimal():
 
 			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex])
 			temp = ScaleRotateTranslate(temp,angleRotation, None, None, None, True)
-			config.workImage.paste(temp, temp)
+			#config.workImage.paste(temp, temp)
+			config.imageLayer.paste(temp, temp)
 			n += 1
 
-		config.workImage.paste(temp, temp)
+		#config.workImage.paste(temp, temp)
 
 		if(random.random() < 0) : flip = True
 		

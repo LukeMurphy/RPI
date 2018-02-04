@@ -8,8 +8,8 @@ import numpy
 import threading
 import resource
 from collections import OrderedDict
-from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
-from modules import colorutils
+from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
+from modules import colorutils, coloroverlay
 
 global thrd, config
 
@@ -89,6 +89,19 @@ def init() :
 	config.bgXpos = 0
 	config.bgYpos = 0
 
+	config.colOverlayA = coloroverlay.ColorOverlay()
+	config.colOverlayB = coloroverlay.ColorOverlay()
+	### This is the speed range of transitions in color
+	### Higher numbers means more possible steps so slower
+	### transitions - 1,10 very blinky, 10,200 very slow
+	config.colOverlayA.randomRange = (1.0,20.0)
+	config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
+	config.colOverlayA.colorB = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
+
+	config.colOverlayB.randomRange = (5.0,30.0)
+	config.colOverlayB.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
+	config.colOverlayB.colorB = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
+
 
 def makeBackGround(drawRef, n = 1):
 	rows = config.patternRows * 2
@@ -155,8 +168,10 @@ def drawBackGround():
 	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
 	config.workImage.paste(config.leadBG, (config.bgXpos,config.bgYpos))
 	config.workImage.paste(config.followBG, (config.bgXpos,config.bgYpos - config.canvasHeight))
+
 	if(config.bgYStepSpeed < 0) :
 		config.workImage.paste(config.followBG, (config.bgXpos,config.bgYpos + config.canvasHeight))
+
 	config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 
 	config.bgYpos += config.bgYStepSpeed
@@ -178,6 +193,36 @@ def drawBackGround():
 		config.followBG = lead
 		config.bgYpos = 0
 
+def colorize(clr = (250,0,250), recolorize = False) :
+
+		#Colorize via overlay etc
+		layer = config.renderImageFull
+		layer = config.imageLayer
+		layer = config.workImage
+
+		w = layer.size[0]
+		h = layer.size[1]
+
+
+		clrBlock = Image.new(layer.mode, (w, h))
+		clrBlockDraw = ImageDraw.Draw(clrBlock)
+
+		# Color overlay on b/w PNG sprite
+		clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
+		clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=clr)
+
+		layer = layer.paste(clrBlock,(0,0))
+
+		'''
+		try :
+			layer = ImageChops.multiply(clrBlock, layer)
+
+		except Exception as e: 
+			print(e, clrBlock.mode, config.renderImageFull.mode)
+			exit()
+			pass
+		'''
+
 def callBack() :
 	global config
 	pass
@@ -187,14 +232,24 @@ def runWork():
 	while True:
 		iterate()
 		#time.sleep(.01)
-		time.sleep(random.random() * config.redrawSpeed)
+		#time.sleep(random.random() * config.redrawSpeed)
+		time.sleep(config.redrawSpeed)
 
 def iterate() :
 	global config
 
 	#config.blank = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+	config.colOverlayA.stepTransition()
+	config.colOverlayB.stepTransition()
+	config.fillColorA = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
+	config.fillColorB = tuple(int (a * config.brightness ) for a in config.colOverlayB.currentColor)
+
+
 	if(config.useScrollingBackGround != True): 
-		config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+		#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+		config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
+		
 		config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 	else :
 		drawBackGround()
@@ -208,7 +263,7 @@ def iterate() :
 		drawCarcas()
 		#makeCarcas()
 	
-
+	#colorize(config.fillColorA)
 	config.image = config.workImage
 
 	config.render(config.image, 0,0)

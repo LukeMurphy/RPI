@@ -110,7 +110,7 @@ def makeBackGround(drawRef, n = 1):
 			poly.append((xStart + xDiv, yStart + yDiv + yDiv))
 			#if(n ==2) : color = (100,200,0,255)
 			if(random.random() < config.patternDrawProb) :
-				drawRef.polygon(poly, fill = config.bgForeGroundColor, outline = (15,15,15))
+				drawRef.polygon(poly, fill = config.bgForeGroundColor) #outline = (15,15,15)
 			xStart += 2 * xDiv
 		xStart = 0
 		yStart += 2 * yDiv
@@ -140,7 +140,7 @@ def drawCarcas():
 	config.imageLayerTempDraw = ImageDraw.Draw(config.imageLayerTemp)
 
 	## Draw the figure
-	config.imageLayerTempDraw.polygon(polyToUse, fill = fills[0], outline = (15,15,15))
+	config.imageLayerTempDraw.polygon(polyToUse, fill = fills[0]) #outline = (15,15,15)
 
 	## resize to fit
 	config.imageLayerTemp = config.imageLayerTemp.resize((config.canvasWidth, config.canvasHeight))

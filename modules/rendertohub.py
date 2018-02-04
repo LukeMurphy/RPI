@@ -7,6 +7,7 @@ from PIL import ImageFilter, ImageChops, ImageEnhance
 import random
 import numpy, time
 import gc, os
+import threading
 
 from modules.filters import *
 
@@ -66,7 +67,7 @@ def setUp():
 	#config.cnvs.update()
 	#config.cnvs.update_idletasks()
 
-	root.after(1000, startWork)
+	root.after(100, startWork)
 	root.call('wm', 'attributes', '.', '-topmost', '1')
 	root.mainloop()
 
@@ -81,25 +82,20 @@ def on_closing():
 def startWork(*args) :
 	global config, work, root, counter
 
-	work.runWork()
-	'''
+	### Putting the animation on its own thread
+	### Still throws and error when manually closed though...
 
-	while True :
-		try :
-			work.runWork()
+	try:
+		t  = threading.Thread.__init__(work.runWork())
+		t.start()
+	except TclError, details:
+		print(details)
+		pass
+		exit()
 
-			count++1
-			print(count)
-			if (count > 1000) :
-				count = 0
-				root.quit()
-		except Exception,e :
-			print(str(e))
-			#work.runWork(False)
-			root.quit()
-			sys.exit()
-			root.destroy()
-	'''
+	#work.runWork()
+	
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

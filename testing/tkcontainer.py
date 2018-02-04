@@ -29,13 +29,14 @@ class App():
 	def __init__(self):
 		self.root = Tk()
 		#self.root.overrideredirect(1)
-		
+		'''
 		self.frame = Frame(self.root, width=128, height=128,
 						   borderwidth=0, padx=0, pady=0)
 		self.frame.pack_propagate(False)
 		self.frame.pack()
 		
-		''''''
+		'''
+
 		Button(self.root, text="Quit",command=self.root.quit).pack()
 
 		
@@ -48,7 +49,7 @@ class App():
 		self.cnvs.update()
 
 		
-		self.root.after(0, self.startAnimation)
+		self.root.after(100, self.startAnimation)
 		self.root.mainloop()     
 
 	def render(self, imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False) :
@@ -60,12 +61,20 @@ class App():
 
 	def startAnimation(self) :
 		try :
-			while True :
-				self.animation()
+
+			t  = threading.Thread.__init__(self.imageAnimation)
+			t.start()
+			#self.imageAnimation()
 		except TclError, details:
 			print(details)
 			pass
 			exit()
+
+	def imageAnimation(self) :
+		time.sleep(.02)
+		self.imageAnimation()		
+		pass
+
 
 	def animation(self) :
 		r = 200
@@ -84,12 +93,12 @@ class App():
 			#cnvs.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
 			self.cnvs.create_rectangle(self.xPos ,self.yPos, self.xPos+30, self.yPos+29, fill="red", outline="#00FF00")
 
-			self.cnvs.update_idletasks()
+			#self.cnvs.update_idletasks()
 
-			gc.collect()
+			#gc.collect()
 			time.sleep(.02)
 		#self.run()
 
 
 app = App()
-app.root.mainloop()
+#app.root.mainloop()

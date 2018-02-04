@@ -179,7 +179,7 @@ def drawBackGround():
 
 	# Color overlay on b/w PNG sprite
 	clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255))
-	clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=clr)
+	clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=config.fillColorA)
 	try :
 		config.workImage = ImageChops.multiply(clrBlock, config.workImage)
 

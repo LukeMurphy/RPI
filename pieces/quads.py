@@ -202,7 +202,7 @@ def iterate() :
 		drawCarcas()
 		#makeCarcas()
 
-	drawBackGround()
+	#drawBackGround()
 
 	config.image = config.workImage
 

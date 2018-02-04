@@ -94,7 +94,7 @@ def init() :
 	### This is the speed range of transitions in color
 	### Higher numbers means more possible steps so slower
 	### transitions - 1,10 very blinky, 10,200 very slow
-	config.colOverlayA.randomRange = (1.0,20.0)
+	config.colOverlayA.randomRange = (10.0,100.0)
 	config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
 	config.colOverlayA.colorB = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
 

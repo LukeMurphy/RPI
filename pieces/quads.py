@@ -174,6 +174,19 @@ def drawBackGround():
 
 	config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 
+	clrBlock = Image.new(config.workImage.mode, (config.canvasWidth, config.canvasHeight))
+	clrBlockDraw = ImageDraw.Draw(clrBlock)
+
+	# Color overlay on b/w PNG sprite
+	clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255))
+	clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=clr)
+	try :
+		config.workImage = ImageChops.multiply(clrBlock, config.workImage)
+
+	except Exception as e: 
+		print(e, clrBlock.mode, config.renderImageFull.mode)
+		pass
+
 	config.bgYpos += config.bgYStepSpeed
 	config.bgXpos += config.bgXStepSpeed
 	lead = config.leadBG
@@ -193,35 +206,6 @@ def drawBackGround():
 		config.followBG = lead
 		config.bgYpos = 0
 
-def colorize(clr = (250,0,250), recolorize = False) :
-
-		#Colorize via overlay etc
-		layer = config.renderImageFull
-		layer = config.imageLayer
-		layer = config.workImage
-
-		w = layer.size[0]
-		h = layer.size[1]
-
-
-		clrBlock = Image.new(layer.mode, (w, h))
-		clrBlockDraw = ImageDraw.Draw(clrBlock)
-
-		# Color overlay on b/w PNG sprite
-		clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
-		clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=clr)
-
-		layer = layer.paste(clrBlock,(0,0))
-
-		'''
-		try :
-			layer = ImageChops.multiply(clrBlock, layer)
-
-		except Exception as e: 
-			print(e, clrBlock.mode, config.renderImageFull.mode)
-			exit()
-			pass
-		'''
 
 def callBack() :
 	global config

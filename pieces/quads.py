@@ -38,6 +38,7 @@ def init() :
 	config.bgG = int(workConfig.get("animals", 'bgG')) 
 	config.bgB = int(workConfig.get("animals", 'bgB'))
 
+	config.useScrollingBackGround = workConfig.getboolean("animals", 'useScrollingBackGround')
 	config.patternRows = int(workConfig.get("animals", 'patternRows'))
 	config.patternCols = int(workConfig.get("animals", 'patternCols'))
 	config.patternRowsOffset = int(workConfig.get("animals", 'patternRowsOffset'))
@@ -191,7 +192,12 @@ def runWork():
 def iterate() :
 	global config
 
-	config.blank = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	#config.blank = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	if(config.useScrollingBackGround != True): 
+		config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+		config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
+	else :
+		drawBackGround()
 	
 	if(random.random() < .5) :
 		config.pixSortYOffset = config.base_pixSortYOffset
@@ -201,8 +207,7 @@ def iterate() :
 		config.pixSortYOffset = config.carcas_pixSortYOffset
 		drawCarcas()
 		#makeCarcas()
-
-	#drawBackGround()
+	
 
 	config.image = config.workImage
 

@@ -154,7 +154,7 @@ def drawBackGround():
 	if config.applyColorOverlayToFullImage == True :
 		config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 
-	if(config.useColorOverlayTransitions == True) :
+	if(config.useColorOverlayTransitions == True and config.applyColorOverlayToFullImage == False) :
 		# Color overlay on b/w PNG sprite
 		#clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255))
 		config.clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=config.fillColorA)
@@ -280,6 +280,7 @@ def iterate() :
 	else :
 		drawBackGround()
 	
+
 	#drawCarcas()
 
 	if(random.random() < .5) :
@@ -289,12 +290,20 @@ def iterate() :
 		config.pixSortYOffset = config.carcas_pixSortYOffset
 		makeblockanimals.makeCarcas()
 
-	if config.applyColorOverlayToFullImage == False :
+	if(config.useColorOverlayTransitions == True and config.applyColorOverlayToFullImage == True) :
+		# Color overlay on b/w PNG sprite
+		#clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255))
+		config.clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=config.fillColorA)
+		try :
+			config.workImage = ImageChops.multiply(config.clrBlock, config.workImage)
+
+		except Exception as e: 
+			print(e, clrBlock.mode, config.renderImageFull.mode)
+			pass
+	else :
 		config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 
-	
 
-	
 	config.render(config.workImage, 0,0)
 
 def main(run = True) :

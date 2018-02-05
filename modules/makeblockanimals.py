@@ -13,8 +13,8 @@ def makeCarcas():
 
 	if random.random() < config.redrawProbablility :
 		
-		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
-		config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
+		config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
 		config.pixSortXOffset = config.pixSortXOffsetVal 
 
 		imgWidth = config.canvasWidth
@@ -219,7 +219,7 @@ def makeAnimal():
 
 		#renderImage = Image.new("RGBA", (imgWidth, imgHeight))
 
-		drawBackGround()
+		#drawBackGround()
 
 		# Choose seam x point  -- ideally about 1/3 from left
 		xVariance = config.xVariance

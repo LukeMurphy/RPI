@@ -38,6 +38,7 @@ def init() :
 	config.bgG = int(workConfig.get("animals", 'bgG')) 
 	config.bgB = int(workConfig.get("animals", 'bgB'))
 
+	config.useColorOverlayTransitions = workConfig.getboolean("animals", 'useColorOverlayTransitions')
 	config.useScrollingBackGround = workConfig.getboolean("animals", 'useScrollingBackGround')
 	config.patternRows = int(workConfig.get("animals", 'patternRows'))
 	config.patternCols = int(workConfig.get("animals", 'patternCols'))
@@ -83,6 +84,10 @@ def init() :
 	makeBackGround(config.bg2Draw, 2)
 	config.leadBG = config.bg1
 	config.followBG = config.bg2
+	config.leadBGDraw = config.bg1Draw
+	config.followBGDraw = config.bg2Draw
+
+
 
 	config.bgImage.paste(config.bg1)
 	config.bgImage.paste(config.bg2,(0,config.canvasHeight))
@@ -112,6 +117,8 @@ def makeBackGround(drawRef, n = 1):
 
 	xStart = 0
 	yStart = 0
+
+	drawRef.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.bgBackGroundColor)
 
 	## Chevron pattern
 	for r in range (0, rows) : 
@@ -174,36 +181,45 @@ def drawBackGround():
 
 	config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 
-	clrBlock = Image.new(config.workImage.mode, (config.canvasWidth, config.canvasHeight))
-	clrBlockDraw = ImageDraw.Draw(clrBlock)
+	if(config.useColorOverlayTransitions == True) :
+		clrBlock = Image.new(config.workImage.mode, (config.canvasWidth, config.canvasHeight))
+		clrBlockDraw = ImageDraw.Draw(clrBlock)
 
-	# Color overlay on b/w PNG sprite
-	clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255))
-	clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=config.fillColorA)
-	try :
-		config.workImage = ImageChops.multiply(clrBlock, config.workImage)
+		# Color overlay on b/w PNG sprite
+		clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255))
+		clrBlockDraw.rectangle(((0,0,config.canvasWidth,config.canvasHeight)), fill=config.fillColorA)
+		try :
+			config.workImage = ImageChops.multiply(clrBlock, config.workImage)
 
-	except Exception as e: 
-		print(e, clrBlock.mode, config.renderImageFull.mode)
-		pass
+		except Exception as e: 
+			print(e, clrBlock.mode, config.renderImageFull.mode)
+			pass
 
 	config.bgYpos += config.bgYStepSpeed
 	config.bgXpos += config.bgXStepSpeed
 	lead = config.leadBG
+	leadBGDraw = config.leadBGDraw
+	swap = False
 
 	if (config.bgXpos > config.canvasWidth) : 
 		config.bgXpos = -config.canvasWidth
 
 	if (config.bgYpos > 1 * config.canvasHeight and config.bgYStepSpeed > 0) : 
 		config.workImage.paste(config.leadBG, (config.bgXpos, -1*config.canvasHeight))
-		config.leadBG = config.followBG
-		config.followBG = lead
-		config.bgYpos = 0
+		makeBackGround(leadBGDraw)
+		swap = True
 
 	if (config.bgYpos < -1 * config.canvasHeight and config.bgYStepSpeed < 0) : 
 		config.workImage.paste(config.leadBG, (config.bgXpos, 1*config.canvasHeight))
+		makeBackGround(leadBGDraw)
+		swap = True
+
+	if(swap == True):
 		config.leadBG = config.followBG
 		config.followBG = lead
+
+		config.leadBGDraw = config.followBGDraw
+		config.followBGDraw = leadBGDraw
 		config.bgYpos = 0
 
 
@@ -230,10 +246,11 @@ def iterate() :
 	config.fillColorB = tuple(int (a * config.brightness ) for a in config.colOverlayB.currentColor)
 
 
-	if(config.useScrollingBackGround != True): 
-		#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
-		config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
-		
+	if(config.useScrollingBackGround != True):
+		if(config.useColorOverlayTransitions == True) :
+			config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
+		else :
+			config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
 		config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 	else :
 		drawBackGround()

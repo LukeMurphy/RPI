@@ -44,7 +44,6 @@ class Fludd :
 	varianceMode = "independent"
 	prisimBrightness = .5
 
-
 	def __init__(self, config, i):
 		print ("init Fludd", i)
 		
@@ -60,10 +59,8 @@ class Fludd :
 		self.draw  = ImageDraw.Draw(self.tempImage)
 		#print(self.tempImage)
 
-
 	def changeAction(self):
 		return False
-
 
 	def reDraw(self) :
 		var = self.var
@@ -79,14 +76,14 @@ class Fludd :
 			light = 0
 
 
-		self.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0))
+		self.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0), outline = None)
 		#config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
 		if(self.borderModel == "prism"):
 			outerBorder = colorutils.randomColor(self.prisimBrightness)
 		else :
 			outerBorder = (light,light,light)
 
-		self.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = outerBorder)
+		self.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = outerBorder, outline = None)
 
 		if(self.varianceMode == "independent") : 
 			xPos1 = random.uniform(-var/2,var)
@@ -101,7 +98,7 @@ class Fludd :
 			xPos4 = random.uniform(-var/2,var)
 			yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
 
-			self.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
+			self.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) , outline = None)
 
 		elif(self.varianceMode == "symmetrical"):
 			svar = random.uniform(0, var)
@@ -109,7 +106,7 @@ class Fludd :
 			symBoxHeight = self.boxHeight - svar
 			xy0 = svar
 			
-			self.draw.rectangle((xy0,xy0,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) )
+			self.draw.rectangle((xy0,xy0,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) , outline = None)
 	
 		elif(self.varianceMode == "asymmetrical"):
 			svarw = random.uniform(0, var)
@@ -118,13 +115,12 @@ class Fludd :
 			symBoxHeight = self.boxHeight - svarh
 			xPos1 = (self.boxMax - symBoxWidth)
 			yPos1 = (self.boxHeight  - symBoxHeight)
-			self.draw.rectangle((xPos1,yPos1,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) )
+			self.draw.rectangle((xPos1,yPos1,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) , outline = None)
 
 		if(random.random() < self.nothingChangeProbability) : self.nothingLevel = random.uniform(0,255)
 
 		# Finally composite full image
 		#config.image.paste(self.mainImage, (numXPos, numYPos), self.scrollImage)
-
 
 	def change(self) :
 		if (self.varianceMode == "independent") :
@@ -142,7 +138,6 @@ class Fludd :
 
 	def done(self): 
 		return True
-
 
 def drawElement() :
 	global config
@@ -223,6 +218,7 @@ def iterate() :
 def main(run = True) :
 	global config
 	global fludds
+	fludds = []
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 
@@ -230,11 +226,13 @@ def main(run = True) :
 	config.colsOfSquares = int(workConfig.get("fludd", 'colsOfSquares'))
 	config.numberOfSquares = config.rowsOfSquares * config.colsOfSquares
 
-	config.boxWidth = config.screenWidth / config.colsOfSquares
-	config.boxHeight = config.screenHeight / config.rowsOfSquares
+	config.boxWidth = int(round(config.screenWidth / config.colsOfSquares))
+	config.boxHeight = int(round(config.screenHeight / config.rowsOfSquares))
 
+	print(config.boxWidth, config.boxHeight)
 
 	squareCount  = 0
+
 	for  r in range (0,config.rowsOfSquares) :
 		for  c in range (0,config.colsOfSquares) :
 			fluddSquare = Fludd(config, squareCount)

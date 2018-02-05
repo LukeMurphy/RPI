@@ -8,12 +8,16 @@ from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
 from modules import colorutils, coloroverlay
 global config
+
 def makeCarcas():
 	global config
 
 	if random.random() < config.redrawProbablility :
 		
 		config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+
+		#config.fillColorA = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
+		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
 		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
 		config.pixSortXOffset = config.pixSortXOffsetVal 
 
@@ -195,7 +199,12 @@ def makeAnimal():
 
 
 	if random.random() < config.redrawProbablility :
-		config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
+		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
+		config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+
+		#config.fillColorA = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
+		#config.imageLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
+
 		config.pixSortXOffset = config.pixSortXOffsetVal 
 
 		imgWidth = config.canvasWidth

@@ -9,7 +9,7 @@ import threading
 import resource
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
-from modules import colorutils, coloroverlay
+from modules import colorutils, coloroverlay, makeblockanimals
 
 global thrd, config
 
@@ -110,6 +110,10 @@ def init() :
 	config.colOverlayA.randomRange = (10.0,100.0)
 	config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
 
+	makeblockanimals.config = config
+	makeblockanimals.drawBackGround = drawBackGround
+	makeblockanimals.ScaleRotateTranslate = ScaleRotateTranslate
+
 def makeBackGround(drawRef, n = 1):
 	rows = config.patternRows * 2
 	cols = config.patternCols * 2
@@ -208,7 +212,8 @@ def drawCarcas():
 	polyToUse = [n + random.uniform(-config.pigglyWiggleToUse,config.pigglyWiggleToUse) for n in poly]
 
 	## Clear the drawing
-	config.imageLayerTemp = Image.new("RGBA", (config.canvasWidth * 3, int(config.canvasHeight * 3.4) ))
+	#config.imageLayerTemp = Image.new("RGBA", (config.canvasWidth * 3, int(config.canvasHeight * 3.4) ))
+	config.imageLayerTemp = Image.new("RGBA", (1000, 1060 ))
 	config.imageLayerTempDraw = ImageDraw.Draw(config.imageLayerTemp)
 
 	## Draw the figure
@@ -219,7 +224,7 @@ def drawCarcas():
 
 	## paste to the image layer
 	config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
-	config.imageLayer.paste(config.imageLayerTemp, (90,-5), config.imageLayerTemp)
+	config.imageLayer.paste(config.imageLayerTemp, (config.xOffset,config.yOffset), config.imageLayerTemp)
 
 def changePigglyWiggle():
 	config.pigglyWiggleToUse = config.pigglyWiggle + int(random.uniform(0, config.pigglyWiggleVariance))
@@ -275,18 +280,21 @@ def iterate() :
 	else :
 		drawBackGround()
 	
-	drawCarcas()
+	#drawCarcas()
+
+	if(random.random() < .5) :
+		config.pixSortYOffset = config.base_pixSortYOffset
+		makeblockanimals.makeAnimal()
+	else :
+		config.pixSortYOffset = config.carcas_pixSortYOffset
+		makeblockanimals.makeCarcas()
+
 	if config.applyColorOverlayToFullImage == False :
 		config.workImage.paste(config.imageLayer, (0,0), config.imageLayer)
 
-	'''
-	if(random.random() < .5) :
-		config.pixSortYOffset = config.base_pixSortYOffset
-		makeAnimal()
-	else :
-		config.pixSortYOffset = config.carcas_pixSortYOffset
-		makeCarcas()
-	'''
+	
+
+	
 	config.render(config.workImage, 0,0)
 
 def main(run = True) :

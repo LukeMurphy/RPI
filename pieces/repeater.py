@@ -54,6 +54,22 @@ def main(run = True) :
 	config.noTrails  = (workConfig.getboolean("repeater", 'noTrails'))
 	config.imageList  = (workConfig.get("repeater", 'imageList'))
 
+	try :
+		config.colorMode = (workConfig.get("repeater", 'colorMode'))
+	except Exception as e: 
+		print (str(e))
+		config.colorMode = "randomized"
+
+
+
+	try :
+		config.resizeMin  = float(workConfig.get("repeater", 'resizeMin'))
+		config.resizeMax  = float(workConfig.get("repeater", 'resizeMax'))
+	except Exception as e: 
+		print (str(e))
+		config.resizeMin = .1
+		config.resizeMax = 1.2
+
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
@@ -87,9 +103,14 @@ def main(run = True) :
 			imgLoader.useBlink = config.useBlink
 			imgLoader.brightnessFactor = config.brightness * random.random()
 			imgLoader.config = config
-			imgLoader.colorMode = "random" 
-			if(random.random() < .5) :
-				imgLoader.colorMode = "colorRGB" 
+			if(config.colorMode == "randomized") :
+				imgLoader.colorMode = "random" 
+				if(random.random() < .5) :
+					imgLoader.colorMode = "colorRGB" 
+			else :
+				imgLoader.colorMode = config.colorMode
+			imgLoader.resizeMin = config.resizeMin
+			imgLoader.resizeMax = config.resizeMax
 			#colorRGB" #colorWheel #random #colorRGB
 			imgLoader.colorModeDirectional = colorModeDirectional
 			#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
@@ -132,7 +153,7 @@ def iterate( n = 0) :
 	if(random.random() > .9985) : shuffle(blocks)
 	if(random.random() > .9985) : colorModeDirectional = False if colorModeDirectional == True else True
 
-	if(config.noTrails) : redrawBackGround()
+	if(config.noTrails == True) : redrawBackGround()
 
 	for n in range (0, len(blocks)) :
 		block = blocks[n]

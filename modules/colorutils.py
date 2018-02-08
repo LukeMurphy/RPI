@@ -21,7 +21,15 @@ sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), k
 
 brightness = 1
 
-
+def getRedShiftedColors(brtns=1) :
+	global brightness, sunset, sorted_sunset
+	if(brtns == 1) : brtns = brightness
+	r = int((random.uniform(0,255)) * brtns)
+	g = int((random.uniform(0,255)) * brtns)
+	b = int((random.uniform(0,255)) * brtns)
+	rRange = 255 - r
+	r = int(r + random.uniform(0, rRange))
+	return (r,g,b)
 
 def getSunsetColors(brtns=1) :
 	global brightness, sunset, sorted_sunset

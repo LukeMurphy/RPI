@@ -78,9 +78,17 @@ def main(run = True) :
 		config.jitterResetRate = .25
 	config.useBlink  = (workConfig.getboolean("plane", 'useBlink'))
 	config.noTrails  = (workConfig.getboolean("plane", 'noTrails'))
-	config.imageList  = (workConfig.get("repeater", 'imageList'))
+	config.imageList  = (workConfig.get("plane", 'imageList'))
 	config.colorMode  = (workConfig.get("plane", 'colorMode'))
 	config.randomColorMode  = (workConfig.getboolean("plane", 'randomColorMode'))
+
+	try :
+		config.resizeMin  = float(workConfig.get("plane", 'resizeMin'))
+		config.resizeMax  = float(workConfig.get("plane", 'resizeMax'))
+	except Exception as e: 
+		print (str(e))
+		config.resizeMin = .1
+		config.resizeMax = 1.2
 
 
 	#for attr, value in config.__dict__.iteritems():print (attr, value)
@@ -137,6 +145,8 @@ def main(run = True) :
 			imgLoader.config = config
 			imgLoader.colorMode = config.colorMode #"colorRGB" #colorWheel #random #colorRGB
 			imgLoader.colorModeDirectional = colorModeDirectional
+			imgLoader.resizeMin = config.resizeMin
+			imgLoader.resizeMax = config.resizeMax
 			#imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
 			imgLoader.make(path + imageList, 1 * config.scalingFactor * 2 , 0, True, True, True, True)

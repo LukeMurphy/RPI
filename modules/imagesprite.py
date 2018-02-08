@@ -64,11 +64,16 @@ class ImageSprite :
 	
 	processImage = True
 	resizeImage = True
+	resizeMin = 1.1
+	resizeMax = 1.2
 	randomizeColor = False
 	randomizeDirection = True
 	colorMode = "random" 
 	colorModeDirectional = True
 	yOffsetChange = True
+
+	resizeMin = .1
+	resizeMax = 1.2
 
 	lastPictureIndex = 0
 	debug = False
@@ -165,7 +170,8 @@ class ImageSprite :
 
 		if(self.processImage) :
 			if(self.resizeImage) :
-				change = random.uniform(.1,1.2) * self.scalingFactor
+				#change = random.uniform(.1,1.2) * self.scalingFactor
+				change = random.uniform(self.resizeMin,self.resizeMax) * self.scalingFactor
 				newSizeX = change * self.image.size[0]
 				newSizeY = change * self.image.size[1]
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
@@ -197,7 +203,9 @@ class ImageSprite :
 							clrIndex  = int(random.uniform(0,3))
 					clr = self.clrUtils.rgbWheel[clrIndex]
 
-
+				# Specific palette
+				if(self.colorMode == "getRedShiftedColors") : 
+					clr = self.clrUtils.getRedShiftedColors(self.config.brightness)
 				# Any RGB color
 				if(self.colorMode == "random") : 
 					clr = self.clrUtils.randomColor(brt)

@@ -26,10 +26,10 @@ workconfig = ConfigParser.ConfigParser()
 import argparse
 
 parser = argparse.ArgumentParser(description='Process')
-parser.add_argument('-mname', type=str, nargs='+', help='machine name (optional)')
-parser.add_argument('-path', type=str, nargs='+', help='directory (optional)')
-parser.add_argument('-cfg', type=str, nargs='+',  help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater, will add the path and .cfg')
-parser.add_argument('-brightnessOverride', type=int, nargs='+',  help='brightness param to override the config value (optional)')
+parser.add_argument('-mname', type=str, default= "local", help='machine name (optional)')
+parser.add_argument('-path', type=str, default = "./", help='directory (optional)')
+parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater, will add the path and .cfg')
+parser.add_argument('-brightnessOverride', type=int,  help='brightness param to override the config value (optional)')
 args = parser.parse_args()
 
 print(args)
@@ -74,17 +74,10 @@ def loadFromArguments(reloading=False):
 				config.path = args[2]
 				argument = args[3]
 				'''
-				if args.mname == None:
-					config.MID = 'local'
-				else:
-					config.MID = args.mname[0]
 
-				if args.path == None:
-					config.path = "./"
-				else:
-					config.path = args.path[0]
-
-				argument = config.path + "configs/" + args.cfg[0] + ".cfg"
+				config.MID = args.mname
+				config.path = args.path
+				argument = config.path + "configs/" + args.cfg + ".cfg"
 
 				workconfig.read(argument)
 
@@ -99,7 +92,7 @@ def loadFromArguments(reloading=False):
 
 				## Optional 4th argument to override the brightness set in the config
 				if(args.brightnessOverride != None):
-					brightnessOverride = args.brightnessOverride[0]
+					brightnessOverride = args.brightnessOverride
 					config.brightness = float(float(brightnessOverride)/100)
 					config.brightnessOverride = float(float(brightnessOverride)/100)
 

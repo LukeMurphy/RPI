@@ -27,9 +27,9 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Process')
 parser.add_argument('-mname', type=str, nargs='+', help='machine name (optional)')
-parser.add_argument('-path', type=str, nargs='+', help='directory')
-parser.add_argument('-cfg', type=str, nargs='+',  help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater')
-parser.add_argument('-brightnessOverride', type=int, nargs='+',  help='brightness param to override the config value')
+parser.add_argument('-path', type=str, nargs='+', help='directory (optional)')
+parser.add_argument('-cfg', type=str, nargs='+',  help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater, will add the path and .cfg')
+parser.add_argument('-brightnessOverride', type=int, nargs='+',  help='brightness param to override the config value (optional)')
 args = parser.parse_args()
 
 print(args)

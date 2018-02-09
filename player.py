@@ -23,6 +23,18 @@ threads = []
 
 workconfig = ConfigParser.ConfigParser()
 
+import argparse
+
+parser = argparse.ArgumentParser(description='Process')
+parser.add_argument('-mname', type=str, nargs='+', help='machine name (optional)')
+parser.add_argument('-path', type=str, nargs='+', help='directory')
+parser.add_argument('-cfg', type=str, nargs='+',  help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater')
+parser.add_argument('-brightnessOverride', type=int, nargs='+',  help='brightness param to override the config value')
+args = parser.parse_args()
+
+print(args)
+
+
 ## Create a blank dummy object container for now
 #config = type('', (object,), {})()
 
@@ -46,19 +58,33 @@ def loadFromArguments(reloading=False):
 			#		name-of-machine
 			#       the local path
 			#		the config file to load
-
+			'''
 			args = sys.argv
 			print("Arguments passed to player.py:")
 			print(args)
-
+			'''
 			config = configuration
 
 			# Load the default work
 
-			if(len(args) > 1):
+			if(args.cfg != None):
+
+				'''
 				config.MID = args[1]
 				config.path = args[2]
 				argument = args[3]
+				'''
+				if args.mname == None:
+					config.MID = 'local'
+				else:
+					config.MID = args.mname[0]
+
+				if args.path == None:
+					config.path = "./"
+				else:
+					config.path = args.path[0]
+
+				argument = config.path + "configs/" + args.cfg[0] + ".cfg"
 
 				workconfig.read(argument)
 
@@ -72,8 +98,8 @@ def loadFromArguments(reloading=False):
 				config.brightnessOverride = None
 
 				## Optional 4th argument to override the brightness set in the config
-				if(len(args) > 4):
-					brightnessOverride = args[4]
+				if(args.brightnessOverride != None):
+					brightnessOverride = args.brightnessOverride[0]
 					config.brightness = float(float(brightnessOverride)/100)
 					config.brightnessOverride = float(float(brightnessOverride)/100)
 

@@ -16,7 +16,7 @@ v = [0,0]
 angle = math.pi/2
 currentAngle = 0
 runRun = True
-d = 3
+d = 10
 
 class Lsys :
 	
@@ -32,16 +32,19 @@ class Lsys :
 	PatternSetSelected = "F-F+F+F-F"
 	PatternSetSelected2 = ""
 	
-	AxiomSelected = "F"
-	PatternSetSelected = "F-[F+F]"
+	AxiomSelected = "F-F-FF-FF-FFF-FFF-FFFF-FFFF-FFFFF-FFFFF-FFFFFF-FFFFFF-"
+	PatternSetSelected = "F"
 	PatternSetSelected2 = ""
 	
+	AxiomSelected = "F-F-FF-FF-FFF-FFF-FFFF-FFFF-FFFFF-FFFFF-FFFFFF-FFFFFF-"
+	PatternSetSelected = "F"
+
 
 	useRandom = True
 	foliage = False
-	incrRange = 6
-	incrEnd = 6
-	angle = 20
+	incrRange = 20
+	incrEnd = 20
+	angle = 90
 	d = 80
 	dFactor = 1
 	dFactorMultiplier = .8

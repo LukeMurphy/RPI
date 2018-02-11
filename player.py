@@ -25,6 +25,13 @@ workconfig = ConfigParser.ConfigParser()
 
 import argparse
 
+'''
+example:
+
+python player.py -cfg p4-6x5/stroop2
+python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
+'''
+
 parser = argparse.ArgumentParser(description='Process')
 parser.add_argument('-mname', type=str, default= "local", help='machine name (optional)')
 parser.add_argument('-path', type=str, default = "./", help='directory (optional)')

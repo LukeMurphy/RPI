@@ -84,7 +84,10 @@ def loadFromArguments(reloading=False):
 
 				config.MID = args.mname
 				config.path = args.path
-				argument = config.path + "configs/" + args.cfg + ".cfg"
+
+				## Older configs may have the .cfg still on the arg
+				args.cfg.split(".cfg")
+				argument = config.path + "configs/" + args.cfg[0] + ".cfg"
 
 				workconfig.read(argument)
 

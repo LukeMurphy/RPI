@@ -39,6 +39,7 @@ then
 	
     ps -ef | pgrep python | xargs kill -9;
 
+
     if test $remotevalue = "fludd"
     then
         config="fludd.cfg"
@@ -89,7 +90,7 @@ then
         config="repeater.cfg"
     fi
 
-execString=$path"player.py "$machine" "$path" "$path$configGroup$config" "$remotevalueControl
+execString=$path"player.py -mname "$machine" -path "$path" -cfg "$path$configGroup$config" "$remotevalueControl
 #echo $execString
 DISPLAY=:0 python $execString&
 fi

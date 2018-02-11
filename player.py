@@ -35,7 +35,7 @@ python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
 parser = argparse.ArgumentParser(description='Process')
 parser.add_argument('-mname', type=str, default= "local", help='machine name (optional)')
 parser.add_argument('-path', type=str, default = "./", help='directory (optional)')
-parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater, will add the path and .cfg')
+parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
 parser.add_argument('-brightnessOverride', type=int,  help='brightness param to override the config value (optional)')
 args = parser.parse_args()
 
@@ -85,9 +85,7 @@ def loadFromArguments(reloading=False):
 				config.MID = args.mname
 				config.path = args.path
 
-				## Older configs may have the .cfg still on the arg
-				args.cfg.split(".cfg")
-				argument = config.path + "configs/" + args.cfg[0] + ".cfg"
+				argument = config.path + "/configs/" + args.cfg #+ ".cfg"
 
 				workconfig.read(argument)
 

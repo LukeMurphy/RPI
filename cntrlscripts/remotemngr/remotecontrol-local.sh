@@ -1,7 +1,7 @@
 #!/bin/sh
 # Changes based on machine setup
 path="/Users/lamshell/Documents/Dev/RPI/"
-configGroup="configs/p4-4x4/"
+configGroup="/p4-4x4/"
 machine="local"
 pieceFileName="http://lukelab/projects/rpi-controls/local-status.cfg"
 brightnessFile="http://lukelab/projects/rpi-controls/local-controlstatus.cfg"
@@ -10,3 +10,4 @@ brightnessFile="http://lukelab/projects/rpi-controls/local-controlstatus.cfg"
 DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 . "$DIR/main.sh"
+#. $path"/cntrlscripts/remotemngr/main.sh"

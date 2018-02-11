@@ -90,7 +90,7 @@ then
         config="repeater.cfg"
     fi
 
-execString=$path"player.py -mname "$machine" -path "$path" -cfg "$path$configGroup$config" --brightnessOverride "$remotevalueControl
+execString=$path"player.py -mname "$machine" -path "$path" -cfg "$path$configGroup$config" -brightnessOverride "$remotevalueControl
 #echo $execString
 DISPLAY=:0 python $execString&
 fi

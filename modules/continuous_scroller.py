@@ -47,11 +47,13 @@ class ScrollObject :
 		self.leadImage = self.bg1
 		self.followImage = self.bg2
 
+		'''
 		self.bg1Draw.rectangle((0,0,100,50), fill=(0,200,0))
 		self.bg1Draw.rectangle((self.canvasWidth - 20,0,self.canvasWidth,50), fill=(0,200,200))
 
 		self.bg2Draw.rectangle((0,0,100,50), fill=(0,00,200))
 		self.bg2Draw.rectangle((self.canvasWidth - 30,0,self.canvasWidth,50), fill=(200,20,200))
+		'''
 
 		self.canvas.paste(self.bg1)
 		self.canvas.paste(self.bg2,(self.canvasWidth, 0))

@@ -33,6 +33,8 @@ def init() :
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
 	config.scroller1 = continuous_scroller.ScrollObject()
+	makeArrows(config.scroller1.bg1Draw)
+
 
 	config.scroller2 = continuous_scroller.ScrollObject()
 	config.scroller2.xSpeed = -4
@@ -40,7 +42,6 @@ def init() :
 
 def makeArrows(drawRef, n =1) :
 
-	drawRef = config.canvasImageDraw
 	rows = config.patternRows * 2
 	cols = config.patternCols * 2
 

@@ -27,30 +27,33 @@ class ScrollObject :
 	xOffset = 0
 	yOffset = 0
 	bgBackGroundColor = (200,0,0)
+	callBack = None
 
 
 
 	def __init__(self, direction="right-left") :
+		print("Scroller Initiated")
 
+
+	def setUp(self):
 		self.canvas = Image.new("RGBA", (self.canvasWidth, self.canvasHeight))
 		self.canvasDraw = ImageDraw.Draw(self.canvas)
 
 		self.bg1 = Image.new("RGBA", (self.canvasWidth, self.canvasHeight))
 		self.bg1Draw = ImageDraw.Draw(self.bg1)
-		#self.bg1Draw.rectangle((0,0,self.canvasWidth, self.canvasHeight), fill = self.bgBackGroundColor)
 
-		
 		self.bg2 = Image.new("RGBA", (self.canvasWidth, self.canvasHeight))
 		self.bg2Draw = ImageDraw.Draw(self.bg2)
-		#self.bg2Draw.rectangle((0,0,self.canvasWidth, self.canvasHeight), fill = self.bgBackGroundColor)
 
 		self.leadImage = self.bg1
 		self.followImage = self.bg2
 
 		'''
+		#self.bg1Draw.rectangle((0,0,self.canvasWidth, self.canvasHeight), fill = self.bgBackGroundColor)
 		self.bg1Draw.rectangle((0,0,100,50), fill=(0,200,0))
 		self.bg1Draw.rectangle((self.canvasWidth - 20,0,self.canvasWidth,50), fill=(0,200,200))
 
+		#self.bg2Draw.rectangle((0,0,self.canvasWidth, self.canvasHeight), fill = self.bgBackGroundColor)
 		self.bg2Draw.rectangle((0,0,100,50), fill=(0,00,200))
 		self.bg2Draw.rectangle((self.canvasWidth - 30,0,self.canvasWidth,50), fill=(200,20,200))
 		'''
@@ -59,18 +62,15 @@ class ScrollObject :
 		self.canvas.paste(self.bg2,(self.canvasWidth, 0))
 
 
-		print("Scroller Initiated")
-
-
 	def scroll(self):
 
 		self.xPos += self.xSpeed
 		self.yPos += self.ySpeed
-		lead = self.leadImage
+		leadImage = self.leadImage
 		swap = False
 
 		## Just right-left scrolling for now ...
-		#self.canvasDraw.rectangle((0,0,self.canvasWidth,self.canvasHeight), fill  = (0,0,0,10))
+		self.canvasDraw.rectangle((0,0,self.canvasWidth,self.canvasHeight), fill  = (0,0,0,10))
 		self.canvas.paste(self.leadImage, (self.xPos ,self.yPos))
 		if (self.xSpeed > 0) : 
 			self.canvas.paste(self.followImage, (self.xPos - self.canvasWidth,self.yPos ))
@@ -79,17 +79,17 @@ class ScrollObject :
 
 		if (self.xPos > 1 * self.canvasWidth and self.xSpeed > 0) : 
 			self.canvas.paste(self.leadImage, ( -1 * self.canvasWidth, self.yPos))
-			#makeBackGround(leadBGDraw)
+			#if self.callBack is not None : self.callBack["func"](imageRef = leadImage, direction = self.callBack["direction"])
 			swap = True
 
 		if (self.xPos < -1 * self.canvasWidth and self.xSpeed < 0) : 
 			self.canvas.paste(self.leadImage, ( 1 * self.canvasWidth, self.yPos))
-			#makeBackGround(leadBGDraw)
 			swap = True
 
 		if(swap == True):
+			if self.callBack is not None : self.callBack["func"](imageRef = leadImage, direction = self.callBack["direction"])
 			self.leadImage = self.followImage
-			self.followImage = lead
+			self.followImage = leadImage
 			self.xPos = 0
 
 		self.render()

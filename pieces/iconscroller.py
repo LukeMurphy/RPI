@@ -51,6 +51,10 @@ def init() :
 	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
 	config.arrowSpeed = int(workConfig.get("scroller", 'arrowSpeed'))
 
+	config.msg1 = workConfig.get("scroller", 'msg1')
+	config.msg2 = workConfig.get("scroller", 'msg2')
+	config.msg3 = workConfig.get("scroller", 'msg3')
+
 	config.bandHeight = int(round(config.windowHeight / config.displayRows) )
 
 	#********* HARD CODING VALUES  ***********************
@@ -94,8 +98,8 @@ def init() :
 	scrollerRef.xSpeed = -config.textSpeed
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	makeMessage(scrollerRef.bg1,"RIGHTY TIGHTY LEFTY LOOSEY", direction)
-	makeMessage(scrollerRef.bg2,"LEFTY LOOSEY RIGHTY TIGHTY ", direction)
+	makeMessage(scrollerRef.bg1,config.msg1, direction)
+	makeMessage(scrollerRef.bg2,config.msg2, direction)
 	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
 	config.scrollArray.append(scrollerRef)
 
@@ -105,14 +109,14 @@ def init() :
 	scrollerRef.xSpeed = config.textSpeed + 1
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	makeMessage(scrollerRef.bg1,"RIGHTY TIGHTY LEFTY LOOSEY", direction)
-	makeMessage(scrollerRef.bg2,"LEFTY LOOSEY RIGHTY TIGHTY ", direction)
+	makeMessage(scrollerRef.bg1,config.msg1, direction)
+	makeMessage(scrollerRef.bg2,config.msg2, direction)
 	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
 	config.scrollArray.append(scrollerRef)
 
 
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
-	messageString = "RIGHTY TIGHTY LEFTY LOOSEY " if random.random() < .5 else "LEFTY LOOSEY RIGHTY TIGHTY "
+	messageString = config.msg1 if random.random() < .5 else config.msg2
 	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
 
 def remakeArrowBlock(imageRef, direction):

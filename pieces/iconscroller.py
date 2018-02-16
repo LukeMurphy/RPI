@@ -50,6 +50,20 @@ def init() :
 	config.patternSpeed = int(workConfig.get("scroller", 'patternSpeed'))
 	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
 	config.arrowSpeed = int(workConfig.get("scroller", 'arrowSpeed'))
+	config.greyLevel = int(workConfig.get("scroller", 'greyLevel'))
+	config.redShift = int(workConfig.get("scroller", 'redShift'))
+
+	config.imageSpeed = int(workConfig.get("scroller", 'imageSpeed'))
+	config.flip = False
+	config.xVariance = int(workConfig.get("scroller", 'xVariance'))
+	config.blockWidth = int(workConfig.get("scroller", 'blockWidth'))
+	config.l1Variance = int(workConfig.get("scroller", 'l1Variance'))
+	config.angleRotationRange = int(workConfig.get("scroller", 'angleRotationRange'))
+	
+	config.bgR = int(workConfig.get("scroller", 'bgR'))
+	config.bgG = int(workConfig.get("scroller", 'bgG'))
+	config.bgB = int(workConfig.get("scroller", 'bgB'))
+	config.fade = int(workConfig.get("scroller", 'fade'))
 
 	config.msg1 = workConfig.get("scroller", 'msg1')
 	config.msg2 = workConfig.get("scroller", 'msg2')
@@ -62,7 +76,10 @@ def init() :
 	config.arrowBgBackGroundColor = (0,0,0,200)
 
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
-	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)	
+
+	config.imageLayer = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
+	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
 
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
@@ -91,6 +108,18 @@ def init() :
 	makeArrows(scrollerRef.bg1Draw, 1)
 	makeArrows(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
+
+	config.scroller5 = continuous_scroller.ScrollObject()
+	scrollerRef = config.scroller5
+	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+	scrollerRef.canvasHeight = int(config.windowHeight)
+	scrollerRef.xSpeed = config.imageSpeed
+	scrollerRef.setUp()
+	direction = 1 if scrollerRef.xSpeed > 0 else -1
+	scrollerRef.callBack = {"func" : remakeImageBlock, "direction" : direction}
+	#makeAnimal(config.imageLayer,scrollerRef.bg1Draw, 1)
+	makeAnimal(config.imageLayer,scrollerRef.bg2Draw, 1)
+	#config.scrollArray.append(scrollerRef)
 
 	config.scroller2 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller2
@@ -126,6 +155,176 @@ def remakeArrowBlock(imageRef, direction):
 def remakePatternBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
+
+def remakeImageBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	makeAnimal(imageRef, drawRef, direction)
+
+def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
+	if center is None:
+		return image.rotate(angle)
+	angle = -angle/180.0*math.pi
+	nx,ny = x,y = center
+	sx=sy=1.0
+	if new_center:
+		(nx,ny) = new_center
+	if scale:
+		(sx,sy) = scale
+	cosine = math.cos(angle)
+	sine = math.sin(angle)
+	a = cosine/sx
+	b = sine/sx
+	c = x-nx*a-ny*b
+	d = -sine/sy
+	e = cosine/sy
+	f = y-nx*d-ny*e
+	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
+
+def makeAnimal(imageRef, imageDrawRef, direction):
+	global config
+
+	#config.imageLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,config.alpha))
+	imageDrawRef.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(config.bgR, config.bgG, config.bgB,config.fade))
+	#config.pixSortXOffset = config.pixSortXOffsetVal 
+
+	imgWidth = config.canvasWidth
+	imgHeight = config.canvasHeight
+	gray0 = 0
+	gray1 = 30
+	gray2 = 100
+	fills = [(gray0,gray0,gray0,255),(gray1,gray1,gray1,255)]
+	fills = [(gray0,gray0,gray0,255),(gray2,gray0,gray0,255)]
+	
+	
+	quadBlocks =  {
+	"tail":	{"order":3, "proportions":[1,1.5] ,"coords":[]},
+	"l1":	{"order":1, "proportions":[3,2] ,"coords":[]},
+	"l2":	{"order":2, "proportions":[3.2,2] ,"coords":[]},
+	"head":	{"order":5, "proportions":[3,3.67],"coords":[]},
+	"body":	{"order":4, "proportions":[5.5,11],"coords":[]},
+	}
+	quadBlocks = OrderedDict(sorted(quadBlocks.items(), key=lambda t: t[1]))
+
+	numSquarePairs = len(quadBlocks)
+
+	# Choose seam x point  -- ideally about 1/3 from left
+	xVariance = config.xVariance
+	flip = config.flip
+	
+	blockWidth = config.blockWidth
+	wVariance = [imgWidth/6, imgWidth/3]
+	hVariance = [imgHeight/6, imgHeight/2]
+	wFactor = 1
+	hFactor = 2
+	l1Variance = config.l1Variance
+
+	yStart = yPos = config.yOffset
+	xStart = xPos = imgWidth/2 - config.xOffset
+
+	bodyEnd = 0
+	bodyStart = 0
+	tiedToBottom = 0 if random.random() < .5 else 2
+	for i in range(0,50) :
+
+		#xStart =  i *30
+
+		angleRotation = random.uniform(-config.angleRotationRange,config.angleRotationRange)
+
+		bodyWidth = quadBlocks["body"]["proportions"][0] * blockWidth * random.uniform(.9,1.25)
+		bodyLength = quadBlocks["body"]["proportions"][1] * blockWidth * random.uniform(.9,1.2)
+
+		tailWidth = quadBlocks["tail"]["proportions"][0] * blockWidth * random.uniform(.9,1.2)
+		tailLength = quadBlocks["tail"]["proportions"][1] * blockWidth * random.uniform(.9,1.2)
+
+		headWidth = quadBlocks["head"]["proportions"][0] * blockWidth * random.uniform(.9,1.2)
+		headLength = quadBlocks["head"]["proportions"][1] * blockWidth * random.uniform(.9,1.2)
+
+		legWidth = quadBlocks["l1"]["proportions"][0] * blockWidth * random.uniform(.9,1.2)
+		legLength = quadBlocks["l1"]["proportions"][1] * blockWidth * random.uniform(.9,1.2)
+
+		xOffsetVal = random.uniform(.9,1.2)
+		xOffsetVal = 1
+
+		quad = "l1"
+		x1 = xStart * xOffsetVal
+		y1 = yStart * random.uniform(.9,1.2)
+		x2 = x1 + legWidth + l1Variance
+		y2 = y1 + legLength
+		quadBlocks[quad]["coords"] = [x1,y1,x2,y2]
+
+		#config.pixSortXOffset *= xOffsetVal
+
+		quad = "l2"
+		x1 = quadBlocks["l1"]["coords"][0] - l1Variance
+		y1 = yStart + bodyLength  - legLength * random.uniform(.9,1.2)
+		x2 = x1 + legWidth + l1Variance
+		y2 = y1 + legLength 
+		quadBlocks[quad]["coords"] = [x1,y1,x2,y2]
+
+		quad = "tail"
+		x1 = quadBlocks["l1"]["coords"][2] + bodyWidth - tailWidth - l1Variance
+		y1 = yStart * random.uniform(.9,1.2) - tailLength/4 * random.uniform(1.05,1.3)
+		x2 = x1 + tailWidth
+		y2 = y1 + tailLength
+		quadBlocks[quad]["coords"] = [x1,y1,x2,y2]
+
+		quad = "body"
+		x1 = quadBlocks["l1"]["coords"][2] - l1Variance
+		y1 = quadBlocks["l1"]["coords"][1]
+		x2 = x1 + bodyWidth
+		y2 = y1 + bodyLength
+		quadBlocks[quad]["coords"] = [x1,y1,x2,y2]
+
+		quad = "head"
+		x1 = quadBlocks["body"]["coords"][2] - headWidth
+		y1 = quadBlocks["body"]["coords"][3] - tailLength/2 * random.uniform(.9,1.2)
+		x2 = x1 + headWidth
+		y2 = y1 + headLength
+		quadBlocks[quad]["coords"] = [x1,y1,x2,y2]
+
+		tempUnit = Image.new("RGBA", (imgWidth, imgHeight))
+		n = 0
+		for quad in quadBlocks:
+
+			if(random.random() < .5 and quad != "body") : 
+				angleRotation = random.uniform(-config.angleRotationRange/2,config.angleRotationRange/2)
+
+			gray0 = int(random.uniform(0,config.greyLevel) * config.brightness)
+			gray1 = int(random.uniform(0,config.greyLevel) * config.brightness)
+			gray2 = int(random.uniform(0,config.greyLevel) * config.brightness)
+			redShift = config.redShift
+			fills = [(gray0 + redShift,gray1,gray1,255),(gray1 + redShift,gray1,gray1,255),(gray2 + redShift,gray2,gray2,255)]
+			
+			#fills = [colorutils.getRandomColor(config.brightness),colorutils.getRandomColor(config.brightness),colorutils.getRandomColor(config.brightness)]
+
+			temp = Image.new("RGBA", (imgWidth, imgHeight))
+			drawtemp = ImageDraw.Draw(temp)
+			fillIndex = n
+			if n >= len(fills) : fillIndex = n - len(fills)
+
+			x1 = quadBlocks[quad]["coords"][0]
+			y1 = quadBlocks[quad]["coords"][1]
+			x2 = quadBlocks[quad]["coords"][2]
+			y2 = quadBlocks[quad]["coords"][3]
+
+
+			drawtemp.rectangle((x1,y1,x2,y2), fill=fills[fillIndex])
+			temp = ScaleRotateTranslate(temp,angleRotation, None, None, None, True)
+			#config.workImage.paste(temp, temp)
+			tempUnit.paste(temp, temp)
+			n += 1
+
+		#tempUnit = ScaleRotateTranslate(tempUnit, 90, None, None, None, True)
+		tempUnit = ScaleRotateTranslate(tempUnit, 90, None, None, None, True)
+		imageRef.paste(tempUnit,(i * 50,0), tempUnit)
+		#config.workImage.paste(temp, temp)
+	imageRef = ScaleRotateTranslate(imageRef,90, None, None, None, False)
+
+	if(random.random() < 0) : flip = True
+	
+	if(flip == True) :
+		imageRef = imageRef.transpose(Image.FLIP_TOP_BOTTOM)
+		imageRef = imageRef.transpose(Image.ROTATE_180)
 
 def makeArrows(drawRef, direction = 1) :
 

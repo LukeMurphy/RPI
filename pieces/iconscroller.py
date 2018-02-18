@@ -69,6 +69,11 @@ def init() :
 	config.msg2 = workConfig.get("scroller", 'msg2')
 	config.msg3 = workConfig.get("scroller", 'msg3')
 
+	config.useOverLayImage = workConfig.getboolean("scroller", 'useOverLayImage')
+	config.overLayImage = workConfig.get("scroller", 'overLayImage')
+	config.overLayXPos = int(workConfig.get("scroller", 'overLayXPos'))
+	config.overLayYPos = int(workConfig.get("scroller", 'overLayYPos'))
+
 	config.bandHeight = int(round(config.windowHeight / config.displayRows) )
 
 	#********* HARD CODING VALUES  ***********************
@@ -109,6 +114,7 @@ def init() :
 	makeArrows(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
 
+	'''
 	config.scroller5 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller5
 	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
@@ -119,7 +125,8 @@ def init() :
 	scrollerRef.callBack = {"func" : remakeImageBlock, "direction" : direction}
 	#makeAnimal(config.imageLayer,scrollerRef.bg1Draw, 1)
 	makeAnimal(config.imageLayer,scrollerRef.bg2Draw, 1)
-	#config.scrollArray.append(scrollerRef)
+	config.scrollArray.append(scrollerRef)
+	'''
 
 	config.scroller2 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller2
@@ -142,6 +149,11 @@ def init() :
 	makeMessage(scrollerRef.bg2,config.msg2, direction)
 	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
 	config.scrollArray.append(scrollerRef)
+
+	if(config.useOverLayImage ==  True) :
+		arg = "."+config.overLayImage
+		config.loadedImage = Image.open(arg , "r")
+		config.loadedImage.load()
 
 
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
@@ -468,6 +480,8 @@ def iterate() :
 			segment = ImageOps.mirror(segment)
 		config.workImage.paste(segment, (0, n * config.bandHeight))
 
+	if(config.useOverLayImage  ==  True) :
+		config.workImage.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
 	config.render(config.workImage, 0,0)
 
 def main(run = True) :

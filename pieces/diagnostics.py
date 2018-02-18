@@ -5,6 +5,7 @@ import math
 import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
+import argparse
 
 class unit:
 	def __init__(self, config):
@@ -74,10 +75,33 @@ class unit:
 		if(random.random() > .5): self.objWidth = int(random.uniform(self.objWidthMin,self.objWidthMax))
 
 
+
+def showGrid():
+	global config
+	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
+	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
+	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
+	
+
+	for row in range (0, config.rows) :
+		for col in range (0, config.cols) :
+			xPos = col * config.tileSizeWidth
+			yPos = row * config.tileSizeHeight
+			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
+			
+			displyInfo  =  str(col) + ", " + str(row) + "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
+			config.draw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
+
+	config.image.paste(config.loadedImage, (0,160), config.loadedImage)
+	
+	config.render(config.image, 0,0)
+
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
 	print("Diag Loaded")
+
+
 	colorutils.brightness = config.brightness
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
@@ -90,6 +114,16 @@ def main(run = True) :
 	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
 	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
+	try:
+		config.showGrid = workConfig.getboolean("diag","showGrid")
+	except Exception as e:
+		print (str(e))
+		config.showGrid = False
+
+	
+	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
+	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
+
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -118,17 +152,9 @@ def main(run = True) :
 
 def setUp():
 	global config
-
-	'''
-	arg = "./assets/imgs/"
-	testImage = Image.open(arg , "r")
-		self.image.load()
-		self.imgHeight =  self.image.getbbox()[3]
-	'''
-
-	pass
-
-
+	arg = "./assets/imgs/sks/skull-s2.png"
+	config.loadedImage = Image.open(arg , "r")
+	config.loadedImage.load()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -141,7 +167,8 @@ def runWork():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def iterate() :
+
+def displayTest():
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
@@ -181,7 +208,14 @@ def iterate() :
 		obj.render()
 	
 	config.render(config.image, 0,0)
-		
+
+def iterate() :
+
+	global config
+	if config.showGrid ==  True :
+		showGrid()
+	else :		
+		displayTest()		
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

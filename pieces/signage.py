@@ -108,7 +108,7 @@ def main(run = True) :
 	config.canvasImageHeight = config.screenHeight
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
-	config.delay = .02
+	config.delay = .005
 	config.numUnits  = 1
 
 	config.fontColorVals = ((workConfig.get("signage", 'fontColor')).split(','))

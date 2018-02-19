@@ -216,10 +216,6 @@ def colorize(clr = (250,0,250), recolorize = False) :
 			print(e, clrBlock.mode, config.renderImageFull.mode)
 			pass
 
-
-
-
-
 def redrawBackGround() :	
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
 	#if(random.random() > .99) : gc.collect()

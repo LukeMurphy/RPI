@@ -7,75 +7,7 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 import argparse
 
-class unit:
-	def __init__(self, config):
-		self.config = config
-		self.xPos = 0
-		self.yPos = 0
-		self.xPosR = self.config.screenWidth/2
-		self.yPosR = self.config.screenHeight/2
-		self.move = True
-		
-		self.dx = random.uniform(-3,3)
-		self.dy = random.uniform(-3,3)
-
-		self.image = Image.new("RGBA", (100 , 100))
-		self.fillColor = colorutils.getRandomRGB()
-		self.outlineColor = colorutils.getRandomRGB(config.brightness)
-		self.objWidth = 20
-		self.objWidthMax = 26
-		self.objWidthMin = 13
-
-		self.draw  = ImageDraw.Draw(self.image)
-
-	def update(self):
-		self.xPos += self.dx
-		self.yPos += self.dy
-		
-		self.xPosR += self.dx
-		self.yPosR += self.dy
-
-		if(self.xPosR + self.objWidth > self.config.screenWidth) : 
-			self.xPosR = self.config.screenWidth - self.objWidth 
-			self.xPos = self.config.screenWidth - self.objWidth 
-			self.changeColor()
-			self.dx *= -1
-		if(self.yPosR + self.objWidth> self.config.screenHeight) : 
-			self.yPosR = self.config.screenHeight-self.objWidth 
-			self.yPos = self.config.screenHeight-self.objWidth 
-			self.changeColor()
-			self.dy *= -1
-		if(self.xPosR < 0) : 
-			self.xPosR = 0
-			self.xPos = 0
-			self.changeColor()
-			self.dx*= -1
-		if(self.yPosR < 0) : 
-			self.yPosR = 0
-			self.yPos = 0
-			self.changeColor()
-			self.dy *= -1
-
-		if(self.dx == 0 and self.dy == 0 ):
-			if(random.random() > .5): self.dx = (2 * random.random())
-			if(random.random() > .5): self.dy = (2 * random.random())
-
-	
-	def render(self):
-		xPos = int(self.xPosR)
-		yPos = int(self.yPosR)
-		self.config.draw.rectangle((xPos, yPos,xPos+ self.objWidth , yPos +self.objWidth ), fill=self.fillColor, outline=self.outlineColor)
-
-
-	def changeColor(self):
-		self.fillColor = colorutils.randomColor(random.random())
-		self.outlineColor = colorutils.getRandomRGB()
-		if(random.random() > .5): self.dx = (4 * random.random() + 2)
-		if(random.random() > .5): self.dy = (4 * random.random() + 2)
-		if(random.random() > .5): self.objWidth = int(random.uniform(self.objWidthMin,self.objWidthMax))
-
-
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def showGrid():
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
@@ -92,112 +24,19 @@ def showGrid():
 			displyInfo  =  str(col) + ", " + str(row) + "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
 			config.draw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
 
+	# the overlay can fall apart independently of the overall image
 	if(config.useOverLayImage  ==  True) :
+		if(random.random() < config.overlayGlitchRate ) :
+			glitchBox(config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize)
+		if(random.random() < config.overlayResetRate ) :
+			config.loadedImage.paste(config.loadedImageCopy)
 		config.image.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
 	
+	if(random.random() < config.fullimageGiltchRate)  : 
+		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 	config.render(config.image, 0,0)
 
-def main(run = True) :
-	global config, directionOrder
-	print("---------------------")
-	print("Diag Loaded")
-
-
-	colorutils.brightness = config.brightness
-	config.canvasImageWidth = config.screenWidth
-	config.canvasImageHeight = config.screenHeight
-	config.canvasImageWidth -= 4
-	config.canvasImageHeight -= 4
-	config.delay = .005
-	config.numUnits  = 1
-
-	config.fontColorVals = ((workConfig.get("signage", 'fontColor')).split(','))
-	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
-	config.outlineColorVals = ((workConfig.get("signage", 'outlineColor')).split(','))
-	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
-
-	config.useOverLayImage = workConfig.getboolean("signage", 'useOverLayImage')
-	config.overLayImage = workConfig.get("signage", 'overLayImage')
-	config.overLayXPos = int(workConfig.get("signage", 'overLayXPos'))
-	config.overLayYPos = int(workConfig.get("signage", 'overLayYPos'))
-
-	try:
-		config.showGrid = workConfig.getboolean("signage","showGrid")
-	except Exception as e:
-		print (str(e))
-		config.showGrid = False
-
-	
-	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
-	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
-
-	if(config.useOverLayImage ==  True) :
-		arg = "."+config.overLayImage
-		config.loadedImage = Image.open(arg , "r")
-		config.loadedImage.load()
-
-
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
-	config.fontSize = 14
-	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
-	
-
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	config.unitArrray = []
-	for i in range(0,config.numUnits):
-		obj = unit(config)
-		#obj.move = False
-		obj.objWidth = 5
-		obj.objWidthMax = 4
-		obj.objWidthMin = 3
-		config.unitArrray.append(obj)
-
-	setUp()
-
-	if(run) : runWork()
-
-def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
-	if center is None:
-		return image.rotate(angle)
-	angle = -angle/180.0*math.pi
-	nx,ny = x,y = center
-	sx=sy=1.0
-	if new_center:
-		(nx,ny) = new_center
-	if scale:
-		(sx,sy) = scale
-	cosine = math.cos(angle)
-	sine = math.sin(angle)
-	a = cosine/sx
-	b = sine/sx
-	c = x-nx*a-ny*b
-	d = -sine/sy
-	e = cosine/sy
-	f = y-nx*d-ny*e
-	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def setUp():
-	global config
-	arg = "./assets/imgs/miscl/burst.png"
-	config.loadedImage = Image.open(arg , "r")
-	config.loadedImage.load()
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def runWork():
-	global blocks, config, XOs
-	#gc.enable()
-	while True:
-		iterate()
-		time.sleep(config.delay)  
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
 def displayTest():
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
@@ -231,14 +70,100 @@ def displayTest():
 		config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
 		xp += w
 
-	
-	for i in range(0,config.numUnits):
-		obj = 	config.unitArrray[i]
-		if(obj.move ==True) : obj.update()
-		obj.render()
-	
+
 	config.render(config.image, 0,0)
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def glitchBox(img, r1 = -10, r2 = 10) :
+	apparentWidth = img.size[1]
+	apparentHeight = img.size[0]
+	dy = int(random.uniform(r1,r2))
+	dx = int(random.uniform(1, config.imageGlitchSize))
+	dx = 0
+
+	# really doing "vertical" or y-axis glitching
+	# block height is uniform but width is variable
+
+	sectionWidth = int(random.uniform(2, apparentHeight - dx))
+	sectionHeight = apparentWidth
+
+	# 95% of the time they dance together as mirrors
+	if(random.random() < .97) :
+		cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
+		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def main(run = True) :
+	global config, directionOrder
+	print("---------------------")
+	print("Diag Loaded")
+
+
+	colorutils.brightness = config.brightness
+	config.canvasImageWidth = config.screenWidth
+	config.canvasImageHeight = config.screenHeight
+	config.canvasImageWidth -= 4
+	config.canvasImageHeight -= 4
+	config.delay = float(workConfig.get("signage", 'redrawDelay'))
+
+
+	config.fontColorVals = ((workConfig.get("signage", 'fontColor')).split(','))
+	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
+	config.outlineColorVals = ((workConfig.get("signage", 'outlineColor')).split(','))
+	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
+
+	config.useOverLayImage = workConfig.getboolean("signage", 'useOverLayImage')
+	config.overLayImage = workConfig.get("signage", 'overLayImage')
+	config.overLayXPos = int(workConfig.get("signage", 'overLayXPos'))
+	config.overLayYPos = int(workConfig.get("signage", 'overLayYPos'))
+	config.imageGlitchSize = int(workConfig.get("signage", 'imageGlitchSize'))
+	config.overlayGlitchSize = int(workConfig.get("signage", 'overlayGlitchSize'))
+	config.overlayBrightness = float(workConfig.get("signage", 'overlayBrightness'))
+	config.overlayGlitchRate = float(workConfig.get("signage", 'overlayGlitchRate'))
+	config.fullimageGiltchRate = float(workConfig.get("signage", 'fullimageGiltchRate'))
+	config.overlayResetRate = float(workConfig.get("signage", 'overlayResetRate'))
+
+	try:
+		config.showGrid = workConfig.getboolean("signage","showGrid")
+	except Exception as e:
+		print (str(e))
+		config.showGrid = False
+
+	
+	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
+	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
+	config.fontSize = 14
+	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
+	
+	setUp()
+	config.enhancer = ImageEnhance.Brightness(config.loadedImage)
+	config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
+	config.loadedImageCopy  = config.loadedImage.copy()
+
+
+	if(run) : runWork()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def setUp():
+	global config
+	if(config.useOverLayImage ==  True) :
+		arg = "." + config.overLayImage
+		config.loadedImage = Image.open(arg , "r")
+		config.loadedImage.load()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def runWork():
+	global blocks, config, XOs
+	#gc.enable()
+	while True:
+		iterate()
+		time.sleep(config.delay)  
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def iterate() :
 
 	global config
@@ -247,14 +172,31 @@ def iterate() :
 	else :		
 		displayTest()		
 
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 def callBack() :
 	global config, XOs
 	return True
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
+	if center is None:
+		return image.rotate(angle)
+	angle = -angle/180.0*math.pi
+	nx,ny = x,y = center
+	sx=sy=1.0
+	if new_center:
+		(nx,ny) = new_center
+	if scale:
+		(sx,sy) = scale
+	cosine = math.cos(angle)
+	sine = math.sin(angle)
+	a = cosine/sx
+	b = sine/sx
+	c = x-nx*a-ny*b
+	d = -sine/sy
+	e = cosine/sy
+	f = y-nx*d-ny*e
+	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
 
 

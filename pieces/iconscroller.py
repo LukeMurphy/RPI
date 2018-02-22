@@ -79,6 +79,10 @@ def init() :
 	#********* HARD CODING VALUES  ***********************
 	config.bgBackGroundColor = (0,0,0,0)
 	config.arrowBgBackGroundColor = (0,0,0,200)
+	config.imageGlitchSize = 10
+	config.overlayGlitchRate = .1
+	config.overlayResetRate = .1
+	config.overlayGlitchSize = 10
 
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
 	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)	
@@ -154,7 +158,25 @@ def init() :
 		arg = "."+config.overLayImage
 		config.loadedImage = Image.open(arg , "r")
 		config.loadedImage.load()
+		config.loadedImageCopy  = config.loadedImage.copy()
 
+def glitchBox(img, r1 = -10, r2 = 10) :
+	apparentWidth = img.size[1]
+	apparentHeight = img.size[0]
+	dy = int(random.uniform(r1,r2))
+	dx = int(random.uniform(1, config.imageGlitchSize))
+	dx = 0
+
+	# really doing "vertical" or y-axis glitching
+	# block height is uniform but width is variable
+
+	sectionWidth = int(random.uniform(2, apparentHeight - dx))
+	sectionHeight = apparentWidth
+
+	# 95% of the time they dance together as mirrors
+	if(random.random() < .97) :
+		cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
+		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
 
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
 	messageString = config.msg1 if random.random() < .5 else config.msg2
@@ -481,6 +503,10 @@ def iterate() :
 		config.workImage.paste(segment, (0, n * config.bandHeight))
 
 	if(config.useOverLayImage  ==  True) :
+		if(random.random() < config.overlayGlitchRate ) :
+			glitchBox(config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize)
+		if(random.random() < config.overlayResetRate ) :
+			config.loadedImage.paste(config.loadedImageCopy)
 		config.workImage.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
 	config.render(config.workImage, 0,0)
 

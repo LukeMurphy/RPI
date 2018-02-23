@@ -490,7 +490,7 @@ def init() :
 	config.scrollArray.append(scrollerRef)
 
 	if(config.useOverLayImage ==  True) :
-		arg = "."+config.overLayImage
+		arg = config.path + config.overLayImage
 		config.loadedImage = Image.open(arg , "r")
 		config.loadedImage.load()
 		config.loadedImageCopy  = config.loadedImage.copy()

@@ -8,6 +8,8 @@ from modules import colorutils, badpixels, coloroverlay
 import argparse
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Image layers 
+
 def showGrid():
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
@@ -36,7 +38,6 @@ def showGrid():
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 	config.render(config.image, 0,0)
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def displayTest():
 	global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
@@ -74,6 +75,8 @@ def displayTest():
 	config.render(config.image, 0,0)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Image manipulation functions
+
 def glitchBox(img, r1 = -10, r2 = 10) :
 	apparentWidth = img.size[1]
 	apparentHeight = img.size[0]
@@ -92,7 +95,29 @@ def glitchBox(img, r1 = -10, r2 = 10) :
 		cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
 		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
 
+def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
+	if center is None:
+		return image.rotate(angle)
+	angle = -angle/180.0*math.pi
+	nx,ny = x,y = center
+	sx=sy=1.0
+	if new_center:
+		(nx,ny) = new_center
+	if scale:
+		(sx,sy) = scale
+	cosine = math.cos(angle)
+	sine = math.sin(angle)
+	a = cosine/sx
+	b = sine/sx
+	c = x-nx*a-ny*b
+	d = -sine/sy
+	e = cosine/sy
+	f = y-nx*d-ny*e
+	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Setup and run functions
+
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
@@ -147,7 +172,6 @@ def main(run = True) :
 
 	if(run) : runWork()
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def setUp():
 	global config
 	if(config.useOverLayImage ==  True) :
@@ -155,7 +179,6 @@ def setUp():
 		config.loadedImage = Image.open(arg , "r")
 		config.loadedImage.load()
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def runWork():
 	global blocks, config, XOs
 	#gc.enable()
@@ -163,7 +186,6 @@ def runWork():
 		iterate()
 		time.sleep(config.delay)  
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def iterate() :
 
 	global config
@@ -172,31 +194,12 @@ def iterate() :
 	else :		
 		displayTest()		
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def callBack() :
 	global config, XOs
 	return True
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
-	if center is None:
-		return image.rotate(angle)
-	angle = -angle/180.0*math.pi
-	nx,ny = x,y = center
-	sx=sy=1.0
-	if new_center:
-		(nx,ny) = new_center
-	if scale:
-		(sx,sy) = scale
-	cosine = math.cos(angle)
-	sine = math.sin(angle)
-	a = cosine/sx
-	b = sine/sx
-	c = x-nx*a-ny*b
-	d = -sine/sy
-	e = cosine/sy
-	f = y-nx*d-ny*e
-	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
+
 
 

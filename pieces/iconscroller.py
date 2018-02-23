@@ -13,186 +13,9 @@ from modules import colorutils, coloroverlay, continuous_scroller
 
 global thrd, config
 
-def init() :
-	global config
-	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 
 
-	config.windowWidth  = float(workConfig.get("displayconfig", 'windowWidth')) 
-	config.windowHeight  = float(workConfig.get("displayconfig", 'windowHeight')) 
-
-	config.xOffset = int(workConfig.get("scroller", 'xOffset')) 
-	config.yOffset = int(workConfig.get("scroller", 'yOffset')) 
-
-	config.displayRows = int(workConfig.get("scroller", 'displayRows'))
-	config.displayCols = int(workConfig.get("scroller", 'displayCols'))
-
-	config.patternRows = int(workConfig.get("scroller", 'patternRows'))
-	config.patternCols = int(workConfig.get("scroller", 'patternCols'))
-	config.arrowCols = int(workConfig.get("scroller", 'arrowCols'))
-
-	config.lineThickness = int(workConfig.get("scroller", 'lineThickness'))
-	config.colorMode = workConfig.get("scroller", 'colorMode')
-	config.sansSerif = workConfig.getboolean("scroller", 'sansSerif')
-	config.fontSize =  int(workConfig.get("scroller", 'fontSize'))
-	config.textVOffest = int(workConfig.get("scroller", 'textVOffest'))
-	config.shadowSize = int(workConfig.get("scroller", 'shadowSize'))
-
-	config.patternRows = int(workConfig.get("scroller", 'patternRows'))
-	config.patternCols = int(workConfig.get("scroller", 'patternCols'))
-	config.patternRowsOffset = int(workConfig.get("scroller", 'patternRowsOffset'))
-	config.patternColsOffset = int(workConfig.get("scroller", 'patternColsOffset'))
-	config.patternDrawProb = float(workConfig.get("scroller", 'patternDrawProb')) 
-	config.bgBackGroundColor = (workConfig.get("scroller", 'bgBackGroundColor').split(","))
-	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
-	config.bgForeGroundColor = (workConfig.get("scroller", 'bgForeGroundColor').split(","))
-	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
-
-	config.patternSpeed = int(workConfig.get("scroller", 'patternSpeed'))
-	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
-	config.arrowSpeed = int(workConfig.get("scroller", 'arrowSpeed'))
-	config.greyLevel = int(workConfig.get("scroller", 'greyLevel'))
-	config.redShift = int(workConfig.get("scroller", 'redShift'))
-
-	config.imageSpeed = int(workConfig.get("scroller", 'imageSpeed'))
-	config.flip = False
-	config.xVariance = int(workConfig.get("scroller", 'xVariance'))
-	config.blockWidth = int(workConfig.get("scroller", 'blockWidth'))
-	config.l1Variance = int(workConfig.get("scroller", 'l1Variance'))
-	config.angleRotationRange = int(workConfig.get("scroller", 'angleRotationRange'))
-	
-	config.bgR = int(workConfig.get("scroller", 'bgR'))
-	config.bgG = int(workConfig.get("scroller", 'bgG'))
-	config.bgB = int(workConfig.get("scroller", 'bgB'))
-	config.fade = int(workConfig.get("scroller", 'fade'))
-
-	config.msg1 = workConfig.get("scroller", 'msg1')
-	config.msg2 = workConfig.get("scroller", 'msg2')
-	config.msg3 = workConfig.get("scroller", 'msg3')
-
-	config.useOverLayImage = workConfig.getboolean("scroller", 'useOverLayImage')
-	config.overLayImage = workConfig.get("scroller", 'overLayImage')
-	config.overLayXPos = int(workConfig.get("scroller", 'overLayXPos'))
-	config.overLayYPos = int(workConfig.get("scroller", 'overLayYPos'))
-
-	config.bandHeight = int(round(config.windowHeight / config.displayRows) )
-
-	#********* HARD CODING VALUES  ***********************
-	config.bgBackGroundColor = (0,0,0,0)
-	config.arrowBgBackGroundColor = (0,0,0,200)
-	config.imageGlitchSize = 10
-	config.overlayGlitchRate = .1
-	config.overlayResetRate = .1
-	config.overlayGlitchSize = 10
-
-	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
-	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)	
-
-	config.imageLayer = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
-	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
-
-	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.workImageDraw = ImageDraw.Draw(config.workImage)
-
-	## Set up the scrolling layers
-	config.scrollArray = []
-
-	config.scroller4 = continuous_scroller.ScrollObject()
-	scrollerRef = config.scroller4
-	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
-	scrollerRef.xSpeed = config.patternSpeed
-	scrollerRef.setUp()
-	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}
-	#makeBackGround(scrollerRef.bg1Draw, 1)
-	makeBackGround(scrollerRef.bg2Draw, 1)
-	config.scrollArray.append(scrollerRef)
-
-	config.scroller1 = continuous_scroller.ScrollObject()
-	scrollerRef = config.scroller1
-	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
-	scrollerRef.xSpeed = config.arrowSpeed
-	scrollerRef.setUp()
-	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	scrollerRef.callBack = {"func" : remakeArrowBlock, "direction" : direction}
-	makeArrows(scrollerRef.bg1Draw, 1)
-	makeArrows(scrollerRef.bg2Draw, 1)
-	config.scrollArray.append(scrollerRef)
-
-	'''
-	config.scroller5 = continuous_scroller.ScrollObject()
-	scrollerRef = config.scroller5
-	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
-	scrollerRef.canvasHeight = int(config.windowHeight)
-	scrollerRef.xSpeed = config.imageSpeed
-	scrollerRef.setUp()
-	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	scrollerRef.callBack = {"func" : remakeImageBlock, "direction" : direction}
-	#makeAnimal(config.imageLayer,scrollerRef.bg1Draw, 1)
-	makeAnimal(config.imageLayer,scrollerRef.bg2Draw, 1)
-	config.scrollArray.append(scrollerRef)
-	'''
-
-	config.scroller2 = continuous_scroller.ScrollObject()
-	scrollerRef = config.scroller2
-	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
-	scrollerRef.xSpeed = -config.textSpeed
-	scrollerRef.setUp()
-	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	makeMessage(scrollerRef.bg1,config.msg1, direction)
-	makeMessage(scrollerRef.bg2,config.msg2, direction)
-	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
-	config.scrollArray.append(scrollerRef)
-
-	config.scroller3 = continuous_scroller.ScrollObject()
-	scrollerRef = config.scroller3
-	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
-	scrollerRef.xSpeed = config.textSpeed + 1
-	scrollerRef.setUp()
-	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	makeMessage(scrollerRef.bg1,config.msg1, direction)
-	makeMessage(scrollerRef.bg2,config.msg2, direction)
-	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
-	config.scrollArray.append(scrollerRef)
-
-	if(config.useOverLayImage ==  True) :
-		arg = "."+config.overLayImage
-		config.loadedImage = Image.open(arg , "r")
-		config.loadedImage.load()
-		config.loadedImageCopy  = config.loadedImage.copy()
-
-def glitchBox(img, r1 = -10, r2 = 10) :
-	apparentWidth = img.size[1]
-	apparentHeight = img.size[0]
-	dy = int(random.uniform(r1,r2))
-	dx = int(random.uniform(1, config.imageGlitchSize))
-	dx = 0
-
-	# really doing "vertical" or y-axis glitching
-	# block height is uniform but width is variable
-
-	sectionWidth = int(random.uniform(2, apparentHeight - dx))
-	sectionHeight = apparentWidth
-
-	# 95% of the time they dance together as mirrors
-	if(random.random() < .97) :
-		cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
-		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
-
-def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
-	messageString = config.msg1 if random.random() < .5 else config.msg2
-	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
-
-def remakeArrowBlock(imageRef, direction):
-	drawRef = ImageDraw.Draw(imageRef)
-	makeArrows(drawRef, direction)
-
-def remakePatternBlock(imageRef, direction):
-	drawRef = ImageDraw.Draw(imageRef)
-	makeBackGround(drawRef, direction)
-
-def remakeImageBlock(imageRef, direction):
-	drawRef = ImageDraw.Draw(imageRef)
-	makeAnimal(imageRef, drawRef, direction)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Image manipulations
 
 def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
 	if center is None:
@@ -213,6 +36,33 @@ def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale =
 	e = cosine/sy
 	f = y-nx*d-ny*e
 	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
+
+def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
+
+	apparentWidth = img.size[0]
+	apparentHeight = img.size[1]
+
+	dx = int(random.uniform(r1,r2))
+	dy = int(random.uniform(r1,r2))
+	
+	#dx = 0
+
+	sectionWidth = int(random.uniform(2, apparentWidth - dx))
+	sectionHeight = int(random.uniform(2, apparentHeight - dy))
+	
+	#sectionHeight = apparentWidth
+
+	# 95% of the time they dance together as mirrors
+	if(random.random() < .97) :
+		if(dir  == "horizontal") :
+			cp1 = img.crop((0, dy,  apparentWidth, dy + sectionHeight))
+		else :
+			cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
+
+		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Layer imagery
 
 def makeAnimal(imageRef, imageDrawRef, direction):
 	global config
@@ -474,6 +324,176 @@ def makeBackGround(drawRef, n = 1):
 			xStart += 2 * xDiv
 		xStart = 0
 		yStart += 2 * yDiv
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Layer imagery callbacks & regeneration functions
+
+def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
+	messageString = config.msg1 if random.random() < .5 else config.msg2
+	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
+
+def remakeArrowBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	makeArrows(drawRef, direction)
+
+def remakePatternBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	makeBackGround(drawRef, direction)
+
+def remakeImageBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	makeAnimal(imageRef, drawRef, direction)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+## Setup and run functions
+
+def init() :
+	global config
+	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 
+
+	config.windowWidth  = float(workConfig.get("displayconfig", 'windowWidth')) 
+	config.windowHeight  = float(workConfig.get("displayconfig", 'windowHeight')) 
+
+	config.xOffset = int(workConfig.get("scroller", 'xOffset')) 
+	config.yOffset = int(workConfig.get("scroller", 'yOffset')) 
+
+	config.displayRows = int(workConfig.get("scroller", 'displayRows'))
+	config.displayCols = int(workConfig.get("scroller", 'displayCols'))
+
+	config.patternRows = int(workConfig.get("scroller", 'patternRows'))
+	config.patternCols = int(workConfig.get("scroller", 'patternCols'))
+	config.arrowCols = int(workConfig.get("scroller", 'arrowCols'))
+
+	config.lineThickness = int(workConfig.get("scroller", 'lineThickness'))
+	config.colorMode = workConfig.get("scroller", 'colorMode')
+	config.sansSerif = workConfig.getboolean("scroller", 'sansSerif')
+	config.fontSize =  int(workConfig.get("scroller", 'fontSize'))
+	config.textVOffest = int(workConfig.get("scroller", 'textVOffest'))
+	config.shadowSize = int(workConfig.get("scroller", 'shadowSize'))
+
+	config.patternRows = int(workConfig.get("scroller", 'patternRows'))
+	config.patternCols = int(workConfig.get("scroller", 'patternCols'))
+	config.patternRowsOffset = int(workConfig.get("scroller", 'patternRowsOffset'))
+	config.patternColsOffset = int(workConfig.get("scroller", 'patternColsOffset'))
+	config.patternDrawProb = float(workConfig.get("scroller", 'patternDrawProb')) 
+	config.bgBackGroundColor = (workConfig.get("scroller", 'bgBackGroundColor').split(","))
+	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
+	config.bgForeGroundColor = (workConfig.get("scroller", 'bgForeGroundColor').split(","))
+	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
+
+	config.patternSpeed = int(workConfig.get("scroller", 'patternSpeed'))
+	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
+	config.arrowSpeed = int(workConfig.get("scroller", 'arrowSpeed'))
+	config.greyLevel = int(workConfig.get("scroller", 'greyLevel'))
+	config.redShift = int(workConfig.get("scroller", 'redShift'))
+
+	config.imageSpeed = int(workConfig.get("scroller", 'imageSpeed'))
+	config.flip = False
+	config.xVariance = int(workConfig.get("scroller", 'xVariance'))
+	config.blockWidth = int(workConfig.get("scroller", 'blockWidth'))
+	config.l1Variance = int(workConfig.get("scroller", 'l1Variance'))
+	config.angleRotationRange = int(workConfig.get("scroller", 'angleRotationRange'))
+	
+	config.bgR = int(workConfig.get("scroller", 'bgR'))
+	config.bgG = int(workConfig.get("scroller", 'bgG'))
+	config.bgB = int(workConfig.get("scroller", 'bgB'))
+	config.fade = int(workConfig.get("scroller", 'fade'))
+
+	config.msg1 = workConfig.get("scroller", 'msg1')
+	config.msg2 = workConfig.get("scroller", 'msg2')
+	config.msg3 = workConfig.get("scroller", 'msg3')
+
+	config.useOverLayImage = workConfig.getboolean("scroller", 'useOverLayImage')
+	config.overLayImage = workConfig.get("scroller", 'overLayImage')
+	config.overLayXPos = int(workConfig.get("scroller", 'overLayXPos'))
+	config.overLayYPos = int(workConfig.get("scroller", 'overLayYPos'))
+	config.overlayGlitchSize = int(workConfig.get("scroller", 'overlayGlitchSize'))
+	config.overlayBrightness = float(workConfig.get("scroller", 'overlayBrightness'))
+	config.overlayGlitchRate = float(workConfig.get("scroller", 'overlayGlitchRate'))
+	config.overlayResetRate = float(workConfig.get("scroller", 'overlayResetRate'))
+
+	config.bandHeight = int(round(config.windowHeight / config.displayRows) )
+
+	#********* HARD CODING VALUES  ***********************
+	config.bgBackGroundColor = (0,0,0,0)
+	config.arrowBgBackGroundColor = (0,0,0,200)
+
+
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
+	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)	
+
+	config.imageLayer = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
+	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
+
+	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.workImageDraw = ImageDraw.Draw(config.workImage)
+
+	## Set up the scrolling layers
+	config.scrollArray = []
+
+	config.scroller4 = continuous_scroller.ScrollObject()
+	scrollerRef = config.scroller4
+	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+	scrollerRef.xSpeed = config.patternSpeed
+	scrollerRef.setUp()
+	direction = 1 if scrollerRef.xSpeed > 0 else -1
+	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}
+	#makeBackGround(scrollerRef.bg1Draw, 1)
+	makeBackGround(scrollerRef.bg2Draw, 1)
+	config.scrollArray.append(scrollerRef)
+
+	config.scroller1 = continuous_scroller.ScrollObject()
+	scrollerRef = config.scroller1
+	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+	scrollerRef.xSpeed = config.arrowSpeed
+	scrollerRef.setUp()
+	direction = 1 if scrollerRef.xSpeed > 0 else -1
+	scrollerRef.callBack = {"func" : remakeArrowBlock, "direction" : direction}
+	makeArrows(scrollerRef.bg1Draw, 1)
+	makeArrows(scrollerRef.bg2Draw, 1)
+	config.scrollArray.append(scrollerRef)
+
+	'''
+	config.scroller5 = continuous_scroller.ScrollObject()
+	scrollerRef = config.scroller5
+	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+	scrollerRef.canvasHeight = int(config.windowHeight)
+	scrollerRef.xSpeed = config.imageSpeed
+	scrollerRef.setUp()
+	direction = 1 if scrollerRef.xSpeed > 0 else -1
+	scrollerRef.callBack = {"func" : remakeImageBlock, "direction" : direction}
+	#makeAnimal(config.imageLayer,scrollerRef.bg1Draw, 1)
+	makeAnimal(config.imageLayer,scrollerRef.bg2Draw, 1)
+	config.scrollArray.append(scrollerRef)
+	'''
+
+	config.scroller2 = continuous_scroller.ScrollObject()
+	scrollerRef = config.scroller2
+	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+	scrollerRef.xSpeed = -config.textSpeed
+	scrollerRef.setUp()
+	direction = 1 if scrollerRef.xSpeed > 0 else -1
+	makeMessage(scrollerRef.bg1,config.msg1, direction)
+	makeMessage(scrollerRef.bg2,config.msg2, direction)
+	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
+	config.scrollArray.append(scrollerRef)
+
+	config.scroller3 = continuous_scroller.ScrollObject()
+	scrollerRef = config.scroller3
+	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+	scrollerRef.xSpeed = config.textSpeed + 1
+	scrollerRef.setUp()
+	direction = 1 if scrollerRef.xSpeed > 0 else -1
+	makeMessage(scrollerRef.bg1,config.msg1, direction)
+	makeMessage(scrollerRef.bg2,config.msg2, direction)
+	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
+	config.scrollArray.append(scrollerRef)
+
+	if(config.useOverLayImage ==  True) :
+		arg = "."+config.overLayImage
+		config.loadedImage = Image.open(arg , "r")
+		config.loadedImage.load()
+		config.loadedImageCopy  = config.loadedImage.copy()
 
 def runWork():
 	global config

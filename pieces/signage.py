@@ -165,9 +165,7 @@ def main(run = True) :
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	
 	setUp()
-	config.enhancer = ImageEnhance.Brightness(config.loadedImage)
-	config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
-	config.loadedImageCopy  = config.loadedImage.copy()
+
 
 
 	if(run) : runWork()
@@ -175,9 +173,13 @@ def main(run = True) :
 def setUp():
 	global config
 	if(config.useOverLayImage ==  True) :
-		arg = "." + config.overLayImage
+		arg = config.path + config.overLayImage
 		config.loadedImage = Image.open(arg , "r")
 		config.loadedImage.load()
+
+		config.enhancer = ImageEnhance.Brightness(config.loadedImage)
+		config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
+		config.loadedImageCopy  = config.loadedImage.copy()
 
 def runWork():
 	global blocks, config, XOs

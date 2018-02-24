@@ -71,18 +71,15 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 	#config.enhancer = ImageEnhance.Brightness(config.loadedImage)
 	#config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
 
-	widthImage = config.imageBlockImage.size[0]
-	heightImage = config.imageBlockImage.size[1]
+	widthImage = config.imageBlockImageLoaded.size[0]
+	heightImage = config.imageBlockImageLoaded.size[1]
 	hBuffer  = config.imageBlockBuffer
-
 	numberOfUnits = int(round(w / (widthImage + hBuffer)))
 
-
-	print(numberOfUnits, hBuffer, widthImage)
 	for i in range (0,numberOfUnits):
 		x = i * ( widthImage + hBuffer)
-		y = -5
-		tempImage  = config.imageBlockImage.copy()
+		y = -0
+		tempImage  = config.imageBlockImageLoaded.copy()
 		#tempEnhancer = ImageEnhance.Brightness(tempImage)
 		#tempImage = tempEnhancer.enhance(random.random())
 
@@ -477,6 +474,19 @@ def init() :
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
+
+	if(config.useOverLayImage ==  True) :
+		arg = config.path + config.overLayImage
+		config.loadedImage = Image.open(arg , "r")
+		config.loadedImage.load()
+		config.loadedImageCopy  = config.loadedImage.copy()
+
+	if(config.useImages ==  True) :
+		arg = config.path + config.imageBlockImage
+		config.imageBlockImageLoaded = Image.open(arg , "r")
+		config.imageBlockImageLoaded.load()
+		config.imageBlockImageLoadedCopy  = config.imageBlockImageLoaded.copy()
+
 	## Set up the scrolling layers
 	config.scrollArray = []
 
@@ -546,17 +556,7 @@ def init() :
 		config.scrollArray.append(scrollerRef)
 
 
-	if(config.useOverLayImage ==  True) :
-		arg = config.path + config.overLayImage
-		config.loadedImage = Image.open(arg , "r")
-		config.loadedImage.load()
-		config.loadedImageCopy  = config.loadedImage.copy()
 
-	if(config.useImages ==  True) :
-		arg = config.path + config.imageBlockImage
-		config.imageBlockImage = Image.open(arg , "r")
-		config.imageBlockImage.load()
-		config.imageBlockImageCopy  = config.imageBlockImage.copy()
 
 def runWork():
 	global config

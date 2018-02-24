@@ -66,18 +66,19 @@ def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 ## Layer imagery
 def makeScrollBlock(imageRef, imageDrawRef, direction):
 	global config
+	w = imageRef.size[0]
 
 	#config.enhancer = ImageEnhance.Brightness(config.loadedImage)
 	#config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
-	tempImage  = config.imageBlockImage.copy()
-	w = imageRef.size[0]
+
 	widthImage = config.imageBlockImage.size[0]
 	heightImage = config.imageBlockImage.size[1]
-
-
 	hBuffer  = config.imageBlockBuffer
 
 	numberOfUnits = int(round(w / (widthImage + hBuffer)))
+
+
+	print(numberOfUnits, hBuffer, widthImage)
 	for i in range (0,numberOfUnits):
 		x = i * ( widthImage + hBuffer)
 		y = -5

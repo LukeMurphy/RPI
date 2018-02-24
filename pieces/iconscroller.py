@@ -9,6 +9,7 @@ import threading
 import resource
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
+from PIL import ImageChops, ImageFilter, ImagePalette
 from modules import colorutils, coloroverlay, continuous_scroller
 
 global thrd, config
@@ -63,6 +64,42 @@ def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery
+def makeScrollBlock(imageRef, imageDrawRef, direction):
+	global config
+	arg = config.path + config.overLayImage
+	config.loadedImage = Image.open(arg , "r")
+	config.loadedImage.load()
+	config.loadedImageCopy  = config.loadedImage.copy()
+	config.enhancer = ImageEnhance.Brightness(config.loadedImage)
+	#config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
+	tempImage  = config.loadedImage.copy()
+	w = imageRef.size[0]
+	widthImage = config.loadedImage.size[0]
+	heightImage = config.loadedImage.size[1]
+
+
+	hBuffer  = 13
+
+	numberOfUnits = int(round(w / (widthImage + hBuffer)))
+	for i in range (0,numberOfUnits):
+		x = i * ( widthImage + hBuffer)
+		y = -5
+		tempImage  = config.loadedImage.copy()
+		tempEnhancer = ImageEnhance.Brightness(tempImage)
+		tempImage = tempEnhancer.enhance(random.random())
+
+		clrBlock = Image.new("RGBA", (widthImage, heightImage))
+		clrBlockDraw = ImageDraw.Draw(clrBlock)
+
+		# Color overlay on b/w PNG sprite
+		# EVERYTHING HAS TO BE PNG  / have ALPHA 
+		clr = colorutils.randomColor()
+		clrBlockDraw.rectangle((0,0,widthImage, heightImage), fill=clr)
+
+		tempImage = ImageChops.multiply(clrBlock, tempImage)
+		imageRef.paste(tempImage,(x,y),tempImage)
+
+
 
 def makeAnimal(imageRef, imageDrawRef, direction):
 	global config
@@ -328,6 +365,10 @@ def makeBackGround(drawRef, n = 1):
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery callbacks & regeneration functions
 
+def remakeScrollBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	makeScrollBlock(imageRef, drawRef, direction)
+
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
 	messageString = config.msg1 if random.random() < .5 else config.msg2
 	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
@@ -440,7 +481,7 @@ def init() :
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}
 	#makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
-	config.scrollArray.append(scrollerRef)
+	#config.scrollArray.append(scrollerRef)
 
 	config.scroller1 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller1
@@ -453,7 +494,7 @@ def init() :
 	makeArrows(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
 
-	'''
+	
 	config.scroller5 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller5
 	scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
@@ -461,11 +502,13 @@ def init() :
 	scrollerRef.xSpeed = config.imageSpeed
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
-	scrollerRef.callBack = {"func" : remakeImageBlock, "direction" : direction}
+	scrollerRef.callBack = {"func" : remakeScrollBlock, "direction" : direction}
+	makeScrollBlock(config.imageLayer,scrollerRef.bg2Draw, 1)
+	makeScrollBlock(config.imageLayer,scrollerRef.bg1Draw, 1)
 	#makeAnimal(config.imageLayer,scrollerRef.bg1Draw, 1)
-	makeAnimal(config.imageLayer,scrollerRef.bg2Draw, 1)
+	#makeAnimal(config.imageLayer,scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
-	'''
+	
 
 	config.scroller2 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller2
@@ -476,7 +519,7 @@ def init() :
 	makeMessage(scrollerRef.bg1,config.msg1, direction)
 	makeMessage(scrollerRef.bg2,config.msg2, direction)
 	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
-	config.scrollArray.append(scrollerRef)
+	#config.scrollArray.append(scrollerRef)
 
 	config.scroller3 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller3
@@ -487,7 +530,7 @@ def init() :
 	makeMessage(scrollerRef.bg1,config.msg1, direction)
 	makeMessage(scrollerRef.bg2,config.msg2, direction)
 	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
-	config.scrollArray.append(scrollerRef)
+	#config.scrollArray.append(scrollerRef)
 
 	if(config.useOverLayImage ==  True) :
 		arg = config.path + config.overLayImage

@@ -78,7 +78,7 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 
 	for i in range (0,numberOfUnits):
 		x = i * ( widthImage + hBuffer)
-		y = -0
+		y = -5
 		tempImage  = config.imageBlockImageLoaded.copy()
 		#tempEnhancer = ImageEnhance.Brightness(tempImage)
 		#tempImage = tempEnhancer.enhance(random.random())

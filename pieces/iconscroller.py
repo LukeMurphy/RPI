@@ -66,25 +66,22 @@ def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 ## Layer imagery
 def makeScrollBlock(imageRef, imageDrawRef, direction):
 	global config
-	arg = config.path + config.overLayImage
-	config.loadedImage = Image.open(arg , "r")
-	config.loadedImage.load()
-	config.loadedImageCopy  = config.loadedImage.copy()
+
 	#config.enhancer = ImageEnhance.Brightness(config.loadedImage)
 	#config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
-	tempImage  = config.loadedImage.copy()
+	tempImage  = config.imageBlockImage.copy()
 	w = imageRef.size[0]
-	widthImage = config.loadedImage.size[0]
-	heightImage = config.loadedImage.size[1]
+	widthImage = config.imageBlockImage.size[0]
+	heightImage = config.imageBlockImage.size[1]
 
 
-	hBuffer  = 13
+	hBuffer  = config.imageBlockBuffer
 
 	numberOfUnits = int(round(w / (widthImage + hBuffer)))
 	for i in range (0,numberOfUnits):
 		x = i * ( widthImage + hBuffer)
 		y = -5
-		tempImage  = config.loadedImage.copy()
+		tempImage  = config.imageBlockImage.copy()
 		#tempEnhancer = ImageEnhance.Brightness(tempImage)
 		#tempImage = tempEnhancer.enhance(random.random())
 
@@ -452,6 +449,9 @@ def init() :
 	config.useTransparentImages = workConfig.getboolean("scroller", 'useTransparentImages')
 	config.useBackground = workConfig.getboolean("scroller", 'useBackground')
 
+	config.imageBlockImage = workConfig.get("scroller", 'imageBlockImage')
+	config.imageBlockBuffer = int(workConfig.get("scroller", 'imageBlockBuffer'))
+	
 	config.overLayImage = workConfig.get("scroller", 'overLayImage')
 	config.overLayXPos = int(workConfig.get("scroller", 'overLayXPos'))
 	config.overLayYPos = int(workConfig.get("scroller", 'overLayYPos'))
@@ -550,6 +550,12 @@ def init() :
 		config.loadedImage = Image.open(arg , "r")
 		config.loadedImage.load()
 		config.loadedImageCopy  = config.loadedImage.copy()
+
+	if(config.useImages ==  True) :
+		arg = config.path + config.imageBlockImage
+		config.imageBlockImage = Image.open(arg , "r")
+		config.imageBlockImage.load()
+		config.imageBlockImageCopy  = config.imageBlockImage.copy()
 
 def runWork():
 	global config

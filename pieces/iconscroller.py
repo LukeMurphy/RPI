@@ -555,9 +555,6 @@ def init() :
 		scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
 		config.scrollArray.append(scrollerRef)
 
-
-
-
 def runWork():
 	global config
 	while True:
@@ -579,8 +576,7 @@ def iterate() :
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
 		segment = config.canvasImage.crop((n * config.windowWidth, 0, config.windowWidth + n * config.windowWidth, config.bandHeight))
-		# At some point go to modulo for even/odd ... but for now not more than 5 rows
-		if ((n == 0 or n == 2 or n == 4) and (config.displayRows >  1) ) :
+		if ((n % 2 ==  0) and (config.displayRows >  1) ) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
 		config.workImage.paste(segment, (0, n * config.bandHeight))

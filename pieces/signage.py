@@ -23,8 +23,8 @@ def showGrid():
 			yPos = row * config.tileSizeHeight
 			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
 			
-			displyInfo  =  str(col) + ", " + str(row) + "0x0D" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
-			config.draw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
+			displyInfo  =  str(col) + ", " + str(row) + unicode('\n') + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
+			config.draw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor, font=config.font)
 
 	# the overlay can fall apart independently of the overall image
 	if(config.useOverLayImage  ==  True) :

@@ -64,6 +64,111 @@ def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery
+def makeDaemonMessages(imageRef, direction = 1):
+	demonsMale = ["Jealousy", "Wrath", "Tears", "Sighing", "Suffering", "Lamentation", "Bitter Weeping"]
+	demonsMaleModifier = ["Jealous", "Wrathful", "Tearful", "Sighing", "Suffering", "Lamenting", "Embittered Weeping"]
+
+	demonsFemale = ["Wrath", "Pain", "Lust", "Sighing", "Cursedness", "Bitterness", "Quarelsomeness"]
+	demonsFemaleModifier = ["Wrathful", "Painful", "Lusty", "Sighing", "Cursed", "Bitter", "Quarelsome"]
+
+	angelsMale = ["Unenviousness", "Blessedness", "Joy", "Truth", "Unbegrudgingness", "Belovedness", "Trustworthyness"]
+	angelsMaleModifier = ["Unenvious", "Blessed", "Joyful", "True", "Unbegrudging", "Beloved", "Trustworthy"]
+
+	angelsFemale = ["Peace", "Gladness", "Rejoicing", "Blessedness", "Truth", "Love", "Faith"]
+	angelsFemaleModifier = ["Peaceful", "Glad", "Rejoicing", "Blessed", "Truthful", "Lovely", "Faithful"]
+
+	maleDemons = [demonsMale, demonsMaleModifier]
+	femaleDemons = [demonsFemale, demonsFemaleModifier]
+	maleAngels = [angelsMale, angelsMaleModifier]
+	femaleAngels = [angelsFemale, angelsFemaleModifier]
+
+
+	md_fd = [maleDemons, femaleDemons]
+	fd_md = [femaleDemons, maleDemons]
+
+	ma_fa = [maleAngels, femaleAngels]
+	fa_ma = [femaleAngels, maleAngels]
+
+	md_fa = [maleDemons, femaleAngels]
+	fa_md = [femaleAngels, maleDemons]
+
+	ma_fd = [maleAngels, femaleDemons]
+	fd_ma = [femaleDemons, maleAngels]
+
+
+	demonArray = [
+	md_fd, 
+	md_fa, 
+	ma_fd, 
+	ma_fa, 
+	fd_md, 
+	fd_ma,
+	fa_md,
+	fa_ma
+	]
+
+	combination = demonArray[int(math.floor(random.uniform(0, len(demonArray))))]
+	arrayToUse = combination[int(math.floor(random.uniform(0, len(combination))))]
+	messageString = ""
+
+	if(config.sansSerif) : 
+		font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
+	else :
+		font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSerifBold.ttf', config.fontSize)
+
+	for i in range(0,4) :
+		adj = arrayToUse[1][int(math.floor(random.uniform(0,7)))]
+		noun = arrayToUse[0][int(math.floor(random.uniform(0,7)))]
+		messageString = messageString + adj.upper() + " " + noun.upper() + "           "
+
+	#print(messageString)
+
+	if (random.random() < .5) :
+		messageString = ""
+		font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSans.ttf', config.fontSize)
+		for i in range(0,23) :
+			xo = "X" if (random.random() < .5) else "O"
+			messageString = messageString + xo
+			messageString = messageString + " " if (random.random() < .5) else messageString
+
+	global config
+
+	if(config.colorMode == "getRandomRGB") : clr = colorutils.getRandomRGB(config.brightness)
+	if(config.colorMode == "randomColor") : clr = colorutils.randomColor(config.brightness)
+	if(config.colorMode == "getRandomColorWheel") : clr = colorutils.getRandomColorWheel(config.brightness)
+
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	# draw the message to get its size
+
+
+	tempImage = Image.new("RGBA", (1200,196))
+	draw  = ImageDraw.Draw(tempImage)
+
+
+	pixLen = draw.textsize(messageString, font = font)
+	# For some reason textsize is not getting full height !
+	fontHeight = int(pixLen[1] * 1.3)
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	# make a new image with the right size
+	scrollImage = Image.new("RGBA", (pixLen[0] + 2 , fontHeight))
+	draw  = ImageDraw.Draw(scrollImage)
+	iid = scrollImage.im.id
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	# Draw the text with "borders"
+	indent = int(.05 * config.tileSize[0])
+	for i in range(1, config.shadowSize) :
+		draw.text((indent + -i,-i),messageString,(0,0,0),font=font)
+		draw.text((indent + i,i),messageString,(0,0,0),font=font)
+
+	draw.text((2,0),messageString, clr ,font=font)
+
+	refDraw = ImageDraw.Draw(imageRef)
+	refDraw.rectangle((0,0,pixLen[0] + 2 , fontHeight), fill = config.bgBackGroundColor)
+	imageRef.paste(scrollImage,(0,config.textVOffest), scrollImage)
+
 def makeScrollBlock(imageRef, imageDrawRef, direction):
 	global config
 	w = imageRef.size[0]
@@ -286,9 +391,7 @@ def makeArrows(drawRef, direction = 1) :
 
 def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 	global config
-	scrollSpeed = 0.004
-	steps = 1
-	fontSize = 14
+
 
 	if(config.colorMode == "getRandomRGB") : clr = colorutils.getRandomRGB(config.brightness)
 	if(config.colorMode == "randomColor") : clr = colorutils.randomColor(config.brightness)
@@ -360,6 +463,10 @@ def makeBackGround(drawRef, n = 1):
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery callbacks & regeneration functions
+
+def remakeDaemonMessages(imageRef, direction = 1):
+	##
+	makeDaemonMessages(imageRef=imageRef, direction=direction)
 
 def remakeScrollBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
@@ -446,6 +553,7 @@ def init() :
 	config.useImages = workConfig.getboolean("scroller", 'useImages')
 	config.useTransparentImages = workConfig.getboolean("scroller", 'useTransparentImages')
 	config.useBackground = workConfig.getboolean("scroller", 'useBackground')
+	config.useAltText = workConfig.getboolean("scroller", 'useAltText')
 
 	config.imageBlockImage = workConfig.get("scroller", 'imageBlockImage')
 	config.imageBlockBuffer = int(workConfig.get("scroller", 'imageBlockBuffer'))
@@ -529,6 +637,19 @@ def init() :
 		config.scrollArray.append(scrollerRef)
 
 
+	if(config.useAltText == True) :
+		config.scroller6 = continuous_scroller.ScrollObject()
+		scrollerRef = config.scroller6
+		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.xSpeed = -config.textSpeed
+		scrollerRef.setUp()
+		direction = 1 if scrollerRef.xSpeed > 0 else -1
+		makeDaemonMessages(scrollerRef.bg1, direction)
+		makeDaemonMessages(scrollerRef.bg2, direction)
+		scrollerRef.callBack = {"func" : remakeDaemonMessages, "direction" : direction}
+		config.scrollArray.append(scrollerRef)
+
+
 	if(config.useImages== True) :
 		config.scroller5 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller5
@@ -553,6 +674,19 @@ def init() :
 		makeMessage(scrollerRef.bg1,config.msg2, direction)
 		makeMessage(scrollerRef.bg2,config.msg2, direction)
 		scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
+		config.scrollArray.append(scrollerRef)
+
+	
+	if(config.useAltText == True) :
+		config.scroller6 = continuous_scroller.ScrollObject()
+		scrollerRef = config.scroller6
+		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.xSpeed = config.textSpeed + 1
+		scrollerRef.setUp()
+		direction = 1 if scrollerRef.xSpeed > 0 else -1
+		makeDaemonMessages(scrollerRef.bg1, direction)
+		makeDaemonMessages(scrollerRef.bg2, direction)
+		scrollerRef.callBack = {"func" : remakeDaemonMessages, "direction" : direction}
 		config.scrollArray.append(scrollerRef)
 
 def runWork():

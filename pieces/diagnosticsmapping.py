@@ -93,6 +93,8 @@ def showGrid():
 
 	
 	#config.image.paste(config.loadedImage, (0,160), config.loadedImage)
+	#crop = config.image.crop((192,256,320,384))
+	#config.image.paste(crop, (0,0), crop)
 	
 	config.render(config.image, 0,0)
 

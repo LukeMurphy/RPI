@@ -194,6 +194,13 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 			# basically same thing as rotating the image to be pasted in
 			# except in some cases, more trailing is created
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+
+
+	if config.remapImageBlock == True :
+
+		crop = config.renderImageFull.crop(config.remapImageBlockSection)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 		
 	if(updateCanvasCall) : updateCanvas() 
 

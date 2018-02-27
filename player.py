@@ -187,7 +187,20 @@ def configure() :
 		config.brightnessVarLow = .8
 		config.brightnessVarHi = 1
 
-	
+	## used when repositioning a block of an image -- sculptural pieces when
+	## card configurations can't handle simple set up
+
+	try :
+		config.remapImageBlock = (workconfig.getboolean("displayconfig", 'remapImageBlock'))
+		config.remapImageBlockSection = workconfig.get("displayconfig", 'remapImageBlockSection').split(",")
+		config.remapImageBlockSection = tuple([int(i) for i in config.remapImageBlockSection])
+		config.remapImageBlockDestination = workconfig.get("displayconfig", 'remapImageBlockDestination').split(",")
+		config.remapImageBlockDestination = tuple([int(i) for i in config.remapImageBlockDestination])
+	except Exception as e:
+		print (str(e))
+		config.remapImageBlock = False
+
+
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 	config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
 	#config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
@@ -326,9 +339,6 @@ def configure() :
 		work.main(False)
 		
 		r.setUp("video")
-
-
-
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

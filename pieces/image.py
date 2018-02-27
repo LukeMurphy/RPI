@@ -154,13 +154,12 @@ def iterate( n = 0) :
 	if(config.useBlanks) :
 		bads.drawBlanks(None, False)
 		if(random.random() > .99) : bads.setBlanks()
-	
-
-	# Render the final full image
 
 	en = ImageEnhance.Brightness(config.renderImageFull)
 	config.renderImageFull = en.enhance(config.brightness)
 	config.renderImageFull.paste(config.renderImageFull)
+
+	# Render the final full image
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False)
 
 	# cleanup the list

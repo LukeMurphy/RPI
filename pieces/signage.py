@@ -12,16 +12,20 @@ import argparse
 
 def showGrid():
 	global config
+
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
 	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
+
+	config.colOverlay.stepTransition()
+	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 	
 
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
 			xPos = col * config.tileSizeWidth
 			yPos = row * config.tileSizeHeight
-			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
+			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor,  outline=config.outlineColor)
 			
 			#u"\u000D"
 			displyInfo1  =  str(col) + ", " + str(row) 
@@ -153,6 +157,9 @@ def main(run = True) :
 	config.overlayGlitchRate = float(workConfig.get("signage", 'overlayGlitchRate'))
 	config.fullimageGiltchRate = float(workConfig.get("signage", 'fullimageGiltchRate'))
 	config.overlayResetRate = float(workConfig.get("signage", 'overlayResetRate'))
+
+
+	config.colOverlay = coloroverlay.ColorOverlay()
 
 	try:
 		config.showGrid = workConfig.getboolean("signage","showGrid")

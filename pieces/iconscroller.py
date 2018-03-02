@@ -595,6 +595,8 @@ def init() :
 		config.imageBlockImageLoaded.load()
 		config.imageBlockImageLoadedCopy  = config.imageBlockImageLoaded.copy()
 
+
+
 	## Set up the scrolling layers
 	config.scrollArray = []
 
@@ -650,17 +652,17 @@ def init() :
 		config.scrollArray.append(scrollerRef)
 
 
-	if(config.useImages== True) :
+	if(config.useImages == True) :
 		config.scroller5 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller5
 		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
-		scrollerRef.canvasHeight = int(config.windowHeight)
+		#scrollerRef.canvasHeight = int(config.windowHeight)
 		scrollerRef.xSpeed = config.imageSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
 		scrollerRef.callBack = {"func" : remakeScrollBlock, "direction" : direction}
-		#makeScrollBlock(config.imageLayer,scrollerRef.bg1Draw, 1)
-		makeScrollBlock(config.imageLayer,scrollerRef.bg2Draw, 1)
+		makeScrollBlock(scrollerRef.bg1, scrollerRef.bg1Draw, direction)
+		makeScrollBlock(scrollerRef.bg2, scrollerRef.bg2Draw, direction)
 		config.scrollArray.append(scrollerRef)
 		
 
@@ -698,7 +700,7 @@ def runWork():
 def iterate() :
 	global config
 
-	config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
+	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
 	config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0))
 
 	for scrollerObj in config.scrollArray :

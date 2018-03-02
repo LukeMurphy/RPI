@@ -48,6 +48,9 @@ class ScrollObject :
 		self.leadImage = self.bg1
 		self.followImage = self.bg2
 
+		#self.bg1Draw.rectangle((0,0,10,100), fill= (100,100,100))
+		#self.bg2Draw.rectangle((0,0,10,100), fill= (100,0,255))
+
 		'''
 		#self.bg1Draw.rectangle((0,0,self.canvasWidth, self.canvasHeight), fill = self.bgBackGroundColor)
 		self.bg1Draw.rectangle((0,0,100,50), fill=(0,200,0))

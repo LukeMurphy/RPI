@@ -196,14 +196,17 @@ def configure() :
 		config.remapImageBlockSection = tuple([int(i) for i in config.remapImageBlockSection])
 		config.remapImageBlockDestination = workconfig.get("displayconfig", 'remapImageBlockDestination').split(",")
 		config.remapImageBlockDestination = tuple([int(i) for i in config.remapImageBlockDestination])
+	except Exception as e:
+		print (str(e))
+		config.remapImageBlock = False
+
+	try :
 		config.imageXOffset = int(workconfig.get("displayconfig","imageXOffset"))
 		config.imageYOffset = int(workconfig.get("displayconfig","imageYOffset"))
 	except Exception as e:
 		print (str(e))
-		config.remapImageBlock = False
 		config.imageXOffset = 0
 		config.imageYOffset = 0
-
 
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 	config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))

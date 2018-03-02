@@ -64,6 +64,9 @@ def main(run = True) :
 	config.imageGlitchSize = float(workConfig.get("filter", 'imageGlitchSize')) 
 	config.imageGlitchDisplacement = int(workConfig.get("filter", 'imageGlitchDisplacement')) 
 
+	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.workImageDraw = ImageDraw.Draw(config.workImage)
+
 	try:
 		config.forceGlitchFrameCount = int(workConfig.get("filter", 'forceGlitchFrameCount')) 
 	except Exception as e:
@@ -131,14 +134,14 @@ def iterate( n = 0) :
 
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
-	x, y = config.renderImageFull.size
+	x, y = config.workImage.size
 	x1, y1  = blocks[0].image.size
 	
 	if(random.random() < config.imageGlitchProb ) :
 		blocks[0].glitchBox(-config.imageGlitchDisplacement, config.imageGlitchDisplacement)
 
 	#blocks[0].image = blocks[0].image.convert(config.renderImageFull.mode)
-	config.renderImageFull.paste(blocks[0].image, (0,0,x,y))
+	config.workImage.paste(blocks[0].image, (0,0,x,y))
 
 	if(random.random() < config.overlayChangeProb ) :
 		config.colorOverlay = colorutils.getRandomRGB()
@@ -154,6 +157,8 @@ def iterate( n = 0) :
 	if(config.useBlanks) :
 		bads.drawBlanks(None, False)
 		if(random.random() > .99) : bads.setBlanks()
+
+	config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
 
 	en = ImageEnhance.Brightness(config.renderImageFull)
 	config.renderImageFull = en.enhance(config.brightness)
@@ -188,7 +193,7 @@ def colorize(clr = (250,0,250), recolorize = False) :
 		#Colorize via overlay etc
 		w = config.renderImageFull.size[0]
 		h = config.renderImageFull.size[1]
-		clrBlock = Image.new(config.renderImageFull.mode, (w, h))
+		clrBlock = Image.new(config.workImage.mode, (w, h))
 		clrBlockDraw = ImageDraw.Draw(clrBlock)
 
 		# Color overlay on b/w PNG sprite
@@ -206,7 +211,7 @@ def colorize(clr = (250,0,250), recolorize = False) :
 		#config.renderImageFull.paste(clrBlock, (0,0))
 
 		try :
-			config.renderImageFull = ImageChops.multiply(clrBlock, config.renderImageFull)
+			config.workImage = ImageChops.multiply(clrBlock, config.workImage)
 			#imgTemp = imgTemp.convert(config.renderImageFull.mode)
 			#print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
 			#config.renderImageFull.paste(imgTemp,(0,0,w,h))

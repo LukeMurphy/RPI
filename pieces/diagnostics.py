@@ -96,7 +96,7 @@ def showGrid():
 			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
 
 	
-	config.image.paste(config.canvasImage, (config.imageXOffset, 0), config.canvasImage)
+	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
 
 	config.draw.rectangle((config.imageXOffset,0,config.imageXOffset + 20, 20), fill=(100,0,0))
 	

@@ -196,9 +196,13 @@ def configure() :
 		config.remapImageBlockSection = tuple([int(i) for i in config.remapImageBlockSection])
 		config.remapImageBlockDestination = workconfig.get("displayconfig", 'remapImageBlockDestination').split(",")
 		config.remapImageBlockDestination = tuple([int(i) for i in config.remapImageBlockDestination])
+		config.imageXOffset = int(workconfig.get("displayconfig","imageXOffset"))
+		config.imageYOffset = int(workconfig.get("displayconfig","imageYOffset"))
 	except Exception as e:
 		print (str(e))
 		config.remapImageBlock = False
+		config.imageXOffset = 0
+		config.imageYOffset = 0
 
 
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
@@ -296,6 +300,8 @@ def configure() :
 		# And to be sure, make the renderImageFull bigger than necessary - 		
 		config.renderImage = PIL.Image.new("RGBA", (config.canvasWidth * config.rows, 32))
 		config.renderImageFull = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+		config.renderImageFull = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
+
 		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 		config.image = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 		config.draw = ImageDraw.Draw(config.image)

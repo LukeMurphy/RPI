@@ -78,21 +78,27 @@ class unit:
 
 def showGrid():
 	global config
+
+	
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
-	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
-	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
+	config.canvasDraw.rectangle((0,0,config.canvasWidth-1, config.canvasHeight-1), fill= None, outline=config.outlineColor)
+	config.canvasDraw.rectangle((1,1,config.canvasWidth-2, config.canvasHeight-2), fill= None, outline=(0,0,int(220 * config.brightness)))
+
+	#print(config.imageXOffset)
 	
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
-			xPos = col * config.tileSizeWidth
+			xPos = col * config.tileSizeWidth 
 			yPos = row * config.tileSizeHeight
-			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
+			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
 			
 			displyInfo  =  str(col) + ", " + str(row) + "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
-			config.draw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
+			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
 
 	
-	#config.image.paste(config.loadedImage, (0,160), config.loadedImage)
+	config.image.paste(config.canvasImage, (config.imageXOffset, 0), config.canvasImage)
+
+	config.draw.rectangle((config.imageXOffset,0,config.imageXOffset + 20, 20), fill=(100,0,0))
 	
 	config.render(config.image, 0,0)
 
@@ -103,10 +109,10 @@ def main(run = True) :
 
 
 	colorutils.brightness = config.brightness
-	config.canvasImageWidth = config.screenWidth
-	config.canvasImageHeight = config.screenHeight
-	config.canvasImageWidth -= 4
-	config.canvasImageHeight -= 4
+	#config.canvasImageWidth = config.screenWidth
+	#config.canvasImageHeight = config.screenHeight
+	#config.canvasImageWidth -= 4
+	#config.canvasImageHeight -= 4
 	config.delay = .02
 	config.numUnits  = 1
 
@@ -116,19 +122,24 @@ def main(run = True) :
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
 	try:
 		config.showGrid = workConfig.getboolean("diag","showGrid")
+		config.imageXOffset = int(workConfig.get("displayconfig","imageXOffset"))
 	except Exception as e:
 		print (str(e))
 		config.showGrid = False
-
+		config.imageXOffset = 0
 	
 	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
 	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
 
 
-
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
+	config.image = Image.new("RGBA", (config.screenWidth  , config.screenHeight))
+
+
+	config.draw = ImageDraw.Draw(config.image)
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth  , config.canvasHeight))
+	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 	config.fontSize = 14
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	

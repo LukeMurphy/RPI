@@ -172,7 +172,6 @@ def makeDaemonMessages(imageRef, direction = 1):
 def makeScrollBlock(imageRef, imageDrawRef, direction):
 	global config
 	w = imageRef.size[0]
-
 	#config.enhancer = ImageEnhance.Brightness(config.loadedImage)
 	#config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
 
@@ -184,6 +183,7 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 	for i in range (0,numberOfUnits):
 		x = i * ( widthImage + hBuffer)
 		y = -5
+
 		tempImage  = config.imageBlockImageLoaded.copy()
 		#tempEnhancer = ImageEnhance.Brightness(tempImage)
 		#tempImage = tempEnhancer.enhance(random.random())
@@ -566,7 +566,7 @@ def init() :
 	config.overlayGlitchRate = float(workConfig.get("scroller", 'overlayGlitchRate'))
 	config.overlayResetRate = float(workConfig.get("scroller", 'overlayResetRate'))
 
-	config.bandHeight = int(round(config.windowHeight / config.displayRows) )
+	config.bandHeight = int(round(config.canvasHeight / config.displayRows) )
 
 	#********* HARD CODING VALUES  ***********************
 	config.bgBackGroundColor = (0,0,0,0)
@@ -576,7 +576,7 @@ def init() :
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
 	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)	
 
-	config.imageLayer = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
+	config.imageLayer = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
 	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
 
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -601,12 +601,12 @@ def init() :
 	if(config.useBackground == True) :
 		config.scroller4 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller4
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.xSpeed = config.patternSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
 		scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}
-		#makeBackGround(scrollerRef.bg1Draw, 1)
+		makeBackGround(scrollerRef.bg1Draw, 1)
 		makeBackGround(scrollerRef.bg2Draw, 1)
 		config.scrollArray.append(scrollerRef)
 
@@ -614,7 +614,7 @@ def init() :
 	if(config.useArrows == True) :
 		config.scroller1 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller1
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.xSpeed = config.arrowSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
@@ -627,7 +627,7 @@ def init() :
 	if(config.useText == True) :
 		config.scroller2 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller2
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.xSpeed = -config.textSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
@@ -640,7 +640,7 @@ def init() :
 	if(config.useAltText == True) :
 		config.scroller6 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller6
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.xSpeed = -config.textSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
@@ -653,21 +653,21 @@ def init() :
 	if(config.useImages== True) :
 		config.scroller5 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller5
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.canvasHeight = int(config.windowHeight)
 		scrollerRef.xSpeed = config.imageSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
 		scrollerRef.callBack = {"func" : remakeScrollBlock, "direction" : direction}
+		#makeScrollBlock(config.imageLayer,scrollerRef.bg1Draw, 1)
 		makeScrollBlock(config.imageLayer,scrollerRef.bg2Draw, 1)
-		makeScrollBlock(config.imageLayer,scrollerRef.bg1Draw, 1)
 		config.scrollArray.append(scrollerRef)
 		
 
 	if(config.useText == True) :
 		config.scroller3 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller3
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.xSpeed = config.textSpeed + 1
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
@@ -680,7 +680,7 @@ def init() :
 	if(config.useAltText == True) :
 		config.scroller6 = continuous_scroller.ScrollObject()
 		scrollerRef = config.scroller6
-		scrollerRef.canvasWidth = int(config.displayRows * config.windowWidth)
+		scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 		scrollerRef.xSpeed = config.textSpeed + 1
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
@@ -698,8 +698,8 @@ def runWork():
 def iterate() :
 	global config
 
-	config.workImageDraw.rectangle((0,0,config.windowWidth,config.windowHeight), fill  = (0,0,0))
-	config.canvasImageDraw.rectangle((0,0,config.windowWidth*10,config.windowHeight), fill  = (0,0,0))
+	config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
+	config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0))
 
 	for scrollerObj in config.scrollArray :
 		scrollerObj.scroll()
@@ -709,7 +709,7 @@ def iterate() :
 	#segmentWidth = config.canvasWidth	
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
-		segment = config.canvasImage.crop((n * config.windowWidth, 0, config.windowWidth + n * config.windowWidth, config.bandHeight))
+		segment = config.canvasImage.crop((n * config.canvasWidth, 0, config.canvasWidth + n * config.canvasWidth, config.bandHeight))
 		if ((n % 2 ==  0) and (config.displayRows >  1) ) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
@@ -721,7 +721,9 @@ def iterate() :
 		if(random.random() < config.overlayResetRate ) :
 			config.loadedImage.paste(config.loadedImageCopy)
 		config.workImage.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
-	config.render(config.workImage, 0,0)
+	
+	config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
+	config.render(config.renderImageFull, 0,0)
 
 def main(run = True) :
 	global config, threads, thrd

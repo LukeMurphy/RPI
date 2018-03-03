@@ -19,6 +19,8 @@ class unit:
 
 		#### Sets up color transitions
 		self.colOverlay = coloroverlay.ColorOverlay()
+		self.colOverlay.randomSteps = True
+		self.colOverlay.steps = 10
 
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower

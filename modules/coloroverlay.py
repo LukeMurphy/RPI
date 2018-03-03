@@ -40,7 +40,6 @@ class ColorOverlay:
 		#self.colorA = self.colorB
 		self.getNewColor()
 
-
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		from operator import sub
 		self.colorDelta = map(sub, self.colorB, self.currentColor)
@@ -53,7 +52,6 @@ class ColorOverlay:
 
 
 	def stepTransition(self, autoReset = True) :
-
 		self.currentColor = [
 		(self.currentColor[0] + self.rateOfColorChange[0]),
 		(self.currentColor[1] + self.rateOfColorChange[1]),
@@ -64,7 +62,6 @@ class ColorOverlay:
 			#if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
 			if (self.currentColor[i] >= self.colorB[i] - abs(self.rateOfColorChange[i])) and  self.currentColor[i] <= (self.colorB[i] + abs(self.rateOfColorChange[i])) :
 				self.rateOfColorChange[i] = 0
-
 		
 		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 
 				self.complete =  True

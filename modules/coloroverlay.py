@@ -14,6 +14,8 @@ class ColorOverlay:
 	colorA = colorB = [0,0,0]
 	complete =  False
 	randomRange = (10.0,100.0)
+	randomSteps = True
+	steps = 100
 
 
 	def __init__(self): 
@@ -34,17 +36,18 @@ class ColorOverlay:
 		self.colorDelta = [0,0,0]
 		self.rateOfColorChange = [0,0,0]
 
-		self.colorA = self.colorB
-		self.currentColor = self.colorA
+		#self.currentColor = self.colorA
+		#self.colorA = self.colorB
 		self.getNewColor()
 
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		from operator import sub
-		self.colorDelta = map(sub, self.colorB, self.colorA)
+		self.colorDelta = map(sub, self.colorB, self.currentColor)
 		test = [abs(a) for a in self.colorDelta]
-		if(steps == 0) : steps = random.uniform(self.randomRange[0],self.randomRange[1])
-		self.rateOfColorChange = [ a/steps for a in self.colorDelta]
+		if(steps == 0 or self.randomSteps == True) : 
+			self.steps = random.uniform(self.randomRange[0],self.randomRange[1])
+		self.rateOfColorChange = [ a/self.steps for a in self.colorDelta]
 		self.complete =  False
 
 
@@ -58,11 +61,13 @@ class ColorOverlay:
 		]
 
 		for i in range (0,3):
-			if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
+			#if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
+			if (self.currentColor[i] >= self.colorB[i] - abs(self.rateOfColorChange[i])) and  self.currentColor[i] <= (self.colorB[i] + abs(self.rateOfColorChange[i])) :
 				self.rateOfColorChange[i] = 0
 
 		
 		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 
 				self.complete =  True
-				if(autoReset == True) : self.colorTransitionSetup()
+				if(autoReset == True) : 
+					self.colorTransitionSetup(self.steps)
 

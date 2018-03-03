@@ -17,7 +17,8 @@ def showGrid():
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
 	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
 
-	config.colOverlay.stepTransition()
+	if(config.unHideGrid == False):
+		config.colOverlay.stepTransition()
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 	fontColor = config.bgColor
 	outlineColor = config.bgColor
@@ -171,7 +172,8 @@ def main(run = True) :
 
 
 	config.colOverlay = coloroverlay.ColorOverlay()
-
+	config.colOverlay.randomSteps = False 
+	config.colOverlay.steps = 200 
 	config.unHideGrid = False
 
 	try:

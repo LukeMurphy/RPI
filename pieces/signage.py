@@ -23,9 +23,13 @@ def showGrid():
 	outlineColor = config.bgColor
 
 	if(random.random() < .005):
+		config.unHideGrid = True
+	if(config.unHideGrid == True):
 		fontColor = config.fontColor
 		outlineColor = config.outlineColor
-	
+	if(random.random() < .05):
+		config.unHideGrid = False
+
 
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
@@ -167,6 +171,8 @@ def main(run = True) :
 
 
 	config.colOverlay = coloroverlay.ColorOverlay()
+
+	config.unHideGrid = False
 
 	try:
 		config.showGrid = workConfig.getboolean("signage","showGrid")

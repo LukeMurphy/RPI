@@ -123,7 +123,7 @@ def makeDaemonMessages(imageRef, direction = 1):
 
 	#print(messageString)
 
-	if (random.random() < .5) :
+	if (random.random() < .15) :
 		messageString = ""
 		font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSans.ttf', config.fontSize)
 		for i in range(0,23) :
@@ -185,8 +185,8 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 		y = -5
 
 		tempImage  = config.imageBlockImageLoaded.copy()
-		#tempEnhancer = ImageEnhance.Brightness(tempImage)
-		#tempImage = tempEnhancer.enhance(random.random())
+		tempEnhancer = ImageEnhance.Brightness(tempImage)
+		tempImage = tempEnhancer.enhance(config.brightness)
 
 		clrBlock = Image.new("RGBA", (widthImage, heightImage))
 		clrBlockDraw = ImageDraw.Draw(clrBlock)
@@ -363,7 +363,7 @@ def makeArrows(drawRef, direction = 1) :
 	arrowLength = cols * 2
 	blade = cols / 3
 
-	clr  = (200,0,0)
+	clr  = (int(220 * config.brightness),0,0)
 
 	drawRef.rectangle((0,0,int(config.displayRows * config.windowWidth), config.canvasHeight), fill = config.bgBackGroundColor)
 
@@ -566,12 +566,19 @@ def init() :
 	config.overlayGlitchRate = float(workConfig.get("scroller", 'overlayGlitchRate'))
 	config.overlayResetRate = float(workConfig.get("scroller", 'overlayResetRate'))
 
-	config.bandHeight = int(round(config.canvasHeight / config.displayRows) )
+	try:
+		config.altDirectionScrolling = workConfig.getboolean("scroller", 'altDirectionScrolling')
+	except Exception as e:
+		print (str(e))
+		config.altDirectionScrolling == True
 
+	
+	
 	#********* HARD CODING VALUES  ***********************
+
+	config.bandHeight = int(round(config.canvasHeight / config.displayRows) )
 	config.bgBackGroundColor = (0,0,0,0)
 	config.arrowBgBackGroundColor = (0,0,0,200)
-
 
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
 	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)	
@@ -707,15 +714,17 @@ def iterate() :
 		scrollerObj.scroll()
 		config.canvasImage.paste(scrollerObj.canvas, (0,0), scrollerObj.canvas)
 
-	#segmentHeight = int(config.canvasHeight / config.displayRows)
-	#segmentWidth = config.canvasWidth	
+
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
 		segment = config.canvasImage.crop((n * config.canvasWidth, 0, config.canvasWidth + n * config.canvasWidth, config.bandHeight))
-		if ((n % 2 ==  0) and (config.displayRows >  1) ) :
+		
+		if ((n % 2 ==  0) and (config.displayRows >  1) and config.altDirectionScrolling == True) :
 			segment = ImageOps.flip(segment)
 			segment = ImageOps.mirror(segment)
+
 		config.workImage.paste(segment, (0, n * config.bandHeight))
+
 
 	if(config.useOverLayImage  ==  True) :
 		if(random.random() < config.overlayGlitchRate ) :

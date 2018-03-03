@@ -22,12 +22,12 @@ def showGrid():
 	fontColor = config.bgColor
 	outlineColor = config.bgColor
 
-	if(random.random() < .005):
+	if(random.random() < .002):
 		config.unHideGrid = True
 	if(config.unHideGrid == True):
 		fontColor = config.fontColor
 		outlineColor = config.outlineColor
-	if(random.random() < .05):
+	if(random.random() < .02):
 		config.unHideGrid = False
 
 

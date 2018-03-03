@@ -19,13 +19,20 @@ def showGrid():
 
 	config.colOverlay.stepTransition()
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
+	fontColor = config.bgColor
+	outlineColor = config.bgColor
+
+	if(random.random() < .005):
+		fontColor = config.fontColor
+		outlineColor = config.outlineColor
 	
 
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
 			xPos = col * config.tileSizeWidth
 			yPos = row * config.tileSizeHeight
-			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor,  outline=config.outlineColor)
+			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), 
+				fill=config.bgColor,  outline=outlineColor)
 			
 			#u"\u000D"
 			displyInfo1  =  str(col) + ", " + str(row) 
@@ -33,8 +40,8 @@ def showGrid():
 	
 			#displyInfo = displyInfo.encode('utf-8')
 
-			config.draw.text((xPos + 2,yPos - 1), (displyInfo1), config.fontColor, font=config.font)
-			config.draw.text((xPos + 2,yPos - 1 + config.fontSize), (displyInfo2), config.fontColor, font=config.font)
+			config.draw.text((xPos + 2,yPos - 1), (displyInfo1), fontColor, font=config.font)
+			config.draw.text((xPos + 2,yPos - 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
 
 	# the overlay can fall apart independently of the overall image
 	if(config.useOverLayImage  ==  True) :

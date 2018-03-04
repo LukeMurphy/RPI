@@ -10,6 +10,90 @@ import argparse
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Image layers 
 
+class unit :
+
+	xPos = 0
+	yPos = 0
+	bgColor = (0,0,0)
+	outlineColor = (0,0,0)
+	tileSizeWidth = 64
+	tileSizeHeight = 32
+
+
+	def __init__(self) :
+
+		self.image = Image.new("RGBA", (self.tileSizeWidth  , self.tileSizeHeight))
+		self.draw = ImageDraw.Draw(self.image)
+
+		self.colOverlay = coloroverlay.ColorOverlay()
+		self.colOverlay.randomSteps = True 
+		self.colOverlay.steps = 80
+		self.unHideGrid = False
+
+		pass
+
+	def drawUnit(self):
+		if(self.unHideGrid == False):
+			self.colOverlay.stepTransition()
+
+		self.bgColor  = tuple(int(a*config.brightness) for a in (self.colOverlay.currentColor))
+		fontColor = self.bgColor
+		outlineColor = self.bgColor
+
+		if(self.unHideGrid == True):
+			fontColor = config.fontColor
+			outlineColor = config.outlineColor
+		
+		self.draw.rectangle((0,0,self.tileSizeWidth - 1,self.tileSizeHeight -1), 
+			fill=self.bgColor,  outline=outlineColor)
+		
+		#u"\u000D"
+		displyInfo1  =  str(self.col) + ", " + str(self.row) 
+		displyInfo2  =  str(self.col * self.tileSizeWidth) + ", " + str(self.row * self.tileSizeHeight)
+
+		#displyInfo = displyInfo.encode('utf-8')
+		self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
+		self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
+
+		
+
+def makeGrid():
+	global config
+	for row in range (0, config.rows) :
+		for col in range (0, config.cols) :
+			u = unit()
+			u.config = config
+			u.tileSizeWidth = config.tileSizeWidth
+			u.tileSizeHeight = config.tileSizeHeight
+			u.xPos = col * config.tileSizeWidth
+			u.yPos = row * config.tileSizeHeight
+			u.row = row
+			u.col = col
+			u.drawUnit()
+			config.unitArrray.append(u)
+
+def redrawGrid():
+	
+	if(random.random() < .002):
+		config.unHideGrid = True
+	if(random.random() < .02):
+		config.unHideGrid = False
+
+	for u in config.unitArrray:
+
+		if(random.random() < .02):
+			u.unHideGrid = True
+		if(random.random() < .02):
+			u.unHideGrid = False
+		#u.unHideGrid = config.unHideGrid
+		u.drawUnit()
+		config.image.paste(u.image,(u.xPos,u.yPos), u.image)
+
+	if(random.random() < config.fullimageGiltchRate)  : 
+		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
+	config.render(config.image, 0,0)
+
+
 def showGrid():
 	global config
 
@@ -100,8 +184,8 @@ def displayTest():
 ## Image manipulation functions
 
 def glitchBox(img, r1 = -10, r2 = 10) :
-	apparentWidth = img.size[1]
-	apparentHeight = img.size[0]
+	apparentWidth = img.size[0]
+	apparentHeight = img.size[1]
 	dy = int(random.uniform(r1,r2))
 	dx = int(random.uniform(1, config.imageGlitchSize))
 	dx = 0
@@ -109,8 +193,8 @@ def glitchBox(img, r1 = -10, r2 = 10) :
 	# really doing "vertical" or y-axis glitching
 	# block height is uniform but width is variable
 
-	sectionWidth = int(random.uniform(2, apparentHeight - dx))
-	sectionHeight = apparentWidth
+	sectionHeight= int(random.uniform(2, apparentHeight - dy))
+	sectionWidth = apparentWidth
 
 	# 95% of the time they dance together as mirrors
 	if(random.random() < .97) :
@@ -176,6 +260,8 @@ def main(run = True) :
 	config.colOverlay.steps = 200 
 	config.unHideGrid = False
 
+	config.unitArrray = []
+
 	try:
 		config.showGrid = workConfig.getboolean("signage","showGrid")
 	except Exception as e:
@@ -208,6 +294,7 @@ def setUp():
 		config.enhancer = ImageEnhance.Brightness(config.loadedImage)
 		config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
 		config.loadedImageCopy  = config.loadedImage.copy()
+	makeGrid()
 
 def runWork():
 	global blocks, config, XOs
@@ -220,7 +307,8 @@ def iterate() :
 
 	global config
 	if config.showGrid ==  True :
-		showGrid()
+		#showGrid()
+		redrawGrid()
 	else :		
 		displayTest()		
 

@@ -570,7 +570,7 @@ def init() :
 		config.altDirectionScrolling = workConfig.getboolean("scroller", 'altDirectionScrolling')
 	except Exception as e:
 		print (str(e))
-		config.altDirectionScrolling == True
+		config.altDirectionScrolling = True
 
 	
 	

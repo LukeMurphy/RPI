@@ -58,7 +58,7 @@ class unit :
 		self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
 		self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
 
-		
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def makeGrid():
 	global config
@@ -102,7 +102,7 @@ def redrawGrid():
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 	config.render(config.image, 0,0)
 
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def showGrid():
 	global config
 
@@ -324,9 +324,6 @@ def iterate() :
 	else :		
 		displayTest()		
 
-def callBack() :
-	global config, XOs
-	return True
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

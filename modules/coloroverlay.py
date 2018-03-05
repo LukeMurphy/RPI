@@ -26,7 +26,7 @@ class ColorOverlay:
 
 	def getNewColor(self):
 		self.colorB = colorutils.randomColor()
-		if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
+		#if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
 
 
 	def colorTransitionSetup(self,steps=0):
@@ -60,7 +60,10 @@ class ColorOverlay:
 
 		for i in range (0,3):
 			#if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
-			if (self.currentColor[i] >= self.colorB[i] - abs(self.rateOfColorChange[i])) and  self.currentColor[i] <= (self.colorB[i] + abs(self.rateOfColorChange[i])) :
+			#if (self.currentColor[i] >= (self.colorB[i] - abs(self.rateOfColorChange[i]))) and  self.currentColor[i] <= (self.colorB[i] + abs(self.rateOfColorChange[i])) :
+			lowerRange = self.colorB[i] - abs(self.rateOfColorChange[i])
+			upperRange = self.colorB[i] + abs(self.rateOfColorChange[i])
+			if (self.currentColor[i] >= (lowerRange) and  self.currentColor[i] <= (upperRange) ) :
 				self.rateOfColorChange[i] = 0
 		
 		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 

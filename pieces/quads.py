@@ -247,6 +247,10 @@ def iterate() :
 	
 
 	#drawCarcas()
+	
+	if(random.random() < .01) :
+		config.pixSortprobDraw = random.uniform(0,.01)
+	
 
 	if(random.random() < .5) :
 		config.pixSortYOffset = config.base_pixSortYOffset

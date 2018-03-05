@@ -328,7 +328,6 @@ def configure() :
 	if(config.rendering == "out") :
 		from modules import rendertofile
 		config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
-		config.usePixelSort  = (workconfig.getboolean("displayconfig", 'usePixelSort'))
 		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
 		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
 		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
@@ -338,7 +337,6 @@ def configure() :
 		r.work.x = r.work.y = 0
 		r.fps = int(workconfig.get("output", 'fps'))
 		r.duration = int(workconfig.get("output", 'duration'))
-
 
 		# Test white rectangle on main rendering image
 		#config.renderDraw.rectangle((0,0,400,300), fill=(255,255,255))

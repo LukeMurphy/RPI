@@ -80,11 +80,13 @@ def redrawGrid():
 
 	config.colOverlay.stepTransition()
 	
+	'''
 	if(random.random() < .002):
 		config.unHideGrid = True
 	if(random.random() < .02):
 		config.unHideGrid = False
-
+	'''
+	
 	for u in config.unitArrray:
 
 		if(random.random() < config.unhideRate):

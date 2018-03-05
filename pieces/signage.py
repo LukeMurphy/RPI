@@ -18,6 +18,7 @@ class unit :
 	outlineColor = (0,0,0)
 	tileSizeWidth = 64
 	tileSizeHeight = 32
+	coordinatedColorChange = True
 
 
 	def __init__(self) :
@@ -36,7 +37,9 @@ class unit :
 		if(self.unHideGrid == False):
 			self.colOverlay.stepTransition()
 
-		self.bgColor  = tuple(int(a*config.brightness) for a in (self.colOverlay.currentColor))
+		if self.coordinatedColorChange == False :
+			self.bgColor  = tuple(int(a*config.brightness) for a in (self.colOverlay.currentColor))
+
 		fontColor = self.bgColor
 		outlineColor = self.bgColor
 
@@ -69,10 +72,13 @@ def makeGrid():
 			u.yPos = row * config.tileSizeHeight
 			u.row = row
 			u.col = col
+			u.coordinatedColorChange = config.coordinatedColorChange
 			u.drawUnit()
 			config.unitArrray.append(u)
 
 def redrawGrid():
+
+	config.colOverlay.stepTransition()
 	
 	if(random.random() < .002):
 		config.unHideGrid = True
@@ -81,11 +87,12 @@ def redrawGrid():
 
 	for u in config.unitArrray:
 
-		if(random.random() < .02):
+		if(random.random() < config.unhideRate):
 			u.unHideGrid = True
-		if(random.random() < .02):
+		if(random.random() < config.rehideRate):
 			u.unHideGrid = False
 		#u.unHideGrid = config.unHideGrid
+		u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 		u.drawUnit()
 		config.image.paste(u.image,(u.xPos,u.yPos), u.image)
 
@@ -244,6 +251,7 @@ def main(run = True) :
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
 
 	config.useOverLayImage = workConfig.getboolean("signage", 'useOverLayImage')
+	config.coordinatedColorChange = workConfig.getboolean("signage", 'coordinatedColorChange')
 	config.overLayImage = workConfig.get("signage", 'overLayImage')
 	config.overLayXPos = int(workConfig.get("signage", 'overLayXPos'))
 	config.overLayYPos = int(workConfig.get("signage", 'overLayYPos'))
@@ -253,6 +261,8 @@ def main(run = True) :
 	config.overlayGlitchRate = float(workConfig.get("signage", 'overlayGlitchRate'))
 	config.fullimageGiltchRate = float(workConfig.get("signage", 'fullimageGiltchRate'))
 	config.overlayResetRate = float(workConfig.get("signage", 'overlayResetRate'))
+	config.unhideRate = float(workConfig.get("signage", 'unhideRate'))
+	config.rehideRate = float(workConfig.get("signage", 'rehideRate'))
 
 
 	config.colOverlay = coloroverlay.ColorOverlay()

@@ -16,6 +16,10 @@ class ColorOverlay:
 	randomRange = (10.0,100.0)
 	randomSteps = True
 	steps = 100
+	tDelta = 0
+	timeTrigger = False
+	tLimit = 30
+	t1 = 0
 
 
 	def __init__(self): 
@@ -23,6 +27,12 @@ class ColorOverlay:
 		self.colorA = colorutils.randomColor()
 		self.colorB = colorutils.randomColor()
 		self.colorB = colorutils.getRandomRGB()
+		self.t1 = time.time()
+		self.timeTrigger = False
+
+	def checkTime(self):
+		t = time.time()
+		self.tDelta = (t - self.t1)
 
 	def getNewColor(self):
 		self.colorB = colorutils.randomColor()
@@ -30,6 +40,8 @@ class ColorOverlay:
 
 
 	def colorTransitionSetup(self,steps=0):
+
+		self.timeTrigger = False
 
 		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		#### Setting up for color transitions
@@ -50,13 +62,19 @@ class ColorOverlay:
 		self.complete =  False
 
 
-
 	def stepTransition(self, autoReset = True) :
 		self.currentColor = [
 		(self.currentColor[0] + self.rateOfColorChange[0]),
 		(self.currentColor[1] + self.rateOfColorChange[1]),
 		(self.currentColor[2] + self.rateOfColorChange[2])
 		]
+
+		self.checkTime()
+
+		if (self.tDelta > self.tLimit and self.timeTrigger == False) :
+			self.timeTrigger = True
+			self.t1 = time.time()
+			self.colorTransitionSetup(self.steps)
 
 		for i in range (0,3):
 			#if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 

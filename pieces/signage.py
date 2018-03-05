@@ -25,16 +25,15 @@ class unit :
 
 		self.image = Image.new("RGBA", (self.tileSizeWidth  , self.tileSizeHeight))
 		self.draw = ImageDraw.Draw(self.image)
+		self.unHideGrid = False
 
+	def setUp(self):
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True 
 		self.colOverlay.steps = 80
-		self.unHideGrid = False
-
-		pass
 
 	def drawUnit(self):
-		if(self.unHideGrid == False):
+		if(self.unHideGrid == False and self.coordinatedColorChange == False):
 			self.colOverlay.stepTransition()
 
 		if self.coordinatedColorChange == False :
@@ -73,6 +72,8 @@ def makeGrid():
 			u.row = row
 			u.col = col
 			u.coordinatedColorChange = config.coordinatedColorChange
+			if (config.coordinatedColorChange == False ) :
+				u.setUp()
 			u.drawUnit()
 			config.unitArrray.append(u)
 
@@ -80,6 +81,7 @@ def redrawGrid():
 
 	config.colOverlay.stepTransition()
 	
+		#config.colOverlay.colorTransitionSetup(100)
 	'''
 	if(random.random() < .002):
 		config.unHideGrid = True
@@ -292,8 +294,6 @@ def main(run = True) :
 	
 	setUp()
 
-
-
 	if(run) : runWork()
 
 def setUp():
@@ -323,7 +323,6 @@ def iterate() :
 		redrawGrid()
 	else :		
 		displayTest()		
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

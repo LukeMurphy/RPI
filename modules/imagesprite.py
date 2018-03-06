@@ -81,6 +81,8 @@ class ImageSprite :
 	tempClrCount = 60
 	frameCount = 1
 
+	imageRotation = 10
+
 	# Helps with lousy looping gifs 
 	forceGlitchFrameCount = 300
 
@@ -102,6 +104,10 @@ class ImageSprite :
 	def callBack(self, *args) :
 
 		if(args[0] == True) :
+
+			self.imageRotation = random.uniform(-30,30)
+			self.dX = random.uniform(1,10)
+
 			self.image = self.imageOriginal.copy()
 
 			self.process()
@@ -362,6 +368,8 @@ class ImageSprite :
 
 			self.x = self.xPos + self.xOffset
 			self.y = self.yPos + self.yOffset
+
+			self.image = self.image.rotate(self.imageRotation)
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	

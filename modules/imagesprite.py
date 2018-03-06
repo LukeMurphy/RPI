@@ -369,7 +369,9 @@ class ImageSprite :
 			self.x = self.xPos + self.xOffset
 			self.y = self.yPos + self.yOffset
 
-			self.imageRotation = random.uniform(-30,30)
+			rangeOfRot = 30  + (self.x /100)
+
+			self.imageRotation = random.uniform(-rangeOfRot,rangeOfRot)
 
 			self.image = self.image.rotate(self.imageRotation)
 	

@@ -127,7 +127,7 @@ class ImageSprite :
 
 			
 			#self.imageRotation = random.uniform(-30,30)
-			self.dX = random.uniform(2,10)
+			self.dX = random.uniform(2,8)
 
 			self.image = self.imageOriginal.copy()
 

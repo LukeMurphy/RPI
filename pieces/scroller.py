@@ -218,7 +218,6 @@ def colorTransitionSetup():
 	steps = random.uniform(10.0,500.0)
 	config.rateOfColorChange = [ a/steps for a in config.colorDelta]
 
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def main(run = True) :

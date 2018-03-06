@@ -6,6 +6,26 @@ from modules import colorutils
 # Import the essentials to everything
 import time, random, math
 
+def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None, expand=False):
+	if center is None:
+		return image.rotate(angle)
+	angle = -angle/180.0*math.pi
+	nx,ny = x,y = center
+	sx=sy=1.0
+	if new_center:
+		(nx,ny) = new_center
+	if scale:
+		(sx,sy) = scale
+	cosine = math.cos(angle)
+	sine = math.sin(angle)
+	a = cosine/sx
+	b = sine/sx
+	c = x-nx*a-ny*b
+	d = -sine/sy
+	e = cosine/sy
+	f = y-nx*d-ny*e
+	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
+
 class ImageSprite :
 	color = (255,0,0)
 	bgColor = (0,255,255)
@@ -105,8 +125,9 @@ class ImageSprite :
 
 		if(args[0] == True) :
 
-			self.imageRotation = random.uniform(-30,30)
-			self.dX = random.uniform(1,10)
+			
+			#self.imageRotation = random.uniform(-30,30)
+			self.dX = random.uniform(2,10)
 
 			self.image = self.imageOriginal.copy()
 
@@ -369,12 +390,17 @@ class ImageSprite :
 			self.x = self.xPos + self.xOffset
 			self.y = self.yPos + self.yOffset
 
-			rangeOfRot = 30  + (self.x /100)
+			rangeOfRot = 20  #+ (self.x /100)
 
 			self.imageRotation = random.uniform(-rangeOfRot,rangeOfRot)
 
-			self.image = self.image.rotate(self.imageRotation)
+			#self.image = self.image.rotate(self.imageRotation, expand=True)
+			#self.image = ScaleRotateTranslate(self.image,self.imageRotation, (self.image.size[0]/2,self.image.size[1]/2), None, (1.03,1.0) )
 	
+
+
+
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 	def loadImage(self,arg):

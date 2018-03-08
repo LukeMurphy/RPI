@@ -463,7 +463,7 @@ class ImageSprite :
 					presentImage()		
 				count += 1
 			except KeyboardInterrupt:
-				print "Stopping...."
+				print ("Stopping....")
 				exit()
 				break
 	

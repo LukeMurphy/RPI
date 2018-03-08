@@ -2,7 +2,7 @@ import time
 import random
 import math
 import sys
-import messenger
+#import messenger
 from PIL import ImageChops, ImageOps
 
 screenWidth =  128

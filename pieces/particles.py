@@ -23,11 +23,13 @@ def main(run = True) :
 	config.delay = .02
 	config.numUnits  = 60
 
+
+	'''
 	config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
 	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
 	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
-
+	'''
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -56,7 +58,9 @@ def main(run = True) :
 	ps.speedMin = float(workConfig.get("particleSystem", 'speedMin'))
 	ps.speedMax = float(workConfig.get("particleSystem", 'speedMax'))
 	ps.numUnits = int(workConfig.get("particleSystem", 'numUnits'))
-	config.trailingFade = int(workConfig.get("particleSystem", 'trailingFade'))
+	config.bgColorVals = ((workConfig.get("particleSystem", 'bgColor')).split(','))
+	config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorVals))
+
 
 	for i in range(0,ps.numUnits):
 		p = Particle(ps)
@@ -92,16 +96,15 @@ def runWork():
 def iterate() :
 	global config, ps
 	## Fade trails or not...
-	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0,config.trailingFade), outline=None)
+	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=config.bgColor, outline=None)
 
 	for p in ps.unitArray:
 		p.update()
 		p.render()
 
 	if random.random() < .0005 :
-		#ps.cohesionDistance = random.uniform(8,30)
-		print(ps.cohesionDistance)
-		print(config.trailingFade)
+		ps.cohesionDistance = random.uniform(8,30)
+		#print(ps.cohesionDistance)
 
 	config.render(config.image, 0,0)
 		

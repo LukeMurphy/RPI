@@ -17,7 +17,7 @@ rgbWheel = [(255,0,0),(255,0,0),(255,255,0),(0,255,0),(0,255,255),(0,0,255),(255
 sunset = dict(drk1=(57,36,25),drk2=(124,77,56),drk3=(153,95,56),mid1=(177,177,78),mid2=(173,104,51),yellow=(218,172,71),ltyellow=(246,232,171),ltorange=(221,144,82),warmwht=(255,255,238) )
 sky = dict(coolblue=(254,254,248),ltblue=(190,200,202),grayblue=(182,186,182))
 #sorted_sunset = {k: (sum(v)/3) for k, v in sunset.iteritems()}
-sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), key=operator.itemgetter(1))
+#sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), key=operator.itemgetter(1))
 
 brightness = 1
 
@@ -31,11 +31,14 @@ def getRedShiftedColors(brtns=1) :
 	r = int(r + random.uniform(0, rRange))
 	return (r,g,b)
 
+
 def getSunsetColors(brtns=1) :
 	global brightness, sunset, sorted_sunset
 	if(brtns == 1) : brtns = brightness
 	indx = int(random.uniform(0,len(sunset)))
-	vals = sunset.values()
+
+
+	vals = list(sunset.values())
 	clr = vals[indx]
 	r = int(clr[0] * brtns)
 	g = int(clr[1] * brtns)
@@ -100,7 +103,10 @@ def randomBaseColor(brtns=1) :
 	g = int((random.uniform(0,100)) * brtns)
 	return (r,g,b) 
 
-def colorCompliment((r,g,b), brtns=1) :
+def colorCompliment(rgb, brtns=1) :
+	r = rgb[0]
+	g = rgb[1]
+	b = rgb[2]
 	global brightness
 	if(brtns == 1) : brtns = brightness
 	minRGB = min(r,min(g,b))
@@ -121,8 +127,11 @@ def randomGray(brtns=1) :
 	return (r,g,b)     
 
 # Find the closest point 
-def closestRBYfromRGB((r,g,b)) :
+def closestRBYfromRGB(rgb) :
 	global brightness, wheel
+	r = rgb[0]
+	g = rgb[1]
+	b = rgb[2]
 	# d = sqrt( x2-x1 ^ 2 ....)
 	dMax = 0
 	dArray = []

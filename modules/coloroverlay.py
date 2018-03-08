@@ -54,7 +54,7 @@ class ColorOverlay:
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		from operator import sub
-		self.colorDelta = map(sub, self.colorB, self.currentColor)
+		self.colorDelta = list(map(sub, self.colorB, self.currentColor))
 		test = [abs(a) for a in self.colorDelta]
 		if(steps == 0 or self.randomSteps == True) : 
 			self.steps = random.uniform(self.randomRange[0],self.randomRange[1])

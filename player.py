@@ -7,7 +7,9 @@ from PIL import ImageChops
 #import numpy
 import os, sys, getopt, time, random, math, datetime, textwrap
 import gc
-import ConfigParser, io
+#import ConfigParser
+import configparser
+import io
 import threading
 import importlib 
 import resource
@@ -21,7 +23,8 @@ global imageTop,imageBottom,image,config,transWiring
 
 threads = []
 
-workconfig = ConfigParser.ConfigParser()
+#workconfig = ConfigParser.ConfigParser()
+workconfig = configparser.ConfigParser()
 
 import argparse
 

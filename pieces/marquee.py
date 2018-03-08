@@ -13,7 +13,7 @@ def makeMarquee(p,w,h,mw,step=1):
 	for i in range (p[1] + 0, p[1] + h + o, step) : perimeter.append([p[0] + w, i])
 	for i in range (p[0] + w , p[0] - o, -step) : perimeter.append([i, p[1] + h])
 	for i in range (p[1] + h , p[1] - o, -step) : perimeter.append([p[0], i])
-	for i in range (p[0] + 0, p[0] + w + step/2, step) : perimeter.append([i, p[1]])
+	for i in range (p[0] + 0, p[0] + w + round(step/2), step) : perimeter.append([i, p[1]])
 	return (perimeter)
 
 

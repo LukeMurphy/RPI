@@ -13,7 +13,7 @@ import datetime
 import textwrap
 import math
 import sys, getopt, os
-import ConfigParser, io
+import io
 import gc
 from subprocess import call
 
@@ -45,7 +45,7 @@ def main(run = True) :
 	config.xPos1 = int(workConfig.get("filter", 'xPos1'))
 	config.yPosBase = int(workConfig.get("filter", 'yPosBase'))
 	config.targetClrs = ((workConfig.get("filter", 'targetClrs')).split(','))
-	config.targetClrs = map(lambda x: int(x) ,config.targetClrs)
+	config.targetClrs = list(map(lambda x: int(x) ,config.targetClrs))
 	config.imageFilterProb = float(workConfig.get("filter", 'imageFilterProb'))
 	config.bgFilterProb = float(workConfig.get("filter", 'bgFilterProb'))
 	config.targetPalette = (workConfig.get("filter", 'targetPalette'))

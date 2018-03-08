@@ -238,7 +238,7 @@ def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale =
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
-	print("Diag Loaded")
+	print("SIGNAGE Loaded")
 
 
 	colorutils.brightness = config.brightness

@@ -1,5 +1,6 @@
-from Tkinter import *
-import tkMessageBox
+#from Tkinter import *
+#import tkMessageBox
+import tkinter as tk
 import PIL.Image
 import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
@@ -41,7 +42,7 @@ def setUp():
 	# after rotation
 	#if(config.rotation == 90) : canvasOffsetY = -25
 
-	root = Tk()
+	root = tk.Tk()
 	w = config.screenWidth + buff
 	h = config.screenHeight  + buff
 	x = windowOffset[0]
@@ -56,7 +57,7 @@ def setUp():
 
 	config.root = root
 
-	cnvs = Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff)
+	cnvs = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff)
 	config.cnvs = cnvs
 	config.cnvs.pack()
 	config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
@@ -88,7 +89,7 @@ def startWork(*args) :
 	try:
 		t  = threading.Thread.__init__(work.runWork())
 		t.start()
-	except TclError, details:
+	except tk.TclError as details:
 		print(details)
 		pass
 		exit()

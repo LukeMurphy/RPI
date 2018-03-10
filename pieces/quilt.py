@@ -12,7 +12,7 @@ class unit:
 		self.yPos = 0
 		self.redraw = False
 
-		self.draw  = ImageDraw.Draw(config.image)
+		self.draw  = ImageDraw.Draw(config.canvasImage)
 
 		#self.fillColor = colorutils.getRandomRGB()
 		#self.outlineColor = colorutils.getRandomRGB()
@@ -111,6 +111,18 @@ class unit:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def transformImage(img) :
+	width, height = img.size
+	m = -0.5
+	xshift = abs(m) * 420
+	new_width = width + int(round(xshift))
+
+	img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
+	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
+	return img
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -130,6 +142,8 @@ def main(run = True) :
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
 
+	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
+	config.transformTuples = tuple([float(i) for i in transformTuples])
 
 	try :
 		config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
@@ -250,26 +264,16 @@ def main(run = True) :
 				config.unitArrray.append(obj)
 
 
-
-
-
-
-	
-
 	setUp()
 
 	if(run) : runWork()
 
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
 	global config
-	pass
 
+	pass
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -293,9 +297,11 @@ def iterate() :
 		obj.update()
 		obj.render()
 
-	config.render(config.image, 0,0)
+	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	temp.paste(config.canvasImage, (0,0), config.canvasImage)
+	temp = transformImage(temp)
+	config.render(temp, 0,0)
 		
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

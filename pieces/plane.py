@@ -13,7 +13,7 @@ import datetime
 import textwrap
 import math
 import sys, getopt, os
-import ConfigParser, io
+#import ConfigParser, io
 import gc
 from subprocess import call
 

@@ -14,7 +14,7 @@ import datetime
 import textwrap
 import math
 import sys, getopt, os
-import ConfigParser, io
+#import ConfigParser, io
 import gc
 from subprocess import call
 
@@ -242,9 +242,8 @@ def iterate( n = 0) :
 		block = blocks[n]
 		block.colorMode = config.colorMode
 		block.colorModeDirectional = colorModeDirectional
-
- 		block.update()
- 		
+		block.update()
+		
 		### Change the color of the figures
 		if(random.random() < config.colorChage and n > 0) : 
 			clr = colorutils.randomColor(random.uniform(.1,1))

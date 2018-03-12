@@ -44,11 +44,12 @@ class Particle(object):
 		self.direction = 0
 
 		self.objWidth = 2
-		self.objHeight = 7
+		self.objHeight = 6
 
 		self.image = Image.new("RGBA", (self.objWidth , self.objHeight))
 		self.draw = ImageDraw.Draw(self.image)
 
+		'''
 		self.fillColor = colorutils.getSunsetColors(self.ps.config.brightness)
 		self.outlineColor = colorutils.getSunsetColors(self.ps.config.brightness)
 		
@@ -57,7 +58,13 @@ class Particle(object):
 		self.outlineColor = (round(random.uniform(200,250)), round(random.uniform(15,195)), round(random.uniform(15,155)))
 		
 		self.fillColor = colorutils.getRandomRGB()
-		self.outlineColor = colorutils.getRandomRGB(self.ps.config.brightness)
+		'''
+		
+		self.fillColor = colorutils.randomColor(self.ps.config.brightness)
+		self.outlineColor = colorutils.getSunsetColors(self.ps.config.brightness/2)
+
+		if(random.random() < .2) :
+			self.fillColor = (100,10,0)
 
 	def update(self):
 

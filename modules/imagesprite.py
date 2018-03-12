@@ -125,12 +125,10 @@ class ImageSprite :
 
 		if(args[0] == True) :
 
-			
 			#self.imageRotation = random.uniform(-30,30)
-			self.dX = random.uniform(1,4)
-
+			direction = -1 if self.dX < 0 else 1 
+			self.dX = random.uniform(1,4) * direction
 			self.image = self.imageOriginal.copy()
-
 			self.process()
 
 			# This turns out to be less interesting - somehow the uniformity of speed
@@ -159,9 +157,9 @@ class ImageSprite :
 
 		if (random.random()> .5 and randomizeDirection) : 
 			self.dX *= -1
-		print("-----------")
-		self.debugMessage("Trying to load " + img + "")	
-		print("-----------")
+		#print("-----------")
+		#self.debugMessage("Trying to load " + img + "")	
+		#print("-----------")
 
 		if(self.loadImage(img)) :
 			# scale to the WIDTH of the screen
@@ -176,6 +174,7 @@ class ImageSprite :
 			if(self.dX < 0) :
 				# Reverse image
 				self.image = self.image.rotate(-180)
+				pass
 
 			self.imageOriginal = self.image.copy()
 			self.process()
@@ -397,10 +396,6 @@ class ImageSprite :
 			#self.image = self.image.rotate(self.imageRotation, expand=True)
 			#self.image = ScaleRotateTranslate(self.image,self.imageRotation, (self.image.size[0]/2,self.image.size[1]/2), None, (1.03,1.0) )
 	
-
-
-
-
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 	def loadImage(self,arg):

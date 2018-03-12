@@ -107,6 +107,7 @@ def main(run = True) :
 		imgLoader.yOffsetFactor = 200
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
+		imgLoader.yOffsetChange = True
 		if(config.unitCount == 1) :
 			imgLoader.scalingFactor = config.scalingFactor
 			imgLoader.useJitter =  config.useJitter

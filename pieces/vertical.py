@@ -56,7 +56,7 @@ class Vertical :
 		self.draw.rectangle(self.cntr, fill = self.config.innerColor)
 		self.draw.rectangle(self.border2, fill = self.config.borderColor)
 		self.draw.rectangle(self.outer2, fill = self.config.outerColor)
-		config.image.paste(self.unitImage, (0, self.vOffset), self.unitImage )
+		config.image.paste(self.unitImage, (0, round(self.vOffset)), self.unitImage )
 
 
 	def done(self): 
@@ -78,24 +78,29 @@ def redraw():
 
 def reArraynge():
 	global config, vertArray
-	# set the current width
-	changeWidth()
-
-	# Pop the last one off the array
-	lastElement = vertArray.pop()
-
-	# generate a replacement
-	lastElement.changeAction()
-	lastElement.make()
-
-	# instert it at the start of the array
-	vertArray.insert(0,lastElement)
-	layers = int(config.canvasHeight / config.blockHeight) 
 
 	# run through the array and reset each blocks new postition
 	# to produce motion animation effect
-	for i in range (0,layers):
-		vertArray[i].vOffset = i * config.blockHeight
+	for i in range (0,config.layers):
+		#vertArray[i].vOffset = i * config.blockHeight
+		vertArray[i].vOffset += config.verticalSpeed
+
+	if(vertArray[config.layers-1].vOffset > config.canvasHeight) :
+		# set the current width
+		changeWidth()
+
+		# Pop the last one off the array
+		lastElement = vertArray.pop()
+
+		# generate a replacement
+		lastElement.changeAction()
+		lastElement.make()
+
+		# instert it at the start of the array
+		vertArray.insert(0,lastElement)
+		lastElement.vOffset = -config.blockHeight
+	
+
 
 def changeWidth():
 	if(config.inMotion == True) :
@@ -181,6 +186,7 @@ def main(run = True) :
 	config.brightness = float(workConfig.get("vertical", 'brightness'))
 	config.minPercentWidth = float(workConfig.get("vertical", 'minPercentWidth'))
 	config.maxPercentWidth = float(workConfig.get("vertical", 'maxPercentWidth'))
+	config.verticalSpeed = float(workConfig.get("vertical", 'verticalSpeed'))
 
 	config.outerColor = ((workConfig.get("vertical", 'outerColor')).split(','))
 	config.outerColor = tuple(map(lambda x: int(int(x) * config.brightness) ,config.outerColor))
@@ -193,10 +199,11 @@ def main(run = True) :
 
 	config.inMotion = False
 
-	layers = int(config.canvasHeight / config.blockHeight) 
+	config.layers = int(config.canvasHeight / config.blockHeight) 
+
 
 	#print(layers)
-	for i in range (0,layers):
+	for i in range (0,config.layers):
 		vert = Vertical(config)
 		vert.make()
 		vert.vOffset = i * config.blockHeight

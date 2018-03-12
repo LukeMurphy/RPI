@@ -2,7 +2,7 @@
 #import modules
 # ################################################### #
 import os, sys, getopt, time, random, math, datetime, textwrap
-import ConfigParser, io
+#import ConfigParser, io
 import importlib 
 import numpy
 import threading
@@ -65,6 +65,8 @@ def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery
 def makeDaemonMessages(imageRef, direction = 1):
+	global config
+
 	demonsMale = ["Jealousy", "Wrath", "Tears", "Sighing", "Suffering", "Lamentation", "Bitter Weeping"]
 	demonsMaleModifier = ["Jealous", "Wrathful", "Tearful", "Sighing", "Suffering", "Lamenting", "Embittered Weeping"]
 
@@ -131,7 +133,6 @@ def makeDaemonMessages(imageRef, direction = 1):
 			messageString = messageString + xo
 			messageString = messageString + " " if (random.random() < .5) else messageString
 
-	global config
 
 	if(config.colorMode == "getRandomRGB") : clr = colorutils.getRandomRGB(config.brightness)
 	if(config.colorMode == "randomColor") : clr = colorutils.randomColor(config.brightness)

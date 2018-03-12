@@ -2,7 +2,7 @@
 #import modules
 # ################################################### #
 import os, sys, getopt, time, random, math, datetime, textwrap
-import ConfigParser, io
+#import ConfigParser, io
 import importlib 
 import numpy
 import threading

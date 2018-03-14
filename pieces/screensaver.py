@@ -14,7 +14,7 @@ import datetime
 import textwrap
 import math
 import sys, getopt, os
-import ConfigParser, io
+#import ConfigParser, io
 import gc
 from subprocess import call
 
@@ -105,7 +105,7 @@ def main(run = True) :
 	print(config.pixLen)
 
 	config.txtColor = (255,200,0)
-	config.txtBoxWd = config.pixLen[0] + 5
+	config.txtBoxWd = config.pixLen[0] + 10
 	config.txtBoxHt = config.pixLen[1] * config.txtBoxHtMultuiplier +2
 
 	config.crawlLen = config.crawlDraw.textsize(config.crawlText, font = config.font3)
@@ -140,7 +140,6 @@ def randomizeVelocities() :
 	if(random.random() > .5): config.vx = int(config.xVelocityRange * random.random())
 	if(random.random() > .5): config.vy = int(config.yVelocityRange * random.random())
 	if(random.random() > .95): config.xPos = -32
-	
 
 def iterate( n = 0) :
 	global config
@@ -205,7 +204,7 @@ def iterate( n = 0) :
 
 
 	###### the higher the alpha value, the less messy the trails are - more black 
-	config.textDraw.rectangle((0,64,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,10))
+	config.textDraw.rectangle((0,128,config.txtBoxWd,config.txtBoxHt), fill=(0,0,10,10))
 
 	#config.textDraw.text((3,0), str(config.xPos), (255,200,0,200), font=config.font2)
 	#config.textDraw.text((29,0), str(config.yPos), (255,200,200), font=config.font2)
@@ -234,7 +233,7 @@ def iterate( n = 0) :
 	imgText = config.textImage
 
 	fontToUse = config.font3
-	config.crawlDraw.rectangle((0,0,config.screenHeight,16), fill=(0,0,10,120))
+	config.crawlDraw.rectangle((0,0,config.screenHeight,32), fill=(0,0,10,120))
 	#config.crawlDraw.text((config.crawlPosx,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)
 	#config.crawlDraw.text((config.crawlPosx + 1 ,config.crawlPosy), config.crawlText, (0,0,0), font=fontToUse)
 	#config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
@@ -248,14 +247,15 @@ def iterate( n = 0) :
 		config.crawlPosx = config.screenHeight
 
 	# background fill and fade
-	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0,0,0,10))
+	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(100,0,0,10))
+
 
 	###### Paste in image
-	config.renderImage.paste(config.iconImage , (config.imageXOffset,config.imageYOffset), config.iconImage)
+	#config.renderImage.paste(config.iconImage , (config.imageXOffset,config.imageYOffset), config.iconImage)
 	
 	###### Paste in rotated text
-	config.renderImage.paste(imgText, (0,0), imgText)	
-	config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
+	#config.renderImage.paste(imgText, (0,0), imgText)	
+	#config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
 	
 	###### Paste in crawl
 	config.image.paste(imgCrawl,(0,0), imgCrawl)
@@ -269,8 +269,6 @@ def iterate( n = 0) :
 	config.render(img, 0, -32, config.screenWidth, config.screenHeight, True, False)
 
 	config.updateCanvas()
-
-
 
 def redrawBackGround() :	
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,200,10))

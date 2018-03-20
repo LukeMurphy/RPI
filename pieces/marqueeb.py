@@ -5,27 +5,41 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils, coloroverlay
 
+class TimerObj:
+	delay = 0
+	t1 = 0
+	t2 = 0
+	done = True
 
-def makeMarquee(p,w,h,mw,step=1):
+	def __init__(self) :
+		self.done =  False
+		pass
+
+	def setTimeOut(self, delay , callBack):
+		self.callBack = callBack
+		self.delay = delay
+		self.t1 = time.time()
+	
+	def checkTime(self):
+		self.t2 = time.time()
+		if(self.t2 - self.t1 >= self.delay * 1 and self.done == False) :
+			self.done = True
+			self.t1 = time.time()
+			self.callBack["func"]()
+
+def makeMarqueeBar(p,w,h,mw,step=1):
 	perimeter = []
 	#mw=0
 	o = 0
 	for i in range (p[1] + 0, p[1] + h + o, step) : perimeter.append([p[0] + w, i])
-	for i in range (p[0] + w , p[0] - o, -step) : perimeter.append([i, p[1] + h])
-	for i in range (p[1] + h , p[1] - o, -step) : perimeter.append([p[0], i])
-	for i in range (p[0] + 0, p[0] + w + round(step/2), step) : perimeter.append([i, p[1]])
 	return (perimeter)
 
 def init() :
 	global config
-	config.alphabetLeft = []
-	config.alphabetLeft = [ a for a in config.alphabet]
-	config.guessed = []
-	config.found = []
-	config.wordNotFound = True
-	config.lost = False
-	config.done = False
-	angle = random.random() * 22/7
+	config.timerArray = [] 
+	config.tmr = TimerObj()
+	config.tmr.setTimeOut(2.0, {"func":changeRotation})
+
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
 
 	config.bgColor = coloroverlay.ColorOverlay()
@@ -69,16 +83,15 @@ def init() :
 		config.marquees.append([
 			0, 
 			pattern, 
-			makeMarquee(
-				(p0[0], p0[1]),
-				innerWidth , innerHeight, mw, step
+			makeMarqueeBar(
+				(p0[0], 0),
+				innerWidth , h, config.marqueeWidth, step
 				), 
-			mw, 
+			config.marqueeWidth, 
 			clrs,
 			colOverlayA,
 			colOverlayB
-			 ])		
-
+			 ])
 
 		#print (config.marquees[i][2])
 
@@ -89,46 +102,22 @@ def init() :
 		innerWidth = innerWidth - 2 * (mw ) - gap + decrement
 		innerHeight = innerHeight - 2 * (mw ) - gap + decrement
 
-		if (gap > 0) :
-			innerWidth -=decrement
-			innerHeight -=decrement
 
-
-		if(mw == 2) :
-			innerWidth -=1
-			innerHeight -=1
-
-
-		if(len(pattern) >= 4 and random.random() > .1) :
+		if(len(pattern) >= 3 ) :
 			pattern = pattern[1:]
 			pattern = pattern[0:len(pattern)-1]
 
-def drawText(xPos=0, yPos=0, messageString = "", crossout=False) :
-	global config
-	# Draw the text with "borders"
-	indent = int(.05 * config.tileSize[0])
-	for i in range(1, config.shadowSize) :
-		config.draw.text((indent + -i,-i),messageString,(0,0,0),font=config.font)
-		config.draw.text((indent + i,i),messageString,(0,0,0),font=config.font)
-
-	config.draw.text((xPos,yPos), messageString, config.clr ,font=config.font)
-	if(crossout == True) :
-		#config.draw.line((xPos, yPos + config.fontSize, xPos + config.fontSize/1.5, yPos - config.fontSize/8), fill=config.clr)
-		config.draw.line((xPos, yPos + config.fontSize/1.5, 
-			xPos + config.fontSize/1.5, 
-			yPos + config.fontSize/1.5) , fill=config.clr)
-
-def drawMarquee() :
-	global config
-	drawText(10, 10, str(config.offset))
-	pass
-
-def drawElement() :
-	global config
-	return True
+def changeRotation():
+	config.rotation +=90
+	if config.rotation > 1000 :
+		config.rotation = config.rotationOrig
 
 def redraw():
 	global config
+
+	if (config.tmr.done == True) : 
+		config.tmr = TimerObj()
+		config.tmr.setTimeOut(random.uniform(1,12), {"func":changeRotation})
 
 	bgColor = tuple(int(c) for c in config.bgColor.currentColor)
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=bgColor)
@@ -153,26 +142,18 @@ def redraw():
 		clrA = colOverlayA.currentColor
 		clrB = colOverlayB.currentColor
 
-		#clrA = [255,0,0]
-		#clrB = [0,0,0]
-
 		count = 0
 
 		perim = perimeter
-		if(mcount%2 > 0 and random.random() > .002) : perim = reversed(perimeter)
+		#if(mcount%2 > 0 and random.random() > .002) : perim = reversed(perimeter)
+		if(mcount%2 > 0 ) : perim = reversed(perimeter)
 
-		#print(pattern)
-		'''
-		if(mcount == len(config.marquees)-1) :
-			clrA = [0,0,0]
-			clrB = [20,20,20]
-		'''
 
 		for p in (perim ):
 			if(pattern[count] == 1) :
-				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth - 1, p[1] + marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrA))
+				config.draw.rectangle((p[0],p[1], p[0] + config.marqueeWidth - 1, p[1] + config.marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrA))
 			else:
-				config.draw.rectangle((p[0],p[1],p[0] + marqueeWidth - 1, p[1] + marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrB))
+				config.draw.rectangle((p[0],p[1], p[0] + config.marqueeWidth - 1, p[1] + config.marqueeWidth - 1), outline=None, fill=tuple(int(c) for c in clrB))
 			count += 1
 			if(count >= len(pattern)) :
 				count = 0
@@ -184,72 +165,32 @@ def redraw():
 		colOverlayA.stepTransition()
 		colOverlayB.stepTransition()
 
-	'''
-	cord = 0
-	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)	
-	cord = 9
-	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)	
-	cord = 18
-	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)
-	'''
-
-def changeColor() :
-	pass
-	return True
-
-def changeCall() :
-	pass
-	return True
-
-def callBack() :
-	global config
-	pass
-
 def runWork():
 	global config
 	while True:
 		iterate()
 		time.sleep(config.redrawSpeed)
-		#time.sleep(random.random() * config.redrawSpeed)
 
 def iterate() :
 	global config
+	config.tmr.checkTime()
 	redraw()
-
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
-
-	if(config.done == True) :
-		#init()
-		#time.sleep(config.redrawSpeed)
-		pass
 
 def main(run = True) :
 	global config
+	config.rotationOrig = config.rotation
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 	config.redrawSpeed  = float(workConfig.get("marquee", 'redrawSpeed')) 
 	config.randomRange  = float(workConfig.get("marquee", 'randomRange')) 
-	config.fontSize = int(workConfig.get("marquee", 'fontSize'))
 	config.marqueeWidth = int(workConfig.get("marquee", 'marqueeWidth'))
 	config.gap = int(workConfig.get("marquee", 'gap'))
 	config.step = int(workConfig.get("marquee", 'step'))
 	config.decrement = int(workConfig.get("marquee", 'decrement'))
 	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
-	config.shadowSize = int(workConfig.get("marquee", 'shadowSize'))
-	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
-	config.clr = (255,0,0)
-	config.textPosY = 40
-	config.textPosX = 120
-
 	config.clr = colorutils.randomColor(1)
-	config.fontSize = int(random.uniform(10,50))
-	config.fontSize = 10
-	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
-
-	config.alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
-	config.word = "FEAR"
 	colorutils.brightness =  float(workConfig.get("displayconfig", 'brightness')) 
-	config.messageString = config.word
 	config.xOffset = 15
 
 	init()

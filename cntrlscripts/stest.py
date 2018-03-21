@@ -1,7 +1,6 @@
 #!/usr/bin/env python2.7
 import RPi.GPIO as GPIO
-import sys, getopt, os
-import ConfigParser, io
+import sys, getopt, os, io
 import time
 import subprocess
 

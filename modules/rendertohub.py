@@ -63,7 +63,7 @@ def setUp():
 	config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
 	
 	#tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	tempImage = tk.ImageTk.PhotoImage(config.renderImageFull)
+	tempImage = ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw', tag="mainer")
 
 	#config.cnvs.update()

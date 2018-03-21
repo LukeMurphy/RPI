@@ -2,8 +2,8 @@
 #import tkMessageBox
 import tkinter as tk
 import PIL.Image
-import PIL.ImageTk
-from PIL import Image, ImageTk, ImageDraw, ImageFont
+#import PIL.ImageTk
+from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageFilter, ImageChops, ImageEnhance
 import random
 import numpy, time

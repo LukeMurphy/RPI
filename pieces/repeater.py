@@ -160,10 +160,10 @@ def iterate( n = 0) :
 		block.update()
 		block.colorModeDirectional = colorModeDirectional
 		updateCanvasCall = True if n == 0 else True
-		config.renderImageFull.paste( block.image, (int(block.x), int(block.y)), block.image )
+		config.renderImageFull.paste( block.image, (round(block.x), round(block.y)), block.image )
 		# Never really want to do this as it force sends to the renderer for EACH item - big slowdowns etc
 		#config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
-		pos = int(block.x + block.image.size[0])
+		pos = round(block.x + block.image.size[0])
 
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))

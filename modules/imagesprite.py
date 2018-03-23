@@ -156,7 +156,7 @@ class ImageSprite :
 
 
 		if (random.random()> .5 and randomizeDirection) : 
-			self.dX *= -1
+			self.dX *= -1.0
 		#print("-----------")
 		#self.debugMessage("Trying to load " + img + "")	
 		#print("-----------")

@@ -25,10 +25,10 @@ threads = []
 
 #workconfig = configparser.ConfigParser()
 
-def configure() :
-	global config, workconfig, path, tempImage, threads, thrd
+def configure(config, workconfig) :
+	global  path, tempImage, threads, thrd
 	#gc.enable()
-
+	
 	print("setting config values")
 
 	### Sets up for testing live config chages
@@ -123,7 +123,6 @@ def configure() :
 	config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
-	#config.render = render
 
 	# Setting up based on how the work is displayed
 	print("Loading:", str(config.work))
@@ -131,116 +130,121 @@ def configure() :
 	work.config = config
 	work.workConfig = workconfig
 
+	if(config.rendering == "hat") : renderUsingIDAFruitHat(work)
+	if(config.rendering == "hub") : renderUsingLINSNHub(work)
+	if(config.rendering == "out") : renderUsingFFMPEG(work)
 
+def renderUsingIDAFruitHat(work):
+	
+	# The AdaFruit specific LED matrix HAT
+	from modules import rendertohat
+	# this tests for the power-down RPI switch
+	from cntrlscripts import stest
+	thrd = threading.Thread(target=stest.__main__)
+	threads.append(thrd)
+	thrd.start()
 
-	if(config.rendering == "hat") :
-		# The AdaFruit specific LED matrix HAT
-		from modules import rendertohat
-		# this tests for the power-down RPI switch
+	r = rendertohat
+	work.config.matrixTiles = int(work.workConfig.get("displayconfig", 'matrixTiles'))
+	work.config.transWiring = (work.workConfig.getboolean("displayconfig", 'transWiring'))
+	work.config.actualScreenWidth  = int(work.workConfig.get("displayconfig", 'actualScreenWidth'))
+	work.config.canvasWidth = int(work.workConfig.get("displayconfig", 'canvasWidth'))
+	work.config.canvasHeight = int(work.workConfig.get("displayconfig", 'canvasHeight'))
+	work.config.rotation = float(work.workConfig.get("displayconfig", 'rotation'))
+	work.config.rotationTrailing = (work.workConfig.getboolean("displayconfig", 'rotationTrailing'))
+	work.config.fullRotation = (work.workConfig.getboolean("displayconfig", 'fullRotation'))
+	work.config.useFilters  = (work.workConfig.getboolean("displayconfig", 'useFilters'))
+
+	try :
+		work.config.isRPI = (work.workConfig.getboolean("displayconfig", 'isRPI')) 
+	except Exception as e: 
+		work.config.useFilters = False
+		work.config.isRPI = True
+		print (str(e))
+	
+	r.config = work.config
+	r.work = work
+	r.canvasOffsetX = int(work.workConfig.get("displayconfig", 'canvasOffsetX'))
+	r.canvasOffsetY = int(work.workConfig.get("displayconfig", 'canvasOffsetY'))
+	work.config.windowXOffset = int(work.workConfig.get("displayconfig", 'windowXOffset'))
+	work.config.windowYOffset = int(work.workConfig.get("displayconfig", 'windowYOffset'))
+	r.setUp()
+	work.config.render = r.render
+	work.config.updateCanvas = r.updateCanvas
+	work.main()
+
+def renderUsingLINSNHub(work):
+
+	from modules import rendertohub
+
+	work.config.useFilters  = (work.workConfig.getboolean("displayconfig", 'useFilters'))
+	work.config.rotation = float(work.workConfig.get("displayconfig", 'rotation'))
+	work.config.rotationTrailing = (work.workConfig.getboolean("displayconfig", 'rotationTrailing'))
+	work.config.fullRotation = (work.workConfig.getboolean("displayconfig", 'fullRotation'))
+	work.config.canvasWidth = int(work.workConfig.get("displayconfig", 'canvasWidth'))
+	work.config.canvasHeight = int(work.workConfig.get("displayconfig", 'canvasHeight'))
+
+	try :
+		work.config.isRPI = (work.workConfig.getboolean("displayconfig", 'isRPI')) 
+	except Exception as e: 
+		work.config.usePixSort = False
+		print (str(e))
+
+	if(work.config.isRPI == True) : 
 		from cntrlscripts import stest
 		thrd = threading.Thread(target=stest.__main__)
 		threads.append(thrd)
 		thrd.start()
+	
+	# Create the image-canvas for the work
+	# Because rotation is an option, recreate accordingly
+	# And to be sure, make the renderImageFull bigger than necessary - 		
+	work.config.renderImage = PIL.Image.new("RGBA", (work.config.canvasWidth * work.config.rows, 32))
+	work.config.renderImageFull = PIL.Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
+	work.config.renderImageFull = PIL.Image.new("RGBA", (work.config.screenWidth, work.config.screenHeight))
 
-		r = rendertohat
-		config.matrixTiles = int(workconfig.get("displayconfig", 'matrixTiles'))
-		config.transWiring = (workconfig.getboolean("displayconfig", 'transWiring'))
-		config.actualScreenWidth  = int(workconfig.get("displayconfig", 'actualScreenWidth'))
-		config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
-		config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
-		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
-		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
-		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
-		config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
+	work.config.renderDraw = ImageDraw.Draw(work.config.renderImageFull)
+	work.config.image = PIL.Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
+	work.config.draw = ImageDraw.Draw(work.config.image)
+	
+	r = rendertohub
+	r.config = work.config
+	r.work = work
+	r.canvasOffsetX = int(work.workConfig.get("displayconfig", 'canvasOffsetX'))
+	r.canvasOffsetY = int(work.workConfig.get("displayconfig", 'canvasOffsetY'))
+	work.config.windowXOffset = int(work.workConfig.get("displayconfig", 'windowXOffset'))
+	work.config.windowYOffset = int(work.workConfig.get("displayconfig", 'windowYOffset'))
 
-		try :
-			config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
-		except Exception as e: 
-			config.useFilters = False
-			config.isRPI = True
-			print (str(e))
-		
-		r.config = config
-		r.work = work
-		r.canvasOffsetX = int(workconfig.get("displayconfig", 'canvasOffsetX'))
-		r.canvasOffsetY = int(workconfig.get("displayconfig", 'canvasOffsetY'))
-		config.windowXOffset = int(workconfig.get("displayconfig", 'windowXOffset'))
-		config.windowYOffset = int(workconfig.get("displayconfig", 'windowYOffset'))
-		r.setUp()
-		config.render = r.render
-		config.updateCanvas = r.updateCanvas
-		work.main()
+	work.config.drawBeforeConversion = r.drawBeforeConversion
+	work.config.render = r.render
+	work.config.updateCanvas = r.updateCanvas
+	work.main(False)
 
-	if(config.rendering == "hub") :
-		from modules import rendertohub
+	print("Setting Up", work.config.doingReload)
+	if(work.config.doingReload == False) : r.setUp()
 
-		config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
-		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
-		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
-		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
-		config.canvasWidth = int(workconfig.get("displayconfig", 'canvasWidth'))
-		config.canvasHeight = int(workconfig.get("displayconfig", 'canvasHeight'))
+def renderUsingFFMPEG(work):
 
-		try :
-			config.isRPI = (workconfig.getboolean("displayconfig", 'isRPI')) 
-		except Exception as e: 
-			config.usePixSort = False
-			print (str(e))
+	from modules import rendertofile
+	config.useFilters  = (workConfig.getboolean("displayconfig", 'useFilters'))
+	config.rotation = float(workConfig.get("displayconfig", 'rotation'))
+	config.rotationTrailing = (workConfig.getboolean("displayconfig", 'rotationTrailing'))
+	config.fullRotation = (workConfig.getboolean("displayconfig", 'fullRotation'))
+	r = rendertofile
+	r.config = config
+	r.work = work
+	r.work.x = r.work.y = 0
+	r.fps = int(workConfig.get("output", 'fps'))
+	r.duration = int(workConfig.get("output", 'duration'))
 
-		if(config.isRPI == True) : 
-			from cntrlscripts import stest
-			thrd = threading.Thread(target=stest.__main__)
-			threads.append(thrd)
-			thrd.start()
-		
-		# Create the image-canvas for the work
-		# Because rotation is an option, recreate accordingly
-		# And to be sure, make the renderImageFull bigger than necessary - 		
-		config.renderImage = PIL.Image.new("RGBA", (config.canvasWidth * config.rows, 32))
-		config.renderImageFull = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-		config.renderImageFull = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	# Test white rectangle on main rendering image
+	#config.renderDraw.rectangle((0,0,400,300), fill=(255,255,255))
 
-		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
-		config.image = PIL.Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-		config.draw = ImageDraw.Draw(config.image)
-		
-		r = rendertohub
-		r.config = config
-		r.work = work
-		r.canvasOffsetX = int(workconfig.get("displayconfig", 'canvasOffsetX'))
-		r.canvasOffsetY = int(workconfig.get("displayconfig", 'canvasOffsetY'))
-		config.windowXOffset = int(workconfig.get("displayconfig", 'windowXOffset'))
-		config.windowYOffset = int(workconfig.get("displayconfig", 'windowYOffset'))
-
-		config.drawBeforeConversion = r.drawBeforeConversion
-		config.render = r.render
-		config.updateCanvas = r.updateCanvas
-		work.main(False)
-
-		print("Setting Up", config.doingReload)
-		if(config.doingReload == False) : r.setUp()
-
-	if(config.rendering == "out") :
-		from modules import rendertofile
-		config.useFilters  = (workconfig.getboolean("displayconfig", 'useFilters'))
-		config.rotation = float(workconfig.get("displayconfig", 'rotation'))
-		config.rotationTrailing = (workconfig.getboolean("displayconfig", 'rotationTrailing'))
-		config.fullRotation = (workconfig.getboolean("displayconfig", 'fullRotation'))
-		r = rendertofile
-		r.config = config
-		r.work = work
-		r.work.x = r.work.y = 0
-		r.fps = int(workconfig.get("output", 'fps'))
-		r.duration = int(workconfig.get("output", 'duration'))
-
-		# Test white rectangle on main rendering image
-		#config.renderDraw.rectangle((0,0,400,300), fill=(255,255,255))
-
-		config.render = r.render
-		config.updateCanvas = r.updateCanvas
-		work.main(False)
-		
-		r.setUp("video")
+	config.render = r.render
+	config.updateCanvas = r.updateCanvas
+	work.main(False)
+	
+	r.setUp("video")
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

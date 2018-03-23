@@ -15,7 +15,6 @@ global thrd, config
 
 class ScrollObject :
 
-	
 	canvasWidth = 330
 	canvasHeight = 64
 	windowWidth = 320

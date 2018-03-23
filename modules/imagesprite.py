@@ -124,10 +124,10 @@ class ImageSprite :
 	def callBack(self, *args) :
 
 		if(args[0] == True) :
-
+			#print(self.dX)
 			#self.imageRotation = random.uniform(-30,30)
 			direction = -1 if self.dX < 0 else 1 
-			self.dX = random.uniform(1,4) * direction
+			self.dX = random.uniform(.3,2) * direction
 			self.image = self.imageOriginal.copy()
 			self.process()
 

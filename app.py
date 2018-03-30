@@ -2,8 +2,11 @@
 
 import os, getopt, sys, time
 import configparser
+from subprocess import call
 from modules import configuration
-#from modules import player
+from modules import player
+
+global thrd, config
 
 
 threads = []
@@ -28,9 +31,8 @@ def loadFromArguments(reloading=False):
 
 			argument = config.path + "/configs/prod/p4-6x8-exp-repeater-cloud.cfg"
 			
-			#workconfig.read(argument)
+			workconfig.read(argument)
 
-			'''
 			config.startTime = time.time()
 			config.currentTime = time.time()
 			config.reloadConfig = False
@@ -44,8 +46,8 @@ def loadFromArguments(reloading=False):
 
 			config.delta = int((config.startTime - f ))
 			print (argument, "LAST MODIFIED DELTA: ", config.delta)
-			'''
-			#player.configure(config, workconfig)
+
+			player.configure(config, workconfig)
 
 		except getopt.GetoptError as err:
 			# print help information and exit:
@@ -53,7 +55,7 @@ def loadFromArguments(reloading=False):
 	else :
 		print("reloading: "+ config.fileName)
 		workconfig.read(config.fileName)
-		#player.configure(config, workconfig)
+		player.configure(config, workconfig)
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

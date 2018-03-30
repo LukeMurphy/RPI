@@ -1,29 +1,26 @@
 #!/usr/bin/python
 #import modules
+import os, sys, getopt, time, random, math, datetime, textwrap
+import importlib 
+import configparser
+
 import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
 
-#import numpy
-import os, sys, getopt, time, random, math, datetime, textwrap
+'''
 import gc
-#import ConfigParser
-import configparser
 import io
 import threading
-import importlib 
 import resource
 from subprocess import call
+'''
 
 from modules import configuration
-#from configs import localconfig
-
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
 
 threads = []
-
-#workconfig = configparser.ConfigParser()
 
 def configure(config, workconfig) :
 	global  path, tempImage, threads, thrd
@@ -130,10 +127,10 @@ def configure(config, workconfig) :
 	work.config = config
 	work.workConfig = workconfig
 
-	if(config.rendering == "hat") : renderUsingIDAFruitHat(work)
+	#if(config.rendering == "hat") : renderUsingIDAFruitHat(work)
 	if(config.rendering == "hub") : renderUsingLINSNHub(work)
-	if(config.rendering == "out") : renderUsingFFMPEG(work)
-
+	#if(config.rendering == "out") : renderUsingFFMPEG(work)
+'''
 def renderUsingIDAFruitHat(work):
 	
 	# The AdaFruit specific LED matrix HAT
@@ -172,7 +169,7 @@ def renderUsingIDAFruitHat(work):
 	work.config.render = r.render
 	work.config.updateCanvas = r.updateCanvas
 	work.main()
-
+'''
 def renderUsingLINSNHub(work):
 
 	from modules import rendertohub
@@ -222,7 +219,7 @@ def renderUsingLINSNHub(work):
 
 	print("Setting Up", work.config.doingReload)
 	if(work.config.doingReload == False) : r.setUp()
-
+'''
 def renderUsingFFMPEG(work):
 
 	from modules import rendertofile
@@ -245,6 +242,6 @@ def renderUsingFFMPEG(work):
 	work.main(False)
 	
 	r.setUp("video")
-
+'''
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

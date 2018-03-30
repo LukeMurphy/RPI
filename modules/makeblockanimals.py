@@ -1,9 +1,10 @@
-import os, sys, getopt, time, random, math, datetime, textwrap
-import ConfigParser, io
-import importlib 
-import numpy
-import threading
-import resource
+#import os, sys, getopt, time, random, math, datetime, textwrap
+#import ConfigParser, io
+#import importlib 
+#import numpy
+#import threading
+#import resource
+import random
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
 from modules import colorutils, coloroverlay
@@ -43,7 +44,7 @@ def makeCarcas():
 
 		"cavity":{"order":5, "proportions":[6, 10],"coords":[]},
 		}
-		quadBlocks = OrderedDict(sorted(quadBlocks.items(), key=lambda t: t[1]))
+		quadBlocks = OrderedDict(sorted(quadBlocks.items(), key=lambda t: t[1]["order"]))
 
 		numSquarePairs = len(quadBlocks)
 
@@ -222,7 +223,7 @@ def makeAnimal():
 		"head":	{"order":5, "proportions":[3,3.67],"coords":[]},
 		"body":	{"order":4, "proportions":[5.5,11],"coords":[]},
 		}
-		quadBlocks = OrderedDict(sorted(quadBlocks.items(), key=lambda t: t[1]))
+		quadBlocks = OrderedDict(sorted(quadBlocks.items(), key=lambda t: t[1]["order"]))
 
 		numSquarePairs = len(quadBlocks)
 

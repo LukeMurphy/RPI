@@ -1,12 +1,13 @@
 #!/usr/bin/python
 #import modules
 # ################################################### #
-import os, sys, getopt, time, random, math, datetime, textwrap
-import ConfigParser, io
-import importlib 
+#import os, sys, getopt, time, random, math, datetime, textwrap
+#import ConfigParser, io
+#import importlib 
 import numpy
-import threading
-import resource
+#import threading
+#import resource
+import random, time
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
 from modules import colorutils, coloroverlay, makeblockanimals, makedrawcarcas

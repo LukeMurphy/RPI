@@ -1,16 +1,17 @@
-#from Tkinter import *
-#import tkMessageBox
 import tkinter as tk
-import PIL.Image
-#import PIL.ImageTk
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter, ImageChops, ImageEnhance
 import random
-import numpy, time
-import gc, os
+import time
 import threading
 
 from modules.filters import *
+
+#from Tkinter import *
+#import tkMessageBox
+#import PIL.Image
+#import PIL.ImageTk
+#import gc, os
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

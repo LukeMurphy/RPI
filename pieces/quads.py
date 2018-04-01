@@ -48,6 +48,8 @@ def init() :
 	config.alpha = int(workConfig.get("animals", 'alpha'))
 	config.pixSortXOffsetVal = config.pixSortXOffset
 
+	config.colorTransitionRangeMin = float(workConfig.get("animals", 'colorTransitionRangeMin')) 
+	config.colorTransitionRangeMax = float(workConfig.get("animals", 'colorTransitionRangeMax')) 
 	config.angleRotationRange = float(workConfig.get("animals", 'angleRotationRange')) 
 	config.pigglyWiggle = int(workConfig.get("animals", 'pigglyWiggle'))
 	config.pigglyWiggleVariance = int(workConfig.get("animals", 'pigglyWiggleVariance'))
@@ -108,7 +110,7 @@ def init() :
 	### This is the speed range of transitions in color
 	### Higher numbers means more possible steps so slower
 	### transitions - 1,10 very blinky, 10,200 very slow
-	config.colOverlayA.randomRange = (40.0,180.0)
+	config.colOverlayA.randomRange = (config.colorTransitionRangeMin,config.colorTransitionRangeMax)
 	config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
 
 	makeblockanimals.config = config

@@ -211,8 +211,8 @@ def main(run = True) :
 	config.displayRows = int(workConfig.get("scroll", 'displayRows'))
 	config.displayCols = int(workConfig.get("scroll", 'displayCols'))
 
-	config.canvasImageWidth = config.canvasWidth * config.displayRows
-	config.canvasImageHeight = config.canvasHeight / config.displayRows
+	config.canvasImageWidth = int(round(config.canvasWidth * config.displayRows))
+	config.canvasImageHeight = int(round(config.canvasHeight / config.displayRows))
 
 	config.fontSize = int(workConfig.get("scroll", 'fontSize'))
 	config.vOffset = int(workConfig.get("scroll", 'vOffset'))

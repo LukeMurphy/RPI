@@ -195,7 +195,7 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 		# Color overlay on b/w PNG sprite
 		# EVERYTHING HAS TO BE PNG  / have ALPHA 
 		if (config.useTransparentImages == True) :
-			clr = colorutils.randomColorAlpha()
+			clr = colorutils.randomColorAlpha(brtns = config.brightness, maxTransparency = 200)
 		else :
 			clr = colorutils.randomColor()
 		clrBlockDraw.rectangle((0,0,widthImage, heightImage), fill=clr)
@@ -447,9 +447,36 @@ def makeBackGround(drawRef, n = 1):
 
 	## Chevron pattern
 	## config.bgForeGroundColor
-	fillClr = colorutils.getRandomColor(config.brightness/2)
-	for r in range (0, rows) : 
-		for c in range (0, cols) : 
+	#fillClr = colorutils.getRandomColor(config.brightness/2)
+	
+	#config.patternColor = config.patternEndColor
+	#config.patternEndColor = colorutils.getRandomColor(config.brightness)
+
+	steps =  cols
+
+	rDelta = 2 * (config.patternEndColor[0] - config.patternColor[0]) / steps
+	gDelta = 2 * (config.patternEndColor[1] - config.patternColor[1]) / steps
+	bDelta = 2 * (config.patternEndColor[2] - config.patternColor[2]) / steps
+
+
+	for c in range (0, cols) : 
+
+		rCol  = config.patternColor[0] + rDelta
+		gCol  = config.patternColor[1] + gDelta
+		bCol  = config.patternColor[2] + bDelta
+		config.patternColor = (rCol, gCol, bCol)
+
+		### Because the way the pattern draws the left end is actually the end color
+		### so need to reverse the color gradient ....
+
+		fillClr = (
+			int(round(config.patternEndColor[0] - rDelta * (c+1))),
+			int(round(config.patternEndColor[1] - gDelta * (c+1))),
+			int(round(config.patternEndColor[2] - bDelta * (c+1))))
+
+		#print(c,fillClr)
+
+		for r in range (0, rows) : 
 			poly = []
 			poly.append((xStart, yStart + yDiv))
 			poly.append((xStart + xDiv, yStart))
@@ -458,9 +485,11 @@ def makeBackGround(drawRef, n = 1):
 			#if(n ==2) : color = (100,200,0,255)
 			if(random.random() < config.patternDrawProb) :
 				drawRef.polygon(poly, fill = fillClr) #outline = (15,15,15)
-			xStart += 2 * xDiv
-		xStart = 0
-		yStart += 2 * yDiv
+			yStart += 2 * yDiv
+		xStart += 2 * xDiv
+		yStart = 0
+
+	config.patternColor = config.patternEndColor
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery callbacks & regeneration functions
@@ -471,7 +500,8 @@ def remakeDaemonMessages(imageRef, direction = 1):
 
 def remakeScrollBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
-	makeScrollBlock(imageRef, drawRef, direction)
+	if(random.random() < config.imageBlockRemakeProb) :
+		makeScrollBlock(imageRef, drawRef, direction)
 
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
 	messageString = config.msg1 if random.random() < .5 else config.msg2
@@ -482,6 +512,9 @@ def remakeArrowBlock(imageRef, direction):
 	makeArrows(drawRef, direction)
 
 def remakePatternBlock(imageRef, direction):
+	config.patternColor = config.patternEndColor
+	if(random.random() < .3) :
+		config.patternEndColor = colorutils.getRandomColor(config.brightness)
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
 
@@ -558,6 +591,7 @@ def init() :
 
 	config.imageBlockImage = workConfig.get("scroller", 'imageBlockImage')
 	config.imageBlockBuffer = int(workConfig.get("scroller", 'imageBlockBuffer'))
+	config.imageBlockRemakeProb = float(workConfig.get("scroller", 'imageBlockRemakeProb'))
 	
 	config.overLayImage = workConfig.get("scroller", 'overLayImage')
 	config.overLayXPos = int(workConfig.get("scroller", 'overLayXPos'))
@@ -615,7 +649,9 @@ def init() :
 		scrollerRef.xSpeed = config.patternSpeed
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
-		scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}
+		scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
+		config.patternColor = (255,0,0)
+		config.patternEndColor = (0,0,255)
 		makeBackGround(scrollerRef.bg1Draw, 1)
 		makeBackGround(scrollerRef.bg2Draw, 1)
 		config.scrollArray.append(scrollerRef)
@@ -671,7 +707,6 @@ def init() :
 		scrollerRef.callBack = {"func" : remakeScrollBlock, "direction" : direction}
 		makeScrollBlock(scrollerRef.bg1, scrollerRef.bg1Draw, direction)
 		makeScrollBlock(scrollerRef.bg2, scrollerRef.bg2Draw, direction)
-		print(config.scroller5.image.size[0])
 		config.scrollArray.append(scrollerRef)
 		
 

@@ -74,13 +74,13 @@ def randomColor(brtns=1) :
 	b = int((random.uniform(0,255)) * brtns)
 	return (r,g,b) 
 
-def randomColorAlpha(brtns=1) :
+def randomColorAlpha(brtns=1, maxTransparency = 255) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
 	r = int((random.uniform(0,255)) * brtns)
 	g = int((random.uniform(0,255)) * brtns)
 	b = int((random.uniform(0,255)) * brtns)
-	a = int(random.uniform(0,255))
+	a = int(random.uniform(0,maxTransparency))
 	return (r,g,b,a) 
 
 ### Yup, same function that should have been called this

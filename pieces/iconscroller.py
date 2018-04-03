@@ -671,6 +671,7 @@ def init() :
 		scrollerRef.callBack = {"func" : remakeScrollBlock, "direction" : direction}
 		makeScrollBlock(scrollerRef.bg1, scrollerRef.bg1Draw, direction)
 		makeScrollBlock(scrollerRef.bg2, scrollerRef.bg2Draw, direction)
+		print(config.scroller5.image.size[0])
 		config.scrollArray.append(scrollerRef)
 		
 

@@ -432,11 +432,11 @@ def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 	imageRef.paste(scrollImage,(0,config.textVOffest), scrollImage)
 
 def makeBackGround(drawRef, n = 1):
-	rows = config.patternRows * 2
-	cols = config.patternCols * 2
+	rows = config.patternRows * 1
+	cols = config.patternCols * 1
 
 	xDiv = int(round(config.displayRows * config.windowWidth)) / cols #- config.patternColsOffset
-	yDiv = config.canvasHeight / rows #- config.patternRowsOffset
+	yDiv = config.canvasHeight / rows / config.displayRows #- config.patternRowsOffset
 
 	xStart = 0
 	yStart = 0
@@ -452,14 +452,23 @@ def makeBackGround(drawRef, n = 1):
 	#config.patternColor = config.patternEndColor
 	#config.patternEndColor = colorutils.getRandomColor(config.brightness)
 
+	#print(xDiv, yDiv)
+
+	rowMultiplier = 1
+	colMultiplier = 1
+
+	if (config.pattern == "diamonds") :
+		rowMultiplier = 2
+		colMultiplier = 2
+
 	steps =  cols
 
 	## The multiplier is actually a factor of the number of rows 
 	## but, generally so far only using two rows ....
-	rDelta = 2 * (config.patternEndColor[0] - config.patternColor[0]) / steps
-	gDelta = 2 * (config.patternEndColor[1] - config.patternColor[1]) / steps
-	bDelta = 2 * (config.patternEndColor[2] - config.patternColor[2]) / steps
-
+	rDelta = colMultiplier * (config.patternEndColor[0] - config.patternColor[0]) / steps
+	gDelta = colMultiplier * (config.patternEndColor[1] - config.patternColor[1]) / steps
+	bDelta = colMultiplier * (config.patternEndColor[2] - config.patternColor[2]) / steps
+	
 
 	for c in range (0, cols) : 
 
@@ -479,16 +488,26 @@ def makeBackGround(drawRef, n = 1):
 		#print(c,fillClr)
 
 		for r in range (0, rows) : 
-			poly = []
-			poly.append((xStart, yStart + yDiv))
-			poly.append((xStart + xDiv, yStart))
-			poly.append((xStart + xDiv + xDiv, yStart + yDiv))
-			poly.append((xStart + xDiv, yStart + yDiv + yDiv))
-			#if(n ==2) : color = (100,200,0,255)
 			if(random.random() < config.patternDrawProb) :
-				drawRef.polygon(poly, fill = fillClr) #outline = (15,15,15)
-			yStart += 2 * yDiv
-		xStart += 2 * xDiv
+				if (config.pattern == "diamonds") :
+					poly = []
+					poly.append((xStart, yStart + yDiv))
+					poly.append((xStart + xDiv, yStart))
+					poly.append((xStart + xDiv + xDiv, yStart + yDiv))
+					poly.append((xStart + xDiv, yStart + yDiv + yDiv))
+					drawRef.polygon(poly, fill = fillClr) 
+					#if(n ==2) : color = (100,200,0,255)
+				else :
+					#if (r%2 > 0):
+					length = int(round(random.uniform(1,2 * xDiv)))
+					offset = int(round(random.uniform(0,4 * xDiv)))
+
+					if(random.random() < .0) :
+						drawRef.rectangle((xStart + xDiv, yStart, xStart + xDiv , yStart + yDiv), fill = fillClr, outline=None)
+					else:
+						drawRef.rectangle((xStart + offset, yStart, xStart + length + offset, yStart + yDiv), fill = fillClr, outline=None)
+			yStart += rowMultiplier * yDiv
+		xStart += colMultiplier * xDiv
 		yStart = 0
 
 	config.patternColor = config.patternEndColor
@@ -517,6 +536,14 @@ def remakePatternBlock(imageRef, direction):
 	config.patternColor = config.patternEndColor
 	if(random.random() < .3) :
 		config.patternEndColor = colorutils.getRandomColor(config.brightness)
+
+	if(random.random() < .3) :
+		config.patternDrawProb = random.uniform(.08,.12)
+	if(random.random() < .3) :
+		config.patternRows = int(round(random.uniform(40,80)))
+	if(random.random() < .3) :
+		config.patternCols = int(round(random.uniform(40,240)))
+
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
 
@@ -560,6 +587,7 @@ def init() :
 	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
 	config.bgForeGroundColor = (workConfig.get("scroller", 'bgForeGroundColor').split(","))
 	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
+	config.pattern = (workConfig.get("scroller", 'pattern'))
 
 	config.patternSpeed = int(workConfig.get("scroller", 'patternSpeed'))
 	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))

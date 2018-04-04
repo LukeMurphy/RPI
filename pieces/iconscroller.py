@@ -503,7 +503,7 @@ def makeBackGround(drawRef, n = 1):
 					offset = int(round(random.uniform(0,4 * xDiv)))
 
 					if(random.random() < .5) :
-						drawRef.rectangle((xStart + xDiv, yStart, xStart + 2 * xDiv , yStart + yDiv), fill = fillClr, outline=None)
+						drawRef.rectangle((xStart, yStart, xStart + 2 * xDiv , yStart + yDiv), fill = fillClr, outline=None)
 					else:
 						drawRef.rectangle((xStart + offset, yStart, xStart + length + offset, yStart + yDiv), fill = fillClr, outline=None)
 			yStart += rowMultiplier * yDiv
@@ -533,16 +533,21 @@ def remakeArrowBlock(imageRef, direction):
 	makeArrows(drawRef, direction)
 
 def remakePatternBlock(imageRef, direction):
+	## Stacking the cards ...
 	config.patternColor = config.patternEndColor
+
 	if(random.random() < .3) :
 		config.patternEndColor = colorutils.getRandomColor(config.brightness)
-
+	if(random.random() < .05) :
+		config.patternEndColor = (254,0,254)
+	if(random.random() < .05) :
+		config.patternEndColor = (0,0,250)
 	if(random.random() < .3) :
 		config.patternDrawProb = random.uniform(.08,.12)
 	if(random.random() < .3) :
 		config.patternRows = int(round(random.uniform(40,80)))
 	if(random.random() < .3) :
-		config.patternCols = int(round(random.uniform(40,240)))
+		config.patternCols = int(round(random.uniform(90,240)))
 
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
@@ -680,8 +685,8 @@ def init() :
 		scrollerRef.setUp()
 		direction = 1 if scrollerRef.xSpeed > 0 else -1
 		scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
-		config.patternColor = (255,0,0)
-		config.patternEndColor = (0,0,255)
+		config.patternColor = (50,0,55)
+		config.patternEndColor = (255,0,255)
 		makeBackGround(scrollerRef.bg1Draw, 1)
 		makeBackGround(scrollerRef.bg2Draw, 1)
 		config.scrollArray.append(scrollerRef)

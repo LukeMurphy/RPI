@@ -502,8 +502,8 @@ def makeBackGround(drawRef, n = 1):
 					length = int(round(random.uniform(1,2 * xDiv)))
 					offset = int(round(random.uniform(0,4 * xDiv)))
 
-					if(random.random() < .0) :
-						drawRef.rectangle((xStart + xDiv, yStart, xStart + xDiv , yStart + yDiv), fill = fillClr, outline=None)
+					if(random.random() < .5) :
+						drawRef.rectangle((xStart + xDiv, yStart, xStart + 2 * xDiv , yStart + yDiv), fill = fillClr, outline=None)
 					else:
 						drawRef.rectangle((xStart + offset, yStart, xStart + length + offset, yStart + yDiv), fill = fillClr, outline=None)
 			yStart += rowMultiplier * yDiv

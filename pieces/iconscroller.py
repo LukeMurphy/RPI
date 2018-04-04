@@ -454,6 +454,8 @@ def makeBackGround(drawRef, n = 1):
 
 	steps =  cols
 
+	## The multiplier is actually a factor of the number of rows 
+	## but, generally so far only using two rows ....
 	rDelta = 2 * (config.patternEndColor[0] - config.patternColor[0]) / steps
 	gDelta = 2 * (config.patternEndColor[1] - config.patternColor[1]) / steps
 	bDelta = 2 * (config.patternEndColor[2] - config.patternColor[2]) / steps

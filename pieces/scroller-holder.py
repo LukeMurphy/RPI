@@ -7,31 +7,11 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
 from PIL import ImageChops, ImageFilter, ImagePalette
 from modules import colorutils, coloroverlay, continuous_scroller
 
-global thrd, config
+global config
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Image manipulations
-
-def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
-	if center is None:
-		return image.rotate(angle)
-	angle = -angle/180.0*math.pi
-	nx,ny = x,y = center
-	sx=sy=1.0
-	if new_center:
-		(nx,ny) = new_center
-	if scale:
-		(sx,sy) = scale
-	cosine = math.cos(angle)
-	sine = math.sin(angle)
-	a = cosine/sx
-	b = sine/sx
-	c = x-nx*a-ny*b
-	d = -sine/sy
-	e = cosine/sy
-	f = y-nx*d-ny*e
-	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
 
 def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 
@@ -165,6 +145,10 @@ def makeDaemonMessages(imageRef, direction = 1):
 	refDraw.rectangle((0,0,pixLen[0] + 2 , fontHeight), fill = config.bgBackGroundColor)
 	imageRef.paste(scrollImage,(0,config.textVOffest), scrollImage)
 
+def remakeDaemonMessages(imageRef, direction = 1):
+	##
+	makeDaemonMessages(imageRef=imageRef, direction=direction)
+
 def makeScrollBlock(imageRef, imageDrawRef, direction):
 	global config
 	w = imageRef.size[0]
@@ -197,6 +181,11 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 
 		tempImage = ImageChops.multiply(clrBlock, tempImage)
 		imageRef.paste(tempImage,(x,y),tempImage)
+
+def remakeScrollBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	if(random.random() < config.imageBlockRemakeProb) :
+		makeScrollBlock(imageRef, drawRef, direction)
 
 def makeArrows(drawRef, direction = 1) :
 
@@ -239,6 +228,10 @@ def makeArrows(drawRef, direction = 1) :
 		#yStart += arrowLength + bufferDistance
 		xStart += arrowLength + bufferDistance
 
+def remakeArrowBlock(imageRef, direction):
+	drawRef = ImageDraw.Draw(imageRef)
+	makeArrows(drawRef, direction)
+
 def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 	global config
 
@@ -280,6 +273,11 @@ def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 	refDraw.rectangle((0,0,pixLen[0] + 2 , fontHeight), fill = config.bgBackGroundColor)
 	imageRef.paste(scrollImage,(0,config.textVOffest), scrollImage)
 
+def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
+	messageString = config.msg1 if random.random() < .5 else config.msg2
+	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def makeBackGround(drawRef, n = 1):
 	rows = config.patternRows * 1
 	cols = config.patternCols * 1
@@ -361,26 +359,7 @@ def makeBackGround(drawRef, n = 1):
 
 	config.patternColor = config.patternEndColor
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Layer imagery callbacks & regeneration functions
-
-def remakeDaemonMessages(imageRef, direction = 1):
-	##
-	makeDaemonMessages(imageRef=imageRef, direction=direction)
-
-def remakeScrollBlock(imageRef, direction):
-	drawRef = ImageDraw.Draw(imageRef)
-	if(random.random() < config.imageBlockRemakeProb) :
-		makeScrollBlock(imageRef, drawRef, direction)
-
-def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
-	messageString = config.msg1 if random.random() < .5 else config.msg2
-	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
-
-def remakeArrowBlock(imageRef, direction):
-	drawRef = ImageDraw.Draw(imageRef)
-	makeArrows(drawRef, direction)
-
 def remakePatternBlock(imageRef, direction):
 	## Stacking the cards ...
 	config.patternColor = config.patternEndColor
@@ -401,9 +380,7 @@ def remakePatternBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Setup and run functions
-
 def configureBackgroundScrolling():
 	config.patternRows = int(workConfig.get("scroller", 'patternRows'))
 	config.patternCols = int(workConfig.get("scroller", 'patternCols'))
@@ -430,6 +407,7 @@ def configureBackgroundScrolling():
 	makeBackGround(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def configureImageScrolling():
 	config.imageSpeed = int(workConfig.get("scroller", 'imageSpeed'))
 	config.imageBlockImage = workConfig.get("scroller", 'imageBlockImage')
@@ -530,6 +508,7 @@ def configureImageOverlay():
 	config.loadedImage.load()
 	config.loadedImageCopy  = config.loadedImage.copy()
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def init() :
 	global config
 	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 

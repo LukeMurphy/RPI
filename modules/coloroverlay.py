@@ -2,7 +2,7 @@ import time
 import random
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from modules import colorutils, badpixels
+from modules import colorutils
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ### Colorizing filter that transitions from colorA to colorB ###

@@ -44,6 +44,7 @@ class Fludd :
 	nothing = "void"
 	varianceMode = "independent"
 	prisimBrightness = .5
+	blackOpacity = 255
 
 
 	def __init__(self, config):
@@ -77,7 +78,7 @@ class Fludd :
 			light = 0
 
 
-		config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0))
+		#config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (0,0,0,100))
 		#config.draw.rectangle((0,0,self.boxMax,self.boxHeight), fill = (light,light,light))
 		if(self.borderModel == "prism"):
 			outerBorder = colorutils.randomColor(self.prisimBrightness)
@@ -99,7 +100,7 @@ class Fludd :
 			xPos4 = random.uniform(-var/2,var)
 			yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
 
-			config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) )
+			config.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray, self.blackOpacity) )
 
 		elif(self.varianceMode == "symmetrical"):
 			svar = random.uniform(0, var)
@@ -107,7 +108,7 @@ class Fludd :
 			symBoxHeight = self.boxHeight - svar
 			xy0 = svar
 			
-			config.draw.rectangle((xy0,xy0,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) )
+			config.draw.rectangle((xy0,xy0,symBoxWidth,symBoxHeight), fill=(gray, gray, gray, self.blackOpacity) )
 	
 		elif(self.varianceMode == "asymmetrical"):
 			svarw = random.uniform(0, var)
@@ -116,13 +117,15 @@ class Fludd :
 			symBoxHeight = self.boxHeight - svarh
 			xPos1 = (self.boxMax - symBoxWidth)
 			yPos1 = (self.boxHeight  - symBoxHeight)
-			config.draw.rectangle((xPos1,yPos1,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) )
+			config.draw.rectangle((xPos1,yPos1,symBoxWidth,symBoxHeight), fill=(gray, gray, gray, self.blackOpacity) )
 
-		if(random.random() < self.nothingChangeProbability) : self.nothingLevel = random.uniform(0,255)
+		if(random.random() < self.nothingChangeProbability) : 
+			self.nothingLevel = random.uniform(0,255)
+		if(random.random() < self.blacknessChangeProbability) : 
+			self.blackOpacity = round(random.uniform(0,255))
 
 		# Finally composite full image
 		#config.image.paste(self.mainImage, (numXPos, numYPos), self.scrollImage)
-
 
 	def change(self) :
 		if (self.varianceMode == "independent") :
@@ -221,6 +224,12 @@ def main(run = True) :
 	fluddSquare.nothing  = workConfig.get("fludd", 'nothing')
 	fluddSquare.var  = int(workConfig.get("fludd", 'var'))
 	fluddSquare.varianceMode  = workConfig.get("fludd", 'varianceMode')
+	fluddSquare.blackOpacity  = int(workConfig.get("fludd", 'blackOpacity')) 
+	fluddSquare.blacknessChangeProbability  = float(workConfig.get("fludd", 'blacknessChangeProbability')) 
+	fluddSquare.nothingChangeProbability  = float(workConfig.get("fludd", 'nothingChangeProbability')) 
+
+
+
 	#fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness')) 
 	# More uniform brightness control
 	fluddSquare.prisimBrightness  = float(workConfig.get("displayconfig", 'brightness')) 

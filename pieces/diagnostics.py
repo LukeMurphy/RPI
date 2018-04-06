@@ -138,7 +138,7 @@ def showGrid():
 	
 	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
 
-	#config.draw.rectangle((config.imageXOffset,0,config.imageXOffset + 20, 20), fill=(100,0,0))
+	config.draw.rectangle((0,0,8,8), fill=(80,0,0), outline = (0,0,100))
 	
 	config.render(config.image, 0,0)
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

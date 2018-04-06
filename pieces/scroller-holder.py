@@ -483,6 +483,12 @@ def configureMessageScrolling():
 	config.scrollArray.append(scrollerRef)
 
 def configureAltTextScrolling() :
+	config.colorMode = workConfig.get("scroller", 'colorMode')
+	config.sansSerif = workConfig.getboolean("scroller", 'sansSerif')
+	config.fontSize =  int(workConfig.get("scroller", 'fontSize'))
+	config.textVOffest = int(workConfig.get("scroller", 'textVOffest'))
+	config.shadowSize = int(workConfig.get("scroller", 'shadowSize'))
+	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
 	config.scroller6 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller6
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)

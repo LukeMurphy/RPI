@@ -117,6 +117,8 @@ def displayTest():
 	
 	config.render(config.image, 0,0)
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
 def showGrid():
 	global config
 
@@ -138,10 +140,14 @@ def showGrid():
 	
 	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
 
-	config.draw.rectangle((0,0,8,8), fill=(80,0,0), outline = (0,0,100))
+	config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
 	
 	config.render(config.image, 0,0)
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
@@ -161,6 +167,11 @@ def main(run = True) :
 	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
 	
+	try:
+		config.fontSize = int(workConfig.get("diag","fontSize"))
+	except Exception as e:
+		print (str(e))
+		config.fontSize = 14
 	try:
 		config.imageXOffset = int(workConfig.get("displayconfig","imageXOffset"))
 	except Exception as e:
@@ -182,7 +193,6 @@ def main(run = True) :
 	config.draw = ImageDraw.Draw(config.image)
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth  , config.canvasHeight))
 	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
-	config.fontSize = 14
 	config.font = ImageFont.truetype(config.path  + '/assets/fonts/freefont/FreeSansBold.ttf', config.fontSize)
 	
 

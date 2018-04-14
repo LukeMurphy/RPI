@@ -214,6 +214,29 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Might be used at some point
+
+def remappingFunctionTemp() :
+	for i in range (0,4) :
+		## Map the one below to the next set of 4
+		pix = 16
+		colWidth = 128
+		row = i
+		cropRow = i * 2 + 1
+
+		remapImageBlockSection = (0, cropRow * pix, colWidth, cropRow * pix + pix)
+		remapImageBlockDestination = (colWidth, row * 16)
+		crop = config.renderImageFull.crop(remapImageBlockSection)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, remapImageBlockDestination, crop)
+		## Move a row "up"
+
+		remapImageBlockSection = (0, (cropRow-1) * pix, colWidth, (cropRow-1) * pix + pix)
+		remapImageBlockDestination = (0, (row) * pix)
+		crop = config.renderImageFull.crop(remapImageBlockSection)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, remapImageBlockDestination, crop)
+
 
 def drawBeforeConversion() :
 	return True

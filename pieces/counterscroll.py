@@ -1,6 +1,5 @@
 import time
 import random
-import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
@@ -11,11 +10,12 @@ XOsBlocks = []
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # LEFT means text or icon moves to the left (i.e. comes from the right)
 # RIGHT means text or icon moves to the right (i.e. comes from the left)
-directionOrder = ["LEFT","RIGHT"]
+directionOrder = ["LEFT", "RIGHT"]
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-class ScrollMessage :
+
+class ScrollMessage:
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	#scroll speed and steps per cycle

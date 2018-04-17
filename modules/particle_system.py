@@ -16,6 +16,12 @@ class ParticleSystem(object):
 	clumpingFactor = 8
 	cohesionFactor =1
 	cohesionDegrades = 1
+	useFlocking = False
+
+	centerRangeXMin = -10
+	centerRangeXMax = 60
+	centerRangeYMin = -40
+	centerRangeYMax = 40
 
 	minDx  = 2
 	minDy  = 2

@@ -4,6 +4,7 @@ import textwrap
 import math
 import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
+from PIL import ImageFilter
 from modules import colorutils, badpixels, coloroverlay
 from modules.particle_system import ParticleSystem
 from modules.particle import Particle
@@ -46,10 +47,13 @@ def main(run = True) :
 	ps.xGravity = float(workConfig.get("particleSystem", 'xGravity'))
 	ps.yGravity = float(workConfig.get("particleSystem", 'yGravity'))
 	ps.damping = float(workConfig.get("particleSystem", 'damping'))
+	ps.collisionDamping = float(workConfig.get("particleSystem", 'collisionDamping'))
 	ps.borderCollisions = (workConfig.getboolean("particleSystem", 'borderCollisions'))
+	ps.expireOnExit = (workConfig.getboolean("particleSystem", 'expireOnExit'))
+
+	ps.useFlocking = (workConfig.getboolean("particleSystem", 'useFlocking'))
 	ps.cohesionDistance = float(workConfig.get("particleSystem", 'cohesionDistance'))
 	ps.repelDistance = float(workConfig.get("particleSystem", 'repelDistance'))
-
 	ps.distanceFactor = float(workConfig.get("particleSystem", 'distanceFactor'))
 	ps.clumpingFactor = float(workConfig.get("particleSystem", 'clumpingFactor'))
 	ps.repelFactor = float(workConfig.get("particleSystem", 'repelFactor'))
@@ -61,20 +65,56 @@ def main(run = True) :
 	config.bgColorVals = ((workConfig.get("particleSystem", 'bgColor')).split(','))
 	config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorVals))
 
+	ps.centerRangeXMin = int(workConfig.get("particleSystem", 'centerRangeXMin'))
+	ps.centerRangeYMin = int(workConfig.get("particleSystem", 'centerRangeYMin'))
+	ps.centerRangeXMax = int(workConfig.get("particleSystem", 'centerRangeXMax'))
+	ps.centerRangeyMax = int(workConfig.get("particleSystem", 'centerRangeyMax'))
+
+	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
+	ps.objHeight = int(workConfig.get("particleSystem", 'objHeight'))
+	ps.widthRate = float(workConfig.get("particleSystem", 'widthRate'))
+	ps.heightRate = float(workConfig.get("particleSystem", 'heightRate'))
+
+	config.fillColorVals = ((workConfig.get("particleSystem", 'fillColor')).split(','))
+	config.fillColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.fillColorVals))
+
+	config.outlineColorVals = ((workConfig.get("particleSystem", 'outlineColor')).split(','))
+	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
+
+	ps.unitBlur = int(workConfig.get("particleSystem", 'unitBlur'))
+	config.overallBlur = int(workConfig.get("particleSystem", 'overallBlur'))
+
 
 	for i in range(0,ps.numUnits):
-		p = Particle(ps)
-		p.xPosR = config.screenWidth - 40
-		p.yPosR = config.screenHeight/2 + random.uniform(-40,40)
-		variance = math.pi/3
-		p.direction = random.uniform(math.pi + math.pi/2 - variance, math.pi + math.pi/2 + variance)
-		p.v = random.uniform(ps.speedMin,ps.speedMax)
-		ps.unitArray.append(p)
+		emitParticle()
 
 	setUp()
 
 	if(run) : runWork()
 
+
+def emitParticle():
+	global config, ps
+	p = Particle(ps)
+	p.xPosR = config.screenWidth/2 + random.uniform(ps.centerRangeXMin, ps.centerRangeXMax)
+	p.yPosR = config.screenHeight/2 + random.uniform(ps.centerRangeYMin, ps.centerRangeYMax)
+	variance = math.pi/3
+	p.direction = random.uniform(math.pi + math.pi/2 - variance, math.pi + math.pi/2 + variance)
+	p.v = random.uniform(ps.speedMin,ps.speedMax)
+	#p.fillColor = colorutils.randomColor(ps.config.brightness)
+	#p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)
+	p.fillColor = config.fillColor #(240,150,0,100)
+	p.outlineColor = config.outlineColor #(100,0,0,100)
+
+	p.objWidth = ps.objWidth
+	p.objHeight = ps.objHeight
+
+	p.setUpParticle()
+
+	#p.direction = 3 * math.pi / 32
+	#p.direction = math.pi
+	#p.v  = 2
+	ps.unitArray.append(p)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -85,7 +125,7 @@ def setUp():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def runWork():
-	global blocks, config, XOs
+	global blocks, config
 	#gc.enable()
 	while True:
 		iterate()
@@ -102,10 +142,16 @@ def iterate() :
 		p.update()
 		p.render()
 
+		if(p.remove == True) :
+			ps.unitArray.remove(p)
+			emitParticle()
+
 	if random.random() < .0005 :
 		ps.cohesionDistance = random.uniform(8,30)
 		#print(ps.cohesionDistance)
 
+	if (config.overallBlur > 0) :
+		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 	config.render(config.image, 0,0)
 		
 

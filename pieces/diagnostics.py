@@ -134,8 +134,10 @@ def showGrid():
 			yPos = row * config.tileSizeHeight
 			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
 			
-			displyInfo  =  str(col) + ", " + str(row) + "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
+			displyInfo  =  str(col) + ", " + str(row) + "\n"
 			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
+			displyInfo  =  "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
+			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor2,font=config.font)
 
 	
 	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
@@ -182,6 +184,12 @@ def main(run = True) :
 	except Exception as e:
 		print (str(e))
 		config.showGrid = False
+	try:
+		fontColor2 = workConfig.get("diag","fontColor2").split(',')
+	except Exception as e:
+		print (str(e))
+		fontColor2 = [0,200,0]
+	config.fontColor2 = tuple(map(lambda x: int(int(x) * config.brightness) , fontColor2))
 	
 	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
 	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))

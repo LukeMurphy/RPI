@@ -4,6 +4,7 @@ import textwrap
 import math
 import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
+from PIL import ImageFilter
 from modules import colorutils
 
 class Particle(object):
@@ -23,7 +24,9 @@ class Particle(object):
 	dxIncremental = 0
 	dyIncremental = 0
 	directionIncrement = 0
-
+	remove = False
+	objWidth = 2
+	objHeight = 6
 
 	changeColorOnChange = False
 
@@ -33,8 +36,8 @@ class Particle(object):
 		self.xPos = 0
 		self.yPos = 0
 
-		self.xPosR = 0 #self.ps.config.screenWidth/2
-		self.yPosR = 0 #self.ps.config.screenHeight/2
+		self.xPosR = 0 #self.ps.config.canvasWidth/2
+		self.yPosR = 0 #self.ps.config.canvasHeight/2
 		self.move = True
 		
 		self.dx = 0
@@ -42,12 +45,6 @@ class Particle(object):
 
 		self.v = random.uniform(1,3)
 		self.direction = 0
-
-		self.objWidth = 2
-		self.objHeight = 6
-
-		self.image = Image.new("RGBA", (self.objWidth , self.objHeight))
-		self.draw = ImageDraw.Draw(self.image)
 
 		'''
 		self.fillColor = colorutils.getSunsetColors(self.ps.config.brightness)
@@ -66,12 +63,40 @@ class Particle(object):
 		if(random.random() < .2) :
 			self.fillColor = (100,10,0)
 
+
+	def setUpParticle(self) :
+		self.objWidth = round(self.objWidth * random.uniform(.5,2))
+		self.objHeight = round(self.objHeight * random.uniform(.5,2))
+
+
+		self.image = Image.new("RGBA", (self.objWidth + 2 , self.objHeight + 2))
+		self.draw = ImageDraw.Draw(self.image)
+
+
 	def update(self):
 
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
 
-		self.dx = self.v * math.sin(self.direction)
-		self.dy = self.v * math.cos(self.direction)
+		#print( self.direction)
+
+		self.dy = self.v * math.sin(self.direction)
+		self.dx = self.v * math.cos(self.direction)
+
+		vy = self.v * math.sin(self.direction)
+		vx = self.v * math.cos(self.direction)
+
+		vy += self.ps.yGravity
+		vx += self.ps.xGravity
+
+		newV  = math.sqrt(vx*vx + vy*vy)
+
+		newDirection = math.atan2(vy,vx)
+		
+		if (self.ps.useFlocking == False) :
+			self.direction = newDirection
+
+		#print( newDirection)
+		#print("")
 
 		self.xPos += self.dx
 		self.yPos += self.dy
@@ -81,55 +106,85 @@ class Particle(object):
 
 		#self.directionIncrement *= self.ps.cohesionDegrades
 		
-
 		if(self.ps.borderCollisions ==  True) :
+			collide = False
 
-			if(self.xPosR + self.objWidth > self.ps.config.screenWidth) : 
-				self.xPosR = self.ps.config.screenWidth - self.objWidth 
-				self.xPos = self.ps.config.screenWidth - self.objWidth 
+			if(self.xPosR + self.objWidth > self.ps.config.canvasWidth) : 
+				self.xPosR = self.ps.config.canvasWidth - self.objWidth 
+				self.xPos = self.ps.config.canvasWidth - self.objWidth 
+				self.v *= self.ps.collisionDamping
 				self.changeColor()
-				self.direction -= math.pi
-			if(self.yPosR + self.objWidth> self.ps.config.screenHeight) : 
-				self.yPosR = self.ps.config.screenHeight-self.objWidth 
-				self.yPos = self.ps.config.screenHeight-self.objWidth 
-				self.changeColor()
-				self.direction -= math.pi
+				if (self.ps.useFlocking == True) :
+					self.direction -= math.pi
+				else :
+					self.direction = math.pi - self.direction
+				if (self.ps.expireOnExit == True) :
+					self.remove = True
+				
 			if(self.xPosR < 0) : 
 				self.xPosR = 0
 				self.xPos = 0
+				self.v *= self.ps.collisionDamping
 				self.changeColor()
-				self.direction -= math.pi
+				if (self.ps.useFlocking == True) :
+					self.direction -= math.pi
+				else :
+					self.direction = math.pi - self.direction
+				if (self.ps.expireOnExit == True) :
+					self.remove = True
+
+			if(self.yPosR + self.objWidth> self.ps.config.canvasHeight) : 
+				self.yPosR = self.ps.config.canvasHeight-self.objWidth 
+				self.yPos = self.ps.config.canvasHeight-self.objWidth 
+				self.v *= self.ps.collisionDamping
+				self.changeColor()
+				if (self.ps.useFlocking == True) :
+					self.direction -= math.pi
+				else :
+					self.direction = 2 * math.pi - self.direction
+				if (self.ps.expireOnExit == True) :
+					self.remove = True
+
 			if(self.yPosR < 0) : 
 				self.yPosR = 0
 				self.yPos = 0
+				self.v *= self.ps.collisionDamping
 				self.changeColor()
-				self.direction -= math.pi
+				if (self.ps.useFlocking == True) :
+					self.direction -= math.pi
+				else :
+					self.direction = 2 * math.pi - self.direction
+				if (self.ps.expireOnExit == True) :
+					self.remove = True
+
 		else :
-			if(self.xPosR  > self.ps.config.screenWidth) : 
+			if(self.xPosR  > self.ps.config.canvasWidth) : 
 				self.xPosR = 0
 				self.xPos = 0
 				self.changeColor()
-			if(self.yPosR > self.ps.config.screenHeight) : 
+			if(self.yPosR > self.ps.config.canvasHeight) : 
 				self.yPosR = 0 
 				self.yPos = 0 
 				self.changeColor()
 
 			if(self.xPosR < 0) : 
-				self.xPosR = self.ps.config.screenWidth
-				self.xPos = self.ps.config.screenWidth
+				self.xPosR = self.ps.config.canvasWidth
+				self.xPos = self.ps.config.canvasWidth
 				self.changeColor()
 
 			if(self.yPosR < 0) : 
-				self.yPosR = self.ps.config.screenHeight
-				self.yPos = self.ps.config.screenHeight
+				self.yPosR = self.ps.config.canvasHeight
+				self.yPos = self.ps.config.canvasHeight
 				self.changeColor()
 
 		
 		self.v *= self.ps.damping
-		self.dx += self.ps.xGravity
-		self.dy += self.ps.yGravity	
 
-		self.checkMyBuddies()
+		self.objWidth *= self.ps.widthRate
+		self.objHeight *= self.ps.heightRate
+		
+		if (self.ps.useFlocking == True) :
+			self.checkMyBuddies()
 
 	def render(self):
 		xPos = int(self.xPosR)
@@ -145,11 +200,16 @@ class Particle(object):
 		self.ps.config.draw.rectangle((xPos, yPos,xPos+ self.objHeight , yPos +self.objWidth ), 
 			fill=self.fillColor, outline=self.outlineColor)
 		'''
-		self.draw.rectangle((0, 0, self.objWidth ,self.objHeight), 
+		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
 			fill=self.fillColor, outline=self.outlineColor)
-		imageToPaste = self.image.rotate(self.direction * 180/math.pi, expand=True)
-		self.ps.config.image.paste(imageToPaste, (xPos,yPos))
 
+		angle = 90 - math.degrees(self.direction)
+		imageToPaste = self.image.rotate(angle, expand=True)
+
+		if self.ps.unitBlur > 0 :
+			imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=self.ps.unitBlur))
+		#imageToPaste = self.image.rotate(self.direction * 180/math.pi, expand=True)
+		self.ps.config.image.paste(imageToPaste, (xPos,yPos))
 
 	def changeColor(self):
 		if(self.changeColorOnChange == True) :

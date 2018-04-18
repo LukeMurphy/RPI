@@ -118,13 +118,12 @@ def displayTest():
 	config.render(config.image, 0,0)
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-
 def showGrid():
 	global config
 
-	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
-	config.canvasDraw.rectangle((0,0,config.canvasWidth-1, config.canvasHeight-1), fill= None, outline=config.outlineColor)
-	config.canvasDraw.rectangle((1,1,config.canvasWidth-2, config.canvasHeight-2), fill= None, outline=(0,0,int(220 * config.brightness)))
+	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
+	config.canvasDraw.rectangle((0,0,config.canvasWidth-1, config.canvasHeight-1), fill= config.bgColor, outline=config.outlineColor)
+	config.canvasDraw.rectangle((1,1,config.canvasWidth-2, config.canvasHeight-2), fill= config.bgColor, outline=(0,0,int(220 * config.brightness)))
 
 	#print(config.imageXOffset)
 	
@@ -132,7 +131,7 @@ def showGrid():
 		for col in range (0, config.cols) :
 			xPos = col * config.tileSizeWidth 
 			yPos = row * config.tileSizeHeight
-			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0), outline=config.outlineColor)
+			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
 			
 			displyInfo  =  str(col) + ", " + str(row) + "\n"
 			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
@@ -142,13 +141,11 @@ def showGrid():
 	
 	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
 
-	config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
+	#config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
 	
 	config.render(config.image, 0,0)
 
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 
 def main(run = True) :
 	global config, directionOrder
@@ -167,7 +164,9 @@ def main(run = True) :
 	config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
 	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
 	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
-	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
+	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))	
+	config.bgColorVals = ((workConfig.get("diag", 'bgColor')).split(','))
+	config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorVals))
 	
 	try:
 		config.fontSize = int(workConfig.get("diag","fontSize"))
@@ -218,12 +217,14 @@ def main(run = True) :
 
 	if(run) : runWork()
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def setUp():
 	global config
 	arg = "./assets/imgs/sks/skull-s2.png"
 	config.loadedImage = Image.open(arg , "r")
 	config.loadedImage.load()
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def runWork():
 	global blocks, config, XOs
 	#gc.enable()
@@ -231,6 +232,7 @@ def runWork():
 		iterate()
 		time.sleep(config.delay)  
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def iterate() :
 
 	global config
@@ -239,6 +241,7 @@ def iterate() :
 	else :		
 		displayTest()		
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def callBack() :
 	global config, XOs
 	return True

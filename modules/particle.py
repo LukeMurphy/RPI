@@ -27,6 +27,7 @@ class Particle(object):
 	remove = False
 	objWidth = 2
 	objHeight = 6
+	unitBlur = 0
 
 	changeColorOnChange = False
 
@@ -65,12 +66,15 @@ class Particle(object):
 
 
 	def setUpParticle(self) :
-		self.objWidth = round(self.objWidth * random.uniform(.5,2))
-		self.objHeight = round(self.objHeight * random.uniform(.5,2))
+
+		rndSize = random.uniform(.5,1.5)
+		self.objWidth = round(self.objWidth * rndSize)
+		self.objHeight = round(self.objHeight * rndSize)
 
 
-		self.image = Image.new("RGBA", (self.objWidth + 2 , self.objHeight + 2))
+		self.image = Image.new("RGBA", (self.objWidth * 3 + 2 , self.objHeight * 2 + 2))
 		self.draw = ImageDraw.Draw(self.image)
+		self.unitBlur = self.ps.unitBlur
 
 
 	def update(self):
@@ -110,8 +114,6 @@ class Particle(object):
 			collide = False
 
 			if(self.xPosR + self.objWidth > self.ps.config.canvasWidth) : 
-				self.xPosR = self.ps.config.canvasWidth - self.objWidth 
-				self.xPos = self.ps.config.canvasWidth - self.objWidth 
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :
@@ -120,10 +122,12 @@ class Particle(object):
 					self.direction = math.pi - self.direction
 				if (self.ps.expireOnExit == True) :
 					self.remove = True
+				else:
+					self.xPosR = self.ps.config.canvasWidth - self.objWidth 
+					self.xPos = self.ps.config.canvasWidth - self.objWidth 
+
 				
-			if(self.xPosR < 0) : 
-				self.xPosR = 0
-				self.xPos = 0
+			if(self.xPosR < -3 * self.objWidth) : 
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :
@@ -132,10 +136,12 @@ class Particle(object):
 					self.direction = math.pi - self.direction
 				if (self.ps.expireOnExit == True) :
 					self.remove = True
+				else :
+					self.xPosR = 0
+					self.xPos = 0
 
-			if(self.yPosR + self.objWidth> self.ps.config.canvasHeight) : 
-				self.yPosR = self.ps.config.canvasHeight-self.objWidth 
-				self.yPos = self.ps.config.canvasHeight-self.objWidth 
+
+			if(self.yPosR + self.objHeight > self.ps.config.canvasHeight and self.ps.ignoreBottom == False) : 
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :
@@ -144,10 +150,12 @@ class Particle(object):
 					self.direction = 2 * math.pi - self.direction
 				if (self.ps.expireOnExit == True) :
 					self.remove = True
+				else:
+					self.yPosR = self.ps.config.canvasHeight - self.objHeight 
+					self.yPos = self.ps.config.canvasHeight - self.objHeight 
 
-			if(self.yPosR < 0) : 
-				self.yPosR = 0
-				self.yPos = 0
+
+			if(self.yPosR < 0) : # -3 * self.objHeight
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :
@@ -156,6 +164,10 @@ class Particle(object):
 					self.direction = 2 * math.pi - self.direction
 				if (self.ps.expireOnExit == True) :
 					self.remove = True
+				else:
+					self.yPosR = 0
+					self.yPos = 0
+					
 
 		else :
 			if(self.xPosR  > self.ps.config.canvasWidth) : 
@@ -200,16 +212,50 @@ class Particle(object):
 		self.ps.config.draw.rectangle((xPos, yPos,xPos+ self.objHeight , yPos +self.objWidth ), 
 			fill=self.fillColor, outline=self.outlineColor)
 		'''
-		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
-			fill=self.fillColor, outline=self.outlineColor)
+		if self.ps.objType == "poly" :
+			self.drawPoly()
+		else:
+			self.drawRectangle()
 
+		angle = 180
+		imageToPaste = self.image.rotate(angle, expand=True)
 		angle = 90 - math.degrees(self.direction)
 		imageToPaste = self.image.rotate(angle, expand=True)
 
+
 		if self.ps.unitBlur > 0 :
-			imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=self.ps.unitBlur))
+			imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
+			self.unitBlur += .7
 		#imageToPaste = self.image.rotate(self.direction * 180/math.pi, expand=True)
 		self.ps.config.image.paste(imageToPaste, (xPos,yPos))
+
+	def drawPoly(self):
+
+		h = self.objWidth
+		b = self.objWidth
+		c = self.objHeight # "height"
+
+
+		poly = []
+
+		poly.append((h, 0))
+		poly.append((0, h))
+		poly.append((0, h + b))
+		poly.append((h + round(b / 2), h + b + c))
+		poly.append((h + b + h, b + h))
+		poly.append((h + b + h, h))
+		poly.append((h + b, 0))
+		poly.append((h, 0))
+
+		self.draw.polygon(poly, fill = self.fillColor, outline=self. outlineColor)
+
+
+		#self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
+	
+	def drawRectangle(self):
+		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
+			fill=self.fillColor, outline=self.outlineColor)
+
 
 	def changeColor(self):
 		if(self.changeColorOnChange == True) :

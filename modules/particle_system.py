@@ -23,6 +23,8 @@ class ParticleSystem(object):
 	centerRangeYMin = -40
 	centerRangeYMax = 40
 
+	ignoreBottom = False
+
 	minDx  = 2
 	minDy  = 2
 

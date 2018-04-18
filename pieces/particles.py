@@ -48,7 +48,8 @@ def main(run = True) :
 	ps.yGravity = float(workConfig.get("particleSystem", 'yGravity'))
 	ps.damping = float(workConfig.get("particleSystem", 'damping'))
 	ps.collisionDamping = float(workConfig.get("particleSystem", 'collisionDamping'))
-	ps.borderCollisions = (workConfig.getboolean("particleSystem", 'borderCollisions'))
+	ps.borderCollisions = (workConfig.getboolean("particleSystem", 'borderCollisions'))    
+	ps.ignoreBottom = (workConfig.getboolean("particleSystem", 'ignoreBottom'))    
 	ps.expireOnExit = (workConfig.getboolean("particleSystem", 'expireOnExit'))
 
 	ps.useFlocking = (workConfig.getboolean("particleSystem", 'useFlocking'))
@@ -70,10 +71,13 @@ def main(run = True) :
 	ps.centerRangeXMax = int(workConfig.get("particleSystem", 'centerRangeXMax'))
 	ps.centerRangeyMax = int(workConfig.get("particleSystem", 'centerRangeyMax'))
 
+	ps.objType = (workConfig.get("particleSystem", 'objType'))
+	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
 	ps.objHeight = int(workConfig.get("particleSystem", 'objHeight'))
 	ps.widthRate = float(workConfig.get("particleSystem", 'widthRate'))
 	ps.heightRate = float(workConfig.get("particleSystem", 'heightRate'))
+	config.variance = float(workConfig.get("particleSystem", 'variance'))
 
 	config.fillColorVals = ((workConfig.get("particleSystem", 'fillColor')).split(','))
 	config.fillColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.fillColorVals))
@@ -96,24 +100,22 @@ def main(run = True) :
 def emitParticle():
 	global config, ps
 	p = Particle(ps)
-	p.xPosR = config.screenWidth/2 + random.uniform(ps.centerRangeXMin, ps.centerRangeXMax)
-	p.yPosR = config.screenHeight/2 + random.uniform(ps.centerRangeYMin, ps.centerRangeYMax)
-	variance = math.pi/3
-	p.direction = random.uniform(math.pi + math.pi/2 - variance, math.pi + math.pi/2 + variance)
-	p.v = random.uniform(ps.speedMin,ps.speedMax)
-	#p.fillColor = colorutils.randomColor(ps.config.brightness)
-	#p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)
-	p.fillColor = config.fillColor #(240,150,0,100)
-	p.outlineColor = config.outlineColor #(100,0,0,100)
-
 	p.objWidth = ps.objWidth
 	p.objHeight = ps.objHeight
+	p.xPosR = config.screenWidth/2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
+	p.yPosR = config.screenHeight/2 + ps.centerRangeYMin - round(random.random() * ps.centerRangeYMax)
+	#variance = math.pi/3
+	p.direction = random.uniform(math.pi + math.pi/2 - config.variance, math.pi + math.pi/2 + config.variance)
+	p.v = random.uniform(ps.speedMin,ps.speedMax)
+
+	if ps.objColor == "rnd" :
+		p.fillColor = colorutils.randomColor(ps.config.brightness)
+		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)
+	else :
+		p.fillColor = config.fillColor #(240,150,0,100)
+		p.outlineColor = config.outlineColor #(100,0,0,100)
 
 	p.setUpParticle()
-
-	#p.direction = 3 * math.pi / 32
-	#p.direction = math.pi
-	#p.v  = 2
 	ps.unitArray.append(p)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

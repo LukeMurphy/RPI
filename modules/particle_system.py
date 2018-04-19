@@ -25,6 +25,8 @@ class ParticleSystem(object):
 
 	ignoreBottom = False
 
+	movement = "travel"
+
 	minDx  = 2
 	minDy  = 2
 

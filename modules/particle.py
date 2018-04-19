@@ -73,11 +73,11 @@ class Particle(object):
 	def setUpParticle(self) :
 
 		rndSize = random.uniform(.5,1.5)
+
 		self.objWidth = round(self.objWidth * rndSize)
 		self.objHeight = round(self.objHeight * rndSize)
 
-
-		self.image = Image.new("RGBA", (self.objWidth * 3 + 2 , self.objHeight * 2 + 2))
+		self.image = Image.new("RGBA", (self.objWidth + 2 , self.objHeight + 2))
 		self.draw = ImageDraw.Draw(self.image)
 		self.unitBlur = self.ps.unitBlur
 
@@ -234,39 +234,35 @@ class Particle(object):
 
 	def update(self):
 
-		#self.travel()
-		self.meander()
+		if(self.ps.movement == "travel"):
+			self.travel()
+
+		if(self.ps.movement == "fire"):
+			self.meander()
+
 		self.checkForBorderCollisions()
 
 		self.directionIncrement *= self.ps.cohesionDegrades
 		self.v *= self.ps.damping
 
-		self.objWidth *= self.ps.widthRate
-		self.objHeight *= self.ps.heightRate
+		if self.ps.movement == "fire" :
+			self.objWidth *= self.ps.widthRate
+			self.objHeight *= self.ps.heightRate
 
-		if(self.objWidth < 2) :
-			self.objWidth = 2
-		if(self.objHeight < 2) :
-			self.objHeight = 2
+			if(self.objWidth < 2) :
+				self.objWidth = 2
+			if(self.objHeight < 2) :
+				self.objHeight = 2
 		
 		if (self.ps.useFlocking == True) :
 			self.checkMyBuddies()
 
+	
 	def render(self):
 		if(self.remove != True) :
 			xPos = int(self.xPosR)
 			yPos = int(self.yPosR)
 
-			if(self.dy == 0) :
-				self.angle = 0
-			else :
-				self.angle = self.dx/self.dy
-			#self.direction = math.atan(self.angle) * 180 / math.pi
-
-			'''
-			self.ps.config.draw.rectangle((xPos, yPos,xPos+ self.objHeight , yPos +self.objWidth ), 
-				fill=self.fillColor, outline=self.outlineColor)
-			'''
 			if self.ps.objType == "poly" :
 				self.drawPoly()
 			else:
@@ -274,17 +270,17 @@ class Particle(object):
 
 			imageToPaste = self.image
 
-			'''
-			angle = 180
-			imageToPaste = self.image.rotate(angle, expand=True)
-			angle = 90 - math.degrees(self.direction)
-			imageToPaste = self.image.rotate(angle, expand=True)
-			'''
-
+			if(self.ps.movement == "travel"):
+			
+				angle = 180
+				imageToPaste = self.image.rotate(angle, expand=True)
+				angle = 90 - math.degrees(self.direction)
+				imageToPaste = self.image.rotate(angle, expand=True)
+			
 			if self.ps.unitBlur > 0 :
 				imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
 				self.unitBlur += .0
-			#imageToPaste = self.image.rotate(self.direction * 180/math.pi, expand=True)
+
 			self.ps.config.image.paste(imageToPaste, (xPos,yPos))
 
 	

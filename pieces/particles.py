@@ -73,6 +73,7 @@ def main(run = True) :
 	ps.centerRangeyMax = int(workConfig.get("particleSystem", 'centerRangeyMax'))
 
 	ps.objType = (workConfig.get("particleSystem", 'objType'))
+	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
 	ps.objHeight = int(workConfig.get("particleSystem", 'objHeight'))

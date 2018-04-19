@@ -5,6 +5,9 @@ import math
 import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
+import noise
+from noise import *
+
 from modules import colorutils
 
 class Particle(object):
@@ -28,6 +31,8 @@ class Particle(object):
 	objWidth = 2
 	objHeight = 6
 	unitBlur = 0
+	meanderFactor = 4
+	meanderFactor2 = 90
 
 	changeColorOnChange = False
 
@@ -76,12 +81,12 @@ class Particle(object):
 		self.draw = ImageDraw.Draw(self.image)
 		self.unitBlur = self.ps.unitBlur
 
+		self.meanderFactor = random.uniform(2,8)
+		self.meanderFactor2 = random.uniform(10,110)
 
-	def update(self):
-
+	
+	def travel(self):
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
-
-		#print( self.direction)
 
 		self.dy = self.v * math.sin(self.direction)
 		self.dx = self.v * math.cos(self.direction)
@@ -99,8 +104,45 @@ class Particle(object):
 		if (self.ps.useFlocking == False) :
 			self.direction = newDirection
 
-		#print( newDirection)
-		#print("")
+		self.xPos += self.dx
+		self.yPos += self.dy
+		
+		self.xPosR += self.dx
+		self.yPosR += self.dy
+
+	
+	def meander(self):
+
+		points = 100
+		span = 10.0
+		speed = 1.0
+		base = 5
+		min = max = 0
+		octaves = 2
+		xMult = 150
+		yMult = 200
+		xOffset = 0
+		yOffset = 200
+
+		self.direction += self.directionIncrement * self.ps.clumpingFactor
+
+		self.dy = self.v * math.sin(self.direction)
+		#self.dx = self.v * math.cos(self.direction)
+
+		self.dx = self.meanderFactor * noise.pnoise1(self.yPos/self.meanderFactor2 , 1)
+
+		vy = self.v * math.sin(self.direction)
+		vx = self.v * math.cos(self.direction)
+
+		vy += self.ps.yGravity
+		#vx += self.ps.xGravity
+
+		newV  = math.sqrt(vx*vx + vy*vy)
+
+		newDirection = math.atan2(vy,vx)
+		
+		if (self.ps.useFlocking == False) :
+			self.direction = newDirection
 
 		self.xPos += self.dx
 		self.yPos += self.dy
@@ -108,8 +150,8 @@ class Particle(object):
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
-		#self.directionIncrement *= self.ps.cohesionDegrades
-		
+
+	def checkForBorderCollisions(self):
 		if(self.ps.borderCollisions ==  True) :
 			collide = False
 
@@ -155,7 +197,7 @@ class Particle(object):
 					self.yPos = self.ps.config.canvasHeight - self.objHeight 
 
 
-			if(self.yPosR < 0) : # -3 * self.objHeight
+			if(self.yPosR < -1 * self.objHeight) : # -3 * self.objHeight
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :
@@ -188,47 +230,64 @@ class Particle(object):
 				self.yPosR = self.ps.config.canvasHeight
 				self.yPos = self.ps.config.canvasHeight
 				self.changeColor()
+	
 
-		
+	def update(self):
+
+		#self.travel()
+		self.meander()
+		self.checkForBorderCollisions()
+
+		self.directionIncrement *= self.ps.cohesionDegrades
 		self.v *= self.ps.damping
 
 		self.objWidth *= self.ps.widthRate
 		self.objHeight *= self.ps.heightRate
+
+		if(self.objWidth < 2) :
+			self.objWidth = 2
+		if(self.objHeight < 2) :
+			self.objHeight = 2
 		
 		if (self.ps.useFlocking == True) :
 			self.checkMyBuddies()
 
 	def render(self):
-		xPos = int(self.xPosR)
-		yPos = int(self.yPosR)
+		if(self.remove != True) :
+			xPos = int(self.xPosR)
+			yPos = int(self.yPosR)
 
-		if(self.dy == 0) :
-			self.angle = 0
-		else :
-			self.angle = self.dx/self.dy
-		#self.direction = math.atan(self.angle) * 180 / math.pi
+			if(self.dy == 0) :
+				self.angle = 0
+			else :
+				self.angle = self.dx/self.dy
+			#self.direction = math.atan(self.angle) * 180 / math.pi
 
-		'''
-		self.ps.config.draw.rectangle((xPos, yPos,xPos+ self.objHeight , yPos +self.objWidth ), 
-			fill=self.fillColor, outline=self.outlineColor)
-		'''
-		if self.ps.objType == "poly" :
-			self.drawPoly()
-		else:
-			self.drawRectangle()
+			'''
+			self.ps.config.draw.rectangle((xPos, yPos,xPos+ self.objHeight , yPos +self.objWidth ), 
+				fill=self.fillColor, outline=self.outlineColor)
+			'''
+			if self.ps.objType == "poly" :
+				self.drawPoly()
+			else:
+				self.drawRectangle()
 
-		angle = 180
-		imageToPaste = self.image.rotate(angle, expand=True)
-		angle = 90 - math.degrees(self.direction)
-		imageToPaste = self.image.rotate(angle, expand=True)
+			imageToPaste = self.image
 
+			'''
+			angle = 180
+			imageToPaste = self.image.rotate(angle, expand=True)
+			angle = 90 - math.degrees(self.direction)
+			imageToPaste = self.image.rotate(angle, expand=True)
+			'''
 
-		if self.ps.unitBlur > 0 :
-			imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
-			self.unitBlur += .7
-		#imageToPaste = self.image.rotate(self.direction * 180/math.pi, expand=True)
-		self.ps.config.image.paste(imageToPaste, (xPos,yPos))
+			if self.ps.unitBlur > 0 :
+				imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
+				self.unitBlur += .0
+			#imageToPaste = self.image.rotate(self.direction * 180/math.pi, expand=True)
+			self.ps.config.image.paste(imageToPaste, (xPos,yPos))
 
+	
 	def drawPoly(self):
 
 		h = self.objWidth
@@ -252,6 +311,7 @@ class Particle(object):
 
 		#self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
 	
+	
 	def drawRectangle(self):
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
 			fill=self.fillColor, outline=self.outlineColor)
@@ -265,6 +325,7 @@ class Particle(object):
 			#if(random.random() > .5): self.dy = (4 * random.random() + 2)
 			#if(random.random() > .5): self.objWidth = int(random.uniform(self.objWidthMin,self.objWidthMax)) 
 
+	
 	def checkMyBuddies(self):
 
 		total = len(self.ps.unitArray)

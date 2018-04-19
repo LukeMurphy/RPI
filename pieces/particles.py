@@ -51,6 +51,7 @@ def main(run = True) :
 	ps.borderCollisions = (workConfig.getboolean("particleSystem", 'borderCollisions'))    
 	ps.ignoreBottom = (workConfig.getboolean("particleSystem", 'ignoreBottom'))    
 	ps.expireOnExit = (workConfig.getboolean("particleSystem", 'expireOnExit'))
+	ps.changeCohesion = (workConfig.getboolean("particleSystem", 'changeCohesion'))
 
 	ps.useFlocking = (workConfig.getboolean("particleSystem", 'useFlocking'))
 	ps.cohesionDistance = float(workConfig.get("particleSystem", 'cohesionDistance'))
@@ -146,9 +147,12 @@ def iterate() :
 
 		if(p.remove == True) :
 			ps.unitArray.remove(p)
-			emitParticle()
+			if len(ps.unitArray) < config.numUnits + 5 :
+				emitParticle()
+				emitParticle()
+				emitParticle()
 
-	if random.random() < .0005 :
+	if random.random() < .0005 and ps.changeCohesion == True:
 		ps.cohesionDistance = random.uniform(8,30)
 		#print(ps.cohesionDistance)
 

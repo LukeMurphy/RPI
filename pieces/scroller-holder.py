@@ -288,9 +288,9 @@ def makeBackGround(drawRef, n = 1):
 	xStart = 0
 	yStart = 0
 
-	config.arrowBgBackGroundColor = (0,0,0,220) #colorutils.getRandomColor()
+	config.arrowBgBackGroundColor = (0,0,0,20) #colorutils.getRandomColor()
 
-	drawRef.rectangle((0,0,int(round(config.displayRows * config.windowWidth)), config.canvasHeight), fill = config.arrowBgBackGroundColor)
+	drawRef.rectangle((0,0,int(round(config.displayRows * config.windowWidth)), config.canvasHeight), fill = config.bgBackGroundColor)
 
 	## Chevron pattern
 	## config.bgForeGroundColor
@@ -330,7 +330,8 @@ def makeBackGround(drawRef, n = 1):
 		fillClr = (
 			int(round(config.patternEndColor[0] - rDelta * (c+1))),
 			int(round(config.patternEndColor[1] - gDelta * (c+1))),
-			int(round(config.patternEndColor[2] - bDelta * (c+1))))
+			int(round(config.patternEndColor[2] - bDelta * (c+1))),
+			200)
 
 		#print(c,fillClr)
 
@@ -365,11 +366,11 @@ def remakePatternBlock(imageRef, direction):
 	config.patternColor = config.patternEndColor
 
 	if(random.random() < .3) :
-		config.patternEndColor = colorutils.getRandomColor(config.brightness)
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 	if(random.random() < .05) :
-		config.patternEndColor = (254,0,254)
+		config.patternEndColor = (254,0,254,255)
 	if(random.random() < .05) :
-		config.patternEndColor = (0,0,250)
+		config.patternEndColor = (0,0,250,255)
 	if(random.random() < .3) :
 		config.patternDrawProb = random.uniform(.08,.12)
 	if(random.random() < .3) :
@@ -392,7 +393,7 @@ def configureBackgroundScrolling():
 	config.bgForeGroundColor = (workConfig.get("scroller", 'bgForeGroundColor').split(","))
 	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
 	config.pattern = (workConfig.get("scroller", 'pattern'))
-	config.patternSpeed = int(workConfig.get("scroller", 'patternSpeed'))
+	config.patternSpeed = float(workConfig.get("scroller", 'patternSpeed'))
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
@@ -401,8 +402,8 @@ def configureBackgroundScrolling():
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
-	config.patternColor = (50,0,55)
-	config.patternEndColor = (255,0,255)
+	config.patternColor = (50,0,55,50)
+	config.patternEndColor = (255,0,255,50)
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
@@ -589,7 +590,7 @@ def iterate() :
 	global config
 
 	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
-	config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0))
+	#config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
 
 	for scrollerObj in config.scrollArray :
 		scrollerObj.scroll()

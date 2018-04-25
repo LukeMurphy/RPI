@@ -64,11 +64,11 @@ class ScrollObject :
 
 		## Just right-left scrolling for now ...
 		self.canvasDraw.rectangle((0,0,self.canvasWidth,self.canvasHeight), fill  = (0,0,0,10))
-		self.canvas.paste(self.leadImage, (self.xPos ,self.yPos))
+		self.canvas.paste(self.leadImage, (round(self.xPos) ,round(self.yPos)))
 		if (self.xSpeed > 0) : 
-			self.canvas.paste(self.followImage, (self.xPos - self.canvasWidth,self.yPos ))
+			self.canvas.paste(self.followImage, (round(self.xPos) - self.canvasWidth,round(self.yPos )))
 		else :
-			self.canvas.paste(self.followImage, (self.xPos + self.canvasWidth,self.yPos ))
+			self.canvas.paste(self.followImage, (round(self.xPos) + self.canvasWidth,round(self.yPos )))
 
 		if (self.xPos > 1 * self.canvasWidth and self.xSpeed > 0) : 
 			self.canvas.paste(self.leadImage, ( -1 * self.canvasWidth, self.yPos))

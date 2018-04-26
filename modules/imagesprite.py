@@ -180,7 +180,7 @@ class ImageSprite :
 			self.process()
 
 			self.imageCopy = Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
-			self.imageCopy.paste(self.image, (0, 0))
+			self.imageCopy.paste(self.image.convert("RGBA"), (0, 0), self.image.convert("RGBA"))
 
 			self.debugMessage( img + " loaded")
 			#init()

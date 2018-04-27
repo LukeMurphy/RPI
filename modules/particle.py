@@ -77,14 +77,19 @@ class Particle(object):
 		self.objWidth = round(self.objWidth * rndSize)
 		self.objHeight = round(self.objHeight * rndSize)
 
-		self.image = Image.new("RGBA", (self.objWidth + 2 , self.objHeight + 2))
-		self.draw = ImageDraw.Draw(self.image)
 		self.unitBlur = self.ps.unitBlur
 
 		self.meanderFactor = random.uniform(2,8)
 		self.meanderFactor2 = random.uniform(10,110)
 
+		self.createParticleImage()
+
 	
+	def createParticleImage(self):
+		self.image = Image.new("RGBA", (round(self.objWidth) + 2 , round(self.objHeight) + 2))
+		self.draw = ImageDraw.Draw(self.image)
+
+
 	def travel(self):
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
 
@@ -112,17 +117,6 @@ class Particle(object):
 
 	
 	def meander(self):
-
-		points = 100
-		span = 10.0
-		speed = 1.0
-		base = 5
-		min = max = 0
-		octaves = 2
-		xMult = 150
-		yMult = 200
-		xOffset = 0
-		yOffset = 200
 
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
 
@@ -263,6 +257,8 @@ class Particle(object):
 			xPos = int(self.xPosR)
 			yPos = int(self.yPosR)
 
+			self.createParticleImage()
+
 			if self.ps.objType == "poly" :
 				self.drawPoly()
 			else:
@@ -279,7 +275,7 @@ class Particle(object):
 			
 			if self.ps.unitBlur > 0 :
 				imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
-				self.unitBlur += .0
+				self.unitBlur += 1
 
 			self.ps.config.image.paste(imageToPaste, (xPos,yPos))
 
@@ -309,6 +305,7 @@ class Particle(object):
 	
 	
 	def drawRectangle(self):
+
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
 			fill=self.fillColor, outline=self.outlineColor)
 

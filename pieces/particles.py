@@ -104,7 +104,7 @@ def emitParticle():
 	p = Particle(ps)
 	p.objWidth = ps.objWidth
 	p.objHeight = ps.objHeight
-	p.xPosR = config.screenWidth/2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
+	p.xPosR = config.screenWidth/2 + ps.centerRangeXMin - round(random.random() * ps.centerRangeXMax) - p.objWidth
 	p.yPosR = config.screenHeight/2 + ps.centerRangeYMin - round(random.random() * ps.centerRangeYMax)
 	#variance = math.pi/3
 	p.direction = random.uniform(math.pi + math.pi/2 - config.variance, math.pi + math.pi/2 + config.variance)
@@ -148,10 +148,10 @@ def iterate() :
 
 		if(p.remove == True) :
 			ps.unitArray.remove(p)
-			if len(ps.unitArray) < config.numUnits + 5 :
+			if len(ps.unitArray) < config.numUnits + 0 :
 				emitParticle()
 				emitParticle()
-				emitParticle()
+				#emitParticle()
 
 	if random.random() < .0005 and ps.changeCohesion == True:
 		ps.cohesionDistance = random.uniform(8,30)
@@ -159,6 +159,9 @@ def iterate() :
 
 	if (config.overallBlur > 0) :
 		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
+		## This needs to be reset
+		config.draw = ImageDraw.Draw(config.image)
+
 	config.render(config.image, 0,0)
 		
 

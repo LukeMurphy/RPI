@@ -132,26 +132,30 @@ def emitParticle():
 def colorize() :
 
 		#Colorize via overlay etc
-		clrBlock = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-		clrBlockDraw = ImageDraw.Draw(clrBlock)
+		config.clrBlock = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+		clrBlockDraw = ImageDraw.Draw(config.clrBlock)
 
 		# Color overlay on b/w PNG sprite
 		#clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
-		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, 
-								config.clrBlkHeight + config.overlayyPos), 
-								fill=config.overlayColor)
+		clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255,255))
+		clrBlockDraw.rectangle((0,0, config.clrBlkWidth, config.clrBlkHeight), fill=config.overlayColor)
+
+
 	
+		'''
 		try :
-			config.image = clrBlock #ImageChops.multiply(clrBlock, config.image)
+			config.image = ImageChops.multiply(config.clrBlock, config.image)
 			#pass
 		except Exception as e: 
 			print(e, config.image.mode)
 			pass
+		'''
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
 	global config
+	colorize()
 	pass
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -170,6 +174,10 @@ def iterate() :
 	## Fade trails or not...
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=config.bgColor, outline=None)
 
+	if config.useOverLay == True :
+		#config.image = ImageChops.multiply(config.clrBlock, config.image)
+		config.image.paste(config.clrBlock,(config.overlayxPos, config.overlayyPos),config.clrBlock)
+
 	for p in ps.unitArray:
 		p.update()
 		p.render()
@@ -185,13 +193,12 @@ def iterate() :
 		ps.cohesionDistance = random.uniform(8,30)
 		#print(ps.cohesionDistance)
 
-	if config.useOverLay == True :
-		colorize() 
-
+		
 	if (config.overallBlur > 0) :
 		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 		## This needs to be reset
 		config.draw = ImageDraw.Draw(config.image)
+
 
 
 

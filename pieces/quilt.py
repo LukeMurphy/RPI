@@ -31,23 +31,23 @@ class unit:
 		self.colOverlay.randomSteps = True
 		self.colOverlay.timeTrigger = True 
 		self.colOverlay.tLimitBase = 20
-		self.colOverlay.maxBrightness = .5
-		self.colOverlay.steps = 30
-
-
-		### This is the speed range of transitions in color
-		### Higher numbers means more possible steps so slower
-		### transitions - 1,10 very blinky, 10,200 very slow
-		self.colOverlay.randomRange = (5.0,30.0)
-
-		### This changes each cycle - incrementing towards next target color
-		self.fillColor = self.colOverlay.currentColor
-
+		self.colOverlay.maxBrightness = self.config.brightness
+		self.colOverlay.steps = 100
 		self.colOverlay.maxBrightness = self.maxBrightness
 		self.colOverlay.minSaturation = self.minSaturation
 		self.colOverlay.maxSaturation = self.maxSaturation
 		self.colOverlay.minValue = self.minValue
 		self.colOverlay.maxValue = self.maxValue
+
+
+		### This is the speed range of transitions in color
+		### Higher numbers means more possible steps so slower
+		### transitions - 1,10 very blinky, 10,200 very slow
+		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
+
+		### This changes each cycle - incrementing towards next target color
+		self.fillColor = self.colOverlay.currentColor
+
 
 		
 		## Like the "stiching" color and affects the overall "tone" of the piece
@@ -69,6 +69,7 @@ class unit:
 		self.changeColor = True
 		self.lines = config.lines
 
+	
 	def setUp(self, n = 0) :
 
 		self.brightness *= self.config.brightness
@@ -86,6 +87,7 @@ class unit:
 		if (self.fillColorMode == "red") :
 			self.colOverlay.getNewColor = self.getNewColor
 
+	
 	def getNewColor(self):
 		n = int(math.floor(random.uniform(0,len(self.redRange))))
 		self.colOverlay.colorB = tuple(int(a*self.brightness) for a in (self.redRange[n]))
@@ -135,7 +137,6 @@ class unit:
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def transformImage(img) :
 	width, height = img.size
@@ -149,7 +150,7 @@ def transformImage(img) :
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 
 def main(run = True) :
 	global config, directionOrder,workConfig
@@ -166,6 +167,9 @@ def main(run = True) :
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
+
+	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
+	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
 
 	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
 	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
@@ -242,6 +246,7 @@ def main(run = True) :
 				obj.blockHeight = config.blockHeight - 1
 				obj.fillColorMode = "red"
 				obj.brightness = .8
+				obj.maxBrightness = .8
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
 				obj.setUp(-1)
@@ -298,6 +303,7 @@ def main(run = True) :
 				obj.blockHeight = config.blockHeight * (i + 1) * 2 - sizeAdjustor
 				obj.fillColorMode = "red"
 				obj.brightness = .4
+				obj.maxBrightness = .4
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
 				obj.setUp(-1)
@@ -307,6 +313,7 @@ def main(run = True) :
 	setUp()
 
 	if(run) : runWork()
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -324,6 +331,7 @@ def runWork():
 	while True:
 		iterate()
 		time.sleep(config.delay)  
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -349,5 +357,6 @@ def iterate() :
 def callBack() :
 	global config, XOs
 	return True
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

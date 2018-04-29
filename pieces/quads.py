@@ -113,6 +113,12 @@ def init() :
 	config.colOverlayA.randomRange = (config.colorTransitionRangeMin,config.colorTransitionRangeMax)
 	config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
 
+	config.colOverlayA.randomSteps = True 
+	config.colOverlayA.timeTrigger = True 
+	config.colOverlayA.steps = 100 
+	config.colOverlayA.tLimitBase = 30
+	config.colOverlayA.maxBrightness = config.brightness
+
 	makeblockanimals.config = config
 	makeblockanimals.drawBackGround = drawBackGround
 	makeblockanimals.ScaleRotateTranslate = ScaleRotateTranslate

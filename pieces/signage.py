@@ -98,10 +98,11 @@ def redrawGrid():
 		#u.unHideGrid = config.unHideGrid
 		u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 		u.drawUnit()
-		config.image.paste(u.image,(u.xPos,u.yPos), u.image)
+		config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
 
 	if(random.random() < config.fullimageGiltchRate)  : 
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
+
 	config.render(config.image, 0,0)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -153,6 +154,7 @@ def showGrid():
 	
 	if(random.random() < config.fullimageGiltchRate)  : 
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
+
 	config.render(config.image, 0,0)
 
 def displayTest():
@@ -269,9 +271,14 @@ def main(run = True) :
 	config.rehideRate = float(workConfig.get("signage", 'rehideRate'))
 
 
+	config.timeTrigger = workConfig.getboolean("signage", 'timeTrigger')
+	config.tLimitBase = int(workConfig.get("signage", 'tLimitBase'))
 	config.colOverlay = coloroverlay.ColorOverlay()
 	config.colOverlay.randomSteps = False 
+	config.colOverlay.timeTrigger = True 
 	config.colOverlay.steps = 200 
+	config.colOverlay.tLimitBase = config.tLimitBase 
+	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
 
 	config.unitArrray = []
@@ -281,7 +288,11 @@ def main(run = True) :
 	except Exception as e:
 		print (str(e))
 		config.showGrid = False
-
+	try:
+		config.imageXOffset = int(workConfig.get("displayconfig","imageXOffset"))
+	except Exception as e:
+		print (str(e))
+		config.imageXOffset = 0
 	
 	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
 	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))

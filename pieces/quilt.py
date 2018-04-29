@@ -6,6 +6,15 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
 class unit:
+
+	timeTrigger = True
+	tLimitBase = 30
+	maxBrightness = 1
+	minSaturation = .25
+	maxSaturation = 1
+	minValue = .1
+	maxValue = 1
+
 	def __init__(self, config):
 		self.config = config
 		self.xPos = 0
@@ -20,7 +29,11 @@ class unit:
 		#### Sets up color transitions
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
-		self.colOverlay.steps = 10
+		self.colOverlay.timeTrigger = True 
+		self.colOverlay.tLimitBase = 20
+		self.colOverlay.maxBrightness = .5
+		self.colOverlay.steps = 30
+
 
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
@@ -29,6 +42,13 @@ class unit:
 
 		### This changes each cycle - incrementing towards next target color
 		self.fillColor = self.colOverlay.currentColor
+
+		self.colOverlay.maxBrightness = self.maxBrightness
+		self.colOverlay.minSaturation = self.minSaturation
+		self.colOverlay.maxSaturation = self.maxSaturation
+		self.colOverlay.minValue = self.minValue
+		self.colOverlay.maxValue = self.maxValue
+
 		
 		## Like the "stiching" color and affects the overall "tone" of the piece
 		self.outlineColor = config.outlineColorObj.currentColor
@@ -36,7 +56,12 @@ class unit:
 
 		blueFactor  =  config.blueFactor
 		greenFactor  =  config.greenFactor
-		self.redRange = [(250,greenFactor,blueFactor),(200,greenFactor,blueFactor),(150,greenFactor,blueFactor),(100,greenFactor,blueFactor),(50,greenFactor,blueFactor),(20,greenFactor,blueFactor)]
+		self.redRange = [(250,greenFactor,blueFactor),
+						(200,greenFactor,blueFactor),
+						(150,greenFactor,blueFactor),
+						(100,greenFactor,blueFactor),
+						(50,greenFactor,blueFactor),
+						(20,greenFactor,blueFactor)]
 		self.outlineRange = [(20,20,250)]
 		self.brightness = 1
 		self.fillColorMode = "random"
@@ -142,6 +167,7 @@ def main(run = True) :
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
 
+	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
 	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
 	config.transformTuples = tuple([float(i) for i in transformTuples])
 
@@ -232,6 +258,13 @@ def main(run = True) :
 				obj.brightness = .99
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
+
+				obj.timeTrigger = True
+				obj.tLimitBase = 30
+				obj.minSaturation = .25
+				obj.maxSaturation = 1
+				obj.minValue = .9
+				obj.maxBrightness = 1
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
@@ -246,6 +279,13 @@ def main(run = True) :
 				obj.brightness = .4
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
+
+				obj.timeTrigger = True
+				obj.tLimitBase = 30
+				obj.minValue = .3
+				obj.maxBrightness = .4
+				obj.minSaturation = .25
+				obj.maxSaturation = 1
 				obj.setUp(-1)
 				config.unitArrray.append(obj)
 
@@ -299,7 +339,8 @@ def iterate() :
 
 	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
-	temp = transformImage(temp)
+	if(config.transformShape == True) :
+		temp = transformImage(temp)
 	config.render(temp, 0,0)
 		
 

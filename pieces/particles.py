@@ -51,7 +51,7 @@ def main(run = True) :
 	ps.borderCollisions = (workConfig.getboolean("particleSystem", 'borderCollisions'))    
 	ps.ignoreBottom = (workConfig.getboolean("particleSystem", 'ignoreBottom'))    
 	ps.expireOnExit = (workConfig.getboolean("particleSystem", 'expireOnExit'))
-	ps.changeCohesion = (workConfig.getboolean("particleSystem", 'changeCohesion'))
+	ps.changeCohesion = (workConfig.getboolean("particleSystem", 'changeCohesion'))     
 
 	ps.useFlocking = (workConfig.getboolean("particleSystem", 'useFlocking'))
 	ps.cohesionDistance = float(workConfig.get("particleSystem", 'cohesionDistance'))
@@ -90,6 +90,14 @@ def main(run = True) :
 	ps.unitBlur = int(workConfig.get("particleSystem", 'unitBlur'))
 	config.overallBlur = int(workConfig.get("particleSystem", 'overallBlur'))
 
+	config.useOverLay = (workConfig.getboolean("particleSystem", 'useOverLay'))     
+	config.overlayColorVals = ((workConfig.get("particleSystem", 'overlayColor')).split(','))
+	config.overlayColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.overlayColorVals))
+	config.clrBlkWidth = int(workConfig.get("particleSystem", 'clrBlkWidth')) 
+	config.clrBlkHeight = int(workConfig.get("particleSystem", 'clrBlkHeight')) 
+	config.overlayxPos = int(workConfig.get("particleSystem", 'overlayxPos')) 
+	config.overlayyPos = int(workConfig.get("particleSystem", 'overlayyPos')) 
+
 
 	for i in range(0,ps.numUnits):
 		emitParticle()
@@ -119,6 +127,26 @@ def emitParticle():
 
 	p.setUpParticle()
 	ps.unitArray.append(p)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def colorize() :
+
+		#Colorize via overlay etc
+		clrBlock = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+		clrBlockDraw = ImageDraw.Draw(clrBlock)
+
+		# Color overlay on b/w PNG sprite
+		#clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
+		clrBlockDraw.rectangle((config.overlayxPos, config.overlayyPos, config.clrBlkWidth + config.overlayxPos, 
+								config.clrBlkHeight + config.overlayyPos), 
+								fill=config.overlayColor)
+	
+		try :
+			config.image = clrBlock #ImageChops.multiply(clrBlock, config.image)
+			#pass
+		except Exception as e: 
+			print(e, config.image.mode)
+			pass
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -157,10 +185,15 @@ def iterate() :
 		ps.cohesionDistance = random.uniform(8,30)
 		#print(ps.cohesionDistance)
 
+	if config.useOverLay == True :
+		colorize() 
+
 	if (config.overallBlur > 0) :
 		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 		## This needs to be reset
 		config.draw = ImageDraw.Draw(config.image)
+
+
 
 	config.render(config.image, 0,0)
 		

@@ -12,14 +12,22 @@ class ColorOverlay:
 	currentColor = [0,0,0]
 	rateOfColorChange = 0
 	colorA = colorB = [0,0,0]
-	complete =  False
 	randomRange = (10.0,100.0)
-	randomSteps = True
-	steps = 100
+	complete =  False
 	tDelta = 0
 	timeTrigger = False
-	tLimit = 30
+	gotoNextTransition = False
 	t1 = 0
+
+	## "Public" variables that can be set
+	randomSteps = True
+	steps = 100
+	tLimit = 10
+	tLimitBase = 10
+	maxBrightness = 1
+	maxSaturation= 1
+	minSaturation = .25
+	minValue = .1
 
 
 	def __init__(self): 
@@ -35,13 +43,16 @@ class ColorOverlay:
 		self.tDelta = (t - self.t1)
 
 	def getNewColor(self):
-		self.colorB = colorutils.randomColor()
+		#self.colorB = colorutils.randomColor()
+		## Vaguely more control of the color parameters ... 
 		#if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
 
+		self.colorB = colorutils.getRandomColorHSV(sMin=self.minSaturation,sMax=self.maxSaturation,vMin=self.minValue,vMax=self.maxBrightness)
 
 	def colorTransitionSetup(self,steps=0):
 
-		self.timeTrigger = False
+		#self.timeTrigger = False
+		self.gotoNextTransition = False
 
 		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		#### Setting up for color transitions
@@ -58,11 +69,14 @@ class ColorOverlay:
 		test = [abs(a) for a in self.colorDelta]
 		if(steps == 0 or self.randomSteps == True) : 
 			self.steps = random.uniform(self.randomRange[0],self.randomRange[1])
+
+		self.tLimit = round(random.uniform(self.tLimitBase/2, self.tLimitBase * 1.5))+ 1
 		self.rateOfColorChange = [ a/self.steps for a in self.colorDelta]
 		self.complete =  False
 
+		#print("New transition started...", self.colorB, self.tLimit)
 
-	def stepTransition(self, autoReset = True) :
+	def stepTransition(self, autoReset = False) :
 		self.currentColor = [
 		(self.currentColor[0] + self.rateOfColorChange[0]),
 		(self.currentColor[1] + self.rateOfColorChange[1]),
@@ -71,8 +85,14 @@ class ColorOverlay:
 
 		self.checkTime()
 
-		if (self.tDelta > self.tLimit and self.timeTrigger == False) :
-			self.timeTrigger = True
+		## Always change to the next color based on TIME
+		if (self.tDelta > self.tLimit and self.gotoNextTransition == False) :
+			#self.timeTrigger = True
+			#and self.complete == True
+
+			#print("Timesup", self.tDelta, self.tLimit)
+			self.gotoNextTransition = True
+			self.complete =  True
 			self.t1 = time.time()
 			self.colorTransitionSetup(self.steps)
 
@@ -83,9 +103,11 @@ class ColorOverlay:
 			upperRange = self.colorB[i] + abs(self.rateOfColorChange[i])
 			if (self.currentColor[i] >= (lowerRange) and  self.currentColor[i] <= (upperRange) ) :
 				self.rateOfColorChange[i] = 0
+				#print("Color reached", i)
 		
 		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 
 				self.complete =  True
-				if(autoReset == True) : 
-					self.colorTransitionSetup(self.steps)
+				#print("Transition complete.")
+				#if(autoReset == True or self.gotoNextTransition == True) : 
+				#	self.colorTransitionSetup(self.steps)
 

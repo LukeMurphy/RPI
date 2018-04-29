@@ -95,6 +95,12 @@ def getRandomColor(brtns=1) :
 	a = 255
 	return (r,g,b) 
 
+def getRandomColorHSV(hMin=0, hMax=360, sMin=0, vMin=0, vMax=0, sMax=0) :
+	h = random.uniform(hMin,hMax)
+	s = random.uniform(sMin,sMax)
+	v = random.uniform(vMin,vMax)
+	return HSVToRGB(h,s,v) 
+
 def randomBaseColor(brtns=1) :
 	global brightness
 	if(brtns == 1) : brtns = brightness

@@ -254,8 +254,8 @@ class Particle(object):
 	
 	def render(self):
 		if(self.remove != True) :
-			xPos = int(self.xPosR)
-			yPos = int(self.yPosR)
+			xPos = int(self.xPosR - self.image.size[0] /2)
+			yPos = int(self.yPosR - self.image.size[1] /2)
 
 			self.createParticleImage()
 

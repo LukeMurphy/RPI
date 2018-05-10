@@ -422,7 +422,7 @@ def configureImageScrolling():
 
 	config.scroller5 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller5
-	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
+	scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
 	#scrollerRef.canvasHeight = int(config.windowHeight)
 	scrollerRef.xSpeed = config.imageSpeed
 	scrollerRef.setUp()

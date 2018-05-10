@@ -76,6 +76,15 @@ def redraw():
 	# new blocks
 	reArraynge()
 
+	if(config.drawCenteringLines == True) :
+		drawCenteringLine()
+
+def drawCenteringLine():
+	global config
+
+	config.draw.rectangle((0,config.screenHeight/2,config.screenWidth,config.screenHeight/2), fill=(0,200,0))
+	config.draw.rectangle((config.screenWidth/2,0,config.screenWidth/2,config.screenHeight), fill=(0,200,0))
+
 def reArraynge():
 	global config, vertArray
 
@@ -98,9 +107,7 @@ def reArraynge():
 
 		# instert it at the start of the array
 		vertArray.insert(0,lastElement)
-		lastElement.vOffset = -config.blockHeight
-	
-
+		lastElement.vOffset = -config.blockHeight	
 
 def changeWidth():
 	if(config.inMotion == True) :
@@ -166,6 +173,7 @@ def main(run = True) :
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 	config.vOffset = int(workConfig.get("vertical", 'vOffset'))
+	config.drawCenteringLines = (workConfig.getboolean("vertical", 'drawCenteringLines'))
 
 	config.redrawSpeed = float(workConfig.get("vertical", 'redrawSpeed'))
 	config.blockHeight = int(workConfig.get("vertical", 'blockHeight'))

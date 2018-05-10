@@ -10,7 +10,7 @@ import numpy
 import random, time
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
-from modules import colorutils, coloroverlay, makeblockanimals #, makedrawcarcas
+from modules import colorutils, coloroverlay, makeblocks
 
 global thrd, config
 
@@ -119,12 +119,11 @@ def init() :
 	config.colOverlayA.tLimitBase = 30
 	config.colOverlayA.maxBrightness = config.brightness
 
-	makeblockanimals.config = config
-	makeblockanimals.drawBackGround = drawBackGround
-	makeblockanimals.ScaleRotateTranslate = ScaleRotateTranslate
+	makeblocks.config = config
+	makeblocks.drawBackGround = drawBackGround
+	makeblocks.ScaleRotateTranslate = ScaleRotateTranslate
 
-	#makedrawcarcas.config = config
-	#makedrawcarcas.ScaleRotateTranslate = ScaleRotateTranslate
+
 
 def makeBackGround(drawRef, n = 1):
 	rows = config.patternRows * 2
@@ -260,13 +259,9 @@ def iterate() :
 	if(random.random() < .01) :
 		config.pixSortprobDraw = random.uniform(0,.01)
 	
+	config.pixSortYOffset = config.base_pixSortYOffset
+	makeblocks.makeComposition()
 
-	if(random.random() < .5) :
-		config.pixSortYOffset = config.base_pixSortYOffset
-		makeblockanimals.makeAnimal()
-	else :
-		config.pixSortYOffset = config.carcas_pixSortYOffset
-		makeblockanimals.makeCarcas()
 
 	if(config.useColorOverlayTransitions == True and config.applyColorOverlayToFullImage == True) :
 		# Color overlay on b/w PNG sprite

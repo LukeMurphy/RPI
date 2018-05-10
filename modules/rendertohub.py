@@ -200,10 +200,19 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 
 	if config.remapImageBlock == True :
-
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
+
+	if config.remapImageBlock2 == True :
+		crop = config.renderImageFull.crop(config.remapImageBlockSection2)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination2, crop)	
+
+	if config.remapImageBlock3 == True :
+		crop = config.renderImageFull.crop(config.remapImageBlockSection3)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
 		
 	if(updateCanvasCall) : updateCanvas() 
 

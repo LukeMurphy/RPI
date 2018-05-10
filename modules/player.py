@@ -93,6 +93,26 @@ def configure(config, workconfig) :
 		config.remapImageBlock = False
 
 	try :
+		config.remapImageBlock2 = (workconfig.getboolean("displayconfig", 'remapImageBlock2'))
+		config.remapImageBlockSection2 = workconfig.get("displayconfig", 'remapImageBlockSection2').split(",")
+		config.remapImageBlockSection2 = tuple([int(i) for i in config.remapImageBlockSection2])
+		config.remapImageBlockDestination2 = workconfig.get("displayconfig", 'remapImageBlockDestination2').split(",")
+		config.remapImageBlockDestination2 = tuple([int(i) for i in config.remapImageBlockDestination2])
+	except Exception as e:
+		print (str(e))
+		config.remapImageBlock2 = False	
+
+	try :
+		config.remapImageBlock3 = (workconfig.getboolean("displayconfig", 'remapImageBlock3'))
+		config.remapImageBlockSection3 = workconfig.get("displayconfig", 'remapImageBlockSection3').split(",")
+		config.remapImageBlockSection3 = tuple([int(i) for i in config.remapImageBlockSection3])
+		config.remapImageBlockDestination3 = workconfig.get("displayconfig", 'remapImageBlockDestination3').split(",")
+		config.remapImageBlockDestination3 = tuple([int(i) for i in config.remapImageBlockDestination3])
+	except Exception as e:
+		print (str(e))
+		config.remapImageBlock3 = False
+
+	try :
 		config.imageXOffset = int(workconfig.get("displayconfig","imageXOffset"))
 		config.imageYOffset = int(workconfig.get("displayconfig","imageYOffset"))
 	except Exception as e:

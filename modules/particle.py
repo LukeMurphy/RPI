@@ -115,7 +115,22 @@ class Particle(object):
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
+
+	def linearMotion(self):
+
+		self.dy = self.v * math.sin(self.direction)
+		self.dx = self.v * math.cos(self.direction)
+
+		vy = self.v * math.sin(self.direction)
+		vx = self.v * math.cos(self.direction)
+
+		self.xPos += self.dx
+		self.yPos += self.dy
+		
+		self.xPosR += self.dx
+		self.yPosR += self.dy
 	
+
 	def meander(self):
 
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
@@ -232,12 +247,16 @@ class Particle(object):
 			self.travel()
 
 		if(self.ps.movement == "fire"):
-			self.meander()
+			self.meander()		
+
+		if(self.ps.movement == "linearMotion"):
+			self.linearMotion()
 
 		self.checkForBorderCollisions()
 
-		self.directionIncrement *= self.ps.cohesionDegrades
-		self.v *= self.ps.damping
+		if(self.ps.movement != "linearMotion"):
+			self.directionIncrement *= self.ps.cohesionDegrades
+			self.v *= self.ps.damping
 
 		if self.ps.movement == "fire" :
 			self.objWidth *= self.ps.widthRate
@@ -277,7 +296,11 @@ class Particle(object):
 				imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
 				self.unitBlur += 1
 
-			self.ps.config.image.paste(imageToPaste, (xPos,yPos))
+			### This produces trails 
+			if (self.ps.objTrails == True) :
+				self.ps.config.image.paste(imageToPaste, (xPos,yPos))
+			else :
+				self.ps.config.image.paste(imageToPaste, (xPos,yPos), imageToPaste)
 
 	
 	def drawPoly(self):

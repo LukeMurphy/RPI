@@ -73,6 +73,19 @@ def main(run = True) :
 	ps.centerRangeyMax = int(workConfig.get("particleSystem", 'centerRangeyMax'))
 
 	ps.objType = (workConfig.get("particleSystem", 'objType'))
+
+	try :
+		ps.objTrails = (workConfig.getboolean("particleSystem", 'objTrails'))
+	except Exception as e: 
+		print (str(e)) 
+		ps.objTrails = True
+
+	try :
+		ps.reEmitNumber = int(workConfig.get("particleSystem", 'reEmitNumber'))
+	except Exception as e: 
+		print (str(e)) 
+		ps.reEmitNumber = 2
+
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
@@ -112,21 +125,42 @@ def emitParticle():
 	p = Particle(ps)
 	p.objWidth = ps.objWidth
 	p.objHeight = ps.objHeight
-	p.xPosR = config.screenWidth/2 + ps.centerRangeXMin - round(random.random() * ps.centerRangeXMax) - p.objWidth
-	p.yPosR = config.screenHeight/2 + ps.centerRangeYMin - round(random.random() * ps.centerRangeYMax)
+	p.xPosR = config.canvasWidth/2 + ps.centerRangeXMin - round(random.random() * ps.centerRangeXMax) - p.objWidth
+	p.yPosR = config.canvasHeight/2 + ps.centerRangeYMin - round(random.random() * ps.centerRangeYMax)
 	#variance = math.pi/3
 	p.direction = random.uniform(math.pi + math.pi/2 - config.variance, math.pi + math.pi/2 + config.variance)
 	p.v = random.uniform(ps.speedMin,ps.speedMax)
 
 	if ps.objColor == "rnd" :
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
-		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)
+		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)	
+	if ps.objColor == "alphaRandom" :
+		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness)
+		p.outlineColor = None
 	else :
 		p.fillColor = config.fillColor #(240,150,0,100)
 		p.outlineColor = config.outlineColor #(100,0,0,100)
 
+
+	if(ps.movement == "linearMotion"):
+
+		p.xPosR = int(random.uniform(0,config.canvasWidth))
+		p.yPosR = int(random.uniform(0,config.canvasHeight))
+
+		directions = [0,math.pi/2,math.pi,-math.pi/2]
+		origins = [(0,p.yPosR),(p.xPosR,0), (config.canvasWidth -  p.objWidth,p.yPosR), (p.xPosR,config.canvasHeight- p.objHeight)  ]
+		dirVal = round(random.uniform(0,3))
+		p.direction = directions[dirVal]
+		p.xPosR = origins[dirVal][0]
+		p.yPosR = origins[dirVal][1]
+
+
+
+		#p.v = 3
+
 	p.setUpParticle()
 	ps.unitArray.append(p)
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def colorize() :
@@ -185,9 +219,10 @@ def iterate() :
 		if(p.remove == True) :
 			ps.unitArray.remove(p)
 			if len(ps.unitArray) < config.numUnits + 0 :
-				emitParticle()
-				emitParticle()
-				#emitParticle()
+
+				for i in range(0, ps.reEmitNumber):
+					emitParticle()
+
 
 	if random.random() < .0005 and ps.changeCohesion == True:
 		ps.cohesionDistance = random.uniform(8,30)

@@ -135,7 +135,7 @@ def emitParticle():
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
 		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)	
 	if ps.objColor == "alphaRandom" :
-		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness)
+		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness, int(random.uniform(10,200)))
 		p.outlineColor = None
 	else :
 		p.fillColor = config.fillColor #(240,150,0,100)

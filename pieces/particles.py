@@ -112,7 +112,7 @@ def main(run = True) :
 	config.overlayyPos = int(workConfig.get("particleSystem", 'overlayyPos')) 
 
 
-	for i in range(0,ps.numUnits):
+	for i in range(0, ps.numUnits):
 		emitParticle()
 
 	setUp()
@@ -125,8 +125,9 @@ def emitParticle():
 	p = Particle(ps)
 	p.objWidth = ps.objWidth
 	p.objHeight = ps.objHeight
-	p.xPosR = config.canvasWidth/2 + ps.centerRangeXMin - round(random.random() * ps.centerRangeXMax) - p.objWidth
-	p.yPosR = config.canvasHeight/2 + ps.centerRangeYMin - round(random.random() * ps.centerRangeYMax)
+	p.setUpParticle()
+	p.xPosR = config.canvasWidth/2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
+	p.yPosR = config.canvasHeight/2 - ps.centerRangeYMin + round(random.random() * ps.centerRangeYMax) - p.objHeight
 	#variance = math.pi/3
 	p.direction = random.uniform(math.pi + math.pi/2 - config.variance, math.pi + math.pi/2 + config.variance)
 	p.v = random.uniform(ps.speedMin,ps.speedMax)
@@ -148,17 +149,25 @@ def emitParticle():
 		p.yPosR = int(random.uniform(0,config.canvasHeight))
 
 		directions = [0,math.pi/2,math.pi,-math.pi/2]
-		origins = [(0,p.yPosR),(p.xPosR,0), (config.canvasWidth -  p.objWidth,p.yPosR), (p.xPosR,config.canvasHeight- p.objHeight)  ]
+		origins = [
+			(-p.objWidth, p.yPosR), 
+			(p.xPosR, -p.objHeight), 
+			(config.canvasWidth -  p.objWidth,p.yPosR), 
+			(p.xPosR,config.canvasHeight - p.objHeight)
+			]
 		dirVal = round(random.uniform(0,3))
+
 		p.direction = directions[dirVal]
 		p.xPosR = origins[dirVal][0]
 		p.yPosR = origins[dirVal][1]
 
-
+		p.direction = 0
+		p.xPosR = origins[0][0]
+		p.yPosR = origins[0][1]
 
 		#p.v = 3
 
-	p.setUpParticle()
+	
 	ps.unitArray.append(p)
 
 

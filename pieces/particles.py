@@ -157,7 +157,8 @@ def emitParticle(i=None):
 	if(ps.movement == "linearMotion"):
 
 		p.xPosR = int(random.uniform(0,config.canvasWidth))
-		p.yPosR = config.canvasHeight/3 - p.objHeight/4 #int(random.uniform(0,config.canvasHeight))
+		p.yPosR = int(random.uniform(0,config.canvasHeight))
+		#config.canvasHeight/3 - p.objHeight/4 #
 
 		directions = [0, math.pi, math.pi/2, -math.pi/2]
 		origins = [

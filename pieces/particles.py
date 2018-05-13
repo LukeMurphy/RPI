@@ -90,6 +90,13 @@ def main(run = True) :
 		print (str(e)) 
 		ps.fixedUnitArray = False
 
+	try :
+		ps.transparencyRange = workConfig.get("particleSystem", 'transparencyRange').split(',')
+		ps.transparencyRange = tuple(map(lambda x: int(int(x)) , ps.transparencyRange))
+	except Exception as e: 
+		print (str(e)) 
+		ps.transparencyRange = (10,200)
+
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
@@ -140,7 +147,7 @@ def emitParticle(i=None):
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
 		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)	
 	if ps.objColor == "alphaRandom" :
-		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness, int(random.uniform(10,30)))
+		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness, int(random.uniform(ps.transparencyRange[0],ps.transparencyRange[1])))
 		p.outlineColor = None
 	else :
 		p.fillColor = config.fillColor #(240,150,0,100)
@@ -150,7 +157,7 @@ def emitParticle(i=None):
 	if(ps.movement == "linearMotion"):
 
 		p.xPosR = int(random.uniform(0,config.canvasWidth))
-		p.yPosR = config.canvasHeight/2 - p.objHeight/2 #int(random.uniform(0,config.canvasHeight))
+		p.yPosR = config.canvasHeight/3 - p.objHeight/4 #int(random.uniform(0,config.canvasHeight))
 
 		directions = [0, math.pi, math.pi/2, -math.pi/2]
 		origins = [

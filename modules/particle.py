@@ -23,7 +23,6 @@ class Particle(object):
 
 	direction = 0
 	angle = 0
-
 	dxIncremental = 0
 	dyIncremental = 0
 	directionIncrement = 0
@@ -166,7 +165,7 @@ class Particle(object):
 		if(self.ps.borderCollisions ==  True) :
 			collide = False
 
-			if(self.xPosR + self.objWidth > self.ps.config.canvasWidth) : 
+			if(self.xPosR  > self.ps.config.canvasWidth + self.objWidth) : 
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :
@@ -194,7 +193,7 @@ class Particle(object):
 					self.xPos = 0
 
 
-			if(self.yPosR + self.objHeight > self.ps.config.canvasHeight and self.ps.ignoreBottom == False) : 
+			if(self.yPosR  > self.ps.config.canvasHeight + self.objHeight and self.ps.ignoreBottom == False) : 
 				self.v *= self.ps.collisionDamping
 				self.changeColor()
 				if (self.ps.useFlocking == True) :

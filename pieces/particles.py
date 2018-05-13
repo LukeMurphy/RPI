@@ -77,6 +77,12 @@ def main(run = True) :
 	except Exception as e: 
 		print (str(e)) 
 		ps.objTrails = True
+	
+	try :
+		ps.linearMotionAlsoHorizontal = (workConfig.getboolean("particleSystem", 'linearMotionAlsoHorizontal'))
+	except Exception as e: 
+		print (str(e)) 
+		ps.linearMotionAlsoHorizontal = True
 
 	try :
 		ps.reEmitNumber = int(workConfig.get("particleSystem", 'reEmitNumber'))
@@ -163,11 +169,15 @@ def emitParticle(i=None):
 		directions = [0, math.pi, math.pi/2, -math.pi/2]
 		origins = [
 			(-p.objWidth, p.yPosR), 
-			(config.canvasWidth -  p.objWidth, p.yPosR), 
+			(config.canvasWidth +  p.objWidth, p.yPosR), 
 			(p.xPosR, -p.objHeight), 
-			(p.xPosR, config.canvasHeight - p.objHeight)
+			(p.xPosR, config.canvasHeight + p.objHeight)
 			]
 		dirVal = round(random.uniform(0,1))
+
+		if(ps.linearMotionAlsoHorizontal == True) :
+			dirVal = round(random.uniform(0,3))
+
 
 		p.direction = directions[dirVal]
 		p.xPosR = origins[dirVal][0]

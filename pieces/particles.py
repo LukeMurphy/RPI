@@ -159,7 +159,7 @@ def emitParticle(i=None):
 			(p.xPosR, -p.objHeight), 
 			(p.xPosR, config.canvasHeight - p.objHeight)
 			]
-		dirVal = round(random.uniform(0,1))
+		dirVal = round(random.uniform(0,3))
 
 		p.direction = directions[dirVal]
 		p.xPosR = origins[dirVal][0]

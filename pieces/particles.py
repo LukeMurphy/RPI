@@ -148,25 +148,18 @@ def emitParticle():
 		p.xPosR = int(random.uniform(0,config.canvasWidth))
 		p.yPosR = int(random.uniform(0,config.canvasHeight))
 
-		directions = [0,math.pi/2,math.pi,-math.pi/2]
+		directions = [0, math.pi, math.pi/2, -math.pi/2]
 		origins = [
 			(-p.objWidth, p.yPosR), 
+			(config.canvasWidth -  p.objWidth, p.yPosR), 
 			(p.xPosR, -p.objHeight), 
-			(config.canvasWidth -  p.objWidth,p.yPosR), 
-			(p.xPosR,config.canvasHeight - p.objHeight)
+			(p.xPosR, config.canvasHeight - p.objHeight)
 			]
-		dirVal = round(random.uniform(0,3))
+		dirVal = round(random.uniform(0,1))
 
 		p.direction = directions[dirVal]
 		p.xPosR = origins[dirVal][0]
 		p.yPosR = origins[dirVal][1]
-
-		p.direction = 0
-		p.xPosR = origins[0][0]
-		p.yPosR = origins[0][1]
-
-		#p.v = 3
-
 	
 	ps.unitArray.append(p)
 

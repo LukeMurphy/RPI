@@ -10,8 +10,6 @@ from modules.particle_system import ParticleSystem
 from modules.particle import Particle
 
 
-
-
 def main(run = True) :
 	global config, directionOrder, ps
 	print("---------------------")
@@ -86,6 +84,12 @@ def main(run = True) :
 		print (str(e)) 
 		ps.reEmitNumber = 2
 
+	try :
+		ps.fixedUnitArray = (workConfig.getboolean("particleSystem", 'fixedUnitArray'))
+	except Exception as e: 
+		print (str(e)) 
+		ps.fixedUnitArray = False
+
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
@@ -120,7 +124,7 @@ def main(run = True) :
 	if(run) : runWork()
 
 
-def emitParticle():
+def emitParticle(i=None):
 	global config, ps
 	p = Particle(ps)
 	p.objWidth = ps.objWidth
@@ -161,7 +165,11 @@ def emitParticle():
 		p.xPosR = origins[dirVal][0]
 		p.yPosR = origins[dirVal][1]
 	
-	ps.unitArray.append(p)
+	if i != None :
+		ps.unitArray[i] = p
+	else :
+		ps.unitArray.append(p)
+	
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -219,11 +227,17 @@ def iterate() :
 		p.render()
 
 		if(p.remove == True) :
-			ps.unitArray.remove(p)
-			if len(ps.unitArray) < config.numUnits + 0 :
+			#print("REMOVING",ps.unitArray.index(p),len(ps.unitArray))
 
-				for i in range(0, ps.reEmitNumber):
-					emitParticle()
+			if(ps.fixedUnitArray == False) :
+				ps.unitArray.remove(p)
+
+				if len(ps.unitArray) < config.numUnits + 0 :
+					for i in range(0, ps.reEmitNumber):
+						emitParticle()
+			else :
+				emitParticle(i = ps.unitArray.index(p))
+
 
 
 	if random.random() < .0005 and ps.changeCohesion == True:

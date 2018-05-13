@@ -33,7 +33,6 @@ class Particle(object):
 	unitBlur = 0
 	meanderFactor = 4
 	meanderFactor2 = 90
-
 	changeColorOnChange = False
 
 	def __init__(self, particleSystemRef):
@@ -62,12 +61,11 @@ class Particle(object):
 		
 		self.fillColor = colorutils.getRandomRGB()
 		'''
-		
 		self.fillColor = colorutils.randomColor(self.ps.config.brightness)
 		self.outlineColor = colorutils.getSunsetColors(self.ps.config.brightness/2)
+		self.imageDrawn = False
 
-		if(random.random() < .2) :
-			self.fillColor = (100,10,0)
+		#if(random.random() < .2) : self.fillColor = (100,10,0)
 
 
 	def setUpParticle(self) :
@@ -82,12 +80,16 @@ class Particle(object):
 		self.meanderFactor = random.uniform(2,8)
 		self.meanderFactor2 = random.uniform(10,110)
 
+		self.remove = False
+
 		self.createParticleImage()
 
 	
 	def createParticleImage(self):
+
 		self.image = Image.new("RGBA", (round(self.objWidth) + 2 , round(self.objHeight) + 2))
 		self.draw = ImageDraw.Draw(self.image)
+		self.imageDrawn = True
 
 
 	def travel(self):
@@ -328,7 +330,6 @@ class Particle(object):
 	
 	
 	def drawRectangle(self):
-
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
 			fill=self.fillColor, outline=self.outlineColor)
 

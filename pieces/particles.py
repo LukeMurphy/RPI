@@ -140,7 +140,7 @@ def emitParticle(i=None):
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
 		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)	
 	if ps.objColor == "alphaRandom" :
-		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness, int(random.uniform(10,200)))
+		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness, int(random.uniform(10,30)))
 		p.outlineColor = None
 	else :
 		p.fillColor = config.fillColor #(240,150,0,100)
@@ -159,7 +159,7 @@ def emitParticle(i=None):
 			(p.xPosR, -p.objHeight), 
 			(p.xPosR, config.canvasHeight - p.objHeight)
 			]
-		dirVal = round(random.uniform(0,3))
+		dirVal = round(random.uniform(0,1))
 
 		p.direction = directions[dirVal]
 		p.xPosR = origins[dirVal][0]

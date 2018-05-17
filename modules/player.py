@@ -37,6 +37,7 @@ def configure(config, workconfig) :
 
 	try :
 		config.usePixelSort  = (workconfig.getboolean("displayconfig", 'usePixelSort'))
+		config.pixelSortRotatesWithImage  = (workconfig.getboolean("displayconfig", 'pixelSortRotatesWithImage'))
 		config.unsharpMaskPercent  = int(workconfig.get("displayconfig", 'unsharpMaskPercent'))
 		config.blurRadius  = int(workconfig.get("displayconfig", 'blurRadius'))
 		config.pixSortXOffset  = int(workconfig.get("displayconfig", 'pixSortXOffset'))
@@ -59,6 +60,7 @@ def configure(config, workconfig) :
 	except Exception as e:
 		print (str(e))
 		config.usePixelSort = False
+		config.pixelSortRotatesWithImage = True
 		config.unsharpMaskPercent  = 50
 		config.blurRadius  = 0
 		config.pixSortXOffset = 0

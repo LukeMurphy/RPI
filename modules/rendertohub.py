@@ -187,7 +187,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	if(config.useFilters) :
 		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
 
-	if(config.usePixelSort) :
+	if(config.usePixelSort == True and config.pixelSortRotatesWithImage == True) :
 		if(random.random()< config.pixelSortAppearanceProb) :
 			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
@@ -198,6 +198,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 			# except in some cases, more trailing is created
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
+	if(config.usePixelSort and config.pixelSortRotatesWithImage == False) :
+		if(random.random()< config.pixelSortAppearanceProb) :
+			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
 	if config.remapImageBlock == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)

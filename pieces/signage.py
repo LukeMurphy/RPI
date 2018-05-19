@@ -150,8 +150,14 @@ def showGrid():
 			glitchBox(config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize)
 		if(random.random() < config.overlayResetRate ) :
 			config.loadedImage.paste(config.loadedImageCopy)
+
+		if random.random() < config.overlayGlitchRate :
+			config.overLayXPos = round(config.overLayXPosInit * random.random())
+		if random.random() < config.overlayGlitchRate :
+			config.overLayYPos = round(config.overLayYPosInit * random.random())
+
 		config.image.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
-	
+
 	if(random.random() < config.fullimageGiltchRate)  : 
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 
@@ -159,15 +165,18 @@ def showGrid():
 
 def displayTest():
 	global config
+
+	config.colOverlay.stepTransition()
+	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
-	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
-	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
-	config.draw.text((1,0),"TOP",config.fontColor,font=config.font)
-	config.draw.text((1,config.screenHeight-15),"BOTTOM",config.fontColor,font=config.font)
+	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=config.bgColor, outline=config.outlineColor)
+	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=config.bgColor, outline=config.outlineColor)
+	#config.draw.text((5,0),"TOP",config.fontColor,font=config.font)
+	#config.draw.text((5,config.screenHeight-15),"BOTTOM",config.fontColor,font=config.font)
 
 	tm = datetime.datetime.now()
 	tm = time.ctime()
-	config.draw.text((10,24),tm,config.fontColor,font=config.font)
+	#config.draw.text((10,24),tm,config.fontColor,font=config.font)
 
 	w = 24
 	h = 24
@@ -179,7 +188,7 @@ def displayTest():
 
 	for i in range(0,len(rgbWheel)):
 		colorBlock = tuple(map(lambda x: int(int(x)  * config.brightness), rgbWheel[i]))
-		config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
+		#config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
 		xp += w
 
 	yp+=h 
@@ -187,9 +196,25 @@ def displayTest():
 
 	for i in range(0,len(rgbWheel)):
 		colorBlock = tuple(map(lambda x: int(int(x)  * config.brightness * .5), rgbWheel[i]))
-		config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
+		#config.draw.rectangle((xp,yp,xp + w,yp+h), fill=colorBlock, outline=colorBlock)
 		xp += w
 
+	# the overlay can fall apart independently of the overall image
+	if(config.useOverLayImage  ==  True) :
+		if(random.random() < config.overlayGlitchRate ) :
+			glitchBox(config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize)
+		if(random.random() < config.overlayResetRate ) :
+			config.loadedImage.paste(config.loadedImageCopy)
+
+		if random.random() < config.overlayGlitchRate :
+			config.overLayXPos = round(config.overLayXPosInit * random.random())
+		if random.random() < config.overlayGlitchRate :
+			config.overLayYPos = round(config.overLayYPosInit * random.random())
+
+		config.image.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
+
+	if(random.random() < config.fullimageGiltchRate)  : 
+		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 
 	config.render(config.image, 0,0)
 
@@ -261,6 +286,9 @@ def main(run = True) :
 	config.overLayImage = workConfig.get("signage", 'overLayImage')
 	config.overLayXPos = int(workConfig.get("signage", 'overLayXPos'))
 	config.overLayYPos = int(workConfig.get("signage", 'overLayYPos'))
+	config.overLayXPosInit = config.overLayXPos
+	config.overLayYPosInit = config.overLayYPos
+
 	config.imageGlitchSize = int(workConfig.get("signage", 'imageGlitchSize'))
 	config.overlayGlitchSize = int(workConfig.get("signage", 'overlayGlitchSize'))
 	config.overlayBrightness = float(workConfig.get("signage", 'overlayBrightness'))

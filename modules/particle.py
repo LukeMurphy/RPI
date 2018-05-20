@@ -280,13 +280,15 @@ class Particle(object):
 			self.createParticleImage()
 
 			if self.ps.objType == "poly" :
-				self.drawPoly()
+				self.drawPoly()			
+			if self.ps.objType == "ellipse":
+				self.drawOval()
 			else:
 				self.drawRectangle()
 
 			imageToPaste = self.image
 
-			if(self.ps.movement == "travel"):
+			if(self.ps.movement == "travel" and self.ps.objType != "ellipse"):
 			
 				angle = 180
 				imageToPaste = self.image.rotate(angle, expand=True)
@@ -323,15 +325,17 @@ class Particle(object):
 		poly.append((h, 0))
 
 		self.draw.polygon(poly, fill = self.fillColor, outline=self. outlineColor)
-
-
 		#self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
 	
+
+	def drawOval(self):
+		self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)), 
+			fill=self.fillColor, outline=self.outlineColor)
 	
 	def drawRectangle(self):
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 
 			fill=self.fillColor, outline=self.outlineColor)
-
+	
 
 	def changeColor(self):
 		if(self.changeColorOnChange == True) :

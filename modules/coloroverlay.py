@@ -78,9 +78,9 @@ class ColorOverlay:
 
 	def stepTransition(self, autoReset = False) :
 		self.currentColor = [
-		(self.currentColor[0] + self.rateOfColorChange[0]),
-		(self.currentColor[1] + self.rateOfColorChange[1]),
-		(self.currentColor[2] + self.rateOfColorChange[2])
+		round(self.currentColor[0] + self.rateOfColorChange[0]),
+		round(self.currentColor[1] + self.rateOfColorChange[1]),
+		round(self.currentColor[2] + self.rateOfColorChange[2])
 		]
 
 		self.checkTime()

@@ -23,16 +23,22 @@ class unit :
 
 	def __init__(self) :
 
+		self.unHideGrid = False
+
+	def createUnitImage(self):
 		self.image = Image.new("RGBA", (self.tileSizeWidth  , self.tileSizeHeight))
 		self.draw = ImageDraw.Draw(self.image)
-		self.unHideGrid = False
+	
 
 	def setUp(self):
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True 
-		self.colOverlay.steps = 80
+		self.colOverlay.steps = self.config.steps
 
+	
 	def drawUnit(self):
+		#self.colOverlay.stepTransition()
+
 		if(self.unHideGrid == False and self.coordinatedColorChange == False):
 			self.colOverlay.stepTransition()
 
@@ -45,6 +51,10 @@ class unit :
 		if(self.unHideGrid == True):
 			fontColor = config.fontColor
 			outlineColor = config.outlineColor
+
+		if self.config.showOutline == False :
+			outlineColor = self.bgColor
+
 		
 		self.draw.rectangle((0,0,self.tileSizeWidth - 1,self.tileSizeHeight -1), 
 			fill=self.bgColor,  outline=outlineColor)
@@ -54,8 +64,9 @@ class unit :
 		displyInfo2  =  str(self.col * self.tileSizeWidth) + ", " + str(self.row * self.tileSizeHeight)
 
 		#displyInfo = displyInfo.encode('utf-8')
-		self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
-		self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
+		if self.config.showText == True :
+			self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
+			self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -72,14 +83,17 @@ def makeGrid():
 			u.row = row
 			u.col = col
 			u.coordinatedColorChange = config.coordinatedColorChange
+			u.createUnitImage()
 			if (config.coordinatedColorChange == False ) :
 				u.setUp()
 			u.drawUnit()
 			config.unitArrray.append(u)
 
+
 def redrawGrid():
 
-	config.colOverlay.stepTransition()
+	if config.coordinatedColorChange == True :
+		config.colOverlay.stepTransition()
 	
 		#config.colOverlay.colorTransitionSetup(100)
 	'''
@@ -103,11 +117,23 @@ def redrawGrid():
 	if(random.random() < config.fullimageGiltchRate)  : 
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 
+		## Also do random image rotation if set to True
+		if config.randomRotation == True :
+			config.rotation = random.uniform(-10,10)
+
+	## Correct any random rotation more quickly
+	if(random.random() < config.fullimageGiltchRate * 2 and config.randomRotation == True)  : 
+			config.rotation = config.baseRotation
+
+
 	config.render(config.image, 0,0)
 
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"Not really used"
 def showGrid():
 	global config
+
 
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
@@ -115,6 +141,7 @@ def showGrid():
 
 	if(config.unHideGrid == False):
 		config.colOverlay.stepTransition()
+
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 	fontColor = config.bgColor
 	outlineColor = config.bgColor
@@ -162,6 +189,7 @@ def showGrid():
 		glitchBox(config.image, -config.imageGlitchSize, config.imageGlitchSize)
 
 	config.render(config.image, 0,0)
+
 
 def displayTest():
 	global config
@@ -221,6 +249,7 @@ def displayTest():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Image manipulation functions
 
+
 def glitchBox(img, r1 = -10, r2 = 10) :
 	apparentWidth = img.size[0]
 	apparentHeight = img.size[1]
@@ -238,6 +267,7 @@ def glitchBox(img, r1 = -10, r2 = 10) :
 	if(random.random() < .97) :
 		cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
 		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
+
 
 def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None,expand=False):
 	if center is None:
@@ -275,6 +305,8 @@ def main(run = True) :
 	config.canvasImageHeight -= 4
 	config.delay = float(workConfig.get("signage", 'redrawDelay'))
 
+	config.baseRotation = config.rotation
+
 
 	config.fontColorVals = ((workConfig.get("signage", 'fontColor')).split(','))
 	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
@@ -304,7 +336,6 @@ def main(run = True) :
 	config.colOverlay = coloroverlay.ColorOverlay()
 	config.colOverlay.randomSteps = False 
 	config.colOverlay.timeTrigger = True 
-	config.colOverlay.steps = 200 
 	config.colOverlay.tLimitBase = config.tLimitBase 
 	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
@@ -312,16 +343,45 @@ def main(run = True) :
 	config.unitArrray = []
 
 	try:
+		config.randomRotation = workConfig.getboolean("signage","randomRotation")
+	except Exception as e:
+		print (str(e))
+		config.randomRotation = False	
+
+	try:
 		config.showGrid = workConfig.getboolean("signage","showGrid")
 	except Exception as e:
 		print (str(e))
-		config.showGrid = False
+		config.showGrid = False	
+
+	try:
+		config.showText = workConfig.getboolean("signage","showText")
+	except Exception as e:
+		print (str(e))
+		config.showText = True
+
+	try:
+		config.showOutline = workConfig.getboolean("signage","showOutline")
+	except Exception as e:
+		print (str(e))
+		config.showOutline = True
+
 	try:
 		config.imageXOffset = int(workConfig.get("displayconfig","imageXOffset"))
 	except Exception as e:
 		print (str(e))
 		config.imageXOffset = 0
+
+	try:
+		config.steps = int(workConfig.get("displayconfig","steps"))
+	except Exception as e:
+		print (str(e))
+		config.steps = 200
 	
+	config.colOverlay.steps = config.steps 
+
+
+
 	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
 	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
 

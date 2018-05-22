@@ -132,7 +132,8 @@ def redrawGrid():
 		if random.random() < config.overlayGlitchRate :
 			config.overLayXPos = round(config.overLayXPosInit * random.random())
 		if random.random() < config.overlayGlitchRate :
-			config.overLayYPos = round(config.overLayYPosInit * random.random())
+			#config.overLayYPos = round(config.overLayYPosInit * random.random())
+			config.overLayYPos = round(random.uniform(-30,64))
 
 		config.image.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
 

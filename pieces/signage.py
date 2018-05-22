@@ -119,7 +119,23 @@ def redrawGrid():
 
 		## Also do random image rotation if set to True
 		if config.randomRotation == True :
-			config.rotation = random.uniform(-10,10)
+			config.rotation = random.uniform(-3,3)
+
+
+	# the overlay can fall apart independently of the overall image
+	if(config.useOverLayImage  ==  True) :
+		if(random.random() < config.overlayGlitchRate ) :
+			glitchBox(config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize)
+		if(random.random() < config.overlayResetRate ) :
+			config.loadedImage.paste(config.loadedImageCopy)
+
+		if random.random() < config.overlayGlitchRate :
+			config.overLayXPos = round(config.overLayXPosInit * random.random())
+		if random.random() < config.overlayGlitchRate :
+			config.overLayYPos = round(config.overLayYPosInit * random.random())
+
+		config.image.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
+
 
 	## Correct any random rotation more quickly
 	if(random.random() < config.fullimageGiltchRate * 2 and config.randomRotation == True)  : 

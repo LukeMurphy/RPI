@@ -119,7 +119,7 @@ def redrawGrid():
 
 		## Also do random image rotation if set to True
 		if config.randomRotation == True :
-			config.rotation = random.uniform(-3,3)
+			config.rotation = random.uniform(-1,1)
 
 
 	# the overlay can fall apart independently of the overall image
@@ -139,7 +139,7 @@ def redrawGrid():
 
 
 	## Correct any random rotation more quickly
-	if(random.random() < config.fullimageGiltchRate * 2 and config.randomRotation == True)  : 
+	if(random.random() < config.fullimageGiltchRate * 100 and config.randomRotation == True)  : 
 			config.rotation = config.baseRotation
 
 

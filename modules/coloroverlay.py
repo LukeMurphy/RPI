@@ -76,11 +76,12 @@ class ColorOverlay:
 
 		#print("New transition started...", self.colorB, self.tLimit)
 
-	def stepTransition(self, autoReset = False) :
+	def stepTransition(self, autoReset = False, alpha = 255) :
 		self.currentColor = [
 		round(self.currentColor[0] + self.rateOfColorChange[0]),
 		round(self.currentColor[1] + self.rateOfColorChange[1]),
-		round(self.currentColor[2] + self.rateOfColorChange[2])
+		round(self.currentColor[2] + self.rateOfColorChange[2]),
+		alpha
 		]
 
 		self.checkTime()

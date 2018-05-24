@@ -5,7 +5,7 @@ import math
 import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
-from modules import colorutils, badpixels, coloroverlay
+from modules import colorutils, coloroverlay
 from modules.particle_system import ParticleSystem
 from modules.particle import Particle
 
@@ -77,6 +77,33 @@ def main(run = True) :
 	except Exception as e: 
 		print (str(e)) 
 		ps.objTrails = True
+
+	try :
+		config.bgTransitions = (workConfig.getboolean("particleSystem", 'bgTransitions'))
+		config.bgColorValsA = ((workConfig.get("particleSystem", 'bgRangeA')).split(','))
+		config.bgRangeA = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorValsA))
+		config.bgColorValsB = ((workConfig.get("particleSystem", 'bgRangeB')).split(','))
+		config.bgRangeB = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorValsB))
+		### the overlay color affects the background only in this case
+		config.colOverlayA = coloroverlay.ColorOverlay()
+		### This is the speed range of transitions in color
+		### Higher numbers means more possible steps so slower
+		### transitions - 1,10 very blinky, 10,200 very slow
+
+		config.bgRangeA = float(workConfig.get("particleSystem", 'bgRangeA'))
+		config.bgRangeB = float(workConfig.get("particleSystem", 'bgRangeB'))
+		config.colOverlayA.randomRange = (config.bgRangeA,config.bgRangeB)
+		config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
+
+		config.colOverlayA.randomSteps = True 
+		config.colOverlayA.timeTrigger = True 
+		config.colOverlayA.steps = 100 
+		config.colOverlayA.tLimitBase = 10
+		config.colOverlayA.maxBrightness = config.brightness
+
+	except Exception as e: 
+		print (str(e)) 
+		config.bgTransitions = False
 	
 	try :
 		ps.linearMotionAlsoHorizontal = (workConfig.getboolean("particleSystem", 'linearMotionAlsoHorizontal'))
@@ -202,8 +229,6 @@ def colorize() :
 		clrBlockDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(255,255,255,255))
 		clrBlockDraw.rectangle((0,0, config.clrBlkWidth, config.clrBlkHeight), fill=config.overlayColor)
 
-
-	
 		'''
 		try :
 			config.image = ImageChops.multiply(config.clrBlock, config.image)
@@ -233,6 +258,12 @@ def runWork():
 
 def iterate() :
 	global config, ps
+
+	if config.bgTransitions == True :
+		config.colOverlayA.stepTransition(alpha=25)
+		config.bgColor = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
+
+
 	## Fade trails or not...
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=config.bgColor, outline=None)
 
@@ -266,6 +297,7 @@ def iterate() :
 	if (config.overallBlur > 0) :
 		config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 		## This needs to be reset
+		config.image = config.image.filter(ImageFilter.UnsharpMask(radius=80,percent=250, threshold=1))
 		config.draw = ImageDraw.Draw(config.image)
 
 

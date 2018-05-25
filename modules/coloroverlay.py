@@ -47,7 +47,7 @@ class ColorOverlay:
 
 	def setStartColor(self):
 		self.colorA = colorutils.getRandomColorHSV(hMin=self.hueMin, hMax=self.hueMax, sMin=self.minSaturation,sMax=self.maxSaturation,vMin=self.minValue,vMax=self.maxBrightness)
-		print("New Color A", self.colorA)
+		#print("New Color A", self.colorA)
 
 	def getNewColor(self):
 		#self.colorB = colorutils.randomColor()
@@ -55,7 +55,7 @@ class ColorOverlay:
 		#if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
 
 		self.colorB = colorutils.getRandomColorHSV(hMin=self.hueMin, hMax=self.hueMax, sMin=self.minSaturation,sMax=self.maxSaturation,vMin=self.minValue,vMax=self.maxBrightness)
-		print("New Color B", self.colorB)
+		#print("New Color B", self.colorB)
 
 	def colorTransitionSetup(self,steps=0):
 

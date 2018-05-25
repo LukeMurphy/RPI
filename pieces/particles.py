@@ -257,7 +257,7 @@ def iterate() :
 	global config, ps
 
 	if config.bgTransitions == True :
-		config.colOverlayA.stepTransition(alpha=25)
+		config.colOverlayA.stepTransition(alpha=config.colOverlayA.bgTransparency)
 		config.bgColor = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
 
 

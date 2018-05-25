@@ -35,9 +35,9 @@ class ColorOverlay:
 
 	def __init__(self): 
 		self.colorTransitionSetup()
-		self.colorA = colorutils.randomColor()
-		self.colorB = colorutils.randomColor()
-		self.colorB = colorutils.getRandomRGB()
+		#self.colorA = colorutils.randomColor()
+		#self.colorB = colorutils.randomColor()
+		#self.colorB = colorutils.getRandomRGB()
 		self.t1 = time.time()
 		self.timeTrigger = False
 

@@ -93,6 +93,7 @@ def main(run = True) :
 		config.colOverlayA.steps = 10 
 		config.colOverlayA.tLimitBase = 10
 		config.colOverlayA.setStartColor()
+		config.colOverlayA.getNewColor()
 
 	except Exception as e: 
 		print (str(e)) 

@@ -90,8 +90,8 @@ def main(run = True) :
 		config.colOverlayA.maxBrightness = float(workConfig.get("particleSystem", 'maxBrightness'))
 		config.colOverlayA.randomSteps = False 
 		config.colOverlayA.timeTrigger = True 
-		config.colOverlayA.steps = 10 
-		config.colOverlayA.tLimitBase = 10
+		config.colOverlayA.steps = 50 
+		config.colOverlayA.tLimitBase = 20
 		config.colOverlayA.setStartColor()
 		config.colOverlayA.getNewColor()
 

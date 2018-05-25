@@ -28,6 +28,9 @@ class ColorOverlay:
 	maxSaturation= 1
 	minSaturation = .25
 	minValue = .1
+	hueMin = 0
+	hueMax = 10
+	valueMax = 1
 
 
 	def __init__(self): 
@@ -42,12 +45,17 @@ class ColorOverlay:
 		t = time.time()
 		self.tDelta = (t - self.t1)
 
+	def setStartColor(self):
+		self.colorA = colorutils.getRandomColorHSV(hMin=self.hueMin, hMax=self.hueMax, sMin=self.minSaturation,sMax=self.maxSaturation,vMin=self.minValue,vMax=self.maxBrightness)
+		print("New Color A", self.colorA)
+
 	def getNewColor(self):
 		#self.colorB = colorutils.randomColor()
 		## Vaguely more control of the color parameters ... 
 		#if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
 
-		self.colorB = colorutils.getRandomColorHSV(sMin=self.minSaturation,sMax=self.maxSaturation,vMin=self.minValue,vMax=self.maxBrightness)
+		self.colorB = colorutils.getRandomColorHSV(hMin=self.hueMin, hMax=self.hueMax, sMin=self.minSaturation,sMax=self.maxSaturation,vMin=self.minValue,vMax=self.maxBrightness)
+		print("New Color B", self.colorB)
 
 	def colorTransitionSetup(self,steps=0):
 

@@ -80,26 +80,19 @@ def main(run = True) :
 
 	try :
 		config.bgTransitions = (workConfig.getboolean("particleSystem", 'bgTransitions'))
-		config.bgColorValsA = ((workConfig.get("particleSystem", 'bgRangeA')).split(','))
-		config.bgRangeA = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorValsA))
-		config.bgColorValsB = ((workConfig.get("particleSystem", 'bgRangeB')).split(','))
-		config.bgRangeB = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorValsB))
-		### the overlay color affects the background only in this case
 		config.colOverlayA = coloroverlay.ColorOverlay()
-		### This is the speed range of transitions in color
-		### Higher numbers means more possible steps so slower
-		### transitions - 1,10 very blinky, 10,200 very slow
-
-		config.bgRangeA = float(workConfig.get("particleSystem", 'bgRangeA'))
-		config.bgRangeB = float(workConfig.get("particleSystem", 'bgRangeB'))
+		config.bgRangeA = int(workConfig.get("particleSystem", 'bgRangeA'))
+		config.bgRangeB = int(workConfig.get("particleSystem", 'bgRangeB'))
 		config.colOverlayA.randomRange = (config.bgRangeA,config.bgRangeB)
-		config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
-
-		config.colOverlayA.randomSteps = True 
+		#config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
+		config.colOverlayA.hueMin = int(workConfig.get("particleSystem", 'hueMin'))
+		config.colOverlayA.hueMax = int(workConfig.get("particleSystem", 'hueMax'))
+		config.colOverlayA.maxBrightness = float(workConfig.get("particleSystem", 'maxBrightness'))
+		config.colOverlayA.randomSteps = False 
 		config.colOverlayA.timeTrigger = True 
-		config.colOverlayA.steps = 100 
+		config.colOverlayA.steps = 10 
 		config.colOverlayA.tLimitBase = 10
-		config.colOverlayA.maxBrightness = config.brightness
+		config.colOverlayA.setStartColor()
 
 	except Exception as e: 
 		print (str(e)) 
@@ -179,9 +172,11 @@ def emitParticle(i=None):
 	if ps.objColor == "rnd" :
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
 		p.outlineColor = colorutils.getSunsetColors(ps.config.brightness/2)	
+
 	if ps.objColor == "alphaRandom" :
 		p.fillColor = colorutils.randomColorAlpha(ps.config.brightness, int(random.uniform(ps.transparencyRange[0],ps.transparencyRange[1])))
 		p.outlineColor = None
+
 	else :
 		p.fillColor = config.fillColor #(240,150,0,100)
 		p.outlineColor = config.outlineColor #(100,0,0,100)

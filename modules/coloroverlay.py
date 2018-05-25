@@ -82,7 +82,9 @@ class ColorOverlay:
 		self.rateOfColorChange = [ a/self.steps for a in self.colorDelta]
 		self.complete =  False
 
-		#print("New transition started...", self.colorB, self.tLimit)
+	
+		#print("New transition started...", self.colorB, self.tLimitBase, self.tLimit)
+
 
 	def stepTransition(self, autoReset = False, alpha = 255) :
 		self.currentColor = [

@@ -90,11 +90,12 @@ def main(run = True) :
 		config.colOverlayA.maxBrightness = float(workConfig.get("particleSystem", 'maxBrightness'))
 		config.colOverlayA.bgTransparency = float(workConfig.get("particleSystem", 'bgTransparency'))
 		config.colOverlayA.randomSteps = True 
-		config.colOverlayA.timeTrigger = True 
-		config.colOverlayA.steps = 100 
-		config.colOverlayA.tLimitBase = 20
+		config.colOverlayA.timeTrigger = True
+		config.colOverlayA.tLimitBase = int(workConfig.get("particleSystem", 'tLimitBase'))
 		config.colOverlayA.setStartColor()
 		config.colOverlayA.getNewColor()
+		config.colOverlayA.colorTransitionSetup()
+
 
 	except Exception as e: 
 		print (str(e)) 

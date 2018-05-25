@@ -88,6 +88,7 @@ def main(run = True) :
 		config.colOverlayA.hueMin = int(workConfig.get("particleSystem", 'hueMin'))
 		config.colOverlayA.hueMax = int(workConfig.get("particleSystem", 'hueMax'))
 		config.colOverlayA.maxBrightness = float(workConfig.get("particleSystem", 'maxBrightness'))
+		config.colOverlayA.bgTransparency = float(workConfig.get("particleSystem", 'bgTransparency'))
 		config.colOverlayA.randomSteps = True 
 		config.colOverlayA.timeTrigger = True 
 		config.colOverlayA.steps = 100 

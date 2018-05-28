@@ -328,7 +328,7 @@ def createPieces() :
 				obj.minSaturation = .8
 				obj.maxSaturation = 1
 				obj.minValue = .05
-				obj.maxValue = .4
+				obj.maxValue = .3
 				obj.minHue = config.redRange[0]
 				obj.maxHue = config.redRange[1]
 

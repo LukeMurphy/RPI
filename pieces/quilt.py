@@ -253,6 +253,7 @@ def createPieces() :
 				obj.fillColorMode = "red"
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
+				obj.brightness =  config.brightness
 
 				obj.minSaturation = .8
 				obj.maxSaturation = 1
@@ -276,6 +277,7 @@ def createPieces() :
 				obj.outlineColorObj	= outlineColorObj
 				obj.timeTrigger = True
 				obj.tLimitBase = 30
+				obj.brightness =  config.brightness
 
 				obj.minSaturation = .7
 				obj.maxSaturation = 1
@@ -299,6 +301,7 @@ def createPieces() :
 				obj.outlineColorObj	= outlineColorObj
 				obj.timeTrigger = True
 				obj.tLimitBase = 30
+				obj.brightness =  config.brightness
 
 				obj.minSaturation = .5
 				obj.maxSaturation = 1
@@ -320,6 +323,7 @@ def createPieces() :
 				obj.fillColorMode = "red"
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
+				obj.brightness =  config.brightness
 
 				obj.minSaturation = .8
 				obj.maxSaturation = 1

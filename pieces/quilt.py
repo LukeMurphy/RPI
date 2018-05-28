@@ -276,7 +276,7 @@ def createPieces() :
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
 				obj.timeTrigger = True
-				obj.tLimitBase = 30
+				obj.tLimitBase = 10
 				obj.brightness =  config.brightness
 
 				obj.minSaturation = .7
@@ -300,7 +300,7 @@ def createPieces() :
 				obj.changeColor = True
 				obj.outlineColorObj	= outlineColorObj
 				obj.timeTrigger = True
-				obj.tLimitBase = 30
+				obj.tLimitBase = 10
 				obj.brightness =  config.brightness
 
 				obj.minSaturation = .5

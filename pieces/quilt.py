@@ -277,9 +277,9 @@ def createPieces() :
 				obj.timeTrigger = True
 				obj.tLimitBase = 30
 
-				obj.minSaturation = .8
+				obj.minSaturation = .7
 				obj.maxSaturation = 1
-				obj.minValue = .8
+				obj.minValue = .5
 				obj.maxValue = 1
 				obj.minHue = 0
 				obj.maxHue = 360

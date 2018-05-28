@@ -231,10 +231,10 @@ def createPieces() :
 			obj.changeColor = False
 			obj.outlineColorObj	= outlineColorObj
 
-			obj.minSaturation = .9
+			obj.minSaturation = .8
 			obj.maxSaturation = 1
 			obj.minValue = .5
-			obj.maxValue = 1
+			obj.maxValue = .8
 			obj.minHue = 350
 			obj.maxHue = 10
 
@@ -255,10 +255,10 @@ def createPieces() :
 				obj.outlineColorObj	= outlineColorObj
 				obj.brightness =  config.brightness
 
-				obj.minSaturation = .8
-				obj.maxSaturation = 1
+				obj.minSaturation = .7
+				obj.maxSaturation = .9
 				obj.minValue = .5
-				obj.maxValue = 1
+				obj.maxValue = .9
 				obj.minHue = config.redRange[0]
 				obj.maxHue = config.redRange[1]
 
@@ -280,7 +280,7 @@ def createPieces() :
 				obj.brightness =  config.brightness
 
 				obj.minSaturation = .7
-				obj.maxSaturation = 1
+				obj.maxSaturation = .9
 				obj.minValue = .5
 				obj.maxValue = 1
 				obj.minHue = 0
@@ -328,7 +328,7 @@ def createPieces() :
 				obj.minSaturation = .8
 				obj.maxSaturation = 1
 				obj.minValue = .05
-				obj.maxValue = .3
+				obj.maxValue = .4
 				obj.minHue = config.redRange[0]
 				obj.maxHue = config.redRange[1]
 

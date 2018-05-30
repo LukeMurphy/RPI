@@ -61,6 +61,13 @@ class ColorOverlay:
 		## Vaguely more control of the color parameters ... 
 		#if(random.random() > .8) : self.colorB = colorutils.getRandomRGB()
 
+		## LEGACY --- If the maxbrightness is being set to something other than the default
+		## set the maxValue to the maxBrightness 
+		if(self.maxBrightness != 1 ) :
+			self.maxValue = self.maxBrightness
+
+		#print(self.minHue,self.maxHue,self.minValue,self.maxValue,self.minSaturation,self.maxSaturation)
+
 		self.colorB = colorutils.getRandomColorHSV(
 			hMin=self.minHue, hMax=self.maxHue, 
 			sMin=self.minSaturation,sMax=self.maxSaturation,

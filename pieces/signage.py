@@ -34,6 +34,7 @@ class unit :
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True 
 		self.colOverlay.steps = self.config.steps
+		self.colOverlay.maxBrightness = self.config.brightness
 
 	
 	def drawUnit(self):
@@ -411,6 +412,7 @@ def main(run = True) :
 	setUp()
 
 	if(run) : runWork()
+
 
 def setUp():
 	global config

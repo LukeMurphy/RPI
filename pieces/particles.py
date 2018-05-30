@@ -85,8 +85,12 @@ def main(run = True) :
 		config.bgRangeB = int(workConfig.get("particleSystem", 'bgRangeB'))
 		config.colOverlayA.randomRange = (config.bgRangeA,config.bgRangeB)
 		#config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
-		config.colOverlayA.hueMin = int(workConfig.get("particleSystem", 'hueMin'))
-		config.colOverlayA.hueMax = int(workConfig.get("particleSystem", 'hueMax'))
+		config.colOverlayA.minHue = int(workConfig.get("particleSystem", 'minHue'))
+		config.colOverlayA.maxHue = int(workConfig.get("particleSystem", 'maxHue'))		
+
+		config.colOverlayA.minValue = float(workConfig.get("particleSystem", 'minValue'))
+		config.colOverlayA.maxValue = float(workConfig.get("particleSystem", 'maxValue'))
+
 		config.colOverlayA.maxBrightness = float(workConfig.get("particleSystem", 'maxBrightness'))
 		config.colOverlayA.bgTransparency = float(workConfig.get("particleSystem", 'bgTransparency'))
 		config.colOverlayA.randomSteps = True 

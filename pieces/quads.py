@@ -244,7 +244,7 @@ def iterate() :
 	config.colOverlayA.stepTransition()
 	config.fillColorA = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
 
-	if(config.useScrollingBackGround != True):
+	if(config.useScrollingBackGround == False):
 		if(config.useColorOverlayTransitions == True) :
 			config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
 		else :

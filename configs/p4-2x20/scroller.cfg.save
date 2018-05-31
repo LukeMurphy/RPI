@@ -53,7 +53,7 @@ remapImageBlockDestination = 0,64
 useOverLayImage = False
 useArrows = False
 useImages = True
-useTransparentImages = True
+useTransparentImages = False
 useBackground = True
 useText = False
 useAltText = False
@@ -61,14 +61,14 @@ useAltText = False
 patternSpeed = .3
 textSpeed = 1
 arrowSpeed = -3
-imageSpeed = -1
+imageSpeed = -2
 
 redrawSpeed = .01
 
 xOffset = -5
-yOffset = -0
+yOffset = 0
 
-displayRows = 1
+displayRows = 2
 displayCols = 10
 
 #--- Text Message
@@ -87,11 +87,11 @@ msg3 = 1234567890
 #patternCols = 100
 #patternDrawProb = .2
 
-patternRows = 64
+patternRows = 1
 patternCols = 240
 patternRowsOffset = 0
 patternColsOffset = 0
-patternDrawProb = .01
+patternDrawProb = .001
 pattern = lines
 
 lineThickness = 2
@@ -106,8 +106,8 @@ redShift = 20
 #--- Overlay image
 overLayImage = /assets/imgs/sks/skull-s4c.png
 overlayBrightness = .99
-overLayXPos = -10
-overLayYPos = 80
+overLayXPos = -1
+overLayYPos = 8
 overlayGlitchSize = 10
 overlayGlitchRate = .31
 overlayResetRate = .1
@@ -115,6 +115,6 @@ overlayResetRate = .1
 #--- Image Scrolling
 imageBlockImage = /assets/imgs/sks/skull-s4d.png
 # Spacing...
-imageBlockBuffer = 1400
-imageBlockRemakeProb = .01
+imageBlockBuffer = 40
+imageBlockRemakeProb = .1
 

@@ -181,15 +181,13 @@ def iterate( n = 0) :
 
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
-	
 	#if(block.setForRemoval==True) : makeBlock()
 	
-	# Render the final full image
-	#config.image = config.renderImageFull
 	if config.kaleidescopicEffect == True :
 		config.noTrails =  False
 		kaleidescopic()
 
+	# Render the final full image
 	config.render(config.renderImageFull, 0, 0, config.screenWidth, config.screenHeight, False, False, updateCanvasCall)
 
 

@@ -95,7 +95,7 @@ def getRandomColor(brtns=1) :
 	a = 255
 	return (r,g,b) 
 
-def getRandomColorHSV(hMin=0, hMax=360, sMin=0, vMin=0, vMax=1, sMax=1) :
+def getRandomColorHSV(hMin=0, hMax=360, sMin=0, sMax=1, vMin=0, vMax=1) :
 
 	# adjust for 360 degrees ranges
 	degreeRange = hMax - hMin

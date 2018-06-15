@@ -36,6 +36,22 @@ class unit :
 		self.colOverlay.steps = self.config.steps
 		self.colOverlay.maxBrightness = self.config.brightness
 
+		if self.useFixedPalette == True :
+
+			self.colOverlay.minHue = self.palette[0]
+			self.colOverlay.maxHue = self.palette[1]
+			self.colOverlay.minSaturation = self.palette[2]
+			self.colOverlay.maxSaturation= self.palette[3]
+			self.colOverlay.minValue = self.palette[4]
+			self.colOverlay.maxValue = self.palette[5]
+			self.colOverlay.maxBrightness = self.colOverlay.maxValue
+
+			self.colOverlay.colorB = [0,0,0]
+			self.colOverlay.colorA = [0,0,0]
+			self.colOverlay.currentColor = [0,0,0]
+
+			self.colOverlay.colorTransitionSetup()
+
 	
 	def drawUnit(self):
 		#self.colOverlay.stepTransition()
@@ -73,6 +89,7 @@ class unit :
 
 def makeGrid():
 	global config
+	unitNumber = 1
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
 			u = unit()
@@ -84,11 +101,18 @@ def makeGrid():
 			u.row = row
 			u.col = col
 			u.coordinatedColorChange = config.coordinatedColorChange
+			u.useFixedPalette = config.useFixedPalette
+
+			if(config.useFixedPalette == True) :
+				u.palette = config.palette['p'+ str(unitNumber)]
+
 			u.createUnitImage()
 			if (config.coordinatedColorChange == False ) :
 				u.setUp()
+
 			u.drawUnit()
 			config.unitArrray.append(u)
+			unitNumber +=1
 
 
 def redrawGrid():
@@ -377,7 +401,7 @@ def main(run = True) :
 	except Exception as e:
 		print (str(e))
 		config.showText = True
-
+	
 	try:
 		config.showOutline = workConfig.getboolean("signage","showOutline")
 	except Exception as e:
@@ -396,8 +420,21 @@ def main(run = True) :
 		print (str(e))
 		config.steps = 200
 	
-	config.colOverlay.steps = config.steps 
+	try:
+		config.useFixedPalette = workConfig.getboolean("signage","useFixedPalette")
+		config.paletteRange = int(workConfig.get("signage","paletteRange"))
+		config.palette = {}
+		for i in range (0,config.paletteRange) :
+			name = "p" + str(i+1)
+			vals = ((workConfig.get("signage", name)).split(','))
+			config.palette[name] = tuple(map(lambda x: float(x), vals))
+		print(config.palette['p1'])
+			
+	except Exception as e:
+		print (str(e))
+		config.useFixedPalette = False
 
+	config.colOverlay.steps = config.steps 
 
 
 	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))

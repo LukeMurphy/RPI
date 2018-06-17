@@ -410,7 +410,7 @@ def configureBackgroundScrolling():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def configureImageScrolling():
-	config.imageSpeed = int(workConfig.get("scroller", 'imageSpeed'))
+	config.imageSpeed = float(workConfig.get("scroller", 'imageSpeed'))
 	config.imageBlockImage = workConfig.get("scroller", 'imageBlockImage')
 	config.imageBlockBuffer = int(workConfig.get("scroller", 'imageBlockBuffer'))
 	config.imageBlockRemakeProb = float(workConfig.get("scroller", 'imageBlockRemakeProb'))

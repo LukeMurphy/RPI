@@ -1,5 +1,8 @@
 #System
 import math
+
+
+"Movement types are linearMotion fire and travel"
 class ParticleSystem(object):
 
 	unitArray = []

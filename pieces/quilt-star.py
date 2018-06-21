@@ -393,16 +393,20 @@ def createPieces() :
 						obj.maxHue = 30
 						obj.minValue = .1
 						obj.maxValue = .3
+						obj.minSaturation = .5
+						obj.maxSaturation = 1
+
 						obj.squareNumber = squareNumber
 						squareNumber += 1
 
 					"The center block"
 					if obj.compositionNumber == 0 and unitRow == 1 :
-						#obj.minValue = .2
-						#obj.maxValue = .1
-						#obj.minHue = 180
+						obj.minValue = .2
+						obj.maxValue = .1
+						obj.minHue = 180
 						obj.maxHue = 359
-
+						obj.minSaturation = .5
+						obj.maxSaturation = 1
 
 					obj.setUp(n)
 					config.unitArrray.append(obj)

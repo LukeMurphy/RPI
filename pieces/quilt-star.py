@@ -12,20 +12,22 @@ class unit:
 
 	maxBrightness = 1
 
-	minSaturation = 1
-	maxSaturation = 1
+	minSaturation = 0.0
+	maxSaturation = 0.0
 
-	minValue = 1
-	maxValue = 1
+	minValue = 0.0
+	maxValue = 0.0
 
-	minHue = 0
-	maxHue = 360
+	minHue = 0.0
+	maxHue = 0.0
 
 	# Default is square made of 4 triangles
 	compositionNumber = 0
 	squareNumber = 0
 
 	darkeningFactor = 1.4
+
+	initialized = True
 	
 	def __init__(self, config):
 		self.config = config
@@ -54,7 +56,7 @@ class unit:
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
 		self.colOverlay.timeTrigger = True 
-		self.colOverlay.tLimitBase = 5
+		self.colOverlay.tLimitBase = 2
 		self.colOverlay.steps = 10
 		
 		self.colOverlay.maxBrightness = self.config.brightness
@@ -76,21 +78,19 @@ class unit:
 		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
 
 
-		self.fillColor = colorutils.getRandomColorHSV(
+		self.colOverlay.colorA = colorutils.getRandomColorHSV(
 			sMin = self.minSaturation, sMax = self.maxSaturation,  
 			hMin = self.minHue, hMax  = self.maxHue, 
 			vMin = self.minValue, vMax = self.maxValue
 			)
-
-		self.colOverlay.colorA = self.fillColor
 
 		self.colOverlay.colorB = colorutils.getRandomColorHSV(
 			sMin = self.minSaturation, sMax = self.maxSaturation,  
 			hMin = self.minHue, hMax  = self.maxHue, 
 			vMin = self.minValue, vMax = self.maxValue
 			)
-		
-		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
+
+		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 
 		self.setupSquares()
 		self.setupTriangles()
@@ -169,8 +169,10 @@ class unit:
 	def update(self):
 		#self.fillColorMode == "random" or 
 		if(random.random() > config.colorPopProb) :
+			if self.initialized == True :
+				self.initialized = False
 			self.colOverlay.stepTransition()
-			self.fillColor = tuple(int (a * self.brightness ) for a in self.colOverlay.currentColor)
+			self.fillColor = tuple(round (a * self.brightness ) for a in self.colOverlay.currentColor)
 		else :
 			self.changeColorFill()
 
@@ -257,13 +259,13 @@ class unit:
 				self.fillColor = colorutils.randomColor(random.uniform(.01,self.brightness))
 				self.outlineColor = colorutils.getRandomRGB(random.uniform(.01,self.brightness))
 			else:
-				self.fillColor = colorutils.getRandomColorHSV(
+				newColor = colorutils.getRandomColorHSV(
 					sMin = self.minSaturation, sMax = self.maxSaturation,  
 					hMin = self.minHue, hMax  = self.maxHue, 
 					vMin = self.minValue, vMax = self.maxValue
 					)
 
-				self.colOverlay.colorA = self.fillColor
+				self.colOverlay.colorA = newColor
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -305,6 +307,16 @@ def main(run = True) :
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
+	config.baseHueRange = tuple([float(i) for i in workConfig.get("quilt", 'baseHueRange').split(",")])
+	config.baseSaturationRange = tuple([float(i) for i in workConfig.get("quilt", 'baseSaturationRange').split(",")])
+	config.baseValueRange = tuple([float(i) for i in workConfig.get("quilt", 'baseValueRange').split(",")])
+	config.squareHueRange = tuple([float(i) for i in workConfig.get("quilt", 'squareHueRange').split(",")])
+	config.squareSaturationRange = tuple([float(i) for i in workConfig.get("quilt", 'squareSaturationRange').split(",")])
+	config.squareValueRange = tuple([float(i) for i in workConfig.get("quilt", 'squareValueRange').split(",")])
+	config.centerHueRange = tuple([float(i) for i in workConfig.get("quilt", 'centerHueRange').split(",")])
+	config.centerValueRange = tuple([float(i) for i in workConfig.get("quilt", 'centerValueRange').split(",")])
+	config.centerSaturationRange = tuple([float(i) for i in workConfig.get("quilt", 'centerSaturationRange').split(",")])
+
 	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
 	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
 	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
@@ -325,12 +337,9 @@ def main(run = True) :
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
-
-
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	createPieces()
-
 
 	if(run) : runWork()
 
@@ -375,38 +384,42 @@ def createPieces() :
 					obj = unit(config)
 					obj.xPos = cntr[0]
 					obj.yPos = cntr[1]
+					obj.fillColorMode = "red"
 					obj.blockLength = config.blockLength - sizeAdjustor
 					obj.blockHeight = config.blockHeight - sizeAdjustor
 					obj.outlineColorObj	= outlineColorObj
 
-					obj.minSaturation = .5
-					obj.maxSaturation = 1
-
-					obj.minValue = .1
-					obj.maxValue = .6
+					obj.minHue = config.baseHueRange[0]
+					obj.maxHue = config.baseHueRange[1]				
+					obj.minSaturation = config.baseSaturationRange[0]
+					obj.maxSaturation = config.baseSaturationRange[1]
+					obj.minValue = config.baseValueRange[0]
+					obj.maxValue = config.baseValueRange[1]
 
 					obj.compositionNumber = pattern[unitRow][unitBlock]
+
 					
 					"The squares"
 					if obj.compositionNumber == 0 :
-						obj.minHue = 0
-						obj.maxHue = 30
-						obj.minValue = .1
-						obj.maxValue = .3
-						obj.minSaturation = .5
-						obj.maxSaturation = 1
+						obj.minHue = config.squareHueRange[0]
+						obj.maxHue = config.squareHueRange[1]				
+						obj.minSaturation = config.squareSaturationRange[0]
+						obj.maxSaturation = config.squareSaturationRange[1]
+						obj.minValue = config.squareValueRange[0]
+						obj.maxValue = config.squareValueRange[1]
 
 						obj.squareNumber = squareNumber
 						squareNumber += 1
 
 					"The center block"
 					if obj.compositionNumber == 0 and unitRow == 1 :
-						obj.minValue = .2
-						obj.maxValue = .1
-						obj.minHue = 180
-						obj.maxHue = 359
-						obj.minSaturation = .5
-						obj.maxSaturation = 1
+						obj.minHue = config.centerHueRange[0]
+						obj.maxHue = config.centerHueRange[1]				
+						obj.minSaturation = config.centerSaturationRange[0]
+						obj.maxSaturation = config.centerSaturationRange[1]
+						obj.minValue = config.centerValueRange[0]
+						obj.maxValue = config.centerValueRange[1]
+					
 
 					obj.setUp(n)
 					config.unitArrray.append(obj)
@@ -430,11 +443,9 @@ def iterate() :
 
 		obj = config.unitArrray[i]
 
-		if(random.random() > .98) : 
-			obj.outlineColorObj.stepTransition()
+		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 
-		if(random.random() > .998) :
-		 obj.setupTriangles()
+		if(random.random() > .998) :obj.setupTriangles()
 
 		obj.update()
 		obj.render()

@@ -33,7 +33,7 @@ class ColorOverlay:
 	minSaturation = 0.1
 	maxSaturation= 1
 	
-	minHue = 0
+	minHue = 1
 	maxHue = 360
 	
 
@@ -72,7 +72,12 @@ class ColorOverlay:
 			hMin=self.minHue, hMax=self.maxHue, 
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue)
-		#print("New Color B", self.colorB)
+
+		'''
+		print("New Color B", self.minHue, self.maxHue, 
+			self.minSaturation, self.maxSaturation,
+			self.minValue, self.maxValue)
+		'''
 
 	def colorTransitionSetup(self,steps=0):
 

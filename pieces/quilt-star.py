@@ -127,7 +127,6 @@ class unit:
 		self.sqrPointsSet.append((3,2,4))
 
 
-
 	def setupTriangles(self):
 		# Square's points made of corners and mid points
 		# 	0	1	2
@@ -380,16 +379,20 @@ def createPieces() :
 					obj.blockHeight = config.blockHeight - sizeAdjustor
 					obj.outlineColorObj	= outlineColorObj
 
-					obj.minSaturation = .8
+					obj.minSaturation = .5
 					obj.maxSaturation = 1
-					obj.minValue = .5
-					obj.maxValue = .8
+
+					obj.minValue = .1
+					obj.maxValue = .6
 
 					obj.compositionNumber = pattern[unitRow][unitBlock]
+					
 					"The squares"
 					if obj.compositionNumber == 0 :
-						obj.minHue = 350
-						obj.maxHue = 10
+						obj.minHue = 0
+						obj.maxHue = 30
+						obj.minValue = .1
+						obj.maxValue = .3
 						obj.squareNumber = squareNumber
 						squareNumber += 1
 
@@ -397,10 +400,8 @@ def createPieces() :
 					if obj.compositionNumber == 0 and unitRow == 1 :
 						#obj.minValue = .2
 						#obj.maxValue = .1
-						obj.minHue = 260
-						obj.maxHue = 290
-
-
+						#obj.minHue = 180
+						obj.maxHue = 359
 
 
 					obj.setUp(n)
@@ -422,9 +423,15 @@ def iterate() :
 	config.outlineColorObj.stepTransition()
 
 	for i in range(0,len(config.unitArrray)):
+
 		obj = config.unitArrray[i]
-		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
-		if(random.random() > .98) : obj.setupTriangles()
+
+		if(random.random() > .98) : 
+			obj.outlineColorObj.stepTransition()
+
+		if(random.random() > .998) :
+		 obj.setupTriangles()
+
 		obj.update()
 		obj.render()
 

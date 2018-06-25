@@ -299,6 +299,7 @@ def main(run = True) :
 
 	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
 	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
+	config.resetTrianglesProd = float(workConfig.get("quilt", 'resetTrianglesProd'))
 
 	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
 	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
@@ -445,7 +446,9 @@ def iterate() :
 
 		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 
-		if(random.random() > .998) :obj.setupTriangles()
+		## Approximating timing so that any one triange changes once every 2 minutes or so
+		## e.g. .9995 prob checked every .01 seconds ~
+		if(random.random() > config.resetTrianglesProd) : obj.setupTriangles()
 
 		obj.update()
 		obj.render()

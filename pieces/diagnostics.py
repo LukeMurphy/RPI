@@ -147,6 +147,46 @@ def showGrid():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def drawPalette():
+	global config
+
+	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
+	config.canvasDraw.rectangle((0,0,config.canvasWidth-1, config.canvasHeight-1), fill= config.bgColor, outline=config.outlineColor)
+	config.canvasDraw.rectangle((1,1,config.canvasWidth-2, config.canvasHeight-2), fill= config.bgColor, outline=(0,0,int(220 * config.brightness)))
+
+	#print(config.imageXOffset)
+	
+	hues = 360/config.cols
+	vals = 1 / config.rows
+	sat = 1
+
+	for row in range (0, config.rows) :
+		for col in range (0, config.cols) :
+			## Draw colors 0 thru 360
+			xPos = col * config.tileSizeWidth 
+			yPos = row * config.tileSizeHeight
+
+			hue = col * hues
+			val = row * vals
+
+			bgColor = colorutils.HSVToRGB(hue, sat, val)
+			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=bgColor, outline=config.outlineColor)
+			
+			
+			displyInfo  =  str(hue) + ", " + str(val) + "\n"
+			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
+			#displyInfo  =  "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
+			#config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor2,font=config.font)
+			
+	
+	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
+
+	#config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
+	
+	config.render(config.image, 0,0)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
@@ -194,6 +234,20 @@ def main(run = True) :
 	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
 
 
+
+	try:
+		config.colorPalette = (workConfig.getboolean("diag","colorPalette"))
+	except Exception as e:
+		print (str(e))
+		config.colorPalette = False
+
+
+	if config.colorPalette == True :
+		config.rows = round(config.canvasHeight / 16)
+		config.cols = round(config.canvasWidth / 16)
+		config.tileSizeWidth = round(config.canvasWidth / 16)
+		config.tileSizeHeight = round(config.canvasHeight / 16)
+
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	config.image = Image.new("RGBA", (config.screenWidth  , config.screenHeight))
@@ -236,10 +290,14 @@ def runWork():
 def iterate() :
 
 	global config
-	if config.showGrid ==  True :
-		showGrid()
-	else :		
-		displayTest()		
+
+	if config.colorPalette == True :
+		drawPalette()
+	else:
+		if config.showGrid ==  True :
+			showGrid()
+		else :		
+			displayTest()		
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def callBack() :

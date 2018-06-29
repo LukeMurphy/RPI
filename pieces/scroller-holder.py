@@ -544,6 +544,8 @@ def init() :
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
+	config.overallBlur = float(workConfig.get("scroller", 'overallBlur', vars=0, fallback=0))
+
 	config.flip = False
 	config.scrollArray = []
 
@@ -614,6 +616,9 @@ def iterate() :
 		if(random.random() < config.overlayResetRate ) :
 			config.loadedImage.paste(config.loadedImageCopy)
 		config.workImage.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
+
+	if (config.overallBlur != 0 ) :
+		config.workImage = config.workImage.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 	
 	config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
 	config.render(config.renderImageFull, 0,0)

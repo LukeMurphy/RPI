@@ -104,7 +104,8 @@ def makeGrid():
 			u.useFixedPalette = config.useFixedPalette
 
 			if(config.useFixedPalette == True) :
-				u.palette = config.palette['p'+ str(unitNumber)]
+				#u.palette = config.palette['p'+ str(unitNumber)]
+				u.palette = config.palette['p1']
 
 			u.createUnitImage()
 			if (config.coordinatedColorChange == False ) :

@@ -17,6 +17,7 @@ class ColorOverlay:
 	tDelta = 0
 	timeTrigger = False
 	gotoNextTransition = False
+	autoChange = True
 	t1 = 0
 
 	## "Public" variables that can be set
@@ -111,6 +112,7 @@ class ColorOverlay:
 		self.tLimit = round(random.uniform(self.tLimitBase/2, self.tLimitBase * 1.5))+ 1
 		self.rateOfColorChange = [ a/self.steps for a in self.colorDelta]
 		self.complete =  False
+		self.t1 = time.time()
 
 	
 		#print("New transition started...", self.colorB, self.tLimitBase, self.tLimit)
@@ -135,7 +137,8 @@ class ColorOverlay:
 			self.gotoNextTransition = True
 			self.complete =  True
 			self.t1 = time.time()
-			self.colorTransitionSetup(self.steps)
+			if self.autoChange == True :
+				self.colorTransitionSetup(self.steps)
 
 		for i in range (0,3):
 			#if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
@@ -151,4 +154,14 @@ class ColorOverlay:
 				#print("Transition complete.")
 				#if(autoReset == True or self.gotoNextTransition == True) : 
 				#	self.colorTransitionSetup(self.steps)
+
+
+	def getPercentageDone(self):
+		diff = 0 
+		for i in range (0,3):
+			diff += abs(self.colorB[i] - self.currentColor[i])/255
+
+		return 100 - (100 * diff/3)
+
+
 

@@ -61,6 +61,27 @@ class unit :
 			self.colOverlay.colorTransitionSetup()
 
 	
+	def getNeighbours(self):
+		N = []
+		previousRow = self.row - 1
+		nextRow = self.row + 1
+		previousCol = self.col - 1
+		nextCol = self.col + 1
+
+		N.append((previousCol, previousRow))
+		N.append((self.col, previousRow))
+		N.append((nextCol, previousRow))
+
+		N.append((previousCol, self.row))
+		N.append((nextCol, self.row))
+
+		N.append((previousCol, nextRow))
+		N.append((self.col, nextRow))
+		N.append((nextCol, nextRow))
+
+		return N
+
+
 	def drawUnit(self):
 
 		self.colOverlay.stepTransition()
@@ -108,6 +129,7 @@ def makeGrid():
 			u.yPos = row * config.tileSizeHeight
 			u.row = row
 			u.col = col
+			u.unitNumber = unitNumber
 			u.useFixedPalette = config.useFixedPalette
 
 			if(config.useFixedPalette == True) :

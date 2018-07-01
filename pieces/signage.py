@@ -46,6 +46,9 @@ class unit :
 			self.colOverlay.maxValue = self.palette[5]
 			self.colOverlay.maxBrightness = self.colOverlay.maxValue
 
+			self.colOverlay.dropHueMin = self.dropHueMin
+			self.colOverlay.dropHueMax = self.dropHueMax
+
 			self.colOverlay.colorB = [0,0,0]
 			self.colOverlay.colorA = [0,0,0]
 			self.colOverlay.currentColor = [0,0,0]
@@ -108,6 +111,8 @@ def makeGrid():
 					u.palette = config.palette['p'+ str(unitNumber)]
 				else :
 					u.palette = config.palette['p' + str(config.paletteRange)]
+				u.dropHueMin = config.paletteDropHueMin
+				u.dropHueMax = config.paletteDropHueMax
 
 			u.createUnitImage()
 			if (config.coordinatedColorChange == False ) :
@@ -432,6 +437,8 @@ def main(run = True) :
 			vals = ((workConfig.get("signage", name)).split(','))
 			config.palette[name] = tuple(map(lambda x: float(x), vals))
 		print(config.palette['p1'])
+		config.paletteDropHueMin = int(workConfig.get("signage","dropHueMin"))
+		config.paletteDropHueMax = int(workConfig.get("signage","dropHueMax"))
 			
 	except Exception as e:
 		print (str(e))
@@ -466,12 +473,14 @@ def setUp():
 		config.loadedImageCopy  = config.loadedImage.copy()
 	makeGrid()
 
+
 def runWork():
 	global blocks, config, XOs
 	#gc.enable()
 	while True:
 		iterate()
 		time.sleep(config.delay)  
+
 
 def iterate() :
 

@@ -95,7 +95,7 @@ def getRandomColor(brtns=1) :
 	a = 255
 	return (r,g,b) 
 
-def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1.0) :
+def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1.0, dropHueMin = 0, dropHueMax = 0) :
 
 	# adjust for 360 degrees ranges
 	degreeRange = hMax - hMin
@@ -105,6 +105,14 @@ def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1
 	h = hMin + random.uniform(0.0, degreeRange)
 
 	if (h > 360.0) : h -= 360.0
+
+	## an option to exclude a range of colors
+	if dropHueMax != dropHueMin :
+		h = dropHueMin + 1
+		while h > dropHueMin and h < dropHueMax :
+			h = hMin + random.uniform(0.0, degreeRange)
+			if (h > 360.0) : h -= 360.0
+
 	#h = random.uniform(hMin,hMax)
 	#print(hMin,hMax,degreeRange, h)
 	s = random.uniform(sMin, sMax)

@@ -88,7 +88,7 @@ class ColorOverlay:
 		'''
 
 	
-	def colorTransitionSetup(self,steps=0):
+	def colorTransitionSetup(self,steps=0, newColor = None):
 
 		#self.timeTrigger = False
 		self.gotoNextTransition = False
@@ -100,7 +100,11 @@ class ColorOverlay:
 
 		#self.currentColor = self.colorA
 		#self.colorA = self.colorB
-		self.getNewColor()
+		if newColor == None :
+			self.getNewColor()
+		else :
+			self.colorB = newColor
+
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		from operator import sub
@@ -161,7 +165,7 @@ class ColorOverlay:
 		for i in range (0,3):
 			diff += abs(self.colorB[i] - self.currentColor[i])/255
 
-		return 100 - (100 * diff/3)
+		return (100 * diff/3)
 
 
 

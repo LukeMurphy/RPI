@@ -88,6 +88,7 @@ class unit :
 		self.bgColor  = tuple(int(a*config.brightness) for a in (self.colOverlay.currentColor))
 
 		fontColor = self.bgColor
+		fontColor = (0,0,0)
 		outlineColor = self.bgColor
 
 		if(self.unHideGrid == True):
@@ -97,11 +98,12 @@ class unit :
 		if self.config.showOutline == False :
 			outlineColor = self.bgColor
 
+		'''
 		if self.colOverlay.gotoNextTransition == True :
 			if self.colOverlay.getPercentageDone() > 50 :
 				if random.random() > .1 :
 					self.colOverlay.colorTransitionSetup()
-
+		'''
 		
 		self.draw.rectangle((0,0,self.tileSizeWidth - 1,self.tileSizeHeight -1), 
 			fill=self.bgColor,  outline=outlineColor)
@@ -111,14 +113,17 @@ class unit :
 			#u"\u000D"
 			displyInfo1  =  str(self.col) + ", " + str(self.row) 
 			displyInfo2  =  str(self.col * self.tileSizeWidth) + ", " + str(self.row * self.tileSizeHeight)
-			self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
-			self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
+			self.draw.text((2,- 1), str(self.unitNumber), fontColor, font=config.font)
+			#self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
+			#self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def makeGrid():
 	global config
 	unitNumber = 1
+	config.gridArray = [[[] for i in range(config.rows)] for i in range(config.cols)]
+
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
 			u = unit()
@@ -147,6 +152,7 @@ def makeGrid():
 			u.drawUnit()
 			config.unitArrray.append(u)
 			unitNumber +=1
+			config.gridArray[col][row] = u
 
 
 def redrawGrid():
@@ -157,6 +163,25 @@ def redrawGrid():
 		u.drawUnit()
 		config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
 
+
+		if u.colOverlay.complete == True :
+			if random.random() >= .95 :
+				#u.colOverlay.colorTransitionSetup(newColor=(255,255,255)) 
+				neighbours = u.getNeighbours()
+				#print (neighbours, u.colOverlay.getPercentageDone(), u.colOverlay.complete)
+				u.colOverlay.colorTransitionSetup()
+				for unit in neighbours:
+					col = unit[0]
+					row = unit[1]
+					if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
+						targetUnit = config.gridArray[col][row]
+						#if targetUnit.colOverlay.gotoNextTransition == True :
+						#print(targetUnit.unitNumber, u.colOverlay.colorB)
+						#targetUnit.colOverlay.complete = True
+						#targetUnit.colOverlay.gotoNextTransition = True
+						targetUnit.colOverlay.colorTransitionSetup(newColor = u.colOverlay.colorB)
+					
+					#exit()
 	config.render(config.image, 0,0)
 
 

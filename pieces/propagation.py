@@ -18,17 +18,15 @@ class unit :
 	outlineColor = (0,0,0)
 	tileSizeWidth = 64
 	tileSizeHeight = 32
-
-
 	percentDone = 100.0
 	resistance = 50.0
-
 
 
 	def __init__(self) :
 
 		self.unHideGrid = False
 
+	
 	def createUnitImage(self):
 		self.image = Image.new("RGBA", (self.tileSizeWidth  , self.tileSizeHeight))
 		self.draw = ImageDraw.Draw(self.image)
@@ -39,6 +37,7 @@ class unit :
 		self.colOverlay.randomSteps = True 
 		self.colOverlay.steps = self.config.steps
 		self.colOverlay.maxBrightness = self.config.brightness
+		self.colOverlay.tLimitBase = self.config.tLimitBase
 
 		if self.useFixedPalette == True :
 
@@ -165,7 +164,7 @@ def redrawGrid():
 
 
 		if u.colOverlay.complete == True :
-			if random.random() >= .95 :
+			if random.random() <= config.propagationProbability :
 				#u.colOverlay.colorTransitionSetup(newColor=(255,255,255)) 
 				neighbours = u.getNeighbours()
 				#print (neighbours, u.colOverlay.getPercentageDone(), u.colOverlay.complete)
@@ -175,11 +174,11 @@ def redrawGrid():
 					row = unit[1]
 					if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
 						targetUnit = config.gridArray[col][row]
-						#if targetUnit.colOverlay.gotoNextTransition == True :
-						#print(targetUnit.unitNumber, u.colOverlay.colorB)
-						#targetUnit.colOverlay.complete = True
-						#targetUnit.colOverlay.gotoNextTransition = True
-						targetUnit.colOverlay.colorTransitionSetup(newColor = u.colOverlay.colorB)
+						if targetUnit.colOverlay.getPercentageDone() < config.doneThreshold :
+							#print(targetUnit.unitNumber, u.colOverlay.colorB)
+							#targetUnit.colOverlay.complete = True
+							#targetUnit.colOverlay.gotoNextTransition = True
+							targetUnit.colOverlay.colorTransitionSetup(newColor = u.colOverlay.colorB)
 					
 					#exit()
 	config.render(config.image, 0,0)
@@ -210,6 +209,8 @@ def main(run = True) :
 
 
 	config.coordinatedColorChange = False
+	config.propagationProbability = float(workConfig.get("signage", 'propagationProbability'))
+	config.doneThreshold = float(workConfig.get("signage", 'doneThreshold'))
 
 
 	config.timeTrigger = workConfig.getboolean("signage", 'timeTrigger')

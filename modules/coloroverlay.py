@@ -163,9 +163,9 @@ class ColorOverlay:
 	def getPercentageDone(self):
 		diff = 0 
 		for i in range (0,3):
-			diff += abs(self.colorB[i] - self.currentColor[i])/255
-
-		return (100 * diff/3)
+			d = abs(self.colorB[i] - self.currentColor[i])/255 
+			if d < diff : diff = d 
+		return diff
 
 
 

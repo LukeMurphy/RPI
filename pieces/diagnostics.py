@@ -157,10 +157,10 @@ def drawPalette():
 	#print(config.imageXOffset)
 	
 	hues = 360/config.cols
-	vals = 1 / config.rows
-	sat = 1
+	vals = 1/ config.rows
+	sat = 1 #/ config.rows
 
-	for row in range (0, config.rows) :
+	for row in range (0, config.rows+1) :
 		for col in range (0, config.cols) :
 			## Draw colors 0 thru 360
 			xPos = col * config.tileSizeWidth 
@@ -168,12 +168,13 @@ def drawPalette():
 
 			hue = col * hues
 			val = row * vals
+			#sat = row * vals
 
 			bgColor = colorutils.HSVToRGB(hue, sat, val)
 			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=bgColor, outline=config.outlineColor)
 			
 			
-			displyInfo  =  str(hue) + ", " + str(val) + "\n"
+			displyInfo  =  str(round(hue)) + "\n " + str(round(val*10)/10) + "\n"
 			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
 			#displyInfo  =  "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
 			#config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor2,font=config.font)
@@ -243,10 +244,11 @@ def main(run = True) :
 
 
 	if config.colorPalette == True :
-		config.rows = round(config.canvasHeight / 16)
-		config.cols = round(config.canvasWidth / 16)
-		config.tileSizeWidth = round(config.canvasWidth / 16)
-		config.tileSizeHeight = round(config.canvasHeight / 16)
+		#config.rows = round(config.canvasHeight / 16)
+		#config.cols = round(config.canvasWidth / 16)
+		#config.tileSizeWidth = round(config.canvasWidth / 16)
+		#config.tileSizeHeight = round(config.canvasHeight / 16)
+		pass
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

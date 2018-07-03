@@ -28,6 +28,8 @@ class unit:
 	darkeningFactor = 1.4
 
 	initialized = True
+
+	fillColor = (0,0,0,255)
 	
 	def __init__(self, config):
 		self.config = config

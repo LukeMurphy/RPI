@@ -310,16 +310,6 @@ def main(run = True) :
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
-	config.baseHueRange = tuple([float(i) for i in workConfig.get("quilt", 'baseHueRange').split(",")])
-	config.baseSaturationRange = tuple([float(i) for i in workConfig.get("quilt", 'baseSaturationRange').split(",")])
-	config.baseValueRange = tuple([float(i) for i in workConfig.get("quilt", 'baseValueRange').split(",")])
-	config.squareHueRange = tuple([float(i) for i in workConfig.get("quilt", 'squareHueRange').split(",")])
-	config.squareSaturationRange = tuple([float(i) for i in workConfig.get("quilt", 'squareSaturationRange').split(",")])
-	config.squareValueRange = tuple([float(i) for i in workConfig.get("quilt", 'squareValueRange').split(",")])
-	config.centerHueRange = tuple([float(i) for i in workConfig.get("quilt", 'centerHueRange').split(",")])
-	config.centerValueRange = tuple([float(i) for i in workConfig.get("quilt", 'centerValueRange').split(",")])
-	config.centerSaturationRange = tuple([float(i) for i in workConfig.get("quilt", 'centerSaturationRange').split(",")])
-
 	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
 	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
 	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
@@ -335,6 +325,18 @@ def main(run = True) :
 	config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
 	config.lines  = (workConfig.getboolean("quilt", 'lines'))
 	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
+
+	config.activeSet = workConfig.get("quilt","activeSet")
+
+	config.baseHueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'baseHueRange').split(",")])
+	config.baseSaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'baseSaturationRange').split(",")])
+	config.baseValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'baseValueRange').split(",")])
+	config.squareHueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'squareHueRange').split(",")])
+	config.squareSaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'squareSaturationRange').split(",")])
+	config.squareValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'squareValueRange').split(",")])
+	config.centerHueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'centerHueRange').split(",")])
+	config.centerValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'centerValueRange').split(",")])
+	config.centerSaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'centerSaturationRange').split(",")])
 
 	# for now, all squares 
 	config.blockLength = config.blockSize

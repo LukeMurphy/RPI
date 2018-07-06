@@ -6,6 +6,7 @@ import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 import argparse
+from threading import Timer
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Image layers 
@@ -20,6 +21,9 @@ class unit :
 	tileSizeHeight = 32
 	percentDone = 100.0
 	resistance = 50.0
+
+
+	score = 1
 
 
 	def __init__(self) :
@@ -56,6 +60,7 @@ class unit :
 			self.colOverlay.colorA = [0,0,0]
 			self.colOverlay.currentColor = [0,0,0]
 			self.colOverlay.autoChange = False
+			self.colOverlay.randomRange = (self.colorStepsRangeMin,self.colorStepsRangeMax)
 
 			self.colOverlay.colorTransitionSetup()
 
@@ -135,6 +140,8 @@ def makeGrid():
 			u.col = col
 			u.unitNumber = unitNumber
 			u.useFixedPalette = config.useFixedPalette
+			u.colorStepsRangeMin =config.colorStepsRangeMin
+			u.colorStepsRangeMax = config.colorStepsRangeMax
 
 			if(config.useFixedPalette == True) :
 				if unitNumber <= config.paletteRange :
@@ -164,23 +171,18 @@ def redrawGrid():
 
 
 		if u.colOverlay.complete == True :
-			if random.random() <= config.propagationProbability :
-				#u.colOverlay.colorTransitionSetup(newColor=(255,255,255)) 
 				neighbours = u.getNeighbours()
-				#print (neighbours, u.colOverlay.getPercentageDone(), u.colOverlay.complete)
 				u.colOverlay.colorTransitionSetup()
 				for unit in neighbours:
 					col = unit[0]
 					row = unit[1]
 					if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
 						targetUnit = config.gridArray[col][row]
-						if targetUnit.colOverlay.getPercentageDone() < config.doneThreshold :
-							#print(targetUnit.unitNumber, u.colOverlay.colorB)
-							#targetUnit.colOverlay.complete = True
-							#targetUnit.colOverlay.gotoNextTransition = True
-							targetUnit.colOverlay.colorTransitionSetup(newColor = u.colOverlay.colorB)
-					
-					#exit()
+						if random.random() <= config.propagationProbability  :
+							if targetUnit.colOverlay.getPercentageDone() > config.doneThreshold :
+								targetUnit.colOverlay.colorTransitionSetup(newColor = u.colOverlay.colorB, steps = round(u.colOverlay.steps/3))
+
+
 	config.render(config.image, 0,0)
 
 
@@ -217,10 +219,12 @@ def main(run = True) :
 	config.tLimitBase = int(workConfig.get("signage", 'tLimitBase'))
 	config.colOverlay = coloroverlay.ColorOverlay()
 	config.colOverlay.randomSteps = False 
-	config.colOverlay.timeTrigger = True 
+	config.colOverlay.timeTrigger = False 
 	config.colOverlay.tLimitBase = config.tLimitBase 
 	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
+	config.colorStepsRangeMin = int(workConfig.get("signage","colorStepsRangeMin"))
+	config.colorStepsRangeMax = int(workConfig.get("signage","colorStepsRangeMax"))
 
 	config.unitArrray = []
 
@@ -244,7 +248,7 @@ def main(run = True) :
 
 
 	try:
-		config.steps = int(workConfig.get("displayconfig","steps"))
+		config.steps = int(workConfig.get("signage","steps"))
 	except Exception as e:
 		print (str(e))
 		config.steps = 200

@@ -1,6 +1,7 @@
 import time
 import random
 import math
+from operator import sub
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils
 
@@ -23,6 +24,7 @@ class ColorOverlay:
 	## "Public" variables that can be set
 	randomSteps = True
 	steps = 100
+	step = 1
 	tLimit = 10
 	tLimitBase = 10
 
@@ -39,6 +41,7 @@ class ColorOverlay:
 
 	dropHueMin = 0
 	dropHueMax = 0
+
 
 	def __init__(self): 
 		self.colorTransitionSetup()
@@ -88,38 +91,42 @@ class ColorOverlay:
 		'''
 
 	
-	def colorTransitionSetup(self,steps=0, newColor = None):
+	def colorTransitionSetup(self, steps = 0, newColor = None):
 
-		#self.timeTrigger = False
+
 		self.gotoNextTransition = False
 
-		''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 		#### Setting up for color transitions
 		self.colorDelta = [0,0,0]
 		self.rateOfColorChange = [0,0,0]
 
-		#self.currentColor = self.colorA
-		#self.colorA = self.colorB
 		if newColor == None :
 			self.getNewColor()
 		else :
 			self.colorB = newColor
 
-
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
-		from operator import sub
+		
 		self.colorDelta = list(map(sub, self.colorB, self.currentColor))
 		test = [abs(a) for a in self.colorDelta]
+
+		# Create random number of transition steps
 		if(steps == 0 or self.randomSteps == True) : 
-			self.steps = random.uniform(self.randomRange[0],self.randomRange[1])
+			self.steps = round(random.uniform(self.randomRange[0],self.randomRange[1]))
 
 		self.tLimit = round(random.uniform(self.tLimitBase/2, self.tLimitBase * 1.5))+ 1
 		self.rateOfColorChange = [ a/self.steps for a in self.colorDelta]
 		self.complete =  False
+		self.step = 1
 		self.t1 = time.time()
 
-	
-		#print("New transition started...", self.colorB, self.tLimitBase, self.tLimit)
+		#print("New transition started...", self.steps, self.tLimitBase, self.tLimit)
+
+	def stopTransition(self):
+			self.gotoNextTransition = True
+			self.complete =  True
+			self.t1 = time.time()
+		
 
 
 	def stepTransition(self, autoReset = False, alpha = 255) :
@@ -130,17 +137,13 @@ class ColorOverlay:
 		alpha
 		]
 
+		self.step += 1
 		self.checkTime()
 
 		## Always change to the next color based on TIME
-		if (self.tDelta > self.tLimit and self.gotoNextTransition == False) :
-			#self.timeTrigger = True
-			#and self.complete == True
-
-			#print("Timesup", self.tDelta, self.tLimit)
-			self.gotoNextTransition = True
-			self.complete =  True
-			self.t1 = time.time()
+		#if (self.tDelta > self.tLimit and self.gotoNextTransition == False) :
+		if (self.tDelta > self.tLimit and self.step >= self.steps) :
+			self.stopTransition()
 			if self.autoChange == True :
 				self.colorTransitionSetup(self.steps)
 
@@ -155,17 +158,13 @@ class ColorOverlay:
 		
 		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 
 				self.complete =  True
-				#print("Transition complete.")
+				#print("Transition complete.", self.steps, self.step)
 				#if(autoReset == True or self.gotoNextTransition == True) : 
 				#	self.colorTransitionSetup(self.steps)
 
 
 	def getPercentageDone(self):
-		diff = 0 
-		for i in range (0,3):
-			d = abs(self.colorB[i] - self.currentColor[i])/255 
-			if d < diff : diff = d 
-		return diff
+		return self.step/self.steps
 
 
 

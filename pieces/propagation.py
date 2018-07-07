@@ -210,7 +210,7 @@ def redrawGrid2():
 				if targetUnit.score == 1 :
 					score +=1
 
-		if u.score ==1 and score < 2 :
+		if u.score == 1 and score < 2 :
 			u.score = 0
 
 		## Should be > 3
@@ -220,7 +220,7 @@ def redrawGrid2():
 		if u.score == 1 and score > 1 and score < 4 :
 			u.score = 1
 
-		if u.score == 0 and score == 3 :
+		if u.score == 0 and score == config.liveThreshold  :
 			u.score = 1
 
 
@@ -228,7 +228,7 @@ def redrawGrid2():
 			u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
 
 		if u.score == 0 :
-			u.colOverlay.colorTransitionSetup(newColor = (0,150,0))
+			u.colOverlay.colorTransitionSetup(newColor = (5,5,100))
 
 		if random.random() > config.propagationProbability :
 			u.score = 1
@@ -262,6 +262,8 @@ def main(run = True) :
 	config.coordinatedColorChange = False
 	config.propagationProbability = float(workConfig.get("signage", 'propagationProbability'))
 	config.doneThreshold = float(workConfig.get("signage", 'doneThreshold'))
+	config.overCrowdingThreshold = int(workConfig.get("signage","overCrowdingThreshold"))
+	config.liveThreshold = int(workConfig.get("signage","liveThreshold"))
 
 
 	config.timeTrigger = workConfig.getboolean("signage", 'timeTrigger')
@@ -274,7 +276,7 @@ def main(run = True) :
 	config.unHideGrid = False
 	config.colorStepsRangeMin = int(workConfig.get("signage","colorStepsRangeMin"))
 	config.colorStepsRangeMax = int(workConfig.get("signage","colorStepsRangeMax"))
-	config.overCrowdingThreshold = int(workConfig.get("signage","overCrowdingThreshold"))
+	
 
 	config.unitArrray = []
 

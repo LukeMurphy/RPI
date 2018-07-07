@@ -43,6 +43,8 @@ class unit :
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.tLimitBase = self.config.tLimitBase
 
+		self.score = 0 if random.random() > .1 else 1
+
 		if self.useFixedPalette == True :
 
 			self.colOverlay.minHue = self.palette[0]
@@ -186,6 +188,53 @@ def redrawGrid():
 	config.render(config.image, 0,0)
 
 
+def redrawGrid2():
+
+	
+	for u in config.unitArrray:
+		u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
+		u.drawUnit()
+		config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
+
+
+		neighbours = u.getNeighbours()
+		u.colOverlay.colorTransitionSetup()
+
+		score = 0
+		for unit in neighbours:
+			col = unit[0]
+			row = unit[1]
+			if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
+				targetUnit = config.gridArray[col][row]
+
+				if targetUnit.score == 1 :
+					score +=1
+
+		if u.score ==1 and score < 2 :
+			u.score = 0
+
+		## Should be > 3
+		if u.score == 1 and score > config.overCrowdingThreshold :
+			u.score = 0
+
+		if u.score == 1 and score > 1 and score < 4 :
+			u.score = 1
+
+		if u.score == 0 and score == 3 :
+			u.score = 1
+
+
+		if u.score == 1 :
+			u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
+
+		if u.score == 0 :
+			u.colOverlay.colorTransitionSetup(newColor = (0,150,0))
+
+		if random.random() > config.propagationProbability :
+			u.score = 1
+
+	config.render(config.image, 0,0)
+
 ## Setup and run functions
 
 def main(run = True) :
@@ -225,6 +274,7 @@ def main(run = True) :
 	config.unHideGrid = False
 	config.colorStepsRangeMin = int(workConfig.get("signage","colorStepsRangeMin"))
 	config.colorStepsRangeMax = int(workConfig.get("signage","colorStepsRangeMax"))
+	config.overCrowdingThreshold = int(workConfig.get("signage","overCrowdingThreshold"))
 
 	config.unitArrray = []
 
@@ -303,7 +353,7 @@ def runWork():
 def iterate() :
 
 	global config
-	redrawGrid()
+	redrawGrid2()
 	
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

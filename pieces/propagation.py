@@ -21,8 +21,6 @@ class unit :
 	tileSizeHeight = 32
 	percentDone = 100.0
 	resistance = 50.0
-
-
 	score = 1
 
 
@@ -128,6 +126,9 @@ class unit :
 def makeGrid():
 	global config
 	unitNumber = 1
+	config.unitArray = []
+	del config.unitArray[:]
+	config.gridArray = []
 	config.gridArray = [[[] for i in range(config.rows)] for i in range(config.cols)]
 
 	for row in range (0, config.rows) :
@@ -158,15 +159,18 @@ def makeGrid():
 				u.setUp()
 
 			u.drawUnit()
-			config.unitArrray.append(u)
+			config.unitArray.append(u)
 			unitNumber +=1
 			config.gridArray[col][row] = u
+
+	tmr = Timer(6.0, makeGrid)
+	tmr.start()
 
 
 def redrawGrid():
 
 	
-	for u in config.unitArrray:
+	for u in config.unitArray:
 		u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 		u.drawUnit()
 		config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
@@ -191,7 +195,7 @@ def redrawGrid():
 def redrawGrid2():
 
 	
-	for u in config.unitArrray:
+	for u in config.unitArray:
 		u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 		u.drawUnit()
 		config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
@@ -201,39 +205,43 @@ def redrawGrid2():
 		u.colOverlay.colorTransitionSetup()
 
 		score = 0
-		for unit in neighbours:
-			col = unit[0]
-			row = unit[1]
-			if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
-				targetUnit = config.gridArray[col][row]
 
-				if targetUnit.score == 1 :
-					score +=1
+		try :
+			for unit in neighbours:
+				col = unit[0]
+				row = unit[1]
+				if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
+					targetUnit = config.gridArray[col][row]
 
-		if u.score == 1 :
-			if score < config.underPopulationThreshold :
-				u.score = 0
+					if targetUnit.score == 1 :
+						score +=1
 
-			## Should be > 3
-			if score > config.overCrowdingThreshold :
-				u.score = 0
+			if u.score == 1 :
+				if score < config.underPopulationThreshold :
+					u.score = 0
 
-			if score > 1 and score < config.dieThreshold  :
+				## Should be > 3
+				if score > config.overCrowdingThreshold :
+					u.score = 0
+
+				if score > 1 and score < config.dieThreshold  :
+					u.score = 1
+
+			if u.score == 0 :
+				if score == config.liveThreshold  :
+					u.score = 1
+
+
+			if u.score == 1 :
+				u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
+
+			if u.score == 0 :
+				u.colOverlay.colorTransitionSetup(newColor = (5,5,100))
+
+			if random.random() > config.propagationProbability :
 				u.score = 1
-
-		if u.score == 0 :
-			if score == config.liveThreshold  :
-				u.score = 1
-
-
-		if u.score == 1 :
-			u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
-
-		if u.score == 0 :
-			u.colOverlay.colorTransitionSetup(newColor = (5,5,100))
-
-		if random.random() > config.propagationProbability :
-			u.score = 1
+		except Exception as e:
+			print(e, len(config.unitArray))
 
 	config.render(config.image, 0,0)
 
@@ -264,7 +272,7 @@ def main(run = True) :
 	config.coordinatedColorChange = False
 	config.propagationProbability = float(workConfig.get("signage", 'propagationProbability'))
 	config.doneThreshold = float(workConfig.get("signage", 'doneThreshold'))
-	
+
 	config.overCrowdingThreshold = int(workConfig.get("signage","overCrowdingThreshold"))
 	config.underPopulationThreshold = int(workConfig.get("signage","underPopulationThreshold"))
 	config.liveThreshold = int(workConfig.get("signage","liveThreshold"))
@@ -282,8 +290,6 @@ def main(run = True) :
 	config.colorStepsRangeMin = int(workConfig.get("signage","colorStepsRangeMin"))
 	config.colorStepsRangeMax = int(workConfig.get("signage","colorStepsRangeMax"))
 	
-
-	config.unitArrray = []
 
 	try:
 		config.randomRotation = workConfig.getboolean("signage","randomRotation")

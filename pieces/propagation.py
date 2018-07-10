@@ -131,6 +131,10 @@ def makeGrid():
 	config.gridArray = []
 	config.gridArray = [[[] for i in range(config.rows)] for i in range(config.cols)]
 
+	config.t1  = time.time()
+	config.t2  = time.time()
+	config.timeToComplete = round(random.uniform(30,220))
+
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
 			u = unit()
@@ -163,11 +167,9 @@ def makeGrid():
 			unitNumber +=1
 			config.gridArray[col][row] = u
 
-	tmr = Timer(6.0, makeGrid)
-	tmr.start()
-
-
-def redrawGrid():
+#"Conway Game of Life Like Redraw"
+"Conway Game of Life Like Redraw"
+def redrawGrid1():
 
 	
 	for u in config.unitArray:
@@ -206,51 +208,57 @@ def redrawGrid2():
 
 		score = 0
 
-		try :
-			for unit in neighbours:
-				col = unit[0]
-				row = unit[1]
-				if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
+		for unit in neighbours:
+			col = unit[0]
+			row = unit[1]
+			if col >= 0 and col < config.cols and row >= 0 and row < config.rows:
+				try :
 					targetUnit = config.gridArray[col][row]
 
 					if targetUnit.score == 1 :
 						score +=1
+				except Exception as e:
+					print(e, len(config.unitArray), unit, col, row)
 
-			if u.score == 1 :
-				if score < config.underPopulationThreshold :
-					u.score = 0
+		if u.score == 1 :
+			if score < config.underPopulationThreshold :
+				u.score = 0
 
-				## Should be > 3
-				if score > config.overCrowdingThreshold :
-					u.score = 0
+			## Should be > 3
+			if score > config.overCrowdingThreshold :
+				u.score = 0
 
-				if score > 1 and score < config.dieThreshold  :
-					u.score = 1
-
-			if u.score == 0 :
-				if score == config.liveThreshold  :
-					u.score = 1
-
-
-			if u.score == 1 :
-				u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
-
-			if u.score == 0 :
-				u.colOverlay.colorTransitionSetup(newColor = (5,5,100))
-
-			if random.random() > config.propagationProbability :
+			if score > 1 and score < config.dieThreshold  :
 				u.score = 1
-		except Exception as e:
-			print(e, len(config.unitArray))
+
+		if u.score == 0 :
+			if score == config.liveThreshold  :
+				u.score = 1
+
+
+		if u.score == 1 :
+			u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
+
+		if u.score == 0 :
+			u.colOverlay.colorTransitionSetup(newColor = (5,5,100))
+
+		if random.random() > config.propagationProbability :
+			u.score = 1
+
 
 	config.render(config.image, 0,0)
 
-## Setup and run functions
+	config.t2  = time.time()
+	delta = config.t2  - config.t1
 
+	if delta > config.timeToComplete :
+		setUp()
+
+## Setup and run functions
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
-	print("SIGNAGE Loaded")
+	print("propagation Loaded")
 
 
 	colorutils.brightness = config.brightness
@@ -258,75 +266,75 @@ def main(run = True) :
 	config.canvasImageHeight = config.screenHeight
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
-	config.delay = float(workConfig.get("signage", 'redrawDelay'))
+	config.delay = float(workConfig.get("propagation", 'redrawDelay'))
 
 	config.baseRotation = config.rotation
 
 
-	config.fontColorVals = ((workConfig.get("signage", 'fontColor')).split(','))
+	config.fontColorVals = ((workConfig.get("propagation", 'fontColor')).split(','))
 	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
-	config.outlineColorVals = ((workConfig.get("signage", 'outlineColor')).split(','))
+	config.outlineColorVals = ((workConfig.get("propagation", 'outlineColor')).split(','))
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
 
 
 	config.coordinatedColorChange = False
-	config.propagationProbability = float(workConfig.get("signage", 'propagationProbability'))
-	config.doneThreshold = float(workConfig.get("signage", 'doneThreshold'))
+	config.propagationProbability = float(workConfig.get("propagation", 'propagationProbability'))
+	config.doneThreshold = float(workConfig.get("propagation", 'doneThreshold'))
 
-	config.overCrowdingThreshold = int(workConfig.get("signage","overCrowdingThreshold"))
-	config.underPopulationThreshold = int(workConfig.get("signage","underPopulationThreshold"))
-	config.liveThreshold = int(workConfig.get("signage","liveThreshold"))
-	config.dieThreshold = int(workConfig.get("signage","dieThreshold"))
+	config.overCrowdingThreshold = int(workConfig.get("propagation","overCrowdingThreshold"))
+	config.underPopulationThreshold = int(workConfig.get("propagation","underPopulationThreshold"))
+	config.liveThreshold = int(workConfig.get("propagation","liveThreshold"))
+	config.dieThreshold = int(workConfig.get("propagation","dieThreshold"))
 
 
-	config.timeTrigger = workConfig.getboolean("signage", 'timeTrigger')
-	config.tLimitBase = int(workConfig.get("signage", 'tLimitBase'))
+	config.timeTrigger = workConfig.getboolean("propagation", 'timeTrigger')
+	config.tLimitBase = int(workConfig.get("propagation", 'tLimitBase'))
 	config.colOverlay = coloroverlay.ColorOverlay()
 	config.colOverlay.randomSteps = False 
 	config.colOverlay.timeTrigger = False 
 	config.colOverlay.tLimitBase = config.tLimitBase 
 	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
-	config.colorStepsRangeMin = int(workConfig.get("signage","colorStepsRangeMin"))
-	config.colorStepsRangeMax = int(workConfig.get("signage","colorStepsRangeMax"))
+	config.colorStepsRangeMin = int(workConfig.get("propagation","colorStepsRangeMin"))
+	config.colorStepsRangeMax = int(workConfig.get("propagation","colorStepsRangeMax"))
 	
 
 	try:
-		config.randomRotation = workConfig.getboolean("signage","randomRotation")
+		config.randomRotation = workConfig.getboolean("propagation","randomRotation")
 	except Exception as e:
 		print (str(e))
 		config.randomRotation = False	
 
 	try:
-		config.showText = workConfig.getboolean("signage","showText")
+		config.showText = workConfig.getboolean("propagation","showText")
 	except Exception as e:
 		print (str(e))
 		config.showText = True
 	
 	try:
-		config.showOutline = workConfig.getboolean("signage","showOutline")
+		config.showOutline = workConfig.getboolean("propagation","showOutline")
 	except Exception as e:
 		print (str(e))
 		config.showOutline = True
 
 
 	try:
-		config.steps = int(workConfig.get("signage","steps"))
+		config.steps = int(workConfig.get("propagation","steps"))
 	except Exception as e:
 		print (str(e))
 		config.steps = 200
 	
 	try:
-		config.useFixedPalette = workConfig.getboolean("signage","useFixedPalette")
-		config.paletteRange = int(workConfig.get("signage","paletteRange"))
+		config.useFixedPalette = workConfig.getboolean("propagation","useFixedPalette")
+		config.paletteRange = int(workConfig.get("propagation","paletteRange"))
 		config.palette = {}
 		for i in range (0,config.paletteRange) :
 			name = "p" + str(i+1)
-			vals = ((workConfig.get("signage", name)).split(','))
+			vals = ((workConfig.get("propagation", name)).split(','))
 			config.palette[name] = tuple(map(lambda x: float(x), vals))
-		print(config.palette['p1'])
-		config.paletteDropHueMin = int(workConfig.get("signage","dropHueMin"))
-		config.paletteDropHueMax = int(workConfig.get("signage","dropHueMax"))
+		#print(config.palette['p1'])
+		config.paletteDropHueMin = int(workConfig.get("propagation","dropHueMin"))
+		config.paletteDropHueMax = int(workConfig.get("propagation","dropHueMax"))
 			
 	except Exception as e:
 		print (str(e))

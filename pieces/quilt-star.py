@@ -99,6 +99,52 @@ class unit:
 		self.setupSquares()
 		self.setupTriangles()
 
+	def setupFullSquares(self):
+		# Square's points made of corners and mid point
+		# 	0	1	2
+		#	3	4	5
+		#	6	7	8
+
+		## e.g. this triangle is 0,4,6
+
+		#	*
+		#	* *
+		#	*	
+
+		## but dividing into smaller triangles
+		## p0,p1,p3
+
+		#	*
+		#	* *
+		#	
+
+		self.sqrPoints = []
+
+		self.sqrPoints.append( 	(self.xPos, self.yPos))
+		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos) )				
+		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos) )	
+
+		self.sqrPoints.append( 	(self.xPos, self.yPos + self.blockHeight/2) )
+		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos + self.blockHeight/2))
+		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos + self.blockHeight) )
+
+		self.sqrPoints.append( 	(self.xPos, self.yPos + self.blockHeight) )
+		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos + self.blockHeight))
+		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos + self.blockHeight) )
+
+		self.sqrPointsSet = []
+		# "TOP"
+		self.sqrPointsSet.append((0,4,3))
+		self.sqrPointsSet.append((0,1,4))
+		self.sqrPointsSet.append((1,2,4))
+		self.sqrPointsSet.append((2,4,5))
+
+		self.sqrPointsSet.append((3,4,6))
+		self.sqrPointsSet.append((6,4,7))
+		self.sqrPointsSet.append((7,5,8))
+		self.sqrPointsSet.append((4,5,8))
+
+
 
 	def setupSquares(self):
 		# Square's points made of corners and mid point

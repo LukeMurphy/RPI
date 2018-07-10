@@ -318,8 +318,27 @@ def createPieces() :
 	## Alignment perfect setup
 	if(config.patternPrecision == True): sizeAdjustor = 1
 
-	n = 0
+	
 	cntr = [0,0]
+
+	pattern = [
+	[0,0,0,0,0,0,0,0],
+	[1,0,0,0,1,1,1,0],
+	[0,0,0,1,0,1,1,1],
+	[0,0,0,0,0,0,0,0],
+	[0,1,1,1,0,0,0,1],
+	[1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1],
+	[1,1,1,0,1,0,0,0],
+	[0,0,0,1,0,1,1,1],
+	[1,1,1,1,1,1,1,1],
+	[1,1,1,1,1,1,1,1],
+	[1,0,0,0,1,1,1,0],
+	[0,0,0,0,0,0,0,0],
+	[1,1,1,0,1,0,0,0],
+	[0,1,1,1,0,0,0,1],
+	[0,0,0,0,0,0,0,0]
+	]
 
 	# Rows and columns of 9-squares
 	for rows in range (0,config.blockRows) :
@@ -329,9 +348,7 @@ def createPieces() :
 		for cols in range (0,config.blockCols) :
 
 			columnStart = cols * config.blockLength * 4 + config.gapSize
-
 			cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-
 			cntr = [columnStart, rowStart]
 
 			## Jinky odds/evens alignment setup
@@ -339,334 +356,25 @@ def createPieces() :
 			## Alignment perfect setup
 			if(config.patternPrecision == True): sizeAdjustor = 1
 
-			obj = unit(config)
-			obj.xPos = cntr[0]
-			obj.yPos = cntr[1]
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength
-			obj.yPos = cntr[1]
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 2
-			obj.yPos = cntr[1]
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 3
-			obj.yPos = cntr[1]
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			####### ROW 2
-
-			obj = unit(config)
-			obj.xPos = cntr[0]
-			obj.yPos = cntr[1] + config.blockLength
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength
-			obj.yPos = cntr[1] + config.blockLength
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 2
-			obj.yPos = cntr[1] + config.blockLength
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 3
-			obj.yPos = cntr[1] + config.blockLength
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-
-			####### ROW 3
-
-			obj = unit(config)
-			obj.xPos = cntr[0]
-			obj.yPos = cntr[1] + config.blockLength * 2
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength
-			obj.yPos = cntr[1] + config.blockLength * 2
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 2
-			obj.yPos = cntr[1] + config.blockLength * 2
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 3
-			obj.yPos = cntr[1] + config.blockLength * 2
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-			####### ROW 4
-
-			obj = unit(config)
-			obj.xPos = cntr[0]
-			obj.yPos = cntr[1] + config.blockLength * 3
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength
-			obj.yPos = cntr[1] + config.blockLength * 3
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 2
-			obj.yPos = cntr[1] + config.blockLength * 3
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[1])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[1])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			obj = unit(config)
-			obj.xPos = cntr[0] + config.blockLength * 3
-			obj.yPos = cntr[1] + config.blockLength * 3
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-			obj.fillColors.append(config.fillColorSet[0])
-
-			obj.setUp()
-			config.unitArrray.append(obj)
-
-
-			n+=1
-
+			n = 0
+			for r in range(0,4):
+				for c in range(0,4):
+					obj = unit(config)
+					obj.xPos = cntr[0] + c * config.blockLength 
+					obj.yPos = cntr[1] + r * config.blockHeight
+					obj.blockLength = config.blockLength - sizeAdjustor
+					obj.blockHeight = config.blockHeight - sizeAdjustor
+					obj.outlineColorObj	= outlineColorObj
+
+					for i in pattern[n] :
+						obj.fillColors.append(config.fillColorSet[i])
+
+					obj.setUp()
+					config.unitArrray.append(obj)
+					n+=1
+			
+
+		
 
 def runWork():
 	global blocks, config, XOs

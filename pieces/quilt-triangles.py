@@ -362,6 +362,8 @@ def createPieces() :
 	[0,0,0,0,0,0,0,0]
 	]
 
+	
+
 	# Rows and columns of 9-squares
 	for rows in range (0,config.blockRows) :
 

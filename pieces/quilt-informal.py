@@ -222,15 +222,15 @@ def main(run = True) :
 
 	if(run) : runWork()
 
+
 def restartPiece():
 
-	config.polyDistortionMin = -random.uniform(0, config.polyDistortion + 1)
-	config.polyDistortionMax = random.uniform(0, config.polyDistortion + 1)
+	config.polyDistortionMin = -random.uniform(1, config.polyDistortion + 1)
+	config.polyDistortionMax = random.uniform(1, config.polyDistortion + 1)
 
 	del config.unitArray[:]
 
 	drawSqareSpiral()
-
 
 
 def drawSqareSpiral():
@@ -388,7 +388,6 @@ def drawSqareSpiral():
 					pass
 
 
-
 def runWork():
 	global blocks, config, XOs
 	#gc.enable()
@@ -423,4 +422,3 @@ def iterate() :
 
 		
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

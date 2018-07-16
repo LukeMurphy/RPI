@@ -208,7 +208,7 @@ def drawSqareSpiral():
 	draw  = ImageDraw.Draw(config.canvasImage)
 	## Archimedes spiral is  r = a + b * theta
 	turns = 8
-	b = 16
+	b = 10
 	xOffset = 100
 	yOffset = 130
 	A = []
@@ -216,18 +216,18 @@ def drawSqareSpiral():
 
 	for i in range(1,turns):
 		x = i * b + xOffset + random.uniform(rangeChange[0],rangeChange[1])
+		y = i * b + yOffset #+ random.uniform(rangeChange[0],rangeChange[1])
+		A.append((x,y))
+
+		x = -i * b + xOffset #+ random.uniform(rangeChange[0],rangeChange[1])
 		y = i * b + yOffset + random.uniform(rangeChange[0],rangeChange[1])
 		A.append((x,y))
 
 		x = -i * b + xOffset + random.uniform(rangeChange[0],rangeChange[1])
-		y = i * b + yOffset + random.uniform(rangeChange[0],rangeChange[1])
+		y = -i * b + yOffset #+ random.uniform(rangeChange[0],rangeChange[1])
 		A.append((x,y))
 
-		x = -i * b + xOffset + random.uniform(rangeChange[0],rangeChange[1])
-		y = -i * b + yOffset + random.uniform(rangeChange[0],rangeChange[1])
-		A.append((x,y))
-
-		x = (i + 1) * b + xOffset + random.uniform(rangeChange[0],rangeChange[1])
+		x = (i + 1) * b + xOffset #+ random.uniform(rangeChange[0],rangeChange[1])
 		y = -i * b + yOffset + random.uniform(rangeChange[0],rangeChange[1])
 		A.append((x,y))
 

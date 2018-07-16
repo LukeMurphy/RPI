@@ -253,21 +253,20 @@ def drawSqareSpiral():
 			#TOP
 			poly = (B[n+1], A[n+5], B[n+6], A[n+2])
 			draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
-			
+
 			n += 4
 		except Exception as e :
 			print(e)
 
 
-	
+	'''
 	for i in range(0, len(A) -1):
 		draw.line((A[i],A[i+1]), fill=(230,10,0))
 
-	#pointsArray2 = []
 
 	for i in range(0, len(B) -1):
 		draw.line((B[i],B[i+1]), fill=(0,0,230))
-	
+	'''
 
 
 def createPieces() :

@@ -206,7 +206,7 @@ def drawSqareSpiral():
 	config.unitArrray = []
 
 	draw  = ImageDraw.Draw(config.canvasImage)
-	## Archimedes spiral is  r = a + b * theta
+	## Archimedean spiral is  r = a + b * theta
 	turns = 8
 	b = 10
 	xOffset = 100
@@ -416,6 +416,8 @@ def runWork():
 def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
+
+	drawSqareSpiral()
 
 	for i in range(0,len(config.unitArrray)):
 		obj = config.unitArrray[i]

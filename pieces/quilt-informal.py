@@ -97,6 +97,22 @@ class unit:
 			self.changeColorFill()
 
 	
+
+	def renderPolys(self):
+
+		if (self.fillColorMode == "red") : 
+			brightnessFactor = self.config.brightnessFactorDark
+		else:
+			brightnessFactor = self.config.brightnessFactorLight
+
+		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
+
+		if(self.lines == True) :
+			self.draw.polygon(self.poly, fill=self.fillColor)
+		else:
+			self.draw.polygon(self.poly, fill=self.fillColor, outline=None)
+
+
 	def render(self):
 
 		if (self.fillColorMode == "red") : 
@@ -186,16 +202,15 @@ def main(run = True) :
 	config.lines  = (workConfig.getboolean("quilt", 'lines'))
 	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
 
+	config.polyDistortionMin = int(workConfig.get("quilt", 'polyDistortionMin')) 
+	config.polyDistortionMax = int(workConfig.get("quilt", 'polyDistortionMax')) 
 	# for now, all squares 
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
-
-
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	#createPieces()
-
 	drawSqareSpiral()
 
 	if(run) : runWork()
@@ -203,70 +218,150 @@ def main(run = True) :
 
 def drawSqareSpiral():
 
+	global config
+	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+
 	config.unitArrray = []
 
-	draw  = ImageDraw.Draw(config.canvasImage)
-	## Archimedean spiral is  r = a + b * theta
-	turns = 8
-	b = 10
-	xOffset = 100
-	yOffset = 130
-	A = []
-	rangeChange = (-10,10)
+	## Alignment perfect setup
+	if(config.patternPrecision == True): sizeAdjustor = 1
 
-	for i in range(1,turns):
-		x = i * b + xOffset + random.uniform(rangeChange[0],rangeChange[1])
-		y = i * b + yOffset #+ random.uniform(rangeChange[0],rangeChange[1])
-		A.append((x,y))
+	n = 0
 
-		x = -i * b + xOffset #+ random.uniform(rangeChange[0],rangeChange[1])
-		y = i * b + yOffset + random.uniform(rangeChange[0],rangeChange[1])
-		A.append((x,y))
+	for rows in range (0,config.blockRows) :
+		for cols in range (0,config.blockCols) :
 
-		x = -i * b + xOffset + random.uniform(rangeChange[0],rangeChange[1])
-		y = -i * b + yOffset #+ random.uniform(rangeChange[0],rangeChange[1])
-		A.append((x,y))
+			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength + config.gapSize
+			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]	
 
-		x = (i + 1) * b + xOffset #+ random.uniform(rangeChange[0],rangeChange[1])
-		y = -i * b + yOffset + random.uniform(rangeChange[0],rangeChange[1])
-		A.append((x,y))
+			outlineColorObj = coloroverlay.ColorOverlay()
+			outlineColorObj.randomRange = (5.0,30.0)
 
+			n+=1
 
-	B = [(item[0] - b ,item[1] ) for item in A]
+			## Archimedean spiral is  r = a + b * theta
+			turns = config.numUnits + 1
+			b = config.blockLength
 
-	n = 1
-	for i in range(0, turns):
-		try :
+			A = []
+			B = []
+			rangeChange = (config.polyDistortionMin,config.polyDistortionMax)
 
-			#LEFT
-			poly = (B[n+1], A[n+1], A[n+0], B[n+0])
-			draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
+			for i in range(1,turns):
+				x = i * b + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
+				y = i * b + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
+				A.append((x,y))
 
-			#BOTTOM
-			poly = (B[n+0], A[n-1], B[n+3], A[n+4])
-			draw.polygon(poly, fill=colorutils.randomColor())
+				x = -i * b + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
+				y = i * b + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
+				A.append((x,y))
 
-			#RIGHT
-			poly = (B[n+2], A[n+2], A[n+3], B[n+3])
-			draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
+				x = -i * b + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
+				y = -i * b + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
+				A.append((x,y))
 
-			#TOP
-			poly = (B[n+1], A[n+5], B[n+6], A[n+2])
-			draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
-
-			n += 4
-		except Exception as e :
-			print(e)
+				x = (i + 1) * b + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
+				y = -i * b + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
+				A.append((x,y))
 
 
-	'''
-	for i in range(0, len(A) -1):
-		draw.line((A[i],A[i+1]), fill=(230,10,0))
+			B = [(item[0] - b ,item[1] ) for item in A]
 
+			obj = unit(config)
+			obj.fillColorMode = "red"
+			obj.changeColor = False
+			obj.outlineColorObj	= outlineColorObj
+			obj.poly = (A[2], B[3], A[0], A[1])
 
-	for i in range(0, len(B) -1):
-		draw.line((B[i],B[i+1]), fill=(0,0,230))
-	'''
+			obj.minSaturation = .8
+			obj.maxSaturation = 1
+			obj.minValue = .5
+			obj.maxValue = .8
+			obj.minHue = 350
+			obj.maxHue = 10
+
+			obj.setUp(n)
+			config.unitArrray.append(obj)
+
+			n = 1
+			for i in range(0, turns):
+				try :
+					#LEFT
+					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
+					obj = unit(config)
+					obj.poly = (B[n+1], A[n+1], A[n+0], B[n+0])
+					obj.fillColorMode = "red"
+					obj.changeColor = False
+					obj.outlineColorObj	= outlineColorObj
+
+					obj.minSaturation = .5
+					obj.maxSaturation = 1
+					obj.minValue = .1
+					obj.maxValue = .5
+					obj.minHue = 0
+					obj.maxHue = 360
+
+					obj.setUp(n)
+					config.unitArrray.append(obj)
+
+					#BOTTOM
+					obj = unit(config)
+					obj.poly = (B[n+0], A[n-1], B[n+3], A[n+4])
+					obj.fillColorMode = "red"
+					obj.changeColor = False
+					obj.outlineColorObj	= outlineColorObj
+
+					obj.minSaturation = .7
+					obj.maxSaturation = .9
+					obj.minValue = .5
+					obj.maxValue = 1
+					obj.minHue = 0
+					obj.maxHue = 360
+
+					obj.setUp(n)
+					config.unitArrray.append(obj)
+					#draw.polygon(poly, fill=colorutils.randomColor())
+
+					#RIGHT
+					obj = unit(config)
+					obj.poly = (B[n+2], A[n+2], A[n+3], B[n+3])
+					obj.fillColorMode = "red"
+					obj.changeColor = False
+					obj.outlineColorObj	= outlineColorObj
+
+					obj.minSaturation = .7
+					obj.maxSaturation = .9
+					obj.minValue = .5
+					obj.maxValue = .9
+					obj.minHue = config.redRange[0]
+					obj.maxHue = config.redRange[1]
+
+					obj.setUp(n)
+					config.unitArrray.append(obj)
+					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
+
+					#TOP
+					obj = unit(config)
+					obj.poly = (B[n+1], A[n+5], B[n+6], A[n+2])
+					obj.fillColorMode = "red"
+					obj.changeColor = False
+					obj.outlineColorObj	= outlineColorObj
+
+					obj.minSaturation = .8
+					obj.maxSaturation = 1
+					obj.minValue = .05
+					obj.maxValue = .4
+					obj.minHue = config.redRange[0]
+					obj.maxHue = config.redRange[1]
+
+					obj.setUp(n)
+					config.unitArrray.append(obj)
+					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
+
+					n += 4
+				except Exception as e :
+					#print(e)
+					pass
 
 
 def createPieces() :
@@ -417,15 +512,15 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	drawSqareSpiral()
-
 	for i in range(0,len(config.unitArrray)):
 		obj = config.unitArrray[i]
 		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 		obj.update()
-		obj.render()
+		obj.renderPolys()
 
 	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	tDraw = ImageDraw.Draw(temp) 
+	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = (200,0,0,200))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)

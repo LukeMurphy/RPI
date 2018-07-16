@@ -41,7 +41,7 @@ class unit :
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.tLimitBase = self.config.tLimitBase
 
-		self.score = 0 if random.random() > .1 else 1
+		self.score = 0 if random.random() > .5 else 1
 
 		if self.useFixedPalette == True :
 
@@ -196,7 +196,6 @@ def redrawGrid1():
 
 def redrawGrid2():
 
-	
 	for u in config.unitArray:
 		u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 		u.drawUnit()

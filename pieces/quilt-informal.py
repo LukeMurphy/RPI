@@ -204,8 +204,9 @@ def main(run = True) :
 	config.lines  = (workConfig.getboolean("quilt", 'lines'))
 	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
 
-	config.polyDistortionMin = int(workConfig.get("quilt", 'polyDistortionMin')) 
-	config.polyDistortionMax = int(workConfig.get("quilt", 'polyDistortionMax')) 
+	config.polyDistortion = float(workConfig.get("quilt", 'polyDistortion')) 
+	config.polyDistortionMin = -config.polyDistortion
+	config.polyDistortionMax = config.polyDistortion
 	
 	# for now, all squares 
 	#config.blockLength = config.blockSize
@@ -217,6 +218,14 @@ def main(run = True) :
 	drawSqareSpiral()
 
 	if(run) : runWork()
+
+def restartPiece():
+
+	config.polyDistortionMin = -random.uniform(0, config.polyDistortion)
+	config.polyDistortionMax = random.uniform(0, config.polyDistortion)
+
+	drawSqareSpiral()
+
 
 
 def drawSqareSpiral():
@@ -369,8 +378,8 @@ def drawSqareSpiral():
 					pass
 
 
-	#config.tmr = Timer(60, drawSqareSpiral)
-	#config.tmr.start()
+	config.tmr = Timer(20, restartPiece)
+	config.tmr.start()
 
 
 

@@ -2,7 +2,8 @@ import time
 import random
 import textwrap
 import math
-from functools import reduce
+
+from threading import Timer
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
@@ -187,10 +188,11 @@ def main(run = True) :
 	config.redRange = tuple([int(i) for i in redRange])
 
 	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
-	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
+	config.hGapSize = int(workConfig.get("quilt", 'hGapSize')) 
+	config.vGapSize = int(workConfig.get("quilt", 'vGapSize')) 
 	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
-	config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
-	config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
+	config.blockLength = float(workConfig.get("quilt", 'blockLength')) 
+	config.blockHeight = float(workConfig.get("quilt", 'blockHeight')) 
 	config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
 	config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
 	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
@@ -204,9 +206,10 @@ def main(run = True) :
 
 	config.polyDistortionMin = int(workConfig.get("quilt", 'polyDistortionMin')) 
 	config.polyDistortionMax = int(workConfig.get("quilt", 'polyDistortionMax')) 
+	
 	# for now, all squares 
-	config.blockLength = config.blockSize
-	config.blockHeight = config.blockSize
+	#config.blockLength = config.blockSize
+	#config.blockHeight = config.blockSize
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
@@ -231,9 +234,10 @@ def drawSqareSpiral():
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :
 
-			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength + config.gapSize
-			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]	
+			hDelta = config.numUnits * config.blockLength * 2 + config.hGapSize
+			vDelta = config.numUnits * config.blockHeight * 2 + config.vGapSize
 
+			cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]	
 			outlineColorObj = coloroverlay.ColorOverlay()
 			outlineColorObj.randomRange = (5.0,30.0)
 
@@ -241,31 +245,32 @@ def drawSqareSpiral():
 
 			## Archimedean spiral is  r = a + b * theta
 			turns = config.numUnits + 1
-			b = config.blockLength
+			b1 = config.blockLength
+			b2 = config.blockHeight
 
 			A = []
 			B = []
 			rangeChange = (config.polyDistortionMin,config.polyDistortionMax)
 
 			for i in range(1,turns):
-				x = i * b + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
-				y = i * b + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
+				x = i * b1 + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
+				y = i * b2 + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
 				A.append((x,y))
 
-				x = -i * b + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
-				y = i * b + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
+				x = -i * b1 + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
+				y = i * b2 + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
 				A.append((x,y))
 
-				x = -i * b + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
-				y = -i * b + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
+				x = -i * b1 + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
+				y = -i * b2 + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
 				A.append((x,y))
 
-				x = (i + 1) * b + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
-				y = -i * b + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
+				x = (i + 1) * b1 + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
+				y = -i * b2 + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
 				A.append((x,y))
 
 
-			B = [(item[0] - b ,item[1] ) for item in A]
+			B = [(item[0] - b1 ,item[1] ) for item in A]
 
 			obj = unit(config)
 			obj.fillColorMode = "red"
@@ -364,140 +369,9 @@ def drawSqareSpiral():
 					pass
 
 
-def createPieces() :
-	global config
-	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+	#config.tmr = Timer(60, drawSqareSpiral)
+	#config.tmr.start()
 
-	config.unitArrray = []
-
-	
-	## Jinky odds/evens alignment setup
-	sizeAdjustor = 0
-	## Alignment perfect setup
-	if(config.patternPrecision == True): sizeAdjustor = 1
-
-	n = 0
-
-	for rows in range (0,config.blockRows) :
-		for cols in range (0,config.blockCols) :
-			delta = config.numUnits * config.blockHeight * 2 +  config.blockLength + config.gapSize
-			cntr = [rows * delta + cntrOffset[0], cols * delta + cntrOffset[1]]	
-
-			outlineColorObj = coloroverlay.ColorOverlay()
-			outlineColorObj.randomRange = (5.0,30.0)
-
-			obj = unit(config)
-			obj.xPos = cntr[0]
-			obj.yPos = cntr[1]
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.fillColorMode = "red"
-			obj.changeColor = False
-			obj.outlineColorObj	= outlineColorObj
-
-			obj.minSaturation = .8
-			obj.maxSaturation = 1
-			obj.minValue = .5
-			obj.maxValue = .8
-			obj.minHue = 350
-			obj.maxHue = 10
-
-			obj.setUp(n)
-			config.unitArrray.append(obj)
-
-			n+=1
-
-			# RIGHT (or TOP when viewed horizontally -- light reds)
-			for i in range(0,config.numUnits):
-				obj = unit(config)
-				obj.xPos = cntr[0] - (i) * config.blockLength
-				obj.yPos = cntr[1] - (i + 1) * config.blockLength
-				obj.blockLength = config.blockLength * (i + 1) * 2 - sizeAdjustor
-				obj.blockHeight = config.blockHeight - 1
-				obj.fillColorMode = "red"
-				obj.changeColor = True
-				obj.outlineColorObj	= outlineColorObj
-				obj.brightness =  config.brightness
-
-				obj.minSaturation = .7
-				obj.maxSaturation = .9
-				obj.minValue = .5
-				obj.maxValue = .9
-				obj.minHue = config.redRange[0]
-				obj.maxHue = config.redRange[1]
-
-				obj.setUp(n)
-				config.unitArrray.append(obj)
-
-			# BOTTOM (or RIGHT when viewed horizontally - bright colors)
-			for i in range(0,config.numUnits):
-				obj = unit(config)
-				obj.xPos = cntr[0] + config.blockLength * (i + 1)
-				obj.yPos = cntr[1] - (i ) * config.blockLength
-				obj.blockLength = config.blockLength - sizeAdjustor
-				obj.blockHeight = config.blockHeight * (i + 1) * 2 - sizeAdjustor
-				obj.fillColorMode = "random"
-				obj.changeColor = True
-				obj.outlineColorObj	= outlineColorObj
-				obj.timeTrigger = True
-				obj.tLimitBase = 10
-				obj.brightness =  config.brightness
-
-				obj.minSaturation = .7
-				obj.maxSaturation = .9
-				obj.minValue = .5
-				obj.maxValue = 1
-				obj.minHue = 0
-				obj.maxHue = 360
-
-				obj.setUp(n)
-				config.unitArrray.append(obj)
-
-			# LEFT (or BOTTOM when viewed horizontally -- darker colors)
-			for i in range(0,config.numUnits):
-				obj = unit(config)
-				obj.xPos = cntr[0] - config.blockLength * (i + 1 ) 
-				obj.yPos = cntr[1] + (i + 1) * config.blockLength
-				obj.blockLength = config.blockLength * (i + 1) * 2 - sizeAdjustor
-				obj.blockHeight = config.blockHeight - sizeAdjustor
-				obj.fillColorMode = "random"
-				obj.changeColor = True
-				obj.outlineColorObj	= outlineColorObj
-				obj.timeTrigger = True
-				obj.tLimitBase = 10
-				obj.brightness =  config.brightness
-
-				obj.minSaturation = .5
-				obj.maxSaturation = 1
-				obj.minValue = .1
-				obj.maxValue = .5
-				obj.minHue = 0
-				obj.maxHue = 360
-
-				obj.setUp(n)
-				config.unitArrray.append(obj)
-
-			# TOP (or LEFT when viewed horizontally -- darker reds)
-			for i in range(0,config.numUnits):
-				obj = unit(config)
-				obj.xPos = cntr[0] - config.blockLength * (i + 1)
-				obj.yPos = cntr[1] - (i + 1) * config.blockLength 
-				obj.blockLength = config.blockLength - sizeAdjustor
-				obj.blockHeight = config.blockHeight * (i + 1) * 2 - sizeAdjustor
-				obj.fillColorMode = "red"
-				obj.changeColor = True
-				obj.outlineColorObj	= outlineColorObj
-				obj.brightness =  config.brightness
-
-				obj.minSaturation = .8
-				obj.maxSaturation = 1
-				obj.minValue = .05
-				obj.maxValue = .4
-				obj.minHue = config.redRange[0]
-				obj.maxHue = config.redRange[1]
-
-				obj.setUp(n)
-				config.unitArrray.append(obj)
 
 
 def runWork():
@@ -520,11 +394,12 @@ def iterate() :
 
 	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	tDraw = ImageDraw.Draw(temp) 
-	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = (200,0,0,200))
+	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = (100,50,0))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
 	config.render(temp, 0,0)
+
 		
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

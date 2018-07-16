@@ -401,7 +401,7 @@ def createPieces() :
 	global config
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArrray = []
+	config.unitArray = []
 
 	## Jinky odds/evens alignment setup
 	sizeAdjustor = 0
@@ -475,7 +475,7 @@ def createPieces() :
 					
 
 					obj.setUp(n)
-					config.unitArrray.append(obj)
+					config.unitArray.append(obj)
 
 			n+=1
 
@@ -492,9 +492,9 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArrray)):
+	for i in range(0,len(config.unitArray)):
 
-		obj = config.unitArrray[i]
+		obj = config.unitArray[i]
 
 		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 

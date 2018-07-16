@@ -80,7 +80,7 @@ def main(run = True) :
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	config.unitArrray = []
+	config.unitArray = []
 	config.xPositions = [48,144]
 	config.yPositions = [80,80]
 
@@ -103,7 +103,7 @@ def main(run = True) :
 		obj.objWidth = config.containerWidth
 		obj.xPos = config.xPositions[i]
 		obj.yPos = config.yPositions[i]
-		config.unitArrray.append(obj)
+		config.unitArray.append(obj)
 
 
 	for i in range(0,config.numUnits):
@@ -115,7 +115,7 @@ def main(run = True) :
 		obj.objWidth = config.objWidth
 		obj.xPos = config.xPositions[i]
 		obj.yPos = config.yPositions[i]
-		config.unitArrray.append(obj)
+		config.unitArray.append(obj)
 
 	setUp()
 
@@ -153,9 +153,9 @@ def iterate() :
 
 	config.fills = [config.colorA,config.colorB,config.colorA,config.colorB]
 
-	l = len(config.unitArrray)
+	l = len(config.unitArray)
 	for i in range(0,l):
-		obj = config.unitArrray[i]
+		obj = config.unitArray[i]
 
 		obj.fillColor = config.fills[i]
 		altFillIndex = 0 if i == 1 else 1

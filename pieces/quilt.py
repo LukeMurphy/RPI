@@ -204,7 +204,7 @@ def createPieces() :
 	global config
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArrray = []
+	config.unitArray = []
 
 	
 	## Jinky odds/evens alignment setup
@@ -239,7 +239,7 @@ def createPieces() :
 			obj.maxHue = 10
 
 			obj.setUp(n)
-			config.unitArrray.append(obj)
+			config.unitArray.append(obj)
 
 			n+=1
 
@@ -263,7 +263,7 @@ def createPieces() :
 				obj.maxHue = config.redRange[1]
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 			# BOTTOM (or RIGHT when viewed horizontally - bright colors)
 			for i in range(0,config.numUnits):
@@ -287,7 +287,7 @@ def createPieces() :
 				obj.maxHue = 360
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 			# LEFT (or BOTTOM when viewed horizontally -- darker colors)
 			for i in range(0,config.numUnits):
@@ -311,7 +311,7 @@ def createPieces() :
 				obj.maxHue = 360
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 			# TOP (or LEFT when viewed horizontally -- darker reds)
 			for i in range(0,config.numUnits):
@@ -333,7 +333,7 @@ def createPieces() :
 				obj.maxHue = config.redRange[1]
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 
 def runWork():
@@ -348,8 +348,8 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArrray)):
-		obj = config.unitArrray[i]
+	for i in range(0,len(config.unitArray)):
+		obj = config.unitArray[i]
 		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 		obj.update()
 		obj.render()

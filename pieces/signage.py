@@ -119,7 +119,7 @@ def makeGrid():
 				u.setUp()
 
 			u.drawUnit()
-			config.unitArrray.append(u)
+			config.unitArray.append(u)
 			unitNumber +=1
 
 
@@ -136,7 +136,7 @@ def redrawGrid():
 		config.unHideGrid = False
 	'''
 	
-	for u in config.unitArrray:
+	for u in config.unitArray:
 
 		if(random.random() < config.unhideRate):
 			u.unHideGrid = True
@@ -390,7 +390,7 @@ def main(run = True) :
 	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
 
-	config.unitArrray = []
+	config.unitArray = []
 
 	try:
 		config.randomRotation = workConfig.getboolean("signage","randomRotation")

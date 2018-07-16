@@ -292,7 +292,7 @@ def main(run = True) :
 
 
 
-	config.unitArrray = []
+	config.unitArray = []
 	config.fillColorSet = []
 	config.fillColorSet.append ([config.c1HueRange, config.c1SaturationRange, config.c1ValueRange])
 	config.fillColorSet.append ([config.c2HueRange, config.c2SaturationRange, config.c2ValueRange])
@@ -309,7 +309,7 @@ def createPieces() :
 	global config
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArrray = []
+	config.unitArray = []
 	outlineColorObj = coloroverlay.ColorOverlay()
 	outlineColorObj.randomRange = (5.0,30.0)
 
@@ -394,7 +394,7 @@ def createPieces() :
 						obj.fillColors.append(config.fillColorSet[i])
 
 					obj.setUp()
-					config.unitArrray.append(obj)
+					config.unitArray.append(obj)
 					n+=1
 			
 
@@ -414,9 +414,9 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArrray)):
+	for i in range(0,len(config.unitArray)):
 
-		obj = config.unitArrray[i]
+		obj = config.unitArray[i]
 
 		#if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 

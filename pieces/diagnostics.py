@@ -111,7 +111,7 @@ def displayTest():
 
 	
 	for i in range(0,config.numUnits):
-		obj = 	config.unitArrray[i]
+		obj = 	config.unitArray[i]
 		if(obj.move ==True) : obj.update()
 		obj.render()
 	
@@ -260,14 +260,14 @@ def main(run = True) :
 	
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	config.unitArrray = []
+	config.unitArray = []
 	for i in range(0,config.numUnits):
 		obj = unit(config)
 		#obj.move = False
 		obj.objWidth = 5
 		obj.objWidthMax = 4
 		obj.objWidthMin = 3
-		config.unitArrray.append(obj)
+		config.unitArray.append(obj)
 
 	setUp()
 

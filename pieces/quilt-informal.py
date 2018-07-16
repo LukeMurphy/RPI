@@ -214,6 +214,9 @@ def main(run = True) :
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
+
+	config.timeToComplete = 60 #round(random.uniform(30,220))
+
 	#createPieces()
 	drawSqareSpiral()
 
@@ -224,6 +227,8 @@ def restartPiece():
 	config.polyDistortionMin = -random.uniform(0, config.polyDistortion)
 	config.polyDistortionMax = random.uniform(0, config.polyDistortion)
 
+	del config.unitArray[:]
+
 	drawSqareSpiral()
 
 
@@ -231,9 +236,14 @@ def restartPiece():
 def drawSqareSpiral():
 
 	global config
+
+	config.t1  = time.time()
+	config.t2  = time.time()
+	
+
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArrray = []
+	config.unitArray = []
 
 	## Alignment perfect setup
 	if(config.patternPrecision == True): sizeAdjustor = 1
@@ -295,7 +305,7 @@ def drawSqareSpiral():
 			obj.maxHue = 10
 
 			obj.setUp(n)
-			config.unitArrray.append(obj)
+			config.unitArray.append(obj)
 
 			n = 1
 			for i in range(0, turns):
@@ -316,7 +326,7 @@ def drawSqareSpiral():
 					obj.maxHue = 360
 
 					obj.setUp(n)
-					config.unitArrray.append(obj)
+					config.unitArray.append(obj)
 
 					#BOTTOM
 					obj = unit(config)
@@ -333,7 +343,7 @@ def drawSqareSpiral():
 					obj.maxHue = 360
 
 					obj.setUp(n)
-					config.unitArrray.append(obj)
+					config.unitArray.append(obj)
 					#draw.polygon(poly, fill=colorutils.randomColor())
 
 					#RIGHT
@@ -351,7 +361,7 @@ def drawSqareSpiral():
 					obj.maxHue = config.redRange[1]
 
 					obj.setUp(n)
-					config.unitArrray.append(obj)
+					config.unitArray.append(obj)
 					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
 
 					#TOP
@@ -369,17 +379,13 @@ def drawSqareSpiral():
 					obj.maxHue = config.redRange[1]
 
 					obj.setUp(n)
-					config.unitArrray.append(obj)
+					config.unitArray.append(obj)
 					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
 
 					n += 4
 				except Exception as e :
 					#print(e)
 					pass
-
-
-	config.tmr = Timer(20, restartPiece)
-	config.tmr.start()
 
 
 
@@ -395,8 +401,8 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArrray)):
-		obj = config.unitArrray[i]
+	for i in range(0,len(config.unitArray)):
+		obj = config.unitArray[i]
 		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 		obj.update()
 		obj.renderPolys()
@@ -408,6 +414,12 @@ def iterate() :
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
 	config.render(temp, 0,0)
+
+	config.t2  = time.time()
+	delta = config.t2  - config.t1
+
+	if delta > config.timeToComplete :
+		restartPiece()
 
 		
 

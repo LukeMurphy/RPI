@@ -224,8 +224,8 @@ def main(run = True) :
 
 def restartPiece():
 
-	config.polyDistortionMin = -random.uniform(0, config.polyDistortion)
-	config.polyDistortionMax = random.uniform(0, config.polyDistortion)
+	config.polyDistortionMin = -random.uniform(0, config.polyDistortion + 1)
+	config.polyDistortionMax = random.uniform(0, config.polyDistortion + 1)
 
 	del config.unitArray[:]
 

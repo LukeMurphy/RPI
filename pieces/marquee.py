@@ -153,20 +153,12 @@ def redraw():
 		clrA = colOverlayA.currentColor
 		clrB = colOverlayB.currentColor
 
-		#clrA = [255,0,0]
-		#clrB = [0,0,0]
 
 		count = 0
 
 		perim = perimeter
-		if(mcount%2 > 0 and random.random() > .002) : perim = reversed(perimeter)
+		if(mcount%2 > 0 ) : perim = reversed(perimeter)
 
-		#print(pattern)
-		'''
-		if(mcount == len(config.marquees)-1) :
-			clrA = [0,0,0]
-			clrB = [20,20,20]
-		'''
 
 		for p in (perim ):
 			if(pattern[count] == 1) :
@@ -184,14 +176,7 @@ def redraw():
 		colOverlayA.stepTransition()
 		colOverlayB.stepTransition()
 
-	'''
-	cord = 0
-	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)	
-	cord = 9
-	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)	
-	cord = 18
-	config.draw.rectangle((cord,cord,cord,cord), fill=(200,200,200), outline=None)
-	'''
+
 
 def changeColor() :
 	pass
@@ -215,13 +200,9 @@ def runWork():
 def iterate() :
 	global config
 	redraw()
-
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
-	if(config.done == True) :
-		#init()
-		#time.sleep(config.redrawSpeed)
-		pass
+
 
 def main(run = True) :
 	global config

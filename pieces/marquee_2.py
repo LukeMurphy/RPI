@@ -31,12 +31,13 @@ class Marquee :
 		pass
 
 	## Creates a series of little boxes -- not efficient but useful if you wanted to make some kind of chasing
-	## gradient marquee
+	## gradient marquee and better to get animation travel speed down as slow as possible
+
 	def makeMarquee(self):
-		#mw=0
+
 		o = 0
 		self.perimeter = []
-		self.stepSize = round(self.marqueeWidth/5)
+		self.stepSize = round(self.marqueeWidth/self.step)
 		if self.stepSize == 0 : self.stepSize = 1
 		self.stepSize = 1
 
@@ -56,35 +57,6 @@ class Marquee :
 		for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth, 
 			self.stepSize) : self.perimeter.append([i, self.p0[1], self.stepSize, self.marqueeWidth])
 
-
-	
-	def makeMarqueeBlocks(self):
-		#mw=0
-		o = 0
-		self.perimeter = []
-		self.stepSize = round(self.marqueeWidth/5)
-		if self.stepSize == 0 : self.stepSize = 1
-
-		# Right
-		for i in range (self.p0[1] + 0, self.p0[1] + self.innerHeight + o, self.stepSize) : 
-			self.perimeter.append([self.p0[0] + self.innerWidth, i])
-
-		# Bottom
-		for i in range (self.p0[0] + self.innerWidth , self.p0[0] - o, -self.stepSize) : 
-			self.perimeter.append([i, self.p0[1] + self.innerHeight])
-
-		# Left
-		for i in range (self.p0[1] + self.innerHeight , self.p0[1] - o, -self.stepSize) : 
-			self.perimeter.append([self.p0[0], i])
-
-		# Top
-		distance = self.innerWidth
-		numberOfBlocks = 10
-		blockWidth = distance/numberOfBlocks
-		#for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth + round(self.step/2), 
-		#	self.stepSize) : self.perimeter.append([i, self.p0[1]])
-		for i in range (0,numberOfBlocks*2, 
-			1) : self.perimeter.append([i*blockWidth/2, self.p0[1]])
 
 	def advance(self):
 		l = len(self.pattern)

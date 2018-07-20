@@ -46,6 +46,9 @@ class Marquee :
 		for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth + round(self.step/2), self.step) : 
 			self.perimeter.append([i, self.p0[1]])
 
+		print (self.perimeter)
+		print( "**")
+
 
 	def advance(self):
 		l = len(self.pattern)

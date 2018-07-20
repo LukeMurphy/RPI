@@ -38,7 +38,7 @@ class Marquee :
 		self.perimeter = []
 		self.stepSize = round(self.marqueeWidth/5)
 		if self.stepSize == 0 : self.stepSize = 1
-		#self.stepSize = 1
+		self.stepSize = 1
 
 		# Right
 		for i in range (self.p0[1], self.p0[1] + self.innerHeight + o + self.marqueeWidth, self.stepSize) : 
@@ -133,17 +133,16 @@ def init() :
 	## building block for the two-color dash
 
 	#pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-	
-	pattern = []
-	pattern.extend((1 for i in range(0,config.baseDashSize)))
-	pattern.extend((0 for i in range(0,config.baseDashSize)))
-
 	#if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	#pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
 	#pattern = [1,1,1,0,0,0]
 	#pattern = [1,0,1,0,0,1,0,0,1,0,1]
 	
+
+	pattern = []
+	pattern.extend((1 for i in range(0,config.baseDashSize)))
+	pattern.extend((0 for i in range(0,config.baseDashSize)))
+
 	p0 = [0,0]
 	marqueeWidth = config.marqueeWidth
 	innerWidth = config.screenWidth - marqueeWidth

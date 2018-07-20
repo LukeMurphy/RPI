@@ -51,7 +51,7 @@ class Marquee :
 
 		self.marqueeBlockLength = round(w/self.marqueeBlockCount)
 
-		self.speed = 1.0
+		self.speed = .3
 
 		#self.marqueeBlockCount = round(self.innerWidth / self.marqueeWidth)
 	
@@ -130,14 +130,7 @@ def init() :
 	config.bgColor.randomRange = (10.0,config.randomRange/2)
 	config.marquees = []
 
-	pattern = [1,1,1,0,0,0]
-	pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
-	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	
-	if(config.step > 2) : 
-		pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-	marqueeWidth = config.marqueeWidth
+	marqueeWidth = config.marqueeWidth 
 	mwPrev = marqueeWidth
 	innerWidth = config.screenWidth - marqueeWidth
 	innerHeight = config.screenHeight - marqueeWidth
@@ -173,7 +166,6 @@ def init() :
 		marquee.marqueeBlockCount = 10 - i
 		marquee.step = config.step
 		marquee.clrs = clrs
-		marquee.pattern = pattern
 		if i%2 > 0 : marquee.direction = -1
 		marquee.setUp()
 
@@ -196,9 +188,6 @@ def init() :
 			innerWidth -=1
 			innerHeight -=1
 
-		if(len(pattern) >= 4) :
-			pattern = pattern[1:]
-			pattern = pattern[0:len(pattern)-1]
 
 
 
@@ -264,17 +253,17 @@ def redraw():
 			p.position[1] += p.velocity[1]
 
 
-			if p.position[1] > m.innerHeight + m.marqueeWidth: 
-				p.position[1] = p.initPosition[1]
+			if p.position[1] > m.innerHeight + p.blockHeight :
+				p.position[1] = p.initPosition[1] - m.marqueeWidth
 
-			if p.position[1] < p.initPosition[1] :
+			if p.position[1] < p.initPosition[1] - p.blockHeight:
 				p.position[1] = m.innerHeight
 
-			if p.position[0] > m.innerWidth + m.marqueeWidth:
-				p.position[0] = p.initPosition[0]
+			if p.position[0] > m.innerWidth + p.blockWidth:
+				p.position[0] = p.initPosition[0] - m.marqueeWidth
 
-			if p.position[0] < p.initPosition[0] :
-				p.position[0] = m.innerWidth
+			if p.position[0] < p.initPosition[0]  :
+				p.position[0] = m.innerWidth #- p.blockWidth
 
 		p.clr.stepTransition()
 

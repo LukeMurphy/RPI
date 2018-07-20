@@ -30,28 +30,65 @@ class Marquee :
 	def setUp(self):
 		pass
 
+	## Creates a series of little boxes -- not efficient but useful if you wanted to make some kind of chasing
+	## gradient marquee
 	def makeMarquee(self):
 		#mw=0
 		o = 0
 		self.perimeter = []
-		for i in range (self.p0[1] + 0, self.p0[1] + self.innerHeight + o, self.step) : 
+		self.stepSize = round(self.marqueeWidth/5)
+		if self.stepSize == 0 : self.stepSize = 1
+		#self.stepSize = 1
+
+		# Right
+		for i in range (self.p0[1], self.p0[1] + self.innerHeight + o + self.marqueeWidth, self.stepSize) : 
+			self.perimeter.append([self.p0[0] + self.innerWidth, i, self.marqueeWidth, self.stepSize])
+
+		# Bottom
+		for i in range (self.p0[0] + self.innerWidth - 1, self.p0[0] - 1, -self.stepSize) : 
+			self.perimeter.append([i, self.p0[1] + self.innerHeight, self.stepSize, self.marqueeWidth])
+
+		# Left
+		for i in range (self.p0[1] + self.innerHeight + self.marqueeWidth - 2, self.p0[1] - o, -self.stepSize) : 
+			self.perimeter.append([self.p0[0], i, self.marqueeWidth, self.stepSize])
+
+		# Top
+		for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth, 
+			self.stepSize) : self.perimeter.append([i, self.p0[1], self.stepSize, self.marqueeWidth])
+
+
+	
+	def makeMarqueeBlocks(self):
+		#mw=0
+		o = 0
+		self.perimeter = []
+		self.stepSize = round(self.marqueeWidth/5)
+		if self.stepSize == 0 : self.stepSize = 1
+
+		# Right
+		for i in range (self.p0[1] + 0, self.p0[1] + self.innerHeight + o, self.stepSize) : 
 			self.perimeter.append([self.p0[0] + self.innerWidth, i])
 
-		for i in range (self.p0[0] + self.innerWidth , self.p0[0] - o, -self.step) : 
+		# Bottom
+		for i in range (self.p0[0] + self.innerWidth , self.p0[0] - o, -self.stepSize) : 
 			self.perimeter.append([i, self.p0[1] + self.innerHeight])
 
-		for i in range (self.p0[1] + self.innerHeight , self.p0[1] - o, -self.step) : 
+		# Left
+		for i in range (self.p0[1] + self.innerHeight , self.p0[1] - o, -self.stepSize) : 
 			self.perimeter.append([self.p0[0], i])
 
-		for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth + round(self.step/2), self.step) : 
-			self.perimeter.append([i, self.p0[1]])
-
-		print (self.perimeter)
-		print( "**")
-
+		# Top
+		distance = self.innerWidth
+		numberOfBlocks = 10
+		blockWidth = distance/numberOfBlocks
+		#for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth + round(self.step/2), 
+		#	self.stepSize) : self.perimeter.append([i, self.p0[1]])
+		for i in range (0,numberOfBlocks*2, 
+			1) : self.perimeter.append([i*blockWidth/2, self.p0[1]])
 
 	def advance(self):
 		l = len(self.pattern)
+
 
 		patternA = self.pattern[0 : (l - self.offset)]
 		patternB = self.pattern[(l - self.offset): l ]
@@ -65,17 +102,19 @@ class Marquee :
 
 		for p in (perim ):
 			if(pattern[count] == 1) :
-				self.configDraw.rectangle((p[0],p[1],p[0] + self.marqueeWidth - 1, p[1] + self.marqueeWidth - 1), 
+				self.configDraw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 
 					outline=None, fill=tuple(int(c) for c in self.colOverlayA.currentColor))
 			else:
-				self.configDraw.rectangle((p[0],p[1],p[0] + self.marqueeWidth - 1, p[1] + self.marqueeWidth - 1), 
+				self.configDraw.rectangle((p[0],p[1],p[0] + p[2], p[1] + p[3]), 
 					outline=None, fill=tuple(int(c) for c in self.colOverlayB.currentColor))
 			count += 1
 			if(count >= len(pattern)) :
 				count = 0
 
+
 		self.offset += 1
-		if(self.offset >= len(pattern)) : self.offset =  0 
+		if(self.offset >= len(pattern)) : 
+			self.offset =  0 
 
 		self.colOverlayA.stepTransition()
 		self.colOverlayB.stepTransition()
@@ -88,10 +127,22 @@ def init() :
 	config.bgColor = coloroverlay.ColorOverlay()
 	config.bgColor.randomRange = (10.0,config.randomRange/2)
 
-	pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-	if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+	## The pattern controls the dash size - each 1 or 0 represents the width of one small
+	## building block for the two-color dash
+
+	#pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+	
+	pattern = []
+	pattern.extend((1 for i in range(0,config.baseDashSize)))
+	pattern.extend((0 for i in range(0,config.baseDashSize)))
+
+	#if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	#pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
 	#pattern = [1,1,1,0,0,0]
+	#pattern = [1,0,1,0,0,1,0,0,1,0,1]
 	
 	p0 = [0,0]
 	marqueeWidth = config.marqueeWidth
@@ -142,8 +193,11 @@ def init() :
 		p0[1] += (marqueeWidth + config.gap) 
 		marqueeWidthPrev = marqueeWidth
 
-		innerWidth = innerWidth - 2 * (marqueeWidth ) - config.gap + decrement
-		innerHeight = innerHeight - 2 * (marqueeWidth ) - config.gap + decrement
+		# If this is 1 then offsets the gap...
+		eveningGap = 2
+
+		innerWidth = innerWidth - 2 * (marqueeWidth ) - config.gap * eveningGap + decrement
+		innerHeight = innerHeight - 2 * (marqueeWidth ) - config.gap * eveningGap + decrement
 
 		if (config.gap > 0) :
 			innerWidth -=decrement
@@ -191,6 +245,7 @@ def main(run = True) :
 	config.redrawSpeed  = float(workConfig.get("marquee", 'redrawSpeed')) 
 	config.randomRange  = float(workConfig.get("marquee", 'randomRange')) 
 	config.marqueeWidth = int(workConfig.get("marquee", 'marqueeWidth'))
+	config.baseDashSize = int(workConfig.get("marquee", 'baseDashSize'))
 	config.gap = int(workConfig.get("marquee", 'gap'))
 	config.step = int(workConfig.get("marquee", 'step'))
 	config.decrement = int(workConfig.get("marquee", 'decrement'))

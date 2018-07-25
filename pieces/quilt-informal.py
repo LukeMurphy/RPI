@@ -3,7 +3,6 @@ import random
 import textwrap
 import math
 
-from threading import Timer
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
@@ -34,6 +33,7 @@ class unit:
 		## Like the "stiching" color and affects the overall "tone" of the piece
 		self.outlineColor = config.outlineColorObj.currentColor
 		self.objWidth = 20
+		
 		self.outlineRange = [(20,20,250)]
 		self.brightness = 1
 		self.fillColorMode = "random"

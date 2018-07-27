@@ -4,207 +4,9 @@ import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
-
-class unit:
-
-	timeTrigger = True
-	tLimitBase = 30
-
-	maxBrightness = 1
-
-	minSaturation = 0.0
-	maxSaturation = 0.0
-
-	minValue = 0.0
-	maxValue = 0.0
-
-	minHue = 0.0
-	maxHue = 0.0
-
-	# Default is square made of 4 triangles
-	compositionNumber = 0
-	squareNumber = 0
-
-	darkeningFactor = 1.4
-
-	initialized = True
-
-	fillColors = []
-	triangles = []
-
-
-	
-	def __init__(self, config):
-		self.config = config
-		self.xPos = 0
-		self.yPos = 0
-		self.redraw = False
-
-		self.draw  = ImageDraw.Draw(config.canvasImage)
-
-		## Like the "stiching" color and affects the overall "tone" of the piece
-		self.outlineColor = config.outlineColorObj.currentColor
-		self.objWidth = 20
-
-		self.outlineRange = [(20,20,250)]
-		self.brightness = 1
-		self.fillColorMode = "random"
-		self.lineColorMode = "red"
-		self.changeColor = True
-		self.lines = config.lines
-
-		self.triangles = []
-		self.fillColors = []
-		## Each of the 8 triangles has a set of coordinates and a color
-		#self.triangles = [[[] for i in range(0,2)] for i in range(0,8)]
-		self.fillColors = []
-		self.triangles = [[[],coloroverlay.ColorOverlay(),[]] for i in range(0,8)]
-
-
-
-	def setUp(self, n = 0) :
-
-		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
-
-		#### Sets up color transitions
-
-		for i in range(0,8) :
-			colOverlay = self.triangles[i][1]
-
-			colOverlay.randomSteps = True
-			colOverlay.timeTrigger = True 
-			colOverlay.tLimitBase = 2
-			colOverlay.steps = 10
-					
-			colOverlay.maxBrightness = self.config.brightness
-			colOverlay.maxBrightness = self.fillColors[i][2][0]
-
-			colOverlay.minHue = self.fillColors[i][0][0]
-			colOverlay.maxHue = self.fillColors[i][0][1]
-			colOverlay.minSaturation = self.fillColors[i][1][0]
-			colOverlay.maxSaturation = self.fillColors[i][1][1]
-			colOverlay.minValue = self.fillColors[i][2][0]
-			colOverlay.maxValue = self.fillColors[i][2][1]
-
-
-			### This is the speed range of transitions in color
-			### Higher numbers means more possible steps so slower
-			### transitions - 1,10 very blinky, 10,200 very slow
-			colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
-
-			colOverlay.colorA = colorutils.getRandomColorHSV(
-				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
-				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
-				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
-				)
-
-			colOverlay.colorB = colorutils.getRandomColorHSV(
-				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
-				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
-				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
-				)
-			colOverlay.colorA = (50,50,50)
-			#self.colOverlay.colorB = (50,50,50)
-
-		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
-
-		self.setupSquares()
-
-
-	def setupSquares(self):
-		# Square's points made of corners and mid point
-		# 	0	1	2
-		#	3	4	5
-		#	6	7	8
-
-		## dividing into 8 smaller triangles
-		## p0,p1,p3
-
-		#	*
-		#	* *
-		#	
-
-		self.sqrPoints = []
-
-		self.sqrPoints.append( 	(self.xPos, self.yPos))
-		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos) )				
-		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos) )	
-
-		self.sqrPoints.append( 	(self.xPos, self.yPos + self.blockHeight/2) )
-		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos + self.blockHeight/2))
-		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos + self.blockHeight) )
-
-		self.sqrPoints.append( 	(self.xPos, self.yPos + self.blockHeight) )
-		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos + self.blockHeight))
-		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos + self.blockHeight) )
-
-
-		# "TOP"
-		self.triangles[0][0] = ((self.sqrPoints[0],self.sqrPoints[4],self.sqrPoints[3]))
-		self.triangles[1][0] = ((self.sqrPoints[0],self.sqrPoints[4],self.sqrPoints[1]))
-		self.triangles[2][0] = ((self.sqrPoints[1],self.sqrPoints[4],self.sqrPoints[2]))
-		self.triangles[3][0] = ((self.sqrPoints[2],self.sqrPoints[4],self.sqrPoints[5]))
-
-		self.triangles[4][0] = ((self.sqrPoints[3],self.sqrPoints[4],self.sqrPoints[6]))
-		self.triangles[5][0] = ((self.sqrPoints[6],self.sqrPoints[4],self.sqrPoints[7]))
-		self.triangles[6][0] = ((self.sqrPoints[7],self.sqrPoints[4],self.sqrPoints[8]))
-		self.triangles[7][0] = ((self.sqrPoints[8],self.sqrPoints[4],self.sqrPoints[5]))
-
-
-	def update(self):
-		for i in range(0,8) :
-			if(random.random() > config.colorPopProb) :
-				self.triangles[i][1].stepTransition()
-				self.triangles[i][2] = tuple(round (a * self.brightness ) for a in self.triangles[i][1].currentColor)
-			else :
-				self.changeColorFill(self.triangles[i])
-
-	def drawUnitTriangles(self):
-		if(self.lines == True) :
-			outline = self.outlineColor
-		else : outline = None
-		
-		for i in range (0,8) :
-			coords = self.triangles[i][0]
-			fillColor = self.triangles[i][2]
-			self.draw.polygon(coords, fill=fillColor, outline=outline)
-
-
-	
-
-	def render(self):
-
-		if (self.fillColorMode == "red") : 
-			brightnessFactor = self.config.brightnessFactorDark
-		else:
-			brightnessFactor = self.config.brightnessFactorLight
-
-		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
-
-		self.drawUnitTriangles()
-
-
-
-	## Straight color change - deprecated - too blinky
-	def changeColorFill(self, obj):
-
-		# obj[0] are coordinates
-		# obj[1] is the colorOverlay object
-		# obj[2] is the fill color
-
-		if(self.changeColor == True) :
-			if(self.fillColorMode == "random") :
-				obj[2] = colorutils.randomColor(random.uniform(.01,self.brightness))
-				self.outlineColor = colorutils.getRandomRGB(random.uniform(.01,self.brightness))
-			else:
-				newColor = colorutils.getRandomColorHSV(
-					hMin = obj[1].minHue, hMax  = obj[1].maxHue, 
-					sMin = obj[1].minSaturation, sMax = obj[1].maxSaturation,  
-					vMin = obj[1].minValue, vMax = obj[1].maxValue
-					)
-
-				obj[1].colorA = newColor
-
+from modules.quilting.colorset import ColorSet
+from modules.quilting import createtrianglepieces
+from modules.quilting import createstarpieces
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -235,6 +37,7 @@ def main(run = True) :
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
 
+	config.quiltPattern = (workConfig.get("quilt", 'pattern'))
 	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
 	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
 	config.resetTrianglesProd = float(workConfig.get("quilt", 'resetTrianglesProd'))
@@ -276,129 +79,43 @@ def main(run = True) :
 	config.c3SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3SaturationRange').split(",")])
 	config.c3ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3ValueRange').split(",")])
 	
-	config.c4HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4HueRange').split(",")])
-	config.c4SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4SaturationRange').split(",")])
-	config.c4ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4ValueRange').split(",")])
-	
-	config.c5HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5HueRange').split(",")])
-	config.c5SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5SaturationRange').split(",")])
-	config.c5ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5ValueRange').split(",")])
-
+	try :
+		config.c4HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4HueRange').split(",")])
+		config.c4SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4SaturationRange').split(",")])
+		config.c4ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4ValueRange').split(",")])
+		
+		config.c5HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5HueRange').split(",")])
+		config.c5SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5SaturationRange').split(",")])
+		config.c5ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5ValueRange').split(",")])
+	except Exception as e:
+		print (e)
+		
 	# for now, all squares 
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
-
-
 	config.unitArray = []
+
 	config.fillColorSet = []
-	config.fillColorSet.append ([config.c1HueRange, config.c1SaturationRange, config.c1ValueRange])
-	config.fillColorSet.append ([config.c2HueRange, config.c2SaturationRange, config.c2ValueRange])
-	config.fillColorSet.append ([config.c3HueRange, config.c3SaturationRange, config.c3ValueRange])
-	config.fillColorSet.append ([config.c4HueRange, config.c4SaturationRange, config.c4ValueRange])
-	config.fillColorSet.append ([config.c5HueRange, config.c5SaturationRange, config.c5ValueRange])
-	
-	createPieces()
+	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
+	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
+	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
+
+	try :
+		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
+		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
+	except Exception as e:
+		print (e)
+
+	if config.quiltPattern == "triangles" :
+		createtrianglepieces.createPieces(config)
+	elif config.quiltPattern == "stars" :
+		createstarpieces.createPieces(config)
 
 	if(run) : runWork()
 
-
-def createPieces() :
-	global config
-	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-
-	config.unitArray = []
-	outlineColorObj = coloroverlay.ColorOverlay()
-	outlineColorObj.randomRange = (5.0,30.0)
-
-	## Jinky odds/evens alignment setup
-	sizeAdjustor = 0
-	## Alignment perfect setup
-	if(config.patternPrecision == True): sizeAdjustor = 1
-
-	
-	cntr = [0,0]
-
-	pattern = [
-	[0,0,0,0,0,0,0,0],
-	[1,0,0,0,1,1,1,0],
-	[0,0,0,1,0,1,1,1],
-	[0,0,0,0,0,0,0,0],
-	[0,1,1,1,0,0,0,1],
-	[1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1],
-	[1,1,1,0,1,0,0,0],
-	[0,0,0,1,0,1,1,1],
-	[1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1],
-	[1,0,0,0,1,1,1,0],
-	[0,0,0,0,0,0,0,0],
-	[1,1,1,0,1,0,0,0],
-	[0,1,1,1,0,0,0,1],
-	[0,0,0,0,0,0,0,0]
-	]
-
-	pattern = [
-	[0,0,0,0,0,0,0,0],
-	[1,0,0,0,1,1,1,0],
-	[0,0,0,1,0,1,1,1],
-	[0,0,0,0,0,0,0,0],
-
-	[0,1,1,1,0,0,0,1],
-	[1,1,1,2,1,2,2,2],
-	[2,1,1,1,2,2,2,1],
-	[1,1,1,0,1,0,0,0],
-
-	[0,0,0,1,0,1,1,1],
-	[1,2,2,2,1,1,1,2],
-	[2,2,2,1,2,1,1,1],
-	[1,0,0,0,1,1,1,0],
-
-	[0,0,0,0,0,0,0,0],
-	[1,1,1,0,1,0,0,0],
-	[0,1,1,1,0,0,0,1],
-	[0,0,0,0,0,0,0,0]
-	]
-
-	
-
-	# Rows and columns of 9-squares
-	for rows in range (0,config.blockRows) :
-
-		rowStart = rows * config.blockHeight * 4 + config.gapSize
-
-		for cols in range (0,config.blockCols) :
-
-			columnStart = cols * config.blockLength * 4 + config.gapSize
-			cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-			cntr = [columnStart, rowStart]
-
-			## Jinky odds/evens alignment setup
-			sizeAdjustor = 0
-			## Alignment perfect setup
-			if(config.patternPrecision == True): sizeAdjustor = 1
-
-			n = 0
-			for r in range(0,4):
-				for c in range(0,4):
-					obj = unit(config)
-					obj.xPos = cntr[0] + c * config.blockLength 
-					obj.yPos = cntr[1] + r * config.blockHeight
-					obj.blockLength = config.blockLength - sizeAdjustor
-					obj.blockHeight = config.blockHeight - sizeAdjustor
-					obj.outlineColorObj	= outlineColorObj
-
-					for i in pattern[n] :
-						obj.fillColors.append(config.fillColorSet[i])
-
-					obj.setUp()
-					config.unitArray.append(obj)
-					n+=1
-			
-
-		
 
 def runWork():
 	global blocks, config, XOs
@@ -409,7 +126,6 @@ def runWork():
 		time.sleep(config.delay)  
 	
 
-
 def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
@@ -417,14 +133,6 @@ def iterate() :
 	for i in range(0,len(config.unitArray)):
 
 		obj = config.unitArray[i]
-
-		#if(random.random() > .98) : obj.outlineColorObj.stepTransition()
-
-		## Approximating timing so that any one triange changes once every 2 minutes or so
-		## e.g. .0005 prob checked every .01 seconds ~ .0005/ .01s = 5% chance per second ...
-		
-		#if(random.random() > config.resetTrianglesProd) : obj.setupTriangles()
-
 		obj.update()
 		obj.render()
 

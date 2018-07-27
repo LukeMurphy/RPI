@@ -6,6 +6,9 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
+## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
+## as well as the infomal bar construction
+
 class unit:
 
 	timeTrigger = True
@@ -187,6 +190,7 @@ def main(run = True) :
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
+	config.opticalPattern = (workConfig.get("quilt", 'opticalPattern')) 
 	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
 	config.hGapSize = int(workConfig.get("quilt", 'hGapSize')) 
 	config.vGapSize = int(workConfig.get("quilt", 'vGapSize')) 
@@ -207,6 +211,8 @@ def main(run = True) :
 	config.polyDistortion = float(workConfig.get("quilt", 'polyDistortion')) 
 	config.polyDistortionMin = -config.polyDistortion
 	config.polyDistortionMax = config.polyDistortion
+
+	config.opticalPatterns = ["Regular","LighteningStrike","Diagonals"]
 	
 	# for now, all squares 
 	#config.blockLength = config.blockSize
@@ -215,7 +221,8 @@ def main(run = True) :
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 
-	config.timeToComplete = 60 #round(random.uniform(30,220))
+	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
+	#config.timeToComplete = 60 #round(random.uniform(30,220))
 
 	#createPieces()
 	drawSqareSpiral()
@@ -229,6 +236,13 @@ def restartPiece():
 	config.polyDistortionMax = random.uniform(1, config.polyDistortion + 1)
 
 	del config.unitArray[:]
+
+
+	p = math.floor(random.uniform(0,len(config.opticalPatterns)))
+
+	config.opticalPattern = config.opticalPatterns[p]
+
+
 
 	drawSqareSpiral()
 
@@ -250,8 +264,84 @@ def drawSqareSpiral():
 
 	n = 0
 
+	darkValues = [.1,.5]
+	lightValues = [.5,.99]
+
+	opticalPattern = config.opticalPattern
+
+
+	'''
+	LIGHTENING PATTERN
+	 dark right dark bottom   dark top. dark right
+	 dark top  dark left.   dark right. dark bottom
+
+	 repeat .....
+
+
+	'''
+
+
 	for rows in range (0,config.blockRows) :
+
 		for cols in range (0,config.blockCols) :
+
+			if opticalPattern == "LighteningStrike" : 
+
+				if cols%2 > 0 :
+					if rows%2> 0 :
+						topValues = lightValues
+						rightValues = darkValues
+						bottomValues = darkValues
+						leftValues = lightValues		
+					else :
+						topValues = darkValues
+						rightValues = darkValues
+						bottomValues = lightValues
+						leftValues = lightValues		
+				else :
+					if rows%2> 0 :
+						topValues = darkValues
+						rightValues = lightValues
+						bottomValues = lightValues
+						leftValues = darkValues	
+					else :
+						topValues = lightValues
+						rightValues = lightValues
+						bottomValues = darkValues
+						leftValues = darkValues
+
+			elif opticalPattern == "Diagonals" : 
+
+				if cols%2 > 0 :
+					if rows%2> 0 :
+						topValues = darkValues
+						rightValues = darkValues
+						bottomValues = lightValues
+						leftValues = lightValues		
+					else :
+						topValues = lightValues
+						rightValues = lightValues
+						bottomValues = darkValues
+						leftValues = darkValues		
+				else :
+					if rows%2> 0 :
+						topValues = lightValues
+						rightValues = lightValues
+						bottomValues = darkValues
+						leftValues = darkValues	
+					else :
+						topValues = darkValues
+						rightValues = darkValues
+						bottomValues = lightValues
+						leftValues = lightValues			
+			else :
+
+				topValues = lightValues
+				rightValues = lightValues
+				bottomValues = darkValues
+				leftValues = darkValues
+
+
 
 			hDelta = config.numUnits * config.blockLength * 2 + config.hGapSize
 			vDelta = config.numUnits * config.blockHeight * 2 + config.vGapSize
@@ -308,22 +398,23 @@ def drawSqareSpiral():
 			config.unitArray.append(obj)
 
 			n = 1
+
+
 			for i in range(0, turns):
 				try :
 					#LEFT
 					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
 					obj = unit(config)
 					obj.poly = (B[n+1], A[n+1], A[n+0], B[n+0])
-					obj.fillColorMode = "red"
 					obj.changeColor = False
 					obj.outlineColorObj	= outlineColorObj
 
 					obj.minSaturation = .5
 					obj.maxSaturation = 1
-					obj.minValue = .1
-					obj.maxValue = .5
-					obj.minHue = 0
-					obj.maxHue = 360
+					obj.minValue = leftValues[0]
+					obj.maxValue = leftValues[1]
+					obj.minHue = config.redRange[0]
+					obj.maxHue = config.redRange[1]
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
@@ -331,14 +422,13 @@ def drawSqareSpiral():
 					#BOTTOM
 					obj = unit(config)
 					obj.poly = (B[n+0], A[n-1], B[n+3], A[n+4])
-					obj.fillColorMode = "red"
 					obj.changeColor = False
 					obj.outlineColorObj	= outlineColorObj
 
-					obj.minSaturation = .7
-					obj.maxSaturation = .9
-					obj.minValue = .5
-					obj.maxValue = 1
+					obj.minSaturation = .8
+					obj.maxSaturation = 1
+					obj.minValue = bottomValues[0]
+					obj.maxValue = bottomValues[1]
 					obj.minHue = 0
 					obj.maxHue = 360
 
@@ -349,16 +439,15 @@ def drawSqareSpiral():
 					#RIGHT
 					obj = unit(config)
 					obj.poly = (B[n+2], A[n+2], A[n+3], B[n+3])
-					obj.fillColorMode = "red"
 					obj.changeColor = False
 					obj.outlineColorObj	= outlineColorObj
 
 					obj.minSaturation = .7
 					obj.maxSaturation = .9
-					obj.minValue = .5
-					obj.maxValue = .9
-					obj.minHue = config.redRange[0]
-					obj.maxHue = config.redRange[1]
+					obj.minValue = rightValues[0]
+					obj.maxValue = rightValues[1]
+					obj.minHue = 0
+					obj.maxHue = 360
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
@@ -367,14 +456,13 @@ def drawSqareSpiral():
 					#TOP
 					obj = unit(config)
 					obj.poly = (B[n+1], A[n+5], B[n+6], A[n+2])
-					obj.fillColorMode = "red"
 					obj.changeColor = False
 					obj.outlineColorObj	= outlineColorObj
 
-					obj.minSaturation = .8
-					obj.maxSaturation = 1
-					obj.minValue = .05
-					obj.maxValue = .4
+					obj.minSaturation = .7
+					obj.maxSaturation = .9
+					obj.minValue = topValues[0]
+					obj.maxValue = topValues[1]
 					obj.minHue = config.redRange[0]
 					obj.maxHue = config.redRange[1]
 

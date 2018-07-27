@@ -5,7 +5,7 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
-class unit:
+class Unit:
 
 	timeTrigger = True
 	tLimitBase = 30
@@ -30,6 +30,10 @@ class unit:
 	initialized = True
 
 	fillColor = (0,0,0,255)
+	fillColors = []
+	triangles = []
+
+
 	
 	def __init__(self, config):
 		self.config = config
@@ -49,6 +53,17 @@ class unit:
 		self.lineColorMode = "red"
 		self.changeColor = True
 		self.lines = config.lines
+
+		self.triangles = []
+		self.fillColors = []
+		## Each of the 8 triangles has a set of coordinates and a color
+		#self.triangles = [[[] for i in range(0,2)] for i in range(0,8)]
+		self.fillColors = []
+
+		## Pre-fill the triangles list/array with ColorOverlay objects
+		self.triangles = [[[],coloroverlay.ColorOverlay(),[]] for i in range(0,8)]
+
+
 
 	def setUp(self, n = 0) :
 
@@ -145,7 +160,6 @@ class unit:
 		self.sqrPointsSet.append((4,5,8))
 
 
-
 	def setupSquares(self):
 		# Square's points made of corners and mid point
 		# 	0		1
@@ -218,13 +232,20 @@ class unit:
 
 	def update(self):
 		#self.fillColorMode == "random" or 
-		if(random.random() > config.colorPopProb) :
+		if(random.random() > self.config.colorPopProb) :
 			if self.initialized == True :
 				self.initialized = False
 			self.colOverlay.stepTransition()
 			self.fillColor = tuple(round (a * self.brightness ) for a in self.colOverlay.currentColor)
 		else :
 			self.changeColorFill()
+
+		if(random.random() > .98) : self.outlineColorObj.stepTransition()
+
+		## Approximating timing so that any one triange changes once every 2 minutes or so
+		## e.g. .0005 prob checked every .01 seconds ~ .0005/ .01s = 5% chance per second ...
+		
+		if(random.random() > self.config.resetTrianglesProd) : self.setupTriangles()
 
 	
 	def drawUnit(self) :
@@ -316,201 +337,3 @@ class unit:
 					)
 
 				self.colOverlay.colorA = newColor
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def transformImage(img) :
-	width, height = img.size
-	m = -0.5
-	xshift = abs(m) * 420
-	new_width = width + int(round(xshift))
-
-	img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
-	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
-	return img
-
-
-def main(run = True) :
-	global config, directionOrder,workConfig
-	print("---------------------")
-	print("QUILT Loaded")
-
-
-	config.brightness = float(workConfig.get("displayconfig", 'brightness')) 
-	colorutils.brightness = config.brightness
-	config.canvasImageWidth = config.screenWidth
-	config.canvasImageHeight = config.screenHeight
-	config.canvasImageWidth -= 4
-	config.canvasImageHeight -= 4
-
-	config.outlineColorObj = coloroverlay.ColorOverlay()
-	config.outlineColorObj.randomRange = (5.0,30.0)
-
-	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
-	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
-	config.resetTrianglesProd = float(workConfig.get("quilt", 'resetTrianglesProd'))
-
-	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
-	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
-	config.transformTuples = tuple([float(i) for i in transformTuples])
-
-	redRange = workConfig.get("quilt", 'redRange').split(",")
-	config.redRange = tuple([int(i) for i in redRange])
-
-	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
-	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
-	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
-	config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
-	config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
-	config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
-	config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
-	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
-	config.cntrOffsetY = int(workConfig.get("quilt", 'cntrOffsetY')) 
-	config.delay = float(workConfig.get("quilt", 'delay'))
-	config.colorPopProb = float(workConfig.get("quilt", 'colorPopProb'))
-	config.brightnessFactorDark = float(workConfig.get("quilt", 'brightnessFactorDark'))
-	config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
-	config.lines  = (workConfig.getboolean("quilt", 'lines'))
-	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
-
-	config.activeSet = workConfig.get("quilt","activeSet")
-
-	config.baseHueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'baseHueRange').split(",")])
-	config.baseSaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'baseSaturationRange').split(",")])
-	config.baseValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'baseValueRange').split(",")])
-	config.squareHueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'squareHueRange').split(",")])
-	config.squareSaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'squareSaturationRange').split(",")])
-	config.squareValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'squareValueRange').split(",")])
-	config.centerHueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'centerHueRange').split(",")])
-	config.centerValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'centerValueRange').split(",")])
-	config.centerSaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'centerSaturationRange').split(",")])
-
-	# for now, all squares 
-	config.blockLength = config.blockSize
-	config.blockHeight = config.blockSize
-
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
-
-	createPieces()
-
-	if(run) : runWork()
-
-
-def createPieces() :
-	global config
-	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-
-	config.unitArray = []
-
-	## Jinky odds/evens alignment setup
-	sizeAdjustor = 0
-	## Alignment perfect setup
-	if(config.patternPrecision == True): sizeAdjustor = 1
-
-	n = 0
-
-	pattern = [(0,1,0),(2,0,3),(0,4,0)]
-
-	# Rows and columns of 9-squares
-	for rows in range (0,config.blockRows) :
-
-		rowStart = rows * config.blockHeight * 3 + config.gapSize
-
-		for cols in range (0,config.blockCols) :
-
-			columnStart = cols * config.blockLength * 3 + config.gapSize
-
-			# Three rows of three squares
-			squareNumber = 0
-			for unitRow in range (0,len(pattern)):
-				rowDelta  =  unitRow * config.blockHeight
-
-				# Each square is either divided in to 4 or 3 triangles
-				for unitBlock in range(0, len(pattern[unitRow])):
-					colDelta  =  unitBlock * config.blockHeight
-					cntr = [columnStart + cntrOffset[0] + colDelta, rowStart  + cntrOffset[1] + rowDelta]	
-
-					outlineColorObj = coloroverlay.ColorOverlay()
-					outlineColorObj.randomRange = (5.0,30.0)
-
-					obj = unit(config)
-					obj.xPos = cntr[0]
-					obj.yPos = cntr[1]
-					obj.fillColorMode = "red"
-					obj.blockLength = config.blockLength - sizeAdjustor
-					obj.blockHeight = config.blockHeight - sizeAdjustor
-					obj.outlineColorObj	= outlineColorObj
-
-					obj.minHue = config.baseHueRange[0]
-					obj.maxHue = config.baseHueRange[1]				
-					obj.minSaturation = config.baseSaturationRange[0]
-					obj.maxSaturation = config.baseSaturationRange[1]
-					obj.minValue = config.baseValueRange[0]
-					obj.maxValue = config.baseValueRange[1]
-
-					obj.compositionNumber = pattern[unitRow][unitBlock]
-
-					
-					"The squares"
-					if obj.compositionNumber == 0 :
-						obj.minHue = config.squareHueRange[0]
-						obj.maxHue = config.squareHueRange[1]				
-						obj.minSaturation = config.squareSaturationRange[0]
-						obj.maxSaturation = config.squareSaturationRange[1]
-						obj.minValue = config.squareValueRange[0]
-						obj.maxValue = config.squareValueRange[1]
-
-						obj.squareNumber = squareNumber
-						squareNumber += 1
-
-					"The center block"
-					if obj.compositionNumber == 0 and unitRow == 1 :
-						obj.minHue = config.centerHueRange[0]
-						obj.maxHue = config.centerHueRange[1]				
-						obj.minSaturation = config.centerSaturationRange[0]
-						obj.maxSaturation = config.centerSaturationRange[1]
-						obj.minValue = config.centerValueRange[0]
-						obj.maxValue = config.centerValueRange[1]
-					
-
-					obj.setUp(n)
-					config.unitArray.append(obj)
-
-			n+=1
-
-
-def runWork():
-	global blocks, config, XOs
-	#gc.enable()
-	while True:
-		iterate()
-		time.sleep(config.delay)  
-
-
-def iterate() :
-	global config
-	config.outlineColorObj.stepTransition()
-
-	for i in range(0,len(config.unitArray)):
-
-		obj = config.unitArray[i]
-
-		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
-
-		## Approximating timing so that any one triange changes once every 2 minutes or so
-		## e.g. .0005 prob checked every .01 seconds ~ .0005/ .01s = 5% chance per second ...
-		
-		if(random.random() > config.resetTrianglesProd) : obj.setupTriangles()
-
-		obj.update()
-		obj.render()
-
-	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	temp.paste(config.canvasImage, (0,0), config.canvasImage)
-	if(config.transformShape == True) :
-		temp = transformImage(temp)
-	config.render(temp, 0,0)
-		
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

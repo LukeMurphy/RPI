@@ -155,8 +155,6 @@ def main(run = True) :
 	colorutils.brightness = config.brightness
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
-	config.canvasImageWidth -= 4
-	config.canvasImageHeight -= 4
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)

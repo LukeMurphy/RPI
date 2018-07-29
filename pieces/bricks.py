@@ -123,8 +123,9 @@ class unit:
 
 		if(self.lines == True) :
 			#self.draw.polygon(poly, fill=self.fillColor,  outline=self.outlineColor)
-
-			self.draw.rectangle( (poly[0] + self.xOffsetInit ,poly[1], poly[4] + self.xOffsetInit,poly[5]), fill=self.fillColor,  outline=self.outlineColor)
+			#self.draw.rectangle( (poly[0] + self.xOffsetInit ,poly[1], poly[4] + self.xOffsetInit,poly[5]), fill=self.fillColor,  outline=self.outlineColor)
+			self.draw.rectangle( (poly[0] + self.xOffsetInit - self.config.hGapSize/2 ,poly[1] - self.config.vGapSize/2, poly[4] + self.xOffsetInit + self.config.hGapSize/2, poly[5] + self.config.vGapSize/2), fill=self.outlineColor,  outline=None)
+			self.draw.rectangle( (poly[0] + self.xOffsetInit ,poly[1], poly[4] + self.xOffsetInit,poly[5]), fill=self.fillColor,  outline=None)
 		else:
 			self.draw.polygon(poly, fill=self.fillColor, outline=None)
 
@@ -241,13 +242,6 @@ def restartPiece():
 
 	del config.unitArray[:]
 
-
-	p = math.floor(random.uniform(0,len(config.opticalPatterns)))
-
-	config.opticalPattern = config.opticalPatterns[p]
-
-
-
 	drawSqareSpiral()
 
 
@@ -336,9 +330,9 @@ def drawSqareSpiral():
 			#outlineColorObj.randomRange = (5.0,300.0)
 			outlineColorObj.minHue = 10
 			outlineColorObj.maxHue = 20
-			outlineColorObj.minSaturation = 1
-			outlineColorObj.maxSaturation = 1
-			outlineColorObj.minValue = 1
+			outlineColorObj.minSaturation = .1
+			outlineColorObj.maxSaturation = .1
+			outlineColorObj.minValue = 2
 			outlineColorObj.maxValue = 2
 			outlineColorObj.maxBrightness = 2
 			obj.outlineColorObj = outlineColorObj
@@ -349,9 +343,6 @@ def drawSqareSpiral():
 			n+=1
 
 			#if cols == 0 : print(obj.poly)
-
-
-
 
 
 def runWork():

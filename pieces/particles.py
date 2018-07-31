@@ -130,6 +130,15 @@ def main(run = True) :
 		print (str(e)) 
 		ps.transparencyRange = (10,200)
 
+	try :
+		config.transformShape = (workConfig.getboolean("particleSystem", 'transformShape'))
+		transformTuples = workConfig.get("particleSystem", 'transformTuples').split(",")
+		config.transformTuples = tuple([float(i) for i in transformTuples])
+	except Exception as e: 
+		print (str(e)) 
+		config.transformShape = False
+
+
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
@@ -218,6 +227,16 @@ def emitParticle(i=None):
 		ps.unitArray.append(p)
 	
 
+def transformImage(img) :
+	width, height = img.size
+	m = -0.5
+	xshift = abs(m) * 420
+	new_width = width + int(round(xshift))
+
+	img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
+	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
+	return img
+	
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def colorize() :
@@ -303,7 +322,8 @@ def iterate() :
 		config.draw = ImageDraw.Draw(config.image)
 
 
-
+	if(config.transformShape == True) :
+		config.image = transformImage(config.image)
 
 	config.render(config.image, 0,0)
 		

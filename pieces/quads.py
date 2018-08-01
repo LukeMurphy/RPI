@@ -10,7 +10,8 @@ import numpy
 import random, time
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
-from modules import colorutils, coloroverlay, makeblockanimals #, makedrawcarcas
+from modules import colorutils, coloroverlay
+from modules.makeblocks import makeblockanimals #, makedrawcarcas
 
 global thrd, config
 

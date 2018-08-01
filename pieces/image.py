@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, configuration, badpixels, colorutils
+from modules import configuration, badpixels, colorutils
 from modules.imagesprite import ImageSprite
 
 from PIL import Image, ImageDraw, ImageMath, ImageEnhance

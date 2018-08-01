@@ -15,7 +15,7 @@ import sys, getopt, os
 
 from subprocess import call
 
-from modules import utils, configuration
+from modules import configuration
 from modules.imagesprite import ImageSprite
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

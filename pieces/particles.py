@@ -6,8 +6,8 @@ import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
 from modules import colorutils, coloroverlay
-from modules.particle_system import ParticleSystem
-from modules.particle import Particle
+from modules.particles.particle_system import ParticleSystem
+from modules.particles.particle import Particle
 
 
 def main(run = True) :

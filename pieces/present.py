@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, configuration
+from modules import configuration
 from modules.imagesprite import ImageSprite
 from modules import colorutils
 

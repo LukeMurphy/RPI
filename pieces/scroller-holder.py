@@ -371,12 +371,19 @@ def remakePatternBlock(imageRef, direction):
 		config.patternEndColor = (254,0,254,255)
 	if(random.random() < .05) :
 		config.patternEndColor = (0,0,250,255)
-	if(random.random() < .3) :
-		config.patternDrawProb = random.uniform(.08,.12)
-	if(random.random() < .3) :
-		config.patternRows = int(round(random.uniform(40,80)))
-	if(random.random() < .3) :
-		config.patternCols = int(round(random.uniform(90,240)))
+
+	if(config.alwaysRandomPattern == True) :
+		if(random.random() < .3) :
+			config.patternDrawProb = random.uniform(.08,.12)
+		if(random.random() < .3) :
+			config.patternRows = int(round(random.uniform(40,80)))
+		if(random.random() < .3) :
+			config.patternCols = int(round(random.uniform(90,240)))
+	else :
+		pass
+
+	if(config.alwaysRandomPatternColor == True) :
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
@@ -403,7 +410,12 @@ def configureBackgroundScrolling():
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
 	config.patternColor = (50,0,55,50)
-	config.patternEndColor = (255,0,255,50)
+	config.patternEndColor = (255,0,255,50)	
+
+	if (config.alwaysRandomPatternColor == True):
+		config.patternColor = colorutils.randomColorAlpha(config.brightness)
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
@@ -562,6 +574,18 @@ def init() :
 	except Exception as e:
 		print (str(e))
 		config.altDirectionScrolling = True
+
+	try:
+		config.alwaysRandomPatternColor = workConfig.getboolean("scroller", 'alwaysRandomPatternColor')
+	except Exception as e:
+		print (str(e))
+		config.alwaysRandomPatternColor = False
+
+	try:
+		config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
+	except Exception as e:
+		print (str(e))
+		config.alwaysRandomPattern = True
 
 	if(config.useOverLayImage ==  True) :
 		configureImageOverlay()

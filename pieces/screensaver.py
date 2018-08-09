@@ -50,6 +50,7 @@ def main(run = True) :
 	config.crawlHeight = int(workConfig.get("txtdisplay", 'crawlHeight'))
 	config.crawlPositionX = int(workConfig.get("txtdisplay", 'crawlPositionX'))
 	config.crawlPositionY = int(workConfig.get("txtdisplay", 'crawlPositionY'))
+	config.crawlRepeatDistanceFactor = float(workConfig.get("txtdisplay", 'crawlRepeatDistanceFactor'))
 
 	config.txtBoxHtMultuiplier = float(workConfig.get("txtdisplay", 'txtBoxHtMultuiplier'))
 	config.txtStringL1 = (workConfig.get("txtdisplay", 'txt1')).replace("'","")
@@ -259,8 +260,8 @@ def iterate( n = 0) :
 	
 	config.crawlPosx -= 1
 
-	if(config.crawlPosx < -config.crawlLen[0]) :
-		config.crawlPosx = config.screenHeight
+	if(config.crawlPosx < -config.crawlLen[0] * config.crawlRepeatDistanceFactor) :
+		config.crawlPosx = config.screenWidth
 
 	# background fill and fade
 	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)

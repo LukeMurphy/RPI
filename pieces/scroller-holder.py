@@ -412,7 +412,12 @@ def configureBackgroundScrolling():
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
 	config.patternColor = (50,0,55,50)
 	config.patternEndColor = (255,0,255,50)	
-	config.pauseProb = float(workConfig.get("scroller", 'pauseProb'))
+	
+	try :
+		config.pauseProb = float(workConfig.get("scroller", 'pauseProb'))
+	except Exception as e: 
+		config.pauseProb = 0.0
+		print (str(e))
 
 	if (config.alwaysRandomPatternColor == True):
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)

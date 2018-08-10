@@ -27,6 +27,15 @@ counter = 0
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def checkTime():
+	config.t2  = time.time()
+	delta = config.t2  - config.t1
+
+	if delta > config.timeToComplete :
+		config.usePixelSort = False
+		#config.rotation = 0
+
+
 def redrawBackGround() :
 	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0))
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (255,0,0))
@@ -58,6 +67,16 @@ def main(run = True) :
 	config.useBlink  = (workConfig.getboolean("repeater", 'useBlink'))
 	config.noTrails  = (workConfig.getboolean("repeater", 'noTrails'))
 	config.imageList  = (workConfig.get("repeater", 'imageList'))
+
+	try :
+		config.pauseProb = float(workConfig.get("repeater", 'pauseProb'))
+	except Exception as e: 
+		config.pauseProb = 0.0
+		print (str(e))
+
+	config.t1  = time.time()
+	config.t2  = time.time()
+	config.timeToComplete = 0
 
 	try :
 		config.colorMode = (workConfig.get("repeater", 'colorMode'))
@@ -183,6 +202,14 @@ def iterate( n = 0) :
 	#if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	#if(block.setForRemoval==True) : makeBlock()
 	
+	if random.random() < config.pauseProb and config.usePixelSort == False:
+		config.usePixelSort = True
+		config.t1  = time.time()
+		config.timeToComplete = random.uniform(1,10)
+
+	checkTime()
+
+
 	if config.kaleidescopicEffect == True :
 		config.noTrails =  False
 		kaleidescopic()

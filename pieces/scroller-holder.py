@@ -404,6 +404,7 @@ def configureBackgroundScrolling():
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
+	scrollerRef.typeOfScroller = "bg"
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.patternSpeed
 	scrollerRef.setUp()
@@ -411,6 +412,7 @@ def configureBackgroundScrolling():
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
 	config.patternColor = (50,0,55,50)
 	config.patternEndColor = (255,0,255,50)	
+	config.pauseProb = float(workConfig.get("scroller", 'pauseProb'))
 
 	if (config.alwaysRandomPatternColor == True):
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)
@@ -418,6 +420,12 @@ def configureBackgroundScrolling():
 
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
+
+	config.t1  = time.time()
+	config.t2  = time.time()
+	config.timeToComplete = 1
+	config.scrollerPauseBool = False
+
 	config.scrollArray.append(scrollerRef)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -606,11 +614,24 @@ def init() :
 	if(config.useImages == True) :
 		configureImageScrolling()
 
+
+
 def runWork():
 	global config
 	while True:
 		iterate()
 		time.sleep(config.redrawSpeed)
+
+def checkTime():
+	config.t2  = time.time()
+	delta = config.t2  - config.t1
+
+	if delta > config.timeToComplete :
+		config.scroller4.paused = False
+		config.usePixelSort = False
+		#config.rotation = 0
+
+
 
 def iterate() :
 	global config
@@ -618,9 +639,19 @@ def iterate() :
 	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
 	#config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
 
+	## Run through each of the objects being scrolled - text, image, background etc
 	for scrollerObj in config.scrollArray :
 		scrollerObj.scroll()
 		config.canvasImage.paste(scrollerObj.canvas, (0,0), scrollerObj.canvas)
+
+		if scrollerObj.typeOfScroller == "bg" :
+			if random.random() < config.pauseProb and scrollerObj.paused == False:
+				scrollerObj.paused = True
+				config.usePixelSort = True
+				#config.rotation = random.uniform(-1,1)
+				config.t1  = time.time()
+				config.timeToComplete = random.uniform(1,10)
+			checkTime()
 
 
 	# Chop up the scrollImage into "rows"

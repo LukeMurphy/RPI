@@ -21,7 +21,7 @@ class unit :
 	tileSizeHeight = 32
 	percentDone = 100.0
 	resistance = 50.0
-	score = 1
+	score = 0
 
 
 	def __init__(self) :
@@ -41,7 +41,7 @@ class unit :
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.tLimitBase = self.config.tLimitBase
 
-		self.score = 0 if random.random() > .5 else 1
+		#self.score = 0 if random.random() > .5 else 1
 
 		if self.useFixedPalette == True :
 
@@ -162,10 +162,14 @@ def makeGrid():
 			if (config.coordinatedColorChange == False ) :
 				u.setUp()
 
+			u.bgColor = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 			u.drawUnit()
+			config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
+
 			config.unitArray.append(u)
 			unitNumber +=1
 			config.gridArray[col][row] = u
+
 
 #"Conway Game of Life Like Redraw"
 "Conway Game of Life Like Redraw"
@@ -201,12 +205,12 @@ def redrawGrid2():
 		u.drawUnit()
 		config.image.paste(u.image,(u.xPos + config.imageXOffset,u.yPos), u.image)
 
-
 		neighbours = u.getNeighbours()
 		u.colOverlay.colorTransitionSetup()
 
 		score = 0
 
+		## Count how many live neighbors there are out of 8 unless at edge (5) or corner (3)
 		for unit in neighbours:
 			col = unit[0]
 			row = unit[1]
@@ -219,6 +223,8 @@ def redrawGrid2():
 				except Exception as e:
 					print(e, len(config.unitArray), unit, col, row)
 
+		## If the cell is alive check if it's being overcrowded 
+		## or has too few neighbors to survive
 		if u.score == 1 :
 			if score < config.underPopulationThreshold :
 				u.score = 0
@@ -227,8 +233,9 @@ def redrawGrid2():
 			if score > config.overCrowdingThreshold :
 				u.score = 0
 
-			if score > 1 and score < config.dieThreshold  :
-				u.score = 1
+			
+			#if score > 1 and score < config.dieThreshold  :
+			#	u.score = 1
 
 		if u.score == 0 :
 			if score == config.liveThreshold  :
@@ -239,7 +246,7 @@ def redrawGrid2():
 			u.colOverlay.colorTransitionSetup(steps = round(u.colOverlay.steps/3))
 
 		if u.score == 0 :
-			u.colOverlay.colorTransitionSetup(newColor = (5,5,100))
+			u.colOverlay.colorTransitionSetup(newColor = (config.deadColor))
 
 		if random.random() > config.propagationProbability :
 			u.score = 1
@@ -283,7 +290,7 @@ def main(run = True) :
 	config.overCrowdingThreshold = int(workConfig.get("propagation","overCrowdingThreshold"))
 	config.underPopulationThreshold = int(workConfig.get("propagation","underPopulationThreshold"))
 	config.liveThreshold = int(workConfig.get("propagation","liveThreshold"))
-	config.dieThreshold = int(workConfig.get("propagation","dieThreshold"))
+	#config.dieThreshold = int(workConfig.get("propagation","dieThreshold"))
 
 
 	config.timeTrigger = workConfig.getboolean("propagation", 'timeTrigger')
@@ -296,6 +303,9 @@ def main(run = True) :
 	config.unHideGrid = False
 	config.colorStepsRangeMin = int(workConfig.get("propagation","colorStepsRangeMin"))
 	config.colorStepsRangeMax = int(workConfig.get("propagation","colorStepsRangeMax"))
+
+	deadColor = ((workConfig.get("propagation", "deadColor")).split(','))
+	config.deadColor = tuple(map(lambda x: float(x), deadColor))
 	
 
 	try:

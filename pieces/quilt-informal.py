@@ -219,8 +219,6 @@ def main(run = True) :
 	#config.blockHeight = config.blockSize
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
-
-
 	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
 	#config.timeToComplete = 60 #round(random.uniform(30,220))
 

@@ -20,6 +20,33 @@ def transformImage(img) :
 	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
 	return img
 
+def restartPiece():
+	config.t1  = time.time()
+	config.t2  = time.time()
+
+	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
+	config.c1HueRange = newRange
+	config.c2HueRange = newRange
+	config.c3HueRange = newRange
+	config.c3HueRange = newRange
+	config.c4HueRange = newRange
+	config.c5HueRange = newRange
+
+
+	config.fillColorSet = []
+	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
+	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
+	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
+	config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
+	config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
+
+
+	if config.quiltPattern == "triangles" :
+		createtrianglepieces.createPieces(config)
+	elif config.quiltPattern == "stars" :
+		createstarpieces.createPieces(config)
+
+
 
 def main(run = True) :
 	global config, directionOrder,workConfig
@@ -64,6 +91,7 @@ def main(run = True) :
 	config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
 	config.lines  = (workConfig.getboolean("quilt", 'lines'))
 	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
+	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
 
 	config.activeSet = workConfig.get("quilt","activeSet")
 
@@ -114,6 +142,9 @@ def main(run = True) :
 	elif config.quiltPattern == "stars" :
 		createstarpieces.createPieces(config)
 
+	config.t1  = time.time()
+	config.t2  = time.time()
+
 	if(run) : runWork()
 
 
@@ -141,6 +172,12 @@ def iterate() :
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
 	config.render(temp, 0,0)
+
+	config.t2  = time.time()
+	delta = config.t2  - config.t1
+
+	if delta > config.timeToComplete :
+		restartPiece()
 		
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

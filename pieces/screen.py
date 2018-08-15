@@ -23,6 +23,7 @@ class Crack:
 
 	def setUp(self):
 		self.crackColor = self.config.bgColor
+		self.crackColor = self.config.colOverlay.colorB
 
 		# Draw from the origin
 		lastPoint = self.origin
@@ -86,7 +87,8 @@ def showGrid():
 	config.sampleVariationX = 5
 	config.sampleVariationY = 0
 	for i in range(0, len(config.crackArray)):
-		config.crackArray[i].render()
+		if i < 3 :
+			config.crackArray[i].render()
 
 		## Draw vertical lines from one line to the next
 		if i < len(config.crackArray) - 1 :
@@ -98,6 +100,11 @@ def showGrid():
 				for x in range( startX, endX, 1) :
 					y =  (x - startX) * config.crackArray[i].slopes[p] + config.crackArray[i].points[p][1]
 					y2 =  (x - startX) * config.crackArray[i+1].slopes[p] + config.crackArray[i+1].points[p][1]
+
+					if config.crackArray[i+1].slopes[p] == 0 :
+						x2 = 0
+					else :
+						x2 =  y2 / config.crackArray[i+1].slopes[p]
 					#config.canvasDraw.rectangle((x, y, x+1, y+1), fill=(200, 0, 0))
 					#y2 = config.crackArray[i].points[p][1]
 					if i > 0 and random.random() < .5:
@@ -114,13 +121,18 @@ def showGrid():
 							colorSample = config.canvasImage.getpixel(samplePoint)
 
 							#randomize brightness a little
-							colorSampleColor = tuple(int(round(c * random.uniform(.1,1))) for c in colorSample)
+							colorSampleColor = tuple(int(round(c * random.uniform(.5,1.8))) for c in colorSample)
 
 							# Once in a little while, the color is just random
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
+							
+							# Draw perpendicular light lines
+							if i == 1 :
+								config.canvasDraw.line((x, y, x2, y), fill=colorSampleColor)
+							else :
+								config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 
-							config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 
 
 	

@@ -22,8 +22,9 @@ class Crack:
 
 
 	def setUp(self):
+		self.crackColor = self.config.bgColor
 
-		# Draw "backwards" from the origin
+		# Draw from the origin
 		lastPoint = self.origin
 		self.points = []
 		self.slopes = []
@@ -55,18 +56,21 @@ class Crack:
 
 			lastPoint[0] = x
 			lastPoint[1] = y
+
+		#print (self.points)
 			
-
-
 	
 	def render(self):
 		for i in range (0, self.pointsCount - 1):
 			self.config.canvasDraw.line((self.points[i][0], self.points[i][1], self.points[i+1][0], self.points[i+1][1] ), fill=self.crackColor)
 
 
-
 def showGrid():
 	global config
+
+
+	config.colOverlay.stepTransition()
+	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 
 	if random.random() < .000001 :
 		config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
@@ -103,9 +107,10 @@ def showGrid():
 						if xSample > config.canvasWidth : xSample = config.canvasWidth 
 						if ySample < 0 : ySample = 0
 						if ySample > config.canvasHeight : ySample = config.canvasHeight
+
 						samplePoint = ( xSample, ySample )
 						# Just make sure the sample point is actually within the bounds of the image
-						if(samplePoint[0] < config.canvasWidth and samplePoint[1] < config.canvasHeight):
+						if(samplePoint[0] < config.canvasWidth and samplePoint[1] < config.canvasHeight and samplePoint[0] > 0 and samplePoint[1] > 0):
 							colorSample = config.canvasImage.getpixel(samplePoint)
 
 							#randomize brightness a little
@@ -115,7 +120,7 @@ def showGrid():
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
 
-						config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
+							config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 
 
 	
@@ -152,15 +157,28 @@ def main(run = True) :
 	config.numCracks = int(workConfig.get("screenproject", 'numCracks'))
 	config.pointsCount = int(workConfig.get("screenproject", 'pointsCount'))
 
-
 	config.randomColorSampleProb = float(workConfig.get("screenproject", 'randomColorSampleProb'))
 	config.yVarMin = int(workConfig.get("screenproject", 'yVarMin'))
 	config.yVarMax = int(workConfig.get("screenproject", 'yVarMax'))
+
+	config.tLimitBase = int(workConfig.get("screenproject", 'tLimitBase'))
+	config.timeTrigger = (workConfig.getboolean("screenproject", 'timeTrigger'))
+
+
+
 
 	config.image = Image.new("RGBA", (config.screenWidth  , config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth  , config.canvasHeight))
 	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+
+
+	config.colOverlay = coloroverlay.ColorOverlay()
+	config.colOverlay.randomSteps = False 
+	config.colOverlay.timeTrigger = True 
+	config.colOverlay.tLimitBase = config.tLimitBase 
+	config.colOverlay.maxBrightness = config.brightness
+	config.colOverlay.steps = 100
 
 	config.crackArray = []
 	for i in range(0,config.numCracks):
@@ -193,6 +211,13 @@ def runWork():
 def iterate() :
 	global config
 	showGrid()
+
+
+	if random.random() < .01 :
+		c = math.floor(random.uniform(0,len(config.crackArray)))
+		#print (c,len(config.crackArray))
+		config.crackArray[c].origin = [0,0]
+		config.crackArray[c].setUp()
 
 
 def callBack() :

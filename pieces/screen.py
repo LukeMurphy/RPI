@@ -9,7 +9,7 @@ import argparse
 
 class Crack:
 
-	origin = [0,0]
+	origin = [64,32]
 	pointsCount = 5
 	points = []
 	yVarMin = 1
@@ -73,15 +73,16 @@ def showGrid():
 	config.colOverlay.stepTransition()
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 
-	if random.random() < .000001 :
+	##This leaves more trails --- but loses smooth transition to next background color...
+	if random.random() < .01 :
 		config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	
-	for row in range (0, config.rows) :
-		for col in range (0, config.cols) :
-			xPos = col * config.tileSizeWidth 
-			yPos = row * config.tileSizeHeight
-			#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
-			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=None)
+		for row in range (0, config.rows) :
+			for col in range (0, config.cols) :
+				xPos = col * config.tileSizeWidth 
+				yPos = row * config.tileSizeHeight
+				#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
+				config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=None)
 			
 
 	config.sampleVariationX = 5
@@ -95,7 +96,7 @@ def showGrid():
 			for p in range(0, config.pointsCount-1):
 				startX = config.crackArray[i].points[p][0]
 				endX = config.crackArray[i].points[p+1][0]
-				aVal =  0
+	
 				#config.canvasDraw.line((startX, 0, startX, config.crackArray[i].points[p][1]), fill=(0, 0, 200,200))
 				for x in range( startX, endX, 1) :
 					y =  (x - startX) * config.crackArray[i].slopes[p] + config.crackArray[i].points[p][1]
@@ -126,12 +127,14 @@ def showGrid():
 							# Once in a little while, the color is just random
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
+
+							if random.random() < 1.1 :
 							
-							# Draw perpendicular light lines
-							if i == 1 :
-								config.canvasDraw.line((x, y, x2, y), fill=colorSampleColor)
-							else :
-								config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
+								# Draw perpendicular light lines
+								if i == 1 :
+									config.canvasDraw.line((x, y, x2, y), fill=colorSampleColor)
+								else :
+									config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 
 
 
@@ -176,6 +179,8 @@ def main(run = True) :
 	config.tLimitBase = int(workConfig.get("screenproject", 'tLimitBase'))
 	config.timeTrigger = (workConfig.getboolean("screenproject", 'timeTrigger'))
 
+	config.originVals = ((workConfig.get("screenproject", 'origin')).split(','))
+	config.origin = tuple(map(lambda x: int(int(x) * config.brightness) , config.originVals))	
 
 
 
@@ -196,7 +201,7 @@ def main(run = True) :
 	for i in range(0,config.numCracks):
 		obj = Crack(config)
 		obj.origin = [config.canvasWidth, config.canvasHeight]
-		obj.origin = [0,0]
+		obj.origin = [config.origin[0], config.origin[1]]
 		obj.pointsCount = config.pointsCount
 		obj.crackColor = config.crackColor
 		obj.yVarMin = config.yVarMin
@@ -228,7 +233,7 @@ def iterate() :
 	if random.random() < .01 :
 		c = math.floor(random.uniform(0,len(config.crackArray)))
 		#print (c,len(config.crackArray))
-		config.crackArray[c].origin = [0,0]
+		config.crackArray[c].origin = [config.origin[0], config.origin[1]]
 		config.crackArray[c].setUp()
 
 

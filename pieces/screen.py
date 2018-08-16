@@ -77,13 +77,13 @@ def showGrid():
 	if random.random() < .01 :
 		config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	
-		for row in range (0, config.rows) :
-			for col in range (0, config.cols) :
-				xPos = col * config.tileSizeWidth 
-				yPos = row * config.tileSizeHeight
-				#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
-				config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=None)
-			
+	for row in range (0, config.rows) :
+		for col in range (0, config.cols) :
+			xPos = col * config.tileSizeWidth 
+			yPos = row * config.tileSizeHeight
+			#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
+			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=None)
+		
 
 	config.sampleVariationX = 5
 	config.sampleVariationY = 0

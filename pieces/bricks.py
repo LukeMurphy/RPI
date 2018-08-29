@@ -322,7 +322,7 @@ def drawSqareSpiral():
 			obj.minSaturation = .2
 			obj.maxSaturation = 1
 			obj.minValue = .2
-			obj.maxValue = 1
+			obj.maxValue = .5
 			obj.blockLength = config.blockLength
 
 

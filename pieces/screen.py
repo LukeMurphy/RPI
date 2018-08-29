@@ -77,18 +77,19 @@ def showGrid():
 	if random.random() < .01 :
 		config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	
+	## Draw the background grid
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
 			xPos = col * config.tileSizeWidth 
 			yPos = row * config.tileSizeHeight
-			#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
+			#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0,2), outline=config.outlineColor)
 			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=None)
 		
 
 	config.sampleVariationX = 5
 	config.sampleVariationY = 0
 	for i in range(0, len(config.crackArray)):
-		if i < 3 :
+		if i < 3 and config.drawCracks == True :
 			config.crackArray[i].render()
 
 		## Draw vertical lines from one line to the next
@@ -108,7 +109,7 @@ def showGrid():
 						x2 =  y2 / config.crackArray[i+1].slopes[p]
 					#config.canvasDraw.rectangle((x, y, x+1, y+1), fill=(200, 0, 0))
 					#y2 = config.crackArray[i].points[p][1]
-					if i > 0 and random.random() < .5:
+					if i > 0 and random.random() < config.probDrawLines:
 						xSample = x - round(random.uniform(-config.sampleVariationX ,config.sampleVariationX ))
 						ySample = y - round(random.uniform(-config.sampleVariationY ,config.sampleVariationY ))
 						if xSample < 0 : xSample = 0
@@ -128,13 +129,16 @@ def showGrid():
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
 
-							if random.random() < 1.1 :
+							if random.random() < config.probDrawPerpLines :
 							
 								# Draw perpendicular light lines
 								if i == 1 :
 									config.canvasDraw.line((x, y, x2, y), fill=colorSampleColor)
 								else :
 									config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
+								
+								if random.random() < config.probDrawBoxes : 
+									config.canvasDraw.rectangle((x, y, x2, y2), fill=colorSampleColor, outline=colorSampleColor)
 
 
 
@@ -173,8 +177,12 @@ def main(run = True) :
 	config.pointsCount = int(workConfig.get("screenproject", 'pointsCount'))
 
 	config.randomColorSampleProb = float(workConfig.get("screenproject", 'randomColorSampleProb'))
+	config.probDrawLines = float(workConfig.get("screenproject", 'probDrawLines'))
+	config.probDrawPerpLines = float(workConfig.get("screenproject", 'probDrawPerpLines'))
+	config.probDrawBoxes = float(workConfig.get("screenproject", 'probDrawBoxes'))
 	config.yVarMin = int(workConfig.get("screenproject", 'yVarMin'))
 	config.yVarMax = int(workConfig.get("screenproject", 'yVarMax'))
+	config.drawCracks = (workConfig.getboolean("screenproject", 'drawCracks'))
 
 	config.tLimitBase = int(workConfig.get("screenproject", 'tLimitBase'))
 	config.timeTrigger = (workConfig.getboolean("screenproject", 'timeTrigger'))

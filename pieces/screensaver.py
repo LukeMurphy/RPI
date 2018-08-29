@@ -35,7 +35,7 @@ def main(run = True) :
 	## display may mean the work has to be also oriented that way
 	
 
-	config.windowOrientation = (workConfig.get("displayconfig", 'windowOrientation'))
+	config.windowOrientation = (workConfig.get("txtdisplay", 'windowOrientation'))
 	
 
 	config.xbuffer = int(workConfig.get("txtdisplay", 'xbuffer'))

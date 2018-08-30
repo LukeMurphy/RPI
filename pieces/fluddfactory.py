@@ -166,6 +166,11 @@ class Fludd :
 			self.yDelta = 0
 
 
+		if self.varianceMode = "symmetrical" :
+			yPos1 = xPos1
+			self.symBoxHeight = self.symBoxWidth
+
+
 
 	def transition(self):
 		self.fillColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay.currentColor)

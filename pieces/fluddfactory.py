@@ -166,8 +166,8 @@ class Fludd :
 			self.yDelta = 0
 
 
-		if self.varianceMode = "symmetrical" :
-			yPos1 = xPos1
+		if self.varianceMode == "symmetrical" :
+			self.yPos1 = self.xPos1
 			self.symBoxHeight = self.symBoxWidth
 
 
@@ -225,11 +225,13 @@ class Fludd :
 
 		elif(self.varianceMode == "symmetrical"):
 			svar = random.uniform(0, var)
-			symBoxWidth = self.boxMax - svar
-			symBoxHeight = self.boxHeight - svar
+			self.symBoxWidth = self.boxMax - svar
+			self.symBoxHeight = self.boxHeight - svar
 			xy0 = svar
-			
-			self.draw.rectangle((xy0,xy0,symBoxWidth,symBoxHeight), fill=(gray, gray, gray) , outline = None)
+			self.xPos1 = xy0
+			self.yPos1 = xy0
+			self.draw.rectangle((xy0,xy0,self.symBoxWidth,self.symBoxHeight), fill=(gray, gray, gray) , outline = None)
+			self.setNewBox()
 	
 		elif(self.varianceMode == "asymmetrical"):
 			self.svarw = random.uniform(0, var)
@@ -287,7 +289,7 @@ def redraw():
 			config.image.paste(fluddSquare.tempImage, (c * config.boxWidth, r * config.boxHeight), fluddSquare.tempImage)
 			squareCount+=1
 
-			if random.random() < .0005 :
+			if random.random() < config.changeBoxProb :
 				fluddSquare.setNewBox()
 
 
@@ -357,6 +359,7 @@ def main(run = True) :
 	config.boxHeight = int(round(config.canvasHeight / config.rowsOfSquares))
 	config.transitionStepsMin = int(workConfig.get("fludd", 'transitionStepsMin'))
 	config.transitionStepsMax = int(workConfig.get("fludd", 'transitionStepsMax'))
+	config.changeBoxProb = float(workConfig.get("fludd", 'changeBoxProb'))
 
 	config.fixedCenterColorVals = ((workConfig.get("fludd", 'fixedCenterColor')).split(','))
 	config.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.fixedCenterColorVals))

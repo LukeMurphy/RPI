@@ -47,6 +47,8 @@ class Fludd :
 	varianceMode = "independent"
 	prisimBrightness = .5
 
+	steps = 20
+
 	def __init__(self, config, i):
 		#print ("init Fludd", i)
 		
@@ -113,7 +115,7 @@ class Fludd :
 		self.heightDelta = 0
 		self.xDelta = 0
 		self.yDelta = 0
-		self.steps = 20
+		
 
 		if self.usedFixedCenterColor == True:
 			self.centerColor = self.fixedCenterColor

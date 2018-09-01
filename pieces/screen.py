@@ -73,10 +73,14 @@ def showGrid():
 	config.colOverlay.stepTransition()
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 
+	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
+
 	##This leaves more trails --- but loses smooth transition to next background color...
-	if random.random() < .01 :
-		config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
+	if random.random() < config.imageResetProb :
+		config.canvasDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	
+	
+	'''
 	## Draw the background grid
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :
@@ -84,7 +88,7 @@ def showGrid():
 			yPos = row * config.tileSizeHeight
 			#config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=(0,0,0,2), outline=config.outlineColor)
 			config.draw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=None)
-		
+	'''
 
 	config.sampleVariationX = 5
 	config.sampleVariationY = 0
@@ -203,7 +207,20 @@ def main(run = True) :
 	config.colOverlay.timeTrigger = True 
 	config.colOverlay.tLimitBase = config.tLimitBase 
 	config.colOverlay.maxBrightness = config.brightness
-	config.colOverlay.steps = 100
+	config.colOverlay.steps = 50
+
+
+	config.colOverlay.minHue = float(workConfig.get("screenproject", 'minHue'))
+	config.colOverlay.maxHue = float(workConfig.get("screenproject", 'maxHue'))
+	config.colOverlay.minSaturation = float(workConfig.get("screenproject", 'minSaturation'))
+	config.colOverlay.maxSaturation= float(workConfig.get("screenproject", 'maxSaturation'))
+	config.colOverlay.minValue = float(workConfig.get("screenproject", 'minValue'))
+	config.colOverlay.maxBrightness = float(workConfig.get("screenproject", 'maxBrightness'))
+	config.colOverlay.maxValue = float(workConfig.get("screenproject", 'maxValue'))
+
+	config.crackChangeProb = float(workConfig.get("screenproject", 'crackChangeProb'))
+	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
+	
 
 	config.crackArray = []
 	for i in range(0,config.numCracks):
@@ -238,7 +255,7 @@ def iterate() :
 	showGrid()
 
 
-	if random.random() < .01 :
+	if random.random() < config.crackChangeProb :
 		c = math.floor(random.uniform(0,len(config.crackArray)))
 		#print (c,len(config.crackArray))
 		config.crackArray[c].origin = [config.origin[0], config.origin[1]]

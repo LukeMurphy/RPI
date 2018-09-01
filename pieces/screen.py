@@ -129,7 +129,7 @@ def showGrid():
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
 
-							if random.random() < config.probDrawPerpLines :
+							if random.random() < config.probDrawPerpLines and i > 3:
 							
 								# Draw perpendicular light lines
 								if i == 1 :

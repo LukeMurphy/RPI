@@ -115,7 +115,7 @@ def init() :
 	pattern.extend((1 for i in range(0,config.baseDashSize)))
 	pattern.extend((0 for i in range(0,config.baseDashSize)))
 
-	p0 = [0,0]
+	p0 = [config.imageXOffset,config.imageYOffset]
 	marqueeWidth = config.marqueeWidth
 	innerWidth = config.screenWidth - marqueeWidth
 	innerHeight = config.screenHeight - marqueeWidth

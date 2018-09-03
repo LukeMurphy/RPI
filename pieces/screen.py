@@ -43,6 +43,10 @@ class Crack:
 			if x < 0 :
 				x = 0
 
+			if i == self.pointsCount - 2:
+				x = self.config.canvasWidth + round(random.uniform(-xRange/8,xRange/4))
+				y = self.config.canvasHeight + round(random.uniform(-xRange/8,xRange/4))
+
 			self.points.append([x,y])
 
 			dx = lastPoint[0] - x
@@ -57,6 +61,7 @@ class Crack:
 
 			lastPoint[0] = x
 			lastPoint[1] = y
+
 
 		#print (self.points)
 			
@@ -133,16 +138,18 @@ def showGrid():
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
 
-							if random.random() < config.probDrawPerpLines and i > 3:
-							
-								# Draw perpendicular light lines
-								if i == 1 :
+							if random.random() < config.probDrawPerpLines:
+								if i == 2:
+									# Draw perpendicular light lines
+									#config.canvasDraw.line((x, y, x, config.canvasHeight), fill=colorSampleColor)
 									config.canvasDraw.line((x, y, x2, y), fill=colorSampleColor)
-								else :
-									config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
+								#else: 
+								#	config.canvasDraw.line((x, y, config.canvasWidth, y), fill=colorSampleColor)
 								
-								if random.random() < config.probDrawBoxes : 
-									config.canvasDraw.rectangle((x, y, x2, y2), fill=colorSampleColor, outline=colorSampleColor)
+							config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
+								
+							if random.random() < config.probDrawBoxes : 
+								config.canvasDraw.rectangle((x, y, x2, y2), fill=colorSampleColor, outline=colorSampleColor)
 
 
 
@@ -155,7 +162,7 @@ def showGrid():
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
-	print("Diag Loaded")
+	print("Screen Loaded")
 
 	colorutils.brightness = config.brightness
 	

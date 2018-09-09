@@ -280,15 +280,19 @@ class Particle(object):
 			self.createParticleImage()
 
 			if self.ps.objType == "poly" :
-				self.drawPoly()			
-			if self.ps.objType == "ellipse":
+				xPos = int(self.xPosR - self.image.size[0] /1.5)
+				yPos = int(self.yPosR - self.image.size[1] /2)
+				self.drawPoly()		
+
+			elif self.ps.objType == "ellipse":
 				self.drawOval()
+
 			else:
 				self.drawRectangle()
 
 			imageToPaste = self.image
 
-			if(self.ps.movement == "travel" and self.ps.objType != "ellipse"):
+			if(self.ps.movement == "travel" and self.ps.objType != "other"):
 			
 				angle = 180
 				imageToPaste = self.image.rotate(angle, expand=True)
@@ -312,25 +316,33 @@ class Particle(object):
 		b = self.objWidth
 		c = self.objHeight # "height"
 
-
 		poly = []
+		poly.append( (round(h) - 0, 0) )
+		poly.append( (round(h) - 4, round(c/4) ) )
+		poly.append( (round(h) - 6, round(c/3) ) )
+		poly.append( (round(h) - 4, round(c/2) ) )
+		poly.append( (round(h) - 0, round(c/2) ) )
+		poly.append( (round(h) + 4, round(c/3) ) )
+		poly.append( (round(h) + 6, round(c/4) ) )
+		poly.append( (round(h) + 4, round(c/2) ) )
+		self.draw.polygon(poly, fill = self.fillColor, outline=self.outlineColor)
 
-		poly.append((h, 0))
-		poly.append((0, h))
-		poly.append((0, h + b))
-		poly.append((h + round(b / 2), h + b + c))
-		poly.append((h + b + h, b + h))
-		poly.append((h + b + h, h))
-		poly.append((h + b, 0))
-		poly.append((h, 0))
+		poly2 = []
+		poly2.append( (round(h) + -0, 0) )
+		poly2.append( (round(h) + 4, -8) )
+		poly2.append( (round(h) + 4, 8) )
+		self.draw.polygon( poly2, fill = self.fillColor, outline=None)
+		
 
-		self.draw.polygon(poly, fill = self.fillColor, outline=self. outlineColor)
+
 		#self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
 	
 
 	def drawOval(self):
-		self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)), 
-			fill=self.fillColor, outline=self.outlineColor)
+		#self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)), 
+		#	fill=self.fillColor, outline=self.outlineColor)		
+		box = [(0,0),(self.objWidth/2 + 1, self.objHeight/2 + 1)]
+		self.draw.chord(box, 0, 360, fill=self.fillColor)
 	
 	def drawRectangle(self):
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 

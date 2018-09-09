@@ -311,7 +311,7 @@ def iterate() :
 
 
 	if random.random() < .0005 and ps.changeCohesion == True:
-		ps.cohesionDistance = random.uniform(8,30)
+		ps.cohesionDistance = random.uniform(14,30)
 		#print(ps.cohesionDistance)
 
 		

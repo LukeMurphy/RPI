@@ -212,7 +212,7 @@ def main(run = True) :
 	config.polyDistortionMin = -config.polyDistortion
 	config.polyDistortionMax = config.polyDistortion
 
-	config.opticalPatterns = ["Regular","LighteningStrike","Diagonals"]
+	config.opticalPatterns = ["Regular","LighteningStrike","LighteningStrikeH","Diagonals"]
 	
 	# for now, all squares 
 	#config.blockLength = config.blockSize
@@ -298,6 +298,31 @@ def drawSqareSpiral():
 						leftValues = lightValues		
 				else :
 					if rows%2> 0 :
+						topValues = darkValues
+						rightValues = lightValues
+						bottomValues = lightValues
+						leftValues = darkValues	
+					else :
+						topValues = lightValues
+						rightValues = lightValues
+						bottomValues = darkValues
+						leftValues = darkValues
+
+			elif opticalPattern == "LighteningStrikeH" : 
+
+				if rows%2 > 0 :
+					if cols%2> 0 :
+						topValues = lightValues
+						rightValues = darkValues
+						bottomValues = darkValues
+						leftValues = lightValues		
+					else :
+						topValues = darkValues
+						rightValues = darkValues
+						bottomValues = lightValues
+						leftValues = lightValues		
+				else :
+					if cols%2> 0 :
 						topValues = darkValues
 						rightValues = lightValues
 						bottomValues = lightValues

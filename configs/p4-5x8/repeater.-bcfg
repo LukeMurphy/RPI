@@ -1,0 +1,109 @@
+[displayconfig]
+
+work = repeater
+
+rendering = hub
+rotation = 0
+fullRotation = True
+rotationTrailing = False
+checkForConfigChanges = True
+isRPI = False
+useFilters = False
+
+usePixelSort = False
+pixSortDirection = medial
+pixelSortAppearanceProb = 1
+unsharpMaskPercent = 30
+blurRadius = 0
+pixSortXOffset = 0
+pixSortYOffset = 70
+pixSortboxHeight = 20
+pixSortboxWidth = 40
+pixSortgap = 10
+pixSortprobDraw = .5
+pixSortprobGetNextColor = .99
+pixSortProbDecriment = 1
+pixSortSizeDecriment = 1.5
+pixSortSampleVariance = 0
+pixSortDrawVariance = 0
+randomColorProbabilty = .001
+brightnessVarLow = 1
+brightnessVarHi = 1.1
+
+tileSizeHeight = 32
+tileSizeWidth = 64
+matrixTiles = 12
+rows = 8
+cols = 5
+
+# ---  Also determines the window geometry
+screenWidth = 320
+screenHeight = 320
+
+# ---  preparing for rotation
+windowWidth = 320
+windowHeight = 320
+
+canvasWidth = 320
+canvasHeight = 320
+
+# - for small adjustments when sending to 
+# - matrix panels & cards
+canvasOffsetX = 3
+canvasOffsetY = 3
+
+# Window Offset
+windowXOffset = 2567
+windowYOffset = 50
+
+# Window Offset
+#windowXOffset = 2567
+#windowYOffset = 105
+
+brightness =  2.8
+minBrightness = 0
+
+imageXOffset = 0
+imageYOffset = 0
+
+remapImageBlock = True
+remapImageBlockSection = 0,0,100,100
+remapImageBlockDestination = 128,96
+
+remapImageBlock2 = True
+remapImageBlockSection2 = 0,0,100,100
+remapImageBlockDestination2 = 64,60
+
+
+# This is currently set up for corner piece
+# added kaleidoscopic type effect params 
+
+
+[repeater]
+# Used for number of images etc
+#imageList = miscl/head-2tw.png
+#imageList = icons/ak-2tw.png
+#imageList = icons/test-img.png
+imageList = icons/test-img.png
+
+
+unitCount = 23
+scalingFactor = 4
+# Higher the speed factor, slower the movement
+speedFactor = 6
+vOffset = -10
+scrollSpeed = .01
+displayRows = 6
+displayCols = 5
+useJitter =  False
+useBlink = True
+noTrails = True
+colormode = random
+
+kaleidescopicEffect = True
+k_rotations = 2
+k_angle = 90
+
+
+
+

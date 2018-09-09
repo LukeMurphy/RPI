@@ -10,7 +10,8 @@ import numpy
 import random, time
 from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
-from modules import colorutils, coloroverlay, makeblockanimals #, makedrawcarcas
+from modules import colorutils, coloroverlay
+from modules.makeblocks import makeblockanimals #, makedrawcarcas
 
 global thrd, config
 
@@ -244,7 +245,7 @@ def iterate() :
 	config.colOverlayA.stepTransition()
 	config.fillColorA = tuple(int (a * config.brightness ) for a in config.colOverlayA.currentColor)
 
-	if(config.useScrollingBackGround != True):
+	if(config.useScrollingBackGround == False):
 		if(config.useColorOverlayTransitions == True) :
 			config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=config.fillColorA)
 		else :

@@ -179,7 +179,7 @@ def main(run = True) :
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	config.unitArrray = []
+	config.unitArray = []
 	for i in range(0,config.numUnits):
 		obj = unit(config)
 		obj.ferrule = config.ferrule
@@ -195,7 +195,7 @@ def main(run = True) :
 		obj.speedRange = config.speedRange
 		obj.rotationProbability = config.rotationProbability
 		obj.orthoProbability = config.orthoProbability
-		config.unitArrray.append(obj)
+		config.unitArray.append(obj)
 
 	config.rectify = True
 
@@ -241,7 +241,7 @@ def iterate() :
 
 
 	for i in range(0,config.numUnits):
-		obj = 	config.unitArrray[i]
+		obj = 	config.unitArray[i]
 		if(config.rectify == True) :
 			obj.orthoProbability = .99
 		else:

@@ -18,6 +18,8 @@ class ScrollObject :
 	yOffset = 0
 	bgBackGroundColor = (200,0,0)
 	callBack = None
+	typeOfScroller = ""
+	paused = False
 
 
 
@@ -57,8 +59,16 @@ class ScrollObject :
 
 	def scroll(self):
 
-		self.xPos += self.xSpeed
-		self.yPos += self.ySpeed
+		if self.typeOfScroller == "bg" :
+			if self.paused != True :
+				self.xPos += self.xSpeed
+				self.yPos += self.ySpeed
+			else:
+				self.xPos += self.xSpeed/20
+				self.yPos += self.ySpeed/20
+		else :
+			self.xPos += self.xSpeed
+			self.yPos += self.ySpeed
 		leadImage = self.leadImage
 		swap = False
 
@@ -71,12 +81,12 @@ class ScrollObject :
 			self.canvas.paste(self.followImage, (round(self.xPos) + self.canvasWidth,round(self.yPos )))
 
 		if (self.xPos > 1 * self.canvasWidth and self.xSpeed > 0) : 
-			self.canvas.paste(self.leadImage, ( -1 * self.canvasWidth, self.yPos))
+			self.canvas.paste(self.leadImage, ( -1 * self.canvasWidth, round(self.yPos)))
 			#if self.callBack is not None : self.callBack["func"](imageRef = leadImage, direction = self.callBack["direction"])
 			swap = True
 
 		if (self.xPos < -1 * self.canvasWidth and self.xSpeed < 0) : 
-			self.canvas.paste(self.leadImage, ( 1 * self.canvasWidth, self.yPos))
+			self.canvas.paste(self.leadImage, ( 1 * self.canvasWidth, round(self.yPos)))
 			swap = True
 
 		if(swap == True):

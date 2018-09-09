@@ -122,6 +122,8 @@ def configure(config, workconfig) :
 		config.imageXOffset = 0
 		config.imageYOffset = 0
 
+
+
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 	config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
 	#config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
@@ -156,7 +158,7 @@ def configure(config, workconfig) :
 def renderUsingIDAFruitHat(work):
 	
 	# The AdaFruit specific LED matrix HAT
-	from modules import rendertohat
+	from modules.rendering import rendertohat
 	# this tests for the power-down RPI switch
 	from cntrlscripts import stest
 	thrd = threading.Thread(target=stest.__main__)
@@ -194,7 +196,7 @@ def renderUsingIDAFruitHat(work):
 '''
 def renderUsingLINSNHub(work):
 
-	from modules import rendertohub
+	from modules.rendering import rendertohub
 
 	work.config.useFilters  = (work.workConfig.getboolean("displayconfig", 'useFilters'))
 	work.config.rotation = float(work.workConfig.get("displayconfig", 'rotation'))
@@ -207,6 +209,7 @@ def renderUsingLINSNHub(work):
 		work.config.isRPI = (work.workConfig.getboolean("displayconfig", 'isRPI')) 
 	except Exception as e: 
 		work.config.usePixSort = False
+		work.config.isRPI = False
 		print (str(e))
 
 	if(work.config.isRPI == True) : 
@@ -244,7 +247,7 @@ def renderUsingLINSNHub(work):
 '''
 def renderUsingFFMPEG(work):
 
-	from modules import rendertofile
+	from modules.rendering import rendertofile
 	config.useFilters  = (workConfig.getboolean("displayconfig", 'useFilters'))
 	config.rotation = float(workConfig.get("displayconfig", 'rotation'))
 	config.rotationTrailing = (workConfig.getboolean("displayconfig", 'rotationTrailing'))

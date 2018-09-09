@@ -371,12 +371,19 @@ def remakePatternBlock(imageRef, direction):
 		config.patternEndColor = (254,0,254,255)
 	if(random.random() < .05) :
 		config.patternEndColor = (0,0,250,255)
-	if(random.random() < .3) :
-		config.patternDrawProb = random.uniform(.08,.12)
-	if(random.random() < .3) :
-		config.patternRows = int(round(random.uniform(40,80)))
-	if(random.random() < .3) :
-		config.patternCols = int(round(random.uniform(90,240)))
+
+	if(config.alwaysRandomPattern == True) :
+		if(random.random() < .3) :
+			config.patternDrawProb = random.uniform(.08,.12)
+		if(random.random() < .3) :
+			config.patternRows = int(round(random.uniform(40,80)))
+		if(random.random() < .3) :
+			config.patternCols = int(round(random.uniform(90,240)))
+	else :
+		pass
+
+	if(config.alwaysRandomPatternColor == True) :
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
@@ -397,20 +404,38 @@ def configureBackgroundScrolling():
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
+	scrollerRef.typeOfScroller = "bg"
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.patternSpeed
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
 	config.patternColor = (50,0,55,50)
-	config.patternEndColor = (255,0,255,50)
+	config.patternEndColor = (255,0,255,50)	
+	
+	try :
+		config.pauseProb = float(workConfig.get("scroller", 'pauseProb'))
+	except Exception as e: 
+		config.pauseProb = 0.0
+		print (str(e))
+
+	if (config.alwaysRandomPatternColor == True):
+		config.patternColor = colorutils.randomColorAlpha(config.brightness)
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
+
+	config.t1  = time.time()
+	config.t2  = time.time()
+	config.timeToComplete = 1
+	config.scrollerPauseBool = False
+
 	config.scrollArray.append(scrollerRef)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def configureImageScrolling():
-	config.imageSpeed = int(workConfig.get("scroller", 'imageSpeed'))
+	config.imageSpeed = float(workConfig.get("scroller", 'imageSpeed'))
 	config.imageBlockImage = workConfig.get("scroller", 'imageBlockImage')
 	config.imageBlockBuffer = int(workConfig.get("scroller", 'imageBlockBuffer'))
 	config.imageBlockRemakeProb = float(workConfig.get("scroller", 'imageBlockRemakeProb'))
@@ -544,6 +569,8 @@ def init() :
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
+	config.overallBlur = float(workConfig.get("scroller", 'overallBlur', vars=0, fallback=0))
+
 	config.flip = False
 	config.scrollArray = []
 
@@ -560,6 +587,18 @@ def init() :
 	except Exception as e:
 		print (str(e))
 		config.altDirectionScrolling = True
+
+	try:
+		config.alwaysRandomPatternColor = workConfig.getboolean("scroller", 'alwaysRandomPatternColor')
+	except Exception as e:
+		print (str(e))
+		config.alwaysRandomPatternColor = False
+
+	try:
+		config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
+	except Exception as e:
+		print (str(e))
+		config.alwaysRandomPattern = True
 
 	if(config.useOverLayImage ==  True) :
 		configureImageOverlay()
@@ -580,11 +619,24 @@ def init() :
 	if(config.useImages == True) :
 		configureImageScrolling()
 
+
+
 def runWork():
 	global config
 	while True:
 		iterate()
 		time.sleep(config.redrawSpeed)
+
+def checkTime():
+	config.t2  = time.time()
+	delta = config.t2  - config.t1
+
+	if delta > config.timeToComplete :
+		config.scroller4.paused = False
+		config.usePixelSort = False
+		#config.rotation = 0
+
+
 
 def iterate() :
 	global config
@@ -592,9 +644,19 @@ def iterate() :
 	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
 	#config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
 
+	## Run through each of the objects being scrolled - text, image, background etc
 	for scrollerObj in config.scrollArray :
 		scrollerObj.scroll()
 		config.canvasImage.paste(scrollerObj.canvas, (0,0), scrollerObj.canvas)
+
+		if scrollerObj.typeOfScroller == "bg" :
+			if random.random() < config.pauseProb and scrollerObj.paused == False:
+				scrollerObj.paused = True
+				config.usePixelSort = True
+				#config.rotation = random.uniform(-1,1)
+				config.t1  = time.time()
+				config.timeToComplete = random.uniform(1,10)
+			checkTime()
 
 
 	# Chop up the scrollImage into "rows"
@@ -614,6 +676,9 @@ def iterate() :
 		if(random.random() < config.overlayResetRate ) :
 			config.loadedImage.paste(config.loadedImageCopy)
 		config.workImage.paste(config.loadedImage, (config.overLayXPos, config.overLayYPos), config.loadedImage)
+
+	if (config.overallBlur != 0 ) :
+		config.workImage = config.workImage.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 	
 	config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
 	config.render(config.renderImageFull, 0,0)

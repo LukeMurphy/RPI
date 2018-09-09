@@ -1,7 +1,7 @@
 
 import sys
-import pyglet
-from pyglet.gl import *
+#import pyglet
+#from pyglet.gl import *
 import noise
 from noise import *
 
@@ -23,12 +23,13 @@ def imports():
 
 def drawTest() :
 
-	points = 512
-	span = 10.0
+	points = 80
+	span = random.uniform(5.0,15.0)
+	span = 5.0
 	speed = 1.0
 	base = 5
 	min = max = 0
-	octaves = 2
+	octaves = 1
 	xMult = 150
 	yMult = 200
 	xOffset = 0
@@ -42,7 +43,7 @@ def drawTest() :
 	draw = ImageDraw.Draw(renderImage)
 	draw.rectangle((0,0,imgWidthFull,imgHeightFull), fill=(220,220,220,255))
 	#draw.rectangle((0,0,100,100), fill=(220,2,2))
-
+	xMult = 5
 
 	for n in range (0,4):
 
@@ -54,18 +55,18 @@ def drawTest() :
 			y2 = noise.pnoise2(x + base, octaves)
 			#print(x * 2.0 / span, y, 0)
 
-			xPos = xOffset + i * 2 #round(xOffset + x * xMult)
+			xPos = xOffset + i * xMult #round(xOffset + x * xMult)
 			yPos = round(yOffset + y * yMult)
 			yPos2 = round(yOffset + y2 * yMult)
 
 			draw.rectangle((xPos, yPos, 2 + xPos, 2 +  yPos), fill=(220,2,2))
-			draw.rectangle((xPos, yPos2, 2 + xPos, 2 +  yPos2), fill=(220,20,200))
-		draw.rectangle((xPos, 0, 1 + xPos, 200), fill=(0,2,200))
-		xOffset += points * 2
+			#draw.rectangle((xPos, yPos2, 2 + xPos, 2 +  yPos2), fill=(220,20,200))
+		#draw.rectangle((xPos, 0, 1 + xPos, 200), fill=(0,2,200))
+		xOffset += points * xMult
 		base += points-1
 
 	t = 1
-	baseName = "output/comp5_"
+	baseName = "./output/comp5_"
 	fn = baseName+ str(t)+".jpg"
 	renderImage.save(fn)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-from modules import utils, configuration, colorutils
+from modules import configuration, colorutils
 from modules.imagesprite import ImageSprite
 #from configs import localconfig
 
@@ -35,7 +35,7 @@ def main(run = True) :
 	## display may mean the work has to be also oriented that way
 	
 
-	config.windowOrientation = (workConfig.get("displayconfig", 'windowOrientation'))
+	config.windowOrientation = (workConfig.get("txtdisplay", 'windowOrientation'))
 	
 
 	config.xbuffer = int(workConfig.get("txtdisplay", 'xbuffer'))
@@ -47,11 +47,28 @@ def main(run = True) :
 	config.xMax = int(workConfig.get("txtdisplay", 'xMax'))
 	config.yMax = int(workConfig.get("txtdisplay", 'yMax'))
 
+	config.crawlHeight = int(workConfig.get("txtdisplay", 'crawlHeight'))
+	config.crawlPositionX = int(workConfig.get("txtdisplay", 'crawlPositionX'))
+	config.crawlPositionY = int(workConfig.get("txtdisplay", 'crawlPositionY'))
+	config.crawlRepeatDistanceFactor = float(workConfig.get("txtdisplay", 'crawlRepeatDistanceFactor'))
+
 	config.txtBoxHtMultuiplier = float(workConfig.get("txtdisplay", 'txtBoxHtMultuiplier'))
 	config.txtStringL1 = (workConfig.get("txtdisplay", 'txt1')).replace("'","")
 	config.txtStringL2 = (workConfig.get("txtdisplay", 'txt2')).replace("'","")
 	config.txtStringL3 = (workConfig.get("txtdisplay", 'txt3')).replace("'","")
 	config.crawlText = (workConfig.get("txtdisplay", 'crawlText'))
+
+	fontColor1 = workConfig.get("txtdisplay", 'fontColor1').split(",")
+	config.fontColor1 = tuple([int(i) for i in fontColor1])
+	fontColor2 = workConfig.get("txtdisplay", 'fontColor2').split(",")
+	config.fontColor2 = tuple([int(i) for i in fontColor2])
+	fontColor3 = workConfig.get("txtdisplay", 'fontColor3').split(",")
+	config.fontColor3 = tuple([int(i) for i in fontColor3])	
+	txtBackgroundColor = workConfig.get("txtdisplay", 'txtBackgroundColor').split(",")
+	config.txtBackgroundColor = tuple([int(i) for i in txtBackgroundColor])
+	backgroundColor = workConfig.get("txtdisplay", 'backgroundColor').split(",")
+	config.backgroundColor = tuple([int(i) for i in backgroundColor])
+
 
 	config.xPos  =  0
 	config.yPos = 0
@@ -102,7 +119,7 @@ def main(run = True) :
 	config.font3 = ImageFont.truetype(config.path + '/assets/fonts/freefont/FreeSansBold.ttf',config.fontSize )
 	config.pixLen = config.textDraw.textsize(config.txtStringL1, font = config.font3)
 
-	print(config.pixLen)
+	#print(config.pixLen)
 
 	config.txtColor = (255,200,0)
 	config.txtBoxWd = config.pixLen[0] + 10
@@ -111,8 +128,8 @@ def main(run = True) :
 	config.crawlLen = config.crawlDraw.textsize(config.crawlText, font = config.font3)
 	###### These will be "reversed" if the images are rotated - e.g. verical screen
 	
-	config.xVelocityRange = 5
-	config.yVelocityRange = 5
+	config.xVelocityRange = 2
+	config.yVelocityRange = 2
 	
 	
 	
@@ -233,21 +250,21 @@ def iterate( n = 0) :
 	imgText = config.textImage
 
 	fontToUse = config.font3
-	config.crawlDraw.rectangle((0,0,config.screenHeight,32), fill=(0,0,10,120))
+	config.crawlDraw.rectangle((0,0,config.screenHeight,config.crawlHeight), fill=config.txtBackgroundColor)
 	#config.crawlDraw.text((config.crawlPosx,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)
 	#config.crawlDraw.text((config.crawlPosx + 1 ,config.crawlPosy), config.crawlText, (0,0,0), font=fontToUse)
 	#config.crawlDraw.text((config.crawlPosx + 1,config.crawlPosy + 1), config.crawlText, (0,0,0), font=fontToUse)	
-	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, (100,100,100,255), font=fontToUse)
+	config.crawlDraw.text((config.crawlPosx, config.crawlPosy), config.crawlText, config.fontColor1, font=fontToUse)
 	
 	imgCrawl = config.textCrawl
 	
 	config.crawlPosx -= 1
 
-	if(config.crawlPosx < -config.crawlLen[0]) :
-		config.crawlPosx = config.screenHeight
+	if(config.crawlPosx < -config.crawlLen[0] * config.crawlRepeatDistanceFactor) :
+		config.crawlPosx = config.screenWidth
 
 	# background fill and fade
-	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(100,0,0,10))
+	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)
 
 
 	###### Paste in image
@@ -258,20 +275,22 @@ def iterate( n = 0) :
 	#config.image.paste(config.renderImage, (int(config.xPos), int(config.yPos)), config.renderImage)
 	
 	###### Paste in crawl
-	config.image.paste(imgCrawl,(0,0), imgCrawl)
+	config.image.paste(imgCrawl,(config.crawlPositionX , config.crawlPositionY), imgCrawl)
 	
 	###### Render the final full image
 	#config.render(config.renderImage, config.xPos, config.yPos, config.screenWidth, config.screenHeight, False, False)
 
 	if (config.windowOrientation == "horizontal"):
 		img = config.image.rotate(90, expand=True)
+	else:
+		img = config.image
 
 	config.render(img, 0, -32, config.screenWidth, config.screenHeight, True, False)
 
 	config.updateCanvas()
 
 def redrawBackGround() :	
-	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,200,10))
+	config.renderDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = config.backgroundColor)
 	#config.renderDraw.rectangle((0,0,4,2), fill=(255,0,0))
 	#if(random.random() > .99) : gc.collect()
 	#if(random.random() > .97) : config.renderImageFull = Image.new("RGBA", (config.screenWidth, config.screenHeight))

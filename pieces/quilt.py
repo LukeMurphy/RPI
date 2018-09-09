@@ -2,6 +2,7 @@ import time
 import random
 import textwrap
 import math
+
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 
@@ -154,8 +155,6 @@ def main(run = True) :
 	colorutils.brightness = config.brightness
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
-	config.canvasImageWidth -= 4
-	config.canvasImageHeight -= 4
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
@@ -204,7 +203,7 @@ def createPieces() :
 	global config
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArrray = []
+	config.unitArray = []
 
 	
 	## Jinky odds/evens alignment setup
@@ -239,7 +238,7 @@ def createPieces() :
 			obj.maxHue = 10
 
 			obj.setUp(n)
-			config.unitArrray.append(obj)
+			config.unitArray.append(obj)
 
 			n+=1
 
@@ -263,7 +262,7 @@ def createPieces() :
 				obj.maxHue = config.redRange[1]
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 			# BOTTOM (or RIGHT when viewed horizontally - bright colors)
 			for i in range(0,config.numUnits):
@@ -287,7 +286,7 @@ def createPieces() :
 				obj.maxHue = 360
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 			# LEFT (or BOTTOM when viewed horizontally -- darker colors)
 			for i in range(0,config.numUnits):
@@ -311,7 +310,7 @@ def createPieces() :
 				obj.maxHue = 360
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 			# TOP (or LEFT when viewed horizontally -- darker reds)
 			for i in range(0,config.numUnits):
@@ -333,7 +332,7 @@ def createPieces() :
 				obj.maxHue = config.redRange[1]
 
 				obj.setUp(n)
-				config.unitArrray.append(obj)
+				config.unitArray.append(obj)
 
 
 def runWork():
@@ -348,8 +347,8 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArrray)):
-		obj = config.unitArrray[i]
+	for i in range(0,len(config.unitArray)):
+		obj = config.unitArray[i]
 		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
 		obj.update()
 		obj.render()

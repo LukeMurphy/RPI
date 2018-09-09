@@ -6,8 +6,8 @@ import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
 from modules import colorutils, coloroverlay
-from modules.particle_system import ParticleSystem
-from modules.particle import Particle
+from modules.particles.particle_system import ParticleSystem
+from modules.particles.particle import Particle
 
 
 def main(run = True) :
@@ -85,8 +85,12 @@ def main(run = True) :
 		config.bgRangeB = int(workConfig.get("particleSystem", 'bgRangeB'))
 		config.colOverlayA.randomRange = (config.bgRangeA,config.bgRangeB)
 		#config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
-		config.colOverlayA.hueMin = int(workConfig.get("particleSystem", 'hueMin'))
-		config.colOverlayA.hueMax = int(workConfig.get("particleSystem", 'hueMax'))
+		config.colOverlayA.minHue = int(workConfig.get("particleSystem", 'minHue'))
+		config.colOverlayA.maxHue = int(workConfig.get("particleSystem", 'maxHue'))		
+
+		config.colOverlayA.minValue = float(workConfig.get("particleSystem", 'minValue'))
+		config.colOverlayA.maxValue = float(workConfig.get("particleSystem", 'maxValue'))
+
 		config.colOverlayA.maxBrightness = float(workConfig.get("particleSystem", 'maxBrightness'))
 		config.colOverlayA.bgTransparency = float(workConfig.get("particleSystem", 'bgTransparency'))
 		config.colOverlayA.randomSteps = True 
@@ -125,6 +129,15 @@ def main(run = True) :
 	except Exception as e: 
 		print (str(e)) 
 		ps.transparencyRange = (10,200)
+
+	try :
+		config.transformShape = (workConfig.getboolean("particleSystem", 'transformShape'))
+		transformTuples = workConfig.get("particleSystem", 'transformTuples').split(",")
+		config.transformTuples = tuple([float(i) for i in transformTuples])
+	except Exception as e: 
+		print (str(e)) 
+		config.transformShape = False
+
 
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
@@ -214,6 +227,16 @@ def emitParticle(i=None):
 		ps.unitArray.append(p)
 	
 
+def transformImage(img) :
+	width, height = img.size
+	m = -0.5
+	xshift = abs(m) * 420
+	new_width = width + int(round(xshift))
+
+	img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
+	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
+	return img
+	
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def colorize() :
@@ -288,7 +311,7 @@ def iterate() :
 
 
 	if random.random() < .0005 and ps.changeCohesion == True:
-		ps.cohesionDistance = random.uniform(8,30)
+		ps.cohesionDistance = random.uniform(14,30)
 		#print(ps.cohesionDistance)
 
 		
@@ -299,7 +322,8 @@ def iterate() :
 		config.draw = ImageDraw.Draw(config.image)
 
 
-
+	if(config.transformShape == True) :
+		config.image = transformImage(config.image)
 
 	config.render(config.image, 0,0)
 		

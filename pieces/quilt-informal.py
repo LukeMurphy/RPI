@@ -310,28 +310,28 @@ def drawSqareSpiral():
 
 			elif opticalPattern == "LighteningStrikeH" : 
 
-				if rows%2 > 0 :
-					if cols%2> 0 :
+				if cols%2 == 0 :
+					if rows%2 == 0 :
 						topValues = lightValues
 						rightValues = darkValues
 						bottomValues = darkValues
 						leftValues = lightValues		
 					else :
 						topValues = darkValues
-						rightValues = darkValues
-						bottomValues = lightValues
-						leftValues = lightValues		
-				else :
-					if cols%2> 0 :
-						topValues = darkValues
 						rightValues = lightValues
 						bottomValues = lightValues
+						leftValues = darkValues		
+				else :
+					if rows%2 == 0 :
+						topValues = lightValues
+						rightValues = lightValues
+						bottomValues = darkValues
 						leftValues = darkValues	
 					else :
-						topValues = lightValues
-						rightValues = lightValues
-						bottomValues = darkValues
-						leftValues = darkValues
+						topValues = darkValues
+						rightValues = darkValues
+						bottomValues = lightValues
+						leftValues = lightValues
 
 			elif opticalPattern == "Diagonals" : 
 

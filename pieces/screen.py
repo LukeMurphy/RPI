@@ -76,14 +76,24 @@ def showGrid():
 
 
 	config.colOverlay.stepTransition()
+	config.colOverlay.currentColor[3] = 30
+
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 
-	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
+
+	config.draw.rectangle((0,0,config.screenWidth/2, config.screenHeight/2), fill=config.bgColor, outline=(0,0,0))
+	if config.bgImage is not None :
+			config.image.paste(config.bgImage, (0,0), config.bgImage)
+
 
 	##This leaves more trails --- but loses smooth transition to next background color...
 	if random.random() < config.imageResetProb :
 		config.canvasDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	
+		if config.bgImage is not None :
+			config.image.paste(config.bgImage, (0,0), config.bgImage)
+			if random.random() < config.imageResetProb :
+				config.canvasImage.paste(config.bgImage, (0,0), config.bgImage)
 	
 	'''
 	## Draw the background grid
@@ -202,7 +212,6 @@ def main(run = True) :
 	config.origin = tuple(map(lambda x: int(int(x) * config.brightness) , config.originVals))	
 
 
-
 	config.image = Image.new("RGBA", (config.screenWidth  , config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth  , config.canvasHeight))
@@ -227,6 +236,18 @@ def main(run = True) :
 
 	config.crackChangeProb = float(workConfig.get("screenproject", 'crackChangeProb'))
 	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
+
+	try:
+		arg = (workConfig.get("screenproject","bgImage"))
+		path = config.path  + arg
+		config.bgImage = Image.open(path , "r")
+		print("loading : ", path)
+		if(config.bgImage.load()):
+			config.bgImage = config.bgImage.convert("RGBA")
+		imgHeight =  config.bgImage.getbbox()[3]
+	except Exception as e:
+		print (str(e))
+		config.bgImage = None
 	
 
 	config.crackArray = []

@@ -141,7 +141,8 @@ def iterate( n = 0) :
 		blocks[0].glitchBox(-config.imageGlitchDisplacement, config.imageGlitchDisplacement)
 
 	#blocks[0].image = blocks[0].image.convert(config.renderImageFull.mode)
-	config.workImage.paste(blocks[0].image.convert("RGBA"), (0,0,x,y), blocks[0].image.convert("RGBA"))
+	#config.workImage.paste(blocks[0].image.convert("RGBA"), (0,0,x,y), blocks[0].image.convert("RGBA"))
+	config.workImage.paste(blocks[0].image.convert("RGBA"), (0,0), blocks[0].image.convert("RGBA"))
 
 	if(random.random() < config.overlayChangeProb ) :
 		config.colorOverlay = colorutils.getRandomRGB()

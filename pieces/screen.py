@@ -81,7 +81,7 @@ def showGrid():
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 
 
-	config.draw.rectangle((0,0,config.screenWidth/2, config.screenHeight/2), fill=config.bgColor, outline=(0,0,0))
+	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	if config.bgImage is not None :
 			config.image.paste(config.bgImage, (0,0), config.bgImage)
 

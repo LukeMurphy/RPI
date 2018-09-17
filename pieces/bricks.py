@@ -124,8 +124,18 @@ class unit:
 		if(self.lines == True) :
 			#self.draw.polygon(poly, fill=self.fillColor,  outline=self.outlineColor)
 			#self.draw.rectangle( (poly[0] + self.xOffsetInit ,poly[1], poly[4] + self.xOffsetInit,poly[5]), fill=self.fillColor,  outline=self.outlineColor)
-			self.draw.rectangle( (poly[0] + self.xOffsetInit - self.config.hGapSize/2 ,poly[1] - self.config.vGapSize/2, poly[4] + self.xOffsetInit + self.config.hGapSize/2, poly[5] + self.config.vGapSize/2), fill=self.outlineColor,  outline=None)
-			self.draw.rectangle( (poly[0] + self.xOffsetInit ,poly[1], poly[4] + self.xOffsetInit,poly[5]), fill=self.fillColor,  outline=None)
+			self.draw.rectangle( 
+				(poly[0] + self.xOffsetInit - self.config.hGapSize/2 ,
+				poly[1] - self.config.vGapSize/2 + self.yOffsetInit, 
+				poly[4] + self.xOffsetInit + self.config.hGapSize/2, 
+				poly[5] + self.config.vGapSize/2 + self.yOffsetInit), 
+				fill=self.outlineColor,  outline=None)
+			self.draw.rectangle( 
+					(poly[0] + self.xOffsetInit ,
+					poly[1] + self.yOffsetInit, 
+					poly[4] + self.xOffsetInit,
+					poly[5] + self.yOffsetInit), 
+					fill=self.fillColor,  outline=None)
 		else:
 			self.draw.polygon(poly, fill=self.fillColor, outline=None)
 
@@ -278,7 +288,12 @@ def drawSqareSpiral():
 
 		for cols in range (0,config.blockCols) :
 
-			cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + yOffset]	
+			if cols%2 > 0 :
+				yOffset =  - config.blockHeight/2
+			else :
+				yOffset = 0
+
+			cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]	
 
 
 			b1 = config.blockLength
@@ -315,7 +330,14 @@ def drawSqareSpiral():
 			obj.poly = [A[0], A[1], A[2], A[3]]
 			obj.initPoly = initPoly
 
+			if config.rotation == 180 :
+				xOffset = 0
+
+			if config.rotation == 0 :
+				yOffset = 0
+
 			obj.xOffsetInit = xOffset
+			obj.yOffsetInit = yOffset
 
 			obj.minHue = 350
 			obj.maxHue = 10			

@@ -36,6 +36,11 @@ def createPieces(config) :
 	[0,0,0,0,0,0,0,0]
 	]
 
+
+	# the pattern array chooses which color each triangle is meant to be
+	# each star unit is comprised of 4 rows and 4 columns of sqaures that 
+	# are each divided into 4 smaller triangles
+	
 	pattern = [
 	[0,0,0,0,0,0,0,0],
 	[1,0,0,0,1,1,1,0],
@@ -92,3 +97,10 @@ def createPieces(config) :
 					obj.setUp()
 					config.unitArray.append(obj)
 					n+=1
+
+
+
+
+
+
+

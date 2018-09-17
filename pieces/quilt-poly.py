@@ -6,6 +6,7 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 from modules.quilting.colorset import ColorSet
 from modules.quilting import createtrianglepieces
+from modules.quilting import createpolypieces
 from modules.quilting import createstarpieces
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -41,10 +42,9 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
 
 
-	if config.quiltPattern == "triangles" :
-		createtrianglepieces.createPieces(config)
-	elif config.quiltPattern == "stars" :
-		createstarpieces.createPieces(config)
+	if config.quiltPattern == "polys" :
+		createpolypieces.createPieces(config)
+
 
 
 
@@ -137,10 +137,9 @@ def main(run = True) :
 	except Exception as e:
 		print (e)
 
-	if config.quiltPattern == "triangles" :
-		createtrianglepieces.createPieces(config)
-	elif config.quiltPattern == "stars" :
-		createstarpieces.createPieces(config)
+	if config.quiltPattern == "polys" :
+		createpolypieces.createPieces(config)
+
 
 	config.t1  = time.time()
 	config.t2  = time.time()

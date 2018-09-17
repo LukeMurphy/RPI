@@ -122,7 +122,7 @@ def main(run = True) :
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
+	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 
 	config.unitArray = []
 
@@ -166,7 +166,7 @@ def iterate() :
 		obj.update()
 		obj.render()
 
-	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)

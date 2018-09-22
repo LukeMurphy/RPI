@@ -133,7 +133,7 @@ def makeGrid():
 
 	config.t1  = time.time()
 	config.t2  = time.time()
-	config.timeToComplete = round(random.uniform(30,220))
+	config.timeToComplete = round(random.uniform(60,220))
 
 	for row in range (0, config.rows) :
 		for col in range (0, config.cols) :

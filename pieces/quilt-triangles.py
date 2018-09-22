@@ -167,7 +167,7 @@ def iterate() :
 		obj.update()
 		obj.render()
 
-	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)

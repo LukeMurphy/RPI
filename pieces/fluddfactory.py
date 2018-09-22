@@ -350,7 +350,7 @@ def main(run = True) :
 	global config
 	global fludds
 	fludds = []
-	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 
 	config.rowsOfSquares = int(workConfig.get("fludd", 'rowsOfSquares'))

@@ -141,7 +141,9 @@ class Unit:
 		n = 0
 		for row in range(0,5):
 			for col in range(0,5):
-				self.sqrPoints[letters[n]] = (self.xPos + col * self.blockLength, self.yPos + row * self.blockHeight)
+				xRnd = round(random.uniform(-self.config.randomness,self.config.randomness))
+				yRnd = round(random.uniform(-self.config.randomness,self.config.randomness))
+				self.sqrPoints[letters[n]] = (self.xPos + col * self.blockLength + xRnd, self.yPos + row * self.blockHeight + yRnd)
 				n = n+1
 
 		#print(self.xPos, self.blockLength)

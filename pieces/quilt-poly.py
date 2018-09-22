@@ -137,6 +137,15 @@ def main(run = True) :
 	except Exception as e:
 		print (e)
 
+
+	try :
+		config.randomness = int(workConfig.get("quilt", 'randomness')) 
+	except Exception as e:
+		config.randomness = 0
+		print (e)
+
+
+
 	if config.quiltPattern == "polys" :
 		createpolypieces.createPieces(config)
 

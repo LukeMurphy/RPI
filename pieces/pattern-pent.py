@@ -25,37 +25,26 @@ def cross(x, y, l = 1, w = 1) :
 
 	return [a,b,c,d,e,f,g,h,i,j,k,m]
 
-def drawPatternBlock(rows, cols, f1, f2, l, w, draw, offsetX0, offsetY0, 
-	colrule=None, rowrule=None, interstitial = 0, intrastitial = 0 ):
-	rCount = 0
-	cCount = 0
-	for r in range (0, rows) :
-		offsetY = offsetY0 + r * (l+w+ interstitial) 
-		for c in range (0,cols) :
-			offsetX = offsetX0 +  c * (l + w + interstitial) 
-			f = f1
-			if c%2 > 0:
-				f = f2
-			box = cross(offsetX + c * (l+w) + c * interstitial , 
-						offsetY + (l+w) * r + r * interstitial , 
-						l, w)
+def pentagram(x, y, a = 1, n = 5, offset = 0, turn = 0) :
+	pointArray = []
+	theta = 2*math.pi / n
+	theta2 = 2*math.pi/4 - theta
+	angleOffset = 0
+	if turn ==0 : angleOffset = theta/ (n - 1)
 
-			if colrule is not None :
-				if r in rowrule :
-					if rCount%2 > 0:
-						f = f1
-					else :
-						f = f2
-					rCount+=1
-				if c in colrule :
-					if cCount%2 > 0:
-						f = f1
-					else :
-						f = f2
-					cCount+=1
-					draw.polygon(box, fill = f)
-			else :
-				draw.polygon(box, fill = f)
+	d = a * math.cos(theta2) / 2
+	r = a / (2 * math.cos(theta2))
+
+	for nn in range (0,n) :
+		xpt = x + math.cos(nn * theta - angleOffset + offset) * r
+		ypt = y + math.sin(nn * theta - angleOffset + offset) * r
+		pointArray.append((xpt,ypt))
+
+	return (pointArray,d)
+
+
+
+
 
 
 def drawPattern():
@@ -83,69 +72,54 @@ def drawPattern():
 	base = config.base
 	exp = 0
 
-	b0 = 0
-	b1 = 1 * base
-	b3 = 3 * base
-	b4 = 4 * base
-	b5 = 5 * base
-	b7 = 7 * base
-	b8 = 8 * base
-	b9 = 9 * base
-	b11 = 11 * base
-	b12 = 12 * base
-	b13 = 13 * base
-	b17 = 17 * base
-	patternXOffset = -b7
+	x = 100
+	y = 100
+	a = 50
+	n = 5
+	offset = 0
+	theta = 2*math.pi/n
+	theta2 = 2*math.pi/4 - theta
 
-	draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=f6)
+	box = pentagram(x, y, a, n, offset)
+	draw.polygon(box[0], fill = f1)
 
-	inter = 0 + exp
-	drawPatternBlock(rows, cols, f2, f1, b3, b5, draw, b1 + patternXOffset, b7, None, None, inter)
-	drawPatternBlock(rows, cols, f2, f1, b5, b3, draw, b0 + patternXOffset, b8, None, None, inter)
+	d = box[1] 
 
-	l = base
-	w = base 
+	offset = 2*math.pi/4 - theta
+	for i in range(0,n) :
 
-	inter = 6 * base  + exp
-	# Top
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, b5 + patternXOffset, b1, None, None, inter)
-	
-	# Right
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, b11 + patternXOffset , b9, None, None, inter)
-	# Left
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, -b1 + patternXOffset , b9, None, None, inter)
+		x1 = x + math.cos(theta2) * d * 2
+		y1 = y + math.sin(theta2) * d * 2
 
-	
-	# Bottom
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, b5 + patternXOffset, b17, None, None, inter)
-	
-	# 3x3 grid
-	for ii in range(0,round(rows), 1) :
-		yOffset = ii * base * 16
-		for i in range(0,round(rows), 2) :
-			xOffset = i * base * 16
-			drawPatternBlock(3, 3, f2, f2, l, w, draw, b1 + patternXOffset + xOffset, b5 + yOffset, None,None, 0)
-			drawPatternBlock(3, 3, f1, f1, l, w, draw, b17 + patternXOffset + xOffset, b5 + yOffset, None,None, 0)
+		offset += theta
+		theta2 += theta
 
-	# interior x
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b5 + patternXOffset, b5, None, None, inter)
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b5 + patternXOffset, b13, None, None, inter)
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b1 + patternXOffset, b9, None, None, inter)
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b9 + patternXOffset, b9, None, None, inter)
-	# larger center x
-	drawPatternBlock(rows, cols, f4, f5, b1, b3, draw, b4 + patternXOffset, 8 * base, None, None,  b4 + exp)
-	# Center
-	drawPatternBlock(rows, cols, f5, f4, l, w, draw, b5 + patternXOffset, b9, None, None, inter)
+		f = f2
+		if i == 0 : f= f3
 
-	# interior off- x
-	drawPatternBlock(rows* 2, cols, f4, f5, l, w, draw, b9 + patternXOffset, b1, None, None, inter)
-	drawPatternBlock(rows* 2, cols, f4, f5, l, w, draw, b17 + patternXOffset, b1, None, None, inter)
-	drawPatternBlock(rows* 1, cols, f4, f5, l, w, draw, b13 + patternXOffset, b13, None, None, inter)
-	drawPatternBlock(rows* 2, cols, f4, f5, l, w, draw, b13 + patternXOffset, b5, None, None, inter)
-	# larger center x
-	drawPatternBlock(rows * 2, cols, f4, f5, b1, b3, draw, b12 + patternXOffset, 0 * base, None, None,  b4 + exp)
-	# Center
-	drawPatternBlock(rows * 2, cols, f2, f1, l, w, draw, b13 + patternXOffset, b1, None, None, inter)
+		box = pentagram(x1, y1, a, n, offset, 1)
+		draw.polygon(box[0], fill = f)
+		draw.rectangle((x,y,x+3,y+3), fill="red")
+		
+		offset2 = math.pi/n + offset
+		theta2b = 2*math.pi/4 - theta2
+
+		if i == 1 :
+			for ii in range(i,n) :
+
+				x2 = x1 + math.cos(theta2b) * d * 2 
+				y2 = y1 + math.sin(theta2b) * d * 2
+
+				offset2 += theta
+				theta2b += theta
+
+				f = f4
+				#if ii == 0 : f= f5
+
+				box = pentagram(x2, y2, a, n, offset2, 0)
+				#draw.polygon(box[0], fill = f)
+				draw.rectangle((x2,y2,x2+3,y2+3), fill="red")
+
 	'''
 	'''
 	#renderImage.save("pattern.png")

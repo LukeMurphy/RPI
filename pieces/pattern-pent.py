@@ -7,30 +7,14 @@ from modules import colorutils, coloroverlay
 import argparse
 
 
-def cross(x, y, l = 1, w = 1) :
-	# 12 points
-
-	a = (x, y)
-	b = (x + l, y)
-	c = (x + l, y - l)
-	d = (x + l + w, y - l)
-	e = (x + l + w, y )
-	f = (x + l + w + l, y )
-	g = (x + l + w + l, y + w)
-	h = (x + l + w, y + w)
-	i = (x + l + w, y + l + w )
-	j = (x + l, y + l + w )
-	k = (x + l, y +  w)
-	m = (x, y + w)
-
-	return [a,b,c,d,e,f,g,h,i,j,k,m]
 
 def pentagram(x, y, a = 1, n = 5, offset = 0, turn = 0) :
 	pointArray = []
 	theta = 2*math.pi / n
 	theta2 = 2*math.pi/4 - theta
 	angleOffset = 0
-	if turn ==0 : angleOffset = theta/ (n - 1)
+	if turn ==0 : 
+		angleOffset = theta / (n - 1)
 
 	d = a * math.cos(theta2) / 2
 	r = a / (2 * math.cos(theta2))
@@ -44,6 +28,42 @@ def pentagram(x, y, a = 1, n = 5, offset = 0, turn = 0) :
 
 
 
+def marker(x, y, draw, f = "red"):
+	draw.rectangle((x,y,x+3,y+3), fill=f)
+
+
+def drawPolygons(start, end, x, y, d, theta, level = 1, parent = 0):
+	draw = config.draw
+	a = config.a
+	offset = 2*math.pi/4 - theta
+	theta2 = theta #2*math.pi/4 - config.theta
+	for i in range(start, end) :
+		theta2 += config.theta
+
+		x1 = x + math.cos(theta2) * d * 2
+		y1 = y + math.sin(theta2) * d * 2
+
+		offset = theta2
+		box = pentagram(x1, y1, config.a, config.n, offset, 1)
+		f = config.colorArray[level]
+		draw.polygon(box[0], fill = f)
+		marker(x1,y1,draw)
+		if i == 0 :
+			marker(x1,y1,draw, "blue")
+
+		d = box[1]
+
+		if level < 2 and i < 5:
+			_start  = i * 2
+			_end = _start + 1
+			theta3 = i  * config.theta + (2*math.pi/config.n - theta) - level * config.theta
+
+
+			if _start == 6 :
+				_start = 3
+				_end = 5
+				theta3 = (i - 5)  * config.theta + (2*math.pi/config.n - theta) - level * config.theta
+			drawPolygons(_start, _end, x1, y1, d, theta3, level+1, i)
 
 
 
@@ -59,12 +79,14 @@ def drawPattern():
 	config.f5.stepTransition()
 	config.f6.stepTransition()
 
-	f1 = tuple(config.f1.currentColor)
-	f2 = tuple(config.f2.currentColor)
-	f3 = tuple(config.f3.currentColor)
-	f4 = tuple(config.f4.currentColor)
-	f5 = tuple(config.f5.currentColor)
-	f6 = tuple(config.f6.currentColor)
+	config.f1t = tuple(config.f1.currentColor)
+	config.f2t = tuple(config.f2.currentColor)
+	config.f3t = tuple(config.f3.currentColor)
+	config.f4t = tuple(config.f4.currentColor)
+	config.f5t = tuple(config.f5.currentColor)
+	config.f6t = tuple(config.f6.currentColor)
+
+	config.colorArray = [config.f1t,config.f2t,config.f3t,config.f4t,config.f5t,config.f6t]
 
 	rows = config.rows
 	cols = config.cols
@@ -74,18 +96,25 @@ def drawPattern():
 
 	x = 100
 	y = 100
-	a = 50
-	n = 5
+	config.a = 20
+	config.n = 5
 	offset = 0
-	theta = 2*math.pi/n
-	theta2 = 2*math.pi/4 - theta
+	config.theta = 2*math.pi/config.n
+	theta2 = 2*math.pi/4 - config.theta
 
-	box = pentagram(x, y, a, n, offset)
-	draw.polygon(box[0], fill = f1)
+	box = pentagram(x, y, config.a, config.n, offset)
+	draw.polygon(box[0], fill = config.f1t)
+	#marker(x,y,config.draw)
 
 	d = box[1] 
 
-	offset = 2*math.pi/4 - theta
+	offset = 2*math.pi/4 - config.theta
+
+	drawPolygons(0,config.n, x, y, d, theta2)
+
+	
+	'''
+
 	for i in range(0,n) :
 
 		x1 = x + math.cos(theta2) * d * 2
@@ -99,31 +128,33 @@ def drawPattern():
 
 		box = pentagram(x1, y1, a, n, offset, 1)
 		draw.polygon(box[0], fill = f)
-		draw.rectangle((x,y,x+3,y+3), fill="red")
+		marker(x1,y1,draw)
 		
-		offset2 = math.pi/n + offset
-		theta2b = 2*math.pi/4 - theta2
+		theta2b = 2*math.pi/n - theta2
+		offset2 = 0
 
-		if i == 1 :
-			for ii in range(i,n) :
+		if i < n :
+			start  = i * 2
+			end = start + 2
+			for ii in range(start, end) :
 
-				x2 = x1 + math.cos(theta2b) * d * 2 
-				y2 = y1 + math.sin(theta2b) * d * 2
+				offset2 = theta * ii
+				theta3 = ii * theta + (2*math.pi/n - theta2)
 
-				offset2 += theta
-				theta2b += theta
+				x2 = x1 + math.cos(theta3) * d * 2 
+				y2 = y1 + math.sin(theta3) * d * 2
 
 				f = f4
-				#if ii == 0 : f= f5
-
 				box = pentagram(x2, y2, a, n, offset2, 0)
-				#draw.polygon(box[0], fill = f)
-				draw.rectangle((x2,y2,x2+3,y2+3), fill="red")
+				draw.polygon(box[0], fill = f)
+				fi = "green"
+				if ii == 0 : fi = "blue"
+				marker(x2,y2,draw,fi)
 
 	'''
-	'''
+
+
 	#renderImage.save("pattern.png")
-
 	#print (rows, b17, cols*b17)
 
 def getColorChanger():

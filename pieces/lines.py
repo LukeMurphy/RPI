@@ -117,7 +117,7 @@ class Line:
 				dx = x1 - x0
 				dy = y1 - y0
 				l = math.sqrt(dx*dx + dy*dy)
-				s = l + 100
+				s = l + 0
 				
 				self.config.canvasDraw.rectangle((x0,y0,x1 + s,y1 + s), fill=self.lineColor)
 				self.config.canvasDraw.ellipse((x0,y0,x0 + s,y0 + s), fill=self.lineColor)

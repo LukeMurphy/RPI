@@ -8,63 +8,55 @@ import argparse
 
 
 
-def pentagram(x, y, a = 1, n = 5, offset = 0, turn = 0) :
-	pointArray = []
-	theta = 2*math.pi / n
-	theta2 = 2*math.pi/4 - theta
-	angleOffset = 0
-	if turn ==0 : 
-		angleOffset = theta / (n - 1)
-
-	d = a * math.cos(theta2) / 2
-	r = a / (2 * math.cos(theta2))
-
-	for nn in range (0,n) :
-		xpt = x + math.cos(nn * theta - angleOffset + offset) * r
-		ypt = y + math.sin(nn * theta - angleOffset + offset) * r
-		pointArray.append((xpt,ypt))
-
-	return (pointArray,d)
-
-
-
 def marker(x, y, draw, f = "red"):
 	draw.rectangle((x,y,x+3,y+3), fill=f)
 
 
-def drawPolygons(start, end, x, y, d, theta, level = 1, parent = 0):
-	draw = config.draw
-	a = config.a
-	offset = 2*math.pi/4 - theta
-	theta2 = theta #2*math.pi/4 - config.theta
-	for i in range(start, end) :
-		theta2 += config.theta
+def drawFigure(offset=(0,0), angleOffset=0, level = 0, numChildren=0, fillLevel = 0):
+	if(level <= 7) :
+		pointsArray = []
+		#marker(offset[0] + config.offset[0],offset[1]+ config.offset[1],config.draw, "yellow")
+		
+		#numberChildren = config.n if level < 1 else numChildren
 
-		x1 = x + math.cos(theta2) * d * 2
-		y1 = y + math.sin(theta2) * d * 2
+		start = 0
+		end = config.n
+		
+		if fillLevel >= len(config.colorArray): fillLevel = 0
 
-		offset = theta2
-		box = pentagram(x1, y1, config.a, config.n, offset, 1)
-		f = config.colorArray[level]
-		draw.polygon(box[0], fill = f)
-		marker(x1,y1,draw)
-		if i == 0 :
-			marker(x1,y1,draw, "blue")
+		for i in range(0, config.n) :
+			angle = config.theta * i + angleOffset
+			x = config.r * math.cos(angle) + config.offset[0] + offset[0]
+			y = config.r * math.sin(angle) + config.offset[1] + offset[1]
 
-		d = box[1]
+			pointsArray.append((x,y))
 
-		if level < 2 and i < 5:
-			_start  = i * 2
-			_end = _start + 1
-			theta3 = i  * config.theta + (2*math.pi/config.n - theta) - level * config.theta
+			x1 = (config.n - 2) * config.d * math.cos(angle + config.theta/2) + offset[0]
+			y1 = (config.n - 2) * config.d * math.sin(angle + config.theta/2) + offset[1]
+			newOffset = (x1,y1)
+			
+
+			if level %2 > 0 :
+				newAngle = angle - config.theta/2 	
+				alt = 1		
+			else :
+				newAngle = angle + config.theta/2 
+				alt = 4
+			
+			if (i == 0 or level < 1) and numChildren != -1:
+				drawFigure(newOffset, newAngle, level + 1, numChildren, fillLevel+1)
+
+			if level == 1 and i == 14:
+				marker(x , y, config.canvasDraw)
+				drawFigure(newOffset, newAngle - config.theta, level + 1, -1, fillLevel+1)
+
+			if level == 1 and i == 1:
+				marker(x , y, config.canvasDraw)
+				drawFigure(newOffset, newAngle + 1 *config.theta, level + 1, -1, fillLevel+1)
 
 
-			if _start == 6 :
-				_start = 3
-				_end = 5
-				theta3 = (i - 5)  * config.theta + (2*math.pi/config.n - theta) - level * config.theta
-			drawPolygons(_start, _end, x1, y1, d, theta3, level+1, i)
-
+		if len(pointsArray) > 0:
+			config.draw.polygon(pointsArray, outline="black", fill = config.colorArray[fillLevel])
 
 
 def drawPattern():
@@ -94,68 +86,42 @@ def drawPattern():
 	base = config.base
 	exp = 0
 
-	x = 100
-	y = 100
-	config.a = 20
 	config.n = 5
-	offset = 0
-	config.theta = 2*math.pi/config.n
-	theta2 = 2*math.pi/4 - config.theta
+	config.r = 12
+	config.offset = (100,100)
 
-	box = pentagram(x, y, config.a, config.n, offset)
-	draw.polygon(box[0], fill = config.f1t)
-	#marker(x,y,config.draw)
-
-	d = box[1] 
-
-	offset = 2*math.pi/4 - config.theta
-
-	drawPolygons(0,config.n, x, y, d, theta2)
-
+	## Start from center for each polygon
+	"sin (theta) = (r + d) / s"
+	"s = 2 * r * cos(theta/2)"
 	
-	'''
+	config.theta = 2*math.pi/config.n
+	config.side = 2 * config.r * math.cos(config.theta/2)
+	config.d = config.side * math.sin(config.theta) - config.r
+	
+	#marker(config.offset[0],config.offset[1],draw,"green")
+	#drawFigure()
 
-	for i in range(0,n) :
-
-		x1 = x + math.cos(theta2) * d * 2
-		y1 = y + math.sin(theta2) * d * 2
-
-		offset += theta
-		theta2 += theta
-
-		f = f2
-		if i == 0 : f= f3
-
-		box = pentagram(x1, y1, a, n, offset, 1)
-		draw.polygon(box[0], fill = f)
-		marker(x1,y1,draw)
-		
-		theta2b = 2*math.pi/n - theta2
-		offset2 = 0
-
-		if i < n :
-			start  = i * 2
-			end = start + 2
-			for ii in range(start, end) :
-
-				offset2 = theta * ii
-				theta3 = ii * theta + (2*math.pi/n - theta2)
-
-				x2 = x1 + math.cos(theta3) * d * 2 
-				y2 = y1 + math.sin(theta3) * d * 2
-
-				f = f4
-				box = pentagram(x2, y2, a, n, offset2, 0)
-				draw.polygon(box[0], fill = f)
-				fi = "green"
-				if ii == 0 : fi = "blue"
-				marker(x2,y2,draw,fi)
-
-	'''
-
+	drawRing()
 
 	#renderImage.save("pattern.png")
 	#print (rows, b17, cols*b17)
+
+
+def drawRing():
+	offset=(0,0)
+	angleOffset = 0
+	level = 0
+	numChildren=0
+	fillLevel = 0
+	pointsArray = []
+
+	for i in range(0, config.n) :
+		angle = config.theta * i + angleOffset
+		x = config.r * math.cos(angle) + config.offset[0] + offset[0]
+		y = config.r * math.sin(angle) + config.offset[1] + offset[1]
+		pointsArray.append((x,y))
+	
+	config.draw.polygon(pointsArray, outline="black", fill = config.colorArray[fillLevel])
 
 def getColorChanger():
 	colOverlay = coloroverlay.ColorOverlay()
@@ -170,21 +136,8 @@ def getColorChanger():
 def showGrid():
 	global config
 
-
-	#config.image = config.image.rotate(config.imageRotation, expand=1)
-
 	config.image.paste(config.canvasImage, (0,0), config.canvasImage)
 	config.render(config.image, round(config.imageOffsetX), round(config.imageOffsetY))
-	#if (random.random() < .02) :
-		#config.base = random.uniform(2,5)
-	#config.base += .1
-	#config.imageOffsetX = -config.base*config.cols
-	#config.imageOffsetY = -config.base*config.rows
-
-	#config.imageOffsetX = -0
-	#config.imageOffsetY = -0
-
-	#config.imageRotation += .1
 
 
 
@@ -237,7 +190,7 @@ def main(run = True) :
 
 	setUp()
 
-	if(run) : runWork()
+	#if(run) : runWork()
 
 
 def setUp():

@@ -25,6 +25,7 @@ def cross(x, y, l = 1, w = 1) :
 
 	return [a,b,c,d,e,f,g,h,i,j,k,m]
 
+
 def drawPatternBlock(rows, cols, f1, f2, l, w, draw, offsetX0, offsetY0, 
 	colrule=None, rowrule=None, interstitial = 0, intrastitial = 0 ):
 	rCount = 0
@@ -61,7 +62,6 @@ def drawPatternBlock(rows, cols, f1, f2, l, w, draw, offsetX0, offsetY0,
 def drawPattern():
 
 	draw = config.draw
-
 
 	config.f1.stepTransition()
 	config.f2.stepTransition()
@@ -152,6 +152,7 @@ def drawPattern():
 
 	#print (rows, b17, cols*b17)
 
+
 def getColorChanger():
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False 
@@ -162,25 +163,26 @@ def getColorChanger():
 	return colOverlay
 
 
+def drawTheReal() :
+	x = 150
+	y = 128
+	w = 120 + x
+	h = 80 + y
+	box = tuple([x, y, w, h])
+	config.canvasDraw.rectangle(box, fill = tuple(config.f6.currentColor))
+
+	lines = h - y
+	for i in range(0, lines, 5)  :
+		f =  tuple(config.f1.currentColor)
+		if random.random() < .1 :
+			f = colorutils.randomColor(1)
+		config.canvasDraw.rectangle((x,y+i,w,y+i+2) , fill = f)
+
+
 def showGrid():
 	global config
-
-
-	#config.image = config.image.rotate(config.imageRotation, expand=1)
-
 	config.image.paste(config.canvasImage, (0,0), config.canvasImage)
 	config.render(config.image, round(config.imageOffsetX), round(config.imageOffsetY))
-	#if (random.random() < .02) :
-		#config.base = random.uniform(2,5)
-	#config.base += .1
-	#config.imageOffsetX = -config.base*config.cols
-	#config.imageOffsetY = -config.base*config.rows
-
-	#config.imageOffsetX = -0
-	#config.imageOffsetY = -0
-
-	#config.imageRotation += .1
-
 
 
 def main(run = True) :
@@ -251,11 +253,8 @@ def iterate() :
 	global config
 	drawPattern()
 	showGrid()
+	drawTheReal()
 
-
-def callBack() :
-	global config
-	return True
 
 
 

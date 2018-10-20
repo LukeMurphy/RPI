@@ -126,6 +126,8 @@ def drawConcentricRings():
 	figs = config.repeatFigures
 	config.r = 200
 
+	config.turnRate += .01
+
 	f = 0
 	for figures in range(0, figs):
 

@@ -219,20 +219,6 @@ def main(run = True) :
 
 
 
-	'''
-	config.colOverlay.minHue = float(workConfig.get("screenproject", 'minHue'))
-	config.colOverlay.maxHue = float(workConfig.get("screenproject", 'maxHue'))
-	config.colOverlay.minSaturation = float(workConfig.get("screenproject", 'minSaturation'))
-	config.colOverlay.maxSaturation= float(workConfig.get("screenproject", 'maxSaturation'))
-	config.colOverlay.minValue = float(workConfig.get("screenproject", 'minValue'))
-	config.colOverlay.maxBrightness = float(workConfig.get("screenproject", 'maxBrightness'))
-	config.colOverlay.maxValue = float(workConfig.get("screenproject", 'maxValue'))
-
-	config.crackChangeProb = float(workConfig.get("screenproject", 'crackChangeProb'))
-	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
-	'''
-
-
 
 	setUp()
 

@@ -22,6 +22,52 @@ def getColorChanger():
 	return colOverlay
 
 
+def drawFigure(offset=(0, 0), angleOffset=0, level=0, numChildren=0, fillLevel=0):
+	if(level <= 7):
+		pointsArray = []
+		#marker(offset[0] + config.offset[0],offset[1]+ config.offset[1],config.draw, "yellow")
+
+		#numberChildren = config.n if level < 1 else numChildren
+
+		start = 0
+		end = config.n
+
+		if fillLevel >= len(config.colorArray):
+			fillLevel = 0
+
+		for i in range(0, config.n):
+			angle = config.theta * i + angleOffset
+			x = config.r * math.cos(angle) + config.offset[0] + offset[0]
+			y = config.r * math.sin(angle) + config.offset[1] + offset[1]
+
+			pointsArray.append((x, y))
+
+			x1 = (config.n - 2) * config.d * math.cos(angle + config.theta / 2) + offset[0]
+			y1 = (config.n - 2) * config.d * math.sin(angle + config.theta / 2) + offset[1]
+			newOffset = (x1, y1)
+
+			if level % 2 > 0:
+				newAngle = angle - config.theta / 2
+				alt = 1
+			else:
+				newAngle = angle + config.theta / 2
+				alt = 4
+
+			if (i == 0 or level < 1) and numChildren != -1:
+				drawFigure(newOffset, newAngle, level + 1, numChildren, fillLevel + 1)
+
+			if level == 1 and i == 14:
+				marker(x, y, config.canvasDraw)
+				drawFigure(newOffset, newAngle - config.theta, level + 1, -1, fillLevel + 1)
+
+			if level == 1 and i == 1:
+				marker(x, y, config.canvasDraw)
+				drawFigure(newOffset, newAngle + 1 * config.theta, level + 1, -1, fillLevel + 1)
+
+		if len(pointsArray) > 0:
+			config.draw.polygon(pointsArray, outline="black", fill=config.colorArray[fillLevel])
+
+
 def drawPattern():
 
 	draw = config.draw
@@ -31,8 +77,22 @@ def drawPattern():
 		i.stepTransition()
 		config.colorArray.append(tuple(i.currentColor))
 
-	drawConcentricRings()
+	'''
+	rows = config.rows
+	cols = config.cols
+
+	base = config.base
+	exp = 0
+	'''
+
+	# marker(config.offset[0],config.offset[1],draw,"green")
+	drawFigure()
+
+
 	drawTheReal()
+
+	# renderImage.save("pattern.png")
+
 
 
 def drawTheReal() :
@@ -53,90 +113,48 @@ def drawTheReal() :
 		config.canvasDraw.rectangle((x,y+i,w,y+i+config.blockLineHeight) , fill = f)
 
 
-def resetPause() :
-	config.paused = False
-	
-	#config.turnRateLimPlus = random.uniform(1,3)
-	#config.turnRateLimNeg = random.uniform(config.turnRateLimPlus-1 ,config.turnRateLimPlus - 3)
 
-
-def drawConcentricRings():
+def drawRings():
 	offset = (0, 0)
 	angleOffset = 0
 	level = 0
 	numChildren = 0
 	fillLevel = 0
 
-	figs = config.repeatFigures
-	config.r = 200
+	for ring in range(0, 4):
 
-	"Ideally, make the rate of change sinusoidal - i.e. change the rate\
-	gradually over time so there are smooth transitions back and forth"
+		if ring == 0 : 
+			figs = 1
+			figTheta = config.theta
+		if ring == 1 : 
+			figs = 5
+			figTheta = config.theta
+		if ring > 1 : 
+			figs = 10
+			figTheta = config.theta/2
 
-	'''
-	config.angle += config.angleIncrement
-	if config.angle == 0 or config.angle == math.pi or config.angle == 2*math.pi :
-		pass
-	else :
-		m = 2
-		#x = m - abs(i % (2*m) - m)
-		#rate = m - abs(math.sin(config.angle) % 2*m - m) + .8
-		rate = m - abs((config.angle) % 2*m - m) + .9
-	'''
-
-	if random.random() > .99 :
-		config.turnRateChange = random.uniform(.5,3) / config.turnRateFactor
+		r = ring * config.d * 3
 
 
+		for figures in range(0, figs):
 
-	if config.paused == False :
-		config.turnRate += config.turnRateChange * config.turnRateDirection
-		#config.turnRate = rate 
-		
-		if config.turnRate > config.turnRateLimPlus :
+			figureAngle = figTheta * figures - config.theta/2 * ring
+			figx = r * math.cos(figureAngle)
+			figy = r * math.sin(figureAngle)
+			figureAngleOffset = config.theta/2 * ring
 
+			pointsArray = []
 
-			config.turnRateDirection = -1
-			config.turnRate = config.turnRateLimPlus
+			for i in range(0, config.n):
+				angle = config.theta * i + figureAngleOffset
+				x = config.r * math.cos(angle) + config.offset[0] + figx
+				y = config.r * math.sin(angle) + config.offset[1] + figy
+				pointsArray.append((x,y))
 
-			#config.paused = True
-			d = random.uniform(.5,2)
-			t1 = Timer(d, resetPause)
-			#t1.start()
-
-		if config.turnRate < config.turnRateLimNeg:
-			config.turnRateDirection = 1
-
-			#config.paused = True
-			d = random.uniform(.5,2)
-			t = Timer(d,resetPause)
-			#t.start()
-		
-
-
-	f = 0
-	for figures in range(0, figs):
-
-		figureAngle = 0 * figures 
-		figx = 0
-		figy = 0
-		figureAngleOffset = config.theta/config.turnRate * figures
-
-		config.r*= config.reduceRate/config.phi
-
-		pointsArray = []
-
-		for i in range(0, config.n):
-			angle = config.theta * i + figureAngleOffset
-			x = config.r * math.cos(angle) + config.offset[0] + figx
-			y = config.r * math.sin(angle) + config.offset[1] + figy
-			pointsArray.append((x,y))
-
-		config.draw.polygon(pointsArray, outline=None, fill = config.colorArray[f])
-
-		f += 1
-		if f >= config.colorRep : f = 0
-
+			if ring  == 2 :
+				marker(figx + config.offset[0],figy + config.offset[1],config.canvasDraw)
+			config.draw.polygon(pointsArray, outline="black", fill = config.colorArray[ring])
+	
 
 def showGrid():
 	global config

@@ -5,6 +5,7 @@ import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, coloroverlay
 import argparse
+from threading import Timer
 
 
 def marker(x, y, draw, f="red"):
@@ -70,50 +71,53 @@ def drawFigure(offset=(0, 0), angleOffset=0, level=0, numChildren=0, fillLevel=0
 def drawPattern():
 
 	draw = config.draw
+	config.colorArray = []
 
-	config.f1.stepTransition()
-	config.f2.stepTransition()
-	config.f3.stepTransition()
-	config.f4.stepTransition()
-	config.f5.stepTransition()
-	config.f6.stepTransition()
+	for i in config.colorArrayBase :
+		i.stepTransition()
+		config.colorArray.append(tuple(i.currentColor))
 
-	config.f1t = tuple(config.f1.currentColor)
-	config.f2t = tuple(config.f2.currentColor)
-	config.f3t = tuple(config.f3.currentColor)
-	config.f4t = tuple(config.f4.currentColor)
-	config.f5t = tuple(config.f5.currentColor)
-	config.f6t = tuple(config.f6.currentColor)
-
-	config.colorArray = [config.f1t, config.f2t, config.f3t, config.f4t, config.f5t, config.f6t]
-
-
+	'''
 	rows = config.rows
 	cols = config.cols
 
 	base = config.base
 	exp = 0
-
-	config.n = config.nSides
-	config.r = config.initialRadius
-	config.offset = (128, 128)
-
-	# Start from center for each polygon
-	"sin (theta) = (r + d) / s"
-	"s = 2 * r * cos(theta/2)"
-
-	config.theta = 2 * math.pi / config.n
-	config.side = 2 * config.r * math.cos(config.theta / 2)
-	config.d = config.side * math.sin(config.theta) - config.r
-	config.phi = (1.0 + math.sqrt(5.0))/2
+	'''
 
 	# marker(config.offset[0],config.offset[1],draw,"green")
 	#drawFigure()
 
 	drawConcentricRings()
+	drawTheReal()
 
 	# renderImage.save("pattern.png")
-	#print (rows, b17, cols*b17)
+
+
+
+def drawTheReal() :
+	x = config.blockDims[0]
+	y = config.blockDims[1]
+	w = config.blockDims[2] + x
+	h = config.blockDims[3] + y
+	box = tuple([x, y, w, h])
+	config.canvasDraw.rectangle(box, fill = tuple(config.f2.currentColor))
+
+
+	lines = h - y
+	for i in range(0, lines, config.blockSteps)  :
+		f =  tuple(config.f1.currentColor)
+		if random.random() < .001 :
+			f = colorutils.randomColor(1)
+			f = tuple(config.f4.currentColor)
+		config.canvasDraw.rectangle((x,y+i,w,y+i+config.blockLineHeight) , fill = f)
+
+
+def resetPause() :
+	config.paused = False
+	
+	#config.turnRateLimPlus = random.uniform(1,3)
+	#config.turnRateLimNeg = random.uniform(config.turnRateLimPlus-1 ,config.turnRateLimPlus - 3)
 
 
 def drawConcentricRings():
@@ -126,7 +130,49 @@ def drawConcentricRings():
 	figs = config.repeatFigures
 	config.r = 200
 
-	config.turnRate += .01
+	"Ideally, make the rate of change sinusoidal - i.e. change the rate\
+	gradually over time so there are smooth transitions back and forth"
+
+	'''
+	config.angle += config.angleIncrement
+	if config.angle == 0 or config.angle == math.pi or config.angle == 2*math.pi :
+		pass
+	else :
+		m = 2
+		#x = m - abs(i % (2*m) - m)
+		#rate = m - abs(math.sin(config.angle) % 2*m - m) + .8
+		rate = m - abs((config.angle) % 2*m - m) + .9
+	'''
+
+	if random.random() > .99 :
+		config.turnRateChange = random.uniform(.0005,.003)
+
+
+
+	if config.paused == False :
+		config.turnRate += config.turnRateChange * config.turnRateDirection
+		#config.turnRate = rate 
+		
+		if config.turnRate > config.turnRateLimPlus :
+
+
+			config.turnRateDirection = -1
+			config.turnRate = config.turnRateLimPlus
+
+			#config.paused = True
+			d = random.uniform(.5,2)
+			t1 = Timer(d, resetPause)
+			#t1.start()
+
+		if config.turnRate < config.turnRateLimNeg:
+			config.turnRateDirection = 1
+
+			#config.paused = True
+			d = random.uniform(.5,2)
+			t = Timer(d,resetPause)
+			#t.start()
+		
+
 
 	f = 0
 	for figures in range(0, figs):
@@ -223,15 +269,37 @@ def main(run=True):
 	config.repeatFigures = int(workConfig.get(config.patternSet, 'repeatFigures'))
 	config.reduceRate = float(workConfig.get(config.patternSet, 'reduceRate'))
 	config.turnRate = float(workConfig.get(config.patternSet, 'turnRate'))
+	config.turnRateDirection = 1
 
 
-	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	config.draw = ImageDraw.Draw(config.image)
-	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+	config.turnRateChange = float(workConfig.get("pattern", 'turnRateChange'))
+	config.turnRateLimPlus = float(workConfig.get("pattern", 'turnRateLimPlus'))
+	config.turnRateLimNeg = float(workConfig.get("pattern", 'turnRateLimNeg'))
 
-	config.imageOffsetX = 0
+	config.xOffset = int(workConfig.get("pattern", 'xOffset'))
+	config.yOffset = int(workConfig.get("pattern", 'yOffset'))
 	config.imageOffsetY = 0
+	config.imageOffsetX = 0
+
+	config.block = ((workConfig.get("pattern", 'block')).split(','))
+	config.blockDims = list([int(i) for i in config.block])
+	config.blockLineHeight = int(workConfig.get("pattern", 'blockLineHeight'))
+	config.blockSteps = int(workConfig.get("pattern", 'blockSteps'))
+	config.paused =  False
+	config.timeDelay = 5.0
+
+
+	# Start from center for each polygon
+	"sin (theta) = (r + d) / s"
+	"s = 2 * r * cos(theta/2)"
+	config.n = config.nSides
+	config.r = config.initialRadius
+	config.offset = (config.xOffset, config.yOffset)
+
+	config.theta = 2 * math.pi / config.n
+	config.side = 2 * config.r * math.cos(config.theta / 2)
+	config.d = config.side * math.sin(config.theta) - config.r
+	config.phi = (1.0 + math.sqrt(5.0))/2
 
 	config.f1 = getColorChanger()
 	config.f2 = getColorChanger()
@@ -240,24 +308,33 @@ def main(run=True):
 	config.f5 = getColorChanger()
 	config.f6 = getColorChanger()
 
-	config.imageRotation = .0001
+	config.colorArrayBase = [config.f1, config.f2, config.f3, config.f4, config.f5, config.f6]
 
-	'''
-	config.colOverlay.minHue = float(workConfig.get("screenproject", 'minHue'))
-	config.colOverlay.maxHue = float(workConfig.get("screenproject", 'maxHue'))
-	config.colOverlay.minSaturation = float(workConfig.get("screenproject", 'minSaturation'))
-	config.colOverlay.maxSaturation= float(workConfig.get("screenproject", 'maxSaturation'))
-	config.colOverlay.minValue = float(workConfig.get("screenproject", 'minValue'))
-	config.colOverlay.maxBrightness = float(workConfig.get("screenproject", 'maxBrightness'))
-	config.colOverlay.maxValue = float(workConfig.get("screenproject", 'maxValue'))
+	for i in range(0,6,2) :
+		setColorProperties(config.colorArrayBase[i])
 
-	config.crackChangeProb = float(workConfig.get("screenproject", 'crackChangeProb'))
-	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
-	'''
+
+	config.angle = 0
+	config.angleIncrement = math.pi/1000
+
+	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.draw = ImageDraw.Draw(config.image)
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
 	setUp()
 
 	#if(run) : runWork()
+
+def setColorProperties(c) :
+	c.minHue = float(workConfig.get("pattern", 'minHue'))
+	c.maxHue = float(workConfig.get("pattern", 'maxHue'))
+	c.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
+	c.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
+	c.minValue = float(workConfig.get("pattern", 'minValue'))
+	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
+	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
+
 
 
 def setUp():
@@ -281,6 +358,3 @@ def iterate():
 def callBack():
 	global config
 	return True
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

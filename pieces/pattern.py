@@ -70,6 +70,16 @@ def drawPattern():
 	config.f5.stepTransition()
 	config.f6.stepTransition()
 
+	config.colorArrayBase = [config.f1, config.f2, config.f3, config.f4, config.f5, config.f6]
+	config.colorArray = []
+
+	for i in range(0,6,2) :
+		setColorProperties(config.colorArrayBase[i])
+
+	for i in config.colorArrayBase :
+		i.stepTransition()
+		config.colorArray.append(tuple(i.currentColor))
+
 	f1 = tuple(config.f1.currentColor)
 	f2 = tuple(config.f2.currentColor)
 	f3 = tuple(config.f3.currentColor)
@@ -101,52 +111,52 @@ def drawPattern():
 	draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=f6)
 
 	inter = 0 + exp
-	drawPatternBlock(rows, cols, f2, f1, b3, b5, draw, b1 + patternXOffset, b7, None, None, inter)
-	drawPatternBlock(rows, cols, f2, f1, b5, b3, draw, b0 + patternXOffset, b8, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[1], config.colorArray[0], b3, b5, draw, b1 + patternXOffset, b7, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[1], config.colorArray[0], b5, b3, draw, b0 + patternXOffset, b8, None, None, inter)
 
 	l = base
 	w = base 
 
 	inter = 6 * base  + exp
 	# Top
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, b5 + patternXOffset, b1, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[1], config.colorArray[0], l, w, draw, b5 + patternXOffset, b1, None, None, inter)
 	
 	# Right
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, b11 + patternXOffset , b9, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[1], config.colorArray[0], l, w, draw, b11 + patternXOffset , b9, None, None, inter)
 	# Left
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, -b1 + patternXOffset , b9, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[1], config.colorArray[0], l, w, draw, -b1 + patternXOffset , b9, None, None, inter)
 
 	
 	# Bottom
-	drawPatternBlock(rows, cols, f2, f1, l, w, draw, b5 + patternXOffset, b17, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[1], config.colorArray[0], l, w, draw, b5 + patternXOffset, b17, None, None, inter)
 	
 	# 3x3 grid
 	for ii in range(0,round(rows), 1) :
 		yOffset = ii * base * 16
 		for i in range(0,round(rows), 2) :
 			xOffset = i * base * 16
-			drawPatternBlock(3, 3, f2, f2, l, w, draw, b1 + patternXOffset + xOffset, b5 + yOffset, None,None, 0)
-			drawPatternBlock(3, 3, f1, f1, l, w, draw, b17 + patternXOffset + xOffset, b5 + yOffset, None,None, 0)
+			drawPatternBlock(3, 3, config.colorArray[1], config.colorArray[1], l, w, draw, b1 + patternXOffset + xOffset, b5 + yOffset, None,None, 0)
+			drawPatternBlock(3, 3, config.colorArray[0], config.colorArray[0], l, w, draw, b17 + patternXOffset + xOffset, b5 + yOffset, None,None, 0)
 
 	# interior x
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b5 + patternXOffset, b5, None, None, inter)
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b5 + patternXOffset, b13, None, None, inter)
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b1 + patternXOffset, b9, None, None, inter)
-	drawPatternBlock(rows, cols, f4, f5, l, w, draw, b9 + patternXOffset, b9, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b5 + patternXOffset, b5, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b5 + patternXOffset, b13, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b1 + patternXOffset, b9, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b9 + patternXOffset, b9, None, None, inter)
 	# larger center x
-	drawPatternBlock(rows, cols, f4, f5, b1, b3, draw, b4 + patternXOffset, 8 * base, None, None,  b4 + exp)
+	drawPatternBlock(rows, cols, config.colorArray[3], config.colorArray[4], b1, b3, draw, b4 + patternXOffset, 8 * base, None, None,  b4 + exp)
 	# Center
-	drawPatternBlock(rows, cols, f5, f4, l, w, draw, b5 + patternXOffset, b9, None, None, inter)
+	drawPatternBlock(rows, cols, config.colorArray[4], config.colorArray[3], l, w, draw, b5 + patternXOffset, b9, None, None, inter)
 
 	# interior off- x
-	drawPatternBlock(rows* 2, cols, f4, f5, l, w, draw, b9 + patternXOffset, b1, None, None, inter)
-	drawPatternBlock(rows* 2, cols, f4, f5, l, w, draw, b17 + patternXOffset, b1, None, None, inter)
-	drawPatternBlock(rows* 1, cols, f4, f5, l, w, draw, b13 + patternXOffset, b13, None, None, inter)
-	drawPatternBlock(rows* 2, cols, f4, f5, l, w, draw, b13 + patternXOffset, b5, None, None, inter)
+	drawPatternBlock(rows* 2, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b9 + patternXOffset, b1, None, None, inter)
+	drawPatternBlock(rows* 2, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b17 + patternXOffset, b1, None, None, inter)
+	drawPatternBlock(rows* 1, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b13 + patternXOffset, b13, None, None, inter)
+	drawPatternBlock(rows* 2, cols, config.colorArray[3], config.colorArray[4], l, w, draw, b13 + patternXOffset, b5, None, None, inter)
 	# larger center x
-	drawPatternBlock(rows * 2, cols, f4, f5, b1, b3, draw, b12 + patternXOffset, 0 * base, None, None,  b4 + exp)
+	drawPatternBlock(rows * 2, cols, config.colorArray[3], config.colorArray[4], b1, b3, draw, b12 + patternXOffset, 0 * base, None, None,  b4 + exp)
 	# Center
-	drawPatternBlock(rows * 2, cols, f2, f1, l, w, draw, b13 + patternXOffset, b1, None, None, inter)
+	drawPatternBlock(rows * 2, cols, config.colorArray[1], config.colorArray[0], l, w, draw, b13 + patternXOffset, b1, None, None, inter)
 	'''
 	'''
 	#renderImage.save("pattern.png")
@@ -158,10 +168,20 @@ def getColorChanger():
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False 
 	colOverlay.timeTrigger = True 
-	colOverlay.tLimitBase = 10 
+	colOverlay.tLimitBase = int(random.uniform(8,10))
 	colOverlay.maxBrightness = config.brightness
-	colOverlay.steps = 50
+	colOverlay.steps = int(random.uniform(150,220))
+	setColorProperties(colOverlay)
 	return colOverlay
+
+def setColorProperties(c) :
+	c.minHue = float(workConfig.get("pattern", 'minHue'))
+	c.maxHue = float(workConfig.get("pattern", 'maxHue'))
+	c.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
+	c.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
+	c.minValue = float(workConfig.get("pattern", 'minValue'))
+	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
+	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
 
 
 def drawTheReal() :

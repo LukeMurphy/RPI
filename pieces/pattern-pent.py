@@ -21,6 +21,14 @@ def getColorChanger():
 	colOverlay.steps = 50
 	return colOverlay
 
+def setColorProperties(c) :
+	c.minHue = float(workConfig.get("pattern", 'minHue'))
+	c.maxHue = float(workConfig.get("pattern", 'maxHue'))
+	c.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
+	c.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
+	c.minValue = float(workConfig.get("pattern", 'minValue'))
+	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
+	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
 
 def drawPattern():
 
@@ -211,13 +219,13 @@ def main(run=True):
 	for i in range(0,6,2) :
 		setColorProperties(config.colorArrayBase[i])
 
-	config.f2.minHue = 90
-	config.f2.maxHue = 180
-	config.f2.minSaturation = .1
-	config.f2.maxSaturation = .3
-	config.f2.minValue = .2
-	config.f2.maxBrightness = .5
-	config.f2.maxValue = .5
+	config.f2.minHue = config.f1.minHue #90
+	config.f2.maxHue = config.f1.maxHue #180
+	config.f2.minSaturation = config.f1.minSaturation #.1
+	config.f2.maxSaturation = config.f1.maxSaturation #.3
+	config.f2.minValue = config.f1.minValue #.2
+	config.f2.maxValue = config.f1.maxValue #.5
+	config.f2.maxBrightness = config.f1.maxBrightness #.5
 
 
 	config.angle = 0
@@ -231,15 +239,6 @@ def main(run=True):
 	setUp()
 
 	#if(run) : runWork()
-
-def setColorProperties(c) :
-	c.minHue = float(workConfig.get("pattern", 'minHue'))
-	c.maxHue = float(workConfig.get("pattern", 'maxHue'))
-	c.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
-	c.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
-	c.minValue = float(workConfig.get("pattern", 'minValue'))
-	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
-	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
 
 
 

@@ -145,7 +145,7 @@ def drawConcentricRings():
 	'''
 
 	if random.random() > .99 :
-		config.turnRateChange = random.uniform(.0005,.003)
+		config.turnRateChange = random.uniform(.5,3) / config.turnRateFactor
 
 
 
@@ -275,6 +275,7 @@ def main(run=True):
 	config.turnRateChange = float(workConfig.get("pattern", 'turnRateChange'))
 	config.turnRateLimPlus = float(workConfig.get("pattern", 'turnRateLimPlus'))
 	config.turnRateLimNeg = float(workConfig.get("pattern", 'turnRateLimNeg'))
+	config.turnRateFactor = float(workConfig.get("pattern", 'turnRateFactor'))
 
 	config.xOffset = int(workConfig.get("pattern", 'xOffset'))
 	config.yOffset = int(workConfig.get("pattern", 'yOffset'))
@@ -312,6 +313,14 @@ def main(run=True):
 
 	for i in range(0,6,2) :
 		setColorProperties(config.colorArrayBase[i])
+
+	config.f2.minHue = 90
+	config.f2.maxHue = 180
+	config.f2.minSaturation = .1
+	config.f2.maxSaturation = .3
+	config.f2.minValue = .2
+	config.f2.maxBrightness = .5
+	config.f2.maxValue = .5
 
 
 	config.angle = 0

@@ -95,7 +95,8 @@ def drawPattern():
 	b12 = 12 * base
 	b13 = 13 * base
 	b17 = 17 * base
-	patternXOffset = -b7
+	patternXOffset = config.patternXOffset
+	#b7
 
 	draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=f6)
 
@@ -196,6 +197,7 @@ def main(run = True) :
 	config.base = float(workConfig.get("pattern", 'base'))
 	config.rows = int(workConfig.get("pattern", 'rows'))
 	config.cols = int(workConfig.get("pattern", 'cols'))
+	config.patternXOffset = int(workConfig.get("pattern", 'patternXOffset'))
 
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))

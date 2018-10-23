@@ -114,6 +114,8 @@ def main(run=True):
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# make script to reduce from one square to 2 to 4 to 8 to 16...
+	# Like a frenetic Albers excercise that is more like a sign
+	# advertising itself
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	config.x = config.y = 0
 	config.r = 255

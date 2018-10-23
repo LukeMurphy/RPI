@@ -7,68 +7,43 @@ from PIL import Image, ImageDraw
 import sys
 from modules import colorutils
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-#make script to reduce from one square to 2 to 4 to 8 to 16...
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-x = y = 0
-r=255
-g=b=0
-pulseSpeed = .1
-colorSwitch = False
-countLimit = 10
-rHeight = 0
-rWidth = 0
-rows  = 1
-cols = 1
-
-lineWidth = 1
-
-# rows, cols
-divisionOfSquares = [1,1,2,2,4,4,8,8,16,16,32,32,64,64]
-
-divisionPosition = 0
-colorutil = colorutils
-
-grayMode = False
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def drawRects() :
+
+def drawRects():
 	global config
-	global r,g,b
-	global colorSwitch, grayMode
-	global rHeight,rWidth,numSquares
-	global rows, cols, lineWidth
 
-	changeColor(colorSwitch)
+	changeColor(config.colorSwitch)
 
 	# For single square dividing, rows = cols all the time
 	# But for double square, start with rows, divide columns
 	# then divide rows, then repeat
 
 	#if (rows * lineWidth) < config.screenHeight : rows = int(config.screenHeight/lineWidth)
-	rHeight = int(config.screenHeight / rows)
-	squaresToDraw = int(rHeight / 2 )
+	rHeight = round(config.screenHeight / config.rows)
+	squaresToDraw = round(rHeight / 2)
 
-	#if(rows*lineWidth < config.screenHeight)
+	# if(rows*lineWidth < config.screenHeight)
 	additionalRows = 0
-	rowDiff = config.screenHeight - rows * rHeight
+	rowDiff = config.screenHeight - config.rows * rHeight
 
-	if( rowDiff > lineWidth + 1) : additionalRows = rowDiff
-	for row in range(0, rows + additionalRows):
-		
-		yOffset = int(row * rHeight)
-		
+	if(rowDiff > config.lineWidth + 1):
+		additionalRows = rowDiff
 
-		for col in range(0, cols):
-			rWidth = int(config.screenWidth / cols)
-			xOffset = int(col* rWidth)
-			colorSwitchMode = int(random.uniform(1,4))
+	for row in range(0, config.rows + additionalRows):
 
-			for n in range(0, squaresToDraw, lineWidth):
+		yOffset = round(row * rHeight)
+
+		for col in range(0, config.cols):
+			rWidth = round(config.screenWidth / config.cols)
+			xOffset = round(col * rWidth)
+			config.colorSwitchMode = round(random.uniform(1, 4))
+
+			for n in range(0, squaresToDraw, config.lineWidth):
 				# --------------------------------------------------------------#
 				# Alternate Bands of Color, keep to one scheme per set of squares
-				changeColor(colorSwitch, colorSwitchMode)
+				changeColor(config.colorSwitch, config.colorSwitchMode)
 
 				xStart = n + xOffset
 				xEnd = xOffset + rWidth - n - 1
@@ -78,81 +53,162 @@ def drawRects() :
 
 				#config.draw.rectangle((xStart, yStart, xEnd, yEnd), outline=(r,g,b))
 
-				for l in range(0,lineWidth) :
-					config.draw.rectangle((xStart+l, yStart+l, xEnd - l, yEnd - l ), outline=(r,g,b))
-		
+				for l in range(0, config.lineWidth):
+					config.draw.rectangle((xStart + l, yStart + l, xEnd - l, yEnd - l), outline=(config.r, config.g, config.b))
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def changeColor( rnd = False, choice = 3) :
-	global r,g,b, colorutil, grayMode      
-	if (rnd == False) :
-		val  = int(255 * config.brightness)
-		if(r == val) :
-			r = 0
-			g = val
-			b = 0
+
+def changeColor(rnd=False, choice=3):
+	global config
+
+	#rnd = True
+
+	if rnd == False and config.rows < 4:
+		val = round(255 * config.brightness)
+		if(config.r == val):
+			config.r = 0
+			config.g = val
+			config.b = 0
 			# Add variant that we pulse red/blue not just red/greeen
 			# red/blue makes for pink afterimage so more about excitement
 			# than red/green making yellow after image, which feels like it's
 			# more about food ...
 
-			if(random.random() > .5) :
-				b = val
-				g = 0
-		else :
-			r = val
-			g = 0
-			b = 0
+			if(random.random() > .5):
+				config.b = 0
+				config.g = val
+		else:
+			config.r = val
+			config.g = 0
+			config.b = 0
 
-	else :
-		choice = int(random.uniform(1,8))
+	else:
+		choice = round(random.uniform(1, 8))
+
 		#choice = 3
-		if(choice == 1) : clr = colorutil.getRandomColorWheel(config.brightness)
-		if(choice == 2) : clr = colorutil.getRandomRGB(config.brightness)
-		if(choice >= 3) : clr = colorutil.randomColor(config.brightness)
+		if(choice == 1):
+			clr = config.colorutil.getRandomColorWheel(config.brightness)
 
-		if(grayMode) : clr = colorutil.randomGray(config.brightness)
-		r = clr[0]
-		g = clr[1]
-		b = clr[2]	
+		if(choice == 2):
+			clr = config.colorutil.getRandomRGB(config.brightness)
+
+		if(choice >= 3):
+			clr = config.colorutil.randomColor(config.brightness)
+
+		if(config.grayMode):
+			clr = config.colorutil.randomGray(config.brightness)
+
+		#clr = config.colorutil.getRandomColorWheel(config.brightness)
+
+		config.r = clr[0]
+		config.g = clr[1]
+		config.b = clr[2]
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def animator() :
-	global rHeight,rWidth, numSquares, colorSwitch, pulseSpeed, msg
-	global rows, cols, columnLimit, count, mode, lineWidth
-	count = 0
-	rWidth = config.screenWidth
-	rHeight = config.screenHeight
-	
-	rows = 1
-	cols = 1
+
+def main(run=True):
+	global config, workConfig
+
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	# make script to reduce from one square to 2 to 4 to 8 to 16...
+	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	config.x = config.y = 0
+	config.r = 255
+	config.g = config.b = 0
+	config.pulseSpeed = .1
+	config.colorSwitch = True
+	config.countLimit = 10
+	config.rHeight = 0
+	config.rWidth = 0
+	config.rows = 1
+	config.cols = 1
+	config.lineWidth = 1
+
+	# rows, cols
+	config.divisionOfSquares = [1, 1, 2, 2, 4, 4, 8, 8, 16, 16, 32, 32]
+
+	config.colorutil = colorutils
+
+	config.grayMode = False
+	config.count = 0
+	config.rWidth = config.screenWidth
+	config.rHeight = config.screenHeight
 
 	# reseting render image size
-	config.renderImage = Image.new("RGBA", (config.actualScreenWidth , 32))
+	config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	config.draw  = ImageDraw.Draw(config.image)
+	config.draw = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
 
-	lineWidth = config.lineWidth = int(workConfig.get("squares", 'lineWidth'))
+	config.lineWidth = config.lineWidth = int(workConfig.get("squares", 'lineWidth'))
 	config.pulseSpeed = float(workConfig.get("squares", 'pulseSpeed'))
-	mode = config.mode = (workConfig.get("squares", 'mode'))
+	config.mode = (workConfig.get("squares", 'mode'))
 	config.countLimit = int(workConfig.get("squares", 'countLimit'))
-	countLimit = config.countLimit
-	
+
+	try:
+		config.forceHoldDivision = int(workConfig.get("squares", 'forceHoldDivision'))
+		config.divisionPosition = config.forceHoldDivision
+	except Exception as e:
+		config.forceHoldDivision = -1
+		config.divisionPosition = 0
+		print(e)
+
+	if(run):
+		runWork()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def main(run = True) :
-	global config, workConfig
-	setUp()
-	if(run) : runWork()
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def iterate():
+	global config
 
-def setUp() :
-	animator()
-	return True
+	drawRects()
+
+	# If colorSwitch is set to False then random colors are generated
+	# Or the fixed 2-color pattern is used
+	# if it's set to True, then a palette or gray is used
+
+	if(random.random() > .2):
+		config.colorSwitch = True
+
+	if(random.random() > .9):
+		config.colorSwitch = False
+
+	if(random.random() > .995):
+		config.grayMode = True
+
+	if(random.random() > .92):
+		config.grayMode = False
+
+	config.count += 1
+
+	if (config.count >= config.countLimit):
+		if config.forceHoldDivision != -1:
+			config.divisionPosition += 0
+		else:
+			config.divisionPosition += 1
+
+		if(config.divisionPosition >= len(config.divisionOfSquares) - 1):
+			reset()
+			config.divisionOfSquares = list(reversed(config.divisionOfSquares))
+			if(config.divisionOfSquares[0] == 1):
+				config.divisionPosition = 2
+				config.countLimit = 1
+		#if(int(config.screenHeight /divisionOfSquares[divisionPosition])) <= lineWidth : reset()
+
+		config.cols = config.divisionOfSquares[config.divisionPosition + 1]
+		config.rows = config.divisionOfSquares[config.divisionPosition]
+		config.count = 0
+
+		config.countLimit = round(config.countLimit * (2 / config.rows)) + round(random.uniform(2, 10))
+
+		if(random.random() > .8):
+			config.colorSwitch = False
+
+	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -164,55 +220,18 @@ def runWork():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def reset() :
-	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
-	divisionPosition = 0
-	countLimit = config.countLimit
-	lineWidth = int( random.uniform(1,9))
 
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def iterate() :
-	global config, colorSwitch, count, countLimit, divisionPosition, divisionOfSquares, lineWidth
-	global rows, cols, grayMode
-
-	drawRects()
-
-	if(random.random() > .7) : colorSwitch = True
-	if(random.random() > .9) : colorSwitch = False
-
-	if(random.random() > .96) : grayMode = False
-	if(random.random() > .97) : grayMode = True
-
-	count += 1
-
-	if (count >= countLimit) :
-		divisionPosition += 1
-
-		if(divisionPosition >= len(divisionOfSquares)-1) : 
-			reset()
-			divisionOfSquares = list(reversed(divisionOfSquares))
-			if(divisionOfSquares[0] == 1) : 
-				divisionPosition = 2
-				countLimit = 1
-		#if(int(config.screenHeight /divisionOfSquares[divisionPosition])) <= lineWidth : reset()
-
-		cols = divisionOfSquares[divisionPosition+1]
-		rows = divisionOfSquares[divisionPosition]
-		count = 0
-
-		countLimit = int(config.countLimit  *  (2 / rows)) + int(random.uniform(2,10))
-
-		if(random.random() > .7) : colorSwitch = False
-
-
-	config.render(config.image, 0, 0,config.screenWidth,config.screenHeight)
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-def callBack() :
+def reset():
 	global config
-	#animator()
+	config.divisionPosition = 0
+	config.countLimit = config.countLimit
+	config.lineWidth = int(random.uniform(1, 9))
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def callBack():
+	global config
+	# animator()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

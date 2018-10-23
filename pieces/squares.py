@@ -64,7 +64,7 @@ def changeColor(rnd=False, choice=3):
 
 	#rnd = True
 
-	if rnd == False and config.rows < 4:
+	if rnd == False and config.rows < 2:
 		val = round(255 * config.brightness)
 		if(config.r == val):
 			config.r = 0

@@ -213,6 +213,10 @@ def iterate():
 			config.colorSwitch = False
 
 
+	## Paste and alpha of the next image, wait a few ms 
+	## then past a more opaque one again
+	## softens the transitions just enough
+	
 	mask1 = config.image.point(lambda i: min(i * 1, 50))
 	config.canvasImage.paste(config.image, (0,0), mask1)
 	config.render(config.canvasImage, 0, 0, config.image)

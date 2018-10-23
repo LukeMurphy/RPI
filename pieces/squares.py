@@ -142,11 +142,13 @@ def main(run=True):
 	# reseting render image size
 	config.renderImage = Image.new("RGBA", (config.actualScreenWidth, 32))
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.canvasImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.id = config.image.im.id
 
 	config.lineWidth = config.lineWidth = int(workConfig.get("squares", 'lineWidth'))
 	config.pulseSpeed = float(workConfig.get("squares", 'pulseSpeed'))
+	config.pasteDelay = float(workConfig.get("squares", 'pasteDelay'))
 	config.mode = (workConfig.get("squares", 'mode'))
 	config.countLimit = int(workConfig.get("squares", 'countLimit'))
 
@@ -210,7 +212,23 @@ def iterate():
 		if(random.random() > .8):
 			config.colorSwitch = False
 
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+
+	mask1 = config.image.point(lambda i: min(i * 1, 50))
+	config.canvasImage.paste(config.image, (0,0), mask1)
+	config.render(config.canvasImage, 0, 0, config.image)
+	
+	time.sleep(config.pasteDelay)
+	mask2 = config.image.point(lambda i: min(i * 25, 100))
+	config.canvasImage.paste(config.image, (0,0), mask2)
+	config.render(config.canvasImage, 0, 0, config.image)
+	
+	time.sleep(config.pasteDelay)
+	mask3 = config.image.point(lambda i: min(i * 25, 255))
+	config.canvasImage.paste(config.image, (0,0), mask3)
+	config.render(config.canvasImage, 0, 0, config.image)
+
+
+	#config.render(config.canvasImage, 0, 0, config.image)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

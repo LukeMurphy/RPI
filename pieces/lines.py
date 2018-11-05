@@ -160,13 +160,15 @@ def showLines():
 			if len(ref.pointArray) > config.activeLineInterceptLimit :
 				for p in ref.pointArray:
 					pr = [round(p[0]), round(p[1])]
-					if pr not in config.pointArray : config.pointArray.append(pr)
+					if pr not in config.pointArray : 
+						config.pointArray.append(pr)
 		else :
 			
 			# it's done, so add the points it has traced to the global "used" points array
 			for p in ref.pointArray:
 				pr = [round(p[0]), round(p[1])]
-				if pr not in config.pointArray : config.pointArray.append(pr)
+				if pr not in config.pointArray : 
+					config.pointArray.append(pr)
 
 			# start anew line altogether
 			if ref.branchCount > config.branchCountLimit : 
@@ -237,15 +239,15 @@ def main(run = True) :
 	config.imageOffsetX = 0
 	config.imageOffsetY = 0
 
-	config.trim = 4
+	config.trim = 6
 	config.trimLimit = 10
 	config.branchProb = .1
 	config.doubleBranchProb = .1
 	config.angleIncrement = 900
-	config.activeLineInterceptLimit = 500
-	config.lineCountLimit = 200
+	config.activeLineInterceptLimit = 100
+	config.lineCountLimit = 300
 	config.segmentLength = 2
-	config.branchCountLimit = 3
+	config.branchCountLimit = 5
 
 	config.f1 = getColorChanger()
 	config.f2 = getColorChanger()
@@ -264,7 +266,7 @@ def setUp():
 	global config
 
 	config.lineCount = 0
-	#config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill =(50,0,100,100))
+	config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill =(50,0,100,100))
 	config.pointArray = [[0,0]]
 	config.linesArray = []
 	config.stop = False

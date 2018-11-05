@@ -253,9 +253,8 @@ def iterate():
 	rows = 5
 	cols = 7
 
-
-
-
+	## move the creation of the images to the setup and create an array of dice
+	## that are updated  - otherwise getting pretty slow
 	for col in range(0, cols):
 		for row in range(0, rows):
 			d = DiceFactory(config)

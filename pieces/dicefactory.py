@@ -20,19 +20,32 @@ class DiceFactory :
 		self.offset = [0,0]
 		self.image = Image.new("RGBA", (self.w, self.w))
 		self.draw = ImageDraw.Draw(self.image)
+		self.offset = []
+		self.fills = [(200,0,0), (0,100,80), (0,0,200),(200,150,0), (200,0,100), (0,150,150)]
+		f = math.floor(random.uniform(0,6))
+		self.fill = self.fills[f]
+
+		
 
 
 	def createDice(self):
 
+		if random.random() < .5 :
+			f = math.floor(random.uniform(0,6))
+			self.fill = self.fills[f]
+
+		self.image = Image.new("RGBA", (self.w, self.w))
+		self.draw = ImageDraw.Draw(self.image)
+
 		w = self.w
 		dibit = self.dibit
 		draw = self.draw
-		offX = self.offset[0]
-		offY = self.offset[1]
+		offX = 0 #self.offset[0]
+		offY = 0 #self.offset[1]
 		draw.rectangle((offX,offY, offX + w , offY + w ), fill = self.fill)
 
-		num = int(random.uniform(1,6))
-		#num = 6
+		num = round(random.uniform(1,6))
+		#num = 2
 
 		if num == 1 :
 			x = w/2
@@ -40,31 +53,33 @@ class DiceFactory :
 			draw.ellipse((offX + x-dibit/2, offY + y-dibit/2, offX + x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
 
 		if num == 2 :
-			x = w/3
-			y = w/3
-			draw.ellipse((offX + x-dibit/2, offY + y-dibit/2, offX + x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
-			draw.ellipse((offX + 2 * x-dibit/2, offY + 2 * y-dibit/2, offX + 2 * x + dibit/2, offY + 2 * y + dibit/2), fill = (200,200,200))
+			x = w/5
+			y = w/5
+			draw.ellipse((offX + 1 * x-dibit/2, offY + 1 * y-dibit/2, offX + 1 * x + dibit/2, offY + 1 * y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 4 * x-dibit/2, offY + 4 * y-dibit/2, offX + 4 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
 
 		if num == 3 :
-			x = w/4
-			y = w/4
+			x = w/5
+			y = w/5
+			draw.ellipse((offX + 1 * x-dibit/2, offY + 1 * y-dibit/2, offX + 1 * x + dibit/2, offY + 1 * y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 4 * x-dibit/2, offY + 4 * y-dibit/2, offX + 4 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
+			x = w/2
+			y = w/2
 			draw.ellipse((offX + x-dibit/2, offY + y-dibit/2, offX + x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
-			draw.ellipse((offX + 2 * x-dibit/2, offY + 2 * y-dibit/2, offX + 2 * x + dibit/2, offY + 2 * y + dibit/2), fill = (200,200,200))
-			draw.ellipse((offX + 3 * x-dibit/2, offY + 3 * y-dibit/2, offX + 3 * x + dibit/2, offY + 3 * y + dibit/2), fill = (200,200,200))
 
 		if num == 4 :
 			x = w/5
 			y = w/5
-			draw.ellipse((offX + x-dibit/2, offY + y-dibit/2, offX + x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
-			draw.ellipse((offX + 4 * x-dibit/2, offY + y-dibit/2, offX + 2 * x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 1 * x-dibit/2, offY + 1 * y-dibit/2, offX + 1 * x + dibit/2, offY + 1 * y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 4 * x-dibit/2, offY + 1 * y-dibit/2, offX + 4 * x + dibit/2, offY + 1 * y + dibit/2), fill = (200,200,200))
 			draw.ellipse((offX + 4 * x-dibit/2, offY + 4 * y-dibit/2, offX + 4 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
-			draw.ellipse((offX + 4 * x-dibit/2, offY + 4 * y-dibit/2, offX + 1 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 1 * x-dibit/2, offY + 4 * y-dibit/2, offX + 1 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
 
 		if num == 5 :
 			x = w/5
 			y = w/5
-			draw.ellipse((offX + x-dibit/2, offY + y-dibit/2, offX + x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
-			draw.ellipse((offX + 4 * x-dibit/2, offY +  y-dibit/2, offX + 4 * x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 1 * x-dibit/2, offY + 1 * y-dibit/2, offX + 1 * x + dibit/2, offY + 1 * y + dibit/2), fill = (200,200,200))
+			draw.ellipse((offX + 4 * x-dibit/2, offY + 1 * y-dibit/2, offX + 4 * x + dibit/2, offY + 1 * y + dibit/2), fill = (200,200,200))
 			draw.ellipse((offX + 4 * x-dibit/2, offY + 4 * y-dibit/2, offX + 4 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
 			draw.ellipse((offX + 1 * x-dibit/2, offY + 4 * y-dibit/2, offX + 1 * x + dibit/2, offY + 4 * y + dibit/2), fill = (200,200,200))
 			x = w/2
@@ -82,6 +97,9 @@ class DiceFactory :
 			y = w/2
 			draw.ellipse((offX + x-dibit/2, offY + y-dibit/2, offX + x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
 			draw.ellipse((offX + 4 * x-dibit/2, offY + y-dibit/2, offX + 4 * x + dibit/2, offY + y + dibit/2), fill = (200,200,200))
+
+		if random.random() < .5 :
+			self.image = self.image.rotate(90)
 
 		return self.image
 
@@ -227,6 +245,21 @@ def main(run=True):
 	config.pasteDelay = float(workConfig.get("dicefactory", 'pasteDelay'))
 	config.mode = (workConfig.get("dicefactory", 'mode'))
 	config.countLimit = int(workConfig.get("dicefactory", 'countLimit'))
+	config.w = int(workConfig.get("dicefactory", 'w'))
+	config.b = int(workConfig.get("dicefactory", 'b'))
+	config.dibit = int(workConfig.get("dicefactory", 'dibit'))
+	config.rows = int(workConfig.get("dicefactory", 'rows'))
+	config.cols = int(workConfig.get("dicefactory", 'cols'))
+	config.reRollProb = float(workConfig.get("dicefactory", 'reRollProb'))
+	config.reDrawProb = float(workConfig.get("dicefactory", 'reDrawProb'))
+	config.alwaysRedrawAfterReRoll = (workConfig.getboolean("dicefactory", 'alwaysRedrawAfterReRoll'))
+	config.allChange = (workConfig.getboolean("dicefactory", 'allChange'))
+
+	config.t1  = time.time()
+	config.t2  = time.time()
+	config.deltaLim = float(workConfig.get("dicefactory", 'deltaLim'))
+	config.rowRunning = 0
+	config.diceArray = []
 
 	try:
 		config.forceHoldDivision = int(workConfig.get("dicefactory", 'forceHoldDivision'))
@@ -236,79 +269,54 @@ def main(run=True):
 		config.divisionPosition = 0
 		print(e)
 
+
+	setUp()
+
 	if(run):
 		runWork()
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def setUp():
 
-
-def iterate():
-	global config
-
-	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0,10))
-	
-	w = 20
-	dibit = 4
-	b = 2
-	rows = 5
-	cols = 7
+	w = config.w
+	dibit = config.dibit
+	b = config.b
+	rows = config.rows
+	cols = config.cols
 
 	## move the creation of the images to the setup and create an array of dice
 	## that are updated  - otherwise getting pretty slow
 	for col in range(0, cols):
 		for row in range(0, rows):
 			d = DiceFactory(config)
-			offset = [col * (w + b), row * (w + b)]
+			d.offset = [col * (w + b), row * (w + b)]
 			d.w = w
 			d.dibit = dibit
+			d.rowNum = row
+			d.colNum = col
+
+			config.diceArray.append(d)
 			img  = d.createDice()
-			config.image.paste(img, (offset[0], offset[1]))
+			config.image.paste(img, (d.offset[0], d.offset[1]))
 
-	#drawRects()
+def iterate():
+	global config
+	rows = config.rows
+	cols = config.cols
 
-	# If colorSwitch is set to False then random colors are generated
-	# Or the fixed 2-color pattern is used
-	# if it's set to True, then a palette or gray is used
+	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill = (0,0,0,1))
 
 
-	'''
-	if(random.random() > .2):
-		config.colorSwitch = True
+	for d in config.diceArray :
+		if d.rowNum == config.rowRunning or config.allChange == True:
+			if random.random() < config.reRollProb :
+				img  = d.createDice()
+				if config.alwaysRedrawAfterReRoll == True :
+					config.image.paste(d.image, (d.offset[0], d.offset[1]))
+			if random.random() < config.reDrawProb :
+				config.image.paste(d.image, (d.offset[0], d.offset[1]))
 
-	if(random.random() > .9):
-		config.colorSwitch = False
-
-	if(random.random() > .995):
-		config.grayMode = True
-
-	if(random.random() > .92):
-		config.grayMode = False
-
-	config.count += 1
-
-	if (config.count >= config.countLimit):
-		if config.forceHoldDivision != -1:
-			config.divisionPosition += 0
-		else:
-			config.divisionPosition += 1
-
-		if(config.divisionPosition >= len(config.divisionOfSquares) - 1):
-			reset()
-			config.divisionOfSquares = list(reversed(config.divisionOfSquares))
-			if(config.divisionOfSquares[0] == 1):
-				config.divisionPosition = 2
-				config.countLimit = 1
-		#if(int(config.screenHeight /divisionOfSquares[divisionPosition])) <= lineWidth : reset()
-
-		config.cols = config.divisionOfSquares[config.divisionPosition + 1]
-		config.rows = config.divisionOfSquares[config.divisionPosition]
-		config.count = 0
-
-		config.countLimit = round(config.countLimit * (2 / config.rows)) + round(random.uniform(2, 10))
-
-		if(random.random() > .8):
-			config.colorSwitch = False
-	'''
+		
 
 	'''
 	'''
@@ -332,6 +340,14 @@ def iterate():
 
 	#config.canvasImage.paste(config.image, (0,0))
 	#config.render(config.canvasImage, 0, 0, config.image)
+
+
+	config.t2 = time.time()
+	if config.t2 - config.t1 > config.deltaLim:
+		config.rowRunning += 1
+		config.t1 = time.time()
+		if config.rowRunning >= config.rows :
+			config.rowRunning = 0
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

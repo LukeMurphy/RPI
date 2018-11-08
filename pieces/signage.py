@@ -446,9 +446,21 @@ def main(run = True) :
 
 	config.colOverlay.steps = config.steps 
 
+	try:
+		config.tileSizeWidth = int(workConfig.get("signage", 'tileSizeWidth'))
+		config.tileSizeHeight = int(workConfig.get("signage", 'tileSizeHeight'))
+	except Exception as e:
+		print (str(e))
+		config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
+		config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
 
-	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
-	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
+	try:
+		config.rows = int(workConfig.get("signage", 'rows'))
+		config.cols = int(workConfig.get("signage", 'cols'))
+	except Exception as e:
+		print (str(e))
+		config.rows = int(workConfig.get("displayconfig", 'rows'))
+		config.cols = int(workConfig.get("displayconfig", 'cols'))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

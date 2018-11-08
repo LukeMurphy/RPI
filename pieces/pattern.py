@@ -219,6 +219,12 @@ def main(run = True) :
 	config.cols = int(workConfig.get("pattern", 'cols'))
 	config.patternXOffset = int(workConfig.get("pattern", 'patternXOffset'))
 
+	config.delay = float(workConfig.get("pattern", 'delay'))
+
+
+
+
+
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
@@ -261,7 +267,7 @@ def iterate() :
 	global config
 	drawPattern()
 	showGrid()
-	drawTheReal()
+	#drawTheReal()
 
 
 

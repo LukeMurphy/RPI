@@ -34,7 +34,9 @@ class DiceFactory :
 			f = math.floor(random.uniform(0,6))
 			self.fill = self.fills[f]
 
-		self.image = Image.new("RGBA", (self.w, self.w))
+			self.fill = colorutils.randomColor(self.config.brightness)
+
+		self.image = Image.new("RGBA", (round(self.w), round(self.w)))
 		self.draw = ImageDraw.Draw(self.image)
 
 		w = self.w
@@ -245,9 +247,9 @@ def main(run=True):
 	config.pasteDelay = float(workConfig.get("dicefactory", 'pasteDelay'))
 	config.mode = (workConfig.get("dicefactory", 'mode'))
 	config.countLimit = int(workConfig.get("dicefactory", 'countLimit'))
-	config.w = int(workConfig.get("dicefactory", 'w'))
-	config.b = int(workConfig.get("dicefactory", 'b'))
-	config.dibit = int(workConfig.get("dicefactory", 'dibit'))
+	config.w = float(workConfig.get("dicefactory", 'w'))
+	config.b = float(workConfig.get("dicefactory", 'b'))
+	config.dibit = float(workConfig.get("dicefactory", 'dibit'))
 	config.rows = int(workConfig.get("dicefactory", 'rows'))
 	config.cols = int(workConfig.get("dicefactory", 'cols'))
 	config.reRollProb = float(workConfig.get("dicefactory", 'reRollProb'))
@@ -297,7 +299,7 @@ def setUp():
 
 			config.diceArray.append(d)
 			img  = d.createDice()
-			config.image.paste(img, (d.offset[0], d.offset[1]))
+			config.image.paste(img, (round(d.offset[0]), round(d.offset[1])))
 
 def iterate():
 	global config
@@ -312,9 +314,9 @@ def iterate():
 			if random.random() < config.reRollProb :
 				img  = d.createDice()
 				if config.alwaysRedrawAfterReRoll == True :
-					config.image.paste(d.image, (d.offset[0], d.offset[1]))
+					config.image.paste(d.image, (round(d.offset[0]), round(d.offset[1])))
 			if random.random() < config.reDrawProb :
-				config.image.paste(d.image, (d.offset[0], d.offset[1]))
+				config.image.paste(d.image, (round(d.offset[0]), round(d.offset[1])))
 
 		
 

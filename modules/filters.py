@@ -12,6 +12,7 @@ lev = 0
 levdiff  = 1
 unsharpMaskPercent = 100
 
+
 def ditherFilter(renderImageFull,xOffset, yOffset, config):
 	#return orderedDither(renderImageFull,xOffset, yOffset)
 	#return dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent, blurRadius)

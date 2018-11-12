@@ -122,6 +122,19 @@ def configure(config, workconfig) :
 		config.imageXOffset = 0
 		config.imageYOffset = 0
 
+	try :
+		config.useBlur  = workconfig.getboolean("displayconfig", 'useBlur')
+		config.blurXOffset = int(workconfig.get("displayconfig", 'blurXOffset'))
+		config.blurYOffset = int(workconfig.get("displayconfig", 'blurYOffset'))
+		config.blurSectionWidth = int(workconfig.get("displayconfig", 'blurSectionWidth'))
+		config.blurSectionHeight = int(workconfig.get("displayconfig", 'blurSectionHeight'))
+		config.sectionBlurRadius = int(workconfig.get("displayconfig", 'sectionBlurRadius'))
+		config.blurSection = (config.blurXOffset, config.blurYOffset, config.blurXOffset + config.blurSectionWidth, config.blurYOffset + config.blurSectionHeight)
+		print ("USING BLUR" , config.sectionBlurRadius)
+	except Exception as e: 
+		print (str(e))
+		config.useBlur  = False
+
 
 
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))

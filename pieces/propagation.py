@@ -304,6 +304,9 @@ def main(run = True) :
 	config.colorStepsRangeMin = int(workConfig.get("propagation","colorStepsRangeMin"))
 	config.colorStepsRangeMax = int(workConfig.get("propagation","colorStepsRangeMax"))
 
+	config.rows = int(workConfig.get("propagation","rows"))
+	config.cols = int(workConfig.get("propagation","cols"))
+
 	deadColor = ((workConfig.get("propagation", "deadColor")).split(','))
 	config.deadColor = tuple(map(lambda x: float(x), deadColor))
 	
@@ -352,8 +355,8 @@ def main(run = True) :
 	config.colOverlay.steps = config.steps 
 
 
-	config.tileSizeWidth = int(workConfig.get("displayconfig", 'tileSizeWidth'))
-	config.tileSizeHeight = int(workConfig.get("displayconfig", 'tileSizeHeight'))
+	config.tileSizeWidth = int(workConfig.get("propagation", 'tileSizeWidth'))
+	config.tileSizeHeight = int(workConfig.get("propagation", 'tileSizeHeight'))
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

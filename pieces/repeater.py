@@ -68,6 +68,7 @@ def main(run = True) :
 	config.noTrails  = (workConfig.getboolean("repeater", 'noTrails'))
 	config.imageList  = (workConfig.get("repeater", 'imageList'))
 
+
 	try :
 		config.pauseProb = float(workConfig.get("repeater", 'pauseProb'))
 	except Exception as e: 

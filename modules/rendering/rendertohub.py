@@ -70,6 +70,7 @@ def setUp():
 	#config.cnvs.update()
 	#config.cnvs.update_idletasks()
 
+
 	root.after(100, startWork)
 	root.call('wm', 'attributes', '.', '-topmost', '1')
 	root.mainloop()
@@ -165,7 +166,6 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
 	except  :
-
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
 	#config.drawBeforeConversion()
@@ -184,21 +184,22 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	#enhancer = ImageEnhance.Brightness(config.renderImageFull)
 	#config.renderImageFull = enhancer.enhance(.75)
 
-	if(config.useFilters) :
+
+	if config.useFilters == True :
 		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
 
-	if(config.usePixelSort == True and config.pixelSortRotatesWithImage == True) :
+	if config.usePixelSort == True and config.pixelSortRotatesWithImage == True :
 		if(random.random()< config.pixelSortAppearanceProb) :
 			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
-	if(config.rotation != 0) : 
+	if config.rotation != 0  : 
 		if(config.rotationTrailing or config.fullRotation) : 
 			# This rotates the image that is painted back to where it was
 			# basically same thing as rotating the image to be pasted in
 			# except in some cases, more trailing is created
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
-	if(config.usePixelSort and config.pixelSortRotatesWithImage == False) :
+	if config.usePixelSort and config.pixelSortRotatesWithImage == False  :
 		if(random.random()< config.pixelSortAppearanceProb) :
 			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
@@ -217,6 +218,14 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
 		
+	if config.useBlur == True :
+		crop = config.renderImageFull.crop(config.blurSection)
+		destination = (config.blurXOffset, config.blurYOffset)
+		crop = crop.convert("RGBA")
+
+		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+		config.renderImageFull.paste(crop, destination, crop)
+
 	if(updateCanvasCall) : updateCanvas() 
 
 	#mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024

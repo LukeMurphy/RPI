@@ -245,7 +245,7 @@ def main(run=True):
 	config.lineWidth = config.lineWidth = int(workConfig.get("dicefactory", 'lineWidth'))
 	config.pulseSpeed = float(workConfig.get("dicefactory", 'pulseSpeed'))
 	config.pasteDelay = float(workConfig.get("dicefactory", 'pasteDelay'))
-	config.mode = (workConfig.get("dicefactory", 'mode'))
+
 	config.countLimit = int(workConfig.get("dicefactory", 'countLimit'))
 	config.w = float(workConfig.get("dicefactory", 'w'))
 	config.b = float(workConfig.get("dicefactory", 'b'))

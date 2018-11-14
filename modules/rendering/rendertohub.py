@@ -206,6 +206,12 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	if config.remapImageBlock == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)
 		crop = crop.convert("RGBA")
+		'''
+		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
+		config.renderDraw.rectangle((config.remapImageBlockDestination[0], config.remapImageBlockDestination[1],
+			config.remapImageBlockSection[2], 
+			config.remapImageBlockSection[3] ), fill=(0,0,0,216))
+		'''
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 
 	if config.remapImageBlock2 == True :

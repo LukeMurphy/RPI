@@ -49,9 +49,9 @@ class unit :
 			self.colOverlay.dropHueMin = self.dropHueMin
 			self.colOverlay.dropHueMax = self.dropHueMax
 
-			self.colOverlay.colorB = [0,0,0]
-			self.colOverlay.colorA = [0,0,0]
-			self.colOverlay.currentColor = [0,0,0]
+			self.colOverlay.colorB = [0,0,0, 10]
+			self.colOverlay.colorA = [0,0,0, 10]
+			self.colOverlay.currentColor = [0,0,0,10]
 
 			self.colOverlay.colorTransitionSetup()
 
@@ -60,17 +60,18 @@ class unit :
 		#self.colOverlay.stepTransition()
 
 		if(self.unHideGrid == False and self.coordinatedColorChange == False):
-			self.colOverlay.stepTransition()
+			self.colOverlay.stepTransition(False, self.config.bgAlpha)
 
 		if self.coordinatedColorChange == False :
-			self.bgColor  = tuple(int(a*config.brightness) for a in (self.colOverlay.currentColor))
+			self.bgColor  = tuple(int(a*self.config.brightness) for a in (self.colOverlay.currentColor))
+
 
 		fontColor = self.bgColor
 		outlineColor = self.bgColor
 
 		if(self.unHideGrid == True):
-			fontColor = config.fontColor
-			outlineColor = config.outlineColor
+			fontColor = self.config.fontColor
+			outlineColor = self.config.outlineColor
 
 		if self.config.showOutline == False :
 			outlineColor = self.bgColor
@@ -85,8 +86,8 @@ class unit :
 
 		#displyInfo = displyInfo.encode('utf-8')
 		if self.config.showText == True :
-			self.draw.text((2,- 1), (displyInfo1), fontColor, font=config.font)
-			self.draw.text((2,- 1 + config.fontSize), (displyInfo2), fontColor, font=config.font)
+			self.draw.text((2,- 1), (displyInfo1), fontColor, font=self.config.font)
+			self.draw.text((2,- 1 + self.config.fontSize), (displyInfo2), fontColor, font=self.config.font)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -176,6 +177,9 @@ def redrawGrid():
 			config.rotation = config.baseRotation
 
 
+	if config.useEdgeSeedColors == True : 
+		colorSeeds() 
+
 	config.render(config.image, 0,0)
 
 
@@ -247,8 +251,10 @@ def displayTest():
 	config.colOverlay.stepTransition()
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
+	
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=config.bgColor, outline=config.outlineColor)
 	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=config.bgColor, outline=config.outlineColor)
+	
 	#config.draw.text((5,0),"TOP",config.fontColor,font=config.font)
 	#config.draw.text((5,config.screenHeight-15),"BOTTOM",config.fontColor,font=config.font)
 
@@ -339,6 +345,29 @@ def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale =
 	f = y-nx*d-ny*e
 	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
 
+## Need someway to "cluster" the seeds
+def colorSeeds() :
+	# Toggle the overall visibility of the color edge streaks
+	if random.random() < config.edgeSeedColorsVisibleChangeProb :
+		config.edgeSeedColorsVisible = True if config.edgeSeedColorsVisible == False else False
+
+	if random.random() < config.edgeSeedColorsDrawProb and config.edgeSeedColorsVisible == True :
+		num  = round(random.uniform(1,10))
+		
+		if random.random() < .002 :
+			config.yPosRangeMin  = round(random.uniform(0, config.canvasImageHeight))
+			config.yPosRangeMax  = round(random.uniform(config.yPosRangeMin, config.canvasImageHeight))
+
+		for i in range(1,num):
+			yPos = round(random.uniform(config.yPosRangeMin, config.yPosRangeMax))
+			xPos = 0 
+			w =round(random.uniform(2,3))
+			h =round(random.uniform(2,4))
+			greenLevel = round(random.uniform(120,200))
+			config.draw.rectangle((xPos,yPos,xPos + w, yPos + h), fill=(220,greenLevel,0,200), outline = None)
+
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ## Setup and run functions
 
@@ -390,7 +419,28 @@ def main(run = True) :
 	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
 
+	## Used for side seed colors
+	config.yPosRangeMin  = round(random.uniform(0, config.canvasImageHeight))
+	config.yPosRangeMax  = round(random.uniform(config.yPosRangeMin, config.canvasImageHeight))
+
 	config.unitArray = []
+
+	try:
+		config.bgAlpha = int(workConfig.get("signage","bgAlpha"))
+	except Exception as e:
+		print (str(e))
+		config.bgAlpha = 216
+	
+
+	try:
+		config.useEdgeSeedColors = workConfig.getboolean("signage","useEdgeSeedColors")
+		config.edgeSeedColorsDrawProb = float(workConfig.get("signage", 'edgeSeedColorsDrawProb'))
+		config.edgeSeedColorsVisibleChangeProb = float(workConfig.get("signage", 'edgeSeedColorsVisibleChangeProb'))
+		config.edgeSeedColorsVisible = True
+	except Exception as e:
+		print (str(e))
+		config.useEdgeSeedColors = False	
+		config.edgeSeedColorsVisible = False
 
 	try:
 		config.randomRotation = workConfig.getboolean("signage","randomRotation")

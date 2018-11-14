@@ -130,7 +130,6 @@ def configure(config, workconfig) :
 		config.blurSectionHeight = int(workconfig.get("displayconfig", 'blurSectionHeight'))
 		config.sectionBlurRadius = int(workconfig.get("displayconfig", 'sectionBlurRadius'))
 		config.blurSection = (config.blurXOffset, config.blurYOffset, config.blurXOffset + config.blurSectionWidth, config.blurYOffset + config.blurSectionHeight)
-		print ("USING BLUR" , config.sectionBlurRadius)
 	except Exception as e: 
 		print (str(e))
 		config.useBlur  = False

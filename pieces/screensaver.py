@@ -102,7 +102,7 @@ def main(run = True) :
 	config.textImage = Image.new("RGBA", (128, 128))
 	config.textDraw = ImageDraw.Draw(config.textImage)
 
-	config.textCrawl = Image.new("RGBA", (config.screenHeight, config.screenHeight))
+	config.textCrawl = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.crawlDraw = ImageDraw.Draw(config.textCrawl)
 	
 	config.iconImage = Image.open((path + imageList[0]) , "r")
@@ -285,7 +285,7 @@ def iterate( n = 0) :
 	else:
 		img = config.image
 
-	config.render(img, 0, -32, config.screenWidth, config.screenHeight, True, False)
+	config.render(img, 0, 0, config.screenWidth, config.screenHeight, True, False)
 
 	config.updateCanvas()
 

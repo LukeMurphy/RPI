@@ -142,7 +142,7 @@ def showGrid():
 							colorSample = config.canvasImage.getpixel(samplePoint)
 
 							#randomize brightness a little
-							colorSampleColor = tuple(int(round(c * random.uniform(.5,1.8))) for c in colorSample)
+							colorSampleColor = tuple(int(round(c * random.uniform(.1,1.8))) for c in colorSample)
 
 							# Once in a little while, the color is just random
 							if(random.random() < config.randomColorSampleProb) : 
@@ -153,8 +153,8 @@ def showGrid():
 									# Draw perpendicular light lines
 									#config.canvasDraw.line((x, y, x, config.canvasHeight), fill=colorSampleColor)
 									config.canvasDraw.line((x, y, x2, y), fill=colorSampleColor)
-								#else: 
-								#	config.canvasDraw.line((x, y, config.canvasWidth, y), fill=colorSampleColor)
+								else: 
+									config.canvasDraw.line((x, y, config.canvasWidth, y), fill=colorSampleColor)
 								
 							config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 								

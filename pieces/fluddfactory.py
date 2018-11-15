@@ -128,8 +128,8 @@ class Fludd :
 		return False
 
 	def setNewBox(self):
-		svarwNew = random.uniform(0, self.var)
-		svarhNew = random.uniform(0, self.var)
+		svarwNew = random.uniform(0, self.varX)
+		svarhNew = random.uniform(0, self.varY)
 		
 		self.symBoxWidthNew = self.boxMax - svarwNew
 		self.symBoxHeightNew = self.boxHeight - svarhNew
@@ -137,11 +137,11 @@ class Fludd :
 		self.xPos1New = (self.boxMax - self.symBoxWidthNew)
 		self.yPos1New = (self.boxHeight  - self.symBoxHeightNew)
 
-		self.widthDelta = (self.symBoxWidthNew - self.symBoxWidth) / self.steps
-		self.heightDelta = (self.symBoxHeightNew - self.symBoxHeight) / self.steps
+		self.widthDelta = (self.symBoxWidthNew - self.symBoxWidth) / self.config.transitionStepsMax
+		self.heightDelta = (self.symBoxHeightNew - self.symBoxHeight) / self.config.transitionStepsMax
 
-		self.xDelta = (self.xPos1New - self.xPos1) / self.steps
-		self.yDelta = (self.yPos1New - self.yPos1) / self.steps
+		self.xDelta = (self.xPos1New - self.xPos1) / self.config.transitionStepsMax
+		self.yDelta = (self.yPos1New - self.yPos1) / self.config.transitionStepsMax
 
 		#print (self.symBoxWidth,self.symBoxWidthNew)
 		#print (self.symBoxHeight,self.symBoxHeightNew)
@@ -187,7 +187,8 @@ class Fludd :
 
 
 	def reDraw(self) :
-		var = self.var
+		varX = self.varX
+		varY = self.varY
 
 		gray = 126
 		brightness = self.config.brightness * random.random()
@@ -211,22 +212,22 @@ class Fludd :
 		self.draw.rectangle((0,0, self.boxMax, self.boxHeight), fill = outerBorder, outline = None)
 
 		if(self.varianceMode == "independent") : 
-			xPos1 = random.uniform(-var/2,var)
-			yPos1 = random.uniform(-var/2,var)
+			xPos1 = random.uniform(-varX/2,varX)
+			yPos1 = random.uniform(-varY/2,varY)
 
-			xPos2 = random.uniform(self.boxMax-var,self.boxMax+var)
-			yPos2 = random.uniform(-var/2,var)	
+			xPos2 = random.uniform(self.boxMax-varX,self.boxMax+varX)
+			yPos2 = random.uniform(-varY/2,varY)	
 
-			xPos3 = random.uniform(self.boxMax-var,self.boxMax+var)
-			yPos3 = random.uniform(self.boxHeight-var,self.boxHeight+var)
+			xPos3 = random.uniform(self.boxMax-varX,self.boxMax+varX)
+			yPos3 = random.uniform(self.boxHeight-varY,self.boxHeight+varY)
 
-			xPos4 = random.uniform(-var/2,var)
-			yPos4 = random.uniform(self.boxHeight-var,self.boxHeight+var)
+			xPos4 = random.uniform(-varX/2,varX)
+			yPos4 = random.uniform(self.boxHeight-varY,self.boxHeight+varY)
 
 			self.draw.polygon((xPos1, yPos1, xPos2, yPos2, xPos3, yPos3, xPos4, yPos4), fill=(gray, gray, gray) , outline = None)
 
 		elif(self.varianceMode == "symmetrical"):
-			svar = random.uniform(0, var)
+			svar = random.uniform(0, varX)
 			self.symBoxWidth = self.boxMax - svar
 			self.symBoxHeight = self.boxHeight - svar
 			xy0 = svar
@@ -236,8 +237,8 @@ class Fludd :
 			self.setNewBox()
 	
 		elif(self.varianceMode == "asymmetrical"):
-			self.svarw = random.uniform(0, var)
-			self.svarh = random.uniform(0, var)
+			self.svarw = random.uniform(0, varX)
+			self.svarh = random.uniform(0, varY)
 			self.symBoxWidth = self.boxMax - self.svarw
 			self.symBoxHeight = self.boxHeight - self.svarh
 			self.xPos1 = (self.boxMax - self.symBoxWidth)
@@ -367,7 +368,19 @@ def main(run = True) :
 	config.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.fixedCenterColorVals))
 	config.usedFixedCenterColor = (workConfig.getboolean("fludd", 'usedFixedCenterColor'))
 
-	print(config.boxWidth, config.boxHeight)
+
+	try:
+		config.varianceX = int(workConfig.get("fludd", 'varianceX'))
+		config.varianceY = int(workConfig.get("fludd", 'varianceY'))
+		
+	except Exception as e: 
+		
+		config.varianceX = int(workConfig.get("fludd", 'var'))
+		config.varianceY = int(workConfig.get("fludd", 'var'))
+		print (str(e))
+
+
+	# print(config.boxWidth, config.boxHeight)
 
 	squareCount  = 0
 
@@ -377,7 +390,8 @@ def main(run = True) :
 			# Prism is all colors, Plenum is white
 			fluddSquare.borderModel  = workConfig.get("fludd", 'borderModel')
 			fluddSquare.nothing  = workConfig.get("fludd", 'nothing')
-			fluddSquare.var  = int(workConfig.get("fludd", 'var'))
+			fluddSquare.varX  = config.varianceX 
+			fluddSquare.varY  = config.varianceY
 			fluddSquare.varianceMode  = workConfig.get("fludd", 'varianceMode')
 			fluddSquare.prisimBrightness  = float(workConfig.get("fludd", 'prisimBrightness')) 
 			fluddSquare.boxMax = config.boxWidth

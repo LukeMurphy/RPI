@@ -394,8 +394,6 @@ def main(run = True) :
 
 
 		shapeVariants = list(map(lambda x: int(x), workConfig.get("collageShapes", config.shapeVariants[i]).split(',')))
-
-		shape.borderModel  = workConfig.get("collageShapes", 'borderModel')
 		shape.varX  = shapeVariants[0]
 		shape.varY  = shapeVariants[1]
 		shape.varianceMode  = workConfig.get("collageShapes", 'varianceMode')

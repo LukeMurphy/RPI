@@ -212,6 +212,10 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 			config.remapImageBlockSection[2], 
 			config.remapImageBlockSection[3] ), fill=(0,0,0,216))
 		'''
+
+		if config.remapImageBlockRotation != 0 :
+			crop = crop.rotate(config.remapImageBlockRotation)
+			#crop = crop.transpose(Image.ROTATE_90)
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 
 	if config.remapImageBlock2 == True :

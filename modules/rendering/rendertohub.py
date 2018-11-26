@@ -199,24 +199,23 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 			# except in some cases, more trailing is created
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
+
+	# ---- Pixel Sort Type Effect ---- #
 	if config.usePixelSort and config.pixelSortRotatesWithImage == False  :
 		if(random.random()< config.pixelSortAppearanceProb) :
 			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
+
+
+	# ---- Remap sections of image to accommodate odd panels ---- #
 	if config.remapImageBlock == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)
-		crop = crop.convert("RGBA")
-		'''
-		config.renderDraw = ImageDraw.Draw(config.renderImageFull)
-		config.renderDraw.rectangle((config.remapImageBlockDestination[0], config.remapImageBlockDestination[1],
-			config.remapImageBlockSection[2], 
-			config.remapImageBlockSection[3] ), fill=(0,0,0,216))
-		'''
-
 		if config.remapImageBlockRotation != 0 :
 			#crop = crop.transpose(Image.ROTATE_90)
 			crop = crop.rotate(config.remapImageBlockRotation)
+		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
+
 
 	if config.remapImageBlock2 == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection2)
@@ -233,11 +232,13 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
 		
+
+
+	# ---- Overall image blurring  ---- #
 	if config.useBlur == True :
 		crop = config.renderImageFull.crop(config.blurSection)
 		destination = (config.blurXOffset, config.blurYOffset)
 		crop = crop.convert("RGBA")
-
 		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
 		config.renderImageFull.paste(crop, destination, crop)
 

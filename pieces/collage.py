@@ -84,8 +84,8 @@ class Shape :
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
 		self.colOverlay.timeTrigger = True 
-		self.colOverlay.tLimitBase = 2
-		self.colOverlay.steps = 10
+		self.colOverlay.tLimitBase = 10
+		self.colOverlay.steps = 100
 		
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.maxBrightness = self.config.brightness
@@ -107,6 +107,7 @@ class Shape :
 		self.heightDelta = 0
 		self.xDelta = 0
 		self.yDelta = 0
+		self.poly = []
 
 		self.setNewBox()
 		
@@ -121,6 +122,7 @@ class Shape :
 			xPos = self.varX + round(p[0] + random.uniform(-self.varX, self.varX))
 			yPos = self.varY + round(p[1] + random.uniform(-self.varY, self.varY))
 			self.poly.append((xPos, yPos))
+
 
 		
 	def transition(self):
@@ -170,10 +172,10 @@ def redraw():
 	if config.shapeTweening == 2:
 			config.tweenCount += 1
 			config.destinationImage
-			composited = Image.blend(config.image, config.destinationImage, alpha = config.tweenCount/600)
+			composited = Image.blend(config.image, config.destinationImage, alpha = config.tweenCount/config.tweenCountMax)
 			config.image.paste(composited, (0,0), composited)
 
-			if config.tweenCount > 600 :
+			if config.tweenCount > config.tweenCountMax :
 				config.tweenCount = 0
 				config.shapeTweening = 0
 
@@ -188,6 +190,7 @@ def redraw():
 						pass
 					else :
 						shapeElement.setNewBox()
+						print("new box: " + shapeElement.name)
 						config.shapeTweening = 1
 
 
@@ -253,6 +256,7 @@ def main(run = True) :
 
 	config.shapeTweening = 0
 	config.tweenCount = 0
+	config.tweenCountMax = 100
 
 
 	for i in  range(0, len(config.shapeSets)):
@@ -273,6 +277,7 @@ def main(run = True) :
 		shapePosition = list(map(lambda x: int(x), workConfig.get(shapeDetails, 'postion').split(",")))
 		shape.shapeXPosition = shapePosition[0]
 		shape.shapeYPosition = shapePosition[1]
+		shape.name = "S_"+str(i)
 
 		shapeCoords = list(map(lambda x: int(x), workConfig.get(shapeDetails, 'coords').split(",")))
 		shape.coords = []

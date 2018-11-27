@@ -70,7 +70,15 @@ def main(run = True) :
 	ps.centerRangeXMax = int(workConfig.get("particleSystem", 'centerRangeXMax'))
 	ps.centerRangeyMax = int(workConfig.get("particleSystem", 'centerRangeyMax'))
 
+	
+
 	ps.objType = (workConfig.get("particleSystem", 'objType'))
+
+	try :
+		ps.meandorFactor = float(workConfig.get("particleSystem", 'meandorFactor'))
+	except Exception as e: 
+		print (str(e)) 
+		ps.meandorFactor = 1.0
 
 	try :
 		ps.objTrails = (workConfig.getboolean("particleSystem", 'objTrails'))

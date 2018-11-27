@@ -139,7 +139,7 @@ class Particle(object):
 		self.dy = self.v * math.sin(self.direction)
 		#self.dx = self.v * math.cos(self.direction)
 
-		self.dx = self.meanderFactor * noise.pnoise1(self.yPos/self.meanderFactor2 , 1)
+		self.dx = self.ps.meandorFactor * self.meanderFactor * noise.pnoise1(self.yPos/self.meanderFactor2 , 1)
 
 		vy = self.v * math.sin(self.direction)
 		vx = self.v * math.cos(self.direction)

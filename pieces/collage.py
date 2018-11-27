@@ -83,9 +83,9 @@ class Shape :
 		#### Sets up color transitions
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
-		self.colOverlay.timeTrigger = True 
-		self.colOverlay.tLimitBase = 10
-		self.colOverlay.steps = 100
+		self.colOverlay.timeTrigger = False 
+		self.colOverlay.tLimitBase = 15
+		self.colOverlay.steps = 120
 		
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.maxBrightness = self.config.brightness
@@ -155,44 +155,63 @@ def redraw():
 	## Each Fludd-square is generated as an image and then pasted into its correct
 	## place in the grid - or off-grid maybe sometime
 
-	#config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,10), outline=None)
-
+	'''
+	config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,10), outline=None)
 	for shapeElement in shapes:
-			shapeElement.transition()
+		shapeElement.transition()
+		img = shapeElement.tempImage.convert("RGBA")
+		config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
+		config.image.paste(config.destinationImage, (0,0), config.destinationImage)
+		if random.random() < config.changeBoxProb:
+			if shapeElement.varX == 0 and shapeElement.varY == 0 :
+				pass
+			else :
+				shapeElement.setNewBox()
+				#print("new box: " + shapeElement.name)
+	'''
 
 	if config.shapeTweening == 1 :
 		config.shapeTweening = 2
 
 		## Generate state to transition to...
 		for shapeElement in shapes:
-			#shapeElement.transition()
+			shapeElement.transition()
 			img = shapeElement.tempImage.convert("RGBA")
 			config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
 
 	if config.shapeTweening == 2:
 			config.tweenCount += 1
 			config.destinationImage
-			composited = Image.blend(config.image, config.destinationImage, alpha = config.tweenCount/config.tweenCountMax)
+			alpha = config.tweenCount/config.tweenCountMax
+			composited = Image.blend(config.image, config.destinationImage, alpha = alpha)
 			config.image.paste(composited, (0,0), composited)
 
-			if config.tweenCount > config.tweenCountMax :
+			# Really an alpha of .5 is good enough to allow full redraw
+			if config.tweenCount > config.tweenCountMax/2 :
 				config.tweenCount = 0
 				config.shapeTweening = 0
+				print("Tweening Done")
+				print("")
 
 	
 	if config.shapeTweening == 0 :
+		shapeToChange = -1
+		if random.random() < config.changeBoxProb:
+			shapeToChange = round(random.uniform(0, len(shapes) - 1))
+			#print(shapeToChange)
+
+		shapeCount = 0
 		for shapeElement in shapes:
-				#shapeElement.transition()
+				shapeElement.transition()
 				img = shapeElement.tempImage.convert("RGBA")
 				config.image.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
-				if random.random() < config.changeBoxProb:
-					if shapeElement.varX == 0 and shapeElement.varY == 0 :
-						pass
-					else :
-						shapeElement.setNewBox()
-						print("new box: " + shapeElement.name)
-						config.shapeTweening = 1
+				if shapeElement.varX != 0 and shapeElement.varY != 0 and shapeCount == shapeToChange :
+					shapeElement.setNewBox()
+					print("new box: " + shapeElement.name)
+					config.shapeTweening = 1
+				shapeCount += 1
 
+	
 
 def runWork():
 	global config
@@ -206,7 +225,7 @@ def iterate() :
 	redraw()
 
 
-
+	'''
 	## Paste an alpha of the next image, wait a few ms 
 	## then past a more opaque one again
 	## softens the transitions just enough
@@ -226,8 +245,8 @@ def iterate() :
 	mask3 = config.image.point(lambda i: min(i * 25, 255))
 	config.canvasImage.paste(config.image, (0,0), mask3)
 	config.render(config.canvasImage, 0, 0, config.image)
-
-	#config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+	'''
+	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	# Done
 
@@ -256,7 +275,12 @@ def main(run = True) :
 
 	config.shapeTweening = 0
 	config.tweenCount = 0
-	config.tweenCountMax = 100
+
+	
+	config.tweenCountMax = int(workConfig.get("collageShapes", 'tweenCountMax'))
+	config.colOverlaytLimitBase = int(workConfig.get("collageShapes", 'colOverlaytLimitBase'))
+	config.colOverlaySteps = int(workConfig.get("collageShapes", 'colOverlaySteps'))
+
 
 
 	for i in  range(0, len(config.shapeSets)):
@@ -286,6 +310,11 @@ def main(run = True) :
 			shape.coords.append((shapeCoords[c], shapeCoords[c+1]))
 
 		shape.setUp()
+
+		# A couple overrides ...
+		shape.colOverlay.tLimitBase = config.colOverlaytLimitBase
+		shape.colOverlay.steps = config.colOverlaySteps
+
 		shape.reDraw()
 		shapes.append(shape)
 

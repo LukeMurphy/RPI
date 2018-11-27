@@ -190,8 +190,8 @@ def redraw():
 			if config.tweenCount > config.tweenCountMax/2 :
 				config.tweenCount = 0
 				config.shapeTweening = 0
-				print("Tweening Done")
-				print("")
+				#print("Tweening Done")
+				#print("")
 
 	
 	if config.shapeTweening == 0 :
@@ -207,7 +207,7 @@ def redraw():
 				config.image.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
 				if shapeElement.varX != 0 and shapeElement.varY != 0 and shapeCount == shapeToChange :
 					shapeElement.setNewBox()
-					print("new box: " + shapeElement.name)
+					#print("new box: " + shapeElement.name)
 					config.shapeTweening = 1
 				shapeCount += 1
 

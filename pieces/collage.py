@@ -84,8 +84,8 @@ class Shape :
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
 		self.colOverlay.timeTrigger = True 
-		self.colOverlay.tLimitBase = 25
-		self.colOverlay.steps = 20
+		self.colOverlay.tLimitBase = 2
+		self.colOverlay.steps = 10
 		
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.maxBrightness = self.config.brightness
@@ -100,9 +100,8 @@ class Shape :
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
-		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
+		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
 		self.fillColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay.currentColor)
-
 
 		self.widthDelta = 0
 		self.heightDelta = 0
@@ -125,12 +124,16 @@ class Shape :
 
 		
 	def transition(self):
-		self.fillColor = []
-		for i in range(0,3) :
-			self.fillColor.append(round(self.colOverlay.currentColor[i] * self.config.brightness ))
-		self.fillColor.append(255)
-		self.fillColor = tuple(int(a) for a in self.fillColor)
-		self.colOverlay.stepTransition()
+		if self.usedFixedCenterColor == True :
+			self.fillColor = self.fixedCenterColor
+		else :
+			self.colOverlay.stepTransition()
+			self.fillColor = []
+			for i in range(0,3) :
+				self.fillColor.append(round(self.colOverlay.currentColor[i] * self.config.brightness ))
+			self.fillColor.append(255)
+			self.fillColor = tuple(int(a) for a in self.fillColor)
+
 		self.draw.rectangle((0,0,self.boxMax, self.boxHeight), fill=(0,0,0,10), outline=None)
 		self.draw.polygon(self.poly, fill=self.fillColor , outline = None)
 
@@ -152,12 +155,15 @@ def redraw():
 
 	#config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,10), outline=None)
 
+	for shapeElement in shapes:
+			shapeElement.transition()
+
 	if config.shapeTweening == 1 :
 		config.shapeTweening = 2
 
 		## Generate state to transition to...
 		for shapeElement in shapes:
-			shapeElement.transition()
+			#shapeElement.transition()
 			img = shapeElement.tempImage.convert("RGBA")
 			config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
 
@@ -174,7 +180,7 @@ def redraw():
 	
 	if config.shapeTweening == 0 :
 		for shapeElement in shapes:
-				shapeElement.transition()
+				#shapeElement.transition()
 				img = shapeElement.tempImage.convert("RGBA")
 				config.image.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
 				if random.random() < config.changeBoxProb:
@@ -195,7 +201,30 @@ def runWork():
 def iterate() :
 	global config
 	redraw()
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+
+
+
+	## Paste an alpha of the next image, wait a few ms 
+	## then past a more opaque one again
+	## softens the transitions just enough
+
+	config.pasteDelay = .02
+
+	mask1 = config.image.point(lambda i: min(i * 1, 50))
+	config.canvasImage.paste(config.image, (0,0), mask1)
+	config.render(config.canvasImage, 0, 0, config.image)
+	
+	time.sleep(config.pasteDelay)
+	mask2 = config.image.point(lambda i: min(i * 25, 100))
+	config.canvasImage.paste(config.image, (0,0), mask2)
+	config.render(config.canvasImage, 0, 0, config.image)
+	
+	time.sleep(config.pasteDelay)
+	mask3 = config.image.point(lambda i: min(i * 25, 255))
+	config.canvasImage.paste(config.image, (0,0), mask3)
+	config.render(config.canvasImage, 0, 0, config.image)
+
+	#config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	# Done
 
@@ -205,6 +234,7 @@ def main(run = True) :
 	global shapes
 	shapes = []
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 
 	config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -233,8 +263,9 @@ def main(run = True) :
 
 		shape.varianceMode  = workConfig.get("collageShapes", 'varianceMode')
 		shape.prisimBrightness  = float(workConfig.get("collageShapes", 'prisimBrightness')) 
-		shape.usedFixedCenterColor = config.usedFixedCenterColor
-		shape.fixedCenterColor = config.fixedCenterColor
+		shape.usedFixedCenterColor = workConfig.getboolean(shapeDetails, 'usedFixedCenterColor')
+		shape.fixedCenterColorVals = workConfig.get(shapeDetails, 'fixedCenterColor').split(',')
+		shape.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , shape.fixedCenterColorVals))
 
 		shape.varX  = float(workConfig.get(shapeDetails, 'varX'))
 		shape.varY  = float(workConfig.get(shapeDetails, 'varY'))

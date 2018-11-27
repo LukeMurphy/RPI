@@ -633,7 +633,7 @@ def checkTime():
 
 	if delta > config.timeToComplete :
 		config.scroller4.paused = False
-		config.usePixelSort = False
+		#config.usePixelSort = False
 		#config.rotation = 0
 
 
@@ -652,7 +652,7 @@ def iterate() :
 		if scrollerObj.typeOfScroller == "bg" :
 			if random.random() < config.pauseProb and scrollerObj.paused == False:
 				scrollerObj.paused = True
-				config.usePixelSort = True
+				#config.usePixelSort = True
 				#config.rotation = random.uniform(-1,1)
 				config.t1  = time.time()
 				config.timeToComplete = random.uniform(1,10)

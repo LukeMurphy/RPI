@@ -275,6 +275,11 @@ def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
 	messageString = config.msg1 if random.random() < .5 else config.msg2
+	config.textVOffest = round(random.uniform(-12,-30))
+	if random.random() < .5 :
+		config.colorMode = "randomColor"
+	else:
+		config.colorMode = "getRandomRGB"
 	makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

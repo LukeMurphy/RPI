@@ -481,7 +481,7 @@ def configureMessageScrolling():
 	config.fontSize =  int(workConfig.get("scroller", 'fontSize'))
 	config.textVOffest = int(workConfig.get("scroller", 'textVOffest'))
 	config.shadowSize = int(workConfig.get("scroller", 'shadowSize'))
-	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
+	config.textSpeed = float(workConfig.get("scroller", 'textSpeed'))
 	config.msg1 = workConfig.get("scroller", 'msg1')
 	config.msg2 = workConfig.get("scroller", 'msg2')
 	config.msg3 = workConfig.get("scroller", 'msg3')
@@ -500,7 +500,7 @@ def configureMessageScrolling():
 	config.scroller3 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller3
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
-	scrollerRef.xSpeed = config.textSpeed + 1
+	scrollerRef.xSpeed = config.textSpeed + .25
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	makeMessage(scrollerRef.bg1,config.msg2, direction)
@@ -514,7 +514,7 @@ def configureAltTextScrolling() :
 	config.fontSize =  int(workConfig.get("scroller", 'fontSize'))
 	config.textVOffest = int(workConfig.get("scroller", 'textVOffest'))
 	config.shadowSize = int(workConfig.get("scroller", 'shadowSize'))
-	config.textSpeed = int(workConfig.get("scroller", 'textSpeed'))
+	config.textSpeed = float(workConfig.get("scroller", 'textSpeed'))
 	config.scroller6 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller6
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)

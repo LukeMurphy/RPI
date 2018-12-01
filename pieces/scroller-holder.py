@@ -579,50 +579,58 @@ def init() :
 	config.flip = False
 	config.scrollArray = []
 
-	config.useOverLayImage = workConfig.getboolean("scroller", 'useOverLayImage')
-	config.useArrows = workConfig.getboolean("scroller", 'useArrows')
-	config.useText = workConfig.getboolean("scroller", 'useText')
-	config.useImages = workConfig.getboolean("scroller", 'useImages')
-	config.useTransparentImages = workConfig.getboolean("scroller", 'useTransparentImages')
-	config.useBackground = workConfig.getboolean("scroller", 'useBackground')
-	config.useAltText = workConfig.getboolean("scroller", 'useAltText')
-
+	## Set up the scrolling layer
 	try:
+		config.useBackground = workConfig.getboolean("scroller", 'useBackground')
 		config.altDirectionScrolling = workConfig.getboolean("scroller", 'altDirectionScrolling')
+		config.alwaysRandomPatternColor = workConfig.getboolean("scroller", 'alwaysRandomPatternColor')
+		config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
+		if(config.useBackground == True) :
+			configureBackgroundScrolling()
 	except Exception as e:
 		print (str(e))
 		config.altDirectionScrolling = True
 
-	try:
-		config.alwaysRandomPatternColor = workConfig.getboolean("scroller", 'alwaysRandomPatternColor')
-	except Exception as e:
-		print (str(e))
-		config.alwaysRandomPatternColor = False
+
 
 	try:
-		config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
+		config.useText = workConfig.getboolean("scroller", 'useText')
+		config.useAltText = workConfig.getboolean("scroller", 'useAltText')
+		if(config.useText == True) :
+			configureMessageScrolling()
+		if(config.useAltText == True) :
+			configureAltTextScrolling()
 	except Exception as e:
 		print (str(e))
-		config.alwaysRandomPattern = True
 
-	if(config.useOverLayImage ==  True) :
-		configureImageOverlay()
+	
+	try:
+		config.useOverLayImage = workConfig.getboolean("scroller", 'useOverLayImage')
+		if(config.useOverLayImage ==  True) :
+			configureImageOverlay()
+	except Exception as e:
+		print (str(e))
+	
 
-	## Set up the scrolling layers
-	if(config.useBackground == True) :
-		configureBackgroundScrolling()
+	
+	try:
+		config.useArrows = workConfig.getboolean("scroller", 'useArrows')
+		if(config.useArrows == True) :
+			configureArrowScrolling()
+	except Exception as e:
+		print (str(e))
+	
 
-	if(config.useArrows == True) :
-		configureArrowScrolling()
+	
+	try:
+		config.useImages = workConfig.getboolean("scroller", 'useImages')
+		config.useTransparentImages = workConfig.getboolean("scroller", 'useTransparentImages')
+		if(config.useImages == True) :
+			configureImageScrolling()
+	except Exception as e:
+		print (str(e))
+	
 
-	if(config.useText == True) :
-		configureMessageScrolling()
-
-	if(config.useAltText == True) :
-		configureAltTextScrolling()
-
-	if(config.useImages == True) :
-		configureImageScrolling()
 
 
 

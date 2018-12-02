@@ -609,6 +609,7 @@ def init() :
 		if(config.useOverLayImage ==  True) :
 			configureImageOverlay()
 	except Exception as e:
+		config.useOverLayImage = False
 		print (str(e))
 	
 

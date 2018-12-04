@@ -76,6 +76,8 @@ def showGrid():
 
 
 	config.colOverlay.stepTransition()
+
+	## Force sets the alpha
 	config.colOverlay.currentColor[3] = 30
 
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
@@ -168,7 +170,6 @@ def showGrid():
 	config.render(config.image, 0,0)
 
 
-
 def main(run = True) :
 	global config, directionOrder
 	print("---------------------")
@@ -224,8 +225,6 @@ def main(run = True) :
 	config.colOverlay.tLimitBase = config.tLimitBase 
 	config.colOverlay.maxBrightness = config.brightness
 	config.colOverlay.steps = 50
-
-
 	config.colOverlay.minHue = float(workConfig.get("screenproject", 'minHue'))
 	config.colOverlay.maxHue = float(workConfig.get("screenproject", 'maxHue'))
 	config.colOverlay.minSaturation = float(workConfig.get("screenproject", 'minSaturation'))

@@ -237,6 +237,18 @@ def main(run = True) :
 	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
 
 	try:
+		config.pauseProb = float(workConfig.get("screenproject", 'pauseProb'))
+		config.unpauseProb = float(workConfig.get("screenproject", 'unpauseProb'))
+		config.usePause = True
+		config.pausing = False
+
+
+	except Exception as e:
+		config.usePause = False
+		print (str(e))
+
+
+	try:
 		arg = (workConfig.get("screenproject","bgImage"))
 		path = config.path  + arg
 		config.bgImage = Image.open(path , "r")
@@ -279,7 +291,17 @@ def runWork():
 
 def iterate() :
 	global config
-	showGrid()
+
+	if random.random() < config.pauseProb and config.usePause == True:
+		config.pausing = True
+	elif config.pausing == False :
+		showGrid()
+
+	if random.random() < config.unpauseProb and config.pausing == True :
+		config.pausing = False
+		
+
+	if config.usePause == False : showGrid()
 
 
 	if random.random() < config.crackChangeProb :

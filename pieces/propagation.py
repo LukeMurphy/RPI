@@ -197,7 +197,6 @@ def redrawGrid1():
 
 	config.render(config.image, 0,0)
 
-
 def redrawGrid2():
 
 	for u in config.unitArray:

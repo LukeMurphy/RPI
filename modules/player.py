@@ -224,6 +224,7 @@ def renderUsingIDAFruitHat(work):
 def renderUsingLINSNHub(work):
 
 	from modules.rendering import rendertohub
+	import threading
 
 	work.config.useFilters  = (work.workConfig.getboolean("displayconfig", 'useFilters'))
 	work.config.rotation = float(work.workConfig.get("displayconfig", 'rotation'))

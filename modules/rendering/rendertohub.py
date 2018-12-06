@@ -211,7 +211,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	if config.remapImageBlock == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)
 		if config.remapImageBlockRotation != 0 :
-			#crop = crop.transpose(Image.ROTATE_90)
+			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockRotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
@@ -220,6 +220,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	if config.remapImageBlock2 == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection2)
 		if config.remapImageBlockSection2Rotation != 0 :
+			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockSection2Rotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination2, crop)	
@@ -228,6 +229,7 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	if config.remapImageBlock3 == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection3)
 		if config.remapImageBlockSection3Rotation != 0 :
+			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockSection3Rotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)

@@ -95,9 +95,9 @@ def configure(config, workconfig) :
 		config.remapImageBlock = False
 	
 	try :
-		config.remapImageBlockRotation = float(workconfig.get("displayconfig", 'remapImageBlockRotation'))
+		config.remapImageBlockSectionRotation = float(workconfig.get("displayconfig", 'remapImageBlockSectionRotation'))
 	except Exception as e:
-		config.remapImageBlockRotation = 0	
+		config.remapImageBlockSectionRotation = 0	
 
 	try :
 		config.remapImageBlock2 = (workconfig.getboolean("displayconfig", 'remapImageBlock2'))

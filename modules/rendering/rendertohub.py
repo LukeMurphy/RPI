@@ -210,9 +210,9 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	# ---- Remap sections of image to accommodate odd panels ---- #
 	if config.remapImageBlock == True :
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)
-		if config.remapImageBlockRotation != 0 :
+		if config.remapImageBlockSectionRotation != 0 :
 			crop = crop.convert("RGBA")
-			crop = crop.rotate(config.remapImageBlockRotation)
+			crop = crop.rotate(config.remapImageBlockSectionRotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 

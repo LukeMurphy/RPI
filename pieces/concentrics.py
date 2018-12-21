@@ -48,20 +48,17 @@ class Unit:
 		self.angleRads  = math.pi/self.numLines	
 		self.angle += self.angleSpeed
 
-		pallette = [(255,0,0),(0,255,0),(0,0,255)]
+		pallette = [(0,0,255),(0,255,0),(255,0,0)]
 		palletteCount = round(self.palletteCountOffset)
 
 		for i in range (0,self.numLines) :
-			xPos = -i*self.expRate + self.x0
-			yPos = -i*self.expRate + self.y0
-
-			self.r = round(math.sin(i * self.angleRads + self.angle) * 255)
+			self.r = round(.2*math.pi * math.cos(math.sin(i * self.angleRads + self.angle)) * 255)
 			self.g = round(math.cos(math.pi + i * self.angleRads + self.angle) * 255)
 			self.b = round(math.sin(math.pi + i * self.angleRads + 1 * self.angle) * 255)
 
-			self.r = pallette[palletteCount][0]
-			self.g = pallette[palletteCount][1]
-			self.b = pallette[palletteCount][2]
+			#self.r = pallette[palletteCount][0]
+			#self.g = pallette[palletteCount][1]
+			#self.b = pallette[palletteCount][2]
 
 			palletteCount += 1
 
@@ -74,10 +71,13 @@ class Unit:
 			else :
 				self.a = round(self.alphaInit * (255 - (255 * i/self.numLines)))
 			self.fillColor = tuple((self.r,self.g,self.b,self.a))
+			for n in range(0,self.linesPerBand) :
+				xPos = -i * self.expRate + n + self.x0
+				yPos = -i * self.expRate + n + self.y0
 
-
-			box = [(xPos,yPos),(self.objWidth/2 + i*self.expRate + self.x0, self.objHeight/2 + i*self.expRate + self.y0)] 
-			self.draw.chord(box, 0, 360, fill =  None, outline=self.fillColor)
+				box = [(xPos,yPos),(self.objWidth/2 + i*self.expRate + self.x0 + n, self.objHeight/2 + i*self.expRate + self.y0 + n)] 
+				self.draw.chord(box, 0, 360, fill =  None, outline=self.fillColor)
+				#self.draw.rectangle(box, fill =  None, outline=self.fillColor)
 
 		if self.alphaInit < 1 :
 			self.alphaInit += .1
@@ -102,7 +102,7 @@ def showGrid():
 
 	config.bgColor  = tuple(int(a*config.brightness) for a in (config.colOverlay.currentColor))
 	#config.bgColor  = (0,0,0,200)
-	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
+	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	#config.canvasDraw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	for i in range(0,config.numUnits):
 		obj = config.unitArray[i]
@@ -155,9 +155,18 @@ def main(run = True) :
 
 		obj.x0 = config.canvasWidth * random.random()
 		obj.y0 = config.canvasHeight * random.random()
+
 		obj.numLines = round(random.uniform(5,30))
 		obj.angleRate = round(random.uniform(60,100))
 		obj.expRate = round(random.uniform(2,4))
+		
+
+		obj.numLines = 12
+		obj.x0 = 20
+		obj.y0 = 40
+		obj.expRate = 3
+		obj.linesPerBand = 4
+		obj.angleRate = 20
 		obj.setUp()
 		config.unitArray.append(obj)
 

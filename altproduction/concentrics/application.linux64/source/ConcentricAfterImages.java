@@ -77,7 +77,7 @@ public void draw() {
       }
     }
   } else {
-
+    background(20, 0, 170);
     Scrunchie.set("time", millis() / 1000.0f);
     shader(Scrunchie);  
     //rect(0, 0, 250, 320); 

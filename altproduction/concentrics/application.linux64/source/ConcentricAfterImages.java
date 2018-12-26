@@ -83,7 +83,7 @@ public void draw() {
     //rect(0, 0, 250, 320); 
     if (setupSet == 1 ) {
       if (!frameMoved) {
-        surface.setLocation(2580, 120);
+        surface.setLocation(100, 100);
         frameMoved = true;
       }
       rect(0, 0, 248, 200);
@@ -99,7 +99,6 @@ public void draw() {
     }
   }
 }
-
   public void settings() {  size(340, 340, P2D); }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "ConcentricAfterImages" };

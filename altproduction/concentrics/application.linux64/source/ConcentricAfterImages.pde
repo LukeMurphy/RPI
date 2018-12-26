@@ -67,7 +67,7 @@ void draw() {
     //rect(0, 0, 250, 320); 
     if (setupSet == 1 ) {
       if (!frameMoved) {
-        surface.setLocation(40, 40);
+        surface.setLocation(2580, 120);
         frameMoved = true;
       }
       rect(0, 0, 248, 200);

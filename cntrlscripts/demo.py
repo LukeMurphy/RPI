@@ -15,19 +15,23 @@ actionDict = [
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-star.cfg'}, 
 	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
-
+	{"---------------" :''},
+	
 	{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
 	{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
 	{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},
+	{"---------------" :''},
 
 	{"Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
+	{"---------------" :''},
 
 	{"Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
 	{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	{"Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
+	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{"---------------" :''},
 
 	{"Arc: Afer Images" :'concentrics/ConcentricAfterImagesArc.app'},
-	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 	]
 
@@ -48,8 +52,6 @@ def action():
 
 
 
-
-
 def stopAll():
 	#print("Tkinter is easy to use!")
 	os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
@@ -58,7 +60,7 @@ root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
 
-Lb = Listbox(frame, width = 70, height = 18) 
+Lb = Listbox(frame, width = 70, height = 25) 
 
 
 for i,item in enumerate(actionDict):

@@ -12,4 +12,6 @@ log.*
 */out
 out/
 *.psd
+*.app
+*/app
 

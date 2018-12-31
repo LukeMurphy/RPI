@@ -3,7 +3,7 @@
 if [ "$2" == "b" ]; then 
 echo
 else
-ps -ef | pgrep Python | xargs sudo kill -9; 
+ps -ef | pgrep -f  player.py | xargs sudo kill -9; 
 fi
 echo
 echo 

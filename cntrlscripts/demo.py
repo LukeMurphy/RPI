@@ -31,7 +31,18 @@ actionDict = [
 	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{"---------------" :''},
 
-	{"Arc: Afer Images" :'concentrics/ConcentricAfterImagesArc.app'},
+	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	{"---------------" :''},
+	
+	{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
+	{"To Fro: Collage" :'p4-5x6-tofro/collage.cfg'},
+	{"---------------" :''},
+	{"To Fro: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{"---------------" :''},
+	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
+	{"To Fro: Screen" :'p4-5x6-tofro/screen.cfg'},
+
 
 	]
 
@@ -60,7 +71,7 @@ root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
 
-Lb = Listbox(frame, width = 70, height = 25) 
+Lb = Listbox(frame, width = 70, height = 30) 
 
 
 for i,item in enumerate(actionDict):

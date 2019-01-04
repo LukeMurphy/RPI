@@ -90,9 +90,11 @@ def configure(config, workconfig) :
 		config.remapImageBlockSection = tuple([int(i) for i in config.remapImageBlockSection])
 		config.remapImageBlockDestination = workconfig.get("displayconfig", 'remapImageBlockDestination').split(",")
 		config.remapImageBlockDestination = tuple([int(i) for i in config.remapImageBlockDestination])
+		config.filterRemap = True
 	except Exception as e:
 		print (str(e))
 		config.remapImageBlock = False
+		config.filterRemap = False
 	
 	try :
 		config.remapImageBlockSectionRotation = float(workconfig.get("displayconfig", 'remapImageBlockSectionRotation'))

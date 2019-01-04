@@ -90,12 +90,12 @@ class Shape :
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.maxBrightness = self.config.brightness
 
-		self.colOverlay.minHue = 0
-		self.colOverlay.maxHue = 360
-		self.colOverlay.minSaturation = .1
-		self.colOverlay.maxSaturation = 1
-		self.colOverlay.minValue = .1
-		self.colOverlay.maxValue = 1
+		self.colOverlay.minHue = self.config.minHue
+		self.colOverlay.maxHue = self.config.maxHue
+		self.colOverlay.minSaturation = self.config.minSaturation
+		self.colOverlay.maxSaturation = self.config.maxSaturation
+		self.colOverlay.minValue = self.config.minValue
+		self.colOverlay.maxValue = self.config.maxValue
 
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
@@ -276,11 +276,29 @@ def main(run = True) :
 	config.shapeTweening = 0
 	config.tweenCount = 0
 
-	
 	config.tweenCountMax = int(workConfig.get("collageShapes", 'tweenCountMax'))
 	config.colOverlaytLimitBase = int(workConfig.get("collageShapes", 'colOverlaytLimitBase'))
 	config.colOverlaySteps = int(workConfig.get("collageShapes", 'colOverlaySteps'))
 
+
+
+	try:
+		
+		config.maxHue  = float(workConfig.get("collageShapes", 'maxHue')) 
+		config.minHue  = float(workConfig.get("collageShapes", 'minHue')) 
+		config.maxSaturation  = float(workConfig.get("collageShapes", 'maxSaturation')) 
+		config.minSaturation  = float(workConfig.get("collageShapes", 'minSaturation')) 
+		config.maxValue  = float(workConfig.get("collageShapes", 'maxValue')) 
+		config.minValue= float(workConfig.get("collageShapes", 'minValue')) 
+
+	except Exception as e :
+		print(e)
+		config.maxHue  = 360
+		config.minHue  = 0
+		config.maxSaturation  = 1
+		config.minSaturation  = .1
+		config.maxValue  = 1
+		config.minValue = .1
 
 
 	for i in  range(0, len(config.shapeSets)):

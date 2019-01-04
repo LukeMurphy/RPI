@@ -87,8 +87,9 @@ class Shape :
 		self.colOverlay.tLimitBase = 15
 		self.colOverlay.steps = 120
 		
-		self.colOverlay.maxBrightness = self.config.brightness
-		self.colOverlay.maxBrightness = self.config.brightness
+		# This will force the overlay color transition functions to use the
+		# configs for HSV
+		self.colOverlay.maxBrightness = 1
 
 		self.colOverlay.minHue = self.config.minHue
 		self.colOverlay.maxHue = self.config.maxHue
@@ -101,6 +102,9 @@ class Shape :
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
 		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.colOverlay.setStartColor()
+		self.colOverlay.getNewColor()
+		
 		self.fillColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay.currentColor)
 
 		self.widthDelta = 0
@@ -305,10 +309,7 @@ def main(run = True) :
 
 		shapeDetails = config.shapeSets[i]
 		shape = Shape(config)
-		# Prism is all colors, Plenum is white
 
-		shape.varianceMode  = workConfig.get("collageShapes", 'varianceMode')
-		shape.prisimBrightness  = float(workConfig.get("collageShapes", 'prisimBrightness')) 
 		shape.usedFixedCenterColor = workConfig.getboolean(shapeDetails, 'usedFixedCenterColor')
 		shape.fixedCenterColorVals = workConfig.get(shapeDetails, 'fixedCenterColor').split(',')
 		shape.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , shape.fixedCenterColorVals))

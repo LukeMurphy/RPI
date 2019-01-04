@@ -93,7 +93,6 @@ class ColorOverlay:
 	
 	def colorTransitionSetup(self, steps = 0, newColor = None):
 
-
 		self.gotoNextTransition = False
 
 		#### Setting up for color transitions

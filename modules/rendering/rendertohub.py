@@ -186,7 +186,12 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 
 	if config.useFilters == True :
-		config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
+		config.tempImage = config.renderImageFull.copy()
+		config.tempImage = ditherFilter(config.tempImage,xOffset, yOffset, config)
+		crop = config.tempImage.crop(config.remapImageBlockSection)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
+		#config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
 
 	if config.usePixelSort == True and config.pixelSortRotatesWithImage == True :
 		if(random.random()< config.pixelSortAppearanceProb) :

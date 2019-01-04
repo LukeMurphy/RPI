@@ -162,7 +162,8 @@ def makeCarcas():
 			redShift = config.redShift
 
 			redShiftToUse = redShift
-			if(quad == "cavity") : redShiftToUse = int(220 * (config.brightness + .2))
+			# This is large red oblong
+			if(quad == "cavity") : redShiftToUse = int(120 * (config.brightness))
 
 			fills = [(gray0 + redShiftToUse,gray1,gray1,255),(gray1 + redShiftToUse,gray1,gray1,255),(gray2 + redShiftToUse,gray2,gray2,255)]
 			

@@ -264,9 +264,11 @@ def iterate() :
 
 	if(random.random() < .5) :
 		config.pixSortYOffset = config.base_pixSortYOffset
+		#print("Animal")
 		makeblockanimals.makeAnimal()
 	else :
 		config.pixSortYOffset = config.carcas_pixSortYOffset
+		#print("Carcass")
 		makeblockanimals.makeCarcas()
 
 	if(config.useColorOverlayTransitions == True and config.applyColorOverlayToFullImage == True) :

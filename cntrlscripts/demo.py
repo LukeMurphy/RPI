@@ -35,13 +35,13 @@ actionDict = [
 	{"---------------" :''},
 	
 	{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
+	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
 	{"To Fro: Collage" :'p4-5x6-tofro/collage.cfg'},
 	{"---------------" :''},
-	{"To Fro: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 	{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{"To Fro: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 	{"---------------" :''},
-	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
-	{"To Fro: Screen" :'p4-5x6-tofro/screen.cfg'},
+
 
 
 	]

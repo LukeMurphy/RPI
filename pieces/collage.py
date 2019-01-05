@@ -104,7 +104,7 @@ class Shape :
 		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
 		self.colOverlay.setStartColor()
 		self.colOverlay.getNewColor()
-		
+
 		self.fillColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay.currentColor)
 
 		self.widthDelta = 0
@@ -141,10 +141,13 @@ class Shape :
 			self.fillColor = tuple(int(a) for a in self.fillColor)
 
 		self.draw.rectangle((0,0,self.boxMax, self.boxHeight), fill=(0,0,0,10), outline=None)
+		if self.varX == -1 :
+			self.draw.ellipse((self.poly[0][0],self.poly[0][1],self.poly[2][0], self.poly[2][1]), fill=self.fillColor, outline=None)
 		self.draw.polygon(self.poly, fill=self.fillColor , outline = None)
 
 
 	def reDraw(self) :
+		#self.draw.rectangle((0,0,self.boxMax, self.boxHeight), fill=self.fillColor, outline=None)
 		self.draw.polygon(self.poly, fill=self.fillColor , outline = None)
 
 

@@ -82,10 +82,10 @@ class Shape :
 		self.draw  = ImageDraw.Draw(self.tempImage)
 		#### Sets up color transitions
 		self.colOverlay = coloroverlay.ColorOverlay()
-		self.colOverlay.randomSteps = True
-		self.colOverlay.timeTrigger = False 
-		self.colOverlay.tLimitBase = 15
-		self.colOverlay.steps = 120
+		self.colOverlay.randomSteps = False
+		self.colOverlay.timeTrigger = True 
+		#self.colOverlay.tLimitBase = 15
+		#self.colOverlay.steps = 120
 		
 		# This will force the overlay color transition functions to use the
 		# configs for HSV

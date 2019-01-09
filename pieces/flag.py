@@ -87,8 +87,8 @@ def drawRects() :
 			yPos = config.starVDis + (config.starVDis/1.5 + config.starDiam) * r
 			starPoints = []
 			for i in range(0,5) :
-				xP = xPos + config.radius * math.cos(i * config.starPointsAngle)
-				yP = yPos + config.radius * math.sin(i * config.starPointsAngle)
+				xP = xPos + config.radius * math.cos(i * config.starPointsAngle + 2/3*config.starPointsAngle)
+				yP = yPos + config.radius * math.sin(i * config.starPointsAngle + 2/3*config.starPointsAngle)
 				starPoints.append((xP,yP))
 			#config.canvasDraw.rectangle(xPos, yPos,xPos + starDiam,yPos + starDiam), fill=whtVal)
 			#config.canvasDraw.chord((xPos, yPos,xPos + starDiam,yPos + starDiam),0,360, fill=whtVal)

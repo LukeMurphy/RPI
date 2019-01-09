@@ -14,6 +14,8 @@ totalCounterWidth = 0
 numberOfDeadPixels = 10
 probabilityOfBlockBlanks = .9
 
+sizeTarget = [160,48]
+
 def setBlanks() : 
 	return None
 

@@ -15,6 +15,7 @@ actionDict = [
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-star.cfg'}, 
 	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
+	{"Wall Hanging: FLAG" :'p4-4x7-slope/flag.cfg'},
 	{"---------------" :''},
 	
 	{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},

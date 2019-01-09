@@ -300,7 +300,7 @@ def main(run = True) :
 
 	if(config.useBlanks) :
 		badpixels.numberOfDeadPixels = config.numberOfDeadPixels
-		badpixels.size = config.canvasImage.size
+		badpixels.sizeTarget = list(config.canvasImage.size)
 		badpixels.config = config
 		badpixels.setBlanksOnScreen() 
 

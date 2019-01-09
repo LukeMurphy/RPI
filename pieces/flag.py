@@ -31,8 +31,11 @@ def main(run=True):
 	config.colOverlay.steps = 50
 
 
-	badpixels.numberOfDeadPixels = 100
-	badpixels.size = config.canvasImage.size
+	config.actualScreenWidth = 256
+
+
+	badpixels.numberOfDeadPixels = 10
+	badpixels.size = (256,256)
 	badpixels.config = config
 	badpixels.setBlanksOnScreen() 
 	
@@ -97,6 +100,8 @@ def iterate():
 	drawRects()
 
 	#config.canvasImage.paste(config.image, (0,0), config.image)
+	badpixels.drawBlanks(config.canvasImage, False)
+	if random.random() > .998 : badpixels.setBlanksOnScreen() 
 	config.render(config.canvasImage, 0, 0, config.canvasImage)
 
 

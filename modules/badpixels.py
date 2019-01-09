@@ -9,7 +9,7 @@ counterPixels = []
 colsRange = (2,20)
 rowsRange = (2,20)
 
-size = ()
+size = (160,160)
 
 totalCounterWidth = 0
 numberOfDeadPixels = 10

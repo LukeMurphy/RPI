@@ -107,7 +107,14 @@ def iterate():
 
 	#config.canvasImage.paste(config.image, (0,0), config.image)
 	badpixels.drawBlanks(config.canvasImage, False)
-	if random.random() > .998 : badpixels.setBlanksOnScreen() 
+	if random.random() > .999 : badpixels.setBlanksOnScreen() 
+	if random.random() > .998 : config.whiteBrightness = random.uniform(.1,.9)
+	if random.random() > .998 : config.colorBrightness = random.uniform(.1,.9)
+	if random.random() > .998 : config.starBrightness = random.uniform(.1,.9)
+	if random.random() > .998 : 
+		config.starBrightness = random.uniform(.8,.95)
+		config.colorBrightness = random.uniform(.7,.9)
+		config.whiteBrightness = random.uniform(.7,.9)
 	config.render(config.canvasImage, 0, 0, config.canvasImage)
 
 

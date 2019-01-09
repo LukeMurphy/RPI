@@ -4,7 +4,7 @@ import random
 import math
 import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from modules import colorutils, coloroverlay
+from modules import colorutils, coloroverlay, badpixels
 import argparse
 
 
@@ -29,6 +29,12 @@ def main(run=True):
 	config.colOverlay.tLimitBase = 5
 	config.colOverlay.maxBrightness = config.brightness
 	config.colOverlay.steps = 50
+
+
+	badpixels.numberOfDeadPixels = 100
+	badpixels.size = config.canvasImage.size
+	badpixels.config = config
+	badpixels.setBlanksOnScreen() 
 	
 
 	if(run):

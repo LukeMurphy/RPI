@@ -40,6 +40,10 @@ def main(run=True):
 	config.starWhtVal = (220,220,220,255)
 	config.blueVal = (0,0,120,255)
 
+
+	#config.blueVal = (120,0,0,255)
+	#config.starWhtVal = (200,180,0,255)
+
 	config.starHDis = 0.063 * config.canvasHeight
 	config.starVDis = 0.054 * config.canvasHeight
 	config.starDiam = 0.036 * config.canvasHeight
@@ -74,7 +78,7 @@ def drawRects() :
 			fillVal = whtVal
 		config.canvasDraw.rectangle((0, config.stripeHeight * s, config.canvasWidth, config.stripeHeight * s + config.stripeHeight), fill=fillVal)
 
-	config.canvasDraw.rectangle((0,0,config.blueWidth,config.blueHeight), fill=blueVal)
+	config.canvasDraw.rectangle((0,config.canvasWidth,config.blueWidth,config.blueHeight), fill=blueVal)
 
 	for r in range(0,7) :
 		starsNum = 6
@@ -84,7 +88,7 @@ def drawRects() :
 			offset = config.starHDis
 		for s in range(0, starsNum):
 			xPos = offset + config.starHDis/1.5 + (config.starHDis + config.starDiam) * s
-			yPos = config.starVDis + (config.starVDis/1.5 + config.starDiam) * r
+			yPos = config.canvasWidth + config.starVDis-100 + (config.starVDis/1.5 + config.starDiam) * r
 			starPoints = []
 			for i in range(0,5) :
 				xP = xPos + config.radius * math.cos(i * config.starPointsAngle + 2/3*config.starPointsAngle)

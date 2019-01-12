@@ -91,14 +91,13 @@ class Shape :
 		# configs for HSV
 		self.colOverlay.maxBrightness = 1
 
-		self.colOverlay.minHue = self.config.minHue
-		self.colOverlay.maxHue = self.config.maxHue
-		self.colOverlay.minSaturation = self.config.minSaturation
-		self.colOverlay.maxSaturation = self.config.maxSaturation
-		self.colOverlay.minValue = self.config.minValue
-		self.colOverlay.maxValue = self.config.maxValue
+		self.colOverlay.minHue = self.minHue
+		self.colOverlay.maxHue = self.maxHue
+		self.colOverlay.minSaturation = self.minSaturation
+		self.colOverlay.maxSaturation = self.maxSaturation
+		self.colOverlay.minValue = self.minValue
+		self.colOverlay.maxValue = self.maxValue
 
-		print (self.colOverlay.minHue,self.colOverlay.maxHue)
 
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
@@ -275,9 +274,6 @@ def main(run = True) :
 	config.transitionStepsMax = int(workConfig.get("collageShapes", 'transitionStepsMax'))
 	config.changeBoxProb = float(workConfig.get("collageShapes", 'changeBoxProb'))
 
-	config.fixedCenterColorVals = ((workConfig.get("collageShapes", 'fixedCenterColor')).split(','))
-	config.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.fixedCenterColorVals))
-	config.usedFixedCenterColor = (workConfig.getboolean("collageShapes", 'usedFixedCenterColor'))
 
 	config.redrawSpeed  = float(workConfig.get("collageShapes", 'redrawSpeed')) 
 	config.shapeSets = list(map(lambda x: x, workConfig.get("collageShapes", 'sets').split(',')))
@@ -289,25 +285,6 @@ def main(run = True) :
 	config.colOverlaytLimitBase = int(workConfig.get("collageShapes", 'colOverlaytLimitBase'))
 	config.colOverlaySteps = int(workConfig.get("collageShapes", 'colOverlaySteps'))
 
-
-
-	try:
-		
-		config.maxHue  = float(workConfig.get("collageShapes", 'maxHue')) 
-		config.minHue  = float(workConfig.get("collageShapes", 'minHue')) 
-		config.maxSaturation  = float(workConfig.get("collageShapes", 'maxSaturation')) 
-		config.minSaturation  = float(workConfig.get("collageShapes", 'minSaturation')) 
-		config.maxValue  = float(workConfig.get("collageShapes", 'maxValue')) 
-		config.minValue= float(workConfig.get("collageShapes", 'minValue')) 
-
-	except Exception as e :
-		print(e)
-		config.maxHue  = 360
-		config.minHue  = 0
-		config.maxSaturation  = 1
-		config.minSaturation  = .1
-		config.maxValue  = 1
-		config.minValue = .1
 
 
 	for i in  range(0, len(config.shapeSets)):
@@ -332,6 +309,24 @@ def main(run = True) :
 
 		for c in range(0, len(shapeCoords), 2):
 			shape.coords.append((shapeCoords[c], shapeCoords[c+1]))
+
+
+		try:
+			shape.maxHue  = float(workConfig.get(shapeDetails, 'maxHue')) 
+			shape.minHue  = float(workConfig.get(shapeDetails, 'minHue')) 
+			shape.maxSaturation  = float(workConfig.get(shapeDetails, 'maxSaturation')) 
+			shape.minSaturation  = float(workConfig.get(shapeDetails, 'minSaturation')) 
+			shape.maxValue  = float(workConfig.get(shapeDetails, 'maxValue')) 
+			shape.minValue= float(workConfig.get(shapeDetails, 'minValue')) 
+
+		except Exception as e :
+			print(e)
+			shape.maxHue  = 360
+			shape.minHue  = 0
+			shape.maxSaturation  = 1
+			shape.minSaturation  = .1
+			shape.maxValue  = 1
+			shape.minValue = .1
 
 		shape.setUp()
 

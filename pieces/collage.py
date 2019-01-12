@@ -98,6 +98,8 @@ class Shape :
 		self.colOverlay.minValue = self.config.minValue
 		self.colOverlay.maxValue = self.config.maxValue
 
+		print (self.colOverlay.minHue,self.colOverlay.maxHue)
+
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow

@@ -15,7 +15,8 @@ actionDict = [
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-star.cfg'}, 
 	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
-	{"Wall Hanging: FLAG" :'p4-4x7-slope/flag.cfg'},
+	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
+	{"Wall Hanging: Collage" :'p4-3x8-informal/mono.cfg'},
 	{"---------------" :''},
 	
 	{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
@@ -72,7 +73,7 @@ root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
 
-Lb = Listbox(frame, width = 70, height = 30) 
+Lb = Listbox(frame, width = 40, height = 30) 
 
 
 for i,item in enumerate(actionDict):

@@ -9,41 +9,54 @@ commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 
 
 actionDict = [
-	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-star.cfg'}, 
 	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
-	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
+	#{"---------------" :''},
+	{" " :''},
+	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
 	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	{"Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
-	{"---------------" :''},
+	#{"---------------" :''},
+	{" " :''},
+	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
+	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{" " :''},
 	
+
+	{"---------------" :''},
 	{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
 	{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
 	{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},
-	{"---------------" :''},
 
+	
+	{"---------------" :''},
 	{"Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
-	{"---------------" :''},
 
+
+	
+	{"---------------" :''},
 	{"Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
 	{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	{"Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
 	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-	{"---------------" :''},
 
-	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
-	{"---------------" :''},
+
 	
+	{"---------------" :''},
+	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+
+
+	
+	{"---------------" :''},
 	{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
 	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
-	{"To Fro: Collage" :'p4-5x6-tofro/collage.cfg'},
-	{"---------------" :''},
 	{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-	{"To Fro: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
-	{"---------------" :''},
+	{" " :''},
+
+
 
 
 
@@ -73,8 +86,9 @@ def stopAll():
 root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
+root.geometry('%dx%d+%d+%d' % (300, 640, 1400, 100))
 
-Lb = Listbox(frame, width = 40, height = 30) 
+Lb = Listbox(frame, width = 40, height = 35) 
 
 
 for i,item in enumerate(actionDict):
@@ -93,3 +107,9 @@ slogan.pack(side=tk.LEFT)
 
 
 root.mainloop()
+
+
+
+
+
+

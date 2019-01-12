@@ -3,7 +3,8 @@ import time
 import random
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
-from modules import colorutils, coloroverlay
+from modules import colorutils, coloroverlay,  badpixels
+import argparse
 
 lastRate  = 0 
 colorutils.brightness =  1
@@ -219,7 +220,18 @@ def redraw():
 					config.shapeTweening = 1
 				shapeCount += 1
 
-	
+	if config.useVariableFilter == True :
+		if random.random() < config.variableFilterProb:
+			config.useFilters = False if config.useFilters == True else True
+			
+	if config.useVariablePixelSort == True :
+		if random.random() < config.variableFilterProb:
+			config.usePixelSort = False if config.usePixelSort == True else True
+
+	if config.useBadPixels == True:
+		badpixels.drawBlanks(config.image, False)
+		if random.random() > .999 : badpixels.setBlanksOnScreen() 
+
 
 def runWork():
 	global config
@@ -254,6 +266,8 @@ def iterate() :
 	config.canvasImage.paste(config.image, (0,0), mask3)
 	config.render(config.canvasImage, 0, 0, config.image)
 	'''
+
+
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	# Done
@@ -285,6 +299,27 @@ def main(run = True) :
 	config.colOverlaytLimitBase = int(workConfig.get("collageShapes", 'colOverlaytLimitBase'))
 	config.colOverlaySteps = int(workConfig.get("collageShapes", 'colOverlaySteps'))
 
+	config.useBadPixels = False;
+
+	try:
+		badpixels.numberOfDeadPixels = int(workConfig.get("collageShapes", 'numberOfDeadPixels'))
+		badpixels.config = config
+		badpixels.sizeTarget = list(config.image.size)
+		badpixels.setBlanksOnScreen() 
+		config.useBadPixels = True;
+	except Exception as e :
+		print(e)
+
+	try:
+		config.useVariableFilter = workConfig.getboolean("collageShapes", 'useVariableFilter')
+		config.useVariablePixelSort = workConfig.getboolean("collageShapes", 'useVariablePixelSort')
+		config.variableFilterProb = float(workConfig.get("collageShapes", 'variableFilterProb'))
+		#config.useFilters = True
+		#config.usePixelSort = True
+	except Exception as e :
+		print(e)
+		config.useVariableFilter = False
+		config.useVariablePixelSort = False
 
 
 	for i in  range(0, len(config.shapeSets)):
@@ -312,8 +347,8 @@ def main(run = True) :
 
 
 		try:
-			shape.maxHue  = float(workConfig.get(shapeDetails, 'maxHue')) 
 			shape.minHue  = float(workConfig.get(shapeDetails, 'minHue')) 
+			shape.maxHue  = float(workConfig.get(shapeDetails, 'maxHue')) 
 			shape.maxSaturation  = float(workConfig.get(shapeDetails, 'maxSaturation')) 
 			shape.minSaturation  = float(workConfig.get(shapeDetails, 'minSaturation')) 
 			shape.maxValue  = float(workConfig.get(shapeDetails, 'maxValue')) 
@@ -321,8 +356,8 @@ def main(run = True) :
 
 		except Exception as e :
 			print(e)
-			shape.maxHue  = 360
 			shape.minHue  = 0
+			shape.maxHue  = 360
 			shape.maxSaturation  = 1
 			shape.minSaturation  = .1
 			shape.maxValue  = 1

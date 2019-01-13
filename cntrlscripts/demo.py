@@ -19,6 +19,7 @@ actionDict = [
 	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	{"Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
+	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
 	#{"---------------" :''},
 	{" " :''},
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},

@@ -46,8 +46,6 @@ class Shape :
 	nothingLevel = 10
 	nothingChangeProbability = .02
 
-	usedFixedCenterColor = True
-
 	borderModel = "prism"
 	nothing = "void"
 	varianceMode = "independent"
@@ -132,15 +130,13 @@ class Shape :
 
 		
 	def transition(self):
-		if self.usedFixedCenterColor == True :
-			self.fillColor = self.fixedCenterColor
-		else :
-			self.colOverlay.stepTransition()
-			self.fillColor = []
-			for i in range(0,3) :
-				self.fillColor.append(round(self.colOverlay.currentColor[i] * self.config.brightness ))
-			self.fillColor.append(255)
-			self.fillColor = tuple(int(a) for a in self.fillColor)
+
+		self.colOverlay.stepTransition()
+		self.fillColor = []
+		for i in range(0,3) :
+			self.fillColor.append(round(self.colOverlay.currentColor[i] * self.config.brightness ))
+		self.fillColor.append(255)
+		self.fillColor = tuple(int(a) for a in self.fillColor)
 
 		self.draw.rectangle((0,0,self.boxMax, self.boxHeight), fill=(0,0,0,10), outline=None)
 		if self.varX == -1 :
@@ -327,9 +323,10 @@ def main(run = True) :
 		shapeDetails = config.shapeSets[i]
 		shape = Shape(config)
 
-		shape.usedFixedCenterColor = workConfig.getboolean(shapeDetails, 'usedFixedCenterColor')
-		shape.fixedCenterColorVals = workConfig.get(shapeDetails, 'fixedCenterColor').split(',')
-		shape.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , shape.fixedCenterColorVals))
+		
+		#shape.usedFixedCenterColor = workConfig.getboolean(shapeDetails, 'usedFixedCenterColor')
+		#shape.fixedCenterColorVals = workConfig.get(shapeDetails, 'fixedCenterColor').split(',')
+		#shape.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , shape.fixedCenterColorVals))
 
 		shape.varX  = float(workConfig.get(shapeDetails, 'varX'))
 		shape.varY  = float(workConfig.get(shapeDetails, 'varY'))

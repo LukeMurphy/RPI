@@ -11,6 +11,7 @@ from modules import colorutils
 class ColorOverlay:
 
 	currentColor = [0,0,0]
+	currentColorRaw  = [0,0,0]
 	rateOfColorChange = 0
 	colorA = colorB = [0,0,0]
 	randomRange = (10.0,100.0)
@@ -90,12 +91,21 @@ class ColorOverlay:
 			self.minValue, self.maxValue)
 		'''
 
-	
+	## Transition starts
 	def colorTransitionSetup(self, steps = 0, newColor = None):
 
-		self.gotoNextTransition = False
+		'''
+		print("\nNew transition started...")
+
+		try :
+			for ii in range (0,3):
+				print(ii, " current:", self.currentColorRaw[ii], " old destination:",self.colorB[ii]," old rate:", self.rateOfColorChange[ii])
+		except:
+			pass
+		'''
 
 		#### Setting up for color transitions
+		self.gotoNextTransition = False
 		self.colorDelta = [0,0,0]
 		self.rateOfColorChange = [0,0,0]
 
@@ -106,9 +116,8 @@ class ColorOverlay:
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		
-		self.colorDelta = list(map(sub, self.colorB, self.currentColor))
-		test = [abs(a) for a in self.colorDelta]
-
+		self.colorDelta = list(map(sub, self.colorB, self.currentColorRaw))
+		
 		# Create random number of transition steps
 		if(steps == 0 or self.randomSteps == True) : 
 			self.steps = round(random.uniform(self.randomRange[0],self.randomRange[1]))
@@ -119,21 +128,68 @@ class ColorOverlay:
 		self.step = 1
 		self.t1 = time.time()
 
-		#print("New transition started...", self.steps, self.tLimitBase, self.tLimit)
+		rounding = .001
 
+		if abs(self.rateOfColorChange[0]) < rounding : self.rateOfColorChange[0] = 0
+		if abs(self.rateOfColorChange[1]) < rounding : self.rateOfColorChange[1] = 0
+		if abs(self.rateOfColorChange[2]) < rounding : self.rateOfColorChange[2] = 0
+
+		self.lowerRange = list(map(lambda x,y: round(x - abs(y))-.5, self.colorB, self.rateOfColorChange))
+		self.upperRange = list(map(lambda x,y: round(x + abs(y))+.5, self.colorB, self.rateOfColorChange))
+
+		#print("New destination: ",self.colorB)
+		#print(" NEW RATE: ", self.rateOfColorChange)
+
+		self.callBackStarted()
+
+
+	## Transition ends
 	def stopTransition(self):
+			#print ("Transition stopped")
 			self.gotoNextTransition = True
 			self.complete =  True
 			self.t1 = time.time()
+			#self.callBackDone()
+
+
+	def setCallBackDoneMethod(self, method):
+		self.callBackDoneMethod = method
+
+
+	def setCallBackStartedMethod(self, method):
+		self.callBackStartedMethod = method
 		
+
+	def callBackDone(self):
+		if(self.complete == True):
+			try:
+				self.callBackDoneMethod()
+			except AttributeError as e:
+				pass
+
+
+	def callBackStarted(self):
+		try:
+			self.callBackStartedMethod()
+		except AttributeError as e:
+			pass
+
 
 
 	def stepTransition(self, autoReset = False, alpha = 255) :
+
+		self.currentColorRaw = [
+			self.currentColorRaw[0] + self.rateOfColorChange[0],
+			self.currentColorRaw[1] + self.rateOfColorChange[1],
+			self.currentColorRaw[2] + self.rateOfColorChange[2],
+			alpha
+		]
+
 		self.currentColor = [
-		round(self.currentColor[0] + self.rateOfColorChange[0]),
-		round(self.currentColor[1] + self.rateOfColorChange[1]),
-		round(self.currentColor[2] + self.rateOfColorChange[2]),
-		alpha
+			round(self.currentColorRaw[0]),
+			round(self.currentColorRaw[1]),
+			round(self.currentColorRaw[2]),
+			alpha
 		]
 
 		self.step += 1
@@ -146,18 +202,23 @@ class ColorOverlay:
 			if self.autoChange == True :
 				self.colorTransitionSetup(self.steps)
 
+
 		for i in range (0,3):
-			#if (self.currentColor[i] - abs(self.rateOfColorChange[i])) <= self.colorB[i] <= (self.currentColor[i] + abs(self.rateOfColorChange[i])) : 
-			#if (self.currentColor[i] >= (self.colorB[i] - abs(self.rateOfColorChange[i]))) and  self.currentColor[i] <= (self.colorB[i] + abs(self.rateOfColorChange[i])) :
-			lowerRange = self.colorB[i] - abs(self.rateOfColorChange[i])
-			upperRange = self.colorB[i] + abs(self.rateOfColorChange[i])
-			if (self.currentColor[i] >= (lowerRange) and  self.currentColor[i] <= (upperRange) ) :
+
+			if self.currentColor[i] >= self.lowerRange[i] and self.currentColor[i] <= self.upperRange[i] and self.rateOfColorChange[i] != 0 :
 				self.rateOfColorChange[i] = 0
 				#print("Color reached", i)
-		
-		if(self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0) : 
+				#self.currentColor[i] = self.colorB[i]
+				'''
+				print("Color reached", i)
+				for ii in range (0,3):
+					print(ii, " current:", self.currentColorRaw[ii], " destination:",self.colorB[ii]," rate:", self.rateOfColorChange[ii])
+				'''
+
+		if self.rateOfColorChange[0] == 0 and self.rateOfColorChange[1] == 0 and self.rateOfColorChange[2] == 0 and self.complete == False : 
 				self.complete =  True
-				#print("Transition complete.", self.steps, self.step)
+				self.callBackDone()
+				#print("Transition complete.")
 				#if(autoReset == True or self.gotoNextTransition == True) : 
 				#	self.colorTransitionSetup(self.steps)
 

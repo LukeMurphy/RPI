@@ -180,7 +180,7 @@ def HSVToRGB(h,s,v,a=255) :
 	m = v - c
 	rgb  = [r1 + m, g1 + m, b1 + m, a]
 
-	rgbCol = tuple((round(i * 255)) for i in rgb)
+	rgbCol = tuple(abs(round(i * 255)) for i in rgb)
 	return rgbCol
 
 def HSLToRGB(h,s,l,a=255) :

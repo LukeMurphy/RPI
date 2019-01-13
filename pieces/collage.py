@@ -5,6 +5,7 @@ import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils, coloroverlay,  badpixels
 import argparse
+import types
 
 lastRate  = 0 
 colorutils.brightness =  1
@@ -62,6 +63,7 @@ class Shape :
 
 		self.unitNumber  = i
 		self.config = config
+		self.colOverlay = coloroverlay.ColorOverlay()
 
 
 	def setUp(self):
@@ -80,7 +82,6 @@ class Shape :
 
 		self.draw  = ImageDraw.Draw(self.tempImage)
 		#### Sets up color transitions
-		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = False
 		self.colOverlay.timeTrigger = True 
 		#self.colOverlay.tLimitBase = 15
@@ -184,6 +185,8 @@ def redraw():
 			img = shapeElement.tempImage.convert("RGBA")
 			config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
 
+		colorTransitionStarted()
+
 	if config.shapeTweening == 2:
 			config.tweenCount += 1
 			config.destinationImage
@@ -195,6 +198,7 @@ def redraw():
 			if config.tweenCount > config.tweenCountMax/2 :
 				config.tweenCount = 0
 				config.shapeTweening = 0
+				colorTransitionDone()
 				#print("Tweening Done")
 				#print("")
 
@@ -229,11 +233,13 @@ def redraw():
 		if random.random() > .999 : badpixels.setBlanksOnScreen() 
 
 
+
 def runWork():
 	global config
 	while True:
 		iterate()
 		time.sleep(config.redrawSpeed)
+
 
 
 def iterate() :
@@ -269,6 +275,17 @@ def iterate() :
 	# Done
 
 
+def colorTransitionDone(arg=None):
+	#print("colorTransition   Done ")
+	config.useFilters = True
+	config.usePixelSort = False
+
+def colorTransitionStarted(arg=None):
+	#print("colorTransition   Started ")
+	config.useFilters = False
+	config.usePixelSort = True
+
+
 def main(run = True) :
 	global config
 	global shapes
@@ -296,6 +313,13 @@ def main(run = True) :
 	config.colOverlaySteps = int(workConfig.get("collageShapes", 'colOverlaySteps'))
 
 	config.useBadPixels = False;
+
+	try:
+		config.triggersVals = workConfig.get("collageShapes", 'triggers')
+		config.triggers = list(map(lambda x: int(x), workConfig.get("collageShapes", 'triggers').split(',')))
+	except Exception as e :
+		print(e)
+		config.triggers = []
 
 	try:
 		badpixels.numberOfDeadPixels = int(workConfig.get("collageShapes", 'numberOfDeadPixels'))
@@ -329,11 +353,6 @@ def main(run = True) :
 
 		shapeDetails = config.shapeSets[i]
 		shape = Shape(config)
-
-		
-		#shape.usedFixedCenterColor = workConfig.getboolean(shapeDetails, 'usedFixedCenterColor')
-		#shape.fixedCenterColorVals = workConfig.get(shapeDetails, 'fixedCenterColor').split(',')
-		#shape.fixedCenterColor = tuple(map(lambda x: int(int(x) * config.brightness) , shape.fixedCenterColorVals))
 
 		shape.varX  = float(workConfig.get(shapeDetails, 'varX'))
 		shape.varY  = float(workConfig.get(shapeDetails, 'varY'))
@@ -373,6 +392,11 @@ def main(run = True) :
 		shape.colOverlay.tLimitBase = config.colOverlaytLimitBase
 		shape.colOverlay.steps = config.colOverlaySteps
 
+		if i in config.triggers:
+			shape.colOverlay.setCallBackDoneMethod(colorTransitionDone)
+			shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted)
+
+		#shape.callBackDone = types.MethodType(callBackDone, shape)
 		shape.reDraw()
 		shapes.append(shape)
 

@@ -221,7 +221,7 @@ def redraw():
 			config.useFilters = False if config.useFilters == True else True
 			
 	if config.useVariablePixelSort == True :
-		if random.random() < config.variableFilterProb:
+		if random.random() < config.variablePixelProb:
 			config.usePixelSort = False if config.usePixelSort == True else True
 
 	if config.useBadPixels == True:
@@ -308,15 +308,22 @@ def main(run = True) :
 
 	try:
 		config.useVariableFilter = workConfig.getboolean("collageShapes", 'useVariableFilter')
-		config.useVariablePixelSort = workConfig.getboolean("collageShapes", 'useVariablePixelSort')
 		config.variableFilterProb = float(workConfig.get("collageShapes", 'variableFilterProb'))
 		#config.useFilters = True
 		#config.usePixelSort = True
 	except Exception as e :
 		print(e)
 		config.useVariableFilter = False
-		config.useVariablePixelSort = False
 
+
+	try:
+		config.useVariablePixelSort = workConfig.getboolean("collageShapes", 'useVariablePixelSort')
+		config.variablePixelProb = float(workConfig.get("collageShapes", 'variablePixelProb'))
+		#config.useFilters = True
+		#config.usePixelSort = True
+	except Exception as e :
+		print(e)
+		config.useVariablePixelSort = False
 
 	for i in  range(0, len(config.shapeSets)):
 

@@ -184,8 +184,9 @@ def redraw():
 			shapeElement.transition()
 			img = shapeElement.tempImage.convert("RGBA")
 			config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
-
-		colorTransitionStarted()
+		
+		if config.useTweenTriggers == True :
+			colorTransitionStarted()
 
 	if config.shapeTweening == 2:
 			config.tweenCount += 1
@@ -198,7 +199,8 @@ def redraw():
 			if config.tweenCount > config.tweenCountMax/2 :
 				config.tweenCount = 0
 				config.shapeTweening = 0
-				colorTransitionDone()
+				if config.useTweenTriggers == True :
+					colorTransitionDone()
 				#print("Tweening Done")
 				#print("")
 
@@ -277,13 +279,13 @@ def iterate() :
 
 def colorTransitionDone(arg=None):
 	#print("colorTransition   Done ")
-	config.useFilters = True
-	config.usePixelSort = False
+	config.useFilters = False
+	config.usePixelSort = True
 
 def colorTransitionStarted(arg=None):
 	#print("colorTransition   Started ")
-	config.useFilters = False
-	config.usePixelSort = True
+	config.useFilters = True
+	config.usePixelSort = False
 
 
 def main(run = True) :
@@ -314,6 +316,12 @@ def main(run = True) :
 
 	config.useBadPixels = False;
 
+	try:
+		config.useTweenTriggers = workConfig.getboolean("collageShapes", 'useTweenTriggers')
+	except Exception as e :
+		print(e)
+		config.useTweenTriggers = False
+		
 	try:
 		config.triggersVals = workConfig.get("collageShapes", 'triggers')
 		config.triggers = list(map(lambda x: int(x), workConfig.get("collageShapes", 'triggers').split(',')))

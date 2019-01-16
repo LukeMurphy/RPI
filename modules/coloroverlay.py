@@ -104,15 +104,20 @@ class ColorOverlay:
 			pass
 		'''
 
-		#### Setting up for color transitions
-		self.gotoNextTransition = False
-		self.colorDelta = [0,0,0]
-		self.rateOfColorChange = [0,0,0]
-
 		if newColor == None :
 			self.getNewColor()
 		else :
 			self.colorB = newColor
+
+		self.colorTransitionSetupValues(steps)
+
+
+
+	def colorTransitionSetupValues(self, steps = 0):
+		#### Setting up for color transitions
+		self.gotoNextTransition = False
+		self.colorDelta = [0,0,0]
+		self.rateOfColorChange = [0,0,0]
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		
@@ -141,7 +146,6 @@ class ColorOverlay:
 		#print(" NEW RATE: ", self.rateOfColorChange)
 
 		self.callBackStarted()
-
 
 	## Transition ends
 	def stopTransition(self):

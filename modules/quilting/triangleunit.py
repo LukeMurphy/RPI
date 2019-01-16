@@ -90,11 +90,15 @@ class Unit:
 			colOverlay.minValue = self.fillColors[i].valueRange[0]
 			colOverlay.maxValue = self.fillColors[i].valueRange[1]
 
+			#colOverlay.minValue = 0
+			#colOverlay.maxValue = 0
+
 
 			### This is the speed range of transitions in color
 			### Higher numbers means more possible steps so slower
 			### transitions - 1,10 very blinky, 10,200 very slow
 			colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
+			'''
 
 			colOverlay.colorA = colorutils.getRandomColorHSV(
 				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
@@ -108,10 +112,11 @@ class Unit:
 				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
 				)
 			colOverlay.colorA = (50,50,50)
-			#self.colOverlay.colorB = (50,50,50)
+			colOverlay.colorB = (0,0,0,255)
+			'''
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
-
+		#self.outlineColor = (0,0,0,255)
 		self.setupSquareWithTriangles()
 
 
@@ -172,6 +177,11 @@ class Unit:
 		for i in range (0,8) :
 			coords = self.triangles[i][0]
 			fillColor = self.triangles[i][2]
+			#print("")
+			#print(fillColor)
+			fillColorList = (list(round (a * self.config.brightness ) for a in fillColor))
+			fillColor = (fillColorList[0],fillColorList[1],fillColorList[2],255)
+			#print(fillColor)
 			self.draw.polygon(coords, fill=fillColor, outline=outline)
 
 
@@ -185,6 +195,7 @@ class Unit:
 		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
 
 		self.drawUnitTriangles()
+
 
 	## Straight color change - deprecated - too blinky
 	def changeColorFill(self, obj):

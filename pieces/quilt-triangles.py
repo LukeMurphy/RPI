@@ -24,28 +24,66 @@ def restartPiece():
 	config.t1  = time.time()
 	config.t2  = time.time()
 
+	A = random.uniform(0,1)
+	B = random.uniform(A,1)
+	newValueRange = (A,B)
+
+	A = random.uniform(0,1)
+	B = random.uniform(A,1)
+	newSaturationRange = (A,B)
+
+	# major outline squares and diamonds
 	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
 	config.c1HueRange = newRange
-	config.c2HueRange = newRange
-	config.c3HueRange = newRange
-	config.c3HueRange = newRange
-	config.c4HueRange = newRange
-	config.c5HueRange = newRange
+	config.c1ValueRange = newValueRange
 
+	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
+	# wings of the 8-point inner starts
+	config.c2HueRange = newRange
+
+	# the star center diamond
+	config.c3HueRange = newRange
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
-	config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
-	config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
 
+	try:
+		config.c4HueRange = newRange
+		config.c5HueRange = newRange
+		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
+		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
+	except Exception as e:
+		print (e)
+
+
+	config.blockSize = round(random.uniform(10,28))
+	config.blockLength = config.blockSize
+	config.blockHeight = config.blockSize
+
+	if (config.blockSize > 16) :
+		config.blockRows = 4
+		config.blockCols = 3
 
 	if config.quiltPattern == "triangles" :
 		createtrianglepieces.createPieces(config)
 	elif config.quiltPattern == "stars" :
 		createstarpieces.createPieces(config)
 
+	config.rotation = random.uniform(-3,3)
+
+	setInitialColors()
+
+def setInitialColors():
+	## Better initial color when piece is turned on
+	for i in range(0,len(config.unitArray)):
+		obj = config.unitArray[i]
+		for c in range(0,8) :
+			colOverlay = obj.triangles[c][1]
+			colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
+			colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
+			colOverlay.colorTransitionSetupValues()
 
 
 def main(run = True) :
@@ -76,11 +114,10 @@ def main(run = True) :
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
-	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
+
 	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
 	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
-	config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
-	config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
+
 	config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
 	config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
 	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
@@ -145,6 +182,9 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
+
+	setInitialColors()
+
 	if(run) : runWork()
 
 
@@ -177,8 +217,7 @@ def iterate() :
 	delta = config.t2  - config.t1
 
 	if delta > config.timeToComplete :
-		pass
-		#restartPiece()
+		restartPiece()
 		
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

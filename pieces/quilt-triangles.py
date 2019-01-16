@@ -20,6 +20,7 @@ def transformImage(img) :
 	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
 	return img
 
+
 def restartPiece():
 	config.t1  = time.time()
 	config.t2  = time.time()
@@ -32,17 +33,21 @@ def restartPiece():
 	B = random.uniform(A,1)
 	newSaturationRange = (A,B)
 
-	# major outline squares and diamonds
+	# triangles: major outline squares and diamonds
+	# stars: BASE
 	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
 	config.c1HueRange = newRange
 	config.c1ValueRange = newValueRange
 
 	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
-	# wings of the 8-point inner starts
+	# triangles:  wings of the 8-point inner starts
+	# stars: SQUARE
 	config.c2HueRange = newRange
 
-	# the star center diamond
+	# triangles:  the star center diamond
+	# stars: CENTER
 	config.c3HueRange = newRange
+	config.c3ValueRange = newValueRange
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
@@ -58,22 +63,33 @@ def restartPiece():
 		print (e)
 
 
-	config.blockSize = round(random.uniform(10,28))
+
+	if(config.quiltPattern == "triangles"):
+		config.blockSize = round(random.uniform(10,28))
+		if (config.blockSize >= 16) :
+			config.blockRows = 4
+			config.blockCols = 3
+		else :
+			config.blockRows = 7
+			config.blockCols = 5
+		createtrianglepieces.createPieces(config)
+	else :
+		config.blockSize = round(random.uniform(8,18))
+		if (config.blockSize >= 11) :
+			config.blockRows = 10
+			config.blockCols = 8
+		else :
+			config.blockRows = 14
+			config.blockCols = 10
+		createstarpieces.createPieces(config)
+
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
-
-	if (config.blockSize > 16) :
-		config.blockRows = 4
-		config.blockCols = 3
-
-	if config.quiltPattern == "triangles" :
-		createtrianglepieces.createPieces(config)
-	elif config.quiltPattern == "stars" :
-		createstarpieces.createPieces(config)
 
 	config.rotation = random.uniform(-3,3)
 
 	setInitialColors()
+
 
 def setInitialColors():
 	## Better initial color when piece is turned on

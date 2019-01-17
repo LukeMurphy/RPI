@@ -57,12 +57,12 @@ class Unit:
 
 		self.triangles = []
 		self.fillColors = []
-		## Each of the 8 triangles has a set of coordinates and a color
-		#self.triangles = [[[] for i in range(0,2)] for i in range(0,8)]
 		self.fillColors = []
 
+		## Each of the 8 triangles has a set of coordinates and a color]
 		## Pre-fill the triangles list/array with ColorOverlay objects
-		self.triangles = [[[],coloroverlay.ColorOverlay(),[]] for i in range(0,8)]
+		self.triangles = [[[],coloroverlay.ColorOverlay(False),[]] for i in range(0,8)]
+
 
 
 
@@ -90,30 +90,12 @@ class Unit:
 			colOverlay.minValue = self.fillColors[i].valueRange[0]
 			colOverlay.maxValue = self.fillColors[i].valueRange[1]
 
-			#colOverlay.minValue = 0
-			#colOverlay.maxValue = 0
-
 
 			### This is the speed range of transitions in color
 			### Higher numbers means more possible steps so slower
 			### transitions - 1,10 very blinky, 10,200 very slow
 			colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
-			'''
 
-			colOverlay.colorA = colorutils.getRandomColorHSV(
-				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
-				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
-				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
-				)
-
-			colOverlay.colorB = colorutils.getRandomColorHSV(
-				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
-				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
-				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
-				)
-			'''
-			colOverlay.colorA = (50,50,50)
-			colOverlay.colorB = (0,0,0,255)
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 		#self.outlineColor = (0,0,0,255)
@@ -172,16 +154,14 @@ class Unit:
 	def drawUnitTriangles(self):
 		if(self.lines == True) :
 			outline = self.outlineColor
-		else : outline = None
+		else : 
+			outline = None
 		
 		for i in range (0,8) :
 			coords = self.triangles[i][0]
 			fillColor = self.triangles[i][2]
-			#print("")
-			#print(fillColor)
 			fillColorList = (list(round (a * self.config.brightness ) for a in fillColor))
 			fillColor = (fillColorList[0],fillColorList[1],fillColorList[2],255)
-			#print(fillColor)
 			self.draw.polygon(coords, fill=fillColor, outline=outline)
 
 

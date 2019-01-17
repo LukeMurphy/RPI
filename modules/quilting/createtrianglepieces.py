@@ -1,7 +1,7 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.triangleunit import Unit
 
-polyPattern = [
+polyPattern_ = [
 [0,0,0,0,0,0,0,0],
 [1,0,0,0,1,1,1,0],
 [0,0,0,1,0,1,1,1],
@@ -47,25 +47,25 @@ polyPattern = [
 [0,0,0,0,0,0,0,0]
 ]
 
-def createPieces(config) :
+def createPieces(config, refresh = False) :
+
 
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArray = []
+	if refresh == False :
+		config.unitArray = []
 	outlineColorObj = coloroverlay.ColorOverlay()
 	outlineColorObj.randomRange = (5.0,30.0)
 
 	## Jinky odds/evens alignment setup
 	sizeAdjustor = 0
 	## Alignment perfect setup
-	if(config.patternPrecision == True): sizeAdjustor = 1
-
-	
+	if(config.patternPrecision == True): 
+		sizeAdjustor = 1
 	cntr = [0,0]
 
-	
-
 	# Rows and columns of 9-squares
+	itemCount = 0
 	for rows in range (0,config.blockRows) :
 
 		rowStart = rows * config.blockHeight * 4 + config.gapSize
@@ -84,7 +84,11 @@ def createPieces(config) :
 			n = 0
 			for r in range(0,4):
 				for c in range(0,4):
-					obj = Unit(config)
+
+					if refresh == True :
+						obj = config.unitArray[itemCount]
+					else :
+						obj = Unit(config)
 					obj.xPos = cntr[0] + c * config.blockLength 
 					obj.yPos = cntr[1] + r * config.blockHeight
 					obj.blockLength = config.blockLength - sizeAdjustor
@@ -95,17 +99,34 @@ def createPieces(config) :
 						obj.fillColors.append(config.fillColorSet[i])
 
 					obj.setUp()
+
 					config.unitArray.append(obj)
 					n+=1
+					itemCount += 1
 
 
 def refreshPalette(config):
-	for obj in config.unitArray:
-		obj.fillColors = []
-		for n in range(0,4):
-			for i in polyPattern[n] :
-				obj.fillColors.append(config.fillColorSet[i])
-		obj.setUp()
+	itemCount = 0
+	for rows in range (0,config.blockRows) :
+		for cols in range (0,config.blockCols) :
+			n = 0
+			for r in range(0,4):
+				for c in range(0,4):
+					obj = config.unitArray[itemCount]
+					fillColors = []
+					for i in polyPattern[n] :
+						fillColors.append(config.fillColorSet[i])
+					n+=1
+					obj.fillColors = fillColors
+					obj.setUp()
+					itemCount+=1
+
+
+
+
+
+
+
 
 
 

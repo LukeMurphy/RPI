@@ -10,10 +10,10 @@ from modules import colorutils
 
 class ColorOverlay:
 
-	currentColor = [0,0,0]
-	currentColorRaw  = [0,0,0]
+	currentColor = [0,0,0,0]
+	currentColorRaw  = [0,0,0,0]
+	colorA = colorB = [0,0,0,0]
 	rateOfColorChange = 0
-	colorA = colorB = [0,0,0]
 	randomRange = (10.0,100.0)
 	complete =  False
 	tDelta = 0
@@ -44,13 +44,18 @@ class ColorOverlay:
 	dropHueMax = 0
 
 
-	def __init__(self): 
+	def __init__(self, randomColorInit=False): 
 		self.colorTransitionSetup()
 		#self.colorA = colorutils.randomColor()
 		#self.colorB = colorutils.randomColor()
 		#self.colorB = colorutils.getRandomRGB()
 		self.t1 = time.time()
 		self.timeTrigger = False
+
+		if randomColorInit == True :
+			self.currentColor = list(colorutils.randomColorAlpha(.5,0))
+			self.currentColorRaw  = list(colorutils.randomColorAlpha(.5,255))
+			self.colorA = self.colorB = list(colorutils.randomColorAlpha(.5,0))
 
 	
 	def checkTime(self):
@@ -63,7 +68,7 @@ class ColorOverlay:
 			hMin=self.minHue, hMax=self.maxHue, 
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue,
-			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax)
+			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax, a=0)
 		#print("New Color A", self.colorA)
 
 	
@@ -83,8 +88,9 @@ class ColorOverlay:
 			hMin=self.minHue, hMax=self.maxHue, 
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue,
-			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax)
+			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax, a=255)
 
+		#print("New Color B", self.colorB)
 		'''
 		print("New Color B", self.minHue, self.maxHue, 
 			self.minSaturation, self.maxSaturation,
@@ -116,19 +122,24 @@ class ColorOverlay:
 	def colorTransitionSetupValues(self, steps = 0):
 		#### Setting up for color transitions
 		self.gotoNextTransition = False
-		self.colorDelta = [0,0,0]
-		self.rateOfColorChange = [0,0,0]
+		self.colorDelta = [0,0,0,0]
+		self.rateOfColorChange = [0,0,0,0]
 
 		#config.colorDelta = [a - b for a, b in zip(config.colorA, config.colorB)]
 		
-		self.colorDelta = list(map(sub, self.colorB, self.currentColorRaw))
+		self.colorDelta = list(map(sub, list(self.colorB), self.currentColorRaw))
+
+		if  len(self.colorDelta) == 3 :
+			self.colorDelta.append(.1)
+
+		#print(self.colorB, self.currentColorRaw)
 		
 		# Create random number of transition steps
 		if(steps == 0 or self.randomSteps == True) : 
 			self.steps = round(random.uniform(self.randomRange[0],self.randomRange[1]))
 
 		self.tLimit = round(random.uniform(self.tLimitBase/2, self.tLimitBase * 1.5))+ 1
-		self.rateOfColorChange = [ a/self.steps for a in self.colorDelta]
+		self.rateOfColorChange = [ x/self.steps for x in self.colorDelta]
 		self.complete =  False
 		self.step = 1
 		self.t1 = time.time()
@@ -138,6 +149,7 @@ class ColorOverlay:
 		if abs(self.rateOfColorChange[0]) < rounding : self.rateOfColorChange[0] = 0
 		if abs(self.rateOfColorChange[1]) < rounding : self.rateOfColorChange[1] = 0
 		if abs(self.rateOfColorChange[2]) < rounding : self.rateOfColorChange[2] = 0
+		if abs(self.rateOfColorChange[3]) < rounding : self.rateOfColorChange[3] = 0
 
 		self.lowerRange = list(map(lambda x,y: round(x - abs(y))-.5, self.colorB, self.rateOfColorChange))
 		self.upperRange = list(map(lambda x,y: round(x + abs(y))+.5, self.colorB, self.rateOfColorChange))
@@ -186,14 +198,14 @@ class ColorOverlay:
 			self.currentColorRaw[0] + self.rateOfColorChange[0],
 			self.currentColorRaw[1] + self.rateOfColorChange[1],
 			self.currentColorRaw[2] + self.rateOfColorChange[2],
-			alpha
+			self.currentColorRaw[3] + self.rateOfColorChange[3],
 		]
 
 		self.currentColor = [
 			round(self.currentColorRaw[0]),
 			round(self.currentColorRaw[1]),
 			round(self.currentColorRaw[2]),
-			alpha
+			round(self.currentColorRaw[3]),
 		]
 
 		self.step += 1

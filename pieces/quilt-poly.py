@@ -40,17 +40,18 @@ def restartPiece():
 
 
 	## The "dark" color to the spokes
-	config.c1HueRange = randomRange(0,0,True)
+	config.c1HueRange = randomRange(0,360,True)
 	config.c2SaturationRange = randomRange(.4,.85)
 	config.c1ValueRange = randomRange(.3,.5)
 	
 	# the light color on the 8 spokes / points
-	config.c2HueRange = randomRange(0,0,True)
+	newHueRange = randomRange(0,360,True)
+	config.c2HueRange = randomRange(0,360,True)
 	config.c2SaturationRange = randomRange(.9,1)
 	config.c2ValueRange = randomRange(.8,1)
 
 	## The background -- ie the squares etc
-	config.c3HueRange = randomRange(0,0,True)
+	config.c3HueRange = randomRange(0,360,True)
 	config.c3ValueRange = randomRange()
 
 	config.fillColorSet = []
@@ -59,48 +60,37 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 
-	if random.random() < 1 :
-		config.blockSize = round(random.uniform(8,18))
-		if (config.blockSize >= 11) :
-			config.blockRows = 10
-			config.blockCols = 8
-		else :
-			config.blockRows = 14
-			config.blockCols = 10
+	config.blockSize = round(random.uniform(8,18))
+	if (config.blockSize >= 11) :
+		config.blockRows = 10
+		config.blockCols = 8
+	else :
+		config.blockRows = 14
+		config.blockCols = 10
 
-		config.blockLength = config.blockSize
-		config.blockHeight = config.blockSize
-
-
-		# poly specific
-		config.randomness = random.uniform(0,5)
-		
-	print("restarting")
-	createpolypieces.createPieces(config, True)
-	setInitialColors(True)
+	config.blockLength = config.blockSize
+	config.blockHeight = config.blockSize
 
 	config.rotation = random.uniform(-3,3)
+	createpolypieces.createPieces(config)
+
+	# poly specific
+	config.randomness = random.uniform(0,5)
+
+	setInitialColors()
 
 
-def setInitialColors(refresh=False):
+def setInitialColors():
 	## Better initial color when piece is turned on
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
-		for c in range(0,4) :
-			if refresh == True :
-				colOverlayCurrentColor = obj.polys[c][1].currentColor
+		for c in range(0,8) :
+			colOverlay = obj.polys[c][1]
+			colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
+			colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
+			colOverlay.colorTransitionSetupValues()
 
-				obj.polys[c][1] = coloroverlay.ColorOverlay()
-				colOverlay = obj.polys[c][1]
-				colOverlay.colorB = colOverlayCurrentColor
-				colOverlay.colorA = colOverlayCurrentColor
-				colOverlay.colorTransitionSetupValues()
-			else :
-				obj.polys[c][1] = coloroverlay.ColorOverlay()
-				colOverlay = obj.polys[c][1]
-				colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
-				colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
-				colOverlay.colorTransitionSetupValues()
+		
 
 
 def main(run = True) :
@@ -176,6 +166,12 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
+	try :
+		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
+		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
+	except Exception as e:
+		print (e)
+
 
 	try :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
@@ -213,14 +209,11 @@ def iterate() :
 		obj.update()
 		obj.render()
 
-	'''
 	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
-	'''
-
-	config.render(config.canvasImage, 0,0)
+	config.render(temp, 0,0)
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1

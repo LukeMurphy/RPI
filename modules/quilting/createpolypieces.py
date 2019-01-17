@@ -1,8 +1,21 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.polyunit import Unit
 
-def createPieces(config, refresh=False) :
+def createPieces(config) :
 
+	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+
+	config.unitArray = []
+	outlineColorObj = coloroverlay.ColorOverlay()
+	outlineColorObj.randomRange = (5.0,30.0)
+
+	## Jinky odds/evens alignment setup
+	sizeAdjustor = 0
+	## Alignment perfect setup
+	if(config.patternPrecision == True): sizeAdjustor = 1
+
+	
+	cntr = [0,0]
 
 
 	# the pattern array chooses which color each triangle is meant to be
@@ -22,70 +35,40 @@ def createPieces(config, refresh=False) :
 	[2,2,2,2]
 	]
 
-	if refresh == False :
-
-		cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-
-		config.unitArray = []
-		outlineColorObj = coloroverlay.ColorOverlay()
-		outlineColorObj.randomRange = (5.0,30.0)
-
-		## Jinky odds/evens alignment setup
-		sizeAdjustor = 0
-		## Alignment perfect setup
-		if(config.patternPrecision == True): sizeAdjustor = 1
-
-		
-		cntr = [0,0]
-
-
 	
 
 	# Rows and columns of 9-squares
+	for rows in range (0,config.blockRows) :
 
-	if refresh == False :
-		for rows in range (0,config.blockRows) :
+		rowStart = rows * config.blockHeight * 3 + config.gapSize
 
-			rowStart = rows * config.blockHeight * 3 + config.gapSize
+		for cols in range (0,config.blockCols) :
 
-			for cols in range (0,config.blockCols) :
+			columnStart = cols * config.blockLength * 3 + config.gapSize
+			cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+			cntr = [columnStart, rowStart]
 
+			## Jinky odds/evens alignment setup
+			sizeAdjustor = 0
+			## Alignment perfect setup
+			if(config.patternPrecision == True): sizeAdjustor = 0
 
-				columnStart = cols * config.blockLength * 3 + config.gapSize
-				cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-				cntr = [columnStart, rowStart]
+			n = 0
 
-				## Jinky odds/evens alignment setup
-				sizeAdjustor = 0
-				## Alignment perfect setup
-				if(config.patternPrecision == True): sizeAdjustor = 0
-
-				n = 0
-
-				obj = Unit(config)
-				obj.xPos = cntr[0] + cols * config.blockLength 
-				obj.yPos = cntr[1] + rows * config.blockHeight
-				obj.blockLength = config.blockLength - sizeAdjustor
-				obj.blockHeight = config.blockHeight - sizeAdjustor
-				obj.outlineColorObj	= outlineColorObj
-
-
-				for n in range(0,4):
-					for i in pattern[n] :
-						obj.fillColors.append(config.fillColorSet[i])
-
-			
-				obj.setUp()
-				config.unitArray.append(obj)
-				#n+=1
-	else :
-
-		for obj in config.unitArray:
-			obj.fillColors = []
+			obj = Unit(config)
+			obj.xPos = cntr[0] + cols * config.blockLength 
+			obj.yPos = cntr[1] + rows * config.blockHeight
+			obj.blockLength = config.blockLength - sizeAdjustor
+			obj.blockHeight = config.blockHeight - sizeAdjustor
+			obj.outlineColorObj	= outlineColorObj
 
 			for n in range(0,4):
 				for i in pattern[n] :
 					obj.fillColors.append(config.fillColorSet[i])
+
+			obj.setUp()
+			config.unitArray.append(obj)
+			#n+=1
 
 
 

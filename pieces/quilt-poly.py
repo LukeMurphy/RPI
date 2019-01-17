@@ -27,7 +27,7 @@ def transformImage(img) :
 # mixed up results
 def randomRange(A=0, B=1, rounding=False):
 	a = random.uniform(A,B)
-	b = random.uniform(A,B)
+	b = random.uniform(a,B)
 	if rounding == False :
 		return (a,b)
 	else :
@@ -41,17 +41,17 @@ def restartPiece():
 
 	## The "dark" color to the spokes
 	config.c1HueRange = randomRange(0,360,True)
-	config.c2SaturationRange = randomRange(.4,.85)
+	config.c2SaturationRange = randomRange(.4,.95)
 	config.c1ValueRange = randomRange(.3,.5)
 	
 	# the light color on the 8 spokes / points
-	newHueRange = randomRange(0,360,True)
 	config.c2HueRange = randomRange(0,360,True)
-	config.c2SaturationRange = randomRange(.9,1)
+	config.c2SaturationRange = randomRange(.4,1)
 	config.c2ValueRange = randomRange(.8,1)
 
 	## The background -- ie the squares etc
 	config.c3HueRange = randomRange(0,360,True)
+	config.c3SaturationRange = randomRange()
 	config.c3ValueRange = randomRange()
 
 	config.fillColorSet = []
@@ -59,28 +59,32 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-
-	config.blockSize = round(random.uniform(8,18))
-	'''
-	if (config.blockSize >= 11) :
-		config.blockRows = 10
-		config.blockCols = 8
-	else :
-		config.blockRows = 14
-		config.blockCols = 10
-	'''
-
-	config.blockLength = config.blockSize
-	config.blockHeight = config.blockSize
-	config.doingRefresh = 0
-	config.doingRefreshCount = 100
-
-	config.rotation = random.uniform(-3,3)
-	if random.random() < .4 :
+	if random.random() < .3 :
+		config.rotation = random.uniform(-3,3)
+		config.doingRefresh = 0
+		config.doingRefreshCount = 100
+		
+	if random.random() < .3 :
+		config.blockSize = round(random.uniform(8,18))
+		'''
+		if (config.blockSize >= 11) :
+			config.blockRows = 10
+			config.blockCols = 8
+		else :
+			config.blockRows = 14
+			config.blockCols = 10
+		'''
+		config.blockLength = config.blockSize
+		config.blockHeight = config.blockSize
+		config.doingRefresh = 0
+		config.doingRefreshCount = 100
 		createpolypieces.createPieces(config, True)
 
 	# poly specific
-	config.randomness = random.uniform(0,3)
+	if random.random() < .3 :
+		config.randomness = random.uniform(0,3)
+		config.doingRefresh = 0
+		config.doingRefreshCount = 100
 
 	createpolypieces.refreshPalette(config)
 	setInitialColors(True)

@@ -2,7 +2,6 @@ import time
 import random
 import textwrap
 import math
-import sys
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules.quilting.colorset import ColorSet
 from modules import colorutils, badpixels, coloroverlay
@@ -36,7 +35,6 @@ class Unit:
 	polys = []
 	pointRange = 28
 
-
 	
 	def __init__(self, config):
 		self.config = config
@@ -63,7 +61,7 @@ class Unit:
 		self.fillColors = []
 
 		## Pre-fill the triangles list/array with ColorOverlay objects
-		self.polys = [[[],coloroverlay.ColorOverlay(),[]] for i in range(0,self.pointRange)]
+		self.polys = [[[],coloroverlay.ColorOverlay(False),[]] for i in range(0,self.pointRange)]
 		#self.triangles = [[[],coloroverlay.ColorOverlay(),[]] for i in range(0,8)]
 
 
@@ -74,17 +72,21 @@ class Unit:
 
 		#### Sets up color transitions
 
-		for i in range(0,28) :
+		#print ("Running setup: polys= {}".format(len(self.polys)))
 
+		for i in range(0, len(self.polys)) :
 			colOverlay = self.polys[i][1]
 
 			colOverlay.randomSteps = True
 			colOverlay.timeTrigger = True 
 			colOverlay.tLimitBase = 2
 			colOverlay.steps = 10
+
+
+			#print(self.fillColors[i].valueRange)
 					
 			colOverlay.maxBrightness = self.config.brightness
-			colOverlay.maxBrightness = self.fillColors[i].valueRange[0]
+			colOverlay.maxBrightness = self.fillColors[i].valueRange[1]
 
 			colOverlay.minHue = self.fillColors[i].hueRange[0]
 			colOverlay.maxHue = self.fillColors[i].hueRange[1]				
@@ -99,24 +101,9 @@ class Unit:
 			### transitions - 1,10 very blinky, 10,200 very slow
 			colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
 
-			'''
-			colOverlay.colorA = colorutils.getRandomColorHSV(
-				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
-				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
-				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
-				)
-
-			colOverlay.colorB = colorutils.getRandomColorHSV(
-				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
-				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
-				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
-				)
-			colOverlay.colorA = (50,50,50)
-			#self.colOverlay.colorB = (50,50,50)
-			'''
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
-
+		#self.outlineColor = (0,0,0,255)
 		self.setupSquareWithTriangles()
 
 
@@ -220,7 +207,8 @@ class Unit:
 		for i in range (0, self.pointRange) :
 			coords = self.polys[i][0]
 			fillColor = self.polys[i][2]
-			fillColor = tuple(round (a * self.config.brightness ) for a in self.polys[i][1].currentColor)
+			fillColorList = (list(round (a * self.config.brightness ) for a in fillColor))
+			fillColor = (fillColorList[0],fillColorList[1],fillColorList[2], 255)
 			self.draw.polygon(coords, fill=fillColor, outline=outline)
 
 

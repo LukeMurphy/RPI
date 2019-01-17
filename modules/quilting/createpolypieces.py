@@ -17,11 +17,12 @@ polyPattern =  [
 	[2,2,2,2]
 	]
 
-def createPieces(config) :
+def createPieces(config, refresh = False) :
 
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArray = []
+	if refresh == False :
+		config.unitArray = []
 	outlineColorObj = coloroverlay.ColorOverlay()
 	outlineColorObj.randomRange = (5.0,30.0)
 
@@ -30,12 +31,10 @@ def createPieces(config) :
 	## Alignment perfect setup
 	if(config.patternPrecision == True): sizeAdjustor = 1
 
-	
 	cntr = [0,0]
 
-
-
 	# Rows and columns of 9-squares
+	itemCount = 0
 	for rows in range (0,config.blockRows) :
 
 		rowStart = rows * config.blockHeight * 3 + config.gapSize
@@ -51,9 +50,11 @@ def createPieces(config) :
 			## Alignment perfect setup
 			if(config.patternPrecision == True): sizeAdjustor = 0
 
-			n = 0
-
-			obj = Unit(config)
+			if refresh == True :
+				obj = config.unitArray[itemCount]
+			else :
+				obj = Unit(config)
+				obj.fillColors = []
 			obj.xPos = cntr[0] + cols * config.blockLength 
 			obj.yPos = cntr[1] + rows * config.blockHeight
 			obj.blockLength = config.blockLength - sizeAdjustor
@@ -65,16 +66,22 @@ def createPieces(config) :
 					obj.fillColors.append(config.fillColorSet[i])
 
 			obj.setUp()
-			config.unitArray.append(obj)
-			#n+=1
+			if refresh == False : config.unitArray.append(obj)
+			itemCount += 1
+
 
 def refreshPalette(config):
-	for obj in config.unitArray:
-		obj.fillColors = []
-		for n in range(0,4):
-			for i in polyPattern[n] :
-				obj.fillColors.append(config.fillColorSet[i])
-		obj.setUp()
+	itemCount = 0
+	for rows in range (0,config.blockRows) :
+		for cols in range (0,config.blockCols) :
+			obj = config.unitArray[itemCount]
+			obj.fillColors = []
+			for n in range(0,4):
+				for i in polyPattern[n] :
+					obj.fillColors.append(config.fillColorSet[i])
+				#obj.fillColors = fillColors
+			obj.setUp()
+			itemCount+=1
 
 
 

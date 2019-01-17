@@ -96,11 +96,14 @@ def createPieces(config, refresh = False) :
 					obj.outlineColorObj	= outlineColorObj
 
 					for i in polyPattern[n] :
-						obj.fillColors.append(config.fillColorSet[i])
+						if refresh == True :
+							obj.fillColors[i] = config.fillColorSet[i]
+						else :
+							obj.fillColors.append(config.fillColorSet[i])
 
 					obj.setUp()
 
-					config.unitArray.append(obj)
+					if refresh == False : config.unitArray.append(obj)
 					n+=1
 					itemCount += 1
 

@@ -81,7 +81,6 @@ def restartPiece():
 		newSaturationRange = randomRange()
 		newValueRange = randomRange()
 
-
 		config.c3HueRange = newHueRange
 		config.c3SaturationRange = newSaturationRange
 		config.c2ValueRange = newValueRange
@@ -94,24 +93,28 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 
-	if random.random() < .5 :
+	if random.random() < .3 :
 		if(config.quiltPattern == "stars"):
 			config.blockSize = round(random.uniform(8,18))
+			'''
 			if (config.blockSize >= 11) :
-				config.blockRows = 10
-				config.blockCols = 8
+				config.blockRows = 14
+				config.blockCols = 10
 			else :
 				config.blockRows = 14
 				config.blockCols = 10
+			'''
 			createstarpieces.createPieces(config, True)
 		else :
 			config.blockSize = round(random.uniform(8,28))
+			'''
 			if (config.blockSize >= 16) :
 				config.blockRows = 7
 				config.blockCols = 5
 			else :
 				config.blockRows = 7
 				config.blockCols = 5
+			'''
 			createtrianglepieces.createPieces(config, True)
 
 		config.blockLength = config.blockSize
@@ -119,10 +122,13 @@ def restartPiece():
 		config.doingRefresh = 0
 		config.doingRefreshCount = 2000
 
-	if config.quiltPattern == "triangles":
+	
+	if config.quiltPattern == "stars":
+		createstarpieces.refreshPalette(config)
+	else:
 		createtrianglepieces.refreshPalette(config)
-
-	setInitialColors(True)
+		setInitialColors(True)
+	
 
 	if random.random() < .5 :
 		config.rotation = random.uniform(-3,3)
@@ -134,7 +140,8 @@ def setInitialColors(refresh=False):
 
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
-		for c in range(0,8) :
+		#print("number of colorOverlay objs {}".format(len(obj.triangles)) )
+		for c in range(0,len(obj.triangles)) :
 			colOverlay = obj.triangles[c][1]
 			#colOverlay.colorB = colorutils.randomColorAlpha(config.brightness * .8,0)
 			colOverlay.colorA = colorutils.randomColorAlpha(config.brightness * .8,0)
@@ -219,13 +226,14 @@ def main(run = True) :
 	elif config.quiltPattern == "stars" :
 		createstarpieces.createPieces(config)
 
+	setInitialColors()
+	
 	config.t1  = time.time()
 	config.t2  = time.time()
 
 	config.doingRefresh = 2000
 	config.doingRefreshCount = 2000
 
-	setInitialColors()
 
 	if(run) : runWork()
 

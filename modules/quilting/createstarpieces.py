@@ -86,12 +86,57 @@ def createPieces(config, refresh = False) :
 
 					obj.setUp(n)
 					itemCount += 1
-					config.unitArray.append(obj)
+					if refresh == False : config.unitArray.append(obj)
 
 			n+=1
 
-
 def refreshPalette(config):
+	itemCount = 0
+	n = 0
+	
+	# Rows and columns of 9-squares
+	for rows in range (0,config.blockRows) :
+		for cols in range (0,config.blockCols) :
+			# Three rows of three squares
+			squareNumber = 0
+			for unitRow in range (0,len(polyPattern)):
+				# Each square is either divided in to 4 or 3 triangles
+				for unitBlock in range(0, len(polyPattern[unitRow])):
+					obj = config.unitArray[itemCount]
+					obj.minHue = config.fillColorSet[0].hueRange[0]
+					obj.maxHue = config.fillColorSet[0].hueRange[1]				
+					obj.minSaturation = config.fillColorSet[0].saturationRange[0]
+					obj.maxSaturation = config.fillColorSet[0].saturationRange[1]
+					obj.minValue = config.fillColorSet[0].valueRange[0]
+					obj.maxValue = config.fillColorSet[0].valueRange[1]
+					obj.compositionNumber = polyPattern[unitRow][unitBlock]
+
+					"The squares"
+					if obj.compositionNumber == 0 :
+						obj.minHue = config.fillColorSet[1].hueRange[0]
+						obj.maxHue = config.fillColorSet[1].hueRange[1]				
+						obj.minSaturation = config.fillColorSet[1].saturationRange[0]
+						obj.maxSaturation = config.fillColorSet[1].saturationRange[1]
+						obj.minValue = config.fillColorSet[1].valueRange[0]
+						obj.maxValue = config.fillColorSet[1].valueRange[1]
+
+						obj.squareNumber = squareNumber
+						squareNumber += 1
+
+					"The center block"
+					if obj.compositionNumber == 0 and unitRow == 1 :
+						obj.minHue = config.fillColorSet[2].hueRange[0]
+						obj.maxHue = config.fillColorSet[2].hueRange[1]				
+						obj.minSaturation = config.fillColorSet[2].saturationRange[0]
+						obj.maxSaturation = config.fillColorSet[2].saturationRange[1]
+						obj.minValue = config.fillColorSet[2].valueRange[0]
+						obj.maxValue = config.fillColorSet[2].valueRange[1]
+					
+					obj.setUp(n)
+					itemCount += 1
+			n+=1
+
+def _refreshPalette(config):
 	itemCount = 0
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :

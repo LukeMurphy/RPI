@@ -61,25 +61,29 @@ def restartPiece():
 
 
 	config.blockSize = round(random.uniform(8,18))
+	'''
 	if (config.blockSize >= 11) :
 		config.blockRows = 10
 		config.blockCols = 8
 	else :
 		config.blockRows = 14
 		config.blockCols = 10
+	'''
 
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
+	config.doingRefresh = 0
+	config.doingRefreshCount = 100
 
 	config.rotation = random.uniform(-3,3)
-	if random.random() < .5 :
-		createpolypieces.createPieces(config)
+	if random.random() < .4 :
+		createpolypieces.createPieces(config, True)
 
 	# poly specific
 	config.randomness = random.uniform(0,3)
 
-	setInitialColors(True)
 	createpolypieces.refreshPalette(config)
+	setInitialColors(True)
 
 
 def setInitialColors(refresh=False):
@@ -153,7 +157,6 @@ def main(run = True) :
 	config.c3ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3ValueRange').split(",")])
 	
 
-		
 	# for now, all squares 
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
@@ -167,11 +170,6 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-	try :
-		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
-		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
-	except Exception as e:
-		print (e)
 
 
 	try :
@@ -187,6 +185,9 @@ def main(run = True) :
 
 	config.t1  = time.time()
 	config.t2  = time.time()
+
+	config.doingRefresh = 100
+	config.doingRefreshCount = 100
 
 	if(run) : runWork()
 
@@ -208,7 +209,11 @@ def iterate() :
 
 		obj = config.unitArray[i]
 		obj.update()
-		obj.render()
+		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
+			obj.render()
+			config.doingRefresh += 1
+		elif config.doingRefresh == config.doingRefreshCount :
+			obj.render()
 
 	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)

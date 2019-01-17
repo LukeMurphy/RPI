@@ -61,7 +61,7 @@ class Unit:
 		self.fillColors = []
 
 		## Pre-fill the triangles list/array with ColorOverlay objects
-		self.triangles = [[[],coloroverlay.ColorOverlay(),[]] for i in range(0,8)]
+		self.triangles = [[[],coloroverlay.ColorOverlay(False),[]] for i in range(0,8)]
 
 
 

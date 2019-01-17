@@ -99,6 +99,7 @@ class Unit:
 			### transitions - 1,10 very blinky, 10,200 very slow
 			colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
 
+			'''
 			colOverlay.colorA = colorutils.getRandomColorHSV(
 				hMin = colOverlay.minHue, hMax  = colOverlay.maxHue, 
 				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
@@ -112,6 +113,7 @@ class Unit:
 				)
 			colOverlay.colorA = (50,50,50)
 			#self.colOverlay.colorB = (50,50,50)
+			'''
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 
@@ -205,7 +207,7 @@ class Unit:
 		for i in range(0,self.pointRange) :
 			if(random.random() > self.config.colorPopProb) :
 				self.polys[i][1].stepTransition()
-				self.polys[i][2] = tuple(round (a * self.brightness ) for a in self.polys[i][1].currentColor)
+				self.polys[i][2] = tuple(round (a * self.config.brightness ) for a in self.polys[i][1].currentColor)
 			else :
 				self.changeColorFill(self.polys[i])
 
@@ -215,10 +217,12 @@ class Unit:
 			outline = self.outlineColor
 		else : outline = None
 		
-		for i in range (0,self.pointRange) :
+		for i in range (0, self.pointRange) :
 			coords = self.polys[i][0]
 			fillColor = self.polys[i][2]
+			fillColor = tuple(round (a * self.config.brightness ) for a in self.polys[i][1].currentColor)
 			self.draw.polygon(coords, fill=fillColor, outline=outline)
+
 
 
 	def render(self):
@@ -228,9 +232,10 @@ class Unit:
 		else:
 			brightnessFactor = self.config.brightnessFactorLight
 
-		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
+		self.outlineColor = tuple(int (a * self.config.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
 
 		self.drawUnitTriangles()
+
 
 	## Straight color change - deprecated - too blinky
 	def changeColorFill(self, obj):

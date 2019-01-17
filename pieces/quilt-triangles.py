@@ -21,32 +21,46 @@ def transformImage(img) :
 	return img
 
 
+# this could be written to use A as the starting point
+# for b's range - but this way it makes for some more
+# mixed up results
+def randomRange(A=0, B=1, rounding=False):
+	a = random.uniform(A,B)
+	b = random.uniform(A,B)
+	if rounding == False :
+		return (a,b)
+	else :
+		return (round(a), round(b))
+
+
 def restartPiece():
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-	A = random.uniform(0,1)
-	B = random.uniform(A,1)
-	newValueRange = (A,B)
-
-	A = random.uniform(0,1)
-	B = random.uniform(A,1)
-	newSaturationRange = (A,B)
+	newValueRange = randomRange()
+	newSaturationRange = randomRange()
+	newHueRange = randomRange(0,360,True)
 
 	# triangles: major outline squares and diamonds
 	# stars: BASE
-	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
-	config.c1HueRange = newRange
+	config.c1HueRange = newHueRange
 	config.c1ValueRange = newValueRange
 
-	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
+	newHueRange = randomRange(0,360,True)
 	# triangles:  wings of the 8-point inner starts
 	# stars: SQUARE
-	config.c2HueRange = newRange
+	if(config.quiltPattern == "stars"): 
+		config.c2SaturationRange = randomRange()
+		config.c2ValueRange = randomRange()
+		config.c2HueRange = randomRange(0,360,True)
+	else :
+		config.c2HueRange = newHueRange
 
 	# triangles:  the star center diamond
-	# stars: CENTER
-	config.c3HueRange = newRange
+	# stars: CENTER SQUARE
+	config.c3HueRange = newHueRange
+	if(config.quiltPattern == "stars"): 
+		newValueRange = randomRange()
 	config.c3ValueRange = newValueRange
 
 	config.fillColorSet = []
@@ -55,13 +69,12 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 	try:
-		config.c4HueRange = newRange
-		config.c5HueRange = newRange
+		config.c4HueRange = newHueRange
+		config.c5HueRange = newHueRange
 		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
 		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
 	except Exception as e:
 		print (e)
-
 
 
 	if(config.quiltPattern == "triangles"):

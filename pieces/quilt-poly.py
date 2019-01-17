@@ -21,31 +21,86 @@ def transformImage(img) :
 	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
 	return img
 
+
+# this could be written to use A as the starting point
+# for b's range - but this way it makes for some more
+# mixed up results
+def randomRange(A=0, B=1, rounding=False):
+	a = random.uniform(A,B)
+	b = random.uniform(A,B)
+	if rounding == False :
+		return (a,b)
+	else :
+		return (round(a), round(b))
+
+
 def restartPiece():
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-	newRange = (round(random.uniform(0,320)),round(random.uniform(0,320)))
-	config.c1HueRange = newRange
-	config.c2HueRange = newRange
-	config.c3HueRange = newRange
-	config.c3HueRange = newRange
-	config.c4HueRange = newRange
-	config.c5HueRange = newRange
 
+	## The "dark" color to the spokes
+	config.c1HueRange = randomRange(0,0,True)
+	config.c2SaturationRange = randomRange(.4,.85)
+	config.c1ValueRange = randomRange(.3,.5)
+	
+	# the light color on the 8 spokes / points
+	config.c2HueRange = randomRange(0,0,True)
+	config.c2SaturationRange = randomRange(.9,1)
+	config.c2ValueRange = randomRange(.8,1)
+
+	## The background -- ie the squares etc
+	config.c3HueRange = randomRange(0,0,True)
+	config.c3ValueRange = randomRange()
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
-	config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
-	config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
 
 
-	if config.quiltPattern == "polys" :
-		createpolypieces.createPieces(config)
+	if random.random() < 1 :
+		config.blockSize = round(random.uniform(8,18))
+		if (config.blockSize >= 11) :
+			config.blockRows = 10
+			config.blockCols = 8
+		else :
+			config.blockRows = 14
+			config.blockCols = 10
+
+		config.blockLength = config.blockSize
+		config.blockHeight = config.blockSize
 
 
+		# poly specific
+		config.randomness = random.uniform(0,5)
+		
+	print("restarting")
+	createpolypieces.createPieces(config, True)
+	setInitialColors(True)
+
+	config.rotation = random.uniform(-3,3)
+
+
+def setInitialColors(refresh=False):
+	## Better initial color when piece is turned on
+	for i in range(0,len(config.unitArray)):
+		obj = config.unitArray[i]
+		for c in range(0,4) :
+			if refresh == True :
+				colOverlayCurrentColor = obj.polys[c][1].currentColor
+
+				obj.polys[c][1] = coloroverlay.ColorOverlay()
+				colOverlay = obj.polys[c][1]
+				colOverlay.colorB = colOverlayCurrentColor
+				colOverlay.colorA = colOverlayCurrentColor
+				colOverlay.colorTransitionSetupValues()
+			else :
+				obj.polys[c][1] = coloroverlay.ColorOverlay()
+				colOverlay = obj.polys[c][1]
+				colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
+				colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
+				colOverlay.colorTransitionSetupValues()
 
 
 def main(run = True) :
@@ -79,8 +134,7 @@ def main(run = True) :
 	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
 	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
 	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
-	config.blockLength = int(workConfig.get("quilt", 'blockLength')) 
-	config.blockHeight = int(workConfig.get("quilt", 'blockHeight')) 
+
 	config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
 	config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
 	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
@@ -107,16 +161,7 @@ def main(run = True) :
 	config.c3SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3SaturationRange').split(",")])
 	config.c3ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3ValueRange').split(",")])
 	
-	try :
-		config.c4HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4HueRange').split(",")])
-		config.c4SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4SaturationRange').split(",")])
-		config.c4ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4ValueRange').split(",")])
-		
-		config.c5HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5HueRange').split(",")])
-		config.c5SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5SaturationRange').split(",")])
-		config.c5ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5ValueRange').split(",")])
-	except Exception as e:
-		print (e)
+
 		
 	# for now, all squares 
 	config.blockLength = config.blockSize
@@ -131,12 +176,6 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-	try :
-		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
-		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
-	except Exception as e:
-		print (e)
-
 
 	try :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
@@ -145,10 +184,9 @@ def main(run = True) :
 		print (e)
 
 
+	createpolypieces.createPieces(config)
 
-	if config.quiltPattern == "polys" :
-		createpolypieces.createPieces(config)
-
+	setInitialColors()
 
 	config.t1  = time.time()
 	config.t2  = time.time()
@@ -175,18 +213,20 @@ def iterate() :
 		obj.update()
 		obj.render()
 
+	'''
 	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
-	config.render(temp, 0,0)
+	'''
+
+	config.render(config.canvasImage, 0,0)
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1
 
 	if delta > config.timeToComplete :
-		pass
-		#restartPiece()
+		restartPiece()
 		
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

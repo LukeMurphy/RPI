@@ -1,21 +1,8 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.polyunit import Unit
 
-def createPieces(config) :
+def createPieces(config, refresh=False) :
 
-	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-
-	config.unitArray = []
-	outlineColorObj = coloroverlay.ColorOverlay()
-	outlineColorObj.randomRange = (5.0,30.0)
-
-	## Jinky odds/evens alignment setup
-	sizeAdjustor = 0
-	## Alignment perfect setup
-	if(config.patternPrecision == True): sizeAdjustor = 1
-
-	
-	cntr = [0,0]
 
 
 	# the pattern array chooses which color each triangle is meant to be
@@ -35,40 +22,70 @@ def createPieces(config) :
 	[2,2,2,2]
 	]
 
+	if refresh == False :
+
+		cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+
+		config.unitArray = []
+		outlineColorObj = coloroverlay.ColorOverlay()
+		outlineColorObj.randomRange = (5.0,30.0)
+
+		## Jinky odds/evens alignment setup
+		sizeAdjustor = 0
+		## Alignment perfect setup
+		if(config.patternPrecision == True): sizeAdjustor = 1
+
+		
+		cntr = [0,0]
+
+
 	
 
 	# Rows and columns of 9-squares
-	for rows in range (0,config.blockRows) :
 
-		rowStart = rows * config.blockHeight * 3 + config.gapSize
+	if refresh == False :
+		for rows in range (0,config.blockRows) :
 
-		for cols in range (0,config.blockCols) :
+			rowStart = rows * config.blockHeight * 3 + config.gapSize
 
-			columnStart = cols * config.blockLength * 3 + config.gapSize
-			cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
-			cntr = [columnStart, rowStart]
+			for cols in range (0,config.blockCols) :
 
-			## Jinky odds/evens alignment setup
-			sizeAdjustor = 0
-			## Alignment perfect setup
-			if(config.patternPrecision == True): sizeAdjustor = 0
 
-			n = 0
+				columnStart = cols * config.blockLength * 3 + config.gapSize
+				cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+				cntr = [columnStart, rowStart]
 
-			obj = Unit(config)
-			obj.xPos = cntr[0] + cols * config.blockLength 
-			obj.yPos = cntr[1] + rows * config.blockHeight
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
+				## Jinky odds/evens alignment setup
+				sizeAdjustor = 0
+				## Alignment perfect setup
+				if(config.patternPrecision == True): sizeAdjustor = 0
+
+				n = 0
+
+				obj = Unit(config)
+				obj.xPos = cntr[0] + cols * config.blockLength 
+				obj.yPos = cntr[1] + rows * config.blockHeight
+				obj.blockLength = config.blockLength - sizeAdjustor
+				obj.blockHeight = config.blockHeight - sizeAdjustor
+				obj.outlineColorObj	= outlineColorObj
+
+
+				for n in range(0,4):
+					for i in pattern[n] :
+						obj.fillColors.append(config.fillColorSet[i])
+
+			
+				obj.setUp()
+				config.unitArray.append(obj)
+				#n+=1
+	else :
+
+		for obj in config.unitArray:
+			obj.fillColors = []
 
 			for n in range(0,4):
 				for i in pattern[n] :
 					obj.fillColors.append(config.fillColorSet[i])
-
-			obj.setUp()
-			config.unitArray.append(obj)
-			#n+=1
 
 
 

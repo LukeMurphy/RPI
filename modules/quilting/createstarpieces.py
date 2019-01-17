@@ -1,6 +1,8 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.starunit import Unit
 
+polyPattern = [[0,1,0],[2,0,3],[0,4,0]]
+
 def createPieces(config) :
 	#global config
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
@@ -14,7 +16,6 @@ def createPieces(config) :
 
 	n = 0
 
-	pattern = [(0,1,0),(2,0,3),(0,4,0)]
 
 	# Rows and columns of 9-squares
 	for rows in range (0,config.blockRows) :
@@ -27,11 +28,11 @@ def createPieces(config) :
 
 			# Three rows of three squares
 			squareNumber = 0
-			for unitRow in range (0,len(pattern)):
+			for unitRow in range (0,len(polyPattern)):
 				rowDelta  =  unitRow * config.blockHeight
 
 				# Each square is either divided in to 4 or 3 triangles
-				for unitBlock in range(0, len(pattern[unitRow])):
+				for unitBlock in range(0, len(polyPattern[unitRow])):
 					colDelta  =  unitBlock * config.blockHeight
 					cntr = [columnStart + cntrOffset[0] + colDelta, rowStart  + cntrOffset[1] + rowDelta]	
 
@@ -53,7 +54,7 @@ def createPieces(config) :
 					obj.minValue = config.fillColorSet[0].valueRange[0]
 					obj.maxValue = config.fillColorSet[0].valueRange[1]
 
-					obj.compositionNumber = pattern[unitRow][unitBlock]
+					obj.compositionNumber = polyPattern[unitRow][unitBlock]
 
 					
 					"The squares"
@@ -82,3 +83,13 @@ def createPieces(config) :
 					config.unitArray.append(obj)
 
 			n+=1
+
+
+def refreshPalette(config):
+	for obj in config.unitArray:
+		obj.fillColors = []
+		for n in range(0,4):
+			for i in polyPattern[n] :
+				obj.fillColors.append(config.fillColorSet[i])
+		obj.setUp()
+

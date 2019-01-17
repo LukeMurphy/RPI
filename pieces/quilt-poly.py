@@ -72,24 +72,25 @@ def restartPiece():
 	config.blockHeight = config.blockSize
 
 	config.rotation = random.uniform(-3,3)
-	createpolypieces.createPieces(config)
+	if random.random() < .5 :
+		createpolypieces.createPieces(config)
 
 	# poly specific
-	config.randomness = random.uniform(0,5)
+	config.randomness = random.uniform(0,3)
 
-	setInitialColors()
+	setInitialColors(True)
+	createpolypieces.refreshPalette(config)
 
 
-def setInitialColors():
+def setInitialColors(refresh=False):
 	## Better initial color when piece is turned on
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
-		for c in range(0,8) :
+		for c in range(0,len(obj.polys)) :
 			colOverlay = obj.polys[c][1]
 			colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
 			colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
 			colOverlay.colorTransitionSetupValues()
-
 		
 
 

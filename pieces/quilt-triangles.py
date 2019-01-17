@@ -68,13 +68,6 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-	try:
-		config.c4HueRange = newHueRange
-		config.c5HueRange = newHueRange
-		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
-		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
-	except Exception as e:
-		print (e)
 
 
 	if(config.quiltPattern == "triangles"):
@@ -85,7 +78,11 @@ def restartPiece():
 		else :
 			config.blockRows = 7
 			config.blockCols = 5
-		createtrianglepieces.createPieces(config)
+		if random.random() < .5 :createtrianglepieces.createPieces(config)
+		setInitialColors(True)
+		createtrianglepieces.refreshPalette(config)
+
+		
 	else :
 		config.blockSize = round(random.uniform(8,18))
 		if (config.blockSize >= 11) :
@@ -95,16 +92,17 @@ def restartPiece():
 			config.blockRows = 14
 			config.blockCols = 10
 		createstarpieces.createPieces(config)
+		setInitialColors(True)
+
 
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
 	config.rotation = random.uniform(-3,3)
 
-	setInitialColors()
 
 
-def setInitialColors():
+def setInitialColors(refresh=False):
 	## Better initial color when piece is turned on
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
@@ -112,6 +110,10 @@ def setInitialColors():
 			colOverlay = obj.triangles[c][1]
 			colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
 			colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
+
+			colOverlay.colorB = (200,0,0,255)
+			colOverlay.colorA = (200,0,0,255)
+
 			colOverlay.colorTransitionSetupValues()
 
 
@@ -173,16 +175,7 @@ def main(run = True) :
 	config.c3SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3SaturationRange').split(",")])
 	config.c3ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3ValueRange').split(",")])
 	
-	try :
-		config.c4HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4HueRange').split(",")])
-		config.c4SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4SaturationRange').split(",")])
-		config.c4ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c4ValueRange').split(",")])
-		
-		config.c5HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5HueRange').split(",")])
-		config.c5SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5SaturationRange').split(",")])
-		config.c5ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c5ValueRange').split(",")])
-	except Exception as e:
-		print (e)
+
 		
 	# for now, all squares 
 	config.blockLength = config.blockSize
@@ -197,11 +190,7 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-	try :
-		config.fillColorSet.append (ColorSet(config.c4HueRange, config.c4SaturationRange, config.c4ValueRange))
-		config.fillColorSet.append (ColorSet(config.c5HueRange, config.c5SaturationRange, config.c5ValueRange))
-	except Exception as e:
-		print (e)
+
 
 	if config.quiltPattern == "triangles" :
 		createtrianglepieces.createPieces(config)

@@ -1,6 +1,52 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.triangleunit import Unit
 
+polyPattern = [
+[0,0,0,0,0,0,0,0],
+[1,0,0,0,1,1,1,0],
+[0,0,0,1,0,1,1,1],
+[0,0,0,0,0,0,0,0],
+[0,1,1,1,0,0,0,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,0,1,0,0,0],
+[0,0,0,1,0,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,0,0,0,1,1,1,0],
+[0,0,0,0,0,0,0,0],
+[1,1,1,0,1,0,0,0],
+[0,1,1,1,0,0,0,1],
+[0,0,0,0,0,0,0,0]
+]
+
+
+# the pattern array chooses which color each triangle is meant to be
+# each star unit is comprised of 4 rows and 4 columns of sqaures that 
+# are each divided into 4 smaller triangles
+
+polyPattern = [
+[0,0,0,0,0,0,0,0],
+[1,0,0,0,1,1,1,0],
+[0,0,0,1,0,1,1,1],
+[0,0,0,0,0,0,0,0],
+
+[0,1,1,1,0,0,0,1],
+[1,1,1,2,1,2,2,2],
+[2,1,1,1,2,2,2,1],
+[1,1,1,0,1,0,0,0],
+
+[0,0,0,1,0,1,1,1],
+[1,2,2,2,1,1,1,2],
+[2,2,2,1,2,1,1,1],
+[1,0,0,0,1,1,1,0],
+
+[0,0,0,0,0,0,0,0],
+[1,1,1,0,1,0,0,0],
+[0,1,1,1,0,0,0,1],
+[0,0,0,0,0,0,0,0]
+]
+
 def createPieces(config) :
 
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
@@ -16,52 +62,6 @@ def createPieces(config) :
 
 	
 	cntr = [0,0]
-
-	pattern = [
-	[0,0,0,0,0,0,0,0],
-	[1,0,0,0,1,1,1,0],
-	[0,0,0,1,0,1,1,1],
-	[0,0,0,0,0,0,0,0],
-	[0,1,1,1,0,0,0,1],
-	[1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1],
-	[1,1,1,0,1,0,0,0],
-	[0,0,0,1,0,1,1,1],
-	[1,1,1,1,1,1,1,1],
-	[1,1,1,1,1,1,1,1],
-	[1,0,0,0,1,1,1,0],
-	[0,0,0,0,0,0,0,0],
-	[1,1,1,0,1,0,0,0],
-	[0,1,1,1,0,0,0,1],
-	[0,0,0,0,0,0,0,0]
-	]
-
-
-	# the pattern array chooses which color each triangle is meant to be
-	# each star unit is comprised of 4 rows and 4 columns of sqaures that 
-	# are each divided into 4 smaller triangles
-	
-	pattern = [
-	[0,0,0,0,0,0,0,0],
-	[1,0,0,0,1,1,1,0],
-	[0,0,0,1,0,1,1,1],
-	[0,0,0,0,0,0,0,0],
-
-	[0,1,1,1,0,0,0,1],
-	[1,1,1,2,1,2,2,2],
-	[2,1,1,1,2,2,2,1],
-	[1,1,1,0,1,0,0,0],
-
-	[0,0,0,1,0,1,1,1],
-	[1,2,2,2,1,1,1,2],
-	[2,2,2,1,2,1,1,1],
-	[1,0,0,0,1,1,1,0],
-
-	[0,0,0,0,0,0,0,0],
-	[1,1,1,0,1,0,0,0],
-	[0,1,1,1,0,0,0,1],
-	[0,0,0,0,0,0,0,0]
-	]
 
 	
 
@@ -91,7 +91,7 @@ def createPieces(config) :
 					obj.blockHeight = config.blockHeight - sizeAdjustor
 					obj.outlineColorObj	= outlineColorObj
 
-					for i in pattern[n] :
+					for i in polyPattern[n] :
 						obj.fillColors.append(config.fillColorSet[i])
 
 					obj.setUp()
@@ -99,7 +99,13 @@ def createPieces(config) :
 					n+=1
 
 
-
+def refreshPalette(config):
+	for obj in config.unitArray:
+		obj.fillColors = []
+		for n in range(0,4):
+			for i in polyPattern[n] :
+				obj.fillColors.append(config.fillColorSet[i])
+		obj.setUp()
 
 
 

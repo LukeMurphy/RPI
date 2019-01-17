@@ -106,7 +106,7 @@ class Unit:
 			hMin = self.minHue, hMax  = self.maxHue, 
 			vMin = self.minValue, vMax = self.maxValue
 			)
-		self.colOverlay.colorA = (50,50,50)
+		self.colOverlay.colorA = (250,250,250)
 		#self.colOverlay.colorB = (50,50,50)
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))

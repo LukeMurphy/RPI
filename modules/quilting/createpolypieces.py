@@ -1,6 +1,22 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.polyunit import Unit
 
+	# the pattern array chooses which color each triangle is meant to be
+	# each star unit is comprised of 4 rows and 4 columns of sqaures that 
+	# are each divided into  smaller triangles
+	# the rows are different lengths becasue of how I divided up each "row"
+	# e.g. the last row is just the left box/square, the middle tqo triangles
+	# and the lower right square/box
+
+	## In this, the 3rd group of color settings (index = 2) is the negative or
+	## background color
+polyPattern =  [
+	[2,1,0,2,2,1,0,2],
+	[2,1,0,1,0,2],
+	[2,0,1,0,1,0,1,1,0,2],
+	[2,2,2,2]
+	]
+
 def createPieces(config) :
 
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
@@ -18,24 +34,6 @@ def createPieces(config) :
 	cntr = [0,0]
 
 
-	# the pattern array chooses which color each triangle is meant to be
-	# each star unit is comprised of 4 rows and 4 columns of sqaures that 
-	# are each divided into  smaller triangles
-	# the rows are different lengths becasue of how I divided up each "row"
-	# e.g. the last row is just the left box/square, the middle tqo triangles
-	# and the lower right square/box
-
-	## In this, the 3rd group of color settings (index = 2) is the negative or
-	## background color
-
-	pattern = [
-	[2,1,0,2,2,1,0,2],
-	[2,1,0,1,0,2],
-	[2,0,1,0,1,0,1,1,0,2],
-	[2,2,2,2]
-	]
-
-	
 
 	# Rows and columns of 9-squares
 	for rows in range (0,config.blockRows) :
@@ -63,13 +61,20 @@ def createPieces(config) :
 			obj.outlineColorObj	= outlineColorObj
 
 			for n in range(0,4):
-				for i in pattern[n] :
+				for i in polyPattern[n] :
 					obj.fillColors.append(config.fillColorSet[i])
 
 			obj.setUp()
 			config.unitArray.append(obj)
 			#n+=1
 
+def refreshPalette(config):
+	for obj in config.unitArray:
+		obj.fillColors = []
+		for n in range(0,4):
+			for i in polyPattern[n] :
+				obj.fillColors.append(config.fillColorSet[i])
+		obj.setUp()
 
 
 

@@ -111,9 +111,9 @@ class Unit:
 				sMin = colOverlay.minSaturation, sMax = colOverlay.maxSaturation,  
 				vMin = colOverlay.minValue, vMax = colOverlay.maxValue
 				)
+			'''
 			colOverlay.colorA = (50,50,50)
 			colOverlay.colorB = (0,0,0,255)
-			'''
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 		#self.outlineColor = (0,0,0,255)

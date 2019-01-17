@@ -3,11 +3,12 @@ from modules.quilting.starunit import Unit
 
 polyPattern = [[0,1,0],[2,0,3],[0,4,0]]
 
-def createPieces(config) :
+def createPieces(config, refresh = False) :
 	#global config
 	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 
-	config.unitArray = []
+	if refresh == False :
+		config.unitArray = []
 
 	## Jinky odds/evens alignment setup
 	sizeAdjustor = 0
@@ -15,7 +16,7 @@ def createPieces(config) :
 	if(config.patternPrecision == True): sizeAdjustor = 1
 
 	n = 0
-
+	itemCount = 0
 
 	# Rows and columns of 9-squares
 	for rows in range (0,config.blockRows) :
@@ -39,7 +40,11 @@ def createPieces(config) :
 					outlineColorObj = coloroverlay.ColorOverlay()
 					outlineColorObj.randomRange = (5.0,30.0)
 
-					obj = Unit(config)
+					if refresh == True :
+						obj = config.unitArray[itemCount]
+					else :
+						obj = Unit(config)
+
 					obj.xPos = cntr[0]
 					obj.yPos = cntr[1]
 					obj.fillColorMode = "red"
@@ -80,16 +85,25 @@ def createPieces(config) :
 					
 
 					obj.setUp(n)
+					itemCount += 1
 					config.unitArray.append(obj)
 
 			n+=1
 
 
 def refreshPalette(config):
-	for obj in config.unitArray:
-		obj.fillColors = []
-		for n in range(0,4):
-			for i in polyPattern[n] :
-				obj.fillColors.append(config.fillColorSet[i])
-		obj.setUp()
+	itemCount = 0
+	for rows in range (0,config.blockRows) :
+		for cols in range (0,config.blockCols) :
+			n = 0
+			for r in range(0,4):
+				for c in range(0,4):
+					obj = config.unitArray[itemCount]
+					fillColors = []
+					for i in polyPattern[n] :
+						fillColors.append(config.fillColorSet[i])
+					n+=1
+					obj.fillColors = fillColors
+					obj.setUp()
+					itemCount+=1
 

@@ -81,43 +81,10 @@ def restartPiece():
 		newSaturationRange = randomRange()
 		newValueRange = randomRange()
 
-		#print(newHueRange,newSaturationRange,newValueRange)
 
 		config.c3HueRange = newHueRange
 		config.c3SaturationRange = newSaturationRange
 		config.c2ValueRange = newValueRange
-
-
-
-
-	'''
-
-	newValueRange = randomRange()
-	newSaturationRange = randomRange()
-	newHueRange = randomRange(0,360,True)
-
-	# triangles: major outline squares and diamonds
-	# stars: BASE
-	config.c1HueRange = newHueRange
-	config.c1ValueRange = newValueRange
-
-	newHueRange = randomRange(0,360,True)
-	# triangles:  wings of the 8-point inner starts
-	# stars: SQUARE
-	if(config.quiltPattern == "stars"): 
-		config.c2SaturationRange = randomRange()
-		config.c2ValueRange = randomRange()
-		config.c2HueRange = randomRange(0,360,True)
-	else :
-		config.c2HueRange = newHueRange
-
-	# triangles:  the star center diamond
-	# stars: CENTER SQUARE
-	config.c3HueRange = newHueRange
-	if(config.quiltPattern == "stars"): 
-		newValueRange = randomRange()
-	config.c3ValueRange = newValueRange
-	'''
 
 
 
@@ -127,43 +94,44 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 
-
-	if(config.quiltPattern == "stars"):
-		config.blockSize = round(random.uniform(8,18))
-		if (config.blockSize >= 11) :
-			config.blockRows = 10
-			config.blockCols = 8
+	if random.random() < .5 :
+		if(config.quiltPattern == "stars"):
+			config.blockSize = round(random.uniform(8,18))
+			if (config.blockSize >= 11) :
+				config.blockRows = 10
+				config.blockCols = 8
+			else :
+				config.blockRows = 14
+				config.blockCols = 10
+			createstarpieces.createPieces(config, True)
 		else :
-			config.blockRows = 14
-			config.blockCols = 10
-		createstarpieces.createPieces(config)
-	else :
-		config.blockSize = round(random.uniform(10,28))
-		if (config.blockSize >= 16) :
-			config.blockRows = 7
-			config.blockCols = 5
-		else :
-			config.blockRows = 7
-			config.blockCols = 5
-
-		'''
-		'''
-		if random.random() < 1 :
+			config.blockSize = round(random.uniform(8,28))
+			if (config.blockSize >= 16) :
+				config.blockRows = 7
+				config.blockCols = 5
+			else :
+				config.blockRows = 7
+				config.blockCols = 5
 			createtrianglepieces.createPieces(config, True)
-		setInitialColors(True)
 
-	config.blockLength = config.blockSize
-	config.blockHeight = config.blockSize
+		config.blockLength = config.blockSize
+		config.blockHeight = config.blockSize
+		config.doingRefresh = 0
+		config.doingRefreshCount = 2000
 
-	config.rotation = random.uniform(-3,3)
+	if config.quiltPattern == "triangles":
+		createtrianglepieces.refreshPalette(config)
 
+	setInitialColors(True)
+
+	if random.random() < .5 :
+		config.rotation = random.uniform(-3,3)
 	
 
 
 def setInitialColors(refresh=False):
 	## Better initial color when piece is turned on
-	if refresh == True:
-		createtrianglepieces.refreshPalette(config)
+
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
 		for c in range(0,8) :
@@ -254,6 +222,9 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
+	config.doingRefresh = 2000
+	config.doingRefreshCount = 2000
+
 	setInitialColors()
 
 	if(run) : runWork()
@@ -276,8 +247,12 @@ def iterate() :
 
 		obj = config.unitArray[i]
 		obj.update()
-		if random.random() < .1 :
+		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
 			obj.render()
+			config.doingRefresh += 1
+		elif config.doingRefresh == config.doingRefreshCount :
+			obj.render()
+			
 
 	temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)

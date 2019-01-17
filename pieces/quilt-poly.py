@@ -27,7 +27,7 @@ def transformImage(img) :
 # mixed up results
 def randomRange(A=0, B=1, rounding=False):
 	a = random.uniform(A,B)
-	b = random.uniform(a,B)
+	b = random.uniform(A,B)
 	if rounding == False :
 		return (a,b)
 	else :
@@ -45,7 +45,8 @@ def restartPiece():
 	config.c1ValueRange = randomRange(.3,.5)
 	
 	# the light color on the 8 spokes / points
-	config.c2HueRange = randomRange(0,360,True)
+	# these ones should always have the maximum variability
+	config.c2HueRange = (0,360) #randomRange(0,360,True)
 	config.c2SaturationRange = randomRange(.4,1)
 	config.c2ValueRange = randomRange(.8,1)
 

@@ -57,7 +57,7 @@ def restartPiece():
 		config.c3ValueRange = randomRange()
 	
 	else :
-		newHueRange = randomRange(0,360,True)
+		newHueRange = (0,360) #randomRange(0,360,True)
 		newSaturationRange = randomRange(.2,1)
 		newValueRange = randomRange(.2,1)
 		

@@ -399,6 +399,7 @@ def main(run = True) :
 		# A couple overrides ...
 		shape.colOverlay.tLimitBase = config.colOverlaytLimitBase
 		shape.colOverlay.steps = config.colOverlaySteps
+		shape.colOverlay.colorTransitionSetupValues()
 
 		if i in config.triggers:
 			shape.colOverlay.setCallBackDoneMethod(colorTransitionDone)

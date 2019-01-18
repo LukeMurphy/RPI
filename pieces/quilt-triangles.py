@@ -94,29 +94,26 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 
-	if random.random() < .3 :
+	if random.random() < config.resetSizeProbability :
 		if(config.quiltPattern == "stars"):
-			config.blockSize = round(random.uniform(8,18))
-			config.blockSize = 8
-			
+			config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
 			if (config.blockSize >= 11) :
-				config.blockRows = 14
-				config.blockCols = 10
+				config.blockCols = config.blockColsMin
+				config.blockRows = config.blockRowsMin
 				createstarpieces.createPieces(config, True)
 			else :
-				config.blockRows = 14
-				config.blockCols = 10
+				config.blockCols = config.blockColsMax
+				config.blockRows = config.blockRowsMax
 				createstarpieces.createPieces(config, False)
 		else :
-			config.blockSize = round(random.uniform(8,28))
-			
+			config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
 			if (config.blockSize >= 16) :
-				config.blockCols = 5
-				config.blockRows = 7
+				config.blockCols = config.blockColsMin
+				config.blockRows = config.blockRowsMin
 				createtrianglepieces.createPieces(config, True)
 			else :
-				config.blockCols = 8
-				config.blockRows = 12
+				config.blockCols = config.blockColsMax
+				config.blockRows = config.blockRowsMax
 				createtrianglepieces.createPieces(config, False)
 
 		config.blockLength = config.blockSize
@@ -167,9 +164,20 @@ def main(run = True) :
 	config.outlineColorObj.randomRange = (5.0,30.0)
 
 	config.quiltPattern = (workConfig.get("quilt", 'pattern'))
+
+	# these control the timing of the individual color transitions - longer is slower
 	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
 	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
-	config.resetTrianglesProd = float(workConfig.get("quilt", 'resetTrianglesProd'))
+
+	# Some triangles will re-draw like a tick - on triangles quilt
+	config.resetTrianglesProb = float(workConfig.get("quilt", 'resetTrianglesProb'))
+
+	# The probability that at the beginning of a new quilt image the size of the
+	# elements will change
+	config.resetSizeProbability = float(workConfig.get("quilt", 'resetSizeProbability'))
+
+	# the time in seconds given before the quilt image resets to new parameters
+	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
 
 	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
 	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
@@ -178,21 +186,34 @@ def main(run = True) :
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
-
+	# the mins and maxes for the size of the units 
 	config.gapSize = int(workConfig.get("quilt", 'gapSize')) 
-	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
+	config.blockSizeMin = int(workConfig.get("quilt", 'blockSizeMin'))
+	config.blockSizeMax = int(workConfig.get("quilt", 'blockSizeMax'))
+	config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
 
-	config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
-	config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
+	config.blockRowsMin = int(workConfig.get("quilt", 'blockRowsMin')) 
+	config.blockRowsMax = int(workConfig.get("quilt", 'blockRowsMax')) 
+	config.blockColsMin = int(workConfig.get("quilt", 'blockColsMin')) 
+	config.blockColsMax = int(workConfig.get("quilt", 'blockColsMax')) 
+	config.blockCols = config.blockColsMax
+	config.blockRows = config.blockRowsMax
+
+	# can adjust the quilt image offset
 	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
 	config.cntrOffsetY = int(workConfig.get("quilt", 'cntrOffsetY')) 
+
+	# frame rate
 	config.delay = float(workConfig.get("quilt", 'delay'))
+	
+	# the probabilty that any triangle will pop to another color
 	config.colorPopProb = float(workConfig.get("quilt", 'colorPopProb'))
+
 	config.brightnessFactorDark = float(workConfig.get("quilt", 'brightnessFactorDark'))
 	config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
 	config.lines  = (workConfig.getboolean("quilt", 'lines'))
 	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
-	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
+	
 
 	config.activeSet = workConfig.get("quilt","activeSet")
 

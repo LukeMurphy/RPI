@@ -245,7 +245,7 @@ class Unit:
 		## Approximating timing so that any one triange changes once every 2 minutes or so
 		## e.g. .0005 prob checked every .01 seconds ~ .0005/ .01s = 5% chance per second ...
 		
-		if(random.random() > self.config.resetTrianglesProd) : self.setupTriangles()
+		if(random.random() > self.config.resetTrianglesProb) : self.setupTriangles()
 
 	
 	def drawUnit(self) :

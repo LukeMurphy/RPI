@@ -54,6 +54,8 @@ def createPieces(config, refresh = False) :
 
 	if refresh == False :
 		config.unitArray = []
+
+
 	outlineColorObj = coloroverlay.ColorOverlay()
 	outlineColorObj.randomRange = (5.0,30.0)
 
@@ -66,6 +68,15 @@ def createPieces(config, refresh = False) :
 
 	# Rows and columns of 9-squares
 	itemCount = 0
+
+	# This will be different for each quilt type and if the dimensions change
+	# doing this to conserve some CPU ....
+	config.unitArrayLimit = config.blockRows * config.blockCols * 16
+
+	if len(config.unitArray) > config.unitArrayLimit :
+		config.unitArray = config.unitArray[:config.unitArrayLimit]
+
+
 	for rows in range (0,config.blockRows) :
 
 		rowStart = rows * config.blockHeight * 4 + config.gapSize
@@ -84,45 +95,54 @@ def createPieces(config, refresh = False) :
 			n = 0
 			for r in range(0,4):
 				for c in range(0,4):
+					if itemCount < config.unitArrayLimit :
+						try :
+							if refresh == True :
+								obj = config.unitArray[itemCount]
+							else :
+								obj = Unit(config)
+							obj.xPos = cntr[0] + c * config.blockLength 
+							obj.yPos = cntr[1] + r * config.blockHeight
+							obj.blockLength = config.blockLength - sizeAdjustor
+							obj.blockHeight = config.blockHeight - sizeAdjustor
+							obj.outlineColorObj	= outlineColorObj
 
-					if refresh == True :
-						obj = config.unitArray[itemCount]
-					else :
-						obj = Unit(config)
-					obj.xPos = cntr[0] + c * config.blockLength 
-					obj.yPos = cntr[1] + r * config.blockHeight
-					obj.blockLength = config.blockLength - sizeAdjustor
-					obj.blockHeight = config.blockHeight - sizeAdjustor
-					obj.outlineColorObj	= outlineColorObj
+							for i in polyPattern[n] :
+								if refresh == True :
+									obj.fillColors[i] = config.fillColorSet[i]
+								else :
+									obj.fillColors.append(config.fillColorSet[i])
 
-					for i in polyPattern[n] :
-						if refresh == True :
-							obj.fillColors[i] = config.fillColorSet[i]
-						else :
-							obj.fillColors.append(config.fillColorSet[i])
+							obj.setUp()
 
-					obj.setUp()
+							if refresh == False : config.unitArray.append(obj)
+							n+=1
+							itemCount += 1
+						except Exception as e :
+							print(itemCount, len(config.unitArray), config.unitArrayLimit)
+							pass
 
-					if refresh == False : config.unitArray.append(obj)
-					n+=1
-					itemCount += 1
 
+
+	
 
 def refreshPalette(config):
 	itemCount = 0
+	config.unitArrayLimit = config.blockRows * config.blockCols * 16
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :
 			n = 0
 			for r in range(0,4):
 				for c in range(0,4):
-					obj = config.unitArray[itemCount]
-					fillColors = []
-					for i in polyPattern[n] :
-						fillColors.append(config.fillColorSet[i])
-					n+=1
-					obj.fillColors = fillColors
-					obj.setUp()
-					itemCount+=1
+					if itemCount < config.unitArrayLimit :
+						obj = config.unitArray[itemCount]
+						fillColors = []
+						for i in polyPattern[n] :
+							fillColors.append(config.fillColorSet[i])
+						n+=1
+						obj.fillColors = fillColors
+						obj.setUp()
+						itemCount+=1
 
 
 

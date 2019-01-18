@@ -77,7 +77,8 @@ def restartPiece():
 
 		# triangles:  the star center diamond
 		#newHueRange = randomRange(0,360,True)
-		newHueRange = randomRange(0,360,True)
+		if random.random() < .5 : 
+			newHueRange = randomRange(0,360,True)
 		newSaturationRange = randomRange()
 		newValueRange = randomRange()
 
@@ -96,26 +97,27 @@ def restartPiece():
 	if random.random() < .3 :
 		if(config.quiltPattern == "stars"):
 			config.blockSize = round(random.uniform(8,18))
-			'''
+			config.blockSize = 8
+			
 			if (config.blockSize >= 11) :
 				config.blockRows = 14
 				config.blockCols = 10
+				createstarpieces.createPieces(config, True)
 			else :
 				config.blockRows = 14
 				config.blockCols = 10
-			'''
-			createstarpieces.createPieces(config, True)
+				createstarpieces.createPieces(config, False)
 		else :
 			config.blockSize = round(random.uniform(8,28))
-			'''
+			
 			if (config.blockSize >= 16) :
-				config.blockRows = 7
 				config.blockCols = 5
+				config.blockRows = 7
+				createtrianglepieces.createPieces(config, True)
 			else :
-				config.blockRows = 7
-				config.blockCols = 5
-			'''
-			createtrianglepieces.createPieces(config, True)
+				config.blockCols = 8
+				config.blockRows = 12
+				createtrianglepieces.createPieces(config, False)
 
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
@@ -131,7 +133,7 @@ def restartPiece():
 	
 
 	if random.random() < .5 :
-		config.rotation = random.uniform(-3,3)
+		config.rotation = random.uniform(-1.5,2)
 	
 
 

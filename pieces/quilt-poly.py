@@ -54,6 +54,24 @@ def restartPiece():
 	config.c3HueRange = randomRange(0,360,True)
 	config.c3SaturationRange = randomRange()
 	config.c3ValueRange = randomRange()
+	if random.random() < .25 :
+		choice = round(random.uniform(1,3))
+		print ("Choice {0}".format(choice))
+		if choice == 1 :
+			# ruby pink bgs
+			config.c3HueRange = (350,40)
+			config.c3SaturationRange = (.5,1)
+			config.c3ValueRange = (.4,1)
+		elif choice == 2 :
+			# blue bg
+			config.c3HueRange = (220,260)
+			config.c3SaturationRange = (.9,1)
+			config.c3ValueRange = (.3,.95)
+		else :
+			# saturated 
+			config.c3HueRange = (0,360)
+			config.c3SaturationRange = (.6,1)
+			config.c3ValueRange = (.9,1)
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))

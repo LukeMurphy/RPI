@@ -55,7 +55,26 @@ def restartPiece():
 		# stars: CENTER SQUARE
 		config.c3HueRange = newHueRange
 		config.c3ValueRange = randomRange()
-	
+		if random.random() < .25 :
+			choice = round(random.uniform(1,3))
+			print ("Choice {0}".format(choice))
+			if choice == 1 :
+				# yellow centers
+				config.c3HueRange = (30,60)
+				config.c3SaturationRange = (.6,1)
+				config.c3ValueRange = (.4,1)
+			elif choice == 2 :
+				# red centers
+				config.c3HueRange = (0,30)
+				config.c3SaturationRange = (.6,1)
+				config.c3ValueRange = (.4,1)
+			else :
+				# yellow centers
+				config.c3HueRange = (0,360)
+				config.c3SaturationRange = (.6,1)
+				config.c3ValueRange = (.4,1)
+
+
 	else :
 		newHueRange = (0,360) #randomRange(0,360,True)
 		newSaturationRange = randomRange(.2,1)

@@ -279,13 +279,15 @@ def iterate() :
 
 def colorTransitionDone(arg=None):
 	#print("colorTransition   Done ")
-	config.useFilters = False
-	config.usePixelSort = True
+	if config.useTransitionCallbacks == True :
+		config.useFilters = False
+		config.usePixelSort = True
 
 def colorTransitionStarted(arg=None):
 	#print("colorTransition   Started ")
-	config.useFilters = True
-	config.usePixelSort = False
+	if config.useTransitionCallbacks == True :
+		config.useFilters = True
+		config.usePixelSort = False
 
 
 def main(run = True) :
@@ -315,6 +317,13 @@ def main(run = True) :
 	config.colOverlaySteps = int(workConfig.get("collageShapes", 'colOverlaySteps'))
 
 	config.useBadPixels = False;
+
+
+	try:
+		config.useTransitionCallbacks = workConfig.getboolean("collageShapes", 'useTransitionCallbacks')
+	except Exception as e :
+		print(e)
+		config.useTransitionCallbacks = False
 
 	try:
 		config.useTweenTriggers = workConfig.getboolean("collageShapes", 'useTweenTriggers')
@@ -365,7 +374,7 @@ def main(run = True) :
 		shape.varX  = float(workConfig.get(shapeDetails, 'varX'))
 		shape.varY  = float(workConfig.get(shapeDetails, 'varY'))
 
-		shapePosition = list(map(lambda x: int(x), workConfig.get(shapeDetails, 'postion').split(",")))
+		shapePosition = list(map(lambda x: int(x), workConfig.get(shapeDetails, 'position').split(",")))
 		shape.shapeXPosition = shapePosition[0]
 		shape.shapeYPosition = shapePosition[1]
 		shape.name = "S_"+str(i)

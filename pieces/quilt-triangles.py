@@ -57,7 +57,7 @@ def restartPiece():
 		config.c3ValueRange = randomRange()
 		if random.random() < .25 :
 			choice = round(random.uniform(1,3))
-			print ("Choice {0}".format(choice))
+			#print ("Choice {0}".format(choice))
 			if choice == 1 :
 				# yellow centers
 				config.c3HueRange = (30,60)

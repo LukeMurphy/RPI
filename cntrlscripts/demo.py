@@ -28,6 +28,9 @@ actionDict = [
 	
 
 	{"---------------" :''},
+	{"Angle Quilt Small" :'p4-1x4-cube/l-quilt.cfg'},
+	
+	{"---------------" :''},
 	{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
 	{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
 	{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},

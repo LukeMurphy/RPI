@@ -128,6 +128,7 @@ class Unit:
 		#		
 		'''
 
+		## This sets up the position of the active points in the grid
 		self.sqrPoints = {}
 		letters = "abcdefghimnopqrstuyz~"
 		n = 0

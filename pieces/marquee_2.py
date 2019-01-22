@@ -75,10 +75,10 @@ class Marquee :
 		for p in (perim ):
 			if(pattern[count] == 1) :
 				self.configDraw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 
-					outline=None, fill=tuple(int(c) for c in self.colOverlayA.currentColor))
+					outline=None, fill=tuple(round(c) for c in self.colOverlayA.currentColor))
 			else:
 				self.configDraw.rectangle((p[0],p[1],p[0] + p[2], p[1] + p[3]), 
-					outline=None, fill=tuple(int(c) for c in self.colOverlayB.currentColor))
+					outline=None, fill=tuple(round(c) for c in self.colOverlayB.currentColor))
 			count += 1
 			if(count >= len(pattern)) :
 				count = 0
@@ -186,7 +186,7 @@ def init() :
 def redraw():
 	global config
 
-	bgColor = tuple(int(c) for c in config.bgColor.currentColor)
+	bgColor = tuple(round(c) for c in config.bgColor.currentColor)
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=bgColor)
 	config.bgColor.stepTransition()
 

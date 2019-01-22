@@ -2,16 +2,13 @@ from modules import colorutils, coloroverlay
 from modules.quilting.polysquaresunit import Unit
 
 	# the pattern array chooses which color each triangle is meant to be
-	# each star unit is comprised of 4 rows and 4 columns of sqaures that 
-	# are each divided into  smaller triangles
-	# the rows are different lengths becasue of how I divided up each "row"
-	# e.g. the last row is just the left box/square, the middle tqo triangles
-	# and the lower right square/box
-
-	## In this, the 3rd group of color settings (index = 2) is the negative or
-	## background color
 polyPattern =  [
-	[1,1,2,0,1,0,2,1,1]
+	[0,1,2,0],
+	[0,2,1,0],
+	[2,1],
+	[2,0,0,1],
+	[1,0,0,2],
+	[1,2],
 	]
 
 def createPieces(config, refresh = False) :
@@ -38,7 +35,7 @@ def createPieces(config, refresh = False) :
 
 		for cols in range (0,config.blockCols) :
 
-			columnStart = cols * config.blockLength * 3 + config.gapSize
+			columnStart = cols * config.blockLength * 2 + config.gapSize
 			cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 			cntr = [columnStart, rowStart]
 
@@ -52,11 +49,12 @@ def createPieces(config, refresh = False) :
 			else :
 				obj = Unit(config)
 				obj.fillColors = []
-			obj.xPos = cntr[0] + cols * config.blockLength 
-			obj.yPos = cntr[1] + rows * config.blockHeight
+			obj.xPos = cntr[0] #+ cols * config.blockLength 
+			obj.yPos = cntr[1] + rows * 3*config.blockHeight
 			obj.blockLength = config.blockLength - sizeAdjustor
 			obj.blockHeight = config.blockHeight - sizeAdjustor
 			obj.outlineColorObj	= outlineColorObj
+			obj.lines = config.lines
 
 			for n in range(0,len(polyPattern)):
 				for i in polyPattern[n] :
@@ -77,6 +75,7 @@ def refreshPalette(config):
 				for i in polyPattern[n] :
 					obj.fillColors.append(config.fillColorSet[i])
 				#obj.fillColors = fillColors
+			obj.lines = config.lines
 			obj.setUp()
 			itemCount+=1
 

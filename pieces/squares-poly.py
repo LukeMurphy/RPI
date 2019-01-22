@@ -38,39 +38,25 @@ def restartPiece():
 	config.t2  = time.time()
 
 
-	## The "dark" color to the spokes
-	config.c1HueRange = randomRange(0,360,True)
-	config.c2SaturationRange = randomRange(.4,.95)
-	config.c1ValueRange = randomRange(.3,.5)
+	## The top / base diamond / square
+	c1Range = round(random.uniform(0,320))
+	config.c1HueRange = (c1Range,c1Range+40) 
+	config.c1SaturationRange = randomRange(.4,.95)
 	
-	# the light color on the 8 spokes / points
-	# these ones should always have the maximum variability
-	config.c2HueRange = (0,360) #randomRange(0,360,True)
+	vRange = (random.uniform(.2,.9))
+	config.c1ValueRange = randomRange(vRange,vRange + 0.1)
+	
+	# the "Shaded" side
+	c2Range = round(random.uniform(0,340))
+	config.c2HueRange = (c2Range,c2Range+20) 
 	config.c2SaturationRange = randomRange(.4,1)
-	config.c2ValueRange = randomRange(.8,1)
+	config.c2ValueRange = randomRange(.1,.5)
 
-	## The background -- ie the squares etc
-	config.c3HueRange = randomRange(0,360,True)
-	config.c3SaturationRange = randomRange()
-	config.c3ValueRange = randomRange()
-	if random.random() < .25 :
-		choice = round(random.uniform(1,3))
-		print ("Choice {0}".format(choice))
-		if choice == 1 :
-			# ruby pink bgs
-			config.c3HueRange = (350,40)
-			config.c3SaturationRange = (.5,1)
-			config.c3ValueRange = (.4,1)
-		elif choice == 2 :
-			# blue bg
-			config.c3HueRange = (220,260)
-			config.c3SaturationRange = (.9,1)
-			config.c3ValueRange = (.3,.95)
-		else :
-			# saturated 
-			config.c3HueRange = (0,360)
-			config.c3SaturationRange = (.6,1)
-			config.c3ValueRange = (.9,1)
+	## The "bright side"
+	config.c3HueRange = config.c2HueRange
+	config.c3SaturationRange = randomRange(.4,.999)
+	config.c3ValueRange = randomRange(.5,1)
+
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
@@ -82,6 +68,11 @@ def restartPiece():
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
 		
+	if random.random() < config.resetSizeProbability/8  :
+		config.lines = True
+	else :
+		config.lines = False
+
 	if random.random() < config.resetSizeProbability  :
 		config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
 		

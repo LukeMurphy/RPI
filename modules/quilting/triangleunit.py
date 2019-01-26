@@ -34,6 +34,8 @@ class Unit:
 	fillColors = []
 	triangles = []
 
+	triangleUnits = 7
+
 
 	
 	def __init__(self, config):
@@ -142,11 +144,11 @@ class Unit:
 		self.triangles[6][0] = ((self.sqrPoints[7],self.sqrPoints[4],self.sqrPoints[8]))
 		# This last triange turns out to be a dup because the 4th triangle actually spans
 		# two rows
-		#self.triangles[7][0] = ((self.sqrPoints[8],self.sqrPoints[4],self.sqrPoints[5]))
+		self.triangles[7][0] = ((self.sqrPoints[8],self.sqrPoints[4],self.sqrPoints[5]))
 
 
 	def update(self):
-		for i in range(0,7) :
+		for i in range(0,self.triangleUnits) :
 			if(random.random() > self.config.colorPopProb) :
 				self.triangles[i][1].stepTransition()
 				self.triangles[i][2] = tuple(round (a * self.brightness ) for a in self.triangles[i][1].currentColor)
@@ -162,7 +164,7 @@ class Unit:
 
 		#outline = (0,0,0,255)
 		
-		for i in range (0,7) :
+		for i in range (0,self.triangleUnits) :
 			coords = self.triangles[i][0]
 			fillColor = self.triangles[i][2]
 			fillColorList = (list(round (a * self.config.brightness ) for a in fillColor))

@@ -60,18 +60,14 @@ class Fludd :
 		self.config = config
 
 
-	def setUp(self):
-		self.tempImage = Image.new("RGBA", (self.boxMax, self.boxHeight))
-		self.draw  = ImageDraw.Draw(self.tempImage)
-		#### Sets up color transitions
+	def done1(self) : 
+
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
 		self.colOverlay.timeTrigger = True 
-		self.colOverlay.tLimitBase = 25
-		self.colOverlay.steps = 20
+		self.colOverlay.tLimitBase = self.config.tLimitBase
+		self.colOverlay.steps = 10
 		
-		self.colOverlay.maxBrightness = self.config.brightness
-		self.colOverlay.maxBrightness = self.config.brightness
 
 		self.colOverlay.minHue = 0
 		self.colOverlay.maxHue = 360
@@ -80,24 +76,18 @@ class Fludd :
 		self.colOverlay.minValue = .1
 		self.colOverlay.maxValue = 1
 
-		### This is the speed range of transitions in color
-		### Higher numbers means more possible steps so slower
-		### transitions - 1,10 very blinky, 10,200 very slow
-		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
-		self.fillColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay.currentColor)
+		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.fillColor = tuple(round (a * self.config.brightness ) for a in self.colOverlay.currentColor)
 
 
-
+	def done2(self):
 		## Used for the center if fixedColorCenter is not chosen ....
-
 		self.colOverlay2 = coloroverlay.ColorOverlay()
 		self.colOverlay2.randomSteps = True
 		self.colOverlay2.timeTrigger = True 
-		self.colOverlay2.tLimitBase = 25
-		self.colOverlay2.steps = 20
-		
-		self.colOverlay2.maxBrightness = self.config.brightness
-		self.colOverlay2.maxBrightness = self.config.brightness
+		self.colOverlay2.tLimitBase = self.config.tLimitBase
+		self.colOverlay2.steps = 10
+
 
 		self.colOverlay2.minHue = 0
 		self.colOverlay2.maxHue = 360
@@ -109,7 +99,82 @@ class Fludd :
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
-		self.colOverlay2.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
+		self.colOverlay2.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)		
+
+	def setUp(self):
+
+
+		self.tempImage = Image.new("RGBA", (self.boxMax, self.boxHeight))
+		self.draw  = ImageDraw.Draw(self.tempImage)
+		#### Sets up color transitions
+
+
+		'''
+			colOverlay.randomSteps = True
+			colOverlay.timeTrigger = True 
+			colOverlay.tLimitBase = 2
+			colOverlay.steps = 10
+					
+			colOverlay.maxBrightness = self.config.brightness
+			colOverlay.maxBrightness = self.fillColors[i].valueRange[0]
+
+			colOverlay.minHue = self.fillColors[i].hueRange[0]
+			colOverlay.maxHue = self.fillColors[i].hueRange[1]				
+			colOverlay.minSaturation = self.fillColors[i].saturationRange[0]
+			colOverlay.maxSaturation = self.fillColors[i].saturationRange[1]
+			colOverlay.minValue = self.fillColors[i].valueRange[0]
+			colOverlay.maxValue = self.fillColors[i].valueRange[1]
+
+
+			### This is the speed range of transitions in color
+			### Higher numbers means more possible steps so slower
+			### transitions - 1,10 very blinky, 10,200 very slow
+			colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
+		'''
+
+
+		self.colOverlay = coloroverlay.ColorOverlay(True)
+		self.colOverlay.randomSteps = True
+		self.colOverlay.timeTrigger = True 
+		self.colOverlay.tLimitBase = self.config.tLimitBase
+		self.colOverlay.steps = 10
+		
+
+		self.colOverlay.minHue = 0
+		self.colOverlay.maxHue = 360
+		self.colOverlay.minSaturation = .1
+		self.colOverlay.maxSaturation = 1
+		self.colOverlay.minValue = .1
+		self.colOverlay.maxValue = 1
+		#self.colOverlay.callBackDoneMethod = self.done
+
+		### This is the speed range of transitions in color
+		### Higher numbers means more possible steps so slower
+		### transitions - 1,10 very blinky, 10,200 very slow
+		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.fillColor = tuple(round (a * self.config.brightness ) for a in self.colOverlay.currentColor)
+
+
+		## Used for the center if fixedColorCenter is not chosen ....
+		self.colOverlay2 = coloroverlay.ColorOverlay(True)
+		self.colOverlay2.randomSteps = True
+		self.colOverlay2.timeTrigger = True 
+		self.colOverlay2.tLimitBase = self.config.tLimitBase
+		self.colOverlay2.steps = 10
+
+
+		self.colOverlay2.minHue = 0
+		self.colOverlay2.maxHue = 360
+		self.colOverlay2.minSaturation = .1
+		self.colOverlay2.maxSaturation = 1
+		self.colOverlay2.minValue = .1
+		self.colOverlay2.maxValue = 1
+		#self.colOverlay2.callBackDoneMethod = self.done2
+
+		### This is the speed range of transitions in color
+		### Higher numbers means more possible steps so slower
+		### transitions - 1,10 very blinky, 10,200 very slow
+		self.colOverlay2.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
 
 		self.widthDelta = 0
 		self.heightDelta = 0
@@ -120,7 +185,7 @@ class Fludd :
 		if self.usedFixedCenterColor == True:
 			self.centerColor = self.fixedCenterColor
 		else:
-			self.centerColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+			self.centerColor = tuple(round (a * self.config.brightness ) for a in self.colOverlay2.currentColor)
 
 
 
@@ -175,15 +240,20 @@ class Fludd :
 
 
 	def transition(self):
-		self.fillColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay.currentColor)
-		self.draw.rectangle((0,0, self.boxMax, self.boxHeight), fill = self.fillColor, outline = None)
-		self.draw.rectangle((round(self.xPos1), round(self.yPos1), round(self.symBoxWidth), round(self.symBoxHeight)), fill = self.centerColor , outline = None)
-		self.colOverlay.stepTransition()
-		if self.usedFixedCenterColor == False :
-			self.colOverlay2.stepTransition()
-			self.centerColor = tuple(int (a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+		self.fillColor = tuple(round(a * self.config.brightness ) for a in self.colOverlay.currentColor)
 
-		self.transitionBox()
+		try:
+			#self.fillColor = (100,50,50)
+			self.draw.rectangle((0,0, self.boxMax, self.boxHeight), fill = self.fillColor, outline = None)
+			self.draw.rectangle((round(self.xPos1), round(self.yPos1), round(self.symBoxWidth), round(self.symBoxHeight)), fill = self.centerColor , outline = None)
+			self.colOverlay.stepTransition()
+
+			if self.usedFixedCenterColor == False :
+				self.colOverlay2.stepTransition()
+				self.centerColor = tuple(round(a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+			self.transitionBox()
+		except Exception as e:
+			print(e, self.fillColor)
 
 
 	def reDraw(self) :
@@ -192,12 +262,12 @@ class Fludd :
 
 		gray = 126
 		brightness = self.config.brightness * random.random()
-		light = int(brightness*self.nothingLevel)
+		light = round(brightness*self.nothingLevel)
 
 		if self.nothing == "void" :
 			gray = 0
 		else :
-			gray = int(self.config.brightness * random.random()*self.nothingLevel/2)
+			gray = round(self.config.brightness * random.random()*self.nothingLevel/2)
 			light = 0
 
 
@@ -360,6 +430,7 @@ def main(run = True) :
 
 	config.boxWidth = int(round(config.canvasWidth / config.colsOfSquares))
 	config.boxHeight = int(round(config.canvasHeight / config.rowsOfSquares))
+	config.tLimitBase = int(workConfig.get("fludd", 'tLimitBase'))
 	config.transitionStepsMin = int(workConfig.get("fludd", 'transitionStepsMin'))
 	config.transitionStepsMax = int(workConfig.get("fludd", 'transitionStepsMax'))
 	config.changeBoxProb = float(workConfig.get("fludd", 'changeBoxProb'))

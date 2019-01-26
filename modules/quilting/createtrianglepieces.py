@@ -1,7 +1,7 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.triangleunit import Unit
 
-polyPattern = [
+polyPattern_ = [
 [0,0,0,1, 0,0,0,1],
 [1,1,1,1,1,1,1,1],
 [1,1,1,1,1,1,1,1],
@@ -29,7 +29,7 @@ polyPattern = [
 # each star unit is comprised of 4 rows and 4 columns of sqaures that 
 # are each divided into 4 smaller triangles
 
-polyPattern_ = [
+polyPattern = [
 [0,0,0,0,0,0,0,0],
 [1,0,0,0,1,1,1,0],
 [0,0,0,1,0,1,1,1],

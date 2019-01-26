@@ -80,7 +80,7 @@ def randomColorAlpha(brtns=1, maxTransparency = 255) :
 	r = int((random.uniform(0,255)) * brtns)
 	g = int((random.uniform(0,255)) * brtns)
 	b = int((random.uniform(0,255)) * brtns)
-	a = int(random.uniform(0,maxTransparency))
+	a = int(random.uniform(0, maxTransparency))
 	return (r,g,b,a) 
 
 ### Yup, same function that should have been called this
@@ -183,7 +183,7 @@ def HSVToRGB(h,s,v,a=255) :
 	rgb  = [r1 + m, g1 + m, b1 + m, a]
 
 	rgbCol = tuple(abs(round(i * 255)) for i in rgb)
-	return rgbCol
+	return (rgbCol[0], rgbCol[1], rgbCol[2], a)
 
 def HSLToRGB(h,s,l,a=255) :
 	c = s * (1- abs(2*l -1))

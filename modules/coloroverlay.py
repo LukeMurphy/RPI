@@ -57,6 +57,8 @@ class ColorOverlay:
 			self.currentColorRaw  = list(colorutils.randomColorAlpha(.5,255))
 			self.colorA = self.colorB = list(colorutils.randomColorAlpha(.5,0))
 
+			#print(self.currentColorRaw)
+
 	
 	def checkTime(self):
 		t = time.time()
@@ -68,8 +70,8 @@ class ColorOverlay:
 			hMin=self.minHue, hMax=self.maxHue, 
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue,
-			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax, a=0)
-		print("New Color A", self.colorA)
+			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax)
+		#print("New Color A", self.colorA)
 
 
 	
@@ -91,10 +93,10 @@ class ColorOverlay:
 			hMin=self.minHue, hMax=self.maxHue, 
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue,
-			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax, a=255)
+			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax)
 
-		#print("New Color B", self.colorB)
 		'''
+		print("New Color B", self.colorB,  self.colorA)
 		print("New Color B", self.minHue, self.maxHue, 
 			self.minSaturation, self.maxSaturation,
 			self.minValue, self.maxValue)
@@ -153,6 +155,15 @@ class ColorOverlay:
 		if abs(self.rateOfColorChange[1]) < rounding : self.rateOfColorChange[1] = 0
 		if abs(self.rateOfColorChange[2]) < rounding : self.rateOfColorChange[2] = 0
 		if abs(self.rateOfColorChange[3]) < rounding : self.rateOfColorChange[3] = 0
+
+		###===========> NEED TO FIX THIS - stopping any alpha transition because
+		###===========> NEED TO FIX THIS - stopping any alpha transition because
+		###===========> NEED TO FIX THIS - stopping any alpha transition because
+		###===========> NEED TO FIX THIS - stopping any alpha transition because
+		###===========> NEED TO FIX THIS - stopping any alpha transition because
+		###===========> NEED TO FIX THIS - stopping any alpha transition because
+		## was throwing errors
+		self.rateOfColorChange[3] = 0
 
 		self.lowerRange = list(map(lambda x,y: round(x - abs(y))-.5, self.colorB, self.rateOfColorChange))
 		self.upperRange = list(map(lambda x,y: round(x + abs(y))+.5, self.colorB, self.rateOfColorChange))

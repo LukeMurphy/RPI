@@ -117,6 +117,7 @@ def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1
 	#print(hMin,hMax,degreeRange, h)
 	s = random.uniform(sMin, sMax)
 	v = random.uniform(vMin, vMax)
+	#print(vMin, vMax, v)
 	rgb  = HSVToRGB(h,s,v) 
 	return (rgb[0],rgb[1],rgb[2],a)
 

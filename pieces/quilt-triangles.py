@@ -38,75 +38,92 @@ def restartPiece():
 	config.t2  = time.time()
 
 
-	if(config.quiltPattern == "stars"): 
-		newHueRange = randomRange(0,360,True)
-		newSaturationRange = randomRange()
-		newValueRange = randomRange()
+	if config.usePresets == True :
 
-		# stars: BASE
-		config.c1HueRange = newHueRange
-		config.c1ValueRange = newValueRange
-
-		# stars: SQUARE
-		config.c2SaturationRange = randomRange()
-		config.c2ValueRange = randomRange()
-		config.c2HueRange = randomRange(0,360,True)
-		
-		# stars: CENTER SQUARE
-		config.c3HueRange = newHueRange
-		config.c3ValueRange = randomRange()
-		if random.random() < .25 :
-			choice = round(random.uniform(1,3))
-			#print ("Choice {0}".format(choice))
-			if choice == 1 :
-				# yellow centers
-				config.c3HueRange = (30,60)
-				config.c3SaturationRange = (.6,1)
-				config.c3ValueRange = (.4,1)
-			elif choice == 2 :
-				# red centers
-				config.c3HueRange = (0,30)
-				config.c3SaturationRange = (.6,1)
-				config.c3ValueRange = (.4,1)
-			else :
-				# yellow centers
-				config.c3HueRange = (0,360)
-				config.c3SaturationRange = (.6,1)
-				config.c3ValueRange = (.4,1)
-
-
-	else :
-		newHueRange = (0,360) #randomRange(0,360,True)
-		newSaturationRange = randomRange(.2,1)
-		newValueRange = randomRange(.2,1)
-		
-		# triangles: major outline squares and diamonds
-		config.c1HueRange = newHueRange
-		config.c1SaturationRange = newSaturationRange
-		config.c1ValueRange = newValueRange
-
-		# triangles:  wings of the 8-point inner starts
-		newHueRange = randomRange(0,360,True)
-		newSaturationRange = randomRange()
-		newValueRange = randomRange()
-		
-		config.c2HueRange = newHueRange
-		config.c2SaturationRange = newSaturationRange
-		config.c2ValueRange = newValueRange
-
-		# triangles:  the star center diamond
-		#newHueRange = randomRange(0,360,True)
-		if random.random() < .5 : 
+		if(config.quiltPattern == "stars"): 
 			newHueRange = randomRange(0,360,True)
-		newSaturationRange = randomRange()
-		newValueRange = randomRange()
+			newSaturationRange = randomRange()
+			newValueRange = randomRange()
 
-		config.c3HueRange = newHueRange
-		config.c3SaturationRange = newSaturationRange
-		config.c2ValueRange = newValueRange
+			# stars: BASE
+			config.c1HueRange = newHueRange
+			config.c1ValueRange = newValueRange
+
+			# stars: SQUARE
+			config.c2SaturationRange = randomRange()
+			config.c2ValueRange = randomRange()
+			config.c2HueRange = randomRange(0,360,True)
+			
+			# stars: CENTER SQUARE
+			config.c3HueRange = newHueRange
+			config.c3ValueRange = randomRange()
+			if random.random() < .25 :
+				choice = round(random.uniform(1,3))
+				#print ("Choice {0}".format(choice))
+				if choice == 1 :
+					# yellow centers
+					config.c3HueRange = (30,60)
+					config.c3SaturationRange = (.6,1)
+					config.c3ValueRange = (.4,1)
+				elif choice == 2 :
+					# red centers
+					config.c3HueRange = (0,30)
+					config.c3SaturationRange = (.6,1)
+					config.c3ValueRange = (.4,1)
+				else :
+					# yellow centers
+					config.c3HueRange = (0,360)
+					config.c3SaturationRange = (.6,1)
+					config.c3ValueRange = (.4,1)
 
 
+		else :
+			newHueRange = (0,360) #randomRange(0,360,True)
+			newSaturationRange = randomRange(.2,1)
+			newValueRange = randomRange(.2,1)
+			
+			# triangles: major outline squares and diamonds
+			config.c1HueRange = newHueRange
+			config.c1SaturationRange = newSaturationRange
+			config.c1ValueRange = newValueRange
 
+			# triangles:  wings of the 8-point inner starts
+			newHueRange = randomRange(0,360,True)
+			newSaturationRange = randomRange()
+			newValueRange = randomRange()
+			
+			config.c2HueRange = newHueRange
+			config.c2SaturationRange = newSaturationRange
+			config.c2ValueRange = newValueRange
+
+			# triangles:  the star center diamond
+			#newHueRange = randomRange(0,360,True)
+			if random.random() < .5 : 
+				newHueRange = randomRange(0,360,True)
+			newSaturationRange = randomRange()
+			newValueRange = randomRange()
+
+			config.c3HueRange = newHueRange
+			config.c3SaturationRange = newSaturationRange
+			config.c2ValueRange = newValueRange
+	else :
+		# major outline squares and diamonds
+		'''
+		config.c1ValueRange = (.3,1.5)
+		config.c2ValueRange = (.3,1.5)
+		config.c3ValueRange = (.3,1.5)
+		config.c1HueRange = (0,360)
+		config.c1SaturationRange = (.53,1.81)
+		# wings of the 8-point inner starts
+		config.c2HueRange = (0,360)
+		config.c2SaturationRange = (.53,1.81)
+		# the star center diamond
+		config.c3HueRange = (0,360)
+		config.c3SaturationRange = (.53,1.81)
+		'''
+
+
+	#print(config.c1ValueRange, config.c2ValueRange, config.c3ValueRange)
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
@@ -138,7 +155,7 @@ def restartPiece():
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
 		config.doingRefresh = 0
-		config.doingRefreshCount = 2000
+		config.doingRefreshCount = round(random.uniform(50,1500))
 
 	
 	if config.quiltPattern == "stars":
@@ -198,9 +215,28 @@ def main(run = True) :
 	# the time in seconds given before the quilt image resets to new parameters
 	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
 
-	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
-	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
-	config.transformTuples = tuple([float(i) for i in transformTuples])
+
+	try:
+		config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
+		transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
+		config.transformTuples = tuple([float(i) for i in transformTuples])
+
+		'''
+		e.g.
+		#transformTuples_ = .9, 0, 0, -0.05,  .6, 0, -0.001, 0
+		#transformTuples__ = 1.2, .5, 0, 0.081,  1, 0, 0.0009, 0.0
+
+		#transformTuples = 1.2, .5, 0, 0.071,  1, 0, 0.0005, 0.0
+		## No transform
+		transformTuples = 1, .5, 0, 0.0,  1, 0, 0.0, 0.0
+
+		#transformTuples = 1, 0, 0, 0.0,  1, 0, 0, 0.0
+		#transformTuples = 0, 0, 0, 0,  0, 0, 0, 0.0
+		'''
+
+	except Exception as e:
+		print(e)
+		config.transformShape = False
 
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
@@ -267,6 +303,12 @@ def main(run = True) :
 		createtrianglepieces.createPieces(config)
 	elif config.quiltPattern == "stars" :
 		createstarpieces.createPieces(config)
+
+	try:
+		config.usePresets  = (workConfig.getboolean("quilt", 'usePresets'))
+	except Exception as e:
+		print(e)
+		config.usePresets = True
 
 	setInitialColors()
 	

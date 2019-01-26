@@ -69,7 +69,8 @@ class ColorOverlay:
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue,
 			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax, a=0)
-		#print("New Color A", self.colorA)
+		print("New Color A", self.colorA)
+
 
 	
 	def getNewColor(self):
@@ -79,9 +80,11 @@ class ColorOverlay:
 
 		## LEGACY --- If the maxbrightness is being set to something other than the default
 		## set the maxValue to the maxBrightness 
+		'''
 		if(self.maxBrightness != 1 ) :
 			self.maxValue = self.maxBrightness
-
+		'''
+		
 		#print(self.minHue,self.maxHue,self.minValue,self.maxValue,self.minSaturation,self.maxSaturation)
 
 		self.colorB = colorutils.getRandomColorHSV(

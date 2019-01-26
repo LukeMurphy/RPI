@@ -1,23 +1,27 @@
 from modules import colorutils, coloroverlay
 from modules.quilting.triangleunit import Unit
 
-polyPattern_ = [
-[0,0,0,0,0,0,0,0],
-[1,0,0,0,1,1,1,0],
-[0,0,0,1,0,1,1,1],
-[0,0,0,0,0,0,0,0],
-[0,1,1,1,0,0,0,1],
+polyPattern = [
+[0,0,0,1, 0,0,0,1],
 [1,1,1,1,1,1,1,1],
 [1,1,1,1,1,1,1,1],
-[1,1,1,0,1,0,0,0],
-[0,0,0,1,0,1,1,1],
+[1,1,1,1,1,1,1,1],
+
 [1,1,1,1,1,1,1,1],
 [1,1,1,1,1,1,1,1],
-[1,0,0,0,1,1,1,0],
-[0,0,0,0,0,0,0,0],
-[1,1,1,0,1,0,0,0],
-[0,1,1,1,0,0,0,1],
-[0,0,0,0,0,0,0,0]
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1],
+
 ]
 
 
@@ -25,7 +29,7 @@ polyPattern_ = [
 # each star unit is comprised of 4 rows and 4 columns of sqaures that 
 # are each divided into 4 smaller triangles
 
-polyPattern = [
+polyPattern_ = [
 [0,0,0,0,0,0,0,0],
 [1,0,0,0,1,1,1,0],
 [0,0,0,1,0,1,1,1],
@@ -113,6 +117,7 @@ def createPieces(config, refresh = False) :
 								else :
 									obj.fillColors.append(config.fillColorSet[i])
 
+							obj.outlineColorObj.currentColor = [0,0,0,255]
 							obj.setUp()
 
 							if refresh == False : config.unitArray.append(obj)
@@ -139,8 +144,10 @@ def refreshPalette(config):
 						fillColors = []
 						for i in polyPattern[n] :
 							fillColors.append(config.fillColorSet[i])
+							#print(config.fillColorSet[i].valueRange)
 						n+=1
 						obj.fillColors = fillColors
+						obj.outlineColorObj.currentColor = [0,0,0,255]
 						obj.setUp()
 						itemCount+=1
 

@@ -12,11 +12,10 @@ actionDict = [
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-star.cfg'}, 
-	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	#{"------------------------------" :''},
 	{" " :''},
+	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
-	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	{"Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
 	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
@@ -24,6 +23,7 @@ actionDict = [
 	{" " :''},
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
 	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 
 
 	#{"------------------------------" :''},
@@ -48,6 +48,7 @@ actionDict = [
 
 	{"------------------------------" :''},
 	{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
+	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
 
 
 	
@@ -93,7 +94,7 @@ def stopAll():
 root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
-root.geometry('%dx%d+%d+%d' % (300, 640, 1400, 100))
+root.geometry('%dx%d+%d+%d' % (300, 640, 1600, 100))
 
 Lb = Listbox(frame, width = 40, height = 35) 
 

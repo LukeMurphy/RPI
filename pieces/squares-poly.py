@@ -39,21 +39,21 @@ def restartPiece():
 
 
 	## The top / base diamond / square
-	c1Range = round(random.uniform(0,320))
-	config.c1HueRange = (c1Range,c1Range+40) 
+	c1Range = round(random.uniform(0,120))
+	config.c1HueRange = (c1Range,c1Range+240) 
 	config.c1SaturationRange = randomRange(.4,.95)
 	
 	vRange = (random.uniform(.2,.9))
 	config.c1ValueRange = randomRange(vRange,vRange + 0.1)
 	
 	# the "Shaded" side
-	c2Range = round(random.uniform(0,340))
-	config.c2HueRange = (c2Range,c2Range+20) 
+	c2Range = round(random.uniform(0,140))
+	config.c2HueRange = (c2Range,c2Range+220) 
 	config.c2SaturationRange = randomRange(.4,1)
 	config.c2ValueRange = randomRange(.1,.5)
 
 	## The "bright side"
-	config.c3HueRange = config.c2HueRange
+	config.c3HueRange = (config.c2HueRange)
 	config.c3SaturationRange = randomRange(.4,.999)
 	config.c3ValueRange = randomRange(.5,1)
 
@@ -91,7 +91,8 @@ def restartPiece():
 
 	# poly specific
 	if random.random() < config.resetSizeProbability  :
-		config.randomness = random.uniform(0,3)
+		if config.randomness != 0:
+			config.randomness = random.uniform(0,3)
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
 
@@ -160,6 +161,9 @@ def main(run = True) :
 	config.blockRowsMax = int(workConfig.get("quilt", 'blockRowsMax')) 
 	config.blockColsMin = int(workConfig.get("quilt", 'blockColsMin')) 
 	config.blockColsMax = int(workConfig.get("quilt", 'blockColsMax')) 
+
+	# the amount to reduce the "vertical" blocks: allowable values are 1-5
+	config.elongation = int(workConfig.get("quilt", 'elongation')) 
 	config.blockCols = config.blockColsMax
 	config.blockRows = config.blockRowsMax
 

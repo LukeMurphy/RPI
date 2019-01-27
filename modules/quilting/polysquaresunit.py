@@ -113,7 +113,7 @@ class Unit:
 		 	a 	b 	c
 		 	d 	e	f
 		 	g	h	i
-		 	j	k	l
+		 	j	j	l
 		 	m	n	o
 		 	p	q	r
 		 	s	t	u
@@ -132,11 +132,16 @@ class Unit:
 		self.sqrPoints = {}
 		letters = "abcdefghimnopqrstuyz~"
 		n = 0
+		rowHeight = 0
 		for row in range(0,7):
+			if row == 3 or  row == 6 :
+				rowHeight += self.blockHeight/self.config.elongation
+			else :
+				rowHeight += self.blockHeight
 			for col in range(0,3):
 				xRnd = round(random.uniform(-self.config.randomness,self.config.randomness))
 				yRnd = round(random.uniform(-self.config.randomness,self.config.randomness))
-				self.sqrPoints[letters[n]] = (self.xPos + col * self.blockLength + xRnd, self.yPos + row * self.blockHeight + yRnd)
+				self.sqrPoints[letters[n]] = (self.xPos + col * self.blockLength + xRnd, self.yPos + rowHeight  + yRnd)
 				n = n+1
 
 		#print(self.xPos, self.blockLength)
@@ -165,53 +170,6 @@ class Unit:
 		# two sides
 		self.polys[8][0] = ( (s["g"], s["h"], s["n"], s["m"] ) )
 		self.polys[9][0] = ( (s["n"], s["h"], s["i"], s["o"] ) )
-
-		self.polys[10][0] = ( (s["p"], s["m"], s["n"] ) )
-		self.polys[11][0] = ( (s["p"], s["q"], s["n"] ) )
-		self.polys[12][0] = ( (s["q"], s["n"], s["r"] ) )
-		self.polys[13][0] = ( (s["n"], s["o"], s["r"] ) )
-
-		self.polys[14][0] = ( (s["s"], s["p"], s["t"] ) )
-		self.polys[15][0] = ( (s["p"], s["q"], s["t"] ) )
-		self.polys[16][0] = ( (s["t"], s["q"], s["r"] ) )
-		self.polys[17][0] = ( (s["t"], s["r"], s["u"] ) )
-
-
-		self.polys[18][0] = ( (s["s"], s["t"], s["z"], s["y"] ) )
-		self.polys[19][0] = ( (s["z"], s["t"], s["u"], s["~"] ) )
-
-
-		'''
-		 	a 	b 	c
-		 	d 	e	f
-		 	g	h	i
-		 	j	k	l
-		 	m	n	o
-		 	p	q	r
-		 	s	t	u
-		 	v	w	x
-		 	y	z	~
-
-		 	m - j
-		 	n - k
-		 	o - l
-			p -
-			q - 
-			r -
-			s -
-			t - 
-			u -
-			v -
-			w - 
-			
-
-		 '''
-
-
-
-		# two sides
-		self.polys[8][0] = ( (s["g"], s["h"], s["k"], s["j"] ) )
-		self.polys[9][0] = ( (s["k"], s["h"], s["i"], s["l"] ) )
 
 		self.polys[10][0] = ( (s["p"], s["m"], s["n"] ) )
 		self.polys[11][0] = ( (s["p"], s["q"], s["n"] ) )

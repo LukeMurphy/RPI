@@ -30,12 +30,18 @@ def createPieces(config, refresh = False) :
 	# Rows and columns of 9-squares
 	itemCount = 0
 	for rows in range (0,config.blockRows) :
+		mult = 0
+		if config.elongation == 1 : mult = 0
+		if config.elongation == 2 : mult = 3
+		if config.elongation == 3 : mult = 4
+		if config.elongation == 4 : mult = 6
+		if config.elongation == 5 : mult = 9
 
-		rowStart = rows * config.blockHeight * 3 + config.gapSize
+		rowStart = rows * config.blockHeight * 3 + rows * config.gapSize - rows * mult * config.blockHeight/config.elongation - config.blockHeight
 
 		for cols in range (0,config.blockCols) :
 
-			columnStart = cols * config.blockLength * 2 + config.gapSize
+			columnStart = cols * config.blockLength * 2 + cols * config.gapSize
 			cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
 			cntr = [columnStart, rowStart]
 

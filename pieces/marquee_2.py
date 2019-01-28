@@ -137,6 +137,11 @@ def init() :
 		colOverlayA = coloroverlay.ColorOverlay()
 		colOverlayB = coloroverlay.ColorOverlay()
 
+		colOverlayA.minHue = config.palettes[config.usePalette][0]
+		colOverlayA.maxHue = config.palettes[config.usePalette][1]
+		colOverlayB.minHue = config.palettes[config.usePalette][2]
+		colOverlayB.maxHue = config.palettes[config.usePalette][3]
+
 		colOverlayA.randomRange = (10.0, config.randomRange)
 		colOverlayB.randomRange = (10.0, config.randomRange)
 
@@ -219,6 +224,10 @@ def iterate() :
 	redraw()
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
+	if random.random() < .002 :
+		palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
+		config.usePalette = list(config.palettes.keys())[palette]
+		print("New Palette:{}".format(config.usePalette))
 
 def main(run = True) :
 	global config
@@ -234,6 +243,16 @@ def main(run = True) :
 	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
 	colorutils.brightness =  float(workConfig.get("displayconfig", 'brightness')) 
 	config.xOffset = 15
+
+	config.palettes = {
+	"all":[0,360,0,360],
+	"warm-cool":[0,40,140,180],
+	"desert":[0,40,40,80],
+	"winter":[180,200,200,240],
+	"wintersun":[30,50,180,240],
+	}
+
+	config.usePalette = list(config.palettes.keys())[1]
 
 	init()
 	

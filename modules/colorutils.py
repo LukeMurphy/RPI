@@ -35,7 +35,7 @@ def getRedShiftedColors(brtns=1) :
 def getSunsetColors(brtns=1) :
 	global brightness, sunset, sorted_sunset
 	if(brtns == 1) : brtns = brightness
-	indx = round(random.uniform(0,len(sunset)))
+	indx = math.floor(random.uniform(0,len(sunset)))
 
 
 	vals = list(sunset.values())
@@ -49,7 +49,7 @@ def getSunsetColors(brtns=1) :
 def getRandomRGB(brtns=1) :
 	global brightness, rgbColorWheel, rgbWheel
 	if(brtns == 1) : brtns = brightness
-	indx = round(random.uniform(0,len(rgbWheel)))
+	indx = math.floor(random.uniform(0,len(rgbWheel)))
 	clr = rgbWheel[indx]
 	r = round(clr[0] * brtns)
 	g = round(clr[1] * brtns)
@@ -59,7 +59,7 @@ def getRandomRGB(brtns=1) :
 def getRandomColorWheel(brtns=1) :
 	global brightness, colorWheel, wheel
 	if(brtns == 1) : brtns = brightness
-	indx = round(random.uniform(0,len(colorWheel)))
+	indx = math.floor(random.uniform(0,len(colorWheel)))
 	clr = wheel[indx]
 	r = round(clr[0] * brtns)
 	g = round(clr[1] * brtns)

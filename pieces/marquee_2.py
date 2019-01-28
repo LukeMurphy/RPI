@@ -224,10 +224,18 @@ def iterate() :
 	redraw()
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
-	if random.random() < .002 :
-		palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
-		config.usePalette = list(config.palettes.keys())[palette]
-		print("New Palette:{}".format(config.usePalette))
+
+	checkTime()
+
+	if config.marqueeTimerDelta > config.changePaletteInterval :
+		if random.random() < .5 :
+			palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
+			config.usePalette = list(config.palettes.keys())[palette]
+			print("New Palette:{}".format(config.usePalette))
+	config.marqueeTimer1 = time.time()
+		
+
+
 
 def main(run = True) :
 	global config
@@ -239,6 +247,7 @@ def main(run = True) :
 	config.baseDashSize = int(workConfig.get("marquee", 'baseDashSize'))
 	config.gap = int(workConfig.get("marquee", 'gap'))
 	config.step = int(workConfig.get("marquee", 'step'))
+	config.changePaletteInterval = int(workConfig.get("marquee", 'changePaletteInterval'))
 	config.decrement = int(workConfig.get("marquee", 'decrement'))
 	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
 	colorutils.brightness =  float(workConfig.get("displayconfig", 'brightness')) 
@@ -249,17 +258,25 @@ def main(run = True) :
 	"warm-cool":[0,40,140,180],
 	"desert":[0,40,40,80],
 	"winter":[180,200,200,240],
+	"winter2":[190,210,210,230],
 	"wintersun":[30,50,180,240],
 	}
 
 	config.usePalette = list(config.palettes.keys())[1]
+
+	config.marqueeTimerDelta = 0 
+	config.marqueeTimer1 = time.time()
+
 
 	init()
 	
 	if(run) : runWork()
 
 
-
+def checkTime():
+	global config
+	t = time.time()
+	config.marqueeTimerDelta = (t - config.marqueeTimer1)
 
 
 

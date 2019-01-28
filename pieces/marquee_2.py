@@ -72,9 +72,7 @@ class Marquee :
 		if(self.reverse == True ) : 
 			perim = reversed(self.perimeter)
 
-
 		try:
-
 			for p in (perim ):
 				if(pattern[count] == 1) :
 					self.configDraw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 

@@ -1,7 +1,7 @@
 # ################################################### #
 import time
 import random
-import math
+import math, sys
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils, coloroverlay
 
@@ -72,16 +72,23 @@ class Marquee :
 		if(self.reverse == True ) : 
 			perim = reversed(self.perimeter)
 
-		for p in (perim ):
-			if(pattern[count] == 1) :
-				self.configDraw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 
-					outline=None, fill=tuple(round(c) for c in self.colOverlayA.currentColor))
-			else:
-				self.configDraw.rectangle((p[0],p[1],p[0] + p[2], p[1] + p[3]), 
-					outline=None, fill=tuple(round(c) for c in self.colOverlayB.currentColor))
-			count += 1
-			if(count >= len(pattern)) :
-				count = 0
+
+		try:
+
+			for p in (perim ):
+				if(pattern[count] == 1) :
+					self.configDraw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 
+						outline=None, fill=tuple(round(c) for c in self.colOverlayA.currentColor))
+				else:
+					self.configDraw.rectangle((p[0],p[1],p[0] + p[2], p[1] + p[3]), 
+						outline=None, fill=tuple(round(c) for c in self.colOverlayB.currentColor))
+				count += 1
+				if(count >= len(pattern)) :
+					count = 0
+		except Exception as e :
+			print(e)
+			print(self.colOverlayA.currentColor, self.colOverlayB.currentColor)
+			sys.exit()
 
 
 		self.offset += 1
@@ -187,8 +194,14 @@ def redraw():
 	global config
 
 	bgColor = tuple(round(c) for c in config.bgColor.currentColor)
-	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=bgColor)
-	config.bgColor.stepTransition()
+
+	try :
+		config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=bgColor)
+		config.bgColor.stepTransition()
+	except Exception as e :
+		print (e)
+		print(bgColor, config.bgColor.currentColor)
+		sys.exit()
 
 	mcount  = 0
 	for mq in config.marquees :

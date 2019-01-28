@@ -215,6 +215,13 @@ class ColorOverlay:
 			self.currentColorRaw[3] + self.rateOfColorChange[3],
 		]
 
+		if self.currentColorRaw[3] > 255 :
+			self.currentColorRaw[3] = 255
+			self.rateOfColorChange[3] = 0
+		if self.currentColorRaw[3] < 0 :
+			self.currentColorRaw[3] = 0
+			self.rateOfColorChange[3] = 0
+
 		self.currentColor = [
 			round(self.currentColorRaw[0]),
 			round(self.currentColorRaw[1]),

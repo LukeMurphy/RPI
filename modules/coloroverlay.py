@@ -163,7 +163,7 @@ class ColorOverlay:
 		###===========> NEED TO FIX THIS - stopping any alpha transition because
 		###===========> NEED TO FIX THIS - stopping any alpha transition because
 		## was throwing errors
-		self.rateOfColorChange[3] = 0
+		#self.rateOfColorChange[3] = 0
 
 		self.lowerRange = list(map(lambda x,y: round(x - abs(y))-.5, self.colorB, self.rateOfColorChange))
 		self.upperRange = list(map(lambda x,y: round(x + abs(y))+.5, self.colorB, self.rateOfColorChange))

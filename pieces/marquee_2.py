@@ -231,8 +231,9 @@ def iterate() :
 		if random.random() < .5 :
 			palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
 			config.usePalette = list(config.palettes.keys())[palette]
-			print("New Palette:{}".format(config.usePalette))
-	config.marqueeTimer1 = time.time()
+			#print("New Palette:{}".format(config.usePalette))
+		config.marqueeTimerDelta = 0
+		config.marqueeTimer1 = time.time()
 		
 
 
@@ -255,6 +256,7 @@ def main(run = True) :
 
 	config.palettes = {
 	"all":[0,360,0,360],
+	"all2":[0,180,180,360],
 	"warm-cool":[0,40,140,180],
 	"desert":[0,40,40,80],
 	"winter":[180,200,200,240],

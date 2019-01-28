@@ -24,63 +24,63 @@ brightness = 1
 def getRedShiftedColors(brtns=1) :
 	global brightness, sunset, sorted_sunset
 	if(brtns == 1) : brtns = brightness
-	r = int((random.uniform(0,255)) * brtns)
-	g = int((random.uniform(0,255)) * brtns)
-	b = int((random.uniform(0,255)) * brtns)
+	r = round((random.uniform(0,255)) * brtns)
+	g = round((random.uniform(0,255)) * brtns)
+	b = round((random.uniform(0,255)) * brtns)
 	rRange = 255 - r
-	r = int(r + random.uniform(0, rRange))
+	r = round(r + random.uniform(0, rRange))
 	return (r,g,b)
 
 
 def getSunsetColors(brtns=1) :
 	global brightness, sunset, sorted_sunset
 	if(brtns == 1) : brtns = brightness
-	indx = int(random.uniform(0,len(sunset)))
+	indx = round(random.uniform(0,len(sunset)))
 
 
 	vals = list(sunset.values())
 	clr = vals[indx]
-	r = int(clr[0] * brtns)
-	g = int(clr[1] * brtns)
-	b = int(clr[2] * brtns)
+	r = round(clr[0] * brtns)
+	g = round(clr[1] * brtns)
+	b = round(clr[2] * brtns)
 	return (r,g,b)
 
 
 def getRandomRGB(brtns=1) :
 	global brightness, rgbColorWheel, rgbWheel
 	if(brtns == 1) : brtns = brightness
-	indx = int(random.uniform(0,len(rgbWheel)))
+	indx = round(random.uniform(0,len(rgbWheel)))
 	clr = rgbWheel[indx]
-	r = int(clr[0] * brtns)
-	g = int(clr[1] * brtns)
-	b = int(clr[2] * brtns)
+	r = round(clr[0] * brtns)
+	g = round(clr[1] * brtns)
+	b = round(clr[2] * brtns)
 	return (r,g,b)
 
 def getRandomColorWheel(brtns=1) :
 	global brightness, colorWheel, wheel
 	if(brtns == 1) : brtns = brightness
-	indx = int(random.uniform(0,len(colorWheel)))
+	indx = round(random.uniform(0,len(colorWheel)))
 	clr = wheel[indx]
-	r = int(clr[0] * brtns)
-	g = int(clr[1] * brtns)
-	b = int(clr[2] * brtns)
+	r = round(clr[0] * brtns)
+	g = round(clr[1] * brtns)
+	b = round(clr[2] * brtns)
 	return (r,g,b) 
 
 def randomColor(brtns=1) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
-	r = int((random.uniform(0,255)) * brtns)
-	g = int((random.uniform(0,255)) * brtns)
-	b = int((random.uniform(0,255)) * brtns)
+	r = round((random.uniform(0,255)) * brtns)
+	g = round((random.uniform(0,255)) * brtns)
+	b = round((random.uniform(0,255)) * brtns)
 	return (r,g,b) 
 
-def randomColorAlpha(brtns=1, maxTransparency = 255) :
+def randomColorAlpha(brtns=1, maxTransparency = 255, minTransparency = 0) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
-	r = int((random.uniform(0,255)) * brtns)
-	g = int((random.uniform(0,255)) * brtns)
-	b = int((random.uniform(0,255)) * brtns)
-	a = int(random.uniform(0, maxTransparency))
+	r = round((random.uniform(0,255)) * brtns)
+	g = round((random.uniform(0,255)) * brtns)
+	b = round((random.uniform(0,255)) * brtns)
+	a = round(random.uniform(minTransparency, maxTransparency))
 	return (r,g,b,a) 
 
 ### Yup, same function that should have been called this
@@ -89,9 +89,9 @@ def randomColorAlpha(brtns=1, maxTransparency = 255) :
 def getRandomColor(brtns=1) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
-	r = int((random.uniform(0,255)) * brtns)
-	g = int((random.uniform(0,255)) * brtns)
-	b = int((random.uniform(0,255)) * brtns)
+	r = round((random.uniform(0,255)) * brtns)
+	g = round((random.uniform(0,255)) * brtns)
+	b = round((random.uniform(0,255)) * brtns)
 	a = 255
 	return (r,g,b) 
 
@@ -124,9 +124,9 @@ def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1
 def randomBaseColor(brtns=1) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
-	b = int((random.uniform(0,255)) * brtns)
-	r = int((random.uniform(0,100)) * brtns)
-	g = int((random.uniform(0,100)) * brtns)
+	b = round((random.uniform(0,255)) * brtns)
+	r = round((random.uniform(0,100)) * brtns)
+	g = round((random.uniform(0,100)) * brtns)
 	return (r,g,b) 
 
 def colorCompliment(rgb, brtns=1) :
@@ -138,21 +138,21 @@ def colorCompliment(rgb, brtns=1) :
 	minRGB = min(r,min(g,b))
 	maxRGB = max(r,max(g,b))
 	minmax = minRGB + maxRGB
-	r = int((minmax - r) * brtns)
-	g = int((minmax - g) * brtns)
-	b = int((minmax - b) * brtns)
+	r = round((minmax - r) * brtns)
+	g = round((minmax - g) * brtns)
+	b = round((minmax - b) * brtns)
 	return (r,g,b)    
 
 def randomGray(brtns=1) :
 	global brightness
 	if(brtns == 1) : brtns = brightness
-	grey = int((random.uniform(0,255)) * brtns)
+	grey = round((random.uniform(0,255)) * brtns)
 	r = grey
 	g = grey
 	b = grey
 	return (r,g,b)     
 
-# Find the closest point 
+# Find the closest poround 
 def closestRBYfromRGB(rgb) :
 	global brightness, wheel
 	r = rgb[0]
@@ -162,7 +162,7 @@ def closestRBYfromRGB(rgb) :
 	dMax = 0
 	dArray = []
 	for n in range (0, len(wheel)) :
-		d = int(math.sqrt( (r-wheel[n][0])**2 + (g-wheel[n][1])**2 + (b-wheel[n][2])**2 ))
+		d = round(math.sqrt( (r-wheel[n][0])**2 + (g-wheel[n][1])**2 + (b-wheel[n][2])**2 ))
 		dArray.append([n,d])
 	dArray = sorted(dArray, key=lambda n:n[1], reverse=False)
 	return wheel[dArray[0][0]]
@@ -199,24 +199,24 @@ def HSLToRGB(h,s,l,a=255) :
 	#m = l - (.3 * r1 + .59 * g1 + .11 * b1)
 	m = l - c/2
 	rgb  = [r1 + m, g1 + m, b1 + m, a]
-	rgbCol = tuple(int(round(i * 255)) for i in rgb)
+	rgbCol = tuple(round(round(i * 255)) for i in rgb)
 	return rgbCol
 
 
 def subtractiveColors(arg) :
 	color = (0,0,0)
-	if(arg == "RED") : color = tuple(int(a*brightness) for a in ((255,2,2)))
-	if(arg == "VERMILLION") : color = tuple(int(a*brightness) for a in ((253,83,8)))
-	if(arg == "ORANGE") : color = tuple(int(a*brightness) for a in ((255,153,1)))
-	if(arg == "AMBER") : color = tuple(int(a*brightness) for a in ((250,188,2)))
-	if(arg == "YELLOW") : color = tuple(int(a*brightness) for a in ((255,255,0)))
-	if(arg == "CHARTREUSE") : color = tuple(int(a*brightness) for a in ((0,255,0)))
-	if(arg == "GREEN") : color = tuple(int(a*brightness) for a in ((0,125,0)))
-	if(arg == "TEAL") : color = tuple(int(a*brightness) for a in ((146,206,0)))
-	if(arg == "BLUE") : color = tuple(int(a*brightness) for a in ((0,0,255)))
-	if(arg == "VIOLET") : color = tuple(int(a*brightness) for a in ((65,0,165)))    
-	if(arg == "PURPLE") : color = tuple(int(a*brightness) for a in ((135,0,175)))    
-	if(arg == "MAGENTA") : color = tuple(int(a*brightness) for a in ((167,25,75)))    
+	if(arg == "RED") : color = tuple(round(a*brightness) for a in ((255,2,2)))
+	if(arg == "VERMILLION") : color = tuple(round(a*brightness) for a in ((253,83,8)))
+	if(arg == "ORANGE") : color = tuple(round(a*brightness) for a in ((255,153,1)))
+	if(arg == "AMBER") : color = tuple(round(a*brightness) for a in ((250,188,2)))
+	if(arg == "YELLOW") : color = tuple(round(a*brightness) for a in ((255,255,0)))
+	if(arg == "CHARTREUSE") : color = tuple(round(a*brightness) for a in ((0,255,0)))
+	if(arg == "GREEN") : color = tuple(round(a*brightness) for a in ((0,125,0)))
+	if(arg == "TEAL") : color = tuple(round(a*brightness) for a in ((146,206,0)))
+	if(arg == "BLUE") : color = tuple(round(a*brightness) for a in ((0,0,255)))
+	if(arg == "VIOLET") : color = tuple(round(a*brightness) for a in ((65,0,165)))    
+	if(arg == "PURPLE") : color = tuple(round(a*brightness) for a in ((135,0,175)))    
+	if(arg == "MAGENTA") : color = tuple(round(a*brightness) for a in ((167,25,75)))    
 	return color
 	
 def colorComplimentRBY(arg) :
@@ -239,6 +239,6 @@ def changeColor(rnd = False) :
 									r = 255
 									b = 0
 	else :
-					r = int(random.uniform(0,255) * brightness)
-					g = int(random.uniform(0,255) * brightness)
-					b = int(random.uniform(0,255) * brightness)
+					r = round(random.uniform(0,255) * brightness)
+					g = round(random.uniform(0,255) * brightness)
+					b = round(random.uniform(0,255) * brightness)

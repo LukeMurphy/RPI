@@ -128,7 +128,7 @@ def init() :
 
 	for i in range (0, config.marqueeNum):
 	
-		clrs = [colorutils.randomColor(),colorutils.getRandomRGB()]
+		clrs = [colorutils.randomColor(),colorutils.randomColorAlpha(255,255)]
 		colOverlayA = coloroverlay.ColorOverlay()
 		colOverlayB = coloroverlay.ColorOverlay()
 

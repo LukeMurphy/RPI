@@ -48,7 +48,7 @@ actionDict = [
 
 
 	{"------------------------------" :''},
-	{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
+	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
 	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
 	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
 

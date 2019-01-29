@@ -12,6 +12,7 @@ actionDict = [
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-star.cfg'}, 
+	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
 	#{"------------------------------" :''},
 	{" " :''},
 	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
@@ -95,9 +96,9 @@ def stopAll():
 root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
-root.geometry('%dx%d+%d+%d' % (300, 640, 1600, 100))
+root.geometry('%dx%d+%d+%d' % (300, 670, 1600, 100))
 
-Lb = Listbox(frame, width = 40, height = 35) 
+Lb = Listbox(frame, width = 40, height = 36) 
 
 
 for i,item in enumerate(actionDict):

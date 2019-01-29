@@ -310,6 +310,27 @@ def main(run = True) :
 		print(e)
 		config.usePresets = True
 
+
+	try :
+		drawBlockCoordsRaw = list(list((i).split(',')) for i in workConfig.get("drawBlock", 'drawBlockCoords').split("|"))
+		config.drawBlockCoords = []
+		for i in drawBlockCoordsRaw :
+			coords = tuple(int(ii) for ii in i)
+			config.drawBlockCoords.append(coords)
+		config.drawBlockCoords = tuple(config.drawBlockCoords)
+
+		config.drawBlockFixedColor = tuple([int(i) for i in workConfig.get("drawBlock", 'drawBlockFixedColor').split(",")])
+		config.drawBlock_c1HueRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1HueRange').split(",")])
+		config.drawBlock_c1SaturationRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1SaturationRange').split(",")])
+		config.drawBlock_c1ValueRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1ValueRange').split(",")])
+		config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+		config.drawBlock = True
+		config.drawBlockShape = lambda : config.canvasImageDraw.polygon(config.drawBlockCoords, fill=config.drawBlockFixedColor)
+	except Exception as e:
+		print (e)
+		config.drawBlock = False
+		config.drawBlockShape = lambda : True
+
 	setInitialColors()
 	
 	config.t1  = time.time()
@@ -346,10 +367,12 @@ def iterate() :
 			obj.render()
 			
 
+	config.drawBlockShape()
 	temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
+		
 	config.render(temp, 0,0)
 
 	config.t2  = time.time()

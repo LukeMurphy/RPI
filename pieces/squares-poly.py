@@ -111,7 +111,6 @@ def setInitialColors(refresh=False):
 			colOverlay.colorTransitionSetupValues()
 		
 
-
 def main(run = True) :
 	global config, directionOrder,workConfig
 	print("---------------------")
@@ -221,6 +220,36 @@ def main(run = True) :
 		print (e)
 
 
+	try :
+		drawBlockCoordsRaw = list(list((i).split(',')) for i in workConfig.get("drawBlock", 'drawBlockCoords').split("|"))
+		config.drawBlockCoords = []
+		for i in drawBlockCoordsRaw :
+			coords = tuple(int(ii) for ii in i)
+			config.drawBlockCoords.append(coords)
+		config.drawBlockCoords = tuple(config.drawBlockCoords)
+
+		config.drawBlockFixedColor = tuple([int(i) for i in workConfig.get("drawBlock", 'drawBlockFixedColor').split(",")])
+		config.drawBlock_c1HueRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1HueRange').split(",")])
+		config.drawBlock_c1SaturationRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1SaturationRange').split(",")])
+		config.drawBlock_c1ValueRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1ValueRange').split(",")])
+		config.drawBlockColor = coloroverlay.ColorOverlay(False)
+		config.drawBlockColor.minHue = config.drawBlock_c1HueRange[0]
+		config.drawBlockColor.maxHue = config.drawBlock_c1HueRange[1]
+		config.drawBlockColor.minSaturation = config.drawBlock_c1SaturationRange[0]
+		config.drawBlockColor.maxSaturation = config.drawBlock_c1SaturationRange[1]
+		config.drawBlockColor.stepTransition()
+		config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+		config.drawBlock = True
+		f1 = lambda : config.canvasImageDraw.polygon(config.drawBlockCoords, fill=tuple(x for x in config.drawBlockColor.currentColor))
+		f2 = lambda : config.drawBlockColor.stepTransition()
+		config.drawBlockShape = [f1,f2]
+
+	except Exception as e:
+		print (e)
+		config.drawBlock = False
+		config.drawBlockShape = []
+
+
 	createpolysquarepieces.createPieces(config)
 
 	setInitialColors()
@@ -257,8 +286,13 @@ def iterate() :
 		elif config.doingRefresh == config.doingRefreshCount :
 			obj.render()
 
+	for f in config.drawBlockShape : f()
+		
+
 	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
+
+
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
 	config.render(temp, 0,0)

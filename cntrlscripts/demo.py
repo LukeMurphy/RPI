@@ -8,7 +8,8 @@ commadStringPyth = 'python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /U
 commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 
 
-actionDict = [
+actionDict1 = [
+	{"-------- WALL -------------" :''},
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
@@ -25,61 +26,70 @@ actionDict = [
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
 	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
+	{" " :''},
 
-
-	#{"------------------------------" :''},
-	#{"Angle Quilt Small" :'p4-1x4-cube/l-quilt.cfg'},
 
 	
-	{"------------------------------" :''},
+	{"-------- BENT WALL -------------" :''},
 	{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
 	{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
 	{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},
+	{" " :''},
 
 
-	{"------------------------------" :''},
+	{"--------- TOWERS -----------" :''},
 	{"Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
+	{" " :''},
 	
-	{"------------------------------" :''},
+	#{"------------------------------" :''},
 	{"Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
 	{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	{"Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
 	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{" " :''},
 
-
-	{"------------------------------" :''},
-	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
-	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
-	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
-
-
-	
-	{"------------------------------" :''},
-	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
-
-
-
-	
-	{"------------------------------" :''},
+	{"---------- FLOOR ----------" :''},
 	{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
 	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
 	{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{" " :''},
 
+	]
+
+actionDict2 = [
+	{"---------- TEST WALL --------------" :''},
+	{"P3 Wall w. removal: cubes" :'p3-2x4/p3-2x6-squares.cfg'},
+	{"P3 Wall w. removal: triangles " :'p3-2x4/p3-2x6.cfg'},
+	{"P3 Wall w. removal: marquee2 " :'p3-2x4/marquee2.cfg'},
+
+	{" " :''},
+	{"-------- TABLE -------------" :''},
+	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
+	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
+	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
 
 
-
+	{" " :''},
+	{"------------------------------" :''},
+	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 	]
 
 
 def action():
 	#print("==>",Lb.curselection())
+	process = False
+	if len(list(Lb1.curselection())) > 0 :
+		selection  = (Lb1.curselection()[0])
+		configSelected  = actionDict1[selection];
+		process = True
+	elif len(list(Lb2.curselection())) > 0 :
+		selection  = (Lb2.curselection()[0])
+		configSelected  = actionDict2[selection];
+		process = True
 
-	if len(list(Lb.curselection())) > 0 :
-		selection  = (Lb.curselection()[0])
+	if process == True:
 		os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
-		configSelected  = actionDict[selection];
 		configToRun = configSelected[list(configSelected.keys())[0]]
 
 		if ".cfg" in configToRun :
@@ -96,15 +106,22 @@ def stopAll():
 root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
-root.geometry('%dx%d+%d+%d' % (300, 670, 1600, 100))
+root.geometry('%dx%d+%d+%d' % (800, 690, 1000, 100))
 
-Lb = Listbox(frame, width = 40, height = 36) 
+Lb1 = Listbox(frame, width = 26, height = 38) 
+Lb2 = Listbox(frame, width = 26, height = 38) 
+
+for i, item in enumerate(actionDict1):
+	Lb1.insert(END, " " + list(item.keys())[0])
 
 
-for i,item in enumerate(actionDict):
-    Lb.insert(END, list(item.keys())[0])
+for i, item in enumerate(actionDict2):
+	Lb2.insert(END, " " + list(item.keys())[0])
 
-Lb.pack(fill=BOTH, expand=1)
+Lb1.pack(side=tk.LEFT,padx=10,ipadx=10 )
+Lb2.pack(side=tk.LEFT,ipadx=10,expand=0  )
+
+
 
 button = tk.Button(frame, text="QUIT", bg="black", fg="red", command=quit)
 button.pack(side=tk.LEFT)

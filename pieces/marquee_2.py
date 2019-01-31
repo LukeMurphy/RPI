@@ -42,7 +42,7 @@ class Marquee :
 		self.stepSize = 1
 
 		# Right
-		for i in range (self.p0[1], self.p0[1] + self.innerHeight + o + self.marqueeWidth, self.stepSize) : 
+		for i in range (self.p0[1], self.p0[1] + self.innerHeight + self.marqueeWidth, self.stepSize) : 
 			self.perimeter.append([self.p0[0] + self.innerWidth, i, self.marqueeWidth, self.stepSize])
 
 		# Bottom
@@ -50,12 +50,12 @@ class Marquee :
 			self.perimeter.append([i, self.p0[1] + self.innerHeight, self.stepSize, self.marqueeWidth])
 
 		# Left
-		for i in range (self.p0[1] + self.innerHeight + self.marqueeWidth - 2, self.p0[1] - o, -self.stepSize) : 
+		for i in range (self.p0[1] + self.innerHeight , self.p0[1], -self.stepSize) : 
 			self.perimeter.append([self.p0[0], i, self.marqueeWidth, self.stepSize])
 
 		# Top
-		for i in range (self.p0[0] + 0, self.p0[0] + self.innerWidth, 
-			self.stepSize) : self.perimeter.append([i, self.p0[1], self.stepSize, self.marqueeWidth])
+		for i in range (self.p0[0], self.p0[0] + self.innerWidth + self.marqueeWidth, self.stepSize) : 
+			self.perimeter.append([i, self.p0[1], self.stepSize, self.marqueeWidth])
 
 
 	def advance(self):
@@ -172,7 +172,7 @@ def init() :
 
 		p0[0] += (marqueeWidth + config.gap) 
 		p0[1] += (marqueeWidth + config.gap) 
-		marqueeWidthPrev = marqueeWidth
+		marqueeWidthPrev = marqueeWidth + 1
 
 		# If this is 1 then offsets the gap...
 		eveningGap = 2

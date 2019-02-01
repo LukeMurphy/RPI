@@ -220,6 +220,7 @@ def main(run = True) :
 		print (e)
 
 
+	## Draws a single colored block .... 
 	try :
 		drawBlockCoordsRaw = list(list((i).split(',')) for i in workConfig.get("drawBlock", 'drawBlockCoords').split("|"))
 		config.drawBlockCoords = []
@@ -236,7 +237,9 @@ def main(run = True) :
 		config.drawBlockColor.minHue = config.drawBlock_c1HueRange[0]
 		config.drawBlockColor.maxHue = config.drawBlock_c1HueRange[1]
 		config.drawBlockColor.minSaturation = config.drawBlock_c1SaturationRange[0]
-		config.drawBlockColor.maxSaturation = config.drawBlock_c1SaturationRange[1]
+		config.drawBlockColor.maxSaturation = config.drawBlock_c1SaturationRange[1]		
+		config.drawBlockColor.minValue = config.drawBlock_c1ValueRange[0]
+		config.drawBlockColor.maxValue = config.drawBlock_c1ValueRange[1]
 		config.drawBlockColor.stepTransition()
 		config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 		config.drawBlock = True

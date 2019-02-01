@@ -58,10 +58,11 @@ actionDict1 = [
 
 actionDict2 = [
 	{"---------- TEST WALL --------------" :''},
-	{"P3 Wall w. removal: cubes" :'p3-2x4/p3-2x6-squares.cfg'},
+	{"P3 Wall w. removal: cubes - blur" :'p3-2x4/p3-2x6-squares.cfg'},
+	{"P3 Wall w. removal: cubes-b" :'p3-2x4/p3-2x6-squares-b.cfg'},
 	{"P3 Wall w. removal: triangles " :'p3-2x4/p3-2x6.cfg'},
-	{"P3 Wall w. removal: marquee2 - disturb " :'p3-2x4/marquee2.cfg'},
-	{"P3 Wall w. removal: marquee2c - full concentric " :'p3-2x4/marquee2c.cfg'},
+	{"P3 Wall w. removal: marquee2 - disturbed " :'p3-2x4/marquee2.cfg'},
+	{"P3 Wall w. removal: marquee2c - concentric " :'p3-2x4/marquee2c.cfg'},
 	{" " :''},
 
 	{"P3 sqr w. shift: marquee2b " :'p3-2x4/marquee2b.cfg'},
@@ -75,6 +76,7 @@ actionDict2 = [
 
 	{" " :''},
 	{"------------------------------" :''},
+	{"ARC - BENT GLITCH" :'p4-1xn-arc/arcdiagnostics.cfg'},
 	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 	]
@@ -110,7 +112,7 @@ def stopAll():
 root = tk.Tk()
 frame = tk.Frame(root)
 frame.pack(padx=10,pady=10)
-root.geometry('%dx%d+%d+%d' % (800, 690, 1000, 100))
+root.geometry('%dx%d+%d+%d' % (740, 690, 1000, 100))
 
 Lb1 = Listbox(frame, width = 26, height = 38) 
 Lb2 = Listbox(frame, width = 33, height = 38) 
@@ -127,15 +129,16 @@ Lb2.pack(side=tk.LEFT,ipadx=10,expand=0  )
 
 
 
-
-slogan = tk.Button(frame,text="Run",fg="Red", command=action)
-slogan.pack(side=tk.LEFT)
-
-slogan = tk.Button(frame,text="Stop All",fg="blue", command=stopAll)
-slogan.pack(side=tk.LEFT)
-
 button = tk.Button(frame, text="QUIT", bg="black", fg="red", command=quit)
 button.pack(side=tk.BOTTOM, padx=2)
+
+slogan = tk.Button(frame,text="Stop All",fg="blue", command=stopAll)
+slogan.pack(side=tk.BOTTOM,padx=2)
+
+slogan = tk.Button(frame,text="Run",fg="Red", command=action)
+slogan.pack(side=tk.BOTTOM,padx=2)
+
+
 
 root.mainloop()
 

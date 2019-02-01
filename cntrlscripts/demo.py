@@ -76,7 +76,7 @@ actionDict2 = [
 
 	{" " :''},
 	{"------------------------------" :''},
-	{"ARC - BENT GLITCH" :'p4-1xn-arc/arcdiagnostics.cfg'},
+	{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
 	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 	]

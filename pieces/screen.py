@@ -158,7 +158,8 @@ def showGrid():
 								else: 
 									config.canvasDraw.line((x, y, config.canvasWidth, y), fill=colorSampleColor)
 								
-							config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
+							if random.random() < config.probDrawVertLines:
+								config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 								
 							if random.random() < config.probDrawBoxes : 
 								config.canvasDraw.rectangle((x, y, x2, y2), fill=colorSampleColor, outline=colorSampleColor)
@@ -237,6 +238,14 @@ def main(run = True) :
 	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
 
 	try:
+		config.probDrawVertLines = float(workConfig.get("screenproject", 'probDrawVertLines'))
+	except Exception as e:
+		config.probDrawVertLines = .9
+		print (str(e))
+
+
+		
+	try:
 		config.pauseProb = float(workConfig.get("screenproject", 'pauseProb'))
 		config.unpauseProb = float(workConfig.get("screenproject", 'unpauseProb'))
 		config.usePause = True
@@ -280,6 +289,7 @@ def main(run = True) :
 
 def setUp():
 	global config
+	pass
 
 
 def runWork():
@@ -301,7 +311,8 @@ def iterate() :
 		config.pausing = False
 		
 
-	if config.usePause == False : showGrid()
+	if config.usePause == False : 
+		showGrid()
 
 
 	if random.random() < config.crackChangeProb :

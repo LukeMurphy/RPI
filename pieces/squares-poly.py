@@ -97,7 +97,7 @@ def restartPiece():
 	# poly specific
 	if random.random() < config.resetSizeProbability  :
 		if config.randomness != 0:
-			config.randomness = random.uniform(0,3)
+			config.randomness = random.uniform(config.minRandomness,3)
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
 
@@ -231,6 +231,12 @@ def main(run = True) :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
 	except Exception as e:
 		config.randomness = 0
+		print (e)
+
+	try :
+		config.minRandomness = int(workConfig.get("quilt", 'minRandomness')) 
+	except Exception as e:
+		config.minRandomness = 0
 		print (e)
 
 

@@ -141,6 +141,13 @@ class Unit:
 			for col in range(0,3):
 				xRnd = round(random.uniform(-self.config.randomness,self.config.randomness))
 				yRnd = round(random.uniform(-self.config.randomness,self.config.randomness))
+
+				if abs(xRnd) < self.config.minRandomness :
+					xRnd = self.config.minRandomness * -1 if xRnd < 0 else self.config.minRandomness
+				if abs(xRnd) < self.config.minRandomness :
+					yRnd = self.config.minRandomness * -1 if yRnd < 0  else self.config.minRandomness
+
+
 				self.sqrPoints[letters[n]] = (self.xPos + col * self.blockLength + xRnd, self.yPos + rowHeight  + yRnd)
 				n = n+1
 

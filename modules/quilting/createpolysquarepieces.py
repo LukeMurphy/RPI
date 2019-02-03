@@ -48,27 +48,31 @@ def createPieces(config, refresh = False) :
 			## Jinky odds/evens alignment setup
 			sizeAdjustor = 0
 			## Alignment perfect setup
-			if(config.patternPrecision == True): sizeAdjustor = 0
+			if(config.patternPrecision == True): 
+				sizeAdjustor = 0
+			try :
+				if refresh == True :
+					obj = config.unitArray[itemCount]
+				else :
+					obj = Unit(config)
+					obj.fillColors = []
+				obj.xPos = cntr[0] #+ cols * config.blockLength 
+				obj.yPos = cntr[1] + rows * 3*config.blockHeight
+				obj.blockLength = config.blockLength - sizeAdjustor
+				obj.blockHeight = config.blockHeight - sizeAdjustor
+				obj.outlineColorObj	= outlineColorObj
+				obj.lines = config.lines
 
-			if refresh == True :
-				obj = config.unitArray[itemCount]
-			else :
-				obj = Unit(config)
-				obj.fillColors = []
-			obj.xPos = cntr[0] #+ cols * config.blockLength 
-			obj.yPos = cntr[1] + rows * 3*config.blockHeight
-			obj.blockLength = config.blockLength - sizeAdjustor
-			obj.blockHeight = config.blockHeight - sizeAdjustor
-			obj.outlineColorObj	= outlineColorObj
-			obj.lines = config.lines
+				for n in range(0,len(polyPattern)):
+					for i in polyPattern[n] :
+						obj.fillColors.append(config.fillColorSet[i])
 
-			for n in range(0,len(polyPattern)):
-				for i in polyPattern[n] :
-					obj.fillColors.append(config.fillColorSet[i])
-
-			obj.setUp()
-			if refresh == False : config.unitArray.append(obj)
-			itemCount += 1
+				obj.setUp()
+				if refresh == False : config.unitArray.append(obj)
+				itemCount += 1
+			except Exception as e:
+				print(e)
+				continue
 
 
 def refreshPalette(config):

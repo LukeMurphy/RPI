@@ -79,15 +79,19 @@ def refreshPalette(config):
 	itemCount = 0
 	for rows in range (0,config.blockRows) :
 		for cols in range (0,config.blockCols) :
-			obj = config.unitArray[itemCount]
-			obj.fillColors = []
-			for n in range(0,len(polyPattern)):
-				for i in polyPattern[n] :
-					obj.fillColors.append(config.fillColorSet[i])
-				#obj.fillColors = fillColors
-			obj.lines = config.lines
-			obj.setUp()
-			itemCount+=1
+			try :
+				obj = config.unitArray[itemCount]
+				obj.fillColors = []
+				for n in range(0,len(polyPattern)):
+					for i in polyPattern[n] :
+						obj.fillColors.append(config.fillColorSet[i])
+					#obj.fillColors = fillColors
+				obj.lines = config.lines
+				obj.setUp()
+				itemCount+=1
+			except Exception as e:
+				print(e)
+				continue
 
 
 

@@ -73,15 +73,20 @@ def restartPiece():
 	else :
 		config.lines = False
 
+	# a lame attempt at "optimizing" the number or rows and cols that are drawn
+	# based on the size of the blocks ... ;[
+
 	if random.random() < config.resetSizeProbability  :
 		config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
 		
-		if (config.blockSize >= 11) :
-			config.blockCols = config.blockColsMin
-			config.blockRows = config.blockRowsMin
-		else :
+		if (config.blockSize <= 11) :
 			config.blockCols = config.blockColsMax
 			config.blockRows = config.blockRowsMax
+		else :
+			config.blockCols = config.blockColsMin
+			config.blockRows = config.blockRowsMin
+
+		#print(config.blockSize, config.blockCols, config.blockRows)
 		
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
@@ -202,6 +207,15 @@ def main(run = True) :
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
+	if (config.blockSize <= 11) :
+		config.blockCols = config.blockColsMax
+		config.blockRows = config.blockRowsMax
+	else :
+		config.blockCols = config.blockColsMin
+		config.blockRows = config.blockRowsMin
+
+	#print(config.blockSize, config.blockCols, config.blockRows)
+
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 
 	config.unitArray = []
@@ -224,6 +238,7 @@ def main(run = True) :
 	try :
 		drawBlockCoordsRaw = list(list((i).split(',')) for i in workConfig.get("drawBlock", 'drawBlockCoords').split("|"))
 		config.drawBlockCoords = []
+
 		for i in drawBlockCoordsRaw :
 			coords = tuple(int(ii) for ii in i)
 			config.drawBlockCoords.append(coords)

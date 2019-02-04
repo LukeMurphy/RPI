@@ -290,7 +290,6 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-
 	# initial crossfade settings
 	config.doingRefresh = 100
 	config.doingRefreshCount = 100

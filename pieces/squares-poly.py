@@ -98,6 +98,8 @@ def restartPiece():
 	if random.random() < config.resetSizeProbability  :
 		if config.randomness != 0:
 			config.randomness = random.uniform(config.minRandomness,3)
+
+		# initialize crossfade - in this case 100 steps ...
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
 
@@ -281,6 +283,8 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
+
+	# initial crossfade settings
 	config.doingRefresh = 100
 	config.doingRefreshCount = 100
 

@@ -51,7 +51,10 @@ def drawCompositions():
 		gray0 = int(random.uniform(0,160))
 		gray1 = int(random.uniform(0,160))
 		gray2 = int(random.uniform(0,160))
-		fills = [(gray0,gray1,gray1,255),(gray1,gray1,gray1,255),(gray2,gray2,gray2,255)]
+		fills = [
+			(gray0,gray1,gray1,255),
+			(gray1,gray1,gray1,255),
+			(gray2,gray2,gray2,255)]
 
 		if random.random() < .5 :
 			fills[0] = (gray0,gray0,gray1,255)
@@ -67,6 +70,7 @@ def drawCompositions():
 			if (n == tiedToBottom) : y2 = config.imageHeight
 			starty = int(random.uniform(0,config.imageHeight/2))
 
+
 		else :
 			x1 = int(random.uniform(xSeam - startx * wFactor, xSeam - wVariance[1]* wFactor) ) 
 			x2 = int(xSeam)
@@ -74,13 +78,24 @@ def drawCompositions():
 			y2 = int(random.uniform(y1 + hVariance[0], y1 + hVariance[1]))
 			if (n == tiedToBottom) : y2 = config.imageHeight
 			starty = y2
+
+			if random.random() < .3 :
+				choice = round(random.uniform(1,2))
+				if n == choice :
+					config.remapImageBlock = True
+					config.remapImageBlockSection = (x1,y1,x2,y2)
+					config.remapImageBlockDestination = (x1,y1)
+
 		rectHeight = y2 - y1
 		
+
 		temp = Image.new("RGBA", (config.imageWidth, config.imageHeight))
 		drawtemp = ImageDraw.Draw(temp)
 		drawtemp.rectangle((x1,y1,x2,y2), fill=fills[n])
 		temp = ScaleRotateTranslate(temp,angleRotation, None, None, None, True)
 		config.canvasImage.paste(temp, temp)
+
+
 
 	#config.canvasImage.paste(temp, temp)
 	

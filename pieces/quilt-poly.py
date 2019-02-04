@@ -79,7 +79,7 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 	if random.random() < config.resetSizeProbability  :
-		config.rotation = random.uniform(-3,3)
+		config.rotation = random.uniform(-config.rotationRange,config.rotationRange)
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
 		
@@ -218,6 +218,12 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 
+	try :
+		config.rotationRange = float(workConfig.get("quilt", 'rotationRange')) 
+	except Exception as e:
+		config.rotationRange = 0
+		print (e)
+
 
 	try :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
@@ -275,23 +281,27 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArray)):
+	# Need to do a crossfade 
+	if config.doingRefresh < config.doingRefreshCount :
+		#print("crossfade...",  config.doingRefresh/config.doingRefreshCount)
+		if config.doingRefresh == 0 :
+			config.snapShot = config.canvasImage.copy()
+		crossFade = Image.blend(config.snapShot, config.canvasImage, config.doingRefresh/config.doingRefreshCount)
+		config.drawBlockShape()
+		config.render(crossFade, 0,0)
+		config.doingRefresh += 1
+	else :
+		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
+		temp.paste(config.canvasImage, (0,0), config.canvasImage)
+		if(config.transformShape == True) :
+			temp = transformImage(temp)
+		config.drawBlockShape()
+		config.render(temp, 0,0)
 
+	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
 		obj.update()
-		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
-			obj.render()
-			config.doingRefresh += 1
-		elif config.doingRefresh == config.doingRefreshCount :
-			obj.render()
-
-	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
-	temp.paste(config.canvasImage, (0,0), config.canvasImage)
-	if(config.transformShape == True) :
-		temp = transformImage(temp)
-
-	config.drawBlockShape()
-	config.render(temp, 0,0)
+		obj.render()
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1

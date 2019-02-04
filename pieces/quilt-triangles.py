@@ -155,7 +155,7 @@ def restartPiece():
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
 		config.doingRefresh = 0
-		config.doingRefreshCount = round(random.uniform(50,1500))
+		config.doingRefreshCount = 100
 
 	
 	if config.quiltPattern == "stars":
@@ -166,7 +166,7 @@ def restartPiece():
 	
 
 	if random.random() < .5 :
-		config.rotation = random.uniform(-1.5,2)
+		config.rotation = random.uniform(-config.rotationRange,config.rotationRange)
 	
 
 
@@ -312,6 +312,13 @@ def main(run = True) :
 
 
 	try :
+		config.rotationRange = float(workConfig.get("quilt", 'rotationRange')) 
+	except Exception as e:
+		config.rotationRange = 0
+		print (e)
+
+
+	try :
 		drawBlockCoordsRaw = list(list((i).split(',')) for i in workConfig.get("drawBlock", 'drawBlockCoords').split("|"))
 		config.drawBlockCoords = []
 		for i in drawBlockCoordsRaw :
@@ -336,8 +343,8 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-	config.doingRefresh = 2000
-	config.doingRefreshCount = 2000
+	config.doingRefresh = 100
+	config.doingRefreshCount = 100
 
 
 	if(run) : runWork()
@@ -356,24 +363,28 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArray)):
+	# Need to do a crossfade 
+	if config.doingRefresh < config.doingRefreshCount :
+		#print("crossfade...",  config.doingRefresh/config.doingRefreshCount)
+		if config.doingRefresh == 0 :
+			config.snapShot = config.canvasImage.copy()
+		crossFade = Image.blend(config.snapShot, config.canvasImage, config.doingRefresh/config.doingRefreshCount)
+		config.drawBlockShape()
+		config.render(crossFade, 0,0)
+		config.doingRefresh += 1
+	else :
+		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
+		temp.paste(config.canvasImage, (0,0), config.canvasImage)
+		if(config.transformShape == True) :
+			temp = transformImage(temp)
+		config.drawBlockShape()
+		config.render(temp, 0,0)
 
+	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
 		obj.update()
-		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
-			obj.render()
-			config.doingRefresh += 1
-		elif config.doingRefresh == config.doingRefreshCount :
-			obj.render()
-			
-
-	config.drawBlockShape()
-	temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	temp.paste(config.canvasImage, (0,0), config.canvasImage)
-	if(config.transformShape == True) :
-		temp = transformImage(temp)
+		obj.render()
 		
-	config.render(temp, 0,0)
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1

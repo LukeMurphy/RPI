@@ -64,7 +64,7 @@ def restartPiece():
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
 	if random.random() < config.resetSizeProbability  :
-		config.rotation = random.uniform(-3,3)
+		config.rotation = random.uniform(-config.rotationRange,config.rotationRange)
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
 		
@@ -227,6 +227,13 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
+
+
+	try :
+		config.rotationRange = float(workConfig.get("quilt", 'rotationRange')) 
+	except Exception as e:
+		config.rotationRange = 0
+		print (e)
 
 
 	try :

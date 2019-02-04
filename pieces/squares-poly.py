@@ -281,8 +281,8 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-	config.doingRefresh = 100
-	config.doingRefreshCount = 100
+	config.doingRefresh = 3
+	config.doingRefreshCount = 3
 
 	if(run) : runWork()
 

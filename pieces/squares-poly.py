@@ -281,8 +281,8 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-	config.doingRefresh = 3
-	config.doingRefreshCount = 3
+	config.doingRefresh = 100
+	config.doingRefreshCount = 100
 
 	if(run) : runWork()
 
@@ -300,26 +300,38 @@ def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArray)):
+	#print(config.doingRefresh)
 
+	# Need to do a crossfade 
+	if config.doingRefresh < config.doingRefreshCount :
+		#print("crossfade...",  config.doingRefresh/config.doingRefreshCount)
+		if config.doingRefresh == 0 :
+			config.snapShot = config.canvasImage.copy()
+		crossFade = Image.blend(config.snapShot, config.canvasImage, config.doingRefresh/config.doingRefreshCount)
+		config.render(crossFade, 0,0)
+		config.doingRefresh += 1
+	else :
+		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
+		temp.paste(config.canvasImage, (0,0), config.canvasImage)
+		if(config.transformShape == True) :
+			temp = transformImage(temp)
+		config.render(temp, 0,0)
+
+	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
 		obj.update()
+		obj.render()
+
+		'''
 		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
 			obj.render()
 			config.doingRefresh += 1
 		elif config.doingRefresh == config.doingRefreshCount :
 			obj.render()
+		'''
 
-	for f in config.drawBlockShape : f()
-		
-
-	temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
-	temp.paste(config.canvasImage, (0,0), config.canvasImage)
-
-
-	if(config.transformShape == True) :
-		temp = transformImage(temp)
-	config.render(temp, 0,0)
+	# For drawing a single color block or other lambda fcu
+	for fcu in config.drawBlockShape : fcu()
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1

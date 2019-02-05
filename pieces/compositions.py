@@ -79,7 +79,7 @@ def drawCompositions():
 			if (n == tiedToBottom) : y2 = config.imageHeight
 			starty = y2
 
-			if random.random() < .3 :
+			if random.random() < config.filterPatchProb :
 				choice = round(random.uniform(1,2))
 				if n == choice :
 					config.remapImageBlock = True
@@ -117,6 +117,7 @@ def main(run = True) :
 	config.refreshCount = int(workConfig.get("compositions", 'refreshCount')) 
 	config.timeToComplete = float(workConfig.get("compositions", 'timeToComplete')) 
 	config.cleanSlateProbability = float(workConfig.get("compositions", 'cleanSlateProbability')) 
+	config.filterPatchProb = float(workConfig.get("compositions", 'filterPatchProb')) 
 
 	config.imageWidth = config.canvasImageWidth
 	config.imageHeight = config.canvasImageHeight

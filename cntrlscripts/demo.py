@@ -18,6 +18,7 @@ actionDict1 = [
 	{" " :''},
 	{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
+	{"Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
 	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	{"Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
 	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
@@ -72,6 +73,7 @@ actionDict2 = [
 	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
 	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
 	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
+	{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
 
 
 	{" " :''},

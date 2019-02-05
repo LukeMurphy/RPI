@@ -28,8 +28,8 @@ def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale =
 	f = y-nx*d-ny*e
 	return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=Image.BICUBIC)
 
-def drawCompositions():
 
+def drawCompositions():
 
 	startx = config.imageWidth/9
 	wVariance = [config.imageWidth/6, config.imageWidth/3]
@@ -141,6 +141,9 @@ def main(run = True) :
 	config.draw = ImageDraw.Draw(config.canvasImage)
 	config.draw.rectangle((0,0,config.imageWidth, config.imageHeight), fill=config.bgColor)
 
+	config.firstRun = True
+	config.flip = False
+
 	drawCompositions()
 
 	setUp()
@@ -154,13 +157,12 @@ def main(run = True) :
 def restartDrawing() :
 
 	config.flip = True if random.random() < .5 else False
-	if random.random() < config.cleanSlateProbability :
-		grayLevel = round(random.uniform(20,70))
-		config.bgColor = (grayLevel,grayLevel,grayLevel)
-
+	if random.random() < config.cleanSlateProbability or config.firstRun == True :
+		#grayLevel = round(random.uniform(20,70))
+		#config.bgColor = (grayLevel,grayLevel,grayLevel)
 		config.bgColor = colorutils.getRandomColorHSV(0,360, .0,.15, .1,.4)
-
-		config.draw.rectangle((0,0,config.imageWidth,config.imageHeight), fill=config.bgColor)
+		config.draw.rectangle((0,0,config.imageWidth, config.imageHeight), fill=config.bgColor)
+		config.firstRun = False
 	drawCompositions()
 
 	config.t1  = time.time()

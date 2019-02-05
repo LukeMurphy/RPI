@@ -140,6 +140,7 @@ def main(run = True) :
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 	config.draw = ImageDraw.Draw(config.canvasImage)
 	config.draw.rectangle((0,0,config.imageWidth, config.imageHeight), fill=config.bgColor)
+
 	drawCompositions()
 
 	setUp()
@@ -151,7 +152,14 @@ def main(run = True) :
 
 
 def restartDrawing() :
+
+	config.flip = True if random.random() < .5 else False
 	if random.random() < config.cleanSlateProbability :
+		grayLevel = round(random.uniform(20,70))
+		config.bgColor = (grayLevel,grayLevel,grayLevel)
+
+		config.bgColor = colorutils.getRandomColorHSV(0,360, .0,.15, .1,.4)
+
 		config.draw.rectangle((0,0,config.imageWidth,config.imageHeight), fill=config.bgColor)
 	drawCompositions()
 
@@ -180,7 +188,7 @@ def runWork():
 
 def iterate() :
 	global config
-	#drawCompositions()
+
 	config.t2  = time.time()
 	delta = config.t2  - config.t1
 

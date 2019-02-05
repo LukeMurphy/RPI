@@ -139,7 +139,7 @@ def main(run = True) :
 
 	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
 	config.draw = ImageDraw.Draw(config.canvasImage)
-	config.draw.rectangle((0,0,config.imageWidth,config.imageHeight), fill=config.bgColor)
+	config.draw.rectangle((0,0,config.imageWidth, config.imageHeight), fill=config.bgColor)
 	drawCompositions()
 
 	setUp()
@@ -194,7 +194,7 @@ def iterate() :
 		config.render(crossFade, 0,0)
 		config.doingRefresh += 1
 	else :
-		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
+		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 		temp.paste(config.canvasImage, (0,0), config.canvasImage)
 		config.render(temp, 0,0)
 	#config.render(config.canvasImage, 0,0)

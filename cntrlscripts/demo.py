@@ -81,6 +81,12 @@ actionDict2 = [
 	{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
 	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
+	{" " :''},
+	{"------------------------------" :''},
+	{"Avatar" :'p4-5x8/icon-angel.cfg'},
+	{"Collage fckp" :'p4-5x8/icon-collage.cfg'},
+
+
 	]
 
 

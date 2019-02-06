@@ -160,7 +160,7 @@ def restartDrawing() :
 	if random.random() < config.cleanSlateProbability or config.firstRun == True :
 		#grayLevel = round(random.uniform(20,70))
 		#config.bgColor = (grayLevel,grayLevel,grayLevel)
-		config.bgColor = colorutils.getRandomColorHSV(0,360, .0,.15, .1,.4)
+		config.bgColor = colorutils.getRandomColorHSV(0,360, .0,.5, .1,.4)
 		config.draw.rectangle((0,0,config.imageWidth, config.imageHeight), fill=config.bgColor)
 		config.firstRun = False
 	drawCompositions()

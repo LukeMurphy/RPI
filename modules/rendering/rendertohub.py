@@ -70,6 +70,8 @@ def setUp():
 	#config.cnvs.update()
 	#config.cnvs.update_idletasks()
 
+	config.torqueAngle = 0
+
 
 	root.after(100, startWork)
 	root.call('wm', 'attributes', '.', '-topmost', '1')
@@ -251,6 +253,21 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		crop = crop.convert("RGBA")
 		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
 		config.renderImageFull.paste(crop, destination, crop)
+
+	
+	'''
+	for i in range(0,40) :
+		delta = 16
+		box = (0,i*delta,448,i*delta+delta)
+		crop = config.renderImageFull.crop(box)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, (i*2 + config.angle, i*delta), crop)
+
+	config.torqueAngle += 1
+	
+	if config.torqueAngle > 1000064 :
+		config.torqueAngle = 0
+	'''
 
 	if(updateCanvasCall) : updateCanvas() 
 

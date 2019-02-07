@@ -145,6 +145,13 @@ def main(run = True) :
 	except Exception as e: 
 		print (str(e)) 
 		config.transformShape = False
+	
+
+	try :
+		config.xWind = float(workConfig.get("particleSystem", 'xWind'))
+	except Exception as e: 
+		print (str(e)) 
+		config.xWind = 0
 
 
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
@@ -172,6 +179,8 @@ def main(run = True) :
 	config.overlayxPos = int(workConfig.get("particleSystem", 'overlayxPos')) 
 	config.overlayyPos = int(workConfig.get("particleSystem", 'overlayyPos')) 
 
+	config.torqueAngleLocal = 0
+
 
 	for i in range(0, ps.numUnits):
 		emitParticle()
@@ -192,6 +201,7 @@ def emitParticle(i=None):
 	#variance = math.pi/3
 	p.direction = random.uniform(math.pi + math.pi/2 - config.variance, math.pi + math.pi/2 + config.variance)
 	p.v = random.uniform(ps.speedMin,ps.speedMax)
+	p.xWind = config.xWind
 
 	if ps.objColor == "rnd" :
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
@@ -332,6 +342,24 @@ def iterate() :
 
 	if(config.transformShape == True) :
 		config.image = transformImage(config.image)
+
+	xDist = 0
+	delta = 8
+	config.torqueRate = 5
+	rows = round(config.canvasHeight / delta)
+	for i in range(0,rows) :
+		# counter speed - i.e. faster at top
+		#xDist = 1 + (rows -i)/config.torqueRate
+		xDist = 1 + (i)/config.torqueRate
+		box = (0,i*delta,448,i*delta+delta)
+		crop = config.renderImageFull.crop(box)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, (round(xDist) , i*delta), crop)
+
+	config.torqueAngleLocal += 0
+	
+	if config.torqueAngleLocal > 1000064 :
+		config.torqueAngleLocal = 0
 
 	config.render(config.image, 0,0)
 		

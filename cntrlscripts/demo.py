@@ -83,8 +83,8 @@ actionDict2 = [
 
 	{" " :''},
 	{"------------------------------" :''},
-	{"Avatar" :'p4-5x8/icon-angel.cfg'},
-	{"Collage fckp" :'p4-5x8/icon-collage.cfg'},
+	{"Ice Figure" :'p4-5x8/figure-ice.cfg'},
+	{"Figure Cake" :'p4-5x8/figure-cake.cfg'},
 
 
 	]

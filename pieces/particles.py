@@ -19,7 +19,7 @@ def main(run = True) :
 	config.canvasImageHeight = config.canvasHeight
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
-	config.delay = .02
+	config.delay = .01
 	config.numUnits  = 60
 
 
@@ -73,6 +73,12 @@ def main(run = True) :
 	
 
 	ps.objType = (workConfig.get("particleSystem", 'objType'))
+
+	try :
+		config.delay = float(workConfig.get("particleSystem", 'delay'))
+	except Exception as e: 
+		print (str(e)) 
+		ps.delay = .01
 
 	try :
 		ps.meandorFactor = float(workConfig.get("particleSystem", 'meandorFactor'))
@@ -148,6 +154,15 @@ def main(run = True) :
 	
 
 	try :
+		config.torqueDelta = int(workConfig.get("particleSystem", 'torqueDelta'))
+		config.torqueRate = float(workConfig.get("particleSystem", 'torqueRate'))
+	except Exception as e: 
+		print (str(e)) 
+		config.torqueDelta = 0
+		config.torqueRate = 0
+
+
+	try :
 		config.xWind = float(workConfig.get("particleSystem", 'xWind'))
 	except Exception as e: 
 		print (str(e)) 
@@ -179,7 +194,7 @@ def main(run = True) :
 	config.overlayxPos = int(workConfig.get("particleSystem", 'overlayxPos')) 
 	config.overlayyPos = int(workConfig.get("particleSystem", 'overlayyPos')) 
 
-	config.torqueAngleLocal = 0
+
 
 
 	for i in range(0, ps.numUnits):
@@ -343,23 +358,21 @@ def iterate() :
 	if(config.transformShape == True) :
 		config.image = transformImage(config.image)
 
-	xDist = 0
-	delta = 8
-	config.torqueRate = 5
-	rows = round(config.canvasHeight / delta)
-	for i in range(0,rows) :
-		# counter speed - i.e. faster at top
-		#xDist = 1 + (rows -i)/config.torqueRate
-		xDist = 1 + (i)/config.torqueRate
-		box = (0,i*delta,448,i*delta+delta)
-		crop = config.renderImageFull.crop(box)
-		crop = crop.convert("RGBA")
-		config.renderImageFull.paste(crop, (round(xDist) , i*delta), crop)
+	if config.torqueRate != 0 :
+		xDist = 0
+		rows = round(config.canvasHeight / config.torqueDelta)
 
-	config.torqueAngleLocal += 0
-	
-	if config.torqueAngleLocal > 1000064 :
-		config.torqueAngleLocal = 0
+		for i in range(0,rows) :
+			# counter speed - i.e. faster at top
+			#xDist = 1 + (rows -i)/config.torqueRate
+			xDist = 1 + (i)/config.torqueRate
+
+			box = (0,i*config.torqueDelta,448,i*config.torqueDelta+config.torqueDelta)
+			crop = config.renderImageFull.crop(box)
+			crop = crop.convert("RGBA")
+			config.renderImageFull.paste(crop, (round(xDist) , i*config.torqueDelta), crop)
+
+
 
 	config.render(config.image, 0,0)
 		

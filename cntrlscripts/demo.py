@@ -66,25 +66,25 @@ actionDict2 = [
 	{"P3 Wall w. removal: marquee2c - concentric " :'p3-2x4/marquee2c.cfg'},
 	{" " :''},
 
-	{"P3 sqr w. shift: marquee2b " :'p3-2x4/marquee2b.cfg'},
+	#{"P3 sqr w. shift: marquee2b " :'p3-2x4/marquee2b.cfg'},
 
 	{" " :''},
 	{"-------- TABLE -------------" :''},
 	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
-	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
-	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
-	{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
+	#{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
+	#{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
+	#{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
 
 
 	{" " :''},
-	{"------------------------------" :''},
-	{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
-	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	#{"------------------------------" :''},
+	#{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
+	#{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 	{" " :''},
 	{"------------------------------" :''},
 	{"Ice Figure" :'p4-5x8/figure-ice.cfg'},
-	{"Figure Cake" :'p4-5x8/figure-cake.cfg'},
+	#{"Figure Cake" :'p4-5x8/figure-cake.cfg'},
 
 
 	]

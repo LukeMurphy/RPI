@@ -122,6 +122,15 @@ def main(run = True) :
 	config.imageWidth = config.canvasImageWidth
 	config.imageHeight = config.canvasImageHeight
 
+	config.minHue = float(workConfig.get("compositions", 'minHue')) 
+	config.maxHue = float(workConfig.get("compositions", 'maxHue')) 
+	config.minSaturation = float(workConfig.get("compositions", 'minSaturation')) 
+	config.maxSaturation = float(workConfig.get("compositions", 'maxSaturation')) 
+	config.minValue = float(workConfig.get("compositions", 'minValue')) 
+	config.maxValue = float(workConfig.get("compositions", 'maxValue')) 
+
+
+
 
 	print("Running")
 
@@ -160,7 +169,7 @@ def restartDrawing() :
 	if random.random() < config.cleanSlateProbability or config.firstRun == True :
 		#grayLevel = round(random.uniform(20,70))
 		#config.bgColor = (grayLevel,grayLevel,grayLevel)
-		config.bgColor = colorutils.getRandomColorHSV(0,360, .0,.5, .1,.4)
+		config.bgColor = colorutils.getRandomColorHSV(config.minHue,config.maxHue, config.minSaturation, config.maxSaturation, config.minValue, config.maxValue)
 		#config.bgColor = colorutils.getRandomColorHSV(0,360, .3,.95, .1,.94)
 		config.draw.rectangle((0,0,config.imageWidth, config.imageHeight), fill=config.bgColor)
 		config.firstRun = False

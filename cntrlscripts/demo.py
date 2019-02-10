@@ -83,8 +83,12 @@ actionDict2 = [
 
 	{" " :''},
 	{"------------------------------" :''},
-	{"Ice Figure" :'p4-5x8/figure-ice.cfg'},
-	#{"Figure Cake" :'p4-5x8/figure-cake.cfg'},
+	{"Square - marquee" :'p4-4x8/square-marquee.cfg'},
+	{"Square - Collage" :'p4-4x8/square-collage.cfg'},
+	{"Square - ICE" :'p4-4x8/square.cfg'},
+	{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
+	{"Square - RUG" :'p4-4x8/square-rug.cfg'},
+
 
 
 	]

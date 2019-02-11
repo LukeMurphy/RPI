@@ -70,6 +70,7 @@ actionDict2 = [
 
 	{" " :''},
 	{"-------- TABLE -------------" :''},
+	{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
 	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
 	#{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
 	#{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
@@ -83,9 +84,12 @@ actionDict2 = [
 
 	{" " :''},
 	{"------------------------------" :''},
-	{"Square - marquee" :'p4-4x8/square-marquee.cfg'},
-	{"Square - Collage" :'p4-4x8/square-collage.cfg'},
 	{"Square - ICE" :'p4-4x8/square.cfg'},
+	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
+	{"Square - marquee" :'p4-4x8/square-marquee.cfg'},
+	
+	{" " :''},
+	{"Square - Collage" :'p4-4x8/square-collage.cfg'},
 	{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
 	{"Square - RUG" :'p4-4x8/square-rug.cfg'},
 
@@ -107,7 +111,7 @@ def action():
 		process = True
 
 	if process == True:
-		os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
+		#os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
 		configToRun = configSelected[list(configSelected.keys())[0]]
 
 		if ".cfg" in configToRun :

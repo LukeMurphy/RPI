@@ -233,6 +233,7 @@ def main(run = True) :
 	config.colOverlay.minValue = float(workConfig.get("screenproject", 'minValue'))
 	config.colOverlay.maxBrightness = float(workConfig.get("screenproject", 'maxBrightness'))
 	config.colOverlay.maxValue = float(workConfig.get("screenproject", 'maxValue'))
+	config.colOverlay.colorTransitionSetup()
 
 	config.crackChangeProb = float(workConfig.get("screenproject", 'crackChangeProb'))
 	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))

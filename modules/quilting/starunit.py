@@ -67,6 +67,8 @@ class Unit:
 
 	def setUp(self, n = 0) :
 
+		self.outlineColorObj.colorTransitionSetup()
+		
 		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 
 		#### Sets up color transitions
@@ -108,6 +110,8 @@ class Unit:
 			)
 		self.colOverlay.colorA = (250,250,250)
 		#self.colOverlay.colorB = (50,50,50)
+
+		self.colOverlay.colorTransitionSetup()
 
 		self.outlineColor = tuple(round(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 

@@ -263,6 +263,9 @@ def main(run = True) :
 
 		config.colorOverlayObjA = coloroverlay.ColorOverlay()
 		config.colorOverlayObjB = coloroverlay.ColorOverlay()
+
+		config.colorOverlayObjA.colorTransitionSetup()
+		config.colorOverlayObjB.colorTransitionSetup()
 		#config.colorA = colorutils.randomColor()
 		#config.colorB = colorutils.randomColor()
 		#config.currentColor = config.colorA

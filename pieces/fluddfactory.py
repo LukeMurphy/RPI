@@ -77,6 +77,8 @@ class Fludd :
 		self.colOverlay.maxValue = 1
 
 		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+
+		self.colOverlay.colorTransitionSetup()
 		self.fillColor = tuple(round (a * self.config.brightness ) for a in self.colOverlay.currentColor)
 
 
@@ -99,7 +101,8 @@ class Fludd :
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
-		self.colOverlay2.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)		
+		self.colOverlay2.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.colOverlay2.colorTransitionSetup()
 
 	def setUp(self):
 
@@ -152,6 +155,8 @@ class Fludd :
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
 		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.colOverlay.colorTransitionSetup()
+
 		self.fillColor = tuple(round (a * self.config.brightness ) for a in self.colOverlay.currentColor)
 
 
@@ -175,6 +180,7 @@ class Fludd :
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
 		self.colOverlay2.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.colOverlay2.colorTransitionSetup()
 
 		self.widthDelta = 0
 		self.heightDelta = 0

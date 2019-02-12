@@ -115,6 +115,7 @@ def setInitialColors(refresh=False):
 			colOverlay = obj.polys[c][1]
 			colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
 			colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
+			colOverlay.colorTransitionSetup()
 			colOverlay.colorTransitionSetupValues()
 		
 
@@ -133,6 +134,7 @@ def main(run = True) :
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
+	config.outlineColorObj.colorTransitionSetup()
 
 	config.quiltPattern = (workConfig.get("quilt", 'pattern'))
 
@@ -270,6 +272,7 @@ def main(run = True) :
 		config.drawBlockColor.maxSaturation = config.drawBlock_c1SaturationRange[1]		
 		config.drawBlockColor.minValue = config.drawBlock_c1ValueRange[0]
 		config.drawBlockColor.maxValue = config.drawBlock_c1ValueRange[1]
+		config.drawBlockColor.colorTransitionSetup()
 		config.drawBlockColor.stepTransition()
 		config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 		config.drawBlock = True

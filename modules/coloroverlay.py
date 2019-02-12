@@ -45,7 +45,7 @@ class ColorOverlay:
 
 
 	def __init__(self, randomColorInit=False): 
-		self.colorTransitionSetup()
+		#self.colorTransitionSetup()
 		#self.colorA = colorutils.randomColor()
 		#self.colorB = colorutils.randomColor()
 		#self.colorB = colorutils.getRandomRGB()
@@ -71,8 +71,10 @@ class ColorOverlay:
 			sMin=self.minSaturation, sMax=self.maxSaturation,
 			vMin=self.minValue, vMax=self.maxValue,
 			dropHueMin = self.dropHueMin, dropHueMax = self.dropHueMax)
-		#print("New Color A", self.colorA)
-
+		
+		'''
+		print("New Color A", self.colorA)
+		'''
 
 	
 	def getNewColor(self):

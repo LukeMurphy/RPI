@@ -180,13 +180,14 @@ def setInitialColors(refresh=False):
 			colOverlay = obj.triangles[c][1]
 			#colOverlay.colorB = colorutils.randomColorAlpha(config.brightness * .8,0)
 			colOverlay.colorA = colorutils.randomColorAlpha(config.brightness * .8,0)
+			colOverlay.colorTransitionSetup()
 			colOverlay.colorTransitionSetupValues()
 
 
 def main(run = True) :
 	global config, directionOrder,workConfig
 	print("---------------------")
-	print("QUILT Loaded")
+	print("QUILT TRIANGLES or STARS Loaded")
 
 
 	config.brightness = float(workConfig.get("displayconfig", 'brightness')) 
@@ -198,6 +199,7 @@ def main(run = True) :
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
+	config.outlineColorObj.colorTransitionSetup()
 
 	config.quiltPattern = (workConfig.get("quilt", 'pattern'))
 
@@ -362,6 +364,7 @@ def runWork():
 def iterate() :
 	global config
 	config.outlineColorObj.stepTransition()
+
 
 	# Need to do a crossfade 
 	if config.doingRefresh < config.doingRefreshCount :

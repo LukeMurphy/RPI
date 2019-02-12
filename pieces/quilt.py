@@ -85,6 +85,8 @@ class unit:
 			hMin = self.minHue, hMax  = self.maxHue, 
 			vMin = self.minValue, vMax = self.maxValue
 			)
+
+		self.colOverlay.colorTransitionSetup()
 		
 		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 

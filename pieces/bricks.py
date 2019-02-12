@@ -92,7 +92,7 @@ class unit:
 			)
 		
 		#self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
-
+		self.colOverlay.colorTransitionSetup()
 
 	def update(self):
 		#self.fillColorMode == "random" or 

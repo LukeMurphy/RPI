@@ -182,6 +182,7 @@ def setColorProperties(c) :
 	c.minValue = float(workConfig.get("pattern", 'minValue'))
 	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
 	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
+	c.colorTransitionSetup()
 
 
 def drawTheReal() :

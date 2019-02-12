@@ -87,6 +87,7 @@ actionDict2 = [
 	{"Square - ICE" :'p4-4x8/square.cfg'},
 	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
 	{"Square - marquee" :'p4-4x8/square-marquee.cfg'},
+	{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
 	
 	{" " :''},
 	{"Square - Collage" :'p4-4x8/square-collage.cfg'},

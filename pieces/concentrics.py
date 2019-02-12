@@ -136,6 +136,8 @@ def main(run = True) :
 	config.colOverlay.tLimitBase = 5
 	config.colOverlay.maxBrightness = config.brightness
 	config.colOverlay.steps = 50
+
+	config.colOverlay.colorTransitionSetup()
 	config.delay = float(workConfig.get("concentrics", 'delay'))
 	config.numUnits = int(workConfig.get("concentrics", 'numUnits'))
 	

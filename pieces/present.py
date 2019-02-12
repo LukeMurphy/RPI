@@ -285,6 +285,7 @@ def iterate( n = 0) :
 
 	if(random.random() < config.overlayChangeProb ) :
 		config.colorOverlay = colorutils.getRandomRGB()
+		config.colOverlay.colorTransitionSetup()
 		#config.colorOverlay = colorutils.getRandomColorWheel()
 	if(random.random() < config.overlayChangePosProb ) :
 		config.overlayyPos = 100

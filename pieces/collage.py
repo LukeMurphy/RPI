@@ -103,6 +103,7 @@ class Shape :
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
 		self.colOverlay.randomRange = (self.config.transitionStepsMin, self.config.transitionStepsMax)
+		self.colOverlay.colorTransitionSetup()
 		self.colOverlay.setStartColor()
 		self.colOverlay.getNewColor()
 

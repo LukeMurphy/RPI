@@ -63,6 +63,7 @@ class unit :
 			self.colOverlay.randomRange = (self.colorStepsRangeMin,self.colorStepsRangeMax)
 
 			self.colOverlay.colorTransitionSetup()
+			
 
 	
 	def getNeighbours(self):

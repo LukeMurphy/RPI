@@ -103,7 +103,7 @@ def init() :
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
 	config.bgColor = coloroverlay.ColorOverlay()
 	config.bgColor.randomRange = (10.0,config.randomRange/2)
-
+	config.bgColor.colorTransitionSetup()
 
 
 	## The pattern controls the dash size - each 1 or 0 represents the width of one small
@@ -144,6 +144,9 @@ def init() :
 
 		colOverlayA.randomRange = (10.0, config.randomRange)
 		colOverlayB.randomRange = (10.0, config.randomRange)
+
+		colOverlayA.colorTransitionSetup()
+		colOverlayB.colorTransitionSetup()
 
 		if (i != 0) : 
 			marqueeWidth = marqueeWidthPrev - decrement

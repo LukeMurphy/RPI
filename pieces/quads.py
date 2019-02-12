@@ -119,6 +119,7 @@ def init() :
 	config.colOverlayA.steps = 100 
 	config.colOverlayA.tLimitBase = 30
 	config.colOverlayA.maxBrightness = config.brightness
+	config.colOverlayA.colorTransitionSetup()
 
 	makeblockanimals.config = config
 	makeblockanimals.drawBackGround = drawBackGround

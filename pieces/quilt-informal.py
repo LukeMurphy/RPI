@@ -75,6 +75,7 @@ class unit:
 		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
 
 
+
 		self.fillColor = colorutils.getRandomColorHSV(
 			sMin = self.minSaturation, sMax = self.maxSaturation,  
 			hMin = self.minHue, hMax  = self.maxHue, 
@@ -88,6 +89,8 @@ class unit:
 			hMin = self.minHue, hMax  = self.maxHue, 
 			vMin = self.minValue, vMax = self.maxValue
 			)
+
+		self.colOverlay.colorTransitionSetup()
 		
 		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 

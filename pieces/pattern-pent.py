@@ -96,16 +96,21 @@ def drawConcentricRings():
 		#x = m - abs(i % (2*m) - m)
 		#rate = m - abs(math.sin(config.angle) % 2*m - m) + .8
 		rate = m - abs((config.angle) % 2*m - m) + .9
-	'''
 
 	if random.random() > .99 :
 		config.turnRateChange = random.uniform(.5,3) / config.turnRateFactor
-
+	'''
 
 
 	if config.paused == False and config.turnRateBase != 0:
 		config.turnRate += config.turnRateChange * config.turnRateDirection
 		#config.turnRate = rate 
+
+		if random.random() < .005 :
+			config.paused = True
+			d = random.uniform(5,20)
+			t1 = Timer(d, resetPause)
+			t1.start()
 		
 		if config.turnRate > config.turnRateLimPlus :
 
@@ -113,7 +118,7 @@ def drawConcentricRings():
 			config.turnRate = config.turnRateLimPlus
 
 			#config.paused = True
-			d = random.uniform(.5,2)
+			d = random.uniform(5,20)
 			t1 = Timer(d, resetPause)
 			#t1.start()
 
@@ -121,8 +126,8 @@ def drawConcentricRings():
 			config.turnRateDirection = 1
 
 			#config.paused = True
-			d = random.uniform(.5,2)
-			t = Timer(d,resetPause)
+			d = random.uniform(5,20)
+			t = Timer(d, resetPause)
 			#t.start()
 		
 

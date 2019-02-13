@@ -26,6 +26,9 @@ def getColorChanger():
 	colOverlay.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
 	colOverlay.minValue = float(workConfig.get("pattern", 'minValue'))
 	colOverlay.maxValue = float(workConfig.get("pattern", 'maxValue'))
+	config.randomRangeMin = int(workConfig.get("pattern", 'randomRangeMin'))
+	config.randomRangeMax = int(workConfig.get("pattern", 'randomRangeMax'))
+	colOverlay.randomRange = (config.randomRangeMin, config.randomRangeMax)
 	return colOverlay
 
 def setColorProperties(c) :
@@ -157,7 +160,10 @@ def drawConcentricRings():
 			y = config.r * math.sin(angle) + config.offset[1] + config.figureDistortions[figures][i]
 			pointsArray.append((x,y))
 
-		config.draw.polygon(pointsArray, outline=(100,0,0,100), fill = config.colorArray[f])
+		if config.showLines == True :
+			config.draw.polygon(pointsArray, outline=config.colorArray[0], fill = config.colorArray[f])
+		else :
+			config.draw.polygon(pointsArray, outline=None, fill = config.colorArray[f])
 
 		f += 1
 		if f >= config.colorRep : f = 0
@@ -184,6 +190,7 @@ def main(run=True):
 
 
 	config.patternSet = workConfig.get("pattern", 'patternSet')
+	config.showLines = workConfig.getboolean("pattern", 'showLines')
 
 	config.initialRadius = float(workConfig.get(config.patternSet, 'initialRadius'))
 	config.nSides = int(workConfig.get(config.patternSet, 'nSides'))
@@ -214,6 +221,10 @@ def main(run=True):
 	config.blockSteps = int(workConfig.get("pattern", 'blockSteps'))
 	config.paused =  False
 	config.timeDelay = 5.0
+
+
+
+
 
 
 	# Start from center for each polygon

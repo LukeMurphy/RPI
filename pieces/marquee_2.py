@@ -106,8 +106,8 @@ def setTwoColors() :
 	colOverlayB.minHue = config.palettes[config.usePalette][2]
 	colOverlayB.maxHue = config.palettes[config.usePalette][3]
 
-	colOverlayA.randomRange = (200.0, config.randomRange)
-	colOverlayB.randomRange = (200.0, config.randomRange)
+	colOverlayA.randomRange = (config.randomRangeMin, config.randomRangeMax)
+	colOverlayB.randomRange = (config.randomRangeMin, config.randomRangeMax)
 
 	colOverlayA.steps = 250
 	colOverlayA.tLimit = 25
@@ -129,7 +129,7 @@ def init() :
 
 	config.draw.rectangle((0,0,config.screenWidth,config.screenHeight), fill=(0,0,0,255))
 	config.bgColor = coloroverlay.ColorOverlay()
-	config.bgColor.randomRange = (10.0,config.randomRange/2)
+	config.bgColor.randomRange = (config.randomRangeMin,config.randomRangeMax)
 	config.bgColor.colorTransitionSetup()
 
 
@@ -265,7 +265,6 @@ def main(run = True) :
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw  = ImageDraw.Draw(config.image)
 	config.redrawSpeed  = float(workConfig.get("marquee", 'redrawSpeed')) 
-	config.randomRange  = float(workConfig.get("marquee", 'randomRange')) 
 	config.marqueeWidth = int(workConfig.get("marquee", 'marqueeWidth'))
 	config.baseDashSize = int(workConfig.get("marquee", 'baseDashSize'))
 	config.gap = int(workConfig.get("marquee", 'gap'))
@@ -273,6 +272,13 @@ def main(run = True) :
 	config.changePaletteInterval = int(workConfig.get("marquee", 'changePaletteInterval'))
 	config.decrement = int(workConfig.get("marquee", 'decrement'))
 	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
+	try :
+		config.randomRangeMin = int(workConfig.get("marquee", 'randomRangeMin'))
+		config.randomRangeMax = int(workConfig.get("marquee", 'randomRangeMax'))
+	except Exception as e :
+		print(e)
+		config.randomRangeMin = 200
+		config.randomRangeMax = 400
 
 	try :
 		config.mulitColor = (workConfig.getboolean("marquee", 'mulitColor'))
@@ -294,6 +300,13 @@ def main(run = True) :
 	"winter2":[190,210,210,230],
 	"wintersun":[30,50,180,240],
 	}
+
+	if config.mulitColor == False :
+		# Only two colors so the palettes are not really applicable
+		config.palettes = {
+		"all":[0,360,0,360],
+		"all2":[0,180,180,360],
+		}
 
 	config.usePalette = list(config.palettes.keys())[1]
 

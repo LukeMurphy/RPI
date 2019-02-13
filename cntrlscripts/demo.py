@@ -86,10 +86,15 @@ actionDict2 = [
 	{"------------------------------" :''},
 	{"Square - ICE" :'p4-4x8/square.cfg'},
 	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
-	{"Square - marquee" :'p4-4x8/square-marquee.cfg'},
+	{" " :''},
+	{"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
+	{"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},
+	{"Square - marquee c" :'p4-4x8/square-marquee-c.cfg'},
 	{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
 	
 	{" " :''},
+	{"Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
+	{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
 	{"Square - Collage" :'p4-4x8/square-collage.cfg'},
 	{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
 	{"Square - RUG" :'p4-4x8/square-rug.cfg'},
@@ -149,11 +154,12 @@ Lb2.pack(side=tk.LEFT,ipadx=10,expand=0  )
 button = tk.Button(frame, text="QUIT", bg="black", fg="red", command=quit)
 button.pack(side=tk.BOTTOM, padx=2)
 
+slogan = tk.Button(frame,text="Run",fg="Red", command=action)
+slogan.pack(side=tk.BOTTOM,padx=2)
+
 slogan = tk.Button(frame,text="Stop All",fg="blue", command=stopAll)
 slogan.pack(side=tk.BOTTOM,padx=2)
 
-slogan = tk.Button(frame,text="Run",fg="Red", command=action)
-slogan.pack(side=tk.BOTTOM,padx=2)
 
 
 

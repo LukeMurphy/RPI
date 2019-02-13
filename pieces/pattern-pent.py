@@ -157,7 +157,7 @@ def drawConcentricRings():
 			y = config.r * math.sin(angle) + config.offset[1] + config.figureDistortions[figures][i]
 			pointsArray.append((x,y))
 
-		config.draw.polygon(pointsArray, outline=None, fill = config.colorArray[f])
+		config.draw.polygon(pointsArray, outline=(100,0,0,100), fill = config.colorArray[f])
 
 		f += 1
 		if f >= config.colorRep : f = 0

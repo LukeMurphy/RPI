@@ -24,10 +24,10 @@ class ColorOverlay:
 
 	## "Public" variables that can be set
 	randomSteps = True
-	steps = 100
+	steps = 200
 	step = 1
-	tLimit = 10
-	tLimitBase = 10
+	tLimit = 20
+	tLimitBase = 20
 
 	maxBrightness = 1
 
@@ -142,8 +142,8 @@ class ColorOverlay:
 		#print(self.colorB, self.currentColorRaw)
 		
 		# Create random number of transition steps
-		if(steps == 0 or self.randomSteps == True) : 
-			self.steps = round(random.uniform(self.randomRange[0],self.randomRange[1]))
+		#if(steps == 0 or self.randomSteps == True) : 
+		self.steps = round(random.uniform(self.randomRange[0],self.randomRange[1]))
 
 		self.tLimit = round(random.uniform(self.tLimitBase/2, self.tLimitBase * 1.5))+ 1
 		self.rateOfColorChange = [ x/self.steps for x in self.colorDelta]

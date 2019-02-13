@@ -20,8 +20,8 @@ class Marquee :
 
 	reverse = False
 	
-	colOverlayA = coloroverlay.ColorOverlay()
-	colOverlayB = coloroverlay.ColorOverlay()
+	#colOverlayA = coloroverlay.ColorOverlay()
+	#colOverlayB = coloroverlay.ColorOverlay()
 
 	def __init__(self):
 		self.p0 = []
@@ -97,6 +97,33 @@ class Marquee :
 		self.colOverlayB.stepTransition()
 
 
+def setTwoColors() :
+	colOverlayA = coloroverlay.ColorOverlay()
+	colOverlayB = coloroverlay.ColorOverlay()
+
+	colOverlayA.minHue = config.palettes[config.usePalette][0]
+	colOverlayA.maxHue = config.palettes[config.usePalette][1]
+	colOverlayB.minHue = config.palettes[config.usePalette][2]
+	colOverlayB.maxHue = config.palettes[config.usePalette][3]
+
+	colOverlayA.randomRange = (200.0, config.randomRange)
+	colOverlayB.randomRange = (200.0, config.randomRange)
+
+	colOverlayA.steps = 250
+	colOverlayA.tLimit = 25
+	colOverlayA.tLimitBase = 25
+	colOverlayB.steps = 250
+	colOverlayB.tLimit = 20
+	colOverlayB.tLimitBase = 20
+
+	colOverlayA.colorTransitionSetup()
+	colOverlayB.colorTransitionSetup()
+
+
+
+	return (colOverlayA, colOverlayB)
+
+
 def init() :
 	global config
 
@@ -131,22 +158,14 @@ def init() :
 
 	config.marquees = []
 
+	unitColors = setTwoColors()
+
 	for i in range (0, config.marqueeNum):
 	
 		clrs = [colorutils.randomColor(),colorutils.randomColorAlpha(255,255)]
-		colOverlayA = coloroverlay.ColorOverlay()
-		colOverlayB = coloroverlay.ColorOverlay()
 
-		colOverlayA.minHue = config.palettes[config.usePalette][0]
-		colOverlayA.maxHue = config.palettes[config.usePalette][1]
-		colOverlayB.minHue = config.palettes[config.usePalette][2]
-		colOverlayB.maxHue = config.palettes[config.usePalette][3]
-
-		colOverlayA.randomRange = (10.0, config.randomRange)
-		colOverlayB.randomRange = (10.0, config.randomRange)
-
-		colOverlayA.colorTransitionSetup()
-		colOverlayB.colorTransitionSetup()
+		if config.mulitColor == True :
+			unitColors = setTwoColors()
 
 		if (i != 0) : 
 			marqueeWidth = marqueeWidthPrev - decrement
@@ -165,8 +184,8 @@ def init() :
 		mq.marqueeWidth = marqueeWidth
 		mq.step = step
 		mq.clrs = clrs
-		mq.colOverlayA = colOverlayA
-		mq.colOverlayB = colOverlayB
+		mq.colOverlayA = unitColors[0]
+		mq.colOverlayB = unitColors[1]
 		mq.configDraw = config.draw
 		mq.reverse = True if(i%2 > 0 ) else False
 
@@ -254,6 +273,15 @@ def main(run = True) :
 	config.changePaletteInterval = int(workConfig.get("marquee", 'changePaletteInterval'))
 	config.decrement = int(workConfig.get("marquee", 'decrement'))
 	config.marqueeNum = int(workConfig.get("marquee", 'marqueeNum'))
+
+	try :
+		config.mulitColor = (workConfig.getboolean("marquee", 'mulitColor'))
+	except Exception as e :
+		print(e)
+		config.mulitColor = True
+
+
+
 	colorutils.brightness =  float(workConfig.get("displayconfig", 'brightness')) 
 	config.xOffset = 15
 

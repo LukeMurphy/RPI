@@ -53,7 +53,7 @@ class unit :
 			self.colOverlay.colorA = [0,0,0, 10]
 			self.colOverlay.currentColor = [0,0,0,10]
 
-			self.colOverlay.colorTransitionSetup()
+		self.colOverlay.colorTransitionSetup()
 
 	
 	def drawUnit(self):

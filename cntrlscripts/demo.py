@@ -84,17 +84,18 @@ actionDict2 = [
 
 	{" " :''},
 	{"------------------------------" :''},
-	{"Square - ICE" :'p4-4x8/square.cfg'},
-	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
+	{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
 	{" " :''},
 	{"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
 	{"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},
 	{"Square - marquee c" :'p4-4x8/square-marquee-c.cfg'},
+	{" " :''},
+	{"Square - ICE" :'p4-4x8/square.cfg'},
+	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
+	{" " :''},
 	{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
-	
 	{" " :''},
 	{"Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
-	{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
 	{"Square - Collage" :'p4-4x8/square-collage.cfg'},
 	{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
 	{"Square - RUG" :'p4-4x8/square-rug.cfg'},
@@ -103,10 +104,10 @@ actionDict2 = [
 
 	]
 
-
-def action():
+def verify():
 	#print("==>",Lb.curselection())
 	process = False
+	configSelected = None
 	if len(list(Lb1.curselection())) > 0 :
 		selection  = (Lb1.curselection()[0])
 		configSelected  = actionDict1[selection];
@@ -115,15 +116,33 @@ def action():
 		selection  = (Lb2.curselection()[0])
 		configSelected  = actionDict2[selection];
 		process = True
+	return (process, configSelected)
 
-	if process == True:
+
+def execute(configToRun) :
+	if ".cfg" in configToRun :
+		os.system(commadStringPyth + configToRun + '&')
+	elif ".app" in configToRun :
+		os.system('open ' + commadStringProc + configToRun)
+	
+	
+
+def action():
+	a = verify()
+	if a[0] == True:
 		#os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
+		configSelected = a[1]
 		configToRun = configSelected[list(configSelected.keys())[0]]
+		execute(configToRun)
 
-		if ".cfg" in configToRun :
-			os.system(commadStringPyth + configToRun + '&')
-		elif ".app" in configToRun :
-			os.system('open ' + commadStringProc + configToRun)
+
+def action2():
+	a = verify()
+	if a[0] == True:
+		os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
+		configSelected = a[1]
+		configToRun = configSelected[list(configSelected.keys())[0]]
+		execute(configToRun)
 
 
 
@@ -158,6 +177,9 @@ slogan = tk.Button(frame,text="Run",fg="Red", command=action)
 slogan.pack(side=tk.BOTTOM,padx=2)
 
 slogan = tk.Button(frame,text="Stop All",fg="blue", command=stopAll)
+slogan.pack(side=tk.BOTTOM,padx=2)
+
+slogan = tk.Button(frame,text="Stop & Run",fg="blue", command=action2)
 slogan.pack(side=tk.BOTTOM,padx=2)
 
 

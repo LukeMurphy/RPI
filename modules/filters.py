@@ -66,7 +66,7 @@ def ditherGlitch(renderImageFull,xOffset, yOffset, config):
 	renderImageFull =  newimage.convert("RGB")
 	return renderImageFull
 
-def pixelSort(renderImageFull, config):
+def pixelSort(imageToModify, config):
 	
 	pixSortXOffset = config.pixSortXOffset
 	pixSortYOffset = config.pixSortYOffset
@@ -86,7 +86,9 @@ def pixelSort(renderImageFull, config):
 	brightnessVarLow = config.brightnessVarLow
 	brightnessVarHi = config.brightnessVarHi
 
-	tempDraw = ImageDraw.Draw(renderImageFull)
+
+
+	tempDraw = ImageDraw.Draw(imageToModify)
 
 	pixSortxStart = 0
 	pixSortyStart = 0
@@ -122,6 +124,7 @@ def pixelSort(renderImageFull, config):
 			# condition when a single LED panel is totally whacked vs a line of LEDS is whacked ;)
 
 			colorSampleColor = (10,10,10) #colorutils.getRandomRGB(random.random())
+			colorSampleColorAlpha = (10,10,10,10) #colorutils.getRandomRGB(random.random())
 			if pixSortDirection == "lateral":
 				## i.e. draw horizontal lines
 				boxRange = int(pixSortboxHeight)
@@ -145,11 +148,11 @@ def pixelSort(renderImageFull, config):
 						#samplePoint = (pixSortxStart + i, pixSortboxHeight + var + pixSortyStart)
 						samplePoint = (pixSortxStart + i + pixSortXOffset,  var + pixSortyStart + pixSortYOffset)
 
-					#print(samplePoint,renderImageFull.size[0],renderImageFull.size[1])
+					#print(samplePoint,imageToModify.size[0],imageToModify.size[1])
 
 					# Just make sure the sample point is actually within the bounds of the image
-					if(samplePoint[0] < renderImageFull.size[0] and samplePoint[1] < renderImageFull.size[1]):
-						colorSample = renderImageFull.getpixel(samplePoint)
+					if(samplePoint[0] < imageToModify.size[0] and samplePoint[1] < imageToModify.size[1]):
+						colorSample = imageToModify.getpixel(samplePoint)
 
 						#randomize brightness a little
 						colorSampleColor = tuple(int(round(c * random.uniform(brightnessVarLow,brightnessVarHi))) for c in colorSample)
@@ -157,6 +160,11 @@ def pixelSort(renderImageFull, config):
 				# Once in a little while, the color is just random
 				if(random.random() < randomColorProbabilty) : colorSampleColor = colorutils.getRandomRGB(random.random())
 
+				colorSampleColorAlpha = tuple(int(c) for c in colorSampleColor) 
+
+				#colorSampleColorAlpha = (100,0,0,0)
+
+				#print(colorSampleColorAlpha)
 				# Variable probability that the line will even draw. Lower probability means more
 				# glitchy lines
 				if(random.random() < pixSortprobDraw and colorSampleColor != (0,0,0)) :
@@ -164,14 +172,14 @@ def pixelSort(renderImageFull, config):
 						tempDraw.line((
 							pixSortxStart + pixSortXOffset- varx, 							i + pixSortyStart + pixSortYOffset, 
 							pixSortboxWidth - varx + pixSortxStart +  pixSortXOffset, 	i + pixSortyStart + pixSortYOffset) , 
-							fill = colorSampleColor)
+							fill = colorSampleColorAlpha)
 					else :
 						tempDraw.line((
 							i + pixSortxStart + pixSortXOffset, 		pixSortyStart + pixSortYOffset - varx, 
 							i + pixSortxStart + pixSortXOffset, 		pixSortyStart - varx + pixSortboxHeight + pixSortYOffset), 
-							fill = colorSampleColor)
+							fill = colorSampleColorAlpha)
 
-	return renderImageFull
+	return imageToModify
 
 
 def orderedDither(renderImageFull,xOffset, yOffset):

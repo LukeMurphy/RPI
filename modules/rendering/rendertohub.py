@@ -215,6 +215,12 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		if(random.random()< config.pixelSortAppearanceProb) :
 			config.renderImageFull =  pixelSort(config.renderImageFull, config)
 
+			
+			#crop = config.renderImageFull.crop()
+			#crop = crop.convert("RGBA")
+			#crop =  pixelSort(crop, config)
+			#config.renderImageFull = config.renderImageFull.convert("RGBA")
+			#config.renderImageFull.paste(crop)
 
 
 	# ---- Remap sections of image to accommodate odd panels ---- #

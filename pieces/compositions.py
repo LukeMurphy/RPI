@@ -48,9 +48,9 @@ def drawCompositions():
 	angleRotation = random.uniform(-3,3)
 
 	for n in range(0, config.numSquarePairs):
-		gray0 = int(random.uniform(0,160))
-		gray1 = int(random.uniform(0,160))
-		gray2 = int(random.uniform(0,160))
+		gray0 = round(random.uniform(0,160) * config.brightness)
+		gray1 = round(random.uniform(0,160) * config.brightness)
+		gray2 = round(random.uniform(0,160) * config.brightness)
 		fills = [
 			(gray0,gray1,gray1,255),
 			(gray1,gray1,gray1,255),
@@ -63,19 +63,19 @@ def drawCompositions():
 			wFactor *= 1.5
 
 		if (n == 0) : 
-			x1 = int(xSeam)
-			x2 = int(random.uniform(x1 + startx, x1 + wVariance[1]))
-			y1 = int(random.uniform(hVariance[0], hVariance[1]))
-			y2 = int(random.uniform(y1 + hVariance[0]*hFactor, y1 + hVariance[1]*hFactor))
+			x1 = round(xSeam)
+			x2 = round(random.uniform(x1 + startx, x1 + wVariance[1]))
+			y1 = round(random.uniform(hVariance[0], hVariance[1]))
+			y2 = round(random.uniform(y1 + hVariance[0]*hFactor, y1 + hVariance[1]*hFactor))
 			if (n == tiedToBottom) : y2 = config.imageHeight
-			starty = int(random.uniform(0,config.imageHeight/2))
+			starty = round(random.uniform(0,config.imageHeight/2))
 
 
 		else :
-			x1 = int(random.uniform(xSeam - startx * wFactor, xSeam - wVariance[1]* wFactor) ) 
-			x2 = int(xSeam)
+			x1 = round(random.uniform(xSeam - startx * wFactor, xSeam - wVariance[1]* wFactor) ) 
+			x2 = round(xSeam)
 			y1 = starty
-			y2 = int(random.uniform(y1 + hVariance[0], y1 + hVariance[1]))
+			y2 = round(random.uniform(y1 + hVariance[0], y1 + hVariance[1]))
 			if (n == tiedToBottom) : y2 = config.imageHeight
 			starty = y2
 

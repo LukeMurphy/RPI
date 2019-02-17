@@ -418,6 +418,7 @@ def main(run = True) :
 	config.colOverlay.tLimitBase = config.tLimitBase 
 	config.colOverlay.maxBrightness = config.brightness
 	config.unHideGrid = False
+	config.colOverlay.colorTransitionSetup()
 
 	## Used for side seed colors
 	config.yPosRangeMin  = round(random.uniform(0, config.canvasImageHeight))

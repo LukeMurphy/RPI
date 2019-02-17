@@ -75,14 +75,13 @@ class unit:
 		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
 
 
-
+		'''
 		self.fillColor = colorutils.getRandomColorHSV(
 			sMin = self.minSaturation, sMax = self.maxSaturation,  
 			hMin = self.minHue, hMax  = self.maxHue, 
 			vMin = self.minValue, vMax = self.maxValue
 			)
 
-		self.colOverlay.colorA = self.fillColor
 
 		self.colOverlay.colorB = colorutils.getRandomColorHSV(
 			sMin = self.minSaturation, sMax = self.maxSaturation,  
@@ -90,7 +89,13 @@ class unit:
 			vMin = self.minValue, vMax = self.maxValue
 			)
 
+		self.colOverlay.colorA = self.fillColor
+		'''
+
+		self.colOverlay.setStartColor()
+		self.colOverlay.getNewColor()
 		self.colOverlay.colorTransitionSetup()
+
 		
 		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
 
@@ -182,6 +187,7 @@ def main(run = True) :
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
+	config.outlineColorObj.colorTransitionSetup()
 
 	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
 	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
@@ -238,11 +244,9 @@ def restartPiece():
 
 	del config.unitArray[:]
 
-
 	p = math.floor(random.uniform(0,len(config.opticalPatterns)))
 
 	config.opticalPattern = config.opticalPatterns[p]
-
 
 
 	drawSqareSpiral()
@@ -375,6 +379,7 @@ def drawSqareSpiral():
 			cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]	
 			outlineColorObj = coloroverlay.ColorOverlay()
 			outlineColorObj.randomRange = (5.0,30.0)
+			outlineColorObj.colorTransitionSetup()
 
 			n+=1
 
@@ -416,9 +421,9 @@ def drawSqareSpiral():
 			obj.minSaturation = .8
 			obj.maxSaturation = 1
 			obj.minValue = .5
-			obj.maxValue = .8
-			obj.minHue = 350
-			obj.maxHue = 10
+			obj.maxValue = .7
+			obj.minHue = 0
+			obj.maxHue = 360
 
 			obj.setUp(n)
 			config.unitArray.append(obj)
@@ -522,7 +527,7 @@ def iterate() :
 
 	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	tDraw = ImageDraw.Draw(temp) 
-	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = (100,50,0))
+	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = (0,0,0,10))
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)

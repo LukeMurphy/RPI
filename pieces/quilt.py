@@ -160,6 +160,7 @@ def main(run = True) :
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
 	config.outlineColorObj.randomRange = (5.0,30.0)
+	config.outlineColorObj.colorTransitionSetup()
 
 	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
 	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
@@ -222,6 +223,7 @@ def createPieces() :
 
 			outlineColorObj = coloroverlay.ColorOverlay()
 			outlineColorObj.randomRange = (5.0,30.0)
+			outlineColorObj.colorTransitionSetup()
 
 			obj = unit(config)
 			obj.xPos = cntr[0]

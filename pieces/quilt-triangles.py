@@ -173,6 +173,7 @@ def restartPiece():
 def setInitialColors(refresh=False):
 	## Better initial color when piece is turned on
 
+
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
 		#print("number of colorOverlay objs {}".format(len(obj.triangles)) )
@@ -376,7 +377,7 @@ def iterate() :
 		config.render(crossFade, 0,0)
 		config.doingRefresh += 1
 	else :
-		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
+		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 		temp.paste(config.canvasImage, (0,0), config.canvasImage)
 		if(config.transformShape == True) :
 			temp = transformImage(temp)

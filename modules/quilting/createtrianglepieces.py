@@ -81,6 +81,7 @@ def createPieces(config, refresh = False) :
 		config.unitArray = config.unitArray[:config.unitArrayLimit]
 
 
+
 	for rows in range (0,config.blockRows) :
 
 		rowStart = rows * config.blockHeight * 4 + config.gapSize
@@ -123,7 +124,7 @@ def createPieces(config, refresh = False) :
 							if refresh == False : config.unitArray.append(obj)
 							n+=1
 							itemCount += 1
-						except Exception as e :
+						except Exception as e : 
 							print(itemCount, len(config.unitArray), config.unitArrayLimit)
 							pass
 

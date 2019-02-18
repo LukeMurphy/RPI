@@ -98,6 +98,7 @@ class unit:
 
 		
 		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
+		self.fillColor = tuple(int(a*self.brightness) for a in (self.colOverlay.currentColor))
 
 
 	def update(self):
@@ -118,6 +119,7 @@ class unit:
 			brightnessFactor = self.config.brightnessFactorLight
 
 		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
+		self.fillColor = tuple(int(a*self.brightness) for a in (self.colOverlay.currentColor))
 
 		if(self.lines == True) :
 			self.draw.polygon(self.poly, fill=self.fillColor)
@@ -133,6 +135,7 @@ class unit:
 			brightnessFactor = self.config.brightnessFactorLight
 
 		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
+		self.fillColor = tuple(int(a*self.brightness) for a in (self.colOverlay.currentColor))
 
 		if(self.lines == True) :
 			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
@@ -418,12 +421,13 @@ def drawSqareSpiral():
 			obj.outlineColorObj	= outlineColorObj
 			obj.poly = (A[2], B[3], A[0], A[1])
 
+			# This is the center square, so should be red, like the hearth it represents
 			obj.minSaturation = .8
 			obj.maxSaturation = 1
-			obj.minValue = .5
+			obj.minValue = .1
 			obj.maxValue = .7
 			obj.minHue = 0
-			obj.maxHue = 360
+			obj.maxHue = 36
 
 			obj.setUp(n)
 			config.unitArray.append(obj)

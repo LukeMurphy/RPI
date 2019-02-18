@@ -202,6 +202,9 @@ def main(run = True) :
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
+	backgroundColor = workConfig.get("quilt", 'backgroundColor').split(",")
+	config.backgroundColor = tuple([int(i) for i in backgroundColor])
+
 	config.opticalPattern = (workConfig.get("quilt", 'opticalPattern')) 
 	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
 	config.hGapSize = int(workConfig.get("quilt", 'hGapSize')) 
@@ -531,7 +534,7 @@ def iterate() :
 
 	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	tDraw = ImageDraw.Draw(temp) 
-	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = (0,0,0,10))
+	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = config.backgroundColor)
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)

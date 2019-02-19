@@ -230,10 +230,23 @@ def redraw():
 	if config.useVariablePixelSort == True :
 		if random.random() < config.variablePixelProb:
 			config.usePixelSort = False if config.usePixelSort == True else True
+			if config.usePixelSort == True :
+				config.useLastOverlay = False
+			else :
+				config.useLastOverlay = True
 
 	if config.useBadPixels == True:
 		badpixels.drawBlanks(config.image, False)
 		if random.random() > .999 : badpixels.setBlanksOnScreen() 
+
+	if random.random() < .01 :
+			#config.useLastOverlay = False if config.useLastOverlay == True  else True
+			config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+			config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+			xPos = 64 * math.floor(random.uniform(0,6))
+			yPos = 32 * math.floor(random.uniform(0,6))
+			config.lastOverlayBox = (xPos,yPos,xPos+ 64, yPos +32)
+			config.lastOverlayFill = (10,0,0,round(random.uniform(5,50)))
 
 
 
@@ -242,7 +255,6 @@ def runWork():
 	while True:
 		iterate()
 		time.sleep(config.redrawSpeed)
-
 
 
 def iterate() :
@@ -283,6 +295,7 @@ def colorTransitionDone(arg=None):
 	if config.useTransitionCallbacks == True :
 		config.useFilters = False
 		config.usePixelSort = True
+
 
 def colorTransitionStarted(arg=None):
 	#print("colorTransition   Started ")
@@ -366,6 +379,9 @@ def main(run = True) :
 	except Exception as e :
 		print(e)
 		config.useVariablePixelSort = False
+
+	config.lastOverlayBox = (0,0,64,32)
+	config.lastOverlayFill = (10,0,0,10)
 
 	for i in  range(0, len(config.shapeSets)):
 

@@ -152,7 +152,6 @@ def configure(config, workconfig) :
 		config.useBlur  = False
 
 
-
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 	config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))
 	#config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
@@ -173,6 +172,7 @@ def configure(config, workconfig) :
 	config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
+
 
 	# Setting up based on how the work is displayed
 	print("Loading:", str(config.work))
@@ -258,10 +258,21 @@ def renderUsingLINSNHub(work):
 	work.config.renderDraw = ImageDraw.Draw(work.config.renderImageFull)
 	work.config.image = PIL.Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
 	work.config.draw = ImageDraw.Draw(work.config.image)
+
 	
 	r = rendertohub
 	r.config = work.config
 	r.work = work
+
+	try :
+		work.config.useLastOverlay  = work.workConfig.getboolean("displayconfig", 'useLastOverlay')
+		work.config.renderImageFullOverlay = Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
+		work.config.renderDrawOver = ImageDraw.Draw(work.config.renderImageFullOverlay)
+	except Exception as e: 
+		print (str(e))
+		work.config.useLastOverlay  = False
+
+
 	r.canvasOffsetX = int(work.workConfig.get("displayconfig", 'canvasOffsetX'))
 	r.canvasOffsetY = int(work.workConfig.get("displayconfig", 'canvasOffsetY'))
 	work.config.windowXOffset = int(work.workConfig.get("displayconfig", 'windowXOffset'))

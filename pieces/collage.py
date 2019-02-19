@@ -232,6 +232,8 @@ def redraw():
 			config.usePixelSort = False if config.usePixelSort == True else True
 			if config.usePixelSort == True :
 				config.useLastOverlay = False
+				config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+				config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 			else :
 				config.useLastOverlay = True
 
@@ -239,12 +241,10 @@ def redraw():
 		badpixels.drawBlanks(config.image, False)
 		if random.random() > .999 : badpixels.setBlanksOnScreen() 
 
-	if random.random() < .01 :
+	if random.random() < .01 and config.useLastOverlay == True :
 			#config.useLastOverlay = False if config.useLastOverlay == True  else True
-			config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-			config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-			xPos = 64 * math.floor(random.uniform(0,6))
-			yPos = 32 * math.floor(random.uniform(0,6))
+			xPos = 64 * math.floor(random.uniform(0,config.cols))
+			yPos = 32 * math.floor(random.uniform(0,config.rows))
 			config.lastOverlayBox = (xPos,yPos,xPos+ 64, yPos +32)
 			config.lastOverlayFill = (10,0,0,round(random.uniform(5,50)))
 

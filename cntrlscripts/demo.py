@@ -30,6 +30,8 @@ actionDict1 = [
 	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	{" " :''},
 
+	{"-------- Large WALL Piece -------------" :''},
+	{"Wall Compositions" :'p4-5x8/compositions.cfg'},
 
 	
 	#{"-------- BENT WALL -------------" :''},
@@ -39,6 +41,7 @@ actionDict1 = [
 	#{" " :''},
 
 
+	{" " :''},
 	{"--------- TOWERS -----------" :''},
 	{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
 	{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},

@@ -31,7 +31,7 @@ actionDict1 = [
 	{" " :''},
 
 	{"-------- Large WALL Piece -------------" :''},
-	{"Wall Compositions" :'p4-5x8/compositions.cfg'},
+	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
 
 	
 	#{"-------- BENT WALL -------------" :''},

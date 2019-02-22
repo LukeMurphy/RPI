@@ -53,7 +53,7 @@ actionDict1 = [
 	{" " :''},
 
 	{"---------- FLOOR - FIREPLCE ----------" :''},
-	{"* To Fro: Algoflames2" :'p4-5x6-tofro/algoflames2.cfg'},
+	{"* To Fro: Algoflames2" :'p4-4x6/algoflames2.cfg'},
 	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
 	{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
 	#{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},

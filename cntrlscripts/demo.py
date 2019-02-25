@@ -78,16 +78,16 @@ actionDict2 = [
 	{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
 	{"Square - RUG" :'p4-4x8/square-rug.cfg'},
 
-
+	
 	{" " :''},
 	{"---------- TEST WALL --------------" :''},
-	{"* P3 Wall w. removal: marquee2 - disturbed " :'p3-2x4/marquee2.cfg'},
-	{"* P3 Wall w. removal: cubes - blur" :'p3-2x4/p3-2x6-squares.cfg'},
-	{" " :''},
-	{"P3 Wall w. removal: cubes-b" :'p3-2x4/p3-2x6-squares-b.cfg'},
-	{"P3 Wall w. removal: triangles " :'p3-2x4/p3-2x6.cfg'},
-	{"P3 Wall w. removal: marquee2c - concentric " :'p3-2x4/marquee2c.cfg'},
-	{" " :''},
+	#{"* P3 Wall w. removal: marquee2 - disturbed " :'p3-2x4/marquee2.cfg'},
+	#{"* P3 Wall w. removal: cubes - blur" :'p3-2x4/p3-2x6-squares.cfg'},
+	#{" " :''},
+	#{"P3 Wall w. removal: cubes-b" :'p3-2x4/p3-2x6-squares-b.cfg'},
+	#{"P3 Wall w. removal: triangles " :'p3-2x4/p3-2x6.cfg'},
+	#{"P3 Wall w. removal: marquee2c - concentric " :'p3-2x4/marquee2c.cfg'},
+	#{" " :''},
 
 	#{"P3 sqr w. shift: marquee2b " :'p3-2x4/marquee2b.cfg'},
 

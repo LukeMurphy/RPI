@@ -30,8 +30,8 @@ actionDict1 = [
 	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	{" " :''},
 
-	{"-------- Large WALL Piece -------------" :''},
-	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
+	#{"-------- Large WALL Piece -------------" :''},
+	#{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
 
 	
 	#{"-------- BENT WALL -------------" :''},
@@ -52,10 +52,10 @@ actionDict1 = [
 	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{" " :''},
 
-	{"---------- FLOOR - FIREPLCE ----------" :''},
-	{"* To Fro: Algoflames2" :'p4-4x6/algoflames2.cfg'},
-	{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
-	{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
+	#{"---------- FLOOR - FIREPLCE ----------" :''},
+	#{"* To Fro: Algoflames2" :'p4-4x6/algoflames2.cfg'},
+	#{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
+	#{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
 	#{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{" " :''},
 

@@ -378,7 +378,13 @@ def main(run = True) :
 		#config.usePixelSort = True
 	except Exception as e :
 		print(e)
-		config.useVariablePixelSort = False
+		config.useVari
+
+	try:
+		config.useLastOverlayProb = workConfig.getboolean("displayConfig", 'useVariablePixelSort')
+	except Exception as e :
+		print(e)
+		config.useLastOverlayProb = .001
 
 	config.lastOverlayBox = (0,0,64,32)
 	config.lastOverlayFill = (10,0,0,10)

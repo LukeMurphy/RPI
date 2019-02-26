@@ -30,8 +30,10 @@ actionDict1 = [
 	{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	{" " :''},
 
-	#{"-------- Large WALL Piece -------------" :''},
+	{"-------- Large WALL  -------------" :''},
 	#{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
+	{"3rd Gen Tatlin" :'p4-7x4/mono-flavin2.cfg'},
+	{"Marquee" :'p4-7x4/marquee-b.cfg'},
 
 	
 	#{"-------- BENT WALL -------------" :''},

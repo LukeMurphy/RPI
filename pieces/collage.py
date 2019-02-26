@@ -241,7 +241,7 @@ def redraw():
 		badpixels.drawBlanks(config.image, False)
 		if random.random() > .999 : badpixels.setBlanksOnScreen() 
 
-	if random.random() < .002 and config.useLastOverlay == True :
+	if random.random() < config.useLastOverlayProb and config.useLastOverlay == True :
 			#config.useLastOverlay = False if config.useLastOverlay == True  else True
 			xPos = 64 * math.floor(random.uniform(0,config.cols))
 			yPos = 32 * math.floor(random.uniform(0,config.rows))

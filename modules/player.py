@@ -266,6 +266,7 @@ def renderUsingLINSNHub(work):
 
 	try :
 		work.config.useLastOverlay  = work.workConfig.getboolean("displayconfig", 'useLastOverlay')
+		work.config.useLastOverlayProb  = float(work.workConfig.get("displayconfig", 'useLastOverlayProb'))
 		work.config.renderImageFullOverlay = Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
 		work.config.renderDrawOver = ImageDraw.Draw(work.config.renderImageFullOverlay)
 	except Exception as e: 

@@ -191,7 +191,8 @@ class Fludd :
 		if self.usedFixedCenterColor == True:
 			self.centerColor = self.fixedCenterColor
 		else:
-			self.centerColor = tuple(round (a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+			centerColorTemp = tuple(round (a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+			self.centerColor = ( round(centerColorTemp[0] * self.config.redBoost), round(centerColorTemp[1] * self.config.greenBoost), round(centerColorTemp[2] * self.config.blueBoost), centerColorTemp[3] )
 
 
 
@@ -247,6 +248,9 @@ class Fludd :
 
 	def transition(self):
 		self.fillColor = tuple(round(a * self.config.brightness ) for a in self.colOverlay.currentColor)
+		fillColorTemp = tuple(round (a * self.config.brightness ) for a in self.colOverlay.currentColor)
+		self.fillColor = ( round(fillColorTemp[0] * self.config.redBoost), round(fillColorTemp[1] * self.config.greenBoost), round(fillColorTemp[2] * self.config.blueBoost), fillColorTemp[3] )
+		#print(fillColorTemp, self.fillColor)
 
 		try:
 			#self.fillColor = (100,50,50)
@@ -257,6 +261,9 @@ class Fludd :
 			if self.usedFixedCenterColor == False :
 				self.colOverlay2.stepTransition()
 				self.centerColor = tuple(round(a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+				centerColorTemp = tuple(round (a * self.config.brightness ) for a in self.colOverlay2.currentColor)
+				self.centerColor = ( round(centerColorTemp[0] * self.config.redBoost), round(centerColorTemp[1] * self.config.greenBoost), round(centerColorTemp[2] * self.config.blueBoost), centerColorTemp[3] )
+
 			self.transitionBox()
 		except Exception as e:
 			print(e, self.fillColor)

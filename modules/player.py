@@ -151,6 +151,20 @@ def configure(config, workconfig) :
 		print (str(e))
 		config.useBlur  = False
 
+	try:
+		config.redBoost = float(workconfig.get("displayconfig", 'redBoost'))
+		config.greenBoost = float(workconfig.get("displayconfig", 'greenBoost'))
+		config.blueBoost = float(workconfig.get("displayconfig", 'blueBoost'))
+
+		
+	except Exception as e: 
+		
+		config.redBoost = 1
+		config.greenBoost = 1
+		config.blueBoost = 1
+
+		print (str(e))
+
 
 	config.screenHeight = int(workconfig.get("displayconfig", 'screenHeight'))
 	config.screenWidth =  int(workconfig.get("displayconfig", 'screenWidth'))

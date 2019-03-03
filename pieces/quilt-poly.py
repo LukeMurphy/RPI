@@ -81,7 +81,7 @@ def restartPiece():
 	if random.random() < config.resetSizeProbability  :
 		config.rotation = random.uniform(-config.rotationRange,config.rotationRange)
 		config.doingRefresh = 0
-		config.doingRefreshCount = 100
+		config.doingRefreshCount = config.refreshCount 
 		
 	if random.random() < config.resetSizeProbability  :
 		config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
@@ -96,14 +96,14 @@ def restartPiece():
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
 		config.doingRefresh = 0
-		config.doingRefreshCount = 100
+		config.doingRefreshCount = config.refreshCount 
 		createpolypieces.createPieces(config, True)
 
 	# poly specific
 	if random.random() < config.resetSizeProbability  :
-		config.randomness = random.uniform(0,3)
+		config.randomness = random.uniform(0,config.randomnessBase)
 		config.doingRefresh = 0
-		config.doingRefreshCount = 100
+		config.doingRefreshCount = config.refreshCount 
 
 	createpolypieces.refreshPalette(config)
 	setInitialColors(True)
@@ -228,7 +228,15 @@ def main(run = True) :
 
 
 	try :
+		config.refreshCount = float(workConfig.get("quilt", 'refreshCount')) 
+	except Exception as e:
+		config.refreshCount = 100
+		print (e)
+
+
+	try :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
+		config.randomnessBase = int(workConfig.get("quilt", 'randomness')) 
 	except Exception as e:
 		config.randomness = 0
 		print (e)
@@ -264,8 +272,8 @@ def main(run = True) :
 	config.t1  = time.time()
 	config.t2  = time.time()
 
-	config.doingRefresh = 100
-	config.doingRefreshCount = 100
+	config.doingRefresh = config.refreshCount
+	config.doingRefreshCount = config.refreshCount
 
 	if(run) : runWork()
 

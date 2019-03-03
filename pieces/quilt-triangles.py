@@ -45,6 +45,8 @@ def restartPiece():
 			newSaturationRange = randomRange()
 			newValueRange = randomRange()
 
+			'''
+
 			# stars: BASE
 			config.c1HueRange = newHueRange
 			config.c1ValueRange = newValueRange
@@ -53,6 +55,8 @@ def restartPiece():
 			config.c2SaturationRange = randomRange()
 			config.c2ValueRange = randomRange()
 			config.c2HueRange = randomRange(0,360,True)
+
+			'''
 			
 			# stars: CENTER SQUARE
 			config.c3HueRange = newHueRange

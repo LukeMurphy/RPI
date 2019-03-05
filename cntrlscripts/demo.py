@@ -59,6 +59,11 @@ actionDict1 = [
 	#{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	{"Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{" " :''},
+	{"* Short Tower: monument-to-the-glitch" :'p4-4x8-3x-short-tower/diagnostics.cfg'},
+	{"* Short Tower: clown" :'p4-4x8-3x-short-tower/quilt.cfg'},
+
+
+	{" " :''},
 
 	#{"---------- FLOOR - FIREPLCE ----------" :''},
 	#{"* To Fro: Algoflames2" :'p4-4x6/algoflames2.cfg'},

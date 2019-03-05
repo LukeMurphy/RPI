@@ -82,9 +82,9 @@ actionDict2 = [
 	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
 	{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
 	{"Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
-	{"Square - Collage" :'p4-4x8/square-collage.cfg'},
-	{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
-	{"Square - RUG" :'p4-4x8/square-rug.cfg'},
+	#{"Square - Collage" :'p4-4x8/square-collage.cfg'},
+	#{"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
+	#{"Square - RUG" :'p4-4x8/square-rug.cfg'},
 
 	
 	{" " :''},

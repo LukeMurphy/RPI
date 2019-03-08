@@ -57,7 +57,7 @@ actionDict1 = [
 	{"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
 	{"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{" " :''},
-	{"------------------------------" :''},
+	#{"------------------------------" :''},
 	#{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	#{" " :''},
 	{"------------------------------" :''},
@@ -67,8 +67,7 @@ actionDict1 = [
 
 
 	{" " :''},
-
-	#{"---------- FLOOR - FIREPLCE ----------" :''},
+	{"---------- FLOOR - FIREPLCE ----------" :''},
 	#{"* To Fro: Algoflames2" :'p4-4x6/algoflames2.cfg'},
 	#{"To Fro: Algoflames" :'p4-5x6-tofro/algoflames.cfg'},
 	#{"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
@@ -83,9 +82,9 @@ actionDict2 = [
 	{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
 	{"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
 	#{" " :''},
-	{"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
-	{"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},
-	{"Square - marquee c" :'p4-4x8/square-marquee-c.cfg'},
+	#{"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
+	#{"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},
+	#{"Square - marquee c" :'p4-4x8/square-marquee-c.cfg'},
 	{" " :''},
 	{"Square - ICE" :'p4-4x8/square.cfg'},
 	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
@@ -97,7 +96,7 @@ actionDict2 = [
 
 	
 	{" " :''},
-	#{"---------- TEST WALL --------------" :''},
+	{"---------- TEST WALL --------------" :''},
 	#{"* P3 Wall w. removal: marquee2 - disturbed " :'p3-2x4/marquee2.cfg'},
 	#{"* P3 Wall w. removal: cubes - blur" :'p3-2x4/p3-2x6-squares.cfg'},
 	#{" " :''},
@@ -108,8 +107,8 @@ actionDict2 = [
 
 	#{"P3 sqr w. shift: marquee2b " :'p3-2x4/marquee2b.cfg'},
 
-	#{" " :''},
-	#{"-------- TABLE -------------" :''},
+	{" " :''},
+	{"-------- TABLE -------------" :''},
 	#{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
 	#{"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
 	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
@@ -119,9 +118,9 @@ actionDict2 = [
 
 
 	{" " :''},
-	#{"------------------------------" :''},
+	{"------------------------------" :''},
 	#{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
-	#{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 
 

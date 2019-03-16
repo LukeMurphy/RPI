@@ -316,7 +316,7 @@ def iterate() :
 	global config
 
 	## reuse the pause prob 
-	if random.random() < config.pauseProb/2 and config.probabilityMultiplierRange > 1 and config.pausing == False:
+	if random.random() < config.unpauseProb/2 and config.probabilityMultiplierRange > 1 and config.pausing == False:
 		config.probabilityMultiplier = random.uniform(1.1, config.probabilityMultiplierRange)	
 
 	if random.random() < config.pauseProb * 4:

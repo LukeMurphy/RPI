@@ -167,7 +167,8 @@ def showGrid():
 
 
 	
-	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
+	if config.pausing == False : 
+		config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
 	config.render(config.image, 0,0)
 
 
@@ -305,6 +306,7 @@ def iterate() :
 
 	if random.random() < config.pauseProb and config.usePause == True:
 		config.pausing = True
+		showGrid()
 	elif config.pausing == False :
 		showGrid()
 

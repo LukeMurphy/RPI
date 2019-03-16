@@ -208,7 +208,6 @@ def main(run = True) :
 	config.yVarMax = int(workConfig.get("screenproject", 'yVarMax'))
 	config.drawCracks = (workConfig.getboolean("screenproject", 'drawCracks'))
 
-	config.probabilityMultiplier = 2.0
 
 	config.tLimitBase = int(workConfig.get("screenproject", 'tLimitBase'))
 	config.timeTrigger = (workConfig.getboolean("screenproject", 'timeTrigger'))
@@ -240,6 +239,15 @@ def main(run = True) :
 
 	config.crackChangeProb = float(workConfig.get("screenproject", 'crackChangeProb'))
 	config.imageResetProb = float(workConfig.get("screenproject", 'imageResetProb'))
+
+	try:
+		# if it's set, will act as a range and turn on the setting
+		config.probabilityMultiplierRange = float(workConfig.get("screenproject", 'probabilityMultiplierRange'))
+	except Exception as e:
+		config.probabilityMultiplierRange = 1.0
+		config.probabilityMultiplier = 1.0
+		print (str(e))
+	
 
 	try:
 		config.probDrawVertLines = float(workConfig.get("screenproject", 'probDrawVertLines'))
@@ -305,6 +313,15 @@ def runWork():
 
 def iterate() :
 	global config
+
+	## reuse the pause prob 
+	if random.random() < config.pauseProb/2 && config.probabilityMultiplierRange > 1:
+		config.probabilityMultiplier = random.uniform(1.1, config.probabilityMultiplierRange)	
+
+	if random.random() < config.pauseProb:
+		config.probabilityMultiplier = 1
+
+
 
 	if random.random() < config.pauseProb and config.usePause == True:
 		config.pausing = True

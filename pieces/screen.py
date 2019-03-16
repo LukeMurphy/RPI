@@ -319,7 +319,7 @@ def iterate() :
 	if random.random() < config.pauseProb/2 and config.probabilityMultiplierRange > 1 and config.pausing == False:
 		config.probabilityMultiplier = random.uniform(1.1, config.probabilityMultiplierRange)	
 
-	if random.random() < config.pauseProb:
+	if random.random() < config.pauseProb * 4:
 		config.probabilityMultiplier = 1
 
 

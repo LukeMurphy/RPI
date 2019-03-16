@@ -130,7 +130,7 @@ def showGrid():
 						x2 =  y2 / config.crackArray[i+1].slopes[p]
 					#config.canvasDraw.rectangle((x, y, x+1, y+1), fill=(200, 0, 0))
 					#y2 = config.crackArray[i].points[p][1]
-					if i > 0 and random.random() < config.probDrawLines:
+					if i > 0 and random.random() < config.probDrawLines * config.probabilityMultiplier:
 						xSample = x - round(random.uniform(-config.sampleVariationX ,config.sampleVariationX ))
 						ySample = y - round(random.uniform(-config.sampleVariationY ,config.sampleVariationY ))
 						if xSample < 0 : xSample = 0
@@ -150,7 +150,7 @@ def showGrid():
 							if(random.random() < config.randomColorSampleProb) : 
 								colorSampleColor = colorutils.getRandomRGB(random.random())
 
-							if random.random() < config.probDrawPerpLines:
+							if random.random() < config.probDrawPerpLines * config.probabilityMultiplier:
 								if i == 2:
 									# Draw perpendicular light lines
 									#config.canvasDraw.line((x, y, x, config.canvasHeight), fill=colorSampleColor)
@@ -158,10 +158,10 @@ def showGrid():
 								else: 
 									config.canvasDraw.line((x, y, config.canvasWidth, y), fill=colorSampleColor)
 								
-							if random.random() < config.probDrawVertLines:
+							if random.random() < config.probDrawVertLines * config.probabilityMultiplier:
 								config.canvasDraw.line((x, y, x, y2), fill=colorSampleColor)
 								
-							if random.random() < config.probDrawBoxes : 
+							if random.random() < config.probDrawBoxes * config.probabilityMultiplier: 
 								config.canvasDraw.rectangle((x, y, x2, y2), fill=colorSampleColor, outline=colorSampleColor)
 
 
@@ -207,6 +207,8 @@ def main(run = True) :
 	config.yVarMin = int(workConfig.get("screenproject", 'yVarMin'))
 	config.yVarMax = int(workConfig.get("screenproject", 'yVarMax'))
 	config.drawCracks = (workConfig.getboolean("screenproject", 'drawCracks'))
+
+	config.probabilityMultiplier = 2.0
 
 	config.tLimitBase = int(workConfig.get("screenproject", 'tLimitBase'))
 	config.timeTrigger = (workConfig.getboolean("screenproject", 'timeTrigger'))

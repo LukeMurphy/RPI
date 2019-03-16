@@ -243,6 +243,7 @@ def main(run = True) :
 	try:
 		# if it's set, will act as a range and turn on the setting
 		config.probabilityMultiplierRange = float(workConfig.get("screenproject", 'probabilityMultiplierRange'))
+		config.probabilityMultiplier = 1.0
 	except Exception as e:
 		config.probabilityMultiplierRange = 1.0
 		config.probabilityMultiplier = 1.0

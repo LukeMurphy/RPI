@@ -228,8 +228,14 @@ def redraw():
 			config.useFilters = False if config.useFilters == True else True
 			
 	if config.useVariablePixelSort == True :
-		if random.random() < config.variablePixelProb:
-			config.usePixelSort = False if config.usePixelSort == True else True
+
+		if random.random() < config.variablePixelProbOff and config.usePixelSort == True:
+			config.usePixelSort = False
+
+
+		if random.random() < config.variablePixelProb and config.usePixelSort == False:
+			#config.usePixelSort = False if config.usePixelSort == True else True
+			config.usePixelSort = True
 			if config.usePixelSort == True :
 				#config.useLastOverlay = False
 				config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -374,11 +380,16 @@ def main(run = True) :
 	try:
 		config.useVariablePixelSort = workConfig.getboolean("collageShapes", 'useVariablePixelSort')
 		config.variablePixelProb = float(workConfig.get("collageShapes", 'variablePixelProb'))
+		try:
+			config.variablePixelProbOff = float(workConfig.get("collageShapes", 'variablePixelProbOff'))
+		except Exception as e :
+			print(e)
+			config.variablePixelProbOff = config.variablePixelProb
 		#config.useFilters = True
 		#config.usePixelSort = True
 	except Exception as e :
 		print(e)
-		config.useVari
+		config.useVariablePixelSort = False
 
 	try:
 		config.useLastOverlayProb = workConfig.getboolean("displayConfig", 'useVariablePixelSort')

@@ -227,7 +227,8 @@ def main(run = True) :
 	config.polyDistortionMin = -config.polyDistortion
 	config.polyDistortionMax = config.polyDistortion
 
-	config.opticalPatterns = ["Regular","LighteningStrike","LighteningStrikeH","Diagonals"]
+	config.opticalPatterns = ["Regular","LighteningStrike","Diagonals"]
+	# "LighteningStrikeH"  aka Charlie Brown sweater ...
 	
 	# for now, all squares 
 	#config.blockLength = config.blockSize

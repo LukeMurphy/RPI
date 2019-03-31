@@ -47,7 +47,8 @@ actionDict1 = [
 	
 	{"-------- LEFT WALL -------------" :''},
 	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
-	{"* Horizontal Bars" :'p4-5x8/mono-lights.cfg'},
+	{"* Vert Bars" :'p4-5x8/mono-lights.cfg'},
+	{"* Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
 	#{" " :''},
 
 

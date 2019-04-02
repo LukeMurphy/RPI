@@ -10,7 +10,7 @@ commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 
 actionDict1 = [
 	{" " :''},
-	{"-------- WALL -------------" :''},
+	{"-------- RIGHT WALL -------------" :''},
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
@@ -37,7 +37,7 @@ actionDict1 = [
 	{" " :''},
 	#{" " :''},
 
-	{"-------- Large WALL  -------------" :''},
+	{"-------- NORTH WALL  -------------" :''},
 	#{"3rd Gen Tatlin" :'p4-7x4/mono-flavin2.cfg'},
 	#{"Marquee" :'p4-7x4/marquee-b.cfg'},
 	#{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},

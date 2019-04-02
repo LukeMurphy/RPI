@@ -319,7 +319,12 @@ def main(run = True) :
 	config.draw  = ImageDraw.Draw(config.image)
 
 	config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-
+	
+	try:
+		config.useLastOverlayProb = workConfig.getboolean("displayconfig", 'useVariablePixelSort')
+	except Exception as e :
+		print(e)
+		config.useLastOverlayProb = .001
 
 	config.transitionStepsMin = int(workConfig.get("collageShapes", 'transitionStepsMin'))
 	config.transitionStepsMax = int(workConfig.get("collageShapes", 'transitionStepsMax'))
@@ -391,11 +396,7 @@ def main(run = True) :
 		print(e)
 		config.useVariablePixelSort = False
 
-	try:
-		config.useLastOverlayProb = workConfig.getboolean("displayConfig", 'useVariablePixelSort')
-	except Exception as e :
-		print(e)
-		config.useLastOverlayProb = .001
+
 
 	config.lastOverlayBox = (0,0,64,32)
 	config.lastOverlayFill = (10,0,0,10)

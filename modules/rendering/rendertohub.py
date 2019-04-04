@@ -251,6 +251,15 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
 		
 
+	if config.remapImageBlock4 == True :
+		crop = config.renderImageFull.crop(config.remapImageBlockSection4)
+		if config.remapImageBlockSection4Rotation != 0 :
+			crop = crop.convert("RGBA")
+			crop = crop.rotate(config.remapImageBlockSection4Rotation)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination4, crop)
+		
+
 
 	# ---- Overall image blurring  ---- #
 	if config.useBlur == True :

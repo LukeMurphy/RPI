@@ -111,10 +111,12 @@ def configure(config, workconfig) :
 		print (str(e))
 		config.remapImageBlock2 = False	
 
+
 	try :
 		config.remapImageBlockSection2Rotation = float(workconfig.get("displayconfig", 'remapImageBlockSection2Rotation'))
 	except Exception as e:
 		config.remapImageBlockSection2Rotation = 0
+
 
 	try :
 		config.remapImageBlock3 = (workconfig.getboolean("displayconfig", 'remapImageBlock3'))
@@ -126,10 +128,12 @@ def configure(config, workconfig) :
 		print (str(e))
 		config.remapImageBlock3 = False
 
+
 	try :
 		config.remapImageBlockSection3Rotation = float(workconfig.get("displayconfig", 'remapImageBlockSection3Rotation'))
 	except Exception as e:
 		config.remapImageBlockSection3Rotation = 0
+
 
 	try :
 		config.imageXOffset = int(workconfig.get("displayconfig","imageXOffset"))
@@ -138,6 +142,7 @@ def configure(config, workconfig) :
 		print (str(e))
 		config.imageXOffset = 0
 		config.imageYOffset = 0
+
 
 	try :
 		config.useBlur  = workconfig.getboolean("displayconfig", 'useBlur')
@@ -151,18 +156,26 @@ def configure(config, workconfig) :
 		print (str(e))
 		config.useBlur  = False
 
+
 	try:
 		config.redBoost = float(workconfig.get("displayconfig", 'redBoost'))
 		config.greenBoost = float(workconfig.get("displayconfig", 'greenBoost'))
 		config.blueBoost = float(workconfig.get("displayconfig", 'blueBoost'))
-
-		
 	except Exception as e: 
-		
 		config.redBoost = 1
 		config.greenBoost = 1
 		config.blueBoost = 1
+		print (str(e))
 
+	try:
+		config.brightnessVariation = (workconfig.getboolean("displayconfig", 'brightnessVariation'))
+		config.brightnessVariationProb = float(workconfig.get("displayconfig", 'brightnessVariationProb'))
+		config.destinationBrightness = random.uniform(.1, config.brightness)
+		config.baseBrightness = config.brightness
+		config.brightnessVariationTransition = False
+	except Exception as e: 
+		config.brightnessVariation = False
+		config.brightnessVariationProb = 0
 		print (str(e))
 
 

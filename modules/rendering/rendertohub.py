@@ -264,6 +264,11 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		config.renderDrawOver.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill, outline = None)
 		config.renderImageFull.paste(config.renderImageFullOverlay, (0,0), config.renderImageFullOverlay)
 
+
+
+		
+
+
 	'''
 	for i in range(0,40) :
 		delta = 16

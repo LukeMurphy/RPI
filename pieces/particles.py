@@ -294,6 +294,26 @@ def colorize() :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def brightnessChanger() :
+	global config, ps
+	if config.brightnessVariation == True :
+		if config.brightnessVariationTransition == False :
+			if random.random() < config.brightnessVariationProb:
+				config.destinationBrightness = random.uniform(.1, config.baseBrightness)
+				config.destinationBrightness = .1
+				config.brightnessDelta = (config.destinationBrightness - config.brightness)/100
+				config.brightnessVariationTransition = True
+				print("New brightness:", config.brightness, config.destinationBrightness, config.brightnessDelta)
+				
+		else :
+			config.brightness += config.brightnessDelta
+			ps.config.brightness = config.brightness
+			if (config.brightness > config.destinationBrightness and config.brightnessDelta >0) or (config.brightness < config.destinationBrightness and config.brightnessDelta < 0):
+				config.brightnessVariationTransition = False
+				print (config.brightness)
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def setUp():
 	global config
 	colorize()
@@ -312,6 +332,8 @@ def runWork():
 
 def iterate() :
 	global config, ps
+
+	brightnessChanger()
 
 	if config.bgTransitions == True :
 		config.colOverlayA.stepTransition(alpha=config.colOverlayA.bgTransparency)

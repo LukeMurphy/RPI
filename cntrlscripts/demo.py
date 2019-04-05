@@ -55,7 +55,14 @@ actionDict1 = [
 
 
 	{" " :''},
-	{"--------- TOWERS -----------" :''},
+	{"--------- FLOOR -----------" :''},
+	{"* Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
+	{"* Tower w. Bump Collage" :'p4-5x8/bump-collage.cfg'},
+	{"* Tower w. Bump Flames" :'p4-5x8/bump-fire.cfg'},
+	{"* Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
+
+
+
 	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
 	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
 	#{"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},

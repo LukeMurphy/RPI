@@ -263,12 +263,15 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 
 	# ---- Overall image blurring  ---- #
 	if config.useBlur == True :
+		config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+		'''
 		crop = config.renderImageFull.crop(config.blurSection)
 		destination = (config.blurXOffset, config.blurYOffset)
 		crop = crop.convert("RGBA")
 		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
 		config.renderImageFull.paste(crop, destination, crop)
-
+		'''
+		
 	if config.useLastOverlay == True :
 		config.renderDrawOver.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill, outline = None)
 		config.renderImageFull.paste(config.renderImageFullOverlay, (0,0), config.renderImageFullOverlay)

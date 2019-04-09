@@ -58,8 +58,14 @@ actionDict1 = [
 	{"--------- FLOOR -----------" :''},
 	{"* Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
 	{"* Tower w. Bump Collage" :'p4-5x8/bump-collage.cfg'},
+	{"* Tower w. Bump Collage2" :'p4-5x8/bump-collage2.cfg'},
 	{"* Tower w. Bump Flames" :'p4-5x8/bump-fire.cfg'},
 	{"* Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
+
+
+	{" " :''},
+	{"TEST ZIGZAG CORNER - collage" :'p4-5x8/bump-collage2.cfg'},
+	{"TEST ZIGZAG CORNER - flames" :'p4-2xsteps/algoflames.cfg'},
 
 
 

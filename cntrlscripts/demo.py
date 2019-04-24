@@ -11,14 +11,15 @@ commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 actionDict1 = [
 	{" " :''},
 	{"-------- RIGHT WALL -------------" :''},
+	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
+	{"* Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
+	{"------------------------------" :''},
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
 	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
 	{"------------------------------" :''},
-	{"* Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
-	{"* Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
-	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
+	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
 	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
@@ -48,26 +49,13 @@ actionDict1 = [
 	
 	{"-------- LEFT WALL -------------" :''},
 	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
-	{"* Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
 	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
-	{"* Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
+	{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
+	{"Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
 	#{" " :''},
 
 
 	{" " :''},
-	{"--------- FLOOR -----------" :''},
-	{"* Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
-	{"* Tower w. Bump Collage" :'p4-5x8/bump-collage.cfg'},
-	{"* Tower w. Bump Collage2" :'p4-5x8/bump-collage2.cfg'},
-	{"* Tower w. Bump Flames" :'p4-5x8/bump-fire.cfg'},
-	{"* Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
-
-
-	{" " :''},
-	{"TEST ZIGZAG CORNER - collage" :'p4-5x8/bump-collage2.cfg'},
-	{"TEST ZIGZAG CORNER - flames" :'p4-2xsteps/algoflames.cfg'},
-
-
 
 	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
 	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
@@ -94,6 +82,26 @@ actionDict1 = [
 	]
 
 actionDict2 = [
+
+	{" " :''},
+	{"--------- FLOOR -----------" :''},
+	{"* Tower w. Bump Collage" :'p4-5x8/bump-collage.cfg'},
+	{"* Tower w. Bump Collage2" :'p4-5x8/bump-collage2.cfg'},
+	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},
+	
+	#{"Tower w. Bump Flames" :'p4-5x8/bump-fire.cfg'},
+	#{"Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
+	#{"Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
+
+
+	{" " :''},
+	{"* Falling Stairs - flames" :'p4-2xsteps/algoflames.cfg'},
+	{" " :''},
+	{"* Three Way Leaning Lights" :'p4-6x8/leaninglights.cfg'},
+	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},
+	{" " :''},
+
+	
 	{" " :''},
 	{"--------- ROUND CORNER -----------" :''},
 	{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},

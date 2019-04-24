@@ -96,6 +96,7 @@ actionDict2 = [
 
 	{" " :''},
 	{"* Falling Stairs - flames" :'p4-2xsteps/algoflames.cfg'},
+	{"* Falling Stairs - ice" :'p4-2xsteps/algofall.cfg'},
 	{" " :''},
 	{"* Three Way Leaning Lights" :'p4-6x8/leaninglights.cfg'},
 	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},

@@ -343,7 +343,7 @@ class Particle(object):
 		#self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)), 
 		#	fill=self.fillColor, outline=self.outlineColor)		
 		box = [(0,0),(self.objWidth/2 + 1, self.objHeight/2 + 1)]
-		self.draw.chord(box, 0, 360, fill=self.fillColor)
+		self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
 	
 	def drawRectangle(self):
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 

@@ -117,20 +117,30 @@ class Unit:
 		#	*
 		#	* *
 		#	
+		jumble = random.uniform(0,10)
+		xRan = random.random() * jumble
+		yRan = random.random() * jumble
 
 		self.sqrPoints = []
 
-		self.sqrPoints.append( 	(self.xPos, self.yPos))
-		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos) )				
-		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos) )	
+		self.sqrPoints.append( 	(self.xPos + xRan, self.yPos + yRan))
+		self.sqrPoints.append( 	(self.xPos + xRan + self.blockLength/2, self.yPos + yRan) )				
+		self.sqrPoints.append( 	(self.xPos + xRan + self.blockLength, self.yPos + yRan) )	
 
-		self.sqrPoints.append( 	(self.xPos, self.yPos + self.blockHeight/2) )
-		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos + self.blockHeight/2))
-		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos + self.blockHeight) )
 
-		self.sqrPoints.append( 	(self.xPos, self.yPos + self.blockHeight) )
-		self.sqrPoints.append( 	(self.xPos + self.blockLength/2, self.yPos + self.blockHeight))
-		self.sqrPoints.append( 	(self.xPos + self.blockLength, self.yPos + self.blockHeight) )
+		xRan = random.random() * jumble
+		yRan = random.random() * jumble
+
+		self.sqrPoints.append( 	(self.xPos + xRan, self.yPos + self.blockHeight/2 + yRan) )
+		self.sqrPoints.append( 	(self.xPos + xRan + self.blockLength/2, self.yPos + self.blockHeight/2 + yRan))
+		self.sqrPoints.append( 	(self.xPos + xRan + self.blockLength, self.yPos + self.blockHeight + yRan) )
+
+		xRan = random.random() * jumble
+		yRan = random.random() * jumble
+
+		self.sqrPoints.append( 	(self.xPos + xRan, self.yPos + self.blockHeight + yRan) )
+		self.sqrPoints.append( 	(self.xPos + xRan + self.blockLength/2, self.yPos + self.blockHeight + yRan))
+		self.sqrPoints.append( 	(self.xPos + xRan + self.blockLength, self.yPos + self.blockHeight + yRan) )
 
 
 		# "TOP"

@@ -1,3 +1,4 @@
+import random
 from modules import colorutils, coloroverlay
 from modules.quilting.triangleunit import Unit
 
@@ -81,7 +82,7 @@ def createPieces(config, refresh = False) :
 		config.unitArray = config.unitArray[:config.unitArrayLimit]
 
 
-
+	jumble = 0
 	for rows in range (0,config.blockRows) :
 
 		rowStart = rows * config.blockHeight * 4 + config.gapSize
@@ -106,10 +107,13 @@ def createPieces(config, refresh = False) :
 								obj = config.unitArray[itemCount]
 							else :
 								obj = Unit(config)
-							obj.xPos = cntr[0] + c * config.blockLength 
-							obj.yPos = cntr[1] + r * config.blockHeight
-							obj.blockLength = config.blockLength - sizeAdjustor
-							obj.blockHeight = config.blockHeight - sizeAdjustor
+
+							xRan = random.random() * jumble
+							yRan = random.random() * jumble
+							obj.xPos = cntr[0] + c * (config.blockLength + xRan)
+							obj.yPos = cntr[1] + r * (config.blockHeight + yRan) 
+							obj.blockLength = config.blockLength - sizeAdjustor + xRan
+							obj.blockHeight = config.blockHeight - sizeAdjustor + yRan
 							obj.outlineColorObj	= outlineColorObj
 
 							for i in polyPattern[n] :
@@ -125,7 +129,7 @@ def createPieces(config, refresh = False) :
 							n+=1
 							itemCount += 1
 						except Exception as e : 
-							print(itemCount, len(config.unitArray), config.unitArrayLimit)
+							print(e, itemCount, len(config.unitArray), config.unitArrayLimit)
 							pass
 
 

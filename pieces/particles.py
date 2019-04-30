@@ -169,6 +169,14 @@ def main(run = True) :
 		config.xWind = 0
 
 
+
+	try :
+		config.pixelSortProbChange = float(workConfig.get("displayconfig", 'pixelSortProbChange'))
+	except Exception as e: 
+		print (str(e)) 
+		config.pixelSortProbChange = 0
+
+
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
@@ -379,6 +387,11 @@ def iterate() :
 
 	if(config.transformShape == True) :
 		config.image = transformImage(config.image)
+
+	if config.pixelSortProbChange != 0 :
+		if random.random() < config.pixelSortProbChange :
+			config.pixSortprobDraw = random.random()
+
 
 	if config.torqueRate != 0 :
 		xDist = 0

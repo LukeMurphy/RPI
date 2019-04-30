@@ -35,6 +35,9 @@ class Particle(object):
 	changeColorOnChange = False
 	xWind = 0
 
+	particleWinkOutXMin = 4
+	particleWinkOutYMin = 4
+
 	def __init__(self, particleSystemRef):
 		super(Particle, self).__init__()
 		self.ps = particleSystemRef
@@ -264,10 +267,14 @@ class Particle(object):
 			self.objWidth *= self.ps.widthRate
 			self.objHeight *= self.ps.heightRate
 
-			if(self.objWidth < 2) :
-				self.objWidth = 2
-			if(self.objHeight < 2) :
-				self.objHeight = 2
+			if(self.objWidth < self.particleWinkOutXMin) :
+				self.objWidth = 0
+				self.objHeight = 0
+				self.remove = True
+			if(self.objHeight < self.particleWinkOutYMin) :
+				self.objHeight = 0
+				self.objWidth = 0
+				self.remove = True
 		
 		if (self.ps.useFlocking == True) :
 			self.checkMyBuddies()

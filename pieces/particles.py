@@ -169,6 +169,14 @@ def main(run = True) :
 		config.xWind = 0
 
 
+	try :
+		config.particleWinkOutXMin = float(workConfig.get("particleSystem", 'particleWinkOutXMin'))
+		config.particleWinkOutYMin = float(workConfig.get("particleSystem", 'particleWinkOutYMin'))
+	except Exception as e: 
+		print (str(e)) 
+		config.particleWinkOutXMin = 5
+		config.particleWinkOutYMin = 5
+
 
 	try :
 		config.pixelSortProbChange = float(workConfig.get("displayconfig", 'pixelSortProbChange'))
@@ -218,6 +226,10 @@ def emitParticle(i=None):
 	p = Particle(ps)
 	p.objWidth = ps.objWidth
 	p.objHeight = ps.objHeight
+
+	p.particleWinkOutXMin = config.particleWinkOutXMin
+	p.particleWinkOutYMin = config.particleWinkOutYMin
+
 	p.setUpParticle()
 	p.xPosR = config.canvasWidth/2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
 	p.yPosR = config.canvasHeight/2 - ps.centerRangeYMin + round(random.random() * ps.centerRangeYMax) - p.objHeight

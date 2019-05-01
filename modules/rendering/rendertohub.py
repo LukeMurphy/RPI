@@ -24,6 +24,7 @@ canvasOffsetX = 4
 canvasOffsetY = 7
 buff  =  8
 
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
@@ -45,7 +46,7 @@ def setUp():
 
 	root = tk.Tk()
 	w = config.screenWidth + buff
-	h = config.screenHeight  + buff
+	h = config.screenHeight + buff
 	x = windowOffset[0]
 	y = windowOffset[1]
 
@@ -58,11 +59,21 @@ def setUp():
 
 	config.root = root
 
-	cnvs = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff)
+	cnvs = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=0)
 	config.cnvs = cnvs
-	config.cnvs.pack()
 	config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
-	
+	config.cnvs.pack()
+	config.cnvs.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff)
+
+
+	'''
+	cnvs2 = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=-4)
+	config.cnvs2 = cnvs2
+	config.cnvs2.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
+	config.cnvs2.pack()
+	config.cnvs2.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff, x=config.screenWidth + 2)
+	'''
+
 	#tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	tempImage = ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw', tag="mainer")
@@ -117,11 +128,19 @@ def updateCanvas() :
 		gc.collect()
 		counter = 0
 
+
 	# This significantly helped performance !!
 	config.cnvs.delete("main")
 	config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw', tag="main")
 	config.cnvs.update()
+
+	'''
+	config.cnvs2.delete("main")
+	config.cnvs2._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
+	config.cnvs2._image_id = config.cnvs2.create_image(canvasOffsetX -4, canvasOffsetY, image=config.cnvs2._image_tk, anchor='nw', tag="main")
+	config.cnvs2.update()
+	'''
 	
 	# This *should* be more efficient 
 	#config.cnvs.update_idletasks()

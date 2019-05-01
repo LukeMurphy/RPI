@@ -38,6 +38,14 @@ class Particle(object):
 	particleWinkOutXMin = 4
 	particleWinkOutYMin = 4
 
+	greyRate = 100.0
+	greyDeltaRate =  [0,0,0]
+	greyCount = 0
+	pixelsGoGray = False 
+	fillColorRawValues = (0,0,0,0)
+	outlineColorRawValues = (0,0,0,0)
+	# gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+
 	def __init__(self, particleSystemRef):
 		super(Particle, self).__init__()
 		self.ps = particleSystemRef
@@ -53,6 +61,7 @@ class Particle(object):
 
 		self.v = random.uniform(1,3)
 		self.direction = 0
+
 
 		'''
 		self.fillColor = colorutils.getSunsetColors(self.ps.config.brightness)
@@ -84,6 +93,8 @@ class Particle(object):
 		self.meanderFactor2 = random.uniform(10,110)
 
 		self.remove = False
+
+		self.greyCount = 0
 
 		self.createParticleImage()
 
@@ -287,6 +298,26 @@ class Particle(object):
 
 			self.createParticleImage()
 
+			if self.pixelsGoGray == True :
+				if self.greyCount < self.greyRate :
+					self.greyCount += 1
+					
+					r = self.outlineColor[0] + self.outlineGreyRate[0]
+					g = self.outlineColor[1] + self.outlineGreyRate[1]
+					b = self.outlineColor[2] + self.outlineGreyRate[2]
+					outlineColorRawValues = (r,g,b,self.fillColor[3])
+					self.outlineColor  = (round(r),round(g),round(b),self.outlineColor[3])
+
+					r = self.fillColorRawValues[0] + self.fillGreyRate[0]
+					g = self.fillColorRawValues[1] + self.fillGreyRate[1]
+					b = self.fillColorRawValues[2] + self.fillGreyRate[2]
+					fillColorRawValues = (r,g,b,self.fillColor[3])
+					self.fillColor  = (round(r),round(g),round(b),self.fillColor[3])
+				else :
+					self.outlineColor  = (round(self.outlineGrey),round(self.outlineGrey),round(self.outlineGrey),self.outlineColor[3])
+					self.fillColor  = (round(self.fillGrey),round(self.fillGrey),round(self.fillGrey),self.fillColor[3])
+
+
 			if self.ps.objType == "poly" :
 				xPos = int(self.xPosR - self.image.size[0] /1.5)
 				yPos = int(self.yPosR - self.image.size[1] /2)
@@ -341,8 +372,6 @@ class Particle(object):
 		poly2.append( (round(h) + 4, 8) )
 		self.draw.polygon( poly2, fill = self.fillColor, outline=None)
 		
-
-
 		#self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
 	
 

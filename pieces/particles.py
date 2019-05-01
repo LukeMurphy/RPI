@@ -185,6 +185,15 @@ def main(run = True) :
 		config.pixelSortProbChange = 0
 
 
+
+	try :
+		config.pixelsGoGray = (workConfig.getboolean("particleSystem", 'pixelsGoGray'))
+		config.greyRate = float(workConfig.get("particleSystem", 'greyRate'))
+	except Exception as e: 
+		print (str(e)) 
+		config.pixelsGoGray = False
+
+
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
 	ps.objWidth = int(workConfig.get("particleSystem", 'objWidth'))
@@ -237,6 +246,7 @@ def emitParticle(i=None):
 	p.direction = random.uniform(math.pi + math.pi/2 - config.variance, math.pi + math.pi/2 + config.variance)
 	p.v = random.uniform(ps.speedMin,ps.speedMax)
 	p.xWind = config.xWind
+	p.pixelsGoGray = config.pixelsGoGray
 
 	if ps.objColor == "rnd" :
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
@@ -250,6 +260,22 @@ def emitParticle(i=None):
 		p.fillColor = config.fillColor #(240,150,0,100)
 		p.outlineColor = config.outlineColor #(100,0,0,100)
 
+		if config.pixelsGoGray == True :
+			p.greyRate = random.uniform(10,config.greyRate)
+			p.greyRate = config.greyRate
+			
+			p.outlineGrey = 0.2989 * p.outlineColor[0] + 0.5870 * p.outlineColor[1] + 0.1140 * p.outlineColor[2]
+			p.outlineGreyRate = [(p.outlineGrey - p.outlineColor[0]) / p.greyRate, 
+								 (p.outlineGrey - p.outlineColor[1]) / p.greyRate, 
+								 (p.outlineGrey - p.outlineColor[2]) / p.greyRate]
+			
+			p.fillGrey = 0.2989 * p.fillColor[0] + 0.5870 * p.fillColor[1] + 0.1140 * p.fillColor[2]
+			p.fillGreyRate = [	(p.fillGrey - p.fillColor[0]) / p.greyRate,
+								(p.fillGrey - p.fillColor[1]) / p.greyRate, 
+								(p.fillGrey - p.fillColor[2]) / p.greyRate]
+
+			p.fillColorRawValues = tuple(float(i) for i in p.fillColor)
+			p.outlineColorRawValues = tuple(float(i) for i in p.outlineColor)
 
 	if(ps.movement == "linearMotion"):
 

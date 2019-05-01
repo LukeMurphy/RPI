@@ -278,6 +278,11 @@ def emitParticle(i=None):
 		if config.pixelsGoGray == True :
 			p.greyRate = random.uniform(config.greyRate/4,config.greyRate)
 			#p.greyRate = config.greyRate
+
+			'''
+			0.2989, 0.5870, 0.1140
+			from BT.601 : Studio encoding parameters of digital television for standard 4:3 and wide screen 16:9 aspect ratios
+			'''
 			
 			p.outlineGrey = 0.2989 * p.outlineColor[0] + 0.5870 * p.outlineColor[1] + 0.1140 * p.outlineColor[2]
 			p.outlineGreyRate = [(p.outlineGrey - p.outlineColor[0]) / p.greyRate, 

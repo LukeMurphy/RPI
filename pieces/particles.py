@@ -184,7 +184,22 @@ def main(run = True) :
 		print (str(e)) 
 		config.pixelSortProbChange = 0
 
+	try :
+		config.restartProb = float(workConfig.get("particleSystem", 'restartProb'))
+	except Exception as e: 
+		print (str(e)) 
+		config.restartProb = 0
 
+
+	'''
+	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
+	Because colors are more interesting against gray, because everything goes gray
+
+	Rate of desaturation is set as greyRate
+
+	Sorry about schitzoid spelling of grey-gray 
+
+	'''
 
 	try :
 		config.pixelsGoGray = (workConfig.getboolean("particleSystem", 'pixelsGoGray'))
@@ -408,6 +423,11 @@ def iterate() :
 						emitParticle()
 			else :
 				emitParticle(i = ps.unitArray.index(p))
+
+
+	if random.random() < config.restartProb :
+		for p in ps.unitArray:
+			p.remove = True
 
 
 

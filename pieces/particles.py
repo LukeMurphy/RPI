@@ -276,8 +276,8 @@ def emitParticle(i=None):
 		p.outlineColor = config.outlineColor #(100,0,0,100)
 
 		if config.pixelsGoGray == True :
-			p.greyRate = random.uniform(10,config.greyRate)
-			p.greyRate = config.greyRate
+			p.greyRate = random.uniform(config.greyRate/4,config.greyRate)
+			#p.greyRate = config.greyRate
 			
 			p.outlineGrey = 0.2989 * p.outlineColor[0] + 0.5870 * p.outlineColor[1] + 0.1140 * p.outlineColor[2]
 			p.outlineGreyRate = [(p.outlineGrey - p.outlineColor[0]) / p.greyRate, 

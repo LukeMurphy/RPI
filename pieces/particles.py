@@ -282,14 +282,39 @@ def emitParticle(i=None):
 			'''
 			0.2989, 0.5870, 0.1140
 			from BT.601 : Studio encoding parameters of digital television for standard 4:3 and wide screen 16:9 aspect ratios
-			'''
+
+			others are
+			0.21 R + 0.72 G + 0.07 B
+
+			or 1/3 each channel
+
+			Turns out, in this context, it does not change things that much!
+
+			# Average
+			rRatio = .33
+			gRatio = .33
+			bRatio = .33
+
+			# Luminosity
+			rRatio = .21
+			gRatio = .72
+			bRatio = .07
 			
-			p.outlineGrey = 0.2989 * p.outlineColor[0] + 0.5870 * p.outlineColor[1] + 0.1140 * p.outlineColor[2]
+			'''
+
+			# BT.601
+			rRatio = 0.2989 
+			gRatio = 0.5870
+			bRatio = 0.1140 
+
+			
+			
+			p.outlineGrey = rRatio * p.outlineColor[0] + gRatio * p.outlineColor[1] + bRatio * p.outlineColor[2]
 			p.outlineGreyRate = [(p.outlineGrey - p.outlineColor[0]) / p.greyRate, 
 								 (p.outlineGrey - p.outlineColor[1]) / p.greyRate, 
 								 (p.outlineGrey - p.outlineColor[2]) / p.greyRate]
 			
-			p.fillGrey = 0.2989 * p.fillColor[0] + 0.5870 * p.fillColor[1] + 0.1140 * p.fillColor[2]
+			p.fillGrey = rRatio * p.fillColor[0] + gRatio * p.fillColor[1] + bRatio * p.fillColor[2]
 			p.fillGreyRate = [	(p.fillGrey - p.fillColor[0]) / p.greyRate,
 								(p.fillGrey - p.fillColor[1]) / p.greyRate, 
 								(p.fillGrey - p.fillColor[2]) / p.greyRate]

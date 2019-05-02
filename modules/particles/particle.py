@@ -302,6 +302,9 @@ class Particle(object):
 				if self.greyCount < self.greyRate :
 					self.greyCount += 1
 					
+					# REALLY this should be outlineColorRawValues being changed
+					# but it seems to look better like this
+					
 					r = self.outlineColor[0] + self.outlineGreyRate[0]
 					g = self.outlineColor[1] + self.outlineGreyRate[1]
 					b = self.outlineColor[2] + self.outlineGreyRate[2]

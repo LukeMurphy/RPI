@@ -208,6 +208,12 @@ def main(run = True) :
 		print (str(e)) 
 		config.pixelsGoGray = False
 
+	try :
+		config.pixelsGoGrayModel = int(workConfig.get("particleSystem", 'pixelsGoGrayModel'))
+	except Exception as e: 
+		print (str(e)) 
+		config.pixelsGoGrayModel = 3
+
 
 	ps.movement = (workConfig.get("particleSystem", 'movement'))
 	ps.objColor = (workConfig.get("particleSystem", 'objColor'))
@@ -288,26 +294,28 @@ def emitParticle(i=None):
 
 			or 1/3 each channel
 
-			Turns out, in this context, it does not change things that much!
+			Turns out, in this context, it does not change things that much - probably has to do with what the 
+			dominant color that is being transitioned to gray - 
 
-			# Average
-			rRatio = .33
-			gRatio = .33
-			bRatio = .33
-
-			# Luminosity
-			rRatio = .21
-			gRatio = .72
-			bRatio = .07
-			
 			'''
 
-			# BT.601
-			rRatio = 0.2989 
-			gRatio = 0.5870
-			bRatio = 0.1140 
+			if config.pixelsGoGrayModel == 3 :
+				# BT.601
+				rRatio = 0.2989 
+				gRatio = 0.5870
+				bRatio = 0.1140 
+			elif config.pixelsGoGrayModel == 2 :
+				# Luminosity
+				rRatio = .21
+				gRatio = .72
+				bRatio = .07
+			else :
+				# Average
+				rRatio = .33
+				gRatio = .33
+				bRatio = .33
 
-			
+				
 			
 			p.outlineGrey = rRatio * p.outlineColor[0] + gRatio * p.outlineColor[1] + bRatio * p.outlineColor[2]
 			p.outlineGreyRate = [(p.outlineGrey - p.outlineColor[0]) / p.greyRate, 

@@ -518,6 +518,7 @@ def drawSqareSpiral():
 def runWork():
 	global blocks, config, XOs
 	#gc.enable()
+	print("quilts ",config.render, config.instanceNumber)
 	while True:
 		iterate()
 		time.sleep(config.delay)  
@@ -539,6 +540,8 @@ def iterate() :
 	temp.paste(config.canvasImage, (0,0), config.canvasImage)
 	if(config.transformShape == True) :
 		temp = transformImage(temp)
+
+	#print("quilts ",config.render, config.instanceNumber)
 	config.render(temp, 0,0)
 
 	config.t2  = time.time()

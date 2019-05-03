@@ -423,6 +423,8 @@ def setUp():
 def runWork():
 	global blocks, config
 	#gc.enable()
+
+	print("particles RUNWORK", config.render, config.instanceNumber)
 	while True:
 		iterate()
 		time.sleep(config.delay)  
@@ -503,7 +505,7 @@ def iterate() :
 			crop = crop.convert("RGBA")
 			config.renderImageFull.paste(crop, (round(xDist) , i*config.torqueDelta), crop)
 
-
+	#print("particles ",config.render, config.instanceNumber)
 
 	config.render(config.image, 0,0)
 		

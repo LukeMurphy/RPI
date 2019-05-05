@@ -518,7 +518,7 @@ def drawSqareSpiral():
 def runWork():
 	global blocks, config, XOs
 	#gc.enable()
-	print("quilts ",config.render, config.instanceNumber)
+	#print("quilts ",config.render, config.instanceNumber)
 	while True:
 		iterate()
 		time.sleep(config.delay)  

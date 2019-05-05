@@ -424,7 +424,7 @@ def runWork():
 	global blocks, config
 	#gc.enable()
 
-	print("particles RUNWORK", config.render, config.instanceNumber)
+	#print("particles RUNWORK", config.render, config.instanceNumber)
 	while True:
 		iterate()
 		time.sleep(config.delay)  

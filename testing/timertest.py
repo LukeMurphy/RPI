@@ -1,11 +1,17 @@
-import time
-import  threading
-import numpy as np
-from Tkinter import *
-import Tkinter as Tk
+import time, threading, random
+import sys
+import os
+import subprocess
+from tkinter import *
+import tkinter as tk
+
+import PIL.Image
+
+from PIL import Image, ImageTk, ImageDraw, ImageFont
+from PIL import ImageFilter, ImageChops, ImageEnhance
 
 def print_time(args):
-	print "From print_time", time.time(), args
+	print ("From print_time", time.time(), args)
 
 def print_some_times():
 	print ("time one", time.time())
@@ -31,7 +37,7 @@ def Init():
 	ns = setInterval(print_time, .1, ".1er")
 
 def run():
-	root = Tk()
+	root = tk.Tk()
 	w = 600
 	h = 500
 	foo = Canvas
@@ -42,9 +48,9 @@ def run():
 
 #run()
 
-import Queue
+#import Queue
 
-q = Queue.Queue()
+#q = Queue.Queue()
 
 # Run tkinter code in another thread
 
@@ -60,10 +66,10 @@ class App(threading.Thread):
         self.root.quit()
 
     def run(self):
-        self.root = Tk.Tk()
+        self.root = tk.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.callback)
 
-        label = Tk.Label(self.root, text="Hello World")
+        label = tk.Label(self.root, text="Hello World")
         label.pack()
 
         self.root.mainloop()

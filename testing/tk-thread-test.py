@@ -97,8 +97,6 @@ def startThreads():
 
 
 '''
-
-
 def binder():
 	thrd = threading.Thread(target=binderCall)
 	thrd.start()
@@ -128,8 +126,8 @@ cnvs1.place(bordermode='outside', width=200, height=200, x = x)
 cnvs1.delete("main1")
 cnvs1._image_tk = PIL.ImageTk.PhotoImage(renderImageFull0)
 cnvs1._image_id = cnvs1.create_image(10, 10, image=cnvs1._image_tk, anchor='nw', tag="main1")
-#renderImageFull0.paste(renderImageFull1, (0,0), renderImageFull1)
 cnvs1.update()
+
 '''
 x = 50
 cnvs2 = tk.Canvas(root, width=200, height=200, border=-4)
@@ -140,8 +138,10 @@ cnvs2.place(bordermode='outside', width=200, height=200, x = x)
 root.bind("<<newwin>>",new_window)
 #root.after(1000, binder)
 root.after(100, startThreads)
-
-
-
 root.mainloop()
+
+
+
+
+
 

@@ -7,6 +7,8 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
 import argparse
 
+workId = 0
+
 class unit:
 	def __init__(self, config):
 		self.config = config
@@ -143,7 +145,7 @@ def showGrid():
 
 	#config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
 	
-	config.render(config.image, 0,0)
+	config.render(config.image, 0,0, config=config, workId=workId)
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

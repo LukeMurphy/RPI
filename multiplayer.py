@@ -48,7 +48,7 @@ def loadFromArguments(reloading=False):
 			'''
 		   
 			# Load the default work
-			masterConfig = configuration
+			masterConfig = configuration.Config()
 			masterConfig.path = "."
 
 			print("")
@@ -75,22 +75,51 @@ def loadFromArguments(reloading=False):
 			#GUI = threading.Thread(target=workWindow.run)
 			#GUI.join()
 
+			masterConfig.instanceNumber = 0
+
+			workWindow.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
+			workWindow.renderer.masterConfig = masterConfig
+			#workWindow.renderer.work = self.work
+			workWindow.renderer.canvasXPosition = 0
+			workWindow.renderer.delay = 1
+			workWindow.renderer.instanceNumber = 0
+			workWindow.renderer.setUp(workWindow.root)
+
 			players = []
 
 			for i in  range(0, len(masterConfig.workSets)):
 				workDetails = masterConfig.workSets[i]
-				cfg = masterConfig.workConfig.get(workDetails, 'cfg')
-				workConfig = configuration
+				cfg = masterConfig.config.get(workDetails, 'cfg')
 				workArgument = masterConfig.path + "/configs/" + cfg  # + ".cfg"
 
 				parser = configparser.ConfigParser()
 				parser.read(workArgument)
 				print("Player: " + str(i))
-				player = playerClass.PlayerObject(workConfig, parser, masterConfig, instanceNumber=i)
+				playerWorkConfig = configuration.Config()
+				player = playerClass.PlayerObject(playerWorkConfig, parser, masterConfig, instanceNumber=i)
 				player.appRoot = workWindow.root
-				player.canvasXPosition = i * 270
+				player.canvasXPosition = 0
+				#i * 270
 				player.delay = (i+1) * 1000
 				player.configure()
+				player.work.config = playerWorkConfig
+
+				print(playerWorkConfig.renderImageFull)
+				print(player.work.config.renderImageFull)
+
+
+				player.work.config.render = workWindow.renderer.render
+				player.renderer = workWindow.renderer
+				############ nope
+				player.renderer.config = playerWorkConfig
+				player.work.workId = i
+				if i == 0 :
+					player.work.config.xOffset = [i]
+				else :
+					player.work.config.xOffset.append(i * 500)
+
+				#player.work.config.canvasOffsetX = i * 100
+
 
 				players.append(player)
 
@@ -104,13 +133,16 @@ def loadFromArguments(reloading=False):
 				print("--------------------------------------")
 				print("--------------------------------------")
 				if i == 0 :
-					workWindow.root.after(player.renderer.delay, procCall1, player.renderer)
+					procCall1(player.work)
+					#workWindow.root.after(player.renderer.delay, procCall1, player.renderer)
 					pass
 				else :
-					workWindow.root.after(player.renderer.delay, procCall2, player.renderer)
+					procCall2(player.work)
+					#workWindow.root.after(player.renderer.delay, procCall2, player.renderer)
 					pass
 
 
+			procCall0(workWindow)
 			workWindow.run()
 			#GUI.start()
 			#workWindow.run()
@@ -125,11 +157,11 @@ def loadFromArguments(reloading=False):
 		#player.configure(config, workconfig)
 
 
-def proc1(renderer):
-	print("PROC1",renderer, renderer.render)
-
-	renderer.work.config.render = renderer.render
-	renderer.work.runWork()
+def proc1(work):
+	print("PROC1")
+	work.runWork()
+	#renderer.work.config.render = renderer.render
+	#renderer.work.runWork()
 	'''
 	while True:
 		#renderer.work.config.render = renderer.render
@@ -137,11 +169,11 @@ def proc1(renderer):
 		time.sleep(.1)
 	'''
 
-def proc2(renderer):
-	print("PROC2",renderer, renderer.render)
-
-	renderer.work.config.render = renderer.render
-	renderer.work.runWork()
+def proc2(work):
+	print("PROC2")
+	work.runWork()
+	#renderer.work.config.render = renderer.render
+	#renderer.work.runWork()
 	'''
 	while True:
 		#renderer.work.config.render = renderer.render
@@ -149,31 +181,43 @@ def proc2(renderer):
 		time.sleep(.5)
 	'''
 
+def proc0(workWindow):
+	while True:
+		workWindow.renderer.updateTheCanvas()
+		time.sleep(.02)
 
-def procCall1(renderer) :
-	print("ProcCall 1", renderer.cnvs)
-	thrd = threading.Thread(target=proc1, kwargs=dict(renderer=renderer))
+
+def procCall0(workWindow) :
+	print("ProcCall 0")
+	#thrd = threading.Thread(target=proc0, kwargs=dict(workWindow=workWindow))
+	#thrd.start()
+	#thrd.join()
+
+	t0  = threading.Thread.__init__(proc0(workWindow))
+	t0.start()
+
+
+def procCall1(work) :
+	print("ProcCall 1")
+	thrd = threading.Thread(target=proc1, kwargs=dict(work=work))
 	thrd.start()
 	#thrd.join()
 
 
-def procCall2(renderer) :
-	print("ProcCall 2", renderer.cnvs)
-	thrd2 = threading.Thread(target=proc2, kwargs=dict(renderer=renderer))
+def procCall2(work) :
+	print("ProcCall 2")
+	thrd2 = threading.Thread(target=proc2, kwargs=dict(work=work))
 	thrd2.start()
 	#thrd2.join()
 
 
 
-
-
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def loadTheConfig(config) :
+def loadTheConfig(masterConfig) :
 
 			print("loadTheConfig")
-			config.workConfig = configparser.ConfigParser()
+			masterConfig.config = configparser.ConfigParser()
 
 			'''
 			example:
@@ -196,35 +240,35 @@ def loadTheConfig(config) :
 			argument = args[3]
 			'''
 
-			config.MID = args.mname
-			config.path = args.path
+			masterConfig.MID = args.mname
+			masterConfig.path = args.path
 
-			argument = config.path + "/configs/" + args.cfg  # + ".cfg"
+			argument = masterConfig.path + "/configs/" + args.cfg  # + ".cfg"
 
-			config.workConfig.read(argument)
+			masterConfig.config.read(argument)
 
-			config.startTime = time.time()
-			config.currentTime = time.time()
-			config.reloadConfig = False
-			config.doingReload = False
-			config.checkForConfigChanges = False
-			config.loadFromArguments = loadFromArguments
-			config.fileName = argument
-			config.brightnessOverride = None
+			masterConfig.startTime = time.time()
+			masterConfig.currentTime = time.time()
+			masterConfig.reloadConfig = False
+			masterConfig.doingReload = False
+			masterConfig.checkForConfigChanges = False
+			masterConfig.loadFromArguments = loadFromArguments
+			masterConfig.fileName = argument
+			masterConfig.brightnessOverride = None
 
 			# Optional 4th argument to override the brightness set in the
 			# config
 			if(args.brightnessOverride != None):
 				brightnessOverride = args.brightnessOverride
-				config.brightness = float(float(brightnessOverride) / 100)
-				config.brightnessOverride = float(
+				masterConfig.brightness = float(float(brightnessOverride) / 100)
+				masterConfig.brightnessOverride = float(
 					float(brightnessOverride) / 100)
 
 			f = os.path.getmtime(argument)
-			config.delta = int((config.startTime - f))
-			print(argument, "LAST MODIFIED DELTA: ", config.delta)
+			masterConfig.delta = int((masterConfig.startTime - f))
+			print(argument, "LAST MODIFIED DELTA: ", masterConfig.delta)
 
-			config.workSets = list(map(lambda x: x, config.workConfig.get("worksList", 'works').split(',')))
+			masterConfig.workSets = list(map(lambda x: x, masterConfig.config.get("worksList", 'works').split(',')))
 
 			return True
 

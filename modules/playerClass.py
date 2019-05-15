@@ -27,11 +27,11 @@ threads = []
 
 class PlayerObject:
 
-	def __init__(self, config, workconfig, masterConfig, instanceNumber):
+	def __init__(self, playerWorkConfig, workconfig, masterConfig, instanceNumber):
 		print("")
 		print("* * * * * * * * * * * * * * *")
 		print("PlayerObject init: " + str(instanceNumber))
-		self.config = config
+		self.config = playerWorkConfig
 		self.workConfig = workconfig
 		self.instanceNumber = instanceNumber
 		self.masterConfig = masterConfig
@@ -219,19 +219,24 @@ class PlayerObject:
 		self.config.cols = int(self.workConfig.get("displayconfig", 'cols'))
 
 		self.config.brightness =  float(self.workConfig.get("displayconfig", 'brightness'))
-		if(self.config.brightnessOverride is not None) : self.config.brightness = self.config.brightnessOverride
+
+		try:
+			self.config.brightness = self.config.brightnessOverride
+		except Exception as e: 
+			print (str(e))
 
 		self.config.minBrightness  = float(self.workConfig.get("displayconfig", 'minBrightness'))
 		self.config.work = self.workConfig.get("displayconfig", 'work')
 		self.config.rendering = self.workConfig.get("displayconfig", 'rendering')
 
 		# Create the image-canvas for the work
+		'''
 		self.config.renderImage = PIL.Image.new("RGBA", (self.config.screenWidth*self.config.rows, 32))
 		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
 		self.config.image = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
 		self.config.draw = ImageDraw.Draw(self.config.image)
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
-
+		'''
 
 		# Setting up based on how the work is displayed
 		print("Loading:", str(self.config.work))
@@ -254,7 +259,8 @@ class PlayerObject:
 		# And to be sure, make the renderImageFull bigger than necessary - 		
 		self.config.renderImage = PIL.Image.new("RGBA", (self.config.canvasWidth * self.config.rows, 32))
 		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
-		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
+
+
 
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 		self.config.image = PIL.Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
@@ -276,6 +282,8 @@ class PlayerObject:
 		self.config.windowYOffset = int(self.workConfig.get("displayconfig", 'windowYOffset'))
 
 		self.config.instanceNumber = self.instanceNumber
+
+		'''	
 		self.renderer = renderClass.CanvasElement(self.appRoot, self.config)
 		self.renderer.masterConfig = self.masterConfig
 		self.renderer.work = self.work
@@ -287,9 +295,12 @@ class PlayerObject:
 		self.config.drawBeforeConversion = self.renderer.drawBeforeConversion
 
 		self.work.config.render = self.renderer.render
+		'''
 		self.work.main(False)
 		#self.work.runWork()
-		print("Setting Up - Reload? ", self.config.doingReload)
+
+
+		#print("Setting Up - Reload? ", self.config.doingReload)
 		
 
 		

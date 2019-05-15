@@ -81,8 +81,8 @@ class CanvasElement:
 			gc.collect()
 			self.counter = 0
 
-		print("Instance Number Render: " + str(self.config.instanceNumber))
-		print(self.instanceNumber, self.cnvs)
+		#print("Instance Number Render: " + str(self.config.instanceNumber))
+		#print(self.instanceNumber, self.cnvs)
 
 		# This significantly helped performance !!
 		self.cnvs.delete("main"+str(self.instanceNumber))
@@ -116,11 +116,11 @@ class CanvasElement:
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-	def renderCall(self, imageToRender, xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
-		print("Instance Number Render: " + str(self.config.instanceNumber), self.cnvs)
+	def renderCall(self, imageToRender, xOffset, yOffset, w=128, h=64, nocrop=False, overlayBottom=False, updateCanvasCall=True) :
+		#print("Instance Number Render: " + str(self.config.instanceNumber), self.cnvs)
 		pass
 
-	def render(self, imageToRender, xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
+	def render(self, imageToRender, xOffset, yOffset, w=128, h=64, nocrop=False, overlayBottom=False, updateCanvasCall=True, config=None, workId = 0) :
 
 		# Render to canvas
 		# This needs to be optomized !!!!!!
@@ -129,6 +129,9 @@ class CanvasElement:
 		#print("Instance Number Render: " + str(self.config.instanceNumber))
 
 		self.imageToRender = imageToRender
+
+		xOffset = config.xOffset[workId]
+
 
 		if(self.config.rotation != 0) : 
 			if(self.config.fullRotation == True) :
@@ -266,7 +269,7 @@ class CanvasElement:
 			config.torqueAngle = 0
 		'''
 
-		if(updateCanvasCall) : self.updateCanvas() 
+		#if(updateCanvasCall ) : self.updateCanvas() 
 
 		#mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
 		#if mem > memoryUsage and debug :
@@ -276,6 +279,9 @@ class CanvasElement:
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	# Might be used at some point
+
+	def updateTheCanvas(self):
+		self.updateCanvas() 
 
 	def remappingFunctionTemp(self) :
 		for i in range (0,4) :

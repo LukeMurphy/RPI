@@ -47,21 +47,13 @@ def loadFromArguments(reloading=False):
 			print(args)
 			'''
 		   
-			# Load the default work
+			print(">>  Multiplayer running loadFromArguments **")
+
 			masterConfig = configuration.Config()
 			masterConfig.path = "."
 
-			print("** Multiplayer running loadFromArguments **")
 			loadTheConfig(masterConfig)
 
-			'''
-			##########################################################################
-			#
-			Create the main app window
-
-
-			##########################################################################
-			'''
 
 			masterConfig.windowXOffset = 100
 			masterConfig.windowYOffset = 100
@@ -69,60 +61,67 @@ def loadFromArguments(reloading=False):
 			masterConfig.screenWidth = 700
 			masterConfig.screenHeight = 700
 
+			# Set up the app window
 			workWindow = appWindow.AppWindow(masterConfig)
 			workWindow.setUp()
+
+			# set up the common rendder -- i.e. everything renders here
+			# but really there should be more than one renderImageFull ....
 			workWindow.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
 			workWindow.renderer.masterConfig = masterConfig
 			workWindow.renderer.canvasXPosition = 0
 			workWindow.renderer.delay = 1
-			workWindow.renderer.setUp(workWindow.root)
+			workWindow.renderer.setUpCanvas(workWindow.root)
+			workWindow.renderer.setUp()
 
-			players = []
+			workWindow.players = []
 
 
 			for i in  range(0, len(masterConfig.workSets)):
 				workDetails = masterConfig.workSets[i]
 				workConfig = configuration.Config()
-				cfg = masterConfig.workConfig.get(workDetails, 'cfg')
-				workArgument = masterConfig.path + "/configs/" + cfg  # + ".cfg"
+				cfgToFetch = masterConfig.workConfigParser.get(workDetails, 'cfg')
+				canvasOffsetX = int(masterConfig.workConfigParser.get(workDetails, 'canvasOffsetX'))
+				canvasOffsetY = int(masterConfig.workConfigParser.get(workDetails, 'canvasOffsetY'))
+				canvasRotation = float(masterConfig.workConfigParser.get(workDetails, 'canvasRotation'))
+				workArgument = masterConfig.path + "/configs/" + cfgToFetch  # + ".cfg"
 
+				## This loads the config file for the work as listed in the
+				## mulitplayer manifest
 				parser = configparser.ConfigParser()
 				parser.read(workArgument)
-				print("** Player: " + str(i))
+
+				print("\n>> CREATING Player: " + str(i) + " " + cfgToFetch)
 				player = playerClass.PlayerObject(workConfig, parser, masterConfig, instanceNumber=i)
 				player.appRoot = workWindow.root
 				player.canvasXPosition = 0
 				player.delay = (i+1) * 1000
+
 				player.configure()
-				player.work.config = workConfig
-				player.work.config.render = workWindow.renderer.render
-				player.renderer = workWindow.renderer
 				player.work.workId = i
+				player.work.config = workConfig
+
+				player.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
+				player.renderer.masterConfig = masterConfig
+				player.renderer.config = workConfig
+				player.renderer.canvasXPosition = 0
+				player.renderer.setUp()
+				player.renderer.config.canvasOffsetX = canvasOffsetX
+				player.renderer.config.canvasOffsetY = canvasOffsetY
+				player.renderer.config.canvasRotation = canvasRotation
+
+				player.work.config.render = player.renderer.render
+				workWindow.players.append(player)
+
+				# For now, only running two at a time .....
 				if i == 0 :
-					player.work.config.xOffset = [i]
+					procCall1(player.work)
 				else :
-					player.work.config.xOffset.append(i * 500)
-
-				#player.work.config.canvasOffsetX = i * 100
-
-				players.append(player)
+					procCall2(player.work)
 
 
-				if i == 0 :
-					#procCall1(player.work)
-					#workWindow.root.after(player.renderer.delay, procCall1, player.renderer)
-					pass
-				else :
-					#procCall2(player.work)
-					#workWindow.root.after(player.renderer.delay, procCall2, player.renderer)
-					pass
-
-
-			exit()
 			procCall0(workWindow)
 			workWindow.run()
-			#GUI.start()
-			#workWindow.run()
 
 
 		except getopt.GetoptError as err:
@@ -130,42 +129,28 @@ def loadFromArguments(reloading=False):
 			print("Error:" + str(err))
 	else:
 		print("reloading: " + config.fileName)
-		#workconfig.read(config.fileName)
-		#player.configure(config, workconfig)
+
 
 
 def proc1(work):
-	print("PROC1")
+	print(">> PROC1")
 	work.runWork()
-	#renderer.work.config.render = renderer.render
-	#renderer.work.runWork()
-	'''
-	while True:
-		#renderer.work.config.render = renderer.render
-		renderer.cnvs.create_rectangle(round(random.uniform(0,100)), round(random.uniform(0,100)), 10, 10, fill="green")
-		time.sleep(.1)
-	'''
+
 
 def proc2(work):
-	print("PROC2")
+	print(">> PROC2")
 	work.runWork()
-	#renderer.work.config.render = renderer.render
-	#renderer.work.runWork()
-	'''
-	while True:
-		#renderer.work.config.render = renderer.render
-		renderer.cnvs.create_rectangle(round(random.uniform(0,100)), round(random.uniform(0,100)), 10, 10, fill="blue")
-		time.sleep(.5)
-	'''
+
 
 def proc0(workWindow):
+	print(">> PROC0 -- overall renderer")
 	while True:
-		workWindow.renderer.updateTheCanvas()
+		workWindow.renderer.updateTheCanvas(workWindow.players)
 		time.sleep(.02)
 
 
 def procCall0(workWindow) :
-	print("ProcCall 0")
+	print(">> ProcCall 0 THREAD")
 	#thrd = threading.Thread(target=proc0, kwargs=dict(workWindow=workWindow))
 	#thrd.start()
 	#thrd.join()
@@ -175,17 +160,19 @@ def procCall0(workWindow) :
 
 
 def procCall1(work) :
-	print("ProcCall 1")
+	print(">> ProcCall 1 THREAD")
 	thrd = threading.Thread(target=proc1, kwargs=dict(work=work))
 	thrd.start()
 	#thrd.join()
 
 
 def procCall2(work) :
-	print("ProcCall 2")
+	print(">> ProcCall 2 THREAD")
 	thrd2 = threading.Thread(target=proc2, kwargs=dict(work=work))
 	thrd2.start()
 	#thrd2.join()
+
+
 
 
 
@@ -193,8 +180,8 @@ def procCall2(work) :
 
 def loadTheConfig(config) :
 
-			print("** Multiplayer running loadTheConfig **")
-			config.workConfig = configparser.ConfigParser()
+			print(">>  Multiplayer running loadTheConfig **")
+			config.workConfigParser = configparser.ConfigParser()
 
 			'''
 			example:
@@ -209,7 +196,7 @@ def loadTheConfig(config) :
 			parser.add_argument('-brightnessOverride', type=int, help='brightness param to override the config value (optional)')
 			args = parser.parse_args()
 
-			print("** Config Arguments --> " + str(args) + " **")
+			print(">>  Config Arguments --> " + str(args) + " **")
 
 			'''
 			config.MID = args[1]
@@ -219,10 +206,9 @@ def loadTheConfig(config) :
 
 			config.MID = args.mname
 			config.path = args.path
-
 			argument = config.path + "/configs/" + args.cfg  # + ".cfg"
 
-			config.workConfig.read(argument)
+			config.workConfigParser.read(argument)
 
 			config.startTime = time.time()
 			config.currentTime = time.time()
@@ -244,7 +230,7 @@ def loadTheConfig(config) :
 			config.delta = int((config.startTime - f))
 			print("** LAST MODIFIED DELTA: " + str(config.delta))
 
-			config.workSets = list(map(lambda x: x, config.workConfig.get("worksList", 'works').split(',')))
+			config.workSets = list(map(lambda x: x, config.workConfigParser.get("worksList", 'works').split(',')))
 
 			return True
 

@@ -26,7 +26,7 @@ def configure(config, workconfig) :
 	global  path, tempImage, threads, thrd
 	#gc.enable()
 	
-	print("setting config values")
+	print("** Setting PLAYER config values **")
 
 	### Sets up for testing live config chages
 	try:
@@ -219,7 +219,7 @@ def configure(config, workconfig) :
 
 
 	# Setting up based on how the work is displayed
-	print("Loading:", str(config.work))
+	print("** Loading:", str(config.work))
 	work = importlib.import_module('pieces.'+str(config.work))
 	work.config = config
 	work.workConfig = workconfig
@@ -328,8 +328,11 @@ def renderUsingLINSNHub(work):
 	work.config.updateCanvas = r.updateCanvas
 	work.main(False)
 
-	print("Setting Up", work.config.doingReload)
-	if(work.config.doingReload == False) : r.setUp()
+	print("** Player setting up: doing reload? " + str(work.config.doingReload) )
+	if(work.config.doingReload == False) : 
+		r.setUp()
+
+
 '''
 def renderUsingFFMPEG(work):
 

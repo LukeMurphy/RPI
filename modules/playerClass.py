@@ -4,7 +4,6 @@ import os, sys, getopt, time, random, math, datetime, textwrap
 import importlib 
 import configparser
 import threading
-
 import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
@@ -18,19 +17,19 @@ from subprocess import call
 '''
 
 from modules import configuration
+from modules.rendering import renderClass
+
+'''
 global thrd, config
 global imageTop,imageBottom,image,config,transWiring
-from modules.rendering import renderClass
-import threading
+'''
 
 threads = []
 
 class PlayerObject:
 
 	def __init__(self, playerWorkConfig, workconfig, masterConfig, instanceNumber):
-		print("")
-		print("* * * * * * * * * * * * * * *")
-		print("PlayerObject init: " + str(instanceNumber))
+		print(">> PlayerObject init: " + str(instanceNumber))
 		self.config = playerWorkConfig
 		self.workConfig = workconfig
 		self.instanceNumber = instanceNumber
@@ -38,10 +37,10 @@ class PlayerObject:
 
 
 	def configure(self) :
-		global  path, tempImage, threads, thrd
+		#global  path, tempImage, threads, thrd
 		#gc.enable()
 		
-		print("setting self.config values")
+		print(">> PlayerObject setting self.config values")
 
 		### Sets up for testing live self.config chages
 		try:
@@ -231,18 +230,17 @@ class PlayerObject:
 
 		# Create the image-canvas for the work
 		'''
+		'''
 		self.config.renderImage = PIL.Image.new("RGBA", (self.config.screenWidth*self.config.rows, 32))
 		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
 		self.config.image = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
 		self.config.draw = ImageDraw.Draw(self.config.image)
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
-		'''
 
 		# Setting up based on how the work is displayed
-		print("Loading:", str(self.config.work))
+		print(">> PlayerObject loading the work: " + str(self.config.work))
 		self.work = importlib.import_module('pieces.'+str(self.config.work))
 		self.work.config = self.config
-		self.workConfig = self.workConfig
 		self.work.workConfig = self.workConfig
 
 
@@ -260,16 +258,14 @@ class PlayerObject:
 		self.config.renderImage = PIL.Image.new("RGBA", (self.config.canvasWidth * self.config.rows, 32))
 		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
 
-
-
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 		self.config.image = PIL.Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
 		self.config.draw = ImageDraw.Draw(self.config.image)
 
 
 		try :
-			self.config.useLastOverlay  = work.workConfig.getboolean("displayconfig", 'useLastOverlay')
-			self.config.useLastOverlayProb  = float(work.workConfig.get("displayconfig", 'useLastOverlayProb'))
+			self.config.useLastOverlay  = self.workConfig.getboolean("displayconfig", 'useLastOverlay')
+			self.config.useLastOverlayProb  = float(self.workConfig.get("displayconfig", 'useLastOverlayProb'))
 			self.config.renderImageFullOverlay = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
 			self.config.renderDrawOver = ImageDraw.Draw(self.config.renderImageFullOverlay)
 		except Exception as e: 
@@ -296,6 +292,7 @@ class PlayerObject:
 
 		self.work.config.render = self.renderer.render
 		'''
+		print(">>>>>>>>>>")		
 		self.work.main(False)
 		#self.work.runWork()
 

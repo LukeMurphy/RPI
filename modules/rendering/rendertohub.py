@@ -28,8 +28,9 @@ buff  =  8
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
-	global root, canvasOffsetX, canvasOffsetY, buff, config
+	#global root, canvasOffsetX, canvasOffsetY, buff, config
 	gc.enable()
+	
 	if(config.MID == "studio-mac") : 
 		config.path = "./"
 		windowOffset = [1900,20]
@@ -97,7 +98,8 @@ def on_closing():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def startWork(*args) :
-	global config, work, root, counter
+	#global config, work, root, counter
+	global counter
 
 	### Putting the animation on its own thread
 	### Still throws and error when manually closed though...
@@ -117,7 +119,8 @@ def startWork(*args) :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def updateCanvas() :
-	global canvasOffsetX, canvasOffsetY, root, counter, buff
+	#global canvasOffsetX, canvasOffsetY, root, counter, buff
+	global counter
 	## For testing ...
 	#draw1  = ImageDraw.Draw(config.renderImageFull)
 	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
@@ -157,9 +160,10 @@ def updateCanvas() :
 
 		if(config.delta <= 1) : 
 			if(config.reloadConfig == False) :
-				print ("LAST MODIFIED DELTA: ", config.delta)
+				print ("** LAST MODIFIED DELTA: " + str(config.delta) + " **")
 				config.doingReload = True
-				config.loadFromArguments(True)
+				## NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
+				config.loadFromArguments(True, config)
 			config.reloadConfig = True
 		else :
 			config.reloadConfig = False
@@ -168,8 +172,8 @@ def updateCanvas() :
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
-	global memoryUsage
-	global config, debug
+	#global memoryUsage
+	#global config, debug
 
 	# Render to canvas
 	# This needs to be optomized !!!!!!

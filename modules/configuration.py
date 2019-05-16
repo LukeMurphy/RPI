@@ -34,7 +34,7 @@ class Config:
 	cols = 1
 	imageRows = [] * rows
 	actualScreenWidth = tileSize[1]*cols*rows
-	path = "/home/pi"
+	path = "."
 	useMassager = False
 	brightness = 1
 	transWiring = True
@@ -42,5 +42,5 @@ class Config:
 	rotation = 0
 
 	def __init__(self):
-		print("** Config instance init **")
+		print("** Config instance init")
 

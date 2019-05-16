@@ -190,8 +190,8 @@ def drawPalette():
 
 def main(run = True) :
 	global config, directionOrder
-	print("---------------------")
-	print("Diag Loaded")
+	print("** ---------------------")
+	print("** Diag Loaded **")
 
 
 	colorutils.brightness = config.brightness

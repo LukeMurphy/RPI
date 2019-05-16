@@ -26,21 +26,23 @@ class CanvasElement:
 		self.threadsList = []
 
 
-	def setUp(self, root):
+	def setUp(self):
+		self.config.renderImage = PIL.Image.new("RGBA", (self.config.screenWidth*self.config.rows, 32))
+		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
+		self.config.image = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
+		self.config.draw = ImageDraw.Draw(self.config.image)
+		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
+		self.config.canvasOffsetX = 0
+		self.config.canvasOffsetY = 0
 
+
+	def setUpCanvas(self, root):
 		self.config.torqueAngle = 0
 		self.cnvs = tk.Canvas(root, width=self.config.screenWidth + self.buff, height=self.config.screenHeight + self.buff, border=0, name='main1')
 		#self.config.cnvs = self.cnvs
 		self.cnvs.create_rectangle(0, 0, self.config.screenWidth + self.buff, self.config.screenHeight + self.buff, fill="black")
 		self.cnvs.pack()
 		self.cnvs.place(bordermode='outside', width=self.config.screenWidth + self.buff, height=self.config.screenHeight + self.buff, x = self.canvasXPosition)
-
-		#tempImage = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
-		#tempImage = ImageTk.PhotoImage(self.config.renderImageFull)
-		#self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=tempImage, anchor='nw', tag="main")
-
-		#root.after(self.delay, self.startWork)
-		#self.root.after(self.delay, self.work.runWork)
 
 
 	def startWork(self) :
@@ -83,11 +85,12 @@ class CanvasElement:
 		#print(self.instanceNumber, self.cnvs)
 
 		# This significantly helped performance !!
-		self.cnvs.delete("main"+str(self.instanceNumber))
+		'''
+		self.cnvs.delete("main1")
 		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
-		self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=self.cnvs._image_tk, anchor='nw', tag="main"+str(self.instanceNumber))
+		self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=self.cnvs._image_tk, anchor='nw', tag="main1")
 		self.cnvs.update()
-
+		'''
 		
 		# This *should* be more efficient 
 		#config.cnvs.update_idletasks()
@@ -119,7 +122,7 @@ class CanvasElement:
 		pass
 
 
-	def render(self, imageToRender, xOffset, yOffset, w=128, h=64, nocrop=False, overlayBottom=False, updateCanvasCall=True, config=None, workId = 0) :
+	def render(self, imageToRender, xOffset, yOffset, w=128, h=64, nocrop=False, overlayBottom=False, updateCanvasCall=True) :
 
 		# Render to canvas
 		# This needs to be optomized !!!!!!
@@ -129,7 +132,7 @@ class CanvasElement:
 
 		self.imageToRender = imageToRender
 
-		xOffset = config.xOffset[workId]
+		xOffset = 0
 
 
 		if(self.config.rotation != 0) : 
@@ -277,10 +280,22 @@ class CanvasElement:
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-	# Might be used at some point
+	# This is kind of screwy as it's only used by the main window .....
+	def updateTheCanvas(self, players):
 
-	def updateTheCanvas(self):
-		self.updateCanvas() 
+		xOff = 0
+		for player in players :
+			self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
+			player.config.renderImageFull = player.config.renderImageFull.convert("RGBA")
+			self.config.renderImageFull.paste(player.config.renderImageFull, (player.config.canvasOffsetX,player.config.canvasOffsetY), player.config.renderImageFull)
+			#self.config.renderImageFull = self.config.renderImageFull.rotate(-player.config.canvasRotation, expand=False)
+
+
+		self.cnvs.delete("main1")
+		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
+		self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=self.cnvs._image_tk, anchor='nw', tag="main1")
+		self.cnvs.update()
+
 
 
 	def remappingFunctionTemp(self) :

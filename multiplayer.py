@@ -54,13 +54,6 @@ def loadFromArguments(reloading=False):
 
 			loadTheConfig(masterConfig)
 
-
-			masterConfig.windowXOffset = 100
-			masterConfig.windowYOffset = 100
-			masterConfig.buff = 8
-			masterConfig.screenWidth = 700
-			masterConfig.screenHeight = 700
-
 			# Set up the app window
 			workWindow = appWindow.AppWindow(masterConfig)
 			workWindow.setUp()
@@ -228,9 +221,15 @@ def loadTheConfig(config) :
 
 			f = os.path.getmtime(argument)
 			config.delta = int((config.startTime - f))
-			print("** LAST MODIFIED DELTA: " + str(config.delta))
+			print(">> LAST MODIFIED DELTA: " + str(config.delta))
 
 			config.workSets = list(map(lambda x: x, config.workConfigParser.get("worksList", 'works').split(',')))
+			config.screenHeight = int(config.workConfigParser.get("worksList", 'screenHeight'))
+			config.screenWidth =  int(config.workConfigParser.get("worksList", 'screenWidth'))
+			config.canvasOffsetX = int(config.workConfigParser.get("worksList", 'canvasOffsetX'))
+			config.canvasOffsetY = int(config.workConfigParser.get("worksList", 'canvasOffsetY'))
+			config.windowXOffset = int(config.workConfigParser.get("worksList", 'windowXOffset'))
+			config.windowYOffset = int(config.workConfigParser.get("worksList", 'windowYOffset'))
 
 			return True
 

@@ -48,8 +48,8 @@ class AppWindow:
 		#if(config.rotation == 90) : canvasOffsetY = -25
 
 		self.root = tk.Tk()
-		w = self.masterConfig.screenWidth + self.masterConfig.buff
-		h = self.masterConfig.screenHeight + self.masterConfig.buff
+		w = self.masterConfig.screenWidth
+		h = self.masterConfig.screenHeight
 		x = windowOffset[0]
 		y = windowOffset[1]
 

@@ -216,7 +216,7 @@ class CanvasElement:
 
 
 		if self.config.remapImageBlock2 == True :
-			crop = self.config.renderImageFull.crop(config.remapImageBlockSection2)
+			crop = self.config.renderImageFull.crop(self.config.remapImageBlockSection2)
 			if self.config.remapImageBlockSection2Rotation != 0 :
 				crop = crop.convert("RGBA")
 				crop = crop.rotate(self.config.remapImageBlockSection2Rotation)
@@ -273,6 +273,7 @@ class CanvasElement:
 			temp2 = temp.rotate(-player.config.canvasRotation, expand=True)
 
 			'''
+			'''
 			if player.config.useFilters == True :
 
 				if player.config.filterRemap == True :
@@ -293,7 +294,6 @@ class CanvasElement:
 			if player.config.usePixelSort and player.config.pixelSortRotatesWithImage == False  :
 				if(random.random()< player.config.pixelSortAppearanceProb) :
 					player.config.renderImageFull =  pixelSort(player.config.renderImageFull, player.config)
-			'''
 			if player.config.useBlur == True :
 				temp2 = temp2.filter(ImageFilter.GaussianBlur(radius=player.config.sectionBlurRadius))
 

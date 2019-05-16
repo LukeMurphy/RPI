@@ -168,7 +168,8 @@ class CanvasElement:
 		#enhancer = ImageEnhance.Brightness(config.renderImageFull)
 		#config.renderImageFull = enhancer.enhance(.75)
 
-
+		'''
+		'''
 		if self.config.useFilters == True :
 
 			if self.config.filterRemap == True :
@@ -203,7 +204,6 @@ class CanvasElement:
 				#crop =  pixelSort(crop, config)
 				#config.renderImageFull = config.renderImageFull.convert("RGBA")
 				#config.renderImageFull.paste(crop)
-
 
 		# ---- Remap sections of image to accommodate odd panels ---- #
 		if self.config.remapImageBlock == True :
@@ -245,40 +245,20 @@ class CanvasElement:
 
 		# ---- Overall image blurring  ---- #
 		if self.config.useBlur == True :
+			pass
 			'''
-			config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-			'''
+			self.config.renderImageFull = self.config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
 			crop = self.config.renderImageFull.crop(self.config.blurSection)
 			destination = (self.config.blurXOffset, self.config.blurYOffset)
 			crop = crop.convert("RGBA")
 			crop = crop.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
 			self.config.renderImageFull.paste(crop, destination, crop)
+			'''
 			
 		if self.config.useLastOverlay == True :
 			self.config.renderDrawOver.rectangle(self.config.lastOverlayBox, fill = self.config.lastOverlayFill, outline = None)
 			self.config.renderImageFull.paste(self.config.renderImageFullOverlay, (0,0), self.config.renderImageFullOverlay)
 
-
-		'''
-		for i in range(0,40) :
-			delta = 16
-			box = (0,i*delta,448,i*delta+delta)
-			crop = config.renderImageFull.crop(box)
-			crop = crop.convert("RGBA")
-			config.renderImageFull.paste(crop, (i*2 + config.angle, i*delta), crop)
-
-		config.torqueAngle += 1
-		
-		if config.torqueAngle > 1000064 :
-			config.torqueAngle = 0
-		'''
-
-		#if(updateCanvasCall ) : self.updateCanvas() 
-
-		#mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
-		#if mem > memoryUsage and debug :
-		#	memoryUsage = mem 
-		#	print 'Memory usage: %s (mb)' % str(memoryUsage)
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -291,6 +271,32 @@ class CanvasElement:
 			temp = player.config.renderImageFull.copy()
 			temp = temp.convert("RGBA")
 			temp2 = temp.rotate(-player.config.canvasRotation, expand=True)
+
+			'''
+			if player.config.useFilters == True :
+
+				if player.config.filterRemap == True :
+					player.config.tempImage = player.config.renderImageFull.copy()
+					player.config.tempImage = ditherFilter(config.tempImage,0, 0, config)
+					crop = player.config.tempImage.crop(player.config.remapImageBlockSection)
+					crop = crop.convert("RGBA")
+					player.config.renderImageFull.paste(crop, player.config.remapImageBlockDestination, crop)
+				else:
+					player.config.renderImageFull = ditherFilter(player.config.renderImageFull,0, 0, player.config)
+
+			if player.config.usePixelSort == True and player.config.pixelSortRotatesWithImage == True :
+				if(random.random()< player.config.pixelSortAppearanceProb) :
+					player.config.renderImageFull =  pixelSort(player.config.renderImageFull, player.config)
+
+
+			# ---- Pixel Sort Type Effect ---- #
+			if player.config.usePixelSort and player.config.pixelSortRotatesWithImage == False  :
+				if(random.random()< player.config.pixelSortAppearanceProb) :
+					player.config.renderImageFull =  pixelSort(player.config.renderImageFull, player.config)
+			'''
+			if player.config.useBlur == True :
+				temp2 = temp2.filter(ImageFilter.GaussianBlur(radius=player.config.sectionBlurRadius))
+
 			self.config.renderImageFull.paste(temp2, (player.config.canvasOffsetX,player.config.canvasOffsetY), temp2)
 
 

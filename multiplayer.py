@@ -99,14 +99,15 @@ def loadFromArguments(reloading=False):
 				player.work.config.rotation = 0
 
 				player.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
-				player.renderer.masterConfig = masterConfig
 				player.renderer.config = workConfig
-				player.renderer.canvasXPosition = 0
 				player.renderer.setUp()
 				player.renderer.config.canvasOffsetX = canvasOffsetX
 				player.renderer.config.canvasOffsetY = canvasOffsetY
 				player.renderer.config.canvasRotation = canvasRotation
 
+				## sets the render function -- in the multi player situation, this just draws
+				## the final animation to each player's final image - the canvas is not updated
+				## since that is handled by the main app window process thread
 				player.work.config.render = player.renderer.render
 				workWindow.players.append(player)
 

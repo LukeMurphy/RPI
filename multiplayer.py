@@ -111,7 +111,7 @@ def loadFromArguments(reloading=False):
 				player.work.config.render = player.renderer.render
 				workWindow.players.append(player)
 
-				# For now, only running two at a time .....
+				# For now, only running two work threads at a time .....
 				if i == 0 :
 					procCall1(player.work)
 				else :

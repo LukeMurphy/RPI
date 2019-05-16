@@ -46,7 +46,7 @@ print(args)
 ##########################################################################
 
 def loadFromArguments(reloading=False):
-    global config, workconfig, path, tempImage, threads, thrd
+    #global config, workconfig, path, tempImage, threads, thrd
 
     if(reloading == False):
         try:
@@ -60,7 +60,7 @@ def loadFromArguments(reloading=False):
             print("Arguments passed to player.py:")
             print(args)
             '''
-            config = configuration
+            config = configuration.Config()
 
             # Load the default work
 

@@ -51,8 +51,7 @@ def loadFromArguments(reloading=False):
 			masterConfig = configuration.Config()
 			masterConfig.path = "."
 
-			print("")
-			print("- - - - - - - - - - - - - - - - - - -")
+			print("** Multiplayer running loadFromArguments **")
 			loadTheConfig(masterConfig)
 
 			'''
@@ -72,46 +71,32 @@ def loadFromArguments(reloading=False):
 
 			workWindow = appWindow.AppWindow(masterConfig)
 			workWindow.setUp()
-			#GUI = threading.Thread(target=workWindow.run)
-			#GUI.join()
-
-			masterConfig.instanceNumber = 0
-
 			workWindow.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
 			workWindow.renderer.masterConfig = masterConfig
-			#workWindow.renderer.work = self.work
 			workWindow.renderer.canvasXPosition = 0
 			workWindow.renderer.delay = 1
-			workWindow.renderer.instanceNumber = 0
 			workWindow.renderer.setUp(workWindow.root)
 
 			players = []
 
+
 			for i in  range(0, len(masterConfig.workSets)):
 				workDetails = masterConfig.workSets[i]
-				cfg = masterConfig.config.get(workDetails, 'cfg')
+				workConfig = configuration.Config()
+				cfg = masterConfig.workConfig.get(workDetails, 'cfg')
 				workArgument = masterConfig.path + "/configs/" + cfg  # + ".cfg"
 
 				parser = configparser.ConfigParser()
 				parser.read(workArgument)
-				print("Player: " + str(i))
-				playerWorkConfig = configuration.Config()
-				player = playerClass.PlayerObject(playerWorkConfig, parser, masterConfig, instanceNumber=i)
+				print("** Player: " + str(i))
+				player = playerClass.PlayerObject(workConfig, parser, masterConfig, instanceNumber=i)
 				player.appRoot = workWindow.root
 				player.canvasXPosition = 0
-				#i * 270
 				player.delay = (i+1) * 1000
 				player.configure()
-				player.work.config = playerWorkConfig
-
-				print(playerWorkConfig.renderImageFull)
-				print(player.work.config.renderImageFull)
-
-
+				player.work.config = workConfig
 				player.work.config.render = workWindow.renderer.render
 				player.renderer = workWindow.renderer
-				############ nope
-				player.renderer.config = playerWorkConfig
 				player.work.workId = i
 				if i == 0 :
 					player.work.config.xOffset = [i]
@@ -120,28 +105,20 @@ def loadFromArguments(reloading=False):
 
 				#player.work.config.canvasOffsetX = i * 100
 
-
 				players.append(player)
 
-				#player.Process = threading.Thread(target=player.work.runWork)
-				#player.Process.start()
-				#player.Process.join(3)	
 
-				print("--------------------------------------")
-				print("--------------------------------------")
-				print(player.renderer.delay, player.renderer.startWork, player.renderer.cnvs,player.renderer.render)
-				print("--------------------------------------")
-				print("--------------------------------------")
 				if i == 0 :
-					procCall1(player.work)
+					#procCall1(player.work)
 					#workWindow.root.after(player.renderer.delay, procCall1, player.renderer)
 					pass
 				else :
-					procCall2(player.work)
+					#procCall2(player.work)
 					#workWindow.root.after(player.renderer.delay, procCall2, player.renderer)
 					pass
 
 
+			exit()
 			procCall0(workWindow)
 			workWindow.run()
 			#GUI.start()
@@ -214,10 +191,10 @@ def procCall2(work) :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def loadTheConfig(masterConfig) :
+def loadTheConfig(config) :
 
-			print("loadTheConfig")
-			masterConfig.config = configparser.ConfigParser()
+			print("** Multiplayer running loadTheConfig **")
+			config.workConfig = configparser.ConfigParser()
 
 			'''
 			example:
@@ -232,7 +209,7 @@ def loadTheConfig(masterConfig) :
 			parser.add_argument('-brightnessOverride', type=int, help='brightness param to override the config value (optional)')
 			args = parser.parse_args()
 
-			print(args)
+			print("** Config Arguments --> " + str(args) + " **")
 
 			'''
 			config.MID = args[1]
@@ -240,35 +217,34 @@ def loadTheConfig(masterConfig) :
 			argument = args[3]
 			'''
 
-			masterConfig.MID = args.mname
-			masterConfig.path = args.path
+			config.MID = args.mname
+			config.path = args.path
 
-			argument = masterConfig.path + "/configs/" + args.cfg  # + ".cfg"
+			argument = config.path + "/configs/" + args.cfg  # + ".cfg"
 
-			masterConfig.config.read(argument)
+			config.workConfig.read(argument)
 
-			masterConfig.startTime = time.time()
-			masterConfig.currentTime = time.time()
-			masterConfig.reloadConfig = False
-			masterConfig.doingReload = False
-			masterConfig.checkForConfigChanges = False
-			masterConfig.loadFromArguments = loadFromArguments
-			masterConfig.fileName = argument
-			masterConfig.brightnessOverride = None
+			config.startTime = time.time()
+			config.currentTime = time.time()
+			config.reloadConfig = False
+			config.doingReload = False
+			config.checkForConfigChanges = False
+			config.loadFromArguments = loadFromArguments
+			config.fileName = argument
+			config.brightnessOverride = None
 
 			# Optional 4th argument to override the brightness set in the
 			# config
 			if(args.brightnessOverride != None):
 				brightnessOverride = args.brightnessOverride
-				masterConfig.brightness = float(float(brightnessOverride) / 100)
-				masterConfig.brightnessOverride = float(
-					float(brightnessOverride) / 100)
+				config.brightness = float(float(brightnessOverride) / 100)
+				config.brightnessOverride = float(float(brightnessOverride) / 100)
 
 			f = os.path.getmtime(argument)
-			masterConfig.delta = int((masterConfig.startTime - f))
-			print(argument, "LAST MODIFIED DELTA: ", masterConfig.delta)
+			config.delta = int((config.startTime - f))
+			print("** LAST MODIFIED DELTA: " + str(config.delta))
 
-			masterConfig.workSets = list(map(lambda x: x, masterConfig.config.get("worksList", 'works').split(',')))
+			config.workSets = list(map(lambda x: x, config.workConfig.get("worksList", 'works').split(',')))
 
 			return True
 
@@ -287,3 +263,6 @@ def main():
 # Kick off .......
 if __name__ == "__main__":
 	main()
+
+
+

@@ -9,7 +9,6 @@ from modules import colorutils, coloroverlay
 from modules.particles.particle_system import ParticleSystem
 from modules.particles.particle import Particle
 
-workId = 0
 
 def main(run = True) :
 	global config, directionOrder, ps
@@ -508,9 +507,8 @@ def iterate() :
 
 	#print("particles ",config.render, config.instanceNumber)
 
-	config.render(config.image, 0,0,workId = workId, config = config)
+	config.render(config.image, 0,0)
 		
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

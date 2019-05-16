@@ -18,7 +18,7 @@ from modules.filters import *
 class CanvasElement:
 
 	def __init__(self, root, config):
-		print("CanvasElement Initialized")
+		print("** CanvasElement Initialized ** ")
 		self.root = root
 		self.config = config
 		self.buff = 8
@@ -28,10 +28,8 @@ class CanvasElement:
 
 	def setUp(self, root):
 
-		print("Instance Number Render: " + str(self.config.instanceNumber))
-
 		self.config.torqueAngle = 0
-		self.cnvs = tk.Canvas(root, width=self.config.screenWidth + self.buff, height=self.config.screenHeight + self.buff, border=0, name=str(self.instanceNumber))
+		self.cnvs = tk.Canvas(root, width=self.config.screenWidth + self.buff, height=self.config.screenHeight + self.buff, border=0, name='main1')
 		#self.config.cnvs = self.cnvs
 		self.cnvs.create_rectangle(0, 0, self.config.screenWidth + self.buff, self.config.screenHeight + self.buff, fill="black")
 		self.cnvs.pack()
@@ -43,6 +41,7 @@ class CanvasElement:
 
 		#root.after(self.delay, self.startWork)
 		#self.root.after(self.delay, self.work.runWork)
+
 
 	def startWork(self) :
 
@@ -66,7 +65,6 @@ class CanvasElement:
 
 	def on_closing(self):
 		return True
-
 
 
 	def updateCanvas(self) :
@@ -119,6 +117,7 @@ class CanvasElement:
 	def renderCall(self, imageToRender, xOffset, yOffset, w=128, h=64, nocrop=False, overlayBottom=False, updateCanvasCall=True) :
 		#print("Instance Number Render: " + str(self.config.instanceNumber), self.cnvs)
 		pass
+
 
 	def render(self, imageToRender, xOffset, yOffset, w=128, h=64, nocrop=False, overlayBottom=False, updateCanvasCall=True, config=None, workId = 0) :
 
@@ -282,6 +281,7 @@ class CanvasElement:
 
 	def updateTheCanvas(self):
 		self.updateCanvas() 
+
 
 	def remappingFunctionTemp(self) :
 		for i in range (0,4) :

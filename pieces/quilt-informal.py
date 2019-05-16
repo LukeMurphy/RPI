@@ -8,7 +8,6 @@ from modules import colorutils, badpixels, coloroverlay
 
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
-workId = 0
 
 class unit:
 
@@ -543,7 +542,7 @@ def iterate() :
 		temp = transformImage(temp)
 
 	#print("quilts ",config.render, config.instanceNumber)
-	config.render(temp, 0,0, workId =workId, config = config)
+	config.render(temp, 0,0)
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1

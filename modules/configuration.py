@@ -27,6 +27,7 @@ class Config:
 
 	screenWidth =  128
 	screenHeight = 64
+	instanceNumber = 0
 
 	tileSize = (32,64)
 	rows = 2
@@ -41,5 +42,5 @@ class Config:
 	rotation = 0
 
 	def __init__(self):
-		print("Config instance init")
+		print("** Config instance init **")
 

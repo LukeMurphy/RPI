@@ -19,7 +19,7 @@ from modules.filters import *
 
 class AppWindow:
 	def __init__(self, masterConfig):
-		print("App Window Initialized")
+		print("** App Window Initialized ** ")
 		self.masterConfig = masterConfig
 
 	def setUp(self):

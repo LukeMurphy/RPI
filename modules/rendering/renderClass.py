@@ -285,10 +285,11 @@ class CanvasElement:
 
 		xOff = 0
 		for player in players :
-			self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
-			player.config.renderImageFull = player.config.renderImageFull.convert("RGBA")
-			self.config.renderImageFull.paste(player.config.renderImageFull, (player.config.canvasOffsetX,player.config.canvasOffsetY), player.config.renderImageFull)
-			#self.config.renderImageFull = self.config.renderImageFull.rotate(-player.config.canvasRotation, expand=False)
+			#self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
+			#player.config.renderImageFull = player.config.renderImageFull.convert("RGBA")
+			temp = player.config.renderImageFull.copy()
+			temp = player.config.renderImageFull.rotate(-player.config.canvasRotation, expand=False)
+			self.config.renderImageFull.paste(temp, (player.config.canvasOffsetX,player.config.canvasOffsetY))
 
 
 		self.cnvs.delete("main1")

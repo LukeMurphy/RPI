@@ -174,7 +174,7 @@ class CanvasElement:
 
 			if self.config.filterRemap == True :
 				self.config.tempImage = self.config.renderImageFull.copy()
-				self.config.tempImage = ditherFilter(config.tempImage,xOffset, yOffset, config)
+				self.config.tempImage = ditherFilter(self.config.tempImage, xOffset, yOffset, self.config)
 				crop = self.config.tempImage.crop(self.config.remapImageBlockSection)
 				crop = crop.convert("RGBA")
 				self.config.renderImageFull.paste(crop, self.config.remapImageBlockDestination, crop)
@@ -185,13 +185,14 @@ class CanvasElement:
 			if(random.random()< self.config.pixelSortAppearanceProb) :
 				self.config.renderImageFull =  pixelSort(self.config.renderImageFull, self.config)
 
+		'''
 		if self.config.rotation != 0  : 
 			if(self.config.rotationTrailing or self.config.fullRotation) : 
 				# This rotates the image that is painted back to where it was
 				# basically same thing as rotating the image to be pasted in
 				# except in some cases, more trailing is created
 				self.config.renderImageFull = self.config.renderImageFull.rotate(self.config.rotation)
-
+		'''
 
 		# ---- Pixel Sort Type Effect ---- #
 		if self.config.usePixelSort and self.config.pixelSortRotatesWithImage == False  :
@@ -273,12 +274,11 @@ class CanvasElement:
 			temp2 = temp.rotate(-player.config.canvasRotation, expand=True)
 
 			'''
-			'''
 			if player.config.useFilters == True :
 
 				if player.config.filterRemap == True :
 					player.config.tempImage = player.config.renderImageFull.copy()
-					player.config.tempImage = ditherFilter(config.tempImage,0, 0, config)
+					player.config.tempImage = ditherFilter(player.config.tempImage,0, 0, player.config.tempImage)
 					crop = player.config.tempImage.crop(player.config.remapImageBlockSection)
 					crop = crop.convert("RGBA")
 					player.config.renderImageFull.paste(crop, player.config.remapImageBlockDestination, crop)
@@ -294,10 +294,13 @@ class CanvasElement:
 			if player.config.usePixelSort and player.config.pixelSortRotatesWithImage == False  :
 				if(random.random()< player.config.pixelSortAppearanceProb) :
 					player.config.renderImageFull =  pixelSort(player.config.renderImageFull, player.config)
-			if player.config.useBlur == True :
-				temp2 = temp2.filter(ImageFilter.GaussianBlur(radius=player.config.sectionBlurRadius))
 
-			self.config.renderImageFull.paste(temp2, (player.config.canvasOffsetX,player.config.canvasOffsetY), temp2)
+			'''
+			if player.config.useBlur == True :
+				temp3 = temp2.filter(ImageFilter.GaussianBlur(radius=player.config.sectionBlurRadius))
+				self.config.renderImageFull.paste(temp3, (player.config.canvasOffsetX, player.config.canvasOffsetY), temp3)
+			else :
+				self.config.renderImageFull.paste(temp2, (player.config.canvasOffsetX, player.config.canvasOffsetY), temp2)
 
 
 		self.cnvs.delete("main1")

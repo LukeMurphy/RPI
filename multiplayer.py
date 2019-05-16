@@ -93,6 +93,9 @@ def loadFromArguments(reloading=False):
 				player.configure()
 				player.work.workId = i
 				player.work.config = workConfig
+				# forcing this to be 0 as things get jittery when doing final
+				# composition
+				player.work.config.rotation = 0
 
 				player.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
 				player.renderer.masterConfig = masterConfig
@@ -139,7 +142,7 @@ def proc0(workWindow):
 	print(">> PROC0 -- overall renderer")
 	while True:
 		workWindow.renderer.updateTheCanvas(workWindow.players)
-		time.sleep(.02)
+		time.sleep(.01)
 
 
 def procCall0(workWindow) :

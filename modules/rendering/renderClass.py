@@ -239,7 +239,7 @@ class CanvasElement:
 			crop = crop.convert("RGBA")
 			self.config.renderImageFull.paste(crop, self.config.remapImageBlockDestination4, crop)
 			
-
+		#print(self.config.instanceNumber,self.config.useBlur, self.config.renderImageFull)
 
 		# ---- Overall image blurring  ---- #
 		if self.config.useBlur == True :
@@ -249,7 +249,7 @@ class CanvasElement:
 			crop = self.config.renderImageFull.crop(self.config.blurSection)
 			destination = (self.config.blurXOffset, self.config.blurYOffset)
 			crop = crop.convert("RGBA")
-			crop = crop.filter(ImageFilter.GaussianBlur(radius=self.onfig.sectionBlurRadius))
+			crop = crop.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
 			self.config.renderImageFull.paste(crop, destination, crop)
 			
 		if self.config.useLastOverlay == True :
@@ -286,10 +286,10 @@ class CanvasElement:
 		xOff = 0
 		for player in players :
 			#self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
-			#player.config.renderImageFull = player.config.renderImageFull.convert("RGBA")
 			temp = player.config.renderImageFull.copy()
-			temp = player.config.renderImageFull.rotate(-player.config.canvasRotation, expand=False)
-			self.config.renderImageFull.paste(temp, (player.config.canvasOffsetX,player.config.canvasOffsetY))
+			temp = temp.convert("RGBA")
+			temp2 = temp.rotate(-player.config.canvasRotation, expand=True)
+			self.config.renderImageFull.paste(temp2, (player.config.canvasOffsetX,player.config.canvasOffsetY), temp2)
 
 
 		self.cnvs.delete("main1")

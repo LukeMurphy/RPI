@@ -7,22 +7,8 @@ import threading
 import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
-
-'''
-import gc
-import io
-import threading
-import resource
-from subprocess import call
-'''
-
 from modules import configuration
 from modules.rendering import renderClass
-
-'''
-global thrd, config
-global imageTop,imageBottom,image,config,transWiring
-'''
 
 threads = []
 
@@ -276,22 +262,8 @@ class PlayerObject:
 		self.config.canvasOffsetY = int(self.workConfig.get("displayconfig", 'canvasOffsetY'))
 		self.config.windowXOffset = int(self.workConfig.get("displayconfig", 'windowXOffset'))
 		self.config.windowYOffset = int(self.workConfig.get("displayconfig", 'windowYOffset'))
-
 		self.config.instanceNumber = self.instanceNumber
 
-		'''	
-		self.renderer = renderClass.CanvasElement(self.appRoot, self.config)
-		self.renderer.masterConfig = self.masterConfig
-		self.renderer.work = self.work
-		self.renderer.canvasXPosition = self.canvasXPosition
-		self.renderer.delay = self.delay
-		self.renderer.instanceNumber = self.instanceNumber
-		self.renderer.setUp(self.appRoot)
-		
-		self.config.drawBeforeConversion = self.renderer.drawBeforeConversion
-
-		self.work.config.render = self.renderer.render
-		'''
 		print(">>>>>>>>>>")		
 		self.work.main(False)
 		#self.work.runWork()

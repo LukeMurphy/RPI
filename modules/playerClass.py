@@ -264,7 +264,7 @@ class PlayerObject:
 		self.config.windowYOffset = int(self.workConfig.get("displayconfig", 'windowYOffset'))
 		self.config.instanceNumber = self.instanceNumber
 
-		print(">>>>>>>>>>")		
+		print(">> PlayerObject running main on work")		
 		self.work.main(False)
 		#self.work.runWork()
 

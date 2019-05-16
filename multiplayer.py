@@ -71,6 +71,7 @@ def loadFromArguments(reloading=False):
 
 
 			for i in  range(0, len(masterConfig.workSets)):
+				print("\n>> CREATING Player: " + str(i))
 				workDetails = masterConfig.workSets[i]
 				workConfig = configuration.Config()
 				cfgToFetch = masterConfig.workConfigParser.get(workDetails, 'cfg')
@@ -84,7 +85,7 @@ def loadFromArguments(reloading=False):
 				parser = configparser.ConfigParser()
 				parser.read(workArgument)
 
-				print("\n>> CREATING Player: " + str(i) + " " + cfgToFetch)
+				print(">> FETCHING: " + str(i) + " " + cfgToFetch)
 				player = playerClass.PlayerObject(workConfig, parser, masterConfig, instanceNumber=i)
 				player.appRoot = workWindow.root
 				player.canvasXPosition = 0
@@ -116,6 +117,7 @@ def loadFromArguments(reloading=False):
 					procCall2(player.work)
 
 
+			print(">> ")
 			procCall0(workWindow)
 			workWindow.run()
 
@@ -124,7 +126,7 @@ def loadFromArguments(reloading=False):
 			# print help information and exit:
 			print("Error:" + str(err))
 	else:
-		print("reloading: " + config.fileName)
+		print(">> reloading: " + config.fileName)
 
 
 
@@ -146,24 +148,24 @@ def proc0(workWindow):
 
 
 def procCall0(workWindow) :
-	print(">> ProcCall 0 THREAD")
+	print(">> ProcCall 0 WORKWINDOW THREAD STARTING")
+	t0  = threading.Thread.__init__(proc0(workWindow))
+	t0.start()
 	#thrd = threading.Thread(target=proc0, kwargs=dict(workWindow=workWindow))
 	#thrd.start()
 	#thrd.join()
 
-	t0  = threading.Thread.__init__(proc0(workWindow))
-	t0.start()
 
 
 def procCall1(work) :
-	print(">> ProcCall 1 THREAD")
+	print(">> ProcCall 1 THREAD STARTING")
 	thrd = threading.Thread(target=proc1, kwargs=dict(work=work))
 	thrd.start()
 	#thrd.join()
 
 
 def procCall2(work) :
-	print(">> ProcCall 2 THREAD")
+	print(">> ProcCall 2 THREAD STARTING")
 	thrd2 = threading.Thread(target=proc2, kwargs=dict(work=work))
 	thrd2.start()
 	#thrd2.join()

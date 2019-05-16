@@ -18,7 +18,7 @@ from modules.filters import *
 class CanvasElement:
 
 	def __init__(self, root, config):
-		print("** CanvasElement Initialized ** ")
+		print(">> CanvasElement Initialized ** ")
 		self.root = root
 		self.config = config
 		self.buff = 8
@@ -27,6 +27,7 @@ class CanvasElement:
 
 
 	def setUp(self):
+		print(">> CanvasElement setting up renderImageFull ** ")
 		self.config.renderImage = PIL.Image.new("RGBA", (self.config.screenWidth*self.config.rows, 32))
 		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
 		self.config.image = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
@@ -37,6 +38,7 @@ class CanvasElement:
 
 
 	def setUpCanvas(self, root):
+		print(">> CanvasElement setting up canvas ** ")
 		self.config.torqueAngle = 0
 		self.cnvs = tk.Canvas(root, width=self.config.screenWidth + self.buff, height=self.config.screenHeight + self.buff, border=0, name='main1')
 		#self.config.cnvs = self.cnvs

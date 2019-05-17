@@ -84,6 +84,10 @@ def loadFromArguments(reloading=False):
 
 				## This loads the config file for the work as listed in the
 				## mulitplayer manifest
+				## right now can't load two of the same works because they will conflict - so
+				## need to create works as objects / classes rather than just files
+				## this was not an issue until I wanted to maybe run two instances of the same work
+				## in one window, which seemed unnecessary when I started...
 				parser = configparser.ConfigParser()
 				parser.read(workArgument)
 

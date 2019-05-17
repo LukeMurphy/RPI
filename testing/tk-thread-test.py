@@ -1,4 +1,6 @@
 import time, threading, random
+import importlib 
+
 import sys
 import os
 import subprocess
@@ -9,6 +11,14 @@ import PIL.Image
 
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from PIL import ImageFilter, ImageChops, ImageEnhance
+
+from importlib import util
+
+
+sys.path.append('./')
+import procfileclass as work
+import proc1file as workDef1
+import proc1file as workDef2
 
 
 
@@ -75,22 +85,28 @@ def cnvsThrd0():
 
 # Draws 
 def cnvsThrd1():
-	print("Starting cnvsThrd1")
+	print("Starting cnvsThrd1 \n" + str(p1.__dict__))
 	#t1  = threading.Thread.__init__(proc1())
 	#t1.start()
-	thrd = threading.Thread(target=proc1)
+
+	thrd = threading.Thread(target=workDef1.proc1)
+	#thrd = threading.Thread(target=p1.proc1)
 	thrd.start()
 
 # Draws 
 def cnvsThrd2():
-	print("Starting cnvsThrd2")
+	print("Starting cnvsThrd2 \n"+ str(p2.__dict__))
 	#t2  = threading.Thread.__init__(proc2())
 	#t2.start()
 	# kwargs=dict(fcu=proc2,clr='blue', x=30
-	thrd = threading.Thread(target=proc2)
+	#thrd = threading.Thread(target=proc2)
+
+	thrd = threading.Thread(target=workDef2.proc1)
+	#thrd = threading.Thread(target=p2.proc1)
 	thrd.start()
 
 def startThreads():
+	print("")
 	cnvsThrd1()
 	cnvsThrd2()
 	cnvsThrd0()
@@ -113,6 +129,16 @@ renderImageFull2 = Image.new("RGBA", (500  , 500))
 draw0  = ImageDraw.Draw(renderImageFull0)
 draw1  = ImageDraw.Draw(renderImageFull1)
 draw2  = ImageDraw.Draw(renderImageFull2)
+
+p1 = work.Proc(drawRef= draw1, xpos=0, delay=.2,clr='blue')
+p2 = work.Proc(drawRef= draw2, xpos =100, delay=.01, clr='green')
+
+workDef1.drawRef = draw1
+
+workDef2.drawRef = draw2
+workDef2.clr = 'blue'
+workDef2.delay = .01
+workDef2.xpos = 100
 
 root = tk.Tk()
 root.title("Control center")

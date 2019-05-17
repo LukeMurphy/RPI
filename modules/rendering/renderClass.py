@@ -4,7 +4,8 @@ from PIL import ImageFilter, ImageChops, ImageEnhance
 import random
 import time
 import threading
-
+from modules.configuration import bcolors
+from modules.configuration import Config
 from modules.filters import *
 
 #from Tkinter import *
@@ -27,7 +28,6 @@ class CanvasElement:
 
 
 	def setUp(self):
-		print(">> CanvasElement setting up renderImageFull ** ")
 		self.config.renderImage = PIL.Image.new("RGBA", (self.config.screenWidth*self.config.rows, 32))
 		self.config.renderImageFull = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
 		self.config.image = PIL.Image.new("RGBA", (self.config.screenWidth, self.config.screenHeight))
@@ -35,6 +35,7 @@ class CanvasElement:
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 		self.config.canvasOffsetX = 0
 		self.config.canvasOffsetY = 0
+		print(bcolors.FAIL + ">> CanvasElement setting up renderImageFull: " +  str(self.config.renderImageFull) +  bcolors.ENDC)
 
 
 	def setUpCanvas(self, root):

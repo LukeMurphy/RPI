@@ -13,6 +13,8 @@ import getopt, random
 import time
 import configparser
 from modules import configuration
+from modules.configuration import bcolors
+from modules.configuration import Config
 from modules import playerClass
 from modules.rendering import renderClass, appWindow
 import argparse
@@ -71,9 +73,9 @@ def loadFromArguments(reloading=False):
 
 
 			for i in  range(0, len(masterConfig.workSets)):
-				print("\n>> CREATING Player: " + str(i))
 				workDetails = masterConfig.workSets[i]
 				workConfig = configuration.Config()
+				print(bcolors.OKBLUE + "\n>> CREATING Player: " + str(i) + str(workConfig) + bcolors.ENDC)
 				cfgToFetch = masterConfig.workConfigParser.get(workDetails, 'cfg')
 				canvasOffsetX = int(masterConfig.workConfigParser.get(workDetails, 'canvasOffsetX'))
 				canvasOffsetY = int(masterConfig.workConfigParser.get(workDetails, 'canvasOffsetY'))
@@ -85,7 +87,7 @@ def loadFromArguments(reloading=False):
 				parser = configparser.ConfigParser()
 				parser.read(workArgument)
 
-				print(">> FETCHING: " + str(i) + " " + cfgToFetch)
+				print(bcolors.WARNING + ">> FETCHING: " + str(i) + " " + cfgToFetch + bcolors.ENDC)
 				player = playerClass.PlayerObject(workConfig, parser, masterConfig, instanceNumber=i)
 				player.appRoot = workWindow.root
 				player.canvasXPosition = 0
@@ -110,6 +112,9 @@ def loadFromArguments(reloading=False):
 				## since that is handled by the main app window process thread
 				player.work.config.render = player.renderer.render
 				workWindow.players.append(player)
+
+
+				#print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(player.work.config.__dict__) + bcolors.ENDC)
 
 				# For now, only running two work threads at a time .....
 				if i == 0 :

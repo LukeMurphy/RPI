@@ -8,6 +8,8 @@ import PIL.Image
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImageChops
 from modules import configuration
+from modules.configuration import bcolors
+from modules.configuration import Config
 from modules.rendering import renderClass
 
 threads = []
@@ -224,7 +226,8 @@ class PlayerObject:
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 
 		# Setting up based on how the work is displayed
-		print(">> PlayerObject loading the work: " + str(self.config.work))
+		print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(self.config.work) + bcolors.ENDC)
+		importlib.invalidate_caches()
 		self.work = importlib.import_module('pieces.'+str(self.config.work))
 		self.work.config = self.config
 		self.work.workConfig = self.workConfig

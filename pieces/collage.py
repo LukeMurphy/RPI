@@ -255,7 +255,6 @@ def redraw():
 			config.lastOverlayFill = (10,0,0,round(random.uniform(5,50)))
 
 
-
 def runWork():
 	global config
 	while True:

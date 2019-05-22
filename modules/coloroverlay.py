@@ -43,6 +43,8 @@ class ColorOverlay:
 	dropHueMin = 0
 	dropHueMax = 0
 
+	configRef = None
+
 
 	def __init__(self, randomColorInit=False): 
 		#self.colorTransitionSetup()
@@ -184,25 +186,34 @@ class ColorOverlay:
 			#self.callBackDone()
 
 
-	def setCallBackDoneMethod(self, method):
+	def setCallBackDoneMethod(self, method, configRef=None):
 		self.callBackDoneMethod = method
+		self.configRef = configRef
 
 
-	def setCallBackStartedMethod(self, method):
+	def setCallBackStartedMethod(self, method, configRef=None):
 		self.callBackStartedMethod = method
+		self.configRef = configRef
 		
 
 	def callBackDone(self):
 		if(self.complete == True):
 			try:
-				self.callBackDoneMethod()
+				if self.configRef != None :
+					self.callBackDoneMethod(self.configRef)
+				else :
+					self.callBackDoneMethod()
+
 			except AttributeError as e:
 				pass
 
 
 	def callBackStarted(self):
 		try:
-			self.callBackStartedMethod()
+			if self.configRef != None :
+				self.callBackStartedMethod(self.configRef)
+			else :
+				self.callBackStartedMethod()
 		except AttributeError as e:
 			pass
 

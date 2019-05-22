@@ -94,6 +94,7 @@ class WorkObject:
 			iterate(self.config)
 			time.sleep(self.config.delay)  
 
+
 def displayTest(config):
 	#global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))

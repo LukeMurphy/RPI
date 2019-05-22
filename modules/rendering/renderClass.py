@@ -133,6 +133,7 @@ class CanvasElement:
 		#print(imageToRender, self.cnvs)
 		#print("Instance Number Render: " + str(self.config.instanceNumber))
 
+
 		self.imageToRender = imageToRender
 
 		xOffset = 0

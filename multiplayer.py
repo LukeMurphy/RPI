@@ -186,10 +186,10 @@ def procCall2(work) :
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def loadTheConfig(config) :
+def loadTheConfig(masterConfig) :
 
 			print(">>  Multiplayer running loadTheConfig **")
-			config.workConfigParser = configparser.ConfigParser()
+			masterConfig.workConfigParser = configparser.ConfigParser()
 
 			'''
 			example:
@@ -212,39 +212,39 @@ def loadTheConfig(config) :
 			argument = args[3]
 			'''
 
-			config.MID = args.mname
-			config.path = args.path
-			argument = config.path + "/configs/" + args.cfg  # + ".cfg"
+			masterConfig.MID = args.mname
+			masterConfig.path = args.path
+			argument = masterConfig.path + "/configs/" + args.cfg  # + ".cfg"
 
-			config.workConfigParser.read(argument)
+			masterConfig.workConfigParser.read(argument)
 
-			config.startTime = time.time()
-			config.currentTime = time.time()
-			config.reloadConfig = False
-			config.doingReload = False
-			config.checkForConfigChanges = False
-			config.loadFromArguments = loadFromArguments
-			config.fileName = argument
-			config.brightnessOverride = None
+			masterConfig.startTime = time.time()
+			masterConfig.currentTime = time.time()
+			masterConfig.reloadConfig = False
+			masterConfig.doingReload = False
+			masterConfig.checkForConfigChanges = False
+			masterConfig.loadFromArguments = loadFromArguments
+			masterConfig.fileName = argument
+			masterConfig.brightnessOverride = None
 
 			# Optional 4th argument to override the brightness set in the
 			# config
 			if(args.brightnessOverride != None):
 				brightnessOverride = args.brightnessOverride
-				config.brightness = float(float(brightnessOverride) / 100)
-				config.brightnessOverride = float(float(brightnessOverride) / 100)
+				masterConfig.brightness = float(float(brightnessOverride) / 100)
+				masterConfig.brightnessOverride = float(float(brightnessOverride) / 100)
 
 			f = os.path.getmtime(argument)
-			config.delta = int((config.startTime - f))
-			print(">> LAST MODIFIED DELTA: " + str(config.delta))
+			masterConfig.delta = int((masterConfig.startTime - f))
+			print(">> LAST MODIFIED DELTA: " + str(masterConfig.delta))
 
-			config.workSets = list(map(lambda x: x, config.workConfigParser.get("worksList", 'works').split(',')))
-			config.screenHeight = int(config.workConfigParser.get("worksList", 'screenHeight'))
-			config.screenWidth =  int(config.workConfigParser.get("worksList", 'screenWidth'))
-			config.canvasOffsetX = int(config.workConfigParser.get("worksList", 'canvasOffsetX'))
-			config.canvasOffsetY = int(config.workConfigParser.get("worksList", 'canvasOffsetY'))
-			config.windowXOffset = int(config.workConfigParser.get("worksList", 'windowXOffset'))
-			config.windowYOffset = int(config.workConfigParser.get("worksList", 'windowYOffset'))
+			masterConfig.workSets = list(map(lambda x: x, masterConfig.workConfigParser.get("worksList", 'works').split(',')))
+			masterConfig.screenHeight = int(masterConfig.workConfigParser.get("worksList", 'screenHeight'))
+			masterConfig.screenWidth =  int(masterConfig.workConfigParser.get("worksList", 'screenWidth'))
+			masterConfig.canvasOffsetX = int(masterConfig.workConfigParser.get("worksList", 'canvasOffsetX'))
+			masterConfig.canvasOffsetY = int(masterConfig.workConfigParser.get("worksList", 'canvasOffsetY'))
+			masterConfig.windowXOffset = int(masterConfig.workConfigParser.get("worksList", 'windowXOffset'))
+			masterConfig.windowYOffset = int(masterConfig.workConfigParser.get("worksList", 'windowYOffset'))
 
 			return True
 

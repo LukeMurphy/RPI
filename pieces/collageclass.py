@@ -12,6 +12,26 @@ colorutils.brightness =  1
 shapes = []
 
 
+class WorkObject:
+
+	def __init__(self, config):
+		print("** WorkObject OBJECT INIT")
+		self.config = config
+
+
+
+	def runWork(self):
+		#global blocks, config, XOs
+		print("RUNNING QUILT INFORMAL")
+		print(self.config)
+		#gc.enable()
+
+		while True:
+			iterate(self.config)
+			time.sleep(self.config.delay) 
+
+
+
 # Really no need for a class here - it's always a singleton and besides
 # with Python everthing is an object already .... some kind of OOP
 # holdover anxiety I guess
@@ -156,8 +176,8 @@ class Shape :
 
 
 
-def redraw():
-	global config, shapes 
+def redraw(config):
+	#global config, shapes 
 
 	## Each Fludd-square is generated as an image and then pasted into its correct
 	## place in the grid - or off-grid maybe sometime
@@ -181,7 +201,7 @@ def redraw():
 		config.shapeTweening = 2
 
 		## Generate state to transition to...
-		for shapeElement in shapes:
+		for shapeElement in config.shapes:
 			shapeElement.transition()
 			img = shapeElement.tempImage.convert("RGBA")
 			config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
@@ -209,11 +229,11 @@ def redraw():
 	if config.shapeTweening == 0 :
 		shapeToChange = -1
 		if random.random() < config.changeBoxProb:
-			shapeToChange = round(random.uniform(0, len(shapes) - 1))
+			shapeToChange = round(random.uniform(0, len(config.shapes) - 1))
 			#print(shapeToChange)
 
 		shapeCount = 0
-		for shapeElement in shapes:
+		for shapeElement in config.shapes:
 				shapeElement.transition()
 				img = shapeElement.tempImage.convert("RGBA")
 				config.image.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
@@ -262,9 +282,9 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 
 
-def iterate() :
-	global config
-	redraw()
+def iterate(config) :
+	#global config
+	redraw(config)
 
 
 	'''
@@ -295,24 +315,24 @@ def iterate() :
 	# Done
 
 
-def colorTransitionDone(arg=None):
+def colorTransitionDone(config,arg=None):
 	#print("colorTransition   Done ")
 	if config.useTransitionCallbacks == True :
 		config.useFilters = False
 		config.usePixelSort = True
 
 
-def colorTransitionStarted(arg=None):
+def colorTransitionStarted(config,arg=None):
 	#print("colorTransition   Started ")
 	if config.useTransitionCallbacks == True :
 		config.useFilters = True
 		config.usePixelSort = False
 
 
-def main(run = True) :
-	global config
-	global shapes
-	shapes = []
+def main(config, workConfig, run = True) :
+	#global config
+	#global shapes
+	config.shapes = []
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw  = ImageDraw.Draw(config.image)
@@ -333,6 +353,7 @@ def main(run = True) :
 
 
 	config.redrawSpeed  = float(workConfig.get("collageShapes", 'redrawSpeed')) 
+	config.delay  = float(workConfig.get("collageShapes", 'delay')) 
 	config.shapeSets = list(map(lambda x: x, workConfig.get("collageShapes", 'sets').split(',')))
 
 	config.shapeTweening = 0
@@ -447,15 +468,15 @@ def main(run = True) :
 		shape.colOverlay.colorTransitionSetupValues()
 
 		if i in config.triggers:
-			shape.colOverlay.setCallBackDoneMethod(colorTransitionDone)
-			shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted)
+			shape.colOverlay.setCallBackDoneMethod(colorTransitionDone, config)
+			shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted, config)
 
 		#shape.callBackDone = types.MethodType(callBackDone, shape)
 		shape.reDraw()
-		shapes.append(shape)
+		config.shapes.append(shape)
 
 
 	
-	if(run) : runWork()
+	#if(run) : runWork()
 		
 

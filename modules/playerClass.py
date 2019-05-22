@@ -213,7 +213,7 @@ class PlayerObject:
 			print (str(e))
 
 		self.config.minBrightness  = float(self.workConfig.get("displayconfig", 'minBrightness'))
-		self.config.work = self.workConfig.get("displayconfig", 'work')
+		self.config.workName = self.workConfig.get("displayconfig", 'work')
 		self.config.rendering = self.workConfig.get("displayconfig", 'rendering')
 
 		# Create the image-canvas for the work
@@ -226,9 +226,9 @@ class PlayerObject:
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 
 		# Setting up based on how the work is displayed
-		print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(self.config.work) + bcolors.ENDC)
+		print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(self.config.workName) + bcolors.ENDC)
 		importlib.invalidate_caches()
-		self.work = importlib.import_module('pieces.'+str(self.config.work))
+		self.work = importlib.import_module('pieces.'+str(self.config.workName))
 
 		self.workObject = self.work.WorkObject(self.config)
 		self.workObject.workConfig = self.workConfig

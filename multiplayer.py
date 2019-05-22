@@ -122,9 +122,9 @@ def loadFromArguments(reloading=False):
 
 				# For now, only running two work threads at a time .....
 				if i == 0 :
-					procCall1(player.work)
+					procCall1(player.workObject)
 				else :
-					procCall2(player.work)
+					procCall2(player.workObject)
 
 
 			print(">> ")

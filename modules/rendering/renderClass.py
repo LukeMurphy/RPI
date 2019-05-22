@@ -53,7 +53,7 @@ class CanvasElement:
 		### Putting the animation on its own thread
 		### Still throws and error when manually closed though...
 
-		print("Starting" + str(self) + str(self.instanceNumber), "Cnvs --->" , self.cnvs)
+		print(">>>>>>>>>>>>Starting" + str(self) + str(self.instanceNumber), "Cnvs --->" , self.cnvs)
 		
 		try:
 			#self.masterConfig.t = threading.Thread.__init__(self.work.runWork())

@@ -76,8 +76,26 @@ class unit:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def displayTest():
-	global config
+class WorkObject:
+
+	def __init__(self, config):
+		print("** WorkObject OBJECT INIT")
+		self.config = config
+
+
+
+	def runWork(self):
+		#global blocks, config, XOs
+		print("RUNNING DIAGNOSTICS")
+		print(self.config)
+		#gc.enable()
+
+		while True:
+			iterate(self.config)
+			time.sleep(self.config.delay)  
+
+def displayTest(config):
+	#global config
 	#config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0), outline=(0,0,0))
 	config.draw.rectangle((0,0,config.screenWidth-1, config.screenHeight-1), fill=(0,0,0), outline=config.outlineColor)
 	config.draw.rectangle((1,1,config.screenWidth-2, config.screenHeight-2), fill=(0,0,0), outline=(0,0,int(220 * config.brightness)))
@@ -118,7 +136,7 @@ def displayTest():
 	config.render(config.image, 0,0)
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def showGrid():
+def showGrid(config):
 	#global config
 
 	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
@@ -147,8 +165,8 @@ def showGrid():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def drawPalette():
-	global config
+def drawPalette(config):
+	#global config
 
 	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=config.bgColor, outline=(0,0,0))
 	config.canvasDraw.rectangle((0,0,config.canvasWidth-1, config.canvasHeight-1), fill= config.bgColor, outline=config.outlineColor)
@@ -188,10 +206,14 @@ def drawPalette():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def main(run = True) :
-	global config, directionOrder
+def main(config, workConfig, run = True) :
+	
+	#global config, directionOrder
 	print("** ---------------------")
 	print("** Diag Loaded **")
+	print(config)
+	print("** ---------------------")
+
 
 
 	colorutils.brightness = config.brightness
@@ -275,7 +297,7 @@ def main(run = True) :
 
 	setUp()
 
-	if(run) : runWork()
+	#if(run) : runWork()
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def setUp():
@@ -286,30 +308,30 @@ def setUp():
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def runWork():
+def runWork(config):
 	#global blocks, config, XOs
 	print("RUNNING DIAGNOSTICS")
 	#gc.enable()
 
 
 	while True:
-		iterate()
+		iterate(config)
 		time.sleep(config.delay)  
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def iterate() :
+def iterate(config) :
 
 	if config.colorPalette == True :
-		drawPalette()
+		drawPalette(config)
 	else:
 		if config.showGrid ==  True :
-			showGrid()
+			showGrid(config)
 		else :		
-			displayTest()		
+			displayTest(config)		
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def callBack() :
-	global config, XOs
+	#global config, XOs
 	return True
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

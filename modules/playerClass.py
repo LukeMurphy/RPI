@@ -229,8 +229,11 @@ class PlayerObject:
 		print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(self.config.work) + bcolors.ENDC)
 		importlib.invalidate_caches()
 		self.work = importlib.import_module('pieces.'+str(self.config.work))
-		self.work.config = self.config
-		self.work.workConfig = self.workConfig
+
+		self.workObject = self.work.WorkObject(self.config)
+		self.workObject.workConfig = self.workConfig
+		#self.work.config = self.config
+		#self.work.workConfig = self.workConfig
 
 
 		self.config.useFilters  = (self.workConfig.getboolean("displayconfig", 'useFilters'))
@@ -268,7 +271,7 @@ class PlayerObject:
 		self.config.instanceNumber = self.instanceNumber
 
 		print(">> PlayerObject running main on work")		
-		self.work.main(False)
+		self.work.main(self.config, self.workConfig, False)
 		#self.work.runWork()
 
 

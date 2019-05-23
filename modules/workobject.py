@@ -12,16 +12,30 @@ from modules.configuration import bcolors
 from modules.configuration import Config
 from modules.rendering import renderClass
 
-threads = []
 
-class PlayerObject:
+class WorkObject:
 
-	def __init__(self, playerWorkConfig, workconfig, masterConfig, instanceNumber):
-		print(">> PlayerObject init: " + str(instanceNumber))
-		self.config = playerWorkConfig
-		self.workConfig = workconfig
+	def __init__(self, workArgument, instanceNumber = 0):
+		print("** WorkObject OBJECT INIT")
 		self.instanceNumber = instanceNumber
-		self.masterConfig = masterConfig
+		self.config = configuration.Config()
+		self.workConfig = configparser.ConfigParser()
+		self.workConfig.read(workArgument)
+		print(bcolors.WARNING + ">> FETCHING: " + " " + workArgument + bcolors.ENDC)
+
+		self.configure()
+
+
+	def runWork(self):
+		#global blocks, config, XOs
+		print("RUNNING QUILT INFORMAL")
+		print(self.config)
+		#gc.enable()
+
+		while True:
+			self.workModule.iterate(self.config)
+			time.sleep(self.config.delay) 
+
 
 
 	def configure(self) :
@@ -225,15 +239,6 @@ class PlayerObject:
 		self.config.draw = ImageDraw.Draw(self.config.image)
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 
-		# Setting up based on how the work is displayed
-		print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(self.config.workName) + bcolors.ENDC)
-		importlib.invalidate_caches()
-		self.work = importlib.import_module('pieces.'+str(self.config.workName))
-
-		self.workObject = self.work.WorkObject(self.config)
-		self.workObject.workConfig = self.workConfig
-		#self.work.config = self.config
-		#self.work.workConfig = self.workConfig
 
 
 		self.config.useFilters  = (self.workConfig.getboolean("displayconfig", 'useFilters'))
@@ -268,19 +273,18 @@ class PlayerObject:
 		self.config.canvasOffsetY = int(self.workConfig.get("displayconfig", 'canvasOffsetY'))
 		self.config.windowXOffset = int(self.workConfig.get("displayconfig", 'windowXOffset'))
 		self.config.windowYOffset = int(self.workConfig.get("displayconfig", 'windowYOffset'))
-		self.config.instanceNumber = self.instanceNumber
-
-		print(">> PlayerObject running main on work")		
-		self.work.main(self.config, self.workConfig, False)
-		#self.work.runWork()
 
 
-		#print("Setting Up - Reload? ", self.config.doingReload)
+		# Setting up based on how the work is displayed
+		print(bcolors.FAIL + ">> WorkObject loading the work: " + str(self.config.workName) + bcolors.ENDC)
+		importlib.invalidate_caches()
+		self.workModule = importlib.import_module('pieces.'+str(self.config.workName))
+		print(">> WorkObject running main on work")		
+		self.workModule.main(self.config, self.workConfig, False)
+
+
 		
 
 		
 		
 
-
-
-	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -15,7 +15,8 @@ import configparser
 from modules import configuration
 from modules.configuration import bcolors
 from modules.configuration import Config
-from modules import playerClass
+
+from modules import workobject
 from modules.rendering import renderClass, appWindow
 import argparse
 import threading
@@ -74,8 +75,8 @@ def loadFromArguments(reloading=False):
 
 			for i in  range(0, len(masterConfig.workSets)):
 				workDetails = masterConfig.workSets[i]
-				workConfig = configuration.Config()
-				print(bcolors.OKBLUE + "\n>> CREATING Player: " + str(i) + str(workConfig) + bcolors.ENDC)
+
+				print(bcolors.OKBLUE + "\n>> CREATING Player: " + str(i) + bcolors.ENDC)
 				cfgToFetch = masterConfig.workConfigParser.get(workDetails, 'cfg')
 				canvasOffsetX = int(masterConfig.workConfigParser.get(workDetails, 'canvasOffsetX'))
 				canvasOffsetY = int(masterConfig.workConfigParser.get(workDetails, 'canvasOffsetY'))
@@ -84,47 +85,34 @@ def loadFromArguments(reloading=False):
 
 				## This loads the config file for the work as listed in the
 				## mulitplayer manifest
-				## right now can't load two of the same works because they will conflict - so
-				## need to create works as objects / classes rather than just files
-				## this was not an issue until I wanted to maybe run two instances of the same work
-				## in one window, which seemed unnecessary when I started...
-				parser = configparser.ConfigParser()
-				parser.read(workArgument)
+				workObject = workobject.WorkObject(workArgument, instanceNumber=i)
+				workObject.workId = i
 
-				print(bcolors.WARNING + ">> FETCHING: " + str(i) + " " + cfgToFetch + bcolors.ENDC)
-				player = playerClass.PlayerObject(workConfig, parser, masterConfig, instanceNumber=i)
-				player.appRoot = workWindow.root
-				player.canvasXPosition = 0
-				player.delay = (i+1) * 1000
-
-				player.configure()
-				player.work.workId = i
-				player.work.config = workConfig
 				# forcing this to be 0 as things get jittery when doing final
 				# composition
-				player.work.config.rotation = 0
-
-				player.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
-				player.renderer.config = workConfig
-				player.renderer.setUp()
-				player.renderer.config.canvasOffsetX = canvasOffsetX
-				player.renderer.config.canvasOffsetY = canvasOffsetY
-				player.renderer.config.canvasRotation = canvasRotation
+				workObject.config.rotation = 0
 
 				## sets the render function -- in the multi player situation, this just draws
 				## the final animation to each player's final image - the canvas is not updated
 				## since that is handled by the main app window process thread
-				player.work.config.render = player.renderer.render
-				workWindow.players.append(player)
+				# This could be done in the WorkObject itself if I pass more stuff there ...
+				workObject.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
+				workObject.renderer.config = workObject.config
+				workObject.renderer.setUp()
+				workObject.renderer.config.canvasOffsetX = canvasOffsetX
+				workObject.renderer.config.canvasOffsetY = canvasOffsetY
+				workObject.renderer.config.canvasRotation = canvasRotation
+				workObject.config.render = workObject.renderer.render
 
+				workWindow.players.append(workObject)
 
 				#print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(player.work.config.__dict__) + bcolors.ENDC)
 
 				# For now, only running two work threads at a time .....
 				if i == 0 :
-					procCall1(player.workObject)
+					procCall1(workObject)
 				else :
-					procCall2(player.workObject)
+					procCall2(workObject)
 
 
 			print(">> ")

@@ -269,40 +269,56 @@ class CanvasElement:
 	def updateTheCanvas(self, players):
 
 		xOff = 0
-		for player in players :
-			#self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
-			temp = player.config.renderImageFull.copy()
+		for work in players :
+			self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
+			temp = work.config.renderImageFull.copy()
 			temp = temp.convert("RGBA")
-			temp2 = temp.rotate(-player.config.canvasRotation, expand=True)
+			if work.config.canvasRotation != 0 :
+				temp2 = temp.rotate(-work.config.canvasRotation, expand=True)
+			else:
+				temp2 = temp.copy()
 
 			'''
-			if player.config.useFilters == True :
+			'''
+			if work.config.useFilters == True :
 
-				if player.config.filterRemap == True :
-					player.config.tempImage = player.config.renderImageFull.copy()
-					player.config.tempImage = ditherFilter(player.config.tempImage,0, 0, player.config.tempImage)
-					crop = player.config.tempImage.crop(player.config.remapImageBlockSection)
+				if work.config.filterRemap == True :
+					work.config.tempImage = work.config.renderImageFull.copy()
+					work.config.tempImage = ditherFilter(work.config.tempImage,0, 0, work.config.tempImage)
+					crop = work.config.tempImage.crop(work.config.remapImageBlockSection)
 					crop = crop.convert("RGBA")
-					player.config.renderImageFull.paste(crop, player.config.remapImageBlockDestination, crop)
+					work.config.renderImageFull.paste(crop, work.config.remapImageBlockDestination, crop)
 				else:
-					player.config.renderImageFull = ditherFilter(player.config.renderImageFull,0, 0, player.config)
+					work.config.renderImageFull = ditherFilter(work.config.renderImageFull,0, 0, work.config)
 
-			if player.config.usePixelSort == True and player.config.pixelSortRotatesWithImage == True :
-				if(random.random()< player.config.pixelSortAppearanceProb) :
-					player.config.renderImageFull =  pixelSort(player.config.renderImageFull, player.config)
+			if work.config.usePixelSort == True and work.config.pixelSortRotatesWithImage == True :
+				if(random.random()< work.config.pixelSortAppearanceProb) :
+					work.config.renderImageFull =  pixelSort(work.config.renderImageFull, work.config)
 
 
 			# ---- Pixel Sort Type Effect ---- #
-			if player.config.usePixelSort and player.config.pixelSortRotatesWithImage == False  :
-				if(random.random()< player.config.pixelSortAppearanceProb) :
-					player.config.renderImageFull =  pixelSort(player.config.renderImageFull, player.config)
+			if work.config.usePixelSort and work.config.pixelSortRotatesWithImage == False  :
+				if(random.random()< work.config.pixelSortAppearanceProb) :
+					work.config.renderImageFull =  pixelSort(work.config.renderImageFull, work.config)
 
-			'''
-			if player.config.useBlur == True :
-				temp3 = temp2.filter(ImageFilter.GaussianBlur(radius=player.config.sectionBlurRadius))
-				self.config.renderImageFull.paste(temp3, (player.config.canvasOffsetX, player.config.canvasOffsetY), temp3)
+
+			if work.config.useBlur == True :
+				temp3 = temp2.filter(ImageFilter.GaussianBlur(radius=work.config.sectionBlurRadius))
+				temp3 = temp3.convert("RGBA")
+				crop = temp3.crop(work.config.blurSection)
+				destination = (work.config.blurXOffset, work.config.blurYOffset)
+				self.config.renderImageFull.paste(temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
+				self.config.renderImageFull.paste(crop, (work.config.canvasOffsetX + work.config.blurXOffset, work.config.canvasOffsetY + work.config.blurYOffset), crop)
+
+				'''
+				#self.config.renderImageFull = self.config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
+				crop = self.config.renderImageFull.crop(work.config.blurSection)
+				crop = crop.convert("RGBA")
+				crop = crop.filter(ImageFilter.GaussianBlur(radius=work.config.sectionBlurRadius))
+				self.config.renderImageFull.paste(crop, destination, crop)
+				'''
 			else :
-				self.config.renderImageFull.paste(temp2, (player.config.canvasOffsetX, player.config.canvasOffsetY), temp2)
+				self.config.renderImageFull.paste(temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 
 
 		self.cnvs.delete("main1")

@@ -6,10 +6,11 @@ import datetime
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
 from modules import colorutils, coloroverlay
-from modules.particles.particle_system import ParticleSystem
-from modules.particles.particle import Particle
 
 
+
+from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
+from pieces.workmodules.particleobjects.particle import Particle
 
 
 

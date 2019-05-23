@@ -260,10 +260,10 @@ class CanvasElement:
 			self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
 			temp = work.config.renderImageFull.copy()
 			temp = temp.convert("RGBA")
+			temp2 = temp.copy()
 			if work.config.canvasRotation != 0 :
 				temp2 = temp.rotate(-work.config.canvasRotation, expand=True)
-			else:
-				temp2 = temp.copy()
+			
 
 			'''
 			'''
@@ -290,9 +290,11 @@ class CanvasElement:
 
 
 			if work.config.useBlur == True :
-				temp3 = temp2.filter(ImageFilter.GaussianBlur(radius=work.config.sectionBlurRadius))
+				temp = work.config.renderImageFull.copy()
+				temp3 = temp.filter(ImageFilter.GaussianBlur(radius=work.config.sectionBlurRadius))
 				temp3 = temp3.convert("RGBA")
 				crop = temp3.crop(work.config.blurSection)
+				crop = crop.rotate(-work.config.canvasRotation, expand=True)
 				destination = (work.config.blurXOffset, work.config.blurYOffset)
 				self.config.renderImageFull.paste(temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 				self.config.renderImageFull.paste(crop, (work.config.canvasOffsetX + work.config.blurXOffset, work.config.canvasOffsetY + work.config.blurYOffset), crop)

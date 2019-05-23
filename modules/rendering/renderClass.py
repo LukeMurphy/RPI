@@ -244,19 +244,6 @@ class CanvasElement:
 			crop = crop.convert("RGBA")
 			self.config.renderImageFull.paste(crop, self.config.remapImageBlockDestination4, crop)
 			
-		#print(self.config.instanceNumber,self.config.useBlur, self.config.renderImageFull)
-
-		# ---- Overall image blurring  ---- #
-		if self.config.useBlur == True :
-			pass
-			'''
-			self.config.renderImageFull = self.config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
-			crop = self.config.renderImageFull.crop(self.config.blurSection)
-			destination = (self.config.blurXOffset, self.config.blurYOffset)
-			crop = crop.convert("RGBA")
-			crop = crop.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
-			self.config.renderImageFull.paste(crop, destination, crop)
-			'''
 			
 		if self.config.useLastOverlay == True :
 			self.config.renderDrawOver.rectangle(self.config.lastOverlayBox, fill = self.config.lastOverlayFill, outline = None)
@@ -309,14 +296,6 @@ class CanvasElement:
 				destination = (work.config.blurXOffset, work.config.blurYOffset)
 				self.config.renderImageFull.paste(temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 				self.config.renderImageFull.paste(crop, (work.config.canvasOffsetX + work.config.blurXOffset, work.config.canvasOffsetY + work.config.blurYOffset), crop)
-
-				'''
-				#self.config.renderImageFull = self.config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
-				crop = self.config.renderImageFull.crop(work.config.blurSection)
-				crop = crop.convert("RGBA")
-				crop = crop.filter(ImageFilter.GaussianBlur(radius=work.config.sectionBlurRadius))
-				self.config.renderImageFull.paste(crop, destination, crop)
-				'''
 			else :
 				self.config.renderImageFull.paste(temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 

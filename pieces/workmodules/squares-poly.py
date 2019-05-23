@@ -4,32 +4,11 @@ import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
-from modules.quilting.colorset import ColorSet
-from modules.quilting import createtrianglepieces
-from modules.quilting import createstarpieces
+from pieces.workmodules.quilting.colorset import ColorSet
+from pieces.workmodules.quilting import createpolysquarepieces
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-class WorkObject:
-
-	def __init__(self, config):
-		print("** WorkObject OBJECT INIT")
-		self.config = config
-
-
-
-	def runWork(self):
-		#global blocks, config, XOs
-		print("RUNNING QUILT INFORMAL")
-		print(self.config)
-		#gc.enable()
-
-		while True:
-			iterate(self.config)
-			time.sleep(self.config.delay) 
-
-
-
 
 def transformImage(img) :
 	width, height = img.size
@@ -59,161 +38,91 @@ def restartPiece(config):
 	config.t2  = time.time()
 
 
-	if config.usePresets == True :
+	## The top / base diamond / square
+	c1Range = round(random.uniform(0,120))
+	config.c1HueRange = (c1Range,c1Range+240) 
+	config.c1SaturationRange = randomRange(.4,.95)
+	
+	vRange = (random.uniform(.2,.9))
+	config.c1ValueRange = randomRange(vRange,vRange + 0.1)
+	
+	# the "Shaded" side
+	c2Range = round(random.uniform(0,140))
+	config.c2HueRange = (c2Range,c2Range+220) 
+	config.c2SaturationRange = randomRange(.4,1)
+	config.c2ValueRange = randomRange(.1,.5)
 
-		if(config.quiltPattern == "stars"): 
-			newHueRange = randomRange(0,360,True)
-			newSaturationRange = randomRange()
-			newValueRange = randomRange()
-
-			'''
-
-			# stars: BASE
-			config.c1HueRange = newHueRange
-			config.c1ValueRange = newValueRange
-
-			# stars: SQUARE
-			config.c2SaturationRange = randomRange()
-			config.c2ValueRange = randomRange()
-			config.c2HueRange = randomRange(0,360,True)
-
-			'''
-			
-			# stars: CENTER SQUARE
-			config.c3HueRange = newHueRange
-			config.c3ValueRange = randomRange()
-			if random.random() < .25 :
-				choice = round(random.uniform(1,3))
-				#print ("Choice {0}".format(choice))
-				if choice == 1 :
-					# yellow centers
-					config.c3HueRange = (30,60)
-					config.c3SaturationRange = (.6,1)
-					config.c3ValueRange = (.4,1)
-				elif choice == 2 :
-					# red centers
-					config.c3HueRange = (0,30)
-					config.c3SaturationRange = (.6,1)
-					config.c3ValueRange = (.4,1)
-				else :
-					# yellow centers
-					config.c3HueRange = (0,360)
-					config.c3SaturationRange = (.6,1)
-					config.c3ValueRange = (.4,1)
+	## The "bright side"
+	config.c3HueRange = (config.c2HueRange)
+	config.c3SaturationRange = randomRange(.4,.999)
+	config.c3ValueRange = randomRange(.5,1)
 
 
-		else :
-			newHueRange = (0,360) #randomRange(0,360,True)
-			newSaturationRange = randomRange(.2,1)
-			newValueRange = randomRange(.2,1)
-			
-			# triangles: major outline squares and diamonds
-			config.c1HueRange = newHueRange
-			config.c1SaturationRange = newSaturationRange
-			config.c1ValueRange = newValueRange
-
-			# triangles:  wings of the 8-point inner starts
-			newHueRange = randomRange(0,360,True)
-			newSaturationRange = randomRange()
-			newValueRange = randomRange()
-			
-			config.c2HueRange = newHueRange
-			config.c2SaturationRange = newSaturationRange
-			config.c2ValueRange = newValueRange
-
-			# triangles:  the star center diamond
-			#newHueRange = randomRange(0,360,True)
-			if random.random() < .5 : 
-				newHueRange = randomRange(0,360,True)
-			newSaturationRange = randomRange()
-			newValueRange = randomRange()
-
-			config.c3HueRange = newHueRange
-			config.c3SaturationRange = newSaturationRange
-			config.c2ValueRange = newValueRange
-	else :
-		# major outline squares and diamonds
-		'''
-		config.c1ValueRange = (.3,1.5)
-		config.c2ValueRange = (.3,1.5)
-		config.c3ValueRange = (.3,1.5)
-		config.c1HueRange = (0,360)
-		config.c1SaturationRange = (.53,1.81)
-		# wings of the 8-point inner starts
-		config.c2HueRange = (0,360)
-		config.c2SaturationRange = (.53,1.81)
-		# the star center diamond
-		config.c3HueRange = (0,360)
-		config.c3SaturationRange = (.53,1.81)
-		'''
-
-
-	#print(config.c1ValueRange, config.c2ValueRange, config.c3ValueRange)
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
+	if random.random() < config.resetSizeProbability  :
+		config.rotation = random.uniform(-config.rotationRange,config.rotationRange)
+		config.doingRefresh = 0
+		config.doingRefreshCount = 100
+		
+	if random.random() < config.resetSizeProbability/8  :
+		config.lines = True
+	else :
+		config.lines = False
 
-	if random.random() < config.resetSizeProbability :
-		if(config.quiltPattern == "stars"):
-			config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
-			if (config.blockSize >= 11) :
-				config.blockCols = config.blockColsMin
-				config.blockRows = config.blockRowsMin
-				createstarpieces.createPieces(config, True)
-			else :
-				config.blockCols = config.blockColsMax
-				config.blockRows = config.blockRowsMax
-				createstarpieces.createPieces(config, False)
+	# a lame attempt at "optimizing" the number or rows and cols that are drawn
+	# based on the size of the blocks ... ;[
+
+	if random.random() < config.resetSizeProbability  :
+		config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
+		
+		if (config.blockSize <= 11) :
+			config.blockCols = config.blockColsMax
+			config.blockRows = config.blockRowsMax
 		else :
-			config.blockSize = round(random.uniform(config.blockSizeMin,config.blockSizeMax))
-			if (config.blockSize >= 16) :
-				config.blockCols = config.blockColsMin
-				config.blockRows = config.blockRowsMin
-				createtrianglepieces.createPieces(config, True)
-			else :
-				config.blockCols = config.blockColsMax
-				config.blockRows = config.blockRowsMax
-				createtrianglepieces.createPieces(config, False)
+			config.blockCols = config.blockColsMin
+			config.blockRows = config.blockRowsMin
 
+		#print(config.blockSize, config.blockCols, config.blockRows)
+		
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
 		config.doingRefresh = 0
 		config.doingRefreshCount = 100
+		createpolysquarepieces.createPieces(config, True)
 
-	
-	if config.quiltPattern == "stars":
-		createstarpieces.refreshPalette(config)
-	else:
-		createtrianglepieces.refreshPalette(config)
-		setInitialColors(True)
-	
+	# poly specific
+	if random.random() < config.resetSizeProbability  :
+		if config.randomness != 0:
+			config.randomness = random.uniform(config.minRandomness,3)
 
-	if random.random() < .5 :
-		config.rotation = random.uniform(-config.rotationRange,config.rotationRange)
-	
+		# initialize crossfade - in this case 100 steps ...
+		config.doingRefresh = 0
+		config.doingRefreshCount = 100
+
+	createpolysquarepieces.refreshPalette(config)
+	setInitialColors(config, True)
 
 
 def setInitialColors(config, refresh=False):
 	## Better initial color when piece is turned on
-
-
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
-		#print("number of colorOverlay objs {}".format(len(obj.triangles)) )
-		for c in range(0,len(obj.triangles)) :
-			colOverlay = obj.triangles[c][1]
-			#colOverlay.colorB = colorutils.randomColorAlpha(config.brightness * .8,0)
-			colOverlay.colorA = colorutils.randomColorAlpha(config.brightness * .8,0)
+		for c in range(0,len(obj.polys)) :
+			colOverlay = obj.polys[c][1]
+			colOverlay.colorB = colorutils.randomColor(config.brightness * .8)
+			colOverlay.colorA = colorutils.randomColor(config.brightness * .8)
 			colOverlay.colorTransitionSetup()
 			colOverlay.colorTransitionSetupValues()
-
+		
 
 def main(config, workConfig, run = True) :
-	#global config, directionOrder,workConfig
+	
 	print("---------------------")
-	print("QUILT TRIANGLES or STARS Loaded")
+	print("POLYS Loaded")
 
 
 	config.brightness = float(workConfig.get("displayconfig", 'brightness')) 
@@ -243,28 +152,9 @@ def main(config, workConfig, run = True) :
 	# the time in seconds given before the quilt image resets to new parameters
 	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
 
-
-	try:
-		config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
-		transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
-		config.transformTuples = tuple([float(i) for i in transformTuples])
-
-		'''
-		e.g.
-		#transformTuples_ = .9, 0, 0, -0.05,  .6, 0, -0.001, 0
-		#transformTuples__ = 1.2, .5, 0, 0.081,  1, 0, 0.0009, 0.0
-
-		#transformTuples = 1.2, .5, 0, 0.071,  1, 0, 0.0005, 0.0
-		## No transform
-		transformTuples = 1, .5, 0, 0.0,  1, 0, 0.0, 0.0
-
-		#transformTuples = 1, 0, 0, 0.0,  1, 0, 0, 0.0
-		#transformTuples = 0, 0, 0, 0,  0, 0, 0, 0.0
-		'''
-
-	except Exception as e:
-		print(e)
-		config.transformShape = False
+	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
+	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
+	config.transformTuples = tuple([float(i) for i in transformTuples])
 
 	redRange = workConfig.get("quilt", 'redRange').split(",")
 	config.redRange = tuple([int(i) for i in redRange])
@@ -279,8 +169,12 @@ def main(config, workConfig, run = True) :
 	config.blockRowsMax = int(workConfig.get("quilt", 'blockRowsMax')) 
 	config.blockColsMin = int(workConfig.get("quilt", 'blockColsMin')) 
 	config.blockColsMax = int(workConfig.get("quilt", 'blockColsMax')) 
+
+	# the amount to reduce the "vertical" blocks: allowable values are 1-5
+	config.elongation = int(workConfig.get("quilt", 'elongation')) 
 	config.blockCols = config.blockColsMax
 	config.blockRows = config.blockRowsMax
+
 
 	# can adjust the quilt image offset
 	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
@@ -312,31 +206,29 @@ def main(config, workConfig, run = True) :
 	config.c3SaturationRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3SaturationRange').split(",")])
 	config.c3ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, 'c3ValueRange').split(",")])
 	
-		
+
 	# for now, all squares 
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
+	if (config.blockSize <= 11) :
+		config.blockCols = config.blockColsMax
+		config.blockRows = config.blockRowsMax
+	else :
+		config.blockCols = config.blockColsMin
+		config.blockRows = config.blockRowsMin
 
+	#print(config.blockSize, config.blockCols, config.blockRows)
+
+	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
+
+	config.unitArray = []
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-
-	config.unitArray = []
-	if config.quiltPattern == "triangles" :
-		createtrianglepieces.createPieces(config)
-	elif config.quiltPattern == "stars" :
-		createstarpieces.createPieces(config)
-
-	try:
-		config.usePresets  = (workConfig.getboolean("quilt", 'usePresets'))
-	except Exception as e:
-		print(e)
-		config.usePresets = True
 
 
 	try :
@@ -347,8 +239,23 @@ def main(config, workConfig, run = True) :
 
 
 	try :
+		config.randomness = int(workConfig.get("quilt", 'randomness')) 
+	except Exception as e:
+		config.randomness = 0
+		print (e)
+
+	try :
+		config.minRandomness = int(workConfig.get("quilt", 'minRandomness')) 
+	except Exception as e:
+		config.minRandomness = 0
+		print (e)
+
+
+	## Draws a single colored block .... 
+	try :
 		drawBlockCoordsRaw = list(list((i).split(',')) for i in workConfig.get("drawBlock", 'drawBlockCoords').split("|"))
 		config.drawBlockCoords = []
+
 		for i in drawBlockCoordsRaw :
 			coords = tuple(int(ii) for ii in i)
 			config.drawBlockCoords.append(coords)
@@ -358,39 +265,45 @@ def main(config, workConfig, run = True) :
 		config.drawBlock_c1HueRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1HueRange').split(",")])
 		config.drawBlock_c1SaturationRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1SaturationRange').split(",")])
 		config.drawBlock_c1ValueRange = tuple([float(i) for i in workConfig.get("drawBlock", 'c1ValueRange').split(",")])
+		config.drawBlockColor = coloroverlay.ColorOverlay(False)
+		config.drawBlockColor.minHue = config.drawBlock_c1HueRange[0]
+		config.drawBlockColor.maxHue = config.drawBlock_c1HueRange[1]
+		config.drawBlockColor.minSaturation = config.drawBlock_c1SaturationRange[0]
+		config.drawBlockColor.maxSaturation = config.drawBlock_c1SaturationRange[1]		
+		config.drawBlockColor.minValue = config.drawBlock_c1ValueRange[0]
+		config.drawBlockColor.maxValue = config.drawBlock_c1ValueRange[1]
+		config.drawBlockColor.colorTransitionSetup()
+		config.drawBlockColor.stepTransition()
 		config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 		config.drawBlock = True
-		config.drawBlockShape = lambda : config.canvasImageDraw.polygon(config.drawBlockCoords, fill=config.drawBlockFixedColor)
+		f1 = lambda : config.canvasImageDraw.polygon(config.drawBlockCoords, fill=tuple(x for x in config.drawBlockColor.currentColor))
+		f2 = lambda : config.drawBlockColor.stepTransition()
+		config.drawBlockShape = [f1,f2]
+
 	except Exception as e:
 		print (e)
 		config.drawBlock = False
-		config.drawBlockShape = lambda : True
+		config.drawBlockShape = []
+
+
+	createpolysquarepieces.createPieces(config)
 
 	setInitialColors(config)
-	
+
 	config.t1  = time.time()
 	config.t2  = time.time()
 
+	# initial crossfade settings
 	config.doingRefresh = 100
 	config.doingRefreshCount = 100
 
-
-	#if(run) : runWork()
-
-
-def runWork():
-	#global blocks, config, XOs
-	#gc.enable()
-	
-	while True:
-		iterate()
-		time.sleep(config.delay)  
 	
 
 def iterate(config) :
-	#global config
+
 	config.outlineColorObj.stepTransition()
 
+	#print(config.doingRefresh)
 
 	# Need to do a crossfade 
 	if config.doingRefresh < config.doingRefreshCount :
@@ -398,22 +311,30 @@ def iterate(config) :
 		if config.doingRefresh == 0 :
 			config.snapShot = config.canvasImage.copy()
 		crossFade = Image.blend(config.snapShot, config.canvasImage, config.doingRefresh/config.doingRefreshCount)
-		config.drawBlockShape()
 		config.render(crossFade, 0,0)
 		config.doingRefresh += 1
 	else :
-		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
+		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageWidth))
 		temp.paste(config.canvasImage, (0,0), config.canvasImage)
 		if(config.transformShape == True) :
 			temp = transformImage(temp)
-		config.drawBlockShape()
 		config.render(temp, 0,0)
 
 	for i in range(0,len(config.unitArray)):
 		obj = config.unitArray[i]
 		obj.update()
 		obj.render()
-		
+
+		'''
+		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
+			obj.render()
+			config.doingRefresh += 1
+		elif config.doingRefresh == config.doingRefreshCount :
+			obj.render()
+		'''
+
+	# For drawing a single color block or other lambda fcu
+	for fcu in config.drawBlockShape : fcu()
 
 	config.t2  = time.time()
 	delta = config.t2  - config.t1

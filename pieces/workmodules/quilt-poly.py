@@ -10,23 +10,7 @@ from modules.quilting import createpolypieces
 from modules.quilting import createstarpieces
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-class WorkObject:
 
-	def __init__(self, config):
-		print("** WorkObject OBJECT INIT")
-		self.config = config
-
-
-
-	def runWork(self):
-		#global blocks, config, XOs
-		print("RUNNING QUILT INFORMAL")
-		print(self.config)
-		#gc.enable()
-
-		while True:
-			iterate(self.config)
-			time.sleep(self.config.delay) 
 
 
 

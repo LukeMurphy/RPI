@@ -1,5 +1,5 @@
 from modules import colorutils, coloroverlay
-from modules.quilting.polyunit import Unit
+from pieces.workmodules.quilting.polyunit import Unit
 
 	# the pattern array chooses which color each triangle is meant to be
 	# each star unit is comprised of 4 rows and 4 columns of sqaures that 

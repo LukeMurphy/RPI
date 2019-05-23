@@ -76,23 +76,6 @@ class unit:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-class WorkObject:
-
-	def __init__(self, config):
-		print("** WorkObject OBJECT INIT")
-		self.config = config
-
-
-
-	def runWork(self):
-		#global blocks, config, XOs
-		print("RUNNING DIAGNOSTICS")
-		print(self.config)
-		#gc.enable()
-
-		while True:
-			iterate(self.config)
-			time.sleep(self.config.delay)  
 
 
 def displayTest(config):

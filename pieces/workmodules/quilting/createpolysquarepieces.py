@@ -1,5 +1,5 @@
 from modules import colorutils, coloroverlay
-from modules.quilting.polysquaresunit import Unit
+from pieces.workmodules.quilting.polysquaresunit import Unit
 
 	# the pattern array chooses which color each triangle is meant to be
 polyPattern =  [

@@ -3,7 +3,7 @@ import random
 import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from modules.quilting.colorset import ColorSet
+from pieces.workmodules.quilting.colorset import ColorSet
 from modules import colorutils, badpixels, coloroverlay
 
 class Unit:

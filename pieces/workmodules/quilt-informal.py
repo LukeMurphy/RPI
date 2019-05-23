@@ -103,7 +103,7 @@ class unit:
 
 	def update(self):
 		#self.fillColorMode == "random" or 
-		if(random.random() > config.colorPopProb) :
+		if(random.random() > self.config.colorPopProb) :
 			self.colOverlay.stepTransition()
 			self.fillColor = tuple(int (a * self.brightness ) for a in self.colOverlay.currentColor)
 		else :
@@ -164,27 +164,6 @@ class unit:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-class WorkObject:
-
-	def __init__(self, config):
-		print("** WorkObject OBJECT INIT")
-		self.config = config
-
-
-
-	def runWork(self):
-		#global blocks, config, XOs
-		print("RUNNING QUILT INFORMAL")
-		print(self.config)
-		#gc.enable()
-
-		while True:
-			iterate(self.config)
-			time.sleep(self.config.delay) 
-
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
 def transformImage(img) :

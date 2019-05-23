@@ -220,9 +220,17 @@ def configure(config, workconfig) :
 
 	# Setting up based on how the work is displayed
 	print("** Loading:", str(config.work))
-	work = importlib.import_module('pieces.'+str(config.work))
-	work.config = config
-	work.workConfig = workconfig
+	try :
+		work = importlib.import_module('pieces.'+str(config.work))
+		work.config = config
+		work.workConfig = workconfig
+	except Exception as e:
+		print(str(e))
+		## On 5-23-019 a lot of pieces were moved to a sub directory called
+		## singletons - this is here to catch any unchanged configs
+		work = importlib.import_module('pieces.singletons.'+str(config.work))
+		work.config = config
+		work.workConfig = workconfig
 
 	#if(config.rendering == "hat") : renderUsingIDAFruitHat(work)
 	if(config.rendering == "hub") : renderUsingLINSNHub(work)

@@ -4,9 +4,9 @@ import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
-from modules.quilting.colorset import ColorSet
-from modules.quilting import createtrianglepieces
-from modules.quilting import createstarpieces
+from pieces.workmodules.quilting.colorset import ColorSet
+from pieces.workmodules.quilting import createtrianglepieces
+from pieces.workmodules.quilting import createstarpieces
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

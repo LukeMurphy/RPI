@@ -142,7 +142,7 @@ def proc0(workWindow):
 	print(">> PROC0 -- overall renderer")
 	while True:
 		workWindow.renderer.updateTheCanvas(workWindow.players)
-		time.sleep(.01)
+		time.sleep(workWindow.masterConfig.repaintDelay )
 
 
 def procCall0(workWindow) :
@@ -233,6 +233,13 @@ def loadTheConfig(masterConfig) :
 			masterConfig.canvasOffsetY = int(masterConfig.workConfigParser.get("worksList", 'canvasOffsetY'))
 			masterConfig.windowXOffset = int(masterConfig.workConfigParser.get("worksList", 'windowXOffset'))
 			masterConfig.windowYOffset = int(masterConfig.workConfigParser.get("worksList", 'windowYOffset'))
+
+			try:
+				masterConfig.repaintDelay = float(masterConfig.workConfigParser.get("worksList", 'repaintDelay'))
+			except Exception as e:
+				print(str(e))
+				masterConfig.repaintDelay = .01
+
 
 			return True
 

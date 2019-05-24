@@ -89,33 +89,17 @@ class CanvasElement:
 
 		# This significantly helped performance !!
 		'''
+		'''
 		self.cnvs.delete("main1")
 		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
 		self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=self.cnvs._image_tk, anchor='nw', tag="main1")
 		self.cnvs.update()
-		'''
 		
 		# This *should* be more efficient 
 		#config.cnvs.update_idletasks()
 		#root.update()
 
-		############################################################
-		######  Check if config file has changed and reload    #####
-		############################################################
 
-		if(self.config.checkForConfigChanges == True) :
-			self.currentTime = time.time()
-			f = os.path.getmtime(self.config.fileName )
-			self.config.delta = ((self.currentTime - f ))
-
-			if(self.config.delta <= 1) : 
-				if(self.config.reloadConfig == False) :
-					print ("LAST MODIFIED DELTA: ", self.config.delta)
-					self.config.doingReload = True
-					self.config.loadFromArguments(True)
-				self.config.reloadConfig = True
-			else :
-				self.config.reloadConfig = False
 
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

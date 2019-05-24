@@ -21,6 +21,7 @@ class WorkObject:
 		self.config = configuration.Config()
 		self.workConfig = configparser.ConfigParser()
 		self.workConfig.read(workArgument)
+		self.workConfigFile = workArgument
 		print(bcolors.WARNING + ">> FETCHING: " + " " + workArgument + bcolors.ENDC)
 
 		self.configure()

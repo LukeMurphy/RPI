@@ -23,12 +23,13 @@ class Marquee :
 	#colOverlayA = coloroverlay.ColorOverlay()
 	#colOverlayB = coloroverlay.ColorOverlay()
 
-	def __init__(self):
+	def __init__(self, config):
 		self.p0 = []
-		pass
+		self.config = config
+		
 
 	def setUp(self):
-		pass
+		return True
 
 	## Creates a series of little boxes -- not efficient but useful if you wanted to make some kind of chasing
 	## gradient marquee and better to get animation travel speed down as slow as possible
@@ -58,9 +59,14 @@ class Marquee :
 			self.perimeter.append([i, self.p0[1], self.stepSize, self.marqueeWidth])
 
 
-	def advance(self):
-		l = len(self.pattern)
 
+	def advance(self):
+
+
+		#self.config.draw.rectangle((0,0,100,100), fill='blue')
+
+		#'''
+		l = len(self.pattern)
 
 		patternA = self.pattern[0 : (l - self.offset)]
 		patternB = self.pattern[(l - self.offset): l ]
@@ -75,18 +81,19 @@ class Marquee :
 		try:
 			for p in (perim ):
 				if(pattern[count] == 1) :
-					self.configDraw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 
+					self.config.draw.rectangle((p[0], p[1], p[0] + p[2], p[1] + p[3]), 
 						outline=None, fill=tuple(round(c) for c in self.colOverlayA.currentColor))
 				else:
-					self.configDraw.rectangle((p[0],p[1],p[0] + p[2], p[1] + p[3]), 
+					self.config.draw.rectangle((p[0],p[1],p[0] + p[2], p[1] + p[3]), 
 						outline=None, fill=tuple(round(c) for c in self.colOverlayB.currentColor))
 				count += 1
 				if(count >= len(pattern)) :
 					count = 0
+			
 		except Exception as e :
 			print(e)
 			print(self.colOverlayA.currentColor, self.colOverlayB.currentColor)
-			sys.exit()
+			#sys.exit()
 
 
 		self.offset += 1
@@ -95,6 +102,8 @@ class Marquee :
 
 		self.colOverlayA.stepTransition()
 		self.colOverlayB.stepTransition()
+		
+		# '''
 
 
 def setTwoColors(config) :
@@ -158,6 +167,7 @@ def init(config) :
 
 	unitColors = setTwoColors(config)
 
+
 	for i in range (0, config.marqueeNum):
 	
 		clrs = [colorutils.randomColor(),colorutils.randomColorAlpha(255,255)]
@@ -174,7 +184,7 @@ def init(config) :
 		if(innerWidth < 32 or i > 6) :
 			step = 1
 
-		mq = Marquee()
+		mq = Marquee(config)
 		mq.pattern = pattern
 		mq.p0 = p0
 		mq.innerWidth = innerWidth
@@ -184,8 +194,9 @@ def init(config) :
 		mq.clrs = clrs
 		mq.colOverlayA = unitColors[0]
 		mq.colOverlayB = unitColors[1]
-		mq.configDraw = config.draw
+		#mq.configDraw = config.draw
 		mq.reverse = True if(i%2 > 0 ) else False
+
 
 		mq.makeMarquee()
 		config.marquees.append(mq)
@@ -233,16 +244,11 @@ def redraw(config):
 
 
 
-def runWork(config):
-
-	while True:
-		iterate()
-		time.sleep(config.redrawSpeed)
-
-
 def iterate(config) :
 
 	redraw(config)
+
+	#config.draw.rectangle((0,0,200,200), fill='red')
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	checkTime(config)

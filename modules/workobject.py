@@ -28,8 +28,7 @@ class WorkObject:
 
 	def runWork(self):
 		#global blocks, config, XOs
-		print("RUNNING QUILT INFORMAL")
-		print(self.config)
+		print("** WorkObject RUNNING WORK "+ str(self.config.workName))
 		#gc.enable()
 
 		while True:

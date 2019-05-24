@@ -146,7 +146,7 @@ def proc0(workWindow):
 
 
 def procCall0(workWindow) :
-	print(">> ProcCall 0 WORKWINDOW THREAD STARTING")
+	print("\n>> ProcCall 0 WORKWINDOW THREAD STARTING")
 	t0  = threading.Thread.__init__(proc0(workWindow))
 	t0.start()
 	#thrd = threading.Thread(target=proc0, kwargs=dict(workWindow=workWindow))

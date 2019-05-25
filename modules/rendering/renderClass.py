@@ -72,35 +72,6 @@ class CanvasElement:
 		return True
 
 
-	def updateCanvas(self) :
-
-		## For testing ...
-		#draw1  = ImageDraw.Draw(config.renderImageFull)
-		#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
-		self.counter +=1
-		if(self.counter > 1000) :
-			#print(gc.get_count())
-			# I don't know if this really really helps
-			gc.collect()
-			self.counter = 0
-
-		#print("Instance Number Render: " + str(self.config.instanceNumber))
-		#print(self.instanceNumber, self.cnvs)
-
-		# This significantly helped performance !!
-		'''
-		'''
-		self.cnvs.delete("main1")
-		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
-		self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=self.cnvs._image_tk, anchor='nw', tag="main1")
-		self.cnvs.update()
-		
-		# This *should* be more efficient 
-		#config.cnvs.update_idletasks()
-		#root.update()
-
-
-
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -286,6 +257,7 @@ class CanvasElement:
 				self.config.renderImageFull.paste(temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 
 
+		# UPDATES THE MAIN CANVAS -- there is only one even in the multiplayer setup
 		self.cnvs.delete("main1")
 		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
 		self.cnvs._image_id = self.cnvs.create_image(self.config.canvasOffsetX, self.config.canvasOffsetY, image=self.cnvs._image_tk, anchor='nw', tag="main1")

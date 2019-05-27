@@ -86,12 +86,26 @@ public void setup() {
 		PsychShader.set("positionX", 255);
 		PsychShader.set("positionY", 180);
 
+	// CORNER ROUND SQUARE
 		if (setupSet == 2) {
-			PsychShader.set("rTimeMult", 2.0f);
-			PsychShader.set("gTimeMult", 2.40f);
-			PsychShader.set("bTimeMult", 2.0f);
+			PsychShader.set("rTimeMult", .010f);
+			PsychShader.set("gTimeMult", .020f);
+			PsychShader.set("bTimeMult", .010f);
+
+			// This affects the tone but adding to or dropping
+			// each rgb chanel
+			PsychShader.set("rFactor", 1.0f);
+			PsychShader.set("gFactor", 1.0f);
+			PsychShader.set("bFactor", 1.0f);
+
+
+			PsychShader.set("rMin", .010f);
+			PsychShader.set("gMin", .01f);
+			PsychShader.set("bMin", .01f);
+
+
 			PsychShader.set("distortionScale", .62f);
-			PsychShader.set("brightness", .8f);
+			PsychShader.set("brightness", .6f);
 			PsychShader.set("tTimeMult", 1000.0f);
 			PsychShader.set("shaderFunction", 0);
 			PsychShader.set("positionX", 25);
@@ -314,8 +328,11 @@ public void draw() {
 				}
 				frameMoved = true;
 			}
-			rect(0, 0, 100, 260);
-			rect(100, 130, 60, 78);
+			//ellipse(0,0,270,270);
+			//rect(0, 0, 100, 260);
+			ellipse(0,0,190,870);
+			//rect(0, 0, 100, 260);
+			//rect(100, 130, 60, 78);
 			//image(img, 0, 0);
 			//drawAndMove();
 		}

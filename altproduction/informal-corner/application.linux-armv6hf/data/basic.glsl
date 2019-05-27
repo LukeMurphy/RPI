@@ -19,12 +19,22 @@ uniform float bTimeMult;
 uniform float distortionScale;
 uniform float brightness;
 
+uniform float rFactor = 1.0; 
+uniform float gFactor = 1.0; 
+uniform float bFactor = 1.0; 
+
 uniform int positionX;
 uniform int positionY;
 
 uniform float rMax = 1.0;
 uniform float gMax = 1.0;
 uniform float bMax = 1.0;
+
+uniform float rMin = .01;
+uniform float gMin = .01;
+uniform float bMin = .01;
+
+
 uniform float min = .0;
 uniform int mono = 0;
 uniform int shaderFunction = 0;
@@ -175,22 +185,33 @@ vec4 radialInterference(void) {
 
 vec3 colorInterferencePatterns(void){
 
-	vec2 position = vec2(320,180);
-	vec2 st = 5. * (gl_FragCoord.xy)/resolution;
+	vec2 position = vec2(320,380);
+	vec2 st = (5.0) * (gl_FragCoord.xy)/resolution;
 
-	vec2 pos = st.xy*vec2(5.,10.);
+	vec2 pos = st.xy * vec2(5.,10.);
 	// Add noise
 	pos = rotate2d( noise(pos ) ) * pos;
 
 	float distanceX = gl_FragCoord.x - position[0] - pos[0];
 	float distanceY = gl_FragCoord.y - position[1] - pos[1];
 	float distance = -distortionScale * sqrt(distanceX*distanceX + distanceY*distanceY);
-	// Smooth interpolation between 0.1 and 0.9
-	float r = smoothstep(0.01, rMax, sin(PI*2 * distance  + time* rTimeMult)) * brightness + min;
-	float g = smoothstep(0.01, gMax, sin(2. * PI*2 * distance + time*gTimeMult)) * brightness + min;
-	float b = smoothstep(0.01, bMax, cos(PI*2 * distance + time*bTimeMult)) * brightness + min;
 
-	vec3 color = vec3(r,g,b);
+	float t = time;
+	t = 100000.0;
+	// Smooth interpolation between 0.1 and 0.9
+	float r = smoothstep(rMin, rMax, sin(rTimeMult * PI*2 * distance * t * rTimeMult)) * brightness + min;
+	float g = smoothstep(gMin, gMax, sin(gTimeMult * PI*2 * distance * t * gTimeMult)) * brightness + min;
+	float b = smoothstep(bMin, bMax, cos(bTimeMult * PI*2 * distance * t * bTimeMult)) * brightness + min;
+
+
+	//r = .1;
+	//g = .1;
+	//b = .4;
+	//float r = smoothstep(rMin, rMax, sin(distance + 1.0 * rTimeMult)) * brightness;
+	//float g = smoothstep(gMin, gMax, sin(distance + 1.0 * gTimeMult)) * brightness;
+	//float b = smoothstep(bMin, bMax, cos(distance + 1.0 * bTimeMult)) * brightness;
+
+	vec3 color = vec3(r/rFactor,g/gFactor,b/bFactor);
 
 	if (mono == 1) {
 		color = vec3(b,b,b);

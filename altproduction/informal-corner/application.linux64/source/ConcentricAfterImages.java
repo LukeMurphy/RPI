@@ -105,7 +105,7 @@ public void setup() {
 
 
 			PsychShader.set("distortionScale", .62f);
-			PsychShader.set("brightness", .6f);
+			PsychShader.set("brightness", .86f);
 			PsychShader.set("tTimeMult", 1000.0f);
 			PsychShader.set("shaderFunction", 0);
 			PsychShader.set("positionX", 25);

@@ -38,7 +38,7 @@ String mode = "run";
 // 5 ==> radial with occlusion
 // 0 ==> user(s)
 // 6 ==> all
-int setupSet = 2;
+int setupSet = 6;
 
 //------------------------------//
 void setup() {
@@ -95,8 +95,6 @@ void setup() {
 			PsychShader.set("positionX", 25);
 			PsychShader.set("positionY", 180);
 			bg = color(20, 0, 80, 1);
-
-
 		}
 
 		if (setupSet == 6) {

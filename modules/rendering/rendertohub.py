@@ -294,11 +294,13 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 		crop = crop.convert("RGBA")
 		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
 		config.renderImageFull.paste(crop, destination, crop)
-		
-	if config.useLastOverlay == True :
-		config.renderDrawOver.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill, outline = None)
-		config.renderImageFull.paste(config.renderImageFullOverlay, (0,0), config.renderImageFullOverlay)
-
+	
+	try:
+		if config.useLastOverlay == True :
+			config.renderDrawOver.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill, outline = None)
+			config.renderImageFull.paste(config.renderImageFullOverlay, (0,0), config.renderImageFullOverlay)
+	except Exception as e:
+		print(e)
 
 	'''
 	for i in range(0,40) :

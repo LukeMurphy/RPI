@@ -208,6 +208,7 @@ def main(run = True) :
 	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))	
 	config.bgColorVals = ((workConfig.get("diag", 'bgColor')).split(','))
 	config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorVals))
+	config.useLastOverlay = False
 
 	config.angle = 0
 

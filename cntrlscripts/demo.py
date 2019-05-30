@@ -102,6 +102,12 @@ actionDict2 = [
 	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},
 	{" " :''},
 
+	{" " :''},
+	{"--------- FLOOR PILE -----------" :''},
+	{"* 3 PILE - compositions" :'p4-3x8-multi/leaninglights-3.cfg'},
+	{"* 3 PILE - flames" :'p4-3x8-multi/alt-flames-2b.cfg'},
+	{"* 3 PILE - leaning lights" :'p4-3x8-multi/leaninglights-2.cfg'},
+
 	
 	{" " :''},
 	{"--------- ROUND CORNER -----------" :''},
@@ -112,6 +118,8 @@ actionDict2 = [
 	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
 	{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
 	{"Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
+
+	
 	#{" " :''},
 	#{"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
 	#{"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},

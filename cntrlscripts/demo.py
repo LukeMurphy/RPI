@@ -44,6 +44,7 @@ actionDict1 = [
 	{"* P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
 	{"* P10 Branch - Quilt" :'p10/branch-quilt-1.cfg'},
 	{"* P10 Branch - Lines On" :'p10/collage-lines-1.cfg'},
+	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
 
 
 

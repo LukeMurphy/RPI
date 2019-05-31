@@ -45,7 +45,7 @@ actionDict1 = [
 	{"* P10 Branch - Quilt" :'p10/branch-quilt-1.cfg'},
 	{"* P10 Branch - Lines On" :'p10/collage-lines-1.cfg'},
 	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
-
+	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 
 	#{"3rd Gen Tatlin" :'p4-7x4/mono-flavin2.cfg'},
@@ -120,13 +120,13 @@ actionDict2 = [
 	
 	{" " :''},
 	{"--------- ROUND CORNER -----------" :''},
-	{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
-	{"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
+	#{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
+	#{"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
 	{" " :''},
-	{"Square - ICE" :'p4-4x8/square.cfg'},
-	{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
-	{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
-	{"Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
+	#{"Square - ICE" :'p4-4x8/square.cfg'},
+	#{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
+	#{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
+	#{"Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
 
 	
 	#{" " :''},
@@ -160,10 +160,10 @@ actionDict2 = [
 	#{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
 
 
-	{" " :''},
-	{"------------------------------" :''},
+	#{" " :''},
+	#{"------------------------------" :''},
 	#{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
-	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	#{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 
 

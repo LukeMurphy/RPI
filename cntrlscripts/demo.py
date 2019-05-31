@@ -39,6 +39,14 @@ actionDict1 = [
 	#{" " :''},
 
 	{"-------- NORTH WALL  -------------" :''},
+	{"* P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
+	{"* P10 Branch - Algoflames" :'p10/algoflames-1.cfg'},
+	{"* P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
+	{"* P10 Branch - Quilt" :'p10/branch-quilt-1.cfg'},
+	{"* P10 Branch - Lines On" :'p10/collage-lines-1.cfg'},
+
+
+
 	#{"3rd Gen Tatlin" :'p4-7x4/mono-flavin2.cfg'},
 	#{"Marquee" :'p4-7x4/marquee-b.cfg'},
 	#{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},

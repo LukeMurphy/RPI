@@ -62,30 +62,25 @@ def drawPatternBlock(rows, cols, f1, f2, l, w, draw, offsetX0, offsetY0,
 def drawPattern():
 
 	draw = config.draw
-
-	config.f1.stepTransition()
-	config.f2.stepTransition()
-	config.f3.stepTransition()
-	config.f4.stepTransition()
-	config.f5.stepTransition()
-	config.f6.stepTransition()
-
-	config.colorArrayBase = [config.f1, config.f2, config.f3, config.f4, config.f5, config.f6]
+	config.colorArrayBase = []
 	config.colorArray = []
+
+	for i in  range(0, 6):
+		c = config.colorSets[i]
+		c.stepTransition()
+		config.colorArrayBase.append(c)
+		config.colorArray.append(tuple(c.currentColor))
+		
+	#config.colorArrayBase = [config.f1, config.f2, config.f3, config.f4, config.f5, config.f6]
 
 	#for i in range(0,6) :
 	#	setColorProperties(config.colorArrayBase[i])
 
-	for i in config.colorArrayBase :
-		i.stepTransition()
-		config.colorArray.append(tuple(i.currentColor))
+	#for i in config.colorArrayBase :
+	#	i.stepTransition()
+	#	config.colorArray.append(tuple(i.currentColor))
 
-	f1 = tuple(config.f1.currentColor)
-	f2 = tuple(config.f2.currentColor)
-	f3 = tuple(config.f3.currentColor)
-	f4 = tuple(config.f4.currentColor)
-	f5 = tuple(config.f5.currentColor)
-	f6 = tuple(config.f6.currentColor)
+	f6 = tuple(config.colorSets[5].currentColor)
 
 	rows = config.rows
 	cols = config.cols
@@ -172,75 +167,7 @@ def getColorChanger(n=0):
 	colOverlay.tLimit = round(random.uniform(18,20))
 	colOverlay.maxBrightness = config.brightness
 	colOverlay.steps = round(random.uniform(15,22))
-	setColorProperties(colOverlay, n)
 	return colOverlay
-
-def setColorProperties(c, n = 0) :
-	c.minHue = float(workConfig.get("pattern", 'minHue'))
-	c.maxHue = float(workConfig.get("pattern", 'maxHue'))
-	c.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
-	c.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
-	c.minValue = float(workConfig.get("pattern", 'minValue'))
-	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
-	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
-
-	# cross shape 1
-	if n == 5 :
-		c.minHue = 0
-		c.maxHue = 30
-		c.minSaturation = .99
-		c.maxSaturation = .99
-		c.minValue = .5
-		c.maxValue = .9
-
-	# outer cross shape 1
-	if n == 1 :
-		c.minHue = 0
-		c.maxHue = 30
-		c.minSaturation = .99
-		c.maxSaturation = .99
-		c.minValue = .5
-		c.maxValue = .9
-
-	# outer cross shape 2
-	if n == 2 :
-		c.minHue = 30
-		c.maxHue = 45
-		c.minSaturation = .99
-		c.maxSaturation = .99
-		c.minValue = .5
-		c.maxValue = .9
-
-	# outline of cross shapes
-	if n == 6 :
-		c.minHue = 0
-		c.maxHue = 50
-		c.minSaturation = .99
-		c.maxSaturation = .99
-		c.minValue = .5
-		c.maxValue = .9
-
-	# Not used it seems ???
-	if n == 3 :
-		c.minHue = 200
-		c.maxHue = 245
-		c.minSaturation = .99
-		c.maxSaturation = .99
-		c.minValue = .5
-		c.maxValue = .9
-
-	# secondary crosss shape
-	if n == 4 :
-		c.minHue = 200
-		c.maxHue = 300
-		c.minSaturation = .99
-		c.maxSaturation = .99
-		c.minValue = .5
-		c.maxValue = .9
-
-
-
-	c.colorTransitionSetup()
 
 
 def drawTheReal() :
@@ -249,11 +176,11 @@ def drawTheReal() :
 	w = 120 + x
 	h = 80 + y
 	box = tuple([x, y, w, h])
-	config.canvasDraw.rectangle(box, fill = tuple(config.f6.currentColor))
+	config.canvasDraw.rectangle(box, fill = tuple(config.colorSets[5].currentColor))
 
 	lines = h - y
 	for i in range(0, lines, 5)  :
-		f =  tuple(config.f1.currentColor)
+		f =  tuple(config.colorSets[0].currentColor)
 		if random.random() < .01 :
 			f = colorutils.randomColor(1)
 		config.canvasDraw.rectangle((x,y+i,w,y+i+2) , fill = f)
@@ -280,7 +207,6 @@ def main(run = True) :
 
 	config.delay = float(workConfig.get("pattern", 'delay'))
 
-
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -289,12 +215,32 @@ def main(run = True) :
 	config.imageOffsetX = 0
 	config.imageOffsetY = 0
 
-	config.f1 = getColorChanger(1)
-	config.f2 = getColorChanger(2)
-	config.f3 = getColorChanger(3)
-	config.f4 = getColorChanger(4)
-	config.f5 = getColorChanger(5)
-	config.f6 = getColorChanger(6)
+	config.colorSets = []
+
+	for i in  range(0, 6):
+		c = getColorChanger()
+		name = "pSet"+str(i+1)
+
+		try:
+			c.minHue = float(workConfig.get(name, 'minHue'))
+			c.maxHue = float(workConfig.get(name, 'maxHue'))
+			c.minSaturation = float(workConfig.get(name, 'minSaturation'))
+			c.maxSaturation = float(workConfig.get(name, 'maxSaturation'))
+			c.minValue = float(workConfig.get(name, 'minValue'))
+			c.maxValue = float(workConfig.get(name, 'maxValue'))
+			c.colorTransitionSetup()
+
+		except Exception as e :
+			print(e)
+			c.minHue  = 0
+			c.maxHue  = 360
+			c.minSaturation  = .1
+			c.maxSaturation  = 1
+			c.minValue = .1
+			c.maxValue  = 1
+
+		print(c)
+		config.colorSets.append(c)
 
 	config.imageRotation = .0001
 

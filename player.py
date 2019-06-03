@@ -6,6 +6,7 @@ import getopt
 import time
 import configparser
 from modules import configuration
+from modules.configuration import bcolors
 from modules import player
 import argparse
 
@@ -44,7 +45,8 @@ print("** " + str(args) + " **")
 def loadFromArguments(reloading=False, config = None):
 	#global config, workconfig, path, tempImage, threads, thrd
 
-	print("** RELOADING: " + str(reloading))
+
+	print(bcolors.OKBLUE + "\n>> ** RELOADING: " + str(reloading) + bcolors.ENDC)
 
 	if(reloading == False):
 		try:
@@ -96,7 +98,7 @@ def loadFromArguments(reloading=False, config = None):
 
 				f = os.path.getmtime(argument)
 				config.delta = int((config.startTime - f))
-				print("** " + str(argument) +  " --> LAST MODIFIED DELTA: " +  str(config.delta) + " **")
+				print(bcolors.OKGREEN + "** " + str(argument) +  " --> LAST MODIFIED DELTA: " +  str(config.delta) + " **" + bcolors.ENDC)
 			else:
 				# Machine ID
 				config.MID = baseconfig.MID
@@ -104,7 +106,7 @@ def loadFromArguments(reloading=False, config = None):
 				config.WRKINID = baseconfig.WRKINID
 				# Default Local Path
 				config.path = baseconfig.path
-				print("** Loading " + config.path + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run. **")
+				print(bcolors.WARNING + "** Loading " + config.path + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run. **" + bcolors.ENDC)
 				workconfig.read(config.path + '/configs/pieces/' + config.WRKINID + ".cfg")
 
 			player.configure(config, workconfig)

@@ -21,15 +21,20 @@ class Line:
 
 	lineNumber  = 0
 
+	
+	#widthMultiplier = 18
+
 
 	def __init__(self, config, setLineAttributes = True):
 
 		self.config = config
-		self.segmentLength = 2
+		self.segmentLength = 4
 		self.direction = -1 if random.random() > .5 else 1
-		self.direction = 1
+		self.direction = 2
 		self.pointArray = [[0,0]]
-		if setLineAttributes == True : self.setLineAttributes()
+		self.widthMultiplier = self.config.widthMultiplier 
+		if setLineAttributes == True : 
+			self.setLineAttributes()
 
 	def reset(self):
 		self.done = False
@@ -38,13 +43,14 @@ class Line:
 
 	def setLineAttributes(self):
 		#print("new")
-		self.angle = random.uniform(0,math.pi * 2)
+		self.angle = random.uniform(math.pi/2, math.pi)
+
 
 		if self.config.angleIncrement == 0 :
 			self.angleIncrement = 0
 		else :
 			angleIncrementDirection = 1 if random.random() > .5 else -1
-			self.angleIncrement = angleIncrementDirection * math.pi/ self.config.angleIncrement
+			self.angleIncrement = angleIncrementDirection * math.pi/self.config.angleIncrement
 
 
 		side = -1
@@ -62,15 +68,15 @@ class Line:
 
 		# TOP BOTTOM RIGHT LEFT
 		if side == 0 :
-			y = 0
+			y = 0 - self.widthMultiplier + 2
 		if side == 1 :
-			y = self.config.canvasHeight			
+			y = self.config.canvasHeight + self.widthMultiplier   - 2			
 
 		if side == 2 :
-			x = self.config.canvasWidth
+			x = self.config.canvasWidth + self.widthMultiplier  - 2
 
 		if side == 3 :
-			x = 0
+			x = 0 - self.widthMultiplier  + 2
 
 		self.lastPoint = [x,y]
 		self.nextPoint = [x,y]
@@ -95,7 +101,7 @@ class Line:
 			y1 = self.nextPoint[1]
 
 			if len(self.pointArray) > 3:
-				rng = self.segmentLength/2
+				rng = self.segmentLength/1
 				xNP = self.nextPoint[0]
 				yNP = self.nextPoint[1]
 
@@ -117,10 +123,12 @@ class Line:
 				dx = x1 - x0
 				dy = y1 - y0
 				l = math.sqrt(dx*dx + dy*dy)
-				s = l + 0
+				s = l * self.widthMultiplier / (self.branchCount/2 + 1)
+
+				if s < 4 : s = 4
 				
-				self.config.canvasDraw.rectangle((x0,y0,x1 + s,y1 + s), fill=self.lineColor)
-				self.config.canvasDraw.ellipse((x0,y0,x0 + s,y0 + s), fill=self.lineColor)
+				#self.config.canvasDraw.rectangle((x0,y0,x1 + s,y1 + s), fill=self.lineColor)
+				self.config.canvasDraw.ellipse((x0,y0,x0 + s, y0 + s), fill=self.lineColor)
 
 
 				"********************************************************************"
@@ -130,9 +138,9 @@ class Line:
 					self.pointArray.append(p)
 				self.lastPoint = self.nextPoint
 
-			if x1 > self.config.canvasWidth or x1 < 0 :
+			if x1 > self.config.canvasWidth + self.widthMultiplier + 3 or x1 < 0 - self.widthMultiplier - 3  :
 				self.done = True
-			if y1 > self.config.canvasHeight or y1 < 0 :
+			if y1 > self.config.canvasHeight + self.widthMultiplier + 3  or y1 < 0 - self.widthMultiplier - 3 :
 				self.done = True
 
 
@@ -198,6 +206,7 @@ def showLines():
 					newLine.angle = currentAngle + math.pi/2
 					newLine.lastPoint = midPoint
 					newLine.done = False
+					newLine.widthMultiplier = config.widthMultiplier
 					#newLine.lineNumber = ref.lineNumber
 					newLine.lineColor = ref.lineColor
 					newLine.branchCount = ref.branchCount + 2
@@ -227,8 +236,13 @@ def main(run = True) :
 
 	config.delay = float(workConfig.get("lines", 'delay'))
 	config.base = float(workConfig.get("lines", 'base'))
+	config.widthMultiplier = float(workConfig.get("lines", 'widthMultiplier'))
 	config.rows = int(workConfig.get("lines", 'rows'))
 	config.cols = int(workConfig.get("lines", 'cols'))
+	config.bgColorVals = ((workConfig.get("lines", 'bgColor')).split(','))
+	config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.bgColorVals))
+
+	print(config.bgColor)
 
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
@@ -241,9 +255,9 @@ def main(run = True) :
 
 	config.trim = 6
 	config.trimLimit = 10
-	config.branchProb = .1
-	config.doubleBranchProb = .1
-	config.angleIncrement = 900
+	config.branchProb = .5
+	config.doubleBranchProb = .5
+	config.angleIncrement = 500
 	config.activeLineInterceptLimit = 100
 	config.lineCountLimit = 300
 	config.segmentLength = 2
@@ -266,12 +280,12 @@ def setUp():
 	global config
 
 	config.lineCount = 0
-	config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill =(50,0,100,100))
+	config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.bgColor)
 	config.pointArray = [[0,0]]
 	config.linesArray = []
 	config.stop = False
 
-	config.angleIncrement = random.uniform(0,2000)
+	config.angleIncrement = random.uniform(20,500)
 
 	#print(config.linesArray)
 
@@ -280,6 +294,7 @@ def setUp():
 		l.lineNumber = i
 		l.lineColor = colorutils.randomColor()
 		l.segmentLength = config.segmentLength
+		l.widthMultiplier = config.widthMultiplier
 		l.setLineAttributes()
 		#print(l.lastPoint)
 		config.linesArray.append(l)

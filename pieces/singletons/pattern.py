@@ -73,8 +73,8 @@ def drawPattern():
 	config.colorArrayBase = [config.f1, config.f2, config.f3, config.f4, config.f5, config.f6]
 	config.colorArray = []
 
-	for i in range(0,6,2) :
-		setColorProperties(config.colorArrayBase[i])
+	#for i in range(0,6) :
+	#	setColorProperties(config.colorArrayBase[i])
 
 	for i in config.colorArrayBase :
 		i.stepTransition()
@@ -164,17 +164,18 @@ def drawPattern():
 	#print (rows, b17, cols*b17)
 
 
-def getColorChanger():
+def getColorChanger(n=0):
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False 
 	colOverlay.timeTrigger = True 
-	colOverlay.tLimitBase = int(random.uniform(8,10))
+	colOverlay.tLimitBase = round(random.uniform(18,20))
+	colOverlay.tLimit = round(random.uniform(18,20))
 	colOverlay.maxBrightness = config.brightness
-	colOverlay.steps = int(random.uniform(150,220))
-	setColorProperties(colOverlay)
+	colOverlay.steps = round(random.uniform(15,22))
+	setColorProperties(colOverlay, n)
 	return colOverlay
 
-def setColorProperties(c) :
+def setColorProperties(c, n = 0) :
 	c.minHue = float(workConfig.get("pattern", 'minHue'))
 	c.maxHue = float(workConfig.get("pattern", 'maxHue'))
 	c.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
@@ -182,6 +183,63 @@ def setColorProperties(c) :
 	c.minValue = float(workConfig.get("pattern", 'minValue'))
 	c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
 	c.maxValue = float(workConfig.get("pattern", 'maxValue'))
+
+	# cross shape 1
+	if n == 5 :
+		c.minHue = 0
+		c.maxHue = 30
+		c.minSaturation = .99
+		c.maxSaturation = .99
+		c.minValue = .5
+		c.maxValue = .9
+
+	# outer cross shape 1
+	if n == 1 :
+		c.minHue = 0
+		c.maxHue = 30
+		c.minSaturation = .99
+		c.maxSaturation = .99
+		c.minValue = .5
+		c.maxValue = .9
+
+	# outer cross shape 2
+	if n == 2 :
+		c.minHue = 30
+		c.maxHue = 45
+		c.minSaturation = .99
+		c.maxSaturation = .99
+		c.minValue = .5
+		c.maxValue = .9
+
+	# outline of cross shapes
+	if n == 6 :
+		c.minHue = 0
+		c.maxHue = 50
+		c.minSaturation = .99
+		c.maxSaturation = .99
+		c.minValue = .5
+		c.maxValue = .9
+
+	# Not used it seems ???
+	if n == 3 :
+		c.minHue = 200
+		c.maxHue = 245
+		c.minSaturation = .99
+		c.maxSaturation = .99
+		c.minValue = .5
+		c.maxValue = .9
+
+	# secondary crosss shape
+	if n == 4 :
+		c.minHue = 200
+		c.maxHue = 300
+		c.minSaturation = .99
+		c.maxSaturation = .99
+		c.minValue = .5
+		c.maxValue = .9
+
+
+
 	c.colorTransitionSetup()
 
 
@@ -196,7 +254,7 @@ def drawTheReal() :
 	lines = h - y
 	for i in range(0, lines, 5)  :
 		f =  tuple(config.f1.currentColor)
-		if random.random() < .1 :
+		if random.random() < .01 :
 			f = colorutils.randomColor(1)
 		config.canvasDraw.rectangle((x,y+i,w,y+i+2) , fill = f)
 
@@ -223,10 +281,6 @@ def main(run = True) :
 	config.delay = float(workConfig.get("pattern", 'delay'))
 
 
-
-
-
-
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -235,12 +289,12 @@ def main(run = True) :
 	config.imageOffsetX = 0
 	config.imageOffsetY = 0
 
-	config.f1 = getColorChanger()
-	config.f2 = getColorChanger()
-	config.f3 = getColorChanger()
-	config.f4 = getColorChanger()
-	config.f5 = getColorChanger()
-	config.f6 = getColorChanger()
+	config.f1 = getColorChanger(1)
+	config.f2 = getColorChanger(2)
+	config.f3 = getColorChanger(3)
+	config.f4 = getColorChanger(4)
+	config.f5 = getColorChanger(5)
+	config.f6 = getColorChanger(6)
 
 	config.imageRotation = .0001
 

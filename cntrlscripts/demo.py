@@ -9,6 +9,28 @@ commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 
 
 actionDict1 = [
+
+	{" " :''},
+	{"--------- FLOOR PILE -----------" :''},
+	{"* 3 PILE - compositions" :'p4-3x8-multi/leaninglights-3.cfg'},
+	{"* 3 PILE - flames" :'p4-3x8-multi/alt-flames-2b.cfg'},
+	{"* 3 PILE - leaning lights" :'p4-3x8-multi/leaninglights-2.cfg'},
+	{"* 3 PILE - leaning pattern" :'p4-3x8-multi/lines.cfg'},
+
+	{" " :''},
+	{"-------- NORTH WALL  -------------" :''},
+	{"* P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
+	{"* P10 Branch - Algoflames" :'p10/algoflames-1.cfg'},
+	{"* P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
+	{"* P10 Branch - Quilt" :'p10/branch-quilt-1.cfg'},
+	{"* P10 Branch - Collage" :'p10/collage-1.cfg'},
+	{"* P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
+	{"* P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
+	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
+	{"* P10 Branch - PATTERN" :'p10/pattern.cfg'},
+	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+
+
 	{" " :''},
 	{"-------- RIGHT WALL -------------" :''},
 	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
@@ -25,46 +47,7 @@ actionDict1 = [
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
 	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	
-	#{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
-	#{"* Wall Hanging 3x7: Fludd Factory" :'p4-3x7-informal/fluddc.cfg'},
-	#{"* Wall Hanging 3x7: Patched Rothko" :'p4-3x7-informal/mono-rothko.cfg'},
-	#{"* Wall Hanging 3x7: Star Quilt" :'p4-3x7-informal/quilt-stars.cfg'},
-	#{"* Wall Hanging 3x7: Tri Quilt" :'p4-3x7-informal/quilt-triangles-b.cfg'},
-	#{"* Wall Hanging 3x7: Signage Abstraction" :'p4-3x7-informal/signage.cfg'},
-	#{"------------------------------" :''},
-	#{" " :''},
-	#{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
-	#{" " :''},
-	{" " :''},
-	#{" " :''},
 
-	{"-------- NORTH WALL  -------------" :''},
-	{"* P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
-	{"* P10 Branch - Algoflames" :'p10/algoflames-1.cfg'},
-	{"* P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
-	{"* P10 Branch - Quilt" :'p10/branch-quilt-1.cfg'},
-	{"* P10 Branch - Collage" :'p10/collage-1.cfg'},
-	{"* P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
-	{"* P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
-	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
-	{"* P10 Branch - PATTERN" :'p10/pattern.cfg'},
-	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-
-
-	#{"3rd Gen Tatlin" :'p4-7x4/mono-flavin2.cfg'},
-	#{"Marquee" :'p4-7x4/marquee-b.cfg'},
-	#{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
-	#{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
-	#{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},
-	{" " :''},
-
-	
-	{"-------- LEFT WALL -------------" :''},
-	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
-	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
-	{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
-	{"Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
-	#{" " :''},
 
 
 	{" " :''},
@@ -94,6 +77,43 @@ actionDict1 = [
 	]
 
 actionDict2 = [
+	{" " :''},
+	{"-------- TABLE -------------" :''},
+	{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
+	{"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
+	{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
+	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
+	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
+	{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
+
+	#{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
+	#{"* Wall Hanging 3x7: Fludd Factory" :'p4-3x7-informal/fluddc.cfg'},
+	#{"* Wall Hanging 3x7: Patched Rothko" :'p4-3x7-informal/mono-rothko.cfg'},
+	#{"* Wall Hanging 3x7: Star Quilt" :'p4-3x7-informal/quilt-stars.cfg'},
+	#{"* Wall Hanging 3x7: Tri Quilt" :'p4-3x7-informal/quilt-triangles-b.cfg'},
+	#{"* Wall Hanging 3x7: Signage Abstraction" :'p4-3x7-informal/signage.cfg'},
+	#{"------------------------------" :''},
+	#{" " :''},
+	#{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
+	#{" " :''},
+	#{" " :''},
+
+
+
+	#{"3rd Gen Tatlin" :'p4-7x4/mono-flavin2.cfg'},
+	#{"Marquee" :'p4-7x4/marquee-b.cfg'},
+	#{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
+	#{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
+	#{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},
+	{" " :''},
+	{"-------- LEFT WALL -------------" :''},
+	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
+	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
+	{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
+	{"Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
+	#{" " :''},
+
+
 
 	{" " :''},
 	{"--------- FLOOR -----------" :''},
@@ -114,12 +134,6 @@ actionDict2 = [
 	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},
 	{" " :''},
 
-	{" " :''},
-	{"--------- FLOOR PILE -----------" :''},
-	{"* 3 PILE - compositions" :'p4-3x8-multi/leaninglights-3.cfg'},
-	{"* 3 PILE - flames" :'p4-3x8-multi/alt-flames-2b.cfg'},
-	{"* 3 PILE - leaning lights" :'p4-3x8-multi/leaninglights-2.cfg'},
-	{"* 3 PILE - leaning pattern" :'p4-3x8-multi/lines.cfg'},
 
 	
 	{" " :''},
@@ -154,20 +168,12 @@ actionDict2 = [
 
 	#{"P3 sqr w. shift: marquee2b " :'p3-2x4/marquee2b.cfg'},
 
-	{" " :''},
-	{"-------- TABLE -------------" :''},
-	#{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
-	#{"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
-	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
-	#{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
-	#{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
-	#{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
 
 
 	#{" " :''},
 	#{"------------------------------" :''},
-	#{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
-	#{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
+	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 
 

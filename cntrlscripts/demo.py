@@ -47,16 +47,13 @@ actionDict1 = [
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
 	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	
-
-
-
 	{" " :''},
 
 	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
 	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
 	#{"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
 	#{"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-	{" " :''},
+
 	#{"------------------------------" :''},
 	#{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	#{" " :''},

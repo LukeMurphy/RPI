@@ -548,6 +548,9 @@ def configureImageOverlay():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def init() :
 	global config
+
+	print("SCROLLER HOLDER INIT")
+
 	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 
 
 	config.windowWidth  = float(workConfig.get("displayconfig", 'windowWidth')) 

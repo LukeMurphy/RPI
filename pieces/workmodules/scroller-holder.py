@@ -287,19 +287,15 @@ def makeBackGround(drawRef, n = 1):
 	rows = config.patternRows * 1
 	cols = config.patternCols * 1
 
-	xDiv = round((config.displayRows * config.windowWidth) / cols) #- config.patternColsOffset
-	yDiv = round((config.canvasHeight / rows) / config.displayRows) #- config.patternRowsOffset
-
-	#print(xDiv, yDiv)
+	xDiv = int(round(config.displayRows * config.windowWidth)) / cols #- config.patternColsOffset
+	yDiv = config.canvasHeight / rows / config.displayRows #- config.patternRowsOffset
 
 	xStart = 0
 	yStart = 0
 
-	gap = 0
-
 	config.arrowBgBackGroundColor = (0,0,0,20) #colorutils.getRandomColor()
 
-	drawRef.rectangle((0,0,(round(config.displayRows * config.windowWidth)), config.canvasHeight), fill = config.bgBackGroundColor)
+	drawRef.rectangle((0,0,int(round(config.displayRows * config.windowWidth)), config.canvasHeight), fill = config.bgBackGroundColor)
 
 	## Chevron pattern
 	## config.bgForeGroundColor
@@ -313,18 +309,6 @@ def makeBackGround(drawRef, n = 1):
 	rowMultiplier = 1
 	colMultiplier = 1
 
-	if (config.pattern == "bricks") :
-		rowMultiplier = 1
-		colMultiplier = 1
-
-	if (config.pattern == "regularLines") :
-		rowMultiplier = 2
-		colMultiplier = 1		
-
-	if (config.pattern == "pluses") :
-		rowMultiplier = 2
-		colMultiplier = 1
-
 	if (config.pattern == "diamonds") :
 		rowMultiplier = 2
 		colMultiplier = 2
@@ -337,8 +321,8 @@ def makeBackGround(drawRef, n = 1):
 	gDelta = colMultiplier * (config.patternEndColor[1] - config.patternColor[1]) / steps
 	bDelta = colMultiplier * (config.patternEndColor[2] - config.patternColor[2]) / steps
 	
+
 	for c in range (0, cols) : 
-		columnOffset = 0
 
 		rCol  = config.patternColor[0] + rDelta
 		gCol  = config.patternColor[1] + gDelta
@@ -349,23 +333,14 @@ def makeBackGround(drawRef, n = 1):
 		### so need to reverse the color gradient ....
 
 		fillClr = (
-			(round(config.patternEndColor[0] - rDelta * (c+1))),
-			(round(config.patternEndColor[1] - gDelta * (c+1))),
-			(round(config.patternEndColor[2] - bDelta * (c+1))),
+			int(round(config.patternEndColor[0] - rDelta * (c+1))),
+			int(round(config.patternEndColor[1] - gDelta * (c+1))),
+			int(round(config.patternEndColor[2] - bDelta * (c+1))),
 			200)
 
 		#print(c,fillClr)
 
 		for r in range (0, rows) : 
-			columnOffset = 0
-			if r == 0 or r == 2 or r == 4 or r == 6:
-				columnOffset = xDiv
-
-			
-			if r/2%2 == 0 :
-				columnOffset = xDiv
-
-
 			if(random.random() < config.patternDrawProb) :
 				if (config.pattern == "diamonds") :
 					poly = []
@@ -375,37 +350,8 @@ def makeBackGround(drawRef, n = 1):
 					poly.append((xStart + xDiv, yStart + yDiv + yDiv))
 					drawRef.polygon(poly, fill = fillClr) 
 					#if(n ==2) : color = (100,200,0,255)
-
-
-				if (config.pattern == "bricks") :
-					length = xDiv
-					xPos = xStart + columnOffset
-					yPos = yStart
-					drawRef.rectangle((xPos, yPos, xPos + length , yPos + yDiv), fill = fillClr, outline=None)
-
-
-				if (config.pattern == "pluses") :
-					length = xDiv
-					height = xDiv/2
-
-					xPos = xStart + columnOffset
-					yPos = yStart
-					
-					xPos2 = xPos + round(length/2 - height/2)
-					yPos2 = round(yPos - length/2 + height/2)
-
-					drawRef.rectangle((xPos, yPos, xPos + length , yPos + yDiv), fill = fillClr, outline=None)
-					drawRef.rectangle((xPos2, yPos2, xPos2 + height , yPos2 + length), fill = fillClr, outline=None)
-					
-
-				if (config.pattern == "regularLines") :
-					length = xDiv
-					xPos = xStart + columnOffset
-					yPos = yStart
-					drawRef.rectangle((xPos, yPos, xPos + length , yPos + yDiv), fill = fillClr, outline=None)
-
-
-				if (config.pattern == "lines")  :
+				else :
+					#if (r%2 > 0):
 					length = int(round(random.uniform(1,2 * xDiv)))
 					offset = int(round(random.uniform(0,4 * xDiv)))
 
@@ -414,9 +360,8 @@ def makeBackGround(drawRef, n = 1):
 					else:
 						drawRef.rectangle((xStart + offset, yStart, xStart + length + offset, yStart + yDiv), fill = fillClr, outline=None)
 			yStart += rowMultiplier * yDiv
-		xStart += xDiv * 2
+		xStart += colMultiplier * xDiv
 		yStart = 0
-
 
 	config.patternColor = config.patternEndColor
 

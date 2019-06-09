@@ -487,6 +487,7 @@ def configureBackgroundScrolling(config, workConfig):
 	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
+	
 	config.patternColor = (50,0,55,50)
 	config.patternEndColor = (255,0,255,50)	
 	

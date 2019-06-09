@@ -7,8 +7,6 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
 from modules import colorutils, coloroverlay
 
-
-
 from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
 from pieces.workmodules.particleobjects.particle import Particle
 

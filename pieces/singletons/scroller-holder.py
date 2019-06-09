@@ -288,7 +288,7 @@ def makeBackGround(drawRef, n = 1):
 	cols = config.patternCols * 1
 
 	xDiv = round((config.displayRows * config.windowWidth) / cols) #- config.patternColsOffset
-	yDiv = round((config.canvasHeight / rows) / config.displayRows) #- config.patternRowsOffset
+	yDiv = ((config.canvasHeight / rows) / config.displayRows) #- config.patternRowsOffset
 
 	#print(xDiv, yDiv)
 
@@ -361,12 +361,12 @@ def makeBackGround(drawRef, n = 1):
 			if r == 0 or r == 2 or r == 4 or r == 6:
 				columnOffset = xDiv
 
-			
 			if r/2%2 == 0 :
 				columnOffset = xDiv
 
 
 			if(random.random() < config.patternDrawProb) :
+
 				if (config.pattern == "diamonds") :
 					poly = []
 					poly.append((xStart, yStart + yDiv))
@@ -406,15 +406,20 @@ def makeBackGround(drawRef, n = 1):
 
 
 				if (config.pattern == "lines")  :
+					#if (r%2 > 0):
 					length = int(round(random.uniform(1,2 * xDiv)))
 					offset = int(round(random.uniform(0,4 * xDiv)))
 
 					if(random.random() < .5) :
 						drawRef.rectangle((xStart, yStart, xStart + 2 * xDiv , yStart + yDiv), fill = fillClr, outline=None)
 					else:
-						drawRef.rectangle((xStart + offset, yStart, xStart + length + offset, yStart + yDiv), fill = fillClr, outline=None)
+						drawRef.rectangle((xStart + offset, yStart, xStart + length + offset, yStart + yDiv), fill = fillClr, outline=None)			
+
 			yStart += rowMultiplier * yDiv
-		xStart += xDiv * 2
+		if config.pattern == "lines" :
+			xStart += colMultiplier * xDiv
+		else :
+			xStart += xDiv * 2
 		yStart = 0
 
 
@@ -638,16 +643,14 @@ def init() :
 	config.scrollArray = []
 
 	## Set up the scrolling layer
-	try:
-		config.useBackground = workConfig.getboolean("scroller", 'useBackground')
-		config.altDirectionScrolling = workConfig.getboolean("scroller", 'altDirectionScrolling')
-		config.alwaysRandomPatternColor = workConfig.getboolean("scroller", 'alwaysRandomPatternColor')
-		config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
-		if(config.useBackground == True) :
-			configureBackgroundScrolling()
-	except Exception as e:
-		print (str(e))
-		config.altDirectionScrolling = True
+	
+	config.useBackground = workConfig.getboolean("scroller", 'useBackground')
+	config.altDirectionScrolling = workConfig.getboolean("scroller", 'altDirectionScrolling')
+	config.alwaysRandomPatternColor = workConfig.getboolean("scroller", 'alwaysRandomPatternColor')
+	config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
+	if(config.useBackground == True) :
+		configureBackgroundScrolling()
+
 
 
 

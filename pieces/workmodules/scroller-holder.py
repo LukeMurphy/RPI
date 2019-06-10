@@ -487,7 +487,7 @@ def configureBackgroundScrolling(config, workConfig):
 	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
-	
+
 	config.patternColor = (50,0,55,50)
 	config.patternEndColor = (255,0,255,50)	
 	
@@ -677,6 +677,22 @@ def init(config, workConfig) :
 	if(config.useBackground == True) :
 		configureBackgroundScrolling(config, workConfig)
 
+	try:
+		config.minHue = float(workConfig.get("scroller", 'minHue')) 
+		config.maxHue = float(workConfig.get("scroller", 'minHue')) 
+		config.minSat = float(workConfig.get("scroller", 'minSat')) 
+		config.maxSat = float(workConfig.get("scroller", 'maxSat')) 
+		config.minVal = float(workConfig.get("scroller", 'minVal')) 
+		config.maxVal = float(workConfig.get("scroller", 'maxVal')) 
+
+	except Exception as e:
+		print (str(e))
+		config.minHue = 0
+		config.maxHue = 360
+		config.minSat = .1
+		config.maxSat = 1.0
+		config.minVal = .1
+		config.maxVal = .85
 
 
 	try:

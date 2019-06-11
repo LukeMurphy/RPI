@@ -31,26 +31,14 @@ actionDict1 = [
 	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 
-	{" " :''},
-	{"-------- RIGHT WALL -------------" :''},
-	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
-	{"* Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
-	{"------------------------------" :''},
-	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
-	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
-	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
-	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
-	{"------------------------------" :''},
-	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
-	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
-	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
-	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
-	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-
-	{" " :''},
+	#{" " :''},
 	#{"* P4 3x8 p4-3x8-informal - disturbed " :'p3-2x4/marquee2.cfg'},
 	
 	{" " :''},
+	{"-------- BUNDLE FLOOR  -------------" :''},
+	{"* P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
+	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
+	{"* P10 BUNDLE PILE - Tourmanline" :'p10/bundle-collage-tourmaline.cfg'},
 
 	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
 	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
@@ -60,7 +48,7 @@ actionDict1 = [
 	#{"------------------------------" :''},
 	#{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
 	#{" " :''},
-	{"------------------------------" :''},
+	#{"------------------------------" :''},
 	#{"* Short Tower: monument-to-the-glitch" :'p4-4x8-3x-short-tower/diagnostics.cfg'},
 	#{"Short Tower: clown" :'p4-4x8-3x-short-tower/quilt.cfg'},
 	#{"Short Tower: quilt" :'p4-4x8-3x-short-tower/quilt-log-cabin.cfg'},
@@ -77,14 +65,33 @@ actionDict1 = [
 	]
 
 actionDict2 = [
+
+
+	{" " :''},
+	{"-------- RIGHT WALL -------------" :''},
+	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
+	{"* Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
+	{"------------------------------" :''},
+	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
+	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
+	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
+	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
+	{"------------------------------" :''},
+	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
+	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
+	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
+	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
+	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+
+
 	{" " :''},
 	{"-------- TABLE -------------" :''},
 	{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
 	{"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
-	{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
-	{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
-	{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
-	{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
+	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
+	#{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
+	#{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
+	#{"X Pile Compositions" :'p4-2x4/compositions.cfg'},
 
 	#{"Wall Hanging: Fludd" :'p4-3x8-informal/fluddc.cfg'}, 
 	#{"* Wall Hanging 3x7: Fludd Factory" :'p4-3x7-informal/fluddc.cfg'},
@@ -136,11 +143,12 @@ actionDict2 = [
 
 
 	
+	
 	{" " :''},
-	{"--------- ROUND CORNER -----------" :''},
+	#{"--------- ROUND CORNER -----------" :''},
 	#{"Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
 	#{"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
-	{" " :''},
+	#{" " :''},
 	#{"Square - ICE" :'p4-4x8/square.cfg'},
 	#{"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
 	#{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
@@ -156,8 +164,8 @@ actionDict2 = [
 	#{"Square - RUG" :'p4-4x8/square-rug.cfg'},
 
 	
-	{" " :''},
-	{"---------- TEST WALL --------------" :''},
+	#{" " :''},
+	#{"---------- TEST WALL --------------" :''},
 	
 	#{"* P3 Wall w. removal: marquee2 - disturbed " :'p3-2x4/marquee2.cfg'},
 	#{"* P3 Wall w. removal: cubes - blur" :'p3-2x4/p3-2x6-squares.cfg'},
@@ -173,8 +181,8 @@ actionDict2 = [
 
 	#{" " :''},
 	#{"------------------------------" :''},
-	{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
-	{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
+	#{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
+	#{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 
 
 

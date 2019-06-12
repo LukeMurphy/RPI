@@ -27,7 +27,7 @@ actionDict1 = [
 	{"* P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
 	{"* P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
 	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
-	{"* P10 Branch - PATTERN" :'p10/pattern.cfg'},
+	#{"* P10 Branch - PATTERN" :'p10/pattern.cfg'},
 	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 

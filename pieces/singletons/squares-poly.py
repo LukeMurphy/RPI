@@ -4,8 +4,8 @@ import textwrap
 import math
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from modules import colorutils, badpixels, coloroverlay
-from modules.quilting.colorset import ColorSet
-from modules.quilting import createpolysquarepieces
+from pieces.workmodules.quilting.colorset import ColorSet
+from pieces.workmodules.quilting import createpolysquarepieces
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -37,6 +37,7 @@ def restartPiece():
 	config.t1  = time.time()
 	config.t2  = time.time()
 
+	'''
 
 	## The top / base diamond / square
 	c1Range = round(random.uniform(0,120))
@@ -57,6 +58,7 @@ def restartPiece():
 	config.c3SaturationRange = randomRange(.4,.999)
 	config.c3ValueRange = randomRange(.5,1)
 
+	'''
 
 	config.fillColorSet = []
 	config.fillColorSet.append (ColorSet(config.c1HueRange, config.c1SaturationRange, config.c1ValueRange))
@@ -97,7 +99,7 @@ def restartPiece():
 	# poly specific
 	if random.random() < config.resetSizeProbability  :
 		if config.randomness != 0:
-			config.randomness = random.uniform(config.minRandomness,3)
+			config.randomness = random.uniform(config.minRandomness,config.maxRandomness)
 
 		# initialize crossfade - in this case 100 steps ...
 		config.doingRefresh = 0
@@ -229,7 +231,9 @@ def main(run = True) :
 	config.fillColorSet.append (ColorSet(config.c2HueRange, config.c2SaturationRange, config.c2ValueRange))
 	config.fillColorSet.append (ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange))
 
-
+	config.randomness = 0
+	config.minRandomness = 0
+	config.maxRandomness = 0
 
 	try :
 		config.rotationRange = float(workConfig.get("quilt", 'rotationRange')) 
@@ -240,9 +244,14 @@ def main(run = True) :
 
 	try :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
+		try :
+			config.maxRandomness = int(workConfig.get("quilt", 'maxRandomness')) 
+		except Exception as e:
+			config.maxRandomness = config.randomness
+			print (e)
 	except Exception as e:
-		config.randomness = 0
 		print (e)
+
 
 	try :
 		config.minRandomness = int(workConfig.get("quilt", 'minRandomness')) 

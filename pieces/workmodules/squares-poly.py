@@ -98,7 +98,7 @@ def restartPiece(config):
 	# poly specific
 	if random.random() < config.resetSizeProbability  :
 		if config.randomness != 0:
-			config.randomness = random.uniform(config.minRandomness,3)
+			config.randomness = random.uniform(config.minRandomness,config.maxRandomness)
 
 		# initialize crossfade - in this case 100 steps ...
 		config.doingRefresh = 0
@@ -232,6 +232,10 @@ def main(config, workConfig, run = True) :
 
 
 
+	config.randomness = 0
+	config.minRandomness = 0
+	config.maxRandomness = 0
+
 	try :
 		config.rotationRange = float(workConfig.get("quilt", 'rotationRange')) 
 	except Exception as e:
@@ -241,9 +245,14 @@ def main(config, workConfig, run = True) :
 
 	try :
 		config.randomness = int(workConfig.get("quilt", 'randomness')) 
+		try :
+			config.maxRandomness = int(workConfig.get("quilt", 'maxRandomness')) 
+		except Exception as e:
+			config.maxRandomness = config.randomness
+			print (e)
 	except Exception as e:
-		config.randomness = 0
 		print (e)
+
 
 	try :
 		config.minRandomness = int(workConfig.get("quilt", 'minRandomness')) 

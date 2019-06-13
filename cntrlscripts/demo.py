@@ -20,14 +20,11 @@ actionDict1 = [
 	{" " :''},
 	{"-------- NORTH WALL  -------------" :''},
 	{"* P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
-	{"* P10 Branch - Algoflames" :'p10/algoflames-1.cfg'},
 	{"* P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
-	{"* P10 Branch - Quilt" :'p10/branch-quilt-1.cfg'},
 	{"* P10 Branch - Collage" :'p10/collage-1.cfg'},
 	{"* P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
 	{"* P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
 	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
-	#{"* P10 Branch - PATTERN" :'p10/pattern.cfg'},
 	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 

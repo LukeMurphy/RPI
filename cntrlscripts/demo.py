@@ -12,10 +12,10 @@ actionDict1 = [
 
 	{" " :''},
 	{"--------- FLOOR PILE -----------" :''},
-	{"* 3 PILE - compositions" :'p4-3x8-multi/leaninglights-3.cfg'},
-	{"* 3 PILE - flames" :'p4-3x8-multi/alt-flames-2b.cfg'},
-	{"* 3 PILE - leaning lights" :'p4-3x8-multi/leaninglights-2.cfg'},
-	{"* 3 PILE - leaning pattern" :'p4-3x8-multi/lines.cfg'},
+	{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
+	{"* 3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
+	{"* 3 PILE - leaning lights" :'p4-3x8-pile/leaninglights-2.cfg'},
+	{"* 3 PILE - leaning pattern" :'p4-3x8-pile/lines.cfg'},
 
 	{" " :''},
 	{"-------- NORTH WALL  -------------" :''},

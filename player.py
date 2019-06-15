@@ -9,6 +9,13 @@ from modules import configuration
 from modules.configuration import bcolors
 from modules import player
 import argparse
+import noise
+from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
+from PIL import ImageFilter
+from modules import colorutils, coloroverlay
+from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
+from pieces.workmodules.particleobjects.particle import Particle
+
 
 workconfig = configparser.ConfigParser()
 

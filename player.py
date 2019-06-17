@@ -13,8 +13,11 @@ import noise
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
 from PIL import ImageFilter
 from modules import colorutils, coloroverlay
+
 from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
 from pieces.workmodules.particleobjects.particle import Particle
+
+from configs import defaultpiece
 
 
 workconfig = configparser.ConfigParser()
@@ -29,7 +32,8 @@ python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
 parser = argparse.ArgumentParser(description='Process')
 parser.add_argument('-mname', type=str, default="local", help='machine name (optional)')
 parser.add_argument('-path', type=str, default="./", help='directory (optional)')
-parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
+#parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
+parser.add_argument('-cfg', type=str, required=False, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
 parser.add_argument('-brightnessOverride', type=int, help='brightness param to override the config value (optional)')
 args = parser.parse_args()
 
@@ -68,6 +72,12 @@ def loadFromArguments(reloading=False, config = None):
 			print(args)
 			'''
 			config = configuration.Config()
+			config.startTime = time.time()
+			config.currentTime = time.time()
+			config.reloadConfig = False
+			config.doingReload = False
+			config.checkForConfigChanges = False
+			config.brightnessOverride = None
 
 			# Load the default work
 
@@ -86,14 +96,8 @@ def loadFromArguments(reloading=False, config = None):
 
 				workconfig.read(argument)
 
-				config.startTime = time.time()
-				config.currentTime = time.time()
-				config.reloadConfig = False
-				config.doingReload = False
-				config.checkForConfigChanges = False
 				config.loadFromArguments = loadFromArguments
 				config.fileName = argument
-				config.brightnessOverride = None
 
 				# Optional 4th argument to override the brightness set in the
 				# config
@@ -108,13 +112,21 @@ def loadFromArguments(reloading=False, config = None):
 				print(bcolors.OKGREEN + "** " + str(argument) +  " --> LAST MODIFIED DELTA: " +  str(config.delta) + " **" + bcolors.ENDC)
 			else:
 				# Machine ID
-				config.MID = baseconfig.MID
+				config.MID = 'local'
 				# Default Work Instance ID
-				config.WRKINID = baseconfig.WRKINID
+				config.WRKINID = defaultpiece.defaultPieceToRun
 				# Default Local Path
-				config.path = baseconfig.path
-				print(bcolors.WARNING + "** Loading " + config.path + '/configs/pieces/' + config.WRKINID + ".cfg" + " to run. **" + bcolors.ENDC)
-				workconfig.read(config.path + '/configs/pieces/' + config.WRKINID + ".cfg")
+				config.path = '/Users/lamshell/Documents/Dev/RPI/'
+				print(bcolors.WARNING + "** Loading " + config.path + 'configs/' + config.WRKINID + ".cfg" + " to run. **" + bcolors.ENDC)
+				workconfig.read(config.path + 'configs/' + config.WRKINID + ".cfg")
+				print(bcolors.OKGREEN + "** ")
+				for c in workconfig :
+					print(c)
+					for a in workconfig[c]:
+						print("\t" + str(a) + ":  " + str(workconfig.get(c,a)))
+				print("**" + bcolors.ENDC)
+
+
 
 			player.configure(config, workconfig)
 

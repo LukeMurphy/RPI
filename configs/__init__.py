@@ -2,4 +2,4 @@
 from modules.dm import dM
 config =  dM('Config 1')
 '''
-print("-- workmodules (works) directory loaded ")
+print("\n-- config directory loaded ")

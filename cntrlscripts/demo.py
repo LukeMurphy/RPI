@@ -233,9 +233,9 @@ def stopAll():
 	os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
 
 root = tk.Tk()
-frame = tk.Frame(root)
-frame.pack(padx=10,pady=10)
-root.geometry('%dx%d+%d+%d' % (740, 690, 1000, 100))
+frame = tk.Frame(root, bg="blue")
+frame.pack(padx=1,pady=1)
+root.geometry('%dx%d+%d+%d' % (680, 650, 1000, 100))
 
 Lb1 = Listbox(frame, width = 26, height = 38) 
 Lb2 = Listbox(frame, width = 33, height = 38) 
@@ -247,21 +247,21 @@ for i, item in enumerate(actionDict1):
 for i, item in enumerate(actionDict2):
 	Lb2.insert(END, " " + list(item.keys())[0])
 
-Lb1.pack(side=tk.LEFT,padx=10,ipadx=10 )
+Lb1.pack(side=tk.LEFT,padx=0,ipadx=10 )
 Lb2.pack(side=tk.LEFT,ipadx=10,expand=0  )
 
 
 
-button = tk.Button(frame, text="QUIT", bg="black", fg="red", command=quit)
+button = tk.Button(frame, text="QUIT", bg="blue", fg="red", highlightbackground='blue',command=quit)
 button.pack(side=tk.BOTTOM, padx=2)
 
-slogan = tk.Button(frame,text="Run",fg="Red", command=action)
+slogan = tk.Button(frame,text="Run",bg="Red", highlightbackground='blue', command=action)
 slogan.pack(side=tk.BOTTOM,padx=2)
 
-slogan = tk.Button(frame,text="Stop All",fg="blue", command=stopAll)
+slogan = tk.Button(frame,text="Stop All",bg="blue", highlightbackground='blue', command=stopAll)
 slogan.pack(side=tk.BOTTOM,padx=2)
 
-slogan = tk.Button(frame,text="Stop & Run",fg="blue", command=action2)
+slogan = tk.Button(frame,text="Stop & Run", bg="blue", highlightbackground='blue', command=action2)
 slogan.pack(side=tk.BOTTOM,padx=2)
 
 

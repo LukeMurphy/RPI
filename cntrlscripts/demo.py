@@ -72,7 +72,7 @@ actionDict1 = [
 	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	{"------------------------------" :''},
 	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
-	{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
+	{"Square - mono-flavin" :'p4-3x8-informal/mono-flavin.cfg'},
 	]
 
 actionDict2 = [

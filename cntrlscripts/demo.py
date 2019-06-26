@@ -10,12 +10,8 @@ commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 
 actionDict1 = [
 
-	{" " :''},
-	{"--------- FLOOR PILE -----------" :''},
-	{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
-	{"* 3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
-	{"* 3 PILE - leaning lights" :'p4-3x8-pile/leaninglights-2.cfg'},
-	{"* 3 PILE - leaning pattern" :'p4-3x8-pile/lines.cfg'},
+	#{" " :''},
+
 
 	{" " :''},
 	{"-------- NORTH WALL  -------------" :''},
@@ -59,11 +55,6 @@ actionDict1 = [
 	#{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	#{" " :''},
 
-	]
-
-actionDict2 = [
-
-
 	{" " :''},
 	{"-------- RIGHT WALL -------------" :''},
 	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
@@ -79,6 +70,22 @@ actionDict2 = [
 	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
 	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
 	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{"------------------------------" :''},
+	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
+	{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
+	]
+
+actionDict2 = [
+
+
+
+
+	{" " :''},
+	{"--------- FLOOR PILE -----------" :''},
+	{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
+	{"* 3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
+	{"* 3 PILE - leaning lights" :'p4-3x8-pile/leaninglights-2.cfg'},
+	{"* 3 PILE - leaning pattern" :'p4-3x8-pile/lines.cfg'},
 
 
 	{" " :''},
@@ -100,7 +107,6 @@ actionDict2 = [
 	#{" " :''},
 	#{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	#{" " :''},
-	#{" " :''},
 
 
 
@@ -109,12 +115,12 @@ actionDict2 = [
 	#{"Aym Shift: Conveyor" :'p4-10x2-asymshift/screenmedium.cfg'},
 	#{"Aym Shift: Flow" :'p4-10x2-asymshift/flow.cfg'},
 	#{"Aym Shift: Repeater" :'p4-10x2-asymshift/repeater-cloud.cfg'},
-	{" " :''},
-	{"-------- LEFT WALL -------------" :''},
-	{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
-	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
-	{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
-	{"Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
+	#{" " :''},
+	#{"-------- LEFT WALL -------------" :''},
+	#{"* Wall Compositions" :'p4-5x8/compositions.cfg'},
+	#{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
+	#{"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
+	#{"Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
 	#{" " :''},
 
 

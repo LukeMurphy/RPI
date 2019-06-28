@@ -26,17 +26,7 @@ actionDict1 = [
 
 	#{" " :''},
 	#{"* P4 3x8 p4-3x8-informal - disturbed " :'p3-2x4/marquee2.cfg'},
-	
-	{" " :''},
-	{"-------- BUNDLE FLOOR  -------------" :''},
-	{"* P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
-	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
-	{"* P10 BUNDLE PILE - Tourmanline" :'p10/bundle-collage-tourmaline.cfg'},
 
-	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
-	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
-	#{"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
-	#{"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 	#{"------------------------------" :''},
 	#{"Pencil Tower: Sun Bolts" :'p10-twr4/6x4-sunbolts.cfg'},
@@ -86,6 +76,29 @@ actionDict2 = [
 	{"* 3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
 	{"* 3 PILE - leaning lights" :'p4-3x8-pile/leaninglights-2.cfg'},
 	{"* 3 PILE - leaning pattern" :'p4-3x8-pile/lines.cfg'},
+
+
+		{" " :''},
+	{"-------- PLANK AND DOOR  -------------" :''},
+	{"* P10 Plank-Door - AlgoFlames" :'p10/plank-algoflames-1b.cfg'},
+	{"* P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
+	{"* P10 Plank-Door - glitch" :'p10/plank-glitch.cfg'},
+	{"* P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},
+	{"* P10 BUNDLE PILE - Flow" :'p10/plank-scroller-flow.cfg'},
+
+
+	
+	{" " :''},
+	{"-------- BUNDLE FLOOR  -------------" :''},
+	{"* P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
+	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
+	{"* P10 BUNDLE PILE - Tourmaline" :'p10/bundle-collage-tourmaline.cfg'},
+
+	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
+	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
+	#{"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
+	#{"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+
 
 
 	{" " :''},

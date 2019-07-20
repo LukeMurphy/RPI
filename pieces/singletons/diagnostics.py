@@ -131,12 +131,13 @@ def showGrid():
 		for col in range (0, config.cols) :
 			xPos = col * config.tileSizeWidth 
 			yPos = row * config.tileSizeHeight
-			config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
-			
-			displyInfo  =  str(col) + ", " + str(row) + "\n"
-			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
-			displyInfo  =  "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
-			config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor2,font=config.font)
+
+			if config.rowsToShow == 0  or row in config.rowsToShow:
+				config.canvasDraw.rectangle((xPos,yPos,xPos + config.tileSizeWidth - 1, yPos +  config.tileSizeHeight -1), fill=config.bgColor, outline=config.outlineColor)
+				displyInfo  =  "x:" + str(col) + ", y:" + str(row) + "\n"
+				config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor,font=config.font)
+				displyInfo  =  "\n" + str(col * config.tileSizeWidth) + ", " + str(row * config.tileSizeHeight)
+				config.canvasDraw.text((xPos + 2,yPos - 1),displyInfo,config.fontColor2,font=config.font)
 
 	
 	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
@@ -211,6 +212,14 @@ def main(run = True) :
 	config.useLastOverlay = False
 
 	config.angle = 0
+
+
+	try:
+		config.rowsVals = ((workConfig.get("diag", 'rowsToShow')).split(','))
+		config.rowsToShow = tuple(map(lambda x: int(x) , config.rowsVals))
+	except Exception as e:
+		print (str(e))
+		config.rowsToShow = 0
 
 
 	

@@ -217,6 +217,8 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 			config.tempImage = ditherFilter(config.tempImage,xOffset, yOffset, config)
 			crop = config.tempImage.crop(config.remapImageBlockSection)
 			crop = crop.convert("RGBA")
+			if config.ditherFilterBrightness != 1.0 :
+				crop = ImageEnhance.Brightness(crop).enhance(config.ditherFilterBrightness)			
 			config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 		else:
 			config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)

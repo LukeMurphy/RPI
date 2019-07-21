@@ -288,6 +288,13 @@ def renderUsingLINSNHub(work):
 	work.config.canvasHeight = int(work.workConfig.get("displayconfig", 'canvasHeight'))
 
 	try :
+		work.config.ditherFilterBrightness = float(work.workConfig.get("displayconfig", 'ditherFilterBrightness')) 
+	except Exception as e: 
+		work.config.ditherFilterBrightness = 1.0
+		print (str(e))
+
+
+	try :
 		work.config.isRPI = (work.workConfig.getboolean("displayconfig", 'isRPI')) 
 	except Exception as e: 
 		work.config.usePixSort = False

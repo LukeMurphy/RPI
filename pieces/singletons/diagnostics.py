@@ -143,6 +143,8 @@ def showGrid():
 	config.image.paste(config.canvasImage, (config.imageXOffset, config.imageYOffset), config.canvasImage)
 
 	#config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
+
+	#config.image=config.image.rotate(-config.rotation)
 	
 	config.render(config.image, 0,0)
 

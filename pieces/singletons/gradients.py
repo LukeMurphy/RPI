@@ -13,39 +13,37 @@ def reDraw() :
 	drawBar()
 
 
-def drawBar() :
+def drawBar(width = 32, height = 32, c1 = (0,100,0,100), c2 =(100,0,0,100)) :
 	global config
+
+	gradientImage = Image.new("RGBA", (width, height))
+	gradientImageDraw  = ImageDraw.Draw(gradientImage)
 	
 	# draw box container
-	config.draw.rectangle((config.xPos-1, config.yPos-1, config.boxMax+1, config.boxHeight+config.yPos+1), outline=None, fill=(config.holderColor) )
+	gradientImageDraw.rectangle((0, 0, width, height), outline=None, fill=(config.holderColor) )
+
 	# draw bar
-	config.boxWidthDisplay = config.boxWidth
-
-	config.xPos1 = config.xPos
-	config.xPos2 = config.boxWidthDisplay+config.xPos
-	config.yPos1 = config.yPos
-	config.yPos2 = config.boxHeight+config.yPos
-	
-
-	vLines = round((config.canvasHeight)/config.steps)
-	arc = math.pi  / vLines
-	dR = ((config.barColorEnd[0] - config.barColorStart[0])/(vLines+1))
-	dG = ((config.barColorEnd[1] - config.barColorStart[1])/(vLines+1))
-	dB = ((config.barColorEnd[2] - config.barColorStart[2])/(vLines+1))
+	vLines = round((height)/config.steps) 
+	arc = (math.pi) / vLines 
+	dR = ((c2[0] - c1[0]))
+	dG = ((c2[1] - c1[1]))
+	dB = ((c2[2] - c1[2]))
+	dA = ((c2[3] - c1[3]))
 
 	for n in range (0, vLines) :
-		yPos = config.yPos1 + (n * config.steps)
-		yPos2 = yPos + ((n + 1) * config.steps)
-		xPos = config.xPos1
-		xPos2 = config.xPos2
-		b = math.sin(arc * n) * n
+		yPos = n * config.steps
+		yPos2 = (n + 1) * config.steps
+		xPos = 0
+		xPos2 = width
+		b = math.sin(arc * n) 
 		rVd = int(config.barColorStart[0] + (b * dR) )
 		gVd = int(config.barColorStart[1] + (b * dG) )
 		bVd = int(config.barColorStart[2] + (b * dB) )
-		barColorDisplay = (rVd, gVd, bVd)
+		bAd = int(config.barColorStart[3] + (b * dA) )
+		barColorDisplay = (rVd, gVd, bVd, bAd)
+		gradientImageDraw.rectangle((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
 
-		if n < 100 :
-			config.draw.rectangle((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
+	return gradientImage
 
 
 
@@ -58,7 +56,7 @@ def runWork():
 def iterate() :
 	global config
 	# Display bar, spinner, message or %
-	reDraw()
+	#reDraw()
 
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -92,8 +90,12 @@ def main(run = True) :
 	config.barColorStart = (0,0,100,100)
 	config.barColorEnd = (255,0,0,100)
 
+	c1 = config.barColorStart
+	c2 = config.barColorEnd
 
-
+	gradientImage = drawBar(100,200, c1,c2)
+	gradientImage = gradientImage.rotate(270, expand=1)
+	config.image.paste(gradientImage, (0,0), gradientImage)
 
 	if(run) : runWork()
 

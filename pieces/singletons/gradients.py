@@ -10,10 +10,26 @@ config.percentage will be the global config variable for display of progress
 
 '''
 def reDraw() :
-	drawBar()
+	for i in range(0,16):
+		for ii in range(0,6):
+			height = round(random.uniform(6,96))
+			width = 16
+			xPos = round(random.uniform(0,config.canvasWidth - width))
+			yPos = round(random.uniform(0,config.canvasWidth - 32))
+			yPos = i * 16
+			angle = random.uniform(0,360)
+			angle = 270
+			c1 = colorutils.randomColorAlpha(1,50,0)
+			c2 = colorutils.randomColorAlpha(1,255,255)
+			if random.random() < .1:
+				c1 = (0,0,0,55)
+
+			gradientImage = drawBar(width, height, c1,c2)
+			gradientImage = gradientImage.rotate(angle, expand=1)
+			config.image.paste(gradientImage, (xPos,yPos), gradientImage)
 
 
-def drawBar(width = 32, height = 32, c1 = (0,100,0,100), c2 =(100,0,0,100)) :
+def drawBar(width = 32, height = 32, c1 = (0,0,0,0), c2 =(0,0,0,0)) :
 	global config
 
 	gradientImage = Image.new("RGBA", (width, height))
@@ -36,10 +52,10 @@ def drawBar(width = 32, height = 32, c1 = (0,100,0,100), c2 =(100,0,0,100)) :
 		xPos = 0
 		xPos2 = width
 		b = math.sin(arc * n) 
-		rVd = int(config.barColorStart[0] + (b * dR) )
-		gVd = int(config.barColorStart[1] + (b * dG) )
-		bVd = int(config.barColorStart[2] + (b * dB) )
-		bAd = int(config.barColorStart[3] + (b * dA) )
+		rVd = int(c1[0] + (b * dR) )
+		gVd = int(c1[1] + (b * dG) )
+		bVd = int(c1[2] + (b * dB) )
+		bAd = int(c1[3] + (b * dA) )
 		barColorDisplay = (rVd, gVd, bVd, bAd)
 		gradientImageDraw.rectangle((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
 
@@ -56,7 +72,7 @@ def runWork():
 def iterate() :
 	global config
 	# Display bar, spinner, message or %
-	#reDraw()
+	reDraw()
 
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -90,12 +106,6 @@ def main(run = True) :
 	config.barColorStart = (0,0,100,255)
 	config.barColorEnd = (255,0,0,255)
 
-	c1 = config.barColorStart
-	c2 = config.barColorEnd
-
-	gradientImage = drawBar(100,200, c1,c2)
-	gradientImage = gradientImage.rotate(270, expand=1)
-	config.image.paste(gradientImage, (0,0), gradientImage)
 
 	if(run) : runWork()
 

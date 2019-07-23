@@ -6,6 +6,27 @@ from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 
 
+
+class Fader:
+
+	def __init__(self):
+		self.doingRefresh =  0
+		self.doingRefreshCount = 50
+		self.fadingDone = False
+
+
+	def fadeIn(self, config) :
+		if self.fadingDone == False :
+			if self.doingRefresh < self.doingRefreshCount :	
+				self.blankImage = Image.new("RGBA", (self.width, self.height))		
+				self.crossFade = Image.blend(self.blankImage, self.image, self.doingRefresh/self.doingRefreshCount)
+				config.image.paste(self.crossFade, (self.xPos,self.yPos), self.crossFade)
+				self.doingRefresh += 1
+			else :
+				config.image.paste(self.image, (self.xPos,self.yPos), self.image)
+				self.fadingDone = True
+
+
 def transformImage(img) :
 	width, height = img.size
 	new_width = 50
@@ -70,7 +91,18 @@ def reDraw(rows=16, rowHeight = 16, angle = 90, prob=.08, blackProb = .5, height
 
 				#gradientImage = transformImage(gradientImage)
 
-				config.image.paste(gradientImage, (xPos,yPos), gradientImage)
+				fadeIn = Fader()
+				#fadeIn.blankImage = Image.new("RGBA", (height, width))
+				fadeIn.crossFade = Image.new("RGBA", (height, width))
+				fadeIn.image = gradientImage
+				fadeIn.xPos = xPos
+				fadeIn.yPos = yPos
+				fadeIn.height = width
+				fadeIn.width = height
+
+				config.fadeArray.append(fadeIn)
+
+				#config.image.paste(gradientImage, (xPos,yPos), gradientImage)
 
 
 def runWork():
@@ -83,6 +115,9 @@ def iterate() :
 	global config
 	# Display bar, spinner, message or %
 	reDraw(config.rowsShown, config.rowHeight, config.angle, config.probDraw, config.blackProb, (config.heightMin, config.heightMax))
+
+	for i in config.fadeArray :
+		i.fadeIn(config)
 
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -126,6 +161,9 @@ def main(run = True) :
 	config.gradientLevel = 2
 	config.barColorStart = (0,0,100,255)
 	config.barColorEnd = (255,0,0,255)
+
+
+	config.fadeArray = []
 
 
 	if(run) : runWork()

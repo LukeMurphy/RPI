@@ -5,28 +5,13 @@ import threading
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance
 from modules import colorutils
 
-'''
-config.percentage will be the global config variable for display of progress
 
-'''
-def reDraw() :
-	for i in range(0,16):
-		for ii in range(0,6):
-			height = round(random.uniform(6,96))
-			width = 16
-			xPos = round(random.uniform(0,config.canvasWidth - width))
-			yPos = round(random.uniform(0,config.canvasWidth - 32))
-			yPos = i * 16
-			angle = random.uniform(0,360)
-			angle = 270
-			c1 = colorutils.randomColorAlpha(1,50,0)
-			c2 = colorutils.randomColorAlpha(1,255,255)
-			if random.random() < .1:
-				c1 = (0,0,0,55)
-
-			gradientImage = drawBar(width, height, c1,c2)
-			gradientImage = gradientImage.rotate(angle, expand=1)
-			config.image.paste(gradientImage, (xPos,yPos), gradientImage)
+def transformImage(img) :
+	width, height = img.size
+	new_width = 50
+	m = .0
+	img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
+	return img
 
 
 def drawBar(width = 32, height = 32, c1 = (0,0,0,0), c2 =(0,0,0,0)) :
@@ -62,6 +47,31 @@ def drawBar(width = 32, height = 32, c1 = (0,0,0,0), c2 =(0,0,0,0)) :
 	return gradientImage
 
 
+def reDraw(rows=16, rowHeight = 16, angle = 90, prob=.08, blackProb = .5, heightRange = (6,96)) :
+	for i in range(0,rows):
+		for ii in range(0,1):
+			if random.random() < prob:
+				height = round(random.uniform(heightRange[0],heightRange[1]))
+				width = rowHeight
+				xPos = round(random.uniform(0,config.canvasWidth - width))
+				xPos = round(random.uniform(-32 ,config.canvasWidth))
+				yPos = round(random.uniform(0,config.canvasWidth - 32))
+				yPos = i * rowHeight
+				#angle = random.uniform(0,360)
+				#
+				c1 = colorutils.randomColorAlpha(config.brightness, config.alpha1, config.alpha1)
+				c2 = colorutils.randomColorAlpha(config.brightness, config.alpha2, config.alpha2)
+				if random.random() < blackProb:
+					c1 = (0,0,0,55)
+					c2 = (0,0,0,255)
+
+				gradientImage = drawBar(width, height, c1, c2)
+				gradientImage = gradientImage.rotate(angle, expand=1)
+
+				#gradientImage = transformImage(gradientImage)
+
+				config.image.paste(gradientImage, (xPos,yPos), gradientImage)
+
 
 def runWork():
 	global config
@@ -72,7 +82,7 @@ def runWork():
 def iterate() :
 	global config
 	# Display bar, spinner, message or %
-	reDraw()
+	reDraw(config.rowsShown, config.rowHeight, config.angle, config.probDraw, config.blackProb, (config.heightMin, config.heightMax))
 
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -90,6 +100,17 @@ def main(run = True) :
 	config.vOffset = int(workConfig.get("gradients", 'vOffset'))
 	config.steps = int(workConfig.get("gradients", 'steps'))
 	config.redrawRate = float(workConfig.get("gradients", 'redrawRate'))
+	config.alpha1 = float(workConfig.get("gradients", 'alpha1'))
+	config.alpha2 = float(workConfig.get("gradients", 'alpha2'))
+
+	config.rowsShown = int(workConfig.get("gradients", 'rowsShown'))
+	config.rowHeight = int(workConfig.get("gradients", 'rowHeight'))
+	config.angle = float(workConfig.get("gradients", 'angle'))
+	config.probDraw = float(workConfig.get("gradients", 'probDraw'))
+	config.blackProb = float(workConfig.get("gradients", 'blackProb'))
+	config.heightMin = int(workConfig.get("gradients", 'heightMin'))
+	config.heightMax = int(workConfig.get("gradients", 'heightMax'))
+
 
 
 	config.useVerticalColorGradient = (workConfig.getboolean("gradients", 'useVerticalColorGradient'))

@@ -87,8 +87,8 @@ def main(run = True) :
 	config.holderColor = (0,100,0,100)
 	config.boxWidth = 200
 	config.gradientLevel = 2
-	config.barColorStart = (0,0,100,100)
-	config.barColorEnd = (255,0,0,100)
+	config.barColorStart = (0,0,100,255)
+	config.barColorEnd = (255,0,0,255)
 
 	c1 = config.barColorStart
 	c2 = config.barColorEnd

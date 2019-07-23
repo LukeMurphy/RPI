@@ -97,8 +97,8 @@ def reDraw(rows=16, rowHeight = 16, angle = 90, prob=.08, blackProb = .5, height
 				fadeIn.image = gradientImage
 				fadeIn.xPos = xPos
 				fadeIn.yPos = yPos
-				fadeIn.height = width
-				fadeIn.width = height
+				fadeIn.height = gradientImage.height
+				fadeIn.width = gradientImage.width
 
 				config.fadeArray.append(fadeIn)
 

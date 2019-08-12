@@ -122,10 +122,18 @@ def iterate() :
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
+	## Vary the rate of change sometimes after initial startup has filled the frame
+	if random.random() < config.probDrawChange :
+		config.probDraw = random.uniform(.001,.05)
+		config.probDrawChange = .001
+		#print(config.probDraw)
+
 
 
 def main(run = True) :
 	global config
+
+	config.probDrawChange = .01
 
 	config.debug = (workConfig.getboolean("gradients", 'debug'))
 

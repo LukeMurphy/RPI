@@ -83,6 +83,7 @@ actionDict2 = [
 	{"-------- PLANK AND DOOR  -------------" :''},
 	{"* P10 Plank-Door - AlgoFlames" :'p10/plank-algoflames-1b.cfg'},
 	{"* P10 Plank-Door - movement" :'p10/plank-movement-2.cfg'},
+	{"* P10 Plank-Door - gradients" :'p10/gradients.cfg'},
 	{"* P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
 	{"* P10 Plank-Door - glitch" :'p10/plank-glitch.cfg'},
 	{"* P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},

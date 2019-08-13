@@ -73,6 +73,13 @@ def main(run = True) :
 
 	ps.objType = (workConfig.get("particleSystem", 'objType'))
 
+	if ps.objType == "image" :
+		ps.objImage = (workConfig.get("particleSystem", 'objImage'))
+		arg = config.path + "assets/" + ps.objImage
+		ps.loadedImage = Image.open(arg , "r")
+		ps.loadedImage.load()
+		ps.loadedImageCopy  = ps.loadedImage.copy()
+
 	try :
 		config.delay = float(workConfig.get("particleSystem", 'delay'))
 	except Exception as e: 

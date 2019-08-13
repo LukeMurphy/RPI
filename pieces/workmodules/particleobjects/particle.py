@@ -329,6 +329,9 @@ class Particle(object):
 			elif self.ps.objType == "ellipse":
 				self.drawOval()
 
+			elif self.ps.objType == "image":
+				self.drawImage()
+
 			else:
 				self.drawRectangle()
 
@@ -376,6 +379,11 @@ class Particle(object):
 		self.draw.polygon( poly2, fill = self.fillColor, outline=None)
 		
 		#self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
+
+	
+	def drawImage(self):
+		img = self.ps.loadedImageCopy.resize((round(self.objWidth) ,round(self.objHeight)))
+		self.image.paste(img, (0,0), img)
 	
 
 	def drawOval(self):
@@ -383,6 +391,7 @@ class Particle(object):
 		#	fill=self.fillColor, outline=self.outlineColor)		
 		box = [(0,0),(self.objWidth/2 + 1, self.objHeight/2 + 1)]
 		self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
+	
 	
 	def drawRectangle(self):
 		self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), 

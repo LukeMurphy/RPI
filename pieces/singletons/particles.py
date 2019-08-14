@@ -75,6 +75,10 @@ def main(run = True) :
 
 	if ps.objType == "image" :
 		ps.objImage = (workConfig.get("particleSystem", 'objImage'))
+		ps.objImageColorize = (workConfig.getboolean("particleSystem", 'objImageColorize'))
+		ps.objImageFlipRate = float(workConfig.get("particleSystem", 'objImageFlipRate'))
+		ps.objImageRotateRate = float(workConfig.get("particleSystem", 'objImageRotateRate'))
+		ps.objImageAlphaBlend = float(workConfig.get("particleSystem", 'objImageAlphaBlend'))
 		arg = config.path + "assets/" + ps.objImage
 		ps.loadedImage = Image.open(arg , "r")
 		ps.loadedImage.load()

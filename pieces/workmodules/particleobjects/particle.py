@@ -3,8 +3,7 @@ import random
 import textwrap
 import math
 import datetime
-from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from PIL import ImageFilter
+from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops, ImageFilter
 import noise
 from noise import *
 
@@ -95,6 +94,32 @@ class Particle(object):
 		self.remove = False
 
 		self.greyCount = 0
+
+		if self.ps.objType == "image" :
+			if self.ps.objImageColorize == True:
+				overlayImage = Image.new("RGBA", (self.ps.loadedImageCopy.width , self.ps.loadedImageCopy.height))
+				overlayImageDraw = ImageDraw.Draw(overlayImage)
+				overlayImageDraw.rectangle((0,0,self.ps.loadedImageCopy.width , self.ps.loadedImageCopy.height), fill=colorutils.randomColorAlpha(self.ps.config.brightness))
+				
+				'''
+				This variant is interesting - puts a few rectangles with faded thumbsup image and more grayscale - slightly less pretty
+
+				self.baseImage = Image.blend(self.ps.loadedImageCopy.convert("RGBA"), overlayImage, alpha = random.random())
+
+				an alpha value of .25 makes for a more early italian renaissance kind of look
+				'''
+				self.baseImage = Image.blend(self.ps.loadedImageCopy, overlayImage, alpha = self.ps.objImageAlphaBlend)
+			else :
+				self.baseImage = self.ps.loadedImageCopy.copy()
+
+			if random.random() < self.ps.objImageFlipRate :
+				self.baseImage = self.baseImage.transpose(Image.FLIP_LEFT_RIGHT)
+
+			if random.random() < self.ps.objImageRotateRate :
+				self.baseImage = self.baseImage.rotate(180)
+
+
+
 
 		self.createParticleImage()
 
@@ -382,7 +407,7 @@ class Particle(object):
 
 	
 	def drawImage(self):
-		img = self.ps.loadedImageCopy.resize((round(self.objWidth) ,round(self.objHeight)))
+		img = self.baseImage.resize((round(self.objWidth) ,round(self.objHeight)))
 		self.image.paste(img, (0,0), img)
 	
 

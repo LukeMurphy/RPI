@@ -294,8 +294,8 @@ def renderUsingLINSNHub(work):
 		print (str(e))
 
 	try :
-		work.config.ditherBlurRadius = float(work.workConfig.get("displayconfig", 'ditherBlurRadius')) 
-		work.config.ditherUnsharpMaskPercent = float(work.workConfig.get("displayconfig", 'ditherUnsharpMaskPercent')) 
+		work.config.ditherBlurRadius = int(work.workConfig.get("displayconfig", 'ditherBlurRadius')) 
+		work.config.ditherUnsharpMaskPercent = int(work.workConfig.get("displayconfig", 'ditherUnsharpMaskPercent')) 
 	except Exception as e: 
 		work.config.ditherBlurRadius  = 0
 		work.config.ditherUnsharpMaskPercent = 30

@@ -50,7 +50,11 @@ def drawBar(width = 32, height = 32, c1 = (0,0,0,0), c2 =(0,0,0,0)) :
 	dR = ((c2[0] - c1[0]))
 	dG = ((c2[1] - c1[1]))
 	dB = ((c2[2] - c1[2]))
-	dA = ((c2[3] - c1[3]))
+
+	if len(c1) == 3 :
+		dA = 0
+	else :
+		dA = ((c2[3] - c1[3]))
 
 	for n in range (0, vLines) :
 		yPos = n * config.steps
@@ -61,7 +65,11 @@ def drawBar(width = 32, height = 32, c1 = (0,0,0,0), c2 =(0,0,0,0)) :
 		rVd = int(c1[0] + (b * dR) )
 		gVd = int(c1[1] + (b * dG) )
 		bVd = int(c1[2] + (b * dB) )
-		bAd = int(c1[3] + (b * dA) )
+
+		if len(c1) == 4 :
+			bAd = int(c1[3] + (b * dA) )
+		else :
+			bAd = 255
 		barColorDisplay = (rVd, gVd, bVd, bAd)
 		gradientImageDraw.rectangle((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
 
@@ -80,8 +88,18 @@ def reDraw(rows=16, rowHeight = 16, angle = 90, prob=.08, blackProb = .5, height
 				yPos = i * rowHeight
 				#angle = random.uniform(0,360)
 				#
-				c1 = colorutils.randomColorAlpha(config.brightness, config.alpha1, config.alpha1)
-				c2 = colorutils.randomColorAlpha(config.brightness, config.alpha2, config.alpha2)
+
+				if config.colorChoice == "rgbAlpha" :
+					c1 = colorutils.randomColorAlpha(config.brightness, config.alpha1, config.alpha1)
+					c2 = colorutils.randomColorAlpha(config.brightness, config.alpha2, config.alpha2)
+				elif config.colorChoice == "rgb":
+					c1 = colorutils.getRandomRGB(config.brightness)
+					c2 = colorutils.getRandomRGB(config.brightness)				
+				else:
+					c1 = colorutils.getRandomColorWheel(config.brightness)
+					c2 = colorutils.getRandomColorWheel(config.brightness)
+
+
 				if random.random() < blackProb:
 					c1 = (0,0,0,55)
 					c2 = (0,0,0,255)
@@ -133,7 +151,6 @@ def iterate() :
 def main(run = True) :
 	global config
 
-	config.probDrawChange = .01
 
 	config.debug = (workConfig.getboolean("gradients", 'debug'))
 
@@ -153,11 +170,10 @@ def main(run = True) :
 	config.blackProb = float(workConfig.get("gradients", 'blackProb'))
 	config.heightMin = int(workConfig.get("gradients", 'heightMin'))
 	config.heightMax = int(workConfig.get("gradients", 'heightMax'))
+	config.colorChoice = (workConfig.get("gradients", 'colorChoice'))
 
+	config.probDrawChange = float(workConfig.get("gradients", 'probDrawChange'))
 
-
-	config.useVerticalColorGradient = (workConfig.getboolean("gradients", 'useVerticalColorGradient'))
-	config.useHorizontalColorGradient = (workConfig.getboolean("gradients", 'useHorizontalColorGradient'))
 	config.boxMax = config.screenWidth - 2
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10,30) * config.screenWidth)
 	config.boxHeight = config.screenHeight - 3

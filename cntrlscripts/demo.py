@@ -15,10 +15,11 @@ actionDict1 = [
 
 	{" " :''},
 	{"-------- NORTH WALL  -------------" :''},
-	{"* P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
-	{"* P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
-	{"* P10 Branch - Collage" :'p10/collage-1.cfg'},
+	{"P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
+	{"P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
+	{"P10 Branch - Collage" :'p10/collage-1.cfg'},
 	{"* P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
+	{"* P10 Branch - Collage branch 2" :'p10/collage-lines-1a.cfg'},
 	{"* P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
 	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
 	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
@@ -67,9 +68,6 @@ actionDict1 = [
 
 actionDict2 = [
 
-
-
-
 	{" " :''},
 	{"--------- FLOOR PILE -----------" :''},
 	{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
@@ -81,12 +79,13 @@ actionDict2 = [
 
 	{" " :''},
 	{"-------- PLANK AND DOOR  -------------" :''},
-	{"* P10 Plank-Door - AlgoFlames" :'p10/plank-algoflames-1b.cfg'},
-	{"* P10 Plank-Door - movement" :'p10/plank-movement-2.cfg'},
+	{"P10 Plank-Door - AlgoFlames" :'p10/plank-algoflames-1b.cfg'},
+	{"P10 Plank-Door - movement" :'p10/plank-movement-2.cfg'},
 	{"* P10 Plank-Door - gradients" :'p10/gradients.cfg'},
 	{"* P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
 	{"* P10 Plank-Door - glitch" :'p10/plank-glitch.cfg'},
 	{"* P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},
+	{"* P10 Plank-Door - Gradients" :'p10/gradients.cfg'},
 	{"* P10 BUNDLE PILE - Flow" :'p10/plank-scroller-flow.cfg'},
 
 

@@ -248,6 +248,17 @@ class WorkObject:
 		self.config.canvasWidth = int(self.workConfig.get("displayconfig", 'canvasWidth'))
 		self.config.canvasHeight = int(self.workConfig.get("displayconfig", 'canvasHeight'))
 
+		try :
+			self.config.ditherBlurRadius = int(self.workConfig.get("displayconfig", 'ditherBlurRadius')) 
+			self.config.ditherUnsharpMaskPercent = int(self.workConfig.get("displayconfig", 'ditherUnsharpMaskPercent')) 
+		except Exception as e: 
+			self.config.ditherBlurRadius  = 0
+			self.config.ditherUnsharpMaskPercent = 30
+			print (str(e))
+
+
+		print(self.config.ditherUnsharpMaskPercent)
+
 
 		# Create the image-canvas for the work
 		# Because rotation is an option, recreate accordingly

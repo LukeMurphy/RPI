@@ -293,6 +293,17 @@ def renderUsingLINSNHub(work):
 		work.config.ditherFilterBrightness = 1.0
 		print (str(e))
 
+	try :
+		work.config.ditherBlurRadius = float(work.workConfig.get("displayconfig", 'ditherBlurRadius')) 
+		work.config.ditherUnsharpMaskPercent = float(work.workConfig.get("displayconfig", 'ditherUnsharpMaskPercent')) 
+	except Exception as e: 
+		work.config.ditherBlurRadius  = 0
+		work.config.ditherUnsharpMaskPercent = 30
+		print (str(e))
+
+
+
+
 
 	try :
 		work.config.isRPI = (work.workConfig.getboolean("displayconfig", 'isRPI')) 

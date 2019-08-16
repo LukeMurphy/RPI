@@ -51,8 +51,17 @@ def ditherGlitch(renderImageFull,xOffset, yOffset, config):
 	if(lev <= 20) : 
 		levdiff = 1
 
-	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.blurRadius))
-	im2 = im1.filter(ImageFilter.UnsharpMask(radius=lev, percent=config.unsharpMaskPercent,threshold=2))
+	try :
+		ditherBlurRadius = config.ditherBlurRadius
+		ditherUnsharpMaskPercent = config.ditherUnsharpMaskPercent
+	except Exception as e:
+		ditherBlurRadius = 0
+		ditherUnsharpMaskPercent = 30
+		#print (str(e))
+
+
+	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=ditherBlurRadius))
+	im2 = im1.filter(ImageFilter.UnsharpMask(radius=lev, percent=ditherUnsharpMaskPercent,threshold=2))
 
 	'''#######################    Paste to Render       #######################'''
 

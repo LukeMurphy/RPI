@@ -280,10 +280,10 @@ root = tk.Tk()
 frame = tk.Frame(root, bg="blue")
 frame.pack(padx=1,pady=1)
 # width x height x X x Y
-root.geometry('%dx%d+%d+%d' % (680, 720, 100, 100))
+root.geometry('%dx%d+%d+%d' % (680, 740, 100, 100))
 
-Lb1 = Listbox(frame, width = 26, height = 46) 
-Lb2 = Listbox(frame, width = 33, height = 46) 
+Lb1 = Listbox(frame, width = 26, height = 48) 
+Lb2 = Listbox(frame, width = 33, height = 48) 
 
 for i, item in enumerate(actionDict1):
 	Lb1.insert(END, " " + list(item.keys())[0])

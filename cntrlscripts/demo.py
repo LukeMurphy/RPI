@@ -5,6 +5,7 @@ import subprocess
 from tkinter import *
 
 commadStringPyth = 'python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg '
+commadStringMultiPyth = 'python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg '
 commadStringProc = '/Users/lamshell/Documents/Dev/RPI/altproduction/'
 
 
@@ -47,14 +48,33 @@ actionDict1 = [
 	#{" " :''},
 
 	{" " :''},
+	{"---------- FLOOR - FIREPLCE ----------" :''},
+	{"* pile: Algoflames2.2" :'p4-6x8/algofall-2.2.cfg'},
+	{"pile: Algoflames2.1" :'p4-6x8/algofall-2.1.cfg'},
+	{"pile: Algoflames2.14" :'p4-6x8/algofall-2.14.cfg'},
+	{"pile: Algoflames-6" :'p4-6x8/algofall6.cfg'},
+	{"pile: Algoflames-6a" :'p4-6x8/algofall6a.cfg'},
+	{"pile: image-particles" :'p4-6x8/image-particles.cfg'},
+
+	#{" " :''},
+
+
+	{" " :''},
 	{"-------- RIGHT WALL -------------" :''},
 	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
 	{"* Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
+	{"* Wall Hanging: compositions a" :'p4-3x8-informal/compositions.cfg'}, 
+	{"* Wall Hanging: compositions b" :'p4-3x8-informal/compositions.cfg'}, 
 	{"------------------------------" :''},
 	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
 	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
 	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
 	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
+	{"Wall Hanging: THRow Multi" :'multi/throw-quilt.cfg'}, 
+	{"------------------------------" :''},
+	{"Wall Hanging: Gradients" :'p4-3x8-informal/gradients.cfg'}, 
+	{"Wall Hanging: TWO FLOW" :'multi/manifest-3x8-informal.cfg'}, 
+
 	{"------------------------------" :''},
 	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
 	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
@@ -224,7 +244,10 @@ def verify():
 
 def execute(configToRun) :
 	if ".cfg" in configToRun :
-		os.system(commadStringPyth + configToRun + '&')
+		if "multi" in configToRun:
+			os.system(commadStringMultiPyth + configToRun + '&')
+		else:
+			os.system(commadStringPyth + configToRun + '&')
 	elif ".app" in configToRun :
 		os.system('open ' + commadStringProc + configToRun)
 	
@@ -256,10 +279,11 @@ def stopAll():
 root = tk.Tk()
 frame = tk.Frame(root, bg="blue")
 frame.pack(padx=1,pady=1)
-root.geometry('%dx%d+%d+%d' % (680, 650, 1000, 100))
+# width x height x X x Y
+root.geometry('%dx%d+%d+%d' % (680, 720, 100, 100))
 
-Lb1 = Listbox(frame, width = 26, height = 38) 
-Lb2 = Listbox(frame, width = 33, height = 38) 
+Lb1 = Listbox(frame, width = 26, height = 46) 
+Lb2 = Listbox(frame, width = 33, height = 46) 
 
 for i, item in enumerate(actionDict1):
 	Lb1.insert(END, " " + list(item.keys())[0])

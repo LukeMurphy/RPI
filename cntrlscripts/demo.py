@@ -105,7 +105,6 @@ actionDict2 = [
 	{"* P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
 	{"* P10 Plank-Door - glitch" :'p10/plank-glitch.cfg'},
 	{"* P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},
-	{"* P10 Plank-Door - Gradients" :'p10/gradients.cfg'},
 	{"* P10 BUNDLE PILE - Flow" :'p10/plank-scroller-flow.cfg'},
 
 
@@ -113,6 +112,8 @@ actionDict2 = [
 	{" " :''},
 	{"-------- BUNDLE FLOOR  -------------" :''},
 	{"* P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
+	{"* P10 BUNDLE PILE - AlgoFlames b" :'p10/bundle-algoflames-2.cfg'},
+	{"* P10 BUNDLE PILE - AlgoFlames c" :'p10/bundle-algofall-2.14.cfg'},
 	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
 	{"* P10 BUNDLE PILE - Tourmaline" :'p10/bundle-collage-tourmaline.cfg'},
 

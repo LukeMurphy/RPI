@@ -89,12 +89,21 @@ actionDict1 = [
 actionDict2 = [
 
 	{" " :''},
-	{"--------- FLOOR PILE -----------" :''},
-	{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
-	{"3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
-	{"3 PILE - leaning lights" :'p4-3x8-pile/leaninglights-2.cfg'},
-	{"3 PILE - leaning pattern" :'p4-3x8-pile/lines.cfg'},
-	{"3 PILE - movement" :'p4-3x8-pile/square-ice-2.cfg'},
+	#{"--------- FLOOR PILE -----------" :''},
+	#{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
+	#{"3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
+
+	
+	{" " :''},
+	{"-------- BUNDLE FLOOR  -------------" :''},
+	{"P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
+	{"P10 BUNDLE PILE - AlgoFlames b" :'p10/bundle-algoflames-2.cfg'},
+	{"* P10 BUNDLE PILE - AlgoFlames c" :'p10/bundle-algofall-2.14.cfg'},
+	#{"3 PILE - movement" :'p4-3x8-pile/square-ice-2.cfg'},
+	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
+	{"P10 BUNDLE PILE - Tourmaline" :'p10/bundle-collage-tourmaline.cfg'},
+	{"P10 BUNDLE PILE - leaning lights" :'p10/bundle-leaninglights-2.cfg'},
+	{"P10 BUNDLE PILE - leaning pattern" :'p10/bundle-lines-2.cfg'},
 
 
 	{" " :''},
@@ -107,15 +116,6 @@ actionDict2 = [
 	{"* P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},
 	{"* P10 BUNDLE PILE - Flow" :'p10/plank-scroller-flow.cfg'},
 
-
-	
-	{" " :''},
-	{"-------- BUNDLE FLOOR  -------------" :''},
-	{"* P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
-	{"* P10 BUNDLE PILE - AlgoFlames b" :'p10/bundle-algoflames-2.cfg'},
-	{"* P10 BUNDLE PILE - AlgoFlames c" :'p10/bundle-algofall-2.14.cfg'},
-	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
-	{"* P10 BUNDLE PILE - Tourmaline" :'p10/bundle-collage-tourmaline.cfg'},
 
 	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
 	#{"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},

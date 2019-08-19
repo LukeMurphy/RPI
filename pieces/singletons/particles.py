@@ -190,6 +190,8 @@ def main(run = True) :
 
 	try :
 		config.pixelSortProbChange = float(workConfig.get("displayconfig", 'pixelSortProbChange'))
+		config.pixelSortProbChangeMin = float(workConfig.get("displayconfig", 'pixelSortProbChangeMin'))
+		config.pixelSortProbChangeMax = float(workConfig.get("displayconfig", 'pixelSortProbChangeMax'))
 	except Exception as e: 
 		print (str(e)) 
 		config.pixelSortProbChange = 0
@@ -498,7 +500,7 @@ def iterate() :
 
 	if config.pixelSortProbChange != 0 :
 		if random.random() < config.pixelSortProbChange :
-			config.pixSortprobDraw = random.random()
+			config.pixSortprobDraw = random.uniform(config.pixelSortProbChangeMin, config.pixelSortProbChangeMax)
 
 
 	if config.torqueRate != 0 :

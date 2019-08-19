@@ -49,6 +49,7 @@ actionDict1 = [
 
 	{" " :''},
 	{"---------- FLOOR - FIREPLCE ----------" :''},
+	{"* pile: Algoflames2.3" :'p4-6x8/algofall-2.3.cfg'},
 	{"* pile: Algoflames2.2" :'p4-6x8/algofall-2.2.cfg'},
 	{"pile: Algoflames2.1" :'p4-6x8/algofall-2.1.cfg'},
 	{"pile: Algoflames2.14" :'p4-6x8/algofall-2.14.cfg'},

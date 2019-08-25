@@ -13,8 +13,8 @@ class Unit:
 	points = []
 	yVarMin = 1
 	yVarMax = 10
-	objWidth = 10
-	objHeight = 10
+	objWidth =120
+	objHeight = 120
 	expRate = 1
 	x0 = 0
 	y0 = 0
@@ -26,7 +26,7 @@ class Unit:
 
 	alphaInit = 0
 
-	numLines = 60
+	numLines = 10
 	angleSpeed = 0
 	angle = 0
 
@@ -164,10 +164,10 @@ def main(run = True) :
 		
 
 		obj.numLines = 12
-		obj.x0 = 20
-		obj.y0 = 40
-		obj.expRate = 3
-		obj.linesPerBand = 4
+		obj.x0 = 100
+		obj.y0 = 100
+		obj.expRate = 4
+		obj.linesPerBand = 2
 		obj.angleRate = 20
 		obj.setUp()
 		config.unitArray.append(obj)

@@ -628,7 +628,7 @@ def configureImageOverlay(config, workConfig):
 def init(config, workConfig) :
 	#global config
 
-	print("SCROLLER HOLDER INIT")
+	print("WORKMODULES SCROLLER HOLDER INIT")
 
 	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 
 
@@ -769,7 +769,7 @@ def iterate(config) :
 				#config.rotation = random.uniform(-1,1)
 				config.t1  = time.time()
 				config.timeToComplete = random.uniform(1,10)
-			checkTime(config)
+			#checkTime(config)
 
 
 	# Chop up the scrollImage into "rows"

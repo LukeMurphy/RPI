@@ -59,6 +59,7 @@ class ScrollObject :
 
 	def scroll(self):
 
+
 		if self.typeOfScroller == "bg" :
 			if self.paused != True :
 				self.xPos += self.xSpeed

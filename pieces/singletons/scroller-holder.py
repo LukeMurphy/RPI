@@ -6,6 +6,9 @@ from collections import OrderedDict
 from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageChops, ImageEnhance
 from PIL import ImageChops, ImageFilter, ImagePalette
 from modules import colorutils, coloroverlay, continuous_scroller
+from modules.faderclass import FaderObj
+
+
 
 global config
 
@@ -38,6 +41,7 @@ def glitchBox(img, r1 = -10, r2 = 10, dir = "horizontal") :
 		img.paste( cp1, (int(0 + dx), int(0 + dy)))	
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 ## Layer imagery
 def makeDaemonMessages(imageRef, direction = 1):
 	global config
@@ -145,9 +149,11 @@ def makeDaemonMessages(imageRef, direction = 1):
 	refDraw.rectangle((0,0,pixLen[0] + 2 , fontHeight), fill = config.bgBackGroundColor)
 	imageRef.paste(scrollImage,(0,config.textVOffest), scrollImage)
 
+
 def remakeDaemonMessages(imageRef, direction = 1):
 	##
 	makeDaemonMessages(imageRef=imageRef, direction=direction)
+
 
 def makeScrollBlock(imageRef, imageDrawRef, direction):
 	global config
@@ -182,10 +188,12 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 		tempImage = ImageChops.multiply(clrBlock, tempImage)
 		imageRef.paste(tempImage,(x,y),tempImage)
 
+
 def remakeScrollBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
 	if(random.random() < config.imageBlockRemakeProb) :
 		makeScrollBlock(imageRef, drawRef, direction)
+
 
 def makeArrows(drawRef, direction = 1) :
 
@@ -228,9 +236,11 @@ def makeArrows(drawRef, direction = 1) :
 		#yStart += arrowLength + bufferDistance
 		xStart += arrowLength + bufferDistance
 
+
 def remakeArrowBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
 	makeArrows(drawRef, direction)
+
 
 def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 	global config
@@ -272,6 +282,7 @@ def makeMessage(imageRef, messageString = "FooBar", direction = 1):
 	refDraw = ImageDraw.Draw(imageRef)
 	refDraw.rectangle((0,0,pixLen[0] + 2 , fontHeight), fill = config.bgBackGroundColor)
 	imageRef.paste(scrollImage,(0,config.textVOffest), scrollImage)
+
 
 def remakeMessage(imageRef, messageString = "FooBar", direction = 1) :
 	messageString = config.msg1 if random.random() < .5 else config.msg2
@@ -425,6 +436,7 @@ def makeBackGround(drawRef, n = 1):
 
 	config.patternColor = config.patternEndColor
 
+
 ## Layer imagery callbacks & regeneration functions
 def remakePatternBlock(imageRef, direction):
 	## Stacking the cards ...
@@ -453,6 +465,7 @@ def remakePatternBlock(imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
 
+
 ## Setup and run functions
 def configureBackgroundScrolling():
 	config.patternRows = int(workConfig.get("scroller", 'patternRows'))
@@ -479,9 +492,9 @@ def configureBackgroundScrolling():
 	config.patternEndColor = (255,0,255,50)	
 	
 	try :
-		config.pauseProb = float(workConfig.get("scroller", 'pauseProb'))
+		config.changeProb = float(workConfig.get("scroller", 'changeProb'))
 	except Exception as e: 
-		config.pauseProb = 0.0
+		config.changeProb = 0.0
 		print (str(e))
 
 	if (config.alwaysRandomPatternColor == True):
@@ -497,6 +510,7 @@ def configureBackgroundScrolling():
 	config.scrollerPauseBool = False
 
 	config.scrollArray.append(scrollerRef)
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def configureImageScrolling():
@@ -522,6 +536,7 @@ def configureImageScrolling():
 	makeScrollBlock(scrollerRef.bg2, scrollerRef.bg2Draw, direction)
 	config.scrollArray.append(scrollerRef)
 		
+
 def configureArrowScrolling():
 	config.arrowCols = int(workConfig.get("scroller", 'arrowCols'))
 	config.lineThickness = int(workConfig.get("scroller", 'lineThickness'))
@@ -539,6 +554,7 @@ def configureArrowScrolling():
 	makeArrows(scrollerRef.bg1Draw, 1)
 	makeArrows(scrollerRef.bg2Draw, 1)
 	config.scrollArray.append(scrollerRef)
+
 
 def configureMessageScrolling():
 	config.colorMode = workConfig.get("scroller", 'colorMode')
@@ -573,6 +589,7 @@ def configureMessageScrolling():
 	scrollerRef.callBack = {"func" : remakeMessage, "direction" : direction}
 	config.scrollArray.append(scrollerRef)
 
+
 def configureAltTextScrolling() :
 	config.colorMode = workConfig.get("scroller", 'colorMode')
 	config.sansSerif = workConfig.getboolean("scroller", 'sansSerif')
@@ -591,6 +608,7 @@ def configureAltTextScrolling() :
 	scrollerRef.callBack = {"func" : remakeDaemonMessages, "direction" : direction}
 	config.scrollArray.append(scrollerRef)
 
+
 def configureImageOverlay():
 	config.overLayImage = workConfig.get("scroller", 'overLayImage')
 	config.overLayXPos = int(workConfig.get("scroller", 'overLayXPos'))
@@ -605,11 +623,14 @@ def configureImageOverlay():
 	config.loadedImage.load()
 	config.loadedImageCopy  = config.loadedImage.copy()
 
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def init() :
 	global config
 
-	print("SCROLLER HOLDER INIT")
+	print("SINGLETON SCROLLER HOLDER INIT")
+
+
 
 	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 
 
@@ -642,6 +663,8 @@ def init() :
 	config.flip = False
 	config.scrollArray = []
 
+
+	
 	## Set up the scrolling layer
 	
 	config.useBackground = workConfig.getboolean("scroller", 'useBackground')
@@ -691,9 +714,24 @@ def init() :
 			configureImageScrolling()
 	except Exception as e:
 		print (str(e))
+
 	
+	try:
+		config.doingRefreshCount = float(workConfig.get("scroller", 'doingRefreshCount'))
+	except Exception as e:
+		config.doingRefreshCount = 50
+		print (str(e))
 
 
+	config.f = FaderObj()
+	config.f.setUp(config.renderImageFull, config.workImage)
+	config.f.doingRefreshCount = config.doingRefreshCount
+	#config.workImageDraw.rectangle((0,0,100,100), fill=(100,0,0,100))
+	config.renderImageFullOld = config.renderImageFull.copy()
+	config.fadingDone = True
+
+	config.useFadeThruAnimation = True
+	config.deltaTimeDone = True
 
 
 def runWork():
@@ -702,37 +740,31 @@ def runWork():
 		iterate()
 		time.sleep(config.redrawSpeed)
 
-def checkTime():
+
+def checkTime(scrollerObj):
 	config.t2  = time.time()
 	delta = config.t2  - config.t1
 
-	if delta > config.timeToComplete :
-		config.scroller4.paused = False
+	if delta > config.timeToComplete and config.deltaTimeDone == False :
+
+		scrollerObj.xSpeed -= 0.1
+
+		if scrollerObj.xSpeed <= 1.0 :
+			config.deltaTimeDone = True
+			config.useFadeThruAnimation = True
+			print ("DELTA TIME UP")
+			#processImageForScrolling()
+			#scrollerObj.xSpeed = 1 
+
 		#config.usePixelSort = False
 		#config.rotation = 0
 
 
-
-def iterate() :
-	global config
-
-	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
-	#config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
-
+def processImageForScrolling() :
 	## Run through each of the objects being scrolled - text, image, background etc
 	for scrollerObj in config.scrollArray :
 		scrollerObj.scroll()
 		config.canvasImage.paste(scrollerObj.canvas, (0,0), scrollerObj.canvas)
-
-		if scrollerObj.typeOfScroller == "bg" :
-			if random.random() < config.pauseProb and scrollerObj.paused == False:
-				scrollerObj.paused = True
-				#config.usePixelSort = True
-				#config.rotation = random.uniform(-1,1)
-				config.t1  = time.time()
-				config.timeToComplete = random.uniform(1,10)
-			checkTime()
-
 
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
@@ -754,9 +786,50 @@ def iterate() :
 
 	if (config.overallBlur != 0 ) :
 		config.workImage = config.workImage.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
-	
-	config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
-	config.render(config.renderImageFull, 0,0)
+
+
+def iterate() :
+	global config
+
+	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
+	#config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
+
+	for scrollerObj in config.scrollArray :
+		if scrollerObj.typeOfScroller == "bg" :
+			if random.random() < config.changeProb and config.deltaTimeDone == True and config.useFadeThruAnimation == True:
+
+				print("CHANGING...")
+				#scrollerObj.paused = True
+				config.useFadeThruAnimation = False
+				#config.usePixelSort = True
+				#config.rotation = random.uniform(-1,1)
+				scrollerObj.xSpeed = random.uniform(1,10)
+				config.deltaTimeDone = False
+				config.t1  = time.time()
+				config.timeToComplete = random.uniform(3,10)
+			checkTime(scrollerObj)
+
+	if config.useFadeThruAnimation == True :
+		if config.f.fadingDone == True :
+			
+			config.renderImageFullOld = config.renderImageFull.copy()
+			processImageForScrolling()
+			config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
+			config.f.xPos = config.imageXOffset
+			config.f.yPos = config.imageYOffset
+			#config.renderImageFull = config.renderImageFull.convert("RGBA")
+			#renderImageFull = renderImageFull.convert("RGBA")
+			config.f.setUp(config.renderImageFullOld.convert("RGBA"), config.workImage.convert("RGBA") )
+
+
+		config.f.fadeIn()
+		config.render(config.f.blendedImage, 0,0)
+
+	else :
+		processImageForScrolling()
+		config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
+		config.render(config.renderImageFull, 0,0)		
+
 
 def main(run = True) :
 	global config, threads, thrd

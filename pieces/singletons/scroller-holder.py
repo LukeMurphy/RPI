@@ -630,8 +630,6 @@ def init() :
 
 	print("SINGLETON SCROLLER HOLDER INIT")
 
-
-
 	config.redrawSpeed  = float(workConfig.get("scroller", 'redrawSpeed')) 
 
 	config.windowWidth  = float(workConfig.get("displayconfig", 'windowWidth')) 
@@ -673,8 +671,6 @@ def init() :
 	config.alwaysRandomPattern = workConfig.getboolean("scroller", 'alwaysRandomPattern')
 	if(config.useBackground == True) :
 		configureBackgroundScrolling()
-
-
 
 
 	try:
@@ -747,17 +743,16 @@ def checkTime(scrollerObj):
 
 	if delta > config.timeToComplete and config.deltaTimeDone == False :
 
-		scrollerObj.xSpeed -= 0.1
+		scrollerObj.xSpeed -= 0.2
 
-		if scrollerObj.xSpeed <= 1.0 :
+		if scrollerObj.xSpeed <= .70 :
 			config.deltaTimeDone = True
 			config.useFadeThruAnimation = True
-			print ("DELTA TIME UP")
-			#processImageForScrolling()
-			#scrollerObj.xSpeed = 1 
+			config.f.fadingDone = True 
 
-		#config.usePixelSort = False
-		#config.rotation = 0
+			#print ("DELTA TIME UP")
+			processImageForScrolling()
+			scrollerObj.xSpeed = 1 
 
 
 def processImageForScrolling() :
@@ -797,13 +792,8 @@ def iterate() :
 	for scrollerObj in config.scrollArray :
 		if scrollerObj.typeOfScroller == "bg" :
 			if random.random() < config.changeProb and config.deltaTimeDone == True and config.useFadeThruAnimation == True:
-
-				print("CHANGING...")
-				#scrollerObj.paused = True
 				config.useFadeThruAnimation = False
-				#config.usePixelSort = True
-				#config.rotation = random.uniform(-1,1)
-				scrollerObj.xSpeed = random.uniform(1,10)
+				scrollerObj.xSpeed = random.uniform(.6,10)
 				config.deltaTimeDone = False
 				config.t1  = time.time()
 				config.timeToComplete = random.uniform(3,10)
@@ -813,13 +803,13 @@ def iterate() :
 		if config.f.fadingDone == True :
 			
 			config.renderImageFullOld = config.renderImageFull.copy()
-			processImageForScrolling()
 			config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
 			config.f.xPos = config.imageXOffset
 			config.f.yPos = config.imageYOffset
 			#config.renderImageFull = config.renderImageFull.convert("RGBA")
 			#renderImageFull = renderImageFull.convert("RGBA")
 			config.f.setUp(config.renderImageFullOld.convert("RGBA"), config.workImage.convert("RGBA") )
+			processImageForScrolling()
 
 
 		config.f.fadeIn()

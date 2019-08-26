@@ -732,8 +732,8 @@ def init(config, workConfig) :
 			configureImageScrolling(config, workConfig)
 	except Exception as e:
 		print (str(e))
-
-
+	
+	
 	try:
 		config.doingRefreshCount = float(workConfig.get("scroller", 'doingRefreshCount'))
 	except Exception as e:
@@ -744,8 +744,10 @@ def init(config, workConfig) :
 	config.f = FaderObj()
 	config.f.setUp(config.renderImageFull, config.workImage)
 	config.f.doingRefreshCount = config.doingRefreshCount
+	#config.workImageDraw.rectangle((0,0,100,100), fill=(100,0,0,100))
 	config.renderImageFullOld = config.renderImageFull.copy()
 	config.fadingDone = True
+
 	config.useFadeThruAnimation = True
 	config.deltaTimeDone = True
 
@@ -762,24 +764,23 @@ def checkTime(config, scrollerObj):
 	delta = config.t2  - config.t1
 
 	if delta > config.timeToComplete and config.deltaTimeDone == False :
-
 		scrollerObj.xSpeed -= 0.2
-
 		if scrollerObj.xSpeed <= .70 :
 			config.deltaTimeDone = True
 			config.useFadeThruAnimation = True
 			config.f.fadingDone = True 
 
-			print ("DELTA TIME UP")
+			#print ("DELTA TIME UP")
 			processImageForScrolling(config)
 			scrollerObj.xSpeed = 1 
 
-
 def processImageForScrolling(config) :
+
 	## Run through each of the objects being scrolled - text, image, background etc
 	for scrollerObj in config.scrollArray :
 		scrollerObj.scroll()
 		config.canvasImage.paste(scrollerObj.canvas, (0,0), scrollerObj.canvas)
+
 
 	# Chop up the scrollImage into "rows"
 	for n in range(0, config.displayRows) :
@@ -804,16 +805,8 @@ def processImageForScrolling(config) :
 
 
 def iterate(config) :
-	#global config
 
-	#config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
-	#config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
-
-	## Run through each of the objects being scrolled - text, image, background etc
 	for scrollerObj in config.scrollArray :
-		scrollerObj.scroll()
-		config.canvasImage.paste(scrollerObj.canvas, (0,0), scrollerObj.canvas)
-
 		if scrollerObj.typeOfScroller == "bg" :
 			if random.random() < config.changeProb and config.deltaTimeDone == True and config.useFadeThruAnimation == True:
 				config.useFadeThruAnimation = False
@@ -823,10 +816,8 @@ def iterate(config) :
 				config.timeToComplete = random.uniform(3,10)
 			checkTime(config, scrollerObj)
 
-
 	if config.useFadeThruAnimation == True :
 		if config.f.fadingDone == True :
-			
 			config.renderImageFullOld = config.renderImageFull.copy()
 			config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
 			config.f.xPos = config.imageXOffset
@@ -836,11 +827,11 @@ def iterate(config) :
 			config.f.setUp(config.renderImageFullOld.convert("RGBA"), config.workImage.convert("RGBA") )
 			processImageForScrolling(config)
 
-
 		config.f.fadeIn()
 		config.render(config.f.blendedImage, 0,0)
 
 	else :
+
 		processImageForScrolling(config)
 		config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)
 		config.render(config.renderImageFull, 0,0)

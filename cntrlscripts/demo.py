@@ -14,16 +14,6 @@ actionDict1 = [
 	#{" " :''},
 
 
-	{" " :''},
-	{"-------- NORTH WALL  -------------" :''},
-	{"P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
-	{"P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
-	{"P10 Branch - Collage" :'p10/collage-1.cfg'},
-	{"* P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
-	{"* P10 Branch - Collage branch 2" :'p10/collage-lines-1a.cfg'},
-	{"* P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
-	{"* P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
-	{"* P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 
 	#{" " :''},
@@ -47,10 +37,41 @@ actionDict1 = [
 	#{"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	#{" " :''},
 
+
+
+
 	{" " :''},
-	{"---------- FLOOR - FIREPLCE ----------" :''},
-	{"* pile: Algoflames2.3" :'p4-6x8/algofall-2.3.cfg'},
-	{"* pile: Algoflames2.2" :'p4-6x8/algofall-2.2.cfg'},
+	{"-------- RIGHT WALL -------------" :''},
+	{"==> Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
+	{"==> Wall Hanging: TWO FLOW" :'multi/manifest-3x8-informal.cfg'}, 
+	{"==> Wall Hanging: Gradients" :'p4-3x8-informal/gradients.cfg'}, 
+	#{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
+	#{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
+	{"Wall Hanging: compositions a" :'p4-3x8-informal/compositions.cfg'}, 
+	{"Wall Hanging: compositions b" :'p4-3x8-informal/compositions.cfg'}, 
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
+	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
+	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
+	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
+	{"Wall Hanging: THRow Multi" :'multi/throw-quilt.cfg'}, 
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
+	#{"Square - mono-flavin" :'p4-3x8-informal/mono-flavin.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
+	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+
+
+	{" " :''},
+	{"-------- FLOOR - FIREPLCE ------" :''},
+	{"==> pile: Algoflames2.3" :'p4-6x8/algofall-2.3.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"pile: Algoflames2.2" :'p4-6x8/algofall-2.2.cfg'},
 	{"pile: Algoflames2.1" :'p4-6x8/algofall-2.1.cfg'},
 	{"pile: Algoflames2.14" :'p4-6x8/algofall-2.14.cfg'},
 	{"pile: Algoflames-6" :'p4-6x8/algofall6.cfg'},
@@ -59,64 +80,76 @@ actionDict1 = [
 
 	#{" " :''},
 
+	{" " :''},
+	{"--------- FLOOR -----------" :''},
+	{"Tower w. Bump Collage" :'p4-5x8/bump-collage.cfg'},
+	{"Tower w. Bump Collage2" :'p4-5x8/bump-collage2.cfg'},
+	{"Alt Flames" :'p4-6x8/alt-flames.cfg'},
+	
+	#{"Tower w. Bump Flames" :'p4-5x8/bump-fire.cfg'},
+	#{"Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
+	#{"Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
 
 	{" " :''},
-	{"-------- RIGHT WALL -------------" :''},
-	{"* Wall Hanging: Patched Rothko" :'p4-3x8-informal/mono-rothko.cfg'},
-	{"* Wall Hanging: Compositions" :'p4-3x8-informal/compositions.cfg'}, 
-	{"* Wall Hanging: compositions a" :'p4-3x8-informal/compositions.cfg'}, 
-	{"* Wall Hanging: compositions b" :'p4-3x8-informal/compositions.cfg'}, 
-	{"------------------------------" :''},
-	{"Wall Hanging: Quilt Polys" :'p4-3x8-informal/quilt-polys.cfg'}, 
-	{"Wall Hanging: Quilt Triangles" :'p4-3x8-informal/quilt-triangles-b.cfg'}, 
-	{"Wall Hanging: Quilt Stars" :'p4-3x8-informal/quilt-stars.cfg'}, 
-	{"Wall Hanging: Squares" :'p4-3x8-informal/quilt-squares.cfg'}, 
-	{"Wall Hanging: THRow Multi" :'multi/throw-quilt.cfg'}, 
-	{"------------------------------" :''},
-	{"Wall Hanging: Gradients" :'p4-3x8-informal/gradients.cfg'}, 
-	{"Wall Hanging: TWO FLOW" :'multi/manifest-3x8-informal.cfg'}, 
+	{"Falling Stairs - flames" :'p4-2xsteps/algoflames.cfg'},
+	{"Falling Stairs - ice" :'p4-2xsteps/algofall.cfg'},
+	#{" " :''},
+	#{"Three Way Leaning Lights" :'p4-6x8/leaninglights.cfg'},
+	#{"Alt Flames" :'p4-6x8/alt-flames.cfg'},
+	{" " :''},
 
-	{"------------------------------" :''},
-	{"Wall Hanging: Signage" :'p4-3x8-informal/signage.cfg'}, 
-	{"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
-	{"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
-	{"Wall Hanging: Propagation" :'p4-3x8-informal/Propagation.cfg'},
-	{"Wall Hanging: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-	{"------------------------------" :''},
-	{"* Vert Bars - gray" :'p4-5x8/mono-lights-gray.cfg'},
-	{"Square - mono-flavin" :'p4-3x8-informal/mono-flavin.cfg'},
+
+
 	]
 
 actionDict2 = [
 
-	{" " :''},
+	#{" " :''},
 	#{"--------- FLOOR PILE -----------" :''},
 	#{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
 	#{"3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
 
+	{" " :''},
+	{"-------- NORTH WALL  -------------" :''},
+	{"==> P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	{"==> P10 Branch - Collage branch" :'p10/collage-lines-1.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
+	{"P10 Branch - Glitch" :'p10/glitch-screen.cfg'},
+	{"P10 Branch - Algoflames-b" :'p10/algoflames-1b.cfg'},
+	{"P10 Branch - Collage" :'p10/collage-1.cfg'},
+	{"P10 Branch - Collage branch 2" :'p10/collage-lines-1a.cfg'},
+	{"P10 Branch - Collage branch inv" :'p10/collage-lines-2.cfg'},
+	{"P10 Branch - Tourmaline" :'p10/collage-tourmaline.cfg'},
+
+
 	
 	{" " :''},
+	{" " :''},
 	{"-------- BUNDLE FLOOR  -------------" :''},
+	{"==> P10 Bundle  - AlgoFlames Pink" :'p10/plank-algoflames-2.cfg'},
+	{"==> P10 BUNDLE PILE - AlgoFlames c" :'p10/bundle-algofall-2.14.cfg'},
+	{"==> P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
+	{"==> P10 BUNDLE PILE - Tourmaline" :'p10/bundle-collage-tourmaline.cfg'},
+	{"==> P10 BUNDLE PILE - leaning lights" :'p10/bundle-leaninglights-2.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
 	{"P10 BUNDLE PILE - AlgoFlames" :'p10/bundle-algoflames-1.cfg'},
 	{"P10 BUNDLE PILE - AlgoFlames b" :'p10/bundle-algoflames-2.cfg'},
-	{"* P10 BUNDLE PILE - AlgoFlames c" :'p10/bundle-algofall-2.14.cfg'},
 	#{"3 PILE - movement" :'p4-3x8-pile/square-ice-2.cfg'},
-	{"* P10 BUNDLE PILE - Flow" :'p10/bundle-scroller-flow.cfg'},
-	{"P10 BUNDLE PILE - Tourmaline" :'p10/bundle-collage-tourmaline.cfg'},
-	{"P10 BUNDLE PILE - leaning lights" :'p10/bundle-leaninglights-2.cfg'},
-	{"P10 BUNDLE PILE - leaning pattern" :'p10/bundle-lines-2.cfg'},
+	#{"P10 BUNDLE PILE - leaning pattern" :'p10/bundle-lines-2.cfg'},
 
 
 	{" " :''},
+	{" " :''},
 	{"-------- PLANK AND DOOR  -------------" :''},
-	{"P10 Plank-Door - AlgoFlames" :'p10/plank-algoflames-1b.cfg'},
-	{"P10 Plank-Door - AlgoFlames Pink" :'p10/plank-algoflames-2.cfg'},
+	{"==> P10 Plank-Door - AlgoFlames Pink" :'p10/plank-algoflames-2.cfg'},
+	{"==> P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},
+	{"==> P10 BUNDLE PILE - Flow" :'p10/plank-scroller-flow.cfg'},
+	{"==> P10 Plank-Door - AlgoFlames" :'p10/plank-algoflames-1b.cfg'},
+	{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
 	{"P10 Plank-Door - movement" :'p10/plank-movement-2.cfg'},
-	{"* P10 Plank-Door - gradients" :'p10/plank-gradients.cfg'},
-	{"* P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
-	{"* P10 Plank-Door - glitch" :'p10/plank-glitch.cfg'},
-	{"* P10 Plank-Door - Tourmanline" :'p10/plank-tourmaline.cfg'},
-	{"* P10 BUNDLE PILE - Flow" :'p10/plank-scroller-flow.cfg'},
+	#{"P10 Plank-Door - gradients" :'p10/plank-gradients.cfg'},
+	#{"P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
+	{"P10 Plank-Door - glitch" :'p10/plank-glitch.cfg'},
 
 
 	#{"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
@@ -127,9 +160,9 @@ actionDict2 = [
 
 
 	{" " :''},
-	{"-------- TABLE -------------" :''},
-	{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
-	{"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
+	#{"-------- TABLE -------------" :''},
+	#{"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
+	#{"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
 	#{"X Pile Quilt" :'p4-2x4/quiltx.cfg'},
 	#{"X Pile square-polys" :'p4-2x4/square-polys.cfg'},
 	#{"X Pile marquee" :'p4-2x4/marquee2.cfg'},
@@ -141,7 +174,7 @@ actionDict2 = [
 	#{"* Wall Hanging 3x7: Star Quilt" :'p4-3x7-informal/quilt-stars.cfg'},
 	#{"* Wall Hanging 3x7: Tri Quilt" :'p4-3x7-informal/quilt-triangles-b.cfg'},
 	#{"* Wall Hanging 3x7: Signage Abstraction" :'p4-3x7-informal/signage.cfg'},
-	#{"------------------------------" :''},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
 	#{" " :''},
 	#{"Wall Hanging: FLAG" :'p4-3x8-informal/flag.cfg'},
 	#{" " :''},
@@ -162,25 +195,6 @@ actionDict2 = [
 	#{" " :''},
 
 
-
-	{" " :''},
-	{"--------- FLOOR -----------" :''},
-	{"* Tower w. Bump Collage" :'p4-5x8/bump-collage.cfg'},
-	{"* Tower w. Bump Collage2" :'p4-5x8/bump-collage2.cfg'},
-	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},
-	
-	#{"Tower w. Bump Flames" :'p4-5x8/bump-fire.cfg'},
-	#{"Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
-	#{"Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
-
-
-	{" " :''},
-	{"* Falling Stairs - flames" :'p4-2xsteps/algoflames.cfg'},
-	{"* Falling Stairs - ice" :'p4-2xsteps/algofall.cfg'},
-	{" " :''},
-	{"* Three Way Leaning Lights" :'p4-6x8/leaninglights.cfg'},
-	{"* Alt Flames" :'p4-6x8/alt-flames.cfg'},
-	{" " :''},
 
 
 	
@@ -221,7 +235,7 @@ actionDict2 = [
 
 
 	#{" " :''},
-	#{"------------------------------" :''},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  ." :''},
 	#{"ARC - BENT GLITCH" :'p4-1xn-arc/bentglitch.cfg'},
 	#{"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 

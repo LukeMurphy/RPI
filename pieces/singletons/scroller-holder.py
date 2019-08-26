@@ -701,6 +701,12 @@ def init() :
 	except Exception as e:
 		print (str(e))
 	
+	
+	try :
+		config.useUltraSlowSpeed = (workConfig.getboolean("scroller", 'useUltraSlowSpeed'))
+	except Exception as e: 
+		config.useUltraSlowSpeed = False
+		print (str(e))	
 
 	
 	try:
@@ -752,7 +758,8 @@ def checkTime(scrollerObj):
 
 			#print ("DELTA TIME UP")
 			processImageForScrolling()
-			scrollerObj.xSpeed = 1 
+			if  config.useUltraSlowSpeed == True :
+				scrollerObj.xSpeed = 1 
 
 
 def processImageForScrolling() :
@@ -799,7 +806,7 @@ def iterate() :
 				config.timeToComplete = random.uniform(3,10)
 			checkTime(scrollerObj)
 
-	if config.useFadeThruAnimation == True :
+	if config.useFadeThruAnimation == True and config.useUltraSlowSpeed == True:
 		if config.f.fadingDone == True :
 			
 			config.renderImageFullOld = config.renderImageFull.copy()

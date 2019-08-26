@@ -492,6 +492,12 @@ def configureBackgroundScrolling(config, workConfig):
 	config.patternEndColor = (255,0,255,50)	
 	
 	try :
+		config.useUltraSlowSpeed = (workConfig.getboolean("scroller", 'useUltraSlowSpeed'))
+	except Exception as e: 
+		config.useUltraSlowSpeed = False
+		print (str(e))	
+
+	try :
 		config.changeProb = float(workConfig.get("scroller", 'changeProb'))
 	except Exception as e: 
 		config.changeProb = 0.0
@@ -772,7 +778,8 @@ def checkTime(config, scrollerObj):
 
 			#print ("DELTA TIME UP")
 			processImageForScrolling(config)
-			scrollerObj.xSpeed = 1 
+			if config.useUltraSlowSpeed == True :
+				scrollerObj.xSpeed = 1 
 
 def processImageForScrolling(config) :
 
@@ -816,7 +823,7 @@ def iterate(config) :
 				config.timeToComplete = random.uniform(3,10)
 			checkTime(config, scrollerObj)
 
-	if config.useFadeThruAnimation == True :
+	if config.useFadeThruAnimation == True and config.useUltraSlowSpeed == True:
 		if config.f.fadingDone == True :
 			config.renderImageFullOld = config.renderImageFull.copy()
 			config.renderImageFull.paste(config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage)

@@ -90,7 +90,7 @@ actionDict1 = [
 	#{"Tower w. Bump Glitch" :'p4-5x8/bump-glitch.cfg'},
 	#{"Tower w. Bump Diagnostics" :'p4-5x8/bump-diagnostics.cfg'},
 
-	{" " :''},
+	
 	{"Falling Stairs - flames" :'p4-2xsteps/algoflames.cfg'},
 	{"Falling Stairs - ice" :'p4-2xsteps/algofall.cfg'},
 	#{" " :''},
@@ -108,7 +108,14 @@ actionDict2 = [
 	#{"--------- FLOOR PILE -----------" :''},
 	#{"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
 	#{"3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
+	{" " :''},
+	{"-------- LEFT / WEST WALL  -------------" :''},
+	{"==> 4x6 bnd: Leaning lights" :'p4-4x6-bent-lean/leaninglights-3.cfg'},
+	{"==> 4x6 bend: Algoflames2.3" :'p4-4x6-bent-lean/algofall-2.3.cfg'},
+	{"==> 4x6 bnd: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
+
+	{" " :''},
 	{" " :''},
 	{"-------- NORTH WALL  -------------" :''},
 	{"==> P10 Branch: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},

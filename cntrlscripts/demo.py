@@ -112,6 +112,7 @@ actionDict2 = [
 	{"-------- LEFT / WEST WALL  -------------" :''},
 	{"==> 4x6 bnd: Leaning lights" :'p4-4x6-bent-lean/leaninglights-3.cfg'},
 	{"==> 4x6 bend: Algoflames2.3" :'p4-4x6-bent-lean/algofall-2.3.cfg'},
+	{"==> TWO FLOW bend" :'multi/manifest-4x6.cfg'}, 
 	{"==> 4x6 bnd: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 
 

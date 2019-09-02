@@ -479,12 +479,14 @@ def configureBackgroundScrolling():
 	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
 	config.pattern = (workConfig.get("scroller", 'pattern'))
 	config.patternSpeed = float(workConfig.get("scroller", 'patternSpeed'))
+	config.maxSpeed = float(workConfig.get("scroller", 'maxSpeed'))
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
 	scrollerRef.typeOfScroller = "bg"
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.patternSpeed
+	scrollerRef.xMaxSpeed = config.maxSpeed
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func" : remakePatternBlock, "direction" : direction}	
@@ -800,7 +802,7 @@ def iterate() :
 		if scrollerObj.typeOfScroller == "bg" :
 			if random.random() < config.changeProb and config.deltaTimeDone == True and config.useFadeThruAnimation == True:
 				config.useFadeThruAnimation = False
-				scrollerObj.xSpeed = random.uniform(.6,10)
+				scrollerObj.xSpeed = random.uniform(.6,scrollerObj.xMaxSpeed )
 				config.deltaTimeDone = False
 				config.t1  = time.time()
 				config.timeToComplete = random.uniform(3,10)

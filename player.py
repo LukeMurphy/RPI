@@ -8,6 +8,7 @@ import sys
 import time
 
 import noise
+
 from configs import defaultpiece
 from modules import coloroverlay, colorutils, configuration, player
 from modules.configuration import bcolors

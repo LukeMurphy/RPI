@@ -9,13 +9,13 @@ from tkinter import *
 
 import PIL.Image
 from PIL import (
-	Image,
-	ImageChops,
-	ImageDraw,
-	ImageEnhance,
-	ImageFilter,
-	ImageFont,
-	ImageTk,
+    Image,
+    ImageChops,
+    ImageDraw,
+    ImageEnhance,
+    ImageFilter,
+    ImageFont,
+    ImageTk,
 )
 
 

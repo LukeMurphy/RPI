@@ -1,8 +1,11 @@
 #!/usr/bin/python
 
-from PIL import Image, ImageDraw,ImageMath, ImageEnhance
+import math
+import random
 # Import the essentials to everything
-import time, random, math
+import time
+
+from PIL import Image, ImageDraw, ImageEnhance, ImageMath
 
 # Rows and chain length are both required parameters:
 r=g=b=0

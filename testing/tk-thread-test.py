@@ -13,13 +13,13 @@ import PIL.Image
 import proc1file as workDef2
 import procfileclass as work
 from PIL import (
-	Image,
-	ImageChops,
-	ImageDraw,
-	ImageEnhance,
-	ImageFilter,
-	ImageFont,
-	ImageTk,
+    Image,
+    ImageChops,
+    ImageDraw,
+    ImageEnhance,
+    ImageFilter,
+    ImageFont,
+    ImageTk,
 )
 
 sys.path.append("./")

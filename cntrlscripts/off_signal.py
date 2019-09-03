@@ -1,8 +1,10 @@
 #Checks for off signal
+import ConfigParser
+import getopt
+import io
+import os
+import sys
 import urllib2
-import sys, getopt, os
-import ConfigParser, io
-
 #import httplib2
 from subprocess import call
 

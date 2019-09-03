@@ -10,9 +10,10 @@ import time
 # import pyglet
 # from pyglet.gl import *
 import noise
+from noise import *
+
 import numpy
 import PIL.Image
-from noise import *
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 

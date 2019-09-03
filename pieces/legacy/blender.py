@@ -1,9 +1,10 @@
 # ################################################### #
-import time
-import random
 import math
-from PIL import Image
+import random
 import sys
+import time
+
+from PIL import Image
 
 r=g=b=125
 pulseSpeed = .01
@@ -197,4 +198,3 @@ def animator(arg) :
 
 		config.matrix.Clear()
 		config.matrix.Fill(0)
-

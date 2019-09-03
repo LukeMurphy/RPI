@@ -1,23 +1,36 @@
 #!/usr/bin/python
 #import modules
-from modules import utils
-from pieces import actions, scroll, bluescreen ,loader, squares, flashing, blender, carousel, squaresalt
-#from cntrlscripts import off_signal
-from modules import configuration
-from configs import localconfig
-
-from PIL import Image, ImageDraw, ImageFont
-import importlib
-import time
-import random
-from rgbmatrix import Adafruit_RGBmatrix
+import ConfigParser
 import datetime
-import textwrap
+import getopt
+import importlib
+import io
 import math
-import sys, getopt, os
-import ConfigParser, io
-from subprocess import call
+import os
+import random
+import sys
+import textwrap
 import threading
+import time
+from subprocess import call
+
+from configs import localconfig
+#from cntrlscripts import off_signal
+from modules import configuration, utils
+from pieces import (
+	actions,
+	blender,
+	bluescreen,
+	carousel,
+	flashing,
+	loader,
+	scroll,
+	squares,
+	squaresalt,
+)
+from PIL import Image, ImageDraw, ImageFont
+from rgbmatrix import Adafruit_RGBmatrix
+
 global thrd
 
 T1 = 0
@@ -600,5 +613,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-

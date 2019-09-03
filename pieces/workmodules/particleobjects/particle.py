@@ -5,8 +5,9 @@ import textwrap
 import time
 
 import noise
-from modules import colorutils
 from noise import *
+
+from modules import colorutils
 from PIL import (
 	Image,
 	ImageChops,

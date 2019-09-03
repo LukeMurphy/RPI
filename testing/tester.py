@@ -15,17 +15,17 @@ import Image
 import ImageDraw
 import ImageFont
 from modules import (
-	actions,
-	blender,
-	bluescreen,
-	carousel,
-	flashing,
-	loader,
-	machine,
-	scroll,
-	squares,
-	user,
-	utils,
+    actions,
+    blender,
+    bluescreen,
+    carousel,
+    flashing,
+    loader,
+    machine,
+    scroll,
+    squares,
+    user,
+    utils,
 )
 from rgbmatrix import Adafruit_RGBmatrix
 

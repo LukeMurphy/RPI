@@ -1,17 +1,27 @@
-import tkMessageBox
-from Tkinter import *
-from PIL import Image, ImageTk, ImageDraw, ImageFont
-import os, sys, getopt, time, random, math, datetime, textwrap
-import ConfigParser, io
-from subprocess import call
-import threading
-global thrd
-
-
+import ConfigParser
+import datetime
 #from cntrlscripts import off_signal
 #from modules import scroll
 #from modules import colorutils
 import gc
+import getopt
+import io
+import math
+import os
+import random
+import sys
+import textwrap
+import threading
+import time
+from subprocess import call
+from Tkinter import *
+
+import tkMessageBox
+from PIL import Image, ImageDraw, ImageFont, ImageTk
+
+global thrd
+
+
 
 
 class App():

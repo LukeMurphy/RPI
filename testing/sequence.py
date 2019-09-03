@@ -72,15 +72,15 @@ def imageScrollSeq() :
 		# probably due to high CPU load etc ...
 		# --------------------------------------------------------------------------#
  		T2 = time.time()
-                if((T2 - T1) > 15) :
-                        threads = []
-                        thrd = threading.Thread(target=off_signal.checker)
-                        threads.append(thrd)
-                        thrd.start()
+	            if((T2 - T1) > 15) :
+	                    threads = []
+	                    thrd = threading.Thread(target=off_signal.checker)
+	                    threads.append(thrd)
+	                    thrd.start()
 
-                        #print(threads)
-                        #off_signal.checker()
-                        T1 = time.time()		
+	                    #print(threads)
+	                    #off_signal.checker()
+	                    T1 = time.time()		
 
 		if (seq == 1) :
 			imageList = ['plane-2b.gif','paletter3c.gif'] 
@@ -632,7 +632,7 @@ def main():
 			print ("Error:" + str(err))
 
 if __name__ == "__main__":
-    main()
+	main()
 
 
 

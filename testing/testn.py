@@ -1,30 +1,36 @@
-
+import datetime
+import getopt
+import math
+import os
+import random
 import sys
-#import pyglet
-#from pyglet.gl import *
+import textwrap
+import time
+
+# import pyglet
+# from pyglet.gl import *
 import noise
-from noise import *
-
-import PIL.Image
-from PIL import Image, ImageDraw, ImageFont
-from PIL import ImageChops
-
 import numpy
-import os, sys, getopt, time, random, math, datetime, textwrap
+import PIL.Image
+from noise import *
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 
 def imports():
 	import types
+
 	for name, val in globals().items():
-		if isinstance(val, types.ModuleType):
-			print(val.__name__)
+	    if isinstance(val, types.ModuleType):
+	        print(val.__name__)
 
-#imports()
 
-def drawTest() :
+# imports()
+
+
+def drawTest():
 
 	points = 80
-	span = random.uniform(5.0,15.0)
+	span = random.uniform(5.0, 15.0)
 	span = 5.0
 	speed = 1.0
 	base = 5
@@ -38,36 +44,35 @@ def drawTest() :
 	imgWidthFull = 1880
 	imgHeightFull = 520
 
-
 	renderImage = Image.new("RGB", (imgWidthFull, imgHeightFull))
 	draw = ImageDraw.Draw(renderImage)
-	draw.rectangle((0,0,imgWidthFull,imgHeightFull), fill=(220,220,220,255))
-	#draw.rectangle((0,0,100,100), fill=(220,2,2))
+	draw.rectangle((0, 0, imgWidthFull, imgHeightFull), fill=(220, 220, 220, 255))
+	# draw.rectangle((0,0,100,100), fill=(220,2,2))
 	xMult = 5
 
-	for n in range (0,4):
+	for n in range(0, 4):
 
-		r = range(points)
-		print(xOffset)
-		for i in range(0,points):
-			x = float(i) * span / points - 0.5 * span
-			y = noise.pnoise1(x + base, octaves)
-			y2 = noise.pnoise2(x + base, octaves)
-			#print(x * 2.0 / span, y, 0)
+	    r = range(points)
+	    print(xOffset)
+	    for i in range(0, points):
+	        x = float(i) * span / points - 0.5 * span
+	        y = noise.pnoise1(x + base, octaves)
+	        y2 = noise.pnoise2(x + base, octaves)
+	        # print(x * 2.0 / span, y, 0)
 
-			xPos = xOffset + i * xMult #round(xOffset + x * xMult)
-			yPos = round(yOffset + y * yMult)
-			yPos2 = round(yOffset + y2 * yMult)
+	        xPos = xOffset + i * xMult  # round(xOffset + x * xMult)
+	        yPos = round(yOffset + y * yMult)
+	        yPos2 = round(yOffset + y2 * yMult)
 
-			draw.rectangle((xPos, yPos, 2 + xPos, 2 +  yPos), fill=(220,2,2))
-			#draw.rectangle((xPos, yPos2, 2 + xPos, 2 +  yPos2), fill=(220,20,200))
-		#draw.rectangle((xPos, 0, 1 + xPos, 200), fill=(0,2,200))
-		xOffset += points * xMult
-		base += points-1
+	        draw.rectangle((xPos, yPos, 2 + xPos, 2 + yPos), fill=(220, 2, 2))
+	        # draw.rectangle((xPos, yPos2, 2 + xPos, 2 +  yPos2), fill=(220,20,200))
+	    # draw.rectangle((xPos, 0, 1 + xPos, 200), fill=(0,2,200))
+	    xOffset += points * xMult
+	    base += points - 1
 
 	t = 1
 	baseName = "./output/comp5_"
-	fn = baseName+ str(t)+".jpg"
+	fn = baseName + str(t) + ".jpg"
 	renderImage.save(fn)
 
 

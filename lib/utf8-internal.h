@@ -23,32 +23,32 @@ template <typename byte_iterator>
 uint32_t utf8_next_codepoint(byte_iterator &it) {
   uint32_t cp = *it++;
   if (cp < 0x80) {
-    return cp;   // iterator already incremented.
+	return cp;   // iterator already incremented.
   }
   else if ((cp & 0xE0) == 0xC0) {
-    cp = ((cp & 0x1F) << 6) + (*it & 0x3F);
+	cp = ((cp & 0x1F) << 6) + (*it & 0x3F);
   }
   else if ((cp & 0xF0) == 0xE0) {
-    cp = ((cp & 0x0F) << 12) + ((*it & 0x3F) << 6);
-    cp += (*++it & 0x3F);
+	cp = ((cp & 0x0F) << 12) + ((*it & 0x3F) << 6);
+	cp += (*++it & 0x3F);
   }
   else if ((cp & 0xF8) == 0xF0) {
-    cp = ((cp & 0x07) << 18) + ((*it & 0x3F) << 12);
-    cp += (*++it & 0x3F) << 6;
-    cp += (*++it & 0x3F);
+	cp = ((cp & 0x07) << 18) + ((*it & 0x3F) << 12);
+	cp += (*++it & 0x3F) << 6;
+	cp += (*++it & 0x3F);
   }
   else if ((cp & 0xFC) == 0xF8) {
-    cp = ((cp & 0x03) << 24) + ((*it & 0x3F) << 18);
-    cp += (*++it & 0x3F) << 12;
-    cp += (*++it & 0x3F) << 6;
-    cp += (*++it & 0x3F);
+	cp = ((cp & 0x03) << 24) + ((*it & 0x3F) << 18);
+	cp += (*++it & 0x3F) << 12;
+	cp += (*++it & 0x3F) << 6;
+	cp += (*++it & 0x3F);
   }
   else if ((cp & 0xFE) == 0xFC) {
-    cp = ((cp & 0x01) << 30) + ((*it & 0x3F) << 24);
-    cp += (*++it & 0x3F) << 18;
-    cp += (*++it & 0x3F) << 12;
-    cp += (*++it & 0x3F) << 6;
-    cp += (*++it & 0x3F);
+	cp = ((cp & 0x01) << 30) + ((*it & 0x3F) << 24);
+	cp += (*++it & 0x3F) << 18;
+	cp += (*++it & 0x3F) << 12;
+	cp += (*++it & 0x3F) << 6;
+	cp += (*++it & 0x3F);
   }
   ++it;
   return cp;

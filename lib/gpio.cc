@@ -51,16 +51,16 @@ GPIO::GPIO() : output_bits_(0), gpio_port_(NULL) {
    
 uint32_t GPIO::InitOutputs(uint32_t outputs) {
   if (gpio_port_ == NULL) {
-    fprintf(stderr, "Attempt to init outputs but initialized.\n");
-    return 0;
+	fprintf(stderr, "Attempt to init outputs but initialized.\n");
+	return 0;
   }
   outputs &= kValidBits;   // Sanitize input.
   output_bits_ = outputs;
   for (uint32_t b = 0; b <= 27; ++b) {
-    if (outputs & (1 << b)) {
-      INP_GPIO(b);   // for writing, we first need to set as input.
-      OUT_GPIO(b);
-    }
+	if (outputs & (1 << b)) {
+	  INP_GPIO(b);   // for writing, we first need to set as input.
+	  OUT_GPIO(b);
+	}
   }
   return output_bits_;
 }
@@ -124,56 +124,56 @@ bool GPIO::Init() {
 
   if(boardType() == 2) { // Raspberry Pi 2?
 
-    // Nasty kludge for timing on Pi 2, see notes in framebuffer.cc
-    extern volatile uint32_t *freeRunTimer;
+	// Nasty kludge for timing on Pi 2, see notes in framebuffer.cc
+	extern volatile uint32_t *freeRunTimer;
 
-    // On Pi2, before we mmap GPIO, let's get the timer peripheral...
-    if((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
-      perror("can't open /dev/mem: ");
-      return 1;
-    }
+	// On Pi2, before we mmap GPIO, let's get the timer peripheral...
+	if((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
+	  perror("can't open /dev/mem: ");
+	  return 1;
+	}
 
-    char *timer_map =
-      (char*)mmap(NULL,
-      BLOCK_SIZE,
-      PROT_READ | PROT_WRITE,
-      MAP_SHARED,
-      mem_fd,
-      0x3F003000); // Offset to free-running 1 MHz timer
+	char *timer_map =
+	  (char*)mmap(NULL,
+	  BLOCK_SIZE,
+	  PROT_READ | PROT_WRITE,
+	  MAP_SHARED,
+	  mem_fd,
+	  0x3F003000); // Offset to free-running 1 MHz timer
 
-    close(mem_fd); // No need to keep mem_fd open after mmap
+	close(mem_fd); // No need to keep mem_fd open after mmap
 
-    if(timer_map == MAP_FAILED) {
-      fprintf(stderr, "mmap error %ld\n", (long)timer_map);
-      return 1;
-    }
+	if(timer_map == MAP_FAILED) {
+	  fprintf(stderr, "mmap error %ld\n", (long)timer_map);
+	  return 1;
+	}
 
-    freeRunTimer = &((volatile uint32_t *)timer_map)[1];
-    // Okay then, getting back to GPIO...
+	freeRunTimer = &((volatile uint32_t *)timer_map)[1];
+	// Okay then, getting back to GPIO...
 
-    gpio_base = 0x3F000000 + 0x200000; // GPIO base addr for Pi 2
+	gpio_base = 0x3F000000 + 0x200000; // GPIO base addr for Pi 2
   } else {
-    gpio_base = 0x20000000 + 0x200000; // " for Pi 1
+	gpio_base = 0x20000000 + 0x200000; // " for Pi 1
   }
 
   if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0) {
-    perror("can't open /dev/mem: ");
-    return false;
+	perror("can't open /dev/mem: ");
+	return false;
   }
 
   char *gpio_map =
-    (char*) mmap(NULL,             //Any adddress in our space will do
-         BLOCK_SIZE,       //Map length
-         PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
-         MAP_SHARED,       //Shared with other processes
-         mem_fd,           //File to map
-         gpio_base);       //Offset to GPIO peripheral
+	(char*) mmap(NULL,             //Any adddress in our space will do
+	     BLOCK_SIZE,       //Map length
+	     PROT_READ|PROT_WRITE,// Enable reading & writting to mapped memory
+	     MAP_SHARED,       //Shared with other processes
+	     mem_fd,           //File to map
+	     gpio_base);       //Offset to GPIO peripheral
 
   close(mem_fd); //No need to keep mem_fd open after mmap
 
   if (gpio_map == MAP_FAILED) {
-    fprintf(stderr, "mmap error %ld\n", (long)gpio_map);
-    return false;
+	fprintf(stderr, "mmap error %ld\n", (long)gpio_map);
+	return false;
   }
 
   gpio_port_ = (volatile uint32_t *)gpio_map;

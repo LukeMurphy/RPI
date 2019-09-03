@@ -1,13 +1,14 @@
-import time
+import math
 import random
 import textwrap
-import math
+import time
 
-from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from modules import colorutils, badpixels, coloroverlay
+from modules import badpixels, coloroverlay, colorutils
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
+
 
 class unit:
 
@@ -31,30 +32,32 @@ class unit:
 		self.yPos = 0
 		self.redraw = False
 
-		self.draw  = ImageDraw.Draw(config.canvasImage)
+		self.draw = ImageDraw.Draw(config.canvasImage)
 
 		## Like the "stiching" color and affects the overall "tone" of the piece
 		self.outlineColor = config.outlineColorObj.currentColor
 		self.objWidth = 20
-		
-		self.outlineRange = [(20,20,250)]
+
+		self.outlineRange = [(20, 20, 250)]
 		self.brightness = 1
 		self.fillColorMode = "random"
 		self.lineColorMode = "red"
 		self.changeColor = True
 		self.lines = config.lines
 
-	def setUp(self, n = 0) :
+	def setUp(self, n=0):
 
-		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
+		self.outlineColor = tuple(
+			int(a * self.brightness) for a in (self.outlineColorObj.currentColor)
+		)
 
 		#### Sets up color transitions
 		self.colOverlay = coloroverlay.ColorOverlay()
 		self.colOverlay.randomSteps = True
-		self.colOverlay.timeTrigger = True 
+		self.colOverlay.timeTrigger = True
 		self.colOverlay.tLimitBase = 5
 		self.colOverlay.steps = 10
-		
+
 		self.colOverlay.maxBrightness = self.config.brightness
 		self.colOverlay.maxBrightness = self.maxBrightness
 
@@ -67,15 +70,15 @@ class unit:
 		self.colOverlay.minHue = self.minHue
 		self.colOverlay.maxHue = self.maxHue
 
-
-
 		### This is the speed range of transitions in color
 		### Higher numbers means more possible steps so slower
 		### transitions - 1,10 very blinky, 10,200 very slow
-		self.colOverlay.randomRange = (self.config.transitionStepsMin,self.config.transitionStepsMax)
+		self.colOverlay.randomRange = (
+			self.config.transitionStepsMin,
+			self.config.transitionStepsMax,
+		)
 
-
-		'''
+		"""
 		self.fillColor = colorutils.getRandomColorHSV(
 			sMin = self.minSaturation, sMax = self.maxSaturation,  
 			hMin = self.minHue, hMax  = self.maxHue, 
@@ -90,160 +93,195 @@ class unit:
 			)
 
 		self.colOverlay.colorA = self.fillColor
-		'''
+		"""
 
 		self.colOverlay.setStartColor()
 		self.colOverlay.getNewColor()
 		self.colOverlay.colorTransitionSetup()
 
-		
-		self.outlineColor = tuple(int(a*self.brightness) for a in (self.outlineColorObj.currentColor))
-		self.fillColor = tuple(int(a*self.brightness) for a in (self.colOverlay.currentColor))
-
+		self.outlineColor = tuple(
+			int(a * self.brightness) for a in (self.outlineColorObj.currentColor)
+		)
+		self.fillColor = tuple(
+			int(a * self.brightness) for a in (self.colOverlay.currentColor)
+		)
 
 	def update(self):
-		#self.fillColorMode == "random" or 
-		if(random.random() > self.config.colorPopProb) :
+		# self.fillColorMode == "random" or
+		if random.random() > self.config.colorPopProb:
 			self.colOverlay.stepTransition()
-			self.fillColor = tuple(int (a * self.brightness ) for a in self.colOverlay.currentColor)
-		else :
+			self.fillColor = tuple(
+				int(a * self.brightness) for a in self.colOverlay.currentColor
+			)
+		else:
 			self.changeColorFill()
-
-	
 
 	def renderPolys(self):
 
-		if (self.fillColorMode == "red") : 
+		if self.fillColorMode == "red":
 			brightnessFactor = self.config.brightnessFactorDark
 		else:
 			brightnessFactor = self.config.brightnessFactorLight
 
-		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
-		self.fillColor = tuple(int(a*self.brightness) for a in (self.colOverlay.currentColor))
+		self.outlineColor = tuple(
+			int(a * self.brightness * brightnessFactor)
+			for a in self.outlineColorObj.currentColor
+		)
+		self.fillColor = tuple(
+			int(a * self.brightness) for a in (self.colOverlay.currentColor)
+		)
 
-		if(self.lines == True) :
+		if self.lines == True:
 			self.draw.polygon(self.poly, fill=self.fillColor)
 		else:
 			self.draw.polygon(self.poly, fill=self.fillColor, outline=None)
 
-
 	def render(self):
 
-		if (self.fillColorMode == "red") : 
+		if self.fillColorMode == "red":
 			brightnessFactor = self.config.brightnessFactorDark
 		else:
 			brightnessFactor = self.config.brightnessFactorLight
 
-		self.outlineColor = tuple(int (a * self.brightness * brightnessFactor) for a in self.outlineColorObj.currentColor)
-		self.fillColor = tuple(int(a*self.brightness) for a in (self.colOverlay.currentColor))
+		self.outlineColor = tuple(
+			int(a * self.brightness * brightnessFactor)
+			for a in self.outlineColorObj.currentColor
+		)
+		self.fillColor = tuple(
+			int(a * self.brightness) for a in (self.colOverlay.currentColor)
+		)
 
-		if(self.lines == True) :
-			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
-			, fill=self.fillColor, outline=self.outlineColor)
+		if self.lines == True:
+			self.draw.rectangle(
+				(
+					(self.xPos, self.yPos),
+					(self.xPos + self.blockLength, self.yPos + self.blockHeight),
+				),
+				fill=self.fillColor,
+				outline=self.outlineColor,
+			)
 		else:
-			self.draw.rectangle(((self.xPos, self.yPos), (self.xPos + self.blockLength, self.yPos + self.blockHeight))
-			, fill=self.fillColor, outline=None)
-
+			self.draw.rectangle(
+				(
+					(self.xPos, self.yPos),
+					(self.xPos + self.blockLength, self.yPos + self.blockHeight),
+				),
+				fill=self.fillColor,
+				outline=None,
+			)
 
 	## Straight color change - deprecated - too blinky
 	def changeColorFill(self):
 
-		if(self.changeColor == True) :
-			if(self.fillColorMode == "random") :
-				self.fillColor = colorutils.randomColor(random.uniform(.01,self.brightness))
-				self.outlineColor = colorutils.getRandomRGB(random.uniform(.01,self.brightness))
+		if self.changeColor == True:
+			if self.fillColorMode == "random":
+				self.fillColor = colorutils.randomColor(
+					random.uniform(0.01, self.brightness)
+				)
+				self.outlineColor = colorutils.getRandomRGB(
+					random.uniform(0.01, self.brightness)
+				)
 			else:
 				self.fillColor = colorutils.getRandomColorHSV(
-					sMin = self.minSaturation, sMax = self.maxSaturation,  
-					hMin = self.minHue, hMax  = self.maxHue, 
-					vMin = self.minValue, vMax = self.maxValue
-					)
+					sMin=self.minSaturation,
+					sMax=self.maxSaturation,
+					hMin=self.minHue,
+					hMax=self.maxHue,
+					vMin=self.minValue,
+					vMax=self.maxValue,
+				)
 
 				self.colOverlay.colorA = self.fillColor
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
-
-def transformImage(img) :
+def transformImage(img):
 	width, height = img.size
 	m = -0.5
 	xshift = abs(m) * 420
 	new_width = width + int(round(xshift))
 
-	img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
-	img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
+	img = img.transform(
+		(new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC
+	)
+	img = img.transform(
+		(new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
+	)
 	return img
 
 
-def main(config, workConfig, run = True) :
-	#global config, directionOrder,workConfig
+def main(config, workConfig, run=True):
+	# global config, directionOrder,workConfig
 	print("---------------------")
 	print("QUILT Loaded")
 
-
-	config.brightness = float(workConfig.get("displayconfig", 'brightness')) 
+	config.brightness = float(workConfig.get("displayconfig", "brightness"))
 	colorutils.brightness = config.brightness
 	config.canvasImageWidth = config.screenWidth
 	config.canvasImageHeight = config.screenHeight
-	#config.canvasImageWidth -= 4
-	#config.canvasImageHeight -= 4
+	# config.canvasImageWidth -= 4
+	# config.canvasImageHeight -= 4
 
 	config.outlineColorObj = coloroverlay.ColorOverlay()
-	config.outlineColorObj.randomRange = (5.0,30.0)
+	config.outlineColorObj.randomRange = (5.0, 30.0)
 	config.outlineColorObj.colorTransitionSetup()
 
-	config.transitionStepsMin = float(workConfig.get("quilt", 'transitionStepsMin'))
-	config.transitionStepsMax = float(workConfig.get("quilt", 'transitionStepsMax'))
+	config.transitionStepsMin = float(workConfig.get("quilt", "transitionStepsMin"))
+	config.transitionStepsMax = float(workConfig.get("quilt", "transitionStepsMax"))
 
-	config.transformShape  = (workConfig.getboolean("quilt", 'transformShape'))
-	transformTuples = workConfig.get("quilt", 'transformTuples').split(",")
+	config.transformShape = workConfig.getboolean("quilt", "transformShape")
+	transformTuples = workConfig.get("quilt", "transformTuples").split(",")
 	config.transformTuples = tuple([float(i) for i in transformTuples])
 
-	redRange = workConfig.get("quilt", 'redRange').split(",")
+	redRange = workConfig.get("quilt", "redRange").split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
-	backgroundColor = workConfig.get("quilt", 'backgroundColor').split(",")
+	backgroundColor = workConfig.get("quilt", "backgroundColor").split(",")
 	config.backgroundColor = tuple([int(i) for i in backgroundColor])
 
-	config.opticalPattern = (workConfig.get("quilt", 'opticalPattern')) 
-	config.numUnits = int(workConfig.get("quilt", 'numUnits')) 
-	config.hGapSize = int(workConfig.get("quilt", 'hGapSize')) 
-	config.vGapSize = int(workConfig.get("quilt", 'vGapSize')) 
-	config.blockSize = int(workConfig.get("quilt", 'blockSize')) 
-	config.blockLength = float(workConfig.get("quilt", 'blockLength')) 
-	config.blockHeight = float(workConfig.get("quilt", 'blockHeight')) 
-	config.blockRows = int(workConfig.get("quilt", 'blockRows')) 
-	config.blockCols = int(workConfig.get("quilt", 'blockCols')) 
-	config.cntrOffsetX = int(workConfig.get("quilt", 'cntrOffsetX')) 
-	config.cntrOffsetY = int(workConfig.get("quilt", 'cntrOffsetY')) 
-	config.delay = float(workConfig.get("quilt", 'delay'))
-	config.colorPopProb = float(workConfig.get("quilt", 'colorPopProb'))
-	config.brightnessFactorDark = float(workConfig.get("quilt", 'brightnessFactorDark'))
-	config.brightnessFactorLight = float(workConfig.get("quilt", 'brightnessFactorLight'))
-	config.lines  = (workConfig.getboolean("quilt", 'lines'))
-	config.patternPrecision  = (workConfig.getboolean("quilt", 'patternPrecision'))
+	config.opticalPattern = workConfig.get("quilt", "opticalPattern")
+	config.numUnits = int(workConfig.get("quilt", "numUnits"))
+	config.hGapSize = int(workConfig.get("quilt", "hGapSize"))
+	config.vGapSize = int(workConfig.get("quilt", "vGapSize"))
+	config.blockSize = int(workConfig.get("quilt", "blockSize"))
+	config.blockLength = float(workConfig.get("quilt", "blockLength"))
+	config.blockHeight = float(workConfig.get("quilt", "blockHeight"))
+	config.blockRows = int(workConfig.get("quilt", "blockRows"))
+	config.blockCols = int(workConfig.get("quilt", "blockCols"))
+	config.cntrOffsetX = int(workConfig.get("quilt", "cntrOffsetX"))
+	config.cntrOffsetY = int(workConfig.get("quilt", "cntrOffsetY"))
+	config.delay = float(workConfig.get("quilt", "delay"))
+	config.colorPopProb = float(workConfig.get("quilt", "colorPopProb"))
+	config.brightnessFactorDark = float(workConfig.get("quilt", "brightnessFactorDark"))
+	config.brightnessFactorLight = float(
+		workConfig.get("quilt", "brightnessFactorLight")
+	)
+	config.lines = workConfig.getboolean("quilt", "lines")
+	config.patternPrecision = workConfig.getboolean("quilt", "patternPrecision")
 
-	config.polyDistortion = float(workConfig.get("quilt", 'polyDistortion')) 
+	config.polyDistortion = float(workConfig.get("quilt", "polyDistortion"))
 	config.polyDistortionMin = -config.polyDistortion
 	config.polyDistortionMax = config.polyDistortion
 
-	config.opticalPatterns = ["Regular","LighteningStrike","Diagonals"]
+	config.opticalPatterns = ["Regular", "LighteningStrike", "Diagonals"]
 	# "LighteningStrikeH"  aka Charlie Brown sweater ...
-	
-	# for now, all squares 
-	#config.blockLength = config.blockSize
-	#config.blockHeight = config.blockSize
 
-	config.canvasImage = Image.new("RGBA", (config.canvasImageWidth  , config.canvasImageHeight))
-	config.timeToComplete = int(workConfig.get("quilt", 'timeToComplete')) 
-	#config.timeToComplete = 60 #round(random.uniform(30,220))
+	# for now, all squares
+	# config.blockLength = config.blockSize
+	# config.blockHeight = config.blockSize
 
-	#createPieces()
+	config.canvasImage = Image.new(
+		"RGBA", (config.canvasImageWidth, config.canvasImageHeight)
+	)
+	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))
+	# config.timeToComplete = 60 #round(random.uniform(30,220))
+
+	# createPieces()
 	drawSqareSpiral(config)
 
-	#if(run) : runWork()
+	# if(run) : runWork()
 
 
 def restartPiece(config):
@@ -253,38 +291,36 @@ def restartPiece(config):
 
 	del config.unitArray[:]
 
-	p = math.floor(random.uniform(0,len(config.opticalPatterns)))
+	p = math.floor(random.uniform(0, len(config.opticalPatterns)))
 
 	config.opticalPattern = config.opticalPatterns[p]
-
 
 	drawSqareSpiral(config)
 
 
 def drawSqareSpiral(config):
 
-	#global config
+	# global config
 
-	config.t1  = time.time()
-	config.t2  = time.time()
-	
+	config.t1 = time.time()
+	config.t2 = time.time()
 
-	cntrOffset = [config.cntrOffsetX,config.cntrOffsetY]
+	cntrOffset = [config.cntrOffsetX, config.cntrOffsetY]
 
 	config.unitArray = []
 
 	## Alignment perfect setup
-	if(config.patternPrecision == True): sizeAdjustor = 1
+	if config.patternPrecision == True:
+		sizeAdjustor = 1
 
 	n = 0
 
-	darkValues = [.1 * config.brightness,.5 * config.brightness]
-	lightValues = [.5 * config.brightness,.99 * config.brightness]
+	darkValues = [0.1 * config.brightness, 0.5 * config.brightness]
+	lightValues = [0.5 * config.brightness, 0.99 * config.brightness]
 
 	opticalPattern = config.opticalPattern
 
-
-	'''
+	"""
 	LIGHTENING PATTERN
 	 dark right dark bottom   dark top. dark right
 	 dark top  dark left.   dark right. dark bottom
@@ -292,105 +328,102 @@ def drawSqareSpiral(config):
 	 repeat .....
 
 
-	'''
+	"""
 
+	for rows in range(0, config.blockRows):
 
-	for rows in range (0,config.blockRows) :
+		for cols in range(0, config.blockCols):
 
-		for cols in range (0,config.blockCols) :
+			if opticalPattern == "LighteningStrike":
 
-			if opticalPattern == "LighteningStrike" : 
-
-				if cols%2 > 0 :
-					if rows%2> 0 :
+				if cols % 2 > 0:
+					if rows % 2 > 0:
 						topValues = lightValues
 						rightValues = darkValues
 						bottomValues = darkValues
-						leftValues = lightValues		
-					else :
+						leftValues = lightValues
+					else:
 						topValues = darkValues
 						rightValues = darkValues
 						bottomValues = lightValues
-						leftValues = lightValues		
-				else :
-					if rows%2> 0 :
+						leftValues = lightValues
+				else:
+					if rows % 2 > 0:
 						topValues = darkValues
 						rightValues = lightValues
 						bottomValues = lightValues
-						leftValues = darkValues	
-					else :
+						leftValues = darkValues
+					else:
 						topValues = lightValues
 						rightValues = lightValues
 						bottomValues = darkValues
 						leftValues = darkValues
 
-			elif opticalPattern == "LighteningStrikeH" : 
+			elif opticalPattern == "LighteningStrikeH":
 
-				if cols%2 == 0 :
-					if rows%2 == 0 :
+				if cols % 2 == 0:
+					if rows % 2 == 0:
 						topValues = lightValues
 						rightValues = darkValues
 						bottomValues = darkValues
-						leftValues = lightValues		
-					else :
+						leftValues = lightValues
+					else:
 						topValues = darkValues
 						rightValues = lightValues
 						bottomValues = lightValues
-						leftValues = darkValues		
-				else :
-					if rows%2 == 0 :
+						leftValues = darkValues
+				else:
+					if rows % 2 == 0:
 						topValues = lightValues
 						rightValues = lightValues
 						bottomValues = darkValues
-						leftValues = darkValues	
-					else :
+						leftValues = darkValues
+					else:
 						topValues = darkValues
 						rightValues = darkValues
 						bottomValues = lightValues
 						leftValues = lightValues
 
-			elif opticalPattern == "Diagonals" : 
+			elif opticalPattern == "Diagonals":
 
-				if cols%2 > 0 :
-					if rows%2> 0 :
+				if cols % 2 > 0:
+					if rows % 2 > 0:
 						topValues = darkValues
 						rightValues = darkValues
 						bottomValues = lightValues
-						leftValues = lightValues		
-					else :
+						leftValues = lightValues
+					else:
 						topValues = lightValues
 						rightValues = lightValues
 						bottomValues = darkValues
-						leftValues = darkValues		
-				else :
-					if rows%2> 0 :
+						leftValues = darkValues
+				else:
+					if rows % 2 > 0:
 						topValues = lightValues
 						rightValues = lightValues
 						bottomValues = darkValues
-						leftValues = darkValues	
-					else :
+						leftValues = darkValues
+					else:
 						topValues = darkValues
 						rightValues = darkValues
 						bottomValues = lightValues
-						leftValues = lightValues			
-			else :
+						leftValues = lightValues
+			else:
 
 				topValues = lightValues
 				rightValues = lightValues
 				bottomValues = darkValues
 				leftValues = darkValues
 
-
-
 			hDelta = config.numUnits * config.blockLength * 2 + config.hGapSize
 			vDelta = config.numUnits * config.blockHeight * 2 + config.vGapSize
 
-			cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]	
+			cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]
 			outlineColorObj = coloroverlay.ColorOverlay()
-			outlineColorObj.randomRange = (5.0,30.0)
+			outlineColorObj.randomRange = (5.0, 30.0)
 			outlineColorObj.colorTransitionSetup()
 
-			n+=1
+			n += 1
 
 			## Archimedean spiral is  r = a + b * theta
 			turns = config.numUnits + 1
@@ -399,39 +432,40 @@ def drawSqareSpiral(config):
 
 			A = []
 			B = []
-			rangeChange = (config.polyDistortionMin,config.polyDistortionMax)
+			rangeChange = (config.polyDistortionMin, config.polyDistortionMax)
 
-			for i in range(1,turns):
-				x = i * b1 + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
-				y = i * b2 + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
-				A.append((x,y))
+			for i in range(1, turns):
+				x = i * b1 + cntr[0] + random.uniform(rangeChange[0], rangeChange[1])
+				y = i * b2 + cntr[1]  # + random.uniform(rangeChange[0],rangeChange[1])
+				A.append((x, y))
 
-				x = -i * b1 + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
-				y = i * b2 + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
-				A.append((x,y))
+				x = -i * b1 + cntr[0]  # + random.uniform(rangeChange[0],rangeChange[1])
+				y = i * b2 + cntr[1] + random.uniform(rangeChange[0], rangeChange[1])
+				A.append((x, y))
 
-				x = -i * b1 + cntr[0] + random.uniform(rangeChange[0],rangeChange[1])
-				y = -i * b2 + cntr[1] #+ random.uniform(rangeChange[0],rangeChange[1])
-				A.append((x,y))
+				x = -i * b1 + cntr[0] + random.uniform(rangeChange[0], rangeChange[1])
+				y = -i * b2 + cntr[1]  # + random.uniform(rangeChange[0],rangeChange[1])
+				A.append((x, y))
 
-				x = (i + 1) * b1 + cntr[0] #+ random.uniform(rangeChange[0],rangeChange[1])
-				y = -i * b2 + cntr[1] + random.uniform(rangeChange[0],rangeChange[1])
-				A.append((x,y))
+				x = (i + 1) * b1 + cntr[
+					0
+				]  # + random.uniform(rangeChange[0],rangeChange[1])
+				y = -i * b2 + cntr[1] + random.uniform(rangeChange[0], rangeChange[1])
+				A.append((x, y))
 
-
-			B = [(item[0] - b1 ,item[1] ) for item in A]
+			B = [(item[0] - b1, item[1]) for item in A]
 
 			obj = unit(config)
 			obj.fillColorMode = "red"
 			obj.changeColor = False
-			obj.outlineColorObj	= outlineColorObj
+			obj.outlineColorObj = outlineColorObj
 			obj.poly = (A[2], B[3], A[0], A[1])
 
 			# This is the center square, so should be red, like the hearth it represents
-			obj.minSaturation = .8
+			obj.minSaturation = 0.8
 			obj.maxSaturation = 1
-			obj.minValue = .1
-			obj.maxValue = .7
+			obj.minValue = 0.1
+			obj.maxValue = 0.7
 			obj.minHue = 0
 			obj.maxHue = 36
 
@@ -440,17 +474,16 @@ def drawSqareSpiral(config):
 
 			n = 1
 
-
 			for i in range(0, turns):
-				try :
-					#LEFT
-					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
+				try:
+					# LEFT
+					# draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
 					obj = unit(config)
-					obj.poly = (B[n+1], A[n+1], A[n+0], B[n+0])
+					obj.poly = (B[n + 1], A[n + 1], A[n + 0], B[n + 0])
 					obj.changeColor = False
-					obj.outlineColorObj	= outlineColorObj
+					obj.outlineColorObj = outlineColorObj
 
-					obj.minSaturation = .5
+					obj.minSaturation = 0.5
 					obj.maxSaturation = 1
 					obj.minValue = leftValues[0]
 					obj.maxValue = leftValues[1]
@@ -460,13 +493,13 @@ def drawSqareSpiral(config):
 					obj.setUp(n)
 					config.unitArray.append(obj)
 
-					#BOTTOM
+					# BOTTOM
 					obj = unit(config)
-					obj.poly = (B[n+0], A[n-1], B[n+3], A[n+4])
+					obj.poly = (B[n + 0], A[n - 1], B[n + 3], A[n + 4])
 					obj.changeColor = False
-					obj.outlineColorObj	= outlineColorObj
+					obj.outlineColorObj = outlineColorObj
 
-					obj.minSaturation = .8
+					obj.minSaturation = 0.8
 					obj.maxSaturation = 1
 					obj.minValue = bottomValues[0]
 					obj.maxValue = bottomValues[1]
@@ -475,16 +508,16 @@ def drawSqareSpiral(config):
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
-					#draw.polygon(poly, fill=colorutils.randomColor())
+					# draw.polygon(poly, fill=colorutils.randomColor())
 
-					#RIGHT
+					# RIGHT
 					obj = unit(config)
-					obj.poly = (B[n+2], A[n+2], A[n+3], B[n+3])
+					obj.poly = (B[n + 2], A[n + 2], A[n + 3], B[n + 3])
 					obj.changeColor = False
-					obj.outlineColorObj	= outlineColorObj
+					obj.outlineColorObj = outlineColorObj
 
-					obj.minSaturation = .7
-					obj.maxSaturation = .9
+					obj.minSaturation = 0.7
+					obj.maxSaturation = 0.9
 					obj.minValue = rightValues[0]
 					obj.maxValue = rightValues[1]
 					obj.minHue = 0
@@ -492,16 +525,16 @@ def drawSqareSpiral(config):
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
-					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
+					# draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
 
-					#TOP
+					# TOP
 					obj = unit(config)
-					obj.poly = (B[n+1], A[n+5], B[n+6], A[n+2])
+					obj.poly = (B[n + 1], A[n + 5], B[n + 6], A[n + 2])
 					obj.changeColor = False
-					obj.outlineColorObj	= outlineColorObj
+					obj.outlineColorObj = outlineColorObj
 
-					obj.minSaturation = .7
-					obj.maxSaturation = .9
+					obj.minSaturation = 0.7
+					obj.maxSaturation = 0.9
 					obj.minValue = topValues[0]
 					obj.maxValue = topValues[1]
 					obj.minHue = config.redRange[0]
@@ -509,48 +542,48 @@ def drawSqareSpiral(config):
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
-					#draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
+					# draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
 
 					n += 4
-				except Exception as e :
-					#print(e)
+				except Exception as e:
+					# print(e)
 					pass
 
 
 def runWork(config):
-	#global blocks, config, XOs
-	#gc.enable()
-	#print("quilts ",config.render, config.instanceNumber)
+	# global blocks, config, XOs
+	# gc.enable()
+	# print("quilts ",config.render, config.instanceNumber)
 	while True:
 		iterate(config)
-		time.sleep(config.delay)  
+		time.sleep(config.delay)
 
 
-def iterate(config) :
-	#global config
+def iterate(config):
+	# global config
 	config.outlineColorObj.stepTransition()
 
-	for i in range(0,len(config.unitArray)):
+	for i in range(0, len(config.unitArray)):
 		obj = config.unitArray[i]
-		if(random.random() > .98) : obj.outlineColorObj.stepTransition()
+		if random.random() > 0.98:
+			obj.outlineColorObj.stepTransition()
 		obj.update()
 		obj.renderPolys()
 
 	temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	tDraw = ImageDraw.Draw(temp) 
-	tDraw.rectangle(((0,0),(config.screenWidth, config.screenHeight)), fill = config.backgroundColor)
-	temp.paste(config.canvasImage, (0,0), config.canvasImage)
-	if(config.transformShape == True) :
+	tDraw = ImageDraw.Draw(temp)
+	tDraw.rectangle(
+		((0, 0), (config.screenWidth, config.screenHeight)), fill=config.backgroundColor
+	)
+	temp.paste(config.canvasImage, (0, 0), config.canvasImage)
+	if config.transformShape == True:
 		temp = transformImage(temp)
 
-	#print("quilts ",config.render, config.instanceNumber)
-	config.render(temp, 0,0)
+	# print("quilts ",config.render, config.instanceNumber)
+	config.render(temp, 0, 0)
 
-	config.t2  = time.time()
-	delta = config.t2  - config.t1
+	config.t2 = time.time()
+	delta = config.t2 - config.t1
 
-	if delta > config.timeToComplete :
+	if delta > config.timeToComplete:
 		restartPiece(config)
-
-		
-

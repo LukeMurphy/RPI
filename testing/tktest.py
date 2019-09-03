@@ -1,5 +1,6 @@
 from Tkinter import *
 
+
 def run():
 	root = Tk()
 	w = 600
@@ -15,6 +16,7 @@ def run():
 	timerFired()
 	root.mainloop()
 
+
 def init():
 	global data
 	data["squareColor"] = "blue"
@@ -24,6 +26,8 @@ def init():
 	data["counter"] = 0
 	data["goingR"] = True
 	data["goingD"] = False
+
+
 def timerFired():
 	global data
 	foo = data["foo"]
@@ -32,47 +36,61 @@ def timerFired():
 	delay = 10
 	foo.after(delay, timerFired)
 
+
 def doTimerFired():
 	global data
 	if data["goingR"]:
-		if (data["squareLeft"] + data["squareSize"] > data["w"]):
-			data["goingR"] = False
-		else:
-			moveRight()
+	    if data["squareLeft"] + data["squareSize"] > data["w"]:
+	        data["goingR"] = False
+	    else:
+	        moveRight()
 	else:
-		if (data["squareLeft"] < 0):
-			data["goingR"] = True
-		else:
-			moveLeft()
+	    if data["squareLeft"] < 0:
+	        data["goingR"] = True
+	    else:
+	        moveLeft()
 	if data["goingD"]:
-			if (data["squareTop"] + data["squareSize"] > data["h"]):
-				data["goingD"] = False
-			else:
-				moveDown()
+	    if data["squareTop"] + data["squareSize"] > data["h"]:
+	        data["goingD"] = False
+	    else:
+	        moveDown()
 	else:
-		if (data["squareTop"] < 0):
-			data["goingD"] = True
-		else:
-			moveUp()
+	    if data["squareTop"] < 0:
+	        data["goingD"] = True
+	    else:
+	        moveUp()
+
 
 def moveLeft():
 	global data
 	data["squareLeft"] -= 5
+
+
 def moveRight():
 	global data
 	data["squareLeft"] += 5
+
+
 def moveUp():
 	global data
 	data["squareTop"] -= 5
+
+
 def moveDown():
 	global data
 	data["squareTop"] += 5
+
+
 def redrawAll():
 	global data
 	data["foo"].delete(ALL)
-	data["foo"].create_rectangle(data["squareLeft"],
-	data["squareTop"],
-	data["squareLeft"] + data["squareSize"],
-	data["squareTop"] + data["squareSize"],
-	fill=data["squareColor"])
+	data["foo"].create_rectangle(
+	    data["squareLeft"],
+	    data["squareTop"],
+	    data["squareLeft"] + data["squareSize"],
+	    data["squareTop"] + data["squareSize"],
+	    fill=data["squareColor"],
+	)
+
+
 run()

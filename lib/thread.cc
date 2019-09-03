@@ -35,7 +35,7 @@ void Thread::WaitStopped() {
   if (!started_) return;
   int result = pthread_join(thread_, NULL);
   if (result != 0) {
-    fprintf(stderr, "err code: %d %s\n", result, strerror(result));
+	fprintf(stderr, "err code: %d %s\n", result, strerror(result));
   }
   started_ = false;
 }
@@ -45,9 +45,9 @@ void Thread::Start(int priority) {
   pthread_create(&thread_, NULL, &PthreadCallRun, this);
 
   if (priority > 0) {
-    struct sched_param p;
-    p.sched_priority = priority;
-    pthread_setschedparam(thread_, SCHED_FIFO, &p);
+	struct sched_param p;
+	p.sched_priority = priority;
+	pthread_setschedparam(thread_, SCHED_FIFO, &p);
   }
 
   started_ = true;

@@ -1,11 +1,12 @@
-import time
-import random
-import math
-import datetime
-from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from modules import colorutils, coloroverlay
 import argparse
+import datetime
+import math
+import random
+import time
 from threading import Timer
+
+from modules import coloroverlay, colorutils
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 
 def marker(x, y, draw, f="red"):
@@ -15,66 +16,69 @@ def marker(x, y, draw, f="red"):
 def getColorChanger():
 
 	colOverlay = coloroverlay.ColorOverlay(False)
-	colOverlay.randomSteps = False 
-	colOverlay.timeTrigger = True 
-	colOverlay.tLimitBase = 10 
+	colOverlay.randomSteps = False
+	colOverlay.timeTrigger = True
+	colOverlay.tLimitBase = 10
 	colOverlay.maxBrightness = config.brightness
 	colOverlay.steps = 50
-	colOverlay.minHue = float(workConfig.get("pattern", 'minHue'))
-	colOverlay.maxHue = float(workConfig.get("pattern", 'maxHue'))
-	colOverlay.minSaturation = float(workConfig.get("pattern", 'minSaturation'))
-	colOverlay.maxSaturation = float(workConfig.get("pattern", 'maxSaturation'))
-	colOverlay.minValue = float(workConfig.get("pattern", 'minValue'))
-	colOverlay.maxValue = float(workConfig.get("pattern", 'maxValue'))
-	config.randomRangeMin = int(workConfig.get("pattern", 'randomRangeMin'))
-	config.randomRangeMax = int(workConfig.get("pattern", 'randomRangeMax'))
+	colOverlay.minHue = float(workConfig.get("pattern", "minHue"))
+	colOverlay.maxHue = float(workConfig.get("pattern", "maxHue"))
+	colOverlay.minSaturation = float(workConfig.get("pattern", "minSaturation"))
+	colOverlay.maxSaturation = float(workConfig.get("pattern", "maxSaturation"))
+	colOverlay.minValue = float(workConfig.get("pattern", "minValue"))
+	colOverlay.maxValue = float(workConfig.get("pattern", "maxValue"))
+	config.randomRangeMin = int(workConfig.get("pattern", "randomRangeMin"))
+	config.randomRangeMax = int(workConfig.get("pattern", "randomRangeMax"))
 	colOverlay.randomRange = (config.randomRangeMin, config.randomRangeMax)
 	return colOverlay
 
-def setColorProperties(c) :
-	#c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
+
+def setColorProperties(c):
+	# c.maxBrightness = float(workConfig.get("pattern", 'maxBrightness'))
 	c.colorTransitionSetup()
 	c.getNewColor()
 	c.setStartColor()
 	c.stepTransition()
 	pass
 
+
 def drawPattern():
 
 	draw = config.draw
 	config.colorArray = []
 
-	for i in config.colorArrayBase :
+	for i in config.colorArrayBase:
 		i.stepTransition()
 		config.colorArray.append(tuple(i.currentColor))
 
 	drawConcentricRings()
-	#drawTheReal()
+	# drawTheReal()
 
 
-def drawTheReal() :
+def drawTheReal():
 	x = config.blockDims[0]
 	y = config.blockDims[1]
 	w = config.blockDims[2] + x
 	h = config.blockDims[3] + y
 	box = tuple([x, y, w, h])
-	config.canvasDraw.rectangle(box, fill = tuple(config.f2.currentColor))
-
+	config.canvasDraw.rectangle(box, fill=tuple(config.f2.currentColor))
 
 	lines = h - y
-	for i in range(0, lines, config.blockSteps)  :
-		f =  tuple(config.f1.currentColor)
-		if random.random() < .001 :
+	for i in range(0, lines, config.blockSteps):
+		f = tuple(config.f1.currentColor)
+		if random.random() < 0.001:
 			f = colorutils.randomColor(1)
 			f = tuple(config.f4.currentColor)
-		config.canvasDraw.rectangle((x,y+i,w,y+i+config.blockLineHeight) , fill = f)
+		config.canvasDraw.rectangle(
+			(x, y + i, w, y + i + config.blockLineHeight), fill=f
+		)
 
 
-def resetPause() :
+def resetPause():
 	config.paused = False
-	
-	#config.turnRateLimPlus = random.uniform(1,3)
-	#config.turnRateLimNeg = random.uniform(config.turnRateLimPlus-1 ,config.turnRateLimPlus - 3)
+
+	# config.turnRateLimPlus = random.uniform(1,3)
+	# config.turnRateLimNeg = random.uniform(config.turnRateLimPlus-1 ,config.turnRateLimPlus - 3)
 
 
 def drawConcentricRings():
@@ -90,7 +94,7 @@ def drawConcentricRings():
 	"Ideally, make the rate of change sinusoidal - i.e. change the rate\
 	gradually over time so there are smooth transitions back and forth"
 
-	'''
+	"""
 	config.angle += config.angleIncrement
 	if config.angle == 0 or config.angle == math.pi or config.angle == 2*math.pi :
 		pass
@@ -102,71 +106,79 @@ def drawConcentricRings():
 
 	if random.random() > .99 :
 		config.turnRateChange = random.uniform(.5,3) / config.turnRateFactor
-	'''
-
+	"""
 
 	if config.paused == False and config.turnRateBase != 0:
 		config.turnRate += config.turnRateChange * config.turnRateDirection
-		#config.turnRate = rate 
+		# config.turnRate = rate
 
-		if random.random() < .005 :
+		if random.random() < 0.005:
 			config.paused = True
-			d = random.uniform(5,20)
+			d = random.uniform(5, 20)
 			t1 = Timer(d, resetPause)
 			t1.start()
-		
-		if config.turnRate > config.turnRateLimPlus :
+
+		if config.turnRate > config.turnRateLimPlus:
 
 			config.turnRateDirection = -1
 			config.turnRate = config.turnRateLimPlus
 
-			#config.paused = True
-			d = random.uniform(5,20)
+			# config.paused = True
+			d = random.uniform(5, 20)
 			t1 = Timer(d, resetPause)
-			#t1.start()
+			# t1.start()
 
 		if config.turnRate < config.turnRateLimNeg:
 			config.turnRateDirection = 1
 
-			#config.paused = True
-			d = random.uniform(5,20)
+			# config.paused = True
+			d = random.uniform(5, 20)
 			t = Timer(d, resetPause)
-			#t.start()
-		
-
+			# t.start()
 
 	f = 0
 	for figures in range(0, figs):
 
-		figureAngle = 0 * figures 
+		figureAngle = 0 * figures
 		figx = 0
 		figy = 0
-		
-		if config.turnRate == 0 :
-			delta = 0
-		else :
-			delta = config.theta/config.turnRate * figures
 
-		#figureAngleOffset = math.pi/4 + delta
+		if config.turnRate == 0:
+			delta = 0
+		else:
+			delta = config.theta / config.turnRate * figures
+
+		# figureAngleOffset = math.pi/4 + delta
 		figureAngleOffset = config.figureRotationBase + delta
 
-		config.r*= config.reduceRate/config.phi
+		config.r *= config.reduceRate / config.phi
 
 		pointsArray = []
 
 		for i in range(0, config.n):
 			angle = config.theta * i + figureAngleOffset
-			x = config.r * math.cos(angle) + config.offset[0] + config.figureDistortions[figures][i]
-			y = config.r * math.sin(angle) + config.offset[1] + config.figureDistortions[figures][i]
-			pointsArray.append((x,y))
+			x = (
+				config.r * math.cos(angle)
+				+ config.offset[0]
+				+ config.figureDistortions[figures][i]
+			)
+			y = (
+				config.r * math.sin(angle)
+				+ config.offset[1]
+				+ config.figureDistortions[figures][i]
+			)
+			pointsArray.append((x, y))
 
-		if config.showLines == True :
-			config.draw.polygon(pointsArray, outline=config.colorArray[0], fill = config.colorArray[f])
-		else :
-			config.draw.polygon(pointsArray, outline=None, fill = config.colorArray[f])
+		if config.showLines == True:
+			config.draw.polygon(
+				pointsArray, outline=config.colorArray[0], fill=config.colorArray[f]
+			)
+		else:
+			config.draw.polygon(pointsArray, outline=None, fill=config.colorArray[f])
 
 		f += 1
-		if f >= config.colorRep : f = 0
+		if f >= config.colorRep:
+			f = 0
 
 
 def showGrid():
@@ -183,49 +195,44 @@ def main(run=True):
 
 	colorutils.brightness = config.brightness
 
-	config.delay = float(workConfig.get("pattern", 'delay'))
-	config.base = float(workConfig.get("pattern", 'base'))
-	config.rows = int(workConfig.get("pattern", 'rows'))
-	config.cols = int(workConfig.get("pattern", 'cols'))
+	config.delay = float(workConfig.get("pattern", "delay"))
+	config.base = float(workConfig.get("pattern", "base"))
+	config.rows = int(workConfig.get("pattern", "rows"))
+	config.cols = int(workConfig.get("pattern", "cols"))
 
+	config.patternSet = workConfig.get("pattern", "patternSet")
+	config.showLines = workConfig.getboolean("pattern", "showLines")
 
-	config.patternSet = workConfig.get("pattern", 'patternSet')
-	config.showLines = workConfig.getboolean("pattern", 'showLines')
+	config.initialRadius = float(workConfig.get(config.patternSet, "initialRadius"))
+	config.nSides = int(workConfig.get(config.patternSet, "nSides"))
+	config.colorRep = int(workConfig.get(config.patternSet, "colorRep"))
+	config.repeatFigures = int(workConfig.get(config.patternSet, "repeatFigures"))
+	config.reduceRate = float(workConfig.get(config.patternSet, "reduceRate"))
+	config.pointVariation = float(workConfig.get("pattern", "pointVariation"))
+	config.figureRotationBaseDegrees = float(
+		workConfig.get("pattern", "figureRotationBaseDegrees")
+	)
+	config.figureRotationBase = config.figureRotationBaseDegrees * math.pi / 180
 
-	config.initialRadius = float(workConfig.get(config.patternSet, 'initialRadius'))
-	config.nSides = int(workConfig.get(config.patternSet, 'nSides'))
-	config.colorRep = int(workConfig.get(config.patternSet, 'colorRep'))
-	config.repeatFigures = int(workConfig.get(config.patternSet, 'repeatFigures'))
-	config.reduceRate = float(workConfig.get(config.patternSet, 'reduceRate'))
-	config.pointVariation = float(workConfig.get("pattern", 'pointVariation'))
-	config.figureRotationBaseDegrees = float(workConfig.get("pattern", 'figureRotationBaseDegrees'))
-	config.figureRotationBase = config.figureRotationBaseDegrees * math.pi/180
-
-
-	config.turnRateChange = float(workConfig.get("pattern", 'turnRateChange'))
-	config.turnRateLimPlus = float(workConfig.get("pattern", 'turnRateLimPlus'))
-	config.turnRateLimNeg = float(workConfig.get("pattern", 'turnRateLimNeg'))
-	config.turnRateFactor = float(workConfig.get("pattern", 'turnRateFactor'))
-	config.turnRateBase = float(workConfig.get(config.patternSet, 'turnRateBase'))
+	config.turnRateChange = float(workConfig.get("pattern", "turnRateChange"))
+	config.turnRateLimPlus = float(workConfig.get("pattern", "turnRateLimPlus"))
+	config.turnRateLimNeg = float(workConfig.get("pattern", "turnRateLimNeg"))
+	config.turnRateFactor = float(workConfig.get("pattern", "turnRateFactor"))
+	config.turnRateBase = float(workConfig.get(config.patternSet, "turnRateBase"))
 	config.turnRateDirection = 1
 	config.turnRate = config.turnRateBase
 
-	config.xOffset = int(workConfig.get("pattern", 'xOffset'))
-	config.yOffset = int(workConfig.get("pattern", 'yOffset'))
+	config.xOffset = int(workConfig.get("pattern", "xOffset"))
+	config.yOffset = int(workConfig.get("pattern", "yOffset"))
 	config.imageOffsetY = 0
 	config.imageOffsetX = 0
 
-	config.block = ((workConfig.get("pattern", 'block')).split(','))
+	config.block = (workConfig.get("pattern", "block")).split(",")
 	config.blockDims = list([int(i) for i in config.block])
-	config.blockLineHeight = int(workConfig.get("pattern", 'blockLineHeight'))
-	config.blockSteps = int(workConfig.get("pattern", 'blockSteps'))
-	config.paused =  False
+	config.blockLineHeight = int(workConfig.get("pattern", "blockLineHeight"))
+	config.blockSteps = int(workConfig.get("pattern", "blockSteps"))
+	config.paused = False
 	config.timeDelay = 5.0
-
-
-
-
-
 
 	# Start from center for each polygon
 	"sin (theta) = (r + d) / s"
@@ -237,7 +244,7 @@ def main(run=True):
 	config.theta = 2 * math.pi / config.n
 	config.side = 2 * config.r * math.cos(config.theta / 2)
 	config.d = config.side * math.sin(config.theta) - config.r
-	config.phi = (1.0 + math.sqrt(5.0))/2
+	config.phi = (1.0 + math.sqrt(5.0)) / 2
 
 	config.f1 = getColorChanger()
 	config.f2 = getColorChanger()
@@ -246,25 +253,32 @@ def main(run=True):
 	config.f5 = getColorChanger()
 	config.f6 = getColorChanger()
 
-	config.colorArrayBase = [config.f1, config.f2, config.f3, config.f4, config.f5, config.f6]
+	config.colorArrayBase = [
+		config.f1,
+		config.f2,
+		config.f3,
+		config.f4,
+		config.f5,
+		config.f6,
+	]
 
-	for i in range(0,6) :
+	for i in range(0, 6):
 		setColorProperties(config.colorArrayBase[i])
 
 	config.figureDistortions = []
 
 	var = config.pointVariation
-	for i in range(0,config.repeatFigures) :
-		polyDist  = []
-		varToUse = var - var * i/config.repeatFigures
-		#print (varToUse)
+	for i in range(0, config.repeatFigures):
+		polyDist = []
+		varToUse = var - var * i / config.repeatFigures
+		# print (varToUse)
 		for ii in range(0, config.n):
-			#polyDist.append(var  - random.random() * 2 * var)
-			polyDist.append(varToUse  - random.random() * 2 * varToUse)
+			# polyDist.append(var  - random.random() * 2 * var)
+			polyDist.append(varToUse - random.random() * 2 * varToUse)
 
 		config.figureDistortions.append(polyDist)
 
-	'''
+	"""
 	config.f2.minHue = config.f1.minHue #90
 	config.f2.maxHue = config.f1.maxHue #180
 	config.f2.minSaturation = config.f1.minSaturation #.1
@@ -280,10 +294,10 @@ def main(run=True):
 	config.f3.minValue = config.f1.minValue #.2
 	config.f3.maxValue = config.f1.maxValue #.5
 	config.f3.maxBrightness = config.f1.maxBrightness #.5
-	'''
+	"""
 
 	config.angle = 0
-	config.angleIncrement = math.pi/1000
+	config.angleIncrement = math.pi / 1000
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
@@ -292,8 +306,7 @@ def main(run=True):
 
 	setUp()
 
-	#if(run) : runWork()
-
+	# if(run) : runWork()
 
 
 def setUp():

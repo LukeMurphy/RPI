@@ -1,40 +1,54 @@
-import time, threading, random
-import sys
 import os
+import random
 import subprocess
-from tkinter import *
+import sys
+import threading
+import time
 import tkinter as tk
+from tkinter import *
 
 import PIL.Image
+from PIL import (
+	Image,
+	ImageChops,
+	ImageDraw,
+	ImageEnhance,
+	ImageFilter,
+	ImageFont,
+	ImageTk,
+)
 
-from PIL import Image, ImageTk, ImageDraw, ImageFont
-from PIL import ImageFilter, ImageChops, ImageEnhance
 
 def print_time(args):
-	print ("From print_time", time.time(), args)
+	print("From print_time", time.time(), args)
+
 
 def print_some_times():
-	print ("time one", time.time())
+	print("time one", time.time())
 	Timer(2, print_time, ()).start()
 	Timer(4, print_time, ()).start()
-	#time.sleep(8)  # sleep while time-delay events execute
-	print ("time two", time.time())
+	# time.sleep(8)  # sleep while time-delay events execute
+	print("time two", time.time())
+
 
 def setInterval(func, sec, args):
 	def func_wrapper():
-		func(args)
-		setInterval(func, sec, args)
-		
+	    func(args)
+	    setInterval(func, sec, args)
+
 	t = threading.Timer(sec, func_wrapper)
 	t.start()
 	return t
 
-#print_some_times()
+
+# print_some_times()
+
 
 def Init():
-	
-	n = setInterval(print_time, .5, "fiver")
-	ns = setInterval(print_time, .1, ".1er")
+
+	n = setInterval(print_time, 0.5, "fiver")
+	ns = setInterval(print_time, 0.1, ".1er")
+
 
 def run():
 	root = tk.Tk()
@@ -45,42 +59,32 @@ def run():
 	root.mainloop()
 
 
+# run()
 
-#run()
+# import Queue
 
-#import Queue
-
-#q = Queue.Queue()
+# q = Queue.Queue()
 
 # Run tkinter code in another thread
 
 
-
 class App(threading.Thread):
+	def __init__(self):
+	    threading.Thread.__init__(self)
+	    self.start()
 
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.start()
+	def callback(self):
+	    self.root.quit()
 
-    def callback(self):
-        self.root.quit()
+	def run(self):
+	    self.root = tk.Tk()
+	    self.root.protocol("WM_DELETE_WINDOW", self.callback)
 
-    def run(self):
-        self.root = tk.Tk()
-        self.root.protocol("WM_DELETE_WINDOW", self.callback)
+	    label = tk.Label(self.root, text="Hello World")
+	    label.pack()
 
-        label = tk.Label(self.root, text="Hello World")
-        label.pack()
-
-        self.root.mainloop()
+	    self.root.mainloop()
 
 
 app = App()
-print('Now we can continue running code while mainloop runs!')
-
-
-
-
-
-
-
+print("Now we can continue running code while mainloop runs!")

@@ -1,47 +1,59 @@
 #!/usr/bin/python
 
+import argparse
+import configparser
+import getopt
 import os
 import sys
-import getopt
 import time
-import configparser
-from modules import configuration
-from modules.configuration import bcolors
-from modules import player
-import argparse
+
 import noise
-from PIL import ImageFont, Image, ImageDraw, ImageOps, ImageEnhance, ImageChops
-from PIL import ImageFilter
-from modules import colorutils, coloroverlay
-
-from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
-from pieces.workmodules.particleobjects.particle import Particle
-
 from configs import defaultpiece
-
+from modules import coloroverlay, colorutils, configuration, player
+from modules.configuration import bcolors
+from pieces.workmodules.particleobjects.particle import Particle
+from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
+from PIL import (
+	Image,
+	ImageChops,
+	ImageDraw,
+	ImageEnhance,
+	ImageFilter,
+	ImageFont,
+	ImageOps,
+)
 
 workconfig = configparser.ConfigParser()
 
-'''
+"""
 example:
 
 python player.py -cfg p4-6x5/stroop2
 python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
-'''
+"""
 
-parser = argparse.ArgumentParser(description='Process')
-parser.add_argument('-mname', type=str, default="local", help='machine name (optional)')
-parser.add_argument('-path', type=str, default="./", help='directory (optional)')
-#parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
-parser.add_argument('-cfg', type=str, required=False, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
-parser.add_argument('-brightnessOverride', type=int, help='brightness param to override the config value (optional)')
+parser = argparse.ArgumentParser(description="Process")
+parser.add_argument("-mname", type=str, default="local", help="machine name (optional)")
+parser.add_argument("-path", type=str, default="./", help="directory (optional)")
+# parser.add_argument('-cfg', type=str, required=True, help='Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg')
+parser.add_argument(
+	"-cfg",
+	type=str,
+	required=False,
+	help="Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg",
+)
+parser.add_argument(
+	"-brightnessOverride",
+	type=int,
+	help="brightness param to override the config value (optional)",
+)
 args = parser.parse_args()
 
 print("** " + str(args) + " **")
 
 
 # Create a blank dummy object container for now
-#config = type('', (object,), {})()
+# config = type('', (object,), {})()
 
 ##########################################################################
 #
@@ -53,24 +65,24 @@ print("** " + str(args) + " **")
 #
 ##########################################################################
 
-def loadFromArguments(reloading=False, config = None):
-	#global config, workconfig, path, tempImage, threads, thrd
 
+def loadFromArguments(reloading=False, config=None):
+	# global config, workconfig, path, tempImage, threads, thrd
 
 	print(bcolors.OKBLUE + "\n>> ** RELOADING: " + str(reloading) + bcolors.ENDC)
 
-	if(reloading == False):
+	if reloading == False:
 		try:
 			###
 			# Expects 3 arguments:
-			#		name-of-machine
+			# 		name-of-machine
 			#       the local path
-			#		the config file to load
-			'''
+			# 		the config file to load
+			"""
 			args = sys.argv
 			print("Arguments passed to player.py:")
 			print(args)
-			'''
+			"""
 			config = configuration.Config()
 			config.startTime = time.time()
 			config.currentTime = time.time()
@@ -81,13 +93,13 @@ def loadFromArguments(reloading=False, config = None):
 
 			# Load the default work
 
-			if(args.cfg != None):
+			if args.cfg != None:
 
-				'''
+				"""
 				config.MID = args[1]
 				config.path = args[2]
 				argument = args[3]
-				'''
+				"""
 
 				config.MID = args.mname
 				config.path = args.path
@@ -101,32 +113,46 @@ def loadFromArguments(reloading=False, config = None):
 
 				# Optional 4th argument to override the brightness set in the
 				# config
-				if(args.brightnessOverride != None):
+				if args.brightnessOverride != None:
 					brightnessOverride = args.brightnessOverride
 					config.brightness = float(float(brightnessOverride) / 100)
-					config.brightnessOverride = float(
-						float(brightnessOverride) / 100)
+					config.brightnessOverride = float(float(brightnessOverride) / 100)
 
 				f = os.path.getmtime(argument)
 				config.delta = int((config.startTime - f))
-				print(bcolors.OKGREEN + "** " + str(argument) +  " --> LAST MODIFIED DELTA: " +  str(config.delta) + " **" + bcolors.ENDC)
+				print(
+					bcolors.OKGREEN
+					+ "** "
+					+ str(argument)
+					+ " --> LAST MODIFIED DELTA: "
+					+ str(config.delta)
+					+ " **"
+					+ bcolors.ENDC
+				)
 			else:
 				# Machine ID
-				config.MID = 'local'
+				config.MID = "local"
 				# Default Work Instance ID
 				config.WRKINID = defaultpiece.defaultPieceToRun
 				# Default Local Path
-				config.path = '/Users/lamshell/Documents/Dev/RPI/'
-				print(bcolors.WARNING + "** Loading " + config.path + 'configs/' + config.WRKINID + ".cfg" + " to run. **" + bcolors.ENDC)
-				workconfig.read(config.path + 'configs/' + config.WRKINID + ".cfg")
+				config.path = "/Users/lamshell/Documents/Dev/RPI/"
+				print(
+					bcolors.WARNING
+					+ "** Loading "
+					+ config.path
+					+ "configs/"
+					+ config.WRKINID
+					+ ".cfg"
+					+ " to run. **"
+					+ bcolors.ENDC
+				)
+				workconfig.read(config.path + "configs/" + config.WRKINID + ".cfg")
 				print(bcolors.OKGREEN + "** ")
-				for c in workconfig :
+				for c in workconfig:
 					print(c)
 					for a in workconfig[c]:
-						print("\t" + str(a) + ":  " + str(workconfig.get(c,a)))
+						print("\t" + str(a) + ":  " + str(workconfig.get(c, a)))
 				print("**" + bcolors.ENDC)
-
-
 
 			player.configure(config, workconfig)
 
@@ -139,18 +165,19 @@ def loadFromArguments(reloading=False, config = None):
 		player.configure(config, workconfig)
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
 def main():
 	global config, threads
 	loadFromArguments()
-	'''
+	"""
 	# Threading now handled by renderer - e.g. see modules/rendertohub.py
 	thrd = threading.Thread(target=configure)
 	threads.append(thrd)
 	thrd.start()
-	'''
+	"""
+
 
 # Kick off .......
 if __name__ == "__main__":

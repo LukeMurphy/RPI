@@ -1,4 +1,3 @@
-def soliloquy(override = False,arg = "") :
-    # This has been removed to a separate class now
-    return True
-
+def soliloquy(override=False, arg=""):
+	# This has been removed to a separate class now
+	return True

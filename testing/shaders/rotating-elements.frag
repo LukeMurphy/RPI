@@ -32,7 +32,7 @@ float hash21(in vec2 n)
 
 vec2 hash22(in vec2 p)
 {
-    p = vec2( dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)) );
+	p = vec2( dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3)) );
 	return fract(sin(p)*43758.5453);
 }
 
@@ -46,8 +46,8 @@ mat2 makem2(in float theta)
 float field1(in vec2 p)
 {
 	vec2 n = floor(p)-0.5;
-    vec2 f = fract(p)-0.5;
-    vec2 o = hash22(n)*.35;
+	vec2 f = fract(p)-0.5;
+	vec2 o = hash22(n)*.35;
 	vec2 r = - f - o;
 	r *= makem2(u_time+hash21(n)*3.14);
 	
@@ -57,7 +57,7 @@ float field1(in vec2 p)
 	float d2 =  1.0-smoothstep(thickness,thickness+0.09,abs(r.y));
 	d2 *= 1.-smoothstep(lengt,lengt+0.02,abs(r.x));
 	
-    return max(d,d2);
+	return max(d,d2);
 }
 
 void mainImage()
@@ -78,5 +78,5 @@ void mainImage()
 }
 
 void main() {
-    mainImage();
+	mainImage();
 }

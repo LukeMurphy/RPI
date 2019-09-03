@@ -1,19 +1,26 @@
-import tkinter as tk
-from PIL import Image, ImageTk, ImageDraw, ImageFont
-from PIL import ImageFilter, ImageChops, ImageEnhance
 import random
-import time
 import threading
+import time
+import tkinter as tk
 
 from modules.filters import *
+from PIL import (
+	Image,
+	ImageChops,
+	ImageDraw,
+	ImageEnhance,
+	ImageFilter,
+	ImageFont,
+	ImageTk,
+)
 
-#from Tkinter import *
-#import tkMessageBox
-#import PIL.Image
-#import PIL.ImageTk
-#import gc, os
+# from Tkinter import *
+# import tkMessageBox
+# import PIL.Image
+# import PIL.ImageTk
+# import gc, os
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 global root
 memoryUsage = 0
@@ -22,28 +29,29 @@ counter = 0
 
 canvasOffsetX = 4
 canvasOffsetY = 7
-buff  =  8
+buff = 8
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 def setUp():
-	#global root, canvasOffsetX, canvasOffsetY, buff, config
+	# global root, canvasOffsetX, canvasOffsetY, buff, config
 	gc.enable()
-	
-	if(config.MID == "studio-mac") : 
+
+	if config.MID == "studio-mac":
 		config.path = "./"
-		windowOffset = [1900,20]
-		windowOffset = [2560,24]
+		windowOffset = [1900, 20]
+		windowOffset = [2560, 24]
 		windowOffset = [config.windowXOffset, config.windowYOffset]
-		#windowOffset = [4,45]
-	else :
-		windowOffset = [-1,13]
+		# windowOffset = [4,45]
+	else:
+		windowOffset = [-1, 13]
 		windowOffset = [config.windowXOffset, config.windowYOffset]
 
 	# -----> this is somewhat arbitrary - just to get the things aligned
 	# after rotation
-	#if(config.rotation == 90) : canvasOffsetY = -25
+	# if(config.rotation == 90) : canvasOffsetY = -25
 
 	root = tk.Tk()
 	w = config.screenWidth + buff
@@ -52,259 +60,290 @@ def setUp():
 	y = windowOffset[1]
 
 	root.overrideredirect(False)
-	root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-	#root.protocol("WM_DELETE_WINDOW", on_closing)
+	root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+	# root.protocol("WM_DELETE_WINDOW", on_closing)
 
-	#Button(root, text="Quit", command=root.quit).pack(side="bottom")
+	# Button(root, text="Quit", command=root.quit).pack(side="bottom")
 	root.lift()
 
 	config.root = root
 
-	cnvs = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=0)
+	cnvs = tk.Canvas(
+		root,
+		width=config.screenWidth + buff,
+		height=config.screenHeight + buff,
+		border=0,
+	)
 	config.cnvs = cnvs
-	config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
+	config.cnvs.create_rectangle(
+		0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black"
+	)
 	config.cnvs.pack()
-	config.cnvs.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff)
+	config.cnvs.place(
+		bordermode="outside",
+		width=config.screenWidth + buff,
+		height=config.screenHeight + buff,
+	)
 
-
-	'''
+	"""
 	cnvs2 = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=-4)
 	config.cnvs2 = cnvs2
 	config.cnvs2.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
 	config.cnvs2.pack()
 	config.cnvs2.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff, x=config.screenWidth + 2)
-	'''
+	"""
 
-	#tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
+	# tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	tempImage = ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor='nw', tag="mainer")
+	config.cnvs._image_id = config.cnvs.create_image(
+		canvasOffsetX, canvasOffsetY, image=tempImage, anchor="nw", tag="mainer"
+	)
 
-	#config.cnvs.update()
-	#config.cnvs.update_idletasks()
+	# config.cnvs.update()
+	# config.cnvs.update_idletasks()
 
 	config.torqueAngle = 0
 
-
 	root.after(100, startWork)
-	root.call('wm', 'attributes', '.', '-topmost', '1')
+	root.call("wm", "attributes", ".", "-topmost", "1")
 	root.mainloop()
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 def on_closing():
 	global root
 	return True
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def startWork(*args) :
-	#global config, work, root, counter
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
+def startWork(*args):
+	# global config, work, root, counter
 	global counter
 
 	### Putting the animation on its own thread
 	### Still throws and error when manually closed though...
 
 	try:
-		t  = threading.Thread.__init__(work.runWork())
+		t = threading.Thread.__init__(work.runWork())
 		t.start()
 	except tk.TclError as details:
 		print(details)
 		pass
 		exit()
 
-	#work.runWork()
-	
+	# work.runWork()
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-def updateCanvas() :
-	#global canvasOffsetX, canvasOffsetY, root, counter, buff
+
+def updateCanvas():
+	# global canvasOffsetX, canvasOffsetY, root, counter, buff
 	global counter
 	## For testing ...
-	#draw1  = ImageDraw.Draw(config.renderImageFull)
-	#draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
-	counter +=1
-	if(counter > 1000) :
-		#print(gc.get_count())
+	# draw1  = ImageDraw.Draw(config.renderImageFull)
+	# draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
+	counter += 1
+	if counter > 1000:
+		# print(gc.get_count())
 		# I don't know if this really really helps
 		gc.collect()
 		counter = 0
 
-
 	# This significantly helped performance !!
 	config.cnvs.delete("main")
 	config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=config.cnvs._image_tk, anchor='nw', tag="main")
+	config.cnvs._image_id = config.cnvs.create_image(
+		canvasOffsetX,
+		canvasOffsetY,
+		image=config.cnvs._image_tk,
+		anchor="nw",
+		tag="main",
+	)
 	config.cnvs.update()
 
-	'''
+	"""
 	config.cnvs2.delete("main")
 	config.cnvs2._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	config.cnvs2._image_id = config.cnvs2.create_image(canvasOffsetX -4, canvasOffsetY, image=config.cnvs2._image_tk, anchor='nw', tag="main")
 	config.cnvs2.update()
-	'''
-	
-	# This *should* be more efficient 
-	#config.cnvs.update_idletasks()
-	#root.update()
+	"""
+
+	# This *should* be more efficient
+	# config.cnvs.update_idletasks()
+	# root.update()
 
 	############################################################
 	######  Check if config file has changed and reload    #####
 	############################################################
 
-	if(config.checkForConfigChanges == True) :
+	if config.checkForConfigChanges == True:
 		currentTime = time.time()
-		f = os.path.getmtime(config.fileName )
-		config.delta = ((currentTime - f ))
+		f = os.path.getmtime(config.fileName)
+		config.delta = currentTime - f
 
-		if(config.delta <= 1) : 
-			if(config.reloadConfig == False) :
-				print ("** LAST MODIFIED DELTA: " + str(config.delta) + " **")
+		if config.delta <= 1:
+			if config.reloadConfig == False:
+				print("** LAST MODIFIED DELTA: " + str(config.delta) + " **")
 				config.doingReload = True
 				## NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
 				config.loadFromArguments(True, config)
 			config.reloadConfig = True
-		else :
+		else:
 			config.reloadConfig = False
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom=False, updateCanvasCall=True) :
-	#global memoryUsage
-	#global config, debug
+
+def render(
+	imageToRender,
+	xOffset,
+	yOffset,
+	w=128,
+	h=64,
+	nocrop=False,
+	overlayBottom=False,
+	updateCanvasCall=True,
+):
+	# global memoryUsage
+	# global config, debug
 
 	# Render to canvas
 	# This needs to be optomized !!!!!!
 
-	if(config.rotation != 0) : 
-		if(config.fullRotation == True) :
+	if config.rotation != 0:
+		if config.fullRotation == True:
 			# This rotates the image that is painted i.e. after pasting-in the image sent
-			config.renderImageFull = config.renderImageFull.rotate(-config.rotation, expand=False)
-		else :
+			config.renderImageFull = config.renderImageFull.rotate(
+				-config.rotation, expand=False
+			)
+		else:
 			# This rotates the image sent to be rendered
-			imageToRender = imageToRender.rotate(-config.rotation, expand=True )
-			#imageToRender = ImageChops.offset(imageToRender, -40, 40) 
+			imageToRender = imageToRender.rotate(-config.rotation, expand=True)
+			# imageToRender = ImageChops.offset(imageToRender, -40, 40)
 
-	try :
+	try:
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
-	except  :
+	except:
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
-	#config.drawBeforeConversion()
+	# config.drawBeforeConversion()
 
 	config.renderImageFull = config.renderImageFull.convert("RGB")
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
-	#config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40) 
+	# config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40)
 
 	# For planes, only this works - has to do with transparency of repeated pasting of
 	# PNG's I think
-	#newimage = Image.new('RGBA', config.renderImageFull.size)
-	#newimage.paste(config.renderImageFull, (0, 0))
-	#config.renderImageFull =  newimage.convert("RGB")
-	
-	#enhancer = ImageEnhance.Brightness(config.renderImageFull)
-	#config.renderImageFull = enhancer.enhance(.75)
+	# newimage = Image.new('RGBA', config.renderImageFull.size)
+	# newimage.paste(config.renderImageFull, (0, 0))
+	# config.renderImageFull =  newimage.convert("RGB")
 
+	# enhancer = ImageEnhance.Brightness(config.renderImageFull)
+	# config.renderImageFull = enhancer.enhance(.75)
 
-	if config.useFilters == True :
+	if config.useFilters == True:
 
-		if config.filterRemap == True :
+		if config.filterRemap == True:
 			config.tempImage = config.renderImageFull.copy()
-			config.tempImage = ditherFilter(config.tempImage,xOffset, yOffset, config)
+			config.tempImage = ditherFilter(config.tempImage, xOffset, yOffset, config)
 			crop = config.tempImage.crop(config.remapImageBlockSection)
 			crop = crop.convert("RGBA")
-			if config.ditherFilterBrightness != 1.0 :
-				crop = ImageEnhance.Brightness(crop).enhance(config.ditherFilterBrightness)			
+			if config.ditherFilterBrightness != 1.0:
+				crop = ImageEnhance.Brightness(crop).enhance(
+					config.ditherFilterBrightness
+				)
 			config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 		else:
-			config.renderImageFull = ditherFilter(config.renderImageFull,xOffset, yOffset, config)
+			config.renderImageFull = ditherFilter(
+				config.renderImageFull, xOffset, yOffset, config
+			)
 
-	if config.usePixelSort == True and config.pixelSortRotatesWithImage == True :
-		if(random.random()< config.pixelSortAppearanceProb) :
-			config.renderImageFull =  pixelSort(config.renderImageFull, config)
+	if config.usePixelSort == True and config.pixelSortRotatesWithImage == True:
+		if random.random() < config.pixelSortAppearanceProb:
+			config.renderImageFull = pixelSort(config.renderImageFull, config)
 
-	if config.rotation != 0  : 
-		if(config.rotationTrailing or config.fullRotation) : 
+	if config.rotation != 0:
+		if config.rotationTrailing or config.fullRotation:
 			# This rotates the image that is painted back to where it was
 			# basically same thing as rotating the image to be pasted in
 			# except in some cases, more trailing is created
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
-
 	# ---- Pixel Sort Type Effect ---- #
-	if config.usePixelSort and config.pixelSortRotatesWithImage == False  :
-		if(random.random()< config.pixelSortAppearanceProb) :
-			config.renderImageFull =  pixelSort(config.renderImageFull, config)
+	if config.usePixelSort and config.pixelSortRotatesWithImage == False:
+		if random.random() < config.pixelSortAppearanceProb:
+			config.renderImageFull = pixelSort(config.renderImageFull, config)
 
-			
-			#crop = config.renderImageFull.crop()
-			#crop = crop.convert("RGBA")
-			#crop =  pixelSort(crop, config)
-			#config.renderImageFull = config.renderImageFull.convert("RGBA")
-			#config.renderImageFull.paste(crop)
-
+			# crop = config.renderImageFull.crop()
+			# crop = crop.convert("RGBA")
+			# crop =  pixelSort(crop, config)
+			# config.renderImageFull = config.renderImageFull.convert("RGBA")
+			# config.renderImageFull.paste(crop)
 
 	# ---- Remap sections of image to accommodate odd panels ---- #
-	if config.remapImageBlock == True :
+	if config.remapImageBlock == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection)
-		if config.remapImageBlockSectionRotation != 0 :
+		if config.remapImageBlockSectionRotation != 0:
 			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockSectionRotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 
-
-	if config.remapImageBlock2 == True :
+	if config.remapImageBlock2 == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection2)
-		if config.remapImageBlockSection2Rotation != 0 :
+		if config.remapImageBlockSection2Rotation != 0:
 			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockSection2Rotation)
 		crop = crop.convert("RGBA")
-		config.renderImageFull.paste(crop, config.remapImageBlockDestination2, crop)	
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination2, crop)
 
-
-	if config.remapImageBlock3 == True :
+	if config.remapImageBlock3 == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection3)
-		if config.remapImageBlockSection3Rotation != 0 :
+		if config.remapImageBlockSection3Rotation != 0:
 			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockSection3Rotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
-		
 
-	if config.remapImageBlock4 == True :
+	if config.remapImageBlock4 == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection4)
-		if config.remapImageBlockSection4Rotation != 0 :
+		if config.remapImageBlockSection4Rotation != 0:
 			crop = crop.convert("RGBA")
 			crop = crop.rotate(config.remapImageBlockSection4Rotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination4, crop)
-		
-
 
 	# ---- Overall image blurring  ---- #
-	if config.useBlur == True :
-		'''
+	if config.useBlur == True:
+		"""
 		config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-		'''
+		"""
 		crop = config.renderImageFull.crop(config.blurSection)
 		destination = (config.blurXOffset, config.blurYOffset)
 		crop = crop.convert("RGBA")
 		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
 		config.renderImageFull.paste(crop, destination, crop)
-	
+
 	try:
-		if config.useLastOverlay == True :
-			config.renderDrawOver.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill, outline = None)
-			config.renderImageFull.paste(config.renderImageFullOverlay, (0,0), config.renderImageFullOverlay)
+		if config.useLastOverlay == True:
+			config.renderDrawOver.rectangle(
+				config.lastOverlayBox, fill=config.lastOverlayFill, outline=None
+			)
+			config.renderImageFull.paste(
+				config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
+			)
 	except Exception as e:
 		print(e)
 
-	'''
+	"""
 	for i in range(0,40) :
 		delta = 16
 		box = (0,i*delta,448,i*delta+delta)
@@ -316,21 +355,23 @@ def render( imageToRender,xOffset,yOffset,w=128,h=64,nocrop=False, overlayBottom
 	
 	if config.torqueAngle > 1000064 :
 		config.torqueAngle = 0
-	'''
+	"""
 
-	if(updateCanvasCall) : updateCanvas() 
+	if updateCanvasCall:
+		updateCanvas()
 
-	#mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
-	#if mem > memoryUsage and debug :
-	#	memoryUsage = mem 
-	#	print 'Memory usage: %s (mb)' % str(memoryUsage)
+	# mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
+	# if mem > memoryUsage and debug :
+	#     memoryUsage = mem
+	#     print 'Memory usage: %s (mb)' % str(memoryUsage)
 
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 # Might be used at some point
 
-def remappingFunctionTemp() :
-	for i in range (0,4) :
+
+def remappingFunctionTemp():
+	for i in range(0, 4):
 		## Map the one below to the next set of 4
 		pix = 16
 		colWidth = 128
@@ -344,17 +385,20 @@ def remappingFunctionTemp() :
 		config.renderImageFull.paste(crop, remapImageBlockDestination, crop)
 		## Move a row "up"
 
-		remapImageBlockSection = (0, (cropRow-1) * pix, colWidth, (cropRow-1) * pix + pix)
+		remapImageBlockSection = (
+			0,
+			(cropRow - 1) * pix,
+			colWidth,
+			(cropRow - 1) * pix + pix,
+		)
 		remapImageBlockDestination = (0, (row) * pix)
 		crop = config.renderImageFull.crop(remapImageBlockSection)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, remapImageBlockDestination, crop)
 
 
-def drawBeforeConversion() :
+def drawBeforeConversion():
 	return True
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-
-
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

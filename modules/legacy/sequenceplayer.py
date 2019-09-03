@@ -53,7 +53,7 @@ def imageScrollSeq() :
 
 						#print(threads)
 						#off_signal.checker()
-						T1 = time.time()		
+						T1 = time.time()        
 
 		if (seq == 1) :
 			imageList = ['plane-2b.gif','paletter3c.gif'] 
@@ -194,7 +194,7 @@ def runSequence() :
 		# -------  SCROLL         -------------
 		elif(seq == 9) :
 			if(random.random() > .8) : actions.explosion()
-			scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")					
+			scroll.scrollMessage("% % %%%% HUGE PROBABILITIES %%%% % %", True, False, "Left")                    
 		
 		# ------- * EMOTIES       -------------
 		elif (seq == 10) :
@@ -220,7 +220,7 @@ def runSequence() :
 			scroll.countLimit = 5
 			scroll.present("ASIF",1)
 		
-		# -------  ASIF LOVE FEAR CAROUSEL -------	
+		# -------  ASIF LOVE FEAR CAROUSEL -------    
 		elif(seq == 12) :
 			clrFlicker = carouselSign.useColorFLicker
 			if(random.random() > .95) : carouselSign.useColorFLicker = True
@@ -228,7 +228,7 @@ def runSequence() :
 			#carouselSign.useColorFlicker = clrFlicker
 			carouselSign.useColorFLicker = False
 		
-		# -------  ASIF LOVE FEAR CAROUSEL noend *	
+		# -------  ASIF LOVE FEAR CAROUSEL noend *    
 		elif(seq == 13) :
 			if(random.random() > .5) : carouselSign.useColorFLicker = True
 			carouselSign.go("       ***** BEEF * CHICKEN * PORK * FISH * LAMB  ****", -1)
@@ -271,7 +271,7 @@ def runSequence() :
 			blend.animator(0)
 
 
-		# Image Loading Modules	
+		# Image Loading Modules    
 		
 		# -------  DEFAULT PAN     -------------
 		elif (seq == 20) :
@@ -575,7 +575,7 @@ def main():
 					imgLoader.action = "pan"
 					imgLoader.countLimit = 1
 					imgLoader.start("",0,-1)
-					exit()	
+					exit()    
 				elif(argument  == "play") :
 					imgLoader.action = "play"
 					imgLoader.countLimit = 100

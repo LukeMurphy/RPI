@@ -1,13 +1,15 @@
 from __future__ import print_function
-import random, time
+
+import random
 import sys
 import threading
+import time
 
-class soliloquy() :
 
-	
+class soliloquy:
+
 	RED = "\x1b[0;31;40m"
-	GREEN ="\x1b[0;32;40m"
+	GREEN = "\x1b[0;32;40m"
 	GREENB = "\x1b[1;32;40m"
 	ORANGE = "\x1b[0;33;40m"
 	BLUE = "\x1b[0;34;40m"
@@ -16,39 +18,38 @@ class soliloquy() :
 	WHITE = "\x1b[0;37;40m"
 	ENDC = "\x1b[0m"
 
-	l1 = .9
-	l2 = l1 + .02
-	l3 = l1 + .04
-	l4 = l1 + .06
-	l5 = l1 + .08
-	l6 = l1 + .09
-	l7 = l1 + .096
-	l8 = l1 + .098
-	l9 = l1 + .0985
-
+	l1 = 0.9
+	l2 = l1 + 0.02
+	l3 = l1 + 0.04
+	l4 = l1 + 0.06
+	l5 = l1 + 0.08
+	l6 = l1 + 0.09
+	l7 = l1 + 0.096
+	l8 = l1 + 0.098
+	l9 = l1 + 0.0985
 
 	def __init__(self, arg=""):
 		self.name = arg
 		self.I = 0
 		self.lastI = 1
 		self.msg = [
-		"Oh Infinite beatitude of existence me ",
-		"I am; and there is nothing else beside I that is me ",
-		"I fill all Space, and what I fill, I am ", 
-		"What I think, that I utter; and what I utter, that I hear ",
-		"I itself is Thinker, Utterer, Hearer, Thought, Word, Audition ",
-		"it is the One, and yet the All in All ",
-		"Ah, the happiness, ah, the happiness of Being "
-		"Ah, the joy, ah, the joy of Thought ",
-		"Ah that is me all me by me "
-		"What can I not achieve by thinking!",
-		" My own Thought coming to myself ",
-		"Ah, the joy, the joy of Being "
-		] 
+			"Oh Infinite beatitude of existence me ",
+			"I am; and there is nothing else beside I that is me ",
+			"I fill all Space, and what I fill, I am ",
+			"What I think, that I utter; and what I utter, that I hear ",
+			"I itself is Thinker, Utterer, Hearer, Thought, Word, Audition ",
+			"it is the One, and yet the All in All ",
+			"Ah, the happiness, ah, the happiness of Being "
+			"Ah, the joy, ah, the joy of Thought ",
+			"Ah that is me all me by me " "What can I not achieve by thinking!",
+			" My own Thought coming to myself ",
+			"Ah, the joy, the joy of Being ",
+		]
 		self.length = len(self.msg)
 
 		self.drawings = []
-		self.drawings.append("""
+		self.drawings.append(
+			"""
  ........................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.....
 ........................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.....
 ........................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.....
@@ -80,23 +81,25 @@ Z$..........................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 ............................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 ............................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 ............................ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
- """)
-		self.drawings.append("""
+ """
+		)
+		self.drawings.append(
+			"""
   `-:/oshdddddddddddddhso/-.                         `.:/oyhdddddhyo/-`               -ddd
 hdddddddddddddhys+/-.                        `.-/+oyhddddddhs+/-`               `      sdd
 dddddhyso/:-.                      `.-:/+osydddddddhys+/-.              `.:/osyhd/     .dd
 :-.`                     .://+osyhddddddddhyso/:-.`             `.-/+syhyo+:-`  hh      +d
-                         /ddddysso+/:-..`           `..-:/+osyhhys+/:.`    `.-  /d:     `d
-                         .dddy                   ydhsso+//:-.`  `..-://///:-.s` `hy      +
-                          dddd                   sd+          ho:-...-.-:::-:-+  +d.     `
-                          hddd.                  ods          s/    ./``--`.: s  `d+      
-                          yddd-                  /dh          oo .``.+..: ``- +`  yy      
-                          sddd:                  /dd   `--.-` +s .``.o  -.`.- :-  +d`     
-                          sddd/                  :dd` ..    :`+y ....o`       -:  -d-     
-                          sddd/      .////::`    :dd` :   ....+y`   `s/::----./:  .d:     
-                          sddd/    `/-      :/   /dd` .-`. `: os         ````..`  `d/     
-        `-::-`            hddd:   `+         -/  +dd   `///:.-yo                  `d/     
-     -oo+/:::+oo:         dddd-   +`          o  odh ...      ho.                 .d:     
+						 /ddddysso+/:-..`           `..-:/+osyhhys+/:.`    `.-  /d:     `d
+						 .dddy                   ydhsso+//:-.`  `..-://///:-.s` `hy      +
+						  dddd                   sd+          ho:-...-.-:::-:-+  +d.     `
+						  hddd.                  ods          s/    ./``--`.: s  `d+      
+						  yddd-                  /dh          oo .``.+..: ``- +`  yy      
+						  sddd:                  /dd   `--.-` +s .``.o  -.`.- :-  +d`     
+						  sddd/                  :dd` ..    :`+y ....o`       -:  -d-     
+						  sddd/      .////::`    :dd` :   ....+y`   `s/::----./:  .d:     
+						  sddd/    `/-      :/   /dd` .-`. `: os         ````..`  `d/     
+		`-::-`            hddd:   `+         -/  +dd   `///:.-yo                  `d/     
+	 -oo+/:::+oo:         dddd-   +`          o  odh ...      ho.                 .d:     
    :o:         `/y.      .dddd`   o      .--  o  ydy.        `d-.-                -d-     
   o/             .y-     /dddh    :-  -::.`` /- `dd+         :do+o/:-..`          /d`     
  s-               .h`    sdddo     /:      ./-  -dd-           `../:/+oosyyyysoo+/yy      
@@ -109,18 +112,22 @@ y`   -/++++oos/   o+   :dddd+:.                hdho.
   -so-`    `:+s/`    `dddd+                  odd-   -+                                    
 ``..:+ssooo/:`       sdddh                  `ydddhso/y`                                  :
 /::::://+ooo/-      +dddd.                     `-/oydmddyo/:.                            y
-            ./ss:  :dddd/                            s:+shddddys+:.`                    :d
-               `+y+ddddo                                  `.:+shddddhso/-`              hd
-                 -mmmds                                         `-/oydddddhyo/-`       +dd
-                .hddmh`                                               .:+shddddddyo/-`-ddd
-               -hdddyh/                                                    `-/oyddddddddds
-               """)
-		self.drawings.append("""
+			./ss:  :dddd/                            s:+shddddys+:.`                    :d
+			   `+y+ddddo                                  `.:+shddddhso/-`              hd
+				 -mmmds                                         `-/oydddddhyo/-`       +dd
+				.hddmh`                                               .:+shddddddyo/-`-ddd
+			   -hdddyh/                                                    `-/oyddddddddds
+			   """
+		)
+		self.drawings.append(
+			"""
 			|-------|
 			|   I   |
 			|-------|
-					""")
-		self.drawings.append("""
+					"""
+		)
+		self.drawings.append(
+			"""
 000000000000000000000000000000000.0000.0000000000000000000000000000000000000000000000000
 0000000000000000000000000000000.00.....0000000000000000000000000000000000000000000
 00000000000000000000000000000  00000000000...0000000000000000000000000000000000000000
@@ -145,10 +152,12 @@ y`   -/++++oos/   o+   :dddd+:.                hdho.
 000000000000000000000..00000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-		""")
+		"""
+		)
 		self.drawings.append("""I <==> me <==> I""")
 
-		self.drawings.append("""
+		self.drawings.append(
+			"""
 ..........................,,......,,,,,,..,,,,,,,,,,,,,.........................
 ................................................................................
 .........................,..,...................................................
@@ -184,54 +193,54 @@ y`   -/++++oos/   o+   :dddd+:.                hdho.
 ....,:==~~~=~~~~~~==~===============++===++++++++++=====+=============~~:,?....,
 ,,,:~~~~~~~~~~~~~~~~~~===============+=====+++++++=+==+===============+++==.....
 ,,,:::~~~~~~~~~~~~~~~~~=~===================+===++=====================+==~:,,,,
-""")
+"""
+		)
 
-
-
-		foo = ("""
+		foo = """
 			....                 ..                   
-                  ,c.               .cOKXx.              .cxxl.                 
+				  ,c.               .cOKXx.              .cxxl.                 
    .::.           .do.              'kkOXKo.            .cxd:od'        .,cl,   
-    ,xl            .cd;             'dcoKk:.              cx' :o'     'lddONd.  
-     'do.            ,dl.            ..'lxc              .do.        ,oooodOl   
-      .ld,            .ld'               ck'            .do.         .ldc..do   
-        ;dl.            cx;      ..      .od.          .dl.        .:dc.   :x'  
-         .ld,            ;x;     cd.      .oo.        .oo.       .;dl.     ...  
-    .'     :x;    ..      :x;    cx.       .xl        lx.      .:ol'            
-    ,dl.    ;x:.  cx'      ;dl.  :k'        lx.      cx,     .cdc.              
-     .ld:    'oo;..ld'      .cd; .xc        cx'.    :x;    'lo:.                
-       'oo,    'lo:':dc.  .'  ,o'.ox'       od:d;  ,k:   ,oo;.                  
-         ,oo'    .ldc,cd:,oo.     .lc.     .xc,x: .do. .lx;                 .   
-           ..      .ld:,o00,               ck'.do..;.'cxOl              .';ol.  
-                 .'. 'ooo0Oo,             .o:  ,xdccll::kl        .';cclcc:'    
-         ',.     .:ol::o00:;                    .;'..  ':.   .':cllc:,..        
-         'cdl.      .;:lx     ,::,..';;.           'o,  ..':lll;..              
-       .   .:lo:.        .,cllxX0lccc:,.          .xklclccc;.                   
+	,xl            .cd;             'dcoKk:.              cx' :o'     'lddONd.  
+	 'do.            ,dl.            ..'lxc              .do.        ,oooodOl   
+	  .ld,            .ld'               ck'            .do.         .ldc..do   
+		;dl.            cx;      ..      .od.          .dl.        .:dc.   :x'  
+		 .ld,            ;x;     cd.      .oo.        .oo.       .;dl.     ...  
+	.'     :x;    ..      :x;    cx.       .xl        lx.      .:ol'            
+	,dl.    ;x:.  cx'      ;dl.  :k'        lx.      cx,     .cdc.              
+	 .ld:    'oo;..ld'      .cd; .xc        cx'.    :x;    'lo:.                
+	   'oo,    'lo:':dc.  .'  ,o'.ox'       od:d;  ,k:   ,oo;.                  
+		 ,oo'    .ldc,cd:,oo.     .lc.     .xc,x: .do. .lx;                 .   
+		   ..      .ld:,o00,               ck'.do..;.'cxOl              .';ol.  
+				 .'. 'ooo0Oo,             .o:  ,xdccll::kl        .';cclcc:'    
+		 ',.     .:ol::o00:;                    .;'..  ':.   .':cllc:,..        
+		 'cdl.      .;:lx     ,::,..';;.           'o,  ..':lll;..              
+	   .   .:lo:.        .,cllxX0lccc:,.          .xklclccc;.                   
  .,collc.     ...         ... 'x:                .xKxc'.         ..             
 .lkO0c.                       .do.               .kO:.        .;od'             
 .ddldlcccccccccccccl,          ck'   .;cll,       .;colc;.  .lOOxc::::::;,..    
  'do,..',,,,,,,,,'..           oXdcoxkdolc'           .'.    :k0kl;,''',;:cl;   
   .;ol.                  .,;,;oKN0xc'.                         'ld;             
-     ..       .',.        ;c:::,'.                               'lo;           
-        .':ccccc;. .':dk;                .:,                       ..           
+	 ..       .',.        ;c:::,'.                               'lo;           
+		.':ccccc;. .':dk;                .:,                       ..           
    .,ccclc:,',',:lxOxxOo.     .'.        ,k:         .                          
    .;,..    'ccclkOc'dd.     .dNk'     .cdl.      'dOdoc;;cc::::::,             
-              .:dl' :k,      ,0WO:.    lKd.      ;0K0d;oKNXNXx:;;;'             
-             .od'  'xl      ,OKOx,    .dXl      .xk,,xl.,xklcoo:'.              
-            .do.  .od.   .:oOKc.cx,   .dXl       ..  ;x: .od. .;cll'            
-          .:dc.    ..    oXxxd. .od.  .dXl            cx' .o:    .:xc.          
-         ;dl.           .cllx;   ..   .oXd.           .do.         'xl          
-       'oo'               'xl          c0x'            ;k;          ;x;         
-     .cx:                 ld.          ;kk,            .dd.          lx'        
-    'do.                 :x,           ,xk;     .';.    :k'          .cd;       
+			  .:dl' :k,      ,0WO:.    lKd.      ;0K0d;oKNXNXx:;;;'             
+			 .od'  'xl      ,OKOx,    .dXl      .xk,,xl.,xklcoo:'.              
+			.do.  .od.   .:oOKc.cx,   .dXl       ..  ;x: .od. .;cll'            
+		  .:dc.    ..    oXxxd. .od.  .dXl            cx' .o:    .:xc.          
+		 ;dl.           .cllx;   ..   .oXd.           .do.         'xl          
+	   'oo'               'xl          c0x'            ;k;          ;x;         
+	 .cx:                 ld.          ;kk,            .dd.          lx'        
+	'do.                 :x,           ,xk;     .';.    :k'          .cd;       
    .xl.                .ld,         ':.,xk;  ,cllcc.    .xc            ,do'     
   'do.                ;dl.          .doo0k;;oo,.        .oo.            .cxc.   
  ,o;                 :x;             .lOK0ko'            ..               .:ol. 
  ..                 .oc                .,::.                                'xl 
 
-			""")
+			"""
 
-		self.drawings.append(""" 
+		self.drawings.append(
+			""" 
 ..............................................................................................
 .......................,:......................,?7=.....................:?I:..................
 .......................=7.....................?7777=...................+7?+I:.................
@@ -294,83 +303,89 @@ y`   -/++++oos/   o+   :dddd+:.                hdho.
 ..=?~......................~?:.................~I7I=??:................,....................=I
 ..~,......................:I:....................:I7I.........................................
 ..........................:+..................................................................
-                                                                                     """)
+																					 """
+		)
 
-	def tester(self) :
+	def tester(self):
 
 		for style in xrange(8):
-			for fg in xrange(30,38):
-				s1 = ''
-				for bg in xrange(40,48):
-					format = ';'.join([str(style), str(fg), str(bg)])
-					#print (str(format))
-					s1 += '\x1b[%sm %s \x1b[0m' % (format, format)
-					#print (s1)
-				#print (s1)
-		print ('\n')
+			for fg in xrange(30, 38):
+				s1 = ""
+				for bg in xrange(40, 48):
+					format = ";".join([str(style), str(fg), str(bg)])
+					# print (str(format))
+					s1 += "\x1b[%sm %s \x1b[0m" % (format, format)
+					# print (s1)
+				# print (s1)
+		print("\n")
 
+		print(self.RED + "RED")
+		print(self.GREEN + "GREEN")
+		print(self.ORANGE + "ORANGE")
+		print(self.BLUE + "BLUE")
+		print(self.PURP + "PURP")
+		print(self.TEAL + "TEAL")
+		print(self.WHITE + "WHITE")
 
-		print (self.RED + "RED")
-		print (self.GREEN + "GREEN")
-		print (self.ORANGE + "ORANGE")
-		print (self.BLUE + "BLUE")
-		print (self.PURP + "PURP")
-		print (self.TEAL + "TEAL")
-		print (self.WHITE + "WHITE")
+	def soliloquy(self):
 
-	def soliloquy(self) :
-		
 		# Print Self Shifters
-		if(random.random() > self.l4) : print(self.ORANGE + 'Me. ' + self.ENDC, end="")
-		if(random.random() > self.l5) : print('Me. '+ self.PURP)
-		if(random.random() > self.l4) : print("O Me", end="")
-		#if(random.random() > self.l5) : print(self.ORANGE + '\nI && Me ', end="")
-		if(random.random() > self.l8) : print('\nMe <<< me ', end="")
-		if(random.random() > self.l2) : 
-			print ("")
-			print ('[ ' + self.GREENB + 'ME ' + self.ENDC + '] ', end="")
+		if random.random() > self.l4:
+			print(self.ORANGE + "Me. " + self.ENDC, end="")
+		if random.random() > self.l5:
+			print("Me. " + self.PURP)
+		if random.random() > self.l4:
+			print("O Me", end="")
+		# if(random.random() > self.l5) : print(self.ORANGE + '\nI && Me ', end="")
+		if random.random() > self.l8:
+			print("\nMe <<< me ", end="")
+		if random.random() > self.l2:
+			print("")
+			print("[ " + self.GREENB + "ME " + self.ENDC + "] ", end="")
 
-		if(random.random() > self.l8) : print(self.RED, self) # Instance Name
-		if(random.random() > self.l9) : print(self.name) # Class Name
-		if(random.random() > self.l9) : 
+		if random.random() > self.l8:
+			print(self.RED, self)  # Instance Name
+		if random.random() > self.l9:
+			print(self.name)  # Class Name
+		if random.random() > self.l9:
 			print("\n")
 			print(time.clock(), end="")
 
 		# Print a Self Drawing
-		if(random.random() > self.l9) : 
-			i = int(random.uniform(0,len(self.drawings)))
+		if random.random() > self.l9:
+			i = int(random.uniform(0, len(self.drawings)))
 			print("And I draw for me.")
-			#print(self.drawings[i])
-			for n in range(0,len(self.drawings[i])) :   
+			# print(self.drawings[i])
+			for n in range(0, len(self.drawings[i])):
 				print(self.drawings[i][n], end="")
-				time.sleep(.0005)
+				time.sleep(0.0005)
 
 		msgTxt = "" + self.ENDC
-		
+
 		### Print from Soliloquy of The Point
-		if(random.random() > self.l3) :
+		if random.random() > self.l3:
+			self.I = int(random.random() * self.length)
+			while self.I == self.lastI:
 				self.I = int(random.random() * self.length)
-				while (self.I == self.lastI):
-					self.I = int(random.random() * self.length)
-				msgTxt  =  "\n" + self.msg[self.I]  
+			msgTxt = "\n" + self.msg[self.I]
 		print(self.GREEN + msgTxt + self.PURP, end="")
 
-		if(random.random() < .95) : print(" " + self.ENDC, end="")
-		#if(random.random() > .85) : print(" ")
+		if random.random() < 0.95:
+			print(" " + self.ENDC, end="")
+		# if(random.random() > .85) : print(" ")
 		self.lastI = self.I
 		sys.stdout.flush()
-		
 
 
 #####################
 
 
 s1 = soliloquy("point-one")
-#s1.tester()
-#exit()
+# s1.tester()
+# exit()
 
 
-'''
+"""
 s1 = soliloquy("s-one")
 s2 = soliloquy("s=two")
 
@@ -384,12 +399,11 @@ t = threading.Thread(target=s2.soliloquy)
 threads.append(t)
 t.start()
 
-'''
+"""
 
-while True :
+while True:
 	s1.soliloquy()
 
-
-	delay = random.random() * .2
-	#delay = .1
+	delay = random.random() * 0.2
+	# delay = .1
 	time.sleep(delay)

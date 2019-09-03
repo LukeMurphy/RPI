@@ -56,7 +56,7 @@ def loadImage(arg):
 	return True
 
 def presentImage() :
-	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, presentTime	
+	global frame, count, xOffset, yOffset, vX, vY, image, panRangeLimit, scrollSpeed, useJitter, useBlink, imageCopy, presentTime    
 	imageCopyTemp = imageCopy
 	enhancer = ImageEnhance.Brightness(imageCopyTemp)
 	imageCopyTemp = enhancer.enhance(brightnessFactor)
@@ -111,7 +111,7 @@ def panImage() :
 			else :
 				#config.render(image, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
 				blink = True
-			time.sleep(.15)	
+			time.sleep(.15)    
 		xPos += image.size[1]
 	else :
 		imageCopyTemp = imageCopy
@@ -138,7 +138,7 @@ def fillColor(force=False) :
 def rotateImage(angle) :
 	global image, matrix
 	image = config.image.resize((32,32))
-	image = image.rotate(angle, Image.BICUBIC, 1);		
+	image = image.rotate(angle, Image.BICUBIC, 1);        
 	config.matrix.Clear()
 	config.matrix.SetImage(config.image.im.id, -8, -8)
 
@@ -210,7 +210,7 @@ def init():
 			elif(action == "pan") : 
 				panImage()
 			elif(action == "present") :
-				presentImage()		
+				presentImage()        
 			count += 1
 		except KeyboardInterrupt:
 			print "Stopping...."
@@ -219,7 +219,7 @@ def init():
 
 def debugMessage(arg) :
 
-	if(debug) : print(arg)		
+	if(debug) : print(arg)        
 
 def start(img="", setvX = 0, setvY = 0):
 
@@ -243,7 +243,7 @@ def start(img="", setvX = 0, setvY = 0):
 		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"
 	'''
 
-	debugMessage("Trying to load " + img)	
+	debugMessage("Trying to load " + img)    
 
 	if(loadImage(img)) :
 		# scale to the WIDTH of the screen
@@ -265,4 +265,4 @@ def runWork(*args) :
 	pass
 	
 	
-###############################	
+###############################    

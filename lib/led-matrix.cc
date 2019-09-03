@@ -41,30 +41,30 @@ public:
   UpdateThread(RGBMatrix *matrix) : running_(true), matrix_(matrix) {}
 
   void Stop() {
-    MutexLock l(&mutex_);
-    running_ = false;
+	MutexLock l(&mutex_);
+	running_ = false;
   }
 
   virtual void Run() {
-    while (running()) {
+	while (running()) {
 #if SHOW_REFRESH_RATE
-      struct timeval start, end;
-      gettimeofday(&start, NULL);
+	  struct timeval start, end;
+	  gettimeofday(&start, NULL);
 #endif
-      matrix_->UpdateScreen();
+	  matrix_->UpdateScreen();
 #if SHOW_REFRESH_RATE
-      gettimeofday(&end, NULL);
-      int64_t usec = ((uint64_t)end.tv_sec * 1000000 + end.tv_usec)
-        - ((int64_t)start.tv_sec * 1000000 + start.tv_usec);
-      printf("\b\b\b\b\b\b\b\b%6.1fHz", 1e6 / usec);
+	  gettimeofday(&end, NULL);
+	  int64_t usec = ((uint64_t)end.tv_sec * 1000000 + end.tv_usec)
+	    - ((int64_t)start.tv_sec * 1000000 + start.tv_usec);
+	  printf("\b\b\b\b\b\b\b\b%6.1fHz", 1e6 / usec);
 #endif
-    }
+	}
   }
 
 private:
   inline bool running() {
-    MutexLock l(&mutex_);
-    return running_;
+	MutexLock l(&mutex_);
+	return running_;
   }
 
   Mutex mutex_;
@@ -74,7 +74,7 @@ private:
 
 RGBMatrix::RGBMatrix(GPIO *io, int rows, int chained_displays)
   : frame_(new Framebuffer(rows, 32 * chained_displays)),
-    io_(NULL), updater_(NULL) {
+	io_(NULL), updater_(NULL) {
   Clear();
   SetGPIO(io);
 }
@@ -112,7 +112,7 @@ void RGBMatrix::UpdateScreen() { frame_->DumpToMatrix(io_); }
 int RGBMatrix::width() const { return frame_->width(); }
 int RGBMatrix::height() const { return frame_->height(); }
 void RGBMatrix::SetPixel(int x, int y,
-                         uint8_t red, uint8_t green, uint8_t blue) {
+	                     uint8_t red, uint8_t green, uint8_t blue) {
   frame_->SetPixel(x, y, red, green, blue);
 }
 void RGBMatrix::Clear() { return frame_->Clear(); }

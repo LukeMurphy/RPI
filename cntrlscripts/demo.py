@@ -268,14 +268,15 @@ button = tk.Button(
 button.pack(side=tk.BOTTOM, padx=2)
 
 slogan = tk.Button(
-	frame, text="Run", bg="Red", highlightbackground="blue", command=action
+	frame, text="Stop All", bg="blue", highlightbackground="blue", command=stopAll
 )
 slogan.pack(side=tk.BOTTOM, padx=2)
 
 slogan = tk.Button(
-	frame, text="Stop All", bg="blue", highlightbackground="blue", command=stopAll
+	frame, text="Run", bg="Red", highlightbackground="blue", command=action
 )
 slogan.pack(side=tk.BOTTOM, padx=2)
+
 
 slogan = tk.Button(
 	frame, text="Stop & Run", bg="blue", highlightbackground="blue", command=action2

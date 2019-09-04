@@ -633,7 +633,6 @@ def configureBackgroundScrolling(config, workConfig):
 	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
 	config.pattern = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
-	config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
@@ -652,8 +651,10 @@ def configureBackgroundScrolling(config, workConfig):
 		config.useUltraSlowSpeed = workConfig.getboolean(
 			"scroller", "useUltraSlowSpeed"
 		)
+		config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
 	except Exception as e:
 		config.useUltraSlowSpeed = False
+		config.maxSpeed = 2
 		print(str(e))
 
 	try:

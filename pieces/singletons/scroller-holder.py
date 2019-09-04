@@ -628,19 +628,24 @@ def configureBackgroundScrolling():
 	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
 	config.pattern = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
-	config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
 	scrollerRef.typeOfScroller = "bg"
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.patternSpeed
-	scrollerRef.xMaxSpeed = config.maxSpeed
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func": remakePatternBlock, "direction": direction}
 	config.patternColor = (50, 0, 55, 50)
 	config.patternEndColor = (255, 0, 255, 50)
+
+	try:
+		config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
+	except Exception as e:
+		config.maxSpeed = config.patternSpeed
+	
+	scrollerRef.xMaxSpeed = config.maxSpeed
 
 	try:
 		config.changeProb = float(workConfig.get("scroller", "changeProb"))

@@ -288,6 +288,12 @@ def configure(config, workconfig):
 		config.brightnessVariationProb = 0
 		print(str(e))
 
+	try:
+		config.forceBGSwap = workconfig.getboolean("displayconfig","forceBGSwap")
+	except Exception as e:
+		config.forceBGSwap = False
+		print(str(e))	
+
 	config.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
 	config.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
 	# config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))

@@ -216,6 +216,18 @@ def render(
 	# Render to canvas
 	# This needs to be optomized !!!!!!
 
+	if config.forceBGSwap == True:
+		data = numpy.array(imageToRender)
+
+		try :
+			im_rgb = data[:, :, [0, 2, 1, 3]]
+		except Exception as e :
+			im_rgb = data[:, :, [0, 2, 1]]
+
+		data2 = numpy.array(im_rgb)
+
+		imageToRender = Image.fromarray(data2)
+
 	if config.rotation != 0:
 		if config.fullRotation == True:
 			# This rotates the image that is painted i.e. after pasting-in the image sent
@@ -234,6 +246,9 @@ def render(
 		config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
 	# config.drawBeforeConversion()
+
+
+	#config.renderImageFull.paste(config.renderImageFull2)
 
 	config.renderImageFull = config.renderImageFull.convert("RGB")
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
@@ -343,8 +358,14 @@ def render(
 	except Exception as e:
 		print(e)
 
+
+
+
+
+	
+
 	"""
-	for i in range(0,40) :
+	for i in range(0,40) :`
 		delta = 16
 		box = (0,i*delta,448,i*delta+delta)
 		crop = config.renderImageFull.crop(box)

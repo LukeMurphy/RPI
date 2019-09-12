@@ -34,5 +34,11 @@ print(d2)
 
 datax = numpy.array([ [ 1,  2,  3,  4], [ 5,  6,  7,  8], [ 9, 10, 11, 12], [13, 14, 15, 16] ])
 
-d2 = datax[1:2,:2]
+d2 = datax[1:2, ::2]
+print(d2)
+
+d2 = datax[1:2, [0,2,1]]
+print(d2)
+
+d2 = datax[:, [0,2,1]]
 print(d2)

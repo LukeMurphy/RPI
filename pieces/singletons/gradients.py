@@ -152,7 +152,7 @@ def iterate():
 		config.rowsShown,
 		config.rowHeight,
 		config.angle,
-		config.probDraw,
+		config.probDrawEffective,
 		config.blackProb,
 		(config.heightMin, config.heightMax),
 	)
@@ -168,6 +168,9 @@ def iterate():
 		config.probDraw = random.uniform(0.001, 0.05)
 		config.probDrawChange = 0.001
 		# print(config.probDraw)
+
+	if random.random() < .01 :
+		config.probDrawEffective = config.probDraw
 
 
 def main(run=True):
@@ -194,6 +197,7 @@ def main(run=True):
 	config.colorChoice = workConfig.get("gradients", "colorChoice")
 
 	config.probDrawChange = float(workConfig.get("gradients", "probDrawChange"))
+	config.probDrawEffective = .9
 
 	config.boxMax = config.screenWidth - 2
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)

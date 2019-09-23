@@ -28,7 +28,7 @@ actionDict1 = [
 	# {"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	# {" " :''},
 	{" ": ""},
-	{"-------- Two Sided & Desktop Sculptures -------------": ""},
+	{"--- Two Sided & Desktop Sculptures -----------": ""},
 	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
 	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 

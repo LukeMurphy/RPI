@@ -164,6 +164,12 @@ def main(run=True):
 	except Exception as e:
 		print(str(e))
 		ps.linearMotionAlsoHorizontal = True
+		
+	try:
+		ps.oneDirection = int(workConfig.getboolean("particleSystem", "oneDirection"))
+	except Exception as e:
+		print(str(e))
+		ps.oneDirection = False
 
 	try:
 		ps.reEmitNumber = int(workConfig.get("particleSystem", "reEmitNumber"))
@@ -274,6 +280,14 @@ def main(run=True):
 	ps.widthRate = float(workConfig.get("particleSystem", "widthRate"))
 	ps.heightRate = float(workConfig.get("particleSystem", "heightRate"))
 	config.variance = float(workConfig.get("particleSystem", "variance"))
+
+	try:
+		ps.rndSizeFactorMin = float(workConfig.get("particleSystem", "rndSizeFactorMin"))
+		ps.rndSizeFactorMax = float(workConfig.get("particleSystem", "rndSizeFactorMax"))
+	except Exception as e:
+		print(str(e))
+		ps.rndSizeFactorMin = .5
+		ps.rndSizeFactorMax = 1.5
 
 	config.fillColorVals = (workConfig.get("particleSystem", "fillColor")).split(",")
 	config.fillColor = tuple(

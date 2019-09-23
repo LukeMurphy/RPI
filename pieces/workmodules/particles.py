@@ -147,6 +147,12 @@ def main(config, workConfig, run=True):
 		ps.linearMotionAlsoHorizontal = True
 
 	try:
+		ps.oneDirection = int(workConfig.getboolean("particleSystem", "oneDirection"))
+	except Exception as e:
+		print(str(e))
+		ps.oneDirection = False
+
+	try:
 		ps.reEmitNumber = int(workConfig.get("particleSystem", "reEmitNumber"))
 	except Exception as e:
 		print(str(e))
@@ -248,6 +254,15 @@ def main(config, workConfig, run=True):
 	ps.objHeight = int(workConfig.get("particleSystem", "objHeight"))
 	ps.widthRate = float(workConfig.get("particleSystem", "widthRate"))
 	ps.heightRate = float(workConfig.get("particleSystem", "heightRate"))
+
+
+	try:
+		ps.rndSizeFactorMin = float(workConfig.get("particleSystem", "rndSizeFactorMin"))
+		ps.rndSizeFactorMax = float(workConfig.get("particleSystem", "rndSizeFactorMax"))
+	except Exception as e:
+		print(str(e))
+		ps.rndSizeFactorMin = .5
+		ps.rndSizeFactorMax = 1.5
 
 	config.ps = ps
 	config.variance = float(workConfig.get("particleSystem", "variance"))
@@ -411,6 +426,7 @@ def emitParticle(config, i=None):
 			dirVal = round(random.uniform(0, 3))
 
 		p.direction = directions[dirVal]
+		if ps.oneDirection == True : p.direction = 0
 		p.xPosR = origins[dirVal][0]
 		p.yPosR = origins[dirVal][1]
 

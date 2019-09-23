@@ -19,7 +19,7 @@ def ditherFilter(renderImageFull, xOffset, yOffset, config):
 	# return dither(renderImageFull,xOffset, yOffset, unsharpMaskPercent, blurRadius)
 	return ditherGlitch(renderImageFull, xOffset, yOffset, config)
 
-
+'''
 def dither(renderImageFull, xOffset, yOffset, config):
 	global lev, levdiff
 	lev += levdiff
@@ -44,7 +44,7 @@ def dither(renderImageFull, xOffset, yOffset, config):
 	renderImageFull = newimage.convert("RGB")
 
 	return renderImageFull
-
+'''
 
 def ditherGlitch(renderImageFull, xOffset, yOffset, config):
 	global lev, levdiff

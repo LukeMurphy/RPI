@@ -29,6 +29,7 @@ class Particle(object):
 	y = 0
 	z = 0
 
+
 	direction = 0
 	angle = 0
 	dxIncremental = 0
@@ -341,9 +342,37 @@ class Particle(object):
 
 			self.createParticleImage()
 
+
 			if self.pixelsGoGray == True:
 				if self.greyCount < self.greyRate:
 					self.greyCount += 1
+
+					'''
+					# REALLY this should be outlineColorRawValues being changed
+					# but it seems to look better like this
+
+					self.OutlineR += self.outlineGreyRate[0]
+					self.OutlineG += self.outlineGreyRate[1]
+					self.OutlineB += self.outlineGreyRate[2]
+
+					#outlineColorRawValues = (r, g, b, self.fillColor[3])
+					
+					self.outlineColor = (
+						round(self.OutlineR),
+						round(self.OutlineG),
+						round(self.OutlineB),
+						self.outlineColor[3],
+					)
+
+					self.FillR += self.fillGreyRate[0]
+					self.FillG += self.fillGreyRate[1]
+					self.FillB += self.fillGreyRate[2]
+					
+					#fillColorRawValues = (r, g, b, self.fillColor[3])
+					
+					self.fillColor = (round(self.FillR), round(self.FillG), round(self.FillB), self.fillColor[3])
+					'''
+
 
 					# REALLY this should be outlineColorRawValues being changed
 					# but it seems to look better like this
@@ -351,7 +380,9 @@ class Particle(object):
 					r = self.outlineColor[0] + self.outlineGreyRate[0]
 					g = self.outlineColor[1] + self.outlineGreyRate[1]
 					b = self.outlineColor[2] + self.outlineGreyRate[2]
-					outlineColorRawValues = (r, g, b, self.fillColor[3])
+
+					if self.jumpToGray == False : self.outlineColorRawValues = (r, g, b, self.fillColor[3])
+
 					self.outlineColor = (
 						round(r),
 						round(g),
@@ -362,8 +393,12 @@ class Particle(object):
 					r = self.fillColorRawValues[0] + self.fillGreyRate[0]
 					g = self.fillColorRawValues[1] + self.fillGreyRate[1]
 					b = self.fillColorRawValues[2] + self.fillGreyRate[2]
-					fillColorRawValues = (r, g, b, self.fillColor[3])
+
+					if self.jumpToGray == False : self.fillColorRawValues = (r, g, b, self.fillColor[3])
+
 					self.fillColor = (round(r), round(g), round(b), self.fillColor[3])
+
+
 				else:
 					self.outlineColor = (
 						round(self.outlineGrey),

@@ -287,8 +287,8 @@ class CanvasElement:
 	def updateTheCanvas(self, players):
 
 		xOff = 0
+		self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
 		for work in players:
-			self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
 			temp = work.config.renderImageFull.copy()
 			temp = temp.convert("RGBA")
 			temp2 = temp.copy()
@@ -359,10 +359,17 @@ class CanvasElement:
 				self.config.renderImageFull.paste(
 					temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2
 				)
+			self.config.renderImageFull.paste(
+				temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
+
+		tempx = self.config.renderImageFull.copy()
+		if self.config.useFilters == True :
+			tempx = ditherFilter(self.config.renderImageFull, 0, 0, self.config)
+			#self.config.renderImageFull.paste(tempx.convert("RGBA"), (0,0))
 
 		# UPDATES THE MAIN CANVAS -- there is only one even in the multiplayer setup
 		self.cnvs.delete("main1")
-		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
+		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(tempx)
 		self.cnvs._image_id = self.cnvs.create_image(
 			self.config.canvasOffsetX,
 			self.config.canvasOffsetY,

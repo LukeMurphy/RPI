@@ -288,6 +288,14 @@ def configure(masterConfig):
 	except Exception as e:
 		print(str(e))
 		masterConfig.repaintDelay = 0.01
+	
+	try:
+		masterConfig.useFilters = masterConfig.workConfigParser.getboolean("worksList", "useFilters")
+	except Exception as e:
+		print(str(e))
+		masterConfig.useFilters = False
+
+
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

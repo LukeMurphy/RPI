@@ -265,6 +265,14 @@ def main(run=True):
 		print(str(e))
 		config.pixelsGoGray = False
 
+	# ok this may seem screwy, but because I made an error a while ago, the jumpToGray
+	# effect is actually default ... so if you want gradual turn to gray, it must be set
+	# actively. blurp. ugh.
+	try :
+		config.jumpToGray = workConfig.getboolean("particleSystem", "jumpToGray")
+	except Exception as e:
+		config.jumpToGray = True
+		
 	try:
 		config.pixelsGoGrayModel = int(
 			workConfig.get("particleSystem", "pixelsGoGrayModel")
@@ -353,7 +361,9 @@ def emitParticle(i=None):
 	)
 	p.v = random.uniform(ps.speedMin, ps.speedMax)
 	p.xWind = config.xWind
+
 	p.pixelsGoGray = config.pixelsGoGray
+	p.jumpToGray = config.jumpToGray
 
 	if ps.objColor == "rnd":
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
@@ -428,6 +438,7 @@ def emitParticle(i=None):
 
 			p.fillColorRawValues = tuple(float(i) for i in p.fillColor)
 			p.outlineColorRawValues = tuple(float(i) for i in p.outlineColor)
+
 
 	if ps.movement == "linearMotion":
 

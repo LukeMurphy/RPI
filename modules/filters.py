@@ -9,9 +9,9 @@ import PIL.Image
 from modules import colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
-lev = 0
-levdiff = 1
-unsharpMaskPercent = 100
+#lev = 0
+#levdiff = 1
+#unsharpMaskPercent = 100
 
 
 def ditherFilter(renderImageFull, xOffset, yOffset, config):
@@ -47,38 +47,42 @@ def dither(renderImageFull, xOffset, yOffset, config):
 '''
 
 def ditherGlitch(renderImageFull, xOffset, yOffset, config):
-	global lev, levdiff
-	lev += levdiff
+	#global lev, levdiff
 
-	if lev >= 120:
-		levdiff = -1
-	if lev <= 20:
-		levdiff = 1
+	# config.lev is the unsharpmask radius
+	# the 'filter' effect is a combination of blur, sharpen and random dithering-down 
+	# it used to be an ugly compromise for color palette compromises - like web 216
+	# or Windows 95 ... but when sent to LED matrix panels it produces a kind of
+	# sparkle 
 
-	try:
-		ditherBlurRadius = config.ditherBlurRadius
-		ditherUnsharpMaskPercent = config.ditherUnsharpMaskPercent
-	except Exception as e:
-		ditherBlurRadius = 0
-		ditherUnsharpMaskPercent = 30
-		# print (str(e))
+	config.lev += config.levdiff
 
-	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=ditherBlurRadius))
+	if config.lev >= 120:
+		config.levdiff = -1
+	if config.lev <= 20:
+		config.levdiff = 1
+
+	## config.lev  config.ditherUnsharpMaskPercent etc are set in the default configuration.py file ..
+	## yes that is dirty but I'm in year 2.5 of this ball of mud ;)
+
+	im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.ditherBlurRadius))
 	im2 = im1.filter(
 		ImageFilter.UnsharpMask(
-			radius=lev, percent=ditherUnsharpMaskPercent, threshold=2
+			radius=config.lev, percent=config.ditherUnsharpMaskPercent, threshold=2
 		)
 	)
 
-	"""#######################    Paste to Render       #######################"""
-
+	#####    Paste to Render   
 	renderImageFull.paste(im2, (xOffset, yOffset))
-	nc = int(random.uniform(2, 255))
+	nc = round(random.uniform(2, 254))
+
+	
 
 	# newimage = renderImageFull.convert("P", palette=Image.WEB, colors = nc)
 	newimage = renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors=nc)
 
-	renderImageFull = newimage.convert("RGB")
+	#renderImageFull = newimage.convert("RGB")
+	renderImageFull = newimage.copy()
 	return renderImageFull
 
 

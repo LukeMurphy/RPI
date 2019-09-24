@@ -147,7 +147,7 @@ def main(config, workConfig, run=True):
 		ps.linearMotionAlsoHorizontal = True
 
 	try:
-		ps.oneDirection = int(workConfig.getboolean("particleSystem", "oneDirection"))
+		ps.oneDirection = workConfig.getboolean("particleSystem", "oneDirection")
 	except Exception as e:
 		print(str(e))
 		ps.oneDirection = False
@@ -246,8 +246,9 @@ def main(config, workConfig, run=True):
 	try :
 		config.jumpToGray = workConfig.getboolean("particleSystem", "jumpToGray")
 	except Exception as e:
+		print(str(e))
 		config.jumpToGray = True
-		
+
 	try:
 		config.pixelsGoGrayModel = int(
 			workConfig.get("particleSystem", "pixelsGoGrayModel")

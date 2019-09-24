@@ -296,7 +296,6 @@ class CanvasElement:
 				temp2 = temp.rotate(-work.config.canvasRotation, expand=True)
 
 			"""
-			"""
 			if work.config.useFilters == True:
 
 				if work.config.filterRemap == True:
@@ -315,6 +314,7 @@ class CanvasElement:
 					work.config.renderImageFull = ditherFilter(
 						work.config.renderImageFull, 0, 0, work.config
 					)
+			"""
 
 			if (
 				work.config.usePixelSort == True
@@ -362,14 +362,15 @@ class CanvasElement:
 			self.config.renderImageFull.paste(
 				temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 
-		tempx = self.config.renderImageFull.copy()
+		
 		if self.config.useFilters == True :
 			tempx = ditherFilter(self.config.renderImageFull, 0, 0, self.config)
-			#self.config.renderImageFull.paste(tempx.convert("RGBA"), (0,0))
+			#tempx = tempx.convert("RGBA")
+			self.config.renderImageFull.paste(tempx, (0,0))
 
 		# UPDATES THE MAIN CANVAS -- there is only one even in the multiplayer setup
 		self.cnvs.delete("main1")
-		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(tempx)
+		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
 		self.cnvs._image_id = self.cnvs.create_image(
 			self.config.canvasOffsetX,
 			self.config.canvasOffsetY,

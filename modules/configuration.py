@@ -53,6 +53,13 @@ class Config:
 	brightness = 1
 	transWiring = True
 
+
+	## These are used in the filter effect filters.py
+	lev = 0
+	levdiff = 1
+	ditherBlurRadius = 0
+	ditherUnsharpMaskPercent = 30
+
 	rotation = 0
 
 	def __init__(self):

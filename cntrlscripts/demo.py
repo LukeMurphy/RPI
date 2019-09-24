@@ -28,7 +28,7 @@ actionDict1 = [
 	# {"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	# {" " :''},
 	{" ": ""},
-	{"--- Two Sided & Desktop Sculptures -----------": ""},
+	{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
 	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
 	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 
@@ -40,10 +40,10 @@ actionDict1 = [
 	# {"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	# {"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
 	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"Wall Hanging: Compositions": "p4-3x8-informal/compositions.cfg"},
-	{"Wall Hanging: compositions a": "p4-3x8-informal/compositions.cfg"},
-	{"Wall Hanging: compositions b": "p4-3x8-informal/compositions.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{"Wall Hanging: Compositions": "p4-3x8-informal/compositions.cfg"},
+	#{"Wall Hanging: compositions a": "p4-3x8-informal/compositions.cfg"},
+	#{"Wall Hanging: compositions b": "p4-3x8-informal/compositions.cfg"},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Wall Hanging: Quilt Polys": "p4-3x8-informal/quilt-polys.cfg"},
 	{"Wall Hanging: Quilt Triangles": "p4-3x8-informal/quilt-triangles-b.cfg"},
 	{"Wall Hanging: Quilt Stars": "p4-3x8-informal/quilt-stars.cfg"},
@@ -58,15 +58,17 @@ actionDict1 = [
 	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Wall Hanging: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 	{" ": ""},
-	{"-------- FLOOR - FIREPLCE ------": ""},
-	{"==> pile: Algoflames2.3": "p4-6x8/algofall-2.3.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"pile: Algoflames2.2": "p4-6x8/algofall-2.2.cfg"},
-	{"pile: Algoflames2.1": "p4-6x8/algofall-2.1.cfg"},
-	{"pile: Algoflames2.14": "p4-6x8/algofall-2.14.cfg"},
-	{"pile: Algoflames-6": "p4-6x8/algofall6.cfg"},
-	{"pile: Algoflames-6a": "p4-6x8/algofall6a.cfg"},
-	{"pile: image-particles": "p4-6x8/image-particles.cfg"},
+	
+
+	#{"-------- FLOOR - FIREPLCE ------": ""},
+	#{"==> pile: Algoflames2.3": "p4-6x8/algofall-2.3.cfg"},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{"pile: Algoflames2.2": "p4-6x8/algofall-2.2.cfg"},
+	#{"pile: Algoflames2.1": "p4-6x8/algofall-2.1.cfg"},
+	#{"pile: Algoflames2.14": "p4-6x8/algofall-2.14.cfg"},
+	#{"pile: Algoflames-6": "p4-6x8/algofall6.cfg"},
+	#{"pile: Algoflames-6a": "p4-6x8/algofall6a.cfg"},
+	#{"pile: image-particles": "p4-6x8/image-particles.cfg"},
 
 
 	{" ": ""},
@@ -131,7 +133,9 @@ actionDict2 = [
 
 	{"-------- NORTH WALL  -------------": ""},
 	{"==> P10 Dangler": "p10/dangler-tourmaline.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+
+	{" ": ""},
+	{"-------- NORTH WALL  -------------": ""},
 	{"==> P10 Branch: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 	{"==> P10 Branch - Collage branch": "p10/collage-lines-1.cfg"},
 	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
@@ -253,13 +257,13 @@ def stopAll():
 
 
 root = tk.Tk()
-frame = tk.Frame(root, bg="blue")
+frame = tk.Frame(root, bg="darkgray")
 frame.pack(padx=1, pady=1)
 # width x height x X x Y
 root.geometry("%dx%d+%d+%d" % (680, 740, 100, 100))
 
-Lb1 = Listbox(frame, width=26, height=48)
-Lb2 = Listbox(frame, width=33, height=48)
+Lb1 = Listbox(frame, width=30, height=48)
+Lb2 = Listbox(frame, width=28, height=48)
 
 for i, item in enumerate(actionDict1):
 	Lb1.insert(END, " " + list(item.keys())[0])
@@ -273,23 +277,25 @@ Lb2.pack(side=tk.LEFT, ipadx=10, expand=0)
 
 
 button = tk.Button(
-	frame, text="QUIT", bg="blue", fg="red", highlightbackground="blue", command=quit
+	frame, text="QUIT", bg="gray", fg="red", highlightbackground="darkgray", command=quit
 )
 button.pack(side=tk.BOTTOM, padx=2)
 
-slogan = tk.Button(
-	frame, text="Stop All", bg="blue", highlightbackground="blue", command=stopAll
-)
-slogan.pack(side=tk.BOTTOM, padx=2)
 
 slogan = tk.Button(
-	frame, text="Run", bg="Red", highlightbackground="blue", command=action
+	frame, text="Stop All", bg="gray", highlightbackground="darkgray", command=stopAll
 )
 slogan.pack(side=tk.BOTTOM, padx=2)
 
 
 slogan = tk.Button(
-	frame, text="Stop & Run", bg="blue", highlightbackground="blue", command=action2
+	frame, text="Run", bg="gray", highlightbackground="darkgray", command=action
+)
+slogan.pack(side=tk.BOTTOM, padx=2)
+
+
+slogan = tk.Button(
+	frame, text="Stop & Run", bg="gray", highlightbackground="darkgray", command=action2
 )
 slogan.pack(side=tk.BOTTOM, padx=2)
 

@@ -364,9 +364,10 @@ class CanvasElement:
 
 		
 		if self.config.useFilters == True :
-			tempx = ditherFilter(self.config.renderImageFull, 0, 0, self.config)
+			pass
+			#tempx = ditherFilter(self.config.renderImageFull, 0, 0, self.config)
 			#tempx = tempx.convert("RGBA")
-			self.config.renderImageFull.paste(tempx, (0,0))
+			#self.config.renderImageFull.paste(tempx, (0,0), tempx)
 
 		# UPDATES THE MAIN CANVAS -- there is only one even in the multiplayer setup
 		self.cnvs.delete("main1")

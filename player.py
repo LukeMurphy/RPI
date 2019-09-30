@@ -12,8 +12,8 @@ import noise
 from configs import defaultpiece
 from modules import coloroverlay, colorutils, configuration, player
 from modules.configuration import bcolors
-from pieces.workmodules.particleobjects.particle import Particle
-from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
+#from pieces.workmodules.particleobjects.particle import Particle
+#from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
 from PIL import (
 	Image,
 	ImageChops,

@@ -322,7 +322,7 @@ def configure(config, workconfig):
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
 	# Setting up based on how the work is displayed
-	print("** Loading:", str(config.work))
+	print("** modules.player.py is Loading:", str(config.work))
 	try:
 		work = importlib.import_module("pieces." + str(config.work))
 		work.config = config

@@ -31,6 +31,7 @@ actionDict1 = [
 	{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
 	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
 	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
+	{"==> Pixel Shack": "p4-2x4-asym/diagnotics-2x6.cfg"},
 
 	{" ": ""},
 	{"-------- RIGHT WALL -------------": ""},

@@ -293,7 +293,12 @@ def iterate():
 		if (config.t1 - config.t2) > config.timeBetweenSetChanges :
 			config.t2 = time.time()
 			if random.random() < config.probablilitySetChanges:
-				config.shapeGroupDisplayed = math.floor(random.uniform(0,len(config.shapeGroups)))
+				newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))
+
+				# ensure the next index is different ...
+				while newIndex == config.shapeGroupDisplayed :
+					newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))
+				config.shapeGroupDisplayed = newIndex
 
 	"""
 	## Paste an alpha of the next image, wait a few ms 

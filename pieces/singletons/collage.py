@@ -291,7 +291,8 @@ def iterate():
 		config.t1 = time.time()
 
 		if (config.t1 - config.t2) > config.timeBetweenSetChanges :
-			print(chr(7))
+			## Beeps ... for debugging
+			# print(chr(7))
 			config.t2 = time.time()
 			if random.random() < config.probablilitySetChanges:
 				newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))

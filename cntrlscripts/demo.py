@@ -76,6 +76,7 @@ actionDict1 = [
 	#{"--------- ROUND CORNER -----------" :''},
 	{"--------- FLOOR -----------": ""},
 	{"ROUND CORNER - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
+	{"ROUND CORNER - mono-flavin-skew" :'p4-4x8/mono-flavin-2.cfg'},
 	#{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
 	# {"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
 	# {" " :''},

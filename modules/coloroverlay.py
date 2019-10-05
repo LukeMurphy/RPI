@@ -209,14 +209,17 @@ class ColorOverlay:
 		self.t1 = time.time()
 		# self.callBackDone()
 
+	
 	def setCallBackDoneMethod(self, method, configRef=None):
 		self.callBackDoneMethod = method
 		self.configRef = configRef
 
+	
 	def setCallBackStartedMethod(self, method, configRef=None):
 		self.callBackStartedMethod = method
 		self.configRef = configRef
 
+	
 	def callBackDone(self):
 		if self.complete == True:
 			try:

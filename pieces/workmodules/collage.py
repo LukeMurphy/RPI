@@ -65,6 +65,7 @@ class Shape:
 		self.config = config
 		self.colOverlay = coloroverlay.ColorOverlay()
 
+
 	def setUp(self):
 
 		xCoords = []
@@ -197,7 +198,7 @@ def redraw(config):
 			)
 
 		if config.useTweenTriggers == True:
-			colorTransitionStarted()
+			colorTransitionStarted(config)
 
 	if config.shapeTweening == 2:
 		config.tweenCount += 1
@@ -211,18 +212,18 @@ def redraw(config):
 			config.tweenCount = 0
 			config.shapeTweening = 0
 			if config.useTweenTriggers == True:
-				colorTransitionDone()
+				colorTransitionDone(config)
 			# print("Tweening Done")
 			# print("")
 
 	if config.shapeTweening == 0:
 		shapeToChange = -1
 		if random.random() < config.changeBoxProb:
-			shapeToChange = round(random.uniform(0, len(config.shapes) - 1))
+			shapeToChange = round(random.uniform(0, len(shapes) - 1))
 			# print(shapeToChange)
 
 		shapeCount = 0
-		for shapeElement in config.shapes:
+		for shapeElement in shapes:
 			shapeElement.transition()
 			img = shapeElement.tempImage.convert("RGBA")
 			config.image.paste(
@@ -537,8 +538,8 @@ def main(config, workConfig, run=True):
 			shape.colOverlay.colorTransitionSetupValues()
 
 			if i in config.triggers:
-				shape.colOverlay.setCallBackDoneMethod(colorTransitionDone)
-				shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted)
+				shape.colOverlay.setCallBackDoneMethod(colorTransitionDone, config)
+				shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted, config)
 
 			# shape.callBackDone = types.MethodType(callBackDone, shape)
 			shape.reDraw()

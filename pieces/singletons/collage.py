@@ -166,7 +166,6 @@ def redraw():
 	global config, shapeGroups
 
 
-	shapes = config.shapeGroups[config.shapeGroupDisplayed]
 
 	## Each Fludd-square is generated as an image and then pasted into its correct
 	## place in the grid - or off-grid maybe sometime
@@ -185,6 +184,7 @@ def redraw():
 				shapeElement.setNewBox()
 				#print("new box: " + shapeElement.name)
 	"""
+	shapes = config.shapeGroups[config.shapeGroupDisplayed]
 
 	if config.shapeTweening == 1:
 		config.shapeTweening = 2

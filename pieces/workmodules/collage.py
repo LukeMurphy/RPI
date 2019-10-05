@@ -183,11 +183,13 @@ def redraw(config):
 				#print("new box: " + shapeElement.name)
 	"""
 
+	shapes = config.shapeGroups[config.shapeGroupDisplayed]
+
 	if config.shapeTweening == 1:
 		config.shapeTweening = 2
 
 		## Generate state to transition to...
-		for shapeElement in config.shapes:
+		for shapeElement in shapes:
 			shapeElement.transition()
 			img = shapeElement.tempImage.convert("RGBA")
 			config.destinationImage.paste(
@@ -284,6 +286,22 @@ def iterate(config):
 	# global config
 	redraw(config)
 
+	if len(config.shapeGroups) > 1 :
+		config.t1 = time.time()
+
+		if (config.t1 - config.t2) > config.timeBetweenSetChanges :
+			## Beeps ... for debugging
+			# print(chr(7))
+			config.t2 = time.time()
+			if random.random() < config.probablilitySetChanges:
+				newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))
+
+				# ensure the next index is different ...
+				while newIndex == config.shapeGroupDisplayed :
+					newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))
+				config.shapeGroupDisplayed = newIndex
+
+
 	"""
 	## Paste an alpha of the next image, wait a few ms 
 	## then past a more opaque one again
@@ -326,9 +344,8 @@ def colorTransitionStarted(config, arg=None):
 
 
 def main(config, workConfig, run=True):
-	# global config
-	# global shapes
-	config.shapes = []
+
+	
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)
@@ -446,59 +463,90 @@ def main(config, workConfig, run=True):
 	config.lastOverlayBox = (0, 0, 64, 32)
 	config.lastOverlayFill = (10, 0, 0, 10)
 
-	for i in range(0, len(config.shapeSets)):
 
-		shapeDetails = config.shapeSets[i]
-		shape = Shape(config)
+	# If there are multiple collage shape sets this sets the time between changes and probability that happens
+	try:
+		config.timeBetweenSetChanges = float(workConfig.get("collageShapes", "timeBetweenSetChanges"))
+		config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
+	except Exception as e:
+		config.timeBetweenSetChanges = 60.0
+		config.probablilitySetChanges = 1.0 
+		print(e)
 
-		shape.varX = float(workConfig.get(shapeDetails, "varX"))
-		shape.varY = float(workConfig.get(shapeDetails, "varY"))
 
-		shapePosition = list(
-			map(lambda x: int(x), workConfig.get(shapeDetails, "position").split(","))
+	config.shapeSets = list(
+		map(lambda x: x, workConfig.get("collageShapes", "sets").split(","))
+	)
+
+	config.shapeGroups = []
+
+
+	for n in range(0, len(config.shapeSets)):
+
+		shapeSetGroup = list(
+			map(lambda x: x, workConfig.get("collageShapes", config.shapeSets[n]).split(","))
 		)
-		shape.shapeXPosition = shapePosition[0]
-		shape.shapeYPosition = shapePosition[1]
-		shape.name = "S_" + str(i)
 
-		shapeCoords = list(
-			map(lambda x: int(x), workConfig.get(shapeDetails, "coords").split(","))
-		)
-		shape.coords = []
+		shapeGroupList = []
 
-		for c in range(0, len(shapeCoords), 2):
-			shape.coords.append((shapeCoords[c], shapeCoords[c + 1]))
+		for i in range(0, len(shapeSetGroup)):
 
-		try:
-			shape.minHue = float(workConfig.get(shapeDetails, "minHue"))
-			shape.maxHue = float(workConfig.get(shapeDetails, "maxHue"))
-			shape.maxSaturation = float(workConfig.get(shapeDetails, "maxSaturation"))
-			shape.minSaturation = float(workConfig.get(shapeDetails, "minSaturation"))
-			shape.maxValue = float(workConfig.get(shapeDetails, "maxValue"))
-			shape.minValue = float(workConfig.get(shapeDetails, "minValue"))
+			shapeDetails = shapeSetGroup[i]
+			shape = Shape(config)
 
-		except Exception as e:
-			print(e)
-			shape.minHue = 0
-			shape.maxHue = 360
-			shape.maxSaturation = 1
-			shape.minSaturation = 0.1
-			shape.maxValue = 1
-			shape.minValue = 0.1
+			shape.varX = float(workConfig.get(shapeDetails, "varX"))
+			shape.varY = float(workConfig.get(shapeDetails, "varY"))
 
-		shape.setUp()
+			shapePosition = list(
+				map(lambda x: int(x), workConfig.get(shapeDetails, "position").split(","))
+			)
+			shape.shapeXPosition = shapePosition[0]
+			shape.shapeYPosition = shapePosition[1]
+			shape.name = "S_" + str(i)
 
-		# A couple overrides ...
-		shape.colOverlay.tLimitBase = config.colOverlaytLimitBase
-		shape.colOverlay.steps = config.colOverlaySteps
-		shape.colOverlay.colorTransitionSetupValues()
+			shapeCoords = list(
+				map(lambda x: int(x), workConfig.get(shapeDetails, "coords").split(","))
+			)
+			shape.coords = []
 
-		if i in config.triggers:
-			shape.colOverlay.setCallBackDoneMethod(colorTransitionDone, config)
-			shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted, config)
+			for c in range(0, len(shapeCoords), 2):
+				shape.coords.append((shapeCoords[c], shapeCoords[c + 1]))
 
-		# shape.callBackDone = types.MethodType(callBackDone, shape)
-		shape.reDraw()
-		config.shapes.append(shape)
+			try:
+				shape.minHue = float(workConfig.get(shapeDetails, "minHue"))
+				shape.maxHue = float(workConfig.get(shapeDetails, "maxHue"))
+				shape.maxSaturation = float(workConfig.get(shapeDetails, "maxSaturation"))
+				shape.minSaturation = float(workConfig.get(shapeDetails, "minSaturation"))
+				shape.maxValue = float(workConfig.get(shapeDetails, "maxValue"))
+				shape.minValue = float(workConfig.get(shapeDetails, "minValue"))
 
-	# if(run) : runWork()
+			except Exception as e:
+				print(e)
+				shape.minHue = 0
+				shape.maxHue = 360
+				shape.maxSaturation = 1
+				shape.minSaturation = 0.1
+				shape.maxValue = 1
+				shape.minValue = 0.1
+
+			shape.setUp()
+
+			# A couple overrides ...
+			shape.colOverlay.tLimitBase = config.colOverlaytLimitBase
+			shape.colOverlay.steps = config.colOverlaySteps
+			shape.colOverlay.colorTransitionSetupValues()
+
+			if i in config.triggers:
+				shape.colOverlay.setCallBackDoneMethod(colorTransitionDone)
+				shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted)
+
+			# shape.callBackDone = types.MethodType(callBackDone, shape)
+			shape.reDraw()
+			shapeGroupList.append(shape)
+
+		config.shapeGroups.append(shapeGroupList)
+
+	# Always start with the first one, index 0
+	config.shapeGroupDisplayed = 0
+
+

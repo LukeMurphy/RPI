@@ -186,16 +186,20 @@ def pixelSort(imageToModify, config):
 					):
 						colorSample = imageToModify.getpixel(samplePoint)
 
-						# randomize brightness a little
-						colorSampleColor = tuple(
-							int(
-								round(
-									c
-									* random.uniform(brightnessVarLow, brightnessVarHi)
+						try :
+							# randomize brightness a little
+							colorSampleColor = tuple(
+								int(
+									round(
+										c
+										* random.uniform(brightnessVarLow, brightnessVarHi)
+									)
 								)
+								for c in colorSample
 							)
-							for c in colorSample
-						)
+						except Exception as e:
+							print(e)
+							print(colorSample)
 
 				# Once in a little while, the color is just random
 				if random.random() < randomColorProbabilty:

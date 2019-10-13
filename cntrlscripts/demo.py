@@ -141,7 +141,8 @@ actionDict2 = [
 	{" ": ""},
 
 	{"-------- NORTH WALL  -------------": ""},
-	{"==> P10 Dangler": "p10/dangler-tourmaline.cfg"},
+	{"==> P10 Dangler Torumaline": "p10/dangler-tourmaline.cfg"},
+	{"==> P10 Dangler Flow": "p10/dangler-flow.cfg"},
 
 	{" ": ""},
 	{"-------- NORTH WALL  -------------": ""},

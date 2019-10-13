@@ -664,6 +664,12 @@ def configureBackgroundScrolling(config, workConfig):
 		config.changeProb = 0.0
 		print(str(e))
 
+	try:
+		config.changeProbReleaseFactor = float(workConfig.get("scroller", "changeProbReleaseFactor"))
+	except Exception as e:
+		config.changeProbReleaseFactor = 1.0
+		print(str(e))
+
 	if config.alwaysRandomPatternColor == True:
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)

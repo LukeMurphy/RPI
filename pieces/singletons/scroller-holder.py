@@ -653,6 +653,12 @@ def configureBackgroundScrolling():
 		config.changeProb = 0.0
 		print(str(e))
 
+	try:
+		config.changeProbReleaseFactor = float(workConfig.get("scroller", "changeProbReleaseFactor"))
+	except Exception as e:
+		config.changeProbReleaseFactor = 1.0
+		print(str(e))
+
 	if config.alwaysRandomPatternColor == True:
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
@@ -987,7 +993,7 @@ def iterate():
 	for scrollerObj in config.scrollArray:
 		if scrollerObj.typeOfScroller == "bg":
 			if (
-				random.random() < config.changeProb
+				random.random() < config.changeProb * config.changeProbReleaseFactor
 				and config.deltaTimeDone == True
 				and config.useFadeThruAnimation == True
 			):

@@ -33,6 +33,9 @@ actionDict1 = [
 	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 
 
+
+
+
 	{" ": ""},
 	{"-------- RIGHT WALL -------------": ""},
 	{"==> Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
@@ -75,21 +78,29 @@ actionDict1 = [
 	{" ": ""},
 	#{"--------- ROUND CORNER -----------" :''},
 	{"--------- FLOOR -----------": ""},
-	{"==> Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
-	{"==> Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
+	{"==> Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
+	{"==> Broken Sqr in Oblong - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
+	{"==> Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
+	{"==> Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
+
+
+
+	#{"==> Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
+	#{"==> Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
 	#{"==> Square scroller": "p4-4x6/scroller-b.cfg"},
-	{"==> Square scroller": "multi/pixel-shack-4x6.cfg"},
+	#{"==> Square scroller": "multi/pixel-shack-4x6.cfg"},
 	#{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
 	# {"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
 	# {" " :''},
 	# {"Square - ICE" :'p4-4x8/square.cfg'},
 	# {"Square - ICE - 2" :'p4-4x8/square-ice-2.cfg'},
-	 {"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
-	{"Square - mono-flavin-skew" :'p4-4x8/mono-flavin-2.cfg'},
+	#{"Square - pattern-pent" :'p4-4x8/pattern-pent.cfg'},
+	#{"Square - mono-flavin-skew" :'p4-4x8/mono-flavin-2.cfg'},
 	# {" " :''},
-	 {"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
-	 {"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},
-	 {"Square - marquee c" :'p4-4x8/square-marquee-c.cfg'},
+	 #{"Square - marquee a" :'p4-4x8/square-marquee-a.cfg'},
+	 
+	 #{"Square - marquee b" :'p4-4x8/square-marquee-b.cfg'},
+	 #{"Square - marquee c" :'p4-4x8/square-marquee-c.cfg'},
 	# {"Square - Collage" :'p4-4x8/square-collage.cfg'},
 	# {"Square - Fludd" :'p4-4x8/square-fludd.cfg'},
 	# {"Square - RUG" :'p4-4x8/square-rug.cfg'},

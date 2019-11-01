@@ -76,12 +76,16 @@ actionDict1 = [
 
 
 	{" ": ""},
-	#{"--------- ROUND CORNER -----------" :''},
+	{"--------- PArtial Plinth -----------" :''},
+	{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
+	{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
+
+	{" ": ""},
 	{"--------- FLOOR -----------": ""},
-	{"==> Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
-	{"==> Broken Sqr in Oblong - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
-	{"==> Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
-	{"==> Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
+	{"Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
+	{"Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
+	{"Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
 
 
 

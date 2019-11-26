@@ -1,6 +1,5 @@
 # Run tkinter code in another thread
 
-import ConfigParser
 import datetime
 import getopt
 import io
@@ -12,41 +11,54 @@ import textwrap
 import threading
 import time
 from subprocess import call
-from Tkinter import *
+import tkinter as tk
 
-import tkMessageBox
+
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 global thrd
 
 
-class App(threading.Thread):
+class App():
 	def __init__(self):
-	    threading.Thread.__init__(self)
-	    self.start()
+		#threading.Thread
+		#threading.Thread.__init__(self)
+		#self.start()
+		pass
 
 	def callback(self):
-	    self.root.quit()
+		self.root.quit()
 
 	def run(self):
-	    self.root = Tk()
-	    # self.root.protocol("WM_DELETE_WINDOW", self.callback)
+		self.root = tk.Tk()
+		# self.root.protocol("WM_DELETE_WINDOW", self.callback)
 
-	    # label = Label(self.root, text="Hello World")
-	    # label.pack()
+		# label = Label(self.root, text="Hello World")
+		# label.pack()
 
-	    Button(self.root, text="Quit", command=self.root.quit).pack()
+		tk.Button(self.root, text="Quit", command=self.root.quit).pack()
 
-	    self.cnvs = Canvas(self.root, width=200, height=200)
-	    self.cnvs.pack()
-	    self.cnvs.create_rectangle(0, 0, 200, 200, fill="blue")
-	    self.cnvs.update()
+		self.cnvs = tk.Canvas(self.root, width=200, height=200)
+		self.cnvs.pack()
+		self.cnvs.create_rectangle(0, 0, 200, 200, fill="blue")
+		self.cnvs.update()
+		self.root.mainloop()
 
-	    self.root.mainloop()
+	def render(self):
+		#self.cnvs.delete("main1")
+		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.renderImageFull)
+		self.cnvs._image_id = self.cnvs.create_image(
+			self.config.canvasOffsetX,
+			self.config.canvasOffsetY,
+			image=self.cnvs._image_tk,
+			anchor="nw",
+			tag="main1",
+		)
+		self.cnvs.update()
 
 
-root = Tk()
-
+'''
+root = tk.Tk()
 
 def task():
 	print("hello")
@@ -55,3 +67,8 @@ def task():
 
 root.after(2000, task)
 root.mainloop()
+'''
+
+
+a = App()
+a.run()

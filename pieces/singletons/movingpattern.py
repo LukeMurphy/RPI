@@ -18,14 +18,28 @@ colorutils.brightness = 1
 # with Python everthing is an object already .... some kind of OOP
 # holdover anxiety I guess
 
+
+def vary1(data, config):
+	data = config.mult_a * np.tan(config.mult_b * np.sin(config.mult_c * config.data + 
+			config.dpatColor/config.mult_d) * config.data + config.data * config.mult_e)
+	return data
+
+
+def vary2(data, config):
+	data = config.mult_a * (config.mult_b * np.cos(config.mult_c * config.data + 
+			config.dpatColor/config.mult_d) )
+	return data
+
+
 def redraw():
 	global config
 
 	if random.random() < config.changeProb :
-		config.datab = config.mult_a * np.tan(config.mult_b * np.sin(config.mult_c * config.data + 
-			config.dpatColor/config.mult_d) * config.data + config.data * config.mult_e)
+		config.datab = vary1(config.datab, config)
 		config.dpatColor += config.deltapatColor
+	
 	datac = np.roll(config.datab, round(config.dpat), (0))
+	#datac = config.data
 
 	#datab = datab[:, :, [0, 2, 1]]
 	config.image = Image.fromarray(datac.astype('uint8'))

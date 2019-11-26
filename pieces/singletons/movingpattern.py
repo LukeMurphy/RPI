@@ -21,12 +21,14 @@ colorutils.brightness = 1
 def redraw():
 	global config
 
-	datab = config.data
-	datab = config.mult_a * np.tan(config.mult_b * np.sin(config.mult_c * config.data + config.dpat/config.mult_d) * config.data + config.data * config.mult_e)
-	datab = np.roll(datab, round(config.dpat), (0))
+	if random.random() < config.changeProb :
+		config.datab = config.mult_a * np.tan(config.mult_b * np.sin(config.mult_c * config.data + 
+			config.dpatColor/config.mult_d) * config.data + config.data * config.mult_e)
+		config.dpatColor += config.deltapatColor
+	datac = np.roll(config.datab, round(config.dpat), (0))
 
 	#datab = datab[:, :, [0, 2, 1]]
-	config.image = Image.fromarray(datab.astype('uint8'))
+	config.image = Image.fromarray(datac.astype('uint8'))
 	#a.renderImageFull.convert('RGBA')
 	config.dpat += config.deltapat
 
@@ -64,13 +66,16 @@ def main(run=True):
 	config.limUp = int(workConfig.get("movingpattern", "limUp"))
 	config.limDown = int(workConfig.get("movingpattern", "limDown"))
 	config.dpat = float(workConfig.get("movingpattern", "dpat"))
+	config.dpatColor = float(workConfig.get("movingpattern", "dpatColor"))
 	config.deltapat = float(workConfig.get("movingpattern", "deltapat"))
+	config.deltapatColor = float(workConfig.get("movingpattern", "deltapatColor"))
 	config.baseImage =(workConfig.get("movingpattern", "baseImage"))
 	config.mult_a = float(workConfig.get("movingpattern", "mult_a"))
 	config.mult_b = float(workConfig.get("movingpattern", "mult_b"))
 	config.mult_c = float(workConfig.get("movingpattern", "mult_c"))
 	config.mult_d = float(workConfig.get("movingpattern", "mult_d"))
 	config.mult_e = float(workConfig.get("movingpattern", "mult_e"))
+	config.changeProb = float(workConfig.get("movingpattern", "changeProb"))
 
 
 	im = Image.open(config.baseImage)
@@ -81,6 +86,7 @@ def main(run=True):
 
 	im = np.array(Image.open(config.baseImage))
 	config.data = im
+	config.datab = config.data
 
 	if run:
 		runWork()

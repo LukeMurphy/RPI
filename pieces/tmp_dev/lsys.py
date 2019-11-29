@@ -9,23 +9,13 @@ import PIL.Image
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageMath
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-canvasBase = dict(width=160, height=160)
-origin = [0, 0]
-pos = 0
-lastCoord = [100, 50]
-nextCoord = [0, 0]
-v = [0, 0]
-angle = math.pi / 2
-currentAngle = 0
-runRun = True
-d = 10
 
 
 class Lsys:
 
 	n = 5
 	c = 0
-	recursionLimit = 5
+	recursionLimit = 8
 	strg = ""
 	AxiomSelected = "FBF--FF--FF"
 	PatternSetSelected = "FF"
@@ -39,15 +29,20 @@ class Lsys:
 	PatternSetSelected = "F"
 	PatternSetSelected2 = ""
 
-	AxiomSelected = "F-F-FF-FF-FFF-FFF-FFFF-FFFF-FFFFF-FFFFF-FFFFFF-FFFFFF-"
-	PatternSetSelected = "F"
+
+	PatternSetSelected2 = ""
+	PatternSetSelected = "F+F-F-F-F+F+F+F-F"
+	PatternSetSelected = "F-F+F+F-F"
+	AxiomSelected = "F"
+
+
 
 	useRandom = True
 	foliage = False
 	incrRange = 20
 	incrEnd = 20
-	angle = 90
-	d = 80
+	angle = 50
+	d = 10
 	dFactor = 1
 	dFactorMultiplier = 0.8
 
@@ -65,8 +60,8 @@ class Lsys:
 
 	def __init__(self):
 		print("Init Lsys")
-		incrRange = 100
-		incrEnd = 100
+		incrRange = 10
+		incrEnd = 10
 		incrStart = 0
 		self.setUpNewDrawingParameters()
 
@@ -76,6 +71,10 @@ class Lsys:
 		if self.PatternSetSelected2 == "":
 			self.PatternSetSelected2 = "B"
 		self.strg = self.parse(self.AxiomSelected)
+		self.strg = self.parse(self.strg)
+		self.strg = self.parse(self.strg)
+		self.strg = self.parse(self.strg)
+
 		print(self.strg)
 
 	def setupDrawing(self):
@@ -177,6 +176,16 @@ def drawBasic(self):
 
 """
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+canvasBase = dict(width=500, height=500)
+origin = [0, 0]
+pos = 0
+lastCoord = [2, 400]
+nextCoord = [0, 0]
+v = [0, 0]
+angle = 2 *math.pi / 4.5
+currentAngle = 0
+runRun = True
+d = 2
 
 
 def drawLines(arg):
@@ -186,8 +195,8 @@ def drawLines(arg):
 	pi = math.pi
 
 	# print(v)
-	if arg == "F":
-		v = [d * math.sin(currentAngle), d * math.cos(currentAngle)]
+	if arg == "F" or arg =="B":
+		v = [d * math.cos(currentAngle), d * math.sin(currentAngle)]
 		nextCoord[0] = lastCoord[0] + v[0]
 		nextCoord[1] = lastCoord[1] + v[1]
 		config.draw.line(
@@ -236,7 +245,7 @@ def runWork():
 	global runRun
 	while True:
 		iterate()
-		time.sleep(0.0001)
+		#time.sleep(0.001)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -244,7 +253,7 @@ def runWork():
 
 def iterate():
 	global config, L, pos, runRun
-	r = 50
+	r = 4
 	if pos < len(L.strg):
 		for i in range(pos, pos + r):
 			if i < len(L.strg):

@@ -57,7 +57,7 @@ class expandingRing:
 			self.radius += self.radialExpansion
 			self.radialExpansion += .05
 
-			if self.radius > self.config.screenWidth/2 + 50 :
+			if self.radius > self.config.screenWidth/2 + 100 :
 				self.radius = 0
 				self.regreshRingParameters()
 				reset = True
@@ -81,30 +81,6 @@ class expandingRing:
 				u.yPos = round(self.radius * math.sin(u.angle)) + self.center[1]
 				u.reDraw()
 
-
-	def colorSetUp(self):
-		self.colOverlay = coloroverlay.ColorOverlay()
-		self.colOverlay.randomSteps = True
-		self.colOverlay.timeTrigger = True
-		self.colOverlay.tLimitBase = self.config.tLimitBase
-		self.colOverlay.steps = 10
-
-		self.colOverlay.minHue = 0
-		self.colOverlay.maxHue = 360
-		self.colOverlay.minSaturation = 0.1
-		self.colOverlay.maxSaturation = 1
-		self.colOverlay.minValue = 0.1
-		self.colOverlay.maxValue = 1
-
-		self.colOverlay.randomRange = (
-			self.config.transitionStepsMin,
-			self.config.transitionStepsMax,
-		)
-
-		self.colOverlay.colorTransitionSetup()
-		self.fillColor = tuple(
-			round(a * self.config.brightness) for a in self.colOverlay.currentColor
-		)
 
 
 ''' ----------------------------------------------------------------------------------- '''

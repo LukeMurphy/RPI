@@ -137,6 +137,15 @@ def randomColorAlpha(brtns=1, maxTransparency=255, minTransparency=0):
 	a = round(random.uniform(minTransparency, maxTransparency))
 	return (r, g, b, a)
 
+def randomGrayAlpha(brtns=1, maxTransparency=255, minTransparency=0):
+	global brightness
+	if brtns == 1:
+		brtns = brightness
+	r = round((random.uniform(0, 255)) * brtns)
+	g = r
+	b = r
+	a = round(random.uniform(minTransparency, maxTransparency))
+	return (r, g, b, a)
 
 ### Yup, same function that should have been called this
 ### to start with...    ;(

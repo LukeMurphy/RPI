@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 colorutils.brightness = 1
 expandingRingss = []
+mode = 1
 
 ''' ----------------------------------------------------------------------------------- '''
 class expandingRing:
@@ -25,11 +26,12 @@ class expandingRing:
 		self.angularRotation = 0 #random.uniform(-math.pi/100,math.pi/100)
 		self.unitBoxWidthExpansionRate = .5
 		self.unitBoxHeightExpansionRate = .5
+		self.mode = 1
 
 
 	def initializeUnits(self) :
 		self.radius = 30 +  round(random.uniform(10,100))
-		self.numUnits = 12 + round(random.uniform(1,24))
+		self.numUnits = 6 + round(random.uniform(1,24))
 		self.radians = 2 * math.pi / self.numUnits
 
 		for i in range (0, self.numUnits) :
@@ -44,7 +46,14 @@ class expandingRing:
 			u.reDraw()
 
 	def regreshRingParameters(self):
-		self.color = colorutils.randomColorAlpha()
+
+		if self.mode == 1 :
+			self.color = colorutils.randomColorAlpha()
+		if self.mode == 2 :
+			self.color = colorutils.getRandomRGB()
+		if self.mode == 3 :
+			self.color = colorutils.randomGrayAlpha()
+		
 		self.radialExpansion = random.uniform(.02,4)
 		self.angularRotation = 0 #random.uniform(-math.pi/100,math.pi/100)
 		unitSizeExpansionRate = random.random()
@@ -130,9 +139,16 @@ def iterate():
 
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
+	if random.random() < config.modeChangeProb :
+		mode = math.floor(random.uniform(0,3)) + 1
+		ringSet = math.floor(random.uniform(0,len(config.ringSets)))
+		for r in config.ringSets[ringSet]['rings'] :
+			r.mode = mode
+		
+
+		
 
 
-	
 def main(run=True):
 	global config
 	global expandingRingss
@@ -144,6 +160,8 @@ def main(run=True):
 	config.redrawSpeed = float(workConfig.get("expandingRings", "redrawSpeed"))
 	ringSets = workConfig.get("expandingRings", "ringSets")
 	ringSets = ringSets.split(",")
+
+	config.modeChangeProb = .01
 	
 	config.ringSets = []
 
@@ -155,9 +173,11 @@ def main(run=True):
 		center  = workConfig.get(ringGroup, "center")
 		ringSetParams['center'] = tuple(int(p) for p in center.split(','))
 		ringSetParams['rings'] = rings
+		ringSetParams['mode'] = 3
 
 		for n in range(0, numberOfRings):
 			er = expandingRing(config)
+			er.mode = ringSetParams['mode']
 			if n > 2 :
 				er.expanding = True
 			er.center = ringSetParams['center']
@@ -165,6 +185,7 @@ def main(run=True):
 			rings.append(er)
 		
 		config.ringSets.append(ringSetParams)
+
 
 
 

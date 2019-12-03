@@ -20,7 +20,7 @@ colorutils.brightness = 1
 
 
 def vary1(data, config):
-	data = config.mult_a * np.tan(config.mult_b * np.sin(config.mult_c * config.data + 
+	data = config.mult_a * (config.mult_b * np.sin(config.mult_c * config.data + 
 			config.dpatColor/config.mult_d) * config.data + config.data * config.mult_e)
 	return data
 
@@ -38,10 +38,10 @@ def redraw():
 		config.datab = vary1(config.datab, config)
 		config.dpatColor += config.deltapatColor
 	
+	#config.datab = config.datab[:, :, [0, 1, 0]]
 	datac = np.roll(config.datab, round(config.dpat), (0))
 	#datac = config.data
 
-	#datab = datab[:, :, [0, 2, 1]]
 	config.image = Image.fromarray(datac.astype('uint8'))
 	#a.renderImageFull.convert('RGBA')
 	config.dpat += config.deltapat

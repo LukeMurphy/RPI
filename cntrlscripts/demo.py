@@ -34,6 +34,24 @@ actionDict1 = [
 
 
 
+	{" ": ""},
+	{"-------- Firestick on FLOOR  -------------": ""},	
+	{"==> p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
+	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
+	{"==> p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
+
+
+	{" ": ""},
+	{"--------- Partial Plinth -----------" :''},
+	{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
+	{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
+
+	{" ": ""},
+	{"--------- FLOOR -----------": ""},
+	{"Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
+	{"Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
+	{"Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
 
 
 	{" ": ""},
@@ -61,8 +79,7 @@ actionDict1 = [
 	{"Wall Hanging: Propagation": "p4-3x8-informal/Propagation.cfg"},
 	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Wall Hanging: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
-	{" ": ""},
-	
+
 
 	#{"-------- FLOOR - FIREPLCE ------": ""},
 	#{"==> pile: Algoflames2.3": "p4-6x8/algofall-2.3.cfg"},
@@ -74,18 +91,6 @@ actionDict1 = [
 	#{"pile: Algoflames-6a": "p4-6x8/algofall6a.cfg"},
 	#{"pile: image-particles": "p4-6x8/image-particles.cfg"},
 
-
-	{" ": ""},
-	{"--------- PArtial Plinth -----------" :''},
-	{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
-	{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
-	{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
-
-	{" ": ""},
-	{"--------- FLOOR -----------": ""},
-	{"Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
-	{"Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
-	{"Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
 
 
 
@@ -171,6 +176,9 @@ actionDict2 = [
 	{"P10 Branch - Glitch": "p10/glitch-screen.cfg"},
 	{"P10 Branch - Algoflames-b": "p10/algoflames-1b.cfg"},
 	{"P10 Branch - Collage": "p10/collage-1.cfg"},
+
+
+
 
 	{" ": ""},
 	{"-------- BUNDLE FLOOR  -------------": ""},

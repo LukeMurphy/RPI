@@ -39,11 +39,10 @@ actionDict1 = [
 	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	{"==> p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
 	{" ": ""},
-	{"==> Upset Cube  - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6.cfg"},
-	{"==> Pixel Shack gradients": "p4-4x6/pixel-shack-gradients-4x6.cfg"},
-	{"==> Pixel Shack - AlgoFlames": "p4-4x6/pixel-shack-algoflames-1b.cfg"},
+	{"==> Upset Cube  - AlgoFlames Pink": "p4-4x4/plank-algoflames-2.cfg"},
+	{"==> Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
+	{"==> Pixel Shack gradients": "p4-4x4/pixel-shack-gradients-4x6.cfg"},
+	{"==> Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
 
 
 	{" ": ""},

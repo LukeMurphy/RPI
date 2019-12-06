@@ -176,7 +176,7 @@ def restartPiece(config):
 		createstarpieces.refreshPalette(config)
 	else:
 		createtrianglepieces.refreshPalette(config)
-		setInitialColors(True)
+		setInitialColors(config, True)
 
 	if random.random() < 0.5:
 		config.rotation = random.uniform(-config.rotationRange, config.rotationRange)
@@ -184,6 +184,7 @@ def restartPiece(config):
 
 def setInitialColors(config, refresh=False):
 	## Better initial color when piece is turned on
+
 	try:
 		for i in range(0, len(config.unitArray)):
 			obj = config.unitArray[i]

@@ -33,12 +33,17 @@ actionDict1 = [
 	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 
 
-
 	{" ": ""},
 	{"-------- Firestick on FLOOR  -------------": ""},	
 	{"==> p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	{"==> p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
+	{" ": ""},
+	{"==> Upset Cube  - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
+	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6.cfg"},
+	{"==> Pixel Shack gradients": "p4-4x6/pixel-shack-gradients-4x6.cfg"},
+	{"==> Pixel Shack - AlgoFlames": "p4-4x6/pixel-shack-algoflames-1b.cfg"},
 
 
 	{" ": ""},
@@ -61,7 +66,7 @@ actionDict1 = [
 	{"==> Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},
 	# {"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	# {"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	#{"Wall Hanging: Compositions": "p4-3x8-informal/compositions.cfg"},
 	#{"Wall Hanging: compositions a": "p4-3x8-informal/compositions.cfg"},
 	#{"Wall Hanging: compositions b": "p4-3x8-informal/compositions.cfg"},
@@ -71,13 +76,13 @@ actionDict1 = [
 	{"Wall Hanging: Quilt Stars": "p4-3x8-informal/quilt-stars.cfg"},
 	{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
 	{"Wall Hanging: THRow Multi": "multi/throw-quilt.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Vert Bars - gray": "p4-5x8/mono-lights-gray.cfg"},
 	# {"Square - mono-flavin" :'p4-3x8-informal/mono-flavin.cfg'},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Wall Hanging: Signage": "p4-3x8-informal/signage.cfg"},
 	{"Wall Hanging: Propagation": "p4-3x8-informal/Propagation.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Wall Hanging: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 
 
@@ -129,11 +134,7 @@ actionDict1 = [
 	# {"Arc: Afer Pink" :'concentrics/ConcentricAfterImagesArc.app'},
 	# {" " :''},
 	#{" ": ""},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"==> Pixel Shack: THRow Multi": "multi/throw-quilt.cfg"},
-	{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6.cfg"},
-	{"==> Pixel Shack gradients": "p4-4x6/pixel-shack-gradients-4x6.cfg"},
-	{"==> Pixel Shack - AlgoFlames": "p4-4x6/pixel-shack-algoflames-1b.cfg"},
+
 
 	#{"Tower w. Bump Collage2": "p4-5x8/bump-collage2.cfg"},
 	#{"Alt Flames": "p4-6x8/alt-flames.cfg"},

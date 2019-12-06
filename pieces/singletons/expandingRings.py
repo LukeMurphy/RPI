@@ -50,7 +50,7 @@ class expandingRing:
 		if self.mode == 1 :
 			self.color = colorutils.randomColorAlpha()
 		if self.mode == 2 :
-			self.color = colorutils.getRandomRGB()
+			self.color = colorutils.getSunsetColors()
 		if self.mode == 3 :
 			self.color = colorutils.randomGrayAlpha()
 		

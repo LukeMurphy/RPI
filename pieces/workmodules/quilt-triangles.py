@@ -184,16 +184,18 @@ def restartPiece(config):
 
 def setInitialColors(config, refresh=False):
 	## Better initial color when piece is turned on
-
-	for i in range(0, len(config.unitArray)):
-		obj = config.unitArray[i]
-		# print("number of colorOverlay objs {}".format(len(obj.triangles)) )
-		for c in range(0, len(obj.triangles)):
-			colOverlay = obj.triangles[c][1]
-			# colOverlay.colorB = colorutils.randomColorAlpha(config.brightness * .8,0)
-			colOverlay.colorA = colorutils.randomColorAlpha(config.brightness * 0.8, 0)
-			colOverlay.colorTransitionSetup()
-			colOverlay.colorTransitionSetupValues()
+	try:
+		for i in range(0, len(config.unitArray)):
+			obj = config.unitArray[i]
+			# print("number of colorOverlay objs {}".format(len(obj.triangles)) )
+			for c in range(0, len(obj.triangles)):
+				colOverlay = obj.triangles[c][1]
+				# colOverlay.colorB = colorutils.randomColorAlpha(config.brightness * .8,0)
+				colOverlay.colorA = colorutils.randomColorAlpha(config.brightness * 0.8, 0)
+				colOverlay.colorTransitionSetup()
+				colOverlay.colorTransitionSetupValues()
+	except Exception as e:
+		print(e)
 
 
 def main(config, workConfig, run=True):

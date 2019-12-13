@@ -36,6 +36,7 @@ actionDict1 = [
 	{" ": ""},
 	{"-------- Firestick on FLOOR  -------------": ""},	
 	{"==> p4-6x1-firestick - box lights": "p4-6x1-firestick/dot-grid.cfg"},
+	{"==> p10-firestick - box lights": "p4-6x1-firestick/p10-dot-grid.cfg"},
 	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},

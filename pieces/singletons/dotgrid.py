@@ -161,7 +161,7 @@ def drawCircle(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0)):
 		barColorDisplay = (rVd, gVd, bVd, bAd)
 		gradientImageDraw.ellipse((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
 
-	gradientImage = gradientImage.filter(ImageFilter.GaussianBlur(radius=4))
+	gradientImage = gradientImage.filter(ImageFilter.GaussianBlur(radius=config.dotBlurRadius))
 
 	return gradientImage
 
@@ -281,6 +281,7 @@ def main(run=True):
 	config.holderColor = tuple(map(lambda x: int(x), config.bgColorVals))
 	config.grayLevelLower = int(workConfig.get("gradients", "grayLevelLower"))
 	config.grayLevelUpper = int(workConfig.get("gradients", "grayLevelUpper"))
+	config.dotBlurRadius = int(workConfig.get("gradients", "dotBlurRadius"))
 
 
 	config.boxWidth = 200

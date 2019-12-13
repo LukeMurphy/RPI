@@ -41,7 +41,7 @@ actionDict1 = [
 	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
 	{" ": ""},
 	{"==> Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
-	{"==> Pixel Shack gradients": "p4-4x4/pixel-shack-gradients-4x6.cfg"},
+	{"==> Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	{"Upset Cube  - AlgoFlames Pink": "p4-4x4/cube-algoflames-2.cfg"},
 	{"Upset Cube  - AlgoFlames Green": "p4-4x4/cube-algoflames-3.cfg"},
 	{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},

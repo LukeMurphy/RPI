@@ -57,8 +57,6 @@ class Fader:
 				self.testing = True
 
 
-
-
 class Element:
 
 	def __init__(self):
@@ -78,8 +76,10 @@ class Element:
 		if config.colorChoice == "rgbAlpha":
 			
 			if random.random() < config.grayProb :
-				self.grayLevel1 = round(random.uniform(0,255))
-				self.grayLevel2 = round(random.uniform(0,255))
+
+				self.grayLevel1 = round(random.uniform(config.grayLevelLower,config.grayLevelUpper))
+				self.grayLevel2 = round(random.uniform(config.grayLevelLower,config.grayLevelUpper))
+
 				self.c1 = (self.grayLevel1, self.grayLevel1, self.grayLevel1, 255)
 				self.c2 = (self.grayLevel2, self.grayLevel2, self.grayLevel2, 255)
 
@@ -279,6 +279,9 @@ def main(run=True):
 
 	config.bgColorVals = (workConfig.get("gradients", "bgColor")).split(",")
 	config.holderColor = tuple(map(lambda x: int(x), config.bgColorVals))
+	config.grayLevelLower = int(workConfig.get("gradients", "grayLevelLower"))
+	config.grayLevelUpper = int(workConfig.get("gradients", "grayLevelUpper"))
+
 
 	config.boxWidth = 200
 	config.gradientLevel = 2

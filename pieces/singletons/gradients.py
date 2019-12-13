@@ -40,6 +40,50 @@ def transformImage(img):
 	)
 	return img
 
+def drawCircle(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0)):
+	global config
+
+	gradientImage = Image.new("RGBA", (width, height))
+	gradientImageDraw = ImageDraw.Draw(gradientImage)
+
+	# draw box container
+	gradientImageDraw.rectangle(
+		(0, 0, width, height), outline=None, fill=(config.holderColor)
+	)
+
+	# draw bar
+	vLines = round((height) / config.steps)
+
+	vLines  = 4;
+	arc = (math.pi) / vLines
+	dR = c2[0] - c1[0]
+	dG = c2[1] - c1[1]
+	dB = c2[2] - c1[2]
+
+	if len(c1) == 3:
+		dA = 0
+	else:
+		dA = c2[3] - c1[3]
+
+	for n in range(0, vLines):
+		xPos = 0
+		xPos2 = width/4 * n
+		yPos = n * config.steps
+		yPos2 = width/4 * n
+		b = math.sin(arc * n)
+		rVd = int(c1[0] + (b * dR))
+		gVd = int(c1[1] + (b * dG))
+		bVd = int(c1[2] + (b * dB))
+
+		if len(c1) == 4:
+			bAd = int(c1[3] + (b * dA))
+		else:
+			bAd = 255
+		barColorDisplay = (rVd, gVd, bVd, bAd)
+		gradientImageDraw.ellipse((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
+
+	return gradientImage
+
 
 def drawBar(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0)):
 	global config
@@ -93,7 +137,10 @@ def reDraw(
 		for ii in range(0, 1):
 			if random.random() < prob:
 				height = round(random.uniform(heightRange[0], heightRange[1]))
+
 				width = rowHeight
+				height = heightRange[1]
+				width = height
 				xPos = round(random.uniform(0, config.canvasWidth - width))
 				xPos = round(random.uniform(-32, config.canvasWidth))
 				yPos = round(random.uniform(0, config.canvasWidth - 32))
@@ -119,8 +166,11 @@ def reDraw(
 					c1 = (0, 0, 0, 55)
 					c2 = (0, 0, 0, 255)
 
-				gradientImage = drawBar(width, height, c1, c2)
-				gradientImage = gradientImage.rotate(angle, expand=1)
+				#gradientImage = drawBar(width, height, c1, c2)
+
+				gradientImage = drawCircle(width, height, c1, c2)
+				
+				#gradientImage = gradientImage.rotate(angle, expand=1)
 
 				# gradientImage = transformImage(gradientImage)
 
@@ -195,6 +245,7 @@ def main(run=True):
 	config.heightMin = int(workConfig.get("gradients", "heightMin"))
 	config.heightMax = int(workConfig.get("gradients", "heightMax"))
 	config.colorChoice = workConfig.get("gradients", "colorChoice")
+	
 
 	config.probDrawChange = float(workConfig.get("gradients", "probDrawChange"))
 	config.probDrawEffective = .9

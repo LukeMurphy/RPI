@@ -35,20 +35,23 @@ actionDict1 = [
 
 	{" ": ""},
 	{"-------- Firestick on FLOOR  -------------": ""},	
-	{"==> p4-6x1-firestick - box lights": "p4-6x1-firestick/dot-grid.cfg"},
-	{"==> p10-firestick - box lights": "p4-6x1-firestick/p10-dot-grid.cfg"},
+	{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
 	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
+	
 	{" ": ""},
+	{"-------- Upset Cube on FLOOR  -------------": ""},	
 	{"==> Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
 	{"==> Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	{"Upset Cube  - AlgoFlames Pink": "p4-4x4/cube-algoflames-2.cfg"},
-	{"Upset Cube  - AlgoFlames Green": "p4-4x4/cube-algoflames-3.cfg"},
+	{"Upset Cube  - AlgoFlames Pink-2": "p4-4x4/cube-algoflames-3.cfg"},
 	{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
-	{"Pixel Shack gradients": "p4-4x4/pixel-shack-gradients-4x6.cfg"},
 	{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
 
+	{" ": ""},
+	{"-------- Buttress Prop   -------------": ""},	
+	{"==> p10-firestick - box lights": "p4-6x1-firestick/p10-dot-grid.cfg"},
 
 	{" ": ""},
 	{"--------- Partial Plinth -----------" :''},

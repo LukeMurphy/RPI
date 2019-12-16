@@ -27,17 +27,16 @@ actionDict1 = [
 	# {"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
 	# {"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	# {" " :''},
-	{" ": ""},
+
 	{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
 	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
 	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
-
 
 	{" ": ""},
 	{"-------- Firestick on FLOOR  -------------": ""},	
 	{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
 	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
-	{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
+	#{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
 	
 	{" ": ""},
@@ -46,12 +45,12 @@ actionDict1 = [
 	{"==> Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	{"Upset Cube  - AlgoFlames Pink": "p4-4x4/cube-algoflames-2.cfg"},
 	{"Upset Cube  - AlgoFlames Pink-2": "p4-4x4/cube-algoflames-3.cfg"},
-	{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
-	{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
+	#{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
+	#{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
 
 	{" ": ""},
 	{"-------- Buttress Prop   -------------": ""},	
-	{"==> p10-firestick - box lights": "p4-6x1-firestick/p10-dot-grid.cfg"},
+	{"==> p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
 
 	{" ": ""},
 	{"--------- Partial Plinth -----------" :''},

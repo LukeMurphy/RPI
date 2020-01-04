@@ -142,7 +142,8 @@ class ImageSprite:
 		if args[0] == True:
 			# print(self.dX)
 			# self.imageRotation = random.uniform(-30,30)
-			direction = -1 if self.dX < 0 else 1
+			# direction = -1 if self.dX < 0 else 1
+			direction = 1
 			self.dX = random.uniform(0.3, 2) * direction
 			self.image = self.imageOriginal.copy()
 			self.process()
@@ -180,7 +181,8 @@ class ImageSprite:
 		self.randomizeDirection = randomizeDirection
 
 		if random.random() > 0.5 and randomizeDirection:
-			self.dX *= -1.0
+			pass
+			#self.dX *= -1.0
 		# print("-----------")
 		# self.debugMessage("Trying to load " + img + "")
 		# print("-----------")
@@ -193,22 +195,22 @@ class ImageSprite:
 					(self.config.screenWidth, int(self.ratio * self.image.size[1]))
 				)
 
-			if self.image.size[1] != self.config.screenHeight and self.resizeToHeight:
-				self.ratio = float(self.config.screenHeight) / self.image.size[1]
+			if self.image.size[1] != self.config.channelHeight and self.channelHeight:
+				self.ratio = float(self.config.channelHeight) / self.image.size[1]
 				self.image = self.image.resize(
-					(int(self.ratio * self.image.size[0]), self.config.screenHeight)
+					(int(self.ratio * self.image.size[0]), self.config.channelHeight)
 				)
 
 			if self.dX < 0:
 				# Reverse image
-				self.image = self.image.rotate(-180)
 				pass
+				#self.image = self.image.rotate(-180)
 
 			self.imageOriginal = self.image.copy()
 			self.process()
 
 			self.imageCopy = Image.new(
-				"RGBA", (self.config.screenWidth, self.config.screenHeight)
+				"RGBA", (self.config.screenWidth, self.config.channelHeight)
 			)
 			self.imageCopy.paste(
 				self.image.convert("RGBA"), (0, 0), self.image.convert("RGBA")
@@ -223,6 +225,13 @@ class ImageSprite:
 
 	def process(self):
 		change = 1
+
+		if random.random() > 0.5 and self.randomizeDirection:
+			self.dX *= -1.0
+			self.image = self.image.rotate(-180)
+
+
+			# Reverse image
 		# print("Processing....")
 		# print("-----------")
 
@@ -431,7 +440,7 @@ class ImageSprite:
 				self.xPos = self.endX
 
 			self.x = self.xPos + self.xOffset
-			self.y = self.yPos + self.yOffset
+			self.y = self.yPos + self.yOffset + self.config.vOffset
 
 			rangeOfRot = 20  # + (self.x /100)
 

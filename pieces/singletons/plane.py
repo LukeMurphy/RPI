@@ -80,6 +80,9 @@ def main(run=True):
 	config.scalingFactor = float(workConfig.get("plane", "scalingFactor"))
 	config.speedFactor = float(workConfig.get("plane", "speedFactor"))
 	config.useJitter = workConfig.getboolean("plane", "useJitter")
+
+	config.channelHeight = int(workConfig.get("plane", "channelHeight"))
+	
 	try:
 		config.jitterRate = float(workConfig.get("plane", "jitterRate"))
 	except Exception as e:
@@ -125,7 +128,8 @@ def main(run=True):
 		imgLoader.xOffset = 0
 		imgLoader.yOffsetFactor = 200
 		imgLoader.endX = config.screenWidth
-		imgLoader.endY = config.screenHeight + 32
+		imgLoader.endY = config.channelHeight + 32
+		imgLoader.channelHeight = config.channelHeight
 		imgLoader.yOffsetChange = True
 		if config.unitCount == 1:
 			imgLoader.scalingFactor = config.scalingFactor
@@ -154,7 +158,7 @@ def main(run=True):
 				0,
 				True,
 				False,
-				False,
+				True,
 				False,
 			)
 			# imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
@@ -212,6 +216,7 @@ def iterate(n=0):
 	# Clear the background and redraw all planes
 	if random.random() > 0.998:
 		shuffle(blocks)
+		
 	if random.random() > 0.9985:
 		colorModeDirectional = False if colorModeDirectional == True else True
 

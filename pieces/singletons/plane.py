@@ -138,7 +138,8 @@ def main(run=True):
 			imgLoader.jitterResetRate = config.jitterResetRate
 			imgLoader.jitterRate = config.jitterRate
 			imgLoader.config = config
-			imgLoader.colorMode = "fixed"  # colorWheel #random #colorRGB
+			#imgLoader.colorMode = "fixed"  # colorWheel #random #colorRGB
+			imgLoader.colorMode = config.colorMode
 			imgLoader.colorModeDirectional = False
 			imgLoader.resizeToHeight = True
 			imgLoader.yOffsetChange = False
@@ -159,7 +160,7 @@ def main(run=True):
 				True,
 				False,
 				True,
-				False,
+				True,
 			)
 			# imgLoader.make(path + imageList[3], 1 * config.scalingFactor * 2 , 0, True, False, False, False)
 

@@ -144,7 +144,7 @@ class ImageSprite:
 			# self.imageRotation = random.uniform(-30,30)
 			# direction = -1 if self.dX < 0 else 1
 			direction = 1
-			self.dX = random.uniform(0.3, 2) * direction
+			self.dX = random.uniform(1.0, 3.0) * direction * self.config.speedFactor
 			self.image = self.imageOriginal.copy()
 			self.process()
 

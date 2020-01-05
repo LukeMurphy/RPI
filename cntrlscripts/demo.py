@@ -51,6 +51,8 @@ actionDict1 = [
 	{" ": ""},
 	{"-------- Buttress Prop   -------------": ""},	
 	{"==> p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
+	{"==> p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
+	{"==> p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
 
 	{" ": ""},
 	{"--------- Partial Plinth -----------" :''},

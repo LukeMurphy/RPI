@@ -141,7 +141,7 @@ def drawBar():
 		(config.xPos1, config.yPos1, config.xPos2, config.yPos2), fill=(200, 0, 0)
 	)
 
-	lines = config.screenHeight - 2
+	lines = config.canvasHeight - 2
 	if config.gradientLevel == 1:
 		arc = math.pi / lines * 1
 	else:
@@ -471,11 +471,11 @@ def main(run=True):
 	)
 	config.boxMax = config.screenWidth - 2
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
-	config.boxHeight = config.screenHeight - 3
+	config.boxHeight = config.canvasHeight - 3
 	config.pausePoint = int(random.random() * 100)
 	config.cyclicalArc = 4 * math.pi / config.boxMax
 	config.cyclicalBrightnessPhase = 0
-	config.spinnerCenter = [config.boxMax - 54, config.boxHeight / 2 + 3]
+	config.spinnerCenter = [config.boxMax - 54, config.canvasHeight / 2 + 3]
 
 	config.pauseProbability = (
 		float(workConfig.get("progressbar", "pauseProbability")) / 100

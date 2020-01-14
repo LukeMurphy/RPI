@@ -335,12 +335,14 @@ def configure(config, workconfig):
 		work.config = config
 		work.workConfig = workconfig
 
-	# if(config.rendering == "hat") : renderUsingIDAFruitHat(work)
+	if(config.rendering == "hat") : 
+		renderUsingIDAFruitHat(work)
 	if config.rendering == "hub":
 		renderUsingLINSNHub(work)
 	# if(config.rendering == "out") : renderUsingFFMPEG(work)
 
 
+"""
 """
 def renderUsingIDAFruitHat(work):
 	
@@ -380,7 +382,6 @@ def renderUsingIDAFruitHat(work):
 	work.config.render = r.render
 	work.config.updateCanvas = r.updateCanvas
 	work.main()
-"""
 
 
 def renderUsingLINSNHub(work):

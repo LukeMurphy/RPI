@@ -3,6 +3,8 @@ import subprocess
 import sys
 import tkinter as tk
 from tkinter import *
+from tkmacosx import Button
+
 
 commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
@@ -32,9 +34,12 @@ actionDict1 = [
 	{"==> Road Sign tree-armature": "p4-4x4/sign-collage.cfg"},
 
 	{" ": ""},
-	{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
-	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
-	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
+	{"-------- Trap Prop   -------------": ""},	
+	{"==> p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
+	{"==> p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
+	{"==> p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
+
+
 
 	{" ": ""},
 	{"-------- Firestick on FLOOR  -------------": ""},	
@@ -53,10 +58,9 @@ actionDict1 = [
 	#{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
 
 	{" ": ""},
-	{"-------- Buttress Prop   -------------": ""},	
-	{"==> p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
-	{"==> p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
-	{"==> p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
+	{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
+	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
+	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 
 	{" ": ""},
 	{"--------- Partial Plinth -----------" :''},
@@ -306,13 +310,13 @@ def stopAll():
 
 
 root = tk.Tk()
-frame = tk.Frame(root, bg="darkgray")
-frame.pack(padx=1, pady=1)
+#frame = tk.Frame(root, bg="darkgray")
+#frame.pack(padx=1, pady=1)
 # width x height x X x Y
 root.geometry("%dx%d+%d+%d" % (680, 740, 100, 100))
 
-Lb1 = Listbox(frame, width=30, height=48)
-Lb2 = Listbox(frame, width=28, height=48)
+Lb1 = Listbox(root, width=33, height=42)
+Lb2 = Listbox(root, width=32, height=42)
 
 for i, item in enumerate(actionDict1):
 	Lb1.insert(END, " " + list(item.keys())[0])
@@ -321,32 +325,37 @@ for i, item in enumerate(actionDict1):
 for i, item in enumerate(actionDict2):
 	Lb2.insert(END, " " + list(item.keys())[0])
 
-Lb1.pack(side=tk.LEFT, padx=0, ipadx=10)
-Lb2.pack(side=tk.LEFT, ipadx=10, expand=0)
+#Lb1.pack(side=tk.LEFT, padx=0, ipadx=10)
+#Lb2.pack(side=tk.LEFT, ipadx=10, expand=0)
+Lb1.place(bordermode=OUTSIDE, x=2, y=2)
+Lb2.place(bordermode=OUTSIDE, x=300, y=2)
 
+topBtnPlace = 400
+leftBtnPlace = 560
 
-button = tk.Button(
-	frame, text="QUIT", bg="gray", fg="red", highlightbackground="darkgray", command=quit
+slogan = Button(
+	root, text="Stop & Run", width = 120, bg='blue', fg='white', borderless=1, command=action2
 )
-button.pack(side=tk.BOTTOM, padx=2)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
 
-slogan = tk.Button(
-	frame, text="Stop All", bg="gray", highlightbackground="darkgray", command=stopAll
+slogan = Button(
+	root, text="Stop All", width = 120, bg='blue', fg='white', borderless=1, command=stopAll
 )
-slogan.pack(side=tk.BOTTOM, padx=2)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+25)
 
 
-slogan = tk.Button(
-	frame, text="Run", bg="gray", highlightbackground="darkgray", command=action
+slogan = Button(
+	root, text="Run", width = 120, bg='blue', fg='white', borderless=1, command=action
 )
-slogan.pack(side=tk.BOTTOM, padx=2)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+50)
 
 
-slogan = tk.Button(
-	frame, text="Stop & Run", bg="gray", highlightbackground="darkgray", command=action2
+quitbutton = Button(
+	root, text="QUIT", width = 120, bg='blue', fg='white', borderless=1, command=quit
 )
-slogan.pack(side=tk.BOTTOM, padx=2)
+quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+75)
+
 
 
 root.mainloop()

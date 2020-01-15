@@ -337,6 +337,7 @@ def configure(config, workconfig):
 		work.workConfig = workconfig
 
 	if(config.rendering == "hat") : 
+		work.config.isRPI = True
 		renderUsingIDAFruitHat(work)
 	if config.rendering == "hub":
 		renderUsingLINSNHub(work)

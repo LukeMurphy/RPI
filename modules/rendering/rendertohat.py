@@ -1,14 +1,25 @@
 import PIL.Image
+import sys, os, threading
 from modules.filters import *
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 #from rgbmatrix import Adafruit_RGBmatrix
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
+from rgbmatrix import graphics
 
 
 def setUp():
 	# importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
 	#config.matrix = Adafruit_RGBmatrix(32, config.matrixTiles)
-	config.matrix = RGBmatrix(32, config.matrixTiles)
+	#config.matrix = RGBmatrix(32, config.matrixTiles)
+
+	options = RGBMatrixOptions()
+
+	options.gpio_slowdown = 4
+	options.rows = 32
+	options.cols = 128
+	options.hardware_mapping = 'adafruit-hat'
+	config.matrix = RGBMatrix(options = options)
 	# print(config.renderImage)
 
 
@@ -41,6 +52,10 @@ def render(
 
 	# the rendered image is the screen size
 	# renderImage = Image.new("RGBA", (screenWidth , 32))
+
+	w=128
+	h=64
+
 	if nocrop == True:
 		for n in range(0, rows):
 			segmentWidth = config.tileSize[1] * config.cols
@@ -53,8 +68,10 @@ def render(
 			)
 
 	elif nocrop == False:
-		segmentWidth = config.tileSize[1] * config.cols
+		segmentWidth = config.tileSize[0] * config.cols
 		segmentHeight = 32
+
+
 
 		# yOffset = 10
 		# xOffset = 100
@@ -71,6 +88,7 @@ def render(
 		cropP2 = [0, 0]
 
 		for n in range(0, config.rows):
+
 
 			# Crop PLACEMENTS\
 			a = max(0, xOffset) + segmentWidth * n
@@ -173,9 +191,11 @@ def render(
 		idtemp = config.image.im.id
 		config.matrix.SetImage(iid, xOffset + screenWidth, 0)
 	else:
-		iid = config.renderImage.im.id
+		iid = config.renderImage
 		idtemp = config.image.im.id
-		config.matrix.SetImage(iid, 0, 0)
+		#config.matrix.Clear()
+		img  = iid.convert('RGB')
+		config.matrix.SetImage(img, 0, 0)
 
 
 #############

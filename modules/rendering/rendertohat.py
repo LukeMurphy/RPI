@@ -1,12 +1,14 @@
 import PIL.Image
 from modules.filters import *
 from PIL import Image, ImageDraw, ImageFont
-from rgbmatrix import Adafruit_RGBmatrix
+#from rgbmatrix import Adafruit_RGBmatrix
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
 
 def setUp():
 	# importlib.import_module('rgbmatrix.Adafruit_RGBmatrix')
-	config.matrix = Adafruit_RGBmatrix(32, config.matrixTiles)
+	#config.matrix = Adafruit_RGBmatrix(32, config.matrixTiles)
+	config.matrix = RGBmatrix(32, config.matrixTiles)
 	# print(config.renderImage)
 
 

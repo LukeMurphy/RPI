@@ -203,7 +203,7 @@ def showGrid():
 					+ str(row * config.tileSizeHeight)
 				)
 				config.canvasDraw.text(
-					(xPos + 2, yPos - 1),
+					(xPos + 2, yPos - 1 + config.fontSize),
 					displyInfo,
 					config.fontColor2,
 					font=config.font,

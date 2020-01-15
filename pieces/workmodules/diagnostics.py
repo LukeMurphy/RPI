@@ -191,18 +191,18 @@ def showGrid(config):
 				outline=config.outlineColor,
 			)
 
-			displyInfo = str(col) + ", " + str(row) + "\n"
+			displyInfo = str(col) + ", " + str(row) + ""
 			config.canvasDraw.text(
 				(xPos + 2, yPos - 1), displyInfo, config.fontColor, font=config.font
 			)
 			displyInfo = (
-				"\n"
+				""
 				+ str(col * config.tileSizeWidth)
 				+ ", "
 				+ str(row * config.tileSizeHeight)
 			)
 			config.canvasDraw.text(
-				(xPos + 2, yPos - 1), displyInfo, config.fontColor2, font=config.font
+				(xPos + 2, yPos - 1 + config.fontSize), displyInfo, config.fontColor2, font=config.font
 			)
 
 	config.image.paste(

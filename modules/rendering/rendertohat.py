@@ -16,8 +16,9 @@ def setUp():
 	options = RGBMatrixOptions()
 
 	options.gpio_slowdown = 4
+	options.chain_length = 4
 	options.rows = 32
-	options.cols = 128
+	options.cols = 64
 	options.hardware_mapping = 'adafruit-hat'
 	config.matrix = RGBMatrix(options = options)
 	# print(config.renderImage)
@@ -53,15 +54,15 @@ def render(
 	# the rendered image is the screen size
 	# renderImage = Image.new("RGBA", (screenWidth , 32))
 
-	w=128
-	h=64
+	w=config.tileSize[0] * config.cols
+	h=config.tileSize[1] * config.rows
 
 	if nocrop == True:
 		for n in range(0, rows):
-			segmentWidth = config.tileSize[1] * config.cols
-			segmentHeight = 32
+			segmentWidth = config.tileSize[0] * config.cols
+			segmentHeight = config.tileSize[1]
 			xPos = n * segmentWidth - xOffset
-			yPos = n * 32  # - yOffset
+			yPos = n * config.tileSize[1]  # - yOffset
 			segment = imageToRender.crop((0, yPos, segmentWidth, segmentHeight + yPos))
 			config.renderImage.paste(
 				segment, (xPos, 0, segmentWidth + xPos, segmentHeight)
@@ -69,7 +70,7 @@ def render(
 
 	elif nocrop == False:
 		segmentWidth = config.tileSize[0] * config.cols
-		segmentHeight = 32
+		segmentHeight = config.tileSize[1]
 
 
 
@@ -96,22 +97,24 @@ def render(
 			c = min(segmentWidth, xOffset + w) + segmentWidth * n
 			d = min(segmentHeight, yOffset + h - segmentHeight * n)
 
+
 			# Cropping
 			cropP2 = [
 				cropP1[0] + c - xOffset,
-				cropP1[1] + min(32, d - yOffset + n * segmentHeight),
+				cropP1[1] + min(config.tileSize[1], d - yOffset + n * segmentHeight),
 			]
 
 			cropP1 = [max(0, 0 - xOffset), max(0, n * segmentHeight - yOffset)]
 			cropP2 = [
 				min(w, segmentWidth - xOffset),
-				min(h, n * segmentHeight + 32 - yOffset),
+				min(h, n * segmentHeight + config.tileSize[1] - yOffset),
 			]
 
 			pCrop = cropP1 + cropP2
 
 			if (n == 0 or n == 2 or n == 4) and (config.transWiring == False):
 				pCrop[1] = 0
+
 			segmentImage.append(imageToRender.crop(pCrop))
 
 			# print(a,b,c,d,cropP1,cropP2)
@@ -172,6 +175,8 @@ def render(
 						## Adding "n" -- because there starts to be a lag as scrolling happens where the top row
 						## looks like it's off by one or more pixels, just adding it helps correct
 						## only for transwired fast moving things though
+						# overriding !!!!!
+						n = 0
 						config.renderImage.paste(
 							segImg,
 							(

@@ -10,6 +10,7 @@ import random
 import sys
 import textwrap
 import time
+import threading
 
 import PIL.Image
 from modules import configuration

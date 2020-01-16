@@ -198,7 +198,7 @@ def render(
 	else:
 		iid = config.renderImage
 		idtemp = config.image.im.id
-		#config.matrix.Clear()
+		config.matrix.Clear()
 		img  = iid.convert('RGB')
 		config.matrix.SetImage(img, 0, 0)
 

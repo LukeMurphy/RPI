@@ -15,7 +15,7 @@ def setUp():
 
 	options = RGBMatrixOptions()
 
-	options.gpio_slowdown = 1
+	options.gpio_slowdown = 4
 	options.chain_length = 4
 	options.rows = 32
 	options.cols = 64

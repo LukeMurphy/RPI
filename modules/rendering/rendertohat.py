@@ -15,12 +15,14 @@ def setUp():
 
 	options = RGBMatrixOptions()
 
-	options.gpio_slowdown = 4
+	options.gpio_slowdown = 5
 	options.chain_length = 4
 	options.rows = 32
 	options.cols = 64
 	options.hardware_mapping = 'adafruit-hat'
 	config.matrix = RGBMatrix(options = options)
+
+	config.double_buffer = config.matrix.CreateFrameCanvas()
 	# print(config.renderImage)
 
 
@@ -200,7 +202,15 @@ def render(
 		idtemp = config.image.im.id
 		#config.matrix.Clear()
 		img  = iid.convert('RGB')
+
+
+
 		config.matrix.SetImage(img, 0, 0)
+		'''
+		config.double_buffer.SetImage(img, 0, 0)
+		config.double_buffer.SetImage(img, 0, -segmentWidth)
+		config.double_buffer = config.matrix.SwapOnVSync(config.double_buffer)
+		'''
 
 
 #############

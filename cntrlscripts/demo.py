@@ -42,14 +42,14 @@ actionDict1 = [
 
 
 	{" ": ""},
-	{"-------- Firestick on FLOOR  -------------": ""},	
+	#{"-------- Firestick on FLOOR  -------------": ""},	
 	{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
 	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	#{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
 	
 	{" ": ""},
-	{"-------- Upset Cube on FLOOR  -------------": ""},	
+	#{"-------- Upset Cube on FLOOR  -------------": ""},	
 	{"==> Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
 	{"==> Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	{"Upset Cube  - AlgoFlames Pink": "p4-4x4/cube-algoflames-2.cfg"},
@@ -57,14 +57,14 @@ actionDict1 = [
 	#{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
 	#{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
 
-	{" ": ""},
-	{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
+	#{" ": ""},
+	#{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
 	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
-	{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
+	#{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 
 	{" ": ""},
-	{"--------- Partial Plinth -----------" :''},
-	{"==> Gray Glory": "grayburst.app"},
+	#{"--------- Partial Plinth -----------" :''},
+	{"==> partial plinth Gray Glory": "grayburst.app"},
 	{"==> DotGridTiles": "DotGridTiles.app"},
 	#{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
 	#{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
@@ -79,6 +79,14 @@ actionDict1 = [
 
 	{" ": ""},
 	{"-------- RIGHT WALL -------------": ""},
+	{"==> Inset frame: light grid": "p4-2x2/dot-grid.cfg"},
+	{"==> Inset frame: compositions": "p4-2x2/compositions-hub.cfg"},
+	{"==> Inset frame: inset collage": "p4-2x2/compositions-2-hub.cfg"},
+	
+
+
+
+	{" ": ""},
 	{"==> Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
 	{"==> Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
 	{"==> Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},

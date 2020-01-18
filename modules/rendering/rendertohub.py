@@ -78,7 +78,7 @@ def setUp():
 	config.cnvs.create_rectangle(
 		0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black"
 	)
-	config.cnvs.pack()
+	#config.cnvs.pack()
 	config.cnvs.place(
 		bordermode="outside",
 		width=config.screenWidth + buff,

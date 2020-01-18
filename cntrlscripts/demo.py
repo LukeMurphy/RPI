@@ -80,8 +80,9 @@ actionDict1 = [
 	{" ": ""},
 	{"-------- RIGHT WALL -------------": ""},
 	{"==> Inset frame: light grid": "p4-2x2/dot-grid.cfg"},
-	{"==> Inset frame: compositions": "p4-2x2/compositions-hub.cfg"},
-	{"==> Inset frame: inset collage": "p4-2x2/compositions-2-hub.cfg"},
+	{"==> Inset frame: compositions 1": "p4-2x2/compositions-hub.cfg"},
+	{"==> Inset frame: inset collage 2": "p4-2x2/compositions-2-hub.cfg"},
+	{"==> Inset frame: inset collage 3": "p4-2x2/compositions-3-hub.cfg"},
 	
 
 

@@ -54,12 +54,12 @@ actionDict1 = [
 	{"==> Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	{"Upset Cube  - AlgoFlames Pink": "p4-4x4/cube-algoflames-2.cfg"},
 	{"Upset Cube  - AlgoFlames Pink-2": "p4-4x4/cube-algoflames-3.cfg"},
+	{"Material Compositions": "p4-4x4/cube-compositions.cfg"},
 	#{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
 	#{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
 
 	#{" ": ""},
 	#{"--- TWO SIDED DESKTOP SCULPTURES ----": ""},
-	{"==> Material Compositions": "p4-3x4/diagnostics.cfg"},
 	#{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 
 	{" ": ""},

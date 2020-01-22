@@ -85,10 +85,10 @@ class Element:
 
 			else :
 				self.c1 = colorutils.randomYellowsAlpha(
-					config.brightness, config.alpha1, config.alpha1
+					config.brightness, config.alpha1, config.alpha1, 0.0, 0.35
 				)
 				self.c2 = colorutils.randomYellowsAlpha(
-					config.brightness, config.alpha2, config.alpha2
+					config.brightness, config.alpha2, config.alpha2, 0.0, 0.35
 				)
 
 				

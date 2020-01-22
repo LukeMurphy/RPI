@@ -127,13 +127,13 @@ def randomColor(brtns=1):
 	return (r, g, b)
 
 
-def randomYellowsAlpha(brtns=1, maxTransparency=255, minTransparency=0):
+def randomYellowsAlpha(brtns=1, maxTransparency=255, minTransparency=0, sMax=1.0, sMin=0.5):
 	global brightness
 	if brtns == 1:
 		brtns = brightness
 
 	h = (random.uniform(42, 60))
-	s = (random.uniform(0.5, 1))
+	s = (random.uniform(sMin, sMax))
 	v = .5
 
 	col = HSVToRGB(h, s, v, a=255)

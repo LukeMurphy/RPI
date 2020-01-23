@@ -31,7 +31,8 @@ actionDict1 = [
 	# {" " :''},
 	{" ": ""},
 	{"-------- Roadsign  -------------": ""},	
-	{"==> Road Sign tree-armature": "p4-4x4/sign-collage.cfg"},
+	{"==> Road Sign tree-armature collage": "p4-4x4/sign-collage.cfg"},
+	{"==> Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
 
 	{" ": ""},
 	{"-------- Trap Prop   -------------": ""},	

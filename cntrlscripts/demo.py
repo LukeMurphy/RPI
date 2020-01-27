@@ -40,12 +40,10 @@ actionDict1 = [
 	{"==> p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
 	{"==> p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
 
-
-
 	{" ": ""},
 	#{"-------- Firestick on FLOOR  -------------": ""},	
 	{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
-	{"==> p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
+	{"p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	#{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
 	
@@ -65,8 +63,8 @@ actionDict1 = [
 
 	{" ": ""},
 	#{"--------- Partial Plinth -----------" :''},
-	{"==> partial plinth Gray Glory": "grayburst.app"},
-	{"==> DotGridTiles": "DotGridTiles.app"},
+	{"Java - partial plinth Gray Glory": "grayburst.app"},
+	{"Java - DotGridTiles": "DotGridTiles.app"},
 	#{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
 	#{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 	#{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
@@ -80,15 +78,12 @@ actionDict1 = [
 
 	{" ": ""},
 	{"-------- RIGHT WALL -------------": ""},
-	{"==> Inset frame: light grid": "p4-2x2/dot-grid.cfg"},
-	{"==> Inset frame: compositions 1": "p4-2x2/compositions-hub.cfg"},
 	{"==> Inset frame: inset collage 2": "p4-2x2/compositions-2-hub.cfg"},
-	{"==> Inset frame: inset collage 3": "p4-2x2/compositions-3-hub.cfg"},
-	{" ": ""},
 	{"==> Small Inset frame: inset collage 3": "p3-2x4/diagnostics.cfg"},
+	{"Inset frame: light grid": "p4-2x2/dot-grid.cfg"},
+	{"Inset frame: inset collage 3": "p4-2x2/compositions-3-hub.cfg"},
+	{"Inset frame: compositions 1": "p4-2x2/compositions-hub.cfg"},
 	
-
-
 
 	{" ": ""},
 	{"==> Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},

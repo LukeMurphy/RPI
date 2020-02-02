@@ -43,15 +43,15 @@ def init():
 	config.packing = int(workConfig.get("spots", "packing"))
 	config.dotrows = int(workConfig.get("spots", "rows"))
 	config.dotcols = int(workConfig.get("spots", "cols"))
+	config.blurRadius = int(workConfig.get("spots", "blurRadius"))
 	config.bgColorVals = (workConfig.get("spots", "bgColor"))
 	config.bgColor = tuple(int(i) for i in config.bgColorVals.split(','))
 
-
+	config.colsXOffset = int(workConfig.get("spots", "colsXOffset"))
+	config.rowsYOffset = int(workConfig.get("spots", "rowsYOffset"))
 	config.imageXOffset = 0 
 	config.imageYOffset = 0
-	config.useUltraSlowSpeed = False
-	config.useFadeThruAnimation = False
-	config.deltaTimeDone = True
+
 
 	config.canvasImage = Image.new(
 		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
@@ -67,27 +67,32 @@ def init():
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 	
 
-	config.f = FaderObj()
-	config.f.doingRefreshCount = config.doingRefreshCount
-	config.f.setUp(config.renderImageFull, config.workImage)
-
-	config.renderImageFullOld = config.renderImageFull.copy()
-	config.fadingDone = True
-
-
 	config.spot = Spot()
-	config.spot.xOffSet = -2
-	config.spot.yOffSet = 0
+	config.spot.xOffSet = config.colsXOffset
+	config.spot.yOffSet = config.rowsYOffset
 	config.spot.dotSize = config.dotSize
 	config.spot.packing = config.packing
 	config.spot.spread = config.spread
 	config.spot.rows = config.dotrows
 	config.spot.cols = config.dotcols
 	config.spot.bgColor = config.bgColor
+	config.spot.blurRadius =  config.blurRadius
 
 	config.spot.setUp()
 	config.spot.render()
 
+	config.init = 0
+	config.initCount = 1
+
+	config.f = FaderObj()
+	config.f.doingRefreshCount = 5
+	config.f.setUp(config.renderImageFull, config.workImage)
+
+	config.renderImageFullOld = config.renderImageFull.copy()
+	config.fadingDone = True
+
+	config.useFadeThruAnimation = True
+	config.deltaTimeDone = True
 
 
 def runWork():
@@ -140,6 +145,15 @@ class Spot :
 				n += 1
 
 
+	def change(self) :
+		self.spotsArray = list()
+		self.workImage = Image.new("RGBA", (self.width, self.height))
+		self.draw = ImageDraw.Draw(self.workImage)
+		self.setUp()
+		self.render()
+
+
+
 	def render(self) :
 		for n in range(0,(self.rows*self.cols)):
 			for i in range(0,3):
@@ -150,7 +164,7 @@ class Spot :
 				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][0].workImage)
 
 
-		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=2))
+		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=self.blurRadius))
 
 
 class Dot :
@@ -184,7 +198,7 @@ def processImage():
 	## Run through the objects .....
 	config.workImageDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
 
-	#blendedImage = ImageChops.add(config.spot.workImage,config.spot2.workImage)
+	config.spot.change()
 
 	config.workImage.paste(config.spot.workImage, (config.spot.xOffSet, config.spot.yOffSet))
 	#config.workImage.paste(config.spot2.workImage, (config.spot2.xOffSet, config.spot2.yOffSet))
@@ -194,6 +208,8 @@ def processImage():
 	#config.workImage = ImageChops.add(config.workImage,)
 
 
+
+
 def iterate():
 	global config
 
@@ -201,8 +217,7 @@ def iterate():
 	# config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
 
 
-
-	if config.useFadeThruAnimation == True and config.useUltraSlowSpeed == True:
+	if config.useFadeThruAnimation == True:
 		if config.f.fadingDone == True:
 
 			config.renderImageFullOld = config.renderImageFull.copy()
@@ -221,8 +236,17 @@ def iterate():
 			)
 			processImage()
 
+
 		config.f.fadeIn()
 		config.render(config.f.blendedImage, 0, 0)
+		config.init += config.initCount
+		
+		# This is to get a faster initial fade-in then when done
+		# set it to the right fade-through count
+		if config.init > 18 and config.initCount > 0 :
+			config.f.doingRefreshCount = config.doingRefreshCount
+			config.initCount = 0
+
 
 	else:
 		processImage()
@@ -232,6 +256,7 @@ def iterate():
 			config.workImage,
 		)
 		config.render(config.renderImageFull, 0, 0)
+
 
 
 def main(run=True):

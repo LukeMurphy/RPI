@@ -47,8 +47,20 @@ def init():
 	config.bgColorVals = (workConfig.get("spots", "bgColor"))
 	config.bgColor = tuple(int(i) for i in config.bgColorVals.split(','))
 
+	config.clrAVals = (workConfig.get("spots", "clrA"))
+	config.clrA = tuple(round(int(i) * config.brightness) for i in config.clrAVals.split(','))
+
+	config.clrBVals = (workConfig.get("spots", "clrB"))
+	config.clrB = tuple(round(int(i) * config.brightness) for i in config.clrBVals.split(','))
+
+	config.clrCVals = (workConfig.get("spots", "clrC"))
+	config.clrCV = tuple(round(int(i) * config.brightness) for i in config.clrCVals.split(','))
+
 	config.colsXOffset = int(workConfig.get("spots", "colsXOffset"))
 	config.rowsYOffset = int(workConfig.get("spots", "rowsYOffset"))
+	config.gridVariation = int(workConfig.get("spots", "gridVariation"))
+	config.dotVariation = int(workConfig.get("spots", "dotVariation"))
+	config.dotVariationByColor = (workConfig.getboolean("spots", "dotVariationByColor"))
 	config.imageXOffset = 0 
 	config.imageYOffset = 0
 
@@ -77,6 +89,11 @@ def init():
 	config.spot.cols = config.dotcols
 	config.spot.bgColor = config.bgColor
 	config.spot.blurRadius =  config.blurRadius
+	config.spot.gridVariation =config.gridVariation
+	config.spot.dotVariation =config.dotVariation
+	config.spot.dotVariationByColor =config.dotVariationByColor
+
+	config.spot.clrs = [config.clrA, config.clrB, config.clrCV]
 
 	config.spot.setUp()
 	config.spot.render()
@@ -132,13 +149,19 @@ class Spot :
 		n = 0
 		for c in range(0,self.cols):
 			for r in range(0,self.rows):
+				xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+				yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
 				self.spotsArray.append(list())
+				if self.dotVariationByColor != True :
+					dotVariation = random.random() * self.dotVariation
 				for i in range(0,3) :
 					d = Dot()
-					d.xOffSet = (self.dotSize + self.packing) * c
-					d.yOffSet = (self.dotSize + self.packing) * r
+					d.xOffSet = (self.dotSize + self.packing) * c + xVariation
+					d.yOffSet = (self.dotSize + self.packing) * r + yVariation
 					d.fillColor = self.clrs[i]
-					d.dotSize = self.dotSize
+					if self.dotVariationByColor == True :
+						dotVariation = random.random() * self.dotVariation
+					d.dotSize = self.dotSize + dotVariation
 					d.spread = self.spread
 					d.setUp()
 					self.spotsArray[n].append(d)

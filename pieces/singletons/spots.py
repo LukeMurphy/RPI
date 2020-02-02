@@ -156,7 +156,7 @@ class Spot :
 					dotVariation = random.random() * self.dotVariation
 				for i in range(0,3) :
 					d = Dot()
-					d.xOffSet = (self.dotSize + self.packing) * c + xVariation
+					d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-1) * 2
 					d.yOffSet = (self.dotSize + self.packing) * r + yVariation
 					d.fillColor = self.clrs[i]
 					if self.dotVariationByColor == True :
@@ -182,10 +182,10 @@ class Spot :
 			for i in range(0,3):
 				self.spotsArray[n][i].drawOval()
 				#self.spotsArray[i].xPos += i
-				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][0].workImage)
-				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][2].workImage)
-				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][1].workImage)
-				
+				self.workImage = ImageChops.add_modulo(self.workImage , self.spotsArray[n][2].workImage)
+				self.workImage = ImageChops.add_modulo(self.workImage , self.spotsArray[n][0].workImage)
+				self.workImage = ImageChops.add_modulo(self.workImage , self.spotsArray[n][1].workImage)
+
 		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=self.blurRadius))
 
 

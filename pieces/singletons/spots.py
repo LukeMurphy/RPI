@@ -185,8 +185,7 @@ class Spot :
 				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][0].workImage)
 				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][2].workImage)
 				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][1].workImage)
-
-
+				
 		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=self.blurRadius))
 
 

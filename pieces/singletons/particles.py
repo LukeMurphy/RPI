@@ -618,6 +618,8 @@ def iterate():
 	if random.random() < config.restartProb:
 		for p in ps.unitArray:
 			p.remove = True
+		config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
+		config.renderImageFull.paste(config.image)
 
 	if random.random() < 0.0005 and ps.changeCohesion == True:
 		ps.cohesionDistance = random.uniform(14, 30)

@@ -1,0 +1,247 @@
+#!/usr/bin/python
+# import modules
+# ################################################### #
+import datetime
+import getopt
+import math
+import os
+import random
+import sys
+import textwrap
+import time
+from collections import OrderedDict
+
+from modules import coloroverlay, colorutils
+from modules.faderclass import FaderObj
+from PIL import (
+	Image,
+	ImageChops,
+	ImageDraw,
+	ImageEnhance,
+	ImageFilter,
+	ImageFont,
+	ImageOps,
+	ImagePalette,
+)
+
+global config
+
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+
+
+def init():
+	global config
+
+	print("SINGLETON Spots HOLDER INIT")
+
+	config.redrawSpeed = float(workConfig.get("spots", "redrawSpeed"))
+	config.doingRefreshCount = float(workConfig.get("spots", "doingRefreshCount"))
+	config.dotSize = int(workConfig.get("spots", "dotSize"))
+	config.spread = int(workConfig.get("spots", "spread"))
+	config.packing = int(workConfig.get("spots", "packing"))
+	config.dotrows = int(workConfig.get("spots", "rows"))
+	config.dotcols = int(workConfig.get("spots", "cols"))
+	config.bgColorVals = (workConfig.get("spots", "bgColor"))
+	config.bgColor = tuple(int(i) for i in config.bgColorVals.split(','))
+
+
+	config.imageXOffset = 0 
+	config.imageYOffset = 0
+	config.useUltraSlowSpeed = False
+	config.useFadeThruAnimation = False
+	config.deltaTimeDone = True
+
+	config.canvasImage = Image.new(
+		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
+	)
+	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+
+	config.imageLayer = Image.new(
+		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
+	)
+	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
+
+	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.workImageDraw = ImageDraw.Draw(config.workImage)
+	
+
+	config.f = FaderObj()
+	config.f.doingRefreshCount = config.doingRefreshCount
+	config.f.setUp(config.renderImageFull, config.workImage)
+
+	config.renderImageFullOld = config.renderImageFull.copy()
+	config.fadingDone = True
+
+
+	config.spot = Spot()
+	config.spot.xOffSet = -2
+	config.spot.yOffSet = 0
+	config.spot.dotSize = config.dotSize
+	config.spot.packing = config.packing
+	config.spot.spread = config.spread
+	config.spot.rows = config.dotrows
+	config.spot.cols = config.dotcols
+	config.spot.bgColor = config.bgColor
+
+	config.spot.setUp()
+	config.spot.render()
+
+
+
+def runWork():
+	global config
+	while True:
+		iterate()
+		time.sleep(config.redrawSpeed)
+
+
+def checkTime(SpotsObj):
+	config.t2 = time.time()
+	delta = config.t2 - config.t1
+
+	#if delta > config.timeToComplete and config.deltaTimeDone == False:
+
+
+class Spot :
+	
+	def __init__(self):
+		self.clrs = [(255,0,0,200), (0,255,0,200), (0,0,255,200)]
+		self.spotsArray = list()
+		self.width = 256
+		self.height = 256
+
+		self.bgColor  = (30,0,100,10)
+
+		self.cols = 4
+		self.rows = 8
+
+		self.workImage = Image.new("RGBA", (self.width, self.height))
+		self.draw = ImageDraw.Draw(self.workImage)
+
+
+
+	def setUp(self) :
+		self.draw.rectangle((0,0,256,256), fill=self.bgColor)
+		n = 0
+		for c in range(0,self.cols):
+			for r in range(0,self.rows):
+				self.spotsArray.append(list())
+				for i in range(0,3) :
+					d = Dot()
+					d.xOffSet = (self.dotSize + self.packing) * c
+					d.yOffSet = (self.dotSize + self.packing) * r
+					d.fillColor = self.clrs[i]
+					d.dotSize = self.dotSize
+					d.spread = self.spread
+					d.setUp()
+					self.spotsArray[n].append(d)
+				n += 1
+
+
+	def render(self) :
+		for n in range(0,(self.rows*self.cols)):
+			for i in range(0,3):
+				self.spotsArray[n][i].drawOval()
+				#self.spotsArray[i].xPos += i
+				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][2].workImage)
+				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][1].workImage)
+				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][0].workImage)
+
+
+		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=2))
+
+
+class Dot :
+
+	def __init__(self):
+
+		self.xOffSet = 0
+		self.yOffSet = 0
+		self.fillColor = (255,0,0,255)
+		self.outlineColor = None
+
+	def setUp(self):
+		self.workImage = Image.new("RGBA", (256, 256))
+		self.width = self.dotSize
+		self.height = self.dotSize
+		self.draw = ImageDraw.Draw(self.workImage)
+		self.xPos = self.spread + self.spread * random.random()
+		self.yPos = self.spread + self.spread * random.random()
+		self.xPos += self.xOffSet
+		self.yPos += self.yOffSet
+
+	def drawOval(self):
+			# self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)),
+			#     fill=self.fillColor, outline=self.outlineColor)
+			box = [(self.xPos, self.yPos), (self.xPos + self.width/2 + 1, self.yPos + self.height/2 + 1)]
+			self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
+
+
+
+def processImage():
+	## Run through the objects .....
+	config.workImageDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
+
+	#blendedImage = ImageChops.add(config.spot.workImage,config.spot2.workImage)
+
+	config.workImage.paste(config.spot.workImage, (config.spot.xOffSet, config.spot.yOffSet))
+	#config.workImage.paste(config.spot2.workImage, (config.spot2.xOffSet, config.spot2.yOffSet))
+	#config.workImage = ImageChops.add(config.spot.workImage,config.workImage)
+	#config.workImage = ImageChops.add(config.spot2.workImage, config.workImage)
+	
+	#config.workImage = ImageChops.add(config.workImage,)
+
+
+def iterate():
+	global config
+
+	# config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
+	# config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
+
+
+
+	if config.useFadeThruAnimation == True and config.useUltraSlowSpeed == True:
+		if config.f.fadingDone == True:
+
+			config.renderImageFullOld = config.renderImageFull.copy()
+			config.renderImageFull.paste(
+				config.workImage,
+				(config.imageXOffset, config.imageYOffset),
+				config.workImage,
+			)
+			config.f.xPos = config.imageXOffset
+			config.f.yPos = config.imageYOffset
+			# config.renderImageFull = config.renderImageFull.convert("RGBA")
+			# renderImageFull = renderImageFull.convert("RGBA")
+			config.f.setUp(
+				config.renderImageFullOld.convert("RGBA"),
+				config.workImage.convert("RGBA"),
+			)
+			processImage()
+
+		config.f.fadeIn()
+		config.render(config.f.blendedImage, 0, 0)
+
+	else:
+		processImage()
+		config.renderImageFull.paste(
+			config.workImage,
+			(config.imageXOffset, config.imageYOffset),
+			config.workImage,
+		)
+		config.render(config.renderImageFull, 0, 0)
+
+
+def main(run=True):
+	global config, threads, thrd
+	init()
+
+	if run:
+		runWork()
+
+
+### Kick off .......
+if __name__ == "__main__":
+	__main__()

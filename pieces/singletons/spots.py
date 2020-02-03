@@ -56,6 +56,11 @@ def init():
 	config.clrCVals = (workConfig.get("spots", "clrC"))
 	config.clrCV = tuple(round(int(i) * config.brightness) for i in config.clrCVals.split(','))
 
+	config.hideDots = (workConfig.get("spots", "hideDots"))
+	config.hideDotsList = tuple((int(i)) for i in config.hideDots.split(','))
+
+
+
 	config.colsXOffset = int(workConfig.get("spots", "colsXOffset"))
 	config.rowsYOffset = int(workConfig.get("spots", "rowsYOffset"))
 	config.gridVariation = int(workConfig.get("spots", "gridVariation"))
@@ -82,6 +87,8 @@ def init():
 	config.spot = Spot()
 	config.spot.xOffSet = config.colsXOffset
 	config.spot.yOffSet = config.rowsYOffset
+	config.spot.colsXOffset = config.colsXOffset
+	config.spot.rowsYOffset = config.rowsYOffset
 	config.spot.dotSize = config.dotSize
 	config.spot.packing = config.packing
 	config.spot.spread = config.spread
@@ -92,6 +99,7 @@ def init():
 	config.spot.gridVariation =config.gridVariation
 	config.spot.dotVariation =config.dotVariation
 	config.spot.dotVariationByColor =config.dotVariationByColor
+	config.spot.hideDotsList = config.hideDotsList
 
 	config.spot.clrs = [config.clrA, config.clrB, config.clrCV]
 
@@ -155,24 +163,69 @@ class Spot :
 				if self.dotVariationByColor != True :
 					dotVariation = random.random() * self.dotVariation
 				for i in range(0,3) :
+
 					d = Dot()
-					d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2)*5
-					d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i)*5
+					d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2)*0 + self.colsXOffset
+					d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i)*0 + self.rowsYOffset
 					d.fillColor = self.clrs[i]
 					if self.dotVariationByColor == True :
 						dotVariation = random.random() * self.dotVariation
 					d.dotSize = self.dotSize + dotVariation
 					d.spread = self.spread
 					d.setUp()
+					if n in self.hideDotsList : 
+						d.visible = False
+					else :
+						d.visible = True
 					self.spotsArray[n].append(d)
+
+
 				n += 1
 
 
 	def change(self) :
-		self.spotsArray = list()
+
 		self.workImage = Image.new("RGBA", (self.width, self.height))
 		self.draw = ImageDraw.Draw(self.workImage)
-		self.setUp()
+
+		if random.random() < .05:
+			# sets a default that is a dot that doesn't exist so things don't throw an
+			# error as per above .....
+			self.hideDotsList = [len(self.spotsArray) + 1]
+
+			for i in range (0,len(self.spotsArray)) :
+				if random.random() < .15 :
+					self.hideDotsList.append(i)
+
+
+
+		self.draw.rectangle((0,0,256,256), fill=self.bgColor)
+		n = 0
+		for c in range(0,self.cols):
+			for r in range(0,self.rows):
+				xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+				yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+
+				if self.dotVariationByColor != True :
+					dotVariation = random.random() * self.dotVariation
+				if random.random() < .5 : 
+					for i in range(0,3) :
+
+						d = self.spotsArray[n][i]
+						d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2)*0 + self.colsXOffset
+						d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i)*0 + self.rowsYOffset
+						d.fillColor = self.clrs[i]
+						if self.dotVariationByColor == True :
+							dotVariation = random.random() * self.dotVariation
+						d.dotSize = self.dotSize + dotVariation
+						d.spread = self.spread
+						d.setUp()
+						if n in self.hideDotsList : 
+							d.visible = False
+						else :
+							d.visible = True
+				n += 1
+
 		self.render()
 
 
@@ -197,6 +250,7 @@ class Dot :
 		self.yOffSet = 0
 		self.fillColor = (255,0,0,255)
 		self.outlineColor = None
+		self.visible = True
 
 	def setUp(self):
 		self.workImage = Image.new("RGBA", (256, 256))
@@ -211,8 +265,9 @@ class Dot :
 	def drawOval(self):
 			# self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)),
 			#     fill=self.fillColor, outline=self.outlineColor)
-			box = [(self.xPos, self.yPos), (self.xPos + self.width/2 + 1, self.yPos + self.height/2 + 1)]
-			self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
+			if self.visible == True :
+				box = [(self.xPos, self.yPos), (self.xPos + self.width/2 + 1, self.yPos + self.height/2 + 1)]
+				self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
 
 
 
@@ -222,7 +277,7 @@ def processImage():
 
 	config.spot.change()
 
-	config.workImage.paste(config.spot.workImage, (config.spot.xOffSet, config.spot.yOffSet))
+	config.workImage.paste(config.spot.workImage, (0,0))
 	#config.workImage.paste(config.spot2.workImage, (config.spot2.xOffSet, config.spot2.yOffSet))
 	#config.workImage = ImageChops.add(config.spot.workImage,config.workImage)
 	#config.workImage = ImageChops.add(config.spot2.workImage, config.workImage)

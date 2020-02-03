@@ -86,6 +86,9 @@ actionDict1 = [
 	
 
 	{" ": ""},
+	{"==> The Problem With Dot Paintings": "p4-3x8-informal/spots.cfg"},
+	{"==> The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
+	{" ": ""},
 	{"==> Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
 	{"==> Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
 	{"==> Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},
@@ -102,11 +105,11 @@ actionDict1 = [
 	{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
 	{"Wall Hanging: THRow Multi": "multi/throw-quilt.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"Vert Bars - gray": "p4-5x8/mono-lights-gray.cfg"},
+	#{"Vert Bars - gray": "p4-5x8/mono-lights-gray.cfg"},
 	# {"Square - mono-flavin" :'p4-3x8-informal/mono-flavin.cfg'},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"Wall Hanging: Signage": "p4-3x8-informal/signage.cfg"},
-	{"Wall Hanging: Propagation": "p4-3x8-informal/Propagation.cfg"},
+	#{"Wall Hanging: Signage": "p4-3x8-informal/signage.cfg"},
+	#{"Wall Hanging: Propagation": "p4-3x8-informal/Propagation.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	{"Wall Hanging: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 

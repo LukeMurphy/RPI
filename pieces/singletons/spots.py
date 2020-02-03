@@ -40,7 +40,7 @@ def init():
 	config.doingRefreshCount = float(workConfig.get("spots", "doingRefreshCount"))
 	config.dotSize = int(workConfig.get("spots", "dotSize"))
 	config.spread = int(workConfig.get("spots", "spread"))
-	config.packing = int(workConfig.get("spots", "packing"))
+	config.packing = float(workConfig.get("spots", "packing"))
 	config.dotrows = int(workConfig.get("spots", "rows"))
 	config.dotcols = int(workConfig.get("spots", "cols"))
 	config.blurRadius = int(workConfig.get("spots", "blurRadius"))
@@ -58,6 +58,7 @@ def init():
 
 	config.hideDots = (workConfig.get("spots", "hideDots"))
 	config.hideDotsList = tuple((int(i)) for i in config.hideDots.split(','))
+	config.hideDotRate = float(workConfig.get("spots", "hideDotRate"))
 
 
 
@@ -100,6 +101,7 @@ def init():
 	config.spot.dotVariation =config.dotVariation
 	config.spot.dotVariationByColor =config.dotVariationByColor
 	config.spot.hideDotsList = config.hideDotsList
+	config.spot.hideDotRate = config.hideDotRate
 
 	config.spot.clrs = [config.clrA, config.clrB, config.clrCV]
 
@@ -150,6 +152,8 @@ class Spot :
 		self.workImage = Image.new("RGBA", (self.width, self.height))
 		self.draw = ImageDraw.Draw(self.workImage)
 
+		self.hideDotRate = 0
+
 
 
 	def setUp(self) :
@@ -188,7 +192,7 @@ class Spot :
 		self.workImage = Image.new("RGBA", (self.width, self.height))
 		self.draw = ImageDraw.Draw(self.workImage)
 
-		if random.random() < .05:
+		if random.random() < self.hideDotRate:
 			# sets a default that is a dot that doesn't exist so things don't throw an
 			# error as per above .....
 			self.hideDotsList = [len(self.spotsArray) + 1]
@@ -208,7 +212,7 @@ class Spot :
 
 				if self.dotVariationByColor != True :
 					dotVariation = random.random() * self.dotVariation
-				if random.random() < .5 : 
+				if random.random() < .75 : 
 					for i in range(0,3) :
 
 						d = self.spotsArray[n][i]

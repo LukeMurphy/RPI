@@ -39,7 +39,8 @@ def init():
 	config.redrawSpeed = float(workConfig.get("spots", "redrawSpeed"))
 	config.doingRefreshCount = float(workConfig.get("spots", "doingRefreshCount"))
 	config.dotSize = int(workConfig.get("spots", "dotSize"))
-	config.spread = int(workConfig.get("spots", "spread"))
+	config.spreadX = int(workConfig.get("spots", "spreadX"))
+	config.spreadY = int(workConfig.get("spots", "spreadY"))
 	config.packing = float(workConfig.get("spots", "packing"))
 	config.dotrows = int(workConfig.get("spots", "rows"))
 	config.dotcols = int(workConfig.get("spots", "cols"))
@@ -59,7 +60,6 @@ def init():
 	config.hideDots = (workConfig.get("spots", "hideDots"))
 	config.hideDotsList = tuple((int(i)) for i in config.hideDots.split(','))
 	config.hideDotRate = float(workConfig.get("spots", "hideDotRate"))
-
 
 
 	config.colsXOffset = int(workConfig.get("spots", "colsXOffset"))
@@ -92,7 +92,8 @@ def init():
 	config.spot.rowsYOffset = config.rowsYOffset
 	config.spot.dotSize = config.dotSize
 	config.spot.packing = config.packing
-	config.spot.spread = config.spread
+	config.spot.spreadX = config.spreadX
+	config.spot.spreadY = config.spreadY
 	config.spot.rows = config.dotrows
 	config.spot.cols = config.dotcols
 	config.spot.bgColor = config.bgColor
@@ -166,6 +167,8 @@ class Spot :
 				self.spotsArray.append(list())
 				if self.dotVariationByColor != True :
 					dotVariation = random.random() * self.dotVariation
+
+				
 				for i in range(0,3) :
 
 					d = Dot()
@@ -175,7 +178,8 @@ class Spot :
 					if self.dotVariationByColor == True :
 						dotVariation = random.random() * self.dotVariation
 					d.dotSize = self.dotSize + dotVariation
-					d.spread = self.spread
+					d.spreadX = self.spreadX
+					d.spreadY = self.spreadY
 					d.setUp()
 					if n in self.hideDotsList : 
 						d.visible = False
@@ -222,7 +226,8 @@ class Spot :
 						if self.dotVariationByColor == True :
 							dotVariation = random.random() * self.dotVariation
 						d.dotSize = self.dotSize + dotVariation
-						d.spread = self.spread
+						d.spreadX = self.spreadX
+						d.spreadY = self.spreadY
 						d.setUp()
 						if n in self.hideDotsList : 
 							d.visible = False
@@ -261,8 +266,8 @@ class Dot :
 		self.width = self.dotSize
 		self.height = self.dotSize
 		self.draw = ImageDraw.Draw(self.workImage)
-		self.xPos = self.spread + self.spread * random.random()
-		self.yPos = self.spread + self.spread * random.random()
+		self.xPos = self.spreadX + self.spreadX * random.random()
+		self.yPos = self.spreadY + self.spreadY * random.random()
 		self.xPos += self.xOffSet
 		self.yPos += self.yOffSet
 

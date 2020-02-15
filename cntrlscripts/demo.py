@@ -40,12 +40,12 @@ actionDict1 = [
 	{"==> p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
 	{"==> p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
 
-	{" ": ""},
+	#{" ": ""},
 	#{"-------- Firestick on FLOOR  -------------": ""},	
-	{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
-	{"p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
+	#{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
+	#{"p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	#{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
-	{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
+	#{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
 	
 	{" ": ""},
 	#{"-------- Upset Cube on FLOOR  -------------": ""},	

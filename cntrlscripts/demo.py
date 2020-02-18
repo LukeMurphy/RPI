@@ -42,6 +42,7 @@ actionDict1 = [
 	{"p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
 
 	{" ": ""},
+	{"-------- Door Insert   -------------": ""},	
 	#{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 	{"==> Door Insert": "p4-4x3-panel/composition-door.cfg"},
 	#{" ": ""},

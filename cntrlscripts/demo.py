@@ -12,6 +12,85 @@ commadStringProc = "/Users/lamshell/Documents/Dev/RPI/altproduction/"
 
 
 actionDict1 = [
+
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
+	{"--- Road Sign tree-armature collage": "p4-4x4/sign-collage.cfg"},
+	{" ": ""},
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Trap Prop  p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
+	{"--- Trap Prop  p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
+	{"--- Trap Prop  p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
+	{" ": ""},
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
+	{" ": ""},
+	
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
+	{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
+	{" ": ""},
+
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
+	{" ": ""},
+	
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"==== Right wall  3x8 Informal ====": ""},
+	{"The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
+	{"The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
+	
+	{" ": ""},
+	{"Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
+	{"Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
+	{"Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},
+	{"Wall Hanging: Quilt Polys": "p4-3x8-informal/quilt-polys.cfg"},
+	{"Wall Hanging: Quilt Triangles": "p4-3x8-informal/quilt-triangles-b.cfg"},
+	{"Wall Hanging: Quilt Stars": "p4-3x8-informal/quilt-stars.cfg"},
+	{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
+	{"Wall Hanging: THRow Multi": "multi/throw-quilt.cfg"},
+
+]
+
+actionDict2 = [
+
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	#{" ": ""},
+	{"==== BUNDLE FLOOR ====": ""},
+	{"--- P10 BUNDLE PILE - Flow": "p10/bundle-scroller-flow.cfg"},
+	{"--- P10 BUNDLE PILE - Flow": "p10/plank-scroller-flow.cfg"},
+	{"--- P10 Bundle  - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
+	{"--- P10 BUNDLE PILE - Tourmaline": "p10/bundle-collage-tourmaline.cfg"},
+	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	{"P10 BUNDLE PILE - leaning lights": "p10/bundle-leaninglights-2.cfg"},
+	{"P10 BUNDLE PILE - AlgoFlames c": "p10/bundle-algofall-2.14.cfg"},
+	{"P10 BUNDLE PILE - AlgoFlames": "p10/bundle-algoflames-1.cfg"},
+	{"P10 BUNDLE PILE - AlgoFlames b": "p10/bundle-algoflames-2.cfg"},
+	{" ": ""},
+
+
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"Java - partial plinth Gray Glory": "grayburst.app"},
+	{"Java - DotGridTiles": "DotGridTiles.app"},
+	{"Java - Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+
+
+
 	# {" " :''},
 	# {" " :''},
 	# {"* P4 3x8 p4-3x8-informal - disturbed " :'p3-2x4/marquee2.cfg'},
@@ -29,72 +108,24 @@ actionDict1 = [
 	# {"To Fro: Betes.2" :'p4-5x6-tofro/betes.cfg'},
 	# {"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	# {" " :''},
-	{"--- LEFT WALL ----": ""},
-	{" ": ""},
-	{"-------- Roadsign  -------------": ""},	
-	{"==> Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
-	{"Road Sign tree-armature collage": "p4-4x4/sign-collage.cfg"},
-
-	{" ": ""},
-	{"-------- Trap Prop   -------------": ""},	
-	{"==> p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
-	{"p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
-	{"p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
-
-	{" ": ""},
-	{"-------- Door Insert   -------------": ""},	
+	#{"--- LEFT WALL ----": ""},
 	#{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
-	{"==> Door Insert": "p4-4x3-panel/composition-door.cfg"},
 	#{" ": ""},
 	#{"-------- Firestick on FLOOR  -------------": ""},	
 	#{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
 	#{"p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	#{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	#{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
-	
-	{" ": ""},
-	#{"-------- Upset Cube on FLOOR  -------------": ""},	
-	{"==> Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
-	{"Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	#{"Upset Cube  - AlgoFlames Pink": "p4-4x4/cube-algoflames-2.cfg"},
 	#{"Upset Cube  - AlgoFlames Pink-2": "p4-4x4/cube-algoflames-3.cfg"},
 	#{"Material Compositions": "p4-4x4/cube-compositions.cfg"},
 	#{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
 	#{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
-
-
-	{" ": ""},
-	#{"--------- Partial Plinth -----------" :''},
-	{"Java - partial plinth Gray Glory": "grayburst.app"},
-	{"Java - DotGridTiles": "DotGridTiles.app"},
-	#{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
-	#{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
-	#{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
-
-	#{" ": ""},
-	#{"--------- FLOOR -----------": ""},
-	#{"Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
-	#{"Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
-	#{"Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
-
-
-	{" ": ""},
-	{"-------- RIGHT WALL -------------": ""},
 	#{"==> Inset frame: inset collage 2": "p4-2x2/compositions-2-hub.cfg"},
 	#{"==> Small Inset frame: inset collage 3": "p3-2x4/diagnostics.cfg"},
 	#{"Inset frame: light grid": "p4-2x2/dot-grid.cfg"},
 	#{"Inset frame: inset collage 3": "p4-2x2/compositions-3-hub.cfg"},
 	#{"Inset frame: compositions 1": "p4-2x2/compositions-hub.cfg"},
-	
-
-	#{" ": ""},
-	{"==> The Problem With Dot Paintings": "p4-3x8-informal/spots.cfg"},
-	{"==> The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
-	
-	{" ": ""},
-	{"Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
-	{"Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
-	{"Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},
 	# {"Wall Hanging: Patched MonoChrome" :'p4-3x8-informal/mono.cfg'},
 	# {"Wall Hanging: Patched Yellow" :'p4-3x8-informal/mono-rothko-yellow.cfg'},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
@@ -102,11 +133,6 @@ actionDict1 = [
 	#{"Wall Hanging: compositions a": "p4-3x8-informal/compositions.cfg"},
 	#{"Wall Hanging: compositions b": "p4-3x8-informal/compositions.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"Wall Hanging: Quilt Polys": "p4-3x8-informal/quilt-polys.cfg"},
-	{"Wall Hanging: Quilt Triangles": "p4-3x8-informal/quilt-triangles-b.cfg"},
-	{"Wall Hanging: Quilt Stars": "p4-3x8-informal/quilt-stars.cfg"},
-	{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
-	{"Wall Hanging: THRow Multi": "multi/throw-quilt.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	#{"Vert Bars - gray": "p4-5x8/mono-lights-gray.cfg"},
 	# {"Square - mono-flavin" :'p4-3x8-informal/mono-flavin.cfg'},
@@ -114,7 +140,7 @@ actionDict1 = [
 	#{"Wall Hanging: Signage": "p4-3x8-informal/signage.cfg"},
 	#{"Wall Hanging: Propagation": "p4-3x8-informal/Propagation.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"Wall Hanging: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	
 
 
 	#{"-------- FLOOR - FIREPLCE ------": ""},
@@ -177,14 +203,6 @@ actionDict1 = [
 	# {" " :''},
 	# {"Three Way Leaning Lights" :'p4-6x8/leaninglights.cfg'},
 	# {"Alt Flames" :'p4-6x8/alt-flames.cfg'},
-]
-
-actionDict2 = [
-	# {" " :''},
-	# {"--------- FLOOR PILE -----------" :''},
-	# {"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
-	# {"3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
-	{" ": ""},
 	#{"-------- LEFT / WEST WALL  -------------": ""},
 	#{"==> 4x6 bnd: Leaning lights": "p4-4x6-bent-lean/leaninglights-3.cfg"},
 	#{"==> TWO FLOW bend": "multi/manifest-4x6.cfg"},
@@ -209,38 +227,11 @@ actionDict2 = [
 	#{"P10 Branch - Algoflames-b": "p10/algoflames-1b.cfg"},
 	#{"P10 Branch - Collage": "p10/collage-1.cfg"},
 
+	# {" " :''},
+	# {"--------- FLOOR PILE -----------" :''},
+	# {"* 3 PILE - compositions" :'p4-3x8-pile/leaninglights-3.cfg'},
+	# {"3 PILE - flames" :'p4-3x8-pile/alt-flames-2b.cfg'},
 
-
-
-	{" ": ""},
-	#{" ": ""},
-	{"-------- BUNDLE FLOOR  -------------": ""},
-	{"==> P10 BUNDLE PILE - Flow": "p10/bundle-scroller-flow.cfg"},
-	{"==> P10 BUNDLE PILE - Flow": "p10/plank-scroller-flow.cfg"},
-	{"==> P10 Bundle  - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
-	#{"==> P10 Plank-Door - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
-	{"==> P10 BUNDLE PILE - Tourmaline": "p10/bundle-collage-tourmaline.cfg"},
-	{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	{"P10 BUNDLE PILE - leaning lights": "p10/bundle-leaninglights-2.cfg"},
-	{"P10 BUNDLE PILE - AlgoFlames c": "p10/bundle-algofall-2.14.cfg"},
-	{"P10 BUNDLE PILE - AlgoFlames": "p10/bundle-algoflames-1.cfg"},
-	{"P10 BUNDLE PILE - AlgoFlames b": "p10/bundle-algoflames-2.cfg"},
-	# {"3 PILE - movement" :'p4-3x8-pile/square-ice-2.cfg'},
-	# {"P10 BUNDLE PILE - leaning pattern" :'p10/bundle-lines-2.cfg'},
-
-	#{"-------- PLANK AND DOOR  -------------": ""},
-	#{"==> P10 Plank-Door - Tourmanline": "p10/plank-tourmaline.cfg"},
-	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	#{"P10 Plank-Door - AlgoFlames": "p10/plank-algoflames-1b.cfg"},
-	#{"P10 Plank-Door - movement": "p10/plank-movement-2.cfg"},
-	#{"P10 Plank-Door - glitch": "p10/plank-glitch.cfg"},
-	# {"P10 Plank-Door - gradients" :'p10/plank-gradients.cfg'},
-	# {"P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
-	# {"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
-	# {"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
-	# {"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
-	# {"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-	{" ": ""},
 	# {"-------- TABLE -------------" :''},
 	# {"Oblong Fire" :'p4-1x4-cube/algoflames.cfg'},
 	# {"Oblong Fire 2" :'p4-1x4-cube/algoflames2.cfg'},
@@ -270,6 +261,35 @@ actionDict2 = [
 	# {"Vert Bars - yellow" :'p4-5x8/mono-lights-yellow.cfg'},
 	# {"Horizontal Bars" :'p4-5x8/mono-lights-h.cfg'},
 	# {" " :''},
+	# {"3 PILE - movement" :'p4-3x8-pile/square-ice-2.cfg'},
+	# {"P10 BUNDLE PILE - leaning pattern" :'p10/bundle-lines-2.cfg'},
+
+	#{"-------- PLANK AND DOOR  -------------": ""},
+	#{"==> P10 Plank-Door - Tourmanline": "p10/plank-tourmaline.cfg"},
+	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
+	#{"P10 Plank-Door - AlgoFlames": "p10/plank-algoflames-1b.cfg"},
+	#{"P10 Plank-Door - movement": "p10/plank-movement-2.cfg"},
+	#{"P10 Plank-Door - glitch": "p10/plank-glitch.cfg"},
+	# {"P10 Plank-Door - gradients" :'p10/plank-gradients.cfg'},
+	# {"P10 Plank-Door - collage" :'p10/plank-collage-1.cfg'},
+	# {"* Tower: Monument to the Glitch" :'p4-7x8-tower/screen.cfg'},
+	# {"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
+	# {"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
+	# {"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
+	#{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
+	#{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	#{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
+
+	#{" ": ""},
+	#{"--------- FLOOR -----------": ""},
+	#{"Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
+	#{"Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
+	#{"Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
+	#{"==> P10 Plank-Door - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
+	#{"--- RIGHT WALL -------------": ""},
+	#{"--------- Partial Plinth -----------" :''},
+
+
 
 ]
 
@@ -372,3 +392,7 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+75)
 
 
 root.mainloop()
+
+
+
+

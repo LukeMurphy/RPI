@@ -68,9 +68,17 @@ actionDict2 = [
 
 	{"_____________________________________________": ""},
 	{" ": ""},
+	{"--- P10 - arbor-vitae-1 - Flow": "p10/arbor-vitae-1.cfg"},
+	{"--- P10 - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
+
+
+
+	{"_____________________________________________": ""},
+	{" ": ""},
 	#{" ": ""},
 	{"==== BUNDLE FLOOR ====": ""},
 	{"--- P10 BUNDLE PILE - Flow": "p10/bundle-scroller-flow.cfg"},
+	{"--- P10 BUNDLE PILE - Flow": "p10/plank-scroller-flow.cfg"},
 	{"--- P10 BUNDLE PILE - Flow": "p10/plank-scroller-flow.cfg"},
 	{"--- P10 Bundle  - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
 	{"--- P10 BUNDLE PILE - Tourmaline": "p10/bundle-collage-tourmaline.cfg"},

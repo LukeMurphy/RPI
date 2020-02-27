@@ -548,5 +548,28 @@ def main(run=True):
 	# Always start with the first one, index 0
 	config.shapeGroupDisplayed = 0
 
+
+
+	try:
+		config.useLastOverlay = workConfig.getboolean("collageShapes", "forceLastOverlay")
+		config.useLastOverlayProb = float(
+			workConfig.get("collageShapes", "useLastOverlayProb")
+		)
+		config.lastOverlayBox = tuple(
+				map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayBox").split(","))
+			)
+		config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+		config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+		config.lastOverlayFill = tuple(
+				map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(","))
+			)
+	except Exception as e:
+		print(e)
+
+
+
+
+
+
 	if run:
 		runWork()

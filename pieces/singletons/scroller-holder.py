@@ -594,6 +594,9 @@ def remakePatternBlock(imageRef, direction):
 	if random.random() < 0.05:
 		config.patternEndColor = (0, 0, 250, 255)
 
+	if config.setPatternColor == True :
+		config.patternEndColor = config.setPatternEndColor
+
 	if config.alwaysRandomPattern == True:
 		if random.random() < 0.3:
 			config.patternDrawProb = random.uniform(0.08, 0.12)
@@ -640,6 +643,9 @@ def configureBackgroundScrolling():
 	config.patternColor = (50, 0, 55, 50)
 	config.patternEndColor = (255, 0, 255, 50)
 
+
+
+
 	try:
 		config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
 	except Exception as e:
@@ -662,6 +668,10 @@ def configureBackgroundScrolling():
 	if config.alwaysRandomPatternColor == True:
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
+	if config.setPatternColor == True :
+		config.patternColor = config.setPatternEndColor
+		config.patternEndColor = config.setPatternEndColor
 
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
@@ -838,6 +848,14 @@ def init():
 	## Set up the scrolling layer
 
 	config.useBackground = workConfig.getboolean("scroller", "useBackground")
+
+	try:
+		config.setPatternColor = workConfig.getboolean("scroller", "setPatternColor")
+		config.setPatternEndColor = list(map(lambda x: int(x), workConfig.get("scroller", "setPatternEndColor").split(",")))
+	except Exception as e:
+		config.setPatternColor = False
+		print(str(e))
+
 	config.altDirectionScrolling = workConfig.getboolean(
 		"scroller", "altDirectionScrolling"
 	)
@@ -900,6 +918,8 @@ def init():
 	except Exception as e:
 		config.doingRefreshCount = 50
 		print(str(e))
+
+
 
 	config.f = FaderObj()
 	config.f.setUp(config.renderImageFull, config.workImage)

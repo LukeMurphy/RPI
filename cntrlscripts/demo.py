@@ -32,18 +32,19 @@ actionDict1 = [
 	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
 	{" ": ""},
 	
-
-	{"_____________________________________________": ""},
-	{" ": ""},
-	{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
-	{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
-	{" ": ""},
-
-
 	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
 	{" ": ""},
+
+
+	#{"_____________________________________________": ""},
+	#{" ": ""},
+	#{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
+	#{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
+	#{" ": ""},
+
+
 	
 	{"_____________________________________________": ""},
 	{" ": ""},
@@ -68,8 +69,8 @@ actionDict2 = [
 
 	{"_____________________________________________": ""},
 	{" ": ""},
-	{"--- P10 - arbor-vitae-1 - Flow": "p10/arbor-vitae-1.cfg"},
-	{"--- P10 - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
+	{"--- P10 - arbor-vitae-1 - flames": "p10/arbor-vitae-1.cfg"},
+	{"--- P10 - arbor-vitae-flow": "p10/arbor-vitae-flow.cfg"},
 
 
 

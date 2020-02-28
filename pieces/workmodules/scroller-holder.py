@@ -597,6 +597,9 @@ def remakePatternBlock(config, imageRef, direction):
 	if random.random() < 0.05:
 		config.patternEndColor = (0, 0, 250, 255)
 
+	if config.setPatternColor == True :
+		config.patternEndColor = config.setPatternEndColor
+
 	if config.alwaysRandomPattern == True:
 		if random.random() < 0.3:
 			config.patternDrawProb = random.uniform(0.08, 0.12)
@@ -855,6 +858,14 @@ def init(config, workConfig):
 	## Set up the scrolling layer
 
 	config.useBackground = workConfig.getboolean("scroller", "useBackground")
+
+	try:
+		config.setPatternColor = workConfig.getboolean("scroller", "setPatternColor")
+		config.setPatternEndColor = list(map(lambda x: int(x), workConfig.get("scroller", "setPatternEndColor").split(",")))
+	except Exception as e:
+		config.setPatternColor = False
+		print(str(e))
+		
 	config.altDirectionScrolling = workConfig.getboolean(
 		"scroller", "altDirectionScrolling"
 	)

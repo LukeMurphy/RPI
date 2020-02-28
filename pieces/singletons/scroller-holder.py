@@ -12,6 +12,7 @@ import time
 from collections import OrderedDict
 
 from modules import coloroverlay, colorutils, continuous_scroller
+
 from modules.faderclass import FaderObj
 from PIL import (
 	Image,
@@ -640,11 +641,9 @@ def configureBackgroundScrolling():
 	scrollerRef.setUp()
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func": remakePatternBlock, "direction": direction}
+	
 	config.patternColor = (50, 0, 55, 50)
 	config.patternEndColor = (255, 0, 255, 50)
-
-
-
 
 	try:
 		config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))

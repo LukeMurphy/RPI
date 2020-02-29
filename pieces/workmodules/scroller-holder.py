@@ -677,6 +677,10 @@ def configureBackgroundScrolling(config, workConfig):
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
+	if config.setPatternColor == True :
+		config.patternColor = config.setPatternEndColor
+		config.patternEndColor = config.setPatternEndColor
+
 	makeBackGround(config, scrollerRef.bg1Draw, 1)
 	makeBackGround(config, scrollerRef.bg2Draw, 1)
 
@@ -865,7 +869,7 @@ def init(config, workConfig):
 	except Exception as e:
 		config.setPatternColor = False
 		print(str(e))
-		
+
 	config.altDirectionScrolling = workConfig.getboolean(
 		"scroller", "altDirectionScrolling"
 	)

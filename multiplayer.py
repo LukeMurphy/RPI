@@ -295,7 +295,29 @@ def configure(masterConfig):
 		print(str(e))
 		masterConfig.useFilters = False
 
-
+	
+	try:
+		masterConfig.useBlur = masterConfig.workConfigParser.getboolean("worksList", "useBlur")
+		masterConfig.blurXOffset = int(masterConfig.workConfigParser.get("worksList", "blurXOffset"))
+		masterConfig.blurYOffset = int(masterConfig.workConfigParser.get("worksList", "blurYOffset"))
+		masterConfig.blurSectionWidth = int(
+			masterConfig.workConfigParser.get("worksList", "blurSectionWidth")
+		)
+		masterConfig.blurSectionHeight = int(
+			masterConfig.workConfigParser.get("worksList", "blurSectionHeight")
+		)
+		masterConfig.sectionBlurRadius = int(
+			masterConfig.workConfigParser.get("worksList", "sectionBlurRadius")
+		)
+		masterConfig.blurSection = (
+			masterConfig.blurXOffset,
+			masterConfig.blurYOffset,
+			masterConfig.blurXOffset + masterConfig.blurSectionWidth,
+			masterConfig.blurYOffset + masterConfig.blurSectionHeight,
+		)
+	except Exception as e:
+		print(str(e))
+		masterConfig.useBlur = False
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

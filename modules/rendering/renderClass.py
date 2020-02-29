@@ -282,9 +282,12 @@ class CanvasElement:
 				self.config.renderImageFullOverlay,
 			)
 
+
+
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 	# This is kind of screwy as it's only used by the main window .....
 	def updateTheCanvas(self, players):
+
 
 		xOff = 0
 		self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
@@ -335,6 +338,7 @@ class CanvasElement:
 						work.config.renderImageFull, work.config
 					)
 
+			'''
 			if work.config.useBlur == True:
 				temp = work.config.renderImageFull.copy()
 				temp3 = temp.filter(
@@ -359,6 +363,8 @@ class CanvasElement:
 				self.config.renderImageFull.paste(
 					temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2
 				)
+			'''
+
 			self.config.renderImageFull.paste(
 				temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
 
@@ -368,6 +374,17 @@ class CanvasElement:
 			#tempx = ditherFilter(self.config.renderImageFull, 0, 0, self.config)
 			#tempx = tempx.convert("RGBA")
 			#self.config.renderImageFull.paste(tempx, (0,0), tempx)
+
+					# ---- Overall image blurring  ---- #
+		if self.config.useBlur == True:
+			"""
+			config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+			"""
+			crop = self.config.renderImageFull.crop(self.config.blurSection)
+			destination = (self.config.blurXOffset, self.config.blurYOffset)
+			crop = crop.convert("RGBA")
+			crop = crop.filter(ImageFilter.GaussianBlur(radius=self.config.sectionBlurRadius))
+			self.config.renderImageFull.paste(crop, destination, crop)
 
 		# UPDATES THE MAIN CANVAS -- there is only one even in the multiplayer setup
 		self.cnvs.delete("main1")

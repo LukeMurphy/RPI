@@ -69,8 +69,9 @@ actionDict2 = [
 
 	{"_____________________________________________": ""},
 	{" ": ""},
-	{"--- P10 - arbor-vitae-1 - flames": "p10/arbor-vitae-1.cfg"},
+	{"--- P10 - arbor-vitae-blue": "multi/manifest-p10-1.cfg"},
 	{"--- P10 - arbor-vitae-flow": "p10/arbor-vitae-flow.cfg"},
+	{"--- P10 - arbor-vitae-1 - flames": "p10/arbor-vitae-1.cfg"},
 
 
 
@@ -100,7 +101,10 @@ actionDict2 = [
 
 
 
-	# {" " :''},
+	{" " :''},
+	{"FirePike" :'p4-4x4/newfire.cfg'},
+
+
 	# {" " :''},
 	# {"* P4 3x8 p4-3x8-informal - disturbed " :'p3-2x4/marquee2.cfg'},
 	# {"------------------------------" :''},

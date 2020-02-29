@@ -72,6 +72,7 @@ actionDict2 = [
 	{"--- P10 - arbor-vitae-blue": "multi/manifest-p10-1.cfg"},
 	{"--- P10 - arbor-vitae-flow": "p10/arbor-vitae-flow.cfg"},
 	{"--- P10 - arbor-vitae-1 - flames": "p10/arbor-vitae-1.cfg"},
+	{"--- P10 - arbor-vitae-1 - flames2": "p10/arbor-vitae-2.cfg"},
 
 
 
@@ -102,7 +103,7 @@ actionDict2 = [
 
 
 	{" " :''},
-	{"FirePike" :'p4-4x4/newfire.cfg'},
+	#{"FirePike" :'p4-4x4/newfire.cfg'},
 
 
 	# {" " :''},

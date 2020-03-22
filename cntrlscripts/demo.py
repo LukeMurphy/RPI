@@ -55,6 +55,7 @@ actionDict1 = [
 	{" ": ""},
 	{"Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
 	{"Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
+	{"Wall Hanging: FAst Flames": "p4-3x8-informal/fast-flames-2.cfg"},
 	{"Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},
 	{"Wall Hanging: Log Cabin Quilt": "p4-3x8-informal/quilt.cfg"},
 	{"Wall Hanging: Quilt Polys": "p4-3x8-informal/quilt-polys.cfg"},

@@ -119,6 +119,8 @@ class ImageSprite:
 
 	imageRotation = 10
 
+	channelHeight = 170
+
 	# Helps with lousy looping gifs
 	forceGlitchFrameCount = 300
 

@@ -71,6 +71,7 @@ def main(run=True):
 	config.useBlink = workConfig.getboolean("repeater", "useBlink")
 	config.noTrails = workConfig.getboolean("repeater", "noTrails")
 	config.imageList = workConfig.get("repeater", "imageList")
+	config.channelHeight = int(workConfig.get("repeater", "channelHeight"))
 
 	try:
 		config.pauseProb = float(workConfig.get("repeater", "pauseProb"))
@@ -111,7 +112,12 @@ def main(run=True):
 	# for i in range (0,simulBlocks) : makeBlock()
 
 	path = config.path + "/assets/imgs/"
-	imageList = [config.imageList]
+
+	imageList = []
+
+	for element in config.imageList.split(',') :
+		imageList.append(element)
+
 
 	for i in range(0, config.unitCount):
 		imgLoader = ImageSprite(config)
@@ -151,10 +157,12 @@ def main(run=True):
 			# imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
 			""" Speed """
-			vX = 1 * config.scalingFactor * 2 / config.speedFactor
+			vX = 1 * config.scalingFactor * 2 * config.speedFactor
 
 			# imgLoader.make(path + imageList[0], vX, 0, True, True, True, True)
-			imgLoader.make(path + imageList[0], vX, 0, True, True, True, True)
+
+			imageListIndex = round(random.uniform(0,len(imageList)-1))
+			imgLoader.make(path + imageList[imageListIndex], vX, 0, True, True, True, True)
 			# imgLoader.x = imgLoader.xPos = 0 #config.screenWidth/4 * random.random()
 			# imgLoader.y = imgLoader.yPos = 10 + i * 10 #config.screenWidth/4 * random.random()
 			# print (imgLoader.x, imgLoader.xPos, imgLoader.y, imgLoader.dX, imgLoader.dY)
@@ -188,11 +196,14 @@ def iterate(n=0):
 	# Clear the background and redraw all planes
 	if random.random() > 0.9985:
 		shuffle(blocks)
+
 	if random.random() > 0.9985:
 		colorModeDirectional = False if colorModeDirectional == True else True
 
 	if config.noTrails == True:
 		redrawBackGround()
+
+
 
 	for n in range(0, len(blocks)):
 		block = blocks[n]
@@ -205,6 +216,7 @@ def iterate(n=0):
 		# Never really want to do this as it force sends to the renderer for EACH item - big slowdowns etc
 		# config.render(block.image, int(block.x), int(block.y), block.image.size[0], block.image.size[1], False, False, updateCanvasCall)
 		pos = round(block.x + block.image.size[0])
+
 
 	# if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	# if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))

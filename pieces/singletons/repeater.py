@@ -142,7 +142,7 @@ def main(run=True):
 			imgLoader.scalingFactor = config.scalingFactor
 			imgLoader.useJitter = config.useJitter
 			imgLoader.useBlink = config.useBlink
-			imgLoader.brightnessFactor = config.brightness * random.random()
+			imgLoader.brightnessFactor = config.brightness * random.uniform(.4,1.1)
 			imgLoader.config = config
 			if config.colorMode == "randomized":
 				imgLoader.colorMode = "random"

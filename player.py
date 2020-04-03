@@ -50,7 +50,9 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-print("** " + str(args) + " **")
+
+print(bcolors.OKBLUE + "** " + str(args) + ""  + bcolors.ENDC)
+
 
 
 # Create a blank dummy object container for now
@@ -70,7 +72,7 @@ print("** " + str(args) + " **")
 def loadFromArguments(reloading=False, config=None):
 	# global config, workconfig, path, tempImage, threads, thrd
 
-	print(bcolors.OKBLUE + "\n>> ** RELOADING: " + str(reloading) + bcolors.ENDC)
+	print(bcolors.OKBLUE + "** RELOADING: " + str(reloading) + bcolors.ENDC)
 
 	if reloading == False:
 		try:
@@ -154,6 +156,10 @@ def loadFromArguments(reloading=False, config=None):
 					for a in workconfig[c]:
 						print("\t" + str(a) + ":  " + str(workconfig.get(c, a)))
 				print("**" + bcolors.ENDC)
+
+			# ****************************************** #
+			# Sets off the piece based on loading the intitail configs #
+			# ****************************************** #
 
 			player.configure(config, workconfig)
 

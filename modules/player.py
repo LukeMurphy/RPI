@@ -14,6 +14,7 @@ import threading
 
 import PIL.Image
 from modules import configuration
+from modules.configuration import bcolors
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 """
@@ -34,8 +35,8 @@ threads = []
 def configure(config, workconfig):
 	global path, tempImage, threads, thrd
 	# gc.enable()
+	print(bcolors.WARNING + "** Setting PLAYER config values **" + bcolors.ENDC)
 
-	print("** Setting PLAYER config values **")
 
 	### Sets up for testing live config chages
 	try:
@@ -323,7 +324,8 @@ def configure(config, workconfig):
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
 	# Setting up based on how the work is displayed
-	print("** modules.player.py is Loading:", str(config.work))
+	print(bcolors.WARNING + "** modules.player.py is Loading: " + str(config.work) + bcolors.ENDC)
+
 	try:
 		work = importlib.import_module("pieces." + str(config.work))
 		work.config = config
@@ -341,7 +343,8 @@ def configure(config, workconfig):
 		renderUsingIDAFruitHat(work)
 	if config.rendering == "hub":
 		renderUsingLINSNHub(work)
-	# if(config.rendering == "out") : renderUsingFFMPEG(work)
+	if(config.rendering == "out") : 
+		renderUsingFFMPEG(work)
 
 
 """
@@ -494,28 +497,37 @@ def renderUsingLINSNHub(work):
 
 
 """
+"""
 def renderUsingFFMPEG(work):
 
 	from modules.rendering import rendertofile
-	config.useFilters  = (workConfig.getboolean("displayconfig", 'useFilters'))
-	config.rotation = float(workConfig.get("displayconfig", 'rotation'))
-	config.rotationTrailing = (workConfig.getboolean("displayconfig", 'rotationTrailing'))
-	config.fullRotation = (workConfig.getboolean("displayconfig", 'fullRotation'))
+	work.config.useFilters = work.workConfig.getboolean("displayconfig", "useFilters")
+	work.config.rotation = float(work.workConfig.get("displayconfig", 'rotation'))
+	work.config.rotationTrailing = (work.workConfig.getboolean("displayconfig", 'rotationTrailing'))
+	work.config.fullRotation = (work.workConfig.getboolean("displayconfig", 'fullRotation'))
+	work.config.matrixTiles = int(work.workConfig.get("displayconfig", 'matrixTiles'))
+	work.config.transWiring = (work.workConfig.getboolean("displayconfig", 'transWiring'))
+	work.config.actualScreenWidth  = int(work.workConfig.get("displayconfig", 'actualScreenWidth'))
+	work.config.canvasWidth = int(work.workConfig.get("displayconfig", 'canvasWidth'))
+	work.config.canvasHeight = int(work.workConfig.get("displayconfig", 'canvasHeight'))
+	work.config.rotation = float(work.workConfig.get("displayconfig", 'rotation'))
+	work.config.rotationTrailing = (work.workConfig.getboolean("displayconfig", 'rotationTrailing'))
+	work.config.fullRotation = (work.workConfig.getboolean("displayconfig", 'fullRotation'))
+	work.config.useFilters  = (work.workConfig.getboolean("displayconfig", 'useFilters'))
 	r = rendertofile
-	r.config = config
+	r.config = work.config
 	r.work = work
 	r.work.x = r.work.y = 0
-	r.fps = int(workConfig.get("output", 'fps'))
-	r.duration = int(workConfig.get("output", 'duration'))
+	r.fps = int(work.workConfig.get("output", 'fps'))
+	r.duration = int(work.workConfig.get("output", 'duration'))
 
 	# Test white rectangle on main rendering image
 	#config.renderDraw.rectangle((0,0,400,300), fill=(255,255,255))
 
-	config.render = r.render
-	config.updateCanvas = r.updateCanvas
+	work.config.render = r.render
+	work.config.updateCanvas = r.updateCanvas
 	work.main(False)
 	
 	r.setUp("video")
-"""
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

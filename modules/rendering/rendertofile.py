@@ -147,7 +147,9 @@ def toVideo():
 
 	ts = time.time()
 	st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
-	name = config.work + "_" + st + "_video.avi"
+	#name = config.work + "_" + st + "_video.avi"
+	# /Users/lamshell/Documents/Dev/RPI/build/
+	name =  "" + st + "_video.avi"
 
 	"""
 	p = Popen(['ffmpeg', '-y', '-f', 'image2pipe', '-vcodec', vcodecImg, '-r', str(fps) , '-i', '-', 
@@ -156,7 +158,7 @@ def toVideo():
 
 	p = Popen(
 		[
-			"ffmpeg",
+			'ffmpeg',
 			"-y",
 			"-f",
 			"image2pipe",

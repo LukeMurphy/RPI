@@ -63,4 +63,5 @@ class Config:
 	rotation = 0
 
 	def __init__(self):
-		print("** Config instance init")
+		print(bcolors.WARNING + "** Config instance init" + bcolors.ENDC)
+		#print("** Config instance init")

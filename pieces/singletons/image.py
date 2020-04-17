@@ -80,6 +80,8 @@ def main(run=True):
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
+	config.channelHeight = 170
+
 	try:
 		config.forceGlitchFrameCount = int(
 			workConfig.get("filter", "forceGlitchFrameCount")

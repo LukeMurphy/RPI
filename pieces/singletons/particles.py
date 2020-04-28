@@ -491,14 +491,15 @@ def transformImage(img):
 def colorize():
 
 	# Colorize via overlay etc
-	config.clrBlock = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.clrBlock = Image.new("RGBA", (config.clrBlkWidth, config.clrBlkHeight))
 	clrBlockDraw = ImageDraw.Draw(config.clrBlock)
 
 	# Color overlay on b/w PNG sprite
 	# clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
 	clrBlockDraw.rectangle(
-		(0, 0, config.canvasWidth, config.canvasHeight), fill=(255, 255, 255, 255)
+		(0, 0, config.canvasWidth, config.clrBlkHeight), fill=(0, 0, 0, 255)
 	)
+
 	clrBlockDraw.rectangle(
 		(0, 0, config.clrBlkWidth, config.clrBlkHeight), fill=config.overlayColor
 	)
@@ -593,12 +594,14 @@ def iterate():
 		outline=None,
 	)
 
+	'''
+	# ORIG PLACEMENT
 	if config.useOverLay == True:
 		# config.image = ImageChops.multiply(config.clrBlock, config.image)
 		config.image.paste(
 			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
 		)
-
+	''' 
 	for p in ps.unitArray:
 		p.update()
 		p.render()
@@ -666,6 +669,13 @@ def iterate():
 			)
 
 	# print("particles ",config.render, config.instanceNumber)
+
+
+	if config.useOverLay == True:
+		# config.image = ImageChops.multiply(config.clrBlock, config.image)
+		config.image.paste(
+			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
+	)
 
 	config.render(config.image, 0, 0)
 

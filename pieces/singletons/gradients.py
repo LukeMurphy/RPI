@@ -166,9 +166,9 @@ def reDraw(
 					c1 = (0, 0, 0, 55)
 					c2 = (0, 0, 0, 255)
 
-				#gradientImage = drawBar(width, height, c1, c2)
+				gradientImage = drawBar(width, height, c1, c2)
 
-				gradientImage = drawCircle(width, height, c1, c2)
+				#gradientImage = drawCircle(width, height, c1, c2)
 				
 				#gradientImage = gradientImage.rotate(angle, expand=1)
 

@@ -8,7 +8,7 @@ from tkmacosx import Button
 
 commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-commadStringProc = "/Users/lamshell/Documents/Dev/RPI/altproduction/"
+commadStringProc = ""
 
 
 actionDict1 = [
@@ -17,7 +17,6 @@ actionDict1 = [
 	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
-	{"--- Road Sign tree-armature motion": "p4-4x4/sign-motion.cfg"},
 	{" ": ""},
 
 	{"_____________________________________________": ""},
@@ -48,11 +47,20 @@ actionDict1 = [
 	
 	{"_____________________________________________": ""},
 	{" ": ""},
-	{"==== Right wall  3x8 Informal ====": ""},
+	{"==== 3x8 Informal ====": ""},
+	{" ": ""},
+
+
+	{"Two poles - Fludd Factory, amusing": "p4-3x8-informal/fluddc.cfg"},
+	{"Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
+
+	{" ": ""},
+	{" ": ""},
+
+
 	{"The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
 	{"The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
 	
-	{" ": ""},
 	{"Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
 	{"Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
 	{"Wall Hanging: FAst Flames": "p4-3x8-informal/fast-flames-2.cfg"},
@@ -98,9 +106,12 @@ actionDict2 = [
 
 	{"_____________________________________________": ""},
 	{" ": ""},
+	{"Java - Impression": "/Users/lamshell/Dropbox/Dev/Processing/production/Impression/application.macosx/Impression.app"},
+	{"Java - Interchange": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
+	{" ": ""},
 	{"Java - partial plinth Gray Glory": "grayburst.app"},
-	{"Java - DotGridTiles": "DotGridTiles.app"},
-	{"Java - Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	{"Java - DotGridTiles": "/Users/lamshell/Documents/Dev/RPI/altproduction/DotGridTiles.app"},
+	{"Java - Afer Images": "/Users/lamshell/Documents/Dev/RPI/altproduction/concentrics/ConcentricAfterImagesAll.app"},
 
 
 

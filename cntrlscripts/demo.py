@@ -49,17 +49,14 @@ actionDict1 = [
 	{" ": ""},
 	{"==== 3x8 Informal ====": ""},
 	{" ": ""},
-
-
-	{"Two poles - Fludd Factory, amusing": "p4-3x8-informal/fluddc.cfg"},
 	{"Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
 
-	{" ": ""},
 	{" ": ""},
 
 
 	{"The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
 	{"The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
+	{" ": ""},
 	
 	{"Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
 	{"Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},

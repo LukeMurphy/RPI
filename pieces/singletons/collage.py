@@ -239,9 +239,12 @@ def redraw():
 				config.shapeTweening = 1
 			shapeCount += 1
 
+	'''
+	# Disabling in favor of patched dithering
 	if config.useVariableFilter == True:
 		if random.random() < config.variableFilterProb:
 			config.useFilters = False if config.useFilters == True else True
+	'''
 
 	if config.useVariablePixelSort == True:
 
@@ -267,6 +270,29 @@ def redraw():
 		badpixels.drawBlanks(config.image, False)
 		if random.random() > 0.999:
 			badpixels.setBlanksOnScreen()
+
+	if random.random() < config.filterPatchProb:
+		print("should be remapping")
+		x1 = round(random.uniform(0,config.canvasWidth))
+		x2 = round(random.uniform(x1,config.canvasWidth))
+		y1 = round(random.uniform(0,config.canvasHeight))
+		y2 = round(random.uniform(y1,config.canvasHeight))
+
+		config.remapImageBlock = True
+		config.remapImageBlockSection = (x1, y1, x2, y2)
+		config.remapImageBlockDestination = (x1, y1)
+
+	# Don't want the patch to always be there - just little interruptions
+	if random.random() < config.filterPatchProb * 3.0 and config.filterPatchProb > 0.0 :
+		print("turning off remapping")
+		x1 = 0
+		x2 = 0
+		y1 = 0
+		y2 = 0
+
+		config.remapImageBlock = True
+		config.remapImageBlockSection = (x1, y1, x2, y2)
+		config.remapImageBlockDestination = (x1, y1)
 
 	if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:
 		# config.useLastOverlay = False if config.useLastOverlay == True  else True
@@ -428,12 +454,17 @@ def main(run=True):
 		print(e)
 
 	try:
+		config.filterPatchProb = float(workConfig.get("collageShapes", "filterPatchProb"))
+	except Exception as e:
+		print(e)
+		config.filterPatchProb = 0.0
+	
+
+	try:
 		config.useVariableFilter = workConfig.getboolean(
 			"collageShapes", "useVariableFilter"
 		)
-		config.variableFilterProb = float(
-			workConfig.get("collageShapes", "variableFilterProb")
-		)
+		config.variableFilterProb = float(workConfig.get("collageShapes", "variableFilterProb"))
 		# config.useFilters = True
 		# config.usePixelSort = True
 	except Exception as e:

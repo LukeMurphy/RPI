@@ -17,24 +17,22 @@ actionDict1 = [
 	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
-	{" ": ""},
+
 
 	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Trap Prop  p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
 	{"--- Trap Prop  p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
 	{"--- Trap Prop  p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
-	{" ": ""},
 
 	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
-	{" ": ""},
+	
 	
 	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
-	{" ": ""},
 
 
 	#{"_____________________________________________": ""},
@@ -43,31 +41,43 @@ actionDict1 = [
 	#{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	#{" ": ""},
 
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Ladder - Interchange (Java)": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
+	{" ": ""},
 
+	
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
+	{"--- Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
 	
 	{"_____________________________________________": ""},
 	{" ": ""},
-	{"==== 3x8 Informal ====": ""},
-	{" ": ""},
-	{"Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
-
-	{" ": ""},
+	{"--- Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
+	{"--- The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
+	{"--- The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
 
 
-	{"The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
-	{"The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
+
+
+
+
 	{" ": ""},
-	
-	{"Wall Hanging: Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
-	{"Wall Hanging: TWO FLOW": "multi/manifest-3x8-informal.cfg"},
-	{"Wall Hanging: FAst Flames": "p4-3x8-informal/fast-flames-2.cfg"},
-	{"Wall Hanging: Gradients": "p4-3x8-informal/gradients.cfg"},
-	{"Wall Hanging: Log Cabin Quilt": "p4-3x8-informal/quilt.cfg"},
-	{"Wall Hanging: Quilt Polys": "p4-3x8-informal/quilt-polys.cfg"},
-	{"Wall Hanging: Quilt Triangles": "p4-3x8-informal/quilt-triangles-b.cfg"},
-	{"Wall Hanging: Quilt Stars": "p4-3x8-informal/quilt-stars.cfg"},
-	{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
-	{"Wall Hanging: THRow Multi": "multi/throw-quilt.cfg"},
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"3x8 Informal : Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
+	{"3x8 Informal : TWO FLOW": "multi/manifest-3x8-informal.cfg"},
+	{"3x8 Informal : FAst Flames": "p4-3x8-informal/fast-flames-2.cfg"},
+	{"3x8 Informal : Gradients": "p4-3x8-informal/gradients.cfg"},
+	{"3x8 Informal : Log Cabin Quilt": "p4-3x8-informal/quilt.cfg"},
+	{"3x8 Informal : Quilt Polys": "p4-3x8-informal/quilt-polys.cfg"},
+	{"3x8 Informal : Quilt Triangles": "p4-3x8-informal/quilt-triangles-b.cfg"},
+	{"3x8 Informal : Quilt Stars": "p4-3x8-informal/quilt-stars.cfg"},
+	{"3x8 Informal : Squares": "p4-3x8-informal/quilt-squares.cfg"},
+	{"3x8 Informal : Squares Plane": "p4-3x8-informal/quilt-squares-plane.cfg"},
+	{"3x8 Informal : THRow Multi": "multi/throw-quilt.cfg"},
 
 ]
 
@@ -100,12 +110,8 @@ actionDict2 = [
 	{" ": ""},
 
 
-
-	{"_____________________________________________": ""},
 	{" ": ""},
 	{"Java - Impression": "/Users/lamshell/Dropbox/Dev/Processing/production/Impression/application.macosx/Impression.app"},
-	{"Java - Interchange": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
-	{" ": ""},
 	{"Java - partial plinth Gray Glory": "grayburst.app"},
 	{"Java - DotGridTiles": "/Users/lamshell/Documents/Dev/RPI/altproduction/DotGridTiles.app"},
 	{"Java - Afer Images": "/Users/lamshell/Documents/Dev/RPI/altproduction/concentrics/ConcentricAfterImagesAll.app"},
@@ -133,10 +139,10 @@ actionDict2 = [
 	# {"To Fro: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
 	# {" " :''},
 	#{"--- LEFT WALL ----": ""},
-	#{"==> Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
+	#{"--- Tower w. Bump Collage": "p4-5x8/bump-collage.cfg"},
 	#{" ": ""},
 	#{"-------- Firestick on FLOOR  -------------": ""},	
-	#{"==> p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
+	#{"--- p4-6x1-firestick - Honly Tonk box lights": "p4-6x1-firestick/dot-grid.cfg"},
 	#{"p4-6x1-firestick - leaninglights": "p4-6x1-firestick/leaninglights-3.cfg"},
 	#{"p4-6x1-firestick - algoflames": "p4-6x1-firestick/bundle-algoflames-1.cfg"},
 	#{"p4-6x1-firestick - AfterImages": "concentrics/ConcentricAfterImagesAll.app"},
@@ -145,8 +151,8 @@ actionDict2 = [
 	#{"Material Compositions": "p4-4x4/cube-compositions.cfg"},
 	#{"Pixel Shack": "p4-4x4/pixel-shack-4x6.cfg"},
 	#{"Pixel Shack - AlgoFlames": "p4-4x4/pixel-shack-algoflames-1b.cfg"},
-	#{"==> Inset frame: inset collage 2": "p4-2x2/compositions-2-hub.cfg"},
-	#{"==> Small Inset frame: inset collage 3": "p3-2x4/diagnostics.cfg"},
+	#{"--- Inset frame: inset collage 2": "p4-2x2/compositions-2-hub.cfg"},
+	#{"--- Small Inset frame: inset collage 3": "p3-2x4/diagnostics.cfg"},
 	#{"Inset frame: light grid": "p4-2x2/dot-grid.cfg"},
 	#{"Inset frame: inset collage 3": "p4-2x2/compositions-3-hub.cfg"},
 	#{"Inset frame: compositions 1": "p4-2x2/compositions-hub.cfg"},
@@ -168,7 +174,7 @@ actionDict2 = [
 
 
 	#{"-------- FLOOR - FIREPLCE ------": ""},
-	#{"==> pile: Algoflames2.3": "p4-6x8/algofall-2.3.cfg"},
+	#{"--- pile: Algoflames2.3": "p4-6x8/algofall-2.3.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	#{"pile: Algoflames2.2": "p4-6x8/algofall-2.2.cfg"},
 	#{"pile: Algoflames2.1": "p4-6x8/algofall-2.1.cfg"},
@@ -180,10 +186,10 @@ actionDict2 = [
 
 
 
-	#{"==> Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
-	#{"==> Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
-	#{"==> Square scroller": "p4-4x6/scroller-b.cfg"},
-	#{"==> Square scroller": "multi/pixel-shack-4x6.cfg"},
+	#{"--- Square - mono-flavin" :'p4-4x8/mono-flavin.cfg'},
+	#{"--- Square - mono-rothko" :'p4-4x8/mono-rothko.cfg'},
+	#{"--- Square scroller": "p4-4x6/scroller-b.cfg"},
+	#{"--- Square scroller": "multi/pixel-shack-4x6.cfg"},
 	#{"Wall Hanging: Squares": "p4-3x8-informal/quilt-squares.cfg"},
 	# {"Square - quilt" :'p4-4x8/quilt-log-cabin.cfg'},
 	# {" " :''},
@@ -228,21 +234,21 @@ actionDict2 = [
 	# {"Three Way Leaning Lights" :'p4-6x8/leaninglights.cfg'},
 	# {"Alt Flames" :'p4-6x8/alt-flames.cfg'},
 	#{"-------- LEFT / WEST WALL  -------------": ""},
-	#{"==> 4x6 bnd: Leaning lights": "p4-4x6-bent-lean/leaninglights-3.cfg"},
-	#{"==> TWO FLOW bend": "multi/manifest-4x6.cfg"},
+	#{"--- 4x6 bnd: Leaning lights": "p4-4x6-bent-lean/leaninglights-3.cfg"},
+	#{"--- TWO FLOW bend": "multi/manifest-4x6.cfg"},
 	#{"4x6 bend: Algoflames2.3": "p4-4x6-bent-lean/algofall-2.3.cfg"},
 	#{"4x6 bnd: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 	#{" ": ""},
 
 	#{"-------- NORTH WALL  -------------": ""},
-	#{"==> P10 Dangler Torumaline": "p10/dangler-tourmaline.cfg"},
-	#{"==> P10 Dangler Flow": "p10/dangler-flow.cfg"},
+	#{"--- P10 Dangler Torumaline": "p10/dangler-tourmaline.cfg"},
+	#{"--- P10 Dangler Flow": "p10/dangler-flow.cfg"},
 
 	#{" ": ""},
 
-	#{"==> P10 Branch: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	#{"--- P10 Branch: Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
-	#{"==> P10 Branch - Collage branch": "p10/collage-lines-1.cfg"},
+	#{"--- P10 Branch - Collage branch": "p10/collage-lines-1.cfg"},
 	#{"P10 Branch - Collage branch 2": "p10/collage-lines-1a.cfg"},
 	#{"P10 Branch - Collage branch inv": "p10/collage-lines-2.cfg"},
 	#{"P10 Branch - Tourmaline": "p10/collage-tourmaline.cfg"},
@@ -289,7 +295,7 @@ actionDict2 = [
 	# {"P10 BUNDLE PILE - leaning pattern" :'p10/bundle-lines-2.cfg'},
 
 	#{"-------- PLANK AND DOOR  -------------": ""},
-	#{"==> P10 Plank-Door - Tourmanline": "p10/plank-tourmaline.cfg"},
+	#{"--- P10 Plank-Door - Tourmanline": "p10/plank-tourmaline.cfg"},
 	#{".  .  .  .  .  .  .  .  .  .  .  .  .": ""},
 	#{"P10 Plank-Door - AlgoFlames": "p10/plank-algoflames-1b.cfg"},
 	#{"P10 Plank-Door - movement": "p10/plank-movement-2.cfg"},
@@ -300,16 +306,16 @@ actionDict2 = [
 	# {"* Pencil Tower: Monument to the Glitch" :'p10-twr4/6x4-monument-to-the-glitch.cfg'},
 	# {"* Pencil Tower: Tourmaline" :'p10-twr4/6x4-tourmaline.cfg'},
 	# {"* Pencil Tower: Afer Images" :'concentrics/ConcentricAfterImagesAll.app'},
-	#{"==> Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
-	#{"==> Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
-	#{"==> Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
+	#{"--- Bad flare - mono-flavin-b" :'p4-4x4/mono-flavin-b.cfg'},
+	#{"--- Afer Images": "concentrics/ConcentricAfterImagesAll.app"},
+	#{"--- Pixel Shack": "p4-4x6/pixel-shack-4x6-b.cfg"},
 
 	#{" ": ""},
 	#{"--------- FLOOR -----------": ""},
 	#{"Broken Sqr in Oblong - mono-flavin" :'p4-4x4/mono-flavin.cfg'},
 	#{"Broken Sqr in Oblong - collage" :'p4-4x4/collage.cfg'},
 	#{"Broken Sqr in Oblong - bluefire" :'p4-4x4/bluefire.cfg'},
-	#{"==> P10 Plank-Door - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
+	#{"--- P10 Plank-Door - AlgoFlames Pink": "p10/plank-algoflames-2.cfg"},
 	#{"--- RIGHT WALL -------------": ""},
 	#{"--------- Partial Plinth -----------" :''},
 

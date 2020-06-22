@@ -21,14 +21,17 @@ configs/staging/p4-inset-compositions-2.cfg
 --> reworked for donation piece
 configs/staging/p4-asym-collage2.cfg 
 
-
-
-
-
-
-
-
-
-
-
 (Macintosh HD⁩ ▸ ⁨Users⁩ ▸ ⁨lamshell⁩ ▸ ⁨Dropbox⁩ ▸ ⁨Dev⁩ ▸ ⁨Processing⁩ ▸ ⁨production ▸ Impression)
+
+
+2020-06-17
+------------------
+
+open /Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app
+
+prun p4-4x3-panel/composition-door
+
+
+
+
+

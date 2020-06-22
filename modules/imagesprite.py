@@ -171,7 +171,7 @@ class ImageSprite:
 		resizeImage=True,
 		randomizeDirection=True,
 		randomizeColor=True,
-	):
+		):
 
 		self.frame = 0
 		self.dX = setvX
@@ -234,8 +234,8 @@ class ImageSprite:
 
 
 			# Reverse image
-		# print("Processing....")
-		# print("-----------")
+		print("Processing....")
+		print("-----------", self.resizeImage)
 
 		if self.processImage:
 			if self.resizeImage:
@@ -384,23 +384,43 @@ class ImageSprite:
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-	def glitchBox(self, r1=-1, r2=1):
-		apparentWidth = self.image.size[1]
-		apparentHeight = self.image.size[0]
+	def glitchBox(self, r1=-1, r2=1, orientation=1):
+		apparentWidth = self.image.size[0]
+		apparentHeight = self.image.size[1]
 		dy = int(random.uniform(r1, r2))
-		dx = int(random.uniform(1, self.config.imageGlitchSize))
-		dx = 0
+		dx = int(random.uniform(r1, r2))
+		#dx = int(random.uniform(1, self.config.imageGlitchSize))
+		#dx = 0
 
-		# really doing "vertical" or y-axis glitching
-		# block height is uniform but width is variable
+		orientation = self.config.verticalOrientation
 
-		sectionWidth = int(random.uniform(2, apparentHeight - dx))
-		sectionHeight = apparentWidth
+		if orientation == 1 : 
+			dx = 0
+			# really doing "vertical" or y-axis glitching
+			# block height is uniform but width is variable
 
-		# 95% of the time they dance together as mirrors
-		if random.random() < 0.97:
-			cp1 = self.image.crop((dx, 0, dx + sectionWidth, sectionHeight))
-			self.image.paste(cp1, (int(0 + dx), int(0 + dy)))
+			sectionWidth = int(random.uniform(2, apparentHeight - dx))
+			sectionHeight = apparentHeight
+
+			# 95% of the time they dance together as mirrors
+			if random.random() < 0.97:
+				cp1 = self.image.crop((dx, 0, dx + sectionWidth, sectionHeight))
+				self.image.paste(cp1, (int(0 + dx), int(0 + dy)))
+		else :
+			# HORIZONTAL GLITCH
+			#dy = 0
+					# really doing "vertical" or y-axis glitching
+			# block height is uniform but width is variable
+
+			sectionHeight = int(random.uniform(2, apparentHeight - dy))
+			sectionWidth = apparentWidth
+
+			# 95% of the time they dance together as mirrors
+			if random.random() < 0.97:
+				cp1 = self.image.crop((0, 0, dx + sectionWidth, sectionHeight))
+				self.image.paste(cp1, (int(dx), int(0 + dy)))
+
+
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -534,6 +554,7 @@ class ImageSprite:
 		imageCopyTemp = imageCopy
 		enhancer = ImageEnhance.Brightness(imageCopyTemp)
 		imageCopyTemp = enhancer.enhance(brightnessFactor)
+
 		config.render(
 			imageCopyTemp,
 			int(xOffset),
@@ -597,6 +618,7 @@ class ImageSprite:
 
 		# This needs fixing  - currently requires extra frame
 		# at end of gif  --
+
 
 		skipTime = False
 		# ************************************#

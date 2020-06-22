@@ -36,7 +36,7 @@ def main(run=True):
 	global config, workConfig, blocks, simulBlocks, bads
 	gc.enable()
 
-	print("Image Loaded")
+	print("Image Piece Loaded")
 
 	config.vOffset = int(workConfig.get("scroll", "vOffset"))
 	config.speed = float(workConfig.get("scroll", "scrollSpeed"))
@@ -80,7 +80,9 @@ def main(run=True):
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
-	config.channelHeight = 170
+	## Sets the image size  -- should probably be set to canvasHeight
+	config.channelHeight = 256
+	config.verticalOrientation = int(workConfig.get("images", "verticalOrientation"))
 
 	try:
 		config.forceGlitchFrameCount = int(
@@ -164,6 +166,13 @@ def iterate(n=0):
 	config.workImage.paste(
 		blocks[0].image.convert("RGBA"), (0, 0), blocks[0].image.convert("RGBA")
 	)
+
+
+	## RESETS
+	if random.random() < .0001:
+		print("RESET")
+		blocks[0].image = blocks[0].imageOriginal.copy()
+		blocks[0].process()
 
 	if random.random() < config.overlayChangeProb:
 		config.colorOverlay = colorutils.getRandomRGB()

@@ -179,6 +179,11 @@ def iterate(n=0):
 		blocks[0].process()
 
 	if random.random() < config.overlayChangeProb:
+		if config.verticalOrientation == 0 : 1 
+		else : 0
+
+
+	if random.random() < config.overlayChangeProb:
 		#config.colorOverlay = colorutils.getRandomRGB()
 		config.colorOverlay = colorutils.randomColorAlpha()
 		if random.random() < config.overlayChangePosProb:

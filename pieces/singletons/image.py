@@ -48,33 +48,33 @@ def main(run=True):
 	config.useImageFilter = workConfig.getboolean("images", "useImageFilter")
 	config.playSpeed = float(workConfig.get("images", "playSpeed"))
 
-	config.lines = int(workConfig.get("filter", "lines"))
-	config.boxHeight = int(workConfig.get("filter", "boxHeight"))
-	config.boxWidth = int(workConfig.get("filter", "boxWidth"))
-	config.xPos1 = int(workConfig.get("filter", "xPos1"))
-	config.yPosBase = int(workConfig.get("filter", "yPosBase"))
-	config.targetClrs = (workConfig.get("filter", "targetClrs")).split(",")
+	config.lines = int(workConfig.get("images", "lines"))
+	config.boxHeight = int(workConfig.get("images", "boxHeight"))
+	config.boxWidth = int(workConfig.get("images", "boxWidth"))
+	config.xPos1 = int(workConfig.get("images", "xPos1"))
+	config.yPosBase = int(workConfig.get("images", "yPosBase"))
+	config.targetClrs = (workConfig.get("images", "targetClrs")).split(",")
 	config.targetClrs = list(map(lambda x: int(x), config.targetClrs))
-	config.imageFilterProb = float(workConfig.get("filter", "imageFilterProb"))
-	config.bgFilterProb = float(workConfig.get("filter", "bgFilterProb"))
-	config.targetPalette = workConfig.get("filter", "targetPalette")
+	config.imageFilterProb = float(workConfig.get("images", "imageFilterProb"))
+	config.bgFilterProb = float(workConfig.get("images", "bgFilterProb"))
+	config.targetPalette = workConfig.get("images", "targetPalette")
 
-	config.clrBlkWidth = int(workConfig.get("filter", "clrBlkWidth"))
-	config.clrBlkHeight = int(workConfig.get("filter", "clrBlkHeight"))
-	config.overlayxPosOrig = int(workConfig.get("filter", "overlayxPos"))
-	config.overlayyPosOrig = int(workConfig.get("filter", "overlayyPos"))
-	config.overlayxPos = int(workConfig.get("filter", "overlayxPos"))
-	config.overlayyPos = int(workConfig.get("filter", "overlayyPos"))
-	config.overlayChangeProb = float(workConfig.get("filter", "overlayChangeProb"))
+	config.clrBlkWidth = int(workConfig.get("images", "clrBlkWidth"))
+	config.clrBlkHeight = int(workConfig.get("images", "clrBlkHeight"))
+	config.overlayxPosOrig = int(workConfig.get("images", "overlayxPos"))
+	config.overlayyPosOrig = int(workConfig.get("images", "overlayyPos"))
+	config.overlayxPos = int(workConfig.get("images", "overlayxPos"))
+	config.overlayyPos = int(workConfig.get("images", "overlayyPos"))
+	config.overlayChangeProb = float(workConfig.get("images", "overlayChangeProb"))
 	config.overlayChangePosProb = float(
-		workConfig.get("filter", "overlayChangePosProb")
+		workConfig.get("images", "overlayChangePosProb")
 	)
 
-	config.animateProb = float(workConfig.get("filter", "animateProb"))
-	config.imageGlitchProb = float(workConfig.get("filter", "imageGlitchProb"))
-	config.imageGlitchSize = float(workConfig.get("filter", "imageGlitchSize"))
+	config.animateProb = float(workConfig.get("images", "animateProb"))
+	config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
+	config.imageGlitchSize = float(workConfig.get("images", "imageGlitchSize"))
 	config.imageGlitchDisplacement = int(
-		workConfig.get("filter", "imageGlitchDisplacement")
+		workConfig.get("images", "imageGlitchDisplacement")
 	)
 
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -82,11 +82,15 @@ def main(run=True):
 
 	## Sets the image size  -- should probably be set to canvasHeight
 	config.channelHeight = 256
+
+	## New configs
+	config.animateProb = float(workConfig.get("images", "animateProb"))
 	config.verticalOrientation = int(workConfig.get("images", "verticalOrientation"))
+	config.resetProbability =float(workConfig.get("images", "resetProbability"))
 
 	try:
 		config.forceGlitchFrameCount = int(
-			workConfig.get("filter", "forceGlitchFrameCount")
+			workConfig.get("images", "forceGlitchFrameCount")
 		)
 	except Exception as e:
 		config.forceGlitchFrameCount = 220
@@ -169,19 +173,21 @@ def iterate(n=0):
 
 
 	## RESETS
-	if random.random() < .0001:
+	if random.random() < config.resetProbability:
 		print("RESET")
 		blocks[0].image = blocks[0].imageOriginal.copy()
 		blocks[0].process()
 
 	if random.random() < config.overlayChangeProb:
-		config.colorOverlay = colorutils.getRandomRGB()
-		# config.colorOverlay = colorutils.getRandomColorWheel()
+		#config.colorOverlay = colorutils.getRandomRGB()
+		config.colorOverlay = colorutils.randomColorAlpha()
 		if random.random() < config.overlayChangePosProb:
-			config.overlayyPos = 100
+			config.overlayyPos = round(random.uniform(0,config.canvasHeight))
+			config.overlayxPos = round(random.uniform(0,config.canvasWidth))
 		if random.random() < config.overlayChangePosProb:
 			config.overlayxPos = config.overlayxPosOrig
 			config.overlayyPos = config.overlayyPosOrig
+
 	colorize(config.colorOverlay)
 
 	if config.useBlanks:

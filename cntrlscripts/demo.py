@@ -15,58 +15,32 @@ actionDict1 = [
 
 
 	{"_____________________________________________": ""},
-	{" ": ""},
-	{"--- Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
 
 
-	{"_____________________________________________": ""},
-	{" ": ""},
-	{"--- Trap Prop  p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
-	{"--- Trap Prop  p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
-	{"--- Trap Prop  p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
 
-	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
 	
 	
-	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
 
 
-	#{"_____________________________________________": ""},
-	#{" ": ""},
-	#{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
-	#{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
-	#{" ": ""},
-
-	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Ladder - Interchange (Java)": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
-	{" ": ""},
-
+	{"_____________________________________________": ""},
 	
 
-	{"_____________________________________________": ""},
-	{" ": ""},
-	{"--- Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
-	{"--- Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
-	
-	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
-	{"--- The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
-	{"--- The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
-
-
-
-
+	{"--- WALKING ": "p4-3x8-informal/img-hub3-walk.cfg"},
 
 
 	{" ": ""},
 	{"_____________________________________________": ""},
 	{" ": ""},
+	{"--- The Problem With Dot Paintings 2": "p4-3x8-informal/spots2.cfg"},
+	{"--- The Problem With Dot Paintings 1": "p4-3x8-informal/spots.cfg"},
 	{"3x8 Informal : Patched Rothko": "p4-3x8-informal/mono-rothko.cfg"},
 	{"3x8 Informal : TWO FLOW": "multi/manifest-3x8-informal.cfg"},
 	{"3x8 Informal : FAst Flames": "p4-3x8-informal/fast-flames-2.cfg"},
@@ -78,6 +52,29 @@ actionDict1 = [
 	{"3x8 Informal : Squares": "p4-3x8-informal/quilt-squares.cfg"},
 	{"3x8 Informal : Squares Plane": "p4-3x8-informal/quilt-squares-plane.cfg"},
 	{"3x8 Informal : THRow Multi": "multi/throw-quilt.cfg"},
+
+	#{"_____________________________________________": ""},
+	#{" ": ""},
+	#{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
+	#{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
+	#{" ": ""},
+
+	#{"_____________________________________________": ""},
+	
+	#{" ": ""},
+
+	#{"_____________________________________________": ""},
+	
+
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
+	{"--- Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
+	
+
+
+	#{"--- Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
+
 
 ]
 
@@ -91,7 +88,13 @@ actionDict2 = [
 	{"--- P10 - arbor-vitae-1 - flames": "p10/arbor-vitae-1.cfg"},
 	{"--- P10 - arbor-vitae-1 - flames2": "p10/arbor-vitae-2.cfg"},
 
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Trap Prop  p10-frame - algoflames": "p4-6x1-firestick/p10-algoflames-rbg.cfg"},
+	{"--- Trap Prop  p10-frame - tourmalines": "p4-6x1-firestick/p10-doorframe-tourmaline.cfg"},
+	{"--- Trap Prop  p10-frame - tourmalines -b": "p4-6x1-firestick/p10-doorframe-tourmaline-b.cfg"},
 
+	{"_____________________________________________": ""},
 
 	{"_____________________________________________": ""},
 	{" ": ""},
@@ -376,7 +379,7 @@ root = tk.Tk()
 #frame = tk.Frame(root, bg="darkgray")
 #frame.pack(padx=1, pady=1)
 # width x height x X x Y
-root.geometry("%dx%d+%d+%d" % (680, 740, 100, 100))
+root.geometry("%dx%d+%d+%d" % (680, 740, 1200, 100))
 
 Lb1 = Listbox(root, width=33, height=42)
 Lb2 = Listbox(root, width=32, height=42)

@@ -185,7 +185,7 @@ def iterate(n=0):
 
 	if random.random() < config.overlayChangeProb:
 		#config.colorOverlay = colorutils.getRandomRGB()
-		config.colorOverlay = colorutils.randomColorAlpha()
+		config.colorOverlay = colorutils.randomColorAlpha(config.brightness, 100,20)
 		if random.random() < config.overlayChangePosProb:
 			config.overlayyPos = round(random.uniform(0,config.canvasHeight))
 			config.overlayxPos = round(random.uniform(0,config.canvasWidth))

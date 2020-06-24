@@ -34,6 +34,7 @@ actionDict1 = [
 	{" ": ""},
 	{"--- Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
 	{"--- WALKING ": "p4-3x8-informal/img-hub3-walk.cfg"},
+	{"--- CLOUDS ": "p4-3x8-informal/img-hub3-clouds.cfg"},
 
 
 	{" ": ""},

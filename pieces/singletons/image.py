@@ -181,7 +181,7 @@ def iterate(n=0):
 
 	## RESETS
 	if random.random() < config.resetProbability:
-		print("RESET")
+		#print("RESET")
 		blocks[0].image = blocks[0].imageOriginal.copy()
 		blocks[0].process()
 

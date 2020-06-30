@@ -190,18 +190,19 @@ class ImageSprite:
 		# print("-----------")
 
 		if self.loadImage(img):
+			if self.resizeImage :
 			# scale to the WIDTH of the screen
-			if self.image.size[0] != self.config.screenWidth and self.resizeToWidth:
-				self.ratio = float(self.config.screenWidth) / self.image.size[0]
-				self.image = self.image.resize(
-					(self.config.screenWidth, int(self.ratio * self.image.size[1]))
-				)
+				if self.image.size[0] != self.config.screenWidth and self.resizeToWidth:
+					self.ratio = float(self.config.screenWidth) / self.image.size[0]
+					self.image = self.image.resize(
+						(self.config.screenWidth, int(self.ratio * self.image.size[1]))
+					)
 
-			if self.image.size[1] != self.config.channelHeight and self.channelHeight:
-				self.ratio = float(self.config.channelHeight) / self.image.size[1]
-				self.image = self.image.resize(
-					(int(self.ratio * self.image.size[0]), self.config.channelHeight)
-				)
+				if self.image.size[1] != self.config.channelHeight and self.channelHeight:
+					self.ratio = float(self.config.channelHeight) / self.image.size[1]
+					self.image = self.image.resize(
+						(int(self.ratio * self.image.size[0]), self.config.channelHeight)
+					)
 
 			if self.dX < 0:
 				# Reverse image
@@ -234,11 +235,13 @@ class ImageSprite:
 
 
 			# Reverse image
-		print("Processing....")
-		print("-----------", self.resizeImage)
+		#print("Processing....")
+		#print("-----------", self.resizeImage)
 
 		if self.processImage:
 			if self.resizeImage:
+
+				print("resize")
 				# change = random.uniform(.1,1.2) * self.scalingFactor
 				change = (
 					random.uniform(self.resizeMin, self.resizeMax) * self.scalingFactor
@@ -325,6 +328,7 @@ class ImageSprite:
 		# Color overlay on b/w PNG sprite
 		# EVERYTHING HAS TO BE PNG  / have ALPHA
 		clrBlockDraw.rectangle((0, 0, self.image.size[0], self.image.size[1]), fill=clr)
+		
 		if recolorize == True:
 			self.image = ImageChops.multiply(clrBlock, self.imageOriginal)
 		else:

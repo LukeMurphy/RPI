@@ -15,26 +15,23 @@ actionDict1 = [
 
 
 	{"_____________________________________________": ""},
-
-
-
 	{" ": ""},
 	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
-	
-	
+	{"_____________________________________________": ""},
 	{" ": ""},
-	{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
-
-
+	{"--- Small Unsettled Abstraction --------": "p4-1x4-cube/panel-test.cfg"},
+	
+	#{" ": ""},
+	#{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
+	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Ladder - Interchange (Java)": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
-	{"_____________________________________________": ""},
-	
 
+	{"_____________________________________________": ""},
 	{" ": ""},
 	{"--- Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
-	{"--- WALKING ": "p4-3x8-informal/img-hub3-walk.cfg"},
-	{"--- CLOUDS ": "p4-3x8-informal/img-hub3-clouds.cfg"},
+	#{"--- WALKING ": "p4-3x8-informal/img-hub3-walk.cfg"},
+	#{"--- CLOUDS ": "p4-3x8-informal/img-hub3-clouds.cfg"},
 
 
 	{" ": ""},

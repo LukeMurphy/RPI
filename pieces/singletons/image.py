@@ -89,10 +89,17 @@ def main(run=True):
 	config.resetProbability =float(workConfig.get("images", "resetProbability"))
 
 	try:
+		config.resizeToFit = workConfig.getboolean("images", "resizeToFit")
+	except Exception as e:
+		print(str(e))
+		config.resizeToFit = False
+
+	try:
 		config.forceGlitchFrameCount = int(
 			workConfig.get("images", "forceGlitchFrameCount")
 		)
 	except Exception as e:
+		print(str(e))
 		config.forceGlitchFrameCount = 220
 
 	config.colorOverlay = (255, 0, 255)
@@ -126,7 +133,7 @@ def main(run=True):
 		imgLoader.brightnessFactor = 0.9
 		imgLoader.config = config
 		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-		imgLoader.make(path + imageList[0], 0, 0, False, False, False, False)
+		imgLoader.make(path + imageList[0], 0, 0, False, config.resizeToFit, False, False)
 		blocks.append(imgLoader)
 
 	if run:
@@ -185,7 +192,7 @@ def iterate(n=0):
 
 	if random.random() < config.overlayChangeProb:
 		#config.colorOverlay = colorutils.getRandomRGB()
-		config.colorOverlay = colorutils.randomColorAlpha(config.brightness, 100,20)
+		config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 2.0, 200,200)
 		if random.random() < config.overlayChangePosProb:
 			config.overlayyPos = round(random.uniform(0,config.canvasHeight))
 			config.overlayxPos = round(random.uniform(0,config.canvasWidth))
@@ -279,7 +286,11 @@ def colorize(clr=(250, 0, 250), recolorize=False):
 	# config.renderImageFull.paste(clrBlock, (0,0))
 
 	try:
-		config.workImage = ImageChops.multiply(clrBlock, config.workImage)
+		if random.random() > .5 :
+			config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
+		else :
+			config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
+
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
 		# config.renderImageFull.paste(imgTemp,(0,0,w,h))

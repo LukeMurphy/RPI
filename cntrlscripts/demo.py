@@ -9,6 +9,7 @@ from tkmacosx import Button
 commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringProc = ""
+JavaAppRunning = ""
 
 
 actionDict1 = [
@@ -27,6 +28,9 @@ actionDict1 = [
 	{"--- Police Line 2 --------": "p10-line/flow-1.cfg"},
 	{"--- Police Line 3 --------": "p10-line/flow-2.cfg"},
 
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Rough Line --------": "p4-1x4-cube/diagnostics-single-line.cfg"},
 
 	#{" ": ""},
 	#{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
@@ -348,6 +352,7 @@ def verify():
 
 
 def execute(configToRun):
+	global JavaAppRunning
 	if ".cfg" in configToRun:
 		if "multi" in configToRun:
 			os.system(commadStringMultiPyth + configToRun + "&")
@@ -355,6 +360,7 @@ def execute(configToRun):
 			os.system(commadStringPyth + configToRun + "&")
 	elif ".app" in configToRun:
 		os.system("open " + commadStringProc + configToRun)
+		JavaAppRunning = configToRun
 
 
 def action():
@@ -367,9 +373,14 @@ def action():
 
 
 def action2():
+	global JavaAppRunning
 	a = verify()
 	if a[0] == True:
 		os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+
+		if JavaAppRunning != '' :
+			os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")
+
 		configSelected = a[1]
 		configToRun = configSelected[list(configSelected.keys())[0]]
 		execute(configToRun)
@@ -409,18 +420,15 @@ slogan = Button(
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
+slogan = Button(
+	root, text="Run", width = 120, bg='blue', fg='white', borderless=1, command=action
+)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+25)
 
 slogan = Button(
 	root, text="Stop All", width = 120, bg='blue', fg='white', borderless=1, command=stopAll
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+25)
-
-
-slogan = Button(
-	root, text="Run", width = 120, bg='blue', fg='white', borderless=1, command=action
-)
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+50)
-
 
 quitbutton = Button(
 	root, text="QUIT", width = 120, bg='blue', fg='white', borderless=1, command=quit

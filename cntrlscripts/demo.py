@@ -128,6 +128,12 @@ actionDict2 = [
 	{"Java - DotGridTiles": "/Users/lamshell/Documents/Dev/RPI/altproduction/DotGridTiles.app"},
 	{"Java - Afer Images": "/Users/lamshell/Documents/Dev/RPI/altproduction/concentrics/ConcentricAfterImagesAll.app"},
 
+	{"_____________________________________________": ""},
+	{"SCREEN TEST ": "screens/test-448x320.cfg"},
+	{"SCREEN TEST @x=100 y=100": "screens/test-448x320b.cfg"},
+	{"SCREEN TEST P8": "screens/p8-448x320b.cfg"},
+	{"SCREEN TEST P10": "screens/p10-192x128.cfg"},
+	{"Police Line P8 ": "p10-line/p8-static-1.cfg"},
 
 
 	{" " :''},

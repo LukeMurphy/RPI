@@ -17,33 +17,39 @@ actionDict1 = [
 
 	{"_____________________________________________": ""},
 	{" ": ""},
-	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
-	{"_____________________________________________": ""},
-	{" ": ""},
+
 	{"--- Small Unsettled Abstraction --------": "p4-1x4-cube/panel-test.cfg"},
 	
-	{"_____________________________________________": ""},
+
 	{" ": ""},
 	{"--- ** Police Line 1 --------": "p10-line/static-1.cfg"},
 	{"--- Police Line 2 --------": "p10-line/flow-1.cfg"},
 	{"--- Police Line 3 --------": "p10-line/flow-2.cfg"},
 
-	{"_____________________________________________": ""},
+
 	{" ": ""},
-	{"--- Rough Line --------": "p4-1x4-cube/diagnostics-single-line.cfg"},
+	{"--- Line with Prop --------": "p4-1x4-cube/diagnostics-single-line.cfg"},
 
 	#{" ": ""},
 	#{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
-	{"_____________________________________________": ""},
+	
 	{" ": ""},
 	{"--- Ladder - Interchange (Java)": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
 
+	{" ": ""},
+	{"_____________________________________________": ""},
 	{"_____________________________________________": ""},
 	{" ": ""},
+	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
 	{"--- Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
 	#{"--- WALKING ": "p4-3x8-informal/img-hub3-walk.cfg"},
 	#{"--- CLOUDS ": "p4-3x8-informal/img-hub3-clouds.cfg"},
 
+	{"_____________________________________________": ""},
+	{" ": ""},
+	{"--- Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
+	{"--- Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
+	
 
 	{" ": ""},
 	{"_____________________________________________": ""},
@@ -75,11 +81,6 @@ actionDict1 = [
 	#{"_____________________________________________": ""},
 	
 
-	{"_____________________________________________": ""},
-	{" ": ""},
-	{"--- Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
-	{"--- Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
-	
 
 
 	#{"--- Road Sign tree-armature tourmanline": "p4-4x4/sign-tourmaline-b.cfg"},
@@ -89,6 +90,12 @@ actionDict1 = [
 
 actionDict2 = [
 
+	{"_____________________________________________": ""},
+	{"SCREEN TEST ": "screens/test-448x320.cfg"},
+	{"SCREEN TEST @x=100 y=100": "screens/test-448x320b.cfg"},
+	{"SCREEN TEST P8": "screens/p8-448x320.cfg"},
+	{"SCREEN TEST P10": "screens/p10-192x128.cfg"},
+	{"Police Line P8 ": "p10-line/p8-static-1.cfg"},
 
 	{"_____________________________________________": ""},
 	{" ": ""},
@@ -128,12 +135,6 @@ actionDict2 = [
 	{"Java - DotGridTiles": "/Users/lamshell/Documents/Dev/RPI/altproduction/DotGridTiles.app"},
 	{"Java - Afer Images": "/Users/lamshell/Documents/Dev/RPI/altproduction/concentrics/ConcentricAfterImagesAll.app"},
 
-	{"_____________________________________________": ""},
-	{"SCREEN TEST ": "screens/test-448x320.cfg"},
-	{"SCREEN TEST @x=100 y=100": "screens/test-448x320b.cfg"},
-	{"SCREEN TEST P8": "screens/p8-448x320b.cfg"},
-	{"SCREEN TEST P10": "screens/p10-192x128.cfg"},
-	{"Police Line P8 ": "p10-line/p8-static-1.cfg"},
 
 
 	{" " :''},
@@ -383,6 +384,7 @@ def action2():
 	a = verify()
 	if a[0] == True:
 		os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+		os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
 
 		if JavaAppRunning != '' :
 			os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")

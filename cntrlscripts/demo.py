@@ -3,7 +3,9 @@ import subprocess
 import sys
 import tkinter as tk
 from tkinter import *
+import tkmacosx
 from tkmacosx import Button
+#from tk import Button
 
 
 commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "

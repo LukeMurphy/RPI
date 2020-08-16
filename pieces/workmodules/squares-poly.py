@@ -42,6 +42,9 @@ def restartPiece(config):
 	config.t1 = time.time()
 	config.t2 = time.time()
 
+
+	'''
+
 	## The top / base diamond / square
 	c1Range = round(random.uniform(0, 120))
 	config.c1HueRange = (c1Range, c1Range + 240)
@@ -60,6 +63,8 @@ def restartPiece(config):
 	config.c3HueRange = config.c2HueRange
 	config.c3SaturationRange = randomRange(0.4, 0.999)
 	config.c3ValueRange = randomRange(0.5, 1)
+
+	'''
 
 	config.fillColorSet = []
 	config.fillColorSet.append(

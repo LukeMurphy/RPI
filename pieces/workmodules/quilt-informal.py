@@ -278,10 +278,12 @@ def main(config, workConfig, run=True):
 	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))
 	# config.timeToComplete = 60 #round(random.uniform(30,220))
 
+
 	# createPieces()
 	drawSqareSpiral(config)
 
 	# if(run) : runWork()
+
 
 
 def restartPiece(config):
@@ -296,6 +298,10 @@ def restartPiece(config):
 	config.opticalPattern = config.opticalPatterns[p]
 
 	drawSqareSpiral(config)
+
+	config.canvasOffsetX = round(random.uniform(-config.canvasOffsetX_init,config.canvasOffsetX_init))
+	config.canvasOffsetY = round(random.uniform(-config.canvasOffsetY_init,config.canvasOffsetY_init))
+	config.canvasRotation = random.uniform(-config.canvasRotation_init,config.canvasRotation_init)
 
 
 def drawSqareSpiral(config):

@@ -103,9 +103,16 @@ def loadFromArguments(masterConfig, reloading=False):
 		workObject.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
 		workObject.renderer.config = workObject.config
 		workObject.renderer.setUp()
+
 		workObject.renderer.config.canvasOffsetX = canvasOffsetX
 		workObject.renderer.config.canvasOffsetY = canvasOffsetY
 		workObject.renderer.config.canvasRotation = canvasRotation
+
+		workObject.renderer.config.canvasOffsetX_init = canvasOffsetX
+		workObject.renderer.config.canvasOffsetY_init = canvasOffsetY
+		workObject.renderer.config.canvasRotation_init = canvasRotation
+
+
 		workObject.config.render = workObject.renderer.render
 
 		workWindow.players.append(workObject)
@@ -151,6 +158,11 @@ def runWindow(workWindow):
 				workWindow.masterConfig.reloadConfig = False
 
 		for work in workWindow.players:
+
+			#if random.random() <.1 :
+				#work.renderer.config.canvasOffsetX = canvasOffsetX
+				#work.renderer.config.canvasOffsetY = canvasOffsetY
+				#work.renderer.config.canvasRotation = random.uniform(-work.config.canvasRotation,work.config.canvasRotation)
 
 			if work.config.checkForConfigChanges == True:
 				work.currentTime = time.time()

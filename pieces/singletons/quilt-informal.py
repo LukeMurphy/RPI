@@ -297,7 +297,7 @@ def restartPiece():
 
 	config.opticalPattern = config.opticalPatterns[p]
 
-	print(config.opticalPattern)
+	#print(config.opticalPattern)
 
 	drawSqareSpiral()
 

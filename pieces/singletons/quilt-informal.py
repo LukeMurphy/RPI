@@ -265,7 +265,8 @@ def main(run=True):
 	config.polyDistortionMin = -config.polyDistortion
 	config.polyDistortionMax = config.polyDistortion
 
-	config.opticalPatterns = ["Regular", "LighteningStrike", "Diagonals"]
+	# stacking the decks a bit in favor of vertical lightening strike and regular
+	config.opticalPatterns = ["Regular" , "Regular", "LighteningStrikeH", "LighteningStrikeH", "Diagonals", "LighteningStrikeH"]
 	# "LighteningStrikeH"  aka Charlie Brown sweater ...
 
 	# for now, all squares
@@ -295,6 +296,8 @@ def restartPiece():
 	p = math.floor(random.uniform(0, len(config.opticalPatterns)))
 
 	config.opticalPattern = config.opticalPatterns[p]
+
+	print(config.opticalPattern)
 
 	drawSqareSpiral()
 

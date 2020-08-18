@@ -299,9 +299,10 @@ def restartPiece(config):
 
 	drawSqareSpiral(config)
 
-	config.canvasOffsetX = round(random.uniform(-config.canvasOffsetX_init,config.canvasOffsetX_init))
-	config.canvasOffsetY = round(random.uniform(-config.canvasOffsetY_init,config.canvasOffsetY_init))
-	config.canvasRotation = random.uniform(-config.canvasRotation_init,config.canvasRotation_init)
+	if config.rangeChange :
+		config.canvasOffsetX = round(random.uniform(-config.canvasOffsetX_init,config.canvasOffsetX_init))
+		config.canvasOffsetY = round(random.uniform(-config.canvasOffsetY_init,config.canvasOffsetY_init))
+		config.canvasRotation = random.uniform(-config.canvasRotation_init,config.canvasRotation_init)
 
 
 def drawSqareSpiral(config):

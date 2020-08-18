@@ -104,14 +104,27 @@ def loadFromArguments(masterConfig, reloading=False):
 		workObject.renderer.config = workObject.config
 		workObject.renderer.setUp()
 
-		workObject.renderer.config.canvasOffsetX = canvasOffsetX
-		workObject.renderer.config.canvasOffsetY = canvasOffsetY
-		workObject.renderer.config.canvasRotation = canvasRotation
+		try:
+			randomChange =	masterConfig.workConfigParser.getboolean(workDetails, "randomChange")
+		except Exception as e:
+			print(str(e))
+			randomChange = True
+
+		workObject.renderer.config.randomChange = randomChange
+
+
+		if randomChange == False :
+			workObject.renderer.config.canvasOffsetX = canvasOffsetX
+			workObject.renderer.config.canvasOffsetY = canvasOffsetY
+			workObject.renderer.config.canvasRotation = canvasRotation
+		else :
+			workObject.renderer.config.canvasOffsetX = 0
+			workObject.renderer.config.canvasOffsetY = 0
+			workObject.renderer.config.canvasRotation = 0
 
 		workObject.renderer.config.canvasOffsetX_init = canvasOffsetX
 		workObject.renderer.config.canvasOffsetY_init = canvasOffsetY
 		workObject.renderer.config.canvasRotation_init = canvasRotation
-
 
 		workObject.config.render = workObject.renderer.render
 

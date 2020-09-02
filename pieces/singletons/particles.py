@@ -251,10 +251,14 @@ def main(run=True):
 	try:
 		config.filterRemapping = (workConfig.getboolean("particleSystem", "filterRemapping"))
 		config.filterRemappingProb = float(workConfig.get("particleSystem", "filterRemappingProb"))
+		config.filterRemapminHoriSize = int(workConfig.get("particleSystem", "filterRemapminHoriSize"))
+		config.filterRemapminVertSize = int(workConfig.get("particleSystem", "filterRemapminVertSize"))
 	except Exception as e:
 		print(str(e))
 		config.filterRemapping = False
 		config.filterRemappingProb = 0.0
+		config.filterRemapminHoriSize = 24
+		config.filterRemapminVertSize = 24
 
 	"""
 	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
@@ -639,10 +643,11 @@ def iterate():
 	if random.random() < config.filterRemappingProb:
 		if config.useFilters == True and config.filterRemapping == True:
 			config.filterRemap = True
-			startX = round(random.uniform(0,config.canvasWidth) )
-			startY = round(random.uniform(0,config.canvasHeight) )
-			endX = round(random.uniform(startX+20,config.canvasWidth) )
-			endY = round(random.uniform(startY+20,config.canvasHeight) )
+
+			startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
+			startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
+			endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
+			endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
 			config.remapImageBlockSection = [startX,startY,endX,endY]
 			config.remapImageBlockDestination = [startX,startY]
 

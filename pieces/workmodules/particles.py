@@ -600,6 +600,7 @@ def iterate(config):
 		for p in ps.unitArray:
 			p.remove = True
 
+
 	if random.random() < 0.0005 and ps.changeCohesion == True:
 		ps.cohesionDistance = random.uniform(14, 30)
 		# print(ps.cohesionDistance)

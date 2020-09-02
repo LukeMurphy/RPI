@@ -248,6 +248,12 @@ def main(run=True):
 		print(str(e))
 		config.restartProb = 0
 
+	try:
+		config.filterRemapping = (workConfig.getboolean("particleSystem", "filterRemapping"))
+	except Exception as e:
+		print(str(e))
+		config.filterRemapping = False
+
 	"""
 	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
 	Because colors are more interesting against gray, because everything goes gray
@@ -623,6 +629,23 @@ def iterate():
 			p.remove = True
 		config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
 		config.renderImageFull.paste(config.image)
+
+		# This was added for the stair steps fire line
+		# to move the dithered sparkle around a bit to 
+		# disturb the eveness of things ..
+
+		if config.useFilters == True and config.filterRemapping == True:
+
+			config.filterRemap = True
+			
+			startX = round(random.uniform(0,config.canvasWidth) )
+			startY = round(random.uniform(0,config.canvasHeight) )
+
+			endX = round(random.uniform(startX+20,config.canvasWidth) )
+			endY = round(random.uniform(startY+20,config.canvasHeight) )
+			config.remapImageBlockSection = [startX,startY,endX,endY]
+			config.remapImageBlockDestination = [startX,startY]
+
 
 	if random.random() < 0.0005 and ps.changeCohesion == True:
 		ps.cohesionDistance = random.uniform(14, 30)

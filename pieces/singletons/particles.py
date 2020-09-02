@@ -250,9 +250,11 @@ def main(run=True):
 
 	try:
 		config.filterRemapping = (workConfig.getboolean("particleSystem", "filterRemapping"))
+		config.filterRemappingProb = float(workConfig.get("particleSystem", "filterRemappingProb"))
 	except Exception as e:
 		print(str(e))
 		config.filterRemapping = False
+		config.filterRemappingProb = 0.0
 
 	"""
 	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
@@ -630,17 +632,15 @@ def iterate():
 		config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
 		config.renderImageFull.paste(config.image)
 
-		# This was added for the stair steps fire line
-		# to move the dithered sparkle around a bit to 
-		# disturb the eveness of things ..
+	# This was added for the stair steps fire line
+	# to move the dithered sparkle around a bit to 
+	# disturb the eveness of things ..
 
+	if random.random() < config.filterRemappingProb:
 		if config.useFilters == True and config.filterRemapping == True:
-
 			config.filterRemap = True
-			
 			startX = round(random.uniform(0,config.canvasWidth) )
 			startY = round(random.uniform(0,config.canvasHeight) )
-
 			endX = round(random.uniform(startX+20,config.canvasWidth) )
 			endY = round(random.uniform(startY+20,config.canvasHeight) )
 			config.remapImageBlockSection = [startX,startY,endX,endY]

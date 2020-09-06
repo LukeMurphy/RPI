@@ -89,6 +89,7 @@ class Particle(object):
 
 	def setUpParticle(self):
 
+
 		rndSize = random.uniform(self.ps.rndSizeFactorMin, self.ps.rndSizeFactorMax)
 
 		self.objWidth = round(self.objWidth * rndSize)

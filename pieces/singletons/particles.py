@@ -373,6 +373,7 @@ def emitParticle(i=None):
 	p.direction = random.uniform(
 		math.pi + math.pi / 2 - config.variance, math.pi + math.pi / 2 + config.variance
 	)
+	
 	p.v = random.uniform(ps.speedMin, ps.speedMax)
 	p.xWind = config.xWind
 
@@ -601,7 +602,7 @@ def iterate():
 
 	## Fade trails or not...
 	config.draw.rectangle(
-		(0, 0, config.screenWidth - 1, config.screenHeight - 1),
+		(0, 0, config.canvasWidth - 1, config.canvasHeight - 1),
 		fill=config.bgColor,
 		outline=None,
 	)

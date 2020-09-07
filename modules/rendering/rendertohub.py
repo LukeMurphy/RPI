@@ -347,6 +347,11 @@ def render(
 		crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
 		config.renderImageFull.paste(crop, destination, crop)
 
+
+
+	if config.renderDiagnostics == True : config.renderDiagnosticsCall()
+
+
 	try:
 		if config.useLastOverlay == True:
 			config.renderDrawOver.rectangle(

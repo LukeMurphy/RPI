@@ -103,6 +103,14 @@ def main(run=True):
 		ps.loadedImage.load()
 		ps.loadedImageCopy = ps.loadedImage.copy()
 
+
+	try:
+		config.renderDiagnostics = (workConfig.getboolean("particleSystem", "renderDiagnostics"))
+		config.renderDiagnosticsCall = renderDiagnosticsCall
+	except Exception as e:
+		print(str(e))
+		config.renderDiagnostics = False
+
 	try:
 		config.delay = float(workConfig.get("particleSystem", "delay"))
 	except Exception as e:
@@ -310,6 +318,8 @@ def main(run=True):
 		print(str(e))
 		ps.rndSizeFactorMin = .5
 		ps.rndSizeFactorMax = 1.5
+
+
 
 	config.fillColorVals = (workConfig.get("particleSystem", "fillColor")).split(",")
 	config.fillColor = tuple(
@@ -708,6 +718,31 @@ def iterate():
 
 	config.render(config.image, 0, 0)
 
+
+def renderDiagnosticsCall() :
+	config.renderImageFullOverlay = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+	
+	config.lastOverlayBox1 = (0,0,192,128)
+	config.lastOverlayBox2 = (0,128,192,256)
+	config.lastOverlayBox3 = (192,0,384,128)
+	config.lastOverlayBox4 = (192,128,384,256)
+
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox1, fill=(255,0,0,0), outline=(255,255,0,255)
+	)
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox2, fill=(255,0,0,0), outline=(255,255,0,255)
+	)
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox3, fill=(255,0,0,0), outline=(255,255,0,255)
+	)
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox4, fill=(255,0,0,0), outline=(255,255,0,255)
+	)
+	config.renderImageFull.paste(
+		config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
+	)
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

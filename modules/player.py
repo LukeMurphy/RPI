@@ -432,6 +432,12 @@ def renderUsingLINSNHub(work):
 		work.config.isRPI = False
 		print(str(e))
 
+	try:
+		work.config.renderDiagnostics = work.workConfig.getboolean("displayconfig", "renderDiagnostics")
+	except Exception as e:
+		work.config.renderDiagnostics = False
+		print(str(e))
+
 	if work.config.isRPI == True:
 		from cntrlscripts import stest
 

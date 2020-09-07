@@ -389,10 +389,39 @@ def main(run=True):
 		obj.objWidthMin = 3
 		config.unitArray.append(obj)
 
+	config.renderDiagnosticsCall = renderDiagnosticsCall
+
 	setUp()
 
 	if run:
 		runWork()
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+def renderDiagnosticsCall() :
+	config.renderImageFullOverlay = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+	
+	config.lastOverlayBox1 = (64,0,256,128)
+	config.lastOverlayBox3 = (256,0,448,128)
+	config.lastOverlayBox2 = (64,128,256,256)
+	config.lastOverlayBox4 = (256,128,448,256)
+
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox1, fill=(255,0,0,100), outline=(255,255,0,255)
+	)
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox2, fill=(255,0,0,100), outline=(255,255,0,255)
+	)
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox3, fill=(255,0,0,100), outline=(255,255,0,255)
+	)
+	config.renderDrawOver.rectangle(
+		config.lastOverlayBox4, fill=(255,0,0,100), outline=(255,255,0,255)
+	)
+	config.renderImageFull.paste(
+		config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
+	)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

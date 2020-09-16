@@ -17,44 +17,40 @@ JavaAppRunning = ""
 actionDict1 = [
 
 
-	{"_____________________________________________": ""},
 	{" ": ""},
 
-	{"--- Small Unsettled Abstraction --------": "p4-1x4-cube/panel-test.cfg"},
 	
-
 	{" ": ""},
-	{"--- ** Police Line 1 --------": "p10-line/static-1.cfg"},
 	#{"--- Police Line 2 --------": "p10-line/flow-1.cfg"},
 	#{"--- Police Line 3 --------": "p10-line/flow-2.cfg"},
-
-
 	{" ": ""},
-	{"--- Line with Prop --------": "p4-1x4-cube/diagnostics-single-line.cfg"},
 	{"Who Level Now? ": ""},
 	{"These shards I have shorn against my ruins": ""},
-	{"New Fludd -  --------": "p4-2x4/fludd.cfg"},
+	{"_____________________________________________": ""},
+	{" ": ""},
+	
+	{">>> New Fludd": "p4-2x4/fludd.cfg"},
+	{">>> Ladder - Interchange (Java)": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
 
 	#{" ": ""},
 	#{"--- Right wall panels: Bridge - Inset": "p4-4x3-panel/composition-panel.cfg"},
 	
 	{" ": ""},
-	{"--- Ladder - Interchange (Java)": "/Users/lamshell/Dropbox/Dev/Processing/production/Player/application.macosx/Player.app"},
 
-	{" ": ""},
-	{"_____________________________________________": ""},
-	{"_____________________________________________": ""},
-	{" ": ""},
-	{"--- Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},
-	{"--- Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
+
 	#{"--- WALKING ": "p4-3x8-informal/img-hub3-walk.cfg"},
 	#{"--- CLOUDS ": "p4-3x8-informal/img-hub3-clouds.cfg"},
 
 	{"_____________________________________________": ""},
 	{" ": ""},
-	{"--- Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
-	{"--- Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
-	
+	{">>> Small Unsettled Abstraction ": "p4-1x4-cube/panel-test.cfg"},
+	{">>> Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
+	{">>> Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
+	{">>> Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},	
+	{" ": ""},
+	{">>> Line with Prop ": "p4-1x4-cube/diagnostics-single-line.cfg"},
+	{">>> Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},
+	{">>> Police Line 1 ": "p10-line/static-1.cfg"},
 
 	{" ": ""},
 	{"_____________________________________________": ""},

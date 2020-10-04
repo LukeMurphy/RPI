@@ -62,7 +62,7 @@ class LeafFactory():
 			leaf.blockWidth = 256
 			leaf.blockHeight = 256
 			leaf.radians =  arc * i
-			leaf.scaleMax = self.scale
+			#leaf.scaleMax = self.scale
 			leaf.scale = self.scale
 
 			self.leafArray.append(leaf)
@@ -93,8 +93,11 @@ class Leaf():
 
 		self.angle = 0
 		self.unit = 0
-		self.scaleMax = 1.0
-		self.scalespeed = .05
+		self.scaleMax = random.uniform(.1,.8)
+		self.scalespeed = random.uniform(.001,.02)
+
+		self.rotation = 0
+		self.rotationSpeed = 4 - random.random() * 8
 
 
 
@@ -145,7 +148,7 @@ class Leaf():
 
 		self.getFromBaseImage()
 
-		self.tx = self.radius * math.cos(self.radians) 
+		self.tx = self.radius * math.cos(self.radians)
 		self.ty = self.radius * math.sin(self.radians) 
 
 
@@ -153,6 +156,8 @@ class Leaf():
 		self.loc_y = round(self.ty + self.origin[1] - self.blockHeight * self.scale/2)
 
 		self.speed = 1 + random.random() * 1
+
+	
 
 		
 		#self.section = self.config.elementArray[i].rotate(math.pi * 180 * random.random())
@@ -172,6 +177,8 @@ class Leaf():
 		self.loc_x = round(self.tx + self.origin[0] - self.blockWidth * self.scale/2)
 		self.loc_y = round(self.ty + self.origin[1] - self.blockHeight * self.scale/2)
 
+		self.rotation += self.rotationSpeed
+
 		if (self.loc_x < 0 - self.blockWidth * self.scale/2 or 
 			self.loc_x > self.config.canvasImageWidth +self.blockWidth * self.scale/2 or 
 			self.loc_y < 0  -self.blockHeight * self.scale/2 or 
@@ -183,6 +190,7 @@ class Leaf():
 
 	def render(self):
 		tempUnit = self.imageElement.resize((round(self.blockWidth * self.scale), round(self.blockHeight * self.scale)))
+		tempUnit =tempUnit.rotate(self.rotation)
 		self.config.canvasImage.paste(tempUnit, (self.loc_x, self.loc_y ), tempUnit)
 
 
@@ -300,7 +308,7 @@ def iterate():
 	global config
 
 
-	config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(2,200,10,100))
+	config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(200,2,100,100))
 	for i in range(0, len(config.Trunk.brandchArray)):
 		branch = config.Trunk.brandchArray[i]
 		branch.render()

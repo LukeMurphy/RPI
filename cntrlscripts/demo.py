@@ -47,6 +47,7 @@ actionDict1 = [
 	{">>> Inset frame: small p3": "staging/p3-inset-compositions.cfg"},
 	{">>> Inset frame oblong p4": "staging/p4-inset-compositions-2.cfg"},
 	{">>> Left wall: Door Insert --------": "p4-4x3-panel/composition-door.cfg"},	
+	{">>> Left wall: Door Insert door-inset-i-tau --------": "p4-3x8/door-inset-i-tau.cfg"},	
 	{" ": ""},
 	{">>> Line with Prop ": "p4-1x4-cube/diagnostics-single-line.cfg"},
 	{">>> Two poles - Rural Lights": "p4-3x8-informal/mono-flavin.cfg"},

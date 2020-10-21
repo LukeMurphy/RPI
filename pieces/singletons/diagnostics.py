@@ -452,6 +452,11 @@ def runWork():
 
 def iterate():
 
+	if config.screenPositionX != config.cnvs.winfo_rootx() or config.screenPositionY != config.cnvs.winfo_rooty()-22 :
+		print(config.cnvs.winfo_rootx(), config.cnvs.winfo_rooty()-22)
+		config.screenPositionX = config.cnvs.winfo_rootx()
+		config.screenPositionY = config.cnvs.winfo_rooty()-22
+
 	if config.colorPalette == True:
 		drawPalette()
 	else:

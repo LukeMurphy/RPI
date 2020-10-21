@@ -59,6 +59,9 @@ def setUp():
 	x = windowOffset[0]
 	y = windowOffset[1]
 
+	config.screenPositionX = x
+	config.screenPositionY = y
+
 	root.overrideredirect(False)
 	root.geometry("%dx%d+%d+%d" % (w, h, x, y))
 	# root.protocol("WM_DELETE_WINDOW", on_closing)
@@ -103,6 +106,8 @@ def setUp():
 	# config.cnvs.update_idletasks()
 
 	config.torqueAngle = 0
+
+
 
 	root.after(100, startWork)
 	root.call("wm", "attributes", ".", "-topmost", "1")
@@ -165,6 +170,10 @@ def updateCanvas():
 		tag="main",
 	)
 	config.cnvs.update()
+
+
+
+	
 
 	"""
 	config.cnvs2.delete("main")

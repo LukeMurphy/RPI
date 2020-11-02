@@ -446,7 +446,7 @@ def colorSeeds():
 	):
 		num = round(random.uniform(1, 10))
 
-		if random.random() < 0.002:
+		if random.random() < 0.02:
 			config.yPosRangeMin = round(random.uniform(0, config.canvasImageHeight))
 			config.yPosRangeMax = round(
 				random.uniform(config.yPosRangeMin, config.canvasImageHeight)

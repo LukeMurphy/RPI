@@ -296,6 +296,7 @@ def configure(config, workconfig):
 		config.forceBGSwap = False
 		print(str(e))	
 
+
 	config.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
 	config.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
 	# config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
@@ -445,6 +446,20 @@ def renderUsingLINSNHub(work):
 		threads.append(thrd)
 		thrd.start()
 
+
+	try:
+		work.config.filterRemapping = (work.workConfig.getboolean("displayconfig", "filterRemapping"))
+		work.config.filterRemappingProb = float(work.workConfig.get("displayconfig", "filterRemappingProb"))
+		work.config.filterRemapminHoriSize = int(work.workConfig.get("displayconfig", "filterRemapminHoriSize"))
+		work.config.filterRemapminVertSize = int(work.workConfig.get("displayconfig", "filterRemapminVertSize"))
+	except Exception as e:
+		print(str(e))
+		work.config.filterRemapping = False
+		work.config.filterRemappingProb = 0.0
+		work.config.filterRemapminHoriSize = 24
+		work.config.filterRemapminVertSize = 24
+
+		
 	# Create the image-canvas for the work
 	# Because rotation is an option, recreate accordingly
 	# And to be sure, make the renderImageFull bigger than necessary -

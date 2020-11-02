@@ -72,8 +72,8 @@ actionDict1 = [
 
 	#{"_____________________________________________": ""},
 	#{" ": ""},
-	#{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
-	#{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
+	{"--- Upset Cube  - GlitchBox": "p4-4x4/cube-screenproject.cfg"},
+	{"--- Upset Cube - Box Lights": "p4-4x4/dot-grid-4x6.cfg"},
 	#{" ": ""},
 
 	#{"_____________________________________________": ""},

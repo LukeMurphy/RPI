@@ -1,4 +1,5 @@
 import os
+import datetime
 import subprocess
 import sys
 import tkinter as tk
@@ -16,6 +17,7 @@ JavaAppRunning = ""
 
 actionDict1 = [
 	#{"--- Police Line 2 --------": "p10-line/flow-1.cfg"},
+	{"SCREEN TEST ": "screens/test-448x320.cfg"},
 ]
 
 actionDict2 = [
@@ -85,27 +87,64 @@ from os import listdir
 from os.path import isfile, join
 from os import walk
 
-configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
-arr = os.listdir(configPath)
-arr.sort()
-for d in arr :
-	if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
-		subArr = os.listdir(configPath + d)
-		subArr.sort()
+def returnSecondElement(l):
+	return l[1]
 
-		for f in subArr:
-			if f.find(".DS_Store") == -1:
-				shortPath = d + "/" + f
-				actionDict1.append({ shortPath  : shortPath})
-		actionDict1.append({ ""  : ""})
+
+def getAllConfigFiles() :
+	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
+	arr = os.listdir(configPath)
+	arr.sort()
+	for d in arr :
+		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
+			subArr = os.listdir(configPath + d)
+			subArr.sort()
+
+			for f in subArr:
+				if f.find(".DS_Store") == -1:
+					shortPath = d + "/" + f
+					actionDict1.append({ shortPath  : shortPath})
+					print(os.stat(configPath + shortPath))
+			actionDict1.append({ ""  : ""})
+
+def getAllConfigFilesByDateModified() :
+	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
+	arr = os.listdir(configPath)
+	fullList = []
+	for d in arr :
+		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
+			subArr = os.listdir(configPath + d)
+			for f in subArr:
+				if f.find(".DS_Store") == -1:
+					shortPath = d + "/" + f
+					res = os.stat(configPath + shortPath)
+					fullList.append((shortPath,res.st_mtime))
+
+
+
+
+	fullList.sort(key=returnSecondElement, reverse=True)
+	for f in fullList :
+		tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
+		actionDict1.append({ ""  : ""})	
+		actionDict1.append({ f[0] + " " +tsTxt  : f[0]})
+
+
+
+
+	#actionDict1.append({ shortPath  : shortPath})
+
+
+
+getAllConfigFilesByDateModified()
 
 root = tk.Tk()
 #frame = tk.Frame(root, bg="darkgray")
 #frame.pack(padx=1, pady=1)
 # width x height x X x Y
-root.geometry("%dx%d+%d+%d" % (420, 740, 1200, 100))
+root.geometry("%dx%d+%d+%d" % (480, 740, 1200, 100))
 
-Lb1 = Listbox(root, width=43, height=42)
+Lb1 = Listbox(root, width=50, height=42)
 
 
 for i, item in enumerate(actionDict1):
@@ -123,7 +162,7 @@ Lb1.config(yscrollcommand = scrollbar.set)
 scrollbar.config(command = Lb1.yview) 
 
 topBtnPlace = 400
-leftBtnPlace = 280
+leftBtnPlace = 340
 
 slogan = Button(
 	root, text="Stop & Run", width = 120, bg='blue', fg='white', borderless=1, command=action2

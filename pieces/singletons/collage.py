@@ -272,7 +272,7 @@ def redraw():
 			badpixels.setBlanksOnScreen()
 
 	if random.random() < config.filterPatchProb:
-		print("should be remapping")
+		#print("should be remapping")
 		x1 = round(random.uniform(0,config.canvasWidth))
 		x2 = round(random.uniform(x1,config.canvasWidth))
 		y1 = round(random.uniform(0,config.canvasHeight))
@@ -283,8 +283,8 @@ def redraw():
 		config.remapImageBlockDestination = (x1, y1)
 
 	# Don't want the patch to always be there - just little interruptions
-	if random.random() < config.filterPatchProb * 3.0 and config.filterPatchProb > 0.0 :
-		print("turning off remapping")
+	if random.random() < config.filterPatchProb * 1.0 and config.filterPatchProb > 0.0 :
+		#print("turning off remapping")
 		x1 = 0
 		x2 = 0
 		y1 = 0

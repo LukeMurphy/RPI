@@ -27,6 +27,7 @@ actionDict2 = [
 
 def verify():
 	# print("==>",Lb.curselection())
+	global actionDict1
 	process = False
 	configSelected = None
 	if len(list(Lb1.curselection())) > 0:
@@ -81,6 +82,17 @@ def stopAll():
 	os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 
 
+def reSort():
+	global sortDefault
+	if sortDefault == 0 :
+		sortDefault = 1
+		getAllConfigFiles()
+	else :
+		sortDefault = 0
+		getAllConfigFilesByDateModified()
+
+
+
 
 # Generate list of configs:
 from os import listdir
@@ -92,9 +104,11 @@ def returnSecondElement(l):
 
 
 def getAllConfigFiles() :
+	global actionDict1, Lb1
 	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
 	arr = os.listdir(configPath)
 	arr.sort()
+	actionDict1 = []
 	for d in arr :
 		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
 			subArr = os.listdir(configPath + d)
@@ -104,13 +118,20 @@ def getAllConfigFiles() :
 				if f.find(".DS_Store") == -1:
 					shortPath = d + "/" + f
 					actionDict1.append({ shortPath  : shortPath})
-					print(os.stat(configPath + shortPath))
+					#print(os.stat(configPath + shortPath))
 			actionDict1.append({ ""  : ""})
 
+	Lb1.delete(0,END)
+	for i, item in enumerate(actionDict1):
+		Lb1.insert(END, " " + list(item.keys())[0])
+
+
 def getAllConfigFilesByDateModified() :
+	global actionDict1, Lb1
 	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
 	arr = os.listdir(configPath)
 	fullList = []
+	actionDict1 = []
 	for d in arr :
 		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
 			subArr = os.listdir(configPath + d)
@@ -122,21 +143,21 @@ def getAllConfigFilesByDateModified() :
 
 
 
-
 	fullList.sort(key=returnSecondElement, reverse=True)
 	for f in fullList :
 		tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
-		actionDict1.append({ ""  : ""})	
+		#actionDict1.append({ ""  : ""})	
 		actionDict1.append({ f[0] + " " +tsTxt  : f[0]})
 
 
+	Lb1.delete(0,END)
+	for i, item in enumerate(actionDict1):
+		Lb1.insert(END, " " + list(item.keys())[0])
 
 
 	#actionDict1.append({ shortPath  : shortPath})
 
 
-
-getAllConfigFilesByDateModified()
 
 root = tk.Tk()
 #frame = tk.Frame(root, bg="darkgray")
@@ -164,6 +185,8 @@ scrollbar.config(command = Lb1.yview)
 topBtnPlace = 400
 leftBtnPlace = 340
 
+sortDefault = 0
+
 slogan = Button(
 	root, text="Stop & Run", width = 120, bg='blue', fg='white', borderless=1, command=action2
 )
@@ -184,7 +207,13 @@ quitbutton = Button(
 )
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+75)
 
+sortbutton = Button(
+	root, text="Re-Sort", width = 120, bg='blue', fg='white', borderless=1, command=reSort
+)
+sortbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+100)
 
+
+getAllConfigFilesByDateModified()
 
 root.mainloop()
 

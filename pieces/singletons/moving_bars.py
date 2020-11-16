@@ -58,7 +58,7 @@ class Bar:
 		self.barThickness = round(random.uniform(config.barThicknessMin, config.barThicknessMax))
 		#self.colorVal = colorutils.randomColorAlpha()
 		cset = config.colorSets[config.usingColorSet]
-		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5] )
+		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0,config.colorAlpha )
 
 
 
@@ -99,16 +99,33 @@ def iterate():
 		bar = config.barArray[i]
 		bar.xPos += bar.speed1
 		bar.yPos += bar.speed2
-		config.draw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
+
+		w = round(math.sqrt(2) * config.barThicknessMax * 1.5)
+
+		angle = 180/math.pi * math.tan(bar.speed2/bar.speed1)
+
+		temp = Image.new("RGBA", (w, w))
+		drw = ImageDraw.Draw(temp)
+		#drw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
+		drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal)
+		drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
+		temp = temp.rotate(45 - angle)
+
+		config.image.paste(temp,(round(bar.xPos), round(bar.yPos)), temp)
 
 		if bar.xPos > config.canvasWidth :
 			bar.remake()
 
 
+	#if random.random() < .003 :
+	#	config.dropHueMax = 255 if config.dropHueMax == 0 else 255
+
 	if random.random() < .003 :
 		config.usingColorSet = math.floor(random.uniform(0,4))
 		# just in case ....
 		if config.usingColorSet == 4 : config.usingColorSet = 3
+
+		config.colorAlpha = round(random.uniform(100,240))
 
 	config.render(config.image, 0,0)
 
@@ -125,6 +142,8 @@ def main(run=True):
 	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
 	config.xPos = 0
+	config.dropHueMax = 0
+	config.colorAlpha = 255
 
 	config.numberOfBars =  int(workConfig.get("bars", "numberOfBars"))
 	config.barThicknessMin =  int(workConfig.get("bars", "barThicknessMin"))

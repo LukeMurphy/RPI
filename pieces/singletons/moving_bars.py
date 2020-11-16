@@ -51,12 +51,14 @@ class Bar:
 
 
 	def remake(self) :
-		self.speed = random.uniform(.5,3)
-		self.speed2 = random.uniform(-.15,.15)
+		self.speed1 = random.uniform(config.speed1RangeMin, config.speed1RangeMax)
+		self.speed2 = random.uniform(config.speed2RangeMin, config.speed2RangeMax)
 		self.yPos = round(random.uniform(0,96))
 		self.xPos = 0
-		self.barThickness = round(random.uniform(5,16))
-		self.colorVal = colorutils.randomColorAlpha()
+		self.barThickness = round(random.uniform(config.barThicknessMin, config.barThicknessMax))
+		#self.colorVal = colorutils.randomColorAlpha()
+		cset = config.colorSets[config.usingColorSet]
+		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5] )
 
 
 
@@ -95,16 +97,21 @@ def iterate():
 
 	for i in range(0, config.numberOfBars):
 		bar = config.barArray[i]
-		bar.xPos += bar.speed
+		bar.xPos += bar.speed1
 		bar.yPos += bar.speed2
-		config.draw.rectangle((bar.xPos-2, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
+		config.draw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
 
 		if bar.xPos > config.canvasWidth :
 			bar.remake()
 
 
+	if random.random() < .003 :
+		config.usingColorSet = math.floor(random.uniform(0,4))
+		# just in case ....
+		if config.usingColorSet == 4 : config.usingColorSet = 3
 
 	config.render(config.image, 0,0)
+
 
 
 
@@ -119,15 +126,34 @@ def main(run=True):
 
 	config.xPos = 0
 
-	config.numberOfBars = 20
+	config.numberOfBars =  int(workConfig.get("bars", "numberOfBars"))
+	config.barThicknessMin =  int(workConfig.get("bars", "barThicknessMin"))
+	config.barThicknessMax =  int(workConfig.get("bars", "barThicknessMax"))
+	config.speed1RangeMin =  float(workConfig.get("bars", "speed1RangeMin"))
+	config.speed1RangeMax =  float(workConfig.get("bars", "speed1RangeMax"))
+	config.speed2RangeMin =  float(workConfig.get("bars", "speed2RangeMin"))
+	config.speed2RangeMax =  float(workConfig.get("bars", "speed2RangeMax"))
 	yPos = 0
 	config.barArray = []
+
+	config.colorSets = []
+	cset1 = (350,50,.5,1,.3,.8)
+	cset2 = (50,180,.5,1,.3,.8)
+	cset3 = (180,270,.5,1,.3,.8)
+	cset4 = (270,350,.5,1,.3,.8)
+	config.colorSets.append(cset1)
+	config.colorSets.append(cset2)
+	config.colorSets.append(cset3)
+	config.colorSets.append(cset4)
+
+	config.usingColorSet = math.floor(random.uniform(0,4))
+	if config.usingColorSet == 4 : config.usingColorSet = 3
+
 	for i in range(0, config.numberOfBars):
 		bar =  Bar()
 		bar.yPos = yPos
 		config.barArray.append(bar)
 		yPos += bar.barThickness
-
 
 
 

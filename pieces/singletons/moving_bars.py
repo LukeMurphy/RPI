@@ -156,10 +156,15 @@ def main(run=True):
 	config.barArray = []
 
 	config.colorSets = []
+	# reds of fall
 	cset1 = (350,50,.5,1,.3,.8)
+	# yellow greens of spring
 	cset2 = (50,180,.5,1,.3,.8)
+	# winter water
 	cset3 = (180,270,.5,1,.3,.8)
+	# psychadelic summer dream 
 	cset4 = (270,350,.5,1,.3,.8)
+
 	config.colorSets.append(cset1)
 	config.colorSets.append(cset2)
 	config.colorSets.append(cset3)

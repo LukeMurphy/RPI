@@ -117,15 +117,21 @@ def iterate():
 			bar.remake()
 
 
-	#if random.random() < .003 :
-	#	config.dropHueMax = 255 if config.dropHueMax == 0 else 255
+	if random.random() < .002 :
+		if config.dropHueMax == 0 :
+			config.dropHueMax = 255
+		else :
+			config.dropHueMax = 0
+		#print("Winter... " + str(config.dropHueMax ))
 
 	if random.random() < .003 :
 		config.usingColorSet = math.floor(random.uniform(0,4))
 		# just in case ....
-		if config.usingColorSet == 4 : config.usingColorSet = 3
-
+		if config.usingColorSet == 4 : 
+			config.usingColorSet = 3
 		config.colorAlpha = round(random.uniform(100,240))
+		config.dropHueMax = 0
+		#print("ColorSet: " + str(config.usingColorSet))
 
 	config.render(config.image, 0,0)
 

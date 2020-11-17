@@ -106,9 +106,17 @@ def iterate():
 
 		temp = Image.new("RGBA", (w, w))
 		drw = ImageDraw.Draw(temp)
+
+		if config.tipType == 1 :
 		#drw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
-		drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal)
-		drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
+			drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal)
+			drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
+		
+		else :
+			drw.ellipse((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
+
+
+
 		temp = temp.rotate(config.tipAngle - angle)
 
 		config.image.paste(temp,(round(bar.xPos), round(bar.yPos)), temp)
@@ -131,6 +139,7 @@ def iterate():
 			config.usingColorSet = 3
 		config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 		config.dropHueMax = 0
+		config.tipType = round(random.random())
 		#print("ColorSet: " + str(config.usingColorSet))
 
 	config.render(config.image, 0,0)
@@ -162,6 +171,8 @@ def main(run=True):
 	config.speed1RangeMax =  float(workConfig.get("bars", "speed1RangeMax"))
 	config.speed2RangeMin =  float(workConfig.get("bars", "speed2RangeMin"))
 	config.speed2RangeMax =  float(workConfig.get("bars", "speed2RangeMax"))
+
+	config.tipType = 1
 	
 	config.colorAlpha = config.leadEdgeAlpahMin
 	yPos = 0

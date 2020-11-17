@@ -109,7 +109,7 @@ def iterate():
 		#drw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
 		drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal)
 		drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
-		temp = temp.rotate(45 - angle)
+		temp = temp.rotate(config.tipAngle - angle)
 
 		config.image.paste(temp,(round(bar.xPos), round(bar.yPos)), temp)
 
@@ -129,7 +129,7 @@ def iterate():
 		# just in case ....
 		if config.usingColorSet == 4 : 
 			config.usingColorSet = 3
-		config.colorAlpha = round(random.uniform(100,240))
+		config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 		config.dropHueMax = 0
 		#print("ColorSet: " + str(config.usingColorSet))
 
@@ -149,15 +149,21 @@ def main(run=True):
 
 	config.xPos = 0
 	config.dropHueMax = 0
-	config.colorAlpha = 255
 
 	config.numberOfBars =  int(workConfig.get("bars", "numberOfBars"))
 	config.barThicknessMin =  int(workConfig.get("bars", "barThicknessMin"))
-	config.barThicknessMax =  int(workConfig.get("bars", "barThicknessMax"))
+	config.barThicknessMax =  int(workConfig.get("bars", "barThicknessMax"))	
+
+	config.leadEdgeAlpahMin =  int(workConfig.get("bars", "leadEdgeAlpahMin"))
+	config.leadEdgeAlpahMax =  int(workConfig.get("bars", "leadEdgeAlpahMax"))
+	config.tipAngle =  float(workConfig.get("bars", "tipAngle"))
+	
 	config.speed1RangeMin =  float(workConfig.get("bars", "speed1RangeMin"))
 	config.speed1RangeMax =  float(workConfig.get("bars", "speed1RangeMax"))
 	config.speed2RangeMin =  float(workConfig.get("bars", "speed2RangeMin"))
 	config.speed2RangeMax =  float(workConfig.get("bars", "speed2RangeMax"))
+	
+	config.colorAlpha = config.leadEdgeAlpahMin
 	yPos = 0
 	config.barArray = []
 

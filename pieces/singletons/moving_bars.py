@@ -179,22 +179,21 @@ def main(run=True):
 	config.barArray = []
 
 	config.colorSets = []
-	# reds of fall
-	cset1 = (350,50,.5,1,.3,.8)
-	# yellow greens of spring
-	cset2 = (50,180,.5,1,.3,.8)
-	# winter water
-	cset3 = (180,270,.5,1,.3,.8)
-	# psychadelic summer dream 
-	cset4 = (270,350,.5,1,.3,.8)
+	
+	config.colorSetList = list(
+		i for i in (workConfig.get("bars", "colorSets").split(","))
+	)
 
-	config.colorSets.append(cset1)
-	config.colorSets.append(cset2)
-	config.colorSets.append(cset3)
-	config.colorSets.append(cset4)
+	config.numberOfColorSets = len(config.colorSetList)
+	for setName in config.colorSetList :
+		cset = list(
+			float(i) for i in (workConfig.get("bars", setName).split(","))
+		)
+		config.colorSets.append(cset)
 
-	config.usingColorSet = math.floor(random.uniform(0,4))
-	if config.usingColorSet == 4 : config.usingColorSet = 3
+
+	config.usingColorSet = math.floor(random.uniform(0,config.numberOfColorSets))
+	if config.usingColorSet == config.numberOfColorSets : config.usingColorSet = config.numberOfColorSets - 1
 
 	for i in range(0, config.numberOfBars):
 		bar =  Bar()

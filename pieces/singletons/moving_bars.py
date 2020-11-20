@@ -58,7 +58,8 @@ class Bar:
 		self.barThickness = round(random.uniform(config.barThicknessMin, config.barThicknessMax))
 		#self.colorVal = colorutils.randomColorAlpha()
 		cset = config.colorSets[config.usingColorSet]
-		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0,config.colorAlpha )
+		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.colorAlpha )
+		self.outlineColorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.outlineColorAlpha )
 
 
 
@@ -76,12 +77,8 @@ def drawBar():
 	global config
 
 
-
-
 def reDraw():
 	global config
-
-
 
 
 def runWork():
@@ -109,12 +106,11 @@ def iterate():
 
 		if config.tipType == 1 :
 		#drw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
-			drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal)
-			drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
+			drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal, outline = bar.outlineColorVal)
+			drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 		
 		else :
-			drw.ellipse((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal)
-
+			drw.ellipse((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 
 
 		temp = temp.rotate(config.tipAngle - angle)
@@ -145,8 +141,6 @@ def iterate():
 	config.render(config.image, 0,0)
 
 
-
-
 def main(run=True):
 	global config
 	config.redrawRate = .02
@@ -175,6 +169,7 @@ def main(run=True):
 	config.tipType = 1
 	
 	config.colorAlpha = config.leadEdgeAlpahMin
+	config.outlineColorAlpha = config.leadEdgeAlpahMin
 	yPos = 0
 	config.barArray = []
 

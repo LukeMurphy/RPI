@@ -133,10 +133,10 @@ def iterate():
 		#print("Winter... " + str(config.dropHueMax ))
 
 	if random.random() < .003 :
-		config.usingColorSet = math.floor(random.uniform(0,4))
+		config.usingColorSet = math.floor(random.uniform(0,config.numberOfColorSets))
 		# just in case ....
-		if config.usingColorSet == 4 : 
-			config.usingColorSet = 3
+		if config.usingColorSet == config.numberOfColorSets : 
+			config.usingColorSet = config.numberOfColorSets-1
 		config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 		config.dropHueMax = 0
 		config.tipType = round(random.random())

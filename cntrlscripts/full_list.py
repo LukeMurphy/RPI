@@ -147,7 +147,7 @@ def getAllConfigFilesByDateModified() :
 	for f in fullList :
 		tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
 		#actionDict1.append({ ""  : ""})	
-		actionDict1.append({ f[0] + " " +tsTxt  : f[0]})
+		actionDict1.append({ "[" + tsTxt  + "]  " + f[0]  : f[0]})
 
 
 	Lb1.delete(0,END)

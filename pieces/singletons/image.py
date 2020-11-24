@@ -71,8 +71,8 @@ def main(run=True):
 
 	config.animateProb = float(workConfig.get("images", "animateProb"))
 	config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
-	config.imageGlitchSize = float(workConfig.get("images", "imageGlitchSize"))
-	config.imageGlitchDisplacement = int(workConfig.get("images", "imageGlitchDisplacement"))
+	config.imageGlitchDisplacementVerical = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
+	config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
 
 
 	## Generate image holders
@@ -191,9 +191,7 @@ def performChanges() :
 	x1, y1 = config.imgLoader.image.size
 
 	if random.random() < config.imageGlitchProb:
-		config.imgLoader.glitchBox(
-			-config.imageGlitchDisplacement, config.imageGlitchDisplacement
-		)
+		config.imgLoader.glitchBox(config.imageGlitchDisplacementHorizontal, config.imageGlitchDisplacementVerical)
 		config.glitchCount += 1
 
 

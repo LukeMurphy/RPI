@@ -388,11 +388,11 @@ class ImageSprite:
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-	def glitchBox(self, r1=-1, r2=1, orientation=1):
+	def glitchBox(self, imageGlitchDisplacementHorizontal=10, imageGlitchDisplacementVertical=10, orientation=1):
 		apparentWidth = self.image.size[0]
 		apparentHeight = self.image.size[1]
-		dy = int(random.uniform(r1, r2))
-		dx = int(random.uniform(r1, r2))
+		dx = round(random.uniform(-imageGlitchDisplacementHorizontal, imageGlitchDisplacementHorizontal))
+		dy = round(random.uniform(-imageGlitchDisplacementVertical, imageGlitchDisplacementVertical))
 		#dx = int(random.uniform(1, self.config.imageGlitchSize))
 		#dx = 0
 
@@ -403,26 +403,28 @@ class ImageSprite:
 			# really doing "vertical" or y-axis glitching
 			# block height is uniform but width is variable
 
-			sectionWidth = int(random.uniform(2, apparentHeight - dx))
-			sectionHeight = apparentHeight
+			sectionWidth = round(random.uniform(2, apparentWidth - dx))
+			#sectionHeight = apparentHeight
+			sectionHeight = round(random.uniform(2, apparentHeight - dy))
 
 			# 95% of the time they dance together as mirrors
 			if random.random() < 0.97:
-				cp1 = self.image.crop((dx, 0, dx + sectionWidth, sectionHeight))
-				self.image.paste(cp1, (int(0 + dx), int(0 + dy)))
+				cp1 = self.image.crop((dx, dy, dx + sectionWidth, dy + sectionHeight))
+				self.image.paste(cp1, (round(0 + dx), round(0 + dy)), cp1)
+				self.image = self.image.rotate(random.uniform(-50,50))
 		else :
 			# HORIZONTAL GLITCH
 			#dy = 0
 					# really doing "vertical" or y-axis glitching
 			# block height is uniform but width is variable
 
-			sectionHeight = int(random.uniform(2, apparentHeight - dy))
+			sectionHeight = round(random.uniform(2, apparentHeight - dy))
 			sectionWidth = apparentWidth
 
 			# 95% of the time they dance together as mirrors
 			if random.random() < 0.97:
 				cp1 = self.image.crop((0, 0, dx + sectionWidth, sectionHeight))
-				self.image.paste(cp1, (int(dx), int(0 + dy)))
+				self.image.paste(cp1, (round(dx), round(0 + dy)))
 
 
 

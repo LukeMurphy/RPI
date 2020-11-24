@@ -67,22 +67,26 @@ def main(run=True):
 	config.overlayxPos = int(workConfig.get("images", "overlayxPos"))
 	config.overlayyPos = int(workConfig.get("images", "overlayyPos"))
 	config.overlayChangeProb = float(workConfig.get("images", "overlayChangeProb"))
-	config.overlayChangePosProb = float(
-		workConfig.get("images", "overlayChangePosProb")
-	)
+	config.overlayChangePosProb = float(workConfig.get("images", "overlayChangePosProb"))
 
 	config.animateProb = float(workConfig.get("images", "animateProb"))
 	config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
 	config.imageGlitchSize = float(workConfig.get("images", "imageGlitchSize"))
-	config.imageGlitchDisplacement = int(
-		workConfig.get("images", "imageGlitchDisplacement")
-	)
+	config.imageGlitchDisplacement = int(workConfig.get("images", "imageGlitchDisplacement"))
 
+
+	## Generate image holders
 	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.workImageDraw = ImageDraw.Draw(config.workImage)
 
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
+	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+
+	config.imageLayer = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
+	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
+
 	## Sets the image size  -- should probably be set to canvasHeight
-	config.channelHeight = 256
+	config.channelHeight = config.canvasHeight
 
 	## New configs
 	config.animateProb = float(workConfig.get("images", "animateProb"))
@@ -119,9 +123,6 @@ def main(run=True):
 
 	config.colorOverlay = (255, 0, 255)
 
-	# for attr, value in config.__dict__.iteritems():print (attr, value)
-	blocks = []
-	# for i in range (0,simulBlocks) : makeBlock()
 
 	path = config.path + "/assets/imgs/"
 	imageList = [config.imageToLoad]
@@ -135,41 +136,25 @@ def main(run=True):
 		bads.rowsRange = (5, 40)
 		bads.setBlanks()
 
-	for i in range(0, 1):
-		imgLoader = ImageSprite(config)
-		imgLoader.debug = True
-		imgLoader.action = "play"
-		imgLoader.xOffset = 0
-		imgLoader.yOffset = 0
-		imgLoader.endX = config.screenWidth
-		imgLoader.endY = config.screenHeight
-		imgLoader.useJitter = True
-		imgLoader.useBlink = True
-		imgLoader.brightnessFactor = 0.9
-		imgLoader.config = config
-		# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-		imgLoader.make(path + imageList[0], 0, 0, False, config.resizeToFit, False, False)
-		blocks.append(imgLoader)
+
+	config.imgLoader = ImageSprite(config)
+	config.imgLoader.debug = True
+	config.imgLoader.action = "play"
+	config.imgLoader.xOffset = 0
+	config.imgLoader.yOffset = 0
+	config.imgLoader.endX = config.screenWidth
+	config.imgLoader.endY = config.screenHeight
+	config.imgLoader.useJitter = True
+	config.imgLoader.useBlink = True
+	config.imgLoader.brightnessFactor = 0.9
+	config.imgLoader.config = config
+	# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
+	config.imgLoader.make(path + imageList[0], 0, 0, False, config.resizeToFit, False, False)
 
 
-	config.canvasImage = Image.new(
-		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
-	)
-	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
-
-	config.imageLayer = Image.new(
-		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
-	)
-	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
-
-	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.workImageDraw = ImageDraw.Draw(config.workImage)
-
-	
 	config.f = FaderObj()
 	config.f.setUp(config.renderImageFull, config.workImage)
 	config.f.doingRefreshCount = config.doingRefreshCount
-	# config.workImageDraw.rectangle((0,0,100,100), fill=(100,0,0,100))
 	config.renderImageFullOld = config.renderImageFull.copy()
 	config.fadingDone = True
 
@@ -181,7 +166,7 @@ def main(run=True):
 
 
 def runWork():
-	global blocks, config, bads
+	global config, bads
 	# gc.enable()
 	while True:
 		iterate()
@@ -190,12 +175,12 @@ def runWork():
 
 def performChanges() :
 
-	if blocks[0].action == "play" and config.animateProb > 0:
+	if config.imgLoader.action == "play" and config.animateProb > 0:
 		if random.random() < config.animateProb:
 			## holdAnimation
-			blocks[0].animate(False)
+			config.imgLoader.animate(False)
 		else:
-			blocks[0].animate(True)
+			config.imgLoader.animate(True)
 
 	# Clear the background and redraw all planes
 	# redrawBackGround()
@@ -203,31 +188,25 @@ def performChanges() :
 	# if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
 	# if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	x, y = config.workImage.size
-	x1, y1 = blocks[0].image.size
+	x1, y1 = config.imgLoader.image.size
 
 	if random.random() < config.imageGlitchProb:
-		blocks[0].glitchBox(
+		config.imgLoader.glitchBox(
 			-config.imageGlitchDisplacement, config.imageGlitchDisplacement
 		)
 		config.glitchCount += 1
-		#config.f.fadingDone = True
 
-	# blocks[0].image = blocks[0].image.convert(config.renderImageFull.mode)
-	# config.workImage.paste(blocks[0].image.convert("RGBA"), (0,0,x,y), blocks[0].image.convert("RGBA"))
-	config.workImage.paste(
-		blocks[0].image.convert("RGBA"), (0, 0), blocks[0].image.convert("RGBA")
-	)
+
+	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
 
 
 	## RESETS
-	## config.resetProbability + 
 	if random.random() < (config.glitchCount/config.glitchCountRestFactor):
-		print("RESET" + str(config.glitchCount/config.glitchCountRestFactor))
-		blocks[0].image = blocks[0].imageOriginal.copy()
-		blocks[0].process()
+		config.imgLoader.image = config.imgLoader.imageOriginal.copy()
+		config.imgLoader.process()
 		#config.f.fadingDone = True
-
 		#print(config.glitchCount)
+		#print("RESET" + str(config.glitchCount/config.glitchCountRestFactor))
 		config.glitchCount = 0
 
 	if random.random() < config.overlayChangeProb:
@@ -238,9 +217,15 @@ def performChanges() :
 	if random.random() < config.overlayChangeProb:
 		#config.colorOverlay = colorutils.getRandomRGB()
 		config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 2.0, 200,200)
+
 		if random.random() < config.overlayChangePosProb:
-			config.overlayyPos = round(random.uniform(0,config.canvasHeight))
+			config.clrBlkWidth = round(random.uniform(0,config.canvasWidth))
+			config.clrBlkHeight = round(random.uniform(0,config.canvasHeight))
+
+		if random.random() < config.overlayChangePosProb:
 			config.overlayxPos = round(random.uniform(0,config.canvasWidth))
+			config.overlayyPos = round(random.uniform(0,config.canvasHeight))
+
 		if random.random() < config.overlayChangePosProb:
 			config.overlayxPos = config.overlayxPosOrig
 			config.overlayyPos = config.overlayyPosOrig
@@ -305,8 +290,6 @@ def iterate(n=0):
 	# blocks[:] = [block for block in blocks if block.setForRemoval!=True]
 	config.updateCanvas()
 
-	if len(blocks) == 0:
-		exit()
 
 
 def drawVLine():
@@ -336,6 +319,7 @@ def colorize(clr=(250, 0, 250), recolorize=False):
 	# Colorize via overlay etc
 	w = config.renderImageFull.size[0]
 	h = config.renderImageFull.size[1]
+
 	clrBlock = Image.new(config.workImage.mode, (w, h))
 	clrBlockDraw = ImageDraw.Draw(clrBlock)
 

@@ -194,6 +194,10 @@ def performChanges() :
 		config.imgLoader.glitchBox(config.imageGlitchDisplacementHorizontal, config.imageGlitchDisplacementVerical)
 		config.glitchCount += 1
 
+	if random.random() < config.imageGlitchProb:
+		config.imgLoader.image = config.imgLoader.image.rotate(random.uniform(-.25,.25))
+		config.glitchCount += 1
+
 
 	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
 

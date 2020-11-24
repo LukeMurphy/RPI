@@ -411,7 +411,7 @@ class ImageSprite:
 			if random.random() < 0.97:
 				cp1 = self.image.crop((dx, dy, dx + sectionWidth, dy + sectionHeight))
 				self.image.paste(cp1, (round(0 + dx), round(0 + dy)), cp1)
-				self.image = self.image.rotate(random.uniform(-50,50))
+				#self.image = self.image.rotate(random.uniform(-50,50))
 		else :
 			# HORIZONTAL GLITCH
 			#dy = 0

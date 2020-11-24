@@ -153,7 +153,7 @@ class XOx:
 			if dash:
 				strg += "-"
 			else:
-				if random.random() > 0.5:
+				if random.random() > self.config.oProb:
 					strg += "X"
 				else:
 					strg += "O"
@@ -378,6 +378,8 @@ def main(run=True):
 		config.txt2 = config.txt1
 		config.breaksArray = [i for i, ltr in enumerate(config.txt1) if ltr == "-"]
 
+
+	config.oProb = 0.5
 	setUp()
 
 	if run:
@@ -437,11 +439,15 @@ def makeText(emotis=False, arg=" FEEL BAD "):
 		maxNums = int(config.fontSize / 2)
 		num = int(random.uniform(3, maxNums))
 		for n in range(0, num):
+			'''
+			strg += "."
+			'''
 			strg += "(:" + space
 			if random.random() > 0.5:
 				strg += "o:" + space
 			if random.random() > 0.95:
 				strg += "(;" + space
+
 		# strg ="| oTESTx |"
 	else:
 		strg = arg
@@ -711,7 +717,7 @@ def iterate():
 def ThreeD(imageToRender):
 
 	numSegments = 64
-	dFactor = 1.34
+	dFactor = 1.0
 	offset = 0
 	angle = math.pi / numSegments
 
@@ -726,14 +732,18 @@ def ThreeD(imageToRender):
 		width = config.screenWidth
 		height = config.screenHeight
 
-	segmentWidth = int((width) * math.sin(angle) / 3)
+	segmentWidth = round((width) * math.sin(angle) / 1.0)
 	useColorFLicker = False
 	placementx = 0
 
+	segmentWidth = 4
+	numSegments = round(config.screenWidth / segmentWidth)
+	angle = math.pi / numSegments * 2
+
 	for n in range(0, numSegments):
 		pCropx = n * segmentWidth + offset
-		pWidth = math.fabs(dFactor * segmentWidth * math.sin(angle * n / 0.98)) + 2
-		projectedWidth = int(pWidth)
+		pWidth = math.fabs( segmentWidth * math.sin(angle * n * .5) + 1.5)
+		projectedWidth = round(pWidth/dFactor)
 
 		segmentImage = Image.new("RGBA", (projectedWidth, height))
 		croppedSegment = imageToRender.crop((pCropx, 0, pCropx + segmentWidth, height))

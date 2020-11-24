@@ -14,6 +14,7 @@ import time
 from random import shuffle
 from subprocess import call
 
+from modules.faderclass import FaderObj
 from modules import badpixels, colorutils, configuration
 from modules.imagesprite import ImageSprite
 from PIL import (
@@ -95,12 +96,26 @@ def main(run=True):
 		config.resizeToFit = False
 
 	try:
+		config.glitchCountRestFactor = float(workConfig.get("images", "glitchCountRestFactor"))
+	except Exception as e:
+		print(str(e))
+		config.glitchCountRestFactor = 1000
+
+	try:
 		config.forceGlitchFrameCount = int(
 			workConfig.get("images", "forceGlitchFrameCount")
 		)
 	except Exception as e:
 		print(str(e))
 		config.forceGlitchFrameCount = 220
+
+	try:
+		config.doingRefreshCount  = int(
+			workConfig.get("images", "doingRefreshCount")
+		)
+	except Exception as e:
+		print(str(e))
+		config.doingRefreshCount = 10
 
 	config.colorOverlay = (255, 0, 255)
 
@@ -136,6 +151,31 @@ def main(run=True):
 		imgLoader.make(path + imageList[0], 0, 0, False, config.resizeToFit, False, False)
 		blocks.append(imgLoader)
 
+
+	config.canvasImage = Image.new(
+		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
+	)
+	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+
+	config.imageLayer = Image.new(
+		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
+	)
+	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
+
+	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.workImageDraw = ImageDraw.Draw(config.workImage)
+
+	
+	config.f = FaderObj()
+	config.f.setUp(config.renderImageFull, config.workImage)
+	config.f.doingRefreshCount = config.doingRefreshCount
+	# config.workImageDraw.rectangle((0,0,100,100), fill=(100,0,0,100))
+	config.renderImageFullOld = config.renderImageFull.copy()
+	config.fadingDone = True
+
+	config.glitchCount = 0
+
+
 	if run:
 		runWork()
 
@@ -148,11 +188,9 @@ def runWork():
 		time.sleep(config.playSpeed)
 
 
-def iterate(n=0):
-	global config, blocks
-	global xPos, yPos
+def performChanges() :
 
-	if blocks[0].action == "play":
+	if blocks[0].action == "play" and config.animateProb > 0:
 		if random.random() < config.animateProb:
 			## holdAnimation
 			blocks[0].animate(False)
@@ -171,6 +209,8 @@ def iterate(n=0):
 		blocks[0].glitchBox(
 			-config.imageGlitchDisplacement, config.imageGlitchDisplacement
 		)
+		config.glitchCount += 1
+		#config.f.fadingDone = True
 
 	# blocks[0].image = blocks[0].image.convert(config.renderImageFull.mode)
 	# config.workImage.paste(blocks[0].image.convert("RGBA"), (0,0,x,y), blocks[0].image.convert("RGBA"))
@@ -180,10 +220,15 @@ def iterate(n=0):
 
 
 	## RESETS
-	if random.random() < config.resetProbability:
-		#print("RESET")
+	## config.resetProbability + 
+	if random.random() < (config.glitchCount/config.glitchCountRestFactor):
+		print("RESET" + str(config.glitchCount/config.glitchCountRestFactor))
 		blocks[0].image = blocks[0].imageOriginal.copy()
 		blocks[0].process()
+		#config.f.fadingDone = True
+
+		#print(config.glitchCount)
+		config.glitchCount = 0
 
 	if random.random() < config.overlayChangeProb:
 		if config.verticalOrientation == 0 : 1 
@@ -215,6 +260,35 @@ def iterate(n=0):
 	config.renderImageFull = en.enhance(config.brightness)
 	config.renderImageFull.paste(config.renderImageFull)
 
+
+
+def iterate(n=0):
+	global config, blocks
+	global xPos, yPos
+
+	if config.f.fadingDone == True:
+
+		config.renderImageFullOld = config.renderImageFull.copy()
+		config.renderImageFull.paste(
+			config.workImage,
+			(config.imageXOffset, config.imageYOffset),
+			config.workImage,
+		)
+		config.f.xPos = config.imageXOffset
+		config.f.yPos = config.imageYOffset
+		# config.renderImageFull = config.renderImageFull.convert("RGBA")
+		# renderImageFull = renderImageFull.convert("RGBA")
+		config.f.setUp(
+			config.renderImageFullOld.convert("RGBA"),
+			config.workImage.convert("RGBA"),
+		)
+
+
+	performChanges() 
+	config.f.fadeIn()
+	config.render(config.f.blendedImage, 0, 0)
+
+	'''
 	# Render the final full image
 	config.render(
 		config.renderImageFull,
@@ -225,6 +299,7 @@ def iterate(n=0):
 		False,
 		False,
 	)
+	'''
 
 	# cleanup the list
 	# blocks[:] = [block for block in blocks if block.setForRemoval!=True]

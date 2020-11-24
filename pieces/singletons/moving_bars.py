@@ -53,7 +53,7 @@ class Bar:
 	def remake(self) :
 		self.speed1 = random.uniform(config.speed1RangeMin, config.speed1RangeMax)
 		self.speed2 = random.uniform(config.speed2RangeMin, config.speed2RangeMax)
-		self.yPos = round(random.uniform(0,96))
+		self.yPos = round(random.uniform(0,config.canvasHeight))
 		self.xPos = 0
 		self.barThickness = round(random.uniform(config.barThicknessMin, config.barThicknessMax))
 		#self.colorVal = colorutils.randomColorAlpha()

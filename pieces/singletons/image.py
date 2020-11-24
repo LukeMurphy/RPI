@@ -124,7 +124,7 @@ def main(run=True):
 	config.colorOverlay = (255, 0, 255)
 
 
-	path = config.path + "/assets/imgs/"
+	path = config.path + "assets/imgs/"
 	imageList = [config.imageToLoad]
 
 	if config.useBlanks:
@@ -150,6 +150,24 @@ def main(run=True):
 	config.imgLoader.config = config
 	# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
 	config.imgLoader.make(path + imageList[0], 0, 0, False, config.resizeToFit, False, False)
+
+
+
+	config.imgLoaderAlt = ImageSprite(config)
+	config.imgLoaderAlt.config = config
+	config.imgLoaderAlt.debug = True
+	config.imgLoaderAlt.action = "none"
+	config.imgLoaderAlt.xOffset = 0
+	config.imgLoaderAlt.yOffset = 0
+	config.imgLoaderAlt.endX = config.screenWidth
+	config.imgLoaderAlt.endY = config.screenHeight
+	config.imgLoaderAlt.useJitter = False
+	config.imgLoaderAlt.useBlink = False
+	config.imgLoaderAlt.brightnessFactor = 0.9
+	config.imgLoaderAlt.config = config
+	config.imgLoaderAlt.make(path + 'bgs/raven.png', 0, 0, False, False, False, False)
+
+	config.imgLoaderAlt.image = config.imgLoaderAlt.image.resize((32,32))
 
 
 	config.f = FaderObj()
@@ -200,6 +218,13 @@ def performChanges() :
 
 
 	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
+	
+
+	if random.random() < .1 and config.glitchCount < 3 :
+		config.imgLoaderAlt.image = config.imgLoaderAlt.image.rotate(random.uniform(0,360))
+		config.imgLoader.image.paste(config.imgLoaderAlt.image.convert("RGBA"), (round(random.uniform(0,config.canvasWidth)), round(random.uniform(0,config.canvasHeight))), config.imgLoaderAlt.image.convert("RGBA"))
+
+
 
 
 	## RESETS

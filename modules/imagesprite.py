@@ -235,8 +235,8 @@ class ImageSprite:
 
 
 			# Reverse image
-		#print("Processing....")
-		#print("-----------", self.resizeImage)
+		print("Processing....")
+		print("-----------", self.processImage)
 
 		if self.processImage:
 			if self.resizeImage:
@@ -300,8 +300,8 @@ class ImageSprite:
 					b = int(random.uniform(200, 255))
 				clr = (r, g, b, a)
 
-			# print("Colorizing ....")
-			# print("-----------")
+			print("Colorizing ....")
+			print("-----------")
 			self.colorize(clr)
 
 			# Not so great - yOffset is rendered useless by this  ....

@@ -220,7 +220,7 @@ def redraw():
 		shapeToChange = -1
 		if random.random() < config.changeBoxProb:
 			shapeToChange = round(random.uniform(0, len(shapes) - 1))
-			# print(shapeToChange)
+			#print(shapeToChange)
 
 		shapeCount = 0
 		for shapeElement in shapes:
@@ -230,8 +230,8 @@ def redraw():
 				img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img
 			)
 			if (
-				shapeElement.varX != 0
-				and shapeElement.varY != 0
+				(shapeElement.varX != 0
+				or shapeElement.varY != 0)
 				and shapeCount == shapeToChange
 			):
 				shapeElement.setNewBox()

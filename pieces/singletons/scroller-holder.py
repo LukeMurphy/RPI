@@ -423,6 +423,12 @@ def makeBackGround(drawRef, n=1):
 
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
 
+
+	config.bgBackGroundColor = colorutils.getRandomColorHSV(
+				config.bg_minHue, config.bg_maxHue, 
+				config.bg_minSaturation, config.bg_maxSaturation, 
+				config.bg_minValue, config.bg_maxValue)
+
 	drawRef.rectangle(
 		(0, 0, (round(config.displayRows * config.windowWidth)), config.canvasHeight),
 		fill=config.bgBackGroundColor,
@@ -609,7 +615,14 @@ def remakePatternBlock(imageRef, direction):
 		pass
 
 	if config.alwaysRandomPatternColor == True:
-		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+		if config.useHSV :
+			print("New Color")
+			config.patternEndColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue)
+		else:
+			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
@@ -622,16 +635,45 @@ def configureBackgroundScrolling():
 	config.patternRowsOffset = int(workConfig.get("scroller", "patternRowsOffset"))
 	config.patternColsOffset = int(workConfig.get("scroller", "patternColsOffset"))
 	config.patternDrawProb = float(workConfig.get("scroller", "patternDrawProb"))
-	config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(
-		","
-	)
+	config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(",")
 	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
-	config.bgForeGroundColor = workConfig.get("scroller", "bgForeGroundColor").split(
-		","
-	)
+	config.bgForeGroundColor = workConfig.get("scroller", "bgForeGroundColor").split(",")
 	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
+	config.patternColor = (50, 0, 55, 50)
+	config.patternEndColor = (255, 0, 255, 50)
 	config.pattern = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
+
+	if config.alwaysRandomPatternColor == True:
+		config.patternColor = colorutils.randomColorAlpha(config.brightness)
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
+	if config.setPatternColor == True :
+		config.patternColor = config.setPatternEndColor
+		config.patternEndColor = config.setPatternEndColor
+
+	if config.useHSV :
+		config.bgForeGroundColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue)		
+
+		config.bgBackGroundColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue)
+
+		config.patternColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue)		
+
+		config.patternEndColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue)
+
+
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
@@ -642,8 +684,6 @@ def configureBackgroundScrolling():
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func": remakePatternBlock, "direction": direction}
 	
-	config.patternColor = (50, 0, 55, 50)
-	config.patternEndColor = (255, 0, 255, 50)
 
 	try:
 		config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
@@ -664,13 +704,6 @@ def configureBackgroundScrolling():
 		config.changeProbReleaseFactor = 1.0
 		print(str(e))
 
-	if config.alwaysRandomPatternColor == True:
-		config.patternColor = colorutils.randomColorAlpha(config.brightness)
-		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
-
-	if config.setPatternColor == True :
-		config.patternColor = config.setPatternEndColor
-		config.patternEndColor = config.setPatternEndColor
 
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
@@ -864,6 +897,35 @@ def init():
 	config.alwaysRandomPattern = workConfig.getboolean(
 		"scroller", "alwaysRandomPattern"
 	)
+
+
+	try:
+		config.useHSV = True
+
+		config.fg_minHue = int(workConfig.get("scroller", "fg_minHue"))
+		config.fg_maxHue = int(workConfig.get("scroller", "fg_maxHue"))
+		config.fg_minSaturation = float(workConfig.get("scroller", "fg_minSaturation"))
+		config.fg_maxSaturation = float(workConfig.get("scroller", "fg_maxSaturation"))
+		config.fg_minValue = float(workConfig.get("scroller", "fg_minValue"))
+		config.fg_maxValue = float(workConfig.get("scroller", "fg_maxValue"))
+
+
+		config.bg_minHue = int(workConfig.get("scroller", "bg_minHue"))
+		config.bg_maxHue = int(workConfig.get("scroller", "bg_maxHue"))
+		config.bg_minSaturation = float(workConfig.get("scroller", "bg_minSaturation"))
+		config.bg_maxSaturation = float(workConfig.get("scroller", "bg_maxSaturation"))
+		config.bg_minValue = float(workConfig.get("scroller", "bg_minValue"))
+		config.bg_maxValue = float(workConfig.get("scroller", "bg_maxValue"))
+
+		config.setPatternEndColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue)	
+	except Exception as e:
+		config.useHSV = False
+		print(str(e))
+
+
 	if config.useBackground == True:
 		configureBackgroundScrolling()
 
@@ -917,6 +979,9 @@ def init():
 	except Exception as e:
 		config.doingRefreshCount = 50
 		print(str(e))
+
+
+
 
 
 

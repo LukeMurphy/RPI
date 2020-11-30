@@ -87,8 +87,10 @@ class Shape:
 
 		# This will force the overlay color transition functions to use the
 		# configs for HSV
-		self.colOverlay.maxBrightness = 1
 
+
+		print(self.minHue,self.maxHue)
+		self.colOverlay.maxBrightness = 1
 		self.colOverlay.minHue = self.minHue
 		self.colOverlay.maxHue = self.maxHue
 		self.colOverlay.minSaturation = self.minSaturation
@@ -375,11 +377,10 @@ def main(run=True):
 
 	config.t1 = time.time()
 	config.t2 = time.time()
-	
+
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)
-
 	config.destinationImage = Image.new(
 		"RGBA", (config.canvasWidth, config.canvasHeight)
 	)
@@ -401,18 +402,14 @@ def main(run=True):
 		workConfig.get("collageShapes", "transitionStepsMax")
 	)
 	config.changeBoxProb = float(workConfig.get("collageShapes", "changeBoxProb"))
-
 	config.redrawSpeed = float(workConfig.get("collageShapes", "redrawSpeed"))
-
 	config.shapeTweening = 0
 	config.tweenCount = 0
-
 	config.tweenCountMax = int(workConfig.get("collageShapes", "tweenCountMax"))
 	config.colOverlaytLimitBase = int(
 		workConfig.get("collageShapes", "colOverlaytLimitBase")
 	)
 	config.colOverlaySteps = int(workConfig.get("collageShapes", "colOverlaySteps"))
-
 	config.useBadPixels = False
 
 	try:

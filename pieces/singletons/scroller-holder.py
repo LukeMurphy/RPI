@@ -423,11 +423,11 @@ def makeBackGround(drawRef, n=1):
 
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
 
-
-	config.bgBackGroundColor = colorutils.getRandomColorHSV(
-				config.bg_minHue, config.bg_maxHue, 
-				config.bg_minSaturation, config.bg_maxSaturation, 
-				config.bg_minValue, config.bg_maxValue)
+	if config.useHSV == True :
+		config.bgBackGroundColor = colorutils.getRandomColorHSV(
+					config.bg_minHue, config.bg_maxHue, 
+					config.bg_minSaturation, config.bg_maxSaturation, 
+					config.bg_minValue, config.bg_maxValue)
 
 	drawRef.rectangle(
 		(0, 0, (round(config.displayRows * config.windowWidth)), config.canvasHeight),
@@ -979,8 +979,6 @@ def init():
 	except Exception as e:
 		config.doingRefreshCount = 50
 		print(str(e))
-
-
 
 
 

@@ -234,6 +234,68 @@ def configure(config, workconfig):
 	except Exception as e:
 		config.remapImageBlockSection4Rotation = 0
 
+
+	try:
+		config.remapImageBlock5 = workconfig.getboolean(
+			"displayconfig", "remapImageBlock5"
+		)
+		config.remapImageBlockSection5 = workconfig.get(
+			"displayconfig", "remapImageBlockSection5"
+		).split(",")
+		config.remapImageBlockSection5 = tuple(
+			[int(i) for i in config.remapImageBlockSection5]
+		)
+		config.remapImageBlockDestination5 = workconfig.get(
+			"displayconfig", "remapImageBlockDestination5"
+		).split(",")
+		config.remapImageBlockDestination5 = tuple(
+			[int(i) for i in config.remapImageBlockDestination5]
+		)
+	except Exception as e:
+		print(str(e))
+		config.remapImageBlock5 = False
+
+	try:
+		config.remapImageBlockSection5Rotation = float(
+			workconfig.get("displayconfig", "remapImageBlockSection5Rotation")
+		)
+	except Exception as e:
+		config.remapImageBlockSection5Rotation = 0
+
+
+	try:
+		config.remapImageBlock6 = workconfig.getboolean(
+			"displayconfig", "remapImageBlock6"
+		)
+		config.remapImageBlockSection6 = workconfig.get(
+			"displayconfig", "remapImageBlockSection6"
+		).split(",")
+		config.remapImageBlockSection6 = tuple(
+			[int(i) for i in config.remapImageBlockSection6]
+		)
+		config.remapImageBlockDestination6 = workconfig.get(
+			"displayconfig", "remapImageBlockDestination6"
+		).split(",")
+		config.remapImageBlockDestination6 = tuple(
+			[int(i) for i in config.remapImageBlockDestination6]
+		)
+	except Exception as e:
+		print(str(e))
+		config.remapImageBlock6 = False
+
+	try:
+		config.remapImageBlockSection6Rotation = float(
+			workconfig.get("displayconfig", "remapImageBlockSection6Rotation")
+		)
+	except Exception as e:
+		config.remapImageBlockSection6Rotation = 0
+
+
+
+
+
+
+
 	try:
 		config.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
 		config.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))

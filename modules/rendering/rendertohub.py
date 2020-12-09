@@ -321,6 +321,7 @@ def render(
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 
+
 	if config.remapImageBlock2 == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection2)
 		if config.remapImageBlockSection2Rotation != 0:
@@ -328,6 +329,7 @@ def render(
 			crop = crop.rotate(config.remapImageBlockSection2Rotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination2, crop)
+
 
 	if config.remapImageBlock3 == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection3)
@@ -337,6 +339,7 @@ def render(
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
 
+
 	if config.remapImageBlock4 == True:
 		crop = config.renderImageFull.crop(config.remapImageBlockSection4)
 		if config.remapImageBlockSection4Rotation != 0:
@@ -344,6 +347,27 @@ def render(
 			crop = crop.rotate(config.remapImageBlockSection4Rotation)
 		crop = crop.convert("RGBA")
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination4, crop)
+
+
+	if config.remapImageBlock5 == True:
+		crop = config.renderImageFull.crop(config.remapImageBlockSection5)
+		if config.remapImageBlockSection5Rotation != 0:
+			crop = crop.convert("RGBA")
+			crop = crop.rotate(config.remapImageBlockSection5Rotation)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination5, crop)
+
+
+	if config.remapImageBlock6 == True:
+		crop = config.renderImageFull.crop(config.remapImageBlockSection6)
+		if config.remapImageBlockSection6Rotation != 0:
+			crop = crop.convert("RGBA")
+			crop = crop.rotate(config.remapImageBlockSection6Rotation)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination6, crop)
+
+
+
 
 	# ---- Overall image blurring  ---- #
 	if config.useBlur == True:

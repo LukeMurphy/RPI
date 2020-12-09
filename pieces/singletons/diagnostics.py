@@ -219,6 +219,10 @@ def showGrid():
 
 	# config.image=config.image.rotate(-config.rotation)
 
+
+
+	
+
 	config.render(config.image, 0, 0)
 
 

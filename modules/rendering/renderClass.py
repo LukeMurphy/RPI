@@ -270,6 +270,26 @@ class CanvasElement:
 				crop, self.config.remapImageBlockDestination4, crop
 			)
 
+		if self.config.remapImageBlock5 == True:
+			crop = self.config.renderImageFull.crop(self.config.remapImageBlockSection5)
+			if self.config.remapImageBlockSection5Rotation != 0:
+				crop = crop.convert("RGBA")
+				crop = crop.rotate(self.config.remapImageBlockSection5Rotation)
+			crop = crop.convert("RGBA")
+			self.config.renderImageFull.paste(
+				crop, self.config.remapImageBlockDestination5, crop
+			)
+
+		if self.config.remapImageBlock6 == True:
+			crop = self.config.renderImageFull.crop(self.config.remapImageBlockSection6)
+			if self.config.remapImageBlockSection6Rotation != 0:
+				crop = crop.convert("RGBA")
+				crop = crop.rotate(self.config.remapImageBlockSection6Rotation)
+			crop = crop.convert("RGBA")
+			self.config.renderImageFull.paste(
+				crop, self.config.remapImageBlockDestination6, crop
+			)
+
 		if self.config.useLastOverlay == True:
 			self.config.renderDrawOver.rectangle(
 				self.config.lastOverlayBox,

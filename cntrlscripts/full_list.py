@@ -86,12 +86,10 @@ def reSort():
 	global sortDefault
 	if sortDefault == 0 :
 		sortDefault = 1
-		getAllConfigFiles()
+		getAllConfigFiles(False)
 	else :
 		sortDefault = 0
-		getAllConfigFilesByDateModified()
-
-
+		getAllConfigFiles(True)
 
 
 # Generate list of configs:
@@ -103,30 +101,7 @@ def returnSecondElement(l):
 	return l[1]
 
 
-def getAllConfigFiles() :
-	global actionDict1, Lb1
-	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
-	arr = os.listdir(configPath)
-	arr.sort()
-	actionDict1 = []
-	for d in arr :
-		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
-			subArr = os.listdir(configPath + d)
-			subArr.sort()
-
-			for f in subArr:
-				if f.find(".DS_Store") == -1:
-					shortPath = d + "/" + f
-					actionDict1.append({ shortPath  : shortPath})
-					#print(os.stat(configPath + shortPath))
-			actionDict1.append({ ""  : ""})
-
-	Lb1.delete(0,END)
-	for i, item in enumerate(actionDict1):
-		Lb1.insert(END, " " + list(item.keys())[0])
-
-
-def getAllConfigFilesByDateModified() :
+def getAllConfigFiles(dateSort=False) :
 	global actionDict1, Lb1
 	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
 	arr = os.listdir(configPath)
@@ -135,19 +110,29 @@ def getAllConfigFilesByDateModified() :
 	for d in arr :
 		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
 			subArr = os.listdir(configPath + d)
+
+			if dateSort == False: 
+				subArr.sort()
+
 			for f in subArr:
 				if f.find(".DS_Store") == -1:
 					shortPath = d + "/" + f
 					res = os.stat(configPath + shortPath)
 					fullList.append((shortPath,res.st_mtime))
 
+			if dateSort == False: 
+				fullList.append({})
 
 
-	fullList.sort(key=returnSecondElement, reverse=True)
+	if dateSort == True : 
+		fullList.sort(key=returnSecondElement, reverse=True)
+
 	for f in fullList :
-		tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
-		#actionDict1.append({ ""  : ""})	
-		actionDict1.append({ "[" + tsTxt  + "]  " + f[0]  : f[0]})
+		if len(f) > 0 :
+			tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
+			actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
+		else :
+			actionDict1.append({ ""  : ""})
 
 
 	Lb1.delete(0,END)
@@ -155,17 +140,14 @@ def getAllConfigFilesByDateModified() :
 		Lb1.insert(END, " " + list(item.keys())[0])
 
 
-	#actionDict1.append({ shortPath  : shortPath})
-
-
 
 root = tk.Tk()
 #frame = tk.Frame(root, bg="darkgray")
 #frame.pack(padx=1, pady=1)
 # width x height x X x Y
-root.geometry("%dx%d+%d+%d" % (480, 740, 1200, 100))
+root.geometry("%dx%d+%d+%d" % (600, 740, 1900, 100))
 
-Lb1 = Listbox(root, width=50, height=42)
+Lb1 = Listbox(root, width=60, height=42)
 
 
 for i, item in enumerate(actionDict1):
@@ -182,8 +164,8 @@ scrollbar.pack(side = RIGHT, fill = BOTH)
 Lb1.config(yscrollcommand = scrollbar.set) 
 scrollbar.config(command = Lb1.yview) 
 
-topBtnPlace = 400
-leftBtnPlace = 340
+topBtnPlace = 8
+leftBtnPlace = 440
 
 sortDefault = 0
 
@@ -213,7 +195,7 @@ sortbutton = Button(
 sortbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+100)
 
 
-getAllConfigFilesByDateModified()
+getAllConfigFiles(True)
 
 root.mainloop()
 

@@ -113,6 +113,8 @@ def loadFromArguments(reloading=False, config=None):
 
 				config.loadFromArguments = loadFromArguments
 				config.fileName = argument
+				config.fileNameRaw = args.cfg
+
 
 				# Optional 4th argument to override the brightness set in the
 				# config
@@ -123,6 +125,7 @@ def loadFromArguments(reloading=False, config=None):
 
 				f = os.path.getmtime(argument)
 				config.delta = int((config.startTime - f))
+				config.deltaWorkFile = int((config.startTime - f))
 				print(
 					bcolors.OKGREEN
 					+ "** "

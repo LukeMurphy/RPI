@@ -193,7 +193,9 @@ def updateCanvas():
 	if config.checkForConfigChanges == True:
 		currentTime = time.time()
 		f = os.path.getmtime(config.fileName)
+		f2 = os.path.getmtime("pieces/singletons/" + config.work + ".py")
 		config.delta = currentTime - f
+		config.delta2 = currentTime - f2
 
 		if config.delta <= 1:
 			if config.reloadConfig == False:
@@ -204,6 +206,11 @@ def updateCanvas():
 			config.reloadConfig = True
 		else:
 			config.reloadConfig = False
+
+		if config.delta2 <= 1 :
+			commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -mname studio -cfg "
+			#os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+			#os.system(commadStringPyth + config.fileNameRaw + "&")
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

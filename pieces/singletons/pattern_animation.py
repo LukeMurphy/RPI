@@ -77,14 +77,19 @@ def runWork():
 def iterate():
 	global config
 
-
 	i = 0
 	base = -math.pi/2
 	r = config.verticalLength
 
+	
+
+	config.angularOffset = time.time()
+	config.angularOffset2 = time.time()*2
+	
+	'''
 	config.angularOffset += config.angularOffsetSpeeed
 	config.angularOffset2 += config.angularOffsetSpeeed2
-
+	'''
 
 	config.draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill =config.bgColor)
 

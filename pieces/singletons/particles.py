@@ -268,6 +268,13 @@ def main(run=True):
 		config.filterRemapminHoriSize = 24
 		config.filterRemapminVertSize = 24
 
+	try:
+		config.filterRemapRangeX = int(workConfig.get("particleSystem", "filterRemapRangeX"))
+		config.filterRemapRangeY = int(workConfig.get("particleSystem", "filterRemapRangeY"))
+	except Exception as e:
+		print(str(e))
+		config.filterRemapRangeX = config.canvasWidth
+		config.filterRemapRangeY = config.canvasHeight
 	"""
 	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
 	Because colors are more interesting against gray, because everything goes gray
@@ -655,11 +662,16 @@ def iterate():
 		if config.useFilters == True and config.filterRemapping == True:
 			config.filterRemap = True
 
-			startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
-			startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
-			endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
-			endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
-			config.remapImageBlockSection = [startX,startY,endX,endY]
+			#startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
+			#startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
+			#endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
+			#endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+			# new version  more control but may require previous pieces to be re-worked
+			startX = round(random.uniform(0,config.filterRemapRangeX) )
+			startY = round(random.uniform(0,config.filterRemapRangeY) )
+			endX = round(random.uniform(4, config.filterRemapminHoriSize) )
+			endY = round(random.uniform(4, config.filterRemapminVertSize) )
+			config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
 			config.remapImageBlockDestination = [startX,startY]
 
 

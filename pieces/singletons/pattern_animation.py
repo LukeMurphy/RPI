@@ -156,7 +156,7 @@ def iterate():
 		config.dropHueMax = 0
 
 		if random.random() < config.colorChangeProb * 3 :
-			config.bgColor = colorutils.randomColorAlpha(config.brightness, config.bgColorAlpha, config.bgColorAlpha)
+			config.bgColor = colorutils.getRandomColorHSV(0,360, .85,1, .1,.4, 0,0, config.bgColorAlpha)
 		else :
 			config.bgColor = config.bgColorInit
 		#print("ColorSet: " + str(config.usingColorSet))

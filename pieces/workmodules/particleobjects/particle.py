@@ -397,9 +397,10 @@ class Particle(object):
 
 					if self.jumpToGray == False : self.fillColorRawValues = (r, g, b, self.fillColor[3])
 
+					#print(self.greyCount, self.greyRate,self.fillGreyRate[0], self.fillColorRawValues[0] , r, self.fillGrey)
 					self.fillColor = (round(r), round(g), round(b), self.fillColor[3])
 
-
+				'''		
 				else:
 					self.outlineColor = (
 						round(self.outlineGrey),
@@ -413,6 +414,7 @@ class Particle(object):
 						round(self.fillGrey),
 						self.fillColor[3],
 					)
+				'''
 
 			if self.ps.objType == "poly":
 				xPos = int(self.xPosR - self.image.size[0] / 1.5)

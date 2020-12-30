@@ -343,6 +343,12 @@ def main(run=True):
 	ps.unitBlur = int(workConfig.get("particleSystem", "unitBlur"))
 	config.overallBlur = int(workConfig.get("particleSystem", "overallBlur"))
 
+	try: 
+		config.legacyUnsharpMask = (workConfig.getboolean("particleSystem", "legacyUnsharpMask"))
+	except Exception as e:
+		print(str(e))
+		config.legacyUnsharpMask = True
+
 	config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
 	config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(
 		","
@@ -462,12 +468,17 @@ def emitParticle(i=None):
 				+ gRatio * p.fillColor[1]
 				+ bRatio * p.fillColor[2]
 			)
+
+
 			p.fillGreyRate = [
 				(p.fillGrey - p.fillColor[0]) / p.greyRate,
 				(p.fillGrey - p.fillColor[1]) / p.greyRate,
 				(p.fillGrey - p.fillColor[2]) / p.greyRate,
 			]
 
+			#print("Fill", p.fillColor)
+			#print("Fill Grey, GreayRate",p.fillGrey, p.fillGreyRate )
+			
 			p.fillColorRawValues = tuple(float(i) for i in p.fillColor)
 			p.outlineColorRawValues = tuple(float(i) for i in p.outlineColor)
 
@@ -684,9 +695,10 @@ def iterate():
 			ImageFilter.GaussianBlur(radius=config.overallBlur)
 		)
 		## This needs to be reset
-		config.image = config.image.filter(
-			ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1)
-		)
+		if config.legacyUnsharpMask == True :
+			config.image = config.image.filter(
+				ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1)
+			)
 		config.draw = ImageDraw.Draw(config.image)
 
 	if config.transformShape == True:

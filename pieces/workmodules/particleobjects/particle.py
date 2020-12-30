@@ -336,6 +336,16 @@ class Particle(object):
 		if self.ps.useFlocking == True:
 			self.checkMyBuddies()
 
+
+
+
+	def isBetween(self, n, a, b, d=0) :
+		if n >= (a - d) and n <= (b + d) :
+			return True
+		else :
+			return False
+
+
 	def render(self):
 		if self.remove != True:
 			xPos = int(self.xPosR - self.image.size[0] / 2)
@@ -343,65 +353,79 @@ class Particle(object):
 
 			self.createParticleImage()
 
-
 			if self.pixelsGoGray == True:
-				if self.greyCount < self.greyRate:
-					self.greyCount += 1
 
-					'''
-					# REALLY this should be outlineColorRawValues being changed
-					# but it seems to look better like this
+				'''
+				# REALLY this should be outlineColorRawValues being changed
+				# but it seems to look better like this
 
-					self.OutlineR += self.outlineGreyRate[0]
-					self.OutlineG += self.outlineGreyRate[1]
-					self.OutlineB += self.outlineGreyRate[2]
+				self.OutlineR += self.outlineGreyRate[0]
+				self.OutlineG += self.outlineGreyRate[1]
+				self.OutlineB += self.outlineGreyRate[2]
 
-					#outlineColorRawValues = (r, g, b, self.fillColor[3])
-					
-					self.outlineColor = (
-						round(self.OutlineR),
-						round(self.OutlineG),
-						round(self.OutlineB),
-						self.outlineColor[3],
-					)
+				#outlineColorRawValues = (r, g, b, self.fillColor[3])
+				
+				self.outlineColor = (
+					round(self.OutlineR),
+					round(self.OutlineG),
+					round(self.OutlineB),
+					self.outlineColor[3],
+				)
 
-					self.FillR += self.fillGreyRate[0]
-					self.FillG += self.fillGreyRate[1]
-					self.FillB += self.fillGreyRate[2]
-					
-					#fillColorRawValues = (r, g, b, self.fillColor[3])
-					
-					self.fillColor = (round(self.FillR), round(self.FillG), round(self.FillB), self.fillColor[3])
-					'''
+				self.FillR += self.fillGreyRate[0]
+				self.FillG += self.fillGreyRate[1]
+				self.FillB += self.fillGreyRate[2]
+				
+				#fillColorRawValues = (r, g, b, self.fillColor[3])
+				
+				self.fillColor = (round(self.FillR), round(self.FillG), round(self.FillB), self.fillColor[3])
+				'''
 
 
-					# REALLY this should be outlineColorRawValues being changed
-					# but it seems to look better like this
+				# REALLY this should be outlineColorRawValues being changed
+				# but it seems to look better like this
 
-					r = self.outlineColor[0] + self.outlineGreyRate[0]
-					g = self.outlineColor[1] + self.outlineGreyRate[1]
-					b = self.outlineColor[2] + self.outlineGreyRate[2]
+				gr_o = round(self.outlineGrey)
+				r_o = self.outlineColor[0] + self.outlineGreyRate[0]
+				g_o = self.outlineColor[1] + self.outlineGreyRate[1]
+				b_o = self.outlineColor[2] + self.outlineGreyRate[2]
 
-					if self.jumpToGray == False : self.outlineColorRawValues = (r, g, b, self.fillColor[3])
+				rr_o = round(r_o)
+				rb_o = round(b_o)
+				rg_o = round(g_o)
 
-					self.outlineColor = (
-						round(r),
-						round(g),
-						round(b),
-						self.outlineColor[3],
-					)
 
-					r = self.fillColorRawValues[0] + self.fillGreyRate[0]
-					g = self.fillColorRawValues[1] + self.fillGreyRate[1]
-					b = self.fillColorRawValues[2] + self.fillGreyRate[2]
+				if self.isBetween(rr_o, gr_o, gr_o, abs(round(self.outlineGreyRate[0]))) : self.outlineGreyRate[0] = 0
+				if self.isBetween(rg_o, gr_o, gr_o, abs(round(self.outlineGreyRate[1]))) : self.outlineGreyRate[1] = 0
+				if self.isBetween(rb_o, gr_o, gr_o, abs(round(self.outlineGreyRate[2]))) : self.outlineGreyRate[2] = 0
 
-					if self.jumpToGray == False : self.fillColorRawValues = (r, g, b, self.fillColor[3])
 
-					#print(self.greyCount, self.greyRate,self.fillGreyRate[0], self.fillColorRawValues[0] , r, self.fillGrey)
-					self.fillColor = (round(r), round(g), round(b), self.fillColor[3])
+				gr = round(self.fillGrey)
+				r = self.fillColorRawValues[0] + self.fillGreyRate[0]
+				g = self.fillColorRawValues[1] + self.fillGreyRate[1]
+				b = self.fillColorRawValues[2] + self.fillGreyRate[2]
 
-				'''		
-				else:
+				rr = round(r)
+				rb = round(b)
+				rg = round(g)
+
+
+				if self.isBetween(rr, gr, gr, abs(round(self.fillGreyRate[0]))) : self.fillGreyRate[0] = 0
+				if self.isBetween(rg, gr, gr, abs(round(self.fillGreyRate[1]))) : self.fillGreyRate[1] = 0
+				if self.isBetween(rb, gr, gr, abs(round(self.fillGreyRate[2]))) : self.fillGreyRate[2] = 0
+
+
+				#if self.jumpToGray == False : 
+				self.outlineColorRawValues = (r_o, g_o, b_o, self.fillColor[3])
+				self.outlineColor = (rr_o, rg_o, rb_o, self.outlineColor[3])
+
+				#if self.jumpToGray == False : 
+				self.fillColorRawValues = (r, g, b, self.fillColor[3])
+				self.fillColor = ( rr, rg, rb, self.fillColor[3])
+
+				'''
+				if self.fillGreyRate[0] == 0 and self.fillGreyRate[1] == 0 and self.fillGreyRate[2] == 0 :
+					print("d0ne", self.fillGrey)
 					self.outlineColor = (
 						round(self.outlineGrey),
 						round(self.outlineGrey),

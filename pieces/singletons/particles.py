@@ -345,9 +345,11 @@ def main(run=True):
 
 	try: 
 		config.legacyUnsharpMask = (workConfig.getboolean("particleSystem", "legacyUnsharpMask"))
+		config.optionallegacyToggleProb = float(workConfig.get("particleSystem", "optionallegacyToggleProb"))
 	except Exception as e:
 		print(str(e))
 		config.legacyUnsharpMask = True
+		config.optionallegacyToggleProb = 0
 
 	config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
 	config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(
@@ -668,6 +670,13 @@ def iterate():
 	# This was added for the stair steps fire line
 	# to move the dithered sparkle around a bit to 
 	# disturb the eveness of things ..
+
+	if random.random() < config.optionallegacyToggleProb:
+		if config.legacyUnsharpMask == True:
+			config.legacyUnsharpMask = False
+		else :
+			config.legacyUnsharpMask = True
+
 
 	if random.random() < config.filterRemappingProb:
 		if config.useFilters == True and config.filterRemapping == True:

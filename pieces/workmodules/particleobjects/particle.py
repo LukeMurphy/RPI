@@ -416,7 +416,7 @@ class Particle(object):
 
 
 				#if self.jumpToGray == False : 
-				self.outlineColorRawValues = (r_o, g_o, b_o, self.fillColor[3])
+				self.outlineColorRawValues = (r_o, g_o, b_o, self.outlineColor[3])
 				self.outlineColor = (rr_o, rg_o, rb_o, self.outlineColor[3])
 
 				#if self.jumpToGray == False : 

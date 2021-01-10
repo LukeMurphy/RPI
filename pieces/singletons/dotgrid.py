@@ -176,6 +176,12 @@ def reDraw():
 			xPos = ii * width
 			yPos = i * config.rowHeight
 
+			if ii > config.blockYOffset[0] and config.blockYOffset[0] != 0 :
+				yPos += config.blockYOffset[1]
+
+			if i > config.blockXOffset[0] and config.blockXOffset[0] != 0 :
+				xPos += config.blockXOffset[1]
+
 			if config.initializing == True :
 				element = Element()
 				element.xPos = xPos
@@ -282,6 +288,14 @@ def main(run=True):
 	config.grayLevelLower = int(workConfig.get("gradients", "grayLevelLower"))
 	config.grayLevelUpper = int(workConfig.get("gradients", "grayLevelUpper"))
 	config.dotBlurRadius = int(workConfig.get("gradients", "dotBlurRadius"))
+
+	try:
+		config.blockXOffset = tuple(map(lambda x: int(x), workConfig.get("gradients", "blockXOffset").split(",")))
+		config.blockYOffset = tuple(map(lambda x: int(x), workConfig.get("gradients", "blockYOffset").split(",")))
+	except Exception as e:
+		print(str(e))
+		config.blockXOffset = (0,0)
+		config.blockYOffset = (0,0)
 
 
 	config.boxWidth = 200

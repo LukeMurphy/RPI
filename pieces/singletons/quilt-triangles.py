@@ -218,12 +218,17 @@ def main(run=True):
 	config.transitionStepsMin = float(workConfig.get("quilt", "transitionStepsMin"))
 	config.transitionStepsMax = float(workConfig.get("quilt", "transitionStepsMax"))
 
-	# Some triangles will re-draw like a tick - on triangles quilt
-	config.resetTrianglesProb = float(workConfig.get("quilt", "resetTrianglesProb"))
+	try:
+		# Some triangles will re-draw like a tick - on triangles quilt
+		config.resetTrianglesProb = float(workConfig.get("quilt", "resetTrianglesProb"))
+		# The probability that at the beginning of a new quilt image the size of the
+		# elements will change
+		config.resetSizeProbability = float(workConfig.get("quilt", "resetSizeProbability"))
+	except Exception as e:
+		print(str(e))
+		config.resetTrianglesProb = .001
+		config.resetSizeProbability = .001
 
-	# The probability that at the beginning of a new quilt image the size of the
-	# elements will change
-	config.resetSizeProbability = float(workConfig.get("quilt", "resetSizeProbability"))
 
 	# the time in seconds given before the quilt image resets to new parameters
 	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))

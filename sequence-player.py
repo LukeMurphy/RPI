@@ -29,9 +29,18 @@ from modules.configuration import bcolors
 def timeChecker(sequenceConfig, config) :
 	sequenceConfig.currentTime = time.time()
 
-	if sequenceConfig.currentTime - sequenceConfig.startTime > 3 :
+	if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration :
 		sequenceConfig.startTime = time.time()
-		pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
+
+		if sequenceConfig.playInOrder == True :
+			sequenceConfig.playOrder += 1
+			if sequenceConfig.playOrder >= len(sequenceConfig.workList) :
+				sequenceConfig.playOrder = 0
+			pieceToPlay = sequenceConfig.playOrder
+		else :
+			pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
+
+		sequenceConfig.currentPieceDuration = random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2])
 		loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 
 
@@ -50,13 +59,13 @@ def loadWorkConfig(work, sequenceConfig):
 	# This is so the Player does not create a window
 	config.standAlone = False
 
-	print("Sequencer: " + work )
+	print("Sequencer: " + work[0] )
 	config.callBack = lambda : timeChecker(sequenceConfig, config)
 
 	config.MID = ""
 	config.path = "./"
 
-	argument = config.path + "/configs/" + work
+	argument = config.path + "/configs/" + sequenceConfig.workListDirectory + work[0]
 
 	workconfig.read(argument)
 	config.fileName = argument
@@ -124,7 +133,25 @@ def loadSequenceFile():
 		sequenceConfig.windowXOffset = int(workconfig.get("displayconfig", "windowXOffset"))
 		sequenceConfig.windowYOffset = int(workconfig.get("displayconfig", "windowYOffset"))
 
-		sequenceConfig.workList = list(workconfig.get("displayconfig","workList").split(','))
+
+		sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
+		sequenceConfig.playOrder = 0 
+
+
+		sequenceConfig.workListDirectory = workconfig.get("displayconfig", "workListDirectory")
+		sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
+		sequenceConfig.currentPieceDuration = 1
+
+		sequenceConfig.workList = []
+
+		for w in sequenceConfig.workListManifest :
+			work = workconfig.get(w, "work")
+			minDuration = int(workconfig.get(w, "minDuration"))
+			maxDuration = int(workconfig.get(w, "maxDuration"))
+			sequenceConfig.workList.append([work,minDuration,maxDuration])
+
+
+		print(sequenceConfig.workList)
 
 
 		sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)

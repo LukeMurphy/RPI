@@ -63,7 +63,7 @@ class Block:
 	revealSpeedMax = 6
 	revealSpeedMin = 6
 
-	colorWord = "RED"
+	colorWord = "ROUGE"
 	colorOfWord = (0, 0, 0)
 	directionStr = "Left"
 
@@ -101,23 +101,23 @@ class Block:
 		# choice = 9
 
 		if choice == 1:
-			colorWord, colorOfWord = "YELLOW", (255, 0, 225)
+			colorWord, colorOfWord = "JAUNE", (255, 0, 225)
 		if choice == 2:
 			colorWord, colorOfWord = "VIOLET", (230, 225, 0)
 		if choice == 3:
-			colorWord, colorOfWord = "RED", (0, 255, 0)
+			colorWord, colorOfWord = "ROUGE", (0, 255, 0)
 		if choice == 4:
-			colorWord, colorOfWord = "BLUE", (225, 100, 0)
+			colorWord, colorOfWord = "BLEU", (225, 100, 0)
 		if choice == 5:
-			colorWord, colorOfWord = "GREEN", (255, 0, 0)
+			colorWord, colorOfWord = "VERT", (255, 0, 0)
 		if choice == 6:
 			colorWord, colorOfWord = "ORANGE", (0, 0, 200)
 		if choice == 7:
-			colorWord, colorOfWord = "GRAY", (50, 50, 50)
+			colorWord, colorOfWord = "GRIS", (50, 50, 50)
 		if choice == 8:
-			colorWord, colorOfWord = "BLACK", (255, 255, 255)
+			colorWord, colorOfWord = "NOIRE", (255, 255, 255)
 		if choice >= 9:
-			colorWord, colorOfWord = "WHITE", (0, 0, 0)
+			colorWord, colorOfWord = "BLANCHE", (0, 0, 0)
 
 		self.colorWord = colorWord
 
@@ -126,23 +126,23 @@ class Block:
 		# Draw Background Color
 		# Optical (RBY) or RGB opposites
 		if opticalOpposites:
-			if colorWord == "RED":
+			if colorWord == "ROUGE":
 				bgColor = tuple(int(a * brightness) for a in ((255, 0, 0)))
-			if colorWord == "GREEN":
+			if colorWord == "VERT":
 				bgColor = tuple(int(a * brightness) for a in ((0, 255, 0)))
-			if colorWord == "BLUE":
+			if colorWord == "BLEU":
 				bgColor = tuple(int(a * brightness) for a in ((0, 0, 255)))
-			if colorWord == "YELLOW":
+			if colorWord == "JAUNE":
 				bgColor = tuple(int(a * brightness) for a in ((255, 255, 0)))
 			if colorWord == "ORANGE":
 				bgColor = tuple(int(a * brightness) for a in ((255, 125, 0)))
 			if colorWord == "VIOLET":
 				bgColor = tuple(int(a * brightness) for a in ((200, 0, 255)))
-			if colorWord == "BLACK":
+			if colorWord == "NOIRE":
 				bgColor = tuple(int(a * brightness) for a in ((0, 0, 0)))
-			if colorWord == "WHITE":
+			if colorWord == "BLANCHE":
 				bgColor = tuple(int(a * brightness) for a in ((250, 250, 250)))
-			if colorWord == "GRAY":
+			if colorWord == "GRIS":
 				bgColor = tuple(int(a * brightness) for a in ((200, 200, 200)))
 		else:
 			bgColor = colorutils.colorCompliment(clr, brightness)

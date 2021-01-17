@@ -218,12 +218,15 @@ def reDraw():
 			elementCount+=1
 
 
-
 def runWork():
 	global config
-	while True:
+	print("RUNNING DotGrid")
+
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.redrawRate)
+		if config.standAlone == False :
+			config.callBack()
 
 
 def iterate():

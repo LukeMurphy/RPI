@@ -439,25 +439,25 @@ def drawSqareSpiral(config):
 
 			A = []
 			B = []
-			rangeChange = (config.polyDistortionMin, config.polyDistortionMax)
+			config.rangeChange = (config.polyDistortionMin, config.polyDistortionMax)
 
 			for i in range(1, turns):
-				x = i * b1 + cntr[0] + random.uniform(rangeChange[0], rangeChange[1])
+				x = i * b1 + cntr[0] + random.uniform(config.rangeChange[0], config.rangeChange[1])
 				y = i * b2 + cntr[1]  # + random.uniform(rangeChange[0],rangeChange[1])
 				A.append((x, y))
 
 				x = -i * b1 + cntr[0]  # + random.uniform(rangeChange[0],rangeChange[1])
-				y = i * b2 + cntr[1] + random.uniform(rangeChange[0], rangeChange[1])
+				y = i * b2 + cntr[1] + random.uniform(config.rangeChange[0], config.rangeChange[1])
 				A.append((x, y))
 
-				x = -i * b1 + cntr[0] + random.uniform(rangeChange[0], rangeChange[1])
+				x = -i * b1 + cntr[0] + random.uniform(config.rangeChange[0], config.rangeChange[1])
 				y = -i * b2 + cntr[1]  # + random.uniform(rangeChange[0],rangeChange[1])
 				A.append((x, y))
 
 				x = (i + 1) * b1 + cntr[
 					0
 				]  # + random.uniform(rangeChange[0],rangeChange[1])
-				y = -i * b2 + cntr[1] + random.uniform(rangeChange[0], rangeChange[1])
+				y = -i * b2 + cntr[1] + random.uniform(config.rangeChange[0], config.rangeChange[1])
 				A.append((x, y))
 
 			B = [(item[0] - b1, item[1]) for item in A]

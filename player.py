@@ -93,6 +93,8 @@ def loadFromArguments(reloading=False, config=None):
 			config.doingReload = False
 			config.checkForConfigChanges = False
 			config.brightnessOverride = None
+			config.standAlone = True
+			config.isRunning = True
 
 			# Load the default work
 

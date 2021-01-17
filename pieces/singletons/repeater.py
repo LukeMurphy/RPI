@@ -178,12 +178,15 @@ def main(run=True):
 
 
 def runWork():
-	global blocks, config
-	# gc.enable()
-	print("running work.")
-	while True:
+	global config
+	print("RUNNING REPEATER")
+
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.speed)
+		if config.standAlone == False :
+			config.callBack()
+
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

@@ -255,6 +255,62 @@ class WorkObject:
 			self.config.remapImageBlockSection4Rotation = 0
 
 		try:
+			self.config.remapImageBlock5 = self.workConfig.getboolean(
+				"displayconfig", "remapImageBlock5"
+			)
+			self.config.remapImageBlockSection5 = self.workConfig.get(
+				"displayconfig", "remapImageBlockSection5"
+			).split(",")
+			self.config.remapImageBlockSection5 = tuple(
+				[int(i) for i in self.config.remapImageBlockSection5]
+			)
+			self.config.remapImageBlockDestination5 = self.workConfig.get(
+				"displayconfig", "remapImageBlockDestination5"
+			).split(",")
+			self.config.remapImageBlockDestination5 = tuple(
+				[int(i) for i in self.config.remapImageBlockDestination5]
+			)
+		except Exception as e:
+			print(str(e))
+			self.config.remapImageBlock5 = False
+
+		try:
+			self.config.remapImageBlockSection5Rotation = float(
+				self.workConfig.get("displayconfig", "remapImageBlockSection5Rotation")
+			)
+		except Exception as e:
+			self.config.remapImageBlockSection5Rotation = 0
+
+		try:
+			self.config.remapImageBlock6 = self.workConfig.getboolean(
+				"displayconfig", "remapImageBlock6"
+			)
+			self.config.remapImageBlockSection6 = self.workConfig.get(
+				"displayconfig", "remapImageBlockSection6"
+			).split(",")
+			self.config.remapImageBlockSection6 = tuple(
+				[int(i) for i in self.config.remapImageBlockSection6]
+			)
+			self.config.remapImageBlockDestination6 = self.workConfig.get(
+				"displayconfig", "remapImageBlockDestination6"
+			).split(",")
+			self.config.remapImageBlockDestination6 = tuple(
+				[int(i) for i in self.config.remapImageBlockDestination6]
+			)
+		except Exception as e:
+			print(str(e))
+			self.config.remapImageBlock6 = False
+
+		try:
+			self.config.remapImageBlockSection6Rotation = float(
+				self.workConfig.get("displayconfig", "remapImageBlockSection6Rotation")
+			)
+		except Exception as e:
+			self.config.remapImageBlockSection6Rotation = 0
+
+
+
+		try:
 			self.config.imageXOffset = int(
 				self.workConfig.get("displayconfig", "imageXOffset")
 			)

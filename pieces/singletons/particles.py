@@ -607,13 +607,14 @@ def setUp():
 
 
 def runWork():
-	global blocks, config
-	# gc.enable()
+	global config
+	print("RUNNING Particle System")
 
-	# print("particles RUNWORK", config.render, config.instanceNumber)
-	while True:
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)
+		if config.standAlone == False :
+			config.callBack()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

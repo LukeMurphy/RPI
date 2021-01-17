@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #import modules
-import ConfigParser
+import configparser
 import datetime
 import getopt
 import io
@@ -13,20 +13,20 @@ import threading
 import time
 from subprocess import call
 
-from cntrlscripts import off_signal
+#from cntrlscripts import off_signal
 from modules import (
-    actions,
-    blender,
-    bluescreen,
-    carousel,
-    flashing,
-    loader,
-    machine,
-    scroll,
-    squares,
-    squaresalt,
-    user,
-    utils,
+	actions,
+	blender,
+	bluescreen,
+	carousel,
+	flashing,
+	loader,
+	machine,
+	scroll,
+	squares,
+	squaresalt,
+	user,
+	utils,
 )
 from PIL import Image, ImageDraw, ImageFont
 from rgbmatrix import Adafruit_RGBmatrix
@@ -89,16 +89,16 @@ def imageScrollSeq() :
 		# Force the checking of the status file  -- sometimes the cron does not run
 		# probably due to high CPU load etc ...
 		# --------------------------------------------------------------------------#
- 		T2 = time.time()
-	            if((T2 - T1) > 15) :
-	                    threads = []
-	                    thrd = threading.Thread(target=off_signal.checker)
-	                    threads.append(thrd)
-	                    thrd.start()
+		T2 = time.time()
+		if((T2 - T1) > 15):
+			threads = []
+			thrd = threading.Thread(target=off_signal.checker)
+			threads.append(thrd)
+			thrd.start()
 
-	                    #print(threads)
-	                    #off_signal.checker()
-	                    T1 = time.time()		
+			#print(threads)
+			#off_signal.checker()
+			T1 = time.time()		
 
 		if (seq == 1) :
 			imageList = ['plane-2b.gif','paletter3c.gif'] 
@@ -153,7 +153,7 @@ def runSequence() :
 	global T1,T2,thrd
 	lastAction  = 0
 
- 	try:
+	try:
 
 		# If there are more than one set of animations per group e.g. various
 		# text sequences, "randomize" the selection and try to avoid repeating
@@ -370,7 +370,7 @@ def runSequence() :
 			img = int(random.random() *  len(imageList))
 			imgLoader.start(path + "/" + imageList[img],0,-1)
 
-	except Exception, e:
+	except Exception as e:
 		if(e == "KeyboardInterrupt") :
 			print("Stopping")
 			exit()

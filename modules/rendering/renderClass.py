@@ -2,9 +2,6 @@ import random
 import threading
 import time
 import tkinter as tk
-
-from modules.configuration import Config, bcolors
-from modules.filters import *
 from PIL import (
 	Image,
 	ImageChops,
@@ -14,6 +11,9 @@ from PIL import (
 	ImageFont,
 	ImageTk,
 )
+
+from modules.configuration import Config, bcolors
+from modules.filters import *
 
 # from Tkinter import *
 # import tkMessageBox

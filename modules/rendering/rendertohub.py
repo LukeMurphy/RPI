@@ -107,8 +107,6 @@ def setUp():
 
 	config.torqueAngle = 0
 
-
-
 	root.after(100, startWork)
 	root.call("wm", "attributes", ".", "-topmost", "1")
 	root.mainloop()

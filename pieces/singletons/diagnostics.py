@@ -360,6 +360,9 @@ def main(run=True):
 	config.tileSizeWidth = int(workConfig.get("displayconfig", "tileSizeWidth"))
 	config.tileSizeHeight = int(workConfig.get("displayconfig", "tileSizeHeight"))
 
+	config.screenPositionX = 0
+	config.screenPositionY = 0
+
 	try:
 		config.colorPalette = workConfig.getboolean("diag", "colorPalette")
 	except Exception as e:
@@ -446,9 +449,11 @@ def runWork():
 	print("RUNNING DIAGNOSTICS")
 	# gc.enable()
 
-	while True:
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)
+		if config.standAlone == False :
+			config.callBack()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

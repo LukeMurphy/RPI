@@ -67,11 +67,56 @@ class AppWindow:
 
 		self.root.overrideredirect(False)
 		self.root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+		self.root.lift()
+
+
+
+	def createMainCanvas(self):
+		self.masterConfig.root = self.root
+
+		self.masterConfig.cnvs = tk.Canvas(
+			self.root,
+			width=self.masterConfig.screenWidth + self.buff,
+			height=self.masterConfig.screenHeight + self.buff,
+			border=0,
+		)
+
+		self.masterConfig.cnvs.create_rectangle(
+			0, 0, self.masterConfig.screenWidth + self.buff, self.masterConfig.screenHeight + self.buff, fill="red"
+		)
+		#config.cnvs.pack()
+		self.masterConfig.cnvs.place(
+			bordermode="outside",
+			width=self.masterConfig.screenWidth + self.buff,
+			height=self.masterConfig.screenHeight + self.buff,
+		)
 		# root.protocol("WM_DELETE_WINDOW", on_closing)
 		# Button(root, text="Quit", command=root.quit).pack(side="bottom")
+		self.masterConfig.renderImageFull  = PIL.Image.new("RGBA", (self.masterConfig.screenWidth, self.masterConfig.screenHeight))
+		self.masterConfig.tempImage = ImageTk.PhotoImage(self.masterConfig.renderImageFull)
+		self.masterConfig.cnvs._image_id = self.masterConfig.cnvs.create_image(self.masterConfig.canvasOffsetX, self.masterConfig.canvasOffsetY, image=self.masterConfig.tempImage, anchor="nw", tag="mainer"
+	)
+
+
+	def startWork(self, work):
+		# global config, work, root, counter
+		global counter
+
+		### Putting the animation on its own thread
+		### Still throws and error when manually closed though...
+
+		try:
+			t = threading.Thread.__init__(work.runWork())
+			t.start()
+			t.join()
+
+		except tk.TclError as details:
+			print(details)
+			pass
+			exit()
+
 
 	def run(self):
-		self.root.lift()
 		self.root.call("wm", "attributes", ".", "-topmost", "1")
 		self.root.mainloop()
 

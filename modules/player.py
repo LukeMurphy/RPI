@@ -292,10 +292,6 @@ def configure(config, workconfig):
 
 
 
-
-
-
-
 	try:
 		config.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
 		config.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))
@@ -362,6 +358,8 @@ def configure(config, workconfig):
 	config.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
 	config.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
 	# config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
+
+
 	config.tileSize = (
 		int(workconfig.get("displayconfig", "tileSizeWidth")),
 		int(workconfig.get("displayconfig", "tileSizeHeight")),
@@ -377,14 +375,23 @@ def configure(config, workconfig):
 	config.work = workconfig.get("displayconfig", "work")
 	config.rendering = workconfig.get("displayconfig", "rendering")
 
-	# Create the image-canvas for the work
-	config.renderImage = PIL.Image.new("RGBA", (config.screenWidth * config.rows, 32))
-	config.renderImageFull = PIL.Image.new(
-		"RGBA", (config.screenWidth, config.screenHeight)
-	)
+
+	#############################################################################
+	# Create the image-canvas for the work if this is a stand-alone player!
+	
+	if  config.standAlone == False :
+		pass
+	else :
+		config.renderImage = PIL.Image.new("RGBA", (config.screenWidth * config.rows, 32))
+		config.renderImageFull = PIL.Image.new(
+			"RGBA", (config.screenWidth, config.screenHeight)
+		)
+
 	config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.renderDraw = ImageDraw.Draw(config.renderImageFull)
+	
+	#############################################################################
 
 	# Setting up based on how the work is displayed
 	print(bcolors.WARNING + "** modules.player.py is Loading: " + str(config.work) + bcolors.ENDC)
@@ -401,6 +408,8 @@ def configure(config, workconfig):
 		work.config = config
 		work.workConfig = workconfig
 
+	config.workRefForSequencer = work
+
 	if(config.rendering == "hat") : 
 		work.config.isRPI = True
 		renderUsingIDAFruitHat(work)
@@ -408,7 +417,6 @@ def configure(config, workconfig):
 		renderUsingLINSNHub(work)
 	if(config.rendering == "out") : 
 		renderUsingFFMPEG(work)
-
 
 """
 """
@@ -541,9 +549,9 @@ def renderUsingLINSNHub(work):
 	)
 	work.config.draw = ImageDraw.Draw(work.config.image)
 
-	r = rendertohub
-	r.config = work.config
-	r.work = work
+	renderer = rendertohub
+	renderer.config = work.config
+	renderer.work = work
 
 	try:
 		work.config.useLastOverlay = work.workConfig.getboolean(
@@ -560,8 +568,8 @@ def renderUsingLINSNHub(work):
 		print(str(e))
 		work.config.useLastOverlay = False
 
-	r.canvasOffsetX = int(work.workConfig.get("displayconfig", "canvasOffsetX"))
-	r.canvasOffsetY = int(work.workConfig.get("displayconfig", "canvasOffsetY"))
+	renderer.canvasOffsetX = int(work.workConfig.get("displayconfig", "canvasOffsetX"))
+	renderer.canvasOffsetY = int(work.workConfig.get("displayconfig", "canvasOffsetY"))
 	work.config.windowXOffset = int(
 		work.workConfig.get("displayconfig", "windowXOffset")
 	)
@@ -569,14 +577,14 @@ def renderUsingLINSNHub(work):
 		work.workConfig.get("displayconfig", "windowYOffset")
 	)
 
-	work.config.drawBeforeConversion = r.drawBeforeConversion
-	work.config.render = r.render
-	work.config.updateCanvas = r.updateCanvas
+	work.config.drawBeforeConversion = renderer.drawBeforeConversion
+	work.config.render = renderer.render
+	work.config.updateCanvas = renderer.updateCanvas
 	work.main(False)
 
 	print("** Player setting up: doing reload? " + str(work.config.doingReload))
-	if work.config.doingReload == False:
-		r.setUp()
+	if work.config.doingReload == False and work.config.standAlone == True:
+		renderer.setUp()
 
 
 """

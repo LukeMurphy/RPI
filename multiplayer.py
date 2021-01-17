@@ -16,6 +16,7 @@ import sys
 import threading
 import time
 
+from threading import Timer
 from modules import configuration, workobject
 from modules.configuration import Config, bcolors
 from modules.rendering import appWindow, renderClass
@@ -207,10 +208,25 @@ def startWindowThread(workWindow):
 
 def startWorkThread(work, i):
 	print(">> startWorkThread THREAD STARTING " + str(i))
+
+	work.config.running = True
+	#work.testFCU(work.config)
 	thrd = threading.Thread(target=runWork, kwargs=dict(work=work))
 	masterConfig.threads.append(thrd)
 	thrd.start()
 	# thrd.join()
+
+	t  = Timer(3.0, unLoadWork, [masterConfig,thrd,work])
+	t.start()
+
+
+def unLoadWork(masterConfig,thrd,work):
+	print("-----> Ending Thread" + str(work))
+
+	work.config.running = False
+	#work.endRunning(work.config)
+
+	
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

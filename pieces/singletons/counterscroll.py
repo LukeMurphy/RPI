@@ -507,15 +507,14 @@ def setUp():
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-
 def runWork():
 	global blocks, config, XOs
-	# gc.enable()
-	while True:
+	print("RUNNING Pattern Pent")
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.scrollSpeed)
-
-
+		if config.standAlone == False :
+			config.callBack()
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 

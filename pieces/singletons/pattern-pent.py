@@ -316,10 +316,13 @@ def setUp():
 
 def runWork():
 	global config
-	while True:
+	print("RUNNING Pattern Pent")
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)
-
+		if config.standAlone == False :
+			config.callBack()	
+			
 
 def iterate():
 	global config

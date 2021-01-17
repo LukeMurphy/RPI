@@ -555,12 +555,13 @@ def drawSqareSpiral():
 
 
 def runWork():
-	global blocks, config, XOs
-	# gc.enable()
-	# print("quilts ",config.render, config.instanceNumber)
-	while True:
+	global config
+	print("RUNNING Pattern Pent")
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)
+		if config.standAlone == False :
+			config.callBack()
 
 
 def iterate():

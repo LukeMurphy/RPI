@@ -248,15 +248,14 @@ def setUp():
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-
 def runWork():
-	global blocks, config, XOs
-	# gc.enable()
-	while True:
+	global config
+	print("RUNNING Compositions2")
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)
-
-
+		if config.standAlone == False :
+			config.callBack()
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 

@@ -996,11 +996,13 @@ def init():
 
 def runWork():
 	global config
+	print("RUNNING Scroller Holder")
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.redrawSpeed)
 		if config.standAlone == False :
 			config.callBack()
+
 
 
 def checkTime(scrollerObj):

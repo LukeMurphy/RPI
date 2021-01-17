@@ -306,9 +306,12 @@ def redraw():
 
 def runWork():
 	global config
-	while True:
+	print("RUNNING Collage")
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.redrawSpeed)
+		if config.standAlone == False :
+			config.callBack()
 
 
 def iterate():

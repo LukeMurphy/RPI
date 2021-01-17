@@ -185,11 +185,17 @@ def callBack():
 	pass
 
 
+
 def runWork():
 	global redrawSpeed
-	while True:
+	global config
+	print("RUNNING Machine")
+
+	while config.isRunning == True:
 		iterate()
 		time.sleep(redrawSpeed)
+		if config.standAlone == False :
+			config.callBack()
 
 
 def iterate(n=0):

@@ -220,7 +220,9 @@ def reDraw():
 
 def runWork():
 	global config
-	print("RUNNING DotGrid")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING dotgrid.py")
+	print(bcolors.ENDC)
 
 	while config.isRunning == True:
 		iterate()

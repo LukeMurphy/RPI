@@ -383,7 +383,9 @@ def createPieces():
 
 def runWork():
 	global config
-	print("RUNNING Quilt")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING Quilt.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

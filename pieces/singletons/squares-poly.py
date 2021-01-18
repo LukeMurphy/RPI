@@ -376,7 +376,9 @@ def main(run=True):
 
 def runWork():
 	global config
-	print("RUNNING Squares Poly")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING squares-poly.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

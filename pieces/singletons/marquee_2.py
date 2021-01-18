@@ -256,7 +256,9 @@ def redraw():
 
 def runWork():
 	global config
-	print("RUNNING Marquee_2")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running marquee_2.py")
+	print(bcolors.ENDC)
 
 	while config.isRunning == True:
 		iterate()

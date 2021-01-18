@@ -395,11 +395,13 @@ def main(run=True):
 def setUp():
 	global config
 	pass
-
+	
 
 def runWork():
 	global config
-	print("RUNNING Screen")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING Screen.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

@@ -189,7 +189,9 @@ def callBack():
 def runWork():
 	global redrawSpeed
 	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
 	print("RUNNING Machine")
+	print(bcolors.ENDC)
 
 	while config.isRunning == True:
 		iterate()

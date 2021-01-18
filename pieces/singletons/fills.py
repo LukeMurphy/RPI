@@ -179,6 +179,9 @@ def main(run=True):
 
 def runWork():
 	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running fills.py")
+	print(bcolors.ENDC)
 	while True:
 		iterate()
 		time.sleep(config.redrawRate)

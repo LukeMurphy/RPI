@@ -58,8 +58,9 @@ def loadWorkConfig(work, sequenceConfig):
 	config.isRunning = True
 	# This is so the Player does not create a window
 	config.standAlone = False
-
+	print(bcolors.WARNING + "** ")
 	print("Sequencer: " + work[0] )
+	print(bcolors.ENDC)
 	config.callBack = lambda : timeChecker(sequenceConfig, config)
 
 	config.MID = ""
@@ -157,8 +158,9 @@ def loadSequenceFile():
 		sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)
 		sequenceConfig.mainAppWindow.setUp()
 		sequenceConfig.mainAppWindow.createMainCanvas()
-		
-		loadWorkConfig(sequenceConfig.workList[0], sequenceConfig)
+
+		pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
+		loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 
 		sequenceConfig.mainAppWindow.run()
 

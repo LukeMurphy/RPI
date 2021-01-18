@@ -176,10 +176,11 @@ def main(run=True):
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-
 def runWork():
 	global config
-	print("RUNNING REPEATER")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING REPEATER repeater.py")
+	print(bcolors.ENDC)
 
 	while config.isRunning == True:
 		iterate()

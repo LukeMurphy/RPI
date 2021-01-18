@@ -996,7 +996,9 @@ def init():
 
 def runWork():
 	global config
-	print("RUNNING Scroller Holder")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING Scroller Holder scroller-holder.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.redrawSpeed)

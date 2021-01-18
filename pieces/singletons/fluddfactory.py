@@ -448,6 +448,9 @@ def redraw():
 
 def runWork():
 	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print ("Running fluddfactory.py")
+	print(bcolors.ENDC)
 	while True:
 		iterate()
 		time.sleep(config.redrawSpeed)

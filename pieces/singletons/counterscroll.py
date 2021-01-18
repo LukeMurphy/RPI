@@ -3,6 +3,7 @@ import random
 import time
 
 from modules import badpixels, coloroverlay, colorutils
+from modules.configuration import bcolors
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 blocks = []
@@ -508,13 +509,17 @@ def setUp():
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 def runWork():
-	global blocks, config, XOs
-	print("RUNNING Pattern Pent")
+	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING counterscroll.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.scrollSpeed)
 		if config.standAlone == False :
 			config.callBack()
+
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 

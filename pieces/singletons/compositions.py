@@ -215,7 +215,9 @@ def setUp():
 
 def runWork():
 	global config
-	print("RUNNING Compositions (1)")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING Compositions (1) compositions.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

@@ -344,7 +344,9 @@ def main(run=True):
 
 def runWork():
 	global config
-	print("RUNNING quilt poly")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING quilt-poly.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

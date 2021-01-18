@@ -445,8 +445,9 @@ def setUp():
 
 
 def runWork():
-	# global blocks, config, XOs
-	print("RUNNING DIAGNOSTICS")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING DIAGNOSTICS diagnostics.py")
+	print(bcolors.ENDC)
 	# gc.enable()
 
 	while config.isRunning == True:

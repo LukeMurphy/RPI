@@ -83,10 +83,14 @@ def reDraw():
 
 def runWork():
 	global config
-	while True:
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running moving_bars.py")
+	print(bcolors.ENDC)
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.redrawRate)
-
+		if config.standAlone == False :
+			config.callBack()
 
 def iterate():
 	global config

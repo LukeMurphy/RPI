@@ -297,7 +297,10 @@ def restartPiece() :
 
 
 def runWork():
-	global blocks, config, XOs
+	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running leaf-factory.py")
+	print(bcolors.ENDC)
 	# gc.enable()
 	while True:
 		iterate()

@@ -306,7 +306,9 @@ def redraw():
 
 def runWork():
 	global config
-	print("RUNNING Collage")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING collage.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.redrawSpeed)

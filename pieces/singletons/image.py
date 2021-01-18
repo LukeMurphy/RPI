@@ -184,7 +184,10 @@ def main(run=True):
 
 
 def runWork():
-	global config, bads
+	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running image.py")
+	print(bcolors.ENDC)
 	# gc.enable()
 	while True:
 		iterate()

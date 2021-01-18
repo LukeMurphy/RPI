@@ -649,7 +649,10 @@ def setUp():
 
 
 def runWork():
-	global blocks, config, XOs
+	global blocks
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING signage.py")
+	print(bcolors.ENDC)
 	# gc.enable()
 	while True:
 		iterate()

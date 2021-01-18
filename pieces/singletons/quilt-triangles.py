@@ -419,7 +419,9 @@ def main(run=True):
 
 def runWork():
 	global config
-	print("RUNNING Quilt Triangles")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING quilt-triangles.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

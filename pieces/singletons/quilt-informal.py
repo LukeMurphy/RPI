@@ -556,7 +556,9 @@ def drawSqareSpiral():
 
 def runWork():
 	global config
-	print("RUNNING Pattern Pent")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING quilt-informal.py")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

@@ -608,7 +608,9 @@ def setUp():
 
 def runWork():
 	global config
-	print("RUNNING Particle System")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING Particle System pieces/singletons/particles.py")
+	print(bcolors.ENDC)
 
 	while config.isRunning == True:
 		iterate()

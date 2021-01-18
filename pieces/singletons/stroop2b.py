@@ -368,7 +368,9 @@ def main(run=True):
 
 def runWork():
 	global config
-	print("RUNNING Stroop2")
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("RUNNING Stroop2 stroop2b.py (Francais)")
+	print(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.stroopSpeed)

@@ -2,7 +2,7 @@ import math
 import random
 import threading
 import time
-
+from modules.configuration import bcolors
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 

@@ -2,7 +2,7 @@ import math
 import random
 import textwrap
 import time
-
+from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils
 from pieces.workmodules.quilting import createpolysquarepieces
 from pieces.workmodules.quilting.colorset import ColorSet

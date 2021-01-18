@@ -4,7 +4,7 @@ import math
 import random
 import sys
 import time
-
+from modules.configuration import bcolors
 import PIL.Image
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps

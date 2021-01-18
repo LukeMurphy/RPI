@@ -10,7 +10,7 @@ import sys
 import textwrap
 import time
 from collections import OrderedDict
-
+from modules.configuration import bcolors
 from modules import coloroverlay, colorutils, continuous_scroller
 
 from modules.faderclass import FaderObj

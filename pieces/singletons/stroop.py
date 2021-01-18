@@ -2,7 +2,7 @@ import math
 import random
 import textwrap
 import time
-
+from modules.configuration import bcolors
 import PIL.Image
 import PIL.ImageTk
 from modules import colorutils

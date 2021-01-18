@@ -7,6 +7,7 @@ import types
 
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from modules.configuration import bcolors
 
 lastRate = 0
 colorutils.brightness = 1

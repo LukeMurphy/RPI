@@ -4,7 +4,7 @@ import math
 import random
 import time
 from threading import Timer
-
+from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 

@@ -4,7 +4,7 @@ import math
 import random
 import time
 import types
-
+from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 

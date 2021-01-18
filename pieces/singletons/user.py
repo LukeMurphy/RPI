@@ -2,7 +2,7 @@
 import math
 import random
 import time
-
+from modules.configuration import bcolors
 import PIL.Image
 from PIL import Image, ImageDraw
 

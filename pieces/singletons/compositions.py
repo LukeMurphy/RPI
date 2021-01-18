@@ -5,7 +5,7 @@ import time
 
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
+from modules.configuration import bcolors
 
 def ScaleRotateTranslate(
 	image, angle, center=None, new_center=None, scale=None, expand=False

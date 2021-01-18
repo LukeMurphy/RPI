@@ -3,7 +3,7 @@ import math
 import random
 import sys
 import time
-
+from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 

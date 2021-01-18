@@ -14,6 +14,7 @@ from random import shuffle
 from subprocess import call
 
 from modules import configuration
+from modules.configuration import bcolors
 from modules.imagesprite import ImageSprite
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 

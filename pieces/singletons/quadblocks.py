@@ -9,7 +9,7 @@
 import random
 import time
 from collections import OrderedDict
-
+from modules.configuration import bcolors
 import numpy
 from modules import coloroverlay, colorutils, makeblocks
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps

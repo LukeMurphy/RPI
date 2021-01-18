@@ -13,7 +13,7 @@ import textwrap
 import time
 from random import shuffle
 from subprocess import call
-
+from modules.configuration import bcolors
 from modules import colorutils, configuration
 from modules.imagesprite import ImageSprite
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImagePalette

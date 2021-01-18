@@ -3,7 +3,7 @@ import math
 import random
 import textwrap
 import time
-
+from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from pieces.workmodules.particleobjects.particle import Particle
 from pieces.workmodules.particleobjects.particlesystem import ParticleSystem

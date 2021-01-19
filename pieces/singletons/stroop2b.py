@@ -81,20 +81,20 @@ class Block:
 	def make(self, colorMode=True, nextRow=-1):
 
 		config = self.config
-		choice = int(random.uniform(1, 7))
+		choice = round(random.uniform(1, 7))
 		brightness = config.brightness
 		brightness = random.uniform(
 			self.config.minBrightness, self.config.brightness + 0.1
 		)
 		opticalOpposites = False if (random.random() > 0.5) else True
 		self.verticalTileSize = (
-			int(config.screenHeight / self.displayRows)
+			round(config.screenHeight / self.displayRows)
 			if self.displayRows != config.rows
 			else config.tileSize[1]
 		)
 
 		if colorMode != True:
-			choice = int(random.uniform(8, 10))
+			choice = round(random.uniform(8, 10))
 
 		# choice = 3 if (random.random() > .5) else 5
 		# choice = 4 if (random.random() > .5) else 6
@@ -127,27 +127,27 @@ class Block:
 		# Optical (RBY) or RGB opposites
 		if opticalOpposites:
 			if colorWord == "ROUGE":
-				bgColor = tuple(int(a * brightness) for a in ((255, 0, 0)))
+				bgColor = tuple(round(a * brightness) for a in ((255, 0, 0)))
 			if colorWord == "VERT":
-				bgColor = tuple(int(a * brightness) for a in ((0, 255, 0)))
+				bgColor = tuple(round(a * brightness) for a in ((0, 255, 0)))
 			if colorWord == "BLEU":
-				bgColor = tuple(int(a * brightness) for a in ((0, 0, 255)))
+				bgColor = tuple(round(a * brightness) for a in ((0, 0, 255)))
 			if colorWord == "JAUNE":
-				bgColor = tuple(int(a * brightness) for a in ((255, 255, 0)))
+				bgColor = tuple(round(a * brightness) for a in ((255, 255, 0)))
 			if colorWord == "ORANGE":
-				bgColor = tuple(int(a * brightness) for a in ((255, 125, 0)))
+				bgColor = tuple(round(a * brightness) for a in ((255, 125, 0)))
 			if colorWord == "VIOLET":
-				bgColor = tuple(int(a * brightness) for a in ((200, 0, 255)))
+				bgColor = tuple(round(a * brightness) for a in ((200, 0, 255)))
 			if colorWord == "NOIRE":
-				bgColor = tuple(int(a * brightness) for a in ((0, 0, 0)))
+				bgColor = tuple(round(a * brightness) for a in ((0, 0, 0)))
 			if colorWord == "BLANCHE":
-				bgColor = tuple(int(a * brightness) for a in ((250, 250, 250)))
+				bgColor = tuple(round(a * brightness) for a in ((250, 250, 250)))
 			if colorWord == "GRIS":
-				bgColor = tuple(int(a * brightness) for a in ((200, 200, 200)))
+				bgColor = tuple(round(a * brightness) for a in ((200, 200, 200)))
 		else:
 			bgColor = colorutils.colorCompliment(clr, brightness)
 
-		clr = tuple(int(a * brightness) for a in (clr))
+		clr = tuple(round(a * brightness) for a in (clr))
 
 		# Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
 		font = ImageFont.truetype(
@@ -162,7 +162,7 @@ class Block:
 		if dims[1] < self.verticalTileSize:
 			dims[1] = self.verticalTileSize + 2
 
-		vPadding = int(0.75 * config.tileSize[1])
+		vPadding = round(0.75 * config.tileSize[1])
 		self.presentationImage = PIL.Image.new("RGBA", (dims[0] + vPadding, dims[1]))
 		self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
 		draw = ImageDraw.Draw(self.presentationImage)
@@ -170,7 +170,7 @@ class Block:
 		draw.rectangle((0, 0, dims[0] + config.tileSize[0], dims[1]), fill=bgColor)
 
 		# Draw the text with "borders"
-		indent = int(0.05 * config.tileSize[0])
+		indent = round(0.05 * config.tileSize[0])
 
 		for i in range(1, self.shadowSize):
 			draw.text((indent + -i, -i), colorWord, (0, 0, 0), font=font2)
@@ -178,27 +178,28 @@ class Block:
 		draw.text((indent + 0, 0), colorWord, clr, font=font)
 
 		if nextRow == -1:
-			vOffset = int(random.uniform(0, self.displayRows)) * self.verticalTileSize
+			vOffset = round(random.uniform(0, self.displayRows)) * self.verticalTileSize
 		else:
 			vOffset = nextRow * self.verticalTileSize
-		if higherVariability:
-			vOffset += int(
-				random.uniform(-config.tileSize[0] / 10, config.tileSize[0] / 10)
+		if config.higherVariability:
+			vOffset += round(
+				random.uniform(-config.tileSize[0] * 2, config.tileSize[0] * 2)
 			)
+			#vOffset = round(random.uniform(0,config.screenHeight))
 
 		self.wd = dims[0]
 		self.ht = dims[1]
 
 		self.y = vOffset
 		# self.y = int(random.uniform(0,config.screenHeight))
-		self.x = int(random.uniform(-self.wd / 2, config.screenWidth - self.wd / 2))
+		self.x = round(random.uniform(-self.wd / 2, config.screenWidth - self.wd / 2))
 		# self.x = config.screenWidth/2
 
 		self.startx = self.x
 		self.starty = self.y
 
-		self.dx = int(random.uniform(-self.speed, self.speed)) * self.speedMultiplier
-		self.dy = int(random.uniform(-self.speed, self.speed)) * self.speedMultiplier
+		self.dx = round(random.uniform(-self.speed, self.speed)) * self.speedMultiplier
+		self.dy = round(random.uniform(-self.speed, self.speed)) * self.speedMultiplier
 
 		if self.dx == 0:
 			self.dx = -1
@@ -208,7 +209,7 @@ class Block:
 		self.endx = -self.wd if self.dx < 0 else config.screenWidth
 		self.endy = -self.ht if self.dy < 0 else config.screenHeight
 
-		self.revealSpeed = int(random.uniform(self.revealSpeedMin, self.revealSpeedMax))
+		self.revealSpeed = round(random.uniform(self.revealSpeedMin, self.revealSpeedMax))
 
 	def callBack(self):
 		self.setForRemoval = True

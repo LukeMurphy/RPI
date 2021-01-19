@@ -181,10 +181,16 @@ class Block:
 			vOffset = int(random.uniform(0, self.displayRows)) * self.verticalTileSize
 		else:
 			vOffset = nextRow * self.verticalTileSize
-		if higherVariability:
-			vOffset += int(
-				random.uniform(-config.tileSize[0] / 10, config.tileSize[0] / 10)
+			
+		if config.higherVariability:
+			vOffset += round(
+				random.uniform(-config.tileSize[0] * 2, config.tileSize[0] * 2)
 			)
+			vOffset = round(random.uniform(0,config.screenHeight))		if config.higherVariability:
+			vOffset += round(
+				random.uniform(-config.tileSize[0] * 2, config.tileSize[0] * 2)
+			)
+			vOffset = round(random.uniform(0,config.screenHeight))
 
 		self.wd = dims[0]
 		self.ht = dims[1]

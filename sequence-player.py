@@ -53,7 +53,8 @@ def loadWorkConfig(work, sequenceConfig):
 	config.reloadConfig = False
 	config.doingReload = False
 	config.checkForConfigChanges = False
-	config.brightnessOverride = None
+	config.brightnessOverride = work[3]
+
 	config.renderImageFull = sequenceConfig.renderImageFull
 	config.isRunning = True
 	# This is so the Player does not create a window
@@ -149,7 +150,14 @@ def loadSequenceFile():
 			work = workconfig.get(w, "work")
 			minDuration = int(workconfig.get(w, "minDuration"))
 			maxDuration = int(workconfig.get(w, "maxDuration"))
-			sequenceConfig.workList.append([work,minDuration,maxDuration])
+			try:
+				brightnessOverride = float(workconfig.get(w,"brightnessOverride"))
+			except Exception as e:
+				print(str(e))
+				brightnessOverride = None
+
+
+			sequenceConfig.workList.append([work,minDuration,maxDuration,brightnessOverride])
 
 
 		print(sequenceConfig.workList)

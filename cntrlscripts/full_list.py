@@ -105,6 +105,8 @@ def getAllConfigFiles(dateSort=False) :
 	global actionDict1, Lb1
 	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
 	arr = os.listdir(configPath)
+	# Sort the directories by name
+	arr.sort(reverse=True)
 	fullList = []
 	actionDict1 = []
 	for d in arr :
@@ -123,7 +125,7 @@ def getAllConfigFiles(dateSort=False) :
 			if dateSort == False: 
 				fullList.append({})
 
-
+	# Sort the configs by date descending
 	if dateSort == True : 
 		fullList.sort(key=returnSecondElement, reverse=True)
 

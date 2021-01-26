@@ -210,10 +210,47 @@ def getRandomColorHSV(
 	# print(hMin,hMax,degreeRange, h)
 	s = random.uniform(sMin, sMax)
 	v = random.uniform(vMin, vMax)
-	# print(vMin, vMax, v)
+	#print(vMin, vMax, v)
 	rgb = HSVToRGB(h, s, v)
 	return (rgb[0], rgb[1], rgb[2], a)
 
+def getRandomColorHSL(
+	hMin=0.0,
+	hMax=360.0,
+	sMin=0.0,
+	sMax=1.0,
+	lMin=0.0,
+	lMax=1.0,
+	dropHueMin=0,
+	dropHueMax=0,
+	a=255,
+):
+
+	# adjust for 360 degrees ranges
+	degreeRange = hMax - hMin
+
+	if hMin > hMax:
+		degreeRange = 360.0 - hMin + hMax
+	h = hMin + random.uniform(0.0, degreeRange)
+
+	if h > 360.0:
+		h -= 360.0
+
+	## an option to exclude a range of colors
+	if dropHueMax != dropHueMin:
+		h = dropHueMin + 1
+		while h > dropHueMin and h < dropHueMax:
+			h = hMin + random.uniform(0.0, degreeRange)
+			if h > 360.0:
+				h -= 360.0
+
+	# h = random.uniform(hMin,hMax)
+	# print(hMin,hMax,degreeRange, h)
+	s = random.uniform(sMin, sMax)
+	l = random.uniform(lMin, lMax)
+	#print(lMin, lMax, l)
+	rgb = HSVToRGB(h, s, l)
+	return (rgb[0], rgb[1], rgb[2], a)
 
 def randomBaseColor(brtns=1):
 	global brightness

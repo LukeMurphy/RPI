@@ -215,6 +215,13 @@ def showGrid():
 		config.canvasImage,
 	)
 
+	if config.useImage == True :
+		config.image.paste(
+			config.testImage,
+			(config.imageXOffset, config.imageYOffset),
+			config.testImage,
+		)
+
 	# config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
 
 	# config.image=config.image.rotate(-config.rotation)
@@ -222,6 +229,7 @@ def showGrid():
 
 
 	
+	#config.image = config.image.rotate(-config.rotation)
 
 	config.render(config.image, 0, 0)
 
@@ -291,6 +299,8 @@ def drawPalette():
 
 	# config.draw.rectangle((0,64,8,72), fill=(200,200,0), outline = (0,0,200))
 
+	config.renderDrawOver.rectangle((0,0,100,100), fill=(100,0,0,.5))
+
 	config.render(config.image, 0, 0)
 
 
@@ -357,6 +367,16 @@ def main(run=True):
 		map(lambda x: int(int(x) * config.brightness), fontColor2)
 	)
 
+	try:
+		config.useImage = (workConfig.getboolean("diag", "useImage"))
+		config.showAsOverLay = (workConfig.getboolean("diag", "showAsOverLay"))
+		config.imgPath = (workConfig.get("diag", "imgPath"))
+	except Exception as e:
+		print(str(e))
+		config.useImage = False
+		config.showAsOverLay = False
+		config.imgPath = ""
+
 	config.tileSizeWidth = int(workConfig.get("displayconfig", "tileSizeWidth"))
 	config.tileSizeHeight = int(workConfig.get("displayconfig", "tileSizeHeight"))
 
@@ -385,6 +405,11 @@ def main(run=True):
 	config.font = ImageFont.truetype(
 		config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
 	)
+
+	if config.useImage == True :
+		config.testImage = Image.open(config.imgPath, "r")
+		config.testImage.load()
+		config.imgHeight = config.testImage.getbbox()[3]
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 	config.unitArray = []

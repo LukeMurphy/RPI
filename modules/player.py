@@ -522,12 +522,16 @@ def renderUsingLINSNHub(work):
 		work.config.filterRemappingProb = float(work.workConfig.get("displayconfig", "filterRemappingProb"))
 		work.config.filterRemapminHoriSize = int(work.workConfig.get("displayconfig", "filterRemapminHoriSize"))
 		work.config.filterRemapminVertSize = int(work.workConfig.get("displayconfig", "filterRemapminVertSize"))
+		work.config.filterRemapRangeX = int(work.workConfig.get("displayconfig", "filterRemapRangeX"))
+		work.config.filterRemapRangeY = int(work.workConfig.get("displayconfig", "filterRemapRangeY"))
 	except Exception as e:
 		print(str(e))
 		work.config.filterRemapping = False
 		work.config.filterRemappingProb = 0.0
-		work.config.filterRemapminHoriSize = 24
-		work.config.filterRemapminVertSize = 24
+		work.config.filterRemapminHoriSize = 128
+		work.config.filterRemapminVertSize = 128
+		work.config.filterRemapRangeX = work.config.canvasWidth
+		work.config.filterRemapRangeY = work.config.canvasHeight
 
 		
 	# Create the image-canvas for the work

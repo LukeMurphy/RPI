@@ -221,8 +221,12 @@ def redraw():
 
 	if config.shapeTweening == 0:
 		shapeToChange = -1
-		if random.random() < config.changeBoxProb:
-			shapeToChange = round(random.uniform(0, len(shapes) - 1))
+
+		sCount = 0
+		for shapeElement in shapes:
+			if random.random() < shapeElement.changeBoxProb:
+				shapeToChange = sCount
+			sCount += 1
 			#print(shapeToChange)
 
 		shapeCount = 0
@@ -358,6 +362,24 @@ def iterate():
 	config.render(config.canvasImage, 0, 0, config.image)
 	"""
 
+
+	if random.random() < config.filterRemappingProb:
+		if config.useFilters == True and config.filterRemapping == True:
+			config.filterRemap = True
+			#print("Doing remap filter")
+
+			#startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
+			#startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
+			#endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
+			#endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+			# new version  more control but may require previous pieces to be re-worked
+			startX = round(random.uniform(0,config.filterRemapRangeX) )
+			startY = round(random.uniform(0,config.filterRemapRangeY) )
+			endX = round(random.uniform(4, config.filterRemapminHoriSize) )
+			endY = round(random.uniform(4, config.filterRemapminVertSize) )
+			config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
+			config.remapImageBlockDestination = [startX,startY]
+
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 	# Done
@@ -464,9 +486,7 @@ def main(run=True):
 	
 
 	try:
-		config.useVariableFilter = workConfig.getboolean(
-			"collageShapes", "useVariableFilter"
-		)
+		config.useVariableFilter = workConfig.getboolean("collageShapes", "useVariableFilter")
 		config.variableFilterProb = float(workConfig.get("collageShapes", "variableFilterProb"))
 		# config.useFilters = True
 		# config.usePixelSort = True
@@ -505,6 +525,7 @@ def main(run=True):
 		config.timeBetweenSetChanges = 60.0
 		config.probablilitySetChanges = 1.0 
 		print(e)
+		print("Setting times to " + str(config.timeBetweenSetChanges) + " " + str(config.probablilitySetChanges ))
 
 
 	config.shapeSets = list(
@@ -561,6 +582,13 @@ def main(run=True):
 				shape.minSaturation = 0.1
 				shape.maxValue = 1
 				shape.minValue = 0.1
+
+			# addding individual change probabilities to each shape
+			try:
+				shape.changeBoxProb  = float(workConfig.get(shapeDetails, "changeBoxProb"))
+			except Exception as e:
+				raise e
+				shape.changeBoxProb  = config.changeBoxProb
 
 			shape.setUp()
 

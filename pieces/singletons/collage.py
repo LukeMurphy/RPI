@@ -587,7 +587,7 @@ def main(run=True):
 			try:
 				shape.changeBoxProb  = float(workConfig.get(shapeDetails, "changeBoxProb"))
 			except Exception as e:
-				raise e
+				print(str(e))
 				shape.changeBoxProb  = config.changeBoxProb
 
 			shape.setUp()

@@ -340,6 +340,15 @@ def main(run=True):
 		map(lambda x: int(int(x) * config.brightness), config.outlineColorVals)
 	)
 
+	try:
+		config.extraOutlineColorVals = (workConfig.get("particleSystem", "extraOutlineColor")).split(",")
+		config.extraOutlineColor = tuple(
+		map(lambda x: round(int(x) * config.brightness), config.extraOutlineColorVals)
+	)
+	except Exception as e:
+		print(str(e))
+		config.extraOutlineColor = None
+
 	ps.unitBlur = int(workConfig.get("particleSystem", "unitBlur"))
 	config.overallBlur = int(workConfig.get("particleSystem", "overallBlur"))
 
@@ -419,6 +428,7 @@ def emitParticle(i=None):
 	else:
 		p.fillColor = config.fillColor  # (240,150,0,100)
 		p.outlineColor = config.outlineColor  # (100,0,0,100)
+		p.extraOutlineColor = config.extraOutlineColor 
 
 		if config.pixelsGoGray == True:
 			p.greyRate = random.uniform(config.greyRate / 4, config.greyRate)

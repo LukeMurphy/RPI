@@ -53,6 +53,8 @@ class Particle(object):
 	pixelsGoGray = False
 	fillColorRawValues = (0, 0, 0, 0)
 	outlineColorRawValues = (0, 0, 0, 0)
+	extraOutlineColor = None
+
 	# gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
 
 	def __init__(self, particleSystemRef):
@@ -511,11 +513,19 @@ class Particle(object):
 		self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
 
 	def drawRectangle(self):
+		
 		self.draw.rectangle(
 			(0, 0, round(self.objWidth), round(self.objHeight)),
 			fill=self.fillColor,
 			outline=self.outlineColor,
 		)
+		
+		if self.extraOutlineColor != None :
+			self.draw.rectangle(
+				(1, 1, round(self.objWidth-1), round(self.objHeight-1)),
+				fill=None,
+				outline=self.extraOutlineColor,
+			)
 
 	def changeColor(self):
 		if self.changeColorOnChange == True:

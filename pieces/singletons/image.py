@@ -68,11 +68,36 @@ def main(run=True):
 	config.overlayyPos = int(workConfig.get("images", "overlayyPos"))
 	config.overlayChangeProb = float(workConfig.get("images", "overlayChangeProb"))
 	config.overlayChangePosProb = float(workConfig.get("images", "overlayChangePosProb"))
-
 	config.animateProb = float(workConfig.get("images", "animateProb"))
 	config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
-	config.imageGlitchDisplacementVerical = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
-	config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
+
+
+
+	try:
+		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangeSizeProb"))
+	except Exception as e:
+		print(str(e))
+		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangePosProb"))
+
+	try:
+		config.pausePlayProb = float(workConfig.get("images", "pausePlayProb"))
+		config.imageGlitchDisplacementVerical = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
+		config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
+		config.imageGlitchCountLimit = int(workConfig.get("images", "imageGlitchCountLimit"))
+	except Exception as e:
+		print(str(e))
+		config.pausePlayProb = 0.0
+		config.imageGlitchDisplacementHorizontal = 0
+		config.imageGlitchDisplacementVerical = 0
+		config.imageGlitchCountLimit = 20
+		config.animateProb = 1.0
+
+
+	try:
+		config.imageGlitchDisplacement = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
+	except Exception as e:
+		print(str(e))
+		config.imageGlitchDisplacement = 15
 
 
 	## Generate image holders
@@ -89,9 +114,15 @@ def main(run=True):
 	config.channelHeight = config.canvasHeight
 
 	## New configs
-	config.animateProb = float(workConfig.get("images", "animateProb"))
-	config.verticalOrientation = int(workConfig.get("images", "verticalOrientation"))
-	config.resetProbability =float(workConfig.get("images", "resetProbability"))
+	try:
+		config.animateProb = float(workConfig.get("images", "animateProb"))
+		config.verticalOrientation = int(workConfig.get("images", "verticalOrientation"))
+		config.resetProbability =float(workConfig.get("images", "resetProbability"))
+	except Exception as e:
+		print(str(e))
+		config.animateProb = .5
+		config.verticalOrientation = 0
+		config.resetProbability = .001
 
 	try:
 		config.resizeToFit = workConfig.getboolean("images", "resizeToFit")
@@ -124,8 +155,8 @@ def main(run=True):
 	config.colorOverlay = (255, 0, 255)
 
 
-	path = config.path + "assets/imgs/"
-	imageList = [config.imageToLoad]
+	config.imagePath = config.path + "assets/imgs/"
+	config.imageList = [config.imageToLoad]
 
 	if config.useBlanks:
 		bads.config = config
@@ -147,27 +178,12 @@ def main(run=True):
 	config.imgLoader.useJitter = True
 	config.imgLoader.useBlink = True
 	config.imgLoader.brightnessFactor = 0.9
+	config.imgLoader.imageGlitchCountLimit = config.imageGlitchCountLimit
+	config.imgLoader.pausePlayProb = config.pausePlayProb
+	config.imgLoader.imageGlitchProb = config.imageGlitchProb
 	config.imgLoader.config = config
 	# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-	config.imgLoader.make(path + imageList[0], 0, 0, False, config.resizeToFit, False, False)
-
-
-
-	config.imgLoaderAlt = ImageSprite(config)
-	config.imgLoaderAlt.config = config
-	config.imgLoaderAlt.debug = False
-	config.imgLoaderAlt.action = "none"
-	config.imgLoaderAlt.xOffset = 0
-	config.imgLoaderAlt.yOffset = 0
-	config.imgLoaderAlt.endX = config.screenWidth
-	config.imgLoaderAlt.endY = config.screenHeight
-	config.imgLoaderAlt.useJitter = False
-	config.imgLoaderAlt.useBlink = False
-	config.imgLoaderAlt.brightnessFactor = 0.9
-	config.imgLoaderAlt.config = config
-	config.imgLoaderAlt.make(path + 'bgs/raven.png', 0, 0, False, False, False, False)
-
-	config.imgLoaderAlt.image = config.imgLoaderAlt.image.resize((32,32))
+	config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
 
 
 	config.f = FaderObj()
@@ -177,6 +193,7 @@ def main(run=True):
 	config.fadingDone = True
 
 	config.glitchCount = 0
+	config.pausePlay = False
 
 
 	if run:
@@ -196,48 +213,32 @@ def runWork():
 
 def performChanges() :
 
-	if config.imgLoader.action == "play" and config.animateProb > 0:
+	if config.imgLoader.action == "play" :
 		if random.random() < config.animateProb:
 			## holdAnimation
 			config.imgLoader.animate(False)
 		else:
 			config.imgLoader.animate(True)
 
-	# Clear the background and redraw all planes
-	# redrawBackGround()
-
-	# if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=20))
-	# if(random.random() > .98) : config.renderImageFull = config.renderImageFull.filter(ImageFilter.UnsharpMask(radius=20, percent=150,threshold=2))
 	x, y = config.workImage.size
 	x1, y1 = config.imgLoader.image.size
-
-	if random.random() < config.imageGlitchProb:
-		config.imgLoader.glitchBox(config.imageGlitchDisplacementHorizontal, config.imageGlitchDisplacementVerical)
-		config.glitchCount += 1
-
-	if random.random() < config.imageGlitchProb:
-		config.imgLoader.image = config.imgLoader.image.rotate(random.uniform(-.25,.25))
-		config.glitchCount += 1
-
 
 	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
 	
 
-	if random.random() < .1 and config.glitchCount < 3 :
-		config.imgLoaderAlt.image = config.imgLoaderAlt.image.rotate(random.uniform(0,360))
-		config.imgLoader.image.paste(config.imgLoaderAlt.image.convert("RGBA"), (round(random.uniform(0,config.canvasWidth)), round(random.uniform(0,config.canvasHeight))), config.imgLoaderAlt.image.convert("RGBA"))
-
-
-
-
 	## RESETS
-	if random.random() < (config.glitchCount/config.glitchCountRestFactor):
+	if config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit:
 		config.imgLoader.image = config.imgLoader.imageOriginal.copy()
-		config.imgLoader.process()
-		#config.f.fadingDone = True
+		config.f.fadingDone = True
 		#print(config.glitchCount)
-		#print("RESET" + str(config.glitchCount/config.glitchCountRestFactor))
-		config.glitchCount = 0
+		#print("RESET " + str(config.glitchCount/config.glitchCountRestFactor))
+		config.imgLoader.glitchCount = 0
+		config.imgLoader.imageGlitchCount = 0
+		config.imgLoader.imageGlitchCountLimit = round(random.uniform(2,config.imageGlitchCountLimit))
+		config.imgLoader.holdAnimation = False
+		config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
+
+
 
 	if random.random() < config.overlayChangeProb:
 		if config.verticalOrientation == 0 : 1 
@@ -248,17 +249,17 @@ def performChanges() :
 		#config.colorOverlay = colorutils.getRandomRGB()
 		config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 2.0, 200,200)
 
-		if random.random() < config.overlayChangePosProb:
-			config.clrBlkWidth = round(random.uniform(0,config.canvasWidth))
-			config.clrBlkHeight = round(random.uniform(0,config.canvasHeight))
+	if random.random() < config.overlayChangeSizeProb:
+		config.clrBlkWidth = round(random.uniform(5,config.canvasWidth))
+		config.clrBlkHeight = round(random.uniform(5,config.canvasHeight))
 
-		if random.random() < config.overlayChangePosProb:
-			config.overlayxPos = round(random.uniform(0,config.canvasWidth))
-			config.overlayyPos = round(random.uniform(0,config.canvasHeight))
+	if random.random() < config.overlayChangePosProb:
+		config.overlayxPos = round(random.uniform(0,2 * config.canvasWidth/3))
+		config.overlayyPos = round(random.uniform(0,2 * config.canvasHeight/3))
 
-		if random.random() < config.overlayChangePosProb:
-			config.overlayxPos = config.overlayxPosOrig
-			config.overlayyPos = config.overlayyPosOrig
+	if random.random() < config.overlayChangePosProb/2.0:
+		config.overlayxPos = config.overlayxPosOrig
+		config.overlayyPos = config.overlayyPosOrig
 
 	colorize(config.colorOverlay)
 
@@ -271,9 +272,9 @@ def performChanges() :
 		config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage
 	)
 
-	en = ImageEnhance.Brightness(config.renderImageFull)
-	config.renderImageFull = en.enhance(config.brightness)
-	config.renderImageFull.paste(config.renderImageFull)
+	#en = ImageEnhance.Brightness(config.renderImageFull)
+	#config.renderImageFull = en.enhance(config.brightness)
+	#config.renderImageFull.paste(config.renderImageFull)
 
 
 
@@ -291,8 +292,10 @@ def iterate(n=0):
 		)
 		config.f.xPos = config.imageXOffset
 		config.f.yPos = config.imageYOffset
+
 		# config.renderImageFull = config.renderImageFull.convert("RGBA")
 		# renderImageFull = renderImageFull.convert("RGBA")
+
 		config.f.setUp(
 			config.renderImageFullOld.convert("RGBA"),
 			config.workImage.convert("RGBA"),
@@ -300,24 +303,10 @@ def iterate(n=0):
 
 
 	performChanges() 
-	config.f.fadeIn()
-	config.render(config.f.blendedImage, 0, 0)
+	#config.f.fadeIn()
+	#config.render(config.f.blendedImage, 0, 0)
 
-	'''
-	# Render the final full image
-	config.render(
-		config.renderImageFull,
-		0,
-		0,
-		config.screenWidth,
-		config.screenHeight,
-		False,
-		False,
-	)
-	'''
 
-	# cleanup the list
-	# blocks[:] = [block for block in blocks if block.setForRemoval!=True]
 	config.updateCanvas()
 
 
@@ -354,7 +343,7 @@ def colorize(clr=(250, 0, 250), recolorize=False):
 	clrBlockDraw = ImageDraw.Draw(clrBlock)
 
 	# Color overlay on b/w PNG sprite
-	clrBlockDraw.rectangle((0, 0, w, h), fill=(255, 255, 255))
+	#clrBlockDraw.rectangle((0, 0, w, h), fill=(255, 255, 255))
 	clrBlockDraw.rectangle(
 		(
 			config.overlayxPos,

@@ -77,7 +77,7 @@ def loadWorkConfig(work, sequenceConfig):
 
 
 	# ****************************************** #
-	# Sets off the piece based on loading the intitail configs #
+	# Sets off the piece based on loading the initiail configs #
 	# ****************************************** #
 	player.configure(config, workconfig)
 	config.cnvs = sequenceConfig.cnvs

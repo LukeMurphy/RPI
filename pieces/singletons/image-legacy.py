@@ -186,9 +186,9 @@ def iterate(n=0):
 		config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage
 	)
 
-	en = ImageEnhance.Brightness(config.renderImageFull)
-	config.renderImageFull = en.enhance(config.brightness)
-	config.renderImageFull.paste(config.renderImageFull)
+	#en = ImageEnhance.Brightness(config.renderImageFull)
+	#config.renderImageFull = en.enhance(config.brightness)
+	#config.renderImageFull.paste(config.renderImageFull)
 
 	# Render the final full image
 	config.render(

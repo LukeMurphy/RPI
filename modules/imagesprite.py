@@ -44,7 +44,7 @@ def ScaleRotateTranslate(
 
 class ImageSprite:
 	color = (255, 0, 0)
-	bgColor = (0, 255, 255)
+	bgColor = (0, 0, 255)
 	speed = 2
 	speedMultiplier = 4
 	x = xPos = 0
@@ -123,6 +123,10 @@ class ImageSprite:
 
 	# Helps with lousy looping gifs
 	forceGlitchFrameCount = 300
+	imageGlitchCount = 0
+	imageGlitchCountLimit = 20
+	holdAnimation = False
+	pausePlayProb = 0.0
 
 	colorModes = ["colorWheel", "random", "colorRGB"]
 
@@ -185,9 +189,9 @@ class ImageSprite:
 		if random.random() > 0.5 and randomizeDirection:
 			pass
 			#self.dX *= -1.0
-		# print("-----------")
-		# self.debugMessage("Trying to load " + img + "")
-		# print("-----------")
+		print("-----------")
+		print("Trying to load " + img + "")
+		print("-----------")
 
 		if self.loadImage(img):
 			if self.resizeImage :
@@ -235,8 +239,8 @@ class ImageSprite:
 
 
 			# Reverse image
-		#print("Processing....")
-		#print("-----------", self.processImage)
+		
+		#print("Processing -----------", self.processImage)
 
 		if self.processImage:
 			if self.resizeImage:
@@ -321,7 +325,7 @@ class ImageSprite:
 		clrBlock = PIL.Image.new("RGBA", (self.image.size[0], self.image.size[1]))
 		clrBlockDraw = ImageDraw.Draw(clrBlock)
 
-		# print("self.image",self.image)
+		if self.debug == True : print("self.image",self.image)
 		# print("self.imageOriginal", self.imageOriginal)
 		# print("clrBlock",clrBlock)
 
@@ -389,6 +393,8 @@ class ImageSprite:
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 	def glitchBox(self, imageGlitchDisplacementHorizontal=10, imageGlitchDisplacementVertical=10, orientation=1):
+
+		# if self.debug == True :  print("Glitch")
 		apparentWidth = self.image.size[0]
 		apparentHeight = self.image.size[1]
 		dx = round(random.uniform(-imageGlitchDisplacementHorizontal, imageGlitchDisplacementHorizontal))
@@ -425,7 +431,6 @@ class ImageSprite:
 			if random.random() < 0.97:
 				cp1 = self.image.crop((0, 0, dx + sectionWidth, sectionHeight))
 				self.image.paste(cp1, (round(dx), round(0 + dy)))
-
 
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -620,52 +625,43 @@ class ImageSprite:
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
+	# Even still images get this called as it runs the glitches as well ...
 	def animate(self, holdAnimation=False, forceGlitch=False):
 
 		# This needs fixing  - currently requires extra frame
 		# at end of gif  --
-
-
 		skipTime = False
-		# ************************************#
-		### DRAW THE IMAGE ACROSS ALL PANELS
-		# imageCopy = image.point(lambda p: p * 0.19)
-		"""
-		self.imageCopy.paste(self.image)
-		#print(imageCopy,image,xOffset,yOffset)
 
-		if(self.brightnessFlux) :
-			rate+=math.pi/self.brightnessFluxRate;
-			brightnessFactor = (math.sin(rate) + 1) / 2 + .01
-			#if(brightnessFactor > 1) : brightnessFactor = 1
-			#if(brightnessFactor < 0) : brightnessFactor = .00001
-		enhancer = ImageEnhance.Brightness(self.imageCopy)
-		imageCopy = enhancer.enhance(self.brightnessFactor)
-		"""
+
+		if random.random() < self.config.pausePlayProb :
+			#print ("Holding 2 " + str(self.config.pausePlayProb))
+			self.holdAnimation = True
+
 		realFrame = 0
 		try:
-			if holdAnimation != True:
+			if self.holdAnimation != True:
 				self.image.seek(self.image.tell() + 1)
 				realFrame = self.image.tell()
 
 				if realFrame > self.config.forceGlitchFrameCount:
 					forceGlitch = True
-				# for i in range(0,10) : self.glitchBox()
+
 		except EOFError:
 			self.image.seek(0)
-			# print("fail", frame)
+			#print("fail", realFrame)
 			skipTime = True
 			pass
 
-		self.frameCount += 1
+		#self.frameCount += 1
 
 		if random.random() < self.config.imageGlitchProb or forceGlitch:
 			r = int(random.uniform(2, 10))
+			if self.holdAnimation == True : 
+				#print("Glitch :" + str(self.imageGlitchCount))
+				self.imageGlitchCount += 1
+
 			for i in range(0, r):
-				self.glitchBox(
-					-self.config.imageGlitchDisplacement,
-					self.config.imageGlitchDisplacement,
-				)
+				self.glitchBox(-self.config.imageGlitchDisplacement,self.config.imageGlitchDisplacement,)
 
 		if self.config.useImageFilter:
 			if random.random() < self.config.imageFilterProb:

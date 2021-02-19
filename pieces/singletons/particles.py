@@ -794,7 +794,7 @@ def renderDiagnosticsCall() :
 
 
 def callBack():
-	global config, XOs
+	global config
 	return True
 
 

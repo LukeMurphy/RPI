@@ -35,9 +35,10 @@ bads = badpixels
 
 def main(run=True):
 	global config, workConfig, blocks, simulBlocks, bads
-	gc.enable()
+	#gc.enable()
 
 	print("Image Piece Loaded")
+	config.playSpeed = float(workConfig.get("images", "playSpeed"))
 
 	config.vOffset = int(workConfig.get("scroll", "vOffset"))
 	config.speed = float(workConfig.get("scroll", "scrollSpeed"))
@@ -47,7 +48,6 @@ def main(run=True):
 	config.imageToLoad = workConfig.get("images", "i1")
 	config.useBlanks = workConfig.getboolean("images", "useBlanks")
 	config.useImageFilter = workConfig.getboolean("images", "useImageFilter")
-	config.playSpeed = float(workConfig.get("images", "playSpeed"))
 
 	config.lines = int(workConfig.get("images", "lines"))
 	config.boxHeight = int(workConfig.get("images", "boxHeight"))
@@ -167,7 +167,7 @@ def main(run=True):
 		bads.rowsRange = (5, 40)
 		bads.setBlanks()
 
-
+	
 	config.imgLoader = ImageSprite(config)
 	config.imgLoader.debug = False
 	config.imgLoader.action = "play"
@@ -199,17 +199,17 @@ def main(run=True):
 	if run:
 		runWork()
 
-
 def runWork():
-	global config
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
 	print("Running image.py")
 	print(bcolors.ENDC)
 	# gc.enable()
-	while True:
+
+	while config.isRunning == True:
 		iterate()
 		time.sleep(config.playSpeed)
-
+		if config.standAlone == False :
+			config.callBack()
 
 def performChanges() :
 
@@ -277,10 +277,11 @@ def performChanges() :
 	#config.renderImageFull.paste(config.renderImageFull)
 
 
-
 def iterate(n=0):
 	global config, blocks
 	global xPos, yPos
+
+
 
 	if config.f.fadingDone == True:
 
@@ -305,10 +306,9 @@ def iterate(n=0):
 	performChanges() 
 	#config.f.fadeIn()
 	#config.render(config.f.blendedImage, 0, 0)
+	config.render(config.renderImageFull, 0, 0)
 
-
-	config.updateCanvas()
-
+	#config.updateCanvas()
 
 
 def drawVLine():
@@ -389,7 +389,7 @@ def redrawBackGround():
 
 def callBack():
 	global config
-	pass
+	return True
 
 
 #####################

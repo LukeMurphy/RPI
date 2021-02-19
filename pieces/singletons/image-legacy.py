@@ -83,6 +83,7 @@ def main(run=True):
 	config.verticalOrientation = 0
 
 	config.channelHeight = 170
+	config.pausePlayProb = 0
 
 	try:
 		config.forceGlitchFrameCount = int(

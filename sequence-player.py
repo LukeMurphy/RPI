@@ -170,6 +170,7 @@ def loadSequenceFile():
 		sequenceConfig.mainAppWindow.createMainCanvas()
 
 		pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
+		pieceToPlay = 0
 		loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 
 		sequenceConfig.mainAppWindow.run()

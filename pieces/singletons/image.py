@@ -40,11 +40,6 @@ def main(run=True):
 	print("Image Piece Loaded")
 	config.playSpeed = float(workConfig.get("images", "playSpeed"))
 
-	config.vOffset = int(workConfig.get("scroll", "vOffset"))
-	config.speed = float(workConfig.get("scroll", "scrollSpeed"))
-	config.displayRows = int(workConfig.get("scroll", "displayRows"))
-	config.displayCols = int(workConfig.get("scroll", "displayCols"))
-
 	config.imageToLoad = workConfig.get("images", "i1")
 	config.useBlanks = workConfig.getboolean("images", "useBlanks")
 	config.useImageFilter = workConfig.getboolean("images", "useImageFilter")

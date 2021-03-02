@@ -147,7 +147,7 @@ root = tk.Tk()
 #frame = tk.Frame(root, bg="darkgray")
 #frame.pack(padx=1, pady=1)
 # width x height x X x Y
-root.geometry("%dx%d+%d+%d" % (600, 740, 1900, 100))
+root.geometry("%dx%d+%d+%d" % (600, 740, 900, 100))
 
 Lb1 = Listbox(root, width=60, height=42)
 

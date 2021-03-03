@@ -61,16 +61,16 @@ def loadWorkConfig(work, sequenceConfig):
 	config.isRunning = True
 	# This is so the Player does not create a window
 	config.standAlone = False
-	print(bcolors.WARNING + "** ")
-	print("Sequencer: " + work[0] )
-	print(bcolors.ENDC)
 	config.callBack = lambda : timeChecker(sequenceConfig, config)
 
 	config.MID = ""
-	#config.path = "./"
+	config.path = sequenceConfig.path
 
 	argument = config.path + "/configs/" + sequenceConfig.workListDirectory + work[0]
 
+	print(bcolors.WARNING + "** ")
+	print("Sequencer: " + work[0] + ":" + argument)
+	print(bcolors.ENDC)
 	workconfig.read(argument)
 	config.fileName = argument
 

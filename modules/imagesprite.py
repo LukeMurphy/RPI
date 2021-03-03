@@ -127,6 +127,8 @@ class ImageSprite:
 	imageGlitchCountLimit = 20
 	holdAnimation = False
 	pausePlayProb = 0.0
+	releasePauseProb = 0.0
+	glitchChanceWhenPausedFactor =10.0
 
 	colorModes = ["colorWheel", "random", "colorRGB"]
 
@@ -654,7 +656,10 @@ class ImageSprite:
 
 		#self.frameCount += 1
 
-		if random.random() < self.config.imageGlitchProb or forceGlitch:
+		glitchChance  = self.config.imageGlitchProb
+		if self.holdAnimation == True :
+			glitchChance *= self.glitchChanceWhenPausedFactor
+		if random.random() < glitchChance or forceGlitch:
 			r = int(random.uniform(2, 10))
 			if self.holdAnimation == True : 
 				#print("Glitch :" + str(self.imageGlitchCount))
@@ -665,6 +670,7 @@ class ImageSprite:
 
 		if self.config.useImageFilter:
 			if random.random() < self.config.imageFilterProb:
+				#print("filterize")
 				self.filterize()
 
 		self.augment()

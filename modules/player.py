@@ -44,7 +44,7 @@ def configure(config, workconfig):
 			"displayconfig", "checkForConfigChanges"
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.checkForConfigChanges = False
 
 	try:
@@ -98,7 +98,7 @@ def configure(config, workconfig):
 		)
 
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.usePixelSort = False
 		config.pixelSortRotatesWithImage = True
 		config.unsharpMaskPercent = 50
@@ -142,7 +142,7 @@ def configure(config, workconfig):
 		)
 		config.filterRemap = True
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlock = False
 		config.filterRemap = False
 
@@ -151,6 +151,7 @@ def configure(config, workconfig):
 			workconfig.get("displayconfig", "remapImageBlockSectionRotation")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlockSectionRotation = 0
 
 	try:
@@ -170,7 +171,7 @@ def configure(config, workconfig):
 			[int(i) for i in config.remapImageBlockDestination2]
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlock2 = False
 
 	try:
@@ -178,6 +179,7 @@ def configure(config, workconfig):
 			workconfig.get("displayconfig", "remapImageBlockSection2Rotation")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlockSection2Rotation = 0
 
 	try:
@@ -197,7 +199,7 @@ def configure(config, workconfig):
 			[int(i) for i in config.remapImageBlockDestination3]
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlock3 = False
 
 	try:
@@ -205,6 +207,7 @@ def configure(config, workconfig):
 			workconfig.get("displayconfig", "remapImageBlockSection3Rotation")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlockSection3Rotation = 0
 
 	try:
@@ -224,7 +227,7 @@ def configure(config, workconfig):
 			[int(i) for i in config.remapImageBlockDestination4]
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlock4 = False
 
 	try:
@@ -232,6 +235,7 @@ def configure(config, workconfig):
 			workconfig.get("displayconfig", "remapImageBlockSection4Rotation")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlockSection4Rotation = 0
 
 
@@ -252,7 +256,7 @@ def configure(config, workconfig):
 			[int(i) for i in config.remapImageBlockDestination5]
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlock5 = False
 
 	try:
@@ -260,6 +264,7 @@ def configure(config, workconfig):
 			workconfig.get("displayconfig", "remapImageBlockSection5Rotation")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlockSection5Rotation = 0
 
 
@@ -280,7 +285,7 @@ def configure(config, workconfig):
 			[int(i) for i in config.remapImageBlockDestination6]
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlock6 = False
 
 	try:
@@ -288,6 +293,7 @@ def configure(config, workconfig):
 			workconfig.get("displayconfig", "remapImageBlockSection6Rotation")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.remapImageBlockSection6Rotation = 0
 
 
@@ -296,7 +302,7 @@ def configure(config, workconfig):
 		config.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
 		config.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.imageXOffset = 0
 		config.imageYOffset = 0
 
@@ -320,7 +326,7 @@ def configure(config, workconfig):
 			config.blurYOffset + config.blurSectionHeight,
 		)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		config.useBlur = False
 
 	try:
@@ -328,10 +334,10 @@ def configure(config, workconfig):
 		config.greenBoost = float(workconfig.get("displayconfig", "greenBoost"))
 		config.blueBoost = float(workconfig.get("displayconfig", "blueBoost"))
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.redBoost = 1
 		config.greenBoost = 1
 		config.blueBoost = 1
-		print(str(e))
 
 	try:
 		config.brightnessVariation = workconfig.getboolean(
@@ -344,15 +350,17 @@ def configure(config, workconfig):
 		config.baseBrightness = config.brightness
 		config.brightnessVariationTransition = False
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.brightnessVariation = False
 		config.brightnessVariationProb = 0
-		print(str(e))
+
 
 	try:
 		config.forceBGSwap = workconfig.getboolean("displayconfig","forceBGSwap")
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		config.forceBGSwap = False
-		print(str(e))	
+
 
 
 	config.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
@@ -395,13 +403,13 @@ def configure(config, workconfig):
 
 	# Setting up based on how the work is displayed
 	print(bcolors.WARNING + "** modules.player.py is Loading: " + str(config.work) + bcolors.ENDC)
-
+	print(bcolors.OKBLUE)
 	try:
 		work = importlib.import_module("pieces." + str(config.work))
 		work.config = config
 		work.workConfig = workconfig
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		## On 5-23-019 a lot of pieces were moved to a sub directory called
 		## singletons - this is here to catch any unchanged configs
 		work = importlib.import_module("pieces.singletons." + str(config.work))
@@ -444,9 +452,10 @@ def renderUsingIDAFruitHat(work):
 	try :
 		work.config.isRPI = (work.workConfig.getboolean("displayconfig", 'isRPI')) 
 	except Exception as e: 
+		print(bcolors.FAIL + "** " +  str(e))
 		work.config.useFilters = False
 		work.config.isRPI = True
-		print (str(e))
+
 	
 	r.config = work.config
 	r.work = work
@@ -481,8 +490,9 @@ def renderUsingLINSNHub(work):
 			work.workConfig.get("displayconfig", "ditherFilterBrightness")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
 		work.config.ditherFilterBrightness = 1.0
-		print(str(e))
+
 
 	try:
 		work.config.ditherBlurRadius = int(
@@ -494,20 +504,20 @@ def renderUsingLINSNHub(work):
 	except Exception as e:
 		work.config.ditherBlurRadius = 0
 		work.config.ditherUnsharpMaskPercent = 30
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 
 	try:
 		work.config.isRPI = work.workConfig.getboolean("displayconfig", "isRPI")
 	except Exception as e:
 		work.config.usePixSort = False
 		work.config.isRPI = False
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 
 	try:
 		work.config.renderDiagnostics = work.workConfig.getboolean("displayconfig", "renderDiagnostics")
 	except Exception as e:
 		work.config.renderDiagnostics = False
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 
 	if work.config.isRPI == True:
 		from cntrlscripts import stest
@@ -525,7 +535,7 @@ def renderUsingLINSNHub(work):
 		work.config.filterRemapRangeX = int(work.workConfig.get("displayconfig", "filterRemapRangeX"))
 		work.config.filterRemapRangeY = int(work.workConfig.get("displayconfig", "filterRemapRangeY"))
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		work.config.filterRemapping = False
 		work.config.filterRemappingProb = 0.0
 		work.config.filterRemapminHoriSize = 128
@@ -569,7 +579,7 @@ def renderUsingLINSNHub(work):
 		)
 		work.config.renderDrawOver = ImageDraw.Draw(work.config.renderImageFullOverlay)
 	except Exception as e:
-		print(str(e))
+		print(bcolors.FAIL + "** " +  str(e))
 		work.config.useLastOverlay = False
 
 	renderer.canvasOffsetX = int(work.workConfig.get("displayconfig", "canvasOffsetX"))

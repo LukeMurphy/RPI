@@ -71,26 +71,33 @@ def main(run=True):
 	try:
 		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangeSizeProb"))
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangePosProb"))
 
 	try:
 		config.pausePlayProb = float(workConfig.get("images", "pausePlayProb"))
+		config.releasePauseProb = float(workConfig.get("images", "releasePauseProb"))
 		config.imageGlitchDisplacementVerical = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
 		config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
 		config.imageGlitchCountLimit = int(workConfig.get("images", "imageGlitchCountLimit"))
+		config.glitchChanceWhenPausedFactor = float(workConfig.get("images", "glitchChanceWhenPausedFactor"))
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
-		config.pausePlayProb = 0.0
-		config.imageGlitchDisplacementHorizontal = 0
-		config.imageGlitchDisplacementVerical = 0
+		config.pausePlayProb = 0.001
+		config.releasePauseProb = 0.001
+		config.imageGlitchDisplacementHorizontal = 10
+		config.imageGlitchDisplacementVerical = 10
 		config.imageGlitchCountLimit = 20
 		config.animateProb = 1.0
+		config.glitchChanceWhenPausedFactor = 10.0
 
 
 	try:
 		config.imageGlitchDisplacement = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.imageGlitchDisplacement = 15
 
@@ -114,6 +121,7 @@ def main(run=True):
 		config.verticalOrientation = int(workConfig.get("images", "verticalOrientation"))
 		config.resetProbability =float(workConfig.get("images", "resetProbability"))
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.animateProb = .5
 		config.verticalOrientation = 0
@@ -122,12 +130,14 @@ def main(run=True):
 	try:
 		config.resizeToFit = workConfig.getboolean("images", "resizeToFit")
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.resizeToFit = False
 
 	try:
 		config.glitchCountRestFactor = float(workConfig.get("images", "glitchCountRestFactor"))
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.glitchCountRestFactor = 1000
 
@@ -136,6 +146,7 @@ def main(run=True):
 			workConfig.get("images", "forceGlitchFrameCount")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.forceGlitchFrameCount = 220
 
@@ -144,8 +155,13 @@ def main(run=True):
 			workConfig.get("images", "doingRefreshCount")
 		)
 	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.doingRefreshCount = 10
+
+
+
+	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
 	config.colorOverlay = (255, 0, 255)
 
@@ -175,7 +191,9 @@ def main(run=True):
 	config.imgLoader.brightnessFactor = 0.9
 	config.imgLoader.imageGlitchCountLimit = config.imageGlitchCountLimit
 	config.imgLoader.pausePlayProb = config.pausePlayProb
+	config.imgLoader.releasePauseProb = config.releasePauseProb
 	config.imgLoader.imageGlitchProb = config.imageGlitchProb
+	config.imgLoader.glitchChanceWhenPausedFactor = config.glitchChanceWhenPausedFactor
 	config.imgLoader.config = config
 	# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
 	config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
@@ -221,8 +239,8 @@ def performChanges() :
 	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
 	
 
-	## RESETS
-	if config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit:
+	## RESETS for paused animation
+	if config.imgLoader.holdAnimation == True and (config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit or random.random() < config.releasePauseProb):
 		config.imgLoader.image = config.imgLoader.imageOriginal.copy()
 		config.f.fadingDone = True
 		#print(config.glitchCount)

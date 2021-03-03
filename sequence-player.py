@@ -67,7 +67,7 @@ def loadWorkConfig(work, sequenceConfig):
 	config.callBack = lambda : timeChecker(sequenceConfig, config)
 
 	config.MID = ""
-	config.path = "./"
+	#config.path = "./"
 
 	argument = config.path + "/configs/" + sequenceConfig.workListDirectory + work[0]
 

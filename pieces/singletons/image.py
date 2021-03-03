@@ -166,7 +166,7 @@ def main(run=True):
 	config.colorOverlay = (255, 0, 255)
 
 
-	config.imagePath = config.path + "assets/imgs/"
+	config.imagePath = config.path + "/assets/imgs/"
 	config.imageList = [config.imageToLoad]
 
 	if config.useBlanks:

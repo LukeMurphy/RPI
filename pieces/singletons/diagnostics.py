@@ -333,6 +333,7 @@ def main(run=True):
 		map(lambda x: int(int(x) * config.brightness), config.bgColorVals)
 	)
 	config.useLastOverlay = False
+	print(config.bgColor)
 
 	config.angle = 0
 

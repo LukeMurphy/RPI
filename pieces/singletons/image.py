@@ -393,7 +393,10 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 			config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
 		else :
 		'''
-		config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
+		#config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
+		
+		imgTemp = ImageChops.darker(clrBlock, config.workImage)
+		config.workImage.paste(imgTemp,(0,0), imgTemp)
 		#config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)

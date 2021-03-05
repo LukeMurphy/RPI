@@ -159,7 +159,12 @@ def main(run=True):
 		print(str(e))
 		config.doingRefreshCount = 10
 
-
+	try:
+		config.overLayMode = int(workConfig.get("images", "overLayMode"))
+	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
+		print(str(e))
+		config.overLayMode = 1
 
 	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
@@ -271,8 +276,8 @@ def performChanges() :
 
 
 	if random.random() < config.overlayChangeSizeProb:
-		config.clrBlkWidth = round(random.uniform(5,config.canvasWidth))
-		config.clrBlkHeight = round(random.uniform(5,config.canvasHeight))
+		config.clrBlkWidth = round(random.uniform(5,config.canvasWidth * 1.25))
+		config.clrBlkHeight = round(random.uniform(5,config.canvasHeight * 1.25))
 
 	if random.random() < config.overlayChangePosProb:
 		config.overlayxPos = round(random.uniform(0,2 * config.canvasWidth/3))
@@ -388,14 +393,16 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 	# config.renderImageFull.paste(clrBlock, (0,0))
 
 	try:
-		'''
-		if random.random() > .5 :
-			config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
-		else :
-		'''
-		#config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
 		
-		imgTemp = ImageChops.darker(clrBlock, config.workImage)
+		if config.overLayMode == 0 :
+			imgTemp = ImageChops.add_modulo(clrBlock, config.workImage)
+			if random.random() < .001 : config.overLayMode = 1
+		else :
+			imgTemp = ImageChops.darker(clrBlock, config.workImage)
+			if random.random() < .001 : config.overLayMode = 0
+		
+		
+
 		config.workImage.paste(imgTemp,(0,0), imgTemp)
 		#config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)

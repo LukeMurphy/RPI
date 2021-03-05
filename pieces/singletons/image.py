@@ -226,6 +226,8 @@ def runWork():
 
 def performChanges() :
 
+
+
 	if config.imgLoader.action == "play" :
 		if random.random() < config.animateProb:
 			## holdAnimation
@@ -236,9 +238,12 @@ def performChanges() :
 	x, y = config.workImage.size
 	x1, y1 = config.imgLoader.image.size
 
+	#config.workImageDraw = ImageDraw.Draw(config.workImage)
+	#config.workImageDraw.rectangle((0,0,256,256), fill=(100,0,0,200))
+	#config.workImage = Image.blend(config.workImage,config.imgLoader.image.convert("RGBA"),.5,)
+
 	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
 	
-
 	## RESETS for paused animation
 	if config.imgLoader.holdAnimation == True and (config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit or random.random() < config.releasePauseProb):
 		config.imgLoader.image = config.imgLoader.imageOriginal.copy()
@@ -252,6 +257,7 @@ def performChanges() :
 		config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
 
 
+	
 
 	if random.random() < config.overlayChangeProb:
 		if config.verticalOrientation == 0 : 1 
@@ -280,6 +286,9 @@ def performChanges() :
 		bads.drawBlanks(None, False)
 		if random.random() > 0.99:
 			bads.setBlanks()
+
+	'''
+	'''
 
 	config.renderImageFull.paste(
 		config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage
@@ -377,11 +386,13 @@ def colorize(clr=(250, 0, 250), recolorize=False):
 	# config.renderImageFull.paste(clrBlock, (0,0))
 
 	try:
+		'''
 		if random.random() > .5 :
 			config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
 		else :
-			config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
-
+		'''
+		config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
+		#config.workImage = ImageChops.add(clrBlock, config.workImage, 1.0, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
 		# config.renderImageFull.paste(imgTemp,(0,0,w,h))

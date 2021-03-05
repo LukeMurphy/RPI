@@ -659,6 +659,7 @@ class ImageSprite:
 		glitchChance  = self.config.imageGlitchProb
 		if self.holdAnimation == True :
 			glitchChance *= self.glitchChanceWhenPausedFactor
+			
 		if random.random() < glitchChance or forceGlitch:
 			r = int(random.uniform(2, 10))
 			if self.holdAnimation == True : 
@@ -673,7 +674,7 @@ class ImageSprite:
 				#print("filterize")
 				self.filterize()
 
-		self.augment()
+		#self.augment()
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

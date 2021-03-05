@@ -266,7 +266,9 @@ def performChanges() :
 
 	if random.random() < config.overlayChangeProb:
 		#config.colorOverlay = colorutils.getRandomRGB()
-		config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 2.0, 200,200)
+		#config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 1.0, 255,255)
+		config.colorOverlay = colorutils.getRandomColorHSV(	0,360, .65,1.0, .5,.5, 0,0, 255)
+
 
 	if random.random() < config.overlayChangeSizeProb:
 		config.clrBlkWidth = round(random.uniform(5,config.canvasWidth))
@@ -355,7 +357,7 @@ def drawVLine():
 		xPos = config.screenWidth
 
 
-def colorize(clr=(250, 0, 250), recolorize=False):
+def colorize(clr=(250, 0, 250, 255), recolorize=False):
 
 	# Colorize via overlay etc
 	w = config.renderImageFull.size[0]
@@ -392,7 +394,7 @@ def colorize(clr=(250, 0, 250), recolorize=False):
 		else :
 		'''
 		config.workImage = ImageChops.add_modulo(clrBlock, config.workImage)
-		#config.workImage = ImageChops.add(clrBlock, config.workImage, 1.0, 1)
+		#config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
 		# config.renderImageFull.paste(imgTemp,(0,0,w,h))

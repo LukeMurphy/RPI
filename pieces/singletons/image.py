@@ -204,10 +204,10 @@ def main(run=True):
 	config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
 
 
+	config.workImageOld = config.workImage.copy()
 	config.f = FaderObj()
-	config.f.setUp(config.renderImageFull, config.workImage)
+	config.f.setUp(config.workImageOld, config.workImage)
 	config.f.doingRefreshCount = config.doingRefreshCount
-	config.renderImageFullOld = config.renderImageFull.copy()
 	config.fadingDone = True
 
 	config.glitchCount = 0
@@ -231,8 +231,6 @@ def runWork():
 
 def performChanges() :
 
-
-
 	if config.imgLoader.action == "play" :
 		if random.random() < config.animateProb:
 			## holdAnimation
@@ -248,6 +246,8 @@ def performChanges() :
 	#config.workImage = Image.blend(config.workImage,config.imgLoader.image.convert("RGBA"),.5,)
 
 	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
+
+
 	
 	## RESETS for paused animation
 	if config.imgLoader.holdAnimation == True and (config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit or random.random() < config.releasePauseProb):
@@ -261,8 +261,6 @@ def performChanges() :
 		config.imgLoader.holdAnimation = False
 		config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
 
-
-	
 
 	if random.random() < config.overlayChangeProb:
 		if config.verticalOrientation == 0 : 1 
@@ -293,13 +291,14 @@ def performChanges() :
 		bads.drawBlanks(None, False)
 		if random.random() > 0.99:
 			bads.setBlanks()
+	
 
-	'''
 	'''
 
 	config.renderImageFull.paste(
 		config.workImage, (config.imageXOffset, config.imageYOffset), config.workImage
 	)
+	'''
 
 	#en = ImageEnhance.Brightness(config.renderImageFull)
 	#config.renderImageFull = en.enhance(config.brightness)
@@ -310,32 +309,21 @@ def iterate(n=0):
 	global config, blocks
 	global xPos, yPos
 
-
+	config.f.fadeIn()
+	config.render(config.f.blendedImage, 0, 0)
 
 	if config.f.fadingDone == True:
 
-		config.renderImageFullOld = config.renderImageFull.copy()
-		config.renderImageFull.paste(
-			config.workImage,
-			(config.imageXOffset, config.imageYOffset),
-			config.workImage,
-		)
+		config.workImageOld = config.workImage.copy()
 		config.f.xPos = config.imageXOffset
 		config.f.yPos = config.imageYOffset
 
-		# config.renderImageFull = config.renderImageFull.convert("RGBA")
-		# renderImageFull = renderImageFull.convert("RGBA")
+		performChanges()
 
 		config.f.setUp(
-			config.renderImageFullOld.convert("RGBA"),
+			config.workImageOld.convert("RGBA"),
 			config.workImage.convert("RGBA"),
 		)
-
-
-	performChanges() 
-	#config.f.fadeIn()
-	#config.render(config.f.blendedImage, 0, 0)
-	config.render(config.renderImageFull, 0, 0)
 
 	#config.updateCanvas()
 

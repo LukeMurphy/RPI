@@ -29,10 +29,11 @@ class FaderObj:
 				self.blendedImage = Image.blend(
 					self.startImage,
 					self.endImage,
-					self.doingRefresh / self.doingRefreshCount,
+					self.doingRefresh / self.doingRefreshCount
 				)
 				# self.targetImage.paste(self.crossFade, (self.xPos, self.yPos), self.crossFade)
 				self.doingRefresh += 1
+
 			else:
 				# self.blendedImage.paste(self.endImage.convert("RGBA"), (self.xPos, self.yPos), self.endImage.convert("RGBA"))
 				self.fadingDone = True

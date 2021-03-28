@@ -307,7 +307,8 @@ def performChanges() :
 		#print("SPEED RESET")
 		config.f.doingRefreshCount = config.doingRefreshCount
 
-	if random.random() < config.doingRefreshCountVariability :
+	# only do slow fast during animation play not during glitch
+	if random.random() < config.doingRefreshCountVariability and config.imgLoader.holdAnimation == False:
 		if random.random() < config.doingRefreshCountFastProb :
 			#FAST
 			print("FAST")

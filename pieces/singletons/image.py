@@ -302,7 +302,10 @@ def performChanges() :
 		config.overlayxPos = config.overlayxPosOrig
 		config.overlayyPos = config.overlayyPosOrig
 
-
+	# not so efficient but the alternative is to set another variable, check that each
+	# cycle etc etc etc blah blah blah and oh god I am trapped in infinite if-then logics so human
+	# but what the hell is human anyway? a giant collecion of other micro systems overwhich we
+	# have zero control except harm or termination
 	if random.random() < config.doingRefreshCountVariabilityReset :
 		#print("SPEED RESET")
 		config.f.doingRefreshCount = config.doingRefreshCount

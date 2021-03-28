@@ -157,7 +157,24 @@ def main(run=True):
 	except Exception as e:
 		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
-		config.doingRefreshCount = 10
+		config.doingRefreshCount = 10	
+
+	try:
+		config.doingRefreshCountVariability  = float(
+			workConfig.get("images", "doingRefreshCountVariability")
+		)
+		config.doingRefreshCountVariabilityReset  = float(
+			workConfig.get("images", "doingRefreshCountVariabilityReset")
+		)		
+		config.doingRefreshCountFastProb  = float(
+			workConfig.get("images", "doingRefreshCountFastProb")
+		)
+	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
+		print(str(e))
+		config.doingRefreshCountVariability = 0.0
+		config.doingRefreshCountVariabilityReset = 1.0
+		config.doingRefreshCountFastProb = .5
 
 	try:
 		config.overLayMode = int(workConfig.get("images", "overLayMode"))
@@ -284,6 +301,21 @@ def performChanges() :
 	if random.random() < config.overlayChangePosProb/2.0:
 		config.overlayxPos = config.overlayxPosOrig
 		config.overlayyPos = config.overlayyPosOrig
+
+
+	if random.random() < config.doingRefreshCountVariabilityReset :
+		#print("SPEED RESET")
+		config.f.doingRefreshCount = config.doingRefreshCount
+
+	if random.random() < config.doingRefreshCountVariability :
+		if random.random() < config.doingRefreshCountFastProb :
+			#FAST
+			print("FAST")
+			config.f.doingRefreshCount = round(random.uniform(0,0))
+		else:
+			#SLOW
+			print("SLOW")
+			config.f.doingRefreshCount = round(random.uniform(10,40))
 
 	colorize(config.colorOverlay)
 

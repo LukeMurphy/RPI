@@ -100,7 +100,7 @@ def drawSpinner():
 		sY0 = config.spinnerInnerRadius * math.cos(angle) + config.spinnerCenter[1]
 		sY = config.spinnerRadius * math.cos(angle) + config.spinnerCenter[1]
 		b = float(s) / float(config.spinnerAngleSteps)
-		fillColor = (int(b * 250), int(b * 200), 0, 200)
+		fillColor = (round(b * 250), round(b * 200), 0, 200)
 		# if (b <=.01) : fillColor = barColor
 		config.draw.line((sX0, sY0, sX, sY), fill=fillColor)
 
@@ -110,9 +110,13 @@ def drawBar():
 
 	# Unless overridden, boxWidth is ~ to percentage
 	if config.drawBarFill:
-		config.boxWidth = int(config.percentage / 100 * config.boxMax)
+		config.boxWidth = round(config.percentage / 100 * config.boxMax)
 
 	# draw box container
+
+	rVd = round(config.barColor[0] * .42)
+	gVd = round(config.barColor[1] * .42)
+	bVd = round(config.barColor[2] * .42)
 	config.draw.rectangle(
 		(
 			config.xPos - 1,
@@ -121,8 +125,12 @@ def drawBar():
 			config.boxHeight + config.yPos + 1,
 		),
 		outline=(config.outlineColor),
-		fill=(config.holderColor),
+		fill=((rVd,0,bVd)),
 	)
+
+
+
+
 	# draw bar
 	config.boxWidthDisplay = config.boxWidth
 	# draw flat box progress bar
@@ -153,9 +161,9 @@ def drawBar():
 			yPos = config.yPos1 + n
 			b = math.sin(arc * n) * 1.2
 			# b = cyclicalBrightness
-			rVd = int(config.barColor[0] * b)
-			gVd = int(config.barColor[1] * b)
-			bVd = int(config.barColor[2] * b)
+			rVd = round(config.barColor[0] * b)
+			gVd = round(config.barColor[1] * b)
+			bVd = round(config.barColor[2] * b)
 			barColorDisplay = (rVd, gVd, bVd)
 			config.draw.rectangle(
 				(config.xPos1, yPos, config.xPos2, yPos), fill=(barColorDisplay)
@@ -163,7 +171,7 @@ def drawBar():
 
 	elif config.useHorizontalColorGradient:
 		# Draw horizontal color gradient bar
-		vLines = int(config.xPos2 - config.xPos1)
+		vLines = round(config.xPos2 - config.xPos1)
 		dR = (config.barColorEnd[0] - config.barColorStart[0]) / (vLines + 1)
 		dG = (config.barColorEnd[1] - config.barColorStart[1]) / (vLines + 1)
 		dB = (config.barColorEnd[2] - config.barColorStart[2]) / (vLines + 1)
@@ -172,19 +180,19 @@ def drawBar():
 			config.xPos2p = config.xPos1p + 1
 			# cyclicalBrightness = abs(math.sin(cyclicalArc * cyclicalBrightnessPhase * boxMax/vLines))+.1
 			# cyclicalBrightness = 1
-			# if(config.debug ) : print(cyclicalBrightness)
-			rV = int(config.barColorStart[0] + p * dR)
-			gV = int(config.barColorStart[1] + p * dG)
-			bV = int(config.barColorStart[2] + p * dB)
+			# if(config.debug ) : prround(cyclicalBrightness)
+			rV = round(config.barColorStart[0] + p * dR)
+			gV = round(config.barColorStart[1] + p * dG)
+			bV = round(config.barColorStart[2] + p * dB)
 
 			# Draw vertical shading gradient "3D!"
 			for n in range(0, lines):
 				config.yPos = config.yPos1 + n
 				b = math.sin(arc * n)
 				# b = cyclicalBrightness
-				rVd = int(rV * b)
-				gVd = int(gV * b)
-				bVd = int(bV * b)
+				rVd = round(rV * b)
+				gVd = round(gV * b)
+				bVd = round(bV * b)
 				barColor = (rVd, gVd, bVd)
 				config.draw.rectangle(
 					(config.xPos1p, config.yPos, config.xPos2p, config.yPos),
@@ -440,6 +448,17 @@ def iterate():
 	# Display bar, spinner, message or %
 	reDraw()
 
+	if random.random() < config.filterRemappingProb:
+		if config.useFilters == True and config.filterRemapping == True:
+			config.filterRemap = True
+			startX = round(random.uniform(0,config.filterRemapRangeX) )
+			startY = round(random.uniform(0,config.filterRemapRangeY) )
+			endX = round(random.uniform(8, config.filterRemapminHoriSize) )
+			endY = round(random.uniform(8, config.filterRemapminVertSize) )
+			config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
+			config.remapImageBlockDestination = [startX,startY]
+			#print("swapping" + str(config.remapImageBlockSection))
+
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
@@ -498,6 +517,26 @@ def main(run=True):
 	)
 	config.noBarProb = float(workConfig.get("progressbar", "noBarProb")) / 100
 	config.noDoneProb = float(workConfig.get("progressbar", "noDoneProb")) / 100
+
+	try:
+		config.filterRemapping = (workConfig.getboolean("progressbar", "filterRemapping"))
+		config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb"))
+		config.filterRemapminHoriSize = int(workConfig.get("progressbar", "filterRemapminHoriSize"))
+		config.filterRemapminVertSize = int(workConfig.get("progressbar", "filterRemapminVertSize"))
+	except Exception as e:
+		print(str(e))
+		config.filterRemapping = False
+		config.filterRemappingProb = 0.0
+		config.filterRemapminHoriSize = 24
+		config.filterRemapminVertSize = 24
+
+	try:
+		config.filterRemapRangeX = int(workConfig.get("progressbar", "filterRemapRangeX"))
+		config.filterRemapRangeY = int(workConfig.get("progressbar", "filterRemapRangeY"))
+	except Exception as e:
+		print(str(e))
+		config.filterRemapRangeX = config.canvasWidth
+		config.filterRemapRangeY = config.canvasHeight
 
 	init()
 

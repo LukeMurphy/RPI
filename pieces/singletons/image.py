@@ -376,11 +376,6 @@ def iterate(n=0):
 	if random.random() < config.filterRemappingProb:
 		if config.useFilters == True and config.filterRemapping == True:
 			config.filterRemap = True
-
-			#startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
-			#startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
-			#endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
-			#endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
 			# new version  more control but may require previous pieces to be re-worked
 			startX = round(random.uniform(0,config.filterRemapRangeX) )
 			startY = round(random.uniform(0,config.filterRemapRangeY) )
@@ -389,8 +384,6 @@ def iterate(n=0):
 			config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
 			config.remapImageBlockDestination = [startX,startY]
 			#print("swapping" + str(config.remapImageBlockSection))
-	# config.updateCanvas()
-
 
 def drawVLine():
 	global xPos, yPos

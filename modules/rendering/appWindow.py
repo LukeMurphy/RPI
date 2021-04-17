@@ -82,7 +82,7 @@ class AppWindow:
 		)
 
 		self.masterConfig.cnvs.create_rectangle(
-			0, 0, self.masterConfig.screenWidth + self.buff, self.masterConfig.screenHeight + self.buff, fill="red"
+			0, 0, self.masterConfig.screenWidth + self.buff, self.masterConfig.screenHeight + self.buff, fill="black"
 		)
 		#config.cnvs.pack()
 		self.masterConfig.cnvs.place(
@@ -104,6 +104,8 @@ class AppWindow:
 
 		### Putting the animation on its own thread
 		### Still throws and error when manually closed though...
+
+		print("Starting threads")
 
 		try:
 			t = threading.Thread.__init__(work.runWork())

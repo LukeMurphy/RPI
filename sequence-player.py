@@ -174,7 +174,7 @@ def loadSequenceFile():
 		pieceToPlay = 0
 		loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 
-		sequenceConfig.mainAppWindow.run()
+		#sequenceConfig.mainAppWindow.run()
 
 
 

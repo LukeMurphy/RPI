@@ -57,6 +57,11 @@ def main(run=True):
 
 	config.clrBlkWidth = int(workConfig.get("images", "clrBlkWidth"))
 	config.clrBlkHeight = int(workConfig.get("images", "clrBlkHeight"))
+	config.clrBlkWidthSet = int(workConfig.get("images", "clrBlkWidth"))
+	config.clrBlkHeightSet = int(workConfig.get("images", "clrBlkHeight"))
+
+
+
 	config.overlayxPosOrig = int(workConfig.get("images", "overlayxPos"))
 	config.overlayyPosOrig = int(workConfig.get("images", "overlayyPos"))
 	config.overlayxPos = int(workConfig.get("images", "overlayxPos"))
@@ -302,8 +307,8 @@ def performChanges():
 		config.colorOverlay = colorutils.getRandomColorHSV(	0, 360, .65, 1.0, .5, .5, 0, 0, 255)
 
 	if random.random() < config.overlayChangeSizeProb:
-		config.clrBlkWidth = round(random.uniform(5, config.canvasWidth * 1.25))
-		config.clrBlkHeight = round(random.uniform(5, config.canvasHeight * 1.25))
+		config.clrBlkWidth = round(random.uniform(5, config.clrBlkWidthSet * 1.25))
+		config.clrBlkHeight = round(random.uniform(5, config.clrBlkHeightSet * 1.25))
 
 	if random.random() < config.overlayChangePosProb:
 		config.overlayxPos = round(random.uniform(0, 2 * config.canvasWidth / 3))

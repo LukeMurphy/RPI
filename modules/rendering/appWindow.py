@@ -107,6 +107,18 @@ class AppWindow:
 
 		print("Starting threads")
 
+
+		'''
+		try:
+			threadRunning = threading.Thread(target=work.runWork)
+			print(threadRunning)
+			threadRunning.start()
+			threadRunning.join()
+		except Exception as e:
+			print("DID NOT WORK")
+			print(str(e))
+		'''
+
 		try:
 			t = threading.Thread.__init__(work.runWork())
 			t.start()

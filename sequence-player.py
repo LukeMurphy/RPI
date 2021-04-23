@@ -26,6 +26,8 @@ from modules.rendering import appWindow
 from modules.configuration import bcolors
 
 
+
+
 def timeChecker(sequenceConfig, config) :
 	sequenceConfig.currentTime = time.time()
 
@@ -73,7 +75,12 @@ def loadWorkConfig(work, sequenceConfig):
 	print(bcolors.ENDC)
 	workconfig.read(argument)
 	config.fileName = argument
+	sequenceConfig.playCount=sequenceConfig.playCount+1
+	print("==========> count play : " + str(sequenceConfig.playCount))
 
+	if (sequenceConfig.playCount > 100) :
+		# Clean threads!
+		os.system( config.path  + '/cntrlscripts/restart_full_sequencer.sh')
 
 
 	# ****************************************** #
@@ -146,6 +153,7 @@ def loadSequenceFile():
 		sequenceConfig.workListDirectory = workconfig.get("displayconfig", "workListDirectory")
 		sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
 		sequenceConfig.currentPieceDuration = 1
+		sequenceConfig.playCount = 0
 
 		sequenceConfig.workList = []
 

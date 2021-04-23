@@ -61,7 +61,6 @@ def main(run=True):
 	config.clrBlkHeightSet = int(workConfig.get("images", "clrBlkHeight"))
 
 
-
 	config.overlayxPosOrig = int(workConfig.get("images", "overlayxPos"))
 	config.overlayyPosOrig = int(workConfig.get("images", "overlayyPos"))
 	config.overlayxPos = int(workConfig.get("images", "overlayxPos"))
@@ -71,12 +70,29 @@ def main(run=True):
 	config.animateProb = float(workConfig.get("images", "animateProb"))
 	config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
 
+
 	try:
 		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangeSizeProb"))
 	except Exception as e:
 		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		print(str(e))
 		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangePosProb"))
+
+	print("------------------")
+	try:
+		overlayColor = workConfig.get("images", "overlayColor").split(',')
+
+		print(overlayColor)
+		config.overlayColor = tuple(map(lambda x: int(x), overlayColor))
+		print(config.overlayColor)
+		config.colorOverlay = config.overlayColor
+
+	except Exception as e:
+		print(bcolors.FAIL + "** " + bcolors.BOLD)
+		config.overlayColor = None
+		config.colorOverlay = (0,200,0,150)
+		print(str(e))
+	print("------------------")	
 
 	try:
 		config.pausePlayProb = float(workConfig.get("images", "pausePlayProb"))
@@ -206,7 +222,7 @@ def main(run=True):
 
 	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
-	config.colorOverlay = (255, 0, 255)
+	
 
 	config.imagePath = config.path + "/assets/imgs/"
 	config.imageList = [config.imageToLoad]

@@ -1,3 +1,22 @@
+"""Summary
+
+Attributes:
+    actionDict1 (TYPE): Description
+    actionDict2 (TYPE): Description
+    commadStringMultiPyth (str): Description
+    commadStringProc (str): Description
+    commadStringPyth (str): Description
+    JavaAppRunning (str): Description
+    Lb1 (TYPE): Description
+    leftBtnPlace (int): Description
+    quitbutton (TYPE): Description
+    root (TYPE): Description
+    scrollbar (TYPE): Description
+    slogan (TYPE): Description
+    sortbutton (TYPE): Description
+    sortDefault (int): Description
+    topBtnPlace (int): Description
+"""
 import os
 import datetime
 import subprocess
@@ -26,6 +45,11 @@ actionDict2 = [
 
 
 def verify():
+	"""Summary
+	
+	Returns:
+	    TYPE: Description
+	"""
 	# print("==>",Lb.curselection())
 	global actionDict1
 	process = False
@@ -42,6 +66,11 @@ def verify():
 
 
 def execute(configToRun):
+	"""Summary
+	
+	Args:
+	    configToRun (TYPE): Description
+	"""
 	global JavaAppRunning
 	if ".cfg" in configToRun:
 		if "multi" in configToRun:
@@ -54,6 +83,8 @@ def execute(configToRun):
 
 
 def action():
+	"""Summary
+	"""
 	a = verify()
 	if a[0] == True:
 		# os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
@@ -63,6 +94,8 @@ def action():
 
 
 def action2():
+	"""Summary
+	"""
 	global JavaAppRunning
 	a = verify()
 	if a[0] == True:
@@ -78,11 +111,15 @@ def action2():
 
 
 def stopAll():
+	"""Summary
+	"""
 	# print("Tkinter is easy to use!")
 	os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 
 
 def reSort():
+	"""Summary
+	"""
 	global sortDefault
 	if sortDefault == 0 :
 		sortDefault = 1
@@ -98,10 +135,23 @@ from os.path import isfile, join
 from os import walk
 
 def returnSecondElement(l):
+	"""Summary
+	
+	Args:
+	    l (TYPE): Description
+	
+	Returns:
+	    TYPE: Description
+	"""
 	return l[1]
 
 
 def getAllConfigFiles(dateSort=False) :
+	"""Summary
+	
+	Args:
+	    dateSort (bool, optional): Description
+	"""
 	global actionDict1, Lb1
 	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
 	arr = os.listdir(configPath)

@@ -24,6 +24,13 @@ from PIL import (
 
 
 class AppWindow:
+	'''[summary]
+	
+	[description]
+	
+	Variables:
+		) {[type]} -- [description]
+	'''
 	def __init__(self, masterConfig):
 		print("** App Window Initialized ** ")
 		self.masterConfig = masterConfig
@@ -70,7 +77,10 @@ class AppWindow:
 		self.root.lift()
 
 
-
+	'''[summary]
+	
+	[description]
+	'''
 	def createMainCanvas(self):
 		self.masterConfig.root = self.root
 

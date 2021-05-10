@@ -1,4 +1,11 @@
 #!/usr/bin/python
+"""Summary
+
+Attributes:
+    args (TYPE): Description
+    parser (TYPE): Description
+    workconfig (TYPE): Description
+"""
 
 import argparse
 import configparser
@@ -70,6 +77,12 @@ print(bcolors.OKBLUE + "** " + str(args) + ""  + bcolors.ENDC)
 
 
 def loadFromArguments(reloading=False, config=None):
+	"""Summary
+	
+	Args:
+	    reloading (bool, optional): Description
+	    config (None, optional): Description
+	"""
 	# global config, workconfig, path, tempImage, threads, thrd
 
 	print(bcolors.OKBLUE + "** RELOADING: " + str(reloading) + bcolors.ENDC)
@@ -181,6 +194,8 @@ def loadFromArguments(reloading=False, config=None):
 
 
 def main():
+	"""Summary
+	"""
 	global config, threads
 	loadFromArguments()
 	"""

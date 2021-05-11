@@ -60,15 +60,84 @@ def reMove(config) :
 		config.yIncrementer = 0
 
 
+def wavePattern(config) :
+	clr = config.lineColor
+	w = 4
+	h = 4
+	x = config.xIncrementer
+	y = config.yIncrementer
+
+
+	config.bgColor = tuple(
+		int(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)	
+
+	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = config.bgColor, outline=config.bgColor)
+
+	numPoints = round(config.blockWidth)
+	amplitude = config.amplitude
+	yOffset = config.yOffset
+	amplitude2 = config.amplitude/2
+	yOffset2 = config.yOffset*1
+	steps = config.steps
+	rads = 2 * 22/7/ numPoints
+
+
+	for i in range (0,numPoints, steps) :
+		angle = (i + config.xIncrementer) * rads
+		angle2 = (i+ config.xIncrementer + steps) * rads
+		a = (i, math.sin(angle) * amplitude + yOffset)
+		b = (i + steps, math.sin(angle) * amplitude + yOffset)
+		c = (i + steps, math.sin(angle2) * amplitude + yOffset)
+
+		if c[1] < a[1] :
+			b = (i, math.sin(angle2) * amplitude + yOffset)
+		config.blockDraw.polygon((a,b,c,a), fill = clr, outline=None)
+
+	phase = round(config.blockWidth/4)
+	for i in range (0,numPoints, steps) :
+		angle = (i + config.xIncrementer + phase) * rads
+		angle2 = (i + config.xIncrementer + phase + steps) * rads
+		a = (i, math.cos(angle) * amplitude2 + yOffset2)
+		b = (i + steps, math.cos(angle) * amplitude2 + yOffset2)
+		c = (i + steps, math.cos(angle2) * amplitude2 + yOffset2)
+
+		if c[1] < a[1] :
+			b = (i, math.cos(angle2) * amplitude2 + yOffset2)
+		config.blockDraw.polygon((a,b,c,a), fill = clr2, outline=None)
+
+
+	config.xIncrementer += config.xSpeed
+	config.yIncrementer += config.ySpeed
+
+	if config.xIncrementer >= config.blockWidth * 1:
+		config.xIncrementer = -0
+	if config.yIncrementer >= config.blockHeight -4:
+		config.yIncrementer = 0
+
 def redraw(config):
-	reMove(config)
+	#reMove(config)
+	wavePattern(config)
 
 
 def repeatImage(config) :
-	for c in range(0, config.cols):
-		for r in range(0, config.rows):
-			config.canvasImage.paste(config.blockImage, (c * config.blockWidth, r * config.blockHeight), config.blockImage)
-
+	cntr = 0
+	skipBlocks = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+	skipBlocks = [ 200]
+	for r in range(0, config.rows):
+		for c in range(0, config.cols):
+			if cntr in skipBlocks :
+				config.canvasDraw.rectangle((c * config.blockWidth, r * config.blockHeight, c * config.blockWidth + config.blockWidth, r * config.blockHeight + config.blockHeight), fill = config.bgColor, outline=config.bgColor)
+			else :
+				config.canvasImage.paste(config.blockImage, (c * config.blockWidth, r * config.blockHeight), config.blockImage)
+			cntr += 1
 
 def runWork():
 	global config
@@ -86,6 +155,7 @@ def iterate():
 	global config
 	config.colOverlay.stepTransition()
 	config.linecolOverlay.stepTransition()
+	config.linecolOverlay2.stepTransition()
 	redraw(config)
 	repeatImage(config)
 	config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
@@ -144,8 +214,20 @@ def main(run=True):
 	minValue = float(workConfig.get("movingpattern", "line_minValue"))
 	maxValue = float(workConfig.get("movingpattern", "line_maxValue"))
 	config.linecolOverlay = getConfigOverlay(tLimitBase,minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue)
+	config.linecolOverlay2 = getConfigOverlay(tLimitBase,minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue)
 
 	config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
+
+	config.steps = int(workConfig.get("movingpattern", "steps"))
+	config.amplitude = int(workConfig.get("movingpattern", "amplitude"))
+	config.yOffset = int(workConfig.get("movingpattern", "yOffset"))
+
+
+	config.xSpeed = float(workConfig.get("movingpattern", "xSpeed"))
+	config.ySpeed = float(workConfig.get("movingpattern", "ySpeed"))
+
+
+	config.repeatProb = .99
 
 	config.xIncrementer = 0
 	config.yIncrementer = 0

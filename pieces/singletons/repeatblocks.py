@@ -49,7 +49,7 @@ def reMove(config) :
 
 	for i in range (0,numLines) :
 		config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult,config.blockHeight), fill=(clr))
-		config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult + 1,config.blockHeight), fill=(clr))
+		if config.useDoubleLine == True : config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult + 1,config.blockHeight), fill=(clr))
 
 	config.xIncrementer += 1
 	config.yIncrementer += 0
@@ -144,6 +144,8 @@ def main(run=True):
 	minValue = float(workConfig.get("movingpattern", "line_minValue"))
 	maxValue = float(workConfig.get("movingpattern", "line_maxValue"))
 	config.linecolOverlay = getConfigOverlay(tLimitBase,minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue)
+
+	config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
 
 	config.xIncrementer = 0
 	config.yIncrementer = 0

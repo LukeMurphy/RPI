@@ -84,9 +84,10 @@ def wavePattern(config) :
 	numPoints = round(config.blockWidth)
 	amplitude = config.amplitude
 	yOffset = config.yOffset
-	amplitude2 = config.amplitude/2
-	yOffset2 = config.yOffset*1
+	amplitude2 = config.amplitude2
+	yOffset2 = config.yOffset2
 	steps = config.steps
+	steps2 = config.steps2
 	rads = 2 * 22/7/ numPoints
 
 
@@ -101,13 +102,13 @@ def wavePattern(config) :
 			b = (i, math.sin(angle2) * amplitude + yOffset)
 		config.blockDraw.polygon((a,b,c,a), fill = clr, outline=None)
 
-	phase = round(config.blockWidth/4)
-	for i in range (0,numPoints, steps) :
-		angle = (i + config.xIncrementer + phase) * rads
-		angle2 = (i + config.xIncrementer + phase + steps) * rads
+	phase = round(config.blockWidth/config.phaseFactor)
+	for i in range (0,numPoints, steps2) :
+		angle = (i - config.speedFactor*config.xIncrementer + phase) * rads
+		angle2 = (i - config.speedFactor*config.xIncrementer + phase + steps2) * rads
 		a = (i, math.cos(angle) * amplitude2 + yOffset2)
-		b = (i + steps, math.cos(angle) * amplitude2 + yOffset2)
-		c = (i + steps, math.cos(angle2) * amplitude2 + yOffset2)
+		b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
+		c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
 
 		if c[1] < a[1] :
 			b = (i, math.cos(angle2) * amplitude2 + yOffset2)
@@ -219,10 +220,14 @@ def main(run=True):
 	config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
 
 	config.steps = int(workConfig.get("movingpattern", "steps"))
+	config.steps2 = int(workConfig.get("movingpattern", "steps2"))
 	config.amplitude = int(workConfig.get("movingpattern", "amplitude"))
+	config.amplitude2 = int(workConfig.get("movingpattern", "amplitude2"))
 	config.yOffset = int(workConfig.get("movingpattern", "yOffset"))
+	config.yOffset2 = int(workConfig.get("movingpattern", "yOffset2"))
 
-
+	config.speedFactor = float(workConfig.get("movingpattern", "speedFactor"))
+	config.phaseFactor = float(workConfig.get("movingpattern", "phaseFactor"))
 	config.xSpeed = float(workConfig.get("movingpattern", "xSpeed"))
 	config.ySpeed = float(workConfig.get("movingpattern", "ySpeed"))
 

@@ -41,6 +41,7 @@ class Particle(object):
 	unitBlur = 0
 	meanderFactor = 4
 	meanderFactor2 = 90
+	meanderDirection = 1
 	changeColorOnChange = False
 	xWind = 0
 
@@ -154,6 +155,7 @@ class Particle(object):
 		self.draw = ImageDraw.Draw(self.image)
 		self.imageDrawn = True
 
+
 	def travel(self):
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
 
@@ -179,6 +181,7 @@ class Particle(object):
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
+
 	def linearMotion(self):
 
 		self.dy = self.v * math.sin(self.direction)
@@ -193,19 +196,32 @@ class Particle(object):
 		self.xPosR += self.dx
 		self.yPosR += self.dy
 
+
 	def meander(self):
 
 		self.direction += self.directionIncrement * self.ps.clumpingFactor
 
-		self.dy = self.v * math.sin(self.direction)
-		# self.dx = self.v * math.cos(self.direction)
 
-		self.dx = (
-			self.ps.meandorFactor
-			* self.meanderFactor
-			* noise.pnoise1(self.yPos / self.meanderFactor2, 1)
-			+ self.xWind
-		)
+		if self.ps.meanderDirection == 1 :
+			self.dx = self.v * math.sin(self.direction)
+			# self.dx = self.v * math.cos(self.direction)
+
+			self.dy = (
+				self.ps.meandorFactor
+				* self.meanderFactor
+				* noise.pnoise1(self.yPos / self.meanderFactor2, 1)
+				+ self.xWind
+			)
+		else :
+			self.dy = self.v * math.sin(self.direction)
+			# self.dx = self.v * math.cos(self.direction)
+
+			self.dx = (
+				self.ps.meandorFactor
+				* self.meanderFactor
+				* noise.pnoise1(self.yPos / self.meanderFactor2, 1)
+				+ self.xWind
+			)
 
 		vy = self.v * math.sin(self.direction)
 		vx = self.v * math.cos(self.direction)
@@ -225,6 +241,7 @@ class Particle(object):
 
 		self.xPosR += self.dx
 		self.yPosR += self.dy
+
 
 	def checkForBorderCollisions(self):
 		if self.ps.borderCollisions == True:
@@ -304,6 +321,7 @@ class Particle(object):
 				self.yPosR = self.ps.config.canvasHeight
 				self.yPos = self.ps.config.canvasHeight
 				self.changeColor()
+
 
 	def update(self):
 

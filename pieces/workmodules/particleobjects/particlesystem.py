@@ -30,6 +30,7 @@ class ParticleSystem(object):
 	ignoreBottom = False
 
 	movement = "travel"
+	meanderDirection = 0.0
 
 	minDx = 2
 	minDy = 2

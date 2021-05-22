@@ -17,6 +17,7 @@ from PIL import (
 	ImageOps,
 )
 
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 def main(run=True):
 	global config, directionOrder, ps
@@ -122,6 +123,12 @@ def main(run=True):
 	except Exception as e:
 		print(str(e))
 		ps.meandorFactor = 1.0
+
+	try:
+		ps.meanderDirection = int(workConfig.get("particleSystem", "meanderDirection"))
+	except Exception as e:
+		print(str(e))
+		ps.meanderDirection = .0
 
 	try:
 		ps.objTrails = workConfig.getboolean("particleSystem", "objTrails")
@@ -381,6 +388,9 @@ def main(run=True):
 		runWork()
 
 
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
 def emitParticle(i=None):
 	global config, ps
 	p = Particle(ps)
@@ -522,6 +532,8 @@ def emitParticle(i=None):
 	else:
 		ps.unitArray.append(p)
 
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 def transformImage(img):
 	width, height = img.size
@@ -763,6 +775,9 @@ def iterate():
 	)
 
 	config.render(config.image, 0, 0)
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
 def renderDiagnosticsCall() :

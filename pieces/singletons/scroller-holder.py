@@ -408,7 +408,7 @@ def makeBackGround(drawRef, n=1):
 	cols = config.patternCols * 1
 
 	xDiv = round(
-		(config.displayRows * config.windowWidth) / cols
+		(config.displayRows * config.canvasWidth) / cols
 	)  # - config.patternColsOffset
 	yDiv = (
 		config.canvasHeight / rows
@@ -430,7 +430,7 @@ def makeBackGround(drawRef, n=1):
 					config.bg_minValue, config.bg_maxValue)
 
 	drawRef.rectangle(
-		(0, 0, (round(config.displayRows * config.windowWidth)), config.canvasHeight),
+		(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
 		fill=config.bgBackGroundColor,
 	)
 

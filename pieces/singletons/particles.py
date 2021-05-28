@@ -794,20 +794,13 @@ def iterate():
 			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
 	)
 
-
+	# RENDERING AS A MOCKUP OR AS REAL
 	if config.useDrawingPoints == True :
+		config.panelDrawing.canvasToUse = config.image
 		config.panelDrawing.render()
 	else :
 		#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-		tester =Image.new("RGBA", (config.screenWidth, config.screenHeight))
-		crop = config.image.crop((0,0,100,50))	
-		crop = crop.rotate(10,Image.NEAREST , 1)
-		tester.paste(crop, (100,50),crop)
-
-		crop = config.image.crop((100,0,200,50))	
-		tester.paste(crop, (200,50),crop)
-		#config.render(config.image, 0, 0)
-		config.render(tester, 0, 0)
+		config.render(config.image, 0, 0)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

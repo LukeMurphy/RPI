@@ -24,7 +24,7 @@ class PanelPathDrawing:
 
 	def render(self) :
 
-		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = (0,0,0,100))
+		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = (0,0,0,255))
 		row = 0
 		col = 0
 		rowBuffer = 0
@@ -53,6 +53,7 @@ class PanelPathDrawing:
 			yPos = round(self.drawingPath[i][1])
 			angle = self.drawingPath[i][2]
 			section = section.rotate(angle, Image.NEAREST , 1)
+			section = section.convert("RGBA")
 			self.canvas.paste(section,(xPos + colOffset ,yPos + rowOffset ),section)
 
 			prevX = xPos

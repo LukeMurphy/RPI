@@ -11,7 +11,7 @@ import textwrap
 import time
 from collections import OrderedDict
 from modules.configuration import bcolors
-from modules import coloroverlay, colorutils, continuous_scroller
+from modules import coloroverlay, colorutils, continuous_scroller,  panelDrawing
 
 from modules.faderclass import FaderObj
 from PIL import (
@@ -981,6 +981,23 @@ def init():
 		print(str(e))
 
 
+	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	try:
+		config.tileSizeWidth = int(workConfig.get("displayconfig", "tileSizeWidth"))
+		config.tileSizeHeight = int(workConfig.get("displayconfig", "tileSizeHeight"))
+		config.useDrawingPoints = workConfig.getboolean("movingpattern", "useDrawingPoints")
+		config.panelDrawing = panelDrawing.PanelPathDrawing(config)
+		config.panelDrawing.canvasToUse = config.image
+
+		drawingPathPoints = workConfig.get("movingpattern", "drawingPathPoints").split("|")
+		config.panelDrawing.drawingPath = []
+
+		for i in range(0, len(drawingPathPoints)) :
+			p = drawingPathPoints[i].split(",")
+			config.panelDrawing.drawingPath.append((int(p[0]), int(p[1]), int(p[2])))
+	except Exception as e:
+		print(str(e))
+		config.useDrawingPoints = False
 
 
 	config.f = FaderObj()
@@ -1121,7 +1138,15 @@ def iterate():
 			(config.imageXOffset, config.imageYOffset),
 			config.workImage,
 		)
-		config.render(config.renderImageFull, 0, 0)
+
+		# RENDERING AS A MOCKUP OR AS REAL
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = config.renderImageFull
+			config.panelDrawing.render()
+		else :
+			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			#config.render(config.image, 0, 0)
+			config.render(config.renderImageFull, 0, 0)
 
 
 def main(run=True):

@@ -5,9 +5,29 @@ import random
 import time
 import types
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 import numpy as np
+
+
+def randomizer(config) :
+
+	w = config.randomBlockWidth
+	h = config.randomBlockHeight
+
+	config.bgColor = tuple(
+		int(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = config.bgColor, outline=None)
+
+	rows = config.blockHeight
+	cols = config.blockWidth
+	for r in range(0,rows, h):
+		for c in range(0, cols, w):
+			clr = colorutils.getRandomRGB()
+			if random.random() < config.randomBlockProb :
+				config.blockDraw.rectangle((c,r,w+c,h+r), fill=(clr), outline=None)
+
 
 
 def diagonalMove(config) :
@@ -124,9 +144,14 @@ def wavePattern(config) :
 		config.yIncrementer = 0
 
 def redraw(config):
-	#reMove(config)
-	wavePattern(config)
-
+	if config.patternModel == "waves" :
+		wavePattern(config)
+	if config.patternModel == "reMove" :
+		reMove(config)
+	if config.patternModel == "diagonalMove" :
+		diagonalMove(config)
+	if config.patternModel == "randomizer" :
+		randomizer(config)
 
 def repeatImage(config) :
 	cntr = 0
@@ -157,9 +182,15 @@ def iterate():
 	config.colOverlay.stepTransition()
 	config.linecolOverlay.stepTransition()
 	config.linecolOverlay2.stepTransition()
+
 	redraw(config)
+
 	repeatImage(config)
-	config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+
+	if config.useDrawingPoints == True :
+		config.panelDrawing.render()
+	else :
+		config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
 	# Done
 
 
@@ -219,6 +250,7 @@ def main(run=True):
 
 	config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
 
+	config.patternModel = (workConfig.get("movingpattern", "patternModel"))
 	config.steps = int(workConfig.get("movingpattern", "steps"))
 	config.steps2 = int(workConfig.get("movingpattern", "steps2"))
 	config.amplitude = int(workConfig.get("movingpattern", "amplitude"))
@@ -230,6 +262,13 @@ def main(run=True):
 	config.phaseFactor = float(workConfig.get("movingpattern", "phaseFactor"))
 	config.xSpeed = float(workConfig.get("movingpattern", "xSpeed"))
 	config.ySpeed = float(workConfig.get("movingpattern", "ySpeed"))
+
+
+	config.randomBlockProb = float(workConfig.get("movingpattern", "randomBlockProb"))
+	config.randomBlockWidth = int(workConfig.get("movingpattern", "randomBlockWidth"))
+	config.randomBlockHeight = int(workConfig.get("movingpattern", "randomBlockHeight"))
+
+
 
 
 	config.repeatProb = .99
@@ -248,7 +287,24 @@ def main(run=True):
 		"RGBA", (config.canvasWidth, config.canvasHeight)
 	)
 
+	#####
 
+
+	config.tileSizeWidth = int(workConfig.get("displayconfig", "tileSizeWidth"))
+	config.tileSizeHeight = int(workConfig.get("displayconfig", "tileSizeHeight"))
+	config.panelDrawing = panelDrawing.PanelPathDrawing(config)
+
+	try:
+		config.useDrawingPoints = workConfig.getboolean("movingpattern", "useDrawingPoints")
+		drawingPathPoints = workConfig.get("movingpattern", "drawingPathPoints").split("|")
+		config.panelDrawing.drawingPath = []
+
+		for i in range(0, len(drawingPathPoints)) :
+			p = drawingPathPoints[i].split(",")
+			config.panelDrawing.drawingPath.append((int(p[0]), int(p[1]), int(p[2])))
+	except Exception as e:
+		print(str(e))
+		config.useDrawingPoints = False
 
 
 	if run:

@@ -5,7 +5,7 @@ import random
 import textwrap
 import time
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 
@@ -231,7 +231,10 @@ def showGrid():
 	
 	#config.image = config.image.rotate(-config.rotation)
 
-	config.render(config.image, 0, 0)
+	if config.useDrawingPoints == True :
+		config.panelDrawing.render()
+	else :
+		config.render(config.image, 0, 0)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -425,6 +428,21 @@ def main(run=True):
 	config.renderDiagnosticsCall = renderDiagnosticsCall
 
 	setUp()
+	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	try:
+		config.useDrawingPoints = workConfig.getboolean("movingpattern", "useDrawingPoints")
+		config.panelDrawing = panelDrawing.PanelPathDrawing(config)
+		config.panelDrawing.canvasToUse = config.image
+
+		drawingPathPoints = workConfig.get("movingpattern", "drawingPathPoints").split("|")
+		config.panelDrawing.drawingPath = []
+
+		for i in range(0, len(drawingPathPoints)) :
+			p = drawingPathPoints[i].split(",")
+			config.panelDrawing.drawingPath.append((int(p[0]), int(p[1]), int(p[2])))
+	except Exception as e:
+		print(str(e))
+		config.useDrawingPoints = False
 
 	if run:
 		runWork()

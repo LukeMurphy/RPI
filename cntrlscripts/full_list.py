@@ -197,7 +197,11 @@ root = tk.Tk()
 #frame = tk.Frame(root, bg="darkgray")
 #frame.pack(padx=1, pady=1)
 # width x height x X x Y
-root.geometry("%dx%d+%d+%d" % (600, 740, 900, 100))
+
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+root.geometry("%dx%d+%d+%d" % (600, round(screen_height/3), round(3*screen_width/4), round(2*screen_height/3)))
 
 Lb1 = Listbox(root, width=60, height=42)
 

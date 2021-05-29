@@ -365,7 +365,14 @@ def configure(config, workconfig):
 
 	config.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
 	config.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
-	# config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
+	#config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
+
+	try:
+		config.tileSizeWidth = int(workconfig.get("displayconfig", "tileSizeWidth"))
+		config.tileSizeHeight = int(workconfig.get("displayconfig", "tileSizeHeight"))
+	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
+		config.forceBGSwap = False
 
 
 	config.tileSize = (

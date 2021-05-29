@@ -379,25 +379,19 @@ def main(run=True):
 	config.overlayxPos = int(workConfig.get("particleSystem", "overlayxPos"))
 	config.overlayyPos = int(workConfig.get("particleSystem", "overlayyPos"))
 
-
-	config.tileSizeWidth = int(workConfig.get("displayconfig", "tileSizeWidth"))
-	config.tileSizeHeight = int(workConfig.get("displayconfig", "tileSizeHeight"))
-
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
-	try:
-		config.useDrawingPoints = workConfig.getboolean("movingpattern", "useDrawingPoints")
-		config.panelDrawing = panelDrawing.PanelPathDrawing(config)
-		config.panelDrawing.canvasToUse = config.image
-
-		drawingPathPoints = workConfig.get("movingpattern", "drawingPathPoints").split("|")
-		config.panelDrawing.drawingPath = []
-
-		for i in range(0, len(drawingPathPoints)) :
-			p = drawingPathPoints[i].split(",")
-			config.panelDrawing.drawingPath.append((int(p[0]), int(p[1]), int(p[2])))
-	except Exception as e:
-		print(str(e))
-		config.useDrawingPoints = False
+	panelDrawing.mockupBlock(config, workConfig)
+	#### Need to add something like this at final render call  as well
+	''' 
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = config.renderImageFull
+			config.panelDrawing.render()
+		else :
+			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			#config.render(config.image, 0, 0)
+			config.render(config.renderImageFull, 0, 0)
+	'''
 
 	for i in range(0, ps.numUnits):
 		emitParticle()

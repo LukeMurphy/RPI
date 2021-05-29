@@ -15,7 +15,7 @@ from random import shuffle
 from subprocess import call
 from modules.configuration import bcolors
 from modules.faderclass import FaderObj
-from modules import badpixels, colorutils, configuration
+from modules import badpixels, colorutils, configuration, panelDrawing
 from modules.imagesprite import ImageSprite
 from PIL import (
 	Image,
@@ -264,6 +264,20 @@ def main(run=True):
 	config.glitchCount = 0
 	config.pausePlay = False
 
+	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	panelDrawing.mockupBlock(config, workConfig)
+	#### Need to add something like this at final render call  as well
+	''' 
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = config.renderImageFull
+			config.panelDrawing.render()
+		else :
+			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			#config.render(config.image, 0, 0)
+			config.render(config.renderImageFull, 0, 0)
+	'''
+
 	if run:
 		runWork()
 
@@ -376,10 +390,17 @@ def iterate(n=0):
 	global config, blocks
 	global xPos, yPos
 
-
-
 	config.f.fadeIn()
-	config.render(config.f.blendedImage, 0, 0)
+
+	########### RENDERING AS A MOCKUP OR AS REAL ###########
+	if config.useDrawingPoints == True :
+		config.panelDrawing.canvasToUse = config.f.blendedImage
+		config.panelDrawing.render()
+	else :
+		#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+		#config.render(config.image, 0, 0)
+		config.render(config.f.blendedImage, 0, 0)
+
 
 	if config.f.fadingDone == True:
 
@@ -405,6 +426,7 @@ def iterate(n=0):
 			config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
 			config.remapImageBlockDestination = [startX,startY]
 			#print("swapping" + str(config.remapImageBlockSection))
+
 
 def drawVLine():
 	global xPos, yPos

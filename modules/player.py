@@ -13,7 +13,7 @@ import time
 import threading
 
 import PIL.Image
-from modules import configuration
+from modules import configuration, panelDrawing
 from modules.configuration import bcolors
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
@@ -605,7 +605,7 @@ def renderUsingLINSNHub(work):
 
 	print("** Player setting up: doing reload? " + str(work.config.doingReload))
 	if work.config.doingReload == False and work.config.standAlone == True:
-		renderer.setUp()
+		renderer.setUp(work.config)
 
 
 """

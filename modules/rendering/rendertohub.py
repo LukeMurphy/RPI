@@ -35,7 +35,7 @@ buff = 8
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
-def setUp():
+def setUp(config):
 	# global root, canvasOffsetX, canvasOffsetY, buff, config
 	gc.enable()
 
@@ -63,7 +63,19 @@ def setUp():
 	config.screenPositionY = y
 
 	root.overrideredirect(False)
-	root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+
+	try:
+		if config.useDrawingPoints == True :
+			screen_width = root.winfo_screenwidth()
+			screen_height = root.winfo_screenheight()
+			root.geometry("%dx%d+%d+%d" % (600, round(.56*screen_height), round(3*screen_width/4), round(0*screen_height/3)))
+		else :
+			root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+	except Exception as e:
+		root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+		print(str(e))
+
+
 	# root.protocol("WM_DELETE_WINDOW", on_closing)
 
 	# Button(root, text="Quit", command=root.quit).pack(side="bottom")

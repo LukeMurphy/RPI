@@ -39,8 +39,30 @@ class PanelPathDrawing:
 		self.xOffset = 0
 		self.yOffset = 0 
 		self.orientation = 0
+		self.fillColor = (0,0,0,255)
 
-		
+	def generateSpiral(self):
+
+		self.drawingPath = []
+		angle = 2 * math.pi/self.panels
+
+		orientationAngle = 90
+		if self.orientation == 1 :
+			orientationAngle = 0
+
+		self.a = self.b = self.panelWidth
+
+		for i in range(0,self.panels) :
+			theta = i * angle
+			a1 = self.a * math.sin(theta)
+			b1 = self.b * math.cos(theta)
+			r = self.a * self.b / math.sqrt(a1*a1 + b1*b1)
+			x = r * math.cos(theta) + self.xOffset
+			y = r * math.sin(theta) + self.yOffset
+			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5,5))
+			self.drawingPath.append((round(x), round(y), round(rTheta)))
+			self.a += 10
+			self.b += 10
 
 	def generateOval(self):
 
@@ -58,14 +80,14 @@ class PanelPathDrawing:
 			r = self.a * self.b / math.sqrt(a1*a1 + b1*b1)
 			x = r * math.cos(theta) + self.xOffset
 			y = r * math.sin(theta) + self.yOffset
-			rTheta = 180 - theta * 180 / math.pi + orientationAngle
+			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5,5))
 			self.drawingPath.append((round(x), round(y), round(rTheta)))
 
 
 
 	def render(self) :
 
-		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = (0,0,0,255))
+		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = self.fillColor)
 		row = 0
 		col = 0
 		rowBuffer = 0
@@ -85,6 +107,15 @@ class PanelPathDrawing:
 			h = round(y + self.panelHeight)
 			section = self.canvasToUse.crop((x,y,w,h))
 
+			section = section.convert("RGBA")
+			sectionImage = Image.new("RGBA", (self.panelWidth+4, self.panelHeight+4), (0,0,0,255))
+			sectionImage.paste(section,(2,2),section)
+
+
+			sectionDraw = ImageDraw.Draw(sectionImage)
+			#sectionDraw.rectangle((0,0,w+1,h+1), outline=(255,0,0,255))
+			#sectionDraw.rectangle((-1,-1,w+2,h+2), outline=(255,0,0,255))
+
 			if x >=self.config.canvasWidth - self.panelWidth :
 				row += 1
 				col = 0
@@ -94,12 +125,11 @@ class PanelPathDrawing:
 			yPos = round(self.drawingPath[i][1])
 			angle = self.drawingPath[i][2]
 			# seem to need to convert to RGBA before doing rotation
-			section = section.convert("RGBA")
-			section = section.rotate(angle, Image.NEAREST , 1)
-			sectionSize = section.size
-			self.canvas.paste(section,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),section)
+			sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
+			sectionSize = sectionImage.size
+			self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
 			if self.drawMarkers ==True: 
-				self.canvasDraw.rectangle((xPos,yPos,xPos+2,yPos+2), fill=(0,0,250))
+				self.canvasDraw.rectangle((xPos,yPos,xPos+2,yPos+2), fill=(0,255,255))
 
 			prevX = xPos
 			prevY = yPos
@@ -124,6 +154,12 @@ def mockupBlock(config, workConfig) :
 		programmedPath = (workConfig.get("mockup", "programmedPath"))
 		drawMarkers = workConfig.getboolean("mockup", "drawMarkers")
 
+		try:
+			bgColorVals = workConfig.get("mockup", "bgColor").split(",")
+			fillColor = tuple(int(a) for a in bgColorVals)
+		except Exception as e:
+			print(str(e))
+
 		config.panelDrawing = PanelPathDrawing(config)
 		config.panelDrawing.canvasToUse = config.image
 		config.panelDrawing.xOffset = xOffset
@@ -133,11 +169,14 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.orientation = orientation
 		config.panelDrawing.panels = panels
 		config.panelDrawing.drawMarkers = drawMarkers
+		config.panelDrawing.fillColor = fillColor
 
 
 		if programmedPath == "ellipse" :
 			config.panelDrawing.generateOval()
-		else :
+		elif programmedPath == "spiral" :
+			config.panelDrawing.generateSpiral()
+		else:
 			drawingPathPoints = workConfig.get("mockup", "drawingPathPoints").split("|")
 			config.panelDrawing.drawingPath = []
 

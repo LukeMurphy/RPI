@@ -84,6 +84,40 @@ class PanelPathDrawing:
 
 
 
+	def generateInformalGrid(self):
+
+		self.drawingPath = []
+
+		orientationAngle = 0
+		if self.orientation == 1 :
+			orientationAngle = 90
+
+		rows = self.gridRows
+		cols = self.gridCols
+		row = 0
+		col = 0
+
+		for i in range(0,self.panels) :
+
+			hSpace = self.panelWidth
+			vSpace = self.panelHeight
+
+			if self.orientation == 1 :
+				vSpace = self.panelWidth
+				hSpace = self.panelHeight
+
+			x = col * hSpace + self.xOffset
+			y = row * vSpace + self.yOffset
+			rTheta = orientationAngle + (random.uniform(-10,10))
+			self.drawingPath.append((round(x), round(y), round(rTheta)))
+
+			col += 1
+			if col >= cols :
+				row += 1
+				col = 0
+
+
+
 	def render(self) :
 
 		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = self.fillColor)
@@ -105,17 +139,16 @@ class PanelPathDrawing:
 			w = round(x + self.panelWidth)
 			h = round(y + self.panelHeight)
 			section = self.canvasToUse.crop((x,y,w,h))
-
 			section = section.convert("RGBA")
 			sectionImage = Image.new("RGBA", (self.panelWidth+4, self.panelHeight+4), (0,0,0,255))
+
 			sectionImage.paste(section,(2,2),section)
-
-
 			sectionDraw = ImageDraw.Draw(sectionImage)
 			#sectionDraw.rectangle((0,0,w+1,h+1), outline=(255,0,0,255))
 			#sectionDraw.rectangle((-1,-1,w+2,h+2), outline=(255,0,0,255))
 
-			if x >=self.config.canvasWidth - self.panelWidth :
+			#if x >=self.config.canvasWidth - self.panelWidth :
+			if col>=self.gridCols-1 :
 				row += 1
 				col = 0
 			else :
@@ -152,6 +185,10 @@ def mockupBlock(config, workConfig) :
 		panels = int(workConfig.get("mockup", "panels"))
 		programmedPath = (workConfig.get("mockup", "programmedPath"))
 		drawMarkers = workConfig.getboolean("mockup", "drawMarkers")
+		gridRows = int(workConfig.get("mockup", "gridRows"))
+		gridCols = int(workConfig.get("mockup", "gridCols"))
+
+		fillColor = (0,0,0,255)
 
 		try:
 			bgColorVals = workConfig.get("mockup", "bgColor").split(",")
@@ -169,10 +206,15 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.panels = panels
 		config.panelDrawing.drawMarkers = drawMarkers
 		config.panelDrawing.fillColor = fillColor
+		config.panelDrawing.programmedPath = programmedPath
+		config.panelDrawing.gridRows = gridRows
+		config.panelDrawing.gridCols = gridCols
 
 
 		if programmedPath == "ellipse" :
 			config.panelDrawing.generateOval()
+		elif programmedPath == "informalGrid" :
+			config.panelDrawing.generateInformalGrid()
 		elif programmedPath == "spiral" :
 			config.panelDrawing.generateSpiral()
 		else:

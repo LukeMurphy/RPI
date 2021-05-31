@@ -50,19 +50,18 @@ class PanelPathDrawing:
 		if self.orientation == 1 :
 			orientationAngle = 0
 
-		self.a = self.b = self.panelWidth
+		r = 10#self.panelWidth
+		theta = 0
 
-		for i in range(0,self.panels) :
+		for i in range(0,self.panels * 2) :
 			theta = i * angle
-			a1 = self.a * math.sin(theta)
-			b1 = self.b * math.cos(theta)
-			r = self.a * self.b / math.sqrt(a1*a1 + b1*b1)
+			r =  self.a + self.b/2 * theta
 			x = r * math.cos(theta) + self.xOffset
 			y = r * math.sin(theta) + self.yOffset
 			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5,5))
 			self.drawingPath.append((round(x), round(y), round(rTheta)))
-			self.a += 10
-			self.b += 10
+			#r += self.panelWidth/4
+
 
 	def generateOval(self):
 
@@ -80,7 +79,7 @@ class PanelPathDrawing:
 			r = self.a * self.b / math.sqrt(a1*a1 + b1*b1)
 			x = r * math.cos(theta) + self.xOffset
 			y = r * math.sin(theta) + self.yOffset
-			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5,5))
+			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-10,10))
 			self.drawingPath.append((round(x), round(y), round(rTheta)))
 
 

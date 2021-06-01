@@ -21,7 +21,7 @@ def reDraw():
 
 def rings():
 	global config
-	config.draw.rectangle((0,0,500,500), fill=(0,0,255,255))
+	config.draw.rectangle((0,0,500,500), fill=(0,0,0,255))
 
 	for row in range(0,config.numRings):
 		points = config.pointsMin + row * config.pointsMin
@@ -30,16 +30,23 @@ def rings():
 		for col in range(0,points):
 			x = math.cos(col * rads) * ra + config.xOffset
 			y = math.sin(col * rads) * ra + config.yOffset
-			yChange = noise.pnoise2(x/config.rowFactor, (y+ config.scroll)/config.colFactor, 1) * config.amplitude + row
+			yChange1 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1, 1) * config.amplitude + row
+			yChange2 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1.1, 1) * config.amplitude + row
+			yChange3 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1.2, 1) * config.amplitude + row
 
 			r = 255
 			g = round(math.sin((col/config.rowFactor)+.1) * 150)
 			b = 50
 
-			if config.markSize == 1 :
-				config.draw.rectangle((x, y + yChange, x+0, y + yChange +0), fill=(r,g,b,255), outline=None)
-			else:
-				config.draw.ellipse((x, y + yChange, x+config.markSize, y + yChange +config.markSize), fill=(r,g,b,255), outline=None)
+			if x > 0  and x < config.canvasWidth-config.xOffset and (y + yChange1)  > 0 and (y + yChange1) <  config.canvasHeight:
+				if config.markSize == 1 :
+					config.draw.rectangle((x, y + yChange1, x+0, y + yChange1 +0), fill=(255,0,0,255), outline=None)
+					config.draw.rectangle((x, y + yChange2, x+0, y + yChange2 +0), fill=(0,255,0,255), outline=None)
+					config.draw.rectangle((x, y + yChange3, x+0, y + yChange3 +0), fill=(0,0,255,255), outline=None)
+				else:
+					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange1 +config.markSize), fill=(255,0,0,255), outline=None)
+					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange2 +config.markSize), fill=(0,255,0,255), outline=None)
+					config.draw.ellipse((x, y + yChange3, x+config.markSize, y + yChange3 +config.markSize), fill=(0,0,255,255), outline=None)
 		#octv += 1
 	config.scroll += 1
 

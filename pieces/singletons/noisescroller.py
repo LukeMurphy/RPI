@@ -21,7 +21,7 @@ def reDraw():
 
 def rings():
 	global config
-	config.draw.rectangle((0,0,500,500), fill=(0,0,0,255))
+	config.draw.rectangle((0,0,500,500), fill=(10,0,50,40))
 	gDelta = 1 + 1/config.rgbSplitFactor
 	bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
@@ -36,9 +36,16 @@ def rings():
 			yChange1 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1, 1) * config.amplitude + row
 			yChange2 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/gDelta, 1) * config.amplitude + row
 			yChange3 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/bDelta, 1) * config.amplitude + row
-
+			
+			if config.drawOptimize == True :
+				doDraw =  False
+			else :
+				doDraw = True 
 
 			if x > 0  and x < config.canvasWidth-config.xOffset and (y + yChange1)  > 0 and (y + yChange1) <  config.canvasHeight:
+				doDraw = True
+
+			if doDraw == True:
 				if config.markSize == 1 :
 					config.draw.rectangle((x, y + yChange1, x+0, y + yChange1 +0), fill=(255,0,100,255), outline=None)
 					config.draw.rectangle((x, y + yChange2, x+0, y + yChange2 +0), fill=(0,255,0,255), outline=None)
@@ -101,19 +108,25 @@ def main(run=True):
 	config.draw = ImageDraw.Draw(config.image)
 
 
-	config.redrawSpeed = float(workConfig.get("woodyscroller", "redrawSpeed"))
-	config.amplitude = float(workConfig.get("woodyscroller", "amplitude"))
-	config.rowFactor = float(workConfig.get("woodyscroller", "rowFactor"))
-	config.colFactor = float(workConfig.get("woodyscroller", "colFactor"))
-	config.rgbSplitFactor = float(workConfig.get("woodyscroller", "rgbSplitFactor"))
+	config.redrawSpeed = float(workConfig.get("noisescroller", "redrawSpeed"))
+	config.amplitude = float(workConfig.get("noisescroller", "amplitude"))
+	config.rowFactor = float(workConfig.get("noisescroller", "rowFactor"))
+	config.colFactor = float(workConfig.get("noisescroller", "colFactor"))
+	config.rgbSplitFactor = float(workConfig.get("noisescroller", "rgbSplitFactor"))
 
-	config.numRings = int(workConfig.get("woodyscroller", "numRings"))
-	config.pointsMin = int(workConfig.get("woodyscroller", "pointsMin"))
-	config.xOffset = int(workConfig.get("woodyscroller", "xOffset"))
-	config.yOffset = int(workConfig.get("woodyscroller", "yOffset"))
-	config.radiusMin = int(workConfig.get("woodyscroller", "radiusMin"))
-	config.markSize = int(workConfig.get("woodyscroller", "markSize"))
+	config.numRings = int(workConfig.get("noisescroller", "numRings"))
+	config.pointsMin = int(workConfig.get("noisescroller", "pointsMin"))
+	config.xOffset = int(workConfig.get("noisescroller", "xOffset"))
+	config.yOffset = int(workConfig.get("noisescroller", "yOffset"))
+	config.radiusMin = int(workConfig.get("noisescroller", "radiusMin"))
+	config.markSize = int(workConfig.get("noisescroller", "markSize"))
 	config.scroll = 0
+
+	try:
+		config.drawOptimize = workConfig.getboolean("noisescroller", "drawOptimize")
+	except Exception as e:
+		print(str(e))
+		config.drawOptimize = False
 
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)

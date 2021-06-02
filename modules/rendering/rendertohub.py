@@ -2,6 +2,7 @@ import random
 import threading
 import time
 import tkinter as tk
+import os
 
 from modules.filters import *
 from PIL import (
@@ -207,12 +208,20 @@ def updateCanvas():
 		config.delta = currentTime - f
 		config.delta2 = currentTime - f2
 
-		if config.delta <= 1:
+		if config.delta <= 1 or config.delta2 <= 1:
 			if config.reloadConfig == False:
 				print("** LAST MODIFIED DELTA: " + str(config.delta) + " **")
-				config.doingReload = True
+				print("** LAST MODIFIED DELTA: " + str(config.initialArgs) + " **")
+				#commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+				os.system( config.path  + '/cntrlscripts/restart_player_dev.sh'+ ' ' + config.initialArgs + "&")
+				#commadStringPyth = ""
+				#os.system(commadStringPyth + config.initialArgs + "&")
+
+
+
+				#config.doingReload = True
 				## NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
-				config.loadFromArguments(True, config)
+				#config.loadFromArguments(True, config)
 			config.reloadConfig = True
 		else:
 			config.reloadConfig = False

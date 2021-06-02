@@ -119,6 +119,8 @@ def loadFromArguments(reloading=False, config=None):
 				argument = args[3]
 				"""
 
+				config.initialArgs = args.cfg
+
 				config.MID = args.mname
 				config.path = args.path
 

@@ -201,9 +201,9 @@ root = tk.Tk()
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
-root.geometry("%dx%d+%d+%d" % (600, round(screen_height/3), round(3*screen_width/4), round(2*screen_height/3)))
+root.geometry("%dx%d+%d+%d" % (600, round(screen_height * .4), round(2*screen_width/3), round(2*screen_height/3)))
 
-Lb1 = Listbox(root, width=60, height=42)
+Lb1 = Listbox(root, width=60, height=32)
 
 
 for i, item in enumerate(actionDict1):

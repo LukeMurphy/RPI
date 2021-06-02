@@ -22,6 +22,8 @@ def reDraw():
 def rings():
 	global config
 	config.draw.rectangle((0,0,500,500), fill=(0,0,0,255))
+	gDelta = 1 + 1/config.rgbSplitFactor
+	bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
 	for row in range(0,config.numRings):
 		points = config.pointsMin + row * config.pointsMin
@@ -30,17 +32,15 @@ def rings():
 		for col in range(0,points):
 			x = math.cos(col * rads) * ra + config.xOffset
 			y = math.sin(col * rads) * ra + config.yOffset
-			yChange1 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1, 1) * config.amplitude + row
-			yChange2 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1.1, 1) * config.amplitude + row
-			yChange3 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1.2, 1) * config.amplitude + row
 
-			r = 255
-			g = round(math.sin((col/config.rowFactor)+.1) * 150)
-			b = 50
+			yChange1 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/1, 1) * config.amplitude + row
+			yChange2 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/gDelta, 1) * config.amplitude + row
+			yChange3 = noise.pnoise2(x/config.rowFactor, (y + config.scroll)/config.colFactor/bDelta, 1) * config.amplitude + row
+
 
 			if x > 0  and x < config.canvasWidth-config.xOffset and (y + yChange1)  > 0 and (y + yChange1) <  config.canvasHeight:
 				if config.markSize == 1 :
-					config.draw.rectangle((x, y + yChange1, x+0, y + yChange1 +0), fill=(255,0,0,255), outline=None)
+					config.draw.rectangle((x, y + yChange1, x+0, y + yChange1 +0), fill=(255,0,100,255), outline=None)
 					config.draw.rectangle((x, y + yChange2, x+0, y + yChange2 +0), fill=(0,255,0,255), outline=None)
 					config.draw.rectangle((x, y + yChange3, x+0, y + yChange3 +0), fill=(0,0,255,255), outline=None)
 				else:
@@ -105,6 +105,7 @@ def main(run=True):
 	config.amplitude = float(workConfig.get("woodyscroller", "amplitude"))
 	config.rowFactor = float(workConfig.get("woodyscroller", "rowFactor"))
 	config.colFactor = float(workConfig.get("woodyscroller", "colFactor"))
+	config.rgbSplitFactor = float(workConfig.get("woodyscroller", "rgbSplitFactor"))
 
 	config.numRings = int(workConfig.get("woodyscroller", "numRings"))
 	config.pointsMin = int(workConfig.get("woodyscroller", "pointsMin"))

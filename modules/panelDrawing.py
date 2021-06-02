@@ -41,6 +41,8 @@ class PanelPathDrawing:
 		self.orientation = 0
 		self.fillColor = (0,0,0,255)
 
+		self.skipPanels = []
+
 	def generateSpiral(self):
 
 		self.drawingPath = []
@@ -59,7 +61,10 @@ class PanelPathDrawing:
 			x = r * math.cos(theta) + self.xOffset
 			y = r * math.sin(theta) + self.yOffset
 			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5,5))
-			self.drawingPath.append((round(x), round(y), round(rTheta)))
+			if i not in self.skipPanels:
+				self.drawingPath.append((round(x), round(y), round(rTheta), 1))
+			else:
+				self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 			#r += self.panelWidth/4
 
 
@@ -80,7 +85,10 @@ class PanelPathDrawing:
 			x = r * math.cos(theta) + self.xOffset
 			y = r * math.sin(theta) + self.yOffset
 			rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-10,10))
-			self.drawingPath.append((round(x), round(y), round(rTheta)))
+			if i not in self.skipPanels:
+				self.drawingPath.append((round(x), round(y), round(rTheta), 1))
+			else:
+				self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
 
 
@@ -109,7 +117,11 @@ class PanelPathDrawing:
 			x = col * hSpace + self.xOffset
 			y = row * vSpace + self.yOffset
 			rTheta = orientationAngle + (random.uniform(-10,10))
-			self.drawingPath.append((round(x), round(y), round(rTheta)))
+
+			if i not in self.skipPanels:
+				self.drawingPath.append((round(x), round(y), round(rTheta), 1))
+			else:
+				self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
 			col += 1
 			if col >= cols :
@@ -129,6 +141,7 @@ class PanelPathDrawing:
 		rowOffset = 0
 		prevX = 0
 		prevY = 0
+		panelCount = 0
 
 
 		for i in range(0, len(self.drawingPath)):
@@ -159,13 +172,16 @@ class PanelPathDrawing:
 			# seem to need to convert to RGBA before doing rotation
 			sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
 			sectionSize = sectionImage.size
-			self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
-			if self.drawMarkers ==True: 
-				self.canvasDraw.rectangle((xPos,yPos,xPos+2,yPos+2), fill=(0,255,255))
+			if self.drawingPath[i][3] == 1 :
+				self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
+				if self.drawMarkers ==True: 
+					self.canvasDraw.rectangle((xPos,yPos,xPos+2,yPos+2), fill=(0,255,255))
 
 			prevX = xPos
 			prevY = yPos
+			panelCount += 1
 
+		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = None, outline= self.fillColor)
 		self.finalRender()
 
 
@@ -209,6 +225,14 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.programmedPath = programmedPath
 		config.panelDrawing.gridRows = gridRows
 		config.panelDrawing.gridCols = gridCols
+
+		try :
+			skipPanels = workConfig.get("mockup", "skipPanels").split(',')
+			config.panelDrawing.skipPanels = list(int(a)-1 for a in skipPanels)
+		except Exception as e:
+			print(str(e))
+
+
 
 
 		if programmedPath == "ellipse" :

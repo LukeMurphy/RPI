@@ -270,8 +270,6 @@ def main(run=True):
 	config.randomBlockHeight = int(workConfig.get("movingpattern", "randomBlockHeight"))
 
 
-
-
 	config.repeatProb = .99
 
 	config.xIncrementer = 0
@@ -290,7 +288,7 @@ def main(run=True):
 
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)
-	config.panelDrawing.canvasToUse = config.image
+
 	''' 
 		########### Need to add something like this at final render call  as well
 			

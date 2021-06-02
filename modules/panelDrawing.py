@@ -247,7 +247,7 @@ def mockupBlock(config, workConfig) :
 
 			for i in range(0, len(drawingPathPoints)) :
 				p = drawingPathPoints[i].split(",")
-				config.panelDrawing.drawingPath.append((int(p[0]) + xOffset, int(p[1]) + yOffset, int(p[2])))
+				config.panelDrawing.drawingPath.append((int(p[0]) + xOffset, int(p[1]) + yOffset, int(p[2]), 1))
 	except Exception as e:
 		print(str(e))
 		config.useDrawingPoints = False

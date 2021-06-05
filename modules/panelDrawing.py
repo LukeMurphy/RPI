@@ -142,15 +142,17 @@ class PanelPathDrawing:
 
 		for l in self.lsysPointsArray :
 
-			if l == "+" or l == "-" :
+			if l in ["+","-","/","|"]:
 				prevOrientation = orientationAngle
 				
 				if l == "+" :
 					orientationAngle += 90
 				elif l == "-" :
 					orientationAngle -= 90
-		
-
+				elif l == "/" :
+					orientationAngle += 45		
+				elif l == "|" :
+					orientationAngle -= 45
 
 				if orientationAngle == 360 or orientationAngle == -360 :
 					orientationAngle = 0
@@ -280,7 +282,10 @@ def mockupBlock(config, workConfig) :
 
 		try:
 			lsys = workConfig.getboolean("mockup","lsys")
-			lsysPoints = workConfig.get("mockup", "lsysPoints")
+			lsysDrawing = workConfig.get("mockup","lsysDrawing")
+			lsysPoints = workConfig.get(lsysDrawing, "lsysPoints")
+			xOffset = int(workConfig.get(lsysDrawing, "xOffset"))
+			yOffset = int(workConfig.get(lsysDrawing, "yOffset"))
 			
 			for l in lsysPoints :
 				lsysPointsArray.append(l)

@@ -91,7 +91,6 @@ class PanelPathDrawing:
 				self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
 
-
 	def generateInformalGrid(self):
 
 		self.drawingPath = []
@@ -128,6 +127,53 @@ class PanelPathDrawing:
 				row += 1
 				col = 0
 
+	
+	def generateLsys(self):
+
+		self.drawingPath = []
+		hSpace = prevhSpace = self.panelWidth
+		vSpace = prevvSpace = self.panelHeight
+
+		lastX = self.xOffset
+		lastY = self.yOffset
+
+		orientationAngle = 0
+		prevOrientation = 0
+
+		for l in self.lsysPointsArray :
+
+			if l == "+" or l == "-" :
+				prevOrientation = orientationAngle
+				
+				if l == "+" :
+					orientationAngle += 90
+				elif l == "-" :
+					orientationAngle -= 90
+		
+
+
+				if orientationAngle == 360 or orientationAngle == -360 :
+					orientationAngle = 0
+
+			else :
+				for i in range(0,int(l)):
+
+					if orientationAngle in (0,180,-180):
+						hSpace = self.panelWidth
+						vSpace = self.panelHeight
+					if orientationAngle in (90,-90,270, -270):
+						vSpace = self.panelWidth
+						hSpace = self.panelHeight
+
+					x = math.cos(orientationAngle * math.pi/180) * hSpace + lastX
+					y = math.sin(orientationAngle * math.pi/180) * vSpace + lastY
+
+					print(x,y,orientationAngle)
+					self.drawingPath.append((round(x), round(y), -orientationAngle, 1))
+					lastX = x
+					lastY = y
+
+
 
 
 	def render(self) :
@@ -142,6 +188,9 @@ class PanelPathDrawing:
 		prevX = 0
 		prevY = 0
 		panelCount = 0
+
+		prevxPos = self.xOffset
+		prevyPos = self.yOffset
 
 
 		for i in range(0, len(self.drawingPath)):
@@ -173,7 +222,23 @@ class PanelPathDrawing:
 			sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
 			sectionSize = sectionImage.size
 			if self.drawingPath[i][3] == 1 :
-				self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
+				if self.lsys == False :
+					self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
+				else:
+					if i != 0 :
+						prevxPos = round(self.drawingPath[i-1][0])
+						prevyPos = round(self.drawingPath[i-1][1])
+
+					if prevyPos < yPos :
+						yPos -= 32
+					if prevyPos > yPos :
+						yPos += 32
+					if prevxPos < xPos :
+						xPos -= 32
+					if prevxPos > xPos :
+						xPos += 32
+					self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
+
 				if self.drawMarkers ==True: 
 					self.canvasDraw.rectangle((xPos,yPos,xPos+2,yPos+2), fill=(0,255,255))
 
@@ -203,6 +268,7 @@ def mockupBlock(config, workConfig) :
 		drawMarkers = workConfig.getboolean("mockup", "drawMarkers")
 		gridRows = int(workConfig.get("mockup", "gridRows"))
 		gridCols = int(workConfig.get("mockup", "gridCols"))
+		lsysPointsArray = []
 
 		fillColor = (0,0,0,255)
 
@@ -211,6 +277,17 @@ def mockupBlock(config, workConfig) :
 			fillColor = tuple(int(a) for a in bgColorVals)
 		except Exception as e:
 			print(str(e))
+
+		try:
+			lsys = workConfig.getboolean("mockup","lsys")
+			lsysPoints = workConfig.get("mockup", "lsysPoints")
+			
+			for l in lsysPoints :
+				lsysPointsArray.append(l)
+
+		except Exception as e:
+			print(str(e))
+			lsys = False
 
 		config.panelDrawing = PanelPathDrawing(config)
 		config.panelDrawing.canvasToUse = config.image
@@ -225,6 +302,11 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.programmedPath = programmedPath
 		config.panelDrawing.gridRows = gridRows
 		config.panelDrawing.gridCols = gridCols
+		config.panelDrawing.lsys = lsys
+		config.panelDrawing.lsysPointsArray = lsysPointsArray
+
+		if lsys == True:
+			programmedPath = "lsys"
 
 		try :
 			skipPanels = workConfig.get("mockup", "skipPanels").split(',')
@@ -233,14 +315,14 @@ def mockupBlock(config, workConfig) :
 			print(str(e))
 
 
-
-
 		if programmedPath == "ellipse" :
 			config.panelDrawing.generateOval()
 		elif programmedPath == "informalGrid" :
 			config.panelDrawing.generateInformalGrid()
 		elif programmedPath == "spiral" :
 			config.panelDrawing.generateSpiral()
+		elif programmedPath == "lsys" :
+			config.panelDrawing.generateLsys()
 		else:
 			drawingPathPoints = workConfig.get("mockup", "drawingPathPoints").split("|")
 			config.panelDrawing.drawingPath = []

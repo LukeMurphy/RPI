@@ -21,7 +21,7 @@ def reDraw():
 
 def rings():
 	global config
-	config.draw.rectangle((0,0,500,500), fill=(10,0,50,40))
+	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
 	gDelta = 1 + 1/config.rgbSplitFactor
 	bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
@@ -59,7 +59,7 @@ def rings():
 
 def waves():
 	global config
-	config.draw.rectangle((0,0,500,500), fill=(0,0,0,55))
+	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
 	octv = 1
 	for row in range(0,420,8):
 		for col in range(0,500):
@@ -121,6 +121,10 @@ def main(run=True):
 	config.radiusMin = int(workConfig.get("noisescroller", "radiusMin"))
 	config.markSize = int(workConfig.get("noisescroller", "markSize"))
 	config.scroll = 0
+
+
+	config.bgColorVals = (workConfig.get("noisescroller", "bgColor")).split(",")
+	config.bgColor = tuple(map(lambda x: int(x), config.bgColorVals))
 
 	try:
 		config.drawOptimize = workConfig.getboolean("noisescroller", "drawOptimize")

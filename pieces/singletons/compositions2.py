@@ -3,7 +3,7 @@ import random
 import textwrap
 import time
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 
@@ -199,6 +199,20 @@ def main(run=True):
 	config.firstRun = True
 	config.flip = False
 
+	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	panelDrawing.mockupBlock(config, workConfig)
+	#### Need to add something like this at final render call  as well
+	''' 
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = config.renderImageFull
+			config.panelDrawing.render()
+		else :
+			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			#config.render(config.image, 0, 0)
+			config.render(config.renderImageFull, 0, 0)
+	'''
+
 	drawCompositions()
 
 	setUp()
@@ -278,12 +292,24 @@ def iterate():
 			config.canvasImage,
 			config.doingRefresh / config.doingRefreshCount,
 		)
-		config.render(crossFade, 0, 0)
+		#config.render(crossFade, 0, 0)
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = crossFade
+			config.panelDrawing.render()
+		else :
+			config.render(crossFade, 0, 0)
 		config.doingRefresh += 1
 	else:
 		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 		temp.paste(config.canvasImage, (0, 0), config.canvasImage)
-		config.render(temp, 0, 0)
+		#config.render(temp, 0, 0)
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = temp
+			config.panelDrawing.render()
+		else :
+			config.render(temp, 0, 0)
 	# config.render(config.canvasImage, 0,0)
 
 

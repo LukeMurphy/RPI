@@ -42,6 +42,7 @@ class PanelPathDrawing:
 		self.fillColor = (0,0,0,255)
 
 		self.skipPanels = []
+		self.recalculateAngles = False
 
 	def generateSpiral(self):
 
@@ -142,7 +143,7 @@ class PanelPathDrawing:
 
 		for l in self.lsysPointsArray :
 
-			if l in ["+","-","/","|"]:
+			if l in ["+","-","/","|","<",">"]:
 				prevOrientation = orientationAngle
 				
 				if l == "+" :
@@ -153,6 +154,10 @@ class PanelPathDrawing:
 					orientationAngle += 45		
 				elif l == "|" :
 					orientationAngle -= 45
+				elif l == ">" :
+					orientationAngle += 30
+				elif l == "<" :
+					orientationAngle -= 30
 
 				if orientationAngle == 360 or orientationAngle == -360 :
 					orientationAngle = 0
@@ -169,11 +174,29 @@ class PanelPathDrawing:
 
 					x = math.cos(orientationAngle * math.pi/180) * hSpace + lastX
 					y = math.sin(orientationAngle * math.pi/180) * vSpace + lastY
+					angle = -orientationAngle
 
-					print(x,y,orientationAngle)
-					self.drawingPath.append((round(x), round(y), -orientationAngle, 1))
+
+					self.drawingPath.append([round(x), round(y), angle, 1])
 					lastX = x
 					lastY = y
+
+		if self.recalculateAngles == True :
+			# re-calculate the angle based on the previous point AND next point
+			# useful in some drawings
+
+			for i in range(1,len(self.drawingPath)-1) :
+				dx = self.drawingPath[i+1][0]  - self.drawingPath[i-1][0]
+				dy = self.drawingPath[i+1][1]  - self.drawingPath[i-1][1]
+				
+				if dx != 0 :
+					angle = -math.atan(dy/dx) * 180/math.pi
+					# orientation is important for animation
+					if dx < 0 : angle += 180
+					self.drawingPath[i][2] = angle 
+
+
+
 
 
 
@@ -193,6 +216,9 @@ class PanelPathDrawing:
 
 		prevxPos = self.xOffset
 		prevyPos = self.yOffset
+
+		nextxPos = self.xOffset
+		nextyPos = self.yOffset
 
 
 		for i in range(0, len(self.drawingPath)):
@@ -220,25 +246,34 @@ class PanelPathDrawing:
 			xPos = round(self.drawingPath[i][0])
 			yPos = round(self.drawingPath[i][1])
 			angle = self.drawingPath[i][2]
-			# seem to need to convert to RGBA before doing rotation
-			sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
-			sectionSize = sectionImage.size
+
+
 			if self.drawingPath[i][3] == 1 :
 				if self.lsys == False :
+					# seem to need to convert to RGBA before doing rotation
+					sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
+					sectionSize = sectionImage.size
 					self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
 				else:
 					if i != 0 :
 						prevxPos = round(self.drawingPath[i-1][0])
 						prevyPos = round(self.drawingPath[i-1][1])
 
-					if prevyPos < yPos :
-						yPos -= 32
-					if prevyPos > yPos :
-						yPos += 32
-					if prevxPos < xPos :
-						xPos -= 32
-					if prevxPos > xPos :
-						xPos += 32
+					# compensates for the panels blocks and keeps drawing integrity
+					if self.recalculateAngles == False:
+						if prevyPos < yPos :
+							yPos -= 32
+						if prevyPos > yPos :
+							yPos += 32
+						if prevxPos < xPos :
+							xPos -= 32
+						if prevxPos > xPos :
+							xPos += 32
+					
+
+					# seem to need to convert to RGBA before doing rotation
+					sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
+					sectionSize = sectionImage.size
 					self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
 
 				if self.drawMarkers ==True: 
@@ -271,6 +306,7 @@ def mockupBlock(config, workConfig) :
 		gridRows = int(workConfig.get("mockup", "gridRows"))
 		gridCols = int(workConfig.get("mockup", "gridCols"))
 		lsysPointsArray = []
+		recalculateAngles = False
 
 		fillColor = (0,0,0,255)
 
@@ -286,7 +322,8 @@ def mockupBlock(config, workConfig) :
 			lsysPoints = workConfig.get(lsysDrawing, "lsysPoints")
 			xOffset = int(workConfig.get(lsysDrawing, "xOffset"))
 			yOffset = int(workConfig.get(lsysDrawing, "yOffset"))
-			
+			recalculateAngles = workConfig.getboolean(lsysDrawing,"recalculateAngles")
+
 			for l in lsysPoints :
 				lsysPointsArray.append(l)
 
@@ -309,6 +346,7 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.gridCols = gridCols
 		config.panelDrawing.lsys = lsys
 		config.panelDrawing.lsysPointsArray = lsysPointsArray
+		config.panelDrawing.recalculateAngles = recalculateAngles
 
 		if lsys == True:
 			programmedPath = "lsys"

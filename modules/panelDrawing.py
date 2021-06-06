@@ -198,9 +198,6 @@ class PanelPathDrawing:
 
 
 
-
-
-
 	def render(self) :
 
 		self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = self.fillColor)

@@ -4,6 +4,7 @@ import time
 from operator import sub
 
 from modules import colorutils
+from modules.configuration import bcolors
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
@@ -91,6 +92,10 @@ class PanelPathDrawing:
 			else:
 				self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
+		print("")
+		print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
+		print("")
+
 
 	def generateInformalGrid(self):
 
@@ -100,8 +105,8 @@ class PanelPathDrawing:
 		if self.orientation == 1 :
 			orientationAngle = 90
 
-		rows = self.gridRows
-		cols = self.gridCols
+		rows = self.informalGridRows
+		cols = self.informalGridCols
 		row = 0
 		col = 0
 
@@ -127,6 +132,10 @@ class PanelPathDrawing:
 			if col >= cols :
 				row += 1
 				col = 0
+
+		print("")
+		print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
+		print("")
 
 	
 	def generateLsys(self):
@@ -194,6 +203,11 @@ class PanelPathDrawing:
 					# orientation is important for animation
 					if dx < 0 : angle += 180
 					self.drawingPath[i][2] = angle 
+
+		print("")
+		print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath)))
+		print("")
+
 
 
 
@@ -308,6 +322,14 @@ def mockupBlock(config, workConfig) :
 		fillColor = (0,0,0,255)
 
 		try:
+			informalGridRows = int(workConfig.get("mockup", "informalGridRows"))
+			informalGridCols = int(workConfig.get("mockup", "informalGridCols"))
+		except Exception as e:
+			print(str(e))
+			informalGridRows = gridRows
+			informalGridCols = gridCols 
+
+		try:
 			bgColorVals = workConfig.get("mockup", "bgColor").split(",")
 			fillColor = tuple(int(a) for a in bgColorVals)
 		except Exception as e:
@@ -315,6 +337,12 @@ def mockupBlock(config, workConfig) :
 
 		try:
 			lsys = workConfig.getboolean("mockup","lsys")
+		except Exception as e:
+			print(str(e))
+			lsys = False
+
+
+		if lsys == True :
 			lsysDrawing = workConfig.get("mockup","lsysDrawing")
 			lsysPoints = workConfig.get(lsysDrawing, "lsysPoints")
 			xOffset = int(workConfig.get(lsysDrawing, "xOffset"))
@@ -324,9 +352,6 @@ def mockupBlock(config, workConfig) :
 			for l in lsysPoints :
 				lsysPointsArray.append(l)
 
-		except Exception as e:
-			print(str(e))
-			lsys = False
 
 		config.panelDrawing = PanelPathDrawing(config)
 		config.panelDrawing.canvasToUse = config.image
@@ -341,6 +366,8 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.programmedPath = programmedPath
 		config.panelDrawing.gridRows = gridRows
 		config.panelDrawing.gridCols = gridCols
+		config.panelDrawing.informalGridRows = informalGridRows
+		config.panelDrawing.informalGridCols = informalGridCols
 		config.panelDrawing.lsys = lsys
 		config.panelDrawing.lsysPointsArray = lsysPointsArray
 		config.panelDrawing.recalculateAngles = recalculateAngles

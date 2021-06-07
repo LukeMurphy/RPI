@@ -45,6 +45,8 @@ class PanelPathDrawing:
 		self.skipPanels = []
 		self.recalculateAngles = False
 
+		self.angleJiggle = 0
+
 	def generateSpiral(self):
 
 		self.drawingPath = []
@@ -121,7 +123,7 @@ class PanelPathDrawing:
 
 			x = col * hSpace + self.xOffset
 			y = row * vSpace + self.yOffset
-			rTheta = orientationAngle + (random.uniform(-10,10))
+			rTheta = orientationAngle + (random.uniform(-self.angleJiggle,self.angleJiggle))
 
 			if i not in self.skipPanels:
 				self.drawingPath.append((round(x), round(y), round(rTheta), 1))
@@ -328,6 +330,12 @@ def mockupBlock(config, workConfig) :
 			print(str(e))
 			informalGridRows = gridRows
 			informalGridCols = gridCols 
+		
+		try:
+			angleJiggle = float(workConfig.get("mockup", "angleJiggle"))
+		except Exception as e:
+			print(str(e))
+			angleJiggle = 0 
 
 		try:
 			bgColorVals = workConfig.get("mockup", "bgColor").split(",")
@@ -371,6 +379,7 @@ def mockupBlock(config, workConfig) :
 		config.panelDrawing.lsys = lsys
 		config.panelDrawing.lsysPointsArray = lsysPointsArray
 		config.panelDrawing.recalculateAngles = recalculateAngles
+		config.panelDrawing.angleJiggle = angleJiggle
 
 		if lsys == True:
 			programmedPath = "lsys"

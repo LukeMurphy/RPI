@@ -3,7 +3,7 @@ import random
 import textwrap
 import time
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
@@ -278,6 +278,20 @@ def main(run=True):
 	)
 	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))
 	# config.timeToComplete = 60 #round(random.uniform(30,220))
+
+	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	panelDrawing.mockupBlock(config, workConfig)
+	#### Need to add something like this at final render call  as well
+	''' 
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = config.renderImageFull
+			config.panelDrawing.render()
+		else :
+			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			#config.render(config.image, 0, 0)
+			config.render(config.renderImageFull, 0, 0)
+	'''
 
 	# createPieces()
 	drawSqareSpiral()
@@ -587,7 +601,14 @@ def iterate():
 		temp = transformImage(temp)
 
 	# print("quilts ",config.render, config.instanceNumber)
-	config.render(temp, 0, 0)
+
+	########### RENDERING AS A MOCKUP OR AS REAL ###########
+	if config.useDrawingPoints == True :
+		config.panelDrawing.canvasToUse = temp
+		config.panelDrawing.render()
+	else :
+		config.render(temp, 0, 0)
+
 
 	config.t2 = time.time()
 	delta = config.t2 - config.t1

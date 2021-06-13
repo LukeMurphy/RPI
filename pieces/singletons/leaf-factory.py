@@ -3,7 +3,7 @@ import random
 import textwrap
 import time
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 
@@ -76,7 +76,8 @@ class LeafFactory():
 
 		for i in range(0, self.numberOfLeaves) :
 			self.leafArray[i].move()
-			self.leafArray[i].render()
+			if random.random() <= self.config.drawProb :
+				self.leafArray[i].render()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -103,31 +104,38 @@ class Leaf():
 
 	def getFromBaseImage(self) :
 
-		self.imageElement = self.config.elementArray[self.unit]
+		self.imageElement = self.config.elementArray[self.unit][0]
+		self.leafType = self.config.elementArray[self.unit][1]
 		self.imageElement = self.imageElement.resize((round(self.blockWidth * self.scale), round(self.blockHeight * self.scale)))
 
 
 		clrBlock = Image.new("RGBA", (self.blockWidth, self.blockWidth))
 		clrBlockDraw = ImageDraw.Draw(clrBlock)
-		clr = colorutils.getRandomColorHSV(
-			hMin=30.0,
-			hMax=160.0,
-			sMin=.850,
-			sMax=1.0,
-			vMin=0.150,
-			vMax=.50,
-			dropHueMin=0,
-			dropHueMax=0,
-			a=round(random.uniform(200,255)),
-		)
 
-		if random.random() > .9 :
+		if self.leafType == 0 :
 			clr = colorutils.getRandomColorHSV(
-				hMin=300.0,
-				hMax=360.0,
+				hMin=40.0,
+				hMax=170.0,
 				sMin=.850,
 				sMax=1.0,
-				vMin=0.850,
+				vMin=0.150,
+				vMax=.50,
+				dropHueMin=0,
+				dropHueMax=0,
+				a=round(random.uniform(200,255)),
+			)
+
+			if clr[1] > 100 and clr[0] > 100 :
+				clr = (150,255,0,255)
+				
+
+		if self.leafType == 1:
+			clr = colorutils.getRandomColorHSV(
+				hMin=250.0,
+				hMax=300.0,
+				sMin=.850,
+				sMax=1.0,
+				vMin=0.50,
 				vMax=1.0,
 				dropHueMin=0,
 				dropHueMax=0,
@@ -138,19 +146,22 @@ class Leaf():
 		self.imageElement = ImageChops.multiply(clrBlock, self.imageElement)
 		self.rotation = 270 - round(180 / math.pi * self.radians)
 		self.imageElement = self.imageElement.rotate( self.rotation , center=None, expand=0)
-		self.scale = .1
+		self.scale = .5
 
 
 	def setup(self) :
 		self.unit = math.floor(random.uniform(0, len(self.config.elementArray)))
 
-		#if random.random() > .5 : self.unit = 0
+		if random.random() <= config.flowerProb : 
+			self.unit = 1
+		else :
+			self.unit = 0
+
 
 		self.getFromBaseImage()
 
 		self.tx = self.radius * math.cos(self.radians)
 		self.ty = self.radius * math.sin(self.radians) 
-
 
 		self.loc_x = round(self.tx + self.origin[0] - self.blockWidth * self.scale/2)
 		self.loc_y = round(self.ty + self.origin[1] - self.blockHeight * self.scale/2)
@@ -158,8 +169,6 @@ class Leaf():
 		self.speed = 1 + random.random() * 1
 
 	
-
-		
 		#self.section = self.config.elementArray[i].rotate(math.pi * 180 * random.random())
 		#self.config.canvasImage.paste(self.section,(self.origin[0],self.origin[1]), self.section)
 		
@@ -167,11 +176,15 @@ class Leaf():
 	def move(self):
 		self.radius += self.speed
 
-		if self.scale <= self.scaleMax : 
+		if self.scale <= self.scaleMax and self.unit == 0: 
 			self.scale += self.scalespeed
+		if self.unit == 1:
+			self.scale = .2
 
 
-		self.tx = self.radius * math.cos(self.radians) 
+		if self.unit == 0 :
+			self.tx = self.radius * math.cos(self.radians) 
+
 		self.ty = self.radius * math.sin(self.radians) 
 
 		self.loc_x = round(self.tx + self.origin[0] - self.blockWidth * self.scale/2)
@@ -224,6 +237,13 @@ def main(run=True):
 	config.spriteSheet = Image.open(path, "r")
 	print("loading : ", path)
 
+
+	config.flowerProb = float(workConfig.get("leaf-factory", "flowerProb"))
+	config.drawProb = float(workConfig.get("leaf-factory", "drawProb"))
+
+	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	panelDrawing.mockupBlock(config, workConfig)
+
 	sheet = config.spriteSheet.copy()
 	blockWidth = 256
 	blockHeight = 256
@@ -233,12 +253,16 @@ def main(run=True):
 	offSet = [200,200]
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
+
+
 	count = 0
-	for row in  range(0,4):
-		for col in range(0,6):
+	for row in  range(0,1):
+		for col in range(0,2):
 			section = sheet.crop((col*blockWidth, row*blockHeight ,col*blockWidth + blockWidth, row*blockHeight  + blockHeight))
 			section = section.resize((round(blockWidth * scale), round(blockHeight * scale)))
-			config.elementArray.append(section)
+			config.elementArray.append([section,col])
 			count+=1
 
 
@@ -275,7 +299,7 @@ def main(run=True):
 	config.delay = .02
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-	origins  = [[128,128],[200,200],[200,200],[100,180]]
+	origins  = [[28,128],[200,200],[200,200],[100,180]]
 	
 	config.Trunk = Trunk(config, origins, 4)
 	
@@ -311,12 +335,17 @@ def iterate():
 	global config
 
 
-	config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(200,2,100,100))
+	#config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(200,2,100,100))
 	for i in range(0, len(config.Trunk.brandchArray)):
 		branch = config.Trunk.brandchArray[i]
 		branch.render()
 
-	config.render(config.canvasImage, 0, 0)
+	########### RENDERING AS A MOCKUP OR AS REAL ###########
+	if config.useDrawingPoints == True :
+		config.panelDrawing.canvasToUse = config.canvasImage
+		config.panelDrawing.render()
+	else :
+		config.render(config.canvasImage, 0, 0)
 
 	config.t2 = time.time()
 	delta = config.t2 - config.t1

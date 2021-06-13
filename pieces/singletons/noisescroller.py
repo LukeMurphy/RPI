@@ -66,7 +66,7 @@ def ringLines():
 				lasty = [y + yChange1,y + yChange2,y + yChange3]
 
 		#octv += 1
-	config.scroll += 1
+	config.scroll += config.scrollRate
 
 
 def rings():
@@ -105,7 +105,7 @@ def rings():
 					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange2 +config.markSize), fill=(0,255,0,255), outline=None)
 					config.draw.ellipse((x, y + yChange3, x+config.markSize, y + yChange3 +config.markSize), fill=(0,0,255,255), outline=None)
 		#octv += 1
-	config.scroll += 1
+	config.scroll += config.scrollRate
 
 def wavey():
 	global config
@@ -118,17 +118,17 @@ def wavey():
 			y = row
 			x = round(noise.pnoise2((col +config.scroll)/config.colFactor/3, (y )/config.rowFactor/1, 1) * config.amplitude + col)
 
-			r = 255
-			g = round(math.sin((col/config.rowFactor)+.1) * 200)
+			r = round(math.sin((y/config.colFactor)+.1) * 200)
+			g = round(math.sin((col/config.rowFactor)+.1) * 100)
 			#g = round(math.sin((x/config.rowFactor)+.1) * 200)
-			b = 50
+			b = round(math.sin((x/config.rowFactor)+.1) * 100)
 			#config.draw.rectangle((x, y, x+1, y+1), fill=(r,g,b,150))
 			if col != 0 :
 				config.draw.line((lastx[0],lasty[0],x,y), fill = (r,g,b,150))
 			lastx = [x,x,x]
 			lasty = [y,y,y]
 		#octv += 1
-	config.scroll += 1.8
+	config.scroll += config.scrollRate
 
 def waves():
 	global config
@@ -150,7 +150,7 @@ def waves():
 			lastx = [x,x,x]
 			lasty = [y,y,y]
 		#octv += 1
-	config.scroll += 2
+	config.scroll += config.scrollRate
 
 
 
@@ -205,6 +205,8 @@ def main(run=True):
 
 	config.bgColorVals = (workConfig.get("noisescroller", "bgColor")).split(",")
 	config.bgColor = tuple(map(lambda x: int(x), config.bgColorVals))
+
+	config.scrollRate = float(workConfig.get("noisescroller", "scrollRate"))
 
 	try:
 		config.drawOptimize = workConfig.getboolean("noisescroller", "drawOptimize")

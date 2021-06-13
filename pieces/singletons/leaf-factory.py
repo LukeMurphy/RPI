@@ -59,8 +59,8 @@ class LeafFactory():
 		for i in range(0, self.numberOfLeaves) :
 			leaf = Leaf(self.config, self.origin)
 			leaf.radius = radius
-			leaf.blockWidth = 256
-			leaf.blockHeight = 256
+			leaf.blockWidth = 128
+			leaf.blockHeight = 128
 			leaf.radians =  arc * i
 			#leaf.scaleMax = self.scale
 			leaf.scale = self.scale
@@ -100,18 +100,24 @@ class Leaf():
 		self.rotation = 0
 		self.rotationSpeed = 4 - random.random() * 8
 
+		self.ty = 1
+		self.tx = 1
+
 
 
 	def getFromBaseImage(self) :
 
 		self.imageElement = self.config.elementArray[self.unit][0]
 		self.leafType = self.config.elementArray[self.unit][1]
-		self.imageElement = self.imageElement.resize((round(self.blockWidth * self.scale), round(self.blockHeight * self.scale)))
+
+		# probably not necessary to resize the original element - degrades sometimes
+		#self.imageElement = self.imageElement.resize((round(self.blockWidth * self.scale), round(self.blockHeight * self.scale)))
 
 
 		clrBlock = Image.new("RGBA", (self.blockWidth, self.blockWidth))
 		clrBlockDraw = ImageDraw.Draw(clrBlock)
 
+		# Color - Leaves
 		if self.leafType == 0 :
 			clr = colorutils.getRandomColorHSV(
 				hMin=40.0,
@@ -128,11 +134,11 @@ class Leaf():
 			if clr[1] > 100 and clr[0] > 100 :
 				clr = (150,255,0,255)
 				
-
+		# Color - "flower"
 		if self.leafType == 1:
 			clr = colorutils.getRandomColorHSV(
 				hMin=250.0,
-				hMax=300.0,
+				hMax=50.0,
 				sMin=.850,
 				sMax=1.0,
 				vMin=0.50,
@@ -145,7 +151,8 @@ class Leaf():
 		clrBlockDraw.rectangle((0, 0, self.blockWidth, self.blockWidth), fill=clr)
 		self.imageElement = ImageChops.multiply(clrBlock, self.imageElement)
 		self.rotation = 270 - round(180 / math.pi * self.radians)
-		self.imageElement = self.imageElement.rotate( self.rotation , center=None, expand=0)
+		# rotate here or when scaling and rendering each cycle ... not both 
+		#self.imageElement = self.imageElement.rotate( self.rotation , center=None, expand=0)
 		self.scale = .5
 
 
@@ -179,13 +186,15 @@ class Leaf():
 		if self.scale <= self.scaleMax and self.unit == 0: 
 			self.scale += self.scalespeed
 		if self.unit == 1:
-			self.scale = .2
-
+			self.scale += self.scalespeed/20.0
 
 		if self.unit == 0 :
 			self.tx = self.radius * math.cos(self.radians) 
+			self.ty = self.radius * math.sin(self.radians) 
+		else :
+			self.tx = self.radius * math.cos(self.radians) /50.0
+			self.ty -= self.scalespeed *100
 
-		self.ty = self.radius * math.sin(self.radians) 
 
 		self.loc_x = round(self.tx + self.origin[0] - self.blockWidth * self.scale/2)
 		self.loc_y = round(self.ty + self.origin[1] - self.blockHeight * self.scale/2)
@@ -203,11 +212,32 @@ class Leaf():
 
 	def render(self):
 		tempUnit = self.imageElement.resize((round(self.blockWidth * self.scale), round(self.blockHeight * self.scale)))
-		tempUnit =tempUnit.rotate(self.rotation)
+		tempUnit = tempUnit.rotate(self.rotation, 3, True)
 		self.config.canvasImage.paste(tempUnit, (self.loc_x, self.loc_y ), tempUnit)
 
 
 
+def iterate():
+	global config
+
+
+	#config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(200,2,100,100))
+	for i in range(0, len(config.Trunk.brandchArray)):
+		branch = config.Trunk.brandchArray[i]
+		branch.render()
+
+	########### RENDERING AS A MOCKUP OR AS REAL ###########
+	if config.useDrawingPoints == True :
+		config.panelDrawing.canvasToUse = config.canvasImage
+		config.panelDrawing.render()
+	else :
+		config.render(config.canvasImage, 0, 0)
+
+	config.t2 = time.time()
+	delta = config.t2 - config.t1
+
+	if delta > config.timeToComplete:
+		restartPiece()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -233,7 +263,7 @@ def main(run=True):
 	config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(100,100,100,255))
 	#config.canvasImage.paste(bg, (0,0), bg)
 
-	path = config.path + "assets/imgs/drawings/21-2.png"
+	path = config.path + "assets/imgs/drawings/21-3b.png"
 	config.spriteSheet = Image.open(path, "r")
 	print("loading : ", path)
 
@@ -245,9 +275,9 @@ def main(run=True):
 	panelDrawing.mockupBlock(config, workConfig)
 
 	sheet = config.spriteSheet.copy()
-	blockWidth = 256
-	blockHeight = 256
-	scale = .41
+	blockWidth = 128
+	blockHeight = 128
+	scale = 1.0
 	config.elementArray = []
 	radius = 10
 	offSet = [200,200]
@@ -267,31 +297,16 @@ def main(run=True):
 
 
 	'''
+	config.elementArray = []
+	for i in range(0,2) :
+		cntrMarker = Image.new("RGBA", (40,40))
+		cntrMarkerDraw = ImageDraw.Draw(cntrMarker)	
+		#cntrMarkerDraw.rectangle((0,0, 0 +20,0 +40), fill=(255,255,255,255))
+		poly = ((20,0),(12,10),(11,20),(13,30),(20,40),(27,30),(29,20)) 
+		cntrMarkerDraw.polygon(poly, fill=(255,255,255,255))
 
-	arc = 2 * math.pi / len(config.elementArray)
-
-	for i in range(0,len(config.elementArray)) :
-		section = config.elementArray[i]
-		radians =  arc * i
-		rotation = 270 - round(180 / math.pi * radians)
-		tx = radius * math.cos(radians) 
-		ty = radius * math.sin(radians) 
-
-		loc_x = round(tx + offSet[0] - blockWidth * scale/2)
-		loc_y = round(ty + offSet[1] - blockHeight * scale/2)
-
-		section = section.rotate( rotation , center=None, expand=0)
-		config.canvasImage.paste(section, (loc_x, loc_y ), section)
-
-
-		test = Image.new("RGBA", (blockWidth,blockHeight))
-		testDraw = ImageDraw.Draw(test)	
-		testDraw.rectangle((blockWidth/2, blockHeight/2, blockWidth/2 +4, blockHeight/2 +4), fill=(255,0,0,255))
-		test = test.resize((round(blockWidth * scale), round(blockHeight * scale)))
-		config.canvasImage.paste(test,  (loc_x, loc_y ), test)
-
+		config.elementArray.append([cntrMarker,i])
 	'''
-	
 
 
 	config.t1 = time.time()
@@ -300,10 +315,11 @@ def main(run=True):
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 	origins  = [[28,128],[200,200],[200,200],[100,180]]
+	#origins  = [[128,128]]
 	
 	config.Trunk = Trunk(config, origins, 4)
 	
-	config.Trunk.setup(24, scale)
+	config.Trunk.setup(12, scale)
 	
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -331,24 +347,3 @@ def runWork():
 		time.sleep(config.delay)
 
 
-def iterate():
-	global config
-
-
-	#config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(200,2,100,100))
-	for i in range(0, len(config.Trunk.brandchArray)):
-		branch = config.Trunk.brandchArray[i]
-		branch.render()
-
-	########### RENDERING AS A MOCKUP OR AS REAL ###########
-	if config.useDrawingPoints == True :
-		config.panelDrawing.canvasToUse = config.canvasImage
-		config.panelDrawing.render()
-	else :
-		config.render(config.canvasImage, 0, 0)
-
-	config.t2 = time.time()
-	delta = config.t2 - config.t1
-
-	if delta > config.timeToComplete:
-		restartPiece()

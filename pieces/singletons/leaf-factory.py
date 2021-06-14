@@ -165,7 +165,7 @@ class Leaf():
 
 		clrBlockDraw.rectangle((0, 0, self.blockWidth, self.blockWidth), fill=clr)
 		self.imageElement = ImageChops.multiply(clrBlock, self.imageElement)
-		self.rotation = 270 - round(180 / math.pi * self.radians)
+		self.rotation = 90 - round(180 / math.pi * self.radians)
 		# rotate here or when scaling and rendering each cycle ... not both 
 		#self.imageElement = self.imageElement.rotate( self.rotation , center=None, expand=0)
 		self.scale = .5
@@ -317,16 +317,25 @@ def main(run=True):
 
 
 	'''
+	'''
 	config.elementArray = []
+	w = 20
+	d4 = 1
+	d3 = 2
+	d1 = 3
+	d2 = 4
 	for i in range(0,2) :
 		cntrMarker = Image.new("RGBA", (40,40))
 		cntrMarkerDraw = ImageDraw.Draw(cntrMarker)	
 		#cntrMarkerDraw.rectangle((0,0, 0 +20,0 +40), fill=(255,255,255,255))
-		poly = ((20,0),(12,10),(11,20),(13,30),(20,40),(27,30),(29,20)) 
+		if i == 1 :
+			poly = ((20,0),(w-d1,10),(w-d2,12),(w-d3,12),(20,10),(w+d3,10),(w+d2,10),(w+d1,10)) 
+		else:
+			poly = ((20,0),(w-d1,10),(w-d2,20),(w-d3,30),(w-d4,32),(20,33),(w+d4,32),(w+d3,30),(w+d2,20),(w+d1,20)) 
+		#poly = ((20,0),(w-d1,10),(w-d2,12),(w-d3,12),(20,5),(w+d3,10),(w+d2,10),(w+d1,10)) 
 		cntrMarkerDraw.polygon(poly, fill=(255,255,255,255))
 
 		config.elementArray.append([cntrMarker,i])
-	'''
 
 
 	config.t1 = time.time()

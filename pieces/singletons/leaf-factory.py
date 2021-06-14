@@ -52,8 +52,8 @@ class LeafFactory():
 		self.scale = scale
 
 	def setup(self):
-		blockWidth = 256
-		blockHeight = 256
+		blockWidth = 128
+		blockHeight = 128
 		radius = 4
 		arc = 2 * math.pi / self.numberOfLeaves
 		for i in range(0, self.numberOfLeaves) :
@@ -76,7 +76,9 @@ class LeafFactory():
 
 		for i in range(0, self.numberOfLeaves) :
 			self.leafArray[i].move()
-			if random.random() <= self.config.drawProb :
+			if random.random() <= self.config.leafDrawProb and self.leafArray[i].unit == 0:
+				self.leafArray[i].render()
+			if random.random() <= self.config.flowerDrawProb and self.leafArray[i].unit == 1:
 				self.leafArray[i].render()
 
 
@@ -94,11 +96,11 @@ class Leaf():
 
 		self.angle = 0
 		self.unit = 0
-		self.scaleMax = random.uniform(.1,.8)
+		self.scaleMax = random.uniform(.1, self.config.scaleMax)
 		self.scalespeed = random.uniform(.001,.02)
 
 		self.rotation = 0
-		self.rotationSpeed = 4 - random.random() * 8
+		self.rotationSpeed = self.config.rotationSpeedMax - random.random() * self.config.rotationSpeedMax * 2
 
 		self.ty = 1
 		self.tx = 1
@@ -138,7 +140,7 @@ class Leaf():
 		if self.leafType == 1:
 			clr = colorutils.getRandomColorHSV(
 				hMin=250.0,
-				hMax=50.0,
+				hMax=350.0,
 				sMin=.850,
 				sMax=1.0,
 				vMin=0.50,
@@ -147,6 +149,19 @@ class Leaf():
 				dropHueMax=0,
 				a=round(random.uniform(220,255)),
 			)
+
+			if random.random() < .1 :
+				clr = colorutils.getRandomColorHSV(
+				hMin=350.0,
+				hMax=25.0,
+				sMin=.850,
+				sMax=1.0,
+				vMin=0.50,
+				vMax=1.0,
+				dropHueMin=0,
+				dropHueMax=0,
+				a=round(random.uniform(220,255)),
+				)
 
 		clrBlockDraw.rectangle((0, 0, self.blockWidth, self.blockWidth), fill=clr)
 		self.imageElement = ImageChops.multiply(clrBlock, self.imageElement)
@@ -263,13 +278,18 @@ def main(run=True):
 	config.bg.rectangle((0,0, config.canvasImageWidth, config.canvasImageHeight), fill=(100,100,100,255))
 	#config.canvasImage.paste(bg, (0,0), bg)
 
-	path = config.path + "assets/imgs/drawings/21-3b.png"
+	config.spriteSheet = (workConfig.get("leaf-factory", "spriteSheet"))
+	path = config.path + config.spriteSheet
 	config.spriteSheet = Image.open(path, "r")
 	print("loading : ", path)
 
 
 	config.flowerProb = float(workConfig.get("leaf-factory", "flowerProb"))
 	config.drawProb = float(workConfig.get("leaf-factory", "drawProb"))
+	config.leafDrawProb = float(workConfig.get("leaf-factory", "leafDrawProb"))
+	config.flowerDrawProb = float(workConfig.get("leaf-factory", "flowerDrawProb"))
+	config.rotationSpeedMax = float(workConfig.get("leaf-factory", "rotationSpeedMax"))
+	config.scaleMax = float(workConfig.get("leaf-factory", "scaleMax"))
 
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)

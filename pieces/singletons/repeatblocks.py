@@ -71,17 +71,7 @@ def runningSpiral(config):
 		p1[1] = p2[1]
 
 
-
-	config.xIncrementer += 1
-	config.yIncrementer += 0
-
-	if config.xIncrementer >= config.blockWidth * 1:
-		config.xIncrementer = -0
-	if config.yIncrementer >= config.blockHeight -4:
-		config.yIncrementer = 0
-
-
-def concentricBoxes(config):
+def shingles(config):
 	clr = config.lineColor
 	w = 4
 	h = 4
@@ -94,15 +84,73 @@ def concentricBoxes(config):
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
 	)
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)
+	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = clr2, outline=None)
+
+	numRows = 2
+	boxWidth = config.blockWidth
+	
+	for i in range(0,2):
+		config.blockDraw.ellipse((
+			i * boxWidth - boxWidth/2, 
+			-2, 
+			i * boxWidth + boxWidth - boxWidth/2,
+			-2 + boxWidth ), 
+			outline=(clr), fill = clr2)
+
+	config.blockDraw.ellipse((
+		0, 
+		-2 -boxWidth/2, 
+		0 + boxWidth,
+		-2 + boxWidth/2), 
+		outline=(clr), fill = clr2)
+
+
+def circles(config):
+	clr = config.lineColor
+	w = 4
+	h = 4
+	x = config.xIncrementer
+	y = config.yIncrementer
+	config.bgColor = tuple(
+		int(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)
+	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = config.bgColor, outline=None)
+
+	numLines = 1
+	for i in range (0,numLines) :
+		config.blockDraw.ellipse((
+			i-1, 
+			i-1, 
+			config.blockWidth-1*i,
+			config.blockHeight-1*i), 
+			outline=(clr), fill = clr2)
+		
+
+def concentricBoxes(config):
+	clr = config.lineColor
+
+	config.bgColor = tuple(
+		int(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
 
 	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = config.bgColor, outline=None)
 
-	lineMult = config.lineDiff  * 2
-	numLines = round(config.blockWidth / config.lineDiff  * 2)
-	numLines = 17
-	lineMult = 1
 
-	for i in range (0,numLines,2) :
+	for i in range (0,config.numConcentricBoxes,2) :
 		config.blockDraw.rectangle((
 			i-1, 
 			i-1, 
@@ -110,14 +158,6 @@ def concentricBoxes(config):
 			config.blockHeight-1*i), 
 			outline=(clr), fill = None)
 		
-	config.xIncrementer += 1
-	config.yIncrementer += 0
-
-	if config.xIncrementer >= config.blockWidth * 1:
-		config.xIncrementer = -0
-	if config.yIncrementer >= config.blockHeight -4:
-		config.yIncrementer = 0
-
 
 def randomizer(config) :
 
@@ -151,49 +191,45 @@ def diamond(config) :
 	)
 
 	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = config.bgColor, outline=None)
-	step = 1
+	step = config.diamondStep
 	row = 1
 	delta = 0
 	w = 0
 	h = 0
 	mid = config.blockWidth/2
+
+	
+
 	for i in range(0,config.blockHeight,step*2) :
 		for r in range(0,row, 1):
 			x =  r  + mid -  row/2
-			y = i
+			y = i + config.yIncrementer
+
+			if y >= config.blockHeight :
+				y -= config.blockHeight
+
 			if (r % 2) !=1 :
 				config.blockDraw.rectangle((x,y,w+x,h+y), fill=(clr), outline=None)
-		row = 2 * i + step  +  delta
-		if i > (config.blockHeight/2) :
-			row = round(2 * (config.blockHeight-i) )+  delta
-			#delta += -2
+		if config.diamondUseTriangles == False :
+			row = 2 * i + step  +  delta
+			if i > (config.blockHeight/2):
+				row = round(2 * (config.blockHeight-i) )+  delta
+				#delta += -2
+		else:
+			row =  i + step
 
 	'''
-	#triangles
-	step = 1
-	row = 1
-	delta = 1
-	w = 0
-	h = 0
-	mid = config.blockWidth/2
-	for i in range(0,config.blockHeight,step*2) :
-		for r in range(0,row, 1):
-			x =  r  + mid -  row/2
-			y = i
-			if (r % 2) !=1 :
-				config.blockDraw.rectangle((x,y,w+x,h+y), fill=(clr), outline=None)
-		row = i + step*1 * delta
-		if row > (config.blockHeight/2) :
-			delta *= -1
+	imgPart1  = config.blockImage.crop((config.blockWidth-1, 0, config.blockWidth, config.blockHeight))
+	imgPart2  = config.blockImage.crop((0, 0, config.blockWidth-1, config.blockHeight))
+
+	config.blockImage.paste(imgPart2, (1,0), imgPart2)
+	config.blockImage.paste(imgPart1, (0,0), imgPart1)
 	'''
 
 
-	#config.xIncrementer += 1
-	#config.yIncrementer += 1
+	config.yIncrementer += config.ySpeed
 
-	if config.xIncrementer >= config.blockWidth -4:
-		config.xIncrementer = 0
-	if config.yIncrementer >= config.blockHeight -4:
+	if config.yIncrementer >= config.blockHeight:
 		config.yIncrementer = 0
 
 
@@ -216,6 +252,7 @@ def diagonalMove(config) :
 
 
 def reMove(config) :
+
 	clr = config.lineColor
 	w = 4
 	h = 4
@@ -238,7 +275,7 @@ def reMove(config) :
 		config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult,config.blockHeight), fill=(clr))
 		if config.useDoubleLine == True : config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult + 1,config.blockHeight), fill=(clr))
 
-	config.xIncrementer += 1
+	config.xIncrementer += config.xSpeed
 	config.yIncrementer += 0
 
 	if config.xIncrementer >= config.blockWidth * 1:
@@ -314,10 +351,13 @@ def wavePattern(config) :
 def redraw(config):
 	if config.patternModel == "waves" :
 		wavePattern(config)
+
 	if config.patternModel == "reMove" :
 		reMove(config)
+
 	if config.patternModel == "diagonalMove" :
 		diagonalMove(config)
+
 	if config.patternModel == "randomizer" :
 		randomizer(config)
 
@@ -326,20 +366,32 @@ def redraw(config):
 
 	if config.patternModel == "concentricBoxes" :
 		concentricBoxes(config)
+
 	if config.patternModel == "diamond" :
 		diamond(config)
+
+	if config.patternModel == "shingles" :
+		shingles(config)
 
 
 def repeatImage(config) :
 	cntr = 0
-	skipBlocks = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
-	skipBlocks = [ 200]
 	for r in range(0, config.rows):
 		for c in range(0, config.cols):
-			if cntr in skipBlocks :
+			if cntr in config.skipBlocks :
 				config.canvasDraw.rectangle((c * config.blockWidth, r * config.blockHeight, c * config.blockWidth + config.blockWidth, r * config.blockHeight + config.blockHeight), fill = config.bgColor, outline=config.bgColor)
 			else :
 				config.canvasImage.paste(config.blockImage, (c * config.blockWidth-c, r * config.blockHeight-r), config.blockImage)
+
+			if cntr == 2 :
+				diamond(config)
+			if cntr == 22 :
+				runningSpiral(config)
+			if cntr == 40 :
+				reMove(config)
+
+			if cntr == 63 :
+				concentricBoxes(config)
 			cntr += 1
 
 
@@ -364,6 +416,22 @@ def iterate():
 	redraw(config)
 
 	repeatImage(config)
+
+
+	if config.randomizeSpeed == True :
+
+		if random.random() < .03 :
+			config.ySpeed = config.ySpeedInit
+
+		if random.random() < .1 :
+			config.ySpeed = 0
+
+
+	if random.random() < .0005 :
+		config.triangles = True
+
+	if random.random() < .01 :
+		config.triangles = False
 
 	if config.useDrawingPoints == True :
 		config.panelDrawing.canvasToUse = config.canvasImage
@@ -443,6 +511,8 @@ def main(run=True):
 
 	config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
 
+	config.randomizeSpeed = (workConfig.getboolean("movingpattern", "randomizeSpeed"))
+
 	config.patternModel = (workConfig.get("movingpattern", "patternModel"))
 	config.steps = int(workConfig.get("movingpattern", "steps"))
 	config.steps2 = int(workConfig.get("movingpattern", "steps2"))
@@ -455,7 +525,17 @@ def main(run=True):
 	config.phaseFactor = float(workConfig.get("movingpattern", "phaseFactor"))
 	config.xSpeed = float(workConfig.get("movingpattern", "xSpeed"))
 	config.ySpeed = float(workConfig.get("movingpattern", "ySpeed"))
+	config.ySpeedInit = float(workConfig.get("movingpattern", "ySpeed"))
 
+	skipBlocks = (workConfig.get("movingpattern", "skipBlocks")).split(",")
+	config.skipBlocks = tuple(
+		map(lambda x: int(int(x)), skipBlocks)
+	)
+	
+	config.diamondUseTriangles = False
+	config.diamondStep = int(workConfig.get("movingpattern", "diamondStep"))
+
+	config.numConcentricBoxes = int(workConfig.get("movingpattern", "numConcentricBoxes"))
 
 	config.randomBlockProb = float(workConfig.get("movingpattern", "randomBlockProb"))
 	config.randomBlockWidth = int(workConfig.get("movingpattern", "randomBlockWidth"))

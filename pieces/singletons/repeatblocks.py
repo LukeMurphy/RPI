@@ -262,10 +262,18 @@ def reMove(config) :
 		int(a * config.brightness) for a in (config.colOverlay.currentColor)
 	)
 
+	bgColor = (config.bgColor[0],config.bgColor[1],config.bgColor[3],255)
+
+
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
 	)
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)
 
+	clr = (clr[0],clr[1],clr[3],25)
+	clr2 = (clr2[0],clr2[1],clr2[3],25)
 	config.blockDraw.rectangle((0,0,config.blockWidth, config.blockHeight), fill = config.bgColor, outline=None)
 
 	lineMult = config.lineDiff  * 2
@@ -273,13 +281,13 @@ def reMove(config) :
 
 	for i in range (0,numLines) :
 		config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult,config.blockHeight), fill=(clr))
-		if config.useDoubleLine == True : config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult + 1,config.blockHeight), fill=(clr))
+		if config.useDoubleLine == True : config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth + config.blockWidth + config.xIncrementer+ i * lineMult + 1,config.blockHeight), fill=(clr2))
 
 	config.xIncrementer += config.xSpeed
 	config.yIncrementer += 0
 
-	if config.xIncrementer >= config.blockWidth * 1:
-		config.xIncrementer = -0
+	if config.xIncrementer > (config.blockWidth + 0):
+		config.xIncrementer = -config.xSpeed
 	if config.yIncrementer >= config.blockHeight -4:
 		config.yIncrementer = 0
 
@@ -383,15 +391,18 @@ def repeatImage(config) :
 			else :
 				config.canvasImage.paste(config.blockImage, (c * config.blockWidth-c, r * config.blockHeight-r), config.blockImage)
 
-			if cntr == 2 :
+			if cntr == 4 :
 				diamond(config)
 			if cntr == 22 :
 				runningSpiral(config)
-			if cntr == 40 :
+			if cntr == 42 :
 				reMove(config)
 
 			if cntr == 63 :
 				concentricBoxes(config)
+
+			if cntr == 95 :
+				shingles(config)
 			cntr += 1
 
 

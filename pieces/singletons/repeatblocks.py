@@ -75,7 +75,6 @@ def runningSpiral(config):
 		p1[1] = p2[1]
 
 
-
 def shingles(config):
 	clr = config.lineColor
 	w = 4
@@ -280,8 +279,8 @@ def reMove(config):
 		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
 	)
 
-	clr = (clr[0], clr[1], clr[3], 25)
-	clr2 = (clr2[0], clr2[1], clr2[3], 25)
+	clr = (clr[0], clr[1], clr[3], 255)
+	clr2 = (clr2[0], clr2[1], clr2[3], 255)
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -402,7 +401,7 @@ def repeatImage(config):
 											 r * config.blockHeight + config.blockHeight), fill=config.bgColor, outline=config.bgColor)
 			else:
 				temp = config.blockImage.copy()
-				if c % 2 != 0 and config.patternModel in config.rotateAltBlock:
+				if c % 2 != 0 and config.rotateAltBlock == 1:
 					temp = temp.rotate(90)
 
 				config.canvasImage.paste(
@@ -410,27 +409,13 @@ def repeatImage(config):
 
 
 			if config.patternModelVariations == True :
-
-				if cntr == 4:
-					config.patternModel = 'diamond'
-					diamond(config)
-
-				if cntr == 22:
-					config.patternModel = 'runningSpiral'
-					runningSpiral(config)
-
-				if cntr == 42:
-					config.patternModel = 'reMove'
-					reMove(config)
-
-				if cntr == 63:
-					config.patternModel = 'concentricBoxes'
-					concentricBoxes(config)
-
-				if cntr == 95:
-					config.patternModel = 'shingles'
-					shingles(config)
-
+				for s in config.patternSequence :
+					if cntr == s[1] :
+						config.patternModel = s[0]
+						config.rotateAltBlock = s[2]
+						func = eval(s[0])
+						func(config)
+						
 			cntr += 1
 
 
@@ -612,16 +597,20 @@ def main(run=True):
 		"RGBA", (config.canvasWidth, config.canvasHeight)
 	)
 
-	config.rotateAltBlock = workConfig.get(
-		"movingpattern", "rotateAltBlock").split(",")
-
+	config.rotateAltBlock = 0
 
 	try:
-		config.patternModelVariations = (workConfig.getboolean(
-		"movingpattern", "patternModelVariations"))
+		config.patternModelVariations = workConfig.getboolean("movingpattern", "patternModelVariations")
+		patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
+		config.patternSequence = []
+		for i in range(0,len(patternSequence),3) :
+			config.patternSequence.append([patternSequence[i], int(patternSequence[i+1]), int(patternSequence[i+2]) ])
 	except Exception as e:
 		print(str(e))
 		config.patternModelVariations = False
+		config.patternSequence =[]
+
+
 
 	# THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)

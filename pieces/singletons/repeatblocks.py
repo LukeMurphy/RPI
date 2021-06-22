@@ -16,9 +16,6 @@ def runningSpiral(config):
 	h = 4
 	x = config.xIncrementer
 	y = config.yIncrementer
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
 
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
@@ -82,10 +79,6 @@ def shingles(config):
 	x = config.xIncrementer
 	y = config.yIncrementer
 
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
-
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
 	)
@@ -124,9 +117,7 @@ def circles(config):
 	h = 4
 	x = config.xIncrementer
 	y = config.yIncrementer
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
+
 
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
@@ -150,10 +141,6 @@ def circles(config):
 def concentricBoxes(config):
 	clr = config.lineColor
 
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
-
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
 	)
@@ -175,17 +162,23 @@ def randomizer(config):
 	w = config.randomBlockWidth
 	h = config.randomBlockHeight
 
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
 	rows = config.blockHeight
 	cols = config.blockWidth
-	for r in range(0, rows, h):
-		for c in range(0, cols, w):
-			clr = colorutils.getRandomRGB()
+
+	step = w
+	hStep = h
+
+	if w == 0 :
+		step = 1	
+	if h == 0 :
+		hStep = 1
+
+	for r in range(0, rows, hStep):
+		for c in range(0, cols, step):
+			clr = colorutils.getRandomRGB(config.brightness/2)
 			if random.random() < config.randomBlockProb:
 				config.blockDraw.rectangle(
 					(c, r, w+c, h+r), fill=(clr), outline=None)
@@ -199,11 +192,6 @@ def diamond(config):
 	y = config.yIncrementer
 
 	# needs to be in odd grid
-
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
-
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -273,9 +261,7 @@ def reMove(config):
 	h = 4
 	x = config.xIncrementer
 	y = config.yIncrementer
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
+
 
 	bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[3], 255)
 
@@ -315,10 +301,6 @@ def wavePattern(config):
 	h = 4
 	x = config.xIncrementer
 	y = config.yIncrementer
-
-	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
 
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
@@ -373,7 +355,7 @@ def wavePattern(config):
 
 
 def redraw(config):
-	if config.patternModel == "waves":
+	if config.patternModel == "wavePattern":
 		wavePattern(config)
 
 	if config.patternModel == "reMove":
@@ -443,6 +425,10 @@ def iterate():
 	config.linecolOverlay.stepTransition()
 	config.linecolOverlay2.stepTransition()
 
+	config.bgColor = tuple(
+		int(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+
 	redraw(config)
 
 	repeatImage(config)
@@ -461,6 +447,9 @@ def iterate():
 	if random.random() < .01:
 		config.triangles = False
 
+	if random.random() < config.rebuildPatternProbability:
+		rebuildPatternSequence(config)
+
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
 		config.panelDrawing.render()
@@ -468,6 +457,21 @@ def iterate():
 		config.render(config.canvasImage, 0, 0,
 					  config.canvasWidth, config.canvasHeight)
 	# Done
+
+def rebuildPatternSequence(config):
+	config.patternSequence = []
+	numberOfPatterns = round(random.uniform(2,5))
+	config.numConcentricBoxes = round(random.uniform(6,16))
+	lastPosition = 0
+	totalSlots = config.rows * config.cols
+
+	for i in range(0,numberOfPatterns) :
+		pattern = config.patterns[math.floor(random.uniform(0,len(config.patterns)))]
+		rotate = round(random.uniform(0,1))
+		slotsLeft = totalSlots - lastPosition
+		position = round(random.uniform(lastPosition,slotsLeft-1))
+		config.patternSequence.append([pattern, position, rotate ])
+		lastPosition = position
 
 
 def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
@@ -604,6 +608,9 @@ def main(run=True):
 	)
 
 	config.rotateAltBlock = 0
+
+	config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
+	config.patterns = ["wavePattern","reMove","randomizer","runningSpiral","concentricBoxes","runningSpiral","diamond","shingles","circles"]
 
 	try:
 		config.patternModelVariations = workConfig.getboolean("movingpattern", "patternModelVariations")

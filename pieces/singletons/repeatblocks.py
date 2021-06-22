@@ -610,7 +610,7 @@ def main(run=True):
 	config.rotateAltBlock = 0
 
 	config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
-	config.patterns = ["wavePattern","reMove","randomizer","runningSpiral","concentricBoxes","runningSpiral","diamond","shingles","circles"]
+	config.patterns = workConfig.get("movingpattern", "patterns").split(",")
 
 	try:
 		config.patternModelVariations = workConfig.getboolean("movingpattern", "patternModelVariations")

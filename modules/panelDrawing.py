@@ -121,8 +121,8 @@ class PanelPathDrawing:
 				vSpace = self.panelWidth
 				hSpace = self.panelHeight
 
-			x = col * hSpace + self.xOffset
-			y = row * vSpace + self.yOffset
+			x = col * hSpace + self.xOffset + col*2
+			y = row * vSpace + self.yOffset + row*2
 			rTheta = orientationAngle + (random.uniform(-self.angleJiggle,self.angleJiggle))
 
 			if i not in self.skipPanels:

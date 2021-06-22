@@ -43,7 +43,7 @@ def runningSpiral(config):
 	p1 = [mid[0], mid[1]]
 	p2 = [mid[0], mid[1]]
 
-	clr = (0,255,255)
+	#clr = (0,255,255)
 
 	for i in range(0, numLines):
 		distance += d
@@ -62,7 +62,7 @@ def runningSpiral(config):
 	p1 = [mid[0] + 1, mid[1] + 3]
 	p2 = [mid[0] + 1, mid[1] + 3]
 
-	clr2 = (255,0,255)
+	#clr2 = (255,0,255)
 	for i in range(0, numLines):
 		distance += d
 		p2[0] = p2[0] + distance * direction
@@ -81,6 +81,7 @@ def shingles(config):
 	h = 4
 	x = config.xIncrementer
 	y = config.yIncrementer
+
 	config.bgColor = tuple(
 		int(a * config.brightness) for a in (config.colOverlay.currentColor)
 	)
@@ -88,9 +89,13 @@ def shingles(config):
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
 	)
+
 	clr2 = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
 	)
+
+	clr2 = config.bgColor
+
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
 
@@ -187,7 +192,8 @@ def randomizer(config):
 
 
 def diamond(config):
-	clr = (255, 0, 0, 210)
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
 
 	x = config.xIncrementer
 	y = config.yIncrementer
@@ -200,6 +206,7 @@ def diamond(config):
 
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+
 	step = config.diamondStep
 	row = 1
 	delta = 0
@@ -279,8 +286,7 @@ def reMove(config):
 		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
 	)
 
-	clr = (clr[0], clr[1], clr[3], 255)
-	clr2 = (clr2[0], clr2[1], clr2[3], 255)
+
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 

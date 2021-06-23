@@ -88,30 +88,31 @@ def balls(config):
 	)
 
 
-
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
 	numRows = 2
 	boxWidth = config.blockWidth
+	dotWidth = boxWidth/2 - 2
+	outline = None
 
 	for i in range(0, 4):
 		config.blockDraw.ellipse((
 			i * boxWidth/2 - boxWidth/4,
-			-0,
-			i * boxWidth/2 + boxWidth/2 - boxWidth/4,
-			-0 + boxWidth/2),
-			outline=(clr2), fill=clr2)
+			0,
+			i * boxWidth/2 - boxWidth/4 + dotWidth,
+			dotWidth ),
+			outline=(outline), fill=clr)
 
 
 
 	for i in range(0, 4):
 		config.blockDraw.ellipse((
-			boxWidth/4 + i * boxWidth/2 - boxWidth/4,
+			i * boxWidth/2,
 			boxWidth/2,
-			boxWidth/4 + i * boxWidth/2 + boxWidth/2 - boxWidth/4,
-			boxWidth/2 + boxWidth/2),
-			outline=(clr2), fill=clr2)
+			i * boxWidth/2 + dotWidth,
+			boxWidth/2 + dotWidth),
+			outline=(outline), fill=clr)
 
 
 def shingles(config):

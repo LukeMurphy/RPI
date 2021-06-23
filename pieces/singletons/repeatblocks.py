@@ -91,29 +91,31 @@ def balls(config):
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
-	numRows = 2
+	numRows = config.numRows
 	boxWidth = config.blockWidth
-	dotWidth = boxWidth/2 - 2
+	density = numRows * 4
+	dotWidth = boxWidth/2/numRows - 2
 	outline = None
 
-	for i in range(0, 4):
-		config.blockDraw.ellipse((
-			i * boxWidth/2 - boxWidth/4,
-			0,
-			i * boxWidth/2 - boxWidth/4 + dotWidth,
-			dotWidth ),
-			outline=(outline), fill=clr)
+	for r in range(0,numRows) : 
 
-
-
-	for i in range(0, 4):
-		config.blockDraw.ellipse((
-			i * boxWidth/2,
-			boxWidth/2,
-			i * boxWidth/2 + dotWidth,
-			boxWidth/2 + dotWidth),
-			outline=(outline), fill=clr)
-
+		for i in range(0, density):
+			yPos = r * (dotWidth * 2) + r * 4
+			config.blockDraw.ellipse((
+				i * 2 * boxWidth/density - boxWidth/density,
+				yPos,
+				i * 2 * boxWidth/density - boxWidth/density + dotWidth,
+				yPos+ dotWidth ),
+				outline=(outline), fill=clr)
+		
+		for i in range(0, density):
+			config.blockDraw.ellipse((
+				i * 2 * boxWidth/density,
+				yPos + 2 * boxWidth/density,
+				i * 2 * boxWidth/density + dotWidth,
+				yPos + 2 * boxWidth/density + dotWidth),
+				outline=(outline), fill=clr)
+		
 
 def shingles(config):
 	clr = config.lineColor
@@ -135,23 +137,26 @@ def shingles(config):
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
 
-	numRows = 2
-	boxWidth = config.blockWidth
+	numRows = config.numRows
+	boxWidth = config.blockWidth/numRows
 
-	for i in range(0, 2):
-		config.blockDraw.ellipse((
-			i * boxWidth - boxWidth/2,
-			-2,
-			i * boxWidth + boxWidth - boxWidth/2,
-			-2 + boxWidth),
-			outline=(clr), fill=clr2)
+	for r in range(numRows, -1, -1):
+		yPos = -2 + r * boxWidth
+		for i in range(0, 3):
+			config.blockDraw.ellipse((
+				i * boxWidth - boxWidth/2,
+				yPos,
+				i * boxWidth + boxWidth - boxWidth/2,
+				yPos + boxWidth),
+				outline=(clr), fill=clr2)
 
-	config.blockDraw.ellipse((
-		0,
-		-2 - boxWidth/2,
-		0 + boxWidth,
-		-2 + boxWidth/2),
-		outline=(clr), fill=clr2)
+		for i in range(0, 2):
+			config.blockDraw.ellipse((
+				i * boxWidth,
+				yPos - boxWidth/2,
+				i * boxWidth + boxWidth,
+				yPos + boxWidth/2),
+				outline=(clr), fill=clr2)
 
 
 def circles(config):
@@ -243,26 +248,30 @@ def diamond(config):
 	delta = 0
 	w = 0
 	h = 0
-	mid = config.blockWidth/2
+	rows = config.numRows
+	blockHeight = round(config.blockHeight/rows)
+	mid = round(blockHeight/2)
 
-	for i in range(0, config.blockHeight, step*2):
-		for r in range(0, row, 1):
-			x = r + mid - row/2
-			y = i + config.yIncrementer
+	for rw in range(0, rows):
+		for c in range(0, rows):
+			for i in range(0, blockHeight, step*2):
+				for r in range(0, row, 1):
+					x = r + mid - row/2 + c * blockHeight
+					y = i + config.yIncrementer + rw * blockHeight
 
-			if y >= config.blockHeight:
-				y -= config.blockHeight
+					if y >= blockHeight*rows:
+						y -= blockHeight*rows
 
-			if (r % 2) != 1:
-				config.blockDraw.rectangle(
-					(x, y, w+x, h+y), fill=(clr), outline=None)
-		if config.diamondUseTriangles == False:
-			row = 2 * i + step + delta
-			if i > (config.blockHeight/2):
-				row = round(2 * (config.blockHeight-i)) + delta
-				#delta += -2
-		else:
-			row = i + step
+					if (r % 2) != 1:
+						config.blockDraw.rectangle(
+							(x, y, w+x, h+y), fill=(clr), outline=None)
+				if config.diamondUseTriangles == False:
+					row = 2 * i + step + delta
+					if i > (blockHeight/2):
+						row = round(2 * (blockHeight-i)) + delta
+						#delta += -2
+				else:
+					row = i + step
 
 	'''
 	imgPart1  = config.blockImage.crop((config.blockWidth-1, 0, config.blockWidth, config.blockHeight))
@@ -274,7 +283,7 @@ def diamond(config):
 
 	config.yIncrementer += config.ySpeed
 
-	if config.yIncrementer >= config.blockHeight:
+	if config.yIncrementer >= blockHeight*2:
 		config.yIncrementer = 0
 
 
@@ -496,6 +505,10 @@ def iterate():
 	if random.random() < config.rebuildPatternProbability:
 		rebuildPatternSequence(config)
 
+	if random.random() < config.rebuildPatternProbability:
+		if config.numRowsRandomize == True :
+			config.numRows = round(random.uniform(1,2))
+
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
 		config.panelDrawing.render()
@@ -512,9 +525,13 @@ def rebuildPatternSequence(config):
 	lastPosition = 0
 	totalSlots = config.rows * config.cols
 
+
 	for i in range(0,numberOfPatterns) :
 		pattern = config.patterns[math.floor(random.uniform(0,len(config.patterns)))]
-		rotate = round(random.uniform(0,1))
+		if pattern not in (["shingles","balls"]) :
+			rotate = round(random.uniform(0,1))
+		else:
+			rotate = 0
 		slotsLeft = totalSlots - lastPosition
 		position = round(random.uniform(lastPosition,slotsLeft-1))
 		config.patternSequence.append([pattern, position, rotate ])
@@ -655,6 +672,14 @@ def main(run=True):
 	)
 
 	config.rotateAltBlock = 0
+
+	try:
+		config.numRows = int(workConfig.get("movingpattern", "numRows"))
+		config.numRowsRandomize = (workConfig.getboolean("movingpattern", "numRowsRandomize"))
+	except Exception as e:
+		config.numRows = 1
+		config.numRowsRandomize = False
+		print(str(e))
 
 	config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
 	config.patterns = workConfig.get("movingpattern", "patterns").split(",")

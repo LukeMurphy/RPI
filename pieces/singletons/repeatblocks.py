@@ -72,6 +72,48 @@ def runningSpiral(config):
 		p1[1] = p2[1]
 
 
+def balls(config):
+	clr = config.lineColor
+	w = 4
+	h = 4
+	x = config.xIncrementer
+	y = config.yIncrementer
+
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
+
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)
+
+
+
+	config.blockDraw.rectangle(
+		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+
+	numRows = 2
+	boxWidth = config.blockWidth
+
+	for i in range(0, 4):
+		config.blockDraw.ellipse((
+			i * boxWidth/2 - boxWidth/4,
+			-0,
+			i * boxWidth/2 + boxWidth/2 - boxWidth/4,
+			-0 + boxWidth/2),
+			outline=(clr2), fill=clr2)
+
+
+
+	for i in range(0, 4):
+		config.blockDraw.ellipse((
+			boxWidth/4 + i * boxWidth/2 - boxWidth/4,
+			boxWidth/2,
+			boxWidth/4 + i * boxWidth/2 + boxWidth/2 - boxWidth/4,
+			boxWidth/2 + boxWidth/2),
+			outline=(clr2), fill=clr2)
+
+
 def shingles(config):
 	clr = config.lineColor
 	w = 4
@@ -379,6 +421,9 @@ def redraw(config):
 	if config.patternModel == "shingles":
 		shingles(config)
 
+	if config.patternModel == "balls":
+		balls(config)
+
 
 def repeatImage(config):
 	cntr = 0
@@ -457,6 +502,7 @@ def iterate():
 		config.render(config.canvasImage, 0, 0,
 					  config.canvasWidth, config.canvasHeight)
 	# Done
+
 
 def rebuildPatternSequence(config):
 	config.patternSequence = []

@@ -481,7 +481,7 @@ def iterate():
 	config.linecolOverlay2.stepTransition()
 
 	config.bgColor = tuple(
-		int(a * config.brightness) for a in (config.colOverlay.currentColor)
+		round(a * config.brightness) for a in (config.colOverlay.currentColor)
 	)
 
 	redraw(config)
@@ -520,7 +520,7 @@ def iterate():
 
 def rebuildPatternSequence(config):
 	config.patternSequence = []
-	numberOfPatterns = round(random.uniform(2,5))
+	numberOfPatterns = round(random.uniform(1,2))
 	config.numConcentricBoxes = round(random.uniform(6,16))
 	lastPosition = 0
 	totalSlots = config.rows * config.cols
@@ -581,37 +581,39 @@ def main(run=True):
 		map(lambda x: int(int(x)), config.lineColorVals)
 	)
 
-	tLimitBase = int(workConfig.get("movingpattern", "tLimitBase"))
-	minHue = float(workConfig.get("movingpattern", "minHue"))
-	maxHue = float(workConfig.get("movingpattern", "maxHue"))
-	minSaturation = float(workConfig.get("movingpattern", "minSaturation")	)
-	maxSaturation = float(workConfig.get("movingpattern", "maxSaturation"))
-	minValue = float(workConfig.get("movingpattern", "minValue"))
-	maxValue = float(workConfig.get("movingpattern", "maxValue"))
+	palette = workConfig.get("movingpattern", "palette")
+
+	tLimitBase = int(workConfig.get(palette, "tLimitBase"))
+	minHue = float(workConfig.get(palette, "minHue"))
+	maxHue = float(workConfig.get(palette, "maxHue"))
+	minSaturation = float(workConfig.get(palette, "minSaturation")	)
+	maxSaturation = float(workConfig.get(palette, "maxSaturation"))
+	minValue = float(workConfig.get(palette, "minValue"))
+	maxValue = float(workConfig.get(palette, "maxValue"))
 	config.colOverlay = getConfigOverlay(
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
-	tLimitBase = int(workConfig.get("movingpattern", "line_tLimitBase"))
-	minHue = float(workConfig.get("movingpattern", "line_minHue"))
-	maxHue = float(workConfig.get("movingpattern", "line_maxHue"))
+	tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
+	minHue = float(workConfig.get(palette, "line_minHue"))
+	maxHue = float(workConfig.get(palette, "line_maxHue"))
 	minSaturation = float(workConfig.get(
-		"movingpattern", "line_minSaturation")	)
+		palette, "line_minSaturation")	)
 	maxSaturation = float(workConfig.get(
-		"movingpattern", "line_maxSaturation"))
-	minValue = float(workConfig.get("movingpattern", "line_minValue"))
-	maxValue = float(workConfig.get("movingpattern", "line_maxValue"))
+		palette, "line_maxSaturation"))
+	minValue = float(workConfig.get(palette, "line_minValue"))
+	maxValue = float(workConfig.get(palette, "line_maxValue"))
 	config.linecolOverlay = getConfigOverlay(
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
-	tLimitBase = int(workConfig.get("movingpattern", "line2_tLimitBase"))
-	minHue = float(workConfig.get("movingpattern", "line2_minHue"))
-	maxHue = float(workConfig.get("movingpattern", "line2_maxHue"))
+	tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
+	minHue = float(workConfig.get(palette, "line2_minHue"))
+	maxHue = float(workConfig.get(palette, "line2_maxHue"))
 	minSaturation = float(workConfig.get(
-		"movingpattern", "line2_minSaturation")	)
+		palette, "line2_minSaturation")	)
 	maxSaturation = float(workConfig.get(
-		"movingpattern", "line2_maxSaturation"))
-	minValue = float(workConfig.get("movingpattern", "line2_minValue"))
-	maxValue = float(workConfig.get("movingpattern", "line2_maxValue"))
+		palette, "line2_maxSaturation"))
+	minValue = float(workConfig.get(palette, "line2_minValue"))
+	maxValue = float(workConfig.get(palette, "line2_maxValue"))
 	config.linecolOverlay2 = getConfigOverlay(
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 

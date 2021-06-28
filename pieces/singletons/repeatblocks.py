@@ -73,7 +73,6 @@ def runningSpiral(config):
 
 
 def balls(config):
-	clr = config.lineColor
 	w = 4
 	h = 4
 	x = config.xIncrementer
@@ -91,7 +90,7 @@ def balls(config):
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
-	numRows = config.numRows
+	numRows = config.numDotRows
 	boxWidth = config.blockWidth
 	density = numRows * 4
 	dotWidth = boxWidth/2/numRows - 2
@@ -118,7 +117,6 @@ def balls(config):
 		
 
 def shingles(config):
-	clr = config.lineColor
 	w = 4
 	h = 4
 	x = config.xIncrementer
@@ -137,7 +135,7 @@ def shingles(config):
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
 
-	numRows = config.numRows
+	numRows = config.numShingleRows
 	boxWidth = config.blockWidth/numRows
 
 	for r in range(numRows, -1, -1):
@@ -160,7 +158,6 @@ def shingles(config):
 
 
 def circles(config):
-	clr = config.lineColor
 	w = 4
 	h = 4
 	x = config.xIncrementer
@@ -187,7 +184,6 @@ def circles(config):
 
 
 def concentricBoxes(config):
-	clr = config.lineColor
 
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
@@ -308,7 +304,6 @@ def diagonalMove(config):
 
 def reMove(config):
 
-	clr = config.lineColor
 	w = 4
 	h = 4
 	x = config.xIncrementer
@@ -348,7 +343,6 @@ def reMove(config):
 
 
 def wavePattern(config):
-	clr = config.lineColor
 	w = 4
 	h = 4
 	x = config.xIncrementer
@@ -437,8 +431,11 @@ def redraw(config):
 
 def repeatImage(config):
 	cntr = 0
-	for r in range(0, config.rows):
-		for c in range(0, config.cols):
+	# 2021-06-28 Opted to build the repetition/tiling vertically instead of horizontally
+	# to suit the graph piece better and upwards or downwards is better than sideways sometimes
+	# so reversed the order of "for c in ..." with "for r in range(..." so builds rows vertically
+	for c in range(0, config.cols):
+		for r in range(0, config.rows):
 			if cntr in config.skipBlocks:
 				config.canvasDraw.rectangle((c * config.blockWidth, r * config.blockHeight, c * config.blockWidth + config.blockWidth,
 											 r * config.blockHeight + config.blockHeight), fill=config.bgColor, outline=config.bgColor)
@@ -488,6 +485,12 @@ def iterate():
 
 	repeatImage(config)
 
+	if random.random() < .005:
+		config.usePixelSort = False
+	if random.random() < .005:
+		config.usePixelSort = True
+
+
 	if config.randomizeSpeed == True:
 
 		if random.random() < .03:
@@ -504,10 +507,28 @@ def iterate():
 
 	if random.random() < config.rebuildPatternProbability:
 		rebuildPatternSequence(config)
+		newPalette = math.floor(random.uniform(0,len(config.palettes)))
+		if newPalette == len(config.palettes) : newPalette = 0
+		buildPalette(config,newPalette)
+
+		'''
+		print("----------")
+		print(config.colOverlay.currentColor)
+		print(config.linecolOverlay.currentColor)
+		print(config.linecolOverlay2.currentColor)
+		print("----------")
+		'''
+	if random.random() < config.rebuildPatternProbability:
+		newPalette = math.floor(random.uniform(0,len(config.palettes)))
+		if newPalette == len(config.palettes) : newPalette = 0
+		buildPalette(config,newPalette)
 
 	if random.random() < config.rebuildPatternProbability:
 		if config.numRowsRandomize == True :
 			config.numRows = round(random.uniform(1,2))
+			config.numShingleRows = round(random.uniform(1,2))
+			dotRows = [1,2,4]
+			config.numDotRows = dotRows[round(random.uniform(0,2))]
 
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
@@ -520,22 +541,29 @@ def iterate():
 
 def rebuildPatternSequence(config):
 	config.patternSequence = []
-	numberOfPatterns = round(random.uniform(1,2))
+	numberOfPatterns = round(random.uniform(2,4))
 	config.numConcentricBoxes = round(random.uniform(6,16))
 	lastPosition = 0
 	totalSlots = config.rows * config.cols
 
 
-	for i in range(0,numberOfPatterns) :
+	#for i in range(0,numberOfPatterns) :
+	i = 0
+	usedPatterns = []
+	while i < numberOfPatterns :
 		pattern = config.patterns[math.floor(random.uniform(0,len(config.patterns)))]
-		if pattern not in (["shingles","balls"]) :
-			rotate = round(random.uniform(0,1))
-		else:
-			rotate = 0
-		slotsLeft = totalSlots - lastPosition
-		position = round(random.uniform(lastPosition,slotsLeft-1))
-		config.patternSequence.append([pattern, position, rotate ])
-		lastPosition = position
+
+		if pattern not in usedPatterns :
+			if pattern not in (["shingles","balls"]) :
+				rotate = round(random.uniform(0,1))
+			else:
+				rotate = 0
+			slotsLeft = totalSlots - lastPosition
+			position = round(random.uniform(lastPosition,slotsLeft-1))
+			config.patternSequence.append([pattern, position, rotate ])
+			usedPatterns.append(pattern)
+			lastPosition = position
+			i+=1
 
 
 def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
@@ -555,33 +583,8 @@ def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, m
 	return colOverlay
 
 
-def main(run=True):
-	global config
-	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
-	config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
-	config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
-	config.rows = int(workConfig.get("movingpattern", "rows"))
-	config.cols = int(workConfig.get("movingpattern", "cols"))
-	config.lineDiff = int(workConfig.get("movingpattern", "lineDiff"))
-
-	config.bgColorVals = (workConfig.get(
-		"movingpattern", "bgColor")).split(",")
-	config.bgColor = tuple(
-		map(lambda x: int(int(x)), config.bgColorVals)
-	)
-	config.lineColorVals = (workConfig.get(
-		"movingpattern", "lineColor")).split(",")
-	config.lineColor = tuple(
-		map(lambda x: int(int(x)), config.lineColorVals)
-	)
-
-	config.lineColorVals = (workConfig.get(
-		"movingpattern", "lineColor")).split(",")
-	config.lineColor2 = tuple(
-		map(lambda x: int(int(x)), config.lineColorVals)
-	)
-
-	palette = workConfig.get("movingpattern", "palette")
+def buildPalette(config,index=0):
+	palette = config.palettes[index]
 
 	tLimitBase = int(workConfig.get(palette, "tLimitBase"))
 	minHue = float(workConfig.get(palette, "minHue"))
@@ -616,6 +619,16 @@ def main(run=True):
 	maxValue = float(workConfig.get(palette, "line2_maxValue"))
 	config.linecolOverlay2 = getConfigOverlay(
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+
+
+def main(run=True):
+	global config
+	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
+	config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
+	config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
+	config.rows = int(workConfig.get("movingpattern", "rows"))
+	config.cols = int(workConfig.get("movingpattern", "cols"))
+	config.lineDiff = int(workConfig.get("movingpattern", "lineDiff"))
 
 	config.useDoubleLine = (workConfig.getboolean(
 		"movingpattern", "useDoubleLine"))
@@ -683,6 +696,14 @@ def main(run=True):
 		config.numRowsRandomize = False
 		print(str(e))
 
+	try:
+		config.numDotRows = int(workConfig.get("movingpattern", "numDotRows"))
+		config.numShingleRows = int(workConfig.get("movingpattern", "numShingleRows"))
+	except Exception as e:
+		config.numDotRows = config.numRows
+		config.numShingleRows = config.numRows
+		print(str(e))
+
 	config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
 	config.patterns = workConfig.get("movingpattern", "patterns").split(",")
 
@@ -698,6 +719,8 @@ def main(run=True):
 		config.patternSequence =[]
 
 
+	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
+	buildPalette(config,0)
 
 	# THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)

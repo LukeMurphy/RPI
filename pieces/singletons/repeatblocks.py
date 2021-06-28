@@ -530,10 +530,21 @@ def iterate():
 			dotRows = [1,2,4]
 			config.numDotRows = dotRows[round(random.uniform(0,2))]
 
+
+	if random.random() < config.rebuildPatternProbability and config.sectionDisturbance == True:
+		config.sectionRotation = random.uniform(-30,30)
+		config.sectionPlacement = [round(random.uniform(0,config.canvasWidth)),round(random.uniform(0,config.canvasHeight))]
+		config.sectionSize = [round(random.uniform(0,256)),round(random.uniform(0,256))]
+
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
 		config.panelDrawing.render()
 	else:
+
+		if config.sectionDisturbance == True :
+			section = config.canvasImage.crop((0,0,config.sectionSize[0],config.sectionSize[1]))
+			section = section.rotate(config.sectionRotation)
+			config.canvasImage.paste(section,config.sectionPlacement,section)
 		config.render(config.canvasImage, 0, 0,
 					  config.canvasWidth, config.canvasHeight)
 	# Done
@@ -724,7 +735,15 @@ def main(run=True):
 		config.usePixelSortRandomize = False
 		print(str(e))
 
+	try:
+		config.sectionDisturbance = (workConfig.getboolean("movingpattern", "sectionDisturbance"))
+	except Exception as e:
+		config.sectionDisturbance = True
+		print(str(e))
 
+	config.sectionPlacement = (128,128)
+	config.sectionRotation = 5
+	config.sectionSize = (128,128)
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
 	buildPalette(config,0)

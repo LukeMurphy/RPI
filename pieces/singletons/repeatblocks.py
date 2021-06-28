@@ -485,9 +485,9 @@ def iterate():
 
 	repeatImage(config)
 
-	if random.random() < .005:
+	if random.random() < .005 and config.usePixelSortRandomize == True:
 		config.usePixelSort = False
-	if random.random() < .005:
+	if random.random() < .005 and config.usePixelSortRandomize == True:
 		config.usePixelSort = True
 
 
@@ -717,6 +717,13 @@ def main(run=True):
 		print(str(e))
 		config.patternModelVariations = False
 		config.patternSequence =[]
+
+	try:
+		config.usePixelSortRandomize = (workConfig.getboolean("movingpattern", "usePixelSortRandomize"))
+	except Exception as e:
+		config.usePixelSortRandomize = False
+		print(str(e))
+
 
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")

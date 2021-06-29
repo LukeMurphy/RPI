@@ -531,10 +531,12 @@ def iterate():
 			config.numDotRows = dotRows[round(random.uniform(0,2))]
 
 
+	# RANDOM OVERLAY REPETITION DISTURBANCE
 	if random.random() < config.rebuildPatternProbability and config.sectionDisturbance == True:
-		config.sectionRotation = random.uniform(-30,30)
-		config.sectionPlacement = [round(random.uniform(0,config.canvasWidth)),round(random.uniform(0,config.canvasHeight))]
-		config.sectionSize = [round(random.uniform(0,256)),round(random.uniform(0,256))]
+		config.sectionRotation = random.uniform(-config.sectionRotationRange,config.sectionRotationRange)
+		config.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
+		config.sectionSize = [round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
+
 
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
@@ -735,15 +737,31 @@ def main(run=True):
 		config.usePixelSortRandomize = False
 		print(str(e))
 
+
 	try:
 		config.sectionDisturbance = (workConfig.getboolean("movingpattern", "sectionDisturbance"))
+
+		config.sectionRotationRange = float(workConfig.get("movingpattern", "sectionRotationRange"))
+
+		sectionPlacementXRange = workConfig.get("movingpattern", "sectionPlacementXRange").split(",")
+		config.sectionPlacementXRange = tuple(map(lambda x: int(int(x)), sectionPlacementXRange))
+		sectionPlacementYRange = workConfig.get("movingpattern", "sectionPlacementXRange").split(",")
+		config.sectionPlacementYRange = tuple(map(lambda x: int(int(x)), sectionPlacementYRange))
+
+		sectionWidthRange = workConfig.get("movingpattern", "sectionWidthRange").split(",")
+		config.sectionWidthRange = tuple(map(lambda x: int(int(x)), sectionWidthRange))
+		sectionHeightRange = workConfig.get("movingpattern", "sectionHeightRange").split(",")
+		config.sectionHeightRange = tuple(map(lambda x: int(int(x)), sectionHeightRange))
+
+
+		config.sectionRotation = random.uniform(-config.sectionRotationRange,config.sectionRotationRange)
+		config.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
+		config.sectionSize = [round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
+
 	except Exception as e:
-		config.sectionDisturbance = True
+		config.sectionDisturbance = False
 		print(str(e))
 
-	config.sectionPlacement = (128,128)
-	config.sectionRotation = 5
-	config.sectionSize = (128,128)
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
 	buildPalette(config,0)

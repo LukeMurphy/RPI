@@ -116,7 +116,7 @@ def balls(config):
 				outline=(outline), fill=clr)
 		
 
-def shingles(config):
+def fishScales(config):
 	w = 4
 	h = 4
 	x = config.xIncrementer
@@ -154,6 +154,48 @@ def shingles(config):
 				yPos - boxWidth/2,
 				i * boxWidth + boxWidth,
 				yPos + boxWidth/2),
+				outline=(clr), fill=clr2)
+
+
+def shingles(config):
+	w = 4
+	h = 4
+	x = config.xIncrementer
+	y = config.yIncrementer
+
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
+
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)
+
+	clr2 = config.bgColor
+
+	config.blockDraw.rectangle(
+		(0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+
+	numRows = config.numShingleRows
+	boxWidth = config.blockWidth/numRows
+	shingleWidth = config.blockWidth/numRows - config.shingleVariationAmount
+
+	for r in range(numRows, -1, -1):
+		yPos = -1 + r * boxWidth
+
+		for i in range(0, 3):
+			config.blockDraw.rectangle((
+				i * boxWidth - boxWidth/2,
+				yPos,
+				i * boxWidth + shingleWidth - boxWidth/2,
+				yPos + boxWidth-1),
+				outline=(clr), fill=clr2)
+		for i in range(0, 2):
+			config.blockDraw.rectangle((
+				i * boxWidth,
+				yPos - boxWidth/2,
+				i * boxWidth + shingleWidth,
+				yPos + boxWidth/2 -1),
 				outline=(clr), fill=clr2)
 
 
@@ -457,8 +499,7 @@ def repeatImage(config):
 				if c % 2 != 0 and config.rotateAltBlock == 1:
 					temp = temp.rotate(90)
 
-				config.canvasImage.paste(
-					temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
+				config.canvasImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
 
 
 			if config.patternModelVariations == True :
@@ -542,6 +583,11 @@ def iterate():
 		config.sectionSize = [round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
 
 
+	if config.shingleVariation == True:
+		if random.random() < config.rebuildPatternProbability :
+			config.shingleVariationAmount = round(random.uniform(0,config.shingleVariationRange))
+
+
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
 		config.panelDrawing.render()
@@ -576,7 +622,7 @@ def rebuildPatternSequence(config):
 		pattern = config.patterns[math.floor(random.uniform(0,len(config.patterns)))]
 
 		if pattern not in usedPatterns :
-			if pattern not in (["shingles","balls"]) :
+			if pattern not in (["shingles","fishScales","balls"]) :
 				rotate = round(random.uniform(0,1))
 			else:
 				rotate = 0
@@ -746,6 +792,16 @@ def main(run=True):
 		config.usePixelSortRandomize = (workConfig.getboolean("movingpattern", "usePixelSortRandomize"))
 	except Exception as e:
 		config.usePixelSortRandomize = False
+		print(str(e))
+
+	try:
+		config.shingleVariation = (workConfig.getboolean("movingpattern", "shingleVariation"))
+		config.shingleVariationRange = int(workConfig.get("movingpattern", "shingleVariationRange"))
+		config.shingleVariationAmount = config.shingleVariationRange
+	except Exception as e:
+		config.shingleVariation = False
+		config.shingleVariationRange = 0
+		config.shingleVariationAmount = 0
 		print(str(e))
 
 

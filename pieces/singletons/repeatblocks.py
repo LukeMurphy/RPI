@@ -185,20 +185,33 @@ def circles(config):
 
 def concentricBoxes(config):
 
+
 	clr = tuple(
 		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
 	)
 
 	config.blockDraw.rectangle(
 		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
+	count  = 0
 	for i in range(0, config.numConcentricBoxes, 2):
+
+		if config.altLineColoring ==  True :
+			outClr = clr2
+			if count % 2 == 0 :
+				outClr = clr
+		else :
+			outClr = clr
 		config.blockDraw.rectangle((
 			i-1,
 			i-1,
 			config.blockWidth-1*i,
 			config.blockHeight-1*i),
-			outline=(clr), fill=None)
+			outline=(outClr), fill=None)
+		count += 1
 
 
 def randomizer(config):
@@ -507,17 +520,8 @@ def iterate():
 
 	if random.random() < config.rebuildPatternProbability:
 		rebuildPatternSequence(config)
-		newPalette = math.floor(random.uniform(0,len(config.palettes)))
-		if newPalette == len(config.palettes) : newPalette = 0
-		buildPalette(config,newPalette)
 
-		'''
-		print("----------")
-		print(config.colOverlay.currentColor)
-		print(config.linecolOverlay.currentColor)
-		print(config.linecolOverlay2.currentColor)
-		print("----------")
-		'''
+
 	if random.random() < config.rebuildPatternProbability:
 		newPalette = math.floor(random.uniform(0,len(config.palettes)))
 		if newPalette == len(config.palettes) : newPalette = 0
@@ -555,9 +559,14 @@ def iterate():
 def rebuildPatternSequence(config):
 	config.patternSequence = []
 	numberOfPatterns = round(random.uniform(2,4))
-	config.numConcentricBoxes = round(random.uniform(6,16))
+	config.numConcentricBoxes = round(random.uniform(8,18))
 	lastPosition = 0
 	totalSlots = config.rows * config.cols
+
+	if random.random() < .5 :
+		config.altLineColoring = True 
+	else :
+		config.altLineColoring = False
 
 
 	#for i in range(0,numberOfPatterns) :
@@ -685,6 +694,8 @@ def main(run=True):
 
 	config.xIncrementer = 0
 	config.yIncrementer = 0
+
+	config.altLineColoring = True
 
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new(

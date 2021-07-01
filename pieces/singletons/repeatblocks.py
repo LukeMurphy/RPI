@@ -382,8 +382,15 @@ def reMove(config):
 	numLines = round(config.blockWidth / config.lineDiff * 2)
 
 	for i in range(0, numLines):
-		config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult, 0, -2*config.blockWidth +
-							   config.blockWidth + config.xIncrementer + i * lineMult, config.blockHeight), fill=(clr))
+
+		x1 = -2*config.blockWidth + config.xIncrementer + i * lineMult
+		y1 = 0
+		x2 = -2*config.blockWidth + config.blockWidth + config.xIncrementer + i * lineMult
+		y2 = config.blockHeight
+
+
+
+		config.blockDraw.line((x1, y1, x2, y2), fill=(clr))
 		if config.useDoubleLine == True:
 			config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth +
 								   config.blockWidth + config.xIncrementer + i * lineMult + 1, config.blockHeight), fill=(clr2))
@@ -391,11 +398,12 @@ def reMove(config):
 	config.xIncrementer += config.xSpeed
 	config.yIncrementer += 0
 
+	'''
+	'''
 	if config.xIncrementer > (config.blockWidth + 0):
 		config.xIncrementer = -config.xSpeed
 	if config.yIncrementer >= config.blockHeight - 4:
 		config.yIncrementer = 0
-
 
 def wavePattern(config):
 	w = 4

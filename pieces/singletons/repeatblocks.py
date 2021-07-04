@@ -6,7 +6,7 @@ import time
 import types
 from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 
 
@@ -597,15 +597,25 @@ def iterate():
 			config.shingleVariationAmount = round(random.uniform(0,config.shingleVariationRange))
 
 
+
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
 		config.panelDrawing.render()
 	else:
 
+		# paste over a section of the image on to itself and rotate
 		if config.sectionDisturbance == True :
 			section = config.canvasImage.crop((0,0,config.sectionSize[0],config.sectionSize[1]))
 			section = section.rotate(config.sectionRotation)
 			config.canvasImage.paste(section,config.sectionPlacement,section)
+		
+		# a blurred section distrubance
+		if config.useBlurSection == True:
+			cp = config.canvasImage.copy()
+			mask_blur = config.mask.filter(ImageFilter.GaussianBlur(config.mask_blur_amt))
+			cp_blur = cp.filter(ImageFilter.GaussianBlur(config.cp_blur_amt))
+			config.canvasImage = Image.composite(cp_blur,config.canvasImage, mask_blur)
+		
 		config.render(config.canvasImage, 0, 0,
 					  config.canvasWidth, config.canvasHeight)
 	# Done
@@ -837,6 +847,18 @@ def main(run=True):
 	except Exception as e:
 		config.sectionDisturbance = False
 		print(str(e))
+
+
+	try:
+		config.useBlurSection =  (workConfig.getboolean("movingpattern", "useBlurSection"))
+		config.mask = Image.new("L", config.canvasImage.size, 0)
+		config.mask_draw = ImageDraw.Draw(config.mask)
+		config.mask_draw.ellipse((200, 200, 260, 320), fill=255)
+		config.mask_blur_amt = 20 
+		config.cp_blur_amt = 3 
+	except Exception as e:
+		print(str(e))
+		config.useBlurSection = False
 
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")

@@ -395,7 +395,7 @@ def reMove(config):
 			config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth +
 								   config.blockWidth + config.xIncrementer + i * lineMult + 1, config.blockHeight), fill=(clr2))
 
-	config.xIncrementer += config.xSpeed
+	config.xIncrementer += 0#config.xSpeed
 	config.yIncrementer += 0
 
 	'''
@@ -404,6 +404,7 @@ def reMove(config):
 		config.xIncrementer = -config.xSpeed
 	if config.yIncrementer >= config.blockHeight - 4:
 		config.yIncrementer = 0
+
 
 def wavePattern(config):
 	w = 4

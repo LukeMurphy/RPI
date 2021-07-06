@@ -12,79 +12,28 @@ class Fader:
 		self.doingRefresh = 0
 		self.doingRefreshCount = 50
 		self.fadingDone = False
+		self.rotation = 0
 
 	def fadeIn(self, config):
 		if self.fadingDone == False:
 			if self.doingRefresh < self.doingRefreshCount:
 				self.blankImage = Image.new("RGBA", (self.width, self.height))
 				d = ImageDraw.Draw(self.blankImage)
-				d.rectangle((0,0,self.width,self.height), outline=None, fill =(100,0,0,0))
+				d.rectangle((0,0,self.width,self.height), outline=None, fill =(0,0,0,0))
 				self.crossFade = Image.blend(
 					self.blankImage,
 					self.image,
 					self.doingRefresh / self.doingRefreshCount,
 				)
+				cf = self.crossFade.rotate(self.rotation ,0,1)
 				config.image.paste(
-					self.crossFade, (self.xPos, self.yPos), self.crossFade
+					cf, (self.xPos, self.yPos), cf
 				)
 				self.doingRefresh += 1
 			else:
 				config.image.paste(self.image, (self.xPos, self.yPos), self.image)
 				self.fadingDone = True
 
-
-def transformImage(img):
-	width, height = img.size
-	new_width = 50
-	m = 0.0
-	img = img.transform(
-		(new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC
-	)
-	return img
-
-def drawCircle(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0)):
-	global config
-
-	gradientImage = Image.new("RGBA", (width, height))
-	gradientImageDraw = ImageDraw.Draw(gradientImage)
-
-	# draw box container
-	gradientImageDraw.rectangle(
-		(0, 0, width, height), outline=None, fill=(config.holderColor)
-	)
-
-	# draw bar
-	vLines = round((height) / config.steps)
-
-	vLines  = 4;
-	arc = (math.pi) / vLines
-	dR = c2[0] - c1[0]
-	dG = c2[1] - c1[1]
-	dB = c2[2] - c1[2]
-
-	if len(c1) == 3:
-		dA = 0
-	else:
-		dA = c2[3] - c1[3]
-
-	for n in range(0, vLines):
-		xPos = 0
-		xPos2 = width/4 * n
-		yPos = n * config.steps
-		yPos2 = width/4 * n
-		b = math.sin(arc * n)
-		rVd = int(c1[0] + (b * dR))
-		gVd = int(c1[1] + (b * dG))
-		bVd = int(c1[2] + (b * dB))
-
-		if len(c1) == 4:
-			bAd = int(c1[3] + (b * dA))
-		else:
-			bAd = 255
-		barColorDisplay = (rVd, gVd, bVd, bAd)
-		gradientImageDraw.ellipse((xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None)
-
-	return gradientImage
 
 
 # Now drawing a gradient with 3 points
@@ -145,7 +94,7 @@ def drawBar(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0), c3=(255,255,2
 			barColorDisplay = (rVd, gVd, bVd, bAd)
 			
 			gradientImageDraw.rectangle(
-				(xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=None
+				(xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=barColorDisplay
 			)
 	if random.random() < .95 :
 		pass
@@ -159,15 +108,17 @@ def reDraw(
 ):
 	for i in range(0, rows):
 
-		if random.random() < prob:
+		if random.random() < config.drawBarProb:
 			#height = round(random.uniform(heightRange[0], heightRange[1]))
 			#width = height
 
-			width = round(random.uniform(4,100))
-			height = heightRange[1]
-			height = rowHeight
-			xPos = round(random.uniform(0, config.canvasWidth - width))
-			yPos = round(random.uniform(0, config.canvasHeight - 32))
+			width = round(random.uniform(config.minWidth,config.maxWidth))
+			height = round(random.uniform(config.heightMin,config.heightMax))
+			#height = heightRange[1]
+			#height = rowHeight
+			xPos = round(random.uniform(0, config.canvasWidth))
+			yPos = round(random.uniform(0, config.canvasHeight))
+			#yPos = i * rowHeight
 
 			#yPos = i * rowHeight
 			# angle = random.uniform(0,360)
@@ -180,22 +131,31 @@ def reDraw(
 				c2 = colorutils.randomColorAlpha(
 					config.brightness, config.alpha2, config.alpha2
 				)
+				c3  = colorutils.getRandomColorHSV(hMin=190.0,hMax=200.0,sMin=.9,sMax=1.0,vMin=.90,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
 			elif config.colorChoice == "rgb":
 				c1 = colorutils.getRandomRGB(config.brightness)
 				c2 = colorutils.getRandomRGB(config.brightness)
+				c3 = colorutils.getRandomRGB(config.brightness)
+			elif config.colorChoice == "random":
+				c1 = colorutils.randomColor(config.brightness)
+				c2 = colorutils.randomColor(config.brightness)
+				c3 = colorutils.randomColor(config.brightness)
 			else:
 				c1 = colorutils.getRandomColorWheel(config.brightness)
 				c2 = colorutils.getRandomColorWheel(config.brightness)
+				c3 = colorutils.getRandomColorWheel(config.brightness)
 
-			c1  = colorutils.getRandomColorHSV(hMin=30.0,hMax=54.0,sMin=.9,sMax=1.0,vMin=.9,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
-			c2  = colorutils.getRandomColorHSV(hMin=190.0,hMax=200.0,sMin=.0,sMax=.0,vMin=1.0,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
-			c3  = colorutils.getRandomColorHSV(hMin=190.0,hMax=200.0,sMin=.9,sMax=1.0,vMin=.90,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
+			#c1  = colorutils.getRandomColorHSV(hMin=30.0,hMax=54.0,sMin=.9,sMax=1.0,vMin=.9,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
+			#c2  = colorutils.getRandomColorHSV(hMin=190.0,hMax=200.0,sMin=.0,sMax=.0,vMin=1.0,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
 
 			#print(c1,c2)
-
-			if random.random() < blackProb:
+			if config.fromBlack  == True :
+				c1 = (0, 0, 0, 255)
+			
+			if random.random() < config.blackProb:
 				c1 = (0, 0, 0, 255)
 				c2 = (0, 0, 0, 255)
+				c3 = (0, 0, 0, 255)
 
 			gradientImage = drawBar(width, height, c1, c2, c3)
 
@@ -214,6 +174,7 @@ def reDraw(
 			fadeIn.height = gradientImage.height
 			fadeIn.width = gradientImage.width
 			fadeIn.doingRefreshCount = config.fadeInRefreshCount
+			fadeIn.rotation = random.uniform(-config.angleRotationRange,config.angleRotationRange)
 
 			config.fadeArray.append(fadeIn)
 
@@ -244,6 +205,15 @@ def iterate():
 
 	for i in config.fadeArray:
 		i.fadeIn(config)
+
+	if len(config.fadeArray) > 400 :
+		config.fadeArray = config.fadeArray[:100]
+
+	if random.random() < config.colorChange:	
+		index = math.floor(random.uniform(0,len(config.colorModes)))
+		if index == len(config.colorModes) : index = 0
+		config.colorChoice = config.colorModes[index]
+
 
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -276,8 +246,16 @@ def main(run=True):
 	config.rowsShown = int(workConfig.get("gradients", "rowsShown"))
 	config.rowHeight = int(workConfig.get("gradients", "rowHeight"))
 	config.angle = float(workConfig.get("gradients", "angle"))
+	config.angleRotationRange = float(workConfig.get("gradients", "angle"))
 	config.probDraw = float(workConfig.get("gradients", "probDraw"))
 	config.blackProb = float(workConfig.get("gradients", "blackProb"))
+
+	try:
+		config.drawBarProb = float(workConfig.get("gradients", "drawBarProb"))
+	except Exception as e:
+		config.drawBarProb = float(workConfig.get("gradients", "blackProb"))
+		print(str(e))
+
 	config.heightMin = int(workConfig.get("gradients", "heightMin"))
 	config.heightMax = int(workConfig.get("gradients", "heightMax"))
 	config.colorChoice = workConfig.get("gradients", "colorChoice")
@@ -291,15 +269,42 @@ def main(run=True):
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
 	config.boxHeight = config.screenHeight - 3
 
+	config.colorModes = ["rgb", "getRandomColorWheel", "randomColor"]
+
+
+	try:
+		config.fromBlack = workConfig.getboolean("gradients", "fromBlack")
+	except Exception as e:
+		print(str(e))
+		config.fromBlack = False
+
+
+	try:
+		config.colorChange = float(workConfig.get("gradients", "colorChange"))
+	except Exception as e:
+		print(str(e))
+		config.colorChange = 0
+
+
+	try:
+		config.minWidth = int(workConfig.get("gradients", "minWidth"))
+		config.maxWidth = int(workConfig.get("gradients", "maxWidth"))
+	except Exception as e:
+		print(str(e))
+		config.minWidth = 4
+		config.maxWidth = 16
+
 	config.xPos = 0
 	config.yPos = 0
-	config.holderColor = (0, 100, 0, 100)
+	config.holderColor = (120, 120, 120, 100)
 	config.boxWidth = 200
 	config.gradientLevel = 2
 	config.barColorStart = (0, 0, 100, 255)
 	config.barColorEnd = (255, 0, 0, 255)
 
 	config.fadeArray = []
+
+	config.usedSpots = []
 
 	if run:
 		runWork()

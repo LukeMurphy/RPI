@@ -102,7 +102,7 @@ def getRandomRGB(brtns=1):
 	r = round(clr[0] * brtns)
 	g = round(clr[1] * brtns)
 	b = round(clr[2] * brtns)
-	return (r, g, b)
+	return (r, g, b, 255)
 
 
 def getRandomColorWheel(brtns=1):
@@ -114,7 +114,7 @@ def getRandomColorWheel(brtns=1):
 	r = round(clr[0] * brtns)
 	g = round(clr[1] * brtns)
 	b = round(clr[2] * brtns)
-	return (r, g, b)
+	return (r, g, b, 255)
 
 
 def randomColor(brtns=1):
@@ -124,7 +124,7 @@ def randomColor(brtns=1):
 	r = round((random.uniform(0, 255)) * brtns)
 	g = round((random.uniform(0, 255)) * brtns)
 	b = round((random.uniform(0, 255)) * brtns)
-	return (r, g, b)
+	return (r, g, b, 255)
 
 
 def randomYellowsAlpha(brtns=1, maxTransparency=255, minTransparency=0, sMax=1.0, sMin=0.5):

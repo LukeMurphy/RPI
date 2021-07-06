@@ -49,9 +49,10 @@ def drawBar(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0), c3=(255,255,2
 	)
 
 	# draw bar
-	steps = round(config.steps/2)
-	segmentHeight = round(height/2)
-	bandHeigth = round(segmentHeight / steps)
+	# round this later so we get continuous segments
+	steps = (config.steps/2) 
+	segmentHeight = (height/2)
+	bandHeigth = (segmentHeight / steps)
 	arc = (math.pi) / bandHeigth
 
 	if len(c1) == 3:
@@ -73,10 +74,10 @@ def drawBar(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0), c3=(255,255,2
 	startColors = [c1,c2]
 	endColors = [c2,c3]
 
-
+	yPos = 0
 	for seg in range(0,2):
-		for n in range(0, steps):
-			yPos = n * bandHeigth + seg * segmentHeight
+		for n in range(0, round(steps)):
+			yPos = (n * bandHeigth + seg * segmentHeight)
 			yPos2 = (n + 1) * bandHeigth + seg * segmentHeight
 			xPos = 0
 			xPos2 = width
@@ -96,33 +97,23 @@ def drawBar(width=32, height=32, c1=(0, 0, 0, 0), c2=(0, 0, 0, 0), c3=(255,255,2
 			gradientImageDraw.rectangle(
 				(xPos, yPos, xPos2, yPos2), fill=barColorDisplay, outline=barColorDisplay
 			)
-	if random.random() < .95 :
-		pass
-		#gradientImage = gradientImage.rotate(180 * random.random())
+
 
 	return gradientImage
 
 
-def reDraw(
-	rows=16, rowHeight=16, angle=90, prob=0.08, blackProb=0.5, heightRange=(6, 96)
-):
-	for i in range(0, rows):
+def reDraw(config):
+	for i in range(0, config.rowsShown):
 
 		if random.random() < config.drawBarProb:
-			#height = round(random.uniform(heightRange[0], heightRange[1]))
-			#width = height
 
 			width = round(random.uniform(config.minWidth,config.maxWidth))
 			height = round(random.uniform(config.heightMin,config.heightMax))
-			#height = heightRange[1]
-			#height = rowHeight
+
 			xPos = round(random.uniform(0, config.canvasWidth))
 			yPos = round(random.uniform(0, config.canvasHeight))
-			#yPos = i * rowHeight
 
-			#yPos = i * rowHeight
-			# angle = random.uniform(0,360)
-			#
+			#yPos = 0
 
 			if config.colorChoice == "rgbAlpha":
 				c1 = colorutils.randomColorAlpha(
@@ -148,7 +139,7 @@ def reDraw(
 			#c1  = colorutils.getRandomColorHSV(hMin=30.0,hMax=54.0,sMin=.9,sMax=1.0,vMin=.9,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
 			#c2  = colorutils.getRandomColorHSV(hMin=190.0,hMax=200.0,sMin=.0,sMax=.0,vMin=1.0,vMax=1.0,dropHueMin=0,dropHueMax=0,a=255)
 
-			#print(c1,c2)
+
 			if config.fromBlack  == True :
 				c1 = (0, 0, 0, 255)
 			
@@ -159,11 +150,6 @@ def reDraw(
 
 			gradientImage = drawBar(width, height, c1, c2, c3)
 
-			#gradientImage = drawCircle(width, height, c1, c2)
-			
-			#gradientImage = gradientImage.rotate(angle, expand=1)
-
-			# gradientImage = transformImage(gradientImage)
 
 			fadeIn = Fader()
 			# fadeIn.blankImage = Image.new("RGBA", (height, width))
@@ -194,18 +180,12 @@ def runWork():
 def iterate():
 	global config
 	# Display bar, spinner, message or %
-	reDraw(
-		config.rowsShown,
-		config.rowHeight,
-		config.angle,
-		config.probDrawEffective,
-		config.blackProb,
-		(config.heightMin, config.heightMax),
-	)
+	reDraw(config)
 
 	for i in config.fadeArray:
 		i.fadeIn(config)
 
+	# some crude memory management ;)
 	if len(config.fadeArray) > 400 :
 		config.fadeArray = config.fadeArray[:100]
 

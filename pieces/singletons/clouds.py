@@ -18,7 +18,7 @@ class Fader:
 			if self.doingRefresh < self.doingRefreshCount:
 				self.blankImage = Image.new("RGBA", (self.width, self.height))
 				d = ImageDraw.Draw(self.blankImage)
-				d.rectangle((0,0,self.width,self.height), outline=None, fill =(5,20,140,2))
+				d.rectangle((0,0,self.width,self.height), outline=None, fill = config.skyColor)
 				self.crossFade = Image.blend(
 					self.blankImage,
 					self.image,
@@ -45,25 +45,24 @@ def transformImage(img):
 
 
 # Now drawing a gradient with 3 points
-def drawBar(config):
+def drawRadials(config):
 
-	gradientImage = Image.new("RGBA", (200, 200))
+	gradientImage = Image.new("RGBA", (config.unitBlockSize, config.unitBlockSize))
 	gradientImageDraw = ImageDraw.Draw(gradientImage)
 
-	rings = 14
 	radiusBase = round(random.uniform(1,4))
-	for r in range(rings,0,-1):
+	for r in range(config.rings,0,-1):
 		radius = r * radiusBase
 		spokes = 60
 		steps = 2*math.pi/spokes 
-		a = 50 - round(50 * r/rings)
+		a = 50 - round(50 * r/config.rings)
 		for i in range(0,spokes):
 			angle = i * steps
 			x = 50 + math.cos(angle) * radius
 			y = 50 + math.sin(angle) * radius
 			# draw box container
 			gradientImageDraw.rectangle(
-				(x, y, x + 3, y +3), outline=None, fill=(160,160,160,a)
+				(x, y, x + 3, y +3), outline=None, fill=(config.whiteColor[0],config.whiteColor[1],config.whiteColor[2],a)
 			)
 
 	
@@ -78,17 +77,17 @@ def reDraw(config):
 			xPos = round(random.uniform(0, config.canvasWidth)) - 50
 			yPos = round(random.uniform(0, config.canvasHeight)) - 50			
 
-			gradientImage = drawBar(config)
+			gradientImage = drawRadials(config)
 
 
 			fadeIn = Fader()
 			# fadeIn.blankImage = Image.new("RGBA", (height, width))
-			fadeIn.crossFade = Image.new("RGBA", (200, 200))
+			fadeIn.crossFade = Image.new("RGBA", (config.unitBlockSize, config.unitBlockSize))
 			fadeIn.image = gradientImage
 			fadeIn.xPos = xPos
 			fadeIn.yPos = yPos
-			fadeIn.height = 200
-			fadeIn.width = 200
+			fadeIn.height = config.unitBlockSize
+			fadeIn.width = config.unitBlockSize
 			fadeIn.doingRefreshCount = config.fadeInRefreshCount
 
 			config.fadeArray.append(fadeIn)
@@ -140,6 +139,8 @@ def main(run=True):
 	config.draw = ImageDraw.Draw(config.image)
 
 	config.vOffset = int(workConfig.get("clouds", "vOffset"))
+	config.rings = int(workConfig.get("clouds", "rings"))
+	config.unitBlockSize = int(workConfig.get("clouds", "unitBlockSize"))
 	config.steps = int(workConfig.get("clouds", "steps"))
 	config.redrawRate = float(workConfig.get("clouds", "redrawRate"))
 	config.alpha1 = float(workConfig.get("clouds", "alpha1"))
@@ -152,7 +153,13 @@ def main(run=True):
 	config.blackProb = float(workConfig.get("clouds", "blackProb"))
 	config.heightMin = int(workConfig.get("clouds", "heightMin"))
 	config.heightMax = int(workConfig.get("clouds", "heightMax"))
-	config.colorChoice = workConfig.get("clouds", "colorChoice")
+
+	skyColor = workConfig.get("clouds", "skyColor").split(',')
+	#config.skyColor = tuple( map(lambda x: int(int(x)), skyColor))
+	config.skyColor = tuple( int(x) for x in skyColor)
+	
+	whiteColor = workConfig.get("clouds", "whiteColor").split(',')
+	config.whiteColor = list( int(x) for x in whiteColor)
 	
 	config.fadeInRefreshCount = int(workConfig.get("clouds", "fadeInRefreshCount"))
 
@@ -162,6 +169,7 @@ def main(run=True):
 	config.boxMax = config.screenWidth - 2
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
 	config.boxHeight = config.screenHeight - 3
+
 
 	config.xPos = 0
 	config.yPos = 0

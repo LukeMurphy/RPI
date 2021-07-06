@@ -50,6 +50,9 @@ def drawRadials(config):
 	gradientImage = Image.new("RGBA", (config.unitBlockSize, config.unitBlockSize))
 	gradientImageDraw = ImageDraw.Draw(gradientImage)
 
+	xOff = round(config.unitBlockSize/2)
+	yOff = round(config.unitBlockSize/2)
+
 	radiusBase = round(random.uniform(1,4))
 	for r in range(config.rings,0,-1):
 		radius = r * radiusBase
@@ -58,8 +61,8 @@ def drawRadials(config):
 		a = 50 - round(50 * r/config.rings)
 		for i in range(0,spokes):
 			angle = i * steps
-			x = 50 + math.cos(angle) * radius
-			y = 50 + math.sin(angle) * radius
+			x = xOff + math.cos(angle) * radius
+			y = yOff + math.sin(angle) * radius
 			# draw box container
 			gradientImageDraw.rectangle(
 				(x, y, x + 3, y +3), outline=None, fill=(config.whiteColor[0],config.whiteColor[1],config.whiteColor[2],a)

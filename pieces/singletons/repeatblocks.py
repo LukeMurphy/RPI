@@ -225,6 +225,38 @@ def circles(config):
 			outline=(clr), fill=clr2)
 
 
+def bars(config):
+
+
+	clr = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+	)
+	clr2 = tuple(
+		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+	)
+
+	config.blockDraw.rectangle(
+		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+
+	count  = 0
+	barWidth = 4
+	for i in range(0, config.numConcentricBoxes, 2):
+
+		if config.altLineColoring ==  True :
+			outClr = clr2
+			if count % 2 == 0 :
+				outClr = clr
+		else :
+			outClr = clr
+		config.blockDraw.rectangle((
+			0,
+			i * barWidth,
+			config.blockWidth-1,
+			i * barWidth),
+			outline=(outClr), fill=None)
+		count += 1
+
+
 def concentricBoxes(config):
 
 
@@ -491,6 +523,9 @@ def redraw(config):
 
 	if config.patternModel == "balls":
 		balls(config)
+
+	if config.patternModel == "bars":
+		bars(config)
 
 
 def repeatImage(config):

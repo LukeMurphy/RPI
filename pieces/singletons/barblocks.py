@@ -1,0 +1,230 @@
+# ################################################### #
+import argparse
+import math
+import random
+import time
+import types
+from modules.configuration import bcolors
+from modules import badpixels, coloroverlay, colorutils, panelDrawing
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
+import numpy as np
+
+
+class Block:
+
+	def __init__(self, config, i):
+		# print ("init Fludd", i)
+
+		# self.boxMax = config.screenWidth - 1
+		# self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
+		# self.boxHeight = config.screenHeight - 2        #
+
+		self.unitNumber = i
+		self.config = config
+
+		self.xPos = 0
+		self.yPos = 0
+		self.blockWidth = 128
+		self.blockHeight = 128
+		self.barWidth = 4
+		self.gap = 0
+		self.rotation = 0
+
+
+	def setUp(self):
+		self.blockImage = Image.new("RGBA", (self.blockWidth, self.blockHeight))
+		self.blockDraw = ImageDraw.Draw(self.blockImage)
+
+
+		tLimitBase = 12
+		minHue = 0 
+		maxHue = 360 
+		minSaturation= .99
+		maxSaturation= .6
+		minValue = .1
+		maxValue = .99
+
+
+		self.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+		self.colOverlay2 = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+
+
+
+	def bars(self):
+
+
+		clr = tuple(
+			round(a * self.config.brightness) for a in (self.colOverlay.currentColor)
+		)
+		clr2 = tuple(
+			round(a * self.config.brightness) for a in (self.colOverlay2.currentColor)
+		)
+
+		self.blockDraw.rectangle(
+			(0, 0, self.blockWidth, self.blockHeight), fill=self.config.bgColor, outline=None)
+
+		count  = 0
+		numBars = round(self.blockHeight/self.barWidth)
+		for i in range(0, numBars):
+			outClr = clr2
+			if count % 2 == 0 :
+				outClr = clr
+
+			self.blockDraw.rectangle((
+				0 ,
+				i * (self.barWidth + self.gap),
+				self.blockWidth-1,
+				i * (self.barWidth + self.gap) + self.barWidth),
+				outline=(None), fill=outClr)
+			count += 1
+
+
+
+
+def redraw(config):
+
+	for b in (config.barBlocks) :
+		b.bars()
+		temp = b.blockImage.copy()
+		if b.rotation != 0 :
+			temp = temp.rotate(b.rotation,0,True)
+		config.canvasImage.paste(temp, (b.xPos, b.yPos), temp)
+		b.colOverlay.stepTransition()
+		b.colOverlay2.stepTransition()
+
+
+def iterate():
+	global config
+	config.colOverlay.stepTransition()
+
+	config.bgColor = tuple(
+		round(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+
+	redraw(config)
+
+
+
+	if config.useDrawingPoints == True:
+		config.panelDrawing.canvasToUse = config.canvasImage
+		config.panelDrawing.render()
+	else:
+		config.render(config.canvasImage, 0, 0,
+					  config.canvasWidth, config.canvasHeight)
+	# Done
+
+
+
+def runWork():
+	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running barblocks.py")
+	print(bcolors.ENDC)
+	while config.isRunning == True:
+		iterate()
+		time.sleep(config.redrawSpeed)
+		if config.standAlone == False:
+			config.callBack()
+
+
+
+def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
+	colOverlay = coloroverlay.ColorOverlay()
+	colOverlay.randomSteps = False
+	colOverlay.timeTrigger = True
+	colOverlay.tLimitBase = tLimitBase
+	colOverlay.maxBrightness = 1
+	colOverlay.steps = 50
+	colOverlay.minHue = minHue
+	colOverlay.maxHue = maxHue
+	colOverlay.minSaturation = minSaturation
+	colOverlay.maxSaturation = maxSaturation
+	colOverlay.minValue = minValue
+	colOverlay.maxValue = maxValue
+	colOverlay.colorTransitionSetup()
+	return colOverlay
+
+
+def buildPalette(config,index=0):
+	palette = config.palettes[index]
+
+	tLimitBase = int(workConfig.get(palette, "tLimitBase"))
+	minHue = float(workConfig.get(palette, "minHue"))
+	maxHue = float(workConfig.get(palette, "maxHue"))
+	minSaturation = float(workConfig.get(palette, "minSaturation")	)
+	maxSaturation = float(workConfig.get(palette, "maxSaturation"))
+	minValue = float(workConfig.get(palette, "minValue"))
+	maxValue = float(workConfig.get(palette, "maxValue"))
+	config.colOverlay = getConfigOverlay(
+		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+
+	
+
+def main(run=True):
+	global config
+	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
+	config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
+	config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
+	config.rows = int(workConfig.get("movingpattern", "rows"))
+	config.cols = int(workConfig.get("movingpattern", "cols"))
+	config.barWidthMin = int(workConfig.get("movingpattern", "barWidthMin"))
+	config.barWidthMax = int(workConfig.get("movingpattern", "barWidthMax"))
+	config.gapWidthMin = int(workConfig.get("movingpattern", "gapWidthMin"))
+	config.gapWidthMax = int(workConfig.get("movingpattern", "gapWidthMax"))
+
+	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.canvasImage = Image.new(
+		"RGBA", (config.canvasWidth, config.canvasHeight))
+	config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+
+
+	config.destinationImage = Image.new(
+		"RGBA", (config.canvasWidth, config.canvasHeight)
+	)
+
+	count = 0
+	config.barBlocks = []
+	delta = 0 
+	for r in range(0,config.rows) :
+		lastX = 0
+		for c in range(0,config.cols) :
+			barBlockUnit = Block(config,count)
+			barBlockUnit.blockWidth = round(random.uniform(config.blockWidth - delta,config.blockWidth + delta)) 
+			barBlockUnit.blockHeight = barBlockUnit.blockWidth
+			barBlockUnit.xPos = lastX #c * barBlockUnit.blockWidth
+			lastX += barBlockUnit.blockWidth 
+			barBlockUnit.yPos = r * config.blockHeight
+
+			barBlockUnit.barWidth = round(random.uniform(config.barWidthMin,config.barWidthMax))
+			barBlockUnit.gap = round(random.uniform(config.gapWidthMin,config.gapWidthMax))
+			if count % 2 != 0 :
+				barBlockUnit.rotation = 90
+			else:
+				barBlockUnit.rotation = 0
+
+			barBlockUnit.setUp()
+			config.barBlocks.append(barBlockUnit)
+			count +=1
+
+
+	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
+	buildPalette(config,0)
+
+	# THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	panelDrawing.mockupBlock(config, workConfig)
+
+	''' 
+		########### Need to add something like this at final render call  as well
+			
+		########### RENDERING AS A MOCKUP OR AS REAL ###########
+		if config.useDrawingPoints == True :
+			config.panelDrawing.canvasToUse = config.renderImageFull
+			config.panelDrawing.render()
+		else :
+			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			#config.render(config.image, 0, 0)
+			config.render(config.renderImageFull, 0, 0)
+	'''
+
+	if run:
+		runWork()

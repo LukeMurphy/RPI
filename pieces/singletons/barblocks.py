@@ -37,7 +37,7 @@ class Block:
 
 
 		tLimitBase = 12
-		minHue = 0 
+		minHue = 0
 		maxHue = 360 
 		minSaturation= .99
 		maxSaturation= .6
@@ -83,6 +83,9 @@ class Block:
 
 def redraw(config):
 
+	config.canvasDraw.rectangle(
+			(0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor, outline=None)
+
 	for b in (config.barBlocks) :
 		b.bars()
 		temp = b.blockImage.copy()
@@ -102,6 +105,9 @@ def iterate():
 	)
 
 	redraw(config)
+
+	if random.random() < config.changeGridProb:
+		buildGrid(config)
 
 
 
@@ -158,11 +164,40 @@ def buildPalette(config,index=0):
 	config.colOverlay = getConfigOverlay(
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
-	
+def buildGrid(config):
+	count = 0
+	config.barBlocks = []
+	delta = 0 
+	sizes = [32,40,48,64,80,128]
+	index = math.floor(random.uniform(0,len(sizes)))
+	config.blockWidth = sizes[index]
+	config.blockHeight = config.blockWidth
+	for r in range(0,config.rows) :
+		lastX = 0
+		for c in range(0,config.cols) :
+			barBlockUnit = Block(config,count)
+			barBlockUnit.blockWidth = round(random.uniform(config.blockWidth - delta, config.blockWidth + delta)) 
+			barBlockUnit.blockHeight = barBlockUnit.blockWidth
+			barBlockUnit.xPos = lastX #c * barBlockUnit.blockWidth
+			lastX += barBlockUnit.blockWidth 
+			barBlockUnit.yPos = r * config.blockHeight
+
+			barBlockUnit.barWidth = round(random.uniform(config.barWidthMin,config.barWidthMax))
+			barBlockUnit.gap = round(random.uniform(config.gapWidthMin,config.gapWidthMax))
+			if count % 2 != 0 :
+				barBlockUnit.rotation = round(random.uniform(90-config.rotationVariation,90+config.rotationVariation))
+			else:
+				barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
+
+			barBlockUnit.setUp()
+			config.barBlocks.append(barBlockUnit)
+			count +=1	
 
 def main(run=True):
 	global config
 	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
+	config.changeGridProb = float(workConfig.get("movingpattern", "changeGridProb"))
+	config.rotationVariation = float(workConfig.get("movingpattern", "rotationVariation"))
 	config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
 	config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
 	config.rows = int(workConfig.get("movingpattern", "rows"))
@@ -182,29 +217,7 @@ def main(run=True):
 		"RGBA", (config.canvasWidth, config.canvasHeight)
 	)
 
-	count = 0
-	config.barBlocks = []
-	delta = 0 
-	for r in range(0,config.rows) :
-		lastX = 0
-		for c in range(0,config.cols) :
-			barBlockUnit = Block(config,count)
-			barBlockUnit.blockWidth = round(random.uniform(config.blockWidth - delta,config.blockWidth + delta)) 
-			barBlockUnit.blockHeight = barBlockUnit.blockWidth
-			barBlockUnit.xPos = lastX #c * barBlockUnit.blockWidth
-			lastX += barBlockUnit.blockWidth 
-			barBlockUnit.yPos = r * config.blockHeight
-
-			barBlockUnit.barWidth = round(random.uniform(config.barWidthMin,config.barWidthMax))
-			barBlockUnit.gap = round(random.uniform(config.gapWidthMin,config.gapWidthMax))
-			if count % 2 != 0 :
-				barBlockUnit.rotation = 90
-			else:
-				barBlockUnit.rotation = 0
-
-			barBlockUnit.setUp()
-			config.barBlocks.append(barBlockUnit)
-			count +=1
+	buildGrid(config)
 
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")

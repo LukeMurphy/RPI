@@ -29,6 +29,8 @@ class Block:
 		self.barWidth = 4
 		self.gap = 0
 		self.rotation = 0
+		self.polyDeltaX = 0
+		self.polyDeltaY = 0
 
 
 	def setUp(self):
@@ -43,6 +45,8 @@ class Block:
 		maxSaturation= .6
 		minValue = .1
 		maxValue = .99
+
+
 
 
 		self.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
@@ -70,12 +74,16 @@ class Block:
 			if count % 2 == 0 :
 				outClr = clr
 
-			self.blockDraw.rectangle((
-				0 ,
-				i * (self.barWidth + self.gap),
-				self.blockWidth-1,
-				i * (self.barWidth + self.gap) + self.barWidth),
-				outline=(None), fill=outClr)
+			self.polyDeltaX = round(random.uniform(-self.config.deltaXVal,self.config.deltaXVal))
+			self.polyDeltaY = round(random.uniform(-self.config.deltaXVal,self.config.deltaYVal))
+			x1 = 0
+			y1 = i * (self.barWidth + self.gap) 
+			x2 = self.blockWidth-1 + self.polyDeltaX
+			y2 = i * (self.barWidth + self.gap) + self.barWidth + self.polyDeltaY
+
+
+			#self.blockDraw.rectangle((x1,y1,x2,y2),outline=(None), fill=outClr)
+			self.blockDraw.polygon(((x1,y1),(x2,y1),(x2,y2),(x1,y2)),outline=(None), fill=outClr)
 			count += 1
 
 
@@ -109,7 +117,9 @@ def iterate():
 	if random.random() < config.changeGridProb:
 		buildGrid(config)
 
-
+	if random.random() < config.changeGridProb * 5:
+		config.deltaXVal = round(random.uniform(0,1))
+		config.deltaYVal = round(random.uniform(0,1))
 
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
@@ -131,7 +141,6 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 		if config.standAlone == False:
 			config.callBack()
-
 
 
 def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
@@ -164,6 +173,7 @@ def buildPalette(config,index=0):
 	config.colOverlay = getConfigOverlay(
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
+
 def buildGrid(config):
 	count = 0
 	config.barBlocks = []
@@ -193,6 +203,7 @@ def buildGrid(config):
 			config.barBlocks.append(barBlockUnit)
 			count +=1	
 
+
 def main(run=True):
 	global config
 	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
@@ -216,6 +227,9 @@ def main(run=True):
 	config.destinationImage = Image.new(
 		"RGBA", (config.canvasWidth, config.canvasHeight)
 	)
+
+	config.deltaXVal = 1
+	config.deltaYVal = 1
 
 	buildGrid(config)
 

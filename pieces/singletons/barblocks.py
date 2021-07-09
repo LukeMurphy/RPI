@@ -117,9 +117,13 @@ def iterate():
 	if random.random() < config.changeGridProb:
 		buildGrid(config)
 
-	if random.random() < config.changeGridProb * 5:
-		config.deltaXVal = round(random.uniform(0,1))
-		config.deltaYVal = round(random.uniform(0,1))
+	if random.random() < config.changeQuiverProb:
+		if random.random() < .75 :
+			config.deltaXVal = round(random.uniform(0,1))
+			config.deltaYVal = round(random.uniform(0,1))
+		else :
+			# a bit more often, things just go still
+			config.deltaXVal = config.deltaYVal = 0
 
 	if config.useDrawingPoints == True:
 		config.panelDrawing.canvasToUse = config.canvasImage
@@ -208,6 +212,7 @@ def main(run=True):
 	global config
 	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
 	config.changeGridProb = float(workConfig.get("movingpattern", "changeGridProb"))
+	config.changeQuiverProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
 	config.rotationVariation = float(workConfig.get("movingpattern", "rotationVariation"))
 	config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
 	config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))

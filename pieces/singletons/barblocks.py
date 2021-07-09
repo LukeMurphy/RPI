@@ -37,7 +37,6 @@ class Block:
 		self.blockImage = Image.new("RGBA", (self.blockWidth, self.blockHeight))
 		self.blockDraw = ImageDraw.Draw(self.blockImage)
 
-
 		tLimitBase = 12
 		minHue = 0
 		maxHue = 360 
@@ -46,12 +45,8 @@ class Block:
 		minValue = .1
 		maxValue = .99
 
-
-
-
 		self.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 		self.colOverlay2 = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-
 
 
 	def bars(self):
@@ -73,9 +68,9 @@ class Block:
 			outClr = clr2
 			if count % 2 == 0 :
 				outClr = clr
-
-			self.polyDeltaX = round(random.uniform(-self.config.deltaXVal,self.config.deltaXVal))
-			self.polyDeltaY = round(random.uniform(-self.config.deltaXVal,self.config.deltaYVal))
+			if self.gap < 3 :
+				self.polyDeltaX = round(random.uniform(-self.config.deltaXVal,self.config.deltaXVal))
+				self.polyDeltaY = round(random.uniform(-self.config.deltaXVal,self.config.deltaYVal))
 			x1 = 0
 			y1 = i * (self.barWidth + self.gap) 
 			x2 = self.blockWidth-1 + self.polyDeltaX
@@ -85,8 +80,6 @@ class Block:
 			#self.blockDraw.rectangle((x1,y1,x2,y2),outline=(None), fill=outClr)
 			self.blockDraw.polygon(((x1,y1),(x2,y1),(x2,y2),(x1,y2)),outline=(None), fill=outClr)
 			count += 1
-
-
 
 
 def redraw(config):
@@ -115,7 +108,9 @@ def iterate():
 	redraw(config)
 
 	if random.random() < config.changeGridProb:
-		buildGrid(config)
+		index = math.floor(random.random() * len(config.gridOptions))
+		if index > len(config.gridOptions) : index = 0
+		eval(config.gridOptions[index])(config)
 
 	if random.random() < config.changeQuiverProb:
 		if random.random() < .75 :
@@ -132,7 +127,6 @@ def iterate():
 		config.render(config.canvasImage, 0, 0,
 					  config.canvasWidth, config.canvasHeight)
 	# Done
-
 
 
 def runWork():
@@ -178,7 +172,118 @@ def buildPalette(config,index=0):
 		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
 
+# Builds flexible grid
 def buildGrid(config):
+
+	count = 0
+	config.barBlocks = []
+	delta = 0 
+	sizes = [16,24,32,40,48,56,64,72,80,88,96,104,112,120,128]
+
+	rows = config.rows * 4
+	cols = config.cols * 4
+
+	gridSize = 8
+	availableCoords = []
+	for r in range(0,rows) :
+		availableCoords.append([])
+		for c in range(0,cols) :
+			availableCoords[r].append( [c * gridSize, r * gridSize, 0])
+
+
+	#first one is upper left
+	for row in range(0,len(availableCoords)-2):
+		for col in range(0,len(availableCoords[row])):
+			if availableCoords[row][col][2] == 0 and availableCoords[row+1][col][2] == 0 and availableCoords[row+2][col][2] == 0 :
+
+				# set size of patch
+				index = math.floor(random.uniform(0,len(sizes)))
+				blockWidth = sizes[index]
+
+				# see if the width is too wide sometimes
+				removedPointsSize = round(blockWidth/gridSize)
+				if removedPointsSize + col < len(availableCoords[row]) :
+					if availableCoords[row][col + removedPointsSize][2] == 1 :
+						#reduce size
+
+						newIndex = math.floor(random.uniform(0,3))
+						blockWidth = sizes[newIndex]
+	
+
+				blockHeight = blockWidth
+
+				barBlockUnit = Block(config,count)
+				barBlockUnit.blockWidth = round(random.uniform(blockWidth - delta, blockWidth + delta)) 
+				barBlockUnit.blockHeight = blockHeight
+
+				barBlockUnit.xPos = availableCoords[row][col][0]
+				barBlockUnit.yPos = availableCoords[row][col][1]
+
+				barBlockUnit.barWidth = round(random.uniform(config.barWidthMin,config.barWidthMax))
+				barBlockUnit.gap = round(random.uniform(config.gapWidthMin,config.gapWidthMax))
+				if count % 2 != 0 :
+					barBlockUnit.rotation = round(random.uniform(90-config.rotationVariation,90+config.rotationVariation))
+				else:
+					barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
+
+				barBlockUnit.setUp()
+				config.barBlocks.append(barBlockUnit)
+				count +=1
+
+				removedPointsSize = round(blockWidth/gridSize)
+				#print(removedPointsSize, len(availableCoords))
+
+				for r in range(0,removedPointsSize):
+					for c in range(0,removedPointsSize):
+						if (col + c) < len(availableCoords[row]) and (row + r) < len(availableCoords):
+							availableCoords[row + r][col + c][2] = 1
+
+
+# Builds overlapped grid
+def buildOverlapGrid(config):
+
+	count = 0
+	config.barBlocks = []
+	delta = 0 
+	sizes = [32,40,48,64,80,128]
+
+
+	rows = 7
+	cols = 7
+
+	gridSize = 32
+	availableCoords = []
+	for r in range(0,rows) :
+		for c in range(0,cols) :
+			availableCoords.append([c * gridSize, r * gridSize])
+
+
+	#first one is upper left
+	for i in range(0,len(availableCoords)) :
+		index = math.floor(random.uniform(0,len(sizes)))
+		blockWidth = sizes[index]
+		blockHeight = config.blockWidth
+		barBlockUnit = Block(config,count)
+		barBlockUnit.blockWidth = round(random.uniform(blockWidth - delta, blockWidth + delta)) 
+		barBlockUnit.blockHeight = barBlockUnit.blockWidth
+		barBlockUnit.xPos = availableCoords[i][0]
+		barBlockUnit.yPos = availableCoords[i][1]
+
+		barBlockUnit.barWidth = round(random.uniform(config.barWidthMin,config.barWidthMax))
+		barBlockUnit.gap = round(random.uniform(config.gapWidthMin,config.gapWidthMax))
+		if count % 2 != 0 :
+			barBlockUnit.rotation = round(random.uniform(90-config.rotationVariation,90+config.rotationVariation))
+		else:
+			barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
+
+		barBlockUnit.setUp()
+		config.barBlocks.append(barBlockUnit)
+		count +=1
+
+
+# Builds uniform grid
+def buildUniformGrid(config):
+
 	count = 0
 	config.barBlocks = []
 	delta = 0 
@@ -236,8 +341,14 @@ def main(run=True):
 	config.deltaXVal = 1
 	config.deltaYVal = 1
 
-	buildGrid(config)
+	config.gridOptions = ['buildGrid','buildGrid','buildUniformGrid']
 
+
+	index = math.floor(random.random() * len(config.gridOptions))
+	if index > len(config.gridOptions) : index = 0
+	eval(config.gridOptions[index])(config)
+
+	
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
 	buildPalette(config,0)

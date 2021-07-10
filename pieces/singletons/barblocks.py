@@ -179,6 +179,7 @@ def buildGrid(config):
 	config.barBlocks = []
 	delta = 0 
 	sizes = [16,24,32,40,48,56,64,72,80,88,96,104,112,120,128]
+	sizes = [16,24,32,40,48,56,64,72,80,88,96,104]
 
 	rows = config.rows * 4
 	cols = config.cols * 4

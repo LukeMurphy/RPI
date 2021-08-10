@@ -427,7 +427,9 @@ def makeBackGround(drawRef, n=1):
 		config.bgBackGroundColor = colorutils.getRandomColorHSV(
 					config.bg_minHue, config.bg_maxHue, 
 					config.bg_minSaturation, config.bg_maxSaturation, 
-					config.bg_minValue, config.bg_maxValue)
+					config.bg_minValue, config.bg_maxValue,
+					config.bg_dropHueMinValue, config.bg_dropHueMaxValue,
+					)
 
 	drawRef.rectangle(
 		(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
@@ -616,11 +618,11 @@ def remakePatternBlock(imageRef, direction):
 
 	if config.alwaysRandomPatternColor == True:
 		if config.useHSV :
-			print("New Color")
 			config.patternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue)
+				config.fg_minValue, config.fg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue)
 		else:
 			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
@@ -898,6 +900,13 @@ def init():
 		"scroller", "alwaysRandomPattern"
 	)
 
+	try:
+		config.bg_dropHueMinValue = float(workConfig.get("scroller", "bg_dropHueMinValue"))
+		config.bg_dropHueMaxValue = float(workConfig.get("scroller", "bg_dropHueMaxValue"))
+	except Exception as e:
+		config.bg_dropHueMinValue = 0
+		config.bg_dropHueMaxValue = 0
+		print(str(e))
 
 	try:
 		config.useHSV = True
@@ -917,10 +926,12 @@ def init():
 		config.bg_minValue = float(workConfig.get("scroller", "bg_minValue"))
 		config.bg_maxValue = float(workConfig.get("scroller", "bg_maxValue"))
 
+
 		config.setPatternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue)	
+				config.fg_minValue, config.fg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue)	
 	except Exception as e:
 		config.useHSV = False
 		print(str(e))

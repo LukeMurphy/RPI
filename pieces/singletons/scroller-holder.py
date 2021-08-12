@@ -423,7 +423,11 @@ def makeBackGround(drawRef, n=1):
 
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
 
+	colorChange = False
+
+	currentBgColor = config.bgBackGroundColor
 	if config.useHSV == True and random.random() < config.backgroundColorChangeProb:
+		colorChange = True
 		config.bgBackGroundColor = colorutils.getRandomColorHSV(
 					config.bg_minHue, config.bg_maxHue, 
 					config.bg_minSaturation, config.bg_maxSaturation, 
@@ -431,10 +435,23 @@ def makeBackGround(drawRef, n=1):
 					config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness
 					)
 
-	drawRef.rectangle(
-		(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
-		fill=config.bgBackGroundColor,
-	)
+
+	if colorChange == True :
+		drawRef.rectangle(
+			(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
+			fill=config.bgBackGroundColor,
+		)
+		# Add a pseudo gradient from previous color to ease the transition
+		bgSteps = 64
+		bgrDelta = (config.bgBackGroundColor[0] - currentBgColor[0] ) / bgSteps
+		bggDelta = (config.bgBackGroundColor[1] - currentBgColor[1] ) / bgSteps
+		bgbDelta = (config.bgBackGroundColor[2] - currentBgColor[2] ) / bgSteps
+
+		for n in range(0, bgSteps) :
+			drawRef.rectangle(
+				(n, 0, n+2, config.canvasHeight),
+				fill=(round(currentBgColor[0] + (n+1) * bgrDelta),round(currentBgColor[1] + (n+1) * bggDelta),round(currentBgColor[2] + (n+1) * bgbDelta),255)
+			)
 
 	## Chevron pattern
 	## config.bgForeGroundColor

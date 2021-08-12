@@ -423,7 +423,7 @@ def makeBackGround(drawRef, n=1):
 
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
 
-	if config.useHSV == True :
+	if config.useHSV == True and random.random() < config.backgroundColorChangeProb:
 		config.bgBackGroundColor = colorutils.getRandomColorHSV(
 					config.bg_minHue, config.bg_maxHue, 
 					config.bg_minSaturation, config.bg_maxSaturation, 
@@ -593,6 +593,7 @@ def makeBackGround(drawRef, n=1):
 
 ## Layer imagery callbacks & regeneration functions
 def remakePatternBlock(imageRef, direction):
+	print("remakePatternBlock")
 	## Stacking the cards ...
 	config.patternColor = config.patternEndColor
 
@@ -612,7 +613,7 @@ def remakePatternBlock(imageRef, direction):
 		config.patternEndColor = config.setPatternEndColor
 
 
-	if config.alwaysRandomPattern == True:
+	if config.alwaysRandomPattern == True :
 		if random.random() < 0.3:
 			config.patternDrawProb = random.uniform(0.08, 0.12)
 		if random.random() < 0.3:
@@ -622,7 +623,7 @@ def remakePatternBlock(imageRef, direction):
 	else:
 		pass
 
-	if config.alwaysRandomPatternColor == True:
+	if config.alwaysRandomPatternColor == True :
 		if config.useHSV :
 			config.patternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
@@ -638,6 +639,7 @@ def remakePatternBlock(imageRef, direction):
 
 ## Setup and run functions
 def configureBackgroundScrolling():
+	print("configureBackgroundScrolling")
 	config.patternRows = int(workConfig.get("scroller", "patternRows"))
 	config.patternCols = int(workConfig.get("scroller", "patternCols"))
 	config.patternRowsOffset = int(workConfig.get("scroller", "patternRowsOffset"))
@@ -896,6 +898,13 @@ def init():
 	config.useBackground = workConfig.getboolean("scroller", "useBackground")
 
 	try:
+		config.backgroundColorChangeProb = float(workConfig.get("scroller", "backgroundColorChangeProb"))
+	except Exception as e:
+		print(str(e))
+		config.backgroundColorChangeProb = .5
+
+
+	try:
 		config.setPatternColor = workConfig.getboolean("scroller", "setPatternColor")
 		config.setPatternEndColor = list(map(lambda x: int(x), workConfig.get("scroller", "setPatternEndColor").split(",")))
 	except Exception as e:
@@ -951,6 +960,7 @@ def init():
 
 	if config.useBackground == True:
 		configureBackgroundScrolling()
+
 
 	try:
 		config.useText = workConfig.getboolean("scroller", "useText")
@@ -1042,7 +1052,6 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 		if config.standAlone == False :
 			config.callBack()
-
 
 
 def checkTime(scrollerObj):

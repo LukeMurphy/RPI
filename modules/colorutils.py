@@ -194,7 +194,7 @@ def getRandomColorHSV(
 
 	if hMin > hMax:
 		degreeRange = 360.0 - hMin + hMax
-	h = hMin + random.uniform(0.0, degreeRange)
+	h = hMin + random.uniform(0.0,degreeRange)
 
 	## an option to exclude a range of colors
 	if dropHueMax != dropHueMin:

@@ -428,7 +428,7 @@ def makeBackGround(drawRef, n=1):
 					config.bg_minHue, config.bg_maxHue, 
 					config.bg_minSaturation, config.bg_maxSaturation, 
 					config.bg_minValue, config.bg_maxValue,
-					config.bg_dropHueMinValue, config.bg_dropHueMaxValue,
+					config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness
 					)
 
 	drawRef.rectangle(
@@ -604,7 +604,13 @@ def remakePatternBlock(imageRef, direction):
 		config.patternEndColor = (0, 0, 250, 255)
 
 	if config.setPatternColor == True :
+		config.setPatternEndColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
 		config.patternEndColor = config.setPatternEndColor
+
 
 	if config.alwaysRandomPattern == True:
 		if random.random() < 0.3:
@@ -622,7 +628,7 @@ def remakePatternBlock(imageRef, direction):
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue)
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
 		else:
 			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
@@ -651,6 +657,11 @@ def configureBackgroundScrolling():
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 	if config.setPatternColor == True :
+		config.setPatternEndColor = colorutils.getRandomColorHSV(
+				config.fg_minHue, config.fg_maxHue, 
+				config.fg_minSaturation, config.fg_maxSaturation, 
+				config.fg_minValue, config.fg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
 		config.patternColor = config.setPatternEndColor
 		config.patternEndColor = config.setPatternEndColor
 
@@ -658,23 +669,24 @@ def configureBackgroundScrolling():
 		config.bgForeGroundColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue)		
+				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
 
 		config.bgBackGroundColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue)
+				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)
 
 		config.patternColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue)		
+				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
 
 		config.patternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue)
-
+				config.fg_minValue, config.fg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+		
 
 
 	config.scroller4 = continuous_scroller.ScrollObject()
@@ -931,7 +943,7 @@ def init():
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue)	
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)	
 	except Exception as e:
 		config.useHSV = False
 		print(str(e))

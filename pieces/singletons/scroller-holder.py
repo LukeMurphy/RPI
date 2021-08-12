@@ -421,37 +421,52 @@ def makeBackGround(drawRef, n=1):
 
 	gap = 0
 
+	steps = cols
+
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
 
 	colorChange = False
 
-	currentBgColor = config.bgBackGroundColor
-	if config.useHSV == True and random.random() < config.backgroundColorChangeProb:
-		colorChange = True
-		config.bgBackGroundColor = colorutils.getRandomColorHSV(
-					config.bg_minHue, config.bg_maxHue, 
-					config.bg_minSaturation, config.bg_maxSaturation, 
-					config.bg_minValue, config.bg_maxValue,
-					config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness
-					)
+	drawRef.rectangle(
+		(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
+		fill=config.bgBackGroundColor)
 
 
-	if colorChange == True :
-		drawRef.rectangle(
-			(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
-			fill=config.bgBackGroundColor,
+	## The multiplier is actually a factor of the number of rows
+	## but, generally so far only using two rows ....
+	rDelta = (
+		(config.bgBackGroundEndColor[0] - config.bgBackGroundColor[0]) / steps
+	)
+	gDelta = (
+		(config.bgBackGroundEndColor[1] - config.bgBackGroundColor[1]) / steps
+	)
+	bDelta = (
+		(config.bgBackGroundEndColor[2] - config.bgBackGroundColor[2]) / steps
+	)
+
+	xPos = 0 
+	for c in range(0, cols):
+		columnOffset = 0
+
+		rCol = config.bgBackGroundColor[0] + rDelta
+		gCol = config.bgBackGroundColor[1] + gDelta
+		bCol = config.bgBackGroundColor[2] + bDelta
+		config.bgBackGroundColor = (rCol, gCol, bCol)
+
+		### Because the way the pattern draws the left end is actually the end color
+		### so need to reverse the color gradient ....
+
+		fillClr = (
+			(round(config.bgBackGroundEndColor[0] - rDelta * (c + 1))),
+			(round(config.bgBackGroundEndColor[1] - gDelta * (c + 1))),
+			(round(config.bgBackGroundEndColor[2] - bDelta * (c + 1))),
+			200,
 		)
-		# Add a pseudo gradient from previous color to ease the transition
-		bgSteps = 64
-		bgrDelta = (config.bgBackGroundColor[0] - currentBgColor[0] ) / bgSteps
-		bggDelta = (config.bgBackGroundColor[1] - currentBgColor[1] ) / bgSteps
-		bgbDelta = (config.bgBackGroundColor[2] - currentBgColor[2] ) / bgSteps
 
-		for n in range(0, bgSteps) :
-			drawRef.rectangle(
-				(n, 0, n+2, config.canvasHeight),
-				fill=(round(currentBgColor[0] + (n+1) * bgrDelta),round(currentBgColor[1] + (n+1) * bggDelta),round(currentBgColor[2] + (n+1) * bgbDelta),255)
-			)
+		drawRef.rectangle((xPos,0,xPos+xDiv,config.canvasHeight), fill = fillClr)
+		xPos += xDiv
+	config.bgBackGroundColor = config.bgBackGroundEndColor
+
 
 	## Chevron pattern
 	## config.bgForeGroundColor
@@ -481,8 +496,7 @@ def makeBackGround(drawRef, n=1):
 		rowMultiplier = 2
 		colMultiplier = 2
 
-	steps = cols
-
+	
 	## The multiplier is actually a factor of the number of rows
 	## but, generally so far only using two rows ....
 	rDelta = (
@@ -610,7 +624,7 @@ def makeBackGround(drawRef, n=1):
 
 ## Layer imagery callbacks & regeneration functions
 def remakePatternBlock(imageRef, direction):
-	print("remakePatternBlock")
+	#print("remakePatternBlock")
 	## Stacking the cards ...
 	config.patternColor = config.patternEndColor
 
@@ -626,7 +640,7 @@ def remakePatternBlock(imageRef, direction):
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 		config.patternEndColor = config.setPatternEndColor
 
 
@@ -646,9 +660,21 @@ def remakePatternBlock(imageRef, direction):
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 		else:
 			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
+
+
+	config.bgBackGroundColor = config.bgBackGroundEndColor
+
+	if random.random() < config.backgroundColorChangeProb :
+		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+				config.bg_minHue, config.bg_maxHue, 
+				config.bg_minSaturation, config.bg_maxSaturation, 
+				config.bg_minValue, config.bg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness)
+
 
 	drawRef = ImageDraw.Draw(imageRef)
 	makeBackGround(drawRef, direction)
@@ -691,9 +717,16 @@ def configureBackgroundScrolling():
 				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
 
 		config.bgBackGroundColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)
+				config.bg_minHue, config.bg_maxHue, 
+				config.bg_minSaturation, config.bg_maxSaturation, 
+				config.bg_minValue, config.bg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+
+		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+				config.bg_minHue, config.bg_maxHue, 
+				config.bg_minSaturation, config.bg_maxSaturation, 
+				config.bg_minValue, config.bg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
 
 		config.patternColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
@@ -704,7 +737,7 @@ def configureBackgroundScrolling():
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 		
 
 
@@ -941,9 +974,13 @@ def init():
 	try:
 		config.bg_dropHueMinValue = float(workConfig.get("scroller", "bg_dropHueMinValue"))
 		config.bg_dropHueMaxValue = float(workConfig.get("scroller", "bg_dropHueMaxValue"))
+		config.fg_dropHueMinValue = float(workConfig.get("scroller", "fg_dropHueMinValue"))
+		config.fg_dropHueMaxValue = float(workConfig.get("scroller", "fg_dropHueMaxValue"))		
 	except Exception as e:
 		config.bg_dropHueMinValue = 0
 		config.bg_dropHueMaxValue = 0
+		config.fg_dropHueMinValue = 0
+		config.fg_dropHueMaxValue = 0
 		print(str(e))
 
 	try:

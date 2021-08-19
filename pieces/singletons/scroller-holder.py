@@ -463,6 +463,7 @@ def makeBackGround(drawRef, n=1):
 			200,
 		)
 
+
 		drawRef.rectangle((xPos,0,xPos+xDiv,config.canvasHeight), fill = fillClr)
 		xPos += xDiv
 	config.bgBackGroundColor = config.bgBackGroundEndColor
@@ -528,6 +529,7 @@ def makeBackGround(drawRef, n=1):
 		)
 
 		# print(c,fillClr)
+		
 
 		for r in range(0, rows):
 			columnOffset = 0
@@ -538,6 +540,15 @@ def makeBackGround(drawRef, n=1):
 				columnOffset = xDiv
 
 			if random.random() < config.patternDrawProb:
+
+				if random.random() < config.redGreenSwapProb: 
+					fillClr = (fillClr[1],fillClr[0],fillClr[2])
+
+				if random.random() < config.redBlueSwapProb: 
+					fillClr = (fillClr[2],fillClr[1],fillClr[0])
+
+				if random.random() < config.greenBlueSwapProb: 
+					fillClr = (fillClr[0],fillClr[2],fillClr[1])
 
 				if config.pattern == "diamonds":
 					poly = []
@@ -970,6 +981,23 @@ def init():
 	config.alwaysRandomPattern = workConfig.getboolean(
 		"scroller", "alwaysRandomPattern"
 	)
+
+
+	try:
+		config.redGreenSwapProb = float(workConfig.get("scroller", "redGreenSwapProb"))
+	except Exception as e:
+		print(str(e))
+		config.redGreenSwapProb = 0
+	try:
+		config.redBlueSwapProb = float(workConfig.get("scroller", "redBlueSwapProb"))
+	except Exception as e:
+		print(str(e))
+		config.redBlueSwapProb = 0
+	try:
+		config.greenBlueSwapProb = float(workConfig.get("scroller", "greenBlueSwapProb"))
+	except Exception as e:
+		print(str(e))
+		config.greenBlueSwapProb = 0
 
 	try:
 		config.bg_dropHueMinValue = float(workConfig.get("scroller", "bg_dropHueMinValue"))

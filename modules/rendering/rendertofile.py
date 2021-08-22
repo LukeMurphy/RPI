@@ -35,9 +35,10 @@ def iterateWork(mode):
 		toVideo()
 
 	elif mode == "gif":
+		toGIF()
 		# ** Make Gifs
-		clip = mpy.VideoClip(clipMaker, duration=duration)
-		clip.write_gif("test.gif", fps=fps)
+		#clip = mpy.VideoClip(clipMaker, duration=duration)
+		#clip.write_gif("test.gif", fps=fps)
 
 
 def clipMaker(t):
@@ -58,6 +59,7 @@ def videoClipMaker():
 	# (imageToRender,xOffset,yOffset) = config.workRef.interate()
 	work.iterate()
 
+	'''
 	imageToRender = config.image
 	xOffset = work.x
 	yOffset = work.y
@@ -123,9 +125,36 @@ def videoClipMaker():
 		else:
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 	# img = config.renderImageFull.resize((640,480))
-	img = config.renderImageFull
+	'''
+
+	# normally would be config.renderImageFull ...
+	img = config.canvasImage
 	# img = img.filter(ImageFilter.UnsharpMask(radius=10, percent=200,threshold=0))
 	return img
+
+
+def toGIF():
+	global config, duration, fps
+	from subprocess import Popen, PIPE
+
+	imagesArray = []
+
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
+	#name = config.work + "_" + st + "_video.avi"
+	# /Users/lamshell/Documents/Dev/RPI/build/
+	name =  "" + st + ".gif"
+
+	frames  = fps * duration
+	imgFormat = "PNG"
+	print(frames)
+	for i in range(frames):
+		# im = Image.new("RGB", (640, 480), (i, 1, 1))
+		im = videoClipMaker()
+		#im.save(str(i) + ".png", imgFormat)
+		imagesArray.append(im)
+
+	imagesArray[0].save(name,save_all=True, append_images=imagesArray[1:], optimize=False, duration=1, loop=0)
 
 
 def toVideo():

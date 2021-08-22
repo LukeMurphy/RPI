@@ -124,6 +124,18 @@ def configure(config, workconfig):
 	## used when repositioning a block of an image -- sculptural pieces when
 	## card configurations can't handle simple set up
 
+
+
+
+	try:
+		config.outputMode = workconfig.getboolean(
+			"displayconfig", "outputMode"
+		)
+	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
+		config.outputMode = ""
+
+
 	try:
 		config.remapImageBlock = workconfig.getboolean(
 			"displayconfig", "remapImageBlock"
@@ -632,6 +644,7 @@ def renderUsingFFMPEG(work):
 	r.work.x = r.work.y = 0
 	r.fps = int(work.workConfig.get("output", 'fps'))
 	r.duration = int(work.workConfig.get("output", 'duration'))
+	r.mode = (work.workConfig.get("output", 'mode'))
 
 	# Test white rectangle on main rendering image
 	#config.renderDraw.rectangle((0,0,400,300), fill=(255,255,255))
@@ -640,6 +653,6 @@ def renderUsingFFMPEG(work):
 	work.config.updateCanvas = r.updateCanvas
 	work.main(False)
 	
-	r.setUp("video")
+	r.setUp(r.mode)
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

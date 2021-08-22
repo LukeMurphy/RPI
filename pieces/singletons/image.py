@@ -311,7 +311,10 @@ def performChanges():
 	#config.workImageDraw.rectangle((0,0,256,256), fill=(100,0,0,200))
 	#config.workImage = Image.blend(config.workImage,config.imgLoader.image.convert("RGBA"),.5,)
 
-	config.workImage.paste(config.imgLoader.image.convert("RGBA"), (0, 0), config.imgLoader.image.convert("RGBA"))
+	enhancer = ImageEnhance.Brightness(config.imgLoader.image.convert("RGBA"))
+	im_output = enhancer.enhance(config.brightness)
+
+	config.workImage.paste(im_output, (0, 0), im_output)
 
 	# RESETS for paused animation
 	if config.imgLoader.holdAnimation == True and (config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit or random.random() < config.releasePauseProb):

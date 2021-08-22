@@ -651,6 +651,8 @@ def iterate():
 			cp_blur = cp.filter(ImageFilter.GaussianBlur(config.cp_blur_amt))
 			config.canvasImage = Image.composite(cp_blur,config.canvasImage, mask_blur)
 		
+		
+		
 		config.render(config.canvasImage, 0, 0,
 					  config.canvasWidth, config.canvasHeight)
 	# Done

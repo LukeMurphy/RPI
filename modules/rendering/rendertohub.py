@@ -1,6 +1,8 @@
 import random
 import threading
+import datetime
 import time
+
 import tkinter as tk
 import os
 
@@ -39,6 +41,10 @@ buff = 8
 def setUp(config):
 	# global root, canvasOffsetX, canvasOffsetY, buff, config
 	gc.enable()
+
+	config.imageArrayForSaving = []
+	config.frameCount = 0
+	config.frameCountLimit = 2
 
 	if config.MID == "studio-mac":
 		config.path = "./"
@@ -424,9 +430,22 @@ def render(
 
 
 
+	if config.outputMode == 'gif' :
+		config.frameCount += 1
+		if config.frameCount >= config.frameCountLimit :
+			config.imageArrayForSaving.append(config.renderImageFull)
+			config.frameCount = 0
 
 
-	
+		
+		if len(config.imageArrayForSaving) > 500 :
+			ts = time.time()
+			st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
+			#name = config.work + "_" + st + "_video.avi"
+			# /Users/lamshell/Documents/Dev/RPI/build/
+			name =  "" + st + ".gif"
+			config.imageArrayForSaving[0].save(name,save_all=True, append_images=config.imageArrayForSaving[1:], optimize=True, duration=.5, loop=0)
+			config.imageArrayForSaving = []
 
 	"""
 	for i in range(0,40) :`

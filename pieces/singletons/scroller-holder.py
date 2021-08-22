@@ -407,6 +407,10 @@ def makeBackGround(drawRef, n=1):
 	rows = config.patternRows * 1
 	cols = config.patternCols * 1
 
+	if config.alwaysRandomPattern == True and random.random() < .5:
+		rows = round(random.uniform(2,config.patternRows))
+		cols = round(random.uniform(2,config.patternCols))
+
 	xDiv = round(
 		(config.displayRows * config.canvasWidth) / cols
 	)  # - config.patternColsOffset
@@ -641,11 +645,13 @@ def remakePatternBlock(imageRef, direction):
 
 	if random.random() < 0.3:
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
+	'''
 	if random.random() < 0.05:
 		config.patternEndColor = (254, 0, 254, 255)
 	if random.random() < 0.05:
 		config.patternEndColor = (0, 0, 250, 255)
-
+	''' 
 	if config.setPatternColor == True :
 		config.setPatternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
@@ -657,14 +663,17 @@ def remakePatternBlock(imageRef, direction):
 
 	if config.alwaysRandomPattern == True :
 		if random.random() < 0.3:
-			config.patternDrawProb = random.uniform(0.08, 0.12)
+			config.patternDrawProb = random.uniform(0.08, 0.8)
+
 		if random.random() < 0.3:
 			config.patternRows = int(round(random.uniform(40, 80)))
+
 		if random.random() < 0.3:
 			config.patternCols = int(round(random.uniform(90, 240)))
 	else:
 		pass
 
+	'''
 	if config.alwaysRandomPatternColor == True :
 		if config.useHSV :
 			config.patternEndColor = colorutils.getRandomColorHSV(
@@ -674,7 +683,7 @@ def remakePatternBlock(imageRef, direction):
 				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 		else:
 			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
-
+	'''
 
 
 	config.bgBackGroundColor = config.bgBackGroundEndColor
@@ -708,16 +717,20 @@ def configureBackgroundScrolling():
 	config.pattern = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
 
+	'''
 	if config.alwaysRandomPatternColor == True:
 		config.patternColor = colorutils.randomColorAlpha(config.brightness)
 		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+	'''
 
 	if config.setPatternColor == True :
+		
 		config.setPatternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
+
 		config.patternColor = config.setPatternEndColor
 		config.patternEndColor = config.setPatternEndColor
 
@@ -975,9 +988,11 @@ def init():
 	config.altDirectionScrolling = workConfig.getboolean(
 		"scroller", "altDirectionScrolling"
 	)
+
 	config.alwaysRandomPatternColor = workConfig.getboolean(
 		"scroller", "alwaysRandomPatternColor"
 	)
+
 	config.alwaysRandomPattern = workConfig.getboolean(
 		"scroller", "alwaysRandomPattern"
 	)

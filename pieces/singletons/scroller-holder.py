@@ -407,48 +407,43 @@ def makeBackGround(drawRef, n=1):
 	rows = config.patternRows * 1
 	cols = config.patternCols * 1
 
-	if config.alwaysRandomPattern == True and random.random() < .5:
-		rows = round(random.uniform(2,config.patternRows))
-		cols = round(random.uniform(2,config.patternCols))
-
 	xDiv = round(
 		(config.displayRows * config.canvasWidth) / cols
 	)  # - config.patternColsOffset
+
+	xDiv = (
+		2 * config.canvasWidth * config.displayCols/ cols 
+	) 
+
 	yDiv = (
 		config.canvasHeight / rows
 	) / config.displayRows  # - config.patternRowsOffset
 
-	# print(xDiv, yDiv)
-
-	xStart = 0
-	yStart = 0
 
 	gap = 0
-
 	steps = cols
-
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
-
 	colorChange = False
 
+	# Background setup
+	'''
+	'''
 	drawRef.rectangle(
 		(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
 		fill=config.bgBackGroundColor)
 
-
 	## The multiplier is actually a factor of the number of rows
 	## but, generally so far only using two rows ....
-	rDelta = (
-		(config.bgBackGroundEndColor[0] - config.bgBackGroundColor[0]) / steps
-	)
-	gDelta = (
-		(config.bgBackGroundEndColor[1] - config.bgBackGroundColor[1]) / steps
-	)
-	bDelta = (
-		(config.bgBackGroundEndColor[2] - config.bgBackGroundColor[2]) / steps
-	)
+	rDelta = ((config.bgBackGroundEndColor[0] - config.bgBackGroundColor[0]) / steps)
+	gDelta = ((config.bgBackGroundEndColor[1] - config.bgBackGroundColor[1]) / steps)
+	bDelta = ((config.bgBackGroundEndColor[2] - config.bgBackGroundColor[2]) / steps)
 
 	xPos = 0 
+	transitionCount = 0 
+	config.patternLengthTransition = 8
+	lengthDelta = round((xDiv - config.currentPatternLength ) / config.patternLengthTransition)
+	patternLength = xDiv
+
 	for c in range(0, cols):
 		columnOffset = 0
 
@@ -467,20 +462,26 @@ def makeBackGround(drawRef, n=1):
 			200,
 		)
 
+		w = patternLength
 
-		drawRef.rectangle((xPos,0,xPos+xDiv,config.canvasHeight), fill = fillClr)
-		xPos += xDiv
+		outline = None
+		if c < 0 :
+			outline=(255,0,0,200)
+
+		drawRef.rectangle((xPos,0,xPos+w,config.canvasHeight), fill = fillClr, outline=outline)
+		xPos += w
+
+		if transitionCount < config.patternLengthTransition-1 : 
+			#print(config.currentPatternLength,xDiv,lengthDelta)
+			transitionCount += 1
+			#patternLength += lengthDelta
+		else :
+			patternLength = xDiv
+
+
 	config.bgBackGroundColor = config.bgBackGroundEndColor
 
-
-	## Chevron pattern
-	## config.bgForeGroundColor
-	# fillClr = colorutils.getRandomColor(config.brightness/2)
-
-	# config.patternColor = config.patternEndColor
-	# config.patternEndColor = colorutils.getRandomColor(config.brightness)
-
-	# print(xDiv, yDiv)
+	# Foreground setup
 
 	rowMultiplier = 1
 	colMultiplier = 1
@@ -504,17 +505,20 @@ def makeBackGround(drawRef, n=1):
 	
 	## The multiplier is actually a factor of the number of rows
 	## but, generally so far only using two rows ....
-	rDelta = (
-		colMultiplier * (config.patternEndColor[0] - config.patternColor[0]) / steps
-	)
-	gDelta = (
-		colMultiplier * (config.patternEndColor[1] - config.patternColor[1]) / steps
-	)
-	bDelta = (
-		colMultiplier * (config.patternEndColor[2] - config.patternColor[2]) / steps
-	)
+	rDelta = ((config.patternEndColor[0] - config.patternColor[0]) / steps)
+	gDelta = ((config.patternEndColor[1] - config.patternColor[1]) / steps)
+	bDelta = ((config.patternEndColor[2] - config.patternColor[2]) / steps)
 
-	for c in range(0, cols):
+	xPos = 0
+	xStart = 0
+	yStart = 0
+	transitionCount = 0 
+	config.patternLengthTransition = 8
+	lengthDelta = round((xDiv - config.currentPatternLength ) / config.patternLengthTransition)
+
+
+	for c in range(0, cols+1):
+		
 		columnOffset = 0
 
 		rCol = config.patternColor[0] + rDelta
@@ -529,11 +533,13 @@ def makeBackGround(drawRef, n=1):
 			(round(config.patternEndColor[0] - rDelta * (c + 1))),
 			(round(config.patternEndColor[1] - gDelta * (c + 1))),
 			(round(config.patternEndColor[2] - bDelta * (c + 1))),
-			200,
+			225,
 		)
-
-		# print(c,fillClr)
 		
+		#drawRef.rectangle((0, 0, 0 + 1, config.canvasHeight), fill = None, outline = (255,0,0,255))
+
+		# length transition
+		patternLength = xDiv
 
 		for r in range(0, rows):
 			columnOffset = 0
@@ -543,7 +549,10 @@ def makeBackGround(drawRef, n=1):
 			if r / 2 % 2 == 0:
 				columnOffset = xDiv
 
-			if random.random() < config.patternDrawProb:
+			if random.random() < config.patternDrawProb or c == 0:
+
+				if config.pattern == "test":
+					drawRef.rectangle((xPos,5,xPos+4,55), fill = fillClr)
 
 				if random.random() < config.redGreenSwapProb: 
 					fillClr = (fillClr[1],fillClr[0],fillClr[2])
@@ -565,10 +574,10 @@ def makeBackGround(drawRef, n=1):
 
 				if config.pattern == "bricks":
 					length = xDiv
-					xPos = xStart + columnOffset
+					#xPos = xStart + columnOffset
 					yPos = yStart
 					drawRef.rectangle(
-						(xPos, yPos, xPos + length, yPos + yDiv),
+						(xPos+ columnOffset, yPos, xPos+ columnOffset + length, yPos + yDiv),
 						fill=fillClr,
 						outline=None,
 					)
@@ -577,14 +586,14 @@ def makeBackGround(drawRef, n=1):
 					length = xDiv
 					height = xDiv / 2
 
-					xPos = xStart + columnOffset
+					#xPos = xStart + columnOffset
 					yPos = yStart
 
 					xPos2 = xPos + round(length / 2 - height / 2)
 					yPos2 = round(yPos - length / 2 + height / 2)
 
 					drawRef.rectangle(
-						(xPos, yPos, xPos + length, yPos + yDiv),
+						(xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv),
 						fill=fillClr,
 						outline=None,
 					)
@@ -593,17 +602,14 @@ def makeBackGround(drawRef, n=1):
 						fill=fillClr,
 						outline=None,
 					)
-
+		
 				if config.pattern == "regularLines":
-					length = xDiv
-					xPos = xStart + columnOffset
+					length = patternLength
+					#xPos = xStart + columnOffset
 					yPos = yStart
-					drawRef.rectangle(
-						(xPos, yPos, xPos + length, yPos + yDiv),
-						fill=fillClr,
-						outline=None,
-					)
+					drawRef.rectangle((xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv), fill = fillClr)
 
+				'''
 				if config.pattern == "lines":
 					# if (r%2 > 0):
 					length = int(round(random.uniform(1, 2 * xDiv)))
@@ -627,31 +633,34 @@ def makeBackGround(drawRef, n=1):
 							outline=None,
 						)
 
+				'''
 			yStart += rowMultiplier * yDiv
+
+		if transitionCount < config.patternLengthTransition-1 : 
+			#print(config.currentPatternLength,xDiv,lengthDelta)
+			transitionCount += 1
+			#patternLength += lengthDelta
+		else :
+			config.currentPatternLength = xDiv
+
+		
 		if config.pattern == "lines":
 			xStart += colMultiplier * xDiv
 		else:
 			xStart += xDiv * 2
+		xPos += xDiv
 		yStart = 0
 
 	config.patternColor = config.patternEndColor
+	config.currentPatternLength = xDiv
 
 
 ## Layer imagery callbacks & regeneration functions
 def remakePatternBlock(imageRef, direction):
 	#print("remakePatternBlock")
 	## Stacking the cards ...
-	config.patternColor = config.patternEndColor
-
-	if random.random() < 0.3:
-		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 	'''
-	if random.random() < 0.05:
-		config.patternEndColor = (254, 0, 254, 255)
-	if random.random() < 0.05:
-		config.patternEndColor = (0, 0, 250, 255)
-	''' 
 	if config.setPatternColor == True :
 		config.setPatternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
@@ -659,35 +668,31 @@ def remakePatternBlock(imageRef, direction):
 				config.fg_minValue, config.fg_maxValue,
 				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 		config.patternEndColor = config.setPatternEndColor
-
-
+		config.patternColor = config.setPatternEndColor
+	'''
+	
 	if config.alwaysRandomPattern == True :
-		if random.random() < 0.3:
+		if random.random() < .5:
 			config.patternDrawProb = random.uniform(0.08, 0.8)
 
-		if random.random() < 0.3:
-			config.patternRows = int(round(random.uniform(40, 80)))
+		if random.random() < .5:
+			config.patternRows = (round(random.uniform(8, 64)))
 
-		if random.random() < 0.3:
-			config.patternCols = int(round(random.uniform(90, 240)))
-	else:
-		pass
+		if random.random() < .5:
+			config.patternCols = (round(random.uniform(4, 960)))
 
-	'''
-	if config.alwaysRandomPatternColor == True :
-		if config.useHSV :
-			config.patternEndColor = colorutils.getRandomColorHSV(
+
+
+	config.patternColor = config.patternEndColor
+	if random.random() < config.backgroundColorChangeProb :
+		config.patternEndColor = colorutils.getRandomColorHSV(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
 				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-		else:
-			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
-	'''
 
 
 	config.bgBackGroundColor = config.bgBackGroundEndColor
-
 	if random.random() < config.backgroundColorChangeProb :
 		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
 				config.bg_minHue, config.bg_maxHue, 
@@ -710,35 +715,11 @@ def configureBackgroundScrolling():
 	config.patternDrawProb = float(workConfig.get("scroller", "patternDrawProb"))
 	config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(",")
 	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
-	config.bgForeGroundColor = workConfig.get("scroller", "bgForeGroundColor").split(",")
-	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
-	config.patternColor = (50, 0, 55, 50)
-	config.patternEndColor = (255, 0, 255, 50)
 	config.pattern = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
 
-	'''
-	if config.alwaysRandomPatternColor == True:
-		config.patternColor = colorutils.randomColorAlpha(config.brightness)
-		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
-	'''
 
-	if config.setPatternColor == True :
-		
-		config.setPatternEndColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,
-				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-
-		config.patternColor = config.setPatternEndColor
-		config.patternEndColor = config.setPatternEndColor
-
-	if config.useHSV :
-		config.bgForeGroundColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
+	if config.useHSV :	
 
 		config.bgBackGroundColor = colorutils.getRandomColorHSV(
 				config.bg_minHue, config.bg_maxHue, 
@@ -762,8 +743,23 @@ def configureBackgroundScrolling():
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
 				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-		
+	else :
 
+		if config.alwaysRandomPatternColor == True:
+			config.patternColor = colorutils.randomColorAlpha(config.brightness)
+			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+
+		if config.setPatternColor == True :
+			config.setPatternEndColor = colorutils.getRandomColorHSV(
+					config.fg_minHue, config.fg_maxHue, 
+					config.fg_minSaturation, config.fg_maxSaturation, 
+					config.fg_minValue, config.fg_maxValue,
+					config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+			config.patternColor = config.setPatternEndColor
+			config.patternEndColor = config.setPatternEndColor
+
+		
+	config.currentPatternLength = 0
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
@@ -797,6 +793,7 @@ def configureBackgroundScrolling():
 
 	makeBackGround(scrollerRef.bg1Draw, 1)
 	makeBackGround(scrollerRef.bg2Draw, 1)
+
 
 	config.t1 = time.time()
 	config.t2 = time.time()
@@ -988,11 +985,9 @@ def init():
 	config.altDirectionScrolling = workConfig.getboolean(
 		"scroller", "altDirectionScrolling"
 	)
-
 	config.alwaysRandomPatternColor = workConfig.getboolean(
 		"scroller", "alwaysRandomPatternColor"
 	)
-
 	config.alwaysRandomPattern = workConfig.getboolean(
 		"scroller", "alwaysRandomPattern"
 	)
@@ -1045,11 +1040,6 @@ def init():
 		config.bg_maxValue = float(workConfig.get("scroller", "bg_maxValue"))
 
 
-		config.setPatternEndColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)	
 	except Exception as e:
 		config.useHSV = False
 		print(str(e))

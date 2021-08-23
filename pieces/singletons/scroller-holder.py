@@ -681,6 +681,15 @@ def remakePatternBlock(imageRef, direction):
 		if random.random() < .15:
 			config.patternCols = (round(random.uniform(4, config.canvasWidth)))
 
+		if random.random() < .15:
+			if random.random() < .5 :
+				config.pattern == "lines"
+			else:
+				config.pattern == "pluses"
+	else :
+		config.pattern == config.initialPattern 
+
+
 
 
 	config.patternColor = config.patternEndColor
@@ -716,6 +725,7 @@ def configureBackgroundScrolling():
 	config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(",")
 	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
 	config.pattern = workConfig.get("scroller", "pattern")
+	config.initialPattern  = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
 
 

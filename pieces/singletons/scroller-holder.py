@@ -609,7 +609,7 @@ def makeBackGround(drawRef, n=1):
 					yPos = yStart
 					drawRef.rectangle((xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv), fill = fillClr)
 
-				'''
+				
 				if config.pattern == "lines":
 					# if (r%2 > 0):
 					length = int(round(random.uniform(1, 2 * xDiv)))
@@ -633,7 +633,7 @@ def makeBackGround(drawRef, n=1):
 							outline=None,
 						)
 
-				'''
+				
 			yStart += rowMultiplier * yDiv
 
 		if transitionCount < config.patternLengthTransition-1 : 
@@ -672,14 +672,14 @@ def remakePatternBlock(imageRef, direction):
 	'''
 	
 	if config.alwaysRandomPattern == True :
-		if random.random() < .5:
+		if random.random() < .15:
 			config.patternDrawProb = random.uniform(0.08, 0.8)
 
-		if random.random() < .5:
-			config.patternRows = (round(random.uniform(8, 64)))
+		if random.random() < .15:
+			config.patternRows = (round(random.uniform(8, config.canvasHeight)))
 
-		if random.random() < .5:
-			config.patternCols = (round(random.uniform(4, 960)))
+		if random.random() < .15:
+			config.patternCols = (round(random.uniform(4, config.canvasWidth)))
 
 
 
@@ -744,6 +744,11 @@ def configureBackgroundScrolling():
 				config.fg_minValue, config.fg_maxValue,
 				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 	else :
+
+		config.bgBackGroundColor = colorutils.randomColorAlpha(config.brightness)
+		config.bgBackGroundEndColor = colorutils.randomColorAlpha(config.brightness)
+		config.patternColor = colorutils.randomColorAlpha(config.brightness)
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 		if config.alwaysRandomPatternColor == True:
 			config.patternColor = colorutils.randomColorAlpha(config.brightness)

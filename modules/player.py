@@ -311,6 +311,35 @@ def configure(config, workconfig):
 
 
 	try:
+		config.remapImageBlock7 = workconfig.getboolean(
+			"displayconfig", "remapImageBlock7"
+		)
+		config.remapImageBlockSection7 = workconfig.get(
+			"displayconfig", "remapImageBlockSection7"
+		).split(",")
+		config.remapImageBlockSection7 = tuple(
+			[int(i) for i in config.remapImageBlockSection7]
+		)
+		config.remapImageBlockDestination7 = workconfig.get(
+			"displayconfig", "remapImageBlockDestination7"
+		).split(",")
+		config.remapImageBlockDestination7 = tuple(
+			[int(i) for i in config.remapImageBlockDestination7]
+		)
+	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
+		config.remapImageBlock7 = False
+
+	try:
+		config.remapImageBlockSection7Rotation = float(
+			workconfig.get("displayconfig", "remapImageBlockSection7Rotation")
+		)
+	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
+		config.remapImageBlockSection7Rotation = 0
+
+
+	try:
 		config.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
 		config.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))
 	except Exception as e:
@@ -373,10 +402,18 @@ def configure(config, workconfig):
 		print(bcolors.FAIL + "** " +  str(e))
 		config.forceBGSwap = False
 
-
-
 	config.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
 	config.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
+
+	try:
+		config.windowWidth = int(workconfig.get("displayconfig", "windowWidth"))
+		config.windowHeight = int(workconfig.get("displayconfig", "windowHeight"))
+	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
+		config.windowHeight = config.screenHeight 
+		config.windowWidth = config.screenWidth 
+
+
 	#config.tileSize = (int(workconfig.get("displayconfig", 'tileSizeHeight')),int(workconfig.get("displayconfig", 'tileSizeWidth')))
 
 	try:

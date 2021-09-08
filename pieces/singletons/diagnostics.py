@@ -497,6 +497,7 @@ def runWork():
 	print(bcolors.ENDC)
 	# gc.enable()
 
+
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

@@ -61,8 +61,8 @@ def setUp(config):
 	# if(config.rotation == 90) : canvasOffsetY = -25
 
 	root = tk.Tk()
-	w = config.screenWidth + buff
-	h = config.screenHeight + buff
+	w = config.windowWidth + buff
+	h = config.windowHeight + buff
 	x = windowOffset[0]
 	y = windowOffset[1]
 
@@ -399,7 +399,13 @@ def render(
 		config.renderImageFull.paste(crop, config.remapImageBlockDestination6, crop)
 
 
-
+	if config.remapImageBlock7 == True:
+		crop = config.renderImageFull.crop(config.remapImageBlockSection7)
+		if config.remapImageBlockSection7Rotation != 0:
+			crop = crop.convert("RGBA")
+			crop = crop.rotate(config.remapImageBlockSection7Rotation)
+		crop = crop.convert("RGBA")
+		config.renderImageFull.paste(crop, config.remapImageBlockDestination7, crop)
 
 	# ---- Overall image blurring  ---- #
 	if config.useBlur == True:

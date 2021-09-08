@@ -27,6 +27,7 @@ class Fader:
 		self.doingRefreshCount = 50
 		self.fadingDone = False
 
+
 	def fadeIn(self, config):
 		if self.fadingDone == False:
 			if self.doingRefresh < self.doingRefreshCount:
@@ -51,15 +52,18 @@ class Bar:
 
 
 	def remake(self) :
-		self.speed1 = random.uniform(config.speed1RangeMin, config.speed1RangeMax)
-		self.speed2 = random.uniform(config.speed2RangeMin, config.speed2RangeMax)
-		self.yPos = round(random.uniform(0,config.canvasHeight))
-		self.xPos = 0
+		self.xSpeed = random.uniform(config.xSpeedRangeMin * config.direction, config.xSpeedRangeMax * config.direction)
+		self.ySpeed = random.uniform(config.ySpeedRangeMin, config.ySpeedRangeMax)
+		self.yPos = round(random.uniform(config.yRangeMin,config.yRangeMax))
+		self.xPos = -config.barThicknessMax * 2
+		if config.direction == -1 :
+			self.xPos = config.canvasWidth + config.barThicknessMax * 2
 		self.barThickness = round(random.uniform(config.barThicknessMin, config.barThicknessMax))
 		#self.colorVal = colorutils.randomColorAlpha()
 		cset = config.colorSets[config.usingColorSet]
-		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.colorAlpha )
-		self.outlineColorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.outlineColorAlpha )
+
+		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.colorAlpha, config.brightness )
+		self.outlineColorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.outlineColorAlpha, config.brightness )
 
 
 
@@ -98,20 +102,19 @@ def iterate():
 
 	for i in range(0, config.numberOfBars):
 		bar = config.barArray[i]
-		bar.xPos += bar.speed1
-		bar.yPos += bar.speed2
+		bar.xPos += bar.xSpeed
+		bar.yPos += bar.ySpeed
 
 		w = round(math.sqrt(2) * config.barThicknessMax * 1.5)
 
-		angle = 180/math.pi * math.tan(bar.speed2/bar.speed1)
+		angle = 180/math.pi * math.tan(bar.ySpeed/abs(bar.xSpeed))
 
 		temp = Image.new("RGBA", (w, w))
 		drw = ImageDraw.Draw(temp)
 
 		if config.tipType == 1 :
-		#drw.rectangle((bar.xPos-1, bar.yPos, bar.xPos, bar.yPos + bar.barThickness ), fill = bar.colorVal)
-			drw.rectangle((0, 0, bar.barThickness, bar.barThickness ), fill = bar.colorVal, outline = bar.outlineColorVal)
-			drw.rectangle((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
+			drw.rectangle((0, 0, bar.barThickness * 2, bar.barThickness ), fill = bar.colorVal, outline = bar.outlineColorVal)
+			drw.rectangle((0, 2, bar.barThickness * 2, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 		
 		else :
 			drw.ellipse((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
@@ -121,7 +124,9 @@ def iterate():
 
 		config.image.paste(temp,(round(bar.xPos), round(bar.yPos)), temp)
 
-		if bar.xPos > config.canvasWidth :
+		if bar.xPos > config.canvasWidth and config.direction == 1:
+			bar.remake()
+		if bar.xPos < 0 and config.direction == -1:
 			bar.remake()
 
 
@@ -139,7 +144,7 @@ def iterate():
 			config.usingColorSet = config.numberOfColorSets-1
 		config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 		config.dropHueMax = 0
-		config.tipType = round(random.random())
+		#config.tipType = round(random.random())
 		#print("ColorSet: " + str(config.usingColorSet))
 
 	config.render(config.image, 0,0)
@@ -160,20 +165,24 @@ def main(run=True):
 	config.numberOfBars =  int(workConfig.get("bars", "numberOfBars"))
 	config.barThicknessMin =  int(workConfig.get("bars", "barThicknessMin"))
 	config.barThicknessMax =  int(workConfig.get("bars", "barThicknessMax"))	
+	config.direction =  int(workConfig.get("bars", "direction"))	
+	yRange =  (workConfig.get("bars", "yRange")).split(",")
+	config.yRangeMin = int(yRange[0])	
+	config.yRangeMax = int(yRange[1])	
 
 	config.leadEdgeAlpahMin =  int(workConfig.get("bars", "leadEdgeAlpahMin"))
 	config.leadEdgeAlpahMax =  int(workConfig.get("bars", "leadEdgeAlpahMax"))
 	config.tipAngle =  float(workConfig.get("bars", "tipAngle"))
 	
-	config.speed1RangeMin =  float(workConfig.get("bars", "speed1RangeMin"))
-	config.speed1RangeMax =  float(workConfig.get("bars", "speed1RangeMax"))
-	config.speed2RangeMin =  float(workConfig.get("bars", "speed2RangeMin"))
-	config.speed2RangeMax =  float(workConfig.get("bars", "speed2RangeMax"))
+	config.xSpeedRangeMin =  float(workConfig.get("bars", "xSpeedRangeMin"))
+	config.xSpeedRangeMax =  float(workConfig.get("bars", "xSpeedRangeMax"))
+	config.ySpeedRangeMin =  float(workConfig.get("bars", "ySpeedRangeMin"))
+	config.ySpeedRangeMax =  float(workConfig.get("bars", "ySpeedRangeMax"))
 
 	config.tipType = 1
 	
-	config.colorAlpha = config.leadEdgeAlpahMin
-	config.outlineColorAlpha = config.leadEdgeAlpahMin
+	config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
+	config.outlineColorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 	yPos = 0
 	config.barArray = []
 
@@ -194,11 +203,13 @@ def main(run=True):
 	config.usingColorSet = math.floor(random.uniform(0,config.numberOfColorSets))
 	if config.usingColorSet == config.numberOfColorSets : config.usingColorSet = config.numberOfColorSets - 1
 
+	# initialize and place the first set
 	for i in range(0, config.numberOfBars):
 		bar =  Bar()
-		bar.yPos = yPos
+		bar.yPos = round(random.uniform(config.yRangeMin,config.yRangeMax))
+		bar.xPos = round(random.uniform(0,config.canvasWidth - config.barThicknessMax))
 		config.barArray.append(bar)
-		yPos += bar.barThickness
+		#yPos += bar.barThickness
 
 
 

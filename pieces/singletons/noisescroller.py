@@ -15,6 +15,12 @@ import numpy as np
 lastRate = 0
 colorutils.brightness = 1
 
+def getColor(r,g,b,a) :
+	clr = list( round(i * config.brightness) for i in [r,g,b])
+	clr.append(a)
+
+	return tuple(clr)
+
 
 def reDraw():
 	if config.function == "wavey" :
@@ -59,9 +65,15 @@ def ringLines():
 
 			if doDraw == True:
 
-				config.draw.line((lastx[0],lasty[0], x, y + yChange1), fill=(255,0,10,250))
-				config.draw.line((lastx[0],lasty[0], x, y + yChange2), fill=(200,120,10,255))
-				config.draw.line((lastx[0],lasty[0], x, y + yChange3), fill=(52,0,250,155))
+				config.draw.line((lastx[0],lasty[0], x, y + yChange1), fill=getColor(255,0,10,250))
+				config.draw.line((lastx[0],lasty[0], x, y + yChange2), fill=getColor(200,120,10,255))
+				config.draw.line((lastx[0],lasty[0], x, y + yChange3), fill=getColor(52,0,250,155))
+
+				if random.random() < .99:
+					config.draw.line((lastx[0],lasty[0], x, y + yChange1), fill=getColor(125,125,125,250))
+					config.draw.line((lastx[0],lasty[0], x, y + yChange2), fill=getColor(25,25,25,255))
+					config.draw.line((lastx[0],lasty[0], x, y + yChange3), fill=getColor(5,5,5,155))
+					
 				lastx = [x,x,x]
 				lasty = [y + yChange1,y + yChange2,y + yChange3]
 
@@ -97,13 +109,13 @@ def rings():
 
 			if doDraw == True:
 				if config.markSize == 1 :
-					config.draw.rectangle((x, y + yChange1, x+0, y + yChange1 +0), fill=(255,0,100,255), outline=None)
-					config.draw.rectangle((x, y + yChange2, x+0, y + yChange2 +0), fill=(0,255,0,255), outline=None)
-					config.draw.rectangle((x, y + yChange3, x+0, y + yChange3 +0), fill=(0,0,255,255), outline=None)
+					config.draw.rectangle((x, y + yChange1, x+0, y + yChange1 +0), fill=getColor(255,0,100,255), outline=None)
+					config.draw.rectangle((x, y + yChange2, x+0, y + yChange2 +0), fill=getColor(0,255,0,255), outline=None)
+					config.draw.rectangle((x, y + yChange3, x+0, y + yChange3 +0), fill=getColor(0,0,255,255), outline=None)
 				else:
-					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange1 +config.markSize), fill=(255,0,0,255), outline=None)
-					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange2 +config.markSize), fill=(0,255,0,255), outline=None)
-					config.draw.ellipse((x, y + yChange3, x+config.markSize, y + yChange3 +config.markSize), fill=(0,0,255,255), outline=None)
+					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange1 +config.markSize), fill=getColor(255,0,0,255), outline=None)
+					config.draw.ellipse((x, y + yChange2, x+config.markSize, y + yChange2 +config.markSize), fill=getColor(0,255,0,255), outline=None)
+					config.draw.ellipse((x, y + yChange3, x+config.markSize, y + yChange3 +config.markSize), fill=getColor(0,0,255,255), outline=None)
 		#octv += 1
 	config.scroll += config.scrollRate
 
@@ -124,7 +136,7 @@ def wavey():
 			b = round(math.sin((x/config.rowFactor)+.1) * 100)
 			#config.draw.rectangle((x, y, x+1, y+1), fill=(r,g,b,150))
 			if col != 0 :
-				config.draw.line((lastx[0],lasty[0],x,y), fill = (r,g,b,150))
+				config.draw.line((lastx[0],lasty[0],x,y), fill = getColor(r,g,b,150))
 			lastx = [x,x,x]
 			lasty = [y,y,y]
 		#octv += 1
@@ -146,7 +158,7 @@ def waves():
 			b = 50
 			#config.draw.rectangle((x, y, x+1, y+1), fill=(r,g,b,150))
 			if col != 0 :
-				config.draw.line((lastx[0],lasty[0],x,y), fill = (r,g,b,150))
+				config.draw.line((lastx[0],lasty[0],x,y), fill = getColor(r,g,b,150))
 			lastx = [x,x,x]
 			lasty = [y,y,y]
 		#octv += 1
@@ -204,7 +216,7 @@ def main(run=True):
 	config.function = (workConfig.get("noisescroller", "function"))
 
 	config.bgColorVals = (workConfig.get("noisescroller", "bgColor")).split(",")
-	config.bgColor = tuple(map(lambda x: int(x), config.bgColorVals))
+	config.bgColor = tuple(map(lambda x: round(float(x) * config.brightness), config.bgColorVals))
 
 	config.scrollRate = float(workConfig.get("noisescroller", "scrollRate"))
 

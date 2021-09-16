@@ -59,7 +59,7 @@ def videoClipMaker():
 	# (imageToRender,xOffset,yOffset) = config.workRef.interate()
 	work.iterate()
 
-	'''
+	
 	imageToRender = config.image
 	xOffset = work.x
 	yOffset = work.y
@@ -82,7 +82,7 @@ def videoClipMaker():
 		config.renderImageFull.paste(im2, (xOffset, yOffset))
 		newimage = Image.new("P", config.renderImageFull.size)
 		newimage = config.renderImageFull.convert("P", colors=64)
-		config.renderImageFull = newimage.convert("RGB")
+		config.renderImageFull = newimage.convert("RGBA")
 
 		"""
 		# Random bright pixel patches -- of limited value aesthetically
@@ -125,10 +125,12 @@ def videoClipMaker():
 		else:
 			config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 	# img = config.renderImageFull.resize((640,480))
-	'''
+	
 
 	# normally would be config.renderImageFull ...
-	img = config.canvasImage
+	#img = config.canvasImage
+	img = config.renderImageFull
+	#img = config.renderImageFull
 	# img = img.filter(ImageFilter.UnsharpMask(radius=10, percent=200,threshold=0))
 	return img
 
@@ -148,18 +150,56 @@ def toGIF():
 	frames  = fps * duration
 	imgFormat = "PNG"
 	print(frames)
+
+	outputImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	for i in range(frames):
 		# im = Image.new("RGB", (640, 480), (i, 1, 1))
 		im = videoClipMaker()
 		#im.save(str(i) + ".png", imgFormat)
-		imagesArray.append(im)
-
-	imagesArray[0].save(name,save_all=True, append_images=imagesArray[1:], optimize=False, duration=1, loop=0)
+		imagesArray.append(im.convert("RGB", colors=1024))
 
 
-def toVideo():
+	imagesArray[0].save(name,save_all=True, append_images=imagesArray[0:], optimize=False, duration=1, loop=0)
+
+
+def toVideo() :
 	global config, duration, fps
 	from subprocess import Popen, PIPE
+	import cv2
+	import argparse
+	import os
+	import numpy as np
+	ts = time.time()
+	st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
+	vdieoFile =  "" + st + "_video.mp4"
+	# Define the codec and create VideoWriter object
+	fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Be sure to use lower case
+	out = cv2.VideoWriter(vdieoFile, fourcc, fps, (config.screenWidth, config.screenHeight))
+
+	#name = config.work + "_" + st + "_video.avi"
+	# /Users/lamshell/Documents/Dev/RPI/build/
+
+	for i in range(fps * duration):
+		# im = Image.new("RGB", (640, 480), (i, 1, 1))
+		frame = videoClipMaker()
+		vFrame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+		out.write(vFrame)
+		#cv2.imshow('video',frame)
+		if (cv2.waitKey(1) & 0xFF) == ord('q'): # Hit `q` to exit
+			break
+
+	# Release everything if job is finished
+	out.release()
+	cv2.destroyAllWindows()
+
+	print("The output video is {}".format(out))
+
+def toVideoOther():
+	global config, duration, fps
+	from subprocess import Popen, PIPE
+	import cv2
+	import argparse
+	import os
 
 	# config.workRef.iterate()
 

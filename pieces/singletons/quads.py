@@ -6,13 +6,13 @@
 # import importlib
 # import threading
 # import resource
+from pieces.workmodules.makeblocks import makeblockanimals  # , makedrawcarcas
 import random
 import time
 from collections import OrderedDict
 from modules.configuration import bcolors
 import numpy
 from modules import coloroverlay, colorutils
-from modules.makeblocks import makeblockanimals  # , makedrawcarcas
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 global thrd, config

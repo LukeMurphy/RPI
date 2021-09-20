@@ -106,7 +106,7 @@ def ringLinesNoLoop():
 		l2 = math.pi * 1 - 1.8 * math.pi/3 
 		angle  = col * rads
 		if angle <  l1 and angle > l2:
-			radialFactor = 2
+			radialFactor = radialFactor
 		xPos = radialFactor * (config.radiusMin + yChange1) * math.cos(col * rads) * 2 + config.xOffset
 		yPos = radialFactor * (config.radiusMin + yChange1) * math.sin(col * rads) * 2 + config.yOffset
 
@@ -197,7 +197,7 @@ def ringLines():
 		l2 = math.pi * 1 - 1.8 * math.pi/3 
 		angle  = col * rads
 		if angle <  l1 and angle > l2:
-			radialFactor = 2
+			radialFactor = config.radialFactor
 		xPos = radialFactor * (config.radiusMin + yChange1) * math.cos(col * rads) * 2 + config.xOffset
 		yPos = radialFactor * (config.radiusMin + yChange1) * math.sin(col * rads) * 2 + config.yOffset
 
@@ -206,15 +206,15 @@ def ringLines():
 			config.draw.line((lastx[0],lasty[0], xPos, yPos), fill=clrToUse)
 		clrToUse2 = colorutils.getRandomColorHSV(36,60,sMin,sMax,vMin,vMax,dropHueMin,dropHueMax,200,brtns)
 
-		clrToUse2 = (255,0,0,50)
+		clrToUse2 = (255,0,0,config.redAlpha)
 		config.draw.rectangle((xPos-1,yPos-1, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 
-		clrToUse2 = (0,255,0,50)
+		clrToUse2 = (0,255,0,config.greenAlpha)
 		xPos = radialFactor * (config.radiusMin + yChange2) * math.cos(col * rads) * 2 + config.xOffset
 		yPos = radialFactor * (config.radiusMin + yChange2) * math.sin(col * rads) * 2 + config.yOffset
 		config.draw.rectangle((xPos-1,yPos-1, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 
-		clrToUse2 = (0,0,255,80)
+		clrToUse2 = (0,0,255,config.blueAlpha)
 		xPos = radialFactor * (config.radiusMin + yChange3) * math.cos(col * rads) * 2 + config.xOffset
 		yPos = radialFactor * (config.radiusMin + yChange3) * math.sin(col * rads) * 2 + config.yOffset
 		config.draw.rectangle((xPos-1,yPos-1, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
@@ -369,6 +369,7 @@ def main(run=True):
 	if config.function == "ringLines" or config.function == 'ringLinesNoLoop':
 		config.frames =  int(workConfig.get("noisescroller", "frames"))
 		config.radiusVal = int(workConfig.get("noisescroller", "radiusVal"))
+		config.radialFactor = float(workConfig.get("noisescroller", "radialFactor"))
 		config.animationDuration = int(workConfig.get("noisescroller", "animationDuration"))
 		config.scrollRate = 2 * math.pi / config.frames
 		config.frameCount = 0 
@@ -385,6 +386,9 @@ def main(run=True):
 		config.line_maxValue = float(workConfig.get("noisescroller", "line_maxValue"))
 		config.line_minValue = float(workConfig.get("noisescroller", "line_minValue"))
 
+		config.redAlpha = int(workConfig.get("noisescroller", "redAlpha"))
+		config.greenAlpha = int(workConfig.get("noisescroller", "greenAlpha"))
+		config.blueAlpha = int(workConfig.get("noisescroller", "blueAlpha"))
 
 		#octv += 1
 

@@ -38,20 +38,20 @@ def reDraw():
 def ringLinesNoLoop():
 	global config
 	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
-	gDelta = 1 + 1/config.rgbSplitFactor
-	bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
+	config.gDelta = 1 + 1/config.rgbSplitFactor
+	config.bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
-	lastx = [config.xOffset,config.xOffset,config.xOffset]
-	lasty = [config.yOffset,config.yOffset,config.yOffset]
+	config.lastx = [config.xOffset,config.xOffset,config.xOffset]
+	config.lasty = [config.yOffset,config.yOffset,config.yOffset]
 
-
-	config.scrollAngle += config.scrollRate
 	config.t2 = time.time()
 	tDelta = config.t2-config.t1
 
-	if tDelta >= 10 :
+	config.scrollAngle += config.scrollRate
+
+	if tDelta >= config.timeToChangeRings :
 		#config.scrollAngle = config.scrollRate
-		if random.random() < .5:
+		if random.random() < config.changeSizeOfMarkProb:
 			#reset it all
 			config.scrollAngle = config.scrollRate
 			config.markSize = round(random.uniform(0,1))
@@ -65,7 +65,7 @@ def ringLinesNoLoop():
 				config.brightness = config.brightnessInit
 
 		fps = config.frameCount / tDelta
-		print("now " + str(fps) + " " + str(config.frameCount) + " " + str(tDelta))
+		print("now fps:" + str(fps) + " frameCount: " + str(config.frameCount) + " time-delta: " + str(tDelta))
 		config.t1 = config.t2
 		config.frameCount = 0
 		radius = 300
@@ -75,89 +75,34 @@ def ringLinesNoLoop():
 			radius = radius/3
 		bgColor = (config.bgColor[0], config.bgColor[1],config.bgColor[2], 200)
 		config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=bgColor, outline=None)
-
+		if config.timeToChangeRingsProb == 1 :
+			config.timeToChangeRings = round(random.uniform(1,32))
 
 	else:
 		config.useFilters = True
 
-
-	config.scrollx = config.radiusVal * math.sin(config.scrollAngle)
-	config.scrolly = config.radiusVal * math.cos(config.scrollAngle)
-	config.frameCount += 1
-
-
-	row = 1
-	rads = 2 * math.pi / config.numRings
-	ra = config.radiusMin * 1 + config.radiusMin
-	hMin=config.line_minHue
-	hMax=config.line_maxHue
-	sMin=config.line_minSaturation
-	sMax=config.line_maxSaturation
-	vMin=config.line_minValue
-	vMax=config.line_maxValue
-	dropHueMin=0
-	dropHueMax=0
-	a=80
-	brtns = config.brightness
-
-	for col in range(0,config.numRings):
-		x = math.cos(col * rads) * ra + config.xOffset
-		#x = col + config.xOffset
-		y = math.sin(col * rads) * ra + config.yOffset
-
-		yChange1 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude + row
-		yChange2 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/gDelta + row
-		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/bDelta + row
-		
-		radialFactor  = 1
-		l1 = math.pi * 1 - 1.2 * math.pi/3
-		l2 = math.pi * 1 - 1.8 * math.pi/3 
-		angle  = col * rads
-		if angle <  l1 and angle > l2:
-			radialFactor = config.radialFactor
-		xPos = radialFactor * (config.radiusMin + yChange1) * math.cos(col * rads) * 2 + config.xOffset
-		yPos = radialFactor * (config.radiusMin + yChange1) * math.sin(col * rads) * 2 + config.yOffset
-
-		if col != 0 :
-			clrToUse = colorutils.getRandomColorHSV(hMin,hMax,sMin,sMax,vMin,vMax,dropHueMin,dropHueMax,a,brtns)
-			config.draw.line((lastx[0],lasty[0], xPos, yPos), fill=clrToUse)
-		clrToUse2 = colorutils.getRandomColorHSV(36,60,sMin,sMax,vMin,vMax,dropHueMin,dropHueMax,200,brtns)
-
-		clrToUse2 = (255,0,0,config.redAlpha)
-		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
-
-		clrToUse2 = (0,255,0,config.greenAlpha)
-		xPos = radialFactor * (config.radiusMin + yChange2) * math.cos(col * rads) * 2 + config.xOffset
-		yPos = radialFactor * (config.radiusMin + yChange2) * math.sin(col * rads) * 2 + config.yOffset
-		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
-
-		clrToUse2 = (0,0,255,config.blueAlpha)
-		xPos = radialFactor * (config.radiusMin + yChange3) * math.cos(col * rads) * 2 + config.xOffset
-		yPos = radialFactor * (config.radiusMin + yChange3) * math.sin(col * rads) * 2 + config.yOffset
-		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
-		
-		lastx = [xPos,xPos,xPos]
-		lasty = [yPos,yPos,yPos]
+	renderRingLines()
 
 
 def ringLines():
 	global config
 	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
-	gDelta = 1 + 1/config.rgbSplitFactor
-	bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
+	config.gDelta = 1 + 1/config.rgbSplitFactor
+	config.bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
-	lastx = [config.xOffset,config.xOffset,config.xOffset]
-	lasty = [config.yOffset,config.yOffset,config.yOffset]
+	config.lastx = [config.xOffset,config.xOffset,config.xOffset]
+	config.lasty = [config.yOffset,config.yOffset,config.yOffset]
 
+	config.t2 = time.time()
+	tDelta = config.t2-config.t1
 
 	config.scrollAngle += config.scrollRate
+
 	if config.scrollAngle >= math.pi * 2 :
 		config.scrollAngle = config.scrollRate
-		config.t2 = time.time()
-		tDelta = config.t2-config.t1
 
 		fps = config.frameCount / tDelta
-		#print("now " + str(fps) + " " + str(config.frameCount) + " " + str(tDelta))
+		print("now fps:" + str(fps) + " frameCount: " + str(config.frameCount) + " time-delta: " + str(tDelta))
 		config.t1 = config.t2
 		config.frameCount = 0
 		radius = 300
@@ -171,7 +116,10 @@ def ringLines():
 	else:
 		config.useFilters = True
 
+	renderRingLines()
 
+
+def renderRingLines():
 	config.scrollx = config.radiusVal * math.sin(config.scrollAngle)
 	config.scrolly = config.radiusVal * math.cos(config.scrollAngle)
 	config.frameCount += 1
@@ -197,8 +145,8 @@ def ringLines():
 		y = math.sin(col * rads) * ra + config.yOffset
 
 		yChange1 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude + row
-		yChange2 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/gDelta + row
-		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/bDelta + row
+		yChange2 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.gDelta + row
+		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.bDelta + row
 		
 		radialFactor  = 1
 		l1 = math.pi * 1 - 1.2 * math.pi/3
@@ -211,24 +159,26 @@ def ringLines():
 
 		if col != 0 :
 			clrToUse = colorutils.getRandomColorHSV(hMin,hMax,sMin,sMax,vMin,vMax,dropHueMin,dropHueMax,a,brtns)
-			config.draw.line((lastx[0],lasty[0], xPos, yPos), fill=clrToUse)
+			config.draw.line((config.lastx[0],config.lasty[0], xPos, yPos), fill=clrToUse)
 		clrToUse2 = colorutils.getRandomColorHSV(36,60,sMin,sMax,vMin,vMax,dropHueMin,dropHueMax,200,brtns)
 
 		clrToUse2 = (255,0,0,config.redAlpha)
-		config.draw.rectangle((xPos-1,yPos-1, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
+		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 
 		clrToUse2 = (0,255,0,config.greenAlpha)
 		xPos = radialFactor * (config.radiusMin + yChange2) * math.cos(col * rads) * 2 + config.xOffset
 		yPos = radialFactor * (config.radiusMin + yChange2) * math.sin(col * rads) * 2 + config.yOffset
-		config.draw.rectangle((xPos-1,yPos-1, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
+		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 
 		clrToUse2 = (0,0,255,config.blueAlpha)
 		xPos = radialFactor * (config.radiusMin + yChange3) * math.cos(col * rads) * 2 + config.xOffset
 		yPos = radialFactor * (config.radiusMin + yChange3) * math.sin(col * rads) * 2 + config.yOffset
-		config.draw.rectangle((xPos-1,yPos-1, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
+		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 		
-		lastx = [xPos,xPos,xPos]
-		lasty = [yPos,yPos,yPos]
+		config.lastx = [xPos,xPos,xPos]
+		config.lasty = [yPos,yPos,yPos]
+
+
 
 
 
@@ -322,7 +272,7 @@ def waves():
 def runWork():
 	global config
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-	print("Running woodyscroller.py")
+	print("Running noisescroller.py")
 	print(bcolors.ENDC)
 
 	while config.isRunning == True:
@@ -393,6 +343,14 @@ def main(run=True):
 		config.line_minSaturation = float(workConfig.get("noisescroller", "line_minSaturation"))
 		config.line_maxValue = float(workConfig.get("noisescroller", "line_maxValue"))
 		config.line_minValue = float(workConfig.get("noisescroller", "line_minValue"))
+
+		config.timeToChangeRings = int(workConfig.get("noisescroller", "timeToChangeRings"))
+		config.timeToChangeRingsProb = 0
+		if config.timeToChangeRings == -1 :
+			config.timeToChangeRingsProb = 1
+			config.timeToChangeRings = round(random.uniform(1,32))
+		config.changeSizeOfMarkProb = float(workConfig.get("noisescroller", "changeSizeOfMarkProb"))
+
 
 		config.redAlpha = int(workConfig.get("noisescroller", "redAlpha"))
 		config.greenAlpha = int(workConfig.get("noisescroller", "greenAlpha"))

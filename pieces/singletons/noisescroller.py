@@ -54,7 +54,7 @@ def ringLinesNoLoop():
 		if random.random() < config.changeSizeOfMarkProb:
 			#reset it all
 			config.scrollAngle = config.scrollRate
-			config.markSize = round(random.uniform(0,1))
+			config.markSize = round(random.uniform(0,2))
 			if config.markSize == 0 :
 				config.brightness = 1.8
 				config.redAlpha = config.greenAlpha = config.blueAlpha = 150
@@ -73,6 +73,7 @@ def ringLinesNoLoop():
 		config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=getColor(250,250,250,255), outline=None)
 		if random.random() < .5 : 
 			radius = radius/3
+		config.bgColor = colorutils.getRandomColorHSV(config.bg_minHue,config.bg_maxHue,config.bg_minSaturation,config.bg_maxSaturation,config.bg_minValue,config.bg_maxValue,0,0,100,config.brightness)
 		bgColor = (config.bgColor[0], config.bgColor[1],config.bgColor[2], 200)
 		config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=bgColor, outline=None)
 		if config.timeToChangeRingsProb == 1 :
@@ -149,8 +150,8 @@ def renderRingLines():
 		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.bDelta + row
 		
 		radialFactor  = 1
-		l1 = math.pi * 1 - 1.2 * math.pi/3
-		l2 = math.pi * 1 - 1.8 * math.pi/3 
+		l1 = math.pi * 1 - 1.1 * math.pi/3
+		l2 = math.pi * 1 - 1.4 * math.pi/3 
 		angle  = col * rads
 		if angle <  l1 and angle > l2:
 			radialFactor = config.radialFactor
@@ -343,6 +344,15 @@ def main(run=True):
 		config.line_minSaturation = float(workConfig.get("noisescroller", "line_minSaturation"))
 		config.line_maxValue = float(workConfig.get("noisescroller", "line_maxValue"))
 		config.line_minValue = float(workConfig.get("noisescroller", "line_minValue"))
+
+		config.bg_minHue = float(workConfig.get("noisescroller", "bg_minHue"))
+		config.bg_maxHue = float(workConfig.get("noisescroller", "bg_maxHue"))
+		config.bg_maxSaturation = float(workConfig.get("noisescroller", "bg_maxSaturation"))
+		config.bg_minSaturation = float(workConfig.get("noisescroller", "bg_minSaturation"))
+		config.bg_maxValue = float(workConfig.get("noisescroller", "bg_maxValue"))
+		config.bg_minValue = float(workConfig.get("noisescroller", "bg_minValue"))
+
+		config.bgColor = colorutils.getRandomColorHSV(config.bg_minHue,config.bg_maxHue,config.bg_minSaturation,config.bg_maxSaturation,config.bg_minValue,config.bg_maxValue,0,0,100,config.brightness)
 
 		config.timeToChangeRings = int(workConfig.get("noisescroller", "timeToChangeRings"))
 		config.timeToChangeRingsProb = 0

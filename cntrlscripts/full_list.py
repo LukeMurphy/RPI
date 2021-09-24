@@ -164,7 +164,7 @@ def getAllConfigFiles(dateSort=False) :
 			subArr = os.listdir(configPath + d)
 
 			if dateSort == False: 
-				subArr.sort()
+				subArr.sort(reverse=True)
 
 			for f in subArr:
 				if f.find(".DS_Store") == -1:

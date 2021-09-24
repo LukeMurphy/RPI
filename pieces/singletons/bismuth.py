@@ -82,18 +82,18 @@ def drawLine(*kwargs):
 
 	rounds = round(random.uniform(4, config.roundsMax))
 
-	l = 1
-	d = .5
+	l = config.initialLength
+	d = config.lengthChange
 	h = w = 0
 
 	'''
 	'''
 	if random.random() < .1:
-		h = round(random.uniform(0, 2*rounds))
+		h = round(random.uniform(0, config.heightRange))
 	else:
-		w = round(random.uniform(0, 2*rounds))
+		w = round(random.uniform(0, config.widthRange))
 
-	unitImage = Image.new("RGBA", (round(rounds)*2 + w, round(rounds )*2  + h))
+	unitImage = Image.new("RGBA", (round(rounds)*2 + w + l, round(rounds )*2  + h + l))
 	unitImageDraw = ImageDraw.Draw(unitImage)
 	#unitImageDraw.rectangle((0,0,unitImage.width,unitImage.height), fill = (255,0,0))
 
@@ -107,15 +107,19 @@ def drawLine(*kwargs):
 	p0 = (xStart, yStart)
 	p1 = (xStart, yStart)
 
-	randomizeLevel = 1
+	randomizeLevel = config.randomizeLevel
 
-	brightness = .2
+	brightness = .2 
 	brightnessDelta = (1 - brightness) / rounds
 
 	
+	lineColor = colorutils.getRandomColorHSV(config.lines_minHue, config.lines_maxHue, config.lines_minSaturation,
+											 config.lines_maxSaturation, config.lines_minValue, config.lines_maxValue, 0, 0, 255, brightness* config.brightness)
 	for i in range(0, rounds):
-		lineColor = colorutils.getRandomColorHSV(config.lines_minHue, config.lines_maxHue, config.lines_minSaturation,
-												 config.lines_maxSaturation, config.lines_minValue, config.lines_maxValue, 0, 0, 255, brightness)
+
+		if random.random() < config.lineColorChangeProb :
+				lineColor = colorutils.getRandomColorHSV(config.lines_minHue, config.lines_maxHue, config.lines_minSaturation,
+											 config.lines_maxSaturation, config.lines_minValue, config.lines_maxValue, 0, 0, 255, brightness* config.brightness)
 
 		p0 = p1
 		p1 = (p0[0]+l+w, p0[1])
@@ -170,7 +174,8 @@ def reDraw(config):
 			fadeIn.yPos = yPos
 			fadeIn.width = unitImage.width
 			fadeIn.height = unitImage.height
-			fadeIn.doingRefreshCount = config.fadeInRefreshCount
+			fadeIn.doingRefreshCount = round(random.uniform(config.fadeInRefreshCountMin,config.fadeInRefreshCount))
+			fadeIn.doingRefresh = config.initialFadeInLevel
 
 			config.fadeArray.append(fadeIn)
 			# config.image.paste(unitImage, (xPos,yPos), unitImage)
@@ -206,26 +211,49 @@ def main(run=True):
 
 	config.bg_minHue = float(workConfig.get("forms", "bg_minHue"))
 	config.bg_maxHue = float(workConfig.get("forms", "bg_maxHue"))
-	config.bg_minSaturation = float(
-		workConfig.get("forms", "bg_minSaturation"))
-	config.bg_maxSaturation = float(
-		workConfig.get("forms", "bg_maxSaturation"))
+	config.bg_minSaturation = float(workConfig.get("forms", "bg_minSaturation"))
+	config.bg_maxSaturation = float(workConfig.get("forms", "bg_maxSaturation"))
 	config.bg_minValue = float(workConfig.get("forms", "bg_minValue"))
 	config.bg_maxValue = float(workConfig.get("forms", "bg_maxValue"))
 
 	config.lines_minHue = float(workConfig.get("forms", "lines_minHue"))
 	config.lines_maxHue = float(workConfig.get("forms", "lines_maxHue"))
-	config.lines_minSaturation = float(
-		workConfig.get("forms", "lines_minSaturation"))
-	config.lines_maxSaturation = float(
-		workConfig.get("forms", "lines_maxSaturation"))
+	config.lines_minSaturation = float(workConfig.get("forms", "lines_minSaturation"))
+	config.lines_maxSaturation = float(workConfig.get("forms", "lines_maxSaturation"))
 	config.lines_minValue = float(workConfig.get("forms", "lines_minValue"))
 	config.lines_maxValue = float(workConfig.get("forms", "lines_maxValue"))
-	config.modeChangeProb = .01
 
+
+	# number of rings
 	config.roundsMax = int(workConfig.get("forms", "roundsMax"))
+	# variation in size
+	config.heightRange = int(workConfig.get("forms", "heightRange"))
+	config.widthRange = int(workConfig.get("forms", "widthRange"))
+	# generally the maximum number of new 
+	# instances per cycle
 	config.simultaneousDraws = int(workConfig.get("forms", "simultaneousDraws"))
+	
+	# the speed of appearance
 	config.fadeInRefreshCount = int(workConfig.get("forms", "fadeInRefreshCount"))
+	config.fadeInRefreshCountMin = int(workConfig.get("forms", "fadeInRefreshCountMin"))
+	# inital level
+	config.initialFadeInLevel = int(workConfig.get("forms", "initialFadeInLevel"))
+
+	# the size of the first line
+	# longer makes for a window like gap
+	config.initialLength = int(workConfig.get("forms", "initialLength"))
+	
+	# rate the line changes each half turn
+	# .5 makes adjactent lines
+	config.lengthChange = float(workConfig.get("forms", "lengthChange"))
+	
+	# the chance the line color changes each turn
+	config.lineColorChangeProb = float(workConfig.get("forms", "lineColorChangeProb"))
+	# abberatiions in drawing the lines
+	config.randomizeLevel = float(workConfig.get("forms", "randomizeLevel"))
+
+	# background color - higher the 
+	# alpha = less persistent images
 	backgroundColor = (workConfig.get("forms", "backgroundColor")).split(",")
 	config.backgroundColor = tuple(int(x) for x in backgroundColor)
 

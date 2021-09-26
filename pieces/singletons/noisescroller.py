@@ -150,8 +150,8 @@ def renderRingLines():
 		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.bDelta + row
 		
 		radialFactor  = 1
-		l1 = math.pi * 1 - 1.1 * math.pi/3
-		l2 = math.pi * 1 - 1.4 * math.pi/3 
+		l1 = math.pi * 1 - config.angle1ForFunnel * math.pi/3
+		l2 = math.pi * 1 - config.angle2ForFunnel * math.pi/3 
 		angle  = col * rads
 		if angle <  l1 and angle > l2:
 			radialFactor = config.radialFactor
@@ -351,6 +351,9 @@ def main(run=True):
 		config.bg_minSaturation = float(workConfig.get("noisescroller", "bg_minSaturation"))
 		config.bg_maxValue = float(workConfig.get("noisescroller", "bg_maxValue"))
 		config.bg_minValue = float(workConfig.get("noisescroller", "bg_minValue"))
+
+		config.angle1ForFunnel = float(workConfig.get("noisescroller", "angle1ForFunnel"))
+		config.angle2ForFunnel = float(workConfig.get("noisescroller", "angle2ForFunnel"))
 
 		config.bgColor = colorutils.getRandomColorHSV(config.bg_minHue,config.bg_maxHue,config.bg_minSaturation,config.bg_maxSaturation,config.bg_minValue,config.bg_maxValue,0,0,100,config.brightness)
 

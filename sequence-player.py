@@ -78,9 +78,9 @@ def loadWorkConfig(work, sequenceConfig):
 	sequenceConfig.playCount=sequenceConfig.playCount+1
 	print("==========> count play : " + str(sequenceConfig.playCount))
 
-	if (sequenceConfig.playCount > 100) :
+	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
 		# Clean threads!
-		os.system( config.path  + '/cntrlscripts/restart_full_sequencer.sh')
+		os.system( config.path  + sequenceConfig.restartScript)
 
 
 	# ****************************************** #
@@ -154,6 +154,15 @@ def loadSequenceFile():
 		sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
 		sequenceConfig.currentPieceDuration = 1
 		sequenceConfig.playCount = 0
+
+		try:
+			sequenceConfig.restartScript = workconfig.get("displayconfig", "restartScript")
+			sequenceConfig.repeatCountTrigger = int(workconfig.get("displayconfig", "repeatCountTrigger"))
+		except Exception as e:
+			print(str(e))
+			sequenceConfig.restartScript = '/cntrlscripts/restart_full_sequencer.sh'
+			sequenceConfig.repeatCountTrigger = 100
+
 
 		sequenceConfig.workList = []
 

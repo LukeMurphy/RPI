@@ -328,6 +328,13 @@ def main(run=True):
 		workConfig.get("screenproject", "maxBrightness")
 	)
 	config.colOverlay.maxValue = float(workConfig.get("screenproject", "maxValue"))
+
+	try:
+		config.colOverlay.dropHueMin = float(workConfig.get("screenproject", "dropHueMin"))
+		config.colOverlay.dropHueMax = float(workConfig.get("screenproject", "dropHueMax"))
+	except Exception as e:
+		print(str(e))
+
 	config.colOverlay.colorTransitionSetup()
 
 	config.crackChangeProb = float(workConfig.get("screenproject", "crackChangeProb"))

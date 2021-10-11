@@ -264,12 +264,7 @@ def ringScribbles():
 	row = 1
 	rads = 32 * math.pi / config.numRings /2
 	ra = config.radiusMin * 1 + config.radiusMin
-	hMin=config.line_minHue
-	hMax=config.line_maxHue
-	sMin=config.line_minSaturation
-	sMax=config.line_maxSaturation
-	vMin=config.line_minValue
-	vMax=config.line_maxValue
+
 	dropHueMin=0
 	dropHueMax=0
 	a=80
@@ -307,7 +302,7 @@ def ringScribbles():
 		'''
 
 		clrToUse2 = (255,0,0,config.redAlpha)
-		clrToUse2 = colorutils.getRandomColorHSV(hMin,hMax,sMin,sMax,vMin,vMax,dropHueMin,dropHueMax,config.redAlpha,brtns)
+		clrToUse2 = colorutils.getRandomColorHSV(config.line_1_minHue,config.line_1_maxHue,config.line_1_minSaturation,config.line_1_maxSaturation,config.line_1_minValue,config.line_1_maxValue,0,0,config.redAlpha,brtns)
 		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 		if col != 0 : 
 			config.draw.line((config.lastx[0],config.lasty[0], xPos, yPos), fill=clrToUse2)
@@ -318,7 +313,7 @@ def ringScribbles():
 		config.lasty[0] = (yPos)
 
 
-		clrToUse2 = (0,255,0,config.greenAlpha)
+		clrToUse2 = colorutils.getRandomColorHSV(config.line_2_minHue,config.line_2_maxHue,config.line_2_minSaturation,config.line_2_maxSaturation,config.line_2_minValue,config.line_2_maxValue,0,0,config.greenAlpha,brtns)
 		xPos = radialFactor * (config.radiusMin + yChange2) * math.cos(col * (rads  + config.anlgleOffset)) * 2 + config.xOffset
 		yPos = radialFactorb * (config.radiusMin + yChange2) * math.sin(col * (rads  + config.anlgleOffset)) * 2 + config.yOffset
 		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
@@ -330,7 +325,7 @@ def ringScribbles():
 		config.lastx[1] = (xPos)
 		config.lasty[1] = (yPos)
 
-		clrToUse2 = (0,0,255,config.blueAlpha)
+		clrToUse2 = colorutils.getRandomColorHSV(config.line_3_minHue,config.line_3_maxHue,config.line_3_minSaturation,config.line_3_maxSaturation,config.line_3_minValue,config.line_3_maxValue,0,0,config.blueAlpha,brtns)
 		xPos = radialFactor * (config.radiusMin + yChange3) * math.cos(col * (rads  + config.anlgleOffset)) * 2 + config.xOffset
 		yPos = radialFactorb * (config.radiusMin + yChange3) * math.sin(col * (rads  + config.anlgleOffset)) * 2 + config.yOffset
 		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
@@ -461,13 +456,37 @@ def main(run=True):
 		config.t1 = time.time()
 		config.t2 = time.time()
 
+		try: 
+			config.line_minHue = float(workConfig.get("noisescroller", "line_minHue"))
+			config.line_maxHue = float(workConfig.get("noisescroller", "line_maxHue"))
+			config.line_maxSaturation = float(workConfig.get("noisescroller", "line_maxSaturation"))
+			config.line_minSaturation = float(workConfig.get("noisescroller", "line_minSaturation"))
+			config.line_maxValue = float(workConfig.get("noisescroller", "line_maxValue"))
+			config.line_minValue = float(workConfig.get("noisescroller", "line_minValue"))
+		except Exception as e:
+			print(str(e))
 
-		config.line_minHue = float(workConfig.get("noisescroller", "line_minHue"))
-		config.line_maxHue = float(workConfig.get("noisescroller", "line_maxHue"))
-		config.line_maxSaturation = float(workConfig.get("noisescroller", "line_maxSaturation"))
-		config.line_minSaturation = float(workConfig.get("noisescroller", "line_minSaturation"))
-		config.line_maxValue = float(workConfig.get("noisescroller", "line_maxValue"))
-		config.line_minValue = float(workConfig.get("noisescroller", "line_minValue"))
+			config.line_1_minHue = float(workConfig.get("noisescroller", "line_1_minHue"))
+			config.line_1_maxHue = float(workConfig.get("noisescroller", "line_1_maxHue"))
+			config.line_1_maxSaturation = float(workConfig.get("noisescroller", "line_1_maxSaturation"))
+			config.line_1_minSaturation = float(workConfig.get("noisescroller", "line_1_minSaturation"))
+			config.line_1_maxValue = float(workConfig.get("noisescroller", "line_1_maxValue"))
+			config.line_1_minValue = float(workConfig.get("noisescroller", "line_1_minValue"))
+
+			config.line_2_minHue = float(workConfig.get("noisescroller", "line_2_minHue"))
+			config.line_2_maxHue = float(workConfig.get("noisescroller", "line_2_maxHue"))
+			config.line_2_maxSaturation = float(workConfig.get("noisescroller", "line_2_maxSaturation"))
+			config.line_2_minSaturation = float(workConfig.get("noisescroller", "line_2_minSaturation"))
+			config.line_2_maxValue = float(workConfig.get("noisescroller", "line_2_maxValue"))
+			config.line_2_minValue = float(workConfig.get("noisescroller", "line_2_minValue"))
+
+			config.line_3_minHue = float(workConfig.get("noisescroller", "line_3_minHue"))
+			config.line_3_maxHue = float(workConfig.get("noisescroller", "line_3_maxHue"))
+			config.line_3_maxSaturation = float(workConfig.get("noisescroller", "line_3_maxSaturation"))
+			config.line_3_minSaturation = float(workConfig.get("noisescroller", "line_3_minSaturation"))
+			config.line_3_maxValue = float(workConfig.get("noisescroller", "line_3_maxValue"))
+			config.line_3_minValue = float(workConfig.get("noisescroller", "line_3_minValue"))
+
 
 		config.bg_minHue = float(workConfig.get("noisescroller", "bg_minHue"))
 		config.bg_maxHue = float(workConfig.get("noisescroller", "bg_maxHue"))

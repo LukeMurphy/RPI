@@ -30,6 +30,7 @@ from tkmacosx import Button
 
 commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringProc = ""
 JavaAppRunning = ""
 
@@ -75,6 +76,8 @@ def execute(configToRun):
 	if ".cfg" in configToRun:
 		if "multi" in configToRun:
 			os.system(commadStringMultiPyth + configToRun + "&")
+		if "seq-" in configToRun:
+			os.system(commadStringSeqPyth + configToRun + "&")
 		else:
 			os.system(commadStringPyth + configToRun + "&")
 	elif ".app" in configToRun:

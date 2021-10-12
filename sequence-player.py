@@ -148,7 +148,11 @@ def loadSequenceFile():
 		sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
 		sequenceConfig.playOrder = 0 
 
-		sequenceConfig.forceBGSwap  = (workconfig.getboolean("displayconfig", "forceBGSwap"))
+		try:
+			sequenceConfig.forceBGSwap  = (workconfig.getboolean("displayconfig", "forceBGSwap"))
+		except Exception as e:
+			print(str(e))
+			sequenceConfig.forceBGSwap  = False
 
 		sequenceConfig.workListDirectory = workconfig.get("displayconfig", "workListDirectory")
 		sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))

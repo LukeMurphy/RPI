@@ -89,7 +89,8 @@ def ringLinesNoLoop():
 
 def ringLines():
 	global config
-	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
+	if config.rendering != "out":
+		config.draw.rectangle((0,0,500,500), fill=config.bgColor)
 	config.gDelta = 1 + 1/config.rgbSplitFactor
 	config.bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
@@ -109,13 +110,14 @@ def ringLines():
 		config.t1 = config.t2
 		config.frameCount = 0
 		radius = 300
-		config.useFilters = False
-		config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=getColor(250,250,250,255), outline=None)
+		
+		#config.useFilters = False
+		#config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=getColor(250,250,250,255), outline=None)
 		if random.random() < .5 : 
 			radius = radius/3
 
-		bgColor = (config.bgColor[0], config.bgColor[1],config.bgColor[2], 200)
-		config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=bgColor, outline=None)
+		#bgColor = (config.bgColor[0], config.bgColor[1],config.bgColor[2], 200)
+		#config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=bgColor, outline=None)
 	else:
 		config.useFilters = True
 
@@ -342,6 +344,7 @@ def ringScribbles():
 		radialFactorb  += config.raIncrease
 		row += config.loopIncrease
 
+
 def wavey():
 	global config
 	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
@@ -394,6 +397,8 @@ def runWork():
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
 	print("Running noisescroller.py")
 	print(bcolors.ENDC)
+
+	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
 
 	while config.isRunning == True:
 		iterate()

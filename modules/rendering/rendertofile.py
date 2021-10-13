@@ -1,6 +1,6 @@
 import datetime
 import time
-
+from modules.filters import *
 import moviepy.editor as mpy
 import moviepy.video.VideoClip as mpv
 from moviepy.video import *
@@ -70,10 +70,12 @@ def videoClipMaker():
 			imageToRender = imageToRender.rotate(-config.rotation)
 		else:
 			config.renderImageFull = config.renderImageFull.rotate(-config.rotation)
+
 	if config.useFilters:
 		"""------------------------------------------------------------------------"""
 		"""#######################    FILTERS               #######################"""
 
+		'''
 		im1 = config.image.filter(ImageFilter.GaussianBlur(radius=0))
 		im2 = im1.filter(ImageFilter.UnsharpMask(radius=20, percent=100, threshold=2))
 
@@ -81,8 +83,15 @@ def videoClipMaker():
 
 		config.renderImageFull.paste(im2, (xOffset, yOffset))
 		newimage = Image.new("P", config.renderImageFull.size)
-		newimage = config.renderImageFull.convert("P", colors=64)
+		nc = round(random.uniform(2, 254))
+		newimage = config.renderImageFull.convert("P", colors=nc)
 		config.renderImageFull = newimage.convert("RGBA")
+
+		'''
+
+		newimage = ditherFilter(config.image,0,0,config)
+		config.renderImageFull.paste(newimage)
+
 
 		"""
 		# Random bright pixel patches -- of limited value aesthetically

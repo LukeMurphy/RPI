@@ -76,7 +76,7 @@ def execute(configToRun):
 	if ".cfg" in configToRun:
 		if "multi" in configToRun:
 			os.system(commadStringMultiPyth + configToRun + "&")
-		if "seq-" in configToRun:
+		if "sequence-" in configToRun:
 			os.system(commadStringSeqPyth + configToRun + "&")
 		else:
 			os.system(commadStringPyth + configToRun + "&")

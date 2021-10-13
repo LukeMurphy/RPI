@@ -66,7 +66,7 @@ def drawMessageText():
 	else:
 		numXPos = config.boxMax - config.pixLen[0] - 8
 	# numXPos = 32
-	numYPos = 24
+	numYPos = int(config.spinnerCenter[1]- config.fontHeight /2)
 	config.spinnerCenter[0] = numXPos - config.spinnerRadius - 0
 	# txtdraw.rectangle((0,0,pixLen[0]+indent+2, pixLen[1] + indent-1), outline=(0,100,0))
 	config.image.paste(scrollImage, (numXPos, numYPos), scrollImage)
@@ -494,7 +494,7 @@ def main(run=True):
 	config.pausePoint = int(random.random() * 100)
 	config.cyclicalArc = 4 * math.pi / config.boxMax
 	config.cyclicalBrightnessPhase = 0
-	config.spinnerCenter = [config.boxMax - 54, config.canvasHeight / 2 + 3]
+	config.spinnerCenter = [config.boxMax - 54, config.canvasHeight / 2 + 1]
 
 	config.pauseProbability = (
 		float(workConfig.get("progressbar", "pauseProbability")) / 100

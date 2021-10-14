@@ -19,7 +19,7 @@ def reDraw():
 	drawBar()
 
 	"""""" """""" """""" """ SPINNER """ """""" """""" """""" """""" """"""
-	drawSpinner()
+	if config.paused == True or config.percentage <= 1: drawSpinner()
 
 	"""""" """""" """""" """ TEXT MESSAGE """ """""" """""" """""" """"""
 	drawMessageText()
@@ -114,9 +114,9 @@ def drawBar():
 
 	# draw box container
 
-	rVd = round(config.barColor[0] * .42)
-	gVd = round(config.barColor[1] * .42)
-	bVd = round(config.barColor[2] * .42)
+	rVd = round(config.barColor[0] * .1)
+	gVd = round(config.barColor[1] * .1)
+	bVd = round(config.barColor[2] * .1)
 	config.draw.rectangle(
 		(
 			config.xPos - 1,
@@ -125,10 +125,8 @@ def drawBar():
 			config.boxHeight + config.yPos + 1,
 		),
 		outline=(config.outlineColor),
-		fill=((rVd,0,bVd)),
+		fill=((rVd,gVd,bVd)),
 	)
-
-
 
 
 	# draw bar
@@ -146,10 +144,10 @@ def drawBar():
 
 	# draw flat box progress bar - default
 	config.draw.rectangle(
-		(config.xPos1, config.yPos1, config.xPos2, config.yPos2), fill=(200, 0, 0)
+		(config.xPos1, config.yPos1, config.xPos2, config.yPos2), fill=(config.barColor[0], config.barColor[1], config.barColor[2])
 	)
 
-	lines = config.canvasHeight - 2
+	lines = config.canvasHeight 
 	if config.gradientLevel == 1:
 		arc = math.pi / lines * 1
 	else:
@@ -159,8 +157,9 @@ def drawBar():
 		# Draw vertical shading gradient
 		for n in range(0, lines):
 			yPos = config.yPos1 + n
-			b = math.sin(arc * n) * 1.2
+			b = math.sin(arc * n) * config.brightness + .3
 			# b = cyclicalBrightness
+			# if b < .75 : b = .75
 			rVd = round(config.barColor[0] * b)
 			gVd = round(config.barColor[1] * b)
 			bVd = round(config.barColor[2] * b)
@@ -252,7 +251,7 @@ def decisions():
 			if config.percentage < 0:
 				if config.debug:
 					print("pause on back")
-				changeRate(1.0, 4.0)
+				changeRate()
 				startPause(random.uniform(2.0, 8.0))
 			else:
 				changeRate()
@@ -262,7 +261,7 @@ def decisions():
 				# config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
 				if config.debug:
 					print("Going back")
-				changeRate(1.0, 2.0)
+				changeRate()
 				config.percentageIncrement *= -1
 				config.hasGoneBack = True
 				config.messageOverrideActive = True
@@ -343,9 +342,12 @@ def doSomething():
 	advanceBar()
 
 
-def changeRate(a=0.05, b=1.0):
+def changeRate(a=0, b=0):
 	global config
 	temp = config.percentageIncrement
+	if a == b == 0 :
+		a = config.rateMin
+		b = config.rateMax
 	config.percentageIncrement = (a + b * random.random()) * config.calibratedCycleRate
 	if config.debug:
 		print(
@@ -477,6 +479,8 @@ def main(run=True):
 	config.vOffset = int(workConfig.get("progressbar", "vOffset"))
 	config.steps = int(workConfig.get("progressbar", "steps"))
 	config.redrawRate = float(workConfig.get("progressbar", "redrawRate"))
+	config.rateMin = float(workConfig.get("progressbar", "rateMin"))
+	config.rateMax = float(workConfig.get("progressbar", "rateMax"))
 
 	# config.rateMultiplier = float(workConfig.get("progressbar", 'rateMultiplier'))
 	config.shadowSize = int(workConfig.get("progressbar", "shadowSize"))
@@ -491,7 +495,7 @@ def main(run=True):
 	config.boxMax = config.screenWidth - 2
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
 	config.boxHeight = config.canvasHeight - 3
-	config.pausePoint = int(random.random() * 100)
+	config.pausePoint = round(random.random() * 100)
 	config.cyclicalArc = 4 * math.pi / config.boxMax
 	config.cyclicalBrightnessPhase = 0
 	config.spinnerCenter = [config.boxMax - 54, config.canvasHeight / 2 + 1]
@@ -520,7 +524,7 @@ def main(run=True):
 
 	try:
 		config.filterRemapping = (workConfig.getboolean("progressbar", "filterRemapping"))
-		config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb"))
+		config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb"))/100
 		config.filterRemapminHoriSize = int(workConfig.get("progressbar", "filterRemapminHoriSize"))
 		config.filterRemapminVertSize = int(workConfig.get("progressbar", "filterRemapminVertSize"))
 	except Exception as e:
@@ -644,7 +648,8 @@ def done():
 
 	config.percentage = 0
 	# config.barColorStart = config.barColor = colorutils.getRandomRGB(1)
-	config.barColorStart = config.barColor = colorutils.randomColor(0.75)
+	config.barColorStart = config.barColor = colorutils.randomColor(config.brightness)
+	config.barColorStart = config.barColor = colorutils.getRandomColorHSV(0,360,.5,1.0,.5,1.0)
 	config.hasPaused = False
 	config.paused == False
 	config.pauseCount = 0

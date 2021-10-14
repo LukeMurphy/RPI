@@ -638,11 +638,14 @@ def done():
 		print("Done called.\n")
 	config.messageOverrideActive = False
 	config.altStringMessage = "PLEASE WAIT"
+	if (random.random() < 0.1) : config.altStringMessage = "PLEASE WAIT - RECALCULATING"
 
 	if random.random() < config.overrideMessagProb:
 		config.altStringMessage = (
 			"RESTARTING..." if (random.random() > 0.5) else "UPDATING"
 		)
+
+		
 	if config.debug:
 		print(config.altStringMessage)
 
@@ -656,14 +659,14 @@ def done():
 	config.boxWidth = 1
 	config.completed = False
 	config.drawBarFill = True
-	config.target = random.uniform(95, 99)
+	config.target = random.uniform(85, 99)
 
 	config.goBack = True if (random.random() < config.goBackwardsProb) else False
 	config.goPast = True if (random.random() < config.goPastProb) else False
 	config.hasGoneBack = False
 	if config.goPast:
 		config.goBack = False
-	config.pausePoint = int(random.random() * 100)
+	config.pausePoint = 20 + round(random.random() * 80)
 	changeRate()
 
 

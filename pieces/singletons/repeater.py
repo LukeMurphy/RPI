@@ -15,7 +15,6 @@ from subprocess import call
 
 from modules import configuration
 from modules.configuration import bcolors
-from modules.imagesprite import ImageSprite
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -108,6 +107,16 @@ def main(run=True):
 		config.resizeMin = 0.1
 		config.resizeMax = 1.2
 
+
+	try:
+		config.imageSpriteModule = workConfig.get("repeater", "imageSpriteModule")
+		from modules.imagesprite_v1 import ImageSprite
+	except Exception as e:
+		print("***************************")
+		print(str(e))
+		print("***************************")
+		from modules.imagesprite import ImageSprite
+
 	# for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	# for i in range (0,simulBlocks) : makeBlock()
@@ -158,7 +167,7 @@ def main(run=True):
 			# imgLoader.make(path + imageList[1], random.uniform(1,2) , 0, False)
 			# processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
 			""" Speed """
-			vX = 1 * config.scalingFactor * 2 * config.speedFactor
+			vX = 1 * config.scalingFactor * 2 / config.speedFactor
 
 			# imgLoader.make(path + imageList[0], vX, 0, True, True, True, True)
 

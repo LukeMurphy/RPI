@@ -130,7 +130,7 @@ class ImageSprite:
 	releasePauseProb = 0.0
 	glitchChanceWhenPausedFactor =10.0
 
-	colorModes = ["colorWheel", "random", "colorRGB"]
+	colorModes = ["colorWheel", "random", "colorRGB", 'hsvFlame']
 
 	def __init__(self, config, iid=0):
 		self.iid = iid
@@ -295,6 +295,10 @@ class ImageSprite:
 				# Any RGB color
 				if self.colorMode == "random":
 					clr = self.clrUtils.randomColor(brt)
+
+				# Any HSV color
+				if self.colorMode == "hsvFlame":
+					clr = self.clrUtils.getRandomColorHSV(350,60,.8,1.0,.8,1.0,0,0,255,brt)
 
 			else:
 				r = int(random.uniform(200, 255))

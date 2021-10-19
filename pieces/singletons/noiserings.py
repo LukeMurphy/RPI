@@ -255,16 +255,19 @@ def ringScribbles():
 		bgColor = (config.bgColor[0], config.bgColor[1],config.bgColor[2], 200)
 		#config.draw.ellipse((config.xOffset-radius,config.yOffset-radius, config.xOffset+radius,config.yOffset+radius), fill=bgColor, outline=None)
 
-		config.lineEcc = random.uniform(4,20)
-		
-		#config.angleDecrementBase = random.uniform(0,20)
-		config.angleDecrementBase -= config.angleDecrementRate
-		if random.random() < .5 : config.lineEcc *= -1
-		config.radialFactor = random.uniform(2,2.2)
-		config.loopIncrease  = random.uniform(.1,.11)
-		config.radiusMin  = random.uniform(config.radiusMinInit,config.radiusMinVar)
+		config.lineEcc = random.uniform(config.lineEccMin,config.lineEccMax)
 		if config.lineEcc == 0 : config.lineEcc = 1
-		config.rotationTheta = random.uniform(-math.pi/50,math.pi/50)
+		#if random.random() < .5 : config.lineEcc *= -1
+		
+		#config.radiusMin  = random.uniform(config.radiusMinInit,config.radiusMinVar)
+		config.angleDecrementBase = random.uniform(0,3.14)
+		
+		#config.angleDecrementRate = random.uniform(-.10,.10)
+		if config.radiusMin > config.screenWidth :
+			config.angleDecrementRate = -config.screenWidth/config.radiusMin/2
+		#config.radialFactor = random.uniform(2,2.2)
+		#config.loopIncrease  = random.uniform(-.05,-.2)
+		#config.rotationTheta = random.uniform(-math.pi/50,math.pi/50)
 
 		#if (config.angleDecrementBase) < -480 :
 		#	config.angleDecrementBase = 0
@@ -300,7 +303,12 @@ def ringScribbles():
 	seed = random.uniform(-.03,.03)
 	seed = 0
 
-	for col in range(0, config.numPointsPerRing * config.numRings ):
+	loopIncrease = 0
+	totalPoints = config.numPointsPerRing * config.numRings
+
+	angleDecrement = config.angleDecrementBase
+
+	for col in range(0, totalPoints ):
 
 
 		x = math.cos(col * rads) * ra + config.xOffset
@@ -309,11 +317,11 @@ def ringScribbles():
 		d = round(math.sqrt(x*x + y*y) /80)
 		d = (radialFactorb + radialFactor)/config.lineSizeFactor
 
-		yChange1 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude + row
-		yChange2 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.gDelta + row
-		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.bDelta + row
+		yChange1 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude + loopIncrease
+		yChange2 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.gDelta + loopIncrease
+		yChange3 = noise.pnoise2(x + config.scrollx, y + config.scrolly) * config.amplitude/config.bDelta + loopIncrease
 
-		ns = noise.pnoise2(col + seed,math.sin(col))
+		ns = noise.pnoise2(loopIncrease,0)
 		rotationTheta += ns/config.lineEcc
 
 		
@@ -324,11 +332,12 @@ def ringScribbles():
 		𝑥(𝛼)=𝑅𝑥cos(𝛼)cos(𝜃)−𝑅𝑦sin(𝛼)sin(𝜃)
 		𝑦(𝛼)=𝑅𝑥cos(𝛼)sin(𝜃)+𝑅𝑦sin(𝛼)cos(𝜃)
 		'''
-		Rx = radialFactor * (config.radiusMin + yChange1)
-		Ry = radialFactorb * (config.radiusMin + yChange1)
+		Rx = radialFactor * (config.radiusMin + yChange1 + loopIncrease) 
+		Ry = radialFactorb * (config.radiusMin + yChange1 + loopIncrease) 
 
-		angleDecrement = - config.angleDecrementBase * col/config.numRings * rads
-
+		
+		#angleDecrement = -config.angleDecrementBase * col/config.numRings * rads
+		angleDecrement += config.angleDecrementRate
 		#if col < 50 :
 		#	angleDecrement = 0
 		a = col * rads + angleDecrement
@@ -347,12 +356,14 @@ def ringScribbles():
 		config.draw.rectangle((xPos-config.markSize,yPos-config.markSize, xPos + 0,yPos + 0 ), fill=clrToUse2, outline=None)
 		if col != 0 : 
 			config.draw.line((config.lastx[0],config.lasty[0], xPos, yPos), fill=clrToUse2)
-			config.draw.polygon((config.lastx[0],config.lasty[0],config.lastx[0],config.lasty[0]-d,  xPos, yPos-d,  xPos, yPos), fill=clrToUse2)
-			if y > 50 :
-				config.draw.polygon((config.lastx[0],config.lasty[0],config.lastx[0]-d,config.lasty[0],  xPos-d, yPos,  xPos, yPos), fill=clrToUse2)
+			#config.draw.polygon((config.lastx[0],config.lasty[0],config.lastx[0],config.lasty[0]-d,  xPos, yPos-d,  xPos, yPos), fill=clrToUse2)
+			#if y > 50 :
+			#	config.draw.polygon((config.lastx[0],config.lasty[0],config.lastx[0]-d,config.lasty[0],  xPos-d, yPos,  xPos, yPos), fill=clrToUse2)
 		config.lastx[0] = (xPos)
 		config.lasty[0] = (yPos)
 
+
+		'''
 		clrToUse2 = colorutils.getRandomColorHSV(config.line_2_minHue,config.line_2_maxHue,config.line_2_minSaturation,config.line_2_maxSaturation,config.line_2_minValue,config.line_2_maxValue,0,0,config.greenAlpha,brtns)
 		xPos = radialFactor * (config.radiusMin + yChange2) * math.cos(col * (rads  + config.anlgleOffset)) * 2 + config.xOffset
 		yPos = radialFactorb * (config.radiusMin + yChange2) * math.sin(col * (rads  + config.anlgleOffset)) * 2 + config.yOffset
@@ -388,10 +399,10 @@ def ringScribbles():
 		config.lastx[2] = (xPos)
 		config.lasty[2] = (yPos)
 		'''
-		'''
 		radialFactor  += config.rIncrease
 		radialFactorb += config.raIncrease
-		row += config.loopIncrease
+		#row += config.loopIncrease
+		loopIncrease+= config.loopIncrease
 
 
 def wavey():
@@ -488,7 +499,6 @@ def main(run=True):
 	config.xOffset = int(workConfig.get("noisescroller", "xOffset"))
 	config.yOffset = int(workConfig.get("noisescroller", "yOffset"))
 	config.radiusMin = float(workConfig.get("noisescroller", "radiusMin"))
-	config.radiusMinInit = float(workConfig.get("noisescroller", "radiusMin"))
 	config.markSize = int(workConfig.get("noisescroller", "markSize"))
 	config.scroll = 0
 
@@ -567,9 +577,12 @@ def main(run=True):
 			config.lineSizeFactor= float(workConfig.get("noisescroller", "lineSizeFactor"))
 			config.lineEcc = float(workConfig.get("noisescroller", "lineEcc"))
 			config.angleDecrementRate = float(workConfig.get("noisescroller", "angleDecrementRate"))
+			config.radiusMinInit = float(workConfig.get("noisescroller", "radiusMin"))
 			config.radiusMinVar = float(workConfig.get("noisescroller", "radiusMinVar"))
-			config.rotationTheta = -math.pi/20
-			config.angleDecrementBase = 20
+			config.lineEccMin = float(workConfig.get("noisescroller", "lineEccMin"))
+			config.lineEccMax = float(workConfig.get("noisescroller", "lineEccMax"))
+			config.rotationTheta = float(workConfig.get("noisescroller", "rotationTheta"))
+			config.angleDecrementBase = float(workConfig.get("noisescroller", "angleDecrementBase"))
 
 		except Exception as e:
 			print(str(e))

@@ -183,10 +183,12 @@ class PanelPathDrawing:
 						vSpace = self.panelWidth
 						hSpace = self.panelHeight
 
-					x = math.cos(orientationAngle * math.pi/180) * hSpace + lastX
-					y = math.sin(orientationAngle * math.pi/180) * vSpace + lastY
-					angle = -orientationAngle
 
+					rTheta =  (random.uniform(-self.angleJiggle,self.angleJiggle))
+					x = math.cos((orientationAngle + rTheta) * math.pi/180) * hSpace + lastX
+					y = math.sin((orientationAngle + rTheta) * math.pi/180) * vSpace + lastY
+					print(orientationAngle+rTheta)
+					angle = -(orientationAngle + rTheta)
 
 					self.drawingPath.append([round(x), round(y), angle, 1])
 					lastX = x
@@ -202,6 +204,7 @@ class PanelPathDrawing:
 				
 				if dx != 0 :
 					angle = -math.atan(dy/dx) * 180/math.pi
+					print(angle)
 					# orientation is important for animation
 					if dx < 0 : angle += 180
 					self.drawingPath[i][2] = angle 
@@ -209,9 +212,6 @@ class PanelPathDrawing:
 		print("")
 		print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath)))
 		print("")
-
-
-
 
 
 	def render(self) :

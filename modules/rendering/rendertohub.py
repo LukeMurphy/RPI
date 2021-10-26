@@ -73,9 +73,10 @@ def setUp(config):
 
 	try:
 		if config.useDrawingPoints == True :
-			screen_width = root.winfo_screenwidth()
-			screen_height = root.winfo_screenheight()
-			root.geometry("%dx%d+%d+%d" % (600, round(.56*screen_height), round(3*screen_width/4), round(0*screen_height/3)))
+			#screen_width = root.winfo_screenwidth()
+			#screen_height = root.winfo_screenheight()
+			#root.geometry("%dx%d+%d+%d" % (600, round(.9*screen_height), round(3*screen_width/4), round(0*screen_height/3)))
+			root.geometry("%dx%d+%d+%d" % (w, h, x, y))
 		else :
 			root.geometry("%dx%d+%d+%d" % (w, h, x, y))
 	except Exception as e:

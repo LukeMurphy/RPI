@@ -47,12 +47,13 @@ parser.add_argument("-path", type=str, default="./", help="directory (optional)"
 parser.add_argument(
 	"-cfg",
 	type=str,
-	required=False,
+	required=True,
 	help="Config File - just need sub-folder and name - e.g. p4-6x5/repeater.cfg",
 )
 parser.add_argument(
 	"-brightnessOverride",
 	type=int,
+	required=False,
 	help="brightness param to override the config value (optional)",
 )
 args = parser.parse_args()

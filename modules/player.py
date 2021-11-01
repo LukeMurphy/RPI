@@ -45,7 +45,15 @@ def configure(config, workconfig):
 		)
 	except Exception as e:
 		print(bcolors.FAIL + "** " +  str(e))
-		config.checkForConfigChanges = False
+		config.checkForConfigChanges = False	
+	### Sets up for testing live config chages DOING FULL RELOAD
+	try:
+		config.doFullReloadOnChange = workconfig.getboolean(
+			"displayconfig", "doFullReloadOnChange"
+		)
+	except Exception as e:
+		print(bcolors.FAIL + "** " +  str(e))
+		config.doFullReloadOnChange = False
 
 	try:
 		config.usePixelSort = workconfig.getboolean("displayconfig", "usePixelSort")

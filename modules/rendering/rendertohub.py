@@ -220,15 +220,16 @@ def updateCanvas():
 				print("** LAST MODIFIED DELTA: " + str(config.delta) + " **")
 				print("** LAST MODIFIED DELTA: " + str(config.initialArgs) + " **")
 				#commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-				os.system( config.path  + '/cntrlscripts/restart_player_dev.sh'+ ' ' + config.initialArgs + "&")
+				
+				if config.doFullReloadOnChange == True :
+					os.system( config.path  + '/cntrlscripts/restart_player_dev.sh'+ ' ' + config.initialArgs + "&")
 				#commadStringPyth = ""
 				#os.system(commadStringPyth + config.initialArgs + "&")
 
-
-
-				#config.doingReload = True
-				## NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
-				#config.loadFromArguments(True, config)
+				else :
+					config.doingReload = True
+					## NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
+					config.loadFromArguments(True, config)
 			config.reloadConfig = True
 		else:
 			config.reloadConfig = False

@@ -59,6 +59,7 @@ class Bar:
 		if config.direction == -1 :
 			self.xPos = config.canvasWidth + config.barThicknessMax * 2
 		self.barThickness = round(random.uniform(config.barThicknessMin, config.barThicknessMax))
+		self.barLength = round(random.uniform(config.barLengthMin, config.barLengthMax))
 		#self.colorVal = colorutils.randomColorAlpha()
 		cset = config.colorSets[config.usingColorSet]
 
@@ -113,11 +114,11 @@ def iterate():
 		drw = ImageDraw.Draw(temp)
 
 		if config.tipType == 1 :
-			drw.rectangle((0, 0, bar.barThickness * 2, bar.barThickness ), fill = bar.colorVal, outline = bar.outlineColorVal)
-			drw.rectangle((0, 2, bar.barThickness * 2, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
+			drw.rectangle((0, 0, bar.barThickness, bar.barLength ), fill = bar.colorVal, outline = bar.outlineColorVal)
+			drw.rectangle((0, 2, bar.barThickness, bar.barLength+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 		
 		else :
-			drw.ellipse((0, 2, bar.barThickness, bar.barThickness+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
+			drw.ellipse((0, 2, bar.barThickness, bar.barLength+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 
 
 		temp = temp.rotate(config.tipAngle - angle)
@@ -165,6 +166,10 @@ def main(run=True):
 	config.numberOfBars =  int(workConfig.get("bars", "numberOfBars"))
 	config.barThicknessMin =  int(workConfig.get("bars", "barThicknessMin"))
 	config.barThicknessMax =  int(workConfig.get("bars", "barThicknessMax"))	
+
+	config.barLengthMin =  int(workConfig.get("bars", "barLengthMin"))
+	config.barLengthMax =  int(workConfig.get("bars", "barLengthMax"))	
+
 	config.direction =  int(workConfig.get("bars", "direction"))	
 	yRange =  (workConfig.get("bars", "yRange")).split(",")
 	config.yRangeMin = int(yRange[0])	

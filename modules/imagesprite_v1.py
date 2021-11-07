@@ -194,6 +194,11 @@ class ImageSprite :
 		#print("Processing....")
 		#print("-----------")
 
+		if random.random() > 0.5 and self.randomizeDirection:
+			self.dX *= -1.0
+			self.image = self.image.rotate(-180)
+
+
 		if(self.processImage) :
 			if(self.resizeImage) :
 				#change = random.uniform(.1,1.2) * self.scalingFactor
@@ -235,6 +240,10 @@ class ImageSprite :
 				# Any RGB color
 				if(self.colorMode == "random") : 
 					clr = self.clrUtils.randomColor(brt)
+
+				# Any HSV color
+				if self.colorMode == "hsvFlame":
+					clr = self.clrUtils.getRandomColorHSV(350,60,.8,1.0,.8,1.0,0,0,255,brt)
 
 			else :
 				r = int(random.uniform(200,255))

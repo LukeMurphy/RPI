@@ -194,10 +194,6 @@ class ImageSprite :
 		#print("Processing....")
 		#print("-----------")
 
-		if random.random() > 0.5 and self.randomizeDirection:
-			self.dX *= -1.0
-			self.image = self.image.rotate(-180)
-
 
 		if(self.processImage) :
 			if(self.resizeImage) :

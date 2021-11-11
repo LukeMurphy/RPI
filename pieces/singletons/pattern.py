@@ -7,6 +7,11 @@ from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
+'''
+Draws a geometric pattern - never could make it interesting enough to use
+for real
+
+'''
 
 def cross(x, y, l=1, w=1):
 	# 12 points

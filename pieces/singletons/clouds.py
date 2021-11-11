@@ -13,12 +13,14 @@ class Fader:
 		self.doingRefreshCount = 50
 		self.fadingDone = False
 
+		self.baseColor = (60,10,30,1)
+
 	def fadeIn(self, config):
 		if self.fadingDone == False:
 			if self.doingRefresh < self.doingRefreshCount:
 				self.blankImage = Image.new("RGBA", (self.width, self.height))
 				d = ImageDraw.Draw(self.blankImage)
-				d.rectangle((0,0,self.width,self.height), outline=None, fill = config.skyColor)
+				d.rectangle((0,0,self.width,self.height), outline=None, fill = self.baseColor)
 				self.crossFade = Image.blend(
 					self.blankImage,
 					self.image,
@@ -82,7 +84,6 @@ def reDraw(config):
 
 			gradientImage = drawRadials(config)
 
-
 			fadeIn = Fader()
 			# fadeIn.blankImage = Image.new("RGBA", (height, width))
 			fadeIn.crossFade = Image.new("RGBA", (config.unitBlockSize, config.unitBlockSize))
@@ -93,6 +94,7 @@ def reDraw(config):
 			fadeIn.width = config.unitBlockSize
 			fadeIn.doingRefreshCount = config.fadeInRefreshCount
 
+			if random.random() < .5: fadeIn.baseColor = config.skyColor
 			config.fadeArray.append(fadeIn)
 			# config.image.paste(gradientImage, (xPos,yPos), gradientImage)
 

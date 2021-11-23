@@ -63,9 +63,11 @@ class Bar:
 		#self.colorVal = colorutils.randomColorAlpha()
 		cset = config.colorSets[config.usingColorSet]
 
-		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.colorAlpha, config.brightness )
-		self.outlineColorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.outlineColorAlpha, config.brightness )
+		colorAlpha = config.outlineColorAlpha
 
+		self.colorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, colorAlpha, config.brightness )
+		self.outlineColorVal = colorutils.getRandomColorHSV(cset[0], cset[1], cset[2], cset[3], cset[4], cset[5], config.dropHueMax,0, config.outlineColorAlpha, config.brightness )
+		self.outlineColorVal = self.colorVal
 
 
 def transformImage(img):
@@ -100,6 +102,8 @@ def runWork():
 def iterate():
 	global config
 
+	config.draw.rectangle((0,0,400,400), fill=(0,0,0,10))
+
 
 	for i in range(0, config.numberOfBars):
 		bar = config.barArray[i]
@@ -117,15 +121,16 @@ def iterate():
 			drw.rectangle((0, 0, bar.barThickness, bar.barLength ), fill = bar.colorVal, outline = bar.outlineColorVal)
 			drw.rectangle((0, 2, bar.barThickness, bar.barLength+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 		
-		else :
+		elif config.tipType == 0:
 			drw.ellipse((0, 2, bar.barThickness, bar.barLength+2 ), fill = bar.colorVal, outline = bar.outlineColorVal)
 
-
+		elif config.tipType == 2:
+			drw.ellipse((0, 2, bar.barThickness, bar.barThickness), fill = bar.colorVal, outline = bar.outlineColorVal)
 		temp = temp.rotate(config.tipAngle - angle)
 
 		config.image.paste(temp,(round(bar.xPos), round(bar.yPos)), temp)
 
-		if bar.xPos > config.canvasWidth and config.direction == 1:
+		if bar.xPos > config.canvasWidth + bar.barLength and config.direction == 1:
 			bar.remake()
 		if bar.xPos < 0 and config.direction == -1:
 			bar.remake()
@@ -184,7 +189,11 @@ def main(run=True):
 	config.ySpeedRangeMin =  float(workConfig.get("bars", "ySpeedRangeMin"))
 	config.ySpeedRangeMax =  float(workConfig.get("bars", "ySpeedRangeMax"))
 
-	config.tipType = 1
+	try:
+		config.tipType = int(workConfig.get("bars", "tipType"))
+	except Exception as e:
+		print(str(e))
+		config.tipType = 1
 	
 	config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 	config.outlineColorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))

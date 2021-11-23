@@ -20,12 +20,14 @@ from modules.imagesprite import ImageSprite
 from PIL import (
 	Image,
 	ImageChops,
+	ImageFont,
 	ImageDraw,
 	ImageEnhance,
 	ImageFilter,
 	ImageMath,
 	ImagePalette,
 )
+import numpy as np
 
 xPos = 320
 yPos = 0
@@ -222,7 +224,8 @@ def main(run=True):
 
 	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
-	
+	config.fontSize = 8
+	config.font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
 
 	config.imagePath = config.path + "/assets/imgs/"
 	config.imageList = [config.imageToLoad]
@@ -495,6 +498,9 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 				config.overLayMode = 0
 
 		config.workImage.paste(imgTemp, (0, 0), imgTemp)
+
+		if random.random() < .1 :
+			alter()
 		#config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
@@ -503,6 +509,70 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 	except Exception as e:
 		print(e, clrBlock.mode, config.renderImageFull.mode)
 		pass
+
+
+def alter():
+	image = config.workImage.convert("L")
+	imageOrig = config.workImage.convert("RGB")
+	imageArray = np.asarray(image)
+	destination_filename = "./output.txt"
+
+
+
+	x = int(image.size[0])
+	y = int((imageArray.shape[0]) * (x / (imageArray.shape[1] * 1.75)))
+	image = image.resize((x, y))
+	imageOrig = imageOrig.resize((x,y))
+	imageArray = np.asarray(image)
+
+	imageArray = imageArray.astype('float64')
+
+	xx = (np.max(imageArray))
+	imageArray = (imageArray / xx) * 255
+	np.sum(imageArray > 0)
+
+
+
+
+
+	'''
+	try:
+	    grayImageArray = np.array(
+	        [[0 for i in range(imageArray.shape[1])] for j in range(imageArray.shape[0])])
+	    for i in range(imageArray.shape[0]):
+	        for j in range(imageArray.shape[1]):
+	            x = ((imageArray[i][j][0]) +
+	                 (imageArray[i][j][1]) + (imageArray[i][j][2]))
+	            grayImageArray[i][j] = x/3
+	except:
+	    grayImageArray = imageArray
+	dest = open(destination_filename, 'w')
+
+	'''
+	grayLevels = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,^`'."[::-1]
+
+	grayLevels = ".'`,^:\";~-_+<>i!lI?/\|()1{}[]rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@"
+	grayLevels = '.:-=+*#%@'
+
+
+	fontColor = (200,140,0)
+	fctrx = 1.0
+	fctry = 1.5
+	steps = 4
+	for i in range(0,imageArray.shape[0],steps):
+	    for j in range(0,imageArray.shape[1],steps):
+	        densityLevel = (9 * (imageArray[i][j])) // 255
+	        densityLevel = (min(round(densityLevel), 8))
+	        fontColor = (200,140,0)
+	        #if random.random() < .5 : fontColor = tuple(map(lambda x: int(x * 3), imageOrig.getpixel((i, j)) ))
+
+
+	        #print(fontColor)
+	        config.workImageDraw.text((j*fctrx, i*fctry), grayLevels[densityLevel], fontColor, font=config.font)
+	        #print(grayLevels[densityLevel], end='')
+	        #dest.write(grayLevels[densityLevel])
+	    #print()
+	    #dest.write('\n')
 
 
 def redrawBackGround():

@@ -143,15 +143,19 @@ def iterate():
 			config.dropHueMax = 0
 		#print("Winter... " + str(config.dropHueMax ))
 
-	if random.random() < .003 :
+	if random.random() < config.colorChangeProb:
 		config.usingColorSet = math.floor(random.uniform(0,config.numberOfColorSets))
 		# just in case ....
 		if config.usingColorSet == config.numberOfColorSets : 
 			config.usingColorSet = config.numberOfColorSets-1
 		config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 		config.dropHueMax = 0
-		#config.tipType = round(random.random())
-		#print("ColorSet: " + str(config.usingColorSet))
+
+		if random.random() < config.changeShapeProb  :
+			config.tipType = config.tipTypeAlt
+		else :
+			config.tipType = config.tipTypeOrig
+
 
 	config.render(config.image, 0,0)
 
@@ -190,10 +194,27 @@ def main(run=True):
 	config.ySpeedRangeMax =  float(workConfig.get("bars", "ySpeedRangeMax"))
 
 	try:
+		config.colorChangeProb = float(workConfig.get("bars", "colorChangeProb"))
+	except Exception as e:
+		print(str(e))
+		config.colorChangeProb = .003
+
+	try:
+		config.changeShapeProb = float(workConfig.get("bars", "changeShapeProb"))
+	except Exception as e:
+		print(str(e))
+		config.changeShapeProb = .001
+
+
+	try:
 		config.tipType = int(workConfig.get("bars", "tipType"))
+		config.tipTypeOrig = int(workConfig.get("bars", "tipType"))
+		config.tipTypeAlt = int(workConfig.get("bars", "tipTypeAlt"))
 	except Exception as e:
 		print(str(e))
 		config.tipType = 1
+		config.tipTypeAlt = 1
+		config.tipTypeOrig = 1
 	
 	config.colorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))
 	config.outlineColorAlpha = round(random.uniform(config.leadEdgeAlpahMin,config.leadEdgeAlpahMax))

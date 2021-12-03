@@ -40,12 +40,26 @@ def timeChecker(sequenceConfig, config) :
 				sequenceConfig.playOrder = 0
 			pieceToPlay = sequenceConfig.playOrder
 		else :
-			pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
+			pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)))
+			if pieceToPlay == len(sequenceConfig.workList) :
+				pieceToPlay = 0
 
 		print("Piece Playing is: " + str(pieceToPlay))
 
 		sequenceConfig.currentPieceDuration = random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2])
-		loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
+		
+		commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
+		#os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+		try:
+			os.system("sudo kill "+ str(sequenceConfig.currentPID) +";")
+		except Exception as e:
+			print(str(e))
+		os.system(commadStringPyth  + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&")
+
+		sequenceConfig.currentPID = os.system("ps -ef | pgrep -f player" )
+
+
+		#loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 
 
 def loadWorkConfig(work, sequenceConfig):
@@ -80,15 +94,35 @@ def loadWorkConfig(work, sequenceConfig):
 
 	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
 		# Clean threads!
-		os.system( config.path  + sequenceConfig.restartScript)
 
+		#print(sequenceConfig.mainAppWindow.activeWork.config.isRunning)
+		#print(sequenceConfig.mainAppWindow.activeWork)
+		#print(sequenceConfig.mainAppWindow.activeWork.config.standAlone)
+		print("DONE .....")
+		exit()
+		#sequenceConfig.mainAppWindow.activeWork.config.isRunning = False
+		#sequenceConfig.mainAppWindow.activeWork.config.callBack()
+		#os.system( config.path  + sequenceConfig.restartScript)
 
+	
 	# ****************************************** #
 	# Sets off the piece based on loading the initiail configs #
 	# ****************************************** #
+
+	'''
 	player.configure(config, workconfig)
 	config.cnvs = sequenceConfig.cnvs
 	sequenceConfig.mainAppWindow.startWork(config.workRefForSequencer)
+	'''
+
+
+
+	fakeCallBack(sequenceConfig, config)
+
+def fakeCallBack(sequenceConfig, config) :
+	while 1==1 :
+		time.sleep(1)
+		timeChecker(sequenceConfig, config)	
 
 
 
@@ -172,8 +206,8 @@ def loadSequenceFile():
 
 		for w in sequenceConfig.workListManifest :
 			work = workconfig.get(w, "work")
-			minDuration = int(workconfig.get(w, "minDuration"))
-			maxDuration = int(workconfig.get(w, "maxDuration"))
+			minDuration = float(workconfig.get(w, "minDuration"))
+			maxDuration = float(workconfig.get(w, "maxDuration"))
 			try:
 				brightnessOverride = float(workconfig.get(w,"brightnessOverride"))
 			except Exception as e:

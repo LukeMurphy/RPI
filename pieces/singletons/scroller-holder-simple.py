@@ -596,8 +596,8 @@ def runWork():
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
 	print("RUNNING Scroller Holder scroller-holder.py")
 	print(bcolors.ENDC)
-	while config.isRunning == True:
-		iterate()
+	while 1==1 :
+		if config.isRunning == True: iterate()
 		time.sleep(config.redrawSpeed)
 		if config.standAlone == False :
 			config.callBack()

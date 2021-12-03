@@ -128,16 +128,20 @@ class AppWindow:
 			print("DID NOT WORK")
 			print(str(e))
 		'''
+		self.activeWork = work
 
 		try:
-			t = threading.Thread.__init__(work.runWork())
+			
+			#t = threading.Thread.__init__(work.runWork())
+			t = threading.Thread(target=work.runWork)
+			work.threadRef = t
 			t.start()
 			t.join()
 
 		except tk.TclError as details:
 			print(details)
 			pass
-			exit()
+			#exit()
 
 
 	def run(self):

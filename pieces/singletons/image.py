@@ -585,7 +585,8 @@ def redrawBackGround():
 
 
 def callBack():
-	global config
+	global configt
+	print("CALLBACL")
 	return True
 
 

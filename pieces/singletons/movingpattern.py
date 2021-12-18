@@ -34,17 +34,76 @@ def vary2(data, config):
 def redraw():
 	global config
 
+
+	if random.random() < .01 :
+		config.step = round(random.uniform(5,16))	
+	if random.random() < .01 :
+		config.redrawSpeed = random.uniform(.01,.1)
+	if random.random() < .01 :
+		config.grout = round(random.uniform(0,4))
+	if random.random() < .01 :
+		xPos = round(random.uniform(0,config.screenWidth))
+		yPos = round(random.uniform(0,config.screenHeight))
+		config.remapImageBlockSection = (xPos,yPos,xPos + round(random.uniform(xPos,config.screenWidth)), yPos + round(random.uniform(yPos,config.screenHeight)))
+		config.remapImageBlockDestination = (xPos,yPos)
+
+	# Scroll the image
+	if config.scrollDirection == 0 :
+		crop1 = config.bufferImage.crop((0,0,config.colStop,config.scrollStep)).convert('RGBA')
+		crop2 = config.bufferImage.crop((0,config.scrollStep, config.colStop, config.rowStop)).convert('RGBA')
+		config.canvasImage.paste(crop2, (0,0), crop2)
+		config.canvasImage.paste(crop1, (0,config.rowStop - config.scrollStep), crop1)
+	else :
+		crop1 = config.bufferImage.crop((0,0,config.scrollStep,config.rowStop)).convert('RGBA')
+		crop2 = config.bufferImage.crop((config.scrollStep,0, config.colStop, config.rowStop)).convert('RGBA')
+		config.canvasImage.paste(crop2, (0,0), crop2)
+		config.canvasImage.paste(crop1, (config.colStop - config.scrollStep, 0), crop1)
+
+
+	config.bufferImage = config.canvasImage
+
+
+	for row in range(0,config.rowStop,config.step) :
+		for col in range(0,config.colStop,config.step) :
+			crop = config.canvasImage.crop((col,row,col+config.step,row+config.step)).convert('RGBA')
+			x = math.floor(random.uniform(0,config.step))
+			y = math.floor(random.uniform(0,config.step))
+			pix = crop.getpixel((x,y))
+			drawPix = (pix[0], pix[1], pix[2], round(random.uniform(10,config.mosaicAlpha)))
+
+			config.draw.rectangle((col,row,col + config.step - config.grout,row + config.step - config.grout), fill = drawPix)
+
+
+
+
+
+
+def redrawUsingArray():
+
+	global config
+
 	if random.random() < config.changeProb :
 		config.datab = vary1(config.datab, config)
 		config.dpatColor += config.deltapatColor
 	
-	#config.datab = config.datab[:, :, [0, 1, 0]]
+	config.datab = config.datab[:, :, [0, 1, 0]]
 	datac = np.roll(config.datab, round(config.dpat), (0))
-	#datac = config.data
+	datac = config.data
 
 	config.image = Image.fromarray(datac.astype('uint8'))
-	#a.renderImageFull.convert('RGBA')
+
+
+	#print(math.floor(config.dpat))
+	#print(len(config.datab[0][0]))
+
+
+
 	config.dpat += config.deltapat
+
+
+	if config.dpat >= len(config.datab[0]) :
+		print(config.dpat)
+		config.dpat = 2
 
 	if config.dpat >= config.limUp or config.dpat <= config.limDown :
 		config.deltapat *= -1
@@ -73,8 +132,9 @@ def iterate():
 def main(run=True):
 	global config
 	
-	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.bufferImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)
 
 	config.destinationImage = Image.new(
@@ -98,6 +158,19 @@ def main(run=True):
 
 
 	im = Image.open(config.baseImage)
+
+
+	config.rowStop = im.height
+	config.colStop = im.width
+	config.scrollStep = int(workConfig.get("movingpattern", "scrollStep"))
+	config.step =int(workConfig.get("movingpattern", "step"))
+	config.grout = int(workConfig.get("movingpattern", "grout"))
+	config.scrollDirection = int(workConfig.get("movingpattern", "scrollDirection"))
+	config.mosaicAlpha = int(workConfig.get("movingpattern", "mosaicAlpha"))
+
+	config.bufferImage =  im
+	config.canvasImage =  im
+	#config.image =  im
 
 	im2arr = np.array(im) # im2arr.shape: height x width x channel
 	arr2im = Image.fromarray(im2arr)

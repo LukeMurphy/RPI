@@ -4,11 +4,11 @@ import math
 import random
 import time
 import types
+import numpy as np
 from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
-import numpy as np
 
 lastRate = 0
 colorutils.brightness = 1
@@ -120,12 +120,39 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 		if config.standAlone == False :
 			config.callBack()
-			
+
+
+def rgbSep() :
+	im = np.array(config.image)
+	im_R = np.array(config.image)
+
+	rads = math.pi / im.shape[0]
+
+	startx = 50
+	starty = 50
+	width = 20
+	height = 100
+	for c in range(startx, width + startx - 3, 1):
+		for r in range(starty, height + starty - 3, 3):
+			rVal = round(abs(math.cos(c * rads * .5)) * r)
+			cVal = round(abs(math.sin(r * rads * .75)) * c)
+			#im_R[c,r] = im[cVal,rVal]
+
+			rVal = im[c,r][0]
+			gVal = im[c,r][1]
+			bVal = im[c,r][2]
+
+			im_R[c,r+0] = [rVal,0,0,255]
+			im_R[c,r+1] = [0,gVal,0,255]
+			im_R[c,r+2] = [0,0,bVal,255]
+
+	config.finalImage = Image.fromarray(im_R)		
 
 def iterate():
 	global config
 	redraw()
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+	rgbSep()
+	config.render(config.finalImage, 0, 0, config.screenWidth, config.screenHeight)
 	# Done
 
 

@@ -128,30 +128,38 @@ def rgbSep() :
 
 	rads = math.pi / im.shape[0]
 
-	startx = 50
-	starty = 50
-	width = 20
-	height = 100
-	for c in range(startx, width + startx - 3, 1):
-		for r in range(starty, height + starty - 3, 3):
-			rVal = round(abs(math.cos(c * rads * .5)) * r)
-			cVal = round(abs(math.sin(r * rads * .75)) * c)
-			#im_R[c,r] = im[cVal,rVal]
+	if random.random() < 	config.rgbs_probChange :
+		config.rgbs_starty = round(random.uniform(1,config.screenHeight)) -1 
+		config.rgbs_startx = round(random.uniform(1,config.screenWidth)) -1 
+		config.rgbs_height = round(random.uniform(1,config.screenHeight - config.rgbs_starty)) -1 
+		config.rgbs_width = round(random.uniform(1,config.screenWidth - config.rgbs_startx)) -1 
 
-			rVal = im[c,r][0]
-			gVal = im[c,r][1]
-			bVal = im[c,r][2]
 
-			im_R[c,r+0] = [rVal,0,0,255]
-			im_R[c,r+1] = [0,gVal,0,255]
-			im_R[c,r+2] = [0,0,bVal,255]
+	try:
+		for c in range(config.rgbs_startx, config.rgbs_width + config.rgbs_startx - 3, 1):
+			for r in range(config.rgbs_starty, config.rgbs_height + config.rgbs_starty - 3, 3):
+				#rVal = round(abs(math.cos(c * rads * .5)) * r)
+				#cVal = round(abs(math.sin(r * rads * .75)) * c)
+				#im_R[c,r] = im[cVal,rVal]
 
-	config.finalImage = Image.fromarray(im_R)		
+				rVal = im[c,r][0]
+				gVal = im[c,r][1]
+				bVal = im[c,r][2]
+
+				im_R[c,r+0] = [rVal,0,0,255]
+				im_R[c,r+1] = [0,gVal,0,255]
+				im_R[c,r+2] = [0,0,bVal,255]
+
+		config.finalImage = Image.fromarray(im_R)		
+
+	except Exception as e:
+		print(str(e))
 
 def iterate():
 	global config
 	redraw()
-	rgbSep()
+	if config.doRGBSep == True :
+		rgbSep()
 	config.render(config.finalImage, 0, 0, config.screenWidth, config.screenHeight)
 	# Done
 
@@ -182,6 +190,18 @@ def main(run=True):
 	config.mult_d = float(workConfig.get("movingpattern", "mult_d"))
 	config.mult_e = float(workConfig.get("movingpattern", "mult_e"))
 	config.changeProb = float(workConfig.get("movingpattern", "changeProb"))
+
+	config.doRGBSep = True
+	try:
+		config.rgbs_probChange = float(workConfig.get("movingpattern", "rgbs_probChange"))
+	except Exception as e:
+		print(str(e))
+		config.rgbs_probChange = .01
+
+	config.rgbs_startx = 50
+	config.rgbs_starty = 50
+	config.rgbs_width = 20
+	config.rgbs_height = 100
 
 
 	im = Image.open(config.baseImage)

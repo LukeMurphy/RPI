@@ -222,6 +222,13 @@ def main(run=True):
 		config.filterRemapRangeX = config.canvasWidth
 		config.filterRemapRangeY = config.canvasHeight
 
+	try:
+		config.alterAsASCIIProb = float(workConfig.get("images", "alterAsASCIIProb"))
+	except Exception as e:
+		print(str(e))
+		config.alterAsASCIIProb = 0
+
+		
 	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
 	config.fontSize = 8
@@ -499,8 +506,8 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 
 		config.workImage.paste(imgTemp, (0, 0), imgTemp)
 
-		if random.random() < .1 :
-			alter()
+		if random.random() < config.alterAsASCIIProb:
+			alterAsASCII()
 		#config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
@@ -511,12 +518,11 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 		pass
 
 
-def alter():
+def alterAsASCII():
 	image = config.workImage.convert("L")
 	imageOrig = config.workImage.convert("RGB")
 	imageArray = np.asarray(image)
 	destination_filename = "./output.txt"
-
 
 
 	x = int(image.size[0])
@@ -530,8 +536,6 @@ def alter():
 	xx = (np.max(imageArray))
 	imageArray = (imageArray / xx) * 255
 	np.sum(imageArray > 0)
-
-
 
 
 
@@ -552,7 +556,7 @@ def alter():
 	grayLevels = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,^`'."[::-1]
 
 	grayLevels = ".'`,^:\";~-_+<>i!lI?/\|()1{}[]rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@"
-	grayLevels = '.:-=+*#%@'
+	#grayLevels = '.:-=+*#%@'
 
 
 	fontColor = (200,140,0)

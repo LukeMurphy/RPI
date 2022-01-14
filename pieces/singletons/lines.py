@@ -253,7 +253,6 @@ def showLines():
 					#newLines.append([currentAngle - math.pi /2,midPoint,ref.lineColor,ref.branchCount + 2,ref.lineNumber + 2,2])
 
 
-
 			# start anew line altogether
 			if ref.branchCount >= config.branchCountLimit:
 				ref.reset()
@@ -371,8 +370,8 @@ def setUp():
 		config.linesArray.append(l)
 		config.lineCount += 1
 
-	config.draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
-	config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
+	#config.draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
+	#config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
 
 def runWork():
 	global config

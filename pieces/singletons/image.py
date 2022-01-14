@@ -429,6 +429,13 @@ def iterate(n=0):
 		)
 
 	if random.random() < config.filterRemappingProb:
+		if random.random() <  .5 :
+			config.filterRemapping == False
+		else :
+			config.filterRemapping == True
+
+
+	if random.random() < config.filterRemappingProb:
 		if config.useFilters == True and config.filterRemapping == True:
 			config.filterRemap = True
 			# new version  more control but may require previous pieces to be re-worked

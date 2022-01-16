@@ -110,6 +110,7 @@ def iterate():
 	if random.random() < config.changeGridProb:
 		index = math.floor(random.random() * len(config.gridOptions))
 		if index > len(config.gridOptions) : index = 0
+		print("Running a :" + str(config.gridOptions[index]) )
 		eval(config.gridOptions[index])(config)
 
 	if random.random() < config.changeQuiverProb:
@@ -179,10 +180,8 @@ def buildGrid(config):
 	config.barBlocks = []
 	delta = 0 
 	sizes = [16,24,32,40,48,56,64,72,80,88,96,104,112,120,128]
-	sizes = [16,24,32,40,48,56,64,72,80,88,96,104]
-
-	rows = config.rows * 4
-	cols = config.cols * 4
+	rows = round(config.canvasHeight / config.blockHeight) * 1
+	cols = round(config.canvasWidth / config.blockWidth) * 2
 
 	gridSize = 8
 	availableCoords = []
@@ -198,8 +197,8 @@ def buildGrid(config):
 			if availableCoords[row][col][2] == 0 and availableCoords[row+1][col][2] == 0 and availableCoords[row+2][col][2] == 0 :
 
 				# set size of patch
-				index = math.floor(random.uniform(0,len(sizes)))
-				blockWidth = sizes[index]
+				index = math.floor(random.uniform(0,len(config.sizeArray)))
+				blockWidth = config.sizeArray[index]
 
 				# see if the width is too wide sometimes
 				removedPointsSize = round(blockWidth/gridSize)
@@ -208,7 +207,7 @@ def buildGrid(config):
 						#reduce size
 
 						newIndex = math.floor(random.uniform(0,3))
-						blockWidth = sizes[newIndex]
+						blockWidth = config.sizeArray[newIndex]
 	
 
 				blockHeight = blockWidth
@@ -246,8 +245,6 @@ def buildOverlapGrid(config):
 	count = 0
 	config.barBlocks = []
 	delta = 0 
-	sizes = [32,40,48,64,80,128]
-
 
 	rows = 7
 	cols = 7
@@ -261,8 +258,8 @@ def buildOverlapGrid(config):
 
 	#first one is upper left
 	for i in range(0,len(availableCoords)) :
-		index = math.floor(random.uniform(0,len(sizes)))
-		blockWidth = sizes[index]
+		index = math.floor(random.uniform(0,len(config.sizeArray)))
+		blockWidth = config.sizeArray[index]
 		blockHeight = config.blockWidth
 		barBlockUnit = Block(config,count)
 		barBlockUnit.blockWidth = round(random.uniform(blockWidth - delta, blockWidth + delta)) 
@@ -288,13 +285,17 @@ def buildUniformGrid(config):
 	count = 0
 	config.barBlocks = []
 	delta = 0 
-	sizes = [32,40,48,64,80,128]
-	index = math.floor(random.uniform(0,len(sizes)))
-	config.blockWidth = sizes[index]
+	index = math.floor(random.uniform(0,len(config.sizeArray)))
+	config.blockWidth = config.sizeArray[index]
 	config.blockHeight = config.blockWidth
-	for r in range(0,config.rows) :
+
+	rows = round(config.canvasHeight / config.blockHeight) * 2
+	cols = round(config.canvasWidth / config.blockWidth) * 2
+
+
+	for r in range(0,rows) :
 		lastX = 0
-		for c in range(0,config.cols) :
+		for c in range(0,cols) :
 			barBlockUnit = Block(config,count)
 			barBlockUnit.blockWidth = round(random.uniform(config.blockWidth - delta, config.blockWidth + delta)) 
 			barBlockUnit.blockHeight = barBlockUnit.blockWidth
@@ -329,6 +330,15 @@ def main(run=True):
 	config.gapWidthMin = int(workConfig.get("movingpattern", "gapWidthMin"))
 	config.gapWidthMax = int(workConfig.get("movingpattern", "gapWidthMax"))
 
+
+	config.sizeArrayVals = (workConfig.get("movingpattern", "sizeArray"))
+	config.sizeArray = config.sizeArrayVals.split(",")
+	config.sizeArray = list(
+		map(lambda x: int(int(x)), config.sizeArray)
+	)
+
+	print(config.sizeArray)
+
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new(
 		"RGBA", (config.canvasWidth, config.canvasHeight))
@@ -347,6 +357,9 @@ def main(run=True):
 
 	index = math.floor(random.random() * len(config.gridOptions))
 	if index > len(config.gridOptions) : index = 0
+
+
+	print("Running a :" + str(config.gridOptions[index]) )
 	eval(config.gridOptions[index])(config)
 
 	

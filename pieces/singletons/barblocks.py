@@ -97,6 +97,32 @@ def redraw(config):
 		b.colOverlay2.stepTransition()
 
 
+	if random.random() < config.filterPatchProb:
+
+		x1 = round(random.uniform(0,config.canvasWidth/2))
+		x2 = round(random.uniform(x1,config.canvasWidth))
+		y1 = round(random.uniform(0,config.canvasHeight/2))
+		y2 = round(random.uniform(y1,config.canvasHeight))
+		config.useFilters = True
+		config.remapImageBlock = True
+		config.remapImageBlockSection = (x1, y1, x2, y2)
+		config.remapImageBlockDestination = (x1, y1)
+
+	if random.random() < config.blurPatchProb:
+
+		x1 = round(random.uniform(0,config.canvasWidth/2))
+		x2 = round(random.uniform(x1,config.canvasWidth))
+		y1 = round(random.uniform(0,config.canvasHeight/2))
+		y2 = round(random.uniform(y1,config.canvasHeight))
+
+		config.useBlur = True
+		blurXOffset = x1
+		blurYOffset = y1
+		blurSectionWidth = x2
+		blurSectionHeight = y2
+		sectionBlurRadius = 1
+
+
 def iterate():
 	global config
 	config.colOverlay.stepTransition()
@@ -181,7 +207,18 @@ def buildGrid(config):
 	delta = 0 
 	sizes = [16,24,32,40,48,56,64,72,80,88,96,104,112,120,128]
 	rows = round(config.canvasHeight / config.blockHeight) * 1
-	cols = round(config.canvasWidth / config.blockWidth) * 2
+	cols = round(config.canvasWidth / config.blockWidth ) 
+
+	if cols > 80 :
+		cols = 80
+
+
+	print("")
+	print("----buildGrid --")
+	print(rows,cols)
+	print("------")
+	print("")
+
 
 	gridSize = 8
 	availableCoords = []
@@ -286,22 +323,28 @@ def buildUniformGrid(config):
 	config.barBlocks = []
 	delta = 0 
 	index = math.floor(random.uniform(0,len(config.sizeArray)))
-	config.blockWidth = config.sizeArray[index]
-	config.blockHeight = config.blockWidth
+	blockWidth = config.sizeArray[index]
+	blockHeight = blockWidth
 
-	rows = round(config.canvasHeight / config.blockHeight) * 2
-	cols = round(config.canvasWidth / config.blockWidth) * 2
+	rows = round(config.canvasHeight / blockHeight) * 2
+	cols = round(config.canvasWidth / blockWidth) 
+
+	print("")
+	print("---- buildUniformGrid --")
+	print(rows,cols,blockWidth,blockHeight)
+	print("------")
+	print("")
 
 
 	for r in range(0,rows) :
 		lastX = 0
 		for c in range(0,cols) :
 			barBlockUnit = Block(config,count)
-			barBlockUnit.blockWidth = round(random.uniform(config.blockWidth - delta, config.blockWidth + delta)) 
+			barBlockUnit.blockWidth = round(random.uniform(blockWidth - delta, blockWidth + delta)) 
 			barBlockUnit.blockHeight = barBlockUnit.blockWidth
 			barBlockUnit.xPos = lastX #c * barBlockUnit.blockWidth
 			lastX += barBlockUnit.blockWidth 
-			barBlockUnit.yPos = r * config.blockHeight
+			barBlockUnit.yPos = r * blockHeight
 
 			barBlockUnit.barWidth = round(random.uniform(config.barWidthMin,config.barWidthMax))
 			barBlockUnit.gap = round(random.uniform(config.gapWidthMin,config.gapWidthMax))
@@ -329,6 +372,9 @@ def main(run=True):
 	config.barWidthMax = int(workConfig.get("movingpattern", "barWidthMax"))
 	config.gapWidthMin = int(workConfig.get("movingpattern", "gapWidthMin"))
 	config.gapWidthMax = int(workConfig.get("movingpattern", "gapWidthMax"))
+
+	config.filterPatchProb = float(workConfig.get("movingpattern", "filterPatchProb"))
+	config.blurPatchProb = float(workConfig.get("movingpattern", "blurPatchProb"))
 
 
 	config.sizeArrayVals = (workConfig.get("movingpattern", "sizeArray"))
@@ -363,7 +409,6 @@ def main(run=True):
 	eval(config.gridOptions[index])(config)
 
 	
-
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
 	buildPalette(config,0)
 

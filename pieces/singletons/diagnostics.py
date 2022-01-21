@@ -159,7 +159,7 @@ def showGrid():
 	# global config
 
 	config.draw.rectangle(
-		(0, 0, config.screenWidth, config.screenHeight),
+		(0, 0, config.canvasWidth, config.canvasHeight),
 		fill=config.bgColor,
 		outline=(0, 0, 0),
 	)
@@ -406,7 +406,7 @@ def main(run=True):
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
-	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasDraw = ImageDraw.Draw(config.canvasImage)

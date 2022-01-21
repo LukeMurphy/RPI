@@ -49,14 +49,14 @@ class Fludd:
 	def __init__(self, config):
 		print("init PB")
 
-		self.boxMax = config.screenWidth - 1
-		self.boxMaxAlt = self.boxMax + int(random.uniform(10, 30) * config.screenWidth)
-		self.boxHeight = config.screenHeight - 2
+		self.boxMax = config.canvasWidth - 1
+		self.boxMaxAlt = self.boxMax + int(random.uniform(10, 30) * config.canvasWidth)
+		self.boxHeight = config.canvasHeight - 2
 		self.config = config
 
 		tempImage = Image.new("RGBA", (640, 640))
 		draw = ImageDraw.Draw(tempImage)
-		self.mainImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+		self.mainImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
 	def changeAction(self):
 		return False
@@ -191,7 +191,7 @@ def iterate():
 
 	if config.calibrated == True:
 		redraw()
-		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+		config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
 		callBack()
 
@@ -209,7 +209,7 @@ def iterate():
 	else:
 		config.cycleCount += 1
 		redraw()
-		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+		config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 		if config.cycleCount > config.calibrationCount:
 			config.t2 = time.time()
 			config.timeToComplete = config.t2 - config.t1
@@ -233,7 +233,7 @@ def iterate():
 def main(run=True):
 	global config
 	global fluddSquare
-	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)
 	fluddSquare = Fludd(config)
 	# Prism is all colors, Plenum is white

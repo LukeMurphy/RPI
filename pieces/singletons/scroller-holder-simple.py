@@ -44,7 +44,7 @@ def makeBackGround(drawRef, n=1):
 	) 
 
 	yDiv = (
-		config.canvasHeight / rows
+		config.patternHeight / rows
 	) / config.displayRows 
 
 
@@ -428,8 +428,12 @@ def init():
 	config.displayCols = int(workConfig.get("scroller", "displayCols"))
 
 	# ********* HARD CODING VALUES  ***********************
-
-	config.bandHeight = int(round(config.canvasHeight / config.displayRows))
+	try:
+		config.patternHeight = int(workConfig.get("scroller", "patternHeight"))
+	except Exception as e:
+		print(str(e))
+		config.patternHeight = config.canvasHeight
+	config.bandHeight = int(round(config.patternHeight / config.displayRows))
 	config.bgBackGroundColor = (0, 0, 0, 0)
 	config.arrowBgBackGroundColor = (0, 0, 0, 200)
 

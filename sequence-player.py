@@ -70,12 +70,14 @@ def timeChecker(sequenceConfig, config) :
 		print("Running python instances are :")
 		print(listOfProcs)
 
-
-		for p in listOfProcs[:-2] :
-			print(p)
-			if p != sequenceConfig.currentPID and p != "":
-				print ("Should be killing " + str(p))
-				os.system("kill " + str(p) + " -9 ;")
+		try:
+			for p in listOfProcs[:-2] :
+				print(p)
+				if p != sequenceConfig.currentPID and p != "":
+					print ("Should be killing " + str(p))
+					os.system("kill " + str(p) + " -9 ;")
+		except Exception as e:
+			print(str(e))
 
 
 

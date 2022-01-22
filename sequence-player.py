@@ -51,7 +51,7 @@ def timeChecker(sequenceConfig, config) :
 		#sequenceConfig.commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
 		#os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 		try:
-			os.system("sudo kill "+ str(sequenceConfig.currentPID) +";")
+			os.system("kill "+ str(sequenceConfig.currentPID) +";")
 		except Exception as e:
 			print(str(e))
 

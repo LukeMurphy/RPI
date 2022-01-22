@@ -112,12 +112,12 @@ def loadWorkConfig(work, sequenceConfig):
 	print(bcolors.ENDC)
 	workconfig.read(argument)
 	config.fileName = argument
-	sequenceConfig.playCount=sequenceConfig.playCount+1
-	print("==========> count play : " + str(sequenceConfig.playCount))
 
 
 	sequenceConfig.currentPID = os.getpid()
 	print("Sequence Player PID is: " + str(sequenceConfig.currentPID))
+
+	exit()
 
 	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
 

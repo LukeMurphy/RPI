@@ -96,13 +96,15 @@ def loadWorkConfig(work, sequenceConfig):
 	print("==========> count play : " + str(sequenceConfig.playCount))
 
 	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
+
+		sequenceConfig.playCount = 0
 		# Clean threads!
 
 		#print(sequenceConfig.mainAppWindow.activeWork.config.isRunning)
 		#print(sequenceConfig.mainAppWindow.activeWork)
 		#print(sequenceConfig.mainAppWindow.activeWork.config.standAlone)
 		print("DONE .....")
-		exit()
+		#exit()
 		#sequenceConfig.mainAppWindow.activeWork.config.isRunning = False
 		#sequenceConfig.mainAppWindow.activeWork.config.callBack()
 		#os.system( config.path  + sequenceConfig.restartScript)

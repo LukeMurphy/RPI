@@ -62,7 +62,6 @@ def timeChecker(sequenceConfig, config) :
 		os.system(commandString)
 
 		sequenceConfig.playCount=sequenceConfig.playCount+1
-		print("==========> count play : " + str(sequenceConfig.playCount))
 
 		# wait for the player to load before cleaning up
 		time.sleep(1)
@@ -70,6 +69,7 @@ def timeChecker(sequenceConfig, config) :
 		# Now check all the running python scripts and kill the one before the one that was just launched
 		listOfProcs = check_output("ps -ef | pgrep -i python", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
+		print("==========> count play : " + str(sequenceConfig.playCount))
 		print("Running python instances are :")
 		print(listOfProcs)
 

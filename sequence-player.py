@@ -48,7 +48,7 @@ def timeChecker(sequenceConfig, config) :
 
 		sequenceConfig.currentPieceDuration = random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2])
 		
-		sequenceConfig.commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
+		#sequenceConfig.commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
 		#os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 		try:
 			os.system("sudo kill "+ str(sequenceConfig.currentPID) +";")

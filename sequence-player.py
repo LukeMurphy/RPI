@@ -180,7 +180,7 @@ def loadSequenceFile():
 
 
 		sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
-		sequenceConfig.commadStringPyth = (workconfig.getboolean("displayconfig", "commadStringPyth"))
+		sequenceConfig.commadStringPyth = (workconfig.get("displayconfig", "commadStringPyth"))
 		sequenceConfig.playOrder = 0 
 
 		try:

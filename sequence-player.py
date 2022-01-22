@@ -54,7 +54,10 @@ def timeChecker(sequenceConfig, config) :
 			os.system("sudo kill "+ str(sequenceConfig.currentPID) +";")
 		except Exception as e:
 			print(str(e))
-		os.system(sequenceConfig.commadStringPyth  + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&")
+
+		commandString = sequenceConfig.commadStringPyth  + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
+		print("Command:  " + commandString)
+		os.system(commandString)
 
 		sequenceConfig.currentPID = os.system("ps -ef | pgrep -f player" )
 

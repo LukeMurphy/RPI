@@ -74,8 +74,8 @@ def timeChecker(sequenceConfig, config) :
 			for p in listOfProcs[:-2] :
 				print(p)
 				if p != sequenceConfig.currentPID and p != "":
-					print ("Should be killing " + str(p))
-					os.system("kill " + str(p) + " -9 ;")
+					print ("Should be killing " + p)
+					os.system("kill " + p + " -9 ;")
 		except Exception as e:
 			print(str(e))
 

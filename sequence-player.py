@@ -61,6 +61,9 @@ def timeChecker(sequenceConfig, config) :
 		print("Command:  " + commandString)
 		os.system(commandString)
 
+		sequenceConfig.playCount=sequenceConfig.playCount+1
+		print("==========> count play : " + str(sequenceConfig.playCount))
+
 		# wait for the player to load before cleaning up
 		time.sleep(1)
 

@@ -117,7 +117,7 @@ def loadWorkConfig(work, sequenceConfig):
 	sequenceConfig.currentPID = os.getpid()
 	print("Sequence Player PID is: " + str(sequenceConfig.currentPID))
 
-	exit()
+	'''
 
 	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
 
@@ -137,14 +137,12 @@ def loadWorkConfig(work, sequenceConfig):
 	# ****************************************** #
 	# Sets off the piece based on loading the initiail configs #
 	# ****************************************** #
-
+	'''
 	'''
 	player.configure(config, workconfig)
 	config.cnvs = sequenceConfig.cnvs
 	sequenceConfig.mainAppWindow.startWork(config.workRefForSequencer)
 	'''
-
-
 
 	fakeCallBack(sequenceConfig, config)
 

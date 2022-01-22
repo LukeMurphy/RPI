@@ -25,7 +25,7 @@ from modules import configuration, player
 from modules.rendering import appWindow
 from modules.configuration import bcolors
 
-
+import subprocess
 from subprocess import check_output
 
 
@@ -75,7 +75,7 @@ def timeChecker(sequenceConfig, config) :
 				print(p)
 				if p != sequenceConfig.currentPID and p != "":
 					print ("Should be killing " + p)
-					os.system("kill " + p + " -9 ;")
+					subprocess.run("kill " + p + " -9 ;", check = True)
 		except Exception as e:
 			print(str(e))
 

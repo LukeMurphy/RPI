@@ -48,13 +48,13 @@ def timeChecker(sequenceConfig, config) :
 
 		sequenceConfig.currentPieceDuration = random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2])
 		
-		commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
+		sequenceConfig.commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
 		#os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 		try:
 			os.system("sudo kill "+ str(sequenceConfig.currentPID) +";")
 		except Exception as e:
 			print(str(e))
-		os.system(commadStringPyth  + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&")
+		os.system(sequenceConfig.commadStringPyth  + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&")
 
 		sequenceConfig.currentPID = os.system("ps -ef | pgrep -f player" )
 
@@ -180,6 +180,7 @@ def loadSequenceFile():
 
 
 		sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
+		sequenceConfig.commadStringPyth = (workconfig.getboolean("displayconfig", "commadStringPyth"))
 		sequenceConfig.playOrder = 0 
 
 		try:

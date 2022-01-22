@@ -67,10 +67,12 @@ def timeChecker(sequenceConfig, config) :
 		# Now check all the running python scripts and kill the one before the one that was just launched
 		listOfProcs = check_output("ps -ef | pgrep -i python", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
+		print("Running python instances are :")
 		print(listOfProcs)
 
 
 		for p in listOfProcs[:-2] :
+			print(p)
 			if p != sequenceConfig.currentPID and p != "":
 				os.system("kill " + str(p))
 

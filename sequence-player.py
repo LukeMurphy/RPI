@@ -75,7 +75,7 @@ def timeChecker(sequenceConfig, config) :
 			print(p)
 			if p != sequenceConfig.currentPID and p != "":
 				print ("Should be killing " + str(p))
-				os.system("kill -9" + str(p) + ";")
+				os.system("kill " + str(p) + " -9 ;")
 
 
 

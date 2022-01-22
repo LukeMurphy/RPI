@@ -55,7 +55,7 @@ def timeChecker(sequenceConfig, config) :
 		except Exception as e:
 			print(str(e))
 
-		commandString = sequenceConfig.commadStringPyth  + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
+		commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
 		print("Command:  " + commandString)
 		os.system(commandString)
 

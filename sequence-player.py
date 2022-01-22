@@ -26,6 +26,12 @@ from modules.rendering import appWindow
 from modules.configuration import bcolors
 
 
+from subprocess import check_output
+
+
+'''
+This file runs as a daemon to mange the sequence of players
+'''
 
 
 def timeChecker(sequenceConfig, config) :
@@ -48,21 +54,25 @@ def timeChecker(sequenceConfig, config) :
 
 		sequenceConfig.currentPieceDuration = random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2])
 		
-		#sequenceConfig.commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI -mname studio -cfg "
-		#os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
-		try:
-			os.system("kill "+ str(sequenceConfig.currentPID) +";")
-		except Exception as e:
-			print(str(e))
-
+		# Launch the next player
 		commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
 		print("Command:  " + commandString)
 		os.system(commandString)
 
-		sequenceConfig.currentPID = os.system("ps -ef | pgrep -f player" )
+		# wait for the player to load before cleaning up
+		time.sleep(1)
+
+		# Now check all the running python scripts and kill the one before the one that was just launched
+		listOfProcs = check_output("ps -ef | pgrep -i python", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
+
+		print(listOfProcs)
 
 
-		#loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
+		for p in listOfProcs[:-2] :
+			if p != sequenceConfig.currentPID and p != "":
+				os.system("kill " + str(p))
+
+
 
 
 def loadWorkConfig(work, sequenceConfig):
@@ -94,6 +104,10 @@ def loadWorkConfig(work, sequenceConfig):
 	config.fileName = argument
 	sequenceConfig.playCount=sequenceConfig.playCount+1
 	print("==========> count play : " + str(sequenceConfig.playCount))
+
+
+	sequenceConfig.currentPID = os.getpid()
+	print("Sequence Player PID is: " + str(sequenceConfig.currentPID))
 
 	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
 
@@ -234,6 +248,7 @@ def loadSequenceFile():
 		pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
 		pieceToPlay = 0
 		loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
+
 
 		#sequenceConfig.mainAppWindow.run()
 

@@ -37,7 +37,7 @@ This file runs as a daemon to mange the sequence of players
 def timeChecker(sequenceConfig, config) :
 	sequenceConfig.currentTime = time.time()
 
-	print(sequenceConfig.currentTime - sequenceConfig.startTime, sequenceConfig.currentPieceDuration )
+	#print(sequenceConfig.currentTime - sequenceConfig.startTime, sequenceConfig.currentPieceDuration )
 
 	if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration :
 		sequenceConfig.startTime = time.time()

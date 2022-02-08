@@ -22,10 +22,10 @@ class ParticleSystem(object):
 	cohesionDegrades = 1
 	useFlocking = False
 
-	centerRangeXMin = -10
-	centerRangeXMax = 60
-	centerRangeYMin = -40
-	centerRangeYMax = 40
+	centerRangeXMin = 0
+	centerRangeXMax = 0
+	centerRangeYMin = 0
+	centerRangeYMax = 0
 
 	ignoreBottom = False
 

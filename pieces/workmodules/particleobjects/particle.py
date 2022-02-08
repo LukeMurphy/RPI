@@ -576,6 +576,7 @@ class Particle(object):
 					centerY += pal.yPosR
 					count += 1
 					distianceProportion = 1  # ( distance/ps.cohesionDistance)
+					#distianceProportion = 1 - distance / ps.cohesionDistance 
 					## Get your pals average direction
 					if distance < ps.cohesionDistance and distance > ps.repelDistance:
 						directionTotal += pal.direction * distianceProportion
@@ -592,7 +593,12 @@ class Particle(object):
 		if count == 1:
 			self.directionIncrement *= ps.cohesionDegrades
 
-		if count > 5:
+
+		if random.random() < .01 :
+			self.direction = random.uniform(-math.pi,math.pi)
+
+		'''
+		if count > 20:
 			dx = self.xPosR - centerX / count
 			dy = self.yPosR - centerY / count
 
@@ -600,5 +606,6 @@ class Particle(object):
 				angle = -self.direction
 			else:
 				angle = math.atan(dy / dx)
+		'''
 
 			# self.directionIncrement += (angle - self.direction) / ps.clumpingFactor * 10

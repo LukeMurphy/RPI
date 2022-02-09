@@ -163,7 +163,11 @@ def makeBackGround(drawRef, n=1):
 			(round(config.patternEndColor[2] - bDelta * (c + 1))),
 			225,
 		)
-		
+
+		if random.random() < .2 :
+
+			fillClr = (round(random.uniform(0,255)),round(random.uniform(0,255)),round(random.uniform(0,255)),255)
+
 		#drawRef.rectangle((0, 0, 0 + 1, config.canvasHeight), fill = None, outline = (255,0,0,255))
 
 		# length transition

@@ -164,12 +164,12 @@ def makeBackGround(drawRef, n=1):
 			225,
 		)
 
-		if random.random() < .5:
+		if random.random() < .15:
 
 			fillClr = (
-				round(random.uniform(0,255) * config.brightness),
-				round(random.uniform(0,150) * config.brightness),
-				round(random.uniform(0,155) * config.brightness),
+				round(random.uniform(0,0) * config.brightness),
+				round(random.uniform(0,120) * config.brightness),
+				round(random.uniform(80,200) * config.brightness),
 				255
 					)
 

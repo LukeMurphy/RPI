@@ -166,7 +166,7 @@ def makeBackGround(drawRef, n=1):
 
 		if random.random() < .2 :
 
-			fillClr = (round(random.uniform(0,255)),round(random.uniform(0,255)),round(random.uniform(0,255)),255)
+			fillClr = (round(random.uniform(0,255) * config.brightness),round(random.uniform(0,255) * config.brightness),round(random.uniform(0,255) * config.brightness),round(random.uniform(0,255))
 
 		#drawRef.rectangle((0, 0, 0 + 1, config.canvasHeight), fill = None, outline = (255,0,0,255))
 

@@ -164,14 +164,13 @@ def makeBackGround(drawRef, n=1):
 			225,
 		)
 
-		if random.random() < .05:
+		if random.random() < config.addrndProb:
 
-			fillClr = (
-				round(random.uniform(0,0) * config.brightness),
-				round(random.uniform(80,120) * config.brightness),
-				round(random.uniform(80,120) * config.brightness),
-				255
-					)
+			fillClr = colorutils.getRandomColorHSV(
+			config.addrnd_minHue, config.addrnd_maxHue, 
+			config.addrnd_minSaturation, config.addrnd_maxSaturation, 
+			config.addrnd_minValue, config.addrnd_maxValue,
+			config.addrnd_dropHueMinValue, config.addrnd_dropHueMaxValue, 255, config.brightness)
 
 		#drawRef.rectangle((0, 0, 0 + 1, config.canvasHeight), fill = None, outline = (255,0,0,255))
 
@@ -515,6 +514,20 @@ def init():
 	config.bg_minValue = float(workConfig.get("scroller", "bg_minValue"))
 	config.bg_maxValue = float(workConfig.get("scroller", "bg_maxValue"))
 
+
+	try :
+		config.addrndProb = float(workConfig.get("scroller","addrndProb"))
+		config.addrnd_minHue = int(workConfig.get("scroller", "addrnd_minHue"))
+		config.addrnd_maxHue = int(workConfig.get("scroller", "addrnd_maxHue"))
+		config.addrnd_minSaturation = float(workConfig.get("scroller", "addrnd_minSaturation"))
+		config.addrnd_maxSaturation = float(workConfig.get("scroller", "addrnd_maxSaturation"))
+		config.addrnd_minValue = float(workConfig.get("scroller", "addrnd_minValue"))
+		config.addrnd_maxValue = float(workConfig.get("scroller", "addrnd_maxValue"))
+		config.addrnd_dropHueMaxValue = float(workConfig.get("scroller", "addrnd_dropHueMaxValue"))
+		config.addrnd_dropHueMinValue = float(workConfig.get("scroller", "addrnd_dropHueMinValue"))
+	except Exception as e:
+		print(str(e))
+		config.addrndProb = 0	
 
 	try:
 		config.redGreenSwapProb = float(workConfig.get("scroller", "redGreenSwapProb"))

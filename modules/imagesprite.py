@@ -43,6 +43,7 @@ def ScaleRotateTranslate(
 
 
 class ImageSprite:
+
 	color = (255, 0, 0)
 	bgColor = (0, 0, 255)
 	speed = 2
@@ -133,6 +134,9 @@ class ImageSprite:
 	colorModes = ["colorWheel", "random", "colorRGB", 'hsvFlame']
 
 	def __init__(self, config, iid=0):
+
+		print("ImageSprite Initiated")
+		
 		self.iid = iid
 		self.config = config
 

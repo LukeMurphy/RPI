@@ -109,6 +109,8 @@ class ImageSprite :
 	colorModes = ["colorWheel","random","colorRGB"]
 
 	def __init__(self, config, iid=0) :
+
+		print("ImageSprite v1 Initiated")
 		self.iid = iid
 		self.config = config
 
@@ -191,7 +193,7 @@ class ImageSprite :
 	
 	def process(self) :
 		change = 1
-		#print("Processing....")
+		#print("Processing...."  + self.colorMode)
 		#print("-----------")
 
 
@@ -204,6 +206,19 @@ class ImageSprite :
 				self.image = self.image.resize((int(newSizeX), int(newSizeY))) #, Image.ANTIALIAS
 
 			brt = random.random() + self.config.minBrightness
+
+			if self.colorMode == "rangeControlled" :
+				clr = self.clrUtils.getRandomColorHSV(
+						self.clrRange_minHue,
+						self.clrRange_maxHue,
+						self.clrRange_minSaturation,
+						self.clrRange_maxSaturation,
+						self.clrRange_minValue,
+						self.clrRange_maxValue,
+						self.clrRange_dropHueMinValue ,
+						self.clrRange_dropHueMaxValue,
+						255,
+						brt)
 
 			# This was really just set up for the multiple-planes piece
 			if(self.randomizeColor) :
@@ -241,6 +256,7 @@ class ImageSprite :
 				if self.colorMode == "hsvFlame":
 					clr = self.clrUtils.getRandomColorHSV(350,60,.8,1.0,.8,1.0,0,0,255,brt)
 
+
 			else :
 				r = int(random.uniform(200,255))
 				g = int(random.uniform(0,100))
@@ -251,7 +267,8 @@ class ImageSprite :
 					b = int(random.uniform(200,255))
 				clr = (r,g,b,a)
 
-			#print("Colorizing ....")
+			#print("Colorizing ...." )
+			#print(clr)
 			#print("-----------")
 			self.colorize(clr)
 

@@ -333,6 +333,19 @@ def main(run=True):
 	config.variance = float(workConfig.get("particleSystem", "variance"))
 
 	try:
+		ps.objWidthMax = int(workConfig.get("particleSystem", "objWidthMax"))
+		ps.objHeightMax = int(workConfig.get("particleSystem", "objHeightMax"))		
+
+		ps.objWidthMin = int(workConfig.get("particleSystem", "objWidthMin"))
+		ps.objHeightMin = int(workConfig.get("particleSystem", "objHeightMin"))
+	except Exception as e:
+		print(str(e))
+		ps.objWidthMax = ps.objWidth
+		ps.objHeightMax = ps.objHeight		
+		ps.objWidthMin = ps.objWidth
+		ps.objHeightMin = ps.objHeight
+
+	try:
 		ps.rndSizeFactorMin = float(workConfig.get("particleSystem", "rndSizeFactorMin"))
 		ps.rndSizeFactorMax = float(workConfig.get("particleSystem", "rndSizeFactorMax"))
 	except Exception as e:
@@ -415,8 +428,8 @@ def main(run=True):
 def emitParticle(i=None):
 	global config, ps
 	p = Particle(ps)
-	p.objWidth = ps.objWidth
-	p.objHeight = ps.objHeight
+	p.objWidth = round(random.uniform(ps.objWidthMin, ps.objWidthMax))
+	p.objHeight = round(random.uniform(ps.objHeightMin, ps.objHeightMax))
 
 	p.particleWinkOutXMin = config.particleWinkOutXMin
 	p.particleWinkOutYMin = config.particleWinkOutYMin
@@ -461,7 +474,10 @@ def emitParticle(i=None):
 			ps.config.brightness,
 			int(random.uniform(ps.transparencyRange[0], ps.transparencyRange[1])),
 		)
-		p.outlineColor = None
+		p.outlineColor = colorutils.randomColorAlpha(
+			ps.config.brightness,
+			int(random.uniform(ps.transparencyRange[0], ps.transparencyRange[1])),
+		)
 
 	else:
 		p.fillColor = config.fillColor  # (240,150,0,100)
@@ -748,7 +764,7 @@ def iterate():
 			config.remapImageBlockDestination = [startX,startY]
 
 
-	if random.random() < ps.changechangeCohesionProb and ps.changeCohesion == True:
+	if random.random() < ps.changechangeCohesionProb and ps.changeCohesion == True and ps.movement == "travel":
 		if random.random() > 0.5 :
 			ps.cohesionDistance = random.uniform(10, 150)
 			
@@ -758,7 +774,7 @@ def iterate():
 			#ps.cohesionDistance = random.uniform(ps.repelDistance * 2 ,200 )
 			#ps.repelFactor = random.uniform(0,10)
 
-		print(ps.cohesionDistance, ps.repelDistance)
+		#print(ps.cohesionDistance, ps.repelDistance)
 
 	if config.overallBlur > 0:
 		config.image = config.image.filter(

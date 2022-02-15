@@ -117,6 +117,22 @@ def main(run=True):
 		print("***************************")
 		from modules.imagesprite import ImageSprite
 
+
+	if config.colorMode == "rangeControlled" :
+		try:
+			config.clrRange_minHue = int(workConfig.get("repeater", "clrRange_minHue"))
+			config.clrRange_maxHue = int(workConfig.get("repeater", "clrRange_maxHue"))
+			config.clrRange_minSaturation = float(workConfig.get("repeater", "clrRange_minSaturation"))
+			config.clrRange_maxSaturation = float(workConfig.get("repeater", "clrRange_maxSaturation"))
+			config.clrRange_minValue = float(workConfig.get("repeater", "clrRange_minValue"))
+			config.clrRange_maxValue = float(workConfig.get("repeater", "clrRange_maxValue"))
+			config.clrRange_dropHueMinValue = int(workConfig.get("repeater", "clrRange_dropHueMinValue"))
+			config.clrRange_dropHueMaxValue = int(workConfig.get("repeater", "clrRange_dropHueMaxValue"))
+		except Exception as e:
+			print("***************************")
+			print(str(e))
+			print("***************************")
+
 	# for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	# for i in range (0,simulBlocks) : makeBlock()
@@ -137,6 +153,7 @@ def main(run=True):
 		imgLoader.yOffsetFactor = 200
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
+
 		if config.unitCount == 1:
 			imgLoader.scalingFactor = config.scalingFactor
 			imgLoader.useJitter = config.useJitter
@@ -154,12 +171,26 @@ def main(run=True):
 			imgLoader.useBlink = config.useBlink
 			imgLoader.brightnessFactor = config.brightness * random.uniform(.4,1.1)
 			imgLoader.config = config
+
 			if config.colorMode == "randomized":
 				imgLoader.colorMode = "random"
 				if random.random() < 0.5:
 					imgLoader.colorMode = "colorRGB"
+
+			elif (config.colorMode == "rangeControlled"):
+					imgLoader.colorMode = config.colorMode
+					imgLoader.clrRange_minHue = config.clrRange_minHue
+					imgLoader.clrRange_maxHue = config.clrRange_maxHue
+					imgLoader.clrRange_minSaturation = config.clrRange_minSaturation
+					imgLoader.clrRange_maxSaturation = config.clrRange_maxSaturation
+					imgLoader.clrRange_minValue = config.clrRange_minValue
+					imgLoader.clrRange_maxValue = config.clrRange_maxValue
+					imgLoader.clrRange_dropHueMinValue = config.clrRange_dropHueMinValue
+					imgLoader.clrRange_dropHueMaxValue = config.clrRange_dropHueMaxValue
+
 			else:
 				imgLoader.colorMode = config.colorMode
+
 			imgLoader.resizeMin = config.resizeMin
 			imgLoader.resizeMax = config.resizeMax
 			# colorRGB" #colorWheel #random #colorRGB

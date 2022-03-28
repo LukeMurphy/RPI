@@ -303,10 +303,16 @@ def redraw():
 
 	if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:
 		# config.useLastOverlay = False if config.useLastOverlay == True  else True
+		#print("lastOVerlay")
 		xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
 		yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
 		config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
-		config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
+
+		cR = config.lastOverLayColorRange
+		lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
+		#print(lastOverlayFill)
+		config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(5, 50)))
+		#config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
 
 
 def runWork():
@@ -516,6 +522,14 @@ def main(run=True):
 
 	config.lastOverlayBox = (0, 0, 64, 32)
 	config.lastOverlayFill = (10, 0, 0, 10)
+
+	try:
+		config.lastOverLayColorRange = list(
+			map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(","))
+		)
+	except Exception as e:
+		print(str(e))
+		config.lastOverLayColorRange = (0,10,.5,1.0,.5,.5)
 
 	# If there are multiple collage shape sets this sets the time between changes and probability that happens
 	try:

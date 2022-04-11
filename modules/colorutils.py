@@ -72,8 +72,8 @@ def getRedShiftedColors(brtns=1):
 	if brtns == 1:
 		brtns = brightness
 	r = round((random.uniform(0, 255)) * brtns)
-	g = round((random.uniform(0, 255)) * brtns)
-	b = round((random.uniform(0, 255)) * brtns)
+	g = round((random.uniform(0, 50)) * brtns)
+	b = round((random.uniform(0, 50)) * brtns)
 	rRange = 255 - r
 	r = round(r + random.uniform(0, rRange))
 	return (r, g, b)

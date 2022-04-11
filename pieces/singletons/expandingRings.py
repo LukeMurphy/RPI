@@ -20,7 +20,6 @@ class expandingRing:
 	def __init__(self, config, i=0):
 		self.config = config
 		self.radialExpansion = 1
-		self.unitArray = []
 		self.color = colorutils.randomColorAlpha(1,255,125)
 		self.colorTuple = tuple(int(i) for i in self.color)
 		self.angularRotation = 0 #random.uniform(-math.pi/100,math.pi/100)
@@ -30,8 +29,9 @@ class expandingRing:
 
 
 	def initializeUnits(self) :
+		self.unitArray = []
 		self.radius = 30 +  round(random.uniform(10,100))
-		self.numUnits = 6 + round(random.uniform(1,24))
+		self.numUnits = 6 + round(random.uniform(config.numUnitsPerRingMin,config.numUnitsPerRingMax))
 		self.radians = 2 * math.pi / self.numUnits
 
 		for i in range (0, self.numUnits) :
@@ -40,21 +40,26 @@ class expandingRing:
 			u.angle = self.radians * i
 			u.xPos = round(self.radius * math.cos(u.angle)) + self.center[0]
 			u.yPos = round(self.radius * math.sin(u.angle)) + self.center[1]
+			u.center = self.center
 			u.color = self.color
 			u.colorTuple = tuple(int(n) for n in self.color)
 			u.boxWidth = u.boxHeight = 10
 			u.reDraw()
+
+	def cleanup(self) :
+			del(self.unitArray)
+
 
 	def regreshRingParameters(self):
 
 		if self.mode == 1 :
 			self.color = colorutils.randomColorAlpha()
 		if self.mode == 2 :
-			self.color = colorutils.getSunsetColors()
+			self.color = colorutils.getRedShiftedColors()
 		if self.mode == 3 :
 			self.color = colorutils.randomGrayAlpha()
 		
-		self.radialExpansion = random.uniform(.02,4)
+		self.radialExpansion = random.uniform(.02,5)
 		self.angularRotation = 0 #random.uniform(-math.pi/100,math.pi/100)
 		unitSizeExpansionRate = random.random()
 		self.unitBoxWidthExpansionRate = unitSizeExpansionRate
@@ -82,6 +87,7 @@ class expandingRing:
 					u.boxWidth = 1
 					u.boxHeight = 1		
 					u.colorTuple = tuple(int(n) for n in self.color)
+					u.length = 1
 
 						
 				u.boxWidth += self.unitBoxWidthExpansionRate
@@ -99,6 +105,7 @@ class unit:
 		self.config = config
 		self.boxWidth = 10
 		self.boxHeight = 10
+		self.length = 2
 		self.setUp()
 
 
@@ -115,7 +122,17 @@ class unit:
 		)
 
 	def reDraw(self):
-		self.config.draw.ellipse((self.xPos - self.boxWidth/2, self.yPos -self.boxHeight/2, self.xPos + self.boxWidth/2, self.yPos + self.boxHeight/2), fill=self.colorTuple)
+		#self.config.draw.ellipse((self.xPos - self.boxWidth/2, self.yPos -self.boxHeight/2, self.xPos + self.boxWidth/2, self.yPos + self.boxHeight/2), fill=self.colorTuple)
+		#self.config.draw.rectangle((self.xPos - self.boxWidth/2, self.yPos -self.boxHeight/2, self.xPos + self.boxWidth/2, self.yPos + self.boxHeight/2), fill=self.colorTuple)
+		
+
+		xPos = round(self.length * math.cos(self.angle)) + self.xPos
+		yPos = round(self.length * math.sin(self.angle)) + self.yPos
+		self.config.draw.line([(self.xPos, self.yPos), (xPos, yPos )], fill=self.colorTuple)
+		self.length += self.config.lineRate
+
+		if self.length <= 0.0:
+			self.length = .1
 
 
 
@@ -135,7 +152,7 @@ def runWork():
 def iterate():
 	global config, expandingRingsRing, lastRate, calibrated, cycleCount
 	#config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0,10))
+	config.draw.rectangle((0,0,config.screenWidth, config.screenHeight), fill=(0,0,0,config.bgAlpha))
 	for ringGroup in config.ringSets :
 		for ring in ringGroup['rings'] :
 			ring.expand()
@@ -147,6 +164,9 @@ def iterate():
 		ringSet = math.floor(random.uniform(0,len(config.ringSets)))
 		for r in config.ringSets[ringSet]['rings'] :
 			r.mode = mode
+
+			r.cleanup()
+			r.initializeUnits()
 		
 
 		
@@ -161,6 +181,10 @@ def main(run=True):
 	config.draw = ImageDraw.Draw(config.image)
 
 	config.redrawSpeed = float(workConfig.get("expandingRings", "redrawSpeed"))
+	config.lineRate = float(workConfig.get("expandingRings", "lineRate"))
+	config.numUnitsPerRingMax = int(workConfig.get("expandingRings", "numUnitsPerRingMax"))
+	config.numUnitsPerRingMin = int(workConfig.get("expandingRings", "numUnitsPerRingMin"))
+	config.bgAlpha = int(workConfig.get("expandingRings", "bgAlpha"))
 	ringSets = workConfig.get("expandingRings", "ringSets")
 	ringSets = ringSets.split(",")
 

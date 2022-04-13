@@ -29,12 +29,213 @@ global config
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+class DotGrid :
+	
+	def __init__(self):
+		self.clrs = [(255,0,0,255), (0,255,0,255), (0,0,255,255)]
+		self.dotGridsArray = list()
+		self.width = 256
+		self.height = 256
 
+		self.bgColor  = (30,0,100,10)
+		self.bgColor  = (0,0,0,255)
+
+		self.cols = 1
+		self.rows = 1
+
+
+
+	def setUp(self) :
+		self.workImage = Image.new("RGBA", (self.width, self.height))
+		self.draw = ImageDraw.Draw(self.workImage)
+		#self.draw.rectangle((0,0,self.width,self.height), fill=self.bgColor)
+
+
+		self.dotImage1 = Image.new("RGBA", (self.width, self.height))
+		self.dotImage2 = Image.new("RGBA", (self.width, self.height))
+		self.dotImage3 = Image.new("RGBA", (self.width, self.height))
+
+		self.dotImageArray = [self.dotImage1, self.dotImage2, self.dotImage3]
+		self.hideDotRate = 0
+
+		for i in range(0,3) :
+			n = 0
+			workImage = self.dotImageArray[i]
+			draw = ImageDraw.Draw(workImage)
+			for c in range(0,self.cols):
+				for r in range(0,self.rows):
+					xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+					yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+					#self.dotGridsArray.append(list())
+					#if self.dotVariationByColor != True :
+					dotVariation = random.random() * self.dotVariation
+					d = Dot()
+					d.workImage = workImage
+					d.draw = draw
+					d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2) * 1 + self.colsXOffset
+					d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i) * 1 + self.rowsYOffset
+					d.fillColor = self.clrs[i]
+					d.bgColor = self.bgColor
+
+					if self.dotVariationByColor == True :
+						dotVariation = random.random() * self.dotVariation
+					d.dotSize = self.dotSize + dotVariation
+					d.spreadX = self.spreadX #+ i * 5
+					d.spreadY = self.spreadY
+	
+					if n in self.hideDotsList : 
+						d.visible = False
+					else :
+						d.visible = True
+					d.setUp()
+					d.drawOval()
+					self.dotGridsArray.append(d)
+					n += 1
+
+
+	def change(self) :
+
+		self.workImage = Image.new("RGBA", (self.width, self.height))
+		self.draw = ImageDraw.Draw(self.workImage)
+		#self.draw.rectangle((0,0,self.width,self.height), fill=self.bgColor)
+		self.dotImage1 = Image.new("RGBA", (self.width, self.height))
+		self.dotImage2 = Image.new("RGBA", (self.width, self.height))
+		self.dotImage3 = Image.new("RGBA", (self.width, self.height))
+
+		self.dotImageArray = [self.dotImage1, self.dotImage2, self.dotImage3]
+		self.hideDotRate = 0
+
+		dNum  = 0
+		for i in range(0,3) :
+			n = 0
+			workImage = self.dotImageArray[i]
+			draw = ImageDraw.Draw(workImage)
+			for c in range(0,self.cols):
+				for r in range(0,self.rows):
+					d = self.dotGridsArray[dNum]
+					d.workImage = workImage
+					d.draw = draw
+
+					if random.random() < self.changeDotRate :
+						xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+						yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
+						dotVariation = random.random() * self.dotVariation
+						d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2) * 1 + self.colsXOffset
+						d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i) * 1 + self.rowsYOffset
+						d.dotSize = self.dotSize + dotVariation
+						d.spreadX = self.spreadX #+ i * 5
+						d.spreadY = self.spreadY
+						d.setUp()
+
+					d.drawOval()
+
+					dNum+= 1
+
+		self.workImage = ImageChops.add_modulo(self.workImage , self.dotImageArray[0])
+		self.workImage = ImageChops.add_modulo(self.workImage , self.dotImageArray[1])
+		self.workImage = ImageChops.add_modulo(self.workImage , self.dotImageArray[2])
+		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=self.blurRadius))
+
+
+
+class Dot :
+
+	def __init__(self):
+
+		self.xOffSet = 0
+		self.yOffSet = 0
+		self.fillColor = (255,255,255,255)
+		self.outlineColor = None
+		self.visible = True
+
+	def setUp(self):
+		#self.workImage = Image.new("RGBA", (256, 256))
+		#self.draw = ImageDraw.Draw(self.workImage)
+		self.width = self.dotSize
+		self.height = self.dotSize
+		self.xPos = self.spreadX + self.spreadX * random.random()
+		self.yPos = self.spreadY + self.spreadY * random.random()
+		self.xPos += self.xOffSet
+		self.yPos += self.yOffSet
+
+	def drawOval(self):
+			# self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)),
+			#     fill=self.fillColor, outline=self.outlineColor)
+			self.draw.rectangle((self.xPos, self.yPos,self.xPos+self.width, self.yPos+self.height), fill= self.bgColor)
+			if self.visible == True :
+				box = [(self.xPos, self.yPos), (self.xPos + self.width/2 + 1, self.yPos + self.height/2 + 1)]
+				self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
+
+
+
+def processImage():
+	## Run through the objects .....
+	#config.workImageDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
+
+	config.dotGrid.change()
+	#config.draw.rectangle((0,0,200,200), fill=config.bgColor)
+
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+	config.canvasImage.paste(config.dotGrid.workImage, (0,0))
+
+
+
+
+def iterate():
+	global config
+
+	# config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
+	# config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
+
+	
+	if config.useFadeThruAnimation == True:
+		if config.f.fadingDone == True:
+
+			config.renderImageFullOld = config.renderImageFull.copy()
+			config.renderImageFull.paste(
+				config.canvasImage,
+				(config.imageXOffset, config.imageYOffset),
+				config.canvasImage,
+			)
+			config.f.xPos = config.imageXOffset
+			config.f.yPos = config.imageYOffset
+			# config.renderImageFull = config.renderImageFull.convert("RGBA")
+			# renderImageFull = renderImageFull.convert("RGBA")
+			config.f.setUp(
+				config.renderImageFullOld.convert("RGBA"),
+				config.canvasImage.convert("RGBA"),
+			)
+			processImage()
+
+
+		config.f.fadeIn()
+		config.render(config.f.blendedImage, 0, 0)
+		config.init += config.initCount
+		
+		# This is to get a faster initial fade-in then when done
+		# set it to the right fade-through count
+		if config.init > 18 and config.initCount > 0 :
+			config.f.doingRefreshCount = config.doingRefreshCount
+			config.initCount = 0
+
+
+	else:
+		processImage()
+		config.renderImageFull.paste(
+			config.canvasImage,
+			(config.imageXOffset, config.imageYOffset),
+			config.canvasImage,
+		)
+		config.render(config.renderImageFull, 0, 0)
+		'''
+		config.render(config.canvasImage, 0, 0)
+		'''
 
 def init():
 	global config
 
-	print("SINGLETON Spots HOLDER INIT")
+	print("SINGLETON dotGrids HOLDER INIT")
 
 	config.redrawSpeed = float(workConfig.get("spots", "redrawSpeed"))
 	config.doingRefreshCount = float(workConfig.get("spots", "doingRefreshCount"))
@@ -60,6 +261,7 @@ def init():
 	config.hideDots = (workConfig.get("spots", "hideDots"))
 	config.hideDotsList = tuple((int(i)) for i in config.hideDots.split(','))
 	config.hideDotRate = float(workConfig.get("spots", "hideDotRate"))
+	config.changeDotRate = float(workConfig.get("spots", "changeDotRate"))
 
 
 	config.colsXOffset = int(workConfig.get("spots", "colsXOffset"))
@@ -71,50 +273,43 @@ def init():
 	config.imageYOffset = 0
 
 
-	config.canvasImage = Image.new(
-		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
-	)
+	config.canvasImage = Image.new("RGBA", (config.canvasWidth , config.canvasHeight))
 	config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 
-	config.imageLayer = Image.new(
-		"RGBA", (config.canvasWidth * 10, config.canvasHeight)
-	)
-	config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
 
-	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.workImageDraw = ImageDraw.Draw(config.workImage)
-	
+	config.dotGrid = DotGrid()
+	config.dotGrid.xOffSet = config.colsXOffset
+	config.dotGrid.yOffSet = config.rowsYOffset
+	config.dotGrid.colsXOffset = config.colsXOffset
+	config.dotGrid.rowsYOffset = config.rowsYOffset
+	config.dotGrid.dotSize = config.dotSize
+	config.dotGrid.packing = config.packing
+	config.dotGrid.spreadX = config.spreadX
+	config.dotGrid.spreadY = config.spreadY
+	config.dotGrid.rows = config.dotrows
+	config.dotGrid.cols = config.dotcols
+	config.dotGrid.bgColor = config.bgColor
+	config.dotGrid.blurRadius =  config.blurRadius
+	config.dotGrid.gridVariation = config.gridVariation
+	config.dotGrid.dotVariation = config.dotVariation
+	config.dotGrid.dotVariationByColor = config.dotVariationByColor
+	config.dotGrid.hideDotsList = config.hideDotsList
+	config.dotGrid.hideDotRate = config.hideDotRate
+	config.dotGrid.changeDotRate = config.changeDotRate
+	config.dotGrid.width = config.canvasWidth
+	config.dotGrid.height = config.canvasHeight
+	config.dotGrid.clrs = [config.clrA, config.clrB, config.clrCV]
 
-	config.spot = Spot()
-	config.spot.xOffSet = config.colsXOffset
-	config.spot.yOffSet = config.rowsYOffset
-	config.spot.colsXOffset = config.colsXOffset
-	config.spot.rowsYOffset = config.rowsYOffset
-	config.spot.dotSize = config.dotSize
-	config.spot.packing = config.packing
-	config.spot.spreadX = config.spreadX
-	config.spot.spreadY = config.spreadY
-	config.spot.rows = config.dotrows
-	config.spot.cols = config.dotcols
-	config.spot.bgColor = config.bgColor
-	config.spot.blurRadius =  config.blurRadius
-	config.spot.gridVariation =config.gridVariation
-	config.spot.dotVariation =config.dotVariation
-	config.spot.dotVariationByColor =config.dotVariationByColor
-	config.spot.hideDotsList = config.hideDotsList
-	config.spot.hideDotRate = config.hideDotRate
+	config.dotGrid.setUp()
 
-	config.spot.clrs = [config.clrA, config.clrB, config.clrCV]
-
-	config.spot.setUp()
-	config.spot.render()
 
 	config.init = 0
 	config.initCount = 1
 
 	config.f = FaderObj()
 	config.f.doingRefreshCount = 5
-	config.f.setUp(config.renderImageFull, config.workImage)
+	config.f.setUp(config.renderImageFull, config.canvasImage)
+
 
 	config.renderImageFullOld = config.renderImageFull.copy()
 	config.fadingDone = True
@@ -130,220 +325,11 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 
 
-def checkTime(SpotsObj):
+def checkTime(dotGridsObj):
 	config.t2 = time.time()
 	delta = config.t2 - config.t1
 
 	#if delta > config.timeToComplete and config.deltaTimeDone == False:
-
-
-class Spot :
-	
-	def __init__(self):
-		self.clrs = [(255,0,0,200), (0,255,0,200), (0,0,255,200)]
-		self.spotsArray = list()
-		self.width = 256
-		self.height = 256
-
-		self.bgColor  = (30,0,100,10)
-
-		self.cols = 4
-		self.rows = 8
-
-		self.workImage = Image.new("RGBA", (self.width, self.height))
-		self.draw = ImageDraw.Draw(self.workImage)
-
-		self.hideDotRate = 0
-
-
-
-	def setUp(self) :
-		self.draw.rectangle((0,0,256,256), fill=self.bgColor)
-		n = 0
-		for c in range(0,self.cols):
-			for r in range(0,self.rows):
-				xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
-				yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
-				self.spotsArray.append(list())
-				if self.dotVariationByColor != True :
-					dotVariation = random.random() * self.dotVariation
-
-				
-				for i in range(0,3) :
-
-					d = Dot()
-					d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2)*0 + self.colsXOffset
-					d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i)*0 + self.rowsYOffset
-					d.fillColor = self.clrs[i]
-					if self.dotVariationByColor == True :
-						dotVariation = random.random() * self.dotVariation
-					d.dotSize = self.dotSize + dotVariation
-					d.spreadX = self.spreadX
-					d.spreadY = self.spreadY
-					d.setUp()
-					if n in self.hideDotsList : 
-						d.visible = False
-					else :
-						d.visible = True
-					self.spotsArray[n].append(d)
-
-
-				n += 1
-
-
-	def change(self) :
-
-		self.workImage = Image.new("RGBA", (self.width, self.height))
-		self.draw = ImageDraw.Draw(self.workImage)
-
-		if random.random() < self.hideDotRate:
-			# sets a default that is a dot that doesn't exist so things don't throw an
-			# error as per above .....
-			self.hideDotsList = [len(self.spotsArray) + 1]
-
-			for i in range (0,len(self.spotsArray)) :
-				if random.random() < .15 :
-					self.hideDotsList.append(i)
-
-
-
-		self.draw.rectangle((0,0,256,256), fill=self.bgColor)
-		n = 0
-		for c in range(0,self.cols):
-			for r in range(0,self.rows):
-				xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
-				yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
-
-				if self.dotVariationByColor != True :
-					dotVariation = random.random() * self.dotVariation
-				if random.random() < .75 : 
-					for i in range(0,3) :
-
-						d = self.spotsArray[n][i]
-						d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2)*0 + self.colsXOffset
-						d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i)*0 + self.rowsYOffset
-						d.fillColor = self.clrs[i]
-						if self.dotVariationByColor == True :
-							dotVariation = random.random() * self.dotVariation
-						d.dotSize = self.dotSize + dotVariation
-						d.spreadX = self.spreadX
-						d.spreadY = self.spreadY
-						d.setUp()
-						if n in self.hideDotsList : 
-							d.visible = False
-						else :
-							d.visible = True
-				n += 1
-
-		self.render()
-
-
-
-	def render(self) :
-		for n in range(0,(self.rows*self.cols)):
-			for i in range(0,3):
-				self.spotsArray[n][i].drawOval()
-				#self.spotsArray[i].xPos += i
-				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][2].workImage)
-				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][0].workImage)
-				self.workImage = ImageChops.add(self.workImage , self.spotsArray[n][1].workImage)
-
-		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=self.blurRadius))
-
-
-class Dot :
-
-	def __init__(self):
-
-		self.xOffSet = 0
-		self.yOffSet = 0
-		self.fillColor = (255,0,0,255)
-		self.outlineColor = None
-		self.visible = True
-
-	def setUp(self):
-		self.workImage = Image.new("RGBA", (256, 256))
-		self.width = self.dotSize
-		self.height = self.dotSize
-		self.draw = ImageDraw.Draw(self.workImage)
-		self.xPos = self.spreadX + self.spreadX * random.random()
-		self.yPos = self.spreadY + self.spreadY * random.random()
-		self.xPos += self.xOffSet
-		self.yPos += self.yOffSet
-
-	def drawOval(self):
-			# self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)),
-			#     fill=self.fillColor, outline=self.outlineColor)
-			if self.visible == True :
-				box = [(self.xPos, self.yPos), (self.xPos + self.width/2 + 1, self.yPos + self.height/2 + 1)]
-				self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
-
-
-
-def processImage():
-	## Run through the objects .....
-	config.workImageDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
-
-	config.spot.change()
-
-	config.workImage.paste(config.spot.workImage, (0,0))
-	#config.workImage.paste(config.spot2.workImage, (config.spot2.xOffSet, config.spot2.yOffSet))
-	#config.workImage = ImageChops.add(config.spot.workImage,config.workImage)
-	#config.workImage = ImageChops.add(config.spot2.workImage, config.workImage)
-	
-	#config.workImage = ImageChops.add(config.workImage,)
-
-
-
-
-def iterate():
-	global config
-
-	# config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
-	# config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
-
-
-	if config.useFadeThruAnimation == True:
-		if config.f.fadingDone == True:
-
-			config.renderImageFullOld = config.renderImageFull.copy()
-			config.renderImageFull.paste(
-				config.workImage,
-				(config.imageXOffset, config.imageYOffset),
-				config.workImage,
-			)
-			config.f.xPos = config.imageXOffset
-			config.f.yPos = config.imageYOffset
-			# config.renderImageFull = config.renderImageFull.convert("RGBA")
-			# renderImageFull = renderImageFull.convert("RGBA")
-			config.f.setUp(
-				config.renderImageFullOld.convert("RGBA"),
-				config.workImage.convert("RGBA"),
-			)
-			processImage()
-
-
-		config.f.fadeIn()
-		config.render(config.f.blendedImage, 0, 0)
-		config.init += config.initCount
-		
-		# This is to get a faster initial fade-in then when done
-		# set it to the right fade-through count
-		if config.init > 18 and config.initCount > 0 :
-			config.f.doingRefreshCount = config.doingRefreshCount
-			config.initCount = 0
-
-
-	else:
-		processImage()
-		config.renderImageFull.paste(
-			config.workImage,
-			(config.imageXOffset, config.imageYOffset),
-			config.workImage,
-		)
-		config.render(config.renderImageFull, 0, 0)
-
-
 
 def main(run=True):
 	global config, threads, thrd

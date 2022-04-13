@@ -23,9 +23,17 @@ class FaderObj:
 
 	def fadeIn(self):
 		if self.fadingDone == False:
+
 			if self.doingRefresh < self.doingRefreshCount:
 				# print(self.doingRefresh)
 				# self.blendImage = Image.new("RGBA", (self.width, self.height))
+				'''
+				print("---------------------")
+				print(self.startImage)
+				print("---------------------")
+				print(self.endImage)
+				print("---------------------")
+				'''
 				self.blendedImage = Image.blend(
 					self.startImage,
 					self.endImage,

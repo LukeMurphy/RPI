@@ -299,15 +299,17 @@ def remakePatternBlock(imageRef, direction):
 		if random.random() < .15:
 			config.patternDrawProb = random.uniform(config.minDrawProb, config.maxDrawProb)
 
-		if random.random() < .15:
+		if random.random() < config.patternRowChangeProb:
 			config.patternRows = (round(random.uniform(config.minPatternRows, config.maxPatternRows)))
 
-		if random.random() < .15:
+		if random.random() < config.patternColChangeProb:
 			config.patternCols = (round(random.uniform(config.minPatternCols, config.maxPatternCols)))
 
 		if random.random() < .15:
 			choice = round(random.uniform(0,len(config.choiceArray)-1))
 			config.pattern = config.choiceArray[choice]
+
+		print("New Patterns : {0} {1}".format(config.patternRows, config.patternCols))
 
 	else :
 		config.pattern == config.initialPattern 
@@ -472,6 +474,18 @@ def init():
 	except Exception as e:
 		print(str(e))
 		config.backgroundColorChangeProb = .5
+
+	try:
+		config.patternRowChangeProb = float(workConfig.get("scroller", "patternRowChangeProb"))
+	except Exception as e:
+		print(str(e))
+		config.patternRowChangeProb = .15
+
+	try:
+		config.patternColChangeProb = float(workConfig.get("scroller", "patternColChangeProb"))
+	except Exception as e:
+		print(str(e))
+		config.patternColChangeProb = .15
 
 
 	try:

@@ -18,6 +18,9 @@ Attributes:
     topBtnPlace (int): Description
 """
 import os
+from os import listdir
+from os.path import isfile, join, isdir
+from os import walk
 import datetime
 import subprocess
 import sys
@@ -131,12 +134,18 @@ def reSort():
 		sortDefault = 0
 		getAllConfigFiles(True)
 
+def openFile() :
+	a = verify()
+	if a[0] == True:
+		# os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
+		configSelected = a[1]
+		os.system('open ' + 'configs/' + configSelected[list(configSelected.keys())[0]])
+
+
+
+
 
 # Generate list of configs:
-from os import listdir
-from os.path import isfile, join
-from os import walk
-
 def returnSecondElement(l):
 	"""Summary
 	
@@ -159,24 +168,33 @@ def getAllConfigFiles(dateSort=False) :
 	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
 	arr = os.listdir(configPath)
 	# Sort the directories by name
-	arr.sort(reverse=True)
+	arr.sort(reverse=False)
 	fullList = []
 	actionDict1 = []
-	for d in arr :
-		if d.find(".py") == -1 and d.find(".DS_Store") == -1 and d.find("_py") == -1 and d.find("LED") == -1:
-			subArr = os.listdir(configPath + d)
+
+	for directory in arr :
+		if directory.find(".py") == -1 and directory.find(".DS_Store") == -1 and directory.find("_py") == -1 and directory.find("LED") == -1:
+			subArr = os.listdir(configPath + directory)
+			subDirectoryList = []
 
 			if dateSort == False: 
 				subArr.sort(reverse=True)
 
-			for f in subArr:
-				if f.find(".DS_Store") == -1:
-					shortPath = d + "/" + f
-					res = os.stat(configPath + shortPath)
-					fullList.append((shortPath,res.st_mtime))
+			for file in subArr:
+				if file.find(".DS_Store") == -1:
+					shortPath = directory + "/" + file
+					if os.path.isfile(configPath + shortPath):
+						res = os.stat(configPath + shortPath)
+						if dateSort == False: 
+							subDirectoryList.append((shortPath,res.st_mtime))
+						else :
+							fullList.append((shortPath,res.st_mtime))
 
 			if dateSort == False: 
+				subDirectoryList.sort(key=returnSecondElement, reverse=True)
+				fullList.extend(subDirectoryList)
 				fullList.append({})
+
 
 	# Sort the configs by date descending
 	if dateSort == True : 
@@ -185,7 +203,14 @@ def getAllConfigFiles(dateSort=False) :
 	for f in fullList :
 		if len(f) > 0 :
 			tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
-			actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
+
+			if dateSort == True : 
+				display = f[0].split("/")
+				actionDict1.append({ display[1]  +"  (" + display[0] + ") " + tsTxt  : f[0]})
+				actionDict1.append({ ""  : ""})
+			else :
+				actionDict1.append({ tsTxt + "  " + f[0]   : f[0]})
+				#actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
 		else :
 			actionDict1.append({ ""  : ""})
 
@@ -252,6 +277,11 @@ sortbutton = Button(
 	root, text="Re-Sort", width = 120, bg='blue', fg='white', borderless=1, command=reSort
 )
 sortbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+100)
+
+openbutton = Button(
+	root, text="Open", width = 120, bg='blue', fg='white', borderless=1, command=openFile
+)
+openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+125)
 
 
 getAllConfigFiles(True)

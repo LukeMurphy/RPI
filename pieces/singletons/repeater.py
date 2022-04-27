@@ -71,7 +71,14 @@ def main(run=True):
 	config.useBlink = workConfig.getboolean("repeater", "useBlink")
 	config.noTrails = workConfig.getboolean("repeater", "noTrails")
 	config.imageList = workConfig.get("repeater", "imageList")
-	config.channelHeight = int(workConfig.get("repeater", "channelHeight"))
+
+
+	try:
+		config.channelHeight = int(workConfig.get("repeater", "channelHeight"))
+	except Exception as e:
+		print(str(e))	
+		config.channelHeight = 80
+
 
 	try:
 		config.pauseProb = float(workConfig.get("repeater", "pauseProb"))

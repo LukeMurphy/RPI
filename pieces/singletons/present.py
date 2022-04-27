@@ -110,6 +110,12 @@ def main(run=True):
 	except Exception as e:
 		print(str(e))
 
+	try:
+		config.channelHeight = int(workConfig.get("images", "channelHeight"))
+	except Exception as e:
+		print(str(e))	
+		config.channelHeight = 80
+
 	# for attr, value in config.__dict__.iteritems():print (attr, value)
 	blocks = []
 	# for i in range (0,simulBlocks) : makeBlock()
@@ -127,6 +133,7 @@ def main(run=True):
 		imgLoader.yOffsetFactor = 0
 		imgLoader.endX = config.screenWidth
 		imgLoader.endY = config.screenHeight + 32
+		imgLoader.channelHeight = config.channelHeight
 
 		imgLoader.scalingFactor = config.scalingFactor
 		imgLoader.useJitter = config.useJitter

@@ -412,9 +412,9 @@ def drawSqareSpiral():
 
 def runWork():
 	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+
 	print("RUNNING bricks.py")
-	print(bcolors.ENDC)
+
 	while True:
 		iterate()
 		time.sleep(config.delay)

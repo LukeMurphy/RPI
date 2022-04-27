@@ -245,9 +245,9 @@ def iterate():
 
 def runWork():
 	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+
 	print("RUNNING squares.py")
-	print(bcolors.ENDC)
+
 	while True:
 		iterate()
 		time.sleep(config.pulseSpeed)

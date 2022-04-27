@@ -80,8 +80,12 @@ def main(run=True):
 	config.scalingFactor = float(workConfig.get("plane", "scalingFactor"))
 	config.speedFactor = float(workConfig.get("plane", "speedFactor"))
 	config.useJitter = workConfig.getboolean("plane", "useJitter")
+	try:
+		config.channelHeight = int(workConfig.get("repeater", "channelHeight"))
+	except Exception as e:
+		print(str(e))	
+		config.channelHeight = 80
 
-	config.channelHeight = int(workConfig.get("plane", "channelHeight"))
 	
 	try:
 		config.jitterRate = float(workConfig.get("plane", "jitterRate"))

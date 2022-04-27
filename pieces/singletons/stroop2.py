@@ -186,11 +186,8 @@ class Block:
 			vOffset += round(
 				random.uniform(-config.tileSize[0] * 2, config.tileSize[0] * 2)
 			)
-			vOffset = round(random.uniform(0,config.screenHeight))		if config.higherVariability:
-			vOffset += round(
-				random.uniform(-config.tileSize[0] * 2, config.tileSize[0] * 2)
-			)
-			vOffset = round(random.uniform(0,config.screenHeight))
+			vOffset = round(random.uniform(0,config.screenHeight))		
+
 
 		self.wd = dims[0]
 		self.ht = dims[1]

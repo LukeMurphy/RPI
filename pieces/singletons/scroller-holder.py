@@ -1133,6 +1133,8 @@ def init():
 
 
 
+
+	config.renderImageFull = config.workImage.copy()
 	config.f = FaderObj()
 	config.f.setUp(config.renderImageFull, config.workImage)
 	config.f.doingRefreshCount = config.doingRefreshCount
@@ -1142,6 +1144,12 @@ def init():
 
 	config.useFadeThruAnimation = True
 	config.deltaTimeDone = True
+
+	try:
+		config.useFadeThruAnimation = workConfig.getboolean("scroller", "useFadeThruAnimation")
+	except Exception as e:
+		print(str(e))
+		config.useFadeThruAnimation = True
 
 
 def runWork():

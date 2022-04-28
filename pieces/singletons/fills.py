@@ -108,7 +108,7 @@ class Fill:
 
 		# Hue, Chroma, Luma
 		self.currentColor = list(colorutils.HSLToRGB(self.hue, self.sat, self.val))
-		self.displayCurrentColor = tuple((int(i)) for i in self.currentColor)
+		self.displayCurrentColor = tuple((round(i* self.config.brightness)) for i in self.currentColor)
 		# if (self.row == 0  and self.col == 0) : print(self.hue, self.displayCurrentColor)
 		self.config.draw.rectangle(
 			(self.x, self.y, self.width + self.x, self.height + self.y),

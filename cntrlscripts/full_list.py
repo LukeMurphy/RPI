@@ -78,6 +78,7 @@ def execute(configToRun):
 	global JavaAppRunning
 	if ".cfg" in configToRun:
 		if "multi" in configToRun:
+			print("MULTIPLAYER STARTING >>>\n")
 			os.system(commadStringMultiPyth + configToRun + "&")
 		if "--manifest" in configToRun:
 			os.system(commadStringSeqPyth + configToRun + "&")

@@ -252,7 +252,8 @@ scrollbar.config(command = Lb1.yview)
 topBtnPlace = 8
 leftBtnPlace = 440
 
-sortDefault = 0
+# sort by directory is 1 sort all by date is 0
+sortDefault = 1
 
 slogan = Button(
 	root, text="Stop & Run", width = 120, bg='blue', fg='white', borderless=1, command=action2
@@ -285,7 +286,7 @@ openbutton = Button(
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+125)
 
 
-getAllConfigFiles(True)
+getAllConfigFiles(False)
 
 root.mainloop()
 

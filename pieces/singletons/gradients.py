@@ -196,7 +196,12 @@ def iterate():
 
 
 	# Do the final rendering of the composited image
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+
+	temp = config.image.copy()
+
+	if config.rotateDrawing != 0 :
+		temp = temp.rotate(config.rotateDrawing)
+	config.render(temp, 0, 0, config.screenWidth, config.screenHeight)
 
 	'''
 	## Vary the rate of change sometimes after initial startup has filled the frame
@@ -258,6 +263,12 @@ def main(run=True):
 	except Exception as e:
 		print(str(e))
 		config.fromBlack = False
+
+	try:
+		config.rotateDrawing = float(workConfig.get("gradients", "rotate"))
+	except Exception as e:
+		print(str(e))
+		config.rotateDrawing = 0
 
 
 	try:

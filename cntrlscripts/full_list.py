@@ -31,9 +31,6 @@ from tkmacosx import Button
 #from tk import Button
 
 
-commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 commadStringProc = ""
 JavaAppRunning = ""
 
@@ -70,6 +67,16 @@ def verify():
 
 
 def execute(configToRun):
+
+	commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+	commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+	commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+
+	print("--------------------------------------------")
+	print("--------------------------------------------")
+	print(configToRun)
+	print("--------------------------------------------")
+	print("--------------------------------------------")
 	"""Summary
 	
 	Args:
@@ -81,6 +88,7 @@ def execute(configToRun):
 			print("MULTIPLAYER STARTING >>>\n")
 			os.system(commadStringMultiPyth + configToRun + "&")
 		if "--manifest" in configToRun:
+			print(commadStringSeqPyth + configToRun + "&")
 			os.system(commadStringSeqPyth + configToRun + "&")
 		else:
 			os.system(commadStringPyth + configToRun + "&")

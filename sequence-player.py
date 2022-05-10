@@ -39,7 +39,7 @@ def timeChecker(sequenceConfig, config) :
 
 	#print(sequenceConfig.currentTime - sequenceConfig.startTime, sequenceConfig.currentPieceDuration )
 
-	if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration :
+	if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration:
 		sequenceConfig.startTime = time.time()
 
 		if sequenceConfig.playInOrder == True :
@@ -62,6 +62,9 @@ def timeChecker(sequenceConfig, config) :
 		os.system(commandString)
 
 		sequenceConfig.playCount=sequenceConfig.playCount+1
+
+		if sequenceConfig.playCount > sequenceConfig.repeatCountTrigger :
+			sequenceConfig.playCount = 0
 
 		# wait for the player to load before cleaning up
 		time.sleep(1)

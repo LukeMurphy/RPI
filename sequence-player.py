@@ -191,6 +191,7 @@ def loadSequenceFile():
 		sequenceConfig.path = args.path
 
 		argument = sequenceConfig.path + "/configs/" + args.cfg  # + ".cfg"
+		print(bcolors.OKBLUE + "** " + argument + ""  + bcolors.ENDC)
 		workconfig.read(argument)
 
 		sequenceConfig.fileName = argument

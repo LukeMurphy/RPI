@@ -248,7 +248,8 @@ def loadSequenceFile():
 
 			sequenceConfig.workList.append([work,minDuration,maxDuration,brightnessOverride])
 
-
+		print("--------------------------------")
+		print("--------------------- WorkList")
 		print(sequenceConfig.workList)
 
 

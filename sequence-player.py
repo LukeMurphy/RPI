@@ -31,13 +31,23 @@ from subprocess import check_output
 
 '''
 This file runs as a daemon to mange the sequence of players
+Mange is right
+I can barely remember how this works
+
+basically it starts a new player and kills off the previous one over and over again to
+avoid a memory leak by having one player re-load new configs that I had the last time
+not elegant but way more maintainable  ;)
+
 '''
 
 
 def timeChecker(sequenceConfig, config) :
+
 	sequenceConfig.currentTime = time.time()
 
-	#print(sequenceConfig.currentTime - sequenceConfig.startTime, sequenceConfig.currentPieceDuration )
+	# uncomment to debug
+	#print(bcolors.WARNING + "** " + "sequence-player.py checking the time ... " + str(round(sequenceConfig.currentTime - sequenceConfig.startTime)) + " / " + str(sequenceConfig.currentPieceDuration) + ""  + bcolors.ENDC)
+	
 
 	if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration:
 		sequenceConfig.startTime = time.time()
@@ -54,7 +64,7 @@ def timeChecker(sequenceConfig, config) :
 
 		print("Piece Playing is: " + str(pieceToPlay))
 
-		sequenceConfig.currentPieceDuration = random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2])
+		sequenceConfig.currentPieceDuration = round(random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))
 		
 		# Launch the next player
 		commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
@@ -70,9 +80,10 @@ def timeChecker(sequenceConfig, config) :
 		time.sleep(1)
 
 		# Now check all the running python scripts and kill the one before the one that was just launched
+		# assumes only these two are running 
 		listOfProcs = check_output("ps -ef | pgrep -i python", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
-		print("==========> count play : " + str(sequenceConfig.playCount))
+		print(bcolors.WARNING + "==========> count play : " + str(sequenceConfig.playCount))
 		print("Running python instances are :")
 		print(listOfProcs)
 
@@ -84,6 +95,7 @@ def timeChecker(sequenceConfig, config) :
 					subprocess.run(["kill " + p], shell=True, check=True)
 		except Exception as e:
 			print(str(e))
+		print(bcolors.ENDC)
 
 
 
@@ -120,37 +132,12 @@ def loadWorkConfig(work, sequenceConfig):
 	sequenceConfig.currentPID = os.getpid()
 	print("Sequence Player PID is: " + str(sequenceConfig.currentPID))
 
-	'''
-
-	if (sequenceConfig.playCount > sequenceConfig.repeatCountTrigger) :
-
-		sequenceConfig.playCount = 0
-		# Clean threads!
-
-		#print(sequenceConfig.mainAppWindow.activeWork.config.isRunning)
-		#print(sequenceConfig.mainAppWindow.activeWork)
-		#print(sequenceConfig.mainAppWindow.activeWork.config.standAlone)
-		print("DONE .....")
-		#exit()
-		#sequenceConfig.mainAppWindow.activeWork.config.isRunning = False
-		#sequenceConfig.mainAppWindow.activeWork.config.callBack()
-		#os.system( config.path  + sequenceConfig.restartScript)
-
-	
-	# ****************************************** #
-	# Sets off the piece based on loading the initiail configs #
-	# ****************************************** #
-	'''
-	'''
-	player.configure(config, workconfig)
-	config.cnvs = sequenceConfig.cnvs
-	sequenceConfig.mainAppWindow.startWork(config.workRefForSequencer)
-	'''
-
 	fakeCallBack(sequenceConfig, config)
 
 def fakeCallBack(sequenceConfig, config) :
 	while 1==1 :
+		# checks the time every second - could configure this if really
+		# necessary
 		time.sleep(1)
 		timeChecker(sequenceConfig, config)	
 

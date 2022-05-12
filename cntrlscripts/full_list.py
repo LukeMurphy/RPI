@@ -216,7 +216,7 @@ def getAllConfigFiles(dateSort=False) :
 			if dateSort == True : 
 				display = f[0].split("/")
 				actionDict1.append({ display[1]  +"  (" + display[0] + ") " + tsTxt  : f[0]})
-				actionDict1.append({ ""  : ""})
+				#actionDict1.append({ ""  : ""})
 			else :
 				actionDict1.append({ tsTxt + "  " + f[0]   : f[0]})
 				#actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})

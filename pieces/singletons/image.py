@@ -560,10 +560,10 @@ def alterAsASCII():
 	dest = open(destination_filename, 'w')
 
 	'''
-	grayLevels = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,^`'."[::-1]
+	#grayLevels = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,^`'."[::-1]
 
+	#grayLevels = '...***@@@'
 	grayLevels = ".'`,^:\";~-_+<>i!lI?/\|()1{}[]rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@"
-	#grayLevels = '.:-=+*#%@'
 
 
 	fontColor = (200,140,0)

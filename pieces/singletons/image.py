@@ -228,6 +228,21 @@ def main(run=True):
 		print(str(e))
 		config.alterAsASCIIProb = 0
 
+
+	try:
+		if config.usePixelSort == True :
+			config.pixelSortProbOn = float(workConfig.get("images", "pixelSortProbOn"))
+			config.pixelSortProbOff = float(workConfig.get("images", "pixelSortProbOff"))
+		else :
+			config.pixelSortProbOn = 0
+			config.pixelSortProbOff = 0
+
+	except Exception as e:
+		print(str(e))
+		config.pixelSortProbOn = 0
+		config.pixelSortProbOff = 0
+
+
 		
 	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
@@ -447,6 +462,12 @@ def iterate(n=0):
 			config.remapImageBlockDestination = [startX,startY]
 			#print("swapping" + str(config.remapImageBlockSection))
 
+	if random.random() < config.pixelSortProbOn :
+		config.usePixelSort = True
+
+	if random.random() < config.pixelSortProbOff :
+		config.usePixelSort = False
+
 
 def drawVLine():
 	global xPos, yPos
@@ -596,7 +617,7 @@ def redrawBackGround():
 
 
 def callBack():
-	global configt
+	global config
 	print("CALLBACL")
 	return True
 

@@ -135,7 +135,7 @@ def main(run=True):
 		ps.meanderDirection = int(workConfig.get("particleSystem", "meanderDirection"))
 	except Exception as e:
 		print(str(e))
-		ps.meanderDirection = .0
+		ps.meanderDirection = 0
 
 	try:
 		ps.objTrails = workConfig.getboolean("particleSystem", "objTrails")
@@ -449,7 +449,20 @@ def emitParticle(i=None):
 	)
 	
 	# variance = math.pi/3
+
+	if ps.movement == 'fire' :
+		p.direction = random.uniform(0,180) * math.pi/180
+		if ps.oneDirection == True :
+			p.direction = 1
 	
+
+
+	if ps.movement == 'travel' :
+		p.direction = random.uniform(0,360) * math.pi/180
+		if ps.oneDirection == True :
+			p.direction = 1
+	
+	'''
 	p.direction = random.uniform(
 		math.pi + math.pi / 2 - config.variance, 
 		math.pi + math.pi / 2 + config.variance
@@ -458,6 +471,8 @@ def emitParticle(i=None):
 	p.direction = random.uniform(-math.pi,math.pi)
 
 	p.direction = random.uniform(0,360) * math.pi/180
+	'''
+
 	
 	p.v = random.uniform(ps.speedMin, ps.speedMax)
 	p.xWind = config.xWind

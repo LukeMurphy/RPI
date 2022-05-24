@@ -15,7 +15,7 @@ from random import shuffle
 from subprocess import call
 from modules.configuration import bcolors
 from modules.faderclass import FaderObj
-from modules import badpixels, colorutils, configuration, panelDrawing
+from modules import badpixels, colorutils,coloroverlay, configuration, panelDrawing
 from modules.imagesprite import ImageSprite
 from PIL import (
 	Image,
@@ -51,20 +51,35 @@ class spriteAnimation() :
 	sliceYOffset = 0
 
 	frameCount = 0
+	playCount = 0
 	step = 1
+	animSpeedMin = 2
+	animSpeedMax = 4
+
+	animationRotation = 0
 
 	def __init__(self,config):
 		self.config = config
 		self.imageFrame = Image.new("RGBA", (self.frameWidth, self.frameHeight))
-
+		
 
 	def nextFrame(self):
 		xPos = self.sliceCol * self.frameWidth + self.sliceXOffset
 		yPos = self.sliceRow * self.frameWidth + self.sliceYOffset
 		frameSlice = self.image.crop((xPos, yPos, xPos + self.sliceWidth, yPos + self.sliceHeight))
+		frameSlice=frameSlice.rotate(self.animationRotation)
 
-		self.sliceCol += self.step
-		self.frameCount += self.step
+
+		self.playCount += self.step
+
+		# This fakes the speed by repeating n number of frames per cycle
+		# i.e. if the animSpeed == 2, then for each cycle the same frame is
+		# shown twice before it advances - this can control smoothness or jittery
+		# or staccato as needed 
+
+		if self.playCount % self.animSpeed == 0 :
+			self.sliceCol += self.step
+			self.frameCount += self.step
 
 		if self.sliceCol >= self.frameCols :
 			self.sliceRow += 1
@@ -74,6 +89,7 @@ class spriteAnimation() :
 			self.sliceRow = 0
 			self.sliceCol = 0
 			self.frameCount = 0
+			self.playCount = 0
 
 
 		return frameSlice
@@ -101,23 +117,66 @@ def main(run=True):
 	config.animationArray = []
 	config.spriteSheet1 = loadImage(config.imageToLoad)
 
+	config.frameWidth = int(workConfig.get("images", "frameWidth"))
+	config.frameHeight = int(workConfig.get("images", "frameHeight"))
+	config.totalFrames = int(workConfig.get("images", "totalFrames"))
+	config.frameCols = int(workConfig.get("images", "frameCols"))
+	config.frameRows = int(workConfig.get("images", "frameRows"))
+	config.sliceWidth = int(workConfig.get("images", "sliceWidth"))
+	config.sliceHeight = int(workConfig.get("images", "sliceHeight"))
+	config.sliceWidthMin = int(workConfig.get("images", "sliceWidthMin"))
+	config.sliceHeightMin = int(workConfig.get("images", "sliceHeightMin"))
+	config.numberOfCells = int(workConfig.get("images", "numberOfCells"))
+	config.animSpeedMin = int(workConfig.get("images", "animSpeedMin"))
+	config.animSpeedMax = int(workConfig.get("images", "animSpeedMax"))
+	config.animationRotation = float(workConfig.get("images", "animationRotation"))
+	config.animationRotationJitter = float(workConfig.get("images", "animationRotationJitter"))
+	config.animationXOffset = int(workConfig.get("images", "animationXOffset"))
+	config.animationYOffset = int(workConfig.get("images", "animationYOffset"))
 
-	for i in range(0,1000) :
+
+	config.bg_minHue = int(workConfig.get("images", "bg_minHue"))
+	config.bg_maxHue = int(workConfig.get("images", "bg_maxHue"))
+	config.bg_minSaturation = float(workConfig.get("images", "bg_minSaturation"))
+	config.bg_maxSaturation = float(workConfig.get("images", "bg_maxSaturation"))
+	config.bg_minValue = float(workConfig.get("images", "bg_minValue"))
+	config.bg_maxValue = float(workConfig.get("images", "bg_maxValue"))
+	config.bg_dropHueMinValue = float(workConfig.get("images", "bg_dropHueMinValue"))
+	config.bg_dropHueMaxValue = float(workConfig.get("images", "bg_dropHueMaxValue"))
+	config.bg_alpha = int(workConfig.get("images", "bg_alpha"))
+	config.backgroundColorChangeProb = float(workConfig.get("images", "backgroundColorChangeProb"))
+	config.changeAnimProb = float(workConfig.get("images", "changeAnimProb"))
+
+
+	#### Sets up color transitions
+	config.colOverlay = coloroverlay.ColorOverlay()
+	config.colOverlay.randomSteps = True
+	config.colOverlay.timeTrigger = True
+	config.colOverlay.tLimitBase = 5
+	config.colOverlay.steps = 10
+
+	config.colOverlay.maxBrightness = config.brightness
+	config.colOverlay.minSaturation = config.bg_minSaturation
+	config.colOverlay.maxSaturation = config.bg_maxSaturation
+	config.colOverlay.minValue = config.bg_minValue
+	config.colOverlay.maxValue = config.bg_maxValue
+	config.colOverlay.minHue = config.bg_minHue
+	config.colOverlay.maxHue = config.bg_maxHue
+	config.colOverlay.colorTransitionSetup()
+
+
+	for i in range(0,config.numberOfCells) :
 		anim = spriteAnimation(config)
-		anim.image = config.spriteSheet1
-		anim.xPos = round(random.random() * config.canvasWidth)
-		anim.yPos = round(random.random() * config.canvasHeight)
 
-		anim.step = round(random.uniform(1,2))
-
-		anim.sliceCol = round(random.random() * anim.frameCols)
-		anim.sliceRow = round(random.random() * anim.frameRows)
-		anim.sliceXOffset = round(random.random() * anim.frameWidth)
-		anim.sliceYOffset = round(random.random() * anim.frameHeight)
-
-		anim.sliceWidth = round(random.random() * (anim.frameWidth - anim.sliceXOffset))
-		anim.sliceHeight = round(random.random() * (anim.frameHeight - anim.sliceYOffset))
-
+		anim.frameWidth = config.frameWidth 
+		anim.frameHeight = config.frameHeight
+		anim.totalFrames = config.totalFrames 
+		animframeColsframeCols = config.frameCols 
+		anim.frameRows = config.frameRows
+		anim.animSpeedMin = config.animSpeedMin
+		anim.animSpeedMax = config.animSpeedMax
+		
+		reConfigAnimationCell(anim)
 		config.animationArray.append(anim)
 
 	
@@ -185,6 +244,37 @@ def main(run=True):
 		runWork()
 
 
+def reConfigAnimationCell(anim) :
+	anim.animSpeed = round(random.uniform(anim.animSpeedMin,anim.animSpeedMax))
+	anim.animationRotation = config.animationRotation + random.uniform(-config.animationRotationJitter,config.animationRotationJitter)
+
+	anim.image = config.spriteSheet1
+
+	# Placement on the canvas
+	anim.xPos = round(random.random() * (config.canvasWidth )) + config.animationXOffset
+	anim.yPos = round(random.random() * (config.canvasHeight ))+ config.animationYOffset
+
+	# deprecating for now in favor or repeat frames per cycle etc
+	#anim.step = round(random.uniform(1,2))
+
+	# random starting point in animation
+	anim.sliceCol = round(random.random() * anim.frameCols)
+	anim.sliceRow = round(random.random() * anim.frameRows)
+	anim.frameCount = anim.sliceCol + anim.sliceRow * config.frameCols
+
+	# random slicing of section to display
+	anim.sliceXOffset = round(random.random() * anim.frameWidth)
+	anim.sliceYOffset = round(random.random() * anim.frameHeight)
+	anim.sliceWidth = round(random.uniform(config.sliceWidthMin, config.sliceWidth ))
+	anim.sliceHeight = round(random.uniform(config.sliceHeightMin, config.sliceHeight))
+
+	if anim.sliceWidth + anim.sliceXOffset > anim.frameWidth :
+		anim.sliceWidth = anim.frameWidth - anim.sliceXOffset
+
+	if anim.sliceHeight + anim.sliceYOffset > anim.frameHeight:
+		anim.sliceHeight = anim.frameHeight - anim.sliceYOffset
+
+
 def runWork():
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
 	print("Running image.py")
@@ -203,10 +293,17 @@ def iterate(n=0):
 	global config, blocks
 	global xPos, yPos
 
+	config.colOverlay.stepTransition()
 
-	config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(0,0,0,100))
+	bgColor = config.colOverlay.currentColor
+
+	config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(bgColor[0],bgColor[1],bgColor[2],config.bg_alpha))
+
 	for anim in config.animationArray:
 		config.canvasImage.paste(anim.nextFrame(), (anim.xPos, anim.yPos), anim.nextFrame())
+
+		if random.random() < config.changeAnimProb :
+			reConfigAnimationCell(anim)
 
 	########### RENDERING AS A MOCKUP OR AS REAL ###########
 	if config.useDrawingPoints == True :
@@ -215,7 +312,6 @@ def iterate(n=0):
 	else :
 		#config.render(config.image, 0, 0)
 		config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-
 
 
 	if random.random() < config.filterRemappingProb:
@@ -244,6 +340,13 @@ def iterate(n=0):
 		config.usePixelSort = False
 
 
+	if random.random() < config.backgroundColorChangeProb :
+		#config.bgBackGroundColor = config.bgBackGroundEndColor
+		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+				config.bg_minHue, config.bg_maxHue, 
+				config.bg_minSaturation, config.bg_maxSaturation, 
+				config.bg_minValue, config.bg_maxValue,
+				config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness)
 
 
 def callBack():

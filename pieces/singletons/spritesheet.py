@@ -116,7 +116,6 @@ def loadImage(spriteSheet):
 	return image
 
 
-
 def main(run=True):
 	global config, workConfig, blocks, simulBlocks, bads
 	# gc.enable()
@@ -132,6 +131,7 @@ def main(run=True):
 	config.animationArray = []
 	config.spriteSheet1 = loadImage(config.imageToLoad)
 
+	config.fixedPosition = (workConfig.getboolean("images", "fixedPosition"))
 	config.frameWidth = int(workConfig.get("images", "frameWidth"))
 	config.frameHeight = int(workConfig.get("images", "frameHeight"))
 	config.totalFrames = int(workConfig.get("images", "totalFrames"))
@@ -165,6 +165,10 @@ def main(run=True):
 	config.changeAnimProb = float(workConfig.get("images", "changeAnimProb"))
 	config.pauseProb = float(workConfig.get("images", "pauseProb"))
 	config.unPauseProb = float(workConfig.get("images", "unPauseProb"))
+	config.freezeGlitchProb = float(workConfig.get("images", "freezeGlitchProb"))
+	config.unFreezeGlitchProb = float(workConfig.get("images", "unFreezeGlitchProb"))
+
+	config.glitching = True
 
 	config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
 	config.imageGlitchDisplacementVertical = int(workConfig.get("images", "imageGlitchDisplacementVertical"))
@@ -268,6 +272,7 @@ def main(run=True):
 	if run:
 		runWork()
 
+
 def glitchBox():
 
 	global config
@@ -287,6 +292,8 @@ def glitchBox():
 
 
 def reConfigAnimationCell(anim) :
+	global config
+
 	anim.animSpeed = round(random.uniform(anim.animSpeedMin,anim.animSpeedMax))
 	anim.animationRotation = config.animationRotation + random.uniform(-config.animationRotationJitter,config.animationRotationJitter)
 
@@ -295,6 +302,10 @@ def reConfigAnimationCell(anim) :
 	# Placement on the canvas
 	anim.xPos = round(random.random() * (config.canvasWidth )) + config.animationXOffset
 	anim.yPos = round(random.random() * (config.canvasHeight ))+ config.animationYOffset
+
+	if config.fixedPosition == True :
+		anim.xPos = config.animationXOffset
+		anim.yPos = config.animationYOffset
 
 
 	# deprecating for now in favor or repeat frames per cycle etc
@@ -345,7 +356,10 @@ def iterate(n=0):
 	bgColor = config.colOverlay.currentColor
 
 	if config.allPause == True :
-		glitchBox()
+		if config.glitching == True :
+			glitchBox()
+			if random.random() < config.freezeGlitchProb :
+				config.glitching = False
 	else :
 		config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(bgColor[0],bgColor[1],bgColor[2],config.bg_alpha))
 		for anim in config.animationArray:
@@ -392,6 +406,9 @@ def iterate(n=0):
 
 	if random.random() < config.pauseProb :
 		config.allPause = True
+
+	if config.allPause == True and random.random() < config.unFreezeGlitchProb :
+		config.glitching = True
 
 	if config.allPause == True and random.random() < config.unPauseProb :
 		config.allPause = False

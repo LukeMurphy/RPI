@@ -57,6 +57,9 @@ class spriteAnimation() :
 	animSpeedMax = 4
 
 	animationRotation = 0
+	animationRotationRate = 0
+
+	pause = False
 
 	def __init__(self,config):
 		self.config = config
@@ -65,31 +68,41 @@ class spriteAnimation() :
 
 	def nextFrame(self):
 		xPos = self.sliceCol * self.frameWidth + self.sliceXOffset
-		yPos = self.sliceRow * self.frameWidth + self.sliceYOffset
+		yPos = self.sliceRow * self.frameHeight + self.sliceYOffset
+
+
 		frameSlice = self.image.crop((xPos, yPos, xPos + self.sliceWidth, yPos + self.sliceHeight))
-		frameSlice=frameSlice.rotate(self.animationRotation)
+		frameSlice = frameSlice.rotate(self.animationRotation)
+
+		if config.brightness != 1.0 :
+			enhancer = ImageEnhance.Brightness(frameSlice)
+			frameSlice = enhancer.enhance(config.brightness)
 
 
-		self.playCount += self.step
+		if self.pause == False :
+			self.playCount += self.step
 
-		# This fakes the speed by repeating n number of frames per cycle
-		# i.e. if the animSpeed == 2, then for each cycle the same frame is
-		# shown twice before it advances - this can control smoothness or jittery
-		# or staccato as needed 
+			# This fakes the speed by repeating n number of frames per cycle
+			# i.e. if the animSpeed == 2, then for each cycle the same frame is
+			# shown twice before it advances - this can control smoothness or jittery
+			# or staccato as needed 
 
-		if self.playCount % self.animSpeed == 0 :
-			self.sliceCol += self.step
-			self.frameCount += self.step
+			if self.playCount % self.animSpeed == 0 :
+				self.sliceCol += self.step
+				self.frameCount += self.step
+				self.animationRotation += self.animationRotationRate
 
-		if self.sliceCol >= self.frameCols :
-			self.sliceRow += 1
-			self.sliceCol = 0
+			if self.sliceCol >= self.frameCols :
+				self.sliceRow += 1
+				self.sliceCol = 0
 
-		if self.sliceRow >= self.frameRows or self.frameCount > self.totalFrames:
-			self.sliceRow = 0
-			self.sliceCol = 0
-			self.frameCount = 0
-			self.playCount = 0
+			if self.sliceRow >= self.frameRows or self.frameCount > self.totalFrames:
+				self.sliceRow = 0
+				self.sliceCol = 0
+				self.frameCount = 0
+				self.playCount = 0
+
+
 
 
 		return frameSlice
@@ -101,6 +114,8 @@ def loadImage(spriteSheet):
 	image.load()
 	imgHeight = image.getbbox()[3]
 	return image
+
+
 
 def main(run=True):
 	global config, workConfig, blocks, simulBlocks, bads
@@ -130,6 +145,7 @@ def main(run=True):
 	config.animSpeedMin = int(workConfig.get("images", "animSpeedMin"))
 	config.animSpeedMax = int(workConfig.get("images", "animSpeedMax"))
 	config.animationRotation = float(workConfig.get("images", "animationRotation"))
+	config.animationRotationRateRange = float(workConfig.get("images", "animationRotationRateRange"))
 	config.animationRotationJitter = float(workConfig.get("images", "animationRotationJitter"))
 	config.animationXOffset = int(workConfig.get("images", "animationXOffset"))
 	config.animationYOffset = int(workConfig.get("images", "animationYOffset"))
@@ -144,8 +160,14 @@ def main(run=True):
 	config.bg_dropHueMinValue = float(workConfig.get("images", "bg_dropHueMinValue"))
 	config.bg_dropHueMaxValue = float(workConfig.get("images", "bg_dropHueMaxValue"))
 	config.bg_alpha = int(workConfig.get("images", "bg_alpha"))
+
 	config.backgroundColorChangeProb = float(workConfig.get("images", "backgroundColorChangeProb"))
 	config.changeAnimProb = float(workConfig.get("images", "changeAnimProb"))
+	config.pauseProb = float(workConfig.get("images", "pauseProb"))
+	config.unPauseProb = float(workConfig.get("images", "unPauseProb"))
+
+	config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
+	config.imageGlitchDisplacementVertical = int(workConfig.get("images", "imageGlitchDisplacementVertical"))
 
 
 	#### Sets up color transitions
@@ -164,6 +186,8 @@ def main(run=True):
 	config.colOverlay.maxHue = config.bg_maxHue
 	config.colOverlay.colorTransitionSetup()
 
+	config.allPause = False
+
 
 	for i in range(0,config.numberOfCells) :
 		anim = spriteAnimation(config)
@@ -171,13 +195,14 @@ def main(run=True):
 		anim.frameWidth = config.frameWidth 
 		anim.frameHeight = config.frameHeight
 		anim.totalFrames = config.totalFrames 
-		animframeColsframeCols = config.frameCols 
+		anim.frameCols = config.frameCols 
 		anim.frameRows = config.frameRows
 		anim.animSpeedMin = config.animSpeedMin
 		anim.animSpeedMax = config.animSpeedMax
 		
 		reConfigAnimationCell(anim)
 		config.animationArray.append(anim)
+
 
 	
 			
@@ -243,6 +268,23 @@ def main(run=True):
 	if run:
 		runWork()
 
+def glitchBox():
+
+	global config
+
+	apparentWidth = config.canvasImage.size[0]
+	apparentHeight = config.canvasImage.size[1]
+	dx = round(random.uniform(-config.imageGlitchDisplacementHorizontal, config.imageGlitchDisplacementHorizontal))
+	dy = round(random.uniform(-config.imageGlitchDisplacementVertical, config.imageGlitchDisplacementVertical))
+
+	sectionWidth = round(random.uniform(2, apparentWidth - dx))
+	sectionHeight = round(random.uniform(2, apparentHeight - dy))
+
+	# 95% of the time they dance together as mirrors
+	if random.random() < 0.97:
+		cp1 = config.canvasImage.crop((0, 0, dx + sectionWidth, dy + sectionHeight))
+		config.canvasImage.paste(cp1, (round(dx), round(dy)))
+
 
 def reConfigAnimationCell(anim) :
 	anim.animSpeed = round(random.uniform(anim.animSpeedMin,anim.animSpeedMax))
@@ -254,6 +296,7 @@ def reConfigAnimationCell(anim) :
 	anim.xPos = round(random.random() * (config.canvasWidth )) + config.animationXOffset
 	anim.yPos = round(random.random() * (config.canvasHeight ))+ config.animationYOffset
 
+
 	# deprecating for now in favor or repeat frames per cycle etc
 	#anim.step = round(random.uniform(1,2))
 
@@ -262,17 +305,22 @@ def reConfigAnimationCell(anim) :
 	anim.sliceRow = round(random.random() * anim.frameRows)
 	anim.frameCount = anim.sliceCol + anim.sliceRow * config.frameCols
 
+
 	# random slicing of section to display
-	anim.sliceXOffset = round(random.random() * anim.frameWidth)
-	anim.sliceYOffset = round(random.random() * anim.frameHeight)
+	anim.sliceXOffset = 0 #round(random.random() * anim.frameWidth)
+	anim.sliceYOffset = 0 #round(random.random() * anim.frameHeight)
 	anim.sliceWidth = round(random.uniform(config.sliceWidthMin, config.sliceWidth ))
 	anim.sliceHeight = round(random.uniform(config.sliceHeightMin, config.sliceHeight))
+
+
 
 	if anim.sliceWidth + anim.sliceXOffset > anim.frameWidth :
 		anim.sliceWidth = anim.frameWidth - anim.sliceXOffset
 
 	if anim.sliceHeight + anim.sliceYOffset > anim.frameHeight:
 		anim.sliceHeight = anim.frameHeight - anim.sliceYOffset
+
+	anim.animationRotationRate = random.uniform(-config.animationRotationRateRange,config.animationRotationRateRange)
 
 
 def runWork():
@@ -288,7 +336,6 @@ def runWork():
 			config.callBack()
 
 
-
 def iterate(n=0):
 	global config, blocks
 	global xPos, yPos
@@ -297,13 +344,17 @@ def iterate(n=0):
 
 	bgColor = config.colOverlay.currentColor
 
-	config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(bgColor[0],bgColor[1],bgColor[2],config.bg_alpha))
+	if config.allPause == True :
+		glitchBox()
+	else :
+		config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill=(bgColor[0],bgColor[1],bgColor[2],config.bg_alpha))
+		for anim in config.animationArray:
+			config.canvasImage.paste(anim.nextFrame(), (anim.xPos, anim.yPos), anim.nextFrame())
+			anim.pause = config.allPause
 
-	for anim in config.animationArray:
-		config.canvasImage.paste(anim.nextFrame(), (anim.xPos, anim.yPos), anim.nextFrame())
+			if random.random() < config.changeAnimProb :
+				reConfigAnimationCell(anim)
 
-		if random.random() < config.changeAnimProb :
-			reConfigAnimationCell(anim)
 
 	########### RENDERING AS A MOCKUP OR AS REAL ###########
 	if config.useDrawingPoints == True :
@@ -339,6 +390,11 @@ def iterate(n=0):
 	if random.random() < config.pixelSortProbOff :
 		config.usePixelSort = False
 
+	if random.random() < config.pauseProb :
+		config.allPause = True
+
+	if config.allPause == True and random.random() < config.unPauseProb :
+		config.allPause = False
 
 	if random.random() < config.backgroundColorChangeProb :
 		#config.bgBackGroundColor = config.bgBackGroundEndColor

@@ -132,16 +132,17 @@ def stopAll():
 	os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 
 
-def reSort():
-	"""Summary
-	"""
-	global sortDefault
-	if sortDefault == 0 :
-		sortDefault = 1
-		getAllConfigFiles(False)
-	else :
-		sortDefault = 0
-		getAllConfigFiles(True)
+
+def sortByDate():
+	getAllConfigFiles(True)
+
+def sortByFolder():		
+	getAllConfigFiles(False)
+
+def sortByFolderAndDate():
+	getAllConfigFiles(False,True)
+
+
 
 def openFile() :
 	a = verify()
@@ -167,7 +168,7 @@ def returnSecondElement(l):
 	return l[1]
 
 
-def getAllConfigFiles(dateSort=False) :
+def getAllConfigFiles(dateSort=False, subsortDate=False) :
 	"""Summary
 	
 	Args:
@@ -200,7 +201,11 @@ def getAllConfigFiles(dateSort=False) :
 							fullList.append((shortPath,res.st_mtime))
 
 			if dateSort == False: 
-				subDirectoryList.sort(key=returnSecondElement, reverse=True)
+				# sorts by date within folder
+				if subsortDate == True :
+					subDirectoryList.sort(key=returnSecondElement, reverse=True)
+				else :
+					subDirectoryList.sort(reverse=False)
 				fullList.extend(subDirectoryList)
 				fullList.append({})
 
@@ -215,7 +220,11 @@ def getAllConfigFiles(dateSort=False) :
 
 			if dateSort == True : 
 				display = f[0].split("/")
-				actionDict1.append({ display[1]  +"  (" + display[0] + ") " + tsTxt  : f[0]})
+				spacer = " \t\t\t\t"
+				if len(display[1]) > 26 : spacer = " \t\t\t"
+				if len(display[1]) > 33 : spacer = " \t"
+				if len(display[1]) < 20 : spacer = " \t\t\t\t\t"
+				actionDict1.append({ display[1]  + spacer + tsTxt  + " \t" +  display[0] : f[0]})
 				#actionDict1.append({ ""  : ""})
 			else :
 				actionDict1.append({ tsTxt + "  " + f[0]   : f[0]})
@@ -238,9 +247,9 @@ root = tk.Tk()
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
-root.geometry("%dx%d+%d+%d" % (600, round(screen_height * .4), round(2*screen_width/3), round(2*screen_height/3)))
+root.geometry("%dx%d+%d+%d" % (700, round(screen_height * .4), round(2*screen_width/3), round(2*screen_height/3)))
 
-Lb1 = Listbox(root, width=60, height=32)
+Lb1 = Listbox(root, width=70, height=32)
 
 
 for i, item in enumerate(actionDict1):
@@ -258,7 +267,7 @@ Lb1.config(yscrollcommand = scrollbar.set)
 scrollbar.config(command = Lb1.yview) 
 
 topBtnPlace = 8
-leftBtnPlace = 440
+leftBtnPlace = 540
 
 # sort by directory is 1 sort all by date is 0
 sortDefault = 1
@@ -283,16 +292,26 @@ quitbutton = Button(
 )
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+75)
 
-sortbutton = Button(
-	root, text="Re-Sort", width = 120, bg='blue', fg='white', borderless=1, command=reSort
+sortbutton1 = Button(
+	root, text="Sort By Date", width = 120, bg='blue', fg='white', borderless=1, command=sortByDate
 )
-sortbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+100)
+sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+100)
+
+sortbutton2 = Button(
+	root, text="Sort by Folder", width = 120, bg='blue', fg='white', borderless=1, command=sortByFolder
+)
+sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+125)
+
+sortbutton3 = Button(
+	root, text="Sort by Folder+", width = 120, bg='blue', fg='white', borderless=1, command=sortByFolderAndDate
+)
+sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+150)
+
 
 openbutton = Button(
 	root, text="Open", width = 120, bg='blue', fg='white', borderless=1, command=openFile
 )
-openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+125)
-
+openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+175)
 
 getAllConfigFiles(False)
 

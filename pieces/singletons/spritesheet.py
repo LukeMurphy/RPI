@@ -129,7 +129,7 @@ def main(run=True):
 
 
 	config.animationArray = []
-	config.spriteSheet1 = loadImage(config.imageToLoad)
+	config.spriteSheet1 = loadImage(config.path + config.imageToLoad)
 
 	config.fixedPosition = (workConfig.getboolean("images", "fixedPosition"))
 	config.frameWidth = int(workConfig.get("images", "frameWidth"))

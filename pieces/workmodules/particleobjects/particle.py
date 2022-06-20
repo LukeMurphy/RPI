@@ -100,8 +100,8 @@ class Particle(object):
 
 		self.unitBlur = self.ps.unitBlur
 
-		self.meanderFactor = random.uniform(2, 8)
-		self.meanderFactor2 = random.uniform(1, 10)
+		self.meanderFactor = random.uniform(.1, 1.0) * self.ps.meanderFactor
+		self.meanderFactor2 = random.uniform(.1, 1.0) * self.ps.meanderFactor2
 
 		self.remove = False
 
@@ -207,8 +207,8 @@ class Particle(object):
 			# self.dx = self.v * math.cos(self.direction)
 
 			self.dy = (
-				self.ps.meandorFactor
-				* self.meanderFactor
+				
+				self.meanderFactor
 				* noise.pnoise1(self.ps.config.canvasWidth-self.xPos / self.meanderFactor2, 1)
 				+ self.xWind
 			)
@@ -217,8 +217,8 @@ class Particle(object):
 			# self.dx = self.v * math.cos(self.direction)
 
 			self.dx = (
-				self.ps.meandorFactor
-				* self.meanderFactor
+				
+				self.meanderFactor
 				* noise.pnoise1(self.yPos / self.meanderFactor2, 1)
 				+ self.xWind
 			)

@@ -115,7 +115,13 @@ def reDraw(config):
 
 			#yPos = 0
 
-			if config.colorChoice == "rgbAlpha":
+			if config.colorChoice == "manual":
+				c1  = colorutils.getRandomColorHSV(hMin=config.c1[0],hMax=config.c1[1],sMin=config.c1[2],sMax=config.c1[3],vMin=config.c1[4],vMax=config.c1[5],dropHueMin=0,dropHueMax=0,a=config.alpha1)
+				c2  = colorutils.getRandomColorHSV(hMin=config.c2[0],hMax=config.c2[1],sMin=config.c2[2],sMax=config.c2[3],vMin=config.c2[4],vMax=config.c2[5],dropHueMin=0,dropHueMax=0,a=config.alpha2)
+				c3  = colorutils.getRandomColorHSV(hMin=config.c3[0],hMax=config.c3[1],sMin=config.c3[2],sMax=config.c3[3],vMin=config.c3[4],vMax=config.c3[5],dropHueMin=0,dropHueMax=0,a=255)
+
+
+			elif config.colorChoice == "rgbAlpha":
 				c1 = colorutils.randomColorAlpha(
 					config.brightness, config.alpha1, config.alpha1
 				)
@@ -255,7 +261,15 @@ def main(run=True):
 	config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
 	config.boxHeight = config.screenHeight - 3
 
-	config.colorModes = ["rgb", "getRandomColorWheel", "randomColor"]
+	config.colorModes = ["rgb", "getRandomColorWheel", "randomColor", "manual"]
+
+	c1 = workConfig.get("gradients", "c1").split(",")
+	c2 = workConfig.get("gradients", "c2").split(",")
+	c3 = workConfig.get("gradients", "c3").split(",")
+
+	config.c1  = tuple(map(lambda x: float(float(x) * config.brightness), c1))
+	config.c2  = tuple(map(lambda x: float(float(x) * config.brightness), c2))
+	config.c3  = tuple(map(lambda x: float(float(x) * config.brightness), c3))
 
 
 	try:

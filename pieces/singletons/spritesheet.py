@@ -72,7 +72,8 @@ class spriteAnimation() :
 
 
 		frameSlice = self.image.crop((xPos, yPos, xPos + self.sliceWidth, yPos + self.sliceHeight))
-		frameSlice = frameSlice.rotate(self.animationRotation)
+		if self.animationRotation != 0 :
+			frameSlice = frameSlice.rotate(self.animationRotation,0,1)
 
 		if config.brightness != 1.0 :
 			enhancer = ImageEnhance.Brightness(frameSlice)
@@ -296,6 +297,10 @@ def reConfigAnimationCell(anim) :
 
 	anim.animSpeed = round(random.uniform(anim.animSpeedMin,anim.animSpeedMax))
 	anim.animationRotation = config.animationRotation + random.uniform(-config.animationRotationJitter,config.animationRotationJitter)
+
+	if config.animationRotation != 0 :
+		maxDim = max(anim.frameHeight, anim.frameWidth)
+		anim.imageFrame = Image.new("RGBA", (maxDim, maxDim))
 
 	anim.image = config.spriteSheet1
 

@@ -32,6 +32,9 @@ class ParticleSystem(object):
 	movement = "travel"
 	meanderDirection = 0.0
 
+	meanderFactor2 = 90.0
+	meanderFactor = 1.0
+
 	minDx = 2
 	minDy = 2
 

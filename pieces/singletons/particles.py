@@ -126,10 +126,16 @@ def main(run=True):
 		ps.delay = 0.01
 
 	try:
-		ps.meandorFactor = float(workConfig.get("particleSystem", "meandorFactor"))
+		ps.meanderFactor = float(workConfig.get("particleSystem", "meanderFactor"))
 	except Exception as e:
 		print(str(e))
-		ps.meandorFactor = 1.0
+		ps.meanderFactor = 1.0
+
+	try:
+		ps.meanderFactor2 = float(workConfig.get("particleSystem", "meanderFactor2"))
+	except Exception as e:
+		print(str(e))
+		ps.meanderFactor2 = 90.0
 
 	try:
 		ps.meanderDirection = int(workConfig.get("particleSystem", "meanderDirection"))
@@ -435,6 +441,7 @@ def emitParticle(i=None):
 	p.particleWinkOutYMin = config.particleWinkOutYMin
 
 	p.setUpParticle()
+
 	p.xPosR = (
 		config.canvasWidth / 2
 		- ps.centerRangeXMin
@@ -479,6 +486,8 @@ def emitParticle(i=None):
 
 	p.pixelsGoGray = config.pixelsGoGray
 	p.jumpToGray = config.jumpToGray
+
+
 
 	if ps.objColor == "rnd":
 		p.fillColor = colorutils.randomColor(ps.config.brightness)
@@ -733,6 +742,9 @@ def iterate():
 		p.update()
 		p.render()
 
+		if p.objHeight > 200 : 
+			 p.remove = True
+
 		if p.remove == True:
 			# print("REMOVING",ps.unitArray.index(p),len(ps.unitArray))
 
@@ -744,6 +756,7 @@ def iterate():
 						emitParticle()
 			else:
 				emitParticle(i=ps.unitArray.index(p))
+
 
 	if random.random() < config.restartProb:
 		for p in ps.unitArray:

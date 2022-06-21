@@ -46,6 +46,7 @@ class DotGrid :
 
 
 	def setUp(self) :
+		self.dotGridsArray = list()
 		self.workImage = Image.new("RGBA", (self.width, self.height))
 		self.draw = ImageDraw.Draw(self.workImage)
 		#self.draw.rectangle((0,0,self.width,self.height), fill=self.bgColor)
@@ -232,6 +233,13 @@ def iterate():
 		config.render(config.canvasImage, 0, 0)
 		'''
 
+	if random.random() < config.dotVariationChangeProb:
+		config.dotVariation = random.uniform(0,config.dotVariationMax)
+		config.dotGrid.dotVariation = config.dotVariation
+		#print(config.dotVariation)
+		config.dotGrid.setUp()
+
+
 def init():
 	global config
 
@@ -266,8 +274,10 @@ def init():
 
 	config.colsXOffset = int(workConfig.get("spots", "colsXOffset"))
 	config.rowsYOffset = int(workConfig.get("spots", "rowsYOffset"))
-	config.gridVariation = int(workConfig.get("spots", "gridVariation"))
-	config.dotVariation = int(workConfig.get("spots", "dotVariation"))
+	config.gridVariation = float(workConfig.get("spots", "gridVariation"))
+	config.dotVariationMax = float(workConfig.get("spots", "dotVariationMax"))
+	config.dotVariation = float(workConfig.get("spots", "dotVariation"))
+	config.dotVariationChangeProb = float(workConfig.get("spots", "dotVariationChangeProb"))
 	config.dotVariationByColor = (workConfig.getboolean("spots", "dotVariationByColor"))
 	config.imageXOffset = 0 
 	config.imageYOffset = 0
@@ -307,7 +317,7 @@ def init():
 	config.initCount = 1
 
 	config.f = FaderObj()
-	config.f.doingRefreshCount = 5
+	config.f.doingRefreshCount = 2
 	config.f.setUp(config.renderImageFull, config.canvasImage)
 
 
@@ -316,6 +326,8 @@ def init():
 
 	config.useFadeThruAnimation = True
 	config.deltaTimeDone = True
+
+
 
 
 def runWork():

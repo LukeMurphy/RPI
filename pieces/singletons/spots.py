@@ -181,7 +181,10 @@ def processImage():
 	config.canvasImage.paste(config.dotGrid.workImage, (0,0))
 
 
-
+def getColor(r,g,b,a) :
+	clr = list( round(i * config.brightness) for i in [r,g,b])
+	clr.append(a)
+	return tuple(clr)
 
 def iterate():
 	global config
@@ -255,7 +258,7 @@ def init():
 	config.dotcols = int(workConfig.get("spots", "cols"))
 	config.blurRadius = int(workConfig.get("spots", "blurRadius"))
 	config.bgColorVals = (workConfig.get("spots", "bgColor"))
-	config.bgColor = tuple(int(i) for i in config.bgColorVals.split(','))
+	config.bgColor = tuple(round(float(i) * config.brightness) for i in config.bgColorVals.split(','))
 
 	config.clrAVals = (workConfig.get("spots", "clrA"))
 	config.clrA = tuple(round(int(i) * config.brightness) for i in config.clrAVals.split(','))

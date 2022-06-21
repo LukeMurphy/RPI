@@ -431,25 +431,67 @@ def wavey():
 
 def waves():
 	global config
-	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
-	octv = 1
+	config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+	octv = 3
 	lastx = [0,0,0]
 	lasty = [0,0,0]
-	for row in range(0,config.canvasHeight,4):
-		for col in range(0,config.canvasWidth):
-			x = col 
-			y = noise.pnoise2(row/config.rowFactor + random.random()*.0, (col+ config.scroll)/config.colFactor + random.random()*.0, octv) * config.amplitude + row
+	rowRads = 2*math.pi / config.waveLines
+	count  = 0
+	countIncr  = 1
+	for row in range(0,config.waveLines):
+		r = 10
+		g = 120
+		b = 250
 
-			r = 255
-			g = round(math.sin((col/config.rowFactor)+.1) * 200)
-			b = 50
+		if random.random() < .95 :
+			r = config.lineColors[count][0]
+			g = config.lineColors[count][1]
+			b = config.lineColors[count][2]
+		else :
+			r = config.assignedLineColors[row][0]
+			g = config.assignedLineColors[row][1]
+			b = config.assignedLineColors[row][2]
+
+
+		count  += countIncr
+
+		if count >= len(config.lineColors) : 
+			count = 0
+			#countIncr = 0
+
+		alpha = round(255 * abs(math.sin(rowRads * row)))
+		#alpha = round(255 * config.waveLines / (5 * row + 1) )
+
+
+
+		for col in range(0,config.canvasWidth+config.colInterval,config.colInterval):
+			x = col 
+			# moving
+			#y = noise.pnoise2(row/config.rowFactor, (col + config.scroll)/config.colFactor, octv) * config.amplitude + 100
+			
+			# standing + moving - low scrollrate
+			y = noise.pnoise2(
+				(row - config.scroll)/config.rowFactor, 
+				(col + config.travel)/config.colFactor, 
+				octv,
+				.5,
+				.95
+				) * config.amplitude + config.yOffset + config.lineFactor * row
+
+			#r = 255
+			#g = round(math.cos((col/config.rowFactor)+.1) * 200)
+			#b = 50
+
+
 			#config.draw.rectangle((x, y, x+1, y+1), fill=(r,g,b,150))
 			if col != 0 :
-				config.draw.line((lastx[0],lasty[0],x,y), fill = getColor(r,g,b,150))
+				config.draw.line((lastx[0],lasty[0],x,y), fill = getColor(r,g,b,alpha))
 			lastx = [x,x,x]
 			lasty = [y,y,y]
 		#octv += 1
 	config.scroll += config.scrollRate
+	config.travel += config.travelRate
+
 
 
 def runWork():
@@ -458,7 +500,7 @@ def runWork():
 	print("Running noisescroller.py")
 	print(bcolors.ENDC)
 
-	config.draw.rectangle((0,0,500,500), fill=config.bgColor)
+	config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
 	while config.isRunning == True:
 		iterate()
@@ -468,6 +510,9 @@ def runWork():
 			
 
 def iterate():
+
+	if random.random() < config.amplitudeChangeProb :
+		config.amplitude = random.uniform(config.amplitudeMin,config.amplitudeMax)
 	reDraw()
 
 
@@ -476,7 +521,7 @@ def iterate():
 		config.panelDrawing.canvasToUse = config.image
 		config.panelDrawing.render()
 	else :
-		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+		config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 	# Done
 
 
@@ -501,6 +546,7 @@ def main(run=True):
 	config.radiusMin = float(workConfig.get("noisescroller", "radiusMin"))
 	config.markSize = int(workConfig.get("noisescroller", "markSize"))
 	config.scroll = 0
+	config.travel = 0
 
 	config.function = (workConfig.get("noisescroller", "function"))
 
@@ -508,6 +554,42 @@ def main(run=True):
 	config.bgColor = tuple(map(lambda x: round(float(x) * config.brightness), config.bgColorVals))
 
 	config.scrollRate = float(workConfig.get("noisescroller", "scrollRate"))
+
+
+	try:
+		config.lineFactor = float(workConfig.get("noisescroller", "lineFactor"))
+	except Exception as e:
+		print(str(e))
+		config.lineFactor = 1
+
+	try:
+		config.colInterval = int(workConfig.get("noisescroller", "colInterval"))
+	except Exception as e:
+		print(str(e))
+		config.colInterval = 1
+
+	try:
+		config.waveLines = int(workConfig.get("noisescroller", "waveLines"))
+	except Exception as e:
+		print(str(e))
+		config.waveLines = 10
+
+	try:
+		config.travelRate = float(workConfig.get("noisescroller", "travelRate"))
+	except Exception as e:
+		print(str(e))
+		config.travelRate = 0.0
+
+	try:
+		config.amplitudeChangeProb = float(workConfig.get("noisescroller", "amplitudeChangeProb"))
+		config.amplitudeMin = float(workConfig.get("noisescroller", "amplitudeMin"))
+		config.amplitudeMax = float(workConfig.get("noisescroller", "amplitudeMax"))
+	except Exception as e:
+		print(str(e))
+		config.amplitudeChangeProb = 0.0
+		config.amplitudeMin = 0.0
+		config.amplitudeMax = 0.0
+
 
 
 	if config.function == "ringLines" or config.function == 'ringLinesNoLoop'  or config.function == 'ringScribbles' :
@@ -611,7 +693,29 @@ def main(run=True):
 
 		#octv += 1
 
-	print (config.scrollRate)
+
+	try:
+		lineColors = workConfig.get("noisescroller", "lineColors").split("|")
+		config.lineColors = []
+		for c in lineColors :
+			cArray = c.split(",")
+			config.lineColors.append(tuple(map(lambda x: round(float(x) * config.brightness), cArray)))
+
+	except Exception as e:
+		print(str(e))
+		config.lineColors = [(100,220,255),(100,220,255),(100,220,255),(10,120,255),(100,90,90)]
+
+
+	config.assignedLineColors = []
+	for row in range(0, config.waveLines) :
+		choice = math.floor(random.uniform(0,len(config.lineColors)))
+		if random.random() < .001 :
+			r = round(random.uniform(0,255))
+			g = round(random.uniform(0,255))
+			b = round(random.uniform(0,255))
+			config.assignedLineColors.append((r,g,b))
+		else :
+			config.assignedLineColors.append(config.lineColors[choice])
 
 	try:
 		config.drawOptimize = workConfig.getboolean("noisescroller", "drawOptimize")

@@ -23,7 +23,7 @@ from noise import *
 class WaveDeformer:
 
     def transform(self, x, y):
-        y = y + 90*math.sin((x + config.xPos)/10) * noise.pnoise2(math.sin(x),y/10)
+        y = y + config.waveAmplitude*math.sin((x + config.xPos)/config.wavePeriodMod) * noise.pnoise2(math.sin(x),y/config.pNoiseMod)
         return x, y
 
     def transform_rectangle(self, x0, y0, x1, y1):
@@ -35,12 +35,11 @@ class WaveDeformer:
 
     def getmesh(self, img):
         self.w, self.h = img.size
-        gridspace = 20
 
         target_grid = []
-        for x in range(0, self.w, gridspace):
-            for y in range(0, self.h, gridspace):
-                target_grid.append((x, y, x + gridspace, y + gridspace))
+        for x in range(0, self.w, config.wavegridspace):
+            for y in range(0, self.h, config.wavegridspace):
+                target_grid.append((x, y, x + config.wavegridspace, y + config.wavegridspace))
 
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
 
@@ -420,6 +419,19 @@ def main(run=True):
 		print(str(e))
 		config.legacyUnsharpMask = True
 		config.optionallegacyToggleProb = 0
+
+
+
+	try: 
+		config.useWaveDistortion = (workConfig.getboolean("particleSystem", "useWaveDistortion"))
+		config.waveAmplitude = float(workConfig.get("particleSystem", "waveAmplitude"))
+		config.wavePeriodMod = float(workConfig.get("particleSystem", "wavePeriodMod"))
+		config.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
+		config.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
+	except Exception as e:
+		print(str(e))
+		config.useWaveDistortion = False
+
 
 	config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
 	config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(
@@ -890,10 +902,13 @@ def iterate():
 		config.panelDrawing.canvasToUse = config.image
 		config.panelDrawing.render()
 	else :
-		#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-		config.xPos += 1
-		config.workImage = ImageOps.deform(config.image, WaveDeformer())
-		config.render(config.workImage, 0, 0)
+		
+		if config.useWaveDistortion == False :
+			config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+		else :
+			config.xPos += 1
+			config.workImage = ImageOps.deform(config.image, WaveDeformer())
+			config.render(config.workImage, 0, 0)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

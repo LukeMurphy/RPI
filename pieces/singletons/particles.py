@@ -16,8 +16,36 @@ from PIL import (
 	ImageFont,
 	ImageOps,
 )
+import noise
+from noise import *
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+class WaveDeformer:
+
+    def transform(self, x, y):
+        y = y + 90*math.sin((x + config.xPos)/10) * noise.pnoise2(math.sin(x),y/10)
+        return x, y
+
+    def transform_rectangle(self, x0, y0, x1, y1):
+        return (*self.transform(x0, y0),
+                *self.transform(x0, y1),
+                *self.transform(x1, y1),
+                *self.transform(x1, y0),
+                )
+
+    def getmesh(self, img):
+        self.w, self.h = img.size
+        gridspace = 20
+
+        target_grid = []
+        for x in range(0, self.w, gridspace):
+            for y in range(0, self.h, gridspace):
+                target_grid.append((x, y, x + gridspace, y + gridspace))
+
+        source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
+
+        return [t for t in zip(target_grid, source_grid)]
+
 
 def main(run=True):
 	global config, directionOrder, ps
@@ -418,6 +446,9 @@ def main(run=True):
 			#config.render(config.image, 0, 0)
 			config.render(config.renderImageFull, 0, 0)
 	'''
+
+
+	config.xPos = 0
 
 	for i in range(0, ps.numUnits):
 		emitParticle()
@@ -860,7 +891,9 @@ def iterate():
 		config.panelDrawing.render()
 	else :
 		#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-		config.render(config.image, 0, 0)
+		config.xPos += 1
+		config.workImage = ImageOps.deform(config.image, WaveDeformer())
+		config.render(config.workImage, 0, 0)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

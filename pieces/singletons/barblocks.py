@@ -33,20 +33,14 @@ class Block:
 		self.polyDeltaY = 0
 
 
-	def setUp(self):
+	def setUp(self,paletteArray):
 		self.blockImage = Image.new("RGBA", (self.blockWidth, self.blockHeight))
 		self.blockDraw = ImageDraw.Draw(self.blockImage)
 
-		tLimitBase = 12
-		minHue = 0
-		maxHue = 360 
-		minSaturation= .99
-		maxSaturation= .6
-		minValue = .1
-		maxValue = .99
+		# [minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase]
 
-		self.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-		self.colOverlay2 = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+		self.colOverlay = getConfigOverlay(paletteArray)
+		self.colOverlay2 = getConfigOverlay(paletteArray)
 
 
 	def bars(self):
@@ -123,71 +117,25 @@ def redraw(config):
 		sectionBlurRadius = 1
 
 
-def iterate():
-	global config
-	config.colOverlay.stepTransition()
-
-	config.bgColor = tuple(
-		round(a * config.brightness) for a in (config.colOverlay.currentColor)
-	)
-
-	redraw(config)
-
-	if random.random() < config.changeGridProb:
-		index = math.floor(random.random() * len(config.gridOptions))
-		if index > len(config.gridOptions) : index = 0
-		print("Running a :" + str(config.gridOptions[index]) )
-		eval(config.gridOptions[index])(config)
-
-	if random.random() < config.changeQuiverProb:
-		if random.random() < .75 :
-			config.deltaXVal = round(random.uniform(0,1))
-			config.deltaYVal = round(random.uniform(0,1))
-		else :
-			# a bit more often, things just go still
-			config.deltaXVal = config.deltaYVal = 0
-
-	if config.useDrawingPoints == True:
-		config.panelDrawing.canvasToUse = config.canvasImage
-		config.panelDrawing.render()
-	else:
-		config.render(config.canvasImage, 0, 0,
-					  config.canvasWidth, config.canvasHeight)
-	# Done
-
-
-def runWork():
-	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-	print("Running barblocks.py")
-	print(bcolors.ENDC)
-	while config.isRunning == True:
-		iterate()
-		time.sleep(config.redrawSpeed)
-		if config.standAlone == False:
-			config.callBack()
-
-
-def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
+def getConfigOverlay( palette):
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False
 	colOverlay.timeTrigger = True
-	colOverlay.tLimitBase = tLimitBase
+	colOverlay.tLimitBase = palette[6]
 	colOverlay.maxBrightness = 1
 	colOverlay.steps = 50
-	colOverlay.minHue = minHue
-	colOverlay.maxHue = maxHue
-	colOverlay.minSaturation = minSaturation
-	colOverlay.maxSaturation = maxSaturation
-	colOverlay.minValue = minValue
-	colOverlay.maxValue = maxValue
+	colOverlay.minHue = palette[0]
+	colOverlay.maxHue = palette[1]
+	colOverlay.minSaturation = palette[2]
+	colOverlay.maxSaturation = palette[3]
+	colOverlay.minValue = palette[4]
+	colOverlay.maxValue = palette[5]
 	colOverlay.colorTransitionSetup()
 	return colOverlay
 
 
 def buildPalette(config,index=0):
 	palette = config.palettes[index]
-
 	tLimitBase = int(workConfig.get(palette, "tLimitBase"))
 	minHue = float(workConfig.get(palette, "minHue"))
 	maxHue = float(workConfig.get(palette, "maxHue"))
@@ -195,8 +143,7 @@ def buildPalette(config,index=0):
 	maxSaturation = float(workConfig.get(palette, "maxSaturation"))
 	minValue = float(workConfig.get(palette, "minValue"))
 	maxValue = float(workConfig.get(palette, "maxValue"))
-	config.colOverlay = getConfigOverlay(
-		tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase])
 
 
 # Builds flexible grid
@@ -263,7 +210,10 @@ def buildGrid(config):
 				else:
 					barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
 
-				barBlockUnit.setUp()
+
+				paletteIndex = math.floor(random.uniform(0,len(config.palettes)))
+				barBlockUnit.setUp(buildPalette(config,paletteIndex))
+
 				config.barBlocks.append(barBlockUnit)
 				count +=1
 
@@ -353,9 +303,55 @@ def buildUniformGrid(config):
 			else:
 				barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
 
-			barBlockUnit.setUp()
+			paletteIndex = math.floor(random.uniform(0,len(config.palettes)))
+			barBlockUnit.setUp(buildPalette(config,paletteIndex))
 			config.barBlocks.append(barBlockUnit)
 			count +=1	
+
+
+def iterate():
+	global config
+	config.colOverlay.stepTransition()
+
+	config.bgColor = tuple(
+		round(a * config.brightness) for a in (config.colOverlay.currentColor)
+	)
+
+	redraw(config)
+
+	if random.random() < config.changeGridProb:
+		index = math.floor(random.random() * len(config.gridOptions))
+		if index > len(config.gridOptions) : index = 0
+		print("Running a :" + str(config.gridOptions[index]) )
+		eval(config.gridOptions[index])(config)
+
+	if random.random() < config.changeQuiverProb:
+		if random.random() < .75 :
+			config.deltaXVal = round(random.uniform(0,1))
+			config.deltaYVal = round(random.uniform(0,1))
+		else :
+			# a bit more often, things just go still
+			config.deltaXVal = config.deltaYVal = 0
+
+	if config.useDrawingPoints == True:
+		config.panelDrawing.canvasToUse = config.canvasImage
+		config.panelDrawing.render()
+	else:
+		config.render(config.canvasImage, 0, 0,
+					  config.canvasWidth, config.canvasHeight)
+	# Done
+
+
+def runWork():
+	global config
+	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	print("Running barblocks.py")
+	print(bcolors.ENDC)
+	while config.isRunning == True:
+		iterate()
+		time.sleep(config.redrawSpeed)
+		if config.standAlone == False:
+			config.callBack()
 
 
 def main(run=True):
@@ -383,7 +379,6 @@ def main(run=True):
 		map(lambda x: int(int(x)), config.sizeArray)
 	)
 
-	print(config.sizeArray)
 
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new(
@@ -404,13 +399,17 @@ def main(run=True):
 	index = math.floor(random.random() * len(config.gridOptions))
 	if index > len(config.gridOptions) : index = 0
 
+	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
+
+	config.colOverlay = getConfigOverlay(buildPalette(config,0))
+	
+
 
 	print("Running a :" + str(config.gridOptions[index]) )
+
 	eval(config.gridOptions[index])(config)
 
-	
-	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
-	buildPalette(config,0)
+
 
 	# THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)

@@ -409,6 +409,40 @@ def main(run=True):
 		print(str(e))
 		config.extraOutlineColor = None
 
+
+	# second color for some particles
+	try:
+		config.useSecondColorProb = float(workConfig.get("particleSystem", "useSecondColorProb"))
+		config.fillColorVals2 = (workConfig.get("particleSystem", "fillColor2")).split(",")
+		config.fillColor2 = tuple(
+			map(lambda x: int(int(x) * config.brightness), config.fillColorVals2)
+		)
+
+		config.outlineColorVals2 = (workConfig.get("particleSystem", "outlineColor2")).split(
+			","
+		)
+		config.outlineColor2 = tuple(
+			map(lambda x: int(int(x) * config.brightness), config.outlineColorVals2)
+		)
+
+		try:
+			config.extraOutlineColorVals2 = (workConfig.get("particleSystem", "extraOutlineColor2")).split(",")
+			config.extraOutlineColor2 = tuple(
+			map(lambda x: round(int(x) * config.brightness), config.extraOutlineColorVals2)
+		)
+		except Exception as e:
+			print(str(e))
+			config.extraOutlineColor2 = None
+	except Exception as e:
+		print(str(e))
+		config.useSecondColorProb = 0
+		config.extraOutlineColor2 = config.extraOutlineColor
+		config.fillColor2 = config.fillColor
+		config.outlineColor2 = config.outlineColor
+		config.extraOutlineColor2 = config.extraOutlineColor
+
+
+
 	ps.unitBlur = int(workConfig.get("particleSystem", "unitBlur"))
 	config.overallBlur = int(workConfig.get("particleSystem", "overallBlur"))
 
@@ -547,9 +581,20 @@ def emitParticle(i=None):
 		)
 
 	else:
+
+
+
+
 		p.fillColor = config.fillColor  # (240,150,0,100)
 		p.outlineColor = config.outlineColor  # (100,0,0,100)
-		p.extraOutlineColor = config.extraOutlineColor 
+		p.extraOutlineColor = config.extraOutlineColor
+
+
+		if  random.random() < config.useSecondColorProb :
+				p.fillColor = config.fillColor2  # (240,150,0,100)
+				p.outlineColor = config.outlineColor2  # (100,0,0,100)
+				p.extraOutlineColor = config.extraOutlineColor2
+
 
 		if config.pixelsGoGray == True:
 			p.greyRate = random.uniform(config.greyRate / 4, config.greyRate)

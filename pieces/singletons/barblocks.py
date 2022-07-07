@@ -33,14 +33,14 @@ class Block:
 		self.polyDeltaY = 0
 
 
-	def setUp(self,paletteArray):
+	def setUp(self,paletteArray, linePaletteArray):
 		self.blockImage = Image.new("RGBA", (self.blockWidth, self.blockHeight))
 		self.blockDraw = ImageDraw.Draw(self.blockImage)
 
 		# [minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase]
 
 		self.colOverlay = getConfigOverlay(paletteArray)
-		self.colOverlay2 = getConfigOverlay(paletteArray)
+		self.colOverlay2 = getConfigOverlay(linePaletteArray)
 
 
 	def bars(self):
@@ -51,7 +51,8 @@ class Block:
 		)
 		clr2 = tuple(
 			round(a * self.config.brightness) for a in (self.colOverlay2.currentColor)
-		)
+		)		
+
 
 		self.blockDraw.rectangle(
 			(0, 0, self.blockWidth, self.blockHeight), fill=self.config.bgColor, outline=None)
@@ -72,7 +73,10 @@ class Block:
 
 
 			#self.blockDraw.rectangle((x1,y1,x2,y2),outline=(None), fill=outClr)
-			self.blockDraw.polygon(((x1,y1),(x2,y1),(x2,y2),(x1,y2)),outline=(None), fill=outClr)
+			if self.config.drawOutlines == True :
+				self.blockDraw.polygon(((x1,y1),(x2,y1),(x2,y2),(x1,y2)),outline=(clr2), fill=outClr)
+			else :
+				self.blockDraw.polygon(((x1,y1),(x2,y1),(x2,y2),(x1,y2)),outline=None, fill=outClr)
 			count += 1
 
 
@@ -117,7 +121,23 @@ def redraw(config):
 		sectionBlurRadius = 1
 
 
-def getConfigOverlay( palette):
+def getConfigOverlay(palette):
+	colOverlay = coloroverlay.ColorOverlay()
+	colOverlay.randomSteps = False
+	colOverlay.timeTrigger = True
+	colOverlay.tLimitBase = palette[6]
+	colOverlay.maxBrightness = 1
+	colOverlay.steps = 50
+	colOverlay.minHue = palette[0]
+	colOverlay.maxHue = palette[1]
+	colOverlay.minSaturation = palette[2]
+	colOverlay.maxSaturation = palette[3]
+	colOverlay.minValue = palette[4]
+	colOverlay.maxValue = palette[5]
+	colOverlay.colorTransitionSetup()
+	return colOverlay
+
+def getConfigLineOverlay(palette):
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False
 	colOverlay.timeTrigger = True
@@ -145,6 +165,16 @@ def buildPalette(config,index=0):
 	maxValue = float(workConfig.get(palette, "maxValue"))
 	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase])
 
+def buildLinePalette(config,index=0):
+	palette = config.palettes[index]
+	tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
+	minHue = float(workConfig.get(palette, "line_minHue"))
+	maxHue = float(workConfig.get(palette, "line_maxHue"))
+	minSaturation = float(workConfig.get(palette, "line_minSaturation")	)
+	maxSaturation = float(workConfig.get(palette, "line_maxSaturation"))
+	minValue = float(workConfig.get(palette, "line_minValue"))
+	maxValue = float(workConfig.get(palette, "line_maxValue"))
+	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase])
 
 # Builds flexible grid
 def buildGrid(config):
@@ -212,7 +242,7 @@ def buildGrid(config):
 
 
 				paletteIndex = math.floor(random.uniform(0,len(config.palettes)))
-				barBlockUnit.setUp(buildPalette(config,paletteIndex))
+				barBlockUnit.setUp(buildPalette(config,paletteIndex), buildLinePalette(config,paletteIndex))
 
 				config.barBlocks.append(barBlockUnit)
 				count +=1
@@ -261,7 +291,8 @@ def buildOverlapGrid(config):
 		else:
 			barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
 
-		barBlockUnit.setUp()
+		paletteIndex = math.floor(random.uniform(0,len(config.palettes)))
+		barBlockUnit.setUp(buildPalette(config,paletteIndex))
 		config.barBlocks.append(barBlockUnit)
 		count +=1
 
@@ -304,7 +335,7 @@ def buildUniformGrid(config):
 				barBlockUnit.rotation = round(random.uniform(-config.rotationVariation,config.rotationVariation))
 
 			paletteIndex = math.floor(random.uniform(0,len(config.palettes)))
-			barBlockUnit.setUp(buildPalette(config,paletteIndex))
+			barBlockUnit.setUp(buildPalette(config,paletteIndex), buildLinePalette(config,paletteIndex))
 			config.barBlocks.append(barBlockUnit)
 			count +=1	
 
@@ -368,6 +399,7 @@ def main(run=True):
 	config.barWidthMax = int(workConfig.get("movingpattern", "barWidthMax"))
 	config.gapWidthMin = int(workConfig.get("movingpattern", "gapWidthMin"))
 	config.gapWidthMax = int(workConfig.get("movingpattern", "gapWidthMax"))
+	config.drawOutlines = (workConfig.getboolean("movingpattern", "drawOutlines"))
 
 	config.filterPatchProb = float(workConfig.get("movingpattern", "filterPatchProb"))
 	config.blurPatchProb = float(workConfig.get("movingpattern", "blurPatchProb"))
@@ -401,6 +433,8 @@ def main(run=True):
 
 	config.palettes = workConfig.get("movingpattern", "palettes").split(",")
 
+	# Right now the background is controlled by the first palette in the list of
+	# palettes to use
 	config.colOverlay = getConfigOverlay(buildPalette(config,0))
 	
 

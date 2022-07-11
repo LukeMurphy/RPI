@@ -18,9 +18,9 @@ def getColorChanger():
 	colOverlay = coloroverlay.ColorOverlay(False)
 	colOverlay.randomSteps = False
 	colOverlay.timeTrigger = True
-	colOverlay.tLimitBase = 10
+	colOverlay.tLimitBase = round(random.uniform(10,50))
 	colOverlay.maxBrightness = config.brightness
-	colOverlay.steps = 50
+	colOverlay.steps = round(random.uniform(20,60))
 	colOverlay.minHue = float(workConfig.get("pattern", "minHue"))
 	colOverlay.maxHue = float(workConfig.get("pattern", "maxHue"))
 	colOverlay.minSaturation = float(workConfig.get("pattern", "minSaturation"))
@@ -52,26 +52,7 @@ def drawPattern():
 		config.colorArray.append(tuple(i.currentColor))
 
 	drawConcentricRings()
-	# drawTheReal()
 
-
-def drawTheReal():
-	x = config.blockDims[0]
-	y = config.blockDims[1]
-	w = config.blockDims[2] + x
-	h = config.blockDims[3] + y
-	box = tuple([x, y, w, h])
-	config.canvasDraw.rectangle(box, fill=tuple(config.f2.currentColor))
-
-	lines = h - y
-	for i in range(0, lines, config.blockSteps):
-		f = tuple(config.f1.currentColor)
-		if random.random() < 0.001:
-			f = colorutils.randomColor(1)
-			f = tuple(config.f4.currentColor)
-		config.canvasDraw.rectangle(
-			(x, y + i, w, y + i + config.blockLineHeight), fill=f
-		)
 
 
 def resetPause():
@@ -89,7 +70,7 @@ def drawConcentricRings():
 	fillLevel = 0
 
 	figs = config.repeatFigures
-	config.r = 200
+	config.r = config.initialRadius
 
 	"Ideally, make the rate of change sinusoidal - i.e. change the rate\
 	gradually over time so there are smooth transitions back and forth"
@@ -112,9 +93,9 @@ def drawConcentricRings():
 		config.turnRate += config.turnRateChange * config.turnRateDirection
 		# config.turnRate = rate
 
-		if random.random() < 0.005:
+		if random.random() < config.pauseProb:
 			config.paused = True
-			d = random.uniform(5, 20)
+			d = random.uniform(.1, config.maxPauseTime)
 			t1 = Timer(d, resetPause)
 			t1.start()
 
@@ -196,9 +177,6 @@ def main(run=True):
 	colorutils.brightness = config.brightness
 
 	config.delay = float(workConfig.get("pattern", "delay"))
-	config.base = float(workConfig.get("pattern", "base"))
-	config.rows = int(workConfig.get("pattern", "rows"))
-	config.cols = int(workConfig.get("pattern", "cols"))
 
 	config.patternSet = workConfig.get("pattern", "patternSet")
 	config.showLines = workConfig.getboolean("pattern", "showLines")
@@ -218,6 +196,8 @@ def main(run=True):
 	config.turnRateLimPlus = float(workConfig.get("pattern", "turnRateLimPlus"))
 	config.turnRateLimNeg = float(workConfig.get("pattern", "turnRateLimNeg"))
 	config.turnRateFactor = float(workConfig.get("pattern", "turnRateFactor"))
+	config.pauseProb = float(workConfig.get("pattern", "pauseProb"))
+	config.maxPauseTime = float(workConfig.get("pattern", "maxPauseTime"))
 	config.turnRateBase = float(workConfig.get(config.patternSet, "turnRateBase"))
 	config.turnRateDirection = 1
 	config.turnRate = config.turnRateBase
@@ -227,12 +207,8 @@ def main(run=True):
 	config.imageOffsetY = 0
 	config.imageOffsetX = 0
 
-	config.block = (workConfig.get("pattern", "block")).split(",")
-	config.blockDims = list([int(i) for i in config.block])
-	config.blockLineHeight = int(workConfig.get("pattern", "blockLineHeight"))
-	config.blockSteps = int(workConfig.get("pattern", "blockSteps"))
+
 	config.paused = False
-	config.timeDelay = 5.0
 
 	# Start from center for each polygon
 	"sin (theta) = (r + d) / s"

@@ -533,6 +533,10 @@ def repeatImage(config):
 	# 2021-06-28 Opted to build the repetition/tiling vertically instead of horizontally
 	# to suit the graph piece better and upwards or downwards is better than sideways sometimes
 	# so reversed the order of "for c in ..." with "for r in range(..." so builds rows vertically
+
+	# 2022-07-12 Changed my mind because the graph piece is not going to get this code - going for a 
+	# tower configuration
+
 	for c in range(0, config.cols):
 		for r in range(0, config.rows):
 			if cntr in config.skipBlocks:
@@ -540,8 +544,9 @@ def repeatImage(config):
 											 r * config.blockHeight + config.blockHeight), fill=config.bgColor, outline=config.bgColor)
 			else:
 				temp = config.blockImage.copy()
+				temp = temp.rotate(90)
 				if c % 2 != 0 and config.rotateAltBlock == 1:
-					temp = temp.rotate(90)
+					temp = temp.rotate(-90)
 
 				config.canvasImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
 
@@ -623,9 +628,10 @@ def iterate():
 	# RANDOM OVERLAY REPETITION DISTURBANCE
 	if random.random() < config.rebuildPatternProbability and config.sectionDisturbance == True:
 		config.sectionRotation = random.uniform(-config.sectionRotationRange,config.sectionRotationRange)
-		config.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
-		config.sectionSize = [round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
-
+		config.sectionPlacement = [	round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),
+									round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
+		config.sectionSize = 	[round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),
+								round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
 
 	if config.shingleVariation == True:
 		if random.random() < config.rebuildPatternProbability :
@@ -642,6 +648,8 @@ def iterate():
 		if config.sectionDisturbance == True :
 			section = config.canvasImage.crop((0,0,config.sectionSize[0],config.sectionSize[1]))
 			section = section.rotate(config.sectionRotation)
+
+
 			config.canvasImage.paste(section,config.sectionPlacement,section)
 		
 		# a blurred section distrubance
@@ -868,18 +876,23 @@ def main(run=True):
 
 		sectionPlacementXRange = workConfig.get("movingpattern", "sectionPlacementXRange").split(",")
 		config.sectionPlacementXRange = tuple(map(lambda x: int(int(x)), sectionPlacementXRange))
-		sectionPlacementYRange = workConfig.get("movingpattern", "sectionPlacementXRange").split(",")
+
+		sectionPlacementYRange = workConfig.get("movingpattern", "sectionPlacementYRange").split(",")
 		config.sectionPlacementYRange = tuple(map(lambda x: int(int(x)), sectionPlacementYRange))
 
 		sectionWidthRange = workConfig.get("movingpattern", "sectionWidthRange").split(",")
 		config.sectionWidthRange = tuple(map(lambda x: int(int(x)), sectionWidthRange))
+
 		sectionHeightRange = workConfig.get("movingpattern", "sectionHeightRange").split(",")
 		config.sectionHeightRange = tuple(map(lambda x: int(int(x)), sectionHeightRange))
 
 
 		config.sectionRotation = random.uniform(-config.sectionRotationRange,config.sectionRotationRange)
-		config.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
-		config.sectionSize = [round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
+		config.sectionPlacement = [	round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),
+									round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
+		config.sectionSize = 	[round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),
+								round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
+
 
 	except Exception as e:
 		config.sectionDisturbance = False
@@ -888,11 +901,20 @@ def main(run=True):
 
 	try:
 		config.useBlurSection =  (workConfig.getboolean("movingpattern", "useBlurSection"))
+		config.blurSectionWidth =  int(workConfig.get("movingpattern", "blurSectionWidth"))
+		config.blurSectionHeight =  int(workConfig.get("movingpattern", "blurSectionHeight"))
+		config.blurSectionXPos =  int(workConfig.get("movingpattern", "blurSectionXPos"))
+		config.blurSectionYPos =  int(workConfig.get("movingpattern", "blurSectionYPos"))
+		config.mask_blur_amt =  int(workConfig.get("movingpattern", "mask_blur_amt"))
+		config.cp_blur_amt =  int(workConfig.get("movingpattern", "cp_blur_amt"))
+
+
 		config.mask = Image.new("L", config.canvasImage.size, 0)
 		config.mask_draw = ImageDraw.Draw(config.mask)
-		config.mask_draw.ellipse((200, 200, 260, 320), fill=255)
-		config.mask_blur_amt = 20 
-		config.cp_blur_amt = 3 
+
+		config.mask_draw.ellipse((config.blurSectionXPos, config.blurSectionYPos, config.blurSectionXPos + config.blurSectionWidth, config.blurSectionYPos + config.blurSectionHeight), fill=255)
+		config.mask_blur_amt = config.mask_blur_amt
+		config.cp_blur_amt = config.cp_blur_amt 
 	except Exception as e:
 		print(str(e))
 		config.useBlurSection = False

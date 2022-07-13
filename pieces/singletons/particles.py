@@ -468,16 +468,21 @@ def main(run=True):
 
 
 	config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
-	config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(
-		","
-	)
-	config.overlayColor = tuple(
-		map(lambda x: int(int(x) * config.brightness), config.overlayColorVals)
-	)
+	config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(",")
+	config.overlayColor = tuple(map(lambda x: int(int(x) * config.brightness), config.overlayColorVals))
 	config.clrBlkWidth = int(workConfig.get("particleSystem", "clrBlkWidth"))
 	config.clrBlkHeight = int(workConfig.get("particleSystem", "clrBlkHeight"))
 	config.overlayxPos = int(workConfig.get("particleSystem", "overlayxPos"))
 	config.overlayyPos = int(workConfig.get("particleSystem", "overlayyPos"))
+
+
+	try:
+		config.useOverLayEnhanced = workConfig.getboolean("particleSystem", "useOverLayEnhanced")
+		config.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
+	except Exception as e:
+		print(str(e))
+		config.useOverLayEnhanced = False
+		config.useOverOnBG = False
 
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)
@@ -818,6 +823,10 @@ def iterate():
 		outline=None,
 	)
 
+	
+	if config.useOverOnBG == True:
+		config.image.paste(config.clrBlock,(config.overlayxPos, config.overlayyPos),config.clrBlock)
+
 	'''
 	# ORIG PLACEMENT
 	if config.useOverLay == True:
@@ -825,6 +834,8 @@ def iterate():
 		config.image.paste(
 			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
 		)
+
+
 	''' 
 	for p in ps.unitArray:
 		p.update()
@@ -934,13 +945,28 @@ def iterate():
 			)
 
 	# print("particles ",config.render, config.instanceNumber)
+	
 
-
-	if config.useOverLay == True:
+	
+	
+	if config.useOverLayEnhanced == True:
 		# config.image = ImageChops.multiply(config.clrBlock, config.image)
-		config.image.paste(
-			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
-	)
+		#config.image = ImageChops.invert(config.image)
+		
+		#config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
+
+		#temp = ImageChops.lighter(config.clrBlock, config.image)
+		#temp = temp.crop((config.overlayxPos, config.overlayyPos,config.clrBlkWidth,config.clrBlkHeight))
+		
+		temp = config.image.crop((config.overlayxPos, config.overlayyPos,config.clrBlkWidth,config.clrBlkHeight))
+		temp = ImageChops.invert(temp)
+		temp = ImageChops.multiply(temp, config.clrBlock)
+
+
+		config.image.paste(temp,(config.overlayxPos, config.overlayyPos),config.clrBlock)
+	
+	elif config.useOverLay == True:
+		config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
 
 	# RENDERING AS A MOCKUP OR AS REAL
 	if config.useDrawingPoints == True :

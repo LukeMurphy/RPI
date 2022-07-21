@@ -36,22 +36,20 @@ class unit:
 		self.colOverlay.steps = self.config.steps
 		self.colOverlay.maxBrightness = self.config.brightness
 
-		if self.useFixedPalette == True:
+		self.colOverlay.minHue = self.palette[0]
+		self.colOverlay.maxHue = self.palette[1]
+		self.colOverlay.minSaturation = self.palette[2]
+		self.colOverlay.maxSaturation = self.palette[3]
+		self.colOverlay.minValue = self.palette[4]
+		self.colOverlay.maxValue = self.palette[5]
+		self.colOverlay.maxBrightness = self.colOverlay.maxValue
 
-			self.colOverlay.minHue = self.palette[0]
-			self.colOverlay.maxHue = self.palette[1]
-			self.colOverlay.minSaturation = self.palette[2]
-			self.colOverlay.maxSaturation = self.palette[3]
-			self.colOverlay.minValue = self.palette[4]
-			self.colOverlay.maxValue = self.palette[5]
-			self.colOverlay.maxBrightness = self.colOverlay.maxValue
+		self.colOverlay.dropHueMin = self.dropHueMin
+		self.colOverlay.dropHueMax = self.dropHueMax
 
-			self.colOverlay.dropHueMin = self.dropHueMin
-			self.colOverlay.dropHueMax = self.dropHueMax
-
-			self.colOverlay.colorB = [0, 0, 0, 10]
-			self.colOverlay.colorA = [0, 0, 0, 10]
-			self.colOverlay.currentColor = [0, 0, 0, 10]
+		self.colOverlay.colorB = [0, 0, 0, 10]
+		self.colOverlay.colorA = [0, 0, 0, 10]
+		self.colOverlay.currentColor = [0, 0, 0, 10]		
 
 		self.colOverlay.colorTransitionSetup()
 
@@ -107,6 +105,7 @@ class unit:
 def makeGrid():
 	global config
 	unitNumber = 1
+	paletteNumber = math.floor(random.uniform(0,len(config.palettes)))
 	for row in range(0, config.rows):
 		for col in range(0, config.cols):
 			u = unit()
@@ -118,15 +117,9 @@ def makeGrid():
 			u.row = row
 			u.col = col
 			u.coordinatedColorChange = config.coordinatedColorChange
-			u.useFixedPalette = config.useFixedPalette
-
-			if config.useFixedPalette == True:
-				if unitNumber <= config.paletteRange:
-					u.palette = config.palette["p" + str(unitNumber)]
-				else:
-					u.palette = config.palette["p" + str(config.paletteRange)]
-				u.dropHueMin = config.paletteDropHueMin
-				u.dropHueMax = config.paletteDropHueMax
+			u.palette = config.palettes[paletteNumber]
+			u.dropHueMin = config.paletteDropHueMin
+			u.dropHueMax = config.paletteDropHueMax
 
 			u.createUnitImage()
 			if config.coordinatedColorChange == False:
@@ -202,6 +195,10 @@ def redrawGrid():
 		colorSeeds()
 
 	config.render(config.image, 0, 0)
+
+	if random.random() < config.paletteChangeProb  and len(config.palettes) > 1:
+		config.unitArray = []
+		makeGrid()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -585,21 +582,18 @@ def main(run=True):
 		print(str(e))
 		config.steps = 200
 
-	try:
-		config.useFixedPalette = workConfig.getboolean("signage", "useFixedPalette")
-		config.paletteRange = int(workConfig.get("signage", "paletteRange"))
-		config.palette = {}
-		for i in range(0, config.paletteRange):
-			name = "p" + str(i + 1)
-			vals = (workConfig.get("signage", name)).split(",")
-			config.palette[name] = tuple(map(lambda x: float(x), vals))
-		print(config.palette["p1"])
-		config.paletteDropHueMin = int(workConfig.get("signage", "dropHueMin"))
-		config.paletteDropHueMax = int(workConfig.get("signage", "dropHueMax"))
+	palettesToUse = (workConfig.get("signage", "palettesToUse")).split(',')
+	config.paletteChangeProb = float(workConfig.get("signage", "paletteChangeProb"))
 
-	except Exception as e:
-		print(str(e))
-		config.useFixedPalette = False
+	config.palettes = []
+	for i in range(0, len(palettesToUse)):
+		name = palettesToUse[i]
+		vals = (workConfig.get("signage", name)).split(",")
+		config.palettes.append( tuple(map(lambda x: float(x), vals)))
+	
+	config.paletteDropHueMin = int(workConfig.get("signage", "dropHueMin"))
+	config.paletteDropHueMax = int(workConfig.get("signage", "dropHueMax"))
+
 
 	config.colOverlay.steps = config.steps
 

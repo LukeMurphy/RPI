@@ -24,7 +24,6 @@ class SlotMaker:
 
 		super(SlotMaker, self).__init__()
 		self.config = config
-		self.slotArray = []
 		self.directorArray = []
 		self.angleOffset = 0
 		self.angleGap = 1
@@ -35,20 +34,35 @@ class SlotMaker:
 
 
 	def setUpLinears(self):
-		jitterAmount = round(random.uniform(0,config.jitterAmount))
+		self.slotArray = []
 		for i in range(0, self.numberOfSlots) :
 			s = Slot()
+			self.slotArray.append(s)
+
+		self.setUpPositions()
+
+
+	def setUpPositions(self) :
+
+		jitterAmount = round(random.uniform(0,config.jitterAmount))
+		for i in range(0, len(self.slotArray)) :
+			s = self.slotArray[i]
 			jitter = 0
 			s.width = self.slotWidth
 			s.height = self.slotHeight
 			spacing = self.slotSpacing
+
+			s.width -= 1
 			if i % self.config.jitterFreq == 0 : jitter = jitterAmount
 			s.xPos = self.xPos + s.width * i + spacing * i
 			s.yPos = self.yPos + jitter
+
 			s.xPos2 = self.xPos + s.width * i + spacing * i + s.width
 			s.yPos2 = self.yPos + jitter
+
 			s.xPos3 = self.xPos + s.width * i + spacing * i  + s.width
 			s.yPos3 = self.yPos + s.height + jitter
+
 			s.xPos4 = self.xPos + s.width * i + spacing * i
 			s.yPos4 = self.yPos + s.height + jitter
 
@@ -62,7 +76,8 @@ class SlotMaker:
 				s.xPos4 = self.xPos + s.height + jitter
 				s.yPos4 = self.yPos + s.width * i + spacing * i
 
-			self.slotArray.append(s)
+
+
 
 	def setUpRadials(self):
 
@@ -151,6 +166,35 @@ class Director:
 		self.tT = time.time()
 
 
+	def setUpSlots(self):
+		s = SlotMaker(self.config)
+		s.numberOfSlots = config.numerOfSlotsMin + round(random.random()*config.numerOfSlotsMax)
+		s.slotSpacing = round(random.uniform(config.slotSpacingMin, config.slotSpacingMax))
+		s.slotWidth = round(random.uniform(config.slotWidthMin, config.slotWidthMax))
+		s.slotHeight = round(random.uniform(config.slotHeightMin, config.slotHeightMax))
+
+		s.orientation = 1 if random.random() > config.orientationProb else -1
+
+		if s.orientation == 1 :
+			s.yPos = round(random.random()*config.yRange)
+			s.xPos = 0
+			s.numberOfSlots = round(config.canvasWidth / (s.slotWidth + s.slotSpacing/2))
+		else : 
+			s.xPos = round(random.random()*config.xRange)
+			s.yPos = 0
+			s.numberOfSlots = round(config.canvasHeight / (s.slotWidth + s.slotSpacing/2))
+
+		s.setUpLinears()
+
+		self.slotMakerRef = s
+		self.orientation = s.orientation
+		self.targetSlotArray = s.slotArray
+		self.color = newColor() if self.orientation == 1 else newColorAlt()
+		self.direction = 1 if random.random() > .5 else -1
+		self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
+		#s.directorArray.append(d)
+
+
 	def checkTime(self):
 		if (time.time() - self.tT) >= self.slotRate :
 			self.tT = time.time()
@@ -164,34 +208,30 @@ class Director:
 		if self.advance == True :
 			#self.targetSlotArray[self.currentSlot].backgroundColor = (0,0,255,255)
 			self.currentSlot += self.direction
+			reset = False
 
 			if self.currentSlot >= len(self.targetSlotArray) :
 				self.currentSlot = 0
-				self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
-				self.color = colorutils.getRandomColorHSV(
-					self.config.bg_minHue,
-					self.config.bg_maxHue,
-					self.config.bg_minSaturation,
-					self.config.bg_maxSaturation,
-					self.config.bg_minValue,
-					self.config.bg_maxValue,
-					self.config.bg_dropHueMinValue,
-					self.config.bg_dropHueMaxValue,
-					)
+				reset = True
 
 			if self.currentSlot < 0:
-				self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
 				self.currentSlot = len(self.targetSlotArray) - 1
-				self.color = colorutils.getRandomColorHSV(
-					self.config.bg_minHue,
-					self.config.bg_maxHue,
-					self.config.bg_minSaturation,
-					self.config.bg_maxSaturation,
-					self.config.bg_minValue,
-					self.config.bg_maxValue,
-					self.config.bg_dropHueMinValue,
-					self.config.bg_dropHueMaxValue,
-					)
+				reset = True
+
+			if reset == True :
+				self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
+				#self.direction *= -1
+				
+
+				if self.orientation == 1 :
+					self.color = newColor()  
+					self.slotMakerRef.yPos = round(random.random()*self.config.yRange)
+					self.slotMakerRef.setUpPositions()
+				else:
+					self.color = newColorAlt()
+					self.slotMakerRef.xPos = round(random.random()*self.config.xRange)
+					self.slotMakerRef.setUpPositions()
+
 
 
 			self.targetSlotArray[self.currentSlot].r = self.color[0]
@@ -207,27 +247,34 @@ class Director:
 		self.targetSlotArray[self.currentSlot].render(self.config.draw)
 
 
-def reDraw(config):
 	
-	for i in range(0, len(config.slotsArray)) :
-		slotMaker = config.slotsArray[i]
 
-		for x in range(0, len(slotMaker.directorArray)):
-			d = slotMaker.directorArray[x]
-			d.next()
-
-
-def iterate():
-	global config, expandingRingsRing, lastRate, calibrated, cycleCount
-	#config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)
-
-
-	reDraw(config)
+def newColor() :
+	return colorutils.getRandomColorHSV(
+				config.bg_minHue,
+				config.bg_maxHue,
+				config.bg_minSaturation,
+				config.bg_maxSaturation,
+				config.bg_minValue,
+				config.bg_maxValue,
+				config.bg_dropHueMinValue,
+				config.bg_dropHueMaxValue,
+				round(random.uniform(config.bg_minAlpha, config.bg_maxAlpha))
+				)
 
 
-	# Do the final rendering of the composited image
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+def newColorAlt() :
+	return colorutils.getRandomColorHSV(
+				config.lines_minHue,
+				config.lines_maxHue,
+				config.lines_minSaturation,
+				config.lines_maxSaturation,
+				config.lines_minValue,
+				config.lines_maxValue,
+				config.lines_dropHueMinValue,
+				config.lines_dropHueMaxValue,
+				round(random.uniform(config.lines_minAlpha, config.lines_maxAlpha))
+				)
 
 
 def main(run=True):
@@ -248,6 +295,8 @@ def main(run=True):
 	config.bg_maxValue = float(workConfig.get("forms", "bg_maxValue"))
 	config.bg_dropHueMinValue = float(workConfig.get("forms", "bg_dropHueMinValue"))
 	config.bg_dropHueMaxValue = float(workConfig.get("forms", "bg_dropHueMaxValue"))
+	config.bg_minAlpha= float(workConfig.get("forms", "bg_minAlpha"))
+	config.bg_maxAlpha = float(workConfig.get("forms", "bg_maxAlpha"))
 
 	config.lines_minHue = float(workConfig.get("forms", "lines_minHue"))
 	config.lines_maxHue = float(workConfig.get("forms", "lines_maxHue"))
@@ -255,18 +304,23 @@ def main(run=True):
 	config.lines_maxSaturation = float(workConfig.get("forms", "lines_maxSaturation"))
 	config.lines_minValue = float(workConfig.get("forms", "lines_minValue"))
 	config.lines_maxValue = float(workConfig.get("forms", "lines_maxValue"))
+	config.lines_dropHueMinValue = float(workConfig.get("forms", "lines_dropHueMinValue"))
+	config.lines_dropHueMaxValue = float(workConfig.get("forms", "lines_dropHueMaxValue"))
+	config.lines_minAlpha= float(workConfig.get("forms", "lines_minAlpha"))
+	config.lines_maxAlpha = float(workConfig.get("forms", "lines_maxAlpha"))
 
 
 	config.orientationProb = float(workConfig.get("forms", "orientationProb"))
 	config.slotSpeedMin = float(workConfig.get("forms", "slotSpeedMin"))
 	config.slotSpeedMax = float(workConfig.get("forms", "slotSpeedMax"))
 
-
 	config.numerOfSlotsMax = int(workConfig.get("forms", "numerOfSlotsMax"))
 	config.numerOfSlotsMin = int(workConfig.get("forms", "numerOfSlotsMin"))
 	config.jitterAmount = int(workConfig.get("forms", "jitterAmount"))
+	config.jitterAmountInit = int(workConfig.get("forms", "jitterAmount"))
 	config.jitterFreq = int(workConfig.get("forms", "jitterFreq"))
-	config.slotSpacing = int(workConfig.get("forms", "slotSpacing"))
+	config.slotSpacingMin = int(workConfig.get("forms", "slotSpacingMin"))
+	config.slotSpacingMax = int(workConfig.get("forms", "slotSpacingMax"))
 	config.slotWidthMin = int(workConfig.get("forms", "slotWidthMin"))
 	config.slotWidthMax = int(workConfig.get("forms", "slotWidthMax"))
 	config.slotHeightMin = int(workConfig.get("forms", "slotHeightMin"))
@@ -280,48 +334,28 @@ def main(run=True):
 		# background color - higher the 
 	# alpha = less persistent images
 	backgroundColor = (workConfig.get("forms", "backgroundColor")).split(",")
-	config.backgroundColor = tuple(int(x) for x in backgroundColor)
+	config.backgroundColor = tuple(int(x) for x in backgroundColor)	
 
-	config.slotsArray = []
+	backgroundFlashcolor = (workConfig.get("forms", "backgroundFlashcolor")).split(",")
+	config.backgroundFlashcolor = tuple(int(x) for x in backgroundFlashcolor)
+
+
+
+
+	config.drawingPaths = []
 
 
 	for i in range(0, config.linesCreated):
-		s = SlotMaker(config)
-		s.numberOfSlots = config.numerOfSlotsMin + round(random.random()*config.numerOfSlotsMax)
-		s.slotSpacing = round(random.random()*config.slotSpacing)
-		s.slotWidth = round(random.uniform(config.slotWidthMin, config.slotWidthMax))
-		s.slotHeight = round(random.uniform(config.slotHeightMin, config.slotHeightMax))
-		s.orientation = 1 if random.random() > config.orientationProb else -1
-
-		if s.orientation == 1 :
-			s.yPos = round(random.random()*config.yRange)
-		else : 
-			s.xPos = round(random.random()*config.xRange)
-
-		s.setUpLinears()
-
 		d = Director(config)
-		d.targetSlotArray = s.slotArray
-		d.color = colorutils.getRandomColorHSV(
-			config.bg_minHue,
-			config.bg_maxHue,
-			config.bg_minSaturation,
-			config.bg_maxSaturation,
-			config.bg_minValue,
-			config.bg_maxValue,
-			config.bg_dropHueMinValue,
-			config.bg_dropHueMaxValue,
-			)
-		d.direction = 1 if random.random() > .5 else -1
-		d.slotRate = random.uniform(config.slotSpeedMin, config.slotSpeedMax)
-		s.directorArray.append(d)
-		config.slotsArray.append(s)
+		d.setUpSlots()
+		config.drawingPaths.append(d)
 
 
+	'''
 	for i in range(0, config.linesCreated):
 		s = SlotMaker(config)
 		s.numberOfSlots = config.numerOfSlotsMin + round(random.random()*config.numerOfSlotsMax)
-		s.slotSpacing = round(random.random()*config.slotSpacing)
+		s.slotSpacing = round(random.uniform(config.slotSpacingMin, config.slotSpacingMax))
 		s.slotWidth = round(random.uniform(config.slotWidthMin, config.slotWidthMax))
 		s.slotHeight = round(random.uniform(config.slotHeightMin, config.slotHeightMax))
 		s.orientation = 1 if random.random() > config.orientationProb else -1
@@ -336,21 +370,12 @@ def main(run=True):
 
 		d = Director(config)
 		d.targetSlotArray = s.slotArray
-		d.color = colorutils.getRandomColorHSV(
-			config.bg_minHue,
-			config.bg_maxHue,
-			config.bg_minSaturation,
-			config.bg_maxSaturation,
-			config.bg_minValue,
-			config.bg_maxValue,
-			config.bg_dropHueMinValue,
-			config.bg_dropHueMaxValue,
-			)
+		d.color = newColor()
 		d.direction = 1 if random.random() > .5 else -1
 		d.slotRate = random.uniform(config.slotSpeedMin, config.slotSpeedMax)
 		s.directorArray.append(d)
-	'''
-		config.slotsArray.append(s)
+		#config.slotsArray.append(s)
+
 	Every set of slots is first built or drawn out and then can have 
 	any number of directors running its slots
 
@@ -363,6 +388,36 @@ def main(run=True):
 	'''
 
 
+def reDraw(config):
+	
+	for d in range(0, len(config.drawingPaths)) :
+		director = config.drawingPaths[d]
+		director.next()
+
+	if random.random() < .001 :
+		config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundFlashcolor)
+		for d in range(0, len(config.drawingPaths)) :
+			director = config.drawingPaths[d]
+			director.currentSlot = 0
+		if config.jitterAmount == 0 :
+			config.jitterAmount = config.jitterAmountInit 
+		else:
+			config.jitterAmount = 0
+
+
+def iterate():
+	global config, expandingRingsRing, lastRate, calibrated, cycleCount
+	#config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)
+	
+
+
+
+	reDraw(config)
+
+	# Do the final rendering of the composited image
+	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+
 
 def runWork():
 	global config
@@ -374,140 +429,140 @@ def runWork():
 		time.sleep(config.redrawSpeed)
 
 
-'''
-s = SlotMaker(config)
-s.numberOfSlots = 180
-s.slotSpacing = 2
-s.slotWidth = 1
-s.slotHeight = 300
-s.xPos = 200
-s.yPos = 200
-s.angleOffset = 0
-s.angleGap = .5
-s.innerRadius = 2
-s.outerRadius = 240
-s.setUp()
+	'''
+	s = SlotMaker(config)
+	s.numberOfSlots = 180
+	s.slotSpacing = 2
+	s.slotWidth = 1
+	s.slotHeight = 300
+	s.xPos = 200
+	s.yPos = 200
+	s.angleOffset = 0
+	s.angleGap = .5
+	s.innerRadius = 2
+	s.outerRadius = 240
+	s.setUp()
 
-d = Director(config)
-d.targetSlotArray = s.slotArray
-d.color = [255,0,0,255]
-d.direction = 1
-d.currentSlot = len(d.targetSlotArray) - 1
-d.slotRate = .02
-s.directorArray.append(d)
+	d = Director(config)
+	d.targetSlotArray = s.slotArray
+	d.color = [255,0,0,255]
+	d.direction = 1
+	d.currentSlot = len(d.targetSlotArray) - 1
+	d.slotRate = .02
+	s.directorArray.append(d)
 
-config.slotsArray.append(s)
+	config.slotsArray.append(s)
 
-s = SlotMaker(config)
-s.numberOfSlots = 180
-s.slotSpacing = 2
-s.slotWidth = 1
-s.slotHeight = 300
-s.xPos = 200
-s.yPos = 200
-s.angleOffset = math.pi
-s.angleGap = .5
-s.innerRadius = 2
-s.outerRadius = 240
-s.setUp()
+	s = SlotMaker(config)
+	s.numberOfSlots = 180
+	s.slotSpacing = 2
+	s.slotWidth = 1
+	s.slotHeight = 300
+	s.xPos = 200
+	s.yPos = 200
+	s.angleOffset = math.pi
+	s.angleGap = .5
+	s.innerRadius = 2
+	s.outerRadius = 240
+	s.setUp()
 
-d = Director(config)
-d.targetSlotArray = s.slotArray
-d.color = [255,0,0,255]
-d.direction = 1
-d.currentSlot = len(d.targetSlotArray) - 1
-d.slotRate = .02
-s.directorArray.append(d)
+	d = Director(config)
+	d.targetSlotArray = s.slotArray
+	d.color = [255,0,0,255]
+	d.direction = 1
+	d.currentSlot = len(d.targetSlotArray) - 1
+	d.slotRate = .02
+	s.directorArray.append(d)
 
-config.slotsArray.append(s)
-
-
-s = SlotMaker(config)
-s.numberOfSlots = 180
-s.slotSpacing = 1
-s.slotWidth = 1
-s.slotHeight = 300
-s.xPos = 208
-s.yPos = 200
-s.angleOffset = -math.pi/100
-s.angleGap = .15
-s.innerRadius = 2
-s.outerRadius = 240
-s.setUp()
-
-d = Director(config)
-d.targetSlotArray = s.slotArray
-d.color = [100,255,0,155]
-d.direction = 1
-d.slotRate = .03
-s.directorArray.append(d)
-config.slotsArray.append(s)
+	config.slotsArray.append(s)
 
 
-s = SlotMaker(config)
-s.numberOfSlots = 180
-s.slotSpacing = 1
-s.slotWidth = 1
-s.slotHeight = 300
-s.xPos = 208
-s.yPos = 200
-s.angleOffset = -math.pi/100 + math.pi
-s.angleGap = .15
-s.innerRadius = 2
-s.outerRadius = 240
-s.setUp()
+	s = SlotMaker(config)
+	s.numberOfSlots = 180
+	s.slotSpacing = 1
+	s.slotWidth = 1
+	s.slotHeight = 300
+	s.xPos = 208
+	s.yPos = 200
+	s.angleOffset = -math.pi/100
+	s.angleGap = .15
+	s.innerRadius = 2
+	s.outerRadius = 240
+	s.setUp()
 
-d = Director(config)
-d.targetSlotArray = s.slotArray
-d.color = [100,255,0,155]
-d.direction = 1
-d.slotRate = .03
-s.directorArray.append(d)
-config.slotsArray.append(s)
-
-
+	d = Director(config)
+	d.targetSlotArray = s.slotArray
+	d.color = [100,255,0,155]
+	d.direction = 1
+	d.slotRate = .03
+	s.directorArray.append(d)
+	config.slotsArray.append(s)
 
 
-s = SlotMaker(config)
-s.numberOfSlots = 180
-s.slotSpacing = 1
-s.slotWidth = 1
-s.slotHeight = 300
-s.xPos = 210
-s.yPos = 200
-s.angleOffset = math.pi/4
-s.angleGap = .5
-s.innerRadius = 0
-s.outerRadius = 240
-s.setUp()
+	s = SlotMaker(config)
+	s.numberOfSlots = 180
+	s.slotSpacing = 1
+	s.slotWidth = 1
+	s.slotHeight = 300
+	s.xPos = 208
+	s.yPos = 200
+	s.angleOffset = -math.pi/100 + math.pi
+	s.angleGap = .15
+	s.innerRadius = 2
+	s.outerRadius = 240
+	s.setUp()
 
-d = Director(config)
-d.targetSlotArray = s.slotArray
-d.color = [0,0,255,255]
-d.direction = -1
-d.slotRate = .03
-s.directorArray.append(d)
-config.slotsArray.append(s)
+	d = Director(config)
+	d.targetSlotArray = s.slotArray
+	d.color = [100,255,0,155]
+	d.direction = 1
+	d.slotRate = .03
+	s.directorArray.append(d)
+	config.slotsArray.append(s)
 
 
-s = SlotMaker(config)
-s.numberOfSlots = 180
-s.slotSpacing = 1
-s.slotWidth = 1
-s.slotHeight = 300
-s.xPos = 210
-s.yPos = 200
-s.angleOffset = math.pi/4 + math.pi
-s.angleGap = .5
-s.innerRadius = 0
-s.outerRadius = 240
-s.setUp()
 
-d = Director(config)
-d.targetSlotArray = s.slotArray
-d.color = [0,0,255,255]
-d.direction = -1
-d.slotRate = .03
-s.directorArray.append(d)
-config.slotsArray.append(s)
-'''
+
+	s = SlotMaker(config)
+	s.numberOfSlots = 180
+	s.slotSpacing = 1
+	s.slotWidth = 1
+	s.slotHeight = 300
+	s.xPos = 210
+	s.yPos = 200
+	s.angleOffset = math.pi/4
+	s.angleGap = .5
+	s.innerRadius = 0
+	s.outerRadius = 240
+	s.setUp()
+
+	d = Director(config)
+	d.targetSlotArray = s.slotArray
+	d.color = [0,0,255,255]
+	d.direction = -1
+	d.slotRate = .03
+	s.directorArray.append(d)
+	config.slotsArray.append(s)
+
+
+	s = SlotMaker(config)
+	s.numberOfSlots = 180
+	s.slotSpacing = 1
+	s.slotWidth = 1
+	s.slotHeight = 300
+	s.xPos = 210
+	s.yPos = 200
+	s.angleOffset = math.pi/4 + math.pi
+	s.angleGap = .5
+	s.innerRadius = 0
+	s.outerRadius = 240
+	s.setUp()
+
+	d = Director(config)
+	d.targetSlotArray = s.slotArray
+	d.color = [0,0,255,255]
+	d.direction = -1
+	d.slotRate = .03
+	s.directorArray.append(d)
+	config.slotsArray.append(s)
+	'''

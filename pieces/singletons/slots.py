@@ -191,7 +191,10 @@ class Director:
 		self.targetSlotArray = s.slotArray
 		self.color = newColor() if self.orientation == 1 else newColorAlt()
 		self.direction = 1 if random.random() > .5 else -1
-		self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
+		if self.orientation == 1 :
+			self.slotRate = random.uniform(self.config.slotSpeed2Min, self.config.slotSpeed2Max)
+		else :
+			self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
 		#s.directorArray.append(d)
 
 
@@ -204,7 +207,9 @@ class Director:
 
 
 	def next(self):
+
 		self.checkTime()
+
 		if self.advance == True :
 			#self.targetSlotArray[self.currentSlot].backgroundColor = (0,0,255,255)
 			self.currentSlot += self.direction
@@ -219,7 +224,10 @@ class Director:
 				reset = True
 
 			if reset == True :
-				self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
+				if self.orientation == 1 :
+					self.slotRate = random.uniform(self.config.slotSpeed2Min, self.config.slotSpeed2Max)
+				else :
+					self.slotRate = random.uniform(self.config.slotSpeedMin, self.config.slotSpeedMax)
 				#self.direction *= -1
 				
 
@@ -311,8 +319,13 @@ def main(run=True):
 
 
 	config.orientationProb = float(workConfig.get("forms", "orientationProb"))
-	config.slotSpeedMin = float(workConfig.get("forms", "slotSpeedMin"))
-	config.slotSpeedMax = float(workConfig.get("forms", "slotSpeedMax"))
+
+	config.slotSpeedMultiplier = float(workConfig.get("forms", "slotSpeedMultiplier"))
+	config.slotSpeedMin = float(workConfig.get("forms", "slotSpeedMin")) * config.slotSpeedMultiplier
+	config.slotSpeedMax = float(workConfig.get("forms", "slotSpeedMax")) * config.slotSpeedMultiplier
+	config.slotSpeed2Min = float(workConfig.get("forms", "slotSpeed2Min")) * config.slotSpeedMultiplier
+	config.slotSpeed2Max = float(workConfig.get("forms", "slotSpeed2Max")) * config.slotSpeedMultiplier
+	config.bgFlashRate = float(workConfig.get("forms", "bgFlashRate"))
 
 	config.numerOfSlotsMax = int(workConfig.get("forms", "numerOfSlotsMax"))
 	config.numerOfSlotsMin = int(workConfig.get("forms", "numerOfSlotsMin"))
@@ -339,7 +352,8 @@ def main(run=True):
 	backgroundFlashcolor = (workConfig.get("forms", "backgroundFlashcolor")).split(",")
 	config.backgroundFlashcolor = tuple(int(x) for x in backgroundFlashcolor)
 
-
+	config.filterPatchProb = float(workConfig.get("forms", "filterPatchProb"))
+	config.filterPatchProbOff = float(workConfig.get("forms", "filterPatchProbOff"))
 
 
 	config.drawingPaths = []
@@ -394,7 +408,7 @@ def reDraw(config):
 		director = config.drawingPaths[d]
 		director.next()
 
-	if random.random() < .001 :
+	if random.random() < config.bgFlashRate:
 		config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundFlashcolor)
 		for d in range(0, len(config.drawingPaths)) :
 			director = config.drawingPaths[d]
@@ -410,10 +424,32 @@ def iterate():
 	#config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)
 	
-
-
-
 	reDraw(config)
+
+	if random.random() < config.filterPatchProb:
+		#print("should be remapping")
+		config.useFilters = True
+		x1 = round(random.uniform(0,config.canvasWidth))
+		x2 = round(random.uniform(x1,config.canvasWidth))
+		y1 = round(random.uniform(0,config.canvasHeight))
+		y2 = round(random.uniform(y1,config.canvasHeight))
+
+		config.remapImageBlock = True
+		config.remapImageBlockSection = (x1, y1, x2, y2)
+		config.remapImageBlockDestination = (x1, y1)
+
+	# Don't want the patch to always be there - just little interruptions
+	if random.random() < config.filterPatchProbOff :
+		#print("turning off remapping")
+		config.useFilters = False
+		x1 = 0
+		x2 = 0
+		y1 = 0
+		y2 = 0
+
+		config.remapImageBlock = True
+		config.remapImageBlockSection = (x1, y1, x2, y2)
+		config.remapImageBlockDestination = (x1, y1)
 
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)

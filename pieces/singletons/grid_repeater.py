@@ -11,9 +11,9 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 def generateInitialImage():
 	image = Image.new("RGBA", (config.blockWidth, config.blockHeight))
 	draw = ImageDraw.Draw(image)
-	draw.rectangle((0,0,config.blockWidth/4,config.blockHeight/4), fill=(190,0,255,100))
-	draw.line((0,0,config.blockWidth,config.blockHeight), fill=(255,0,0,255))
+	#draw.rectangle((0,0,config.blockWidth/4,config.blockHeight/4), fill=(190,0,255,100))
 	draw.line((config.blockWidth,0,0,config.blockHeight), fill=(0,180,0))
+	draw.line((0,0,config.blockWidth,config.blockHeight), fill=(255,0,0,255))
 	draw.line((0,config.blockHeight/2,config.blockWidth,config.blockHeight/2), fill=(0,0,255))
 	return image
 
@@ -35,7 +35,6 @@ class Director:
 		super(Director, self).__init__()
 		self.config = config
 		self.tT = time.time()
-
 
 
 	def checkTime(self):
@@ -150,19 +149,20 @@ def main(run=True):
 	config.filterPatchProbOff = float(workConfig.get("forms", "filterPatchProbOff"))
 
 
-	config.blockWidth = 28
-	config.blockHeight = 28
+	config.blockWidth = 18
+	config.blockHeight = 18
 	config.colGap = 1
 	config.rowGap = 1
 	config.angle = 0
 	config.angleIncrement = -5
 	config.repeatFactor = .01
-	config.expandPaste = True
+	config.expandPaste = False
 
 	config.gridCols = round(config.canvasWidth / config.blockWidth)
 	config.gridRows = round(config.canvasHeight / config.blockHeight)
 
-	img  = generateInitialImage()
+	config.director = Director(config)
+	config.director.slotRate = .03
 
 
 
@@ -173,20 +173,7 @@ def main(run=True):
 	'''
 
 	'''
-
-
-def reDraw(config):
-	
-	pass
-
-
-def iterate():
-	global config, expandingRingsRing, lastRate, calibrated, cycleCount
-	#config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)
-	
-	reDraw(config)
-
+def drawGrid() :
 	img  = generateInitialImage()
 
 	i = 0 
@@ -196,13 +183,54 @@ def iterate():
 			#rotAngle = -config.angle + 360/(config.gridCols * config.repeatFactor ) * i
 			rotAngle = -config.angle + rad * i 
 			imgTemp = img.rotate(rotAngle, expand=config.expandPaste)
-			config.image.paste(imgTemp, (col * (config.blockWidth + config.colGap), row * (config.blockHeight + config.rowGap)), imgTemp)
+			xPos = col * (config.blockWidth + config.colGap)
+			yPos = row * (config.blockHeight + config.rowGap)
+			config.image.paste(imgTemp, (xPos, yPos ), imgTemp)
 			#config.angle += config.angleIncrement
 			i += 1
 	config.angle += config.angleIncrement
 
-	# Do the final rendering of the composited image
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+
+def drawSpiral() :
+	img  = generateInitialImage()
+
+	i = 0 
+	rad = round(360/config.gridRows/config.gridCols/config.repeatFactor)
+	sAngle = 0
+	sAngleRate = math.pi/20
+	sRadius = 5
+	sRadiusRate = .49
+	sRadiusRateChange = .998
+	xPosInit = config.canvasWidth/2 - config.blockWidth/2
+	yPosInit = config.canvasHeight/2 - config.blockHeight/2
+	numberOfUnits = config.gridRows * config.gridCols * 2
+	for element in range(0, numberOfUnits) :
+		rotAngle = -config.angle + rad * i 
+		imgTemp = img.rotate(rotAngle, expand=config.expandPaste)
+		xPos = round(xPosInit + math.cos(sAngle) * sRadius)
+		yPos = round(yPosInit + math.sin(sAngle) * sRadius)
+		config.image.paste(imgTemp, (xPos, yPos ), imgTemp)
+		#config.angle += config.angleIncrement
+		i += 1
+		sAngle += sAngleRate
+		sRadius += sRadiusRate
+		sRadiusRate *= sRadiusRateChange
+	config.angle += config.angleIncrement
+
+
+def reDraw(config):
+	drawSpiral()
+	
+def iterate():
+	global config, expandingRingsRing, lastRate, calibrated, cycleCount
+	#config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+	config.director.checkTime()
+	if config.director.advance == True :
+		config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor)
+		reDraw(config)
+		# Do the final rendering of the composited image
+		config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 
 def runWork():

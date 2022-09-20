@@ -255,8 +255,6 @@ class Director:
 		self.targetSlotArray[self.currentSlot].render(self.config.draw)
 
 
-	
-
 def newColor() :
 	return colorutils.getRandomColorHSV(
 				config.bg_minHue,

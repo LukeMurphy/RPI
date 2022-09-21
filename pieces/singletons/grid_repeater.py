@@ -64,6 +64,7 @@ def newColorAlt() :
 				round(random.uniform(config.line1_minAlpha, config.line1_maxAlpha))
 				)
 
+
 def newColorAlt2() :
 	return colorutils.getRandomColorHSV(
 				config.line2_minHue,
@@ -77,17 +78,23 @@ def newColorAlt2() :
 				round(random.uniform(config.line1_minAlpha, config.line1_maxAlpha))
 				)
 
-''' ----------------------------------------------------------------------------------- '''
+
 def generateInitialImage():
 	image = Image.new("RGBA", (config.blockWidth, config.blockHeight))
 	draw = ImageDraw.Draw(image)
-	#draw.rectangle((0,0,config.blockWidth/4,config.blockHeight/4), fill=(190,0,255,100))
-	draw.line((config.blockWidth,0,0,config.blockHeight), fill=config.lineAColor)
-	draw.line((0,0,config.blockWidth,config.blockHeight), fill=config.lineBColor)
-	draw.line((0,config.blockHeight/2,config.blockWidth,config.blockHeight/2), fill=config.lineCColor)
+	if config.figureType == 'boxes' :
+		draw.rectangle((0,0,config.boxSize,config.boxSize), fill=(config.lineAColor))
+		if config.elementNumber > 1 :
+			draw.rectangle((config.blockWidth/2,config.blockHeight/2, config.blockWidth/2 + config.boxSize, config.blockHeight/2 + config.boxSize), fill=(config.lineBColor))
+		if config.elementNumber > 2 :
+			draw.rectangle((3 * config.blockWidth/4,3 * config.blockHeight/4,3 * config.blockWidth/4 + config.boxSize,3 * config.blockHeight/4 + config.boxSize), fill=(config.lineCColor))
+	else :
+		draw.line((config.blockWidth,0,0,config.blockHeight), fill=config.lineAColor)
+		if config.elementNumber > 1 :
+			draw.line((0,0,config.blockWidth,config.blockHeight), fill=config.lineBColor)
+		if config.elementNumber > 2 :
+			draw.line((0,config.blockHeight/2,config.blockWidth,config.blockHeight/2), fill=config.lineCColor)
 	return image
-
-''' ----------------------------------------------------------------------------------- '''
 
 
 def drawGrid() :
@@ -195,12 +202,14 @@ def setUp() :
 	config.lineAColor = newColor()
 	config.lineBColor = newColorAlt()
 	config.lineCColor = newColorAlt2()
-	config.patternType = workConfig.get("forms", "patternType")
+
 
 	config.gridCols = round(config.canvasWidth / config.blockWidth)
 	config.gridRows = round(config.canvasHeight / config.blockHeight)
 
 	config.expandPaste = True if random.random() > .5 else False
+	config.figureType = "boxes" if random.random() > .5 else "lines"
+	config.patternType = "spiral" if random.random() > .5 else "grid"
 
 
 def main(run=True):
@@ -276,6 +285,11 @@ def main(run=True):
 	config.sRadiusRate = float(workConfig.get("forms", "sRadiusRate"))
 	config.sRadiusRateChange = float(workConfig.get("forms", "sRadiusRateChange"))
 	config.radiusMutiplier = float(workConfig.get("forms", "radiusMutiplier"))
+
+	config.patternType = workConfig.get("forms", "patternType")
+	config.figureType = workConfig.get("forms", "figureType")
+	config.elementNumber = int(workConfig.get("forms", "elementNumber"))
+	config.boxSize = int(workConfig.get("forms", "boxSize"))
 
 
 	# background color - higher the 

@@ -210,6 +210,7 @@ def setUp() :
 	config.expandPaste = True if random.random() > .5 else False
 	config.figureType = "boxes" if random.random() > .5 else "lines"
 	config.patternType = "spiral" if random.random() > .5 else "grid"
+	config.elementNumber = round(random.uniform(1,3))
 
 
 def main(run=True):

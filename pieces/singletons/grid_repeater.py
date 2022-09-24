@@ -75,7 +75,7 @@ def newColorAlt2() :
 				config.line2_maxValue,
 				config.line2_dropHueMinValue,
 				config.line2_dropHueMaxValue,
-				round(random.uniform(config.line1_minAlpha, config.line1_maxAlpha))
+				round(random.uniform(config.line2_minAlpha, config.line2_maxAlpha))
 				)
 
 
@@ -89,11 +89,15 @@ def generateInitialImage():
 		if config.elementNumber > 2 :
 			draw.rectangle((3 * config.blockWidth/4,3 * config.blockHeight/4,3 * config.blockWidth/4 + config.boxSize,3 * config.blockHeight/4 + config.boxSize), fill=(config.lineCColor))
 	else :
-		draw.line((config.blockWidth,0,0,config.blockHeight), fill=config.lineAColor)
-		if config.elementNumber > 1 :
-			draw.line((0,0,config.blockWidth,config.blockHeight), fill=config.lineBColor)
 		if config.elementNumber > 2 :
-			draw.line((0,config.blockHeight/2,config.blockWidth,config.blockHeight/2), fill=config.lineCColor)
+			draw.line((0,1,config.blockWidth,config.blockHeight+1), fill=config.lineCColor)
+			draw.line((0,0,config.blockWidth,config.blockHeight), fill=config.lineCColor)
+		if config.elementNumber > 1 :
+			draw.line((config.blockWidth/2,0,config.blockWidth/2,config.blockHeight), fill=config.lineBColor)
+			draw.line((config.blockWidth/2+1,0,config.blockWidth/2+1,config.blockHeight), fill=config.lineBColor)
+		draw.line((0,config.blockHeight/2,config.blockWidth,config.blockHeight/2), fill=config.lineAColor)
+		draw.line((0,config.blockHeight/2+1,config.blockWidth,config.blockHeight/2+1), fill=config.lineAColor)
+
 	return image
 
 
@@ -112,7 +116,7 @@ def drawGrid() :
 			config.image.paste(imgTemp, (xPos, yPos ), imgTemp)
 			#config.angle += config.angleIncrement
 			i += 1
-	config.angle += config.angleIncrement
+	config.angle += config.gridAngleIncrement
 
 
 def drawSpiral() :
@@ -139,7 +143,7 @@ def drawSpiral() :
 		sAngle += sAngleRate
 		sRadius += sRadiusRate
 		sRadiusRate *= sRadiusRateChange
-	config.angle += config.angleIncrement
+	config.angle += config.spiralAngleIncrement
 
 
 def reDraw(config):
@@ -196,7 +200,8 @@ def setUp() :
 	config.colGap = round(random.uniform(config.blockColSpacingMin, config.blockColSpacingMax))
 	config.rowGap = round(random.uniform(config.blockRowSpacingMin, config.blockRowSpacingMax))
 	config.angle = 0
-	config.angleIncrement = random.uniform(config.angleIncrementMin, config.angleIncrementMax)
+	config.gridAngleIncrement = random.uniform(config.gridAngleIncrementMin, config.gridAngleIncrementMax)
+	config.spiralAngleIncrement = random.uniform(config.spiralAngleIncrementMin, config.spiralAngleIncrementMax)
 	config.repeatFactor = random.uniform(config.repeatFactorMin, config.repeatFactorMax)
 
 	config.lineAColor = newColor()
@@ -204,11 +209,11 @@ def setUp() :
 	config.lineCColor = newColorAlt2()
 
 
-	config.gridCols = round(config.canvasWidth / config.blockWidth)
-	config.gridRows = round(config.canvasHeight / config.blockHeight)
+	config.gridCols = round(config.canvasWidth / config.blockWidth) + 2
+	config.gridRows = round(config.canvasHeight / config.blockHeight) + 2
 
-	config.expandPaste = True if random.random() > .5 else False
-	config.figureType = "boxes" if random.random() > .5 else "lines"
+	#config.expandPaste = True if random.random() > .5 else False
+	#config.figureType = "boxes" if random.random() > .5 else "lines"
 	#config.patternType = "spiral" if random.random() > .5 else "grid"
 	#config.elementNumber = round(random.uniform(1,3))
 
@@ -275,8 +280,11 @@ def main(run=True):
 	config.xPosInit = int(workConfig.get("forms", "xPosInit"))
 	config.yPosInit = int(workConfig.get("forms", "yPosInit"))
 
-	config.angleIncrementMin = float(workConfig.get("forms", "angleIncrementMin"))
-	config.angleIncrementMax = float(workConfig.get("forms", "angleIncrementMax"))
+	config.gridAngleIncrementMin = float(workConfig.get("forms", "gridAngleIncrementMin"))
+	config.gridAngleIncrementMax = float(workConfig.get("forms", "gridAngleIncrementMax"))
+	config.spiralAngleIncrementMin = float(workConfig.get("forms", "spiralAngleIncrementMin"))
+	config.spiralAngleIncrementMax = float(workConfig.get("forms", "spiralAngleIncrementMax"))
+
 	config.repeatFactorMin = float(workConfig.get("forms", "repeatFactorMin"))
 	config.repeatFactorMax = float(workConfig.get("forms", "repeatFactorMax"))
 	config.expandPaste = (workConfig.getboolean("forms", "expandPaste"))

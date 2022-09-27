@@ -20,6 +20,28 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 				config.fadeArray.append(fadeIn)
 
 '''
+class Director:
+    """docstring for Director"""
+
+    slotRate = .5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate :
+            self.tT = time.time()
+            self.advance = True
+        else :
+            self.advance = False
+
+
+    def next(self):
+
+        self.checkTime()
 
 
 class Fader:
@@ -137,7 +159,9 @@ def runWork():
     print("Running moving_bars.py")
     print(bcolors.ENDC)
     while config.isRunning == True:
-        iterate()
+        config.directorController.checkTime()
+        if config.directorController.advance == True :
+            iterate()
         time.sleep(config.redrawRate)
         if config.standAlone == False:
             config.callBack()
@@ -301,6 +325,9 @@ def main(run=True):
             0, config.canvasWidth - 2))
         config.barArray.append(bar)
         #yPos += bar.barThickness
+
+    config.directorController = Director(config)
+    config.directorController.slotRate = .03
 
     if run:
         runWork()

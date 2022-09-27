@@ -28,6 +28,30 @@ from PIL import (
 global config
 
 
+class Director:
+	"""docstring for Director"""
+
+	slotRate = .5
+
+	def __init__(self, config):
+		super(Director, self).__init__()
+		self.config = config
+		self.tT = time.time()
+
+
+	def checkTime(self):
+		if (time.time() - self.tT) >= self.slotRate :
+			self.tT = time.time()
+			self.advance = True
+		else :
+			self.advance = False
+
+
+	def next(self):
+
+		self.checkTime()
+
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
@@ -374,7 +398,6 @@ def configureBackgroundScrolling():
 			config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 
 
-		
 	config.currentPatternLength = 0
 
 	config.scroller4 = continuous_scroller.ScrollObject()
@@ -420,7 +443,6 @@ def configureBackgroundScrolling():
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-
 
 
 def init():
@@ -603,6 +625,11 @@ def init():
 		print(str(e))
 
 
+	config.useBend = True
+	config.directorController = Director(config)
+	config.directorController.slotRate = .03
+
+
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)
 	''' 
@@ -637,7 +664,10 @@ def runWork():
 	print("RUNNING Scroller Holder scroller-holder.py")
 	print(bcolors.ENDC)
 	while 1==1 :
-		if config.isRunning == True: iterate()
+		if config.isRunning == True : 
+			config.directorController.checkTime()
+			if config.directorController.advance == True :
+				iterate()
 		time.sleep(config.redrawSpeed)
 		if config.standAlone == False :
 			config.callBack()
@@ -664,6 +694,7 @@ def checkTime(scrollerObj):
 
 def processImageForScrolling():
 	## Run through each of the objects being scrolled - text, image, background etc
+	config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	for scrollerObj in config.scrollArray:
 		scrollerObj.scroll()
 		config.canvasImage.paste(scrollerObj.canvas, (0, 0), scrollerObj.canvas)
@@ -706,6 +737,38 @@ def processImageForScrolling():
 		config.workImage = config.workImage.filter(
 			ImageFilter.GaussianBlur(radius=config.overallBlur)
 		)
+
+
+	# Create a bend
+	if config.useBend  == True :
+		workImageTemp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+		bendWidth = config.patternHeight
+		segments = 22
+		bendStart = [200,0]
+		centerOfPivot = [round(bendStart[0] + bendWidth/2),round(bendStart[1] + bendWidth/2)]
+		bendEnd = [200 + bendWidth, round(bendStart[1] + bendWidth) + 400]
+		cropWidth = round(bendWidth/ segments)
+
+		destination = [200, bendWidth]
+
+
+		crop1 = config.workImage.crop((0,0,bendStart[0],bendWidth))
+		workImageTemp.paste(crop1, (0,0), crop1)
+
+		crop3 = config.workImage.crop((bendStart[0] + bendWidth ,0,bendEnd[1],bendStart[1] + bendWidth ))
+		crop3 = crop3.rotate(-90, expand=True)
+		workImageTemp.paste(crop3, (bendStart[0],bendWidth), crop3)
+
+		for i in range (segments + 1, -1 , -1) :
+			cropTemp = config.workImage.crop((bendStart[0] + i*cropWidth, 0, bendStart[0] + (i+1)*cropWidth + 2, bendWidth))
+			cropTemp = cropTemp.rotate(i * -90/segments, expand=True, center = None, translate = None, fillcolor = (255,0,0,0))
+			xPos = round(centerOfPivot[0] - bendWidth/2)# + i * 20 #- cropWidth * 2 #+ round(crop2a.size[0]/2)
+			yPos = round(bendWidth - cropTemp.size[1]) 
+			workImageTemp.paste(cropTemp, (xPos,yPos) , cropTemp)
+
+
+		config.workImage = workImageTemp
 
 
 def iterate():

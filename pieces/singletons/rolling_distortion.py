@@ -162,8 +162,8 @@ def main(run=True) :
     config.img = loadImage('./assets/imgs/bgs/water2.jpg')
     config.xPos = 0
     config.yPos = 0
-    config.scrollSpeed = 10
-    config.xNoiseFactor = 100
+    config.scrollSpeed = 1
+    config.xNoiseFactor = 10
     config.yNoiseFactor = 100
 
     config.period = 20.0

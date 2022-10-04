@@ -8,6 +8,10 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 
 ''' ----------------------------------------------------------------------------------- '''
+class ColorPalette :
+
+	def __init__(self):
+		pass 
 
 
 class SlotMaker:
@@ -104,9 +108,6 @@ class SlotMaker:
 			self.slotArray.append(s)
 
 
-''' ----------------------------------------------------------------------------------- '''
-
-
 class Slot:
 	"""docstring for Slot"""
 
@@ -145,8 +146,6 @@ class Slot:
 
 		ref.polygon((p1,p2,p3,p4), fill = self.backgroundColor)
 		#ref.rectangle((self.xPos, self.yPos, self.xPos + self.width, self.yPos + self.height), fill=self.backgroundColor)
-
-''' ----------------------------------------------------------------------------------- '''
 
 
 class Director:
@@ -189,7 +188,7 @@ class Director:
 		self.slotMakerRef = s
 		self.orientation = s.orientation
 		self.targetSlotArray = s.slotArray
-		self.color = newColor() if self.orientation == 1 else newColorAlt()
+		self.color = newColor(config.activeColorPalette) if self.orientation == 1 else newColorAlt(config.activeColorPalette )
 		self.direction = 1 if random.random() > .5 else -1
 		if self.orientation == 1 :
 			self.slotRate = random.uniform(self.config.slotSpeed2Min, self.config.slotSpeed2Max)
@@ -232,11 +231,11 @@ class Director:
 				
 
 				if self.orientation == 1 :
-					self.color = newColor()  
+					self.color = newColor(config.activeColorPalette)  
 					self.slotMakerRef.yPos = round(random.random()*self.config.yRange)
 					self.slotMakerRef.setUpPositions()
 				else:
-					self.color = newColorAlt()
+					self.color = newColorAlt(config.activeColorPalette)
 					self.slotMakerRef.xPos = round(random.random()*self.config.xRange)
 					self.slotMakerRef.setUpPositions()
 
@@ -254,32 +253,37 @@ class Director:
 
 		self.targetSlotArray[self.currentSlot].render(self.config.draw)
 
+''' ----------------------------------------------------------------------------------- '''
 
-def newColor() :
+
+def newColor(arg=0) :
+
+	cp = config.colorPalettes[arg]
 	return colorutils.getRandomColorHSV(
-				config.bg_minHue,
-				config.bg_maxHue,
-				config.bg_minSaturation,
-				config.bg_maxSaturation,
-				config.bg_minValue,
-				config.bg_maxValue,
-				config.bg_dropHueMinValue,
-				config.bg_dropHueMaxValue,
-				round(random.uniform(config.bg_minAlpha, config.bg_maxAlpha))
+				cp.bg_minHue,
+				cp.bg_maxHue,
+				cp.bg_minSaturation,
+				cp.bg_maxSaturation,
+				cp.bg_minValue,
+				cp.bg_maxValue,
+				cp.bg_dropHueMinValue,
+				cp.bg_dropHueMaxValue,
+				round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha))
 				)
 
 
-def newColorAlt() :
+def newColorAlt(arg=0) :
+	cp = config.colorPalettes[arg]
 	return colorutils.getRandomColorHSV(
-				config.lines_minHue,
-				config.lines_maxHue,
-				config.lines_minSaturation,
-				config.lines_maxSaturation,
-				config.lines_minValue,
-				config.lines_maxValue,
-				config.lines_dropHueMinValue,
-				config.lines_dropHueMaxValue,
-				round(random.uniform(config.lines_minAlpha, config.lines_maxAlpha))
+				cp.lines_minHue,
+				cp.lines_maxHue,
+				cp.lines_minSaturation,
+				cp.lines_maxSaturation,
+				cp.lines_minValue,
+				cp.lines_maxValue,
+				cp.lines_dropHueMinValue,
+				cp.lines_dropHueMaxValue,
+				round(random.uniform(cp.lines_minAlpha, cp.lines_maxAlpha))
 				)
 
 
@@ -293,29 +297,39 @@ def main(run=True):
 
 	config.redrawSpeed = float(workConfig.get("forms", "redrawSpeed"))
 
-	config.bg_minHue = float(workConfig.get("forms", "bg_minHue"))
-	config.bg_maxHue = float(workConfig.get("forms", "bg_maxHue"))
-	config.bg_minSaturation = float(workConfig.get("forms", "bg_minSaturation"))
-	config.bg_maxSaturation = float(workConfig.get("forms", "bg_maxSaturation"))
-	config.bg_minValue = float(workConfig.get("forms", "bg_minValue"))
-	config.bg_maxValue = float(workConfig.get("forms", "bg_maxValue"))
-	config.bg_dropHueMinValue = float(workConfig.get("forms", "bg_dropHueMinValue"))
-	config.bg_dropHueMaxValue = float(workConfig.get("forms", "bg_dropHueMaxValue"))
-	config.bg_minAlpha= float(workConfig.get("forms", "bg_minAlpha"))
-	config.bg_maxAlpha = float(workConfig.get("forms", "bg_maxAlpha"))
+	config.colorPaletteSets = workConfig.get("forms", "sets").split(",")
 
-	config.lines_minHue = float(workConfig.get("forms", "lines_minHue"))
-	config.lines_maxHue = float(workConfig.get("forms", "lines_maxHue"))
-	config.lines_minSaturation = float(workConfig.get("forms", "lines_minSaturation"))
-	config.lines_maxSaturation = float(workConfig.get("forms", "lines_maxSaturation"))
-	config.lines_minValue = float(workConfig.get("forms", "lines_minValue"))
-	config.lines_maxValue = float(workConfig.get("forms", "lines_maxValue"))
-	config.lines_dropHueMinValue = float(workConfig.get("forms", "lines_dropHueMinValue"))
-	config.lines_dropHueMaxValue = float(workConfig.get("forms", "lines_dropHueMaxValue"))
-	config.lines_minAlpha= float(workConfig.get("forms", "lines_minAlpha"))
-	config.lines_maxAlpha = float(workConfig.get("forms", "lines_maxAlpha"))
+	config.colorPalettes = []
 
+	for s in config.colorPaletteSets :
 
+		colorSet = ColorPalette()
+
+		colorSet.bg_minHue = float(workConfig.get(s, "bg_minHue"))
+		colorSet.bg_maxHue = float(workConfig.get(s, "bg_maxHue"))
+		colorSet.bg_minSaturation = float(workConfig.get(s, "bg_minSaturation"))
+		colorSet.bg_maxSaturation = float(workConfig.get(s, "bg_maxSaturation"))
+		colorSet.bg_minValue = float(workConfig.get(s, "bg_minValue"))
+		colorSet.bg_maxValue = float(workConfig.get(s, "bg_maxValue"))
+		colorSet.bg_dropHueMinValue = float(workConfig.get(s, "bg_dropHueMinValue"))
+		colorSet.bg_dropHueMaxValue = float(workConfig.get(s, "bg_dropHueMaxValue"))
+		colorSet.bg_minAlpha= float(workConfig.get(s, "bg_minAlpha"))
+		colorSet.bg_maxAlpha = float(workConfig.get(s, "bg_maxAlpha"))
+
+		colorSet.lines_minHue = float(workConfig.get(s, "lines_minHue"))
+		colorSet.lines_maxHue = float(workConfig.get(s, "lines_maxHue"))
+		colorSet.lines_minSaturation = float(workConfig.get(s, "lines_minSaturation"))
+		colorSet.lines_maxSaturation = float(workConfig.get(s, "lines_maxSaturation"))
+		colorSet.lines_minValue = float(workConfig.get(s, "lines_minValue"))
+		colorSet.lines_maxValue = float(workConfig.get(s, "lines_maxValue"))
+		colorSet.lines_dropHueMinValue = float(workConfig.get(s, "lines_dropHueMinValue"))
+		colorSet.lines_dropHueMaxValue = float(workConfig.get(s, "lines_dropHueMaxValue"))
+		colorSet.lines_minAlpha= float(workConfig.get(s, "lines_minAlpha"))
+		colorSet.lines_maxAlpha = float(workConfig.get(s, "lines_maxAlpha"))
+
+		config.colorPalettes.append(colorSet)
+
+	config.activeColorPalette = 0
 	config.orientationProb = float(workConfig.get("forms", "orientationProb"))
 
 	config.slotSpeedMultiplier = float(workConfig.get("forms", "slotSpeedMultiplier"))
@@ -406,15 +420,27 @@ def reDraw(config):
 		director = config.drawingPaths[d]
 		director.next()
 
+
 	if random.random() < config.bgFlashRate:
 		config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundFlashcolor)
+		config.activeColorPalette = math.floor(random.uniform(0, len(config.colorPalettes)))
+		config.drawingPaths = []
+
+
+		for i in range(0, config.linesCreated):
+			d = Director(config)
+			d.setUpSlots()
+			config.drawingPaths.append(d)
+		'''
 		for d in range(0, len(config.drawingPaths)) :
 			director = config.drawingPaths[d]
 			director.currentSlot = 0
+
 		if config.jitterAmount == 0 :
 			config.jitterAmount = config.jitterAmountInit 
 		else:
 			config.jitterAmount = 0
+		'''
 
 
 def iterate():

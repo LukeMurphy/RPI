@@ -86,10 +86,14 @@ class Bar:
         self.xPos = 0  # -config.barThicknessMax * 2
         if self.direction == -1:
             self.xPos = config.canvasWidth  # + config.barThicknessMax * 2
+
         self.barThickness = round(random.uniform(
             config.barThicknessMin, config.barThicknessMax))
+
         self.barLength = round(random.uniform(
             config.barLengthMin, config.barLengthMax))
+
+
         #self.colorVal = colorutils.randomColorAlpha()
         cset = config.colorSets[config.usingColorSet]
 
@@ -170,7 +174,9 @@ def runWork():
 def iterate():
     global config
 
-    config.draw.rectangle((0, 0, 400, 400), fill=(0, 0, 0, 10))
+    config.draw.rectangle((0, 0, 400, 400), fill=(0, 0, 0, 1))
+
+    locus = [100,100]
 
     for i in range(0, config.numberOfBars):
         bar = config.barArray[i]
@@ -180,16 +186,21 @@ def iterate():
 
         w = round(math.sqrt(2) * config.barThicknessMax * 1.5)
 
-        angle = 180/math.pi * math.tan(bar.ySpeed/abs(bar.xSpeed))
+        angle = math.atan2(bar.ySpeed, bar.xSpeed)
 
-        temp = Image.new("RGBA", (w, w))
+        temp = Image.new("RGBA", (bar.barLength, bar.barLength))
         drw = ImageDraw.Draw(temp)
 
+
+        dx = bar.xPos - locus[0]
+        dy = bar.yPos - locus[1]
+        angle = math.atan2(dy, dx)
+
+
         if config.tipType == 1:
-            drw.rectangle((0, 0, bar.barThickness, bar.barLength),
+            drw.rectangle((0, bar.barLength/2, bar.barLength, bar.barLength/2 + bar.barThickness  ),
                           fill=bar.colorVal, outline=bar.outlineColorVal)
-            drw.rectangle((0, 2, bar.barThickness, bar.barLength+2),
-                          fill=bar.colorVal, outline=bar.outlineColorVal)
+            #drw.rectangle((0, 2, bar.barThickness, bar.barLength+2),fill=bar.colorVal, outline=bar.outlineColorVal)
 
         elif config.tipType == 0:
             drw.ellipse((0, 2, bar.barThickness, bar.barLength+2),
@@ -198,14 +209,24 @@ def iterate():
         elif config.tipType == 2:
             drw.ellipse((0, 2, bar.barThickness, bar.barThickness),
                         fill=bar.colorVal, outline=bar.outlineColorVal)
-        temp = temp.rotate(config.tipAngle - angle)
+
+        temp = temp.rotate( 180 - math.degrees(angle))
 
         config.image.paste(temp, (round(bar.xPos), round(bar.yPos)), temp)
 
-        if bar.xPos > config.canvasWidth + bar.barLength and bar.direction == 1:
-            bar.remake()
-        if bar.xPos < 0 and bar.direction == -1:
-            bar.remake()
+        if bar.xPos > config.canvasWidth:
+            #bar.remake()
+            bar.xPos = 0
+
+        if bar.xPos < 0 :
+            bar.xPos = config.canvasWidth
+
+        if bar.yPos < 0 :
+            bar.yPos = config.canvasHeight
+
+        if bar.yPos > config.canvasHeight :
+            bar.yPos = 0
+            #bar.remake()
 
     if random.random() < .002:
         if config.dropHueMax == 0:

@@ -106,6 +106,8 @@ class Point:
 			config.barLengthMin, config.barLengthMax))
 
 		#self.colorVal = colorutils.randomColorAlpha()
+
+		config.usingColorSet = math.floor(random.uniform(0, config.numberOfColorSets))
 		cset = config.colorSets[config.usingColorSet]
 
 		self.colorVal = colorutils.getRandomColorHSV(
@@ -208,6 +210,24 @@ def iterate():
 
 	config.draw.rectangle((0, 0, 400, 400), fill=(
 		config.fillColor[0], config.fillColor[1], config.fillColor[2], config.fillColorAlpha))
+
+	config.locus[0] += config.locus[2]
+	config.locus[1] += config.locus[3]
+
+	if config.locus[0] > config.canvasWidth:
+		config.locus[0] = 0
+		config.locus[2] = config.locus[4] - 2 * random.random() * config.locus[4]
+		print(config.locus[2])
+	if config.locus[0] < 0:
+		config.locus[0] = config.canvasWidth
+		config.locus[2] = config.locus[4] - 2 * random.random() * config.locus[4]
+		print(config.locus[2])
+	if config.locus[1] > config.canvasHeight:
+		config.locus[3] = config.locus[5] - 2 * random.random() * config.locus[5]
+		config.locus[1] = 0
+	if config.locus[1] < 0:
+		config.locus[1] = config.canvasHeight
+		config.locus[3] = config.locus[5] - 2 * random.random() * config.locus[5]
 
 	for i in range(0, config.numberOfPoints):
 		bar = config.barArray[i]
@@ -355,6 +375,10 @@ def main(run=True):
 
 	config.locus = list(int(i) for i in (workConfig.get("Points", "locus").split(",")))
 	config.useLocus = (workConfig.getboolean("Points", "useLocus"))
+	# storing initial values of locus drift
+	config.locus.append(config.locus[2])
+	config.locus.append(config.locus[3])
+
 
 	config.edgeAlphaMin = int(workConfig.get("Points", "edgeAlphaMin"))
 	config.edgeAlphaMax = int(workConfig.get("Points", "edgeAlphaMax"))

@@ -67,7 +67,7 @@ def callBack():
 class WaveDeformer:
 
     def transform(self, x, y):
-        y = y + 20*math.sin((x + config.xPos)/20) 
+        y = y + config.amplitude*math.sin((x + config.xPos)/config.period) 
         return x, y
 
     def transform_rectangle(self, x0, y0, x1, y1):
@@ -79,7 +79,7 @@ class WaveDeformer:
 
     def getmesh(self, img):
         self.w, self.h = img.size
-        gridspace = 20
+        gridspace = config.gridSpace
 
         target_grid = []
         for x in range(0, self.w, gridspace):
@@ -159,15 +159,17 @@ def main(run=True) :
 
 
     #config.img = loadImage('./assets/imgs/miscl/lena.jpg')
-    config.img = loadImage('./assets/imgs/bgs/water2.jpg')
+    #config.img = loadImage('./assets/imgs/bgs/water2.jpg')
+    config.img = loadImage('./assets/imgs/bgs/stripes.jpg')
     config.xPos = 0
     config.yPos = 0
-    config.scrollSpeed = 1
+    config.scrollSpeed = 2.0
     config.xNoiseFactor = 10
-    config.yNoiseFactor = 100
+    config.yNoiseFactor = 1
 
-    config.period = 20.0
+    config.period = 12.0
     config.rads = math.pi / config.canvasWidth * config.period
     config.amplitude = 20.0
+    config.gridSpace = 100
 
 

@@ -161,15 +161,16 @@ def main(run=True) :
     #config.img = loadImage('./assets/imgs/miscl/lena.jpg')
     #config.img = loadImage('./assets/imgs/bgs/water2.jpg')
     config.img = loadImage('./assets/imgs/bgs/stripes.jpg')
+    config.img = loadImage('./assets/imgs/bgs/stripes2.jpg')
     config.xPos = 0
     config.yPos = 0
-    config.scrollSpeed = 2.0
+    config.scrollSpeed = .150
     config.xNoiseFactor = 10
     config.yNoiseFactor = 1
 
-    config.period = 12.0
+    config.period = 5.0
     config.rads = math.pi / config.canvasWidth * config.period
     config.amplitude = 20.0
-    config.gridSpace = 100
+    config.gridSpace = 10
 
 

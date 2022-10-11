@@ -157,20 +157,16 @@ def main(run=True) :
     config.workImageDraw = ImageDraw.Draw(config.workImage)
     config.playSpeed = .02
 
+    config.img = loadImage(workConfig.get("distortion", "imageAsset"))
+    config.xPos = int(workConfig.get("distortion", "xPos"))
+    config.yPos = int(workConfig.get("distortion", "yPos"))
+    config.scrollSpeed = float(workConfig.get("distortion", "scrollSpeed"))
+    config.xNoiseFactor = float(workConfig.get("distortion", "xNoiseFactor"))
+    config.yNoiseFactor = float(workConfig.get("distortion", "yNoiseFactor"))
 
-    #config.img = loadImage('./assets/imgs/miscl/lena.jpg')
-    #config.img = loadImage('./assets/imgs/bgs/water2.jpg')
-    config.img = loadImage('./assets/imgs/bgs/stripes.jpg')
-    config.img = loadImage('./assets/imgs/bgs/stripes2.jpg')
-    config.xPos = 0
-    config.yPos = 0
-    config.scrollSpeed = .150
-    config.xNoiseFactor = 10
-    config.yNoiseFactor = 1
-
-    config.period = 5.0
+    config.period = float(workConfig.get("distortion", "period"))
     config.rads = math.pi / config.canvasWidth * config.period
-    config.amplitude = 20.0
-    config.gridSpace = 10
+    config.amplitude = float(workConfig.get("distortion", "amplitude"))
+    config.gridSpace = int(workConfig.get("distortion", "gridSpace"))
 
 

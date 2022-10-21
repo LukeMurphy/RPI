@@ -601,8 +601,6 @@ class Director:
 		self.checkTime()
 
 
-
-
 def rebuildSections() :
 	global config
 
@@ -612,10 +610,14 @@ def rebuildSections() :
 		section.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0],config.sectionPlacementXRange[1])),round(random.uniform(config.sectionPlacementYRange[0],config.sectionPlacementYRange[1]))]
 		section.sectionPlacementInit = [section.sectionPlacement[0], section.sectionPlacement[1]]
 		section.sectionSize = [round(random.uniform(config.sectionWidthRange[0],config.sectionWidthRange[1])),round(random.uniform(config.sectionHeightRange[0],config.sectionHeightRange[1]))]
-		section.sectionSpeed = [random.uniform(-.1,.1), random.uniform(-.1,.1)]
+		section.sectionSpeed = [random.uniform(-.1,.1)/config.sectionSpeedFactorHorizontal, random.uniform(-.1,.1)/config.sectionSpeedFactorVertical]
 		section.rotationSpeed = random.uniform(-.1,.1)
-
+		section.actionCount = 0
+		section.actionCountLimit = round(random.uniform(10,config.sectionMovementCountMax))
+		section.done = False
 		section.stopProb = random.uniform(0,config.stopProb)
+	config.drawingPrinted = False
+
 
 def iterate():
 	global config
@@ -629,7 +631,12 @@ def iterate():
 
 	if config.repeatDrawingMode == 1 :
 		redraw(config)
-		repeatImage(config)
+
+		if random.random() < .5 :
+			repeatImage(config)
+		else :
+			loadImageForBase()
+
 		config.repeatDrawingMode = 0
 
 	if random.random() < .005 and config.usePixelSortRandomize == True:
@@ -695,34 +702,50 @@ def iterate():
 
 		# paste over a section of the image on to itself and rotate
 		if config.sectionDisturbance == True :
+			doneCoount  = 0 
 			for i in range(0,config.numberOfSections) :
 				sectionParams = config.movingSections[i]
-
-				xPos = round(sectionParams.sectionPlacementInit[0])
-				yPos = round(sectionParams.sectionPlacementInit[1])
-				section = config.canvasImage.crop((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
-				'''
-				section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
-				sectionParams.sectionRotation += sectionParams.rotationSpeed
-				'''
-
-				config.canvasImage.paste(section,(round(sectionParams.sectionPlacement[0]),round(sectionParams.sectionPlacement[1])),section)
-				
-				if random.random() <  .5 : 
-					sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0]
-				if random.random() <  .5 : 
-					sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1]
-				
-
-				if random.random() < sectionParams.stopProb : 
+				if sectionParams.actionCount > sectionParams.actionCountLimit :
 					sectionParams.rotationSpeed = 0
-				if random.random() < sectionParams.stopProb : 
 					sectionParams.sectionSpeed[0] = 0
-				if random.random() < sectionParams.stopProb : 
 					sectionParams.sectionSpeed[1] = 0
+					doneCoount += 1
+
+				else :
+
+					xPos = round(sectionParams.sectionPlacementInit[0])
+					yPos = round(sectionParams.sectionPlacementInit[1])
+					section = config.canvasImage.crop((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+					'''
+					section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
+					sectionParams.sectionRotation += sectionParams.rotationSpeed
+					'''
+
+					config.canvasImage.paste(section,(round(sectionParams.sectionPlacement[0]),round(sectionParams.sectionPlacement[1])),section)
+					
+					sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0]
+					sectionParams.sectionSpeed[0] *= .9
+
+					sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1]
+					sectionParams.sectionSpeed[1] *= .9
+
+					sectionParams.actionCount  += 1
 
 
-		
+					if random.random() < sectionParams.stopProb : 
+						sectionParams.rotationSpeed = 0
+					if random.random() < sectionParams.stopProb : 
+						sectionParams.sectionSpeed[0] = 0
+					if random.random() < sectionParams.stopProb : 
+						sectionParams.sectionSpeed[1] = 0
+
+			if doneCoount >= config.numberOfSections and config.drawingPrinted == False:
+				config.drawingPrinted = True
+				currentTime = time.time()
+				baseName = "/Users/lamshell/Desktop/bending_output/" + str(currentTime)
+				writeImage(baseName, renderImage=config.canvasImage)
+
+
 		# a blurred section distrubance
 		if config.useBlurSection == True:
 			cp = config.canvasImage.copy()
@@ -740,6 +763,7 @@ def iterate():
 
 
 def rebuildPatternSequence(config):
+
 
 	config.patternSequence = []
 	numberOfPatterns = round(random.uniform(2,4))
@@ -772,6 +796,14 @@ def rebuildPatternSequence(config):
 			i+=1
 
 
+def loadImageForBase() :
+	#image = Image.open("./assets/imgs/drawings/P1060494.jpg", "r")
+	#image = Image.open("./assets/imgs/miscl/comp-384.jpg", "r")
+	image = Image.open("./assets/imgs/miscl/lm_a.png", "r")
+	image.load()
+	config.canvasImage.paste(image, (0,0))
+
+
 def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False
@@ -787,11 +819,6 @@ def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, m
 	colOverlay.maxValue = maxValue
 	colOverlay.colorTransitionSetup()
 	return colOverlay
-
-
-class Holder:
-	def __init__(self):
-		pass
 
 
 def buildPalette(config,index=0):
@@ -840,6 +867,12 @@ def buildPalette(config,index=0):
 	#config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,200)
 	#config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.colOverlay.currentColor)
 	#config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,10)
+
+
+def writeImage(baseName, renderImage) :
+	#baseName = "outputquad3/comp2_"
+	fn = baseName+".png"
+	renderImage.save(fn)
 
 
 
@@ -966,8 +999,11 @@ def main(run=True):
 		config.sectionHeightRange = tuple(map(lambda x: int(int(x)), sectionHeightRange))
 
 		config.numberOfSections = int(workConfig.get("movingpattern", "numberOfSections"))
+		config.sectionMovementCountMax = int(workConfig.get("movingpattern", "sectionMovementCountMax"))
 
 		config.stopProb = float(workConfig.get("movingpattern", "stopProbMax"))
+		config.sectionSpeedFactorHorizontal = float(workConfig.get("movingpattern", "sectionSpeedFactorHorizontal"))
+		config.sectionSpeedFactorVertical = float(workConfig.get("movingpattern", "sectionSpeedFactorVertical"))
 		config.movingSections = []
 		for i in range(0,config.numberOfSections) :
 			section = Holder()
@@ -1009,7 +1045,8 @@ def main(run=True):
 	# THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)
 
-	config.repeatDrawingMode =  1
+	config.repeatDrawingMode = 1
+	config.drawingPrinted = False
 
 	config.directorController = Director(config)
 	config.directorController.slotRate = .03

@@ -427,12 +427,11 @@ def render(
 
 	try:
 		if config.useLastOverlay == True:
-			config.renderDrawOver.rectangle(
-				config.lastOverlayBox, fill=config.lastOverlayFill, outline=None
-			)
-			config.renderImageFull.paste(
-				config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
-			)
+			config.renderDrawOver.rectangle(config.lastOverlayBox, fill=config.lastOverlayFill, outline=None)
+			#config.renderDrawOver.rectangle(config.lastOverlayBox, fill=(255,0,0,255), outline=None)
+			if config.lastOverlayBlur > 0 :
+				config.renderImageFullOverlay = config.renderImageFullOverlay.filter(ImageFilter.GaussianBlur(radius=config.lastOverlayBlur))
+			config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
 	except Exception as e:
 		print(e)
 
@@ -443,7 +442,6 @@ def render(
 		if config.frameCount >= config.frameCountLimit :
 			config.imageArrayForSaving.append(config.renderImageFull)
 			config.frameCount = 0
-
 
 		
 		if len(config.imageArrayForSaving) > 500 :

@@ -558,6 +558,8 @@ def repeatImage(config):
 def rebuildSections():
     global config
 
+    #print("REBUILDSECTIONS RUNNING NOW")
+
     for i in range(0, config.numberOfSections):
         section = config.movingSections[i]
         section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
@@ -819,45 +821,47 @@ def iterate():
             for i in range(0, config.numberOfSections):
                 sectionParams = config.movingSections[i]
                 if sectionParams.actionCount > sectionParams.actionCountLimit:
-                    sectionParams.rotationSpeed = 0
-                    sectionParams.sectionSpeed[0] = 0
-                    sectionParams.sectionSpeed[1] = 0
+                    #sectionParams.rotationSpeed = 0
+                    #sectionParams.sectionSpeed[0] = 0
+                    #sectionParams.sectionSpeed[1] = 0
                     doneCoount += 1
+                #else:
 
-                else:
+                xPos = round(sectionParams.sectionPlacementInit[0])
+                yPos = round(sectionParams.sectionPlacementInit[1])
+                section = config.canvasImage.crop(
+                    (xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+                '''
+				section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
+				sectionParams.sectionRotation += sectionParams.rotationSpeed
+				'''
 
-                    xPos = round(sectionParams.sectionPlacementInit[0])
-                    yPos = round(sectionParams.sectionPlacementInit[1])
-                    section = config.canvasImage.crop(
-                        (xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
-                    '''
-					section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
-					sectionParams.sectionRotation += sectionParams.rotationSpeed
-					'''
+                config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
+                    sectionParams.sectionPlacement[1])), section)
 
-                    config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
-                        sectionParams.sectionPlacement[1])), section)
+                sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0]
+                sectionParams.sectionSpeed[0] *= .9
 
-                    sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0]
-                    sectionParams.sectionSpeed[0] *= .9
+                sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1]
+                sectionParams.sectionSpeed[1] *= .9
 
-                    sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1]
-                    sectionParams.sectionSpeed[1] *= .9
+                sectionParams.actionCount += 1
 
-                    sectionParams.actionCount += 1
-
-                    if random.random() < sectionParams.stopProb:
-                        sectionParams.rotationSpeed = 0
-                    if random.random() < sectionParams.stopProb:
-                        sectionParams.sectionSpeed[0] = 0
-                    if random.random() < sectionParams.stopProb:
-                        sectionParams.sectionSpeed[1] = 0
+                if random.random() < sectionParams.stopProb:
+                    sectionParams.rotationSpeed = 0
+                if random.random() < sectionParams.stopProb:
+                    sectionParams.sectionSpeed[0] = 0
+                if random.random() < sectionParams.stopProb:
+                    sectionParams.sectionSpeed[1] = 0
 
             if doneCoount >= config.numberOfSections and config.drawingPrinted == False:
                 config.drawingPrinted = True
                 currentTime = time.time()
-                baseName = "/Users/lamshell/Desktop/bending_output/" + str(currentTime)
+                baseName = config.outPutPath + str(currentTime)
                 writeImage(baseName, renderImage=config.canvasImage)
+
+            #if doneCoount >= (config.numberOfSections ):
+            #    rebuildSections()
 
         # a blurred section distrubance
         if config.useBlurSection == True:
@@ -1042,6 +1046,7 @@ def main(run=True):
     config.repeatDrawingMode = 1
     config.drawingPrinted = True
     config.saveImages = (workConfig.getboolean("movingpattern", "saveImages"))
+    config.outPutPath = workConfig.get("movingpattern", "outPutPath")
     config.loadAnImageProb = float(workConfig.get("movingpattern", "loadAnImageProb"))
     config.imageSources = workConfig.get("movingpattern", "imageSources").split(',')
 

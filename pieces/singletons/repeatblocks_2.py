@@ -488,6 +488,55 @@ def wavePattern(config):
 
 
 ###############################################
+class Fader:
+	def __init__(self):
+		self.doingRefresh = 0
+		self.doingRefreshCount = 50
+		self.fadingDone = False
+		self.testing = True
+
+	def setUp(self):
+		self.blankImage = Image.new("RGBA", (self.width, self.height))
+		self.image = Image.new("RGBA", (self.width, self.height))
+		self.crossFade = Image.new("RGBA", (self.width, self.height))
+
+	def test(self):
+		print("test")
+		#self.blankImage = Image.new("RGBA", (self.width, self.height))
+		draw = ImageDraw.Draw(self.crossFade)
+		draw.rectangle((0,0,100,100), fill=(0,0,255,255))
+		config.image.paste(
+			self.crossFade, (self.xPos, self.yPos), self.crossFade
+		)
+
+	def fadeIn(self, config):
+		config.fadeThruBlack = False
+		if self.fadingDone == False:
+
+			if self.testing == True :
+				self.testing = False
+				#print(self.fadingDone, self.doingRefresh)
+
+			if self.doingRefresh < self.doingRefreshCount:
+
+				if config.fadeThruBlack == True :
+					self.blankImage = Image.new("RGBA", (self.width, self.height))
+				percent  = self.doingRefresh / self.doingRefreshCount
+				self.crossFade = Image.blend(
+					self.blankImage,
+					self.image,
+					percent,
+				)
+				config.image.paste(
+					self.crossFade, (self.xPos, self.yPos), self.crossFade
+				)
+				self.doingRefresh += 1
+			else:
+				config.image.paste(self.image, (self.xPos, self.yPos), self.image)
+				self.fadingDone = True
+				self.doingRefresh = 0
+				self.blankImage = self.image.copy()
+				self.testing = True
 
 def redraw(config):
 
@@ -531,6 +580,8 @@ def repeatImage(config):
 	# 2022-07-12 Changed my mind because the graph piece is not going to get this code - going for a
 	# tower configuration
 
+	#config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
 	for c in range(0, config.cols):
 		for r in range(0, config.rows):
 			if cntr in config.skipBlocks:
@@ -543,6 +594,7 @@ def repeatImage(config):
 					temp = temp.rotate(-90)
 
 				config.canvasImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
+				#config.transitionImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
 
 			if config.patternModelVariations == True:
 				for s in config.patternSequence:
@@ -825,14 +877,14 @@ def iterate():
 
 		# paste over a section of the image on to itself and rotate
 		if config.sectionDisturbance == True:
-			doneCoount = 0
+			doneCount = 0
 			for i in range(0, config.numberOfSections):
 				sectionParams = config.movingSections[i]
 				if sectionParams.actionCount > sectionParams.actionCountLimit:
 					#sectionParams.rotationSpeed = 0
 					#sectionParams.sectionSpeed[0] = 0
 					#sectionParams.sectionSpeed[1] = 0
-					doneCoount += 1
+					doneCount += 1
 				
 
 
@@ -866,14 +918,6 @@ def iterate():
 						sectionParams.sectionSpeed[1] = 0
 
 
-			if doneCoount >= config.numberOfSections and config.drawingPrinted == False and config.saveImages == True :
-				config.drawingPrinted = True
-				currentTime = time.time()
-				baseName = config.outPutPath + str(currentTime)
-				writeImage(baseName, renderImage=config.canvasImage)
-
-			if doneCoount >= (config.numberOfSections ) and config.rebuildImmediatelyAfterDone:
-				rebuildPatterns()
 
 		# a blurred section distrubance
 		if config.useBlurSection == True:
@@ -882,11 +926,33 @@ def iterate():
 			cp_blur = cp.filter(ImageFilter.GaussianBlur(config.cp_blur_amt))
 			config.canvasImage = Image.composite(cp_blur, config.canvasImage, mask_blur)
 
+		if config.fader.fadingDone == True:
+					config.fader.fadingDone = False
+					config.fader.image = config.canvasImage
+					config.fader.doingRefreshCount = 0
+					
+					if doneCount >= config.numberOfSections and config.drawingPrinted == False and config.saveImages == True :
+						config.fader.doingRefreshCount = 40
+						config.drawingPrinted = True
+						currentTime = time.time()
+						baseName = config.outPutPath + str(currentTime)
+						writeImage(baseName, renderImage=config.canvasImage)
+
+					if doneCount >= (config.numberOfSections ) and config.rebuildImmediatelyAfterDone:
+						config.fader.doingRefreshCount = 20
+						rebuildPatterns()
+
+
+		config.fader.fadeIn(config)
+
 		temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 		temp1Draw = ImageDraw.Draw(temp1)
 		temp1Draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.colOverlay.bgColor)
-		temp1.paste(config.canvasImage, (0, 0), config.canvasImage)
+		temp1.paste(config.image, (0, 0), config.image)
 		config.render(temp1, 0, 0, config.canvasWidth, config.canvasHeight)
+
+
+
 	# Done
 
 
@@ -943,8 +1009,8 @@ def main(run=True):
 	config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
 	config.blockDraw = ImageDraw.Draw(config.blockImage)
 
-	config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight)
-										)
+	config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+	config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
 	config.rotateAltBlock = 0
 
@@ -1062,6 +1128,22 @@ def main(run=True):
 	config.outPutPath = workConfig.get("movingpattern", "outPutPath")
 	config.loadAnImageProb = float(workConfig.get("movingpattern", "loadAnImageProb"))
 	config.imageSources = workConfig.get("movingpattern", "imageSources").split(',')
+
+
+
+
+
+	config.fader = Fader()
+	config.fader.height = config.canvasHeight
+	config.fader.width = config.canvasWidth
+	config.fader.xPos = 0
+	config.fader.yPos = 0
+	config.fader.setUp()
+
+	config.fader.image = config.canvasImage
+
+
+
 
 	config.directorController = Director(config)
 	config.directorController.slotRate = .03

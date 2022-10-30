@@ -488,6 +488,7 @@ def wavePattern(config):
 
 
 ###############################################
+
 class Fader:
 	def __init__(self):
 		self.doingRefresh = 0
@@ -537,6 +538,7 @@ class Fader:
 				self.doingRefresh = 0
 				self.blankImage = self.image.copy()
 				self.testing = True
+
 
 def redraw(config):
 

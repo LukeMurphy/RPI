@@ -63,9 +63,9 @@ class Block:
 			outClr = clr2
 			if count % 2 == 0 :
 				outClr = clr
-			if self.gap < 3 :
-				self.polyDeltaX = round(random.uniform(-self.config.deltaXVal,self.config.deltaXVal))
-				self.polyDeltaY = round(random.uniform(-self.config.deltaXVal,self.config.deltaYVal))
+			#if self.gap < 3 :
+			self.polyDeltaX = round(random.uniform(-self.config.deltaXVal,self.config.deltaXVal))
+			self.polyDeltaY = round(random.uniform(-self.config.deltaXVal,self.config.deltaYVal))
 			x1 = 0
 			y1 = i * (self.barWidth + self.gap) 
 			x2 = self.blockWidth-1 + self.polyDeltaX
@@ -126,7 +126,6 @@ def getConfigOverlay(palette):
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False
 	colOverlay.timeTrigger = True
-	colOverlay.tLimitBase = palette[6]
 	colOverlay.maxBrightness = 1
 	colOverlay.steps = 50
 	colOverlay.minHue = palette[0]
@@ -135,6 +134,9 @@ def getConfigOverlay(palette):
 	colOverlay.maxSaturation = palette[3]
 	colOverlay.minValue = palette[4]
 	colOverlay.maxValue = palette[5]
+	colOverlay.dropHueMin = palette[6]
+	colOverlay.dropHueMax = palette[7]
+	colOverlay.tLimitBase = palette[8]
 	colOverlay.colorTransitionSetup()
 	return colOverlay
 
@@ -142,7 +144,6 @@ def getConfigLineOverlay(palette):
 	colOverlay = coloroverlay.ColorOverlay()
 	colOverlay.randomSteps = False
 	colOverlay.timeTrigger = True
-	colOverlay.tLimitBase = palette[6]
 	colOverlay.maxBrightness = 1
 	colOverlay.steps = 50
 	colOverlay.minHue = palette[0]
@@ -151,6 +152,9 @@ def getConfigLineOverlay(palette):
 	colOverlay.maxSaturation = palette[3]
 	colOverlay.minValue = palette[4]
 	colOverlay.maxValue = palette[5]
+	colOverlay.dropHueMin = palette[6]
+	colOverlay.dropHueMax = palette[7]
+	colOverlay.tLimitBase = palette[8]
 	colOverlay.colorTransitionSetup()
 	return colOverlay
 
@@ -164,7 +168,15 @@ def buildPalette(config,index=0):
 	maxSaturation = float(workConfig.get(palette, "maxSaturation"))
 	minValue = float(workConfig.get(palette, "minValue"))
 	maxValue = float(workConfig.get(palette, "maxValue"))
-	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase])
+	try:
+		dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
+		dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
+	except Exception as e:
+		print(str(e))
+		dropHueMax = 0
+		dropHueMin = 0
+	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,dropHueMin,dropHueMax,tLimitBase])
+
 
 def buildLinePalette(config,index=0):
 	palette = config.palettes[index]
@@ -175,7 +187,43 @@ def buildLinePalette(config,index=0):
 	maxSaturation = float(workConfig.get(palette, "line_maxSaturation"))
 	minValue = float(workConfig.get(palette, "line_minValue"))
 	maxValue = float(workConfig.get(palette, "line_maxValue"))
-	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase])
+	try:
+		dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
+		dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
+	except Exception as e:
+		print(str(e))
+		dropHueMax = 0
+		dropHueMin = 0
+	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,dropHueMin,dropHueMax,tLimitBase])
+
+# This is not really used - for future use sometime
+def buildLinePalette2(config,index=0):
+	palette = config.palettes[index]
+	try:
+		tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
+		minHue = float(workConfig.get(palette, "line2_minHue"))
+		maxHue = float(workConfig.get(palette, "line2_maxHue"))
+		minSaturation = float(workConfig.get(palette, "line2_minSaturation"))
+		maxSaturation = float(workConfig.get(palette, "line2_maxSaturation"))
+		minValue = float(workConfig.get(palette, "line2_minValue"))
+		maxValue = float(workConfig.get(palette, "line2_maxValue"))
+		dropHueMin = float(workConfig.get(palette, "line2_dropHueMin"))
+		dropHueMax = float(workConfig.get(palette, "line2_dropHueMax"))
+	except Exception as e:
+		print(str(e))
+		tLimitBase = 0
+		minHue = 0
+		maxHue = 0
+		minSaturation = 0
+		maxSaturation = 0
+		minValue = 0
+		maxValue = 0
+		dropHueMin = 0
+		dropHueMax = 0
+		dropHueMax = 0
+		dropHueMin = 0
+	return([minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,dropHueMin,dropHueMax,tLimitBase])
+
 
 # Builds flexible grid
 def buildGrid(config):
@@ -359,8 +407,8 @@ def iterate():
 
 	if random.random() < config.changeQuiverProb:
 		if random.random() < .75 :
-			config.deltaXVal = round(random.uniform(0,1))
-			config.deltaYVal = round(random.uniform(0,1))
+			config.deltaXVal = round(random.uniform(0,config.deltaVal ))
+			config.deltaYVal = round(random.uniform(0,config.deltaVal ))
 		else :
 			# a bit more often, things just go still
 			config.deltaXVal = config.deltaYVal = 0
@@ -439,8 +487,17 @@ def main(run=True):
 		"RGBA", (config.canvasWidth, config.canvasHeight)
 	)
 
-	config.deltaXVal = 1
-	config.deltaYVal = 1
+
+	try:
+		config.deltaXVal = int(workConfig.get("movingpattern", "deltaVal"))
+		config.deltaYVal = int(workConfig.get("movingpattern", "deltaVal"))
+		config.deltaVal = int(workConfig.get("movingpattern", "deltaVal"))
+	except Exception as e:
+		print(str(e))
+		config.deltaXVal = 1
+		config.deltaYVal = 1
+		config.deltaVal = 1
+
 
 	config.gridOptions = ['buildGrid','buildGrid','buildUniformGrid']
 

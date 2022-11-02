@@ -112,6 +112,7 @@ class ColorOverlay:
 		print("New Color B", self.minHue, self.maxHue, 
 			self.minSaturation, self.maxSaturation,
 			self.minValue, self.maxValue)
+		print(self.dropHueMin, self.dropHueMax, self.tLimitBase)
 		"""
 
 	## Transition starts

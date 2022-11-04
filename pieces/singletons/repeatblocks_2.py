@@ -613,6 +613,10 @@ def rebuildSections():
 	global config
 
 	#print("REBUILDSECTIONS RUNNING NOW")
+	if random.random() < .5 :
+		config.speedDeAcceleration = config.speedDeAccelerationUpperLimit
+	else :
+		speedDeAcceleration = config.speedDeAccelerationBase
 
 	for i in range(0, config.numberOfSections):
 		section = config.movingSections[i]
@@ -1116,6 +1120,13 @@ def main(run=True):
 	config.sectionSpeedFactorHorizontal = float(workConfig.get("movingpattern", "sectionSpeedFactorHorizontal"))
 	config.sectionSpeedFactorVertical = float(workConfig.get("movingpattern", "sectionSpeedFactorVertical"))
 	config.speedDeAcceleration = float(workConfig.get("movingpattern", "speedDeAcceleration"))
+	config.speedDeAccelerationBase = float(workConfig.get("movingpattern", "speedDeAcceleration"))
+	try:
+		config.speedDeAccelerationUpperLimit = float(workConfig.get("movingpattern", "speedDeAccelerationUpperLimit"))
+	except Exception as e:
+		print(str(e))
+		config.speedDeAccelerationUpperLimit = float(workConfig.get("movingpattern", "speedDeAcceleration"))
+		
 	config.movingSections = []
 	for i in range(0, config.numberOfSections):
 		section = Holder()

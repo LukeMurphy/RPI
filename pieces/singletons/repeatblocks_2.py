@@ -5,486 +5,9 @@ import random
 import time
 import types
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils, panelDrawing
+from modules import badpixels, coloroverlay, colorutils, panelDrawing, pattern_blocks
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
-
-
-def runningSpiral(config):
-	# 16px grid box spiral for now
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	lineMult = config.lineDiff * 2
-	numLines = round(config.blockWidth / config.lineDiff * 2)
-
-	d = 3
-	direction = 1
-	distance = 1
-
-	mid = [config.blockWidth/2-1, config.blockHeight/2-1]
-
-	p1 = [mid[0], mid[1]]
-	p2 = [mid[0], mid[1]]
-
-	#clr = (0,255,255)
-
-	for i in range(0, numLines):
-		distance += d
-		p2[0] = p2[0] + distance * direction
-		config.blockDraw.line((p1[0], p1[1], p2[0], p2[1]), fill=clr)
-		p1[0] = p2[0]
-		distance += d
-		p2[1] = p2[1] + distance * direction
-		config.blockDraw.line((p1[0], p1[1], p2[0], p2[1]), fill=clr)
-		direction *= -1
-		p1[1] = p2[1]
-
-	direction = -1
-	distance = 1
-
-	p1 = [mid[0] + 1, mid[1] + 3]
-	p2 = [mid[0] + 1, mid[1] + 3]
-
-	#clr2 = (255,0,255)
-	for i in range(0, numLines):
-		distance += d
-		p2[0] = p2[0] + distance * direction
-		config.blockDraw.line((p1[0], p1[1], p2[0], p2[1]), fill=clr2)
-		p1[0] = p2[0]
-		distance += d
-		p2[1] = p2[1] + distance * direction
-		config.blockDraw.line((p1[0], p1[1], p2[0], p2[1]), fill=clr2)
-		direction *= -1
-		p1[1] = p2[1]
-
-
-def balls(config):
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	numRows = config.numDotRows
-	boxWidth = config.blockWidth
-	density = numRows * 4
-	dotWidth = boxWidth/2/numRows - 2
-	outline = None
-
-	for r in range(0, numRows):
-
-		for i in range(0, density):
-			yPos = r * (dotWidth * 2) + r * 4
-			config.blockDraw.ellipse((
-				i * 2 * boxWidth/density - boxWidth/density,
-				yPos,
-				i * 2 * boxWidth/density - boxWidth/density + dotWidth,
-				yPos + dotWidth),
-				outline=(outline), fill=clr)
-
-		for i in range(0, density):
-			config.blockDraw.ellipse((
-				i * 2 * boxWidth/density,
-				yPos + 2 * boxWidth/density,
-				i * 2 * boxWidth/density + dotWidth,
-				yPos + 2 * boxWidth/density + dotWidth),
-				outline=(outline), fill=clr)
-
-
-def fishScales(config):
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	clr2 = config.bgColor
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
-
-	numRows = config.numShingleRows
-	boxWidth = config.blockWidth/numRows
-
-	for r in range(numRows, -1, -1):
-		yPos = -2 + r * boxWidth
-		for i in range(0, 3):
-			config.blockDraw.ellipse((
-				i * boxWidth - boxWidth/2,
-				yPos,
-				i * boxWidth + boxWidth - boxWidth/2,
-				yPos + boxWidth),
-				outline=(clr), fill=clr2)
-
-		for i in range(0, 2):
-			config.blockDraw.ellipse((
-				i * boxWidth,
-				yPos - boxWidth/2,
-				i * boxWidth + boxWidth,
-				yPos + boxWidth/2),
-				outline=(clr), fill=clr2)
-
-
-def shingles(config):
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	clr2 = config.bgColor
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
-
-	numRows = config.numShingleRows
-	boxWidth = config.blockWidth/numRows
-	shingleWidth = config.blockWidth/numRows - config.shingleVariationAmount
-
-	for r in range(numRows, -1, -1):
-		yPos = -1 + r * boxWidth
-
-		for i in range(0, 3):
-			config.blockDraw.rectangle((
-				i * boxWidth - boxWidth/2,
-				yPos,
-				i * boxWidth + shingleWidth - boxWidth/2,
-				yPos + boxWidth-1),
-				outline=(clr), fill=clr2)
-		for i in range(0, 2):
-			config.blockDraw.rectangle((
-				i * boxWidth,
-				yPos - boxWidth/2,
-				i * boxWidth + shingleWidth,
-				yPos + boxWidth/2 - 1),
-				outline=(clr), fill=clr2)
-
-
-def circles(config):
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	numLines = 1
-	for i in range(0, numLines):
-		config.blockDraw.ellipse((
-			i-1,
-			i-1,
-			config.blockWidth-1*i,
-			config.blockHeight-1*i),
-			outline=(clr), fill=clr2)
-
-
-def bars(config):
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	count = 0
-	barWidth = 4
-	for i in range(0, config.numConcentricBoxes, 2):
-
-		if config.altLineColoring == True:
-			outClr = clr2
-			if count % 2 == 0:
-				outClr = clr
-		else:
-			outClr = clr
-		config.blockDraw.rectangle((
-			0,
-			i * barWidth,
-			config.blockWidth-1,
-			i * barWidth),
-			outline=(outClr), fill=None)
-		count += 1
-
-
-def concentricBoxes(config):
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	count = 0
-	for i in range(0, config.numConcentricBoxes, 2):
-
-		if config.altLineColoring == True:
-			outClr = clr2
-			if count % 2 == 0:
-				outClr = clr
-		else:
-			outClr = clr
-		config.blockDraw.rectangle((
-			i-1,
-			i-1,
-			config.blockWidth-1*i,
-			config.blockHeight-1*i),
-			outline=(outClr), fill=None)
-		count += 1
-
-
-def randomizer(config):
-
-	w = config.randomBlockWidth
-	h = config.randomBlockHeight
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	rows = config.blockHeight
-	cols = config.blockWidth
-
-	step = w
-	hStep = h
-
-	if w == 0:
-		step = 1
-	if h == 0:
-		hStep = 1
-
-	for r in range(0, rows, hStep):
-		for c in range(0, cols, step):
-			clr = colorutils.getRandomRGB(config.brightness/2)
-			if random.random() < config.randomBlockProb:
-				config.blockDraw.rectangle(
-					(c, r, w+c, h+r), fill=(clr), outline=None)
-
-
-def diamond(config):
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
-
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	# needs to be in odd grid
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	step = config.diamondStep
-	row = 1
-	delta = 0
-	w = 0
-	h = 0
-	rows = config.numRows
-	blockHeight = round(config.blockHeight/rows)
-	mid = round(blockHeight/2)
-
-	for rw in range(0, rows):
-		for c in range(0, rows):
-			for i in range(0, blockHeight, step*2):
-				for r in range(0, row, 1):
-					x = r + mid - row/2 + c * blockHeight
-					y = i + config.yIncrementer + rw * blockHeight
-
-					if y >= blockHeight*rows:
-						y -= blockHeight*rows
-
-					if (r % 2) != 1:
-						config.blockDraw.rectangle(
-							(x, y, w+x, h+y), fill=(clr), outline=None)
-				if config.diamondUseTriangles == False:
-					row = 2 * i + step + delta
-					if i > (blockHeight/2):
-						row = round(2 * (blockHeight-i)) + delta
-						#delta += -2
-				else:
-					row = i + step
-
-	'''
-	imgPart1  = config.blockImage.crop((config.blockWidth-1, 0, config.blockWidth, config.blockHeight))
-	imgPart2  = config.blockImage.crop((0, 0, config.blockWidth-1, config.blockHeight))
-
-	config.blockImage.paste(imgPart2, (1,0), imgPart2)
-	config.blockImage.paste(imgPart1, (0,0), imgPart1)
-	'''
-
-	config.yIncrementer += config.ySpeed
-
-	if config.yIncrementer >= blockHeight*2:
-		config.yIncrementer = 0
-
-
-def diagonalMove(config):
-	clr = (255, 0, 0, 210)
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-	config.blockDraw.rectangle((x, y, w+x, h+y), fill=(clr), outline=None)
-	config.xIncrementer += 1
-	config.yIncrementer += 1
-
-	if config.xIncrementer >= config.blockWidth - 4:
-		config.xIncrementer = 0
-	if config.yIncrementer >= config.blockHeight - 4:
-		config.yIncrementer = 0
-
-
-def reMove(config):
-
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], 255)
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-	lineMult = config.lineDiff * 2
-	numLines = round(config.blockWidth / config.lineDiff * 2)
-
-	for i in range(0, numLines):
-
-		x1 = -2*config.blockWidth + config.xIncrementer + i * lineMult
-		y1 = 0
-		x2 = -2*config.blockWidth + config.blockWidth + config.xIncrementer + i * lineMult
-		y2 = config.blockHeight
-
-		config.blockDraw.line((x1, y1, x2, y2), fill=(clr))
-		if config.useDoubleLine == True:
-			config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth +
-								   config.blockWidth + config.xIncrementer + i * lineMult + 1, config.blockHeight), fill=(clr2))
-
-	config.xIncrementer += 0  # config.xSpeed
-	config.yIncrementer += 0
-
-	'''
-	'''
-	if config.xIncrementer > (config.blockWidth + 0):
-		config.xIncrementer = -config.xSpeed
-	if config.yIncrementer >= config.blockHeight - 4:
-		config.yIncrementer = 0
-
-
-def wavePattern(config):
-	w = 4
-	h = 4
-	x = config.xIncrementer
-	y = config.yIncrementer
-
-	clr = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-	)
-	clr2 = tuple(
-		int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-	)
-
-	config.blockDraw.rectangle(
-		(0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
-
-	numPoints = round(config.blockWidth)
-	amplitude = config.amplitude
-	yOffset = config.yOffset
-	amplitude2 = config.amplitude2
-	yOffset2 = config.yOffset2
-	steps = config.steps
-	steps2 = config.steps2
-	rads = 2 * 22/7 / numPoints
-
-	for i in range(0, numPoints, steps):
-		angle = (i + config.xIncrementer) * rads
-		angle2 = (i + config.xIncrementer + steps) * rads
-		a = (i, math.sin(angle) * amplitude + yOffset)
-		b = (i + steps, math.sin(angle) * amplitude + yOffset)
-		c = (i + steps, math.sin(angle2) * amplitude + yOffset)
-
-		if c[1] < a[1]:
-			b = (i, math.sin(angle2) * amplitude + yOffset)
-		config.blockDraw.polygon((a, b, c, a), fill=clr, outline=None)
-
-	phase = round(config.blockWidth/config.phaseFactor)
-	for i in range(0, numPoints, steps2):
-		angle = (i - config.speedFactor*config.xIncrementer + phase) * rads
-		angle2 = (i - config.speedFactor *
-				  config.xIncrementer + phase + steps2) * rads
-		a = (i, math.cos(angle) * amplitude2 + yOffset2)
-		b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
-		c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
-
-		if c[1] < a[1]:
-			b = (i, math.cos(angle2) * amplitude2 + yOffset2)
-		config.blockDraw.polygon((a, b, c, a), fill=clr2, outline=None)
-
-	config.xIncrementer += config.xSpeed
-	config.yIncrementer += config.ySpeed
-
-	if config.xIncrementer >= config.blockWidth * 1:
-		config.xIncrementer = -0
-	if config.yIncrementer >= config.blockHeight - 4:
-		config.yIncrementer = 0
 
 
 ###############################################
@@ -543,34 +66,34 @@ class Fader:
 def redraw(config):
 
 	if config.patternModel == "wavePattern":
-		wavePattern(config)
+		pattern_blocks.wavePattern(config)
 
 	if config.patternModel == "reMove":
-		reMove(config)
+		pattern_blocks.reMove(config)
 
 	if config.patternModel == "diagonalMove":
-		diagonalMove(config)
+		pattern_blocks.diagonalMove(config)
 
 	if config.patternModel == "randomizer":
-		randomizer(config)
+		pattern_blocks.randomizer(config)
 
 	if config.patternModel == "runningSpiral":
-		runningSpiral(config)
+		pattern_blocks.runningSpiral(config)
 
 	if config.patternModel == "concentricBoxes":
-		concentricBoxes(config)
+		pattern_blocks.concentricBoxes(config)
 
 	if config.patternModel == "diamond":
-		diamond(config)
+		pattern_blocks.diamond(config)
 
 	if config.patternModel == "shingles":
-		shingles(config)
+		pattern_blocks.shingles(config)
 
 	if config.patternModel == "balls":
-		balls(config)
+		pattern_blocks.balls(config)
 
 	if config.patternModel == "bars":
-		bars(config)
+		pattern_blocks.bars(config)
 
 
 def repeatImage(config):
@@ -603,42 +126,10 @@ def repeatImage(config):
 					if cntr == s[1]:
 						config.patternModel = s[0]
 						config.rotateAltBlock = s[2]
-						func = eval(s[0])
+						func = eval("pattern_blocks." + s[0])
 						func(config)
 
 			cntr += 1
-
-
-def rebuildSections():
-	global config
-
-	if random.random() < config.changeDisturbanceSetProb :
-		setNumber = math.floor(random.uniform(0,len(config.disturbanceConfigSets)))
-		setUpDisturbanceConfigs(config.disturbanceConfigSets[setNumber])
-		print("REBUILDSECTIONS RUNNING NOW: " + config.disturbanceConfigSets[setNumber])
-		
-	if random.random() < .5 :
-		config.speedDeAcceleration = config.speedDeAccelerationUpperLimit
-	else :
-		speedDeAcceleration = config.speedDeAccelerationBase
-
-	baseSpeed = config.baseSectionSpeed
-	for i in range(0, config.numberOfSections):
-		section = config.movingSections[i]
-		section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
-		section.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])), round(
-			random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1]))]
-		section.sectionPlacementInit = [section.sectionPlacement[0], section.sectionPlacement[1]]
-		section.sectionSize = [round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])), round(
-			random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
-		section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
-								random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
-		section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
-		section.actionCount = 0
-		section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
-		section.done = False
-		section.stopProb = random.uniform(0, config.stopProb)
-	config.drawingPrinted = False
 
 
 def rebuildPatternSequence(config):
@@ -787,6 +278,41 @@ def rebuildPatterns(arg=0) :
 ###############################################
 
 
+def rebuildSections():
+	global config
+
+	if random.random() < config.changeDisturbanceSetProb :
+		setNumber = math.floor(random.uniform(0,len(config.disturbanceConfigSets)))
+		setUpDisturbanceConfigs(config.disturbanceConfigSets[setNumber])
+		print("REBUILDSECTIONS RUNNING NOW: " + config.disturbanceConfigSets[setNumber])
+		
+	if random.random() < .5 :
+		config.speedDeAcceleration = config.speedDeAccelerationUpperLimit
+	else :
+		speedDeAcceleration = config.speedDeAccelerationBase
+
+	baseSpeed = config.baseSectionSpeed
+	for i in range(0, config.numberOfSections):
+		section = config.movingSections[i]
+		section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
+		section.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])), round(
+			random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1]))]
+		section.sectionPlacementInit = [section.sectionPlacement[0], section.sectionPlacement[1]]
+		section.sectionSize = [round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])), round(
+			random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
+		section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
+								random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
+		section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
+		section.actionCount = 0
+		section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
+		section.done = False
+		section.stopProb = random.uniform(0, config.stopProb)
+	config.drawingPrinted = False
+
+
+#############################################
+
+
 class Holder:
 	def __init__(self):
 		pass
@@ -813,6 +339,64 @@ class Director:
 		self.checkTime()
 
 
+def disturber():
+	config.doneCount = 0
+
+	if config.doSectionDisturbance == True :
+		for i in range(0, config.numberOfSections):
+			sectionParams = config.movingSections[i]
+			if sectionParams.actionCount >= sectionParams.actionCountLimit:
+				#sectionParams.rotationSpeed = 0
+				#sectionParams.sectionSpeed[0] = 0
+				#sectionParams.sectionSpeed[1] = 0
+				config.doneCount += 1
+			
+
+			if sectionParams.actionCount < sectionParams.actionCountLimit:
+
+				xPos = round(sectionParams.sectionPlacementInit[0])
+				yPos = round(sectionParams.sectionPlacementInit[1])
+				section = config.canvasImage.crop(
+					(xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+				'''
+				section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
+				sectionParams.sectionRotation += sectionParams.rotationSpeed
+				'''
+
+				config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
+					sectionParams.sectionPlacement[1])), section)
+
+				delta = (sectionParams.actionCountLimit - sectionParams.actionCount)/sectionParams.actionCountLimit
+				#rads = (math.pi / 2) / sectionParams.actionCountLimit
+				#d = 1.0 - math.sin(sectionParams.actionCount * rads)
+				#d = 1.0 - math.pow(3, -.9 * delta)
+
+				d = math.pow(delta,8)
+				d =1
+
+				sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0] * d
+				sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1] * d
+				sectionParams.sectionSpeed[0] *= config.speedDeAcceleration
+				sectionParams.sectionSpeed[1] *= config.speedDeAcceleration
+
+				'''
+				if sectionParams.sectionSpeed[0] != 0:
+					sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
+				if sectionParams.sectionSpeed[1] != 0:
+					sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
+				'''
+
+				# add some better easing
+
+				sectionParams.actionCount += 1
+
+				if random.random() < sectionParams.stopProb:
+					sectionParams.rotationSpeed = 0
+				if random.random() < sectionParams.stopProb:
+					sectionParams.sectionSpeed[0] = 0
+				if random.random() < sectionParams.stopProb:
+					sectionParams.sectionSpeed[1] = 0
+
 def runWork():
 	global config
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
@@ -833,9 +417,14 @@ def iterate():
 	# config.linecolOverlay.stepTransition()
 	# config.linecolOverlay2.stepTransition()
 
+
 	config.bgColor = tuple(
 		round(a * config.brightness) for a in (config.colOverlay.currentColor)
 	)
+
+	#redraw(config)
+
+	#repeatImage(config)
 
 	if config.repeatDrawingMode == 1:
 		redraw(config)
@@ -870,62 +459,7 @@ def iterate():
 
 	# paste over a section of the image on to itself and rotate
 	if config.sectionDisturbance == True and config.fader.fadingDone == True:
-		config.doneCount = 0
-
-		if config.doSectionDisturbance == True :
-			for i in range(0, config.numberOfSections):
-				sectionParams = config.movingSections[i]
-				if sectionParams.actionCount >= sectionParams.actionCountLimit:
-					#sectionParams.rotationSpeed = 0
-					#sectionParams.sectionSpeed[0] = 0
-					#sectionParams.sectionSpeed[1] = 0
-					config.doneCount += 1
-				
-
-				if sectionParams.actionCount < sectionParams.actionCountLimit:
-
-					xPos = round(sectionParams.sectionPlacementInit[0])
-					yPos = round(sectionParams.sectionPlacementInit[1])
-					section = config.canvasImage.crop(
-						(xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
-					'''
-					section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
-					sectionParams.sectionRotation += sectionParams.rotationSpeed
-					'''
-
-					config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
-						sectionParams.sectionPlacement[1])), section)
-
-					delta = (sectionParams.actionCountLimit - sectionParams.actionCount)/sectionParams.actionCountLimit
-					#rads = (math.pi / 2) / sectionParams.actionCountLimit
-					#d = 1.0 - math.sin(sectionParams.actionCount * rads)
-					#d = 1.0 - math.pow(3, -.9 * delta)
-
-					d = math.pow(delta,8)
-					d =1
-
-					sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0] * d
-					sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1] * d
-					sectionParams.sectionSpeed[0] *= config.speedDeAcceleration
-					sectionParams.sectionSpeed[1] *= config.speedDeAcceleration
-
-					'''
-					if sectionParams.sectionSpeed[0] != 0:
-						sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
-					if sectionParams.sectionSpeed[1] != 0:
-						sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
-					'''
-
-					# add some better easing
-
-					sectionParams.actionCount += 1
-
-					if random.random() < sectionParams.stopProb:
-						sectionParams.rotationSpeed = 0
-					if random.random() < sectionParams.stopProb:
-						sectionParams.sectionSpeed[0] = 0
-					if random.random() < sectionParams.stopProb:
-						sectionParams.sectionSpeed[1] = 0
+		disturber()
 
 	# a blurred section distrubance
 	if config.useBlurSection == True:

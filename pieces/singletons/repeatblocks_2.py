@@ -344,75 +344,82 @@ def disturber():
 	config.doneCount = 0
 
 	if config.doSectionDisturbance == True :
-		for i in range(0, config.numberOfSections):
-			sectionParams = config.movingSections[i]
-			if sectionParams.actionCount >= sectionParams.actionCountLimit:
-				#sectionParams.rotationSpeed = 0
-				#sectionParams.sectionSpeed[0] = 0
-				#sectionParams.sectionSpeed[1] = 0
-				config.doneCount += 1
-			
+		if config.skipFramesCount >= config.skipFrames :
+			config.skipFramesCount = 0
+		
+			for i in range(0, config.numberOfSections):
+				sectionParams = config.movingSections[i]
+				if sectionParams.actionCount >= sectionParams.actionCountLimit:
+					#sectionParams.rotationSpeed = 0
+					#sectionParams.sectionSpeed[0] = 0
+					#sectionParams.sectionSpeed[1] = 0
+					config.doneCount += 1
+				
 
-			if sectionParams.actionCount < sectionParams.actionCountLimit:
+				if sectionParams.actionCount < sectionParams.actionCountLimit:
 
-				xPos = round(sectionParams.sectionPlacementInit[0])
-				yPos = round(sectionParams.sectionPlacementInit[1])
-				section = config.canvasImage.crop(
-					(xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
-				'''
-				section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
-				sectionParams.sectionRotation += sectionParams.rotationSpeed
-				'''
+					xPos = round(sectionParams.sectionPlacementInit[0])
+					yPos = round(sectionParams.sectionPlacementInit[1])
+					section = config.canvasImage.crop(
+						(xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+					'''
+					section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
+					sectionParams.sectionRotation += sectionParams.rotationSpeed
+					'''
 
-				config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
-					sectionParams.sectionPlacement[1])), section)
+					config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
+						sectionParams.sectionPlacement[1])), section)
 
-				delta = (sectionParams.actionCountLimit - sectionParams.actionCount)/sectionParams.actionCountLimit
-				#rads = (math.pi / 2) / sectionParams.actionCountLimit
-				#d = 1.0 - math.sin(sectionParams.actionCount * rads)
-				#d = 1.0 - math.pow(3, -.9 * delta)
+					delta = (sectionParams.actionCountLimit - sectionParams.actionCount)/sectionParams.actionCountLimit
+					#rads = (math.pi / 2) / sectionParams.actionCountLimit
+					#d = 1.0 - math.sin(sectionParams.actionCount * rads)
+					#d = 1.0 - math.pow(3, -.9 * delta)
 
-				d = math.pow(delta,8)
-				d =1
+					d = math.pow(delta,8)
+					d =1
 
-				sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0] * d
-				sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1] * d
-				sectionParams.sectionSpeed[0] *= config.speedDeAcceleration
-				sectionParams.sectionSpeed[1] *= config.speedDeAcceleration
+					sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0] * d
+					sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1] * d
+					sectionParams.sectionSpeed[0] *= config.speedDeAcceleration
+					sectionParams.sectionSpeed[1] *= config.speedDeAcceleration
 
-				'''
-				if sectionParams.sectionSpeed[0] != 0:
-					sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
-				if sectionParams.sectionSpeed[1] != 0:
-					sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
-				'''
+					'''
+					if sectionParams.sectionSpeed[0] != 0:
+						sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
+					if sectionParams.sectionSpeed[1] != 0:
+						sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
+					'''
 
-				# add some better easing
+					# add some better easing
 
-				sectionParams.actionCount += 1
+					sectionParams.actionCount += 1
 
-				if random.random() < sectionParams.stopProb:
-					sectionParams.rotationSpeed = 0
-				if random.random() < sectionParams.stopProb:
-					sectionParams.sectionSpeed[0] = 0
-				if random.random() < sectionParams.stopProb:
-					sectionParams.sectionSpeed[1] = 0
+					if random.random() < sectionParams.stopProb:
+						sectionParams.rotationSpeed = 0
+					if random.random() < sectionParams.stopProb:
+						sectionParams.sectionSpeed[0] = 0
+					if random.random() < sectionParams.stopProb:
+						sectionParams.sectionSpeed[1] = 0
 
+		else :
+			config.skipFramesCount += 1
 
 		for s in config.stableSegments :
 
 			tempCrop = config.patternImage.crop((s[0],s[1],s[2],s[3]))
 			config.canvasImage.paste(tempCrop, (s[0],s[1]), tempCrop)	
 
-		'''
-		tempCrop = config.patternImage.crop((0,0,256,32))
+			
 
-		tempCrop = config.patternImage.crop((0,160,256,184))
-		config.canvasImage.paste(tempCrop, (0,160), tempCrop)	
+	'''
+	tempCrop = config.patternImage.crop((0,0,256,32))
 
-		tempCrop = config.patternImage.crop((50,54,256,176))
-		config.canvasImage.paste(tempCrop, (50,54), tempCrop)	
-		'''
+	tempCrop = config.patternImage.crop((0,160,256,184))
+	config.canvasImage.paste(tempCrop, (0,160), tempCrop)	
+
+	tempCrop = config.patternImage.crop((50,54,256,176))
+	config.canvasImage.paste(tempCrop, (50,54), tempCrop)	
+	'''
 
 
 def runWork():
@@ -692,6 +699,8 @@ def main(run=True):
 	config.disturbanceConfigSets = (workConfig.get("movingpattern", "disturbanceConfigSets")).split(",")
 	config.changeDisturbanceSetProb = float(workConfig.get("movingpattern", "changeDisturbanceSetProb"))
 	workingDisturbanceSet = config.disturbanceConfigSets[0]
+	config.skipFrames = 1
+	config.skipFramesCount = 0
 	setUpDisturbanceConfigs(workingDisturbanceSet)
 
 

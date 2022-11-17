@@ -1,7 +1,7 @@
 import random
 
 from modules import coloroverlay, colorutils
-from pieces.workmodules.quilting.triangleunit import Unit
+from modules.quilting.triangleunit import Unit
 
 polyPattern_ = [
 	[0, 0, 0, 1, 0, 0, 0, 1],

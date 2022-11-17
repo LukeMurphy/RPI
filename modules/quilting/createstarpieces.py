@@ -1,5 +1,5 @@
 from modules import coloroverlay, colorutils
-from pieces.workmodules.quilting.starunit import Unit
+from modules.quilting.starunit import Unit
 
 polyPattern = [[0, 1, 0], [2, 0, 3], [0, 4, 0]]
 

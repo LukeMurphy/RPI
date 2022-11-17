@@ -10,9 +10,9 @@ import sys
 import textwrap
 import time
 from collections import OrderedDict
-from modules.configuration import bcolors
-from modules import coloroverlay, colorutils, continuous_scroller,  panelDrawing
 
+from modules import coloroverlay, colorutils
+from modules import continuous_scroller
 from modules.faderclass import FaderObj
 from PIL import (
 	Image,
@@ -25,7 +25,7 @@ from PIL import (
 	ImagePalette,
 )
 
-global config
+# global config
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
@@ -37,13 +37,13 @@ def glitchBox(img, r1=-10, r2=10, dir="horizontal"):
 	apparentWidth = img.size[0]
 	apparentHeight = img.size[1]
 
-	dx = int(random.uniform(r1, r2))
-	dy = int(random.uniform(r1, r2))
+	dx = round(random.uniform(r1, r2))
+	dy = round(random.uniform(r1, r2))
 
 	# dx = 0
 
-	sectionWidth = int(random.uniform(2, apparentWidth - dx))
-	sectionHeight = int(random.uniform(2, apparentHeight - dy))
+	sectionWidth = round(random.uniform(2, apparentWidth - dx))
+	sectionHeight = round(random.uniform(2, apparentHeight - dy))
 
 	# sectionHeight = apparentWidth
 
@@ -54,14 +54,13 @@ def glitchBox(img, r1=-10, r2=10, dir="horizontal"):
 		else:
 			cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
 
-		img.paste(cp1, (int(0 + dx), int(0 + dy)))
+		img.paste(cp1, (round(0 + dx), round(0 + dy)))
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-
 ## Layer imagery
-def makeDaemonMessages(imageRef, direction=1):
-	global config
+def makeDaemonMessages(config, imageRef, direction=1):
+	# global config
 
 	demonsMale = [
 		"Jealousy",
@@ -158,8 +157,8 @@ def makeDaemonMessages(imageRef, direction=1):
 
 	demonArray = [md_fd, md_fa, ma_fd, ma_fa, fd_md, fd_ma, fa_md, fa_ma]
 
-	combination = demonArray[int(math.floor(random.uniform(0, len(demonArray))))]
-	arrayToUse = combination[int(math.floor(random.uniform(0, len(combination))))]
+	combination = demonArray[round(math.floor(random.uniform(0, len(demonArray))))]
+	arrayToUse = combination[round(math.floor(random.uniform(0, len(combination))))]
 	messageString = ""
 
 	if config.sansSerif:
@@ -172,8 +171,8 @@ def makeDaemonMessages(imageRef, direction=1):
 		)
 
 	for i in range(0, 4):
-		adj = arrayToUse[1][int(math.floor(random.uniform(0, 7)))]
-		noun = arrayToUse[0][int(math.floor(random.uniform(0, 7)))]
+		adj = arrayToUse[1][round(math.floor(random.uniform(0, 7)))]
+		noun = arrayToUse[0][round(math.floor(random.uniform(0, 7)))]
 		messageString = messageString + adj.upper() + " " + noun.upper() + "           "
 
 	# print(messageString)
@@ -232,8 +231,9 @@ def remakeDaemonMessages(imageRef, direction=1):
 	makeDaemonMessages(imageRef=imageRef, direction=direction)
 
 
-def makeScrollBlock(imageRef, imageDrawRef, direction):
-	global config
+def makeScrollBlock(config, imageRef, imageDrawRef, direction):
+
+	# global config
 	w = imageRef.size[0]
 	# config.enhancer = ImageEnhance.Brightness(config.loadedImage)
 	# config.loadedImage = config.enhancer.enhance(config.overlayBrightness)
@@ -268,18 +268,18 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
 		imageRef.paste(tempImage, (x, y), tempImage)
 
 
-def remakeScrollBlock(imageRef, direction):
+def remakeScrollBlock(config, imageRef, direction):
 	drawRef = ImageDraw.Draw(imageRef)
 	if random.random() < config.imageBlockRemakeProb:
 		makeScrollBlock(imageRef, drawRef, direction)
 
 
-def makeArrows(drawRef, direction=1):
+def makeArrows(config, drawRef, direction=1):
 
 	rows = config.displayCols * 2
 	cols = config.arrowCols * 2
 
-	xDiv = int(config.displayRows * config.windowWidth) / cols
+	xDiv = round(config.displayRows * config.windowWidth) / cols
 	yDiv = config.canvasHeight / rows
 
 	xStart = 0  # config.canvasWidth / 2
@@ -289,10 +289,10 @@ def makeArrows(drawRef, direction=1):
 	arrowLength = cols * 2
 	blade = cols / 3
 
-	clr = (int(220 * config.brightness), 0, 0)
+	clr = (round(220 * config.brightness), 0, 0)
 
 	drawRef.rectangle(
-		(0, 0, int(config.displayRows * config.windowWidth), config.canvasHeight),
+		(0, 0, round(config.displayRows * config.windowWidth), config.canvasHeight),
 		fill=config.bgBackGroundColor,
 	)
 
@@ -343,8 +343,8 @@ def remakeArrowBlock(imageRef, direction):
 	makeArrows(drawRef, direction)
 
 
-def makeMessage(imageRef, messageString="FooBar", direction=1):
-	global config
+def makeMessage(config, imageRef, messageString="FooBar", direction=1):
+	# global config
 
 	if config.colorMode == "getRandomRGB":
 		clr = colorutils.getRandomRGB(config.brightness)
@@ -368,7 +368,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
 	draw = ImageDraw.Draw(tempImage)
 	pixLen = draw.textsize(messageString, font=font)
 	# For some reason textsize is not getting full height !
-	fontHeight = int(pixLen[1] * 1.3)
+	fontHeight = round(pixLen[1] * 1.3)
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 	# make a new image with the right size
@@ -378,7 +378,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 	# Draw the text with "borders"
-	indent = int(0.05 * config.tileSize[0])
+	indent = round(0.05 * config.tileSize[0])
 	for i in range(1, config.shadowSize):
 		draw.text((indent + -i, -i), messageString, (0, 0, 0), font=font)
 		draw.text((indent + i, i), messageString, (0, 0, 0), font=font)
@@ -390,7 +390,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
 	imageRef.paste(scrollImage, (0, config.textVOffest), scrollImage)
 
 
-def remakeMessage(imageRef, messageString="FooBar", direction=1):
+def remakeMessage(config, imageRef, messageString="FooBar", direction=1):
 	messageString = config.msg1 if random.random() < 0.5 else config.msg2
 	config.textVOffest = round(random.uniform(-12, -30))
 	if random.random() < 0.5:
@@ -403,85 +403,39 @@ def remakeMessage(imageRef, messageString="FooBar", direction=1):
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
-def makeBackGround(drawRef, n=1):
+def makeBackGround(config, drawRef, n=1):
 	rows = config.patternRows * 1
 	cols = config.patternCols * 1
 
 	xDiv = round(
-		(config.displayRows * config.canvasWidth) / cols
+		(config.displayRows * config.windowWidth) / cols
 	)  # - config.patternColsOffset
-
-	xDiv = (
-		2 * config.canvasWidth * config.displayCols/ cols 
-	) 
-
 	yDiv = (
 		config.canvasHeight / rows
 	) / config.displayRows  # - config.patternRowsOffset
 
+	# print(xDiv, yDiv)
+
+	xStart = 0
+	yStart = 0
 
 	gap = 0
-	steps = cols
+
 	config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
-	colorChange = False
 
-	# Background setup
-	'''
-	'''
 	drawRef.rectangle(
-		(0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
-		fill=config.bgBackGroundColor)
+		(0, 0, (round(config.displayRows * config.windowWidth)), config.canvasHeight),
+		fill=config.bgBackGroundColor,
+	)
 
-	## The multiplier is actually a factor of the number of rows
-	## but, generally so far only using two rows ....
-	rDelta = ((config.bgBackGroundEndColor[0] - config.bgBackGroundColor[0]) / steps)
-	gDelta = ((config.bgBackGroundEndColor[1] - config.bgBackGroundColor[1]) / steps)
-	bDelta = ((config.bgBackGroundEndColor[2] - config.bgBackGroundColor[2]) / steps)
+	## Chevron pattern
+	## config.bgForeGroundColor
+	# fillClr = colorutils.getRandomColor(config.brightness/2)
 
-	xPos = 0 
-	transitionCount = 0 
-	config.patternLengthTransition = 8
-	lengthDelta = round((xDiv - config.currentPatternLength ) / config.patternLengthTransition)
-	patternLength = xDiv
+	# config.patternColor = config.patternEndColor
+	# config.patternEndColor = colorutils.getRandomColor(config.brightness)
 
-	for c in range(0, cols):
-		columnOffset = 0
-
-		rCol = config.bgBackGroundColor[0] + rDelta
-		gCol = config.bgBackGroundColor[1] + gDelta
-		bCol = config.bgBackGroundColor[2] + bDelta
-		config.bgBackGroundColor = (rCol, gCol, bCol)
-
-		### Because the way the pattern draws the left end is actually the end color
-		### so need to reverse the color gradient ....
-
-		fillClr = (
-			(round(config.bgBackGroundEndColor[0] - rDelta * (c + 1))),
-			(round(config.bgBackGroundEndColor[1] - gDelta * (c + 1))),
-			(round(config.bgBackGroundEndColor[2] - bDelta * (c + 1))),
-			200,
-		)
-
-		w = patternLength
-
-		outline = None
-		if c < 0 :
-			outline=(255,0,0,200)
-
-		drawRef.rectangle((xPos,0,xPos+w,config.canvasHeight), fill = fillClr, outline=outline)
-		xPos += w
-
-		if transitionCount < config.patternLengthTransition-1 : 
-			#print(config.currentPatternLength,xDiv,lengthDelta)
-			transitionCount += 1
-			#patternLength += lengthDelta
-		else :
-			patternLength = xDiv
-
-
-	config.bgBackGroundColor = config.bgBackGroundEndColor
-
-	# Foreground setup
+	# print(xDiv, yDiv)
 
 	rowMultiplier = 1
 	colMultiplier = 1
@@ -502,23 +456,21 @@ def makeBackGround(drawRef, n=1):
 		rowMultiplier = 2
 		colMultiplier = 2
 
-	
+	steps = cols
+
 	## The multiplier is actually a factor of the number of rows
 	## but, generally so far only using two rows ....
-	rDelta = ((config.patternEndColor[0] - config.patternColor[0]) / steps)
-	gDelta = ((config.patternEndColor[1] - config.patternColor[1]) / steps)
-	bDelta = ((config.patternEndColor[2] - config.patternColor[2]) / steps)
+	rDelta = (
+		colMultiplier * (config.patternEndColor[0] - config.patternColor[0]) / steps
+	)
+	gDelta = (
+		colMultiplier * (config.patternEndColor[1] - config.patternColor[1]) / steps
+	)
+	bDelta = (
+		colMultiplier * (config.patternEndColor[2] - config.patternColor[2]) / steps
+	)
 
-	xPos = 0
-	xStart = 0
-	yStart = 0
-	transitionCount = 0 
-	config.patternLengthTransition = 8
-	lengthDelta = round((xDiv - config.currentPatternLength ) / config.patternLengthTransition)
-
-
-	for c in range(0, cols+1):
-		
+	for c in range(0, cols):
 		columnOffset = 0
 
 		rCol = config.patternColor[0] + rDelta
@@ -533,13 +485,10 @@ def makeBackGround(drawRef, n=1):
 			(round(config.patternEndColor[0] - rDelta * (c + 1))),
 			(round(config.patternEndColor[1] - gDelta * (c + 1))),
 			(round(config.patternEndColor[2] - bDelta * (c + 1))),
-			225,
+			200,
 		)
-		
-		#drawRef.rectangle((0, 0, 0 + 1, config.canvasHeight), fill = None, outline = (255,0,0,255))
 
-		# length transition
-		patternLength = xDiv
+		# print(c,fillClr)
 
 		for r in range(0, rows):
 			columnOffset = 0
@@ -549,19 +498,7 @@ def makeBackGround(drawRef, n=1):
 			if r / 2 % 2 == 0:
 				columnOffset = xDiv
 
-			if random.random() < config.patternDrawProb or c == 0:
-
-				if config.pattern == "test":
-					drawRef.rectangle((xPos,5,xPos+4,55), fill = fillClr)
-
-				if random.random() < config.redGreenSwapProb: 
-					fillClr = (fillClr[1],fillClr[0],fillClr[2])
-
-				if random.random() < config.redBlueSwapProb: 
-					fillClr = (fillClr[2],fillClr[1],fillClr[0])
-
-				if random.random() < config.greenBlueSwapProb: 
-					fillClr = (fillClr[0],fillClr[2],fillClr[1])
+			if random.random() < config.patternDrawProb:
 
 				if config.pattern == "diamonds":
 					poly = []
@@ -574,10 +511,10 @@ def makeBackGround(drawRef, n=1):
 
 				if config.pattern == "bricks":
 					length = xDiv
-					#xPos = xStart + columnOffset
+					xPos = xStart + columnOffset
 					yPos = yStart
 					drawRef.rectangle(
-						(xPos+ columnOffset, yPos, xPos+ columnOffset + length, yPos + yDiv),
+						(xPos, yPos, xPos + length, yPos + yDiv),
 						fill=fillClr,
 						outline=None,
 					)
@@ -586,14 +523,14 @@ def makeBackGround(drawRef, n=1):
 					length = xDiv
 					height = xDiv / 2
 
-					#xPos = xStart + columnOffset
+					xPos = xStart + columnOffset
 					yPos = yStart
 
 					xPos2 = xPos + round(length / 2 - height / 2)
 					yPos2 = round(yPos - length / 2 + height / 2)
 
 					drawRef.rectangle(
-						(xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv),
+						(xPos, yPos, xPos + length, yPos + yDiv),
 						fill=fillClr,
 						outline=None,
 					)
@@ -602,14 +539,17 @@ def makeBackGround(drawRef, n=1):
 						fill=fillClr,
 						outline=None,
 					)
-		
-				if config.pattern == "regularLines":
-					length = patternLength
-					#xPos = xStart + columnOffset
-					yPos = yStart
-					drawRef.rectangle((xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv), fill = fillClr)
 
-				
+				if config.pattern == "regularLines":
+					length = xDiv
+					xPos = xStart + columnOffset
+					yPos = yStart
+					drawRef.rectangle(
+						(xPos, yPos, xPos + length, yPos + yDiv),
+						fill=fillClr,
+						outline=None,
+					)
+
 				if config.pattern == "lines":
 					# if (r%2 > 0):
 					length = int(round(random.uniform(1, 2 * xDiv)))
@@ -633,165 +573,93 @@ def makeBackGround(drawRef, n=1):
 							outline=None,
 						)
 
-				
 			yStart += rowMultiplier * yDiv
-
-		if transitionCount < config.patternLengthTransition-1 : 
-			#print(config.currentPatternLength,xDiv,lengthDelta)
-			transitionCount += 1
-			#patternLength += lengthDelta
-		else :
-			config.currentPatternLength = xDiv
-
-		
 		if config.pattern == "lines":
 			xStart += colMultiplier * xDiv
 		else:
 			xStart += xDiv * 2
-		xPos += xDiv
 		yStart = 0
 
 	config.patternColor = config.patternEndColor
-	config.currentPatternLength = xDiv
 
 
 ## Layer imagery callbacks & regeneration functions
-def remakePatternBlock(imageRef, direction):
-	#print("remakePatternBlock")
+
+
+def remakePatternBlock(config, imageRef, direction):
 	## Stacking the cards ...
-
-	'''
-	if config.setPatternColor == True :
-		config.setPatternEndColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,
-				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-		config.patternEndColor = config.setPatternEndColor
-		config.patternColor = config.setPatternEndColor
-	'''
-	
-	if config.alwaysRandomPattern == True :
-		if random.random() < .15:
-			config.patternDrawProb = random.uniform(0.08, 0.8)
-
-		if random.random() < .15:
-			config.patternRows = (round(random.uniform(8, config.canvasHeight)))
-
-		if random.random() < .15:
-			config.patternCols = (round(random.uniform(4, config.canvasWidth)))
-
-		if random.random() < .15:
-			if random.random() < .5 :
-				config.pattern == "lines"
-			else:
-				config.pattern == "pluses"
-	else :
-		config.pattern == config.initialPattern 
-
-
-
-
 	config.patternColor = config.patternEndColor
-	if random.random() < config.backgroundColorChangeProb :
-		config.patternEndColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,
-				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
 
+	if random.random() < 0.3:
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
+	if random.random() < 0.05:
+		config.patternEndColor = (254, 0, 254, 255)
+	if random.random() < 0.05:
+		config.patternEndColor = (0, 0, 250, 255)
 
-	config.bgBackGroundColor = config.bgBackGroundEndColor
-	if random.random() < config.backgroundColorChangeProb :
-		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
-				config.bg_minHue, config.bg_maxHue, 
-				config.bg_minSaturation, config.bg_maxSaturation, 
-				config.bg_minValue, config.bg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness)
+	if config.setPatternColor == True :
+		config.patternEndColor = config.setPatternEndColor
 
+	if config.alwaysRandomPattern == True:
+		if random.random() < 0.3:
+			config.patternDrawProb = random.uniform(0.08, 0.12)
+		if random.random() < 0.3:
+			config.patternRows = round(random.uniform(40, 80))
+		if random.random() < 0.3:
+			config.patternCols = round(random.uniform(90, 240))
+	else:
+		pass
+
+	if config.alwaysRandomPatternColor == True:
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
 	drawRef = ImageDraw.Draw(imageRef)
-	makeBackGround(drawRef, direction)
+	makeBackGround(config, drawRef, direction)
 
 
 ## Setup and run functions
-def configureBackgroundScrolling():
-	print("configureBackgroundScrolling")
+
+
+def configureBackgroundScrolling(config, workConfig):
 	config.patternRows = int(workConfig.get("scroller", "patternRows"))
 	config.patternCols = int(workConfig.get("scroller", "patternCols"))
 	config.patternRowsOffset = int(workConfig.get("scroller", "patternRowsOffset"))
 	config.patternColsOffset = int(workConfig.get("scroller", "patternColsOffset"))
 	config.patternDrawProb = float(workConfig.get("scroller", "patternDrawProb"))
-	config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(",")
+	config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(
+		","
+	)
 	config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
+	config.bgForeGroundColor = workConfig.get("scroller", "bgForeGroundColor").split(
+		","
+	)
+	config.bgForeGroundColor = tuple([int(i) for i in config.bgForeGroundColor])
 	config.pattern = workConfig.get("scroller", "pattern")
-	config.initialPattern  = workConfig.get("scroller", "pattern")
 	config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
-
-
-	if config.useHSV :	
-
-		config.bgBackGroundColor = colorutils.getRandomColorHSV(
-				config.bg_minHue, config.bg_maxHue, 
-				config.bg_minSaturation, config.bg_maxSaturation, 
-				config.bg_minValue, config.bg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
-
-		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
-				config.bg_minHue, config.bg_maxHue, 
-				config.bg_minSaturation, config.bg_maxSaturation, 
-				config.bg_minValue, config.bg_maxValue,
-				config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
-
-		config.patternColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
-
-		config.patternEndColor = colorutils.getRandomColorHSV(
-				config.fg_minHue, config.fg_maxHue, 
-				config.fg_minSaturation, config.fg_maxSaturation, 
-				config.fg_minValue, config.fg_maxValue,
-				config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-	else :
-
-		config.bgBackGroundColor = colorutils.randomColorAlpha(config.brightness)
-		config.bgBackGroundEndColor = colorutils.randomColorAlpha(config.brightness)
-		config.patternColor = colorutils.randomColorAlpha(config.brightness)
-		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
-
-		if config.alwaysRandomPatternColor == True:
-			config.patternColor = colorutils.randomColorAlpha(config.brightness)
-			config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
-
-		if config.setPatternColor == True :
-			config.setPatternEndColor = colorutils.getRandomColorHSV(
-					config.fg_minHue, config.fg_maxHue, 
-					config.fg_minSaturation, config.fg_maxSaturation, 
-					config.fg_minValue, config.fg_maxValue,
-					config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
-			config.patternColor = config.setPatternEndColor
-			config.patternEndColor = config.setPatternEndColor
-
-		
-	config.currentPatternLength = 0
+	config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
 
 	config.scroller4 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller4
 	scrollerRef.typeOfScroller = "bg"
 	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.patternSpeed
-	scrollerRef.setUp()
+	scrollerRef.xMaxSpeed = config.maxSpeed
+	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func": remakePatternBlock, "direction": direction}
-	
+
+	config.patternColor = (50, 0, 55, 50)
+	config.patternEndColor = (255, 0, 255, 50)
 
 	try:
+		config.useUltraSlowSpeed = workConfig.getboolean(
+			"scroller", "useUltraSlowSpeed"
+		)
 		config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
 	except Exception as e:
-		config.maxSpeed = config.patternSpeed
-	
-	scrollerRef.xMaxSpeed = config.maxSpeed
+		config.useUltraSlowSpeed = False
+		config.xMaxSpeed = 2
+		print(str(e))
 
 	try:
 		config.changeProb = float(workConfig.get("scroller", "changeProb"))
@@ -805,10 +673,16 @@ def configureBackgroundScrolling():
 		config.changeProbReleaseFactor = 1.0
 		print(str(e))
 
+	if config.alwaysRandomPatternColor == True:
+		config.patternColor = colorutils.randomColorAlpha(config.brightness)
+		config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
-	makeBackGround(scrollerRef.bg1Draw, 1)
-	makeBackGround(scrollerRef.bg2Draw, 1)
+	if config.setPatternColor == True :
+		config.patternColor = config.setPatternEndColor
+		config.patternEndColor = config.setPatternEndColor
 
+	makeBackGround(config, scrollerRef.bg1Draw, 1)
+	makeBackGround(config, scrollerRef.bg2Draw, 1)
 
 	config.t1 = time.time()
 	config.t2 = time.time()
@@ -821,7 +695,7 @@ def configureBackgroundScrolling():
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
-def configureImageScrolling():
+def configureImageScrolling(config, workConfig):
 	config.imageSpeed = float(workConfig.get("scroller", "imageSpeed"))
 	config.imageBlockImage = workConfig.get("scroller", "imageBlockImage")
 	config.imageBlockBuffer = int(workConfig.get("scroller", "imageBlockBuffer"))
@@ -836,10 +710,10 @@ def configureImageScrolling():
 
 	config.scroller5 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller5
-	scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
+	scrollerRef.canvasWidth = round(config.displayCols * config.canvasWidth)
 	# scrollerRef.canvasHeight = int(config.windowHeight)
 	scrollerRef.xSpeed = config.imageSpeed
-	scrollerRef.setUp()
+	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func": remakeScrollBlock, "direction": direction}
 	makeScrollBlock(scrollerRef.bg1, scrollerRef.bg1Draw, direction)
@@ -847,7 +721,7 @@ def configureImageScrolling():
 	config.scrollArray.append(scrollerRef)
 
 
-def configureArrowScrolling():
+def configureArrowScrolling(config, workConfig):
 	config.arrowCols = int(workConfig.get("scroller", "arrowCols"))
 	config.lineThickness = int(workConfig.get("scroller", "lineThickness"))
 	config.arrowSpeed = int(workConfig.get("scroller", "arrowSpeed"))
@@ -856,9 +730,9 @@ def configureArrowScrolling():
 	config.scroller1 = continuous_scroller.ScrollObject()
 
 	scrollerRef = config.scroller1
-	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
+	scrollerRef.canvasWidth = round(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.arrowSpeed
-	scrollerRef.setUp()
+	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	scrollerRef.callBack = {"func": remakeArrowBlock, "direction": direction}
 	makeArrows(scrollerRef.bg1Draw, 1)
@@ -866,7 +740,7 @@ def configureArrowScrolling():
 	config.scrollArray.append(scrollerRef)
 
 
-def configureMessageScrolling():
+def configureMessageScrolling(config, workConfig):
 	config.colorMode = workConfig.get("scroller", "colorMode")
 	config.sansSerif = workConfig.getboolean("scroller", "sansSerif")
 	config.fontSize = int(workConfig.get("scroller", "fontSize"))
@@ -879,9 +753,9 @@ def configureMessageScrolling():
 
 	config.scroller2 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller2
-	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
+	scrollerRef.canvasWidth = round(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = -config.textSpeed
-	scrollerRef.setUp()
+	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	makeMessage(scrollerRef.bg1, config.msg1, direction)
 	makeMessage(scrollerRef.bg2, config.msg1, direction)
@@ -890,9 +764,9 @@ def configureMessageScrolling():
 
 	config.scroller3 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller3
-	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
+	scrollerRef.canvasWidth = round(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = config.textSpeed + 0.25
-	scrollerRef.setUp()
+	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	makeMessage(scrollerRef.bg1, config.msg2, direction)
 	makeMessage(scrollerRef.bg2, config.msg2, direction)
@@ -900,7 +774,7 @@ def configureMessageScrolling():
 	config.scrollArray.append(scrollerRef)
 
 
-def configureAltTextScrolling():
+def configureAltTextScrolling(config, workConfig):
 	config.colorMode = workConfig.get("scroller", "colorMode")
 	config.sansSerif = workConfig.getboolean("scroller", "sansSerif")
 	config.fontSize = int(workConfig.get("scroller", "fontSize"))
@@ -909,9 +783,9 @@ def configureAltTextScrolling():
 	config.textSpeed = float(workConfig.get("scroller", "textSpeed"))
 	config.scroller6 = continuous_scroller.ScrollObject()
 	scrollerRef = config.scroller6
-	scrollerRef.canvasWidth = int(config.displayRows * config.canvasWidth)
+	scrollerRef.canvasWidth = round(config.displayRows * config.canvasWidth)
 	scrollerRef.xSpeed = -config.textSpeed
-	scrollerRef.setUp()
+	scrollerRef.setUp(config)
 	direction = 1 if scrollerRef.xSpeed > 0 else -1
 	makeDaemonMessages(scrollerRef.bg1, direction)
 	makeDaemonMessages(scrollerRef.bg2, direction)
@@ -919,7 +793,7 @@ def configureAltTextScrolling():
 	config.scrollArray.append(scrollerRef)
 
 
-def configureImageOverlay():
+def configureImageOverlay(config, workConfig):
 	config.overLayImage = workConfig.get("scroller", "overLayImage")
 	config.overLayXPos = int(workConfig.get("scroller", "overLayXPos"))
 	config.overLayYPos = int(workConfig.get("scroller", "overLayYPos"))
@@ -937,12 +811,18 @@ def configureImageOverlay():
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
-def init():
-	global config
+def init(config, workConfig):
+	# global config
 
-	print("SINGLETON SCROLLER HOLDER INIT")
+	print("WORKMODULES SCROLLER HOLDER INIT")
 
 	config.redrawSpeed = float(workConfig.get("scroller", "redrawSpeed"))
+
+	try:
+		config.delay = float(workConfig.get("scroller", "delay"))
+	except Exception as e:
+		print(str(e))
+		config.delay = float(workConfig.get("scroller", "redrawSpeed"))
 
 	config.windowWidth = float(workConfig.get("displayconfig", "windowWidth"))
 	config.windowHeight = float(workConfig.get("displayconfig", "windowHeight"))
@@ -984,13 +864,6 @@ def init():
 	config.useBackground = workConfig.getboolean("scroller", "useBackground")
 
 	try:
-		config.backgroundColorChangeProb = float(workConfig.get("scroller", "backgroundColorChangeProb"))
-	except Exception as e:
-		print(str(e))
-		config.backgroundColorChangeProb = .5
-
-
-	try:
 		config.setPatternColor = workConfig.getboolean("scroller", "setPatternColor")
 		config.setPatternEndColor = list(map(lambda x: int(x), workConfig.get("scroller", "setPatternEndColor").split(",")))
 	except Exception as e:
@@ -1006,78 +879,40 @@ def init():
 	config.alwaysRandomPattern = workConfig.getboolean(
 		"scroller", "alwaysRandomPattern"
 	)
-
-
-	try:
-		config.redGreenSwapProb = float(workConfig.get("scroller", "redGreenSwapProb"))
-	except Exception as e:
-		print(str(e))
-		config.redGreenSwapProb = 0
-	try:
-		config.redBlueSwapProb = float(workConfig.get("scroller", "redBlueSwapProb"))
-	except Exception as e:
-		print(str(e))
-		config.redBlueSwapProb = 0
-	try:
-		config.greenBlueSwapProb = float(workConfig.get("scroller", "greenBlueSwapProb"))
-	except Exception as e:
-		print(str(e))
-		config.greenBlueSwapProb = 0
-
-	try:
-		config.bg_dropHueMinValue = float(workConfig.get("scroller", "bg_dropHueMinValue"))
-		config.bg_dropHueMaxValue = float(workConfig.get("scroller", "bg_dropHueMaxValue"))
-		config.fg_dropHueMinValue = float(workConfig.get("scroller", "fg_dropHueMinValue"))
-		config.fg_dropHueMaxValue = float(workConfig.get("scroller", "fg_dropHueMaxValue"))		
-	except Exception as e:
-		config.bg_dropHueMinValue = 0
-		config.bg_dropHueMaxValue = 0
-		config.fg_dropHueMinValue = 0
-		config.fg_dropHueMaxValue = 0
-		print(str(e))
-
-	try:
-		config.useHSV = True
-
-		config.fg_minHue = int(workConfig.get("scroller", "fg_minHue"))
-		config.fg_maxHue = int(workConfig.get("scroller", "fg_maxHue"))
-		config.fg_minSaturation = float(workConfig.get("scroller", "fg_minSaturation"))
-		config.fg_maxSaturation = float(workConfig.get("scroller", "fg_maxSaturation"))
-		config.fg_minValue = float(workConfig.get("scroller", "fg_minValue"))
-		config.fg_maxValue = float(workConfig.get("scroller", "fg_maxValue"))
-
-
-		config.bg_minHue = int(workConfig.get("scroller", "bg_minHue"))
-		config.bg_maxHue = int(workConfig.get("scroller", "bg_maxHue"))
-		config.bg_minSaturation = float(workConfig.get("scroller", "bg_minSaturation"))
-		config.bg_maxSaturation = float(workConfig.get("scroller", "bg_maxSaturation"))
-		config.bg_minValue = float(workConfig.get("scroller", "bg_minValue"))
-		config.bg_maxValue = float(workConfig.get("scroller", "bg_maxValue"))
-
-
-	except Exception as e:
-		config.useHSV = False
-		print(str(e))
-
-
 	if config.useBackground == True:
-		configureBackgroundScrolling()
+		configureBackgroundScrolling(config, workConfig)
 
+	try:
+		config.minHue = float(workConfig.get("scroller", "minHue"))
+		config.maxHue = float(workConfig.get("scroller", "minHue"))
+		config.minSat = float(workConfig.get("scroller", "minSat"))
+		config.maxSat = float(workConfig.get("scroller", "maxSat"))
+		config.minVal = float(workConfig.get("scroller", "minVal"))
+		config.maxVal = float(workConfig.get("scroller", "maxVal"))
+
+	except Exception as e:
+		print(str(e))
+		config.minHue = 0
+		config.maxHue = 360
+		config.minSat = 0.1
+		config.maxSat = 1.0
+		config.minVal = 0.1
+		config.maxVal = 0.85
 
 	try:
 		config.useText = workConfig.getboolean("scroller", "useText")
 		config.useAltText = workConfig.getboolean("scroller", "useAltText")
 		if config.useText == True:
-			configureMessageScrolling()
+			configureMessageScrolling(config, workConfig)
 		if config.useAltText == True:
-			configureAltTextScrolling()
+			configureAltTextScrolling(config, workConfig)
 	except Exception as e:
 		print(str(e))
 
 	try:
 		config.useOverLayImage = workConfig.getboolean("scroller", "useOverLayImage")
 		if config.useOverLayImage == True:
-			configureImageOverlay()
+			configureImageOverlay(config, workConfig)
 	except Exception as e:
 		config.useOverLayImage = False
 		print(str(e))
@@ -1085,16 +920,8 @@ def init():
 	try:
 		config.useArrows = workConfig.getboolean("scroller", "useArrows")
 		if config.useArrows == True:
-			configureArrowScrolling()
+			configureArrowScrolling(config, workConfig)
 	except Exception as e:
-		print(str(e))
-
-	try:
-		config.useUltraSlowSpeed = workConfig.getboolean(
-			"scroller", "useUltraSlowSpeed"
-		)
-	except Exception as e:
-		config.useUltraSlowSpeed = False
 		print(str(e))
 
 	try:
@@ -1103,7 +930,7 @@ def init():
 			"scroller", "useTransparentImages"
 		)
 		if config.useImages == True:
-			configureImageScrolling()
+			configureImageScrolling(config, workConfig)
 	except Exception as e:
 		print(str(e))
 
@@ -1115,26 +942,6 @@ def init():
 		config.doingRefreshCount = 50
 		print(str(e))
 
-
-	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
-	panelDrawing.mockupBlock(config, workConfig)
-	''' 
-		########### Need to add something like this at final render call  as well
-			
-		########### RENDERING AS A MOCKUP OR AS REAL ###########
-		if config.useDrawingPoints == True :
-			config.panelDrawing.canvasToUse = config.renderImageFull
-			config.panelDrawing.render()
-		else :
-			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-			#config.render(config.image, 0, 0)
-			config.render(config.renderImageFull, 0, 0)
-	'''
-
-
-
-
-	config.renderImageFull = config.workImage.copy()
 	config.f = FaderObj()
 	config.f.setUp(config.renderImageFull, config.workImage)
 	config.f.doingRefreshCount = config.doingRefreshCount
@@ -1145,45 +952,33 @@ def init():
 	config.useFadeThruAnimation = True
 	config.deltaTimeDone = True
 
-	try:
-		config.useFadeThruAnimation = workConfig.getboolean("scroller", "useFadeThruAnimation")
-	except Exception as e:
-		print(str(e))
-		config.useFadeThruAnimation = True
 
-
-def runWork():
-	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-	print("RUNNING Scroller Holder scroller-holder.py")
-	print(bcolors.ENDC)
-	while config.isRunning == True:
-		iterate()
+def runWork(config):
+	# global config
+	while True:
+		iterate(config)
 		time.sleep(config.redrawSpeed)
-		if config.standAlone == False :
-			config.callBack()
 
 
-def checkTime(scrollerObj):
+def checkTime(config, scrollerObj):
 	config.t2 = time.time()
 	delta = config.t2 - config.t1
 
 	if delta > config.timeToComplete and config.deltaTimeDone == False:
-
 		scrollerObj.xSpeed -= 0.2
-
 		if scrollerObj.xSpeed <= 0.70:
 			config.deltaTimeDone = True
 			config.useFadeThruAnimation = True
 			config.f.fadingDone = True
 
 			# print ("DELTA TIME UP")
-			processImageForScrolling()
+			processImageForScrolling(config)
 			if config.useUltraSlowSpeed == True:
 				scrollerObj.xSpeed = 1
 
 
-def processImageForScrolling():
+def processImageForScrolling(config):
+
 	## Run through each of the objects being scrolled - text, image, background etc
 	for scrollerObj in config.scrollArray:
 		scrollerObj.scroll()
@@ -1229,16 +1024,12 @@ def processImageForScrolling():
 		)
 
 
-def iterate():
-	global config
-
-	# config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
-	# config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
+def iterate(config):
 
 	for scrollerObj in config.scrollArray:
 		if scrollerObj.typeOfScroller == "bg":
 			if (
-				random.random() < config.changeProb * config.changeProbReleaseFactor
+				random.random() < config.changeProb
 				and config.deltaTimeDone == True
 				and config.useFadeThruAnimation == True
 			):
@@ -1247,11 +1038,10 @@ def iterate():
 				config.deltaTimeDone = False
 				config.t1 = time.time()
 				config.timeToComplete = random.uniform(3, 10)
-			checkTime(scrollerObj)
+			checkTime(config, scrollerObj)
 
 	if config.useFadeThruAnimation == True and config.useUltraSlowSpeed == True:
 		if config.f.fadingDone == True:
-
 			config.renderImageFullOld = config.renderImageFull.copy()
 			config.renderImageFull.paste(
 				config.workImage,
@@ -1266,35 +1056,28 @@ def iterate():
 				config.renderImageFullOld.convert("RGBA"),
 				config.workImage.convert("RGBA"),
 			)
-			processImageForScrolling()
+			processImageForScrolling(config)
 
 		config.f.fadeIn()
 		config.render(config.f.blendedImage, 0, 0)
 
 	else:
-		processImageForScrolling()
+
+		processImageForScrolling(config)
 		config.renderImageFull.paste(
 			config.workImage,
 			(config.imageXOffset, config.imageYOffset),
 			config.workImage,
 		)
-
-		# RENDERING AS A MOCKUP OR AS REAL
-		if config.useDrawingPoints == True :
-			config.panelDrawing.canvasToUse = config.renderImageFull
-			config.panelDrawing.render()
-		else :
-			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-			#config.render(config.image, 0, 0)
-			config.render(config.renderImageFull, 0, 0)
+		config.render(config.renderImageFull, 0, 0)
 
 
-def main(run=True):
-	global config, threads, thrd
-	init()
+def main(config, workConfig, run=True):
+	# global config, threads, thrd
+	init(config, workConfig)
 
 	if run:
-		runWork()
+		runWork(config)
 
 
 ### Kick off .......

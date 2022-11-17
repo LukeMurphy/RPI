@@ -476,7 +476,7 @@ def configure(config, workconfig):
 		print(bcolors.FAIL + "** " +  str(e))
 		## On 5-23-019 a lot of pieces were moved to a sub directory called
 		## singletons - this is here to catch any unchanged configs
-		work = importlib.import_module("pieces.singletons." + str(config.work))
+		work = importlib.import_module("pieces." + str(config.work))
 		work.config = config
 		work.workConfig = workconfig
 

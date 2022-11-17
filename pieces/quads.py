@@ -6,7 +6,7 @@
 # import importlib
 # import threading
 # import resource
-from pieces.workmodules.makeblocks import makeblockanimals  # , makedrawcarcas
+from modules.makeblocks import makeblockanimals  # , makedrawcarcas
 import random
 import time
 from collections import OrderedDict

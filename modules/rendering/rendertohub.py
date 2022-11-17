@@ -211,7 +211,7 @@ def updateCanvas():
 	if config.checkForConfigChanges == True:
 		currentTime = time.time()
 		f = os.path.getmtime(config.fileName)
-		f2 = os.path.getmtime(config.path + "/pieces/singletons/" + config.work + ".py")
+		f2 = os.path.getmtime(config.path + "pieces/" + config.work + ".py")
 		config.delta = currentTime - f
 		config.delta2 = currentTime - f2
 

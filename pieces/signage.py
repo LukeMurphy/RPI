@@ -582,17 +582,32 @@ def main(run=True):
 		print(str(e))
 		config.steps = 200
 
-	palettesToUse = (workConfig.get("signage", "palettesToUse")).split(',')
-	config.paletteChangeProb = float(workConfig.get("signage", "paletteChangeProb"))
 
-	config.palettes = []
-	for i in range(0, len(palettesToUse)):
-		name = palettesToUse[i]
-		vals = (workConfig.get("signage", name)).split(",")
-		config.palettes.append( tuple(map(lambda x: float(x), vals)))
-	
-	config.paletteDropHueMin = int(workConfig.get("signage", "dropHueMin"))
-	config.paletteDropHueMax = int(workConfig.get("signage", "dropHueMax"))
+	try:
+		palettesToUse = (workConfig.get("signage", "palettesToUse")).split(',')
+		config.paletteChangeProb = float(workConfig.get("signage", "paletteChangeProb"))
+
+		config.palettes = []
+		for i in range(0, len(palettesToUse)):
+			name = palettesToUse[i]
+			vals = (workConfig.get("signage", name)).split(",")
+			config.palettes.append( tuple(map(lambda x: float(x), vals)))
+		
+		config.paletteDropHueMin = int(workConfig.get("signage", "dropHueMin"))
+		config.paletteDropHueMax = int(workConfig.get("signage", "dropHueMax"))
+	except Exception as e:
+		print(str(e))
+		palettesToUse = ['base']
+		config.paletteChangeProb = .00
+
+		config.palettes = []
+		for i in range(0, len(palettesToUse)):
+			name = palettesToUse[i]
+			vals = [0,360,0,1.0,0,1.0]
+			config.palettes.append( tuple(map(lambda x: float(x), vals)))
+		
+		config.paletteDropHueMin = 0
+		config.paletteDropHueMax = 0
 
 
 	config.colOverlay.steps = config.steps

@@ -4,7 +4,7 @@ import threading
 import time
 from modules.configuration import bcolors
 from modules import colorutils, coloroverlay
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 
 
 '''
@@ -47,8 +47,9 @@ class Director:
 class Fader:
 	def __init__(self):
 		self.doingRefresh = 0
-		self.doingRefreshCount = 50
+		self.doingRefreshCount = 10
 		self.fadingDone = False
+		print("Fader")
 
 	def fadeIn(self, config):
 		if self.fadingDone == False:
@@ -71,7 +72,7 @@ class Fader:
 
 class Point:
 
-	remakeOnExit = False
+	remakeOnExit = True
 
 	def __init__(self, config):
 		self.config = config
@@ -83,8 +84,12 @@ class Point:
 		self.direction = 1
 		if random.random() < .5:
 			self.direction = -1
-		self.xSpeed = random.uniform(config.xSpeedRangeMin * self.direction, config.xSpeedRangeMax * self.direction)
-		self.ySpeed = random.uniform(config.ySpeedRangeMin, config.ySpeedRangeMax)
+		self.xSpeed = random.uniform(config.xSpeedRangeMin, config.xSpeedRangeMax) * self.direction
+		self.ySpeed = random.uniform(config.ySpeedRangeMin, config.ySpeedRangeMax) 
+
+		self.speed = random.uniform(1, config.speedRange) * self.direction
+
+		#self.speed = 3 * self.direction
 
 		self.xSpeedInit = self.xSpeed
 		self.ySpeedInit = self.ySpeed
@@ -96,14 +101,27 @@ class Point:
 		dy = self.yPos - config.locus[1]
 		self.angle = math.atan2(dy, dx)
 
-		if self.direction == -1:
-			self.xPos = config.canvasWidth  # + config.barThicknessMax * 2
 
-		self.barThickness = round(random.uniform(
+		self.xSpeed = math.cos(self.angle) * self.speed
+		self.ySpeed = math.sin(self.angle) * self.speed
+
+		self.growthCount = 0
+
+		#print(self.angle)
+
+
+		#if self.direction == -1:
+		#	self.xPos = config.canvasWidth  # + config.barThicknessMax * 2
+
+		self.finalBarThickness = round(random.uniform(
 			config.barThicknessMin, config.barThicknessMax))
 
-		self.barLength = round(random.uniform(
+		self.finalBarLength = round(random.uniform(
 			config.barLengthMin, config.barLengthMax))
+
+		self.barLength = 0
+		self.barThickness = 0
+
 
 		#self.colorVal = colorutils.randomColorAlpha()
 
@@ -152,16 +170,17 @@ class Point:
 			self.setColors()
 
 	def render(self, angle=0):
-		temp = Image.new("RGBA", (self.barLength+1, self.barLength+1))
+		temp = Image.new("RGBA", ((self.finalBarLength)+1, (self.finalBarLength)+1))
 		drw = ImageDraw.Draw(temp)
-		xPos = 0
-		yPos = self.barLength/2
-		xPos2 = self.barLength
-		yPos2 = self.barLength/2 + self.barThickness
+		xPos = round(self.finalBarLength/2 - self.barLength/2)
+		xPos2 = round(self.finalBarLength/2 + self.barLength/2)
+		yPos = round(self.finalBarLength/2 - self.barThickness/2)
+		yPos2 = round(self.finalBarLength/2 + self.barThickness/2)
 
 		if config.tipType == 1:
-			drw.rectangle((xPos, yPos-1, xPos2, yPos2+1), fill=self.colorVal, outline=self.outlineColorVal)
-			#drw.rectangle((xPos, yPos, xPos2, yPos2), fill=self.colorVal, outline=None)
+			#drw.rectangle((xPos, yPos-1, xPos2, yPos2+1), fill=self.colorVal, outline=self.outlineColorVal)
+			#drw.rectangle((0, 0, self.finalBarLength-2, self.finalBarLength-2), outline=(255,0,0), fill=None)
+			drw.rectangle((xPos, yPos, xPos2, yPos2), fill=self.colorVal, outline=None)
 
 		elif config.tipType == 2:
 			drw.ellipse((xPos, yPos, xPos2, yPos2), fill=self.colorVal, outline=self.outlineColorVal)
@@ -172,6 +191,11 @@ class Point:
 
 		del temp
 
+		if self.growthCount < 10 :
+			self.growthCount +=1
+			self.barLength += self.finalBarLength / 10
+			self.barThickness += self.finalBarThickness / 10
+
 
 def transformImage(img):
 	width, height = img.size
@@ -181,14 +205,6 @@ def transformImage(img):
 		(new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC
 	)
 	return img
-
-
-def drawBar():
-	global config
-
-
-def reDraw():
-	global config
 
 
 def runWork():
@@ -211,23 +227,29 @@ def iterate():
 	config.draw.rectangle((0, 0, 400, 400), fill=(
 		config.fillColor[0], config.fillColor[1], config.fillColor[2], config.fillColorAlpha))
 
+
+	## Change the center locus
+
 	config.locus[0] += config.locus[2]
 	config.locus[1] += config.locus[3]
 
 	if config.locus[0] > config.canvasWidth:
-		config.locus[0] = 0
-		config.locus[2] = config.locus[4] - 2 * random.random() * config.locus[4]
-		print(config.locus[2])
-	if config.locus[0] < 0:
+		#config.locus[0] = 0
 		config.locus[0] = config.canvasWidth
+		config.locus[2] = config.locus[4] - 2 * random.random() * config.locus[4] *-1
+	if config.locus[0] < 0:
+		config.locus[0] = 0
+		#config.locus[0] = config.canvasWidth
 		config.locus[2] = config.locus[4] - 2 * random.random() * config.locus[4]
-		print(config.locus[2])
 	if config.locus[1] > config.canvasHeight:
-		config.locus[3] = config.locus[5] - 2 * random.random() * config.locus[5]
-		config.locus[1] = 0
+		#config.locus[1] = 0
+		config.locus[3] = config.locus[5] - 2 * random.random() * config.locus[5]*-1
 	if config.locus[1] < 0:
-		config.locus[1] = config.canvasHeight
+		config.locus[1] = 0
 		config.locus[3] = config.locus[5] - 2 * random.random() * config.locus[5]
+
+
+	## Run through the elements to update
 
 	for i in range(0, config.numberOfPoints):
 		bar = config.barArray[i]
@@ -235,18 +257,18 @@ def iterate():
 		#w = round(math.sqrt(2) * config.barThicknessMax * 1.5)
 		#angle = math.atan2(bar.ySpeed, bar.xSpeed)
 
+		dx = bar.xPos - config.locus[0]
+		dy = bar.yPos - config.locus[1]
+		d = math.sqrt(dx*dx+dy*dy)
+		angle = math.atan2(bar.ySpeed, bar.xSpeed)
+
 		if config.useLocus :
-			dx = bar.xPos - config.locus[0]
-			dy = bar.yPos - config.locus[1]
 			angle = math.atan2(dy, dx)
-		else :
-			angle = math.atan2(bar.ySpeed, bar.xSpeed)
+			#print(d, angle)
 
 
+		
 		if config.movementModel == "concentric":
-			dx = bar.xPos - config.locus[0]
-			dy = bar.yPos - config.locus[1]
-
 			d = 1.5
 			if (abs(dx) > bar.barLength*d) and (abs(dy) > bar.barLength*d):
 				bar.angle = math.atan2(dy, dx)
@@ -254,11 +276,17 @@ def iterate():
 			bar.xPos += bar.xSpeedInit * math.cos(bar.angle) * 5
 			bar.yPos += bar.xSpeedInit * math.sin(bar.angle) * 5
 
-		else:
+		if config.movementModel == "linear":
 			if config.noXMovement == False:
 				bar.xPos += bar.xSpeed
 			if config.noYMovement == False:
 				bar.yPos += bar.ySpeed
+
+
+		if config.movementModel == "radiating":
+				bar.xPos += bar.xSpeed
+				bar.yPos += bar.ySpeed
+
 
 		bar.update()
 
@@ -272,24 +300,26 @@ def iterate():
 		if bar.xPos < - bar.barLength:
 			bar.xPos = config.canvasWidth + bar.barLength
 			if bar.remakeOnExit == True:
-				bbar.remake()
+				bar.remake()
 
 		if bar.yPos < -bar.barLength:
 			bar.yPos = config.canvasHeight + bar.barLength
 			if bar.remakeOnExit == True:
-				bbar.remake()
+				bar.remake()
 
 		if bar.yPos > config.canvasHeight + bar.barLength:
 			bar.yPos = -bar.barLength
 			if bar.remakeOnExit == True:
-				bbar.remake()
-
+				bar.remake()
+	'''
 	if random.random() < .002:
+		print("drophue")
 		if config.dropHueMax == 0:
 			config.dropHueMax = 255
 		else:
 			config.dropHueMax = 0
 		#print("Winter... " + str(config.dropHueMax ))
+	'''
 
 	if random.random() < config.colorChangeProb:
 
@@ -299,7 +329,10 @@ def iterate():
 			config.usingColorSet = config.numberOfColorSets-1
 
 		config.colorAlpha = round(random.uniform(config.fillAlphaMin, config.fillAlphaMax))
-		config.dropHueMax = 0
+		#config.dropHueMax = 0
+
+		print("change colors " + str(config.usingColorSet) + " " + str(config.numberOfColorSets))
+
 
 		if random.random() < config.changeShapeProb:
 			config.tipType = config.tipTypeAlt
@@ -307,6 +340,7 @@ def iterate():
 			config.tipType = config.tipTypeOrig
 
 	if random.random() < config.changeMovementProb:
+		print("remaking bars")
 		for i in range(0, config.numberOfPoints):
 			bar = config.barArray[i]
 			bar.remake()
@@ -326,9 +360,13 @@ def iterate():
 			config.noXMovement = False
 			config.noYMovement = False
 			config.movementModel = "linear"
-		if choice >=5 :
+		if choice >=4 :
 			config.movementModel = "concentric"
 			config.useLocus = True
+		if choice >=5 :
+			config.movementModel = "radiating"
+			config.useLocus = True
+		print("new Movement: " +  config.movementModel)
 
 	if random.random() < config.filterRemappingProb:
 
@@ -337,17 +375,19 @@ def iterate():
 
 		startX = round(random.uniform(0, config.filterRemapRangeX))
 		startY = round(random.uniform(0, config.filterRemapRangeY))
-		endX = round(random.uniform(4, config.filterRemapminHoriSize))
-		endY = round(random.uniform(4, config.filterRemapminVertSize))
+		endX = round(random.uniform(128, config.filterRemapminHoriSize))
+		endY = round(random.uniform(64, config.filterRemapminVertSize))
 		config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
 		config.remapImageBlockDestination = [startX, startY]
 
-	config.render(config.image, 0, 0)
+	temp1 = config.image.copy()
+	if config.blurRadius != 0 : temp1 = temp1.filter(ImageFilter.GaussianBlur(radius=config.blurRadius))
+	config.render(temp1, 0, 0)
 
 
 def main(run=True):
 	global config
-	config.redrawRate = .02
+
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)
@@ -364,7 +404,6 @@ def main(run=True):
 	config.barLengthMin = int(workConfig.get("Points", "barLengthMin"))
 	config.barLengthMax = int(workConfig.get("Points", "barLengthMax"))
 
-	config.direction = int(workConfig.get("Points", "direction"))
 
 	yRange = (workConfig.get("Points", "yRange")).split(",")
 	config.yRangeMin = int(yRange[0])
@@ -391,6 +430,7 @@ def main(run=True):
 	config.xSpeedRangeMax = float(workConfig.get("Points", "xSpeedRangeMax"))
 	config.ySpeedRangeMin = float(workConfig.get("Points", "ySpeedRangeMin"))
 	config.ySpeedRangeMax = float(workConfig.get("Points", "ySpeedRangeMax"))
+	config.speedRange = float(workConfig.get("Points", "speedRange"))
 
 	try:
 		config.colorChangeProb = float(workConfig.get("Points", "colorChangeProb"))
@@ -433,6 +473,7 @@ def main(run=True):
 	config.filterRemapRangeY = int(workConfig.get("Points", "filterRemapRangeY"))
 	config.filterRemapminHoriSize = int(workConfig.get("Points", "filterRemapminHoriSize"))
 	config.filterRemapminVertSize = int(workConfig.get("Points", "filterRemapminVertSize"))
+	config.blurRadius = int(workConfig.get("Points", "blurRadius"))
 
 	config.barArray = []
 	config.colorSets = []
@@ -470,8 +511,13 @@ def main(run=True):
 		config.barArray.append(bar)
 		#yPos += bar.barThickness
 
+
+	config.redrawRate = .03
 	config.directorController = Director(config)
-	config.directorController.slotRate = .03
+	config.directorController.slotRate = .05
 
 	if run:
 		runWork()
+
+
+

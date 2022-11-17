@@ -185,6 +185,19 @@ class Point:
 		elif config.tipType == 2:
 			drw.ellipse((xPos, yPos, xPos2, yPos2), fill=self.colorVal, outline=self.outlineColorVal)
 
+
+		dx = self.xPos - config.locus[0]
+		dy = self.yPos - config.locus[1]
+		d = math.sqrt(dx*dx+dy*dy)
+
+
+		reduceFactor = round(30/(d+1))+1
+
+		if reduceFactor > 10 :
+			reduceFactor = 10
+
+		temp = temp.reduce(reduceFactor)
+
 		temp = temp.rotate(180 - math.degrees(angle))
 
 		config.image.paste(temp, (round(self.xPos), round(self.yPos)), temp)
@@ -260,6 +273,8 @@ def iterate():
 		dx = bar.xPos - config.locus[0]
 		dy = bar.yPos - config.locus[1]
 		d = math.sqrt(dx*dx+dy*dy)
+
+
 		angle = math.atan2(bar.ySpeed, bar.xSpeed)
 
 		if config.useLocus :
@@ -380,8 +395,25 @@ def iterate():
 		config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
 		config.remapImageBlockDestination = [startX, startY]
 
+	if random.random() < config.filterRemappingProb:
+
+		config.useFilters = True
+		config.remapImageBlock = True
+
+		startX = round(random.uniform(0, config.blurRemapRangeX))
+		startY = round(random.uniform(0, config.blurRemapRangeY))
+		endX = round(random.uniform(128, config.blurRemapminHoriSize))
+		endY = round(random.uniform(64, config.blurRemapminVertSize))
+		config.blurImageBlockSection = [startX, startY, startX + endX, startY + endY]
+		config.blurImageBlockDestination = [startX, startY]
+
+
 	temp1 = config.image.copy()
-	if config.blurRadius != 0 : temp1 = temp1.filter(ImageFilter.GaussianBlur(radius=config.blurRadius))
+	if config.blurRadius != 0 : 
+		temp2 = config.image.copy()
+		temp2 = temp2.crop((config.blurImageBlockSection[0],config.blurImageBlockSection[1],config.blurImageBlockSection[2],config.blurImageBlockSection[3]))
+		temp2 = temp2.filter(ImageFilter.GaussianBlur(radius=config.blurRadius))
+		temp1.paste(temp2,(config.blurImageBlockSection[0],config.blurImageBlockSection[1]))
 	config.render(temp1, 0, 0)
 
 
@@ -473,6 +505,13 @@ def main(run=True):
 	config.filterRemapRangeY = int(workConfig.get("Points", "filterRemapRangeY"))
 	config.filterRemapminHoriSize = int(workConfig.get("Points", "filterRemapminHoriSize"))
 	config.filterRemapminVertSize = int(workConfig.get("Points", "filterRemapminVertSize"))
+	config.blurImageBlockSection = [0, 0, 0, 0]
+	config.blurImageBlockDestination = [0, 0]
+
+	config.blurRemapRangeX = int(workConfig.get("Points", "blurRemapRangeX"))
+	config.blurRemapRangeY = int(workConfig.get("Points", "blurRemapRangeY"))
+	config.blurRemapminHoriSize = int(workConfig.get("Points", "blurRemapminHoriSize"))
+	config.blurRemapminVertSize = int(workConfig.get("Points", "blurRemapminVertSize"))
 	config.blurRadius = int(workConfig.get("Points", "blurRadius"))
 
 	config.barArray = []

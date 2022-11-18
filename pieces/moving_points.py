@@ -157,13 +157,13 @@ class Point:
 
 		self.colOverlay.colorA = self.colorVal
 
-	def update(self):
+	def update(self, factorVal = 1.0):
 		self.colOverlay.stepTransition()
 		self.colorVal = (
-			int(self.colOverlay.currentColor[0]*self.config.brightness),
-			int(self.colOverlay.currentColor[1]*self.config.brightness),
-			int(self.colOverlay.currentColor[2]*self.config.brightness),
-			self.config.colorAlpha
+			round(self.colOverlay.currentColor[0]*self.config.brightness),
+			round(self.colOverlay.currentColor[1]*self.config.brightness),
+			round(self.colOverlay.currentColor[2]*self.config.brightness),
+			round(self.config.colorAlpha/factorVal)
 		)
 
 		if self.colOverlay.complete == True:
@@ -177,6 +177,12 @@ class Point:
 		yPos = round(self.finalBarLength/2 - self.barThickness/2)
 		yPos2 = round(self.finalBarLength/2 + self.barThickness/2)
 
+		dx = self.xPos - config.locus[0]
+		dy = self.yPos - config.locus[1]
+		d = math.sqrt(dx*dx+dy*dy)
+
+		self.update(d/config.distanceFadeOffFactor)
+
 		if config.tipType == 1:
 			#drw.rectangle((xPos, yPos-1, xPos2, yPos2+1), fill=self.colorVal, outline=self.outlineColorVal)
 			#drw.rectangle((0, 0, self.finalBarLength-2, self.finalBarLength-2), outline=(255,0,0), fill=None)
@@ -186,12 +192,9 @@ class Point:
 			drw.ellipse((xPos, yPos, xPos2, yPos2), fill=self.colorVal, outline=self.outlineColorVal)
 
 
-		dx = self.xPos - config.locus[0]
-		dy = self.yPos - config.locus[1]
-		d = math.sqrt(dx*dx+dy*dy)
 
 
-		reduceFactor = round(30/(d+1))+1
+		reduceFactor = round(config.distanceReductionFactor/(d+1))+1
 
 		if reduceFactor > 10 :
 			reduceFactor = 10
@@ -444,11 +447,11 @@ def main(run=True):
 	config.xRangeMin = int(yRange[0])
 	config.xRangeMax = int(yRange[1])
 
-	config.locus = list(int(i) for i in (workConfig.get("Points", "locus").split(",")))
+	config.locus = list(float(i) for i in (workConfig.get("Points", "locus").split(",")))
 	config.useLocus = (workConfig.getboolean("Points", "useLocus"))
 	# storing initial values of locus drift
-	config.locus.append(config.locus[2])
-	config.locus.append(config.locus[3])
+	config.locus.append(float(config.locus[2]))
+	config.locus.append(float(config.locus[3]))
 
 
 	config.edgeAlphaMin = int(workConfig.get("Points", "edgeAlphaMin"))
@@ -513,6 +516,8 @@ def main(run=True):
 	config.blurRemapminHoriSize = int(workConfig.get("Points", "blurRemapminHoriSize"))
 	config.blurRemapminVertSize = int(workConfig.get("Points", "blurRemapminVertSize"))
 	config.blurRadius = int(workConfig.get("Points", "blurRadius"))
+	config.distanceFadeOffFactor = float(workConfig.get("Points", "distanceFadeOffFactor"))
+	config.distanceReductionFactor = float(workConfig.get("Points", "distanceReductionFactor"))
 
 	config.barArray = []
 	config.colorSets = []

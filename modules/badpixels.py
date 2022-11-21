@@ -75,9 +75,15 @@ def drawBlanks(target=None, direct=True):
 	count = 0
 	blankNum = len(blankPixels)
 
-	for n in range(0, blankNum):
-		if direct:
-			config.matrix.SetPixel(blankPixels[n][0], blankPixels[n][1], 0, 0, 0)
-		else:
-			if blankPixels[n][0] < sizeTarget[0] and blankPixels[n][1] < sizeTarget[1]:
-				target.putpixel((blankPixels[n][0], blankPixels[n][1]), (0, 0, 0))
+
+	try:
+		pass
+
+		for n in range(0, blankNum):
+			if direct:
+				config.matrix.SetPixel(blankPixels[n][0], blankPixels[n][1], 0, 0, 0)
+			else:
+				if blankPixels[n][0] < sizeTarget[0] and blankPixels[n][1] < sizeTarget[1]:
+					target.putpixel((blankPixels[n][0], blankPixels[n][1]), (0, 0, 0))
+	except Exception as e:
+		print(str(e))

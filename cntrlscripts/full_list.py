@@ -313,7 +313,7 @@ openbutton = Button(
 )
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+175)
 
-getAllConfigFiles(False)
+getAllConfigFiles(False, True)
 
 root.mainloop()
 

@@ -14,6 +14,7 @@ XOsBlocks = []
 # RIGHT means text or icon moves to the right (i.e. comes from the left)
 directionOrder = ["LEFT", "RIGHT"]
 
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
@@ -308,6 +309,12 @@ def main(run=True):
 	config.colorMode = workConfig.get("scroll", "colorMode")
 	config.colorOverlay = workConfig.getboolean("scroll", "colorOverlay")
 
+	try:
+		config.coloroverlayBackgroundOnly = workConfig.getboolean("scroll", "coloroverlayBackgroundOnly")
+	except Exception as e:
+		print(str(e))
+		config.coloroverlayBackgroundOnly = False
+
 	if config.colorOverlay == True:
 
 		config.colorOverlayObjA = coloroverlay.ColorOverlay()
@@ -315,6 +322,24 @@ def main(run=True):
 
 		config.colorOverlayObjA.colorTransitionSetup()
 		config.colorOverlayObjB.colorTransitionSetup()
+
+		config.colorOverlayObjB.minHue = 180
+		config.colorOverlayObjB.maxHue = 180
+		config.colorOverlayObjB.minSaturation = .5
+		config.colorOverlayObjB.maxSaturation = .5
+		config.colorOverlayObjB.minValue = .5
+		config.colorOverlayObjB.maxValue = .5
+		config.colorOverlayObjB.setStartColor()
+
+
+		config.colorOverlayObjA.minHue = 0
+		config.colorOverlayObjA.maxHue = 360
+		config.colorOverlayObjA.minSaturation = .7
+		config.colorOverlayObjA.maxSaturation = .99
+		config.colorOverlayObjA.minValue = .5
+		config.colorOverlayObjA.maxValue = .5
+		config.colorOverlayObjA.setStartColor()
+
 		# config.colorA = colorutils.randomColor()
 		# config.colorB = colorutils.randomColor()
 		# config.currentColor = config.colorA
@@ -328,6 +353,8 @@ def main(run=True):
 		"RGBA", (config.canvasImageWidth, config.canvasImageHeight)
 	)
 
+
+	print(config.canvasImageHeight)
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 	# Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
 	config.canvasImageFinal = Image.new(
@@ -355,7 +382,8 @@ def main(run=True):
 
 	if config.useBlanks:
 		badpixels.numberOfDeadPixels = config.numberOfDeadPixels
-		badpixels.sizeTarget = list(config.canvasImage.size)
+		badpixels.sizeTarget = list(config.canvasImageFinal.size)
+		print(badpixels.sizeTarget)
 		badpixels.config = config
 		badpixels.setBlanksOnScreen()
 
@@ -379,6 +407,10 @@ def main(run=True):
 		config.txt2 = config.txt1
 		config.breaksArray = [i for i, ltr in enumerate(config.txt1) if ltr == "-"]
 
+
+
+	config.directorController = Director(config)
+	config.directorController.slotRate = .02
 
 	config.oProb = 0.5
 	setUp()
@@ -514,7 +546,9 @@ def runWork():
 	print("RUNNING counterscroll.py")
 	print(bcolors.ENDC)
 	while config.isRunning == True:
-		iterate()
+		config.directorController.checkTime()
+		if config.directorController.advance == True:
+			iterate()
 		time.sleep(config.scrollSpeed)
 		if config.standAlone == False :
 			config.callBack()
@@ -531,9 +565,15 @@ def iterate():
 	draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0))
 
 	draw = ImageDraw.Draw(config.canvasImage)
-	draw.rectangle(
-		(0, 0, config.canvasImageWidth, config.screenHeight), fill=(config.bgColor)
-	)
+
+	if config.coloroverlayBackgroundOnly == True :
+		draw.rectangle(
+			(0, 0, config.canvasImageWidth, config.screenHeight), fill=tuple([int(a) for a in config.colorOverlayObjA.currentColor])
+		)		
+	else :
+		draw.rectangle(
+			(0, 0, config.canvasImageWidth, config.screenHeight), fill=(config.bgColor)
+		)
 
 	displayWidth = config.screenWidth * config.displayRows
 
@@ -592,10 +632,6 @@ def iterate():
 			else:
 				block.xPos = prevBlockEndPoint + block.bufferSpacing
 
-	if config.useBlanks:
-		badpixels.drawBlanks(config.canvasImage, False)
-	if random.random() > 0.998 and (config.useBlanks):
-		badpixels.setBlanksOnScreen()
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
@@ -682,10 +718,22 @@ def iterate():
 			fill=tuple([int(a) for a in config.colorOverlayObjA.currentColor]),
 		)
 		# draw.rectangle((projectedWidth/2,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjB.currentColor] ))
-		temp = ImageChops.multiply(config.canvasImageFinal, segmentColorizer)
-		config.canvasImageFinal.paste(temp, (0, 0), temp)
+
+		if config.coloroverlayBackgroundOnly == False :
+			temp = ImageChops.multiply(config.canvasImageFinal, segmentColorizer)
+			config.canvasImageFinal.paste(temp, (0, 0), temp)
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+
+
+
+	if config.useBlanks:
+		badpixels.drawBlanks(config.canvasImageFinal, False)
+
+	if random.random() > 0.998 and (config.useBlanks):
+		badpixels.setBlanksOnScreen()
+
+
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 	# Debug geometry for rotation
@@ -776,6 +824,28 @@ def ThreeD(imageToRender):
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
+class Director:
+	"""docstring for Director"""
+
+	slotRate = .5
+
+	def __init__(self, config):
+		super(Director, self).__init__()
+		self.config = config
+		self.tT = time.time()
+
+	def checkTime(self):
+		if (time.time() - self.tT) >= self.slotRate:
+			self.tT = time.time()
+			self.advance = True
+		else:
+			self.advance = False
+
+	def next(self):
+		self.checkTime()
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 def callBack():
 	global config, XOs

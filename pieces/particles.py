@@ -1010,6 +1010,7 @@ def renderDiagnosticsCall() :
 		config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
 	)
 
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 

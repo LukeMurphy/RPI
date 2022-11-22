@@ -188,9 +188,9 @@ class XOx:
 
 			if (self.xoString[n]) == "X":
 				clr = (
-					int(self.XColor[0] * config.brightness),
-					int(self.XColor[1] * config.brightness),
-					int(self.XColor[2] * config.brightness),
+					round(self.XColor[0] * config.brightness),
+					round(self.XColor[1] * config.brightness),
+					round(self.XColor[2] * config.brightness),
 				)
 				draw.line(
 					(startX, startY, endX, endY), fill=clr, width=self.lineThickness
@@ -200,17 +200,17 @@ class XOx:
 				)
 			elif (self.xoString[n]) == "O":
 				clr = (
-					int(self.OColor[0] * config.brightness),
-					int(self.OColor[1] * config.brightness),
-					int(self.OColor[2] * config.brightness),
+					round(self.OColor[0] * config.brightness),
+					round(self.OColor[1] * config.brightness),
+					round(self.OColor[2] * config.brightness),
 				)
 				draw.ellipse((startX, startY, endX, endY), outline=clr)
 				draw.ellipse((startX + 1, startY + 1, endX - 1, endY - 1), outline=clr)
 			else:
 				clr = (
-					int(self.ArrowColor[0] * config.brightness),
-					int(self.ArrowColor[1] * config.brightness),
-					int(self.ArrowColor[2] * config.brightness),
+					round(self.ArrowColor[0] * config.brightness),
+					round(self.ArrowColor[1] * config.brightness),
+					round(self.ArrowColor[2] * config.brightness),
 				)
 				y0 = startY + self.xsWidth / 2 + config.arrowOffset
 				yA = self.xsWidth / 4 + config.arrowOffset
@@ -325,8 +325,8 @@ def main(run=True):
 
 		config.colorOverlayObjB.minHue = 180
 		config.colorOverlayObjB.maxHue = 180
-		config.colorOverlayObjB.minSaturation = .5
-		config.colorOverlayObjB.maxSaturation = .5
+		config.colorOverlayObjB.minSaturation = .8
+		config.colorOverlayObjB.maxSaturation = .99
 		config.colorOverlayObjB.minValue = .5
 		config.colorOverlayObjB.maxValue = .5
 		config.colorOverlayObjB.setStartColor()
@@ -334,7 +334,7 @@ def main(run=True):
 
 		config.colorOverlayObjA.minHue = 0
 		config.colorOverlayObjA.maxHue = 360
-		config.colorOverlayObjA.minSaturation = .7
+		config.colorOverlayObjA.minSaturation = .8
 		config.colorOverlayObjA.maxSaturation = .99
 		config.colorOverlayObjA.minValue = .5
 		config.colorOverlayObjA.maxValue = .5
@@ -478,7 +478,7 @@ def makeText(emotis=False, arg=" FEEL BAD "):
 			strg += "(:" + space
 			if random.random() > 0.5:
 				strg += "o:" + space
-			if random.random() > 0.95:
+			if random.random() > 0.75:
 				strg += "(;" + space
 
 		# strg ="| oTESTx |"

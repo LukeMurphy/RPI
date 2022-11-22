@@ -46,6 +46,28 @@ class WaveDeformer:
         return [t for t in zip(target_grid, source_grid)]
 
 
+class Director:
+	"""docstring for Director"""
+
+	slotRate = .5
+
+	def __init__(self, config):
+		super(Director, self).__init__()
+		self.config = config
+		self.tT = time.time()
+
+	def checkTime(self):
+		if (time.time() - self.tT) >= self.slotRate:
+			self.tT = time.time()
+			self.advance = True
+		else:
+			self.advance = False
+
+	def next(self):
+
+		self.checkTime()
+
+
 def main(run=True):
 	global config, directionOrder, ps
 	print("---------------------")
@@ -55,7 +77,6 @@ def main(run=True):
 	config.canvasImageHeight = config.canvasHeight
 	config.canvasImageWidth -= 4
 	config.canvasImageHeight -= 4
-	config.delay = 0.01
 	config.numUnits = 60
 
 	"""
@@ -146,11 +167,21 @@ def main(run=True):
 		print(str(e))
 		config.renderDiagnostics = False
 
+	# managing speed of animation and framerate
+	config.directorController = Director(config)
+
 	try:
 		config.delay = float(workConfig.get("particleSystem", "delay"))
 	except Exception as e:
 		print(str(e))
+		config.delay = .01
 		ps.delay = 0.01
+	try:
+		config.directorController.slotRate  = float(workConfig.get("particleSystem", "slotRate"))
+	except Exception as e:
+		print(str(e))
+		print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
+		config.directorController.slotRate  = .03
 
 	try:
 		ps.meanderFactor = float(workConfig.get("particleSystem", "meanderFactor"))
@@ -498,7 +529,7 @@ def main(run=True):
 			config.render(config.renderImageFull, 0, 0)
 	'''
 
-
+	
 	config.xPos = 0
 
 	for i in range(0, ps.numUnits):
@@ -796,7 +827,9 @@ def runWork():
 	print(bcolors.ENDC)
 
 	while config.isRunning == True:
-		iterate()
+		config.directorController.checkTime()
+		if config.directorController.advance == True:
+			iterate()
 		time.sleep(config.delay)
 		if config.standAlone == False :
 			config.callBack()

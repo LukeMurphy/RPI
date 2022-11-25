@@ -726,7 +726,6 @@ def iterate():
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
-
 	if config.useBlanks:
 		badpixels.drawBlanks(config.canvasImageFinal, False)
 

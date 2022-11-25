@@ -70,9 +70,10 @@ class ParticleDot:
 		self.mode = 1
 		self.gravity = random.uniform(0.51, 1.52)
 		self.orbit = orbit
+		self.sizeNum = 1 if random.random() < .5 else 2
 
 
-class Sparkles:
+class ParticleSystem:
 	def __init__(self, config):
 		self.config = config
 		self.x = 0
@@ -83,10 +84,38 @@ class Sparkles:
 		self.initXRange = [config.initXRangeMin, config.initXRangeMax]
 		self.initYRange = [config.initYRangeMin, config.initYRangeMax]
 
+
+	def setNewAttributes(self):
+		self.bands = round(random.uniform(12,24))
+		self.wBase = round(random.uniform(220,config.canvasWidth))
+
+		self.xSpeed = random.random()/2.0
+		self.ySpeed = random.random()
+		self.ySpeed = 0
+
+
+		self.radialsArray = []
+		self.radials = round(random.uniform(120,300))
+		self.rads = 2 * math.pi/self.radials
+		innerRadius = self.wBase/3
+		outerRadius = self.wBase
+		skipRatio = random.random() + .3
+		for i in range(0,self.radials) :
+			ir = innerRadius + random.uniform(-50,50)
+			outr = outerRadius + random.uniform(-50,50)
+			skip = 0 if random.random() < skipRatio else 1
+			self.radialsArray.append([ir,outr,skip])
+	
+
+	def setCenter(self) :
+		# initial center position
+		self.x = round(random.uniform(self.initXRange[0], self.initXRange[1]))
+		self.y = round(random.uniform(self.initYRange[0], self.initYRange[1]))
+
+
 	def setUp(self):
 
-
-		self.directionProb = random.random()
+		self.directionProb = random.uniform(.4,.6)
 		self.orbitProb = random.random()
 		# Number of sparks
 		self.p = int(5 + (random.uniform(config.minParticles, config.maxParticles)))
@@ -95,11 +124,8 @@ class Sparkles:
 		config.numberDone = round(self.p / 5)
 
 		# Speed factor
-		self.fFactor = int(random.uniform(1, 6))
+		self.fFactor = int(random.uniform(config.speedFactorMin, config.speedFactorMax))
 
-		# initial center position
-		self.x = round(random.uniform(self.initXRange[0], self.initXRange[1]))
-		self.y = round(random.uniform(self.initYRange[0], self.initYRange[1]))
 		'''
 		if config.rotation != 0:
 			approxVisibleArea = self.config.canvasWidth * 0.6
@@ -141,9 +167,14 @@ class Sparkles:
 
 
 	def move(self):
-		"""
-		if(self.traces == False) : self.config.matrix.Clear()
-		"""
+
+
+		self.x += self.xSpeed
+		self.y += self.ySpeed
+
+		if self.x  > config.canvasWidth - round(self.wBase/4):
+			self.xSpeed = 0
+
 		sumOfDone = 0
 		for q in range(0, self.p):
 			sumOfDone += self.particles[q].done
@@ -158,16 +189,6 @@ class Sparkles:
 
 		for q in range(0, self.p):
 			ref = self.particles[q]
-
-			'''
-			# deacelleration / damping
-			ref.vx = ref.vx * self.deacellerationx
-			ref.vy = ref.vy * self.deacelleration
-
-			# pseudo gravity
-			ref.vy = ref.vy + ref.gravity * math.sin(config.systemRotation * math.pi/180)  # self.gravity
-			ref.vx = ref.vx + ref.gravity * math.cos(config.systemRotation * math.pi/180)  # self.gravity
-			'''
 
 			if ref.mode == 1 :
 				ref.xPos += ref.vx
@@ -223,8 +244,8 @@ class Sparkles:
 			if sumOfClrs < 10 and random.random() > 0.95:
 				self.config.traces = False
 
-			# Sparkles!!
-			if random.random() < 0.1:
+			# Sparkles !!
+			if random.random() < config.sparkleProb:
 				r = int(220 * self.sparkleBrightness)
 				g = int(220 * self.sparkleBrightness)
 				b = int(255 * self.sparkleBrightness)
@@ -240,7 +261,15 @@ class Sparkles:
 				and yDisplayPos <= config.canvasHeight
 			):
 				try:
-					config.image.putpixel((int(xDisplayPos), int(yDisplayPos)), (r, g, b))
+
+					if ref.sizeNum == 2 :
+						config.draw.rectangle( (round(xDisplayPos), round(yDisplayPos), round(xDisplayPos)+1, round(yDisplayPos)+0), fill=(r, g, b,255) )
+					else :
+						config.draw.rectangle( (round(xDisplayPos), round(yDisplayPos), round(xDisplayPos)+0, round(yDisplayPos)+0), fill=(r, g, b,255) )
+					#config.image.putpixel((round(xDisplayPos), round(yDisplayPos)), (r, g, b))
+					#config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)), (r, g, b))
+					#config.image.putpixel((round(xDisplayPos), round(yDisplayPos)+1), (r, g, b))
+					#config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)+1), (r, g, b))
 				except Exception as e:
 					print(str(e))
 
@@ -256,12 +285,8 @@ class Sparkles:
 				ref.setUp(self, ref.id)
 
 
-			if random.random() < .05 :
+			if random.random() < config.particleResetProb :
 				ref.setUp(self, ref.id)
-
-
-				#print(ref.xPos,ref.yPos,ref.done,ref.mode)
-
 
 
 def drawElement():
@@ -295,6 +320,46 @@ def runWork():
 		time.sleep(redrawSpeed)
 
 
+def drawBands(p) :
+
+	wBase = p.wBase
+	wDiff = round(wBase / p.bands)
+
+	aBase = 0
+	aDiff = 10
+
+	bBAse = 10
+	bDiff = 5
+
+	for i in range(0,p.bands) :
+
+		w = wBase - i * wDiff
+		x0 = p.x - w/2
+		y0 = p.y - w/2
+		x1 = p.x + w/2
+		y1 = p.y + w/2
+
+		a = round(config.fadeRate + aBase) if config.fadeRate > aBase else config.fadeRate
+
+		config.draw.ellipse((x0,y0,x1,y1), fill =(4,4,bBAse,round(a) ))
+
+		if i == 1:
+			config.draw.ellipse((x0,y0,x1,y1), fill =(20,14,bBAse,round(a ) ))
+
+		if i == 0 or i == 12:
+			config.draw.ellipse((x0,y0,x1,y1), fill =(30,24,bBAse,round(a ) ))
+		bBAse += bDiff
+
+	i = 0
+	for n in range(0, len(p.radialsArray)) :
+		x0 = math.cos(i * p.rads) * p.radialsArray[n][0] + p.x
+		y0 = math.sin(i * p.rads) * p.radialsArray[n][0] + p.y
+		x1 = math.cos(i * p.rads) * p.radialsArray[n][1] + p.x
+		y1 = math.sin(i * p.rads) * p.radialsArray[n][1] + p.y	
+		i += 1
+		if p.radialsArray[n][2] == 0 :
+			config.draw.line((x0,y0,x1,y1), fill =(40,30,0,25))
+
 
 def iterate():
 	global config
@@ -310,55 +375,17 @@ def iterate():
 		(0, 0, config.canvasWidth, config.canvasHeight),
 		fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2], round(config.fadeRate)),
 	)
-	w = 190
-	x0 = sprkl.x - w/2
-	y0 = sprkl.y - w/2
-	x1 = sprkl.x + w/2
-	y1 = sprkl.y + w/2
-
-	a = round(config.fadeRate + 90) if config.fadeRate > 90 else config.fadeRate
-
-	config.draw.ellipse((x0,y0,x1,y1), fill =(4,4,10,round(a) ))
-
-
-
-	w = 160
-	x0 = sprkl.x - w/2
-	y0 = sprkl.y - w/2
-	x1 = sprkl.x + w/2
-	y1 = sprkl.y + w/2
-
-	a = round(config.fadeRate + 100) if config.fadeRate > 100 else config.fadeRate
-
-	config.draw.ellipse((x0,y0,x1,y1), fill =(4,4,30,round(a) ))
-
-
-	w = 130
-	x0 = sprkl.x - w/2
-	y0 = sprkl.y - w/2
-	x1 = sprkl.x + w/2
-	y1 = sprkl.y + w/2
-	a = round(config.fadeRate + 120) if config.fadeRate > 120 else config.fadeRate
-
-	config.draw.ellipse((x0,y0,x1,y1), fill =(4,4,20,round(a) ))
-
-	w = 100
-	x0 = sprkl.x - w/2
-	y0 = sprkl.y - w/2
-	x1 = sprkl.x + w/2
-	y1 = sprkl.y + w/2
-	a = round(config.fadeRate + 140) if config.fadeRate > 140 else config.fadeRate
-
-	config.draw.ellipse((x0,y0,x1,y1), fill =(4,4,10,round(a) ))
 
 
 	config.sideWind = False
 
 
+	drawBands(sprkl)
 	sprkl.move()
 
+
 	config.fadeRate += config.fadeRateDelta
-	if random.random() < .001 :
+	if random.random() < config.totalResetProb :
 		print("now")
 		#config.fadeRate = 250
 		#config.fadeRateDelta = 0
@@ -369,7 +396,16 @@ def iterate():
 
 	if config.fadeRate > 255 :
 		config.fadeRate = 30
-		config.fadeRateDelta = random.uniform(.1,5) 
+		config.fadeRateDelta = random.uniform(.1,2)
+
+		print (config.fadeRateDelta)
+		if config.fadeRateDelta  <= 1.0 :
+			print("ALL NEW")
+			sprkl.setCenter()
+			sprkl.setNewAttributes()
+			sprkl.setUp()
+
+
 	config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
 
@@ -381,31 +417,40 @@ def main(run=True):
 	global redrawSpeed
 	global sprkl
 
-	config.traces = False
-	config.sideWind = False
+	config.traces = (workConfig.getboolean("particles", "traces"))
+	config.sideWind = (workConfig.getboolean("particles", "sideWind"))
 
-	config.minParticles = 2000
-	config.maxParticles = 2000
+	config.minParticles = int(workConfig.get("particles", "minParticles"))
+	config.maxParticles = int(workConfig.get("particles", "maxParticles"))
 	config.numberDone = 1
 
-	config.initXRangeMin = 220
-	config.initXRangeMax = 220
-	config.initYRangeMin = 120
-	config.initYRangeMax = 120
+	config.speedFactorMin = float(workConfig.get("particles", "speedFactorMin"))
+	config.speedFactorMax = float(workConfig.get("particles", "speedFactorMax"))
+
+	config.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
+	config.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
+	config.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
+	config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
 
 	config.action = "other"
-	config.systemRotation = 200
+	config.systemRotation = float(workConfig.get("particles", "systemRotation"))
 
 	config.bgColor = [1, 1, 2]
-	config.fadeRate = 90
-	config.fadeRateDelta = 1.0
+	config.fadeRate = float(workConfig.get("particles", "fadeRate"))
+	config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
+	config.sparkleProb = float(workConfig.get("particles", "sparkleProb"))
+
+	config.particleResetProb =  float(workConfig.get("particles", "particleResetProb"))
+	config.totalResetProb =  float(workConfig.get("particles", "totalResetProb"))
 
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)
-	sprkl = Sparkles(config)
+	sprkl = ParticleSystem(config)
+	sprkl.setCenter()
+	sprkl.setNewAttributes()
 	sprkl.setUp()
 
-		# managing speed of animation and framerate
+	# managing speed of animation and framerate
 	config.directorController = Director(config)
 	config.directorController.slotRate  = .03
 

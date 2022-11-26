@@ -152,7 +152,7 @@ class ParticleSystem:
 		# speed that each light fades to black / sparkle
 
 		self.decr_r = round(random.uniform(.25, 1))
-		self.decr_g = round(random.uniform(.5, 1))
+		self.decr_g = round(random.uniform(.25, 1))
 		self.decr_b = round(random.uniform(.25, 1))
 
 		# vertical deacelleration

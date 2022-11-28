@@ -239,7 +239,7 @@ def restartDrawing():
 			config.maxValue,
 		)
 
-		print(config.bgColor)
+		# print(config.bgColor)
 		# config.bgColor = colorutils.getRandomColorHSV(0,360, .3,.95, .1,.94)
 		config.draw.rectangle(
 			(0, 0, config.imageWidth, config.imageHeight), fill=config.bgColor

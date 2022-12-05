@@ -28,7 +28,8 @@ import tkinter as tk
 from tkinter import *
 import tkmacosx
 from tkmacosx import Button
-#from tk import Button
+
+# from tk import Button
 
 
 commadStringProc = ""
@@ -36,235 +37,244 @@ JavaAppRunning = ""
 
 
 actionDict1 = [
-	#{"--- Police Line 2 --------": "p10-line/flow-1.cfg"},
-	{"SCREEN TEST ": "screens/test-448x320.cfg"},
+    # {"--- Police Line 2 --------": "p10-line/flow-1.cfg"},
+    {"SCREEN TEST ": "screens/test-448x320.cfg"},
 ]
 
 actionDict2 = [
-	{"SCREEN TEST ": "screens/test-448x320.cfg"},
+    {"SCREEN TEST ": "screens/test-448x320.cfg"},
 ]
 
 
 def verify():
-	"""Summary
-	
-	Returns:
-	    TYPE: Description
-	"""
-	# print("==>",Lb.curselection())
-	global actionDict1
-	process = False
-	configSelected = None
-	if len(list(Lb1.curselection())) > 0:
-		selection = Lb1.curselection()[0]
-		configSelected = actionDict1[selection]
-		process = True
-	elif len(list(Lb2.curselection())) > 0:
-		selection = Lb2.curselection()[0]
-		configSelected = actionDict2[selection]
-		process = True
-	return (process, configSelected)
+    """Summary
+
+    Returns:
+        TYPE: Description
+    """
+    # print("==>",Lb.curselection())
+    global actionDict1
+    process = False
+    configSelected = None
+    if len(list(Lb1.curselection())) > 0:
+        selection = Lb1.curselection()[0]
+        configSelected = actionDict1[selection]
+        process = True
+    elif len(list(Lb2.curselection())) > 0:
+        selection = Lb2.curselection()[0]
+        configSelected = actionDict2[selection]
+        process = True
+    return (process, configSelected)
 
 
 def execute(configToRun):
 
-	commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-	commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-	commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+    commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+    commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+    commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
-	print("--------------------------------------------")
-	print("--------------------------------------------")
-	print(configToRun)
-	print("--------------------------------------------")
-	print("--------------------------------------------")
-	"""Summary
-	
+    print("--------------------------------------------")
+    print("--------------------------------------------")
+    print(configToRun)
+    print("--------------------------------------------")
+    print("--------------------------------------------")
+    """Summary
+
 	Args:
 	    configToRun (TYPE): Description
 	"""
-	global JavaAppRunning
-	if ".cfg" in configToRun:
-		if "multi" in configToRun:
-			print("MULTIPLAYER STARTING >>>\n")
-			os.system(commadStringMultiPyth + configToRun + "&")
-		if "--manifest" in configToRun:
-			print(commadStringSeqPyth + configToRun + "&")
-			os.system(commadStringSeqPyth + configToRun + "&")
-		else:
-			os.system(commadStringPyth + configToRun + "&")
-	elif ".app" in configToRun:
-		os.system("open " + commadStringProc + configToRun)
-		JavaAppRunning = configToRun
+    global JavaAppRunning
+    if ".cfg" in configToRun:
+        if "multi" in configToRun:
+            print("MULTIPLAYER STARTING >>>\n")
+            os.system(commadStringMultiPyth + configToRun + "&")
+        if "--manifest" in configToRun:
+            print(commadStringSeqPyth + configToRun + "&")
+            os.system(commadStringSeqPyth + configToRun + "&")
+        else:
+            os.system(commadStringPyth + configToRun + "&")
+    elif ".app" in configToRun:
+        os.system("open " + commadStringProc + configToRun)
+        JavaAppRunning = configToRun
 
 
 def action():
-	"""Summary
-	"""
-	a = verify()
-	if a[0] == True:
-		# os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
-		configSelected = a[1]
-		configToRun = configSelected[list(configSelected.keys())[0]]
-		execute(configToRun)
+    """Summary"""
+    a = verify()
+    if a[0] == True:
+        # os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
+        configSelected = a[1]
+        configToRun = configSelected[list(configSelected.keys())[0]]
+        execute(configToRun)
 
 
 def action2():
-	"""Summary
-	"""
-	global JavaAppRunning
-	a = verify()
-	if a[0] == True:
-		os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
-		os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
+    """Summary"""
+    global JavaAppRunning
+    a = verify()
+    if a[0] == True:
+        os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+        os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
 
-		if JavaAppRunning != '' :
-			os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")
+        if JavaAppRunning != "":
+            os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")
 
-		configSelected = a[1]
-		configToRun = configSelected[list(configSelected.keys())[0]]
-		execute(configToRun)
+        configSelected = a[1]
+        configToRun = configSelected[list(configSelected.keys())[0]]
+        execute(configToRun)
 
 
 def stopAll():
-	"""Summary
-	"""
-	# print("Tkinter is easy to use!")
-	os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
-
+    """Summary"""
+    # print("Tkinter is easy to use!")
+    os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
 
 
 def sortByDate():
-	getAllConfigFiles(True)
+    getAllConfigFiles(True)
 
-def sortByFolder():		
-	getAllConfigFiles(False)
+
+def sortByFolder():
+    getAllConfigFiles(False)
+
 
 def sortByFolderAndDate():
-	getAllConfigFiles(False,True)
+    getAllConfigFiles(False, True)
 
 
-
-def openFile() :
-	a = verify()
-	if a[0] == True:
-		# os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
-		configSelected = a[1]
-		os.system('open ' + 'configs/' + configSelected[list(configSelected.keys())[0]])
-
-
-
+def openFile():
+    a = verify()
+    if a[0] == True:
+        # os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
+        configSelected = a[1]
+        os.system("open " + "configs/" + configSelected[list(configSelected.keys())[0]])
 
 
 # Generate list of configs:
 def returnSecondElement(l):
-	"""Summary
-	
-	Args:
-	    l (TYPE): Description
-	
-	Returns:
-	    TYPE: Description
-	"""
-	return l[1]
+    """Summary
+
+    Args:
+        l (TYPE): Description
+
+    Returns:
+        TYPE: Description
+    """
+    return l[1]
 
 
-def getAllConfigFiles(dateSort=False, subsortDate=False) :
-	"""Summary
-	
-	Args:
-	    dateSort (bool, optional): Description
-	"""
-	global actionDict1, Lb1
-	configPath  = "/Users/lamshell/Documents/Dev/RPI/configs/"
-	arr = os.listdir(configPath)
-	# Sort the directories by name
-	arr.sort(reverse=False)
-	fullList = []
-	actionDict1 = []
+def getAllConfigFiles(dateSort=False, subsortDate=False):
+    """Summary
 
-	for directory in arr :
-		if directory.find(".py") == -1 and directory.find(".DS_Store") == -1 and directory.find("_py") == -1 and directory.find("LED") == -1:
-			subArr = os.listdir(configPath + directory)
-			subDirectoryList = []
+    Args:
+        dateSort (bool, optional): Description
+    """
+    global actionDict1, Lb1
+    configPath = "/Users/lamshell/Documents/Dev/RPI/configs/"
+    arr = os.listdir(configPath)
+    # Sort the directories by name
+    arr.sort(reverse=False)
+    fullList = []
+    actionDict1 = []
 
-			if dateSort == False: 
-				subArr.sort(reverse=True)
+    for directory in arr:
+        if (
+            directory.find(".py") == -1
+            and directory.find(".DS_Store") == -1
+            and directory.find("_py") == -1
+            and directory.find("LED") == -1
+        ):
+            subArr = os.listdir(configPath + directory)
+            subDirectoryList = []
 
-			for file in subArr:
-				if file.find(".DS_Store") == -1:
-					shortPath = directory + "/" + file
-					if os.path.isfile(configPath + shortPath):
-						res = os.stat(configPath + shortPath)
-						if dateSort == False: 
-							subDirectoryList.append((shortPath,res.st_mtime))
-						else :
-							fullList.append((shortPath,res.st_mtime))
+            if dateSort == False:
+                subArr.sort(reverse=True)
 
-			if dateSort == False: 
-				# sorts by date within folder
-				if subsortDate == True :
-					subDirectoryList.sort(key=returnSecondElement, reverse=True)
-				else :
-					subDirectoryList.sort(reverse=False)
-				fullList.extend(subDirectoryList)
-				fullList.append({})
+            for file in subArr:
+                if file.find(".DS_Store") == -1:
+                    shortPath = directory + "/" + file
+                    if os.path.isfile(configPath + shortPath):
+                        res = os.stat(configPath + shortPath)
+                        if dateSort == False:
+                            subDirectoryList.append((shortPath, res.st_mtime))
+                        else:
+                            fullList.append((shortPath, res.st_mtime))
 
+            if dateSort == False:
+                # sorts by date within folder
+                if subsortDate == True:
+                    subDirectoryList.sort(key=returnSecondElement, reverse=True)
+                else:
+                    subDirectoryList.sort(reverse=False)
+                fullList.extend(subDirectoryList)
+                fullList.append({})
 
-	# Sort the configs by date descending
-	if dateSort == True : 
-		fullList.sort(key=returnSecondElement, reverse=True)
+    # Sort the configs by date descending
+    if dateSort == True:
+        fullList.sort(key=returnSecondElement, reverse=True)
 
-	for f in fullList :
-		if len(f) > 0 :
-			tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime('[%Y-%m-%d %H:%M]')
+    for f in fullList:
+        if len(f) > 0:
+            tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("[%Y-%m-%d %H:%M]")
 
-			if dateSort == True : 
-				display = f[0].split("/")
-				spacer = " \t\t\t\t"
-				if len(display[1]) > 26 : spacer = " \t\t\t"
-				if len(display[1]) > 33 : spacer = " \t"
-				if len(display[1]) < 20 : spacer = " \t\t\t\t\t"
-				actionDict1.append({ display[1]  + spacer + tsTxt  + " \t" +  display[0] : f[0]})
-				#actionDict1.append({ ""  : ""})
-			else :
-				actionDict1.append({ tsTxt + "  " + f[0]   : f[0]})
-				#actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
-		else :
-			actionDict1.append({ ""  : ""})
+            if dateSort == True:
+                display = f[0].split("/")
+                spacer = " \t\t\t\t"
+                if len(display[1]) > 26:
+                    spacer = " \t\t\t"
+                if len(display[1]) > 33:
+                    spacer = " \t"
+                if len(display[1]) < 20:
+                    spacer = " \t\t\t\t\t"
+                actionDict1.append(
+                    {display[1] + spacer + tsTxt + " \t" + display[0]: f[0]}
+                )
+                # actionDict1.append({ ""  : ""})
+            else:
+                actionDict1.append({tsTxt + "  " + f[0].split('/')[0] + "     " + f[0].split('/')[1]: f[0]})
+                # actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
+        else:
+            actionDict1.append({"": ""})
 
-
-	Lb1.delete(0,END)
-	for i, item in enumerate(actionDict1):
-		Lb1.insert(END, " " + list(item.keys())[0])
-
+    Lb1.delete(0, END)
+    for i, item in enumerate(actionDict1):
+        Lb1.insert(END, " " + list(item.keys())[0])
 
 
 root = tk.Tk()
-#frame = tk.Frame(root, bg="darkgray")
-#frame.pack(padx=1, pady=1)
+# frame = tk.Frame(root, bg="darkgray")
+# frame.pack(padx=1, pady=1)
 # width x height x X x Y
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
-root.geometry("%dx%d+%d+%d" % (700, round(screen_height * .4), round(2*screen_width/3), round(2*screen_height/3)))
+root.geometry(
+    "%dx%d+%d+%d"
+    % (
+        700,
+        round(screen_height * 0.4),
+        round(2 * screen_width / 3),
+        round(2 * screen_height / 3),
+    )
+)
 
 Lb1 = Listbox(root, width=70, height=32)
 
 
 for i, item in enumerate(actionDict1):
-	Lb1.insert(END, " " + list(item.keys())[0])
+    Lb1.insert(END, " " + list(item.keys())[0])
 
 
-#Lb1.pack(side=tk.LEFT, padx=0, ipadx=10)
-#Lb2.pack(side=tk.LEFT, ipadx=10, expand=0)
+# Lb1.pack(side=tk.LEFT, padx=0, ipadx=10)
+# Lb2.pack(side=tk.LEFT, ipadx=10, expand=0)
 Lb1.place(bordermode=OUTSIDE, x=2, y=2)
 
 
 scrollbar = Scrollbar(root)
-scrollbar.pack(side = RIGHT, fill = BOTH)
-Lb1.config(yscrollcommand = scrollbar.set) 
-scrollbar.config(command = Lb1.yview) 
+scrollbar.pack(side=RIGHT, fill=BOTH)
+Lb1.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=Lb1.yview)
 
 topBtnPlace = 8
 leftBtnPlace = 540
@@ -273,50 +283,76 @@ leftBtnPlace = 540
 sortDefault = 1
 
 slogan = Button(
-	root, text="Stop & Run", width = 120, bg='blue', fg='white', borderless=1, command=action2
+    root,
+    text="Stop & Run",
+    width=120,
+    bg="blue",
+    fg="white",
+    borderless=1,
+    command=action2,
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
 slogan = Button(
-	root, text="Run", width = 120, bg='blue', fg='white', borderless=1, command=action
+    root, text="Run", width=120, bg="blue", fg="white", borderless=1, command=action
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+25)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 slogan = Button(
-	root, text="Stop All", width = 120, bg='blue', fg='white', borderless=1, command=stopAll
+    root,
+    text="Stop All",
+    width=120,
+    bg="blue",
+    fg="white",
+    borderless=1,
+    command=stopAll,
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+50)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
 quitbutton = Button(
-	root, text="QUIT", width = 120, bg='blue', fg='white', borderless=1, command=quit
+    root, text="QUIT", width=120, bg="blue", fg="white", borderless=1, command=quit
 )
-quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+75)
+quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 75)
 
 sortbutton1 = Button(
-	root, text="Sort By Date", width = 120, bg='blue', fg='white', borderless=1, command=sortByDate
+    root,
+    text="Sort By Date",
+    width=120,
+    bg="blue",
+    fg="white",
+    borderless=1,
+    command=sortByDate,
 )
-sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+100)
+sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 
 sortbutton2 = Button(
-	root, text="Sort by Folder", width = 120, bg='blue', fg='white', borderless=1, command=sortByFolder
+    root,
+    text="Sort by Folder",
+    width=120,
+    bg="blue",
+    fg="white",
+    borderless=1,
+    command=sortByFolder,
 )
-sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+125)
+sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 
 sortbutton3 = Button(
-	root, text="Sort by Folder+", width = 120, bg='blue', fg='white', borderless=1, command=sortByFolderAndDate
+    root,
+    text="Sort by Folder+",
+    width=120,
+    bg="blue",
+    fg="white",
+    borderless=1,
+    command=sortByFolderAndDate,
 )
-sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+150)
+sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 
 
 openbutton = Button(
-	root, text="Open", width = 120, bg='blue', fg='white', borderless=1, command=openFile
+    root, text="Open", width=120, bg="blue", fg="white", borderless=1, command=openFile
 )
-openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace+175)
+openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 getAllConfigFiles(False, True)
 
 root.mainloop()
-
-
-
-

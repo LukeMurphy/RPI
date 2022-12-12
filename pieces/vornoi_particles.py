@@ -455,7 +455,7 @@ def iterate():
 
     PS.move()
 
-    #drawBands(PS)
+    drawBands(PS)
 
     #generate_voronoi_diagram(256, 256, 70)
 

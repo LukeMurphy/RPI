@@ -625,7 +625,7 @@ def init():
 		print(str(e))
 
 
-	config.useBend = True
+	config.useBend = False
 	config.directorController = Director(config)
 	config.directorController.slotRate = .03
 

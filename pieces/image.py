@@ -94,6 +94,14 @@ def main(run=True):
 		config.overlayColor = None
 		config.colorOverlay = (0,200,0,150)
 		print(str(e))
+
+
+	try:
+		config.colorOverlayAlpha = int(workConfig.get("images", "colorOverlayAlpha"))
+	except Exception as e:
+		print(str(e))
+		config.colorOverlayAlpha = 250
+
 	print("------------------")	
 
 	try:
@@ -362,7 +370,7 @@ def performChanges():
 	if random.random() < config.overlayChangeProb:
 		#config.colorOverlay = colorutils.getRandomRGB()
 		#config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 1.0, 255,255)
-		config.colorOverlay = colorutils.getRandomColorHSV(	0, 360, .65, 1.0, .5, .5, 0, 0, 100)
+		config.colorOverlay = colorutils.getRandomColorHSV(	0, 360, .65, 1.0, .5, .5, 0, 0, config.colorOverlayAlpha)
 
 	if random.random() < config.overlayChangeSizeProb:
 		config.clrBlkWidth = round(random.uniform(5, config.clrBlkWidthSet * 1.25))

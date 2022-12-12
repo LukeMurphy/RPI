@@ -253,7 +253,6 @@ def main(run=True):
 	backgroundColor = workConfig.get("quilt", "backgroundColor").split(",")
 	config.backgroundColor = tuple([int(i) for i in backgroundColor])
 
-	config.opticalPattern = workConfig.get("quilt", "opticalPattern")
 	config.numUnits = int(workConfig.get("quilt", "numUnits"))
 	config.hGapSize = int(workConfig.get("quilt", "hGapSize"))
 	config.vGapSize = int(workConfig.get("quilt", "vGapSize"))
@@ -278,12 +277,19 @@ def main(run=True):
 	config.polyDistortionMax = config.polyDistortion
 
 	# stacking the decks a bit in favor of vertical lightening strike and regular
-	config.opticalPatterns = ["Regular" , "Regular", "LighteningStrikeH", "LighteningStrikeH", "Diagonals", "LighteningStrikeH"]
+	try:
+		config.opticalPatterns = workConfig.get("quilt","opticalPatterns").split(",")
+	except Exception as e:
+		print(str(e))
+		config.opticalPatterns = ["Regular" , "Regular", "LighteningStrikeH", "LighteningStrikeH", "Diagonals", "LighteningStrikeH"]
 	# "LighteningStrikeH"  aka Charlie Brown sweater ...
 
 	# for now, all squares
 	# config.blockLength = config.blockSize
 	# config.blockHeight = config.blockSize
+
+	p = math.floor(random.uniform(0, len(config.opticalPatterns)))
+	config.opticalPattern = config.opticalPatterns[p]
 
 	config.canvasImage = Image.new(
 		"RGBA", (config.canvasImageWidth, config.canvasImageHeight)

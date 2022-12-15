@@ -34,10 +34,15 @@ from PIL import (
 workconfig = configparser.ConfigParser()
 
 """
+
+Command line start of any piece:
 example:
 
 python player.py -cfg p4-6x5/stroop2
 python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
+
+python3 player.py -path ./ -cfg __in_progress/p8_particles_sparkles&
+
 """
 
 parser = argparse.ArgumentParser(description="Process")

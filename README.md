@@ -30,8 +30,8 @@ On a Mac
 Python3 with Tkinter, python3-pil, numpy, noise
 
 
-
-Lubuntu:
+Lubuntu / Linux flavors -
+As of 2022 using Linux Mint for most things
 
 sudo apt-get remove xfce4-power-manager
 sudo apt install gnome-power-manager
@@ -42,12 +42,13 @@ sudo apt-get install xscreensaver
 sudo apt-get install git
 sudo apt-get install openssh-server
 sudo apt-get install python3-pip
-sudo apt-get install python3-pil.imagetk
 
+
+sudo apt-get install python3-pil.imagetk
 pip3 install numpy
 pip3 install noise
 
-git clone -b py3.6 https://github.com/LukeMurphy/RPI.git
+git clone -b F22 https://github.com/LukeMurphy/RPI.git
 
 mkdir ~/.config/autostart
 nano ~/.config/autostart/startup0.desktop

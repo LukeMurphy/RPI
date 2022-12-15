@@ -46,9 +46,9 @@ class ParticleDot:
         fy = random.random() * p.fFactor + 1
         vx = math.cos(p.angle * n) * fx * direction
         vy = math.sin(p.angle * n) * fy * direction
-        r = int(random.uniform(0, 255) * p.brightness)
-        g = int(random.uniform(0, 200) * p.brightness)
-        b = int(random.uniform(0, 255) * p.brightness)
+        r = int(random.uniform(0, config.rRange) * p.brightness)
+        g = int(random.uniform(0, config.gRange) * p.brightness)
+        b = int(random.uniform(0, config.bRange) * p.brightness)
         radius = random.uniform(1, p.maxRadius)
 
 
@@ -478,6 +478,17 @@ def main(run=True):
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
+
+    try:
+        config.rRange = int(workConfig.get("particles","rRange"))
+        config.gRange = int(workConfig.get("particles","gRange"))
+        config.bRange = int(workConfig.get("particles","bRange"))
+    except Exception as e:
+        print(str(e))
+        config.rRange = 255
+        config.gRange = 200
+        config.bRange = 255
+
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)

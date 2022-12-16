@@ -96,6 +96,7 @@ class ParticleSystem:
         self.y = 0
         self.particles = []
         self.done = False
+        self.drawRadialPolys = True
         self.orientation = 1
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
@@ -107,6 +108,8 @@ class ParticleSystem:
         self.xSpeed = random.random() / 2.0
         self.ySpeed = random.random()
         self.ySpeed = 0
+
+        self.drawRadialPolys = True if random.random() < .5 else False
 
         self.radialsArray = []
         self.radials = round(random.uniform(120, 300))
@@ -359,6 +362,8 @@ def drawBands(p):
 
     i = 0
     p.angleOffset += p.angleOffsetSpeed
+    polyArray = []
+
     for n in range(0, len(p.radialsArray)):
         a = i * p.rads + p.angleOffset
         x0 = math.cos(a) * p.radialsArray[n][0] + p.x
@@ -366,8 +371,15 @@ def drawBands(p):
         x1 = math.cos(a) * p.radialsArray[n][1] + p.x
         y1 = math.sin(a) * p.radialsArray[n][1] + p.y
         i += 1
+        polyArray.append((x0,y0))
+        polyArray.append((x1,y1))
         if p.radialsArray[n][2] == 0:
             config.draw.line((x0, y0, x1, y1), fill=(50, 30, 0, 75))
+
+    if p.drawRadialPolys == True:
+        config.draw.polygon(polyArray, fill=(50,10,0,10), outline=(50, 30, 0, 95))
+
+
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

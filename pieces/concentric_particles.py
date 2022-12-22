@@ -289,6 +289,7 @@ class ParticleSystem:
                             ),
                             fill=(r, g, b, 255),
                         )
+                    # faster procesor, better c subroutines and maybe we could do it this way ...
                     # config.image.putpixel((round(xDisplayPos), round(yDisplayPos)), (r, g, b))
                     # config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)), (r, g, b))
                     # config.image.putpixel((round(xDisplayPos), round(yDisplayPos)+1), (r, g, b))

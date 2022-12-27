@@ -76,8 +76,6 @@ def ditherGlitch(renderImageFull, xOffset, yOffset, config):
 	renderImageFull.paste(im2, (xOffset, yOffset))
 	nc = round(random.uniform(2, 254))
 
-
-
 	# newimage = renderImageFull.convert("P", palette=Image.WEB, colors = nc)
 	newimage = renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors=nc)
 

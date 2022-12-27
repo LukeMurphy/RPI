@@ -72,6 +72,8 @@ class Block:
 	## Options are reveal, revealmove, move
 	movementMode = "reveal"
 
+	orientation = 1
+
 	def __init__(self, iid=0):
 		self.iid = iid
 
@@ -81,7 +83,7 @@ class Block:
 	def make(self, colorMode=True, nextRow=-1):
 
 		config = self.config
-		choice = round(random.uniform(1, 7))
+		choice = round(random.uniform(1, len(config.wordsList)))
 		brightness = config.brightness
 		brightness = random.uniform(
 			self.config.minBrightness, self.config.brightness + 0.1
@@ -94,30 +96,33 @@ class Block:
 		)
 
 		if colorMode != True:
-			choice = round(random.uniform(8, 10))
+			choice = round(random.uniform(8, len(config.wordsList)))
 
 		# choice = 3 if (random.random() > .5) else 5
 		# choice = 4 if (random.random() > .5) else 6
 		# choice = 9
 
 		if choice == 1:
-			colorWord, colorOfWord = "YELLOW", (255, 0, 225)
+			colorWord, colorOfWord = config.wordsList[0], (255, 0, 225)
 		if choice == 2:
-			colorWord, colorOfWord = "VIOLET", (230, 225, 0)
+			colorWord, colorOfWord = config.wordsList[1], (230, 225, 0)
 		if choice == 3:
-			colorWord, colorOfWord = "RED", (0, 255, 0)
+			colorWord, colorOfWord = config.wordsList[2], (0, 255, 0)
 		if choice == 4:
-			colorWord, colorOfWord = "BLUE", (225, 100, 0)
+			colorWord, colorOfWord = config.wordsList[3], (225, 100, 0)
 		if choice == 5:
-			colorWord, colorOfWord = "GREEN", (255, 0, 0)
+			colorWord, colorOfWord = config.wordsList[4], (255, 0, 0)
 		if choice == 6:
-			colorWord, colorOfWord = "ORANGE", (0, 0, 200)
+			colorWord, colorOfWord = config.wordsList[5], (0, 0, 200)
 		if choice == 7:
-			colorWord, colorOfWord = "GRAY", (50, 50, 50)
+			colorWord, colorOfWord = config.wordsList[6], (50, 50, 50)
 		if choice == 8:
-			colorWord, colorOfWord = "BLACK", (255, 255, 255)
-		if choice >= 9:
-			colorWord, colorOfWord = "WHITE", (0, 0, 0)
+			colorWord, colorOfWord = config.wordsList[7], (255, 255, 255)
+		if choice == 9:
+			colorWord, colorOfWord = config.wordsList[8], (0, 0, 0)
+		if choice > 9:
+			colorWord, colorOfWord = config.wordsList[choice-1], (255, 0, 0)
+
 
 		self.colorWord = colorWord
 
@@ -125,6 +130,8 @@ class Block:
 
 		# Draw Background Color
 		# Optical (RBY) or RGB opposites
+
+		bgColor = tuple(round(a * brightness) for a in ((200, 200, 200)))
 		if opticalOpposites:
 			if colorWord == "RED":
 				bgColor = tuple(round(a * brightness) for a in ((255, 0, 0)))
@@ -147,6 +154,9 @@ class Block:
 		else:
 			bgColor = colorutils.colorCompliment(clr, brightness)
 
+
+		bgColor = colorutils.getRandomColorHSV(0,360,.4, 1.0, .5, 1.0);
+
 		clr = tuple(round(a * brightness) for a in (clr))
 
 		# Setting 2 fonts - one for the main text and the other for its "border"... not really necessary
@@ -156,26 +166,75 @@ class Block:
 		font2 = ImageFont.truetype(
 			config.path + "/assets/fonts/freefont/FreeSansBold.ttf", self.fontSize
 		)
+
 		pixLen = config.draw.textsize(colorWord, font=font)
 
 		dims = [pixLen[0], pixLen[1]]
 		if dims[1] < self.verticalTileSize:
 			dims[1] = self.verticalTileSize + 2
 
+
 		vPadding = round(0.75 * config.tileSize[1])
-		self.presentationImage = PIL.Image.new("RGBA", (dims[0] + vPadding, dims[1]))
-		self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
+
+
+		if random.random() < .1 :
+			self.orientation = 0
+
+		if self.orientation == 1 :
+			self.presentationImage = PIL.Image.new("RGBA", (dims[0] + vPadding, dims[1]))
+			self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
+		else :
+			self.presentationImage = PIL.Image.new("RGBA", (dims[1] + vPadding, round(dims[0]*1.5)))
+			self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
+
+
 		draw = ImageDraw.Draw(self.presentationImage)
 		iid = self.image.im.id
-		draw.rectangle((0, 0, dims[0] + config.tileSize[0], dims[1]), fill=bgColor)
 
-		# Draw the text with "borders"
-		indent = round(0.05 * config.tileSize[0])
 
-		for i in range(1, self.shadowSize):
-			draw.text((indent + -i, -i), colorWord, (0, 0, 0), font=font2)
-			draw.text((indent + i, i), colorWord, (0, 0, 0), font=font2)
-		draw.text((indent + 0, 0), colorWord, clr, font=font)
+		if self.orientation == 1 :
+			draw.rectangle((0, 0, dims[0] + config.tileSize[0], dims[1]), fill=bgColor)
+
+			# Draw the text with "borders"
+			indent = round(0.05 * config.tileSize[0])
+
+			for i in range(1, self.shadowSize):
+				draw.text((indent + -i, -i), colorWord, (0, 0, 0), font=font2)
+				draw.text((indent + i, i), colorWord, (0, 0, 0), font=font2)
+			draw.text((indent + 0, 0), colorWord, clr, font=font)
+
+		else :
+
+			draw.rectangle((0, 0, dims[1] -5 , round(dims[0]*1.5)), fill=bgColor)
+			counter  = 0
+			# Generate vertical text
+			for letter in colorWord:
+				# rough estimate to create vertical text
+				xD = 2
+				# "kerning ... hahhaha ;) "
+				if letter == "I":
+					xD = 6 * int(stroopFontSize / 30)
+
+				# Draw the text with "borders"
+				indent = xD
+
+				for i in range(1, self.shadowSize):
+					draw.text(
+						(indent + -i, -i + counter * (stroopFontSize - 1)),
+						letter,
+						(0, 0, 0),
+						font=font2,
+					)
+					draw.text(
+						(indent + i, i + counter * (stroopFontSize - 1)),
+						letter,
+						(0, 0, 0),
+						font=font2,
+					)
+				draw.text((xD, counter * (stroopFontSize - 1)), letter, clr, font=font)
+				counter += 1
+
+
 
 		if nextRow == -1:
 			vOffset = round(random.uniform(0, self.displayRows)) * self.verticalTileSize
@@ -213,6 +272,9 @@ class Block:
 
 		self.revealSpeed = round(random.uniform(self.revealSpeedMin, self.revealSpeedMax))
 
+		if self.orientation == 0 :
+			self.revealSpeed = self.revealSpeedMax * 2
+
 	def callBack(self):
 		self.setForRemoval = True
 		pass
@@ -245,8 +307,12 @@ class Block:
 			segment = self.presentationImage.crop((0, 0, dims[0], self.reveal))
 			self.image.paste(segment, (0, 0), segment)
 
-			if self.reveal > dims[1]:
-				self.callBack()
+			if self.orientation == 1 :
+				if self.reveal > dims[1]:
+					self.callBack()
+			else :
+				if self.reveal > dims[1]*2:
+					self.callBack()
 				# prround(self.colorWord, self.reveal, self.revealSpeed, self.image.size, dims)
 
 	def update(self):
@@ -351,6 +417,7 @@ def main(run=True):
 	config.revealSpeedMin = int(workConfig.get("stroop", "revealSpeedMin"))
 	config.moveProbability = float(workConfig.get("stroop", "moveProbability"))
 	config.colorProbability = float(workConfig.get("stroop", "colorProbability"))
+	config.wordsList = (workConfig.get("stroop", "wordsList")).split(",")
 	config.colorProbabilityReturn = float(
 		workConfig.get("stroop", "colorProbabilityReturn")
 	)

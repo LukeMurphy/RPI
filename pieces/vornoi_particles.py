@@ -118,8 +118,8 @@ class ParticleSystem:
         outerRadius = self.wBase
         skipRatio = random.random() + 0.3
         for i in range(0, self.radials):
-            ir = innerRadius + random.uniform(-50, 50)
-            outr = outerRadius + random.uniform(-50, 50)
+            ir = innerRadius + random.uniform(-config.innerRadius, config.innerRadius)
+            outr = outerRadius + random.uniform(-config.innerRadius, config.outerRadius)
             skip = 0 if random.random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
@@ -386,7 +386,7 @@ def drawBands(p):
         y1 = math.sin(a) * p.radialsArray[n][1] + p.y
         i += 1
         if p.radialsArray[n][2] == 0:
-            config.draw.line((x0, y0, x1, y1), fill=(250, 20, 0, 75))
+            config.draw.line((x0, y0, x1, y1), fill=(250, 180, 0, 55))
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -525,12 +525,13 @@ def main(run=True):
     config.gDiff = int(workConfig.get("particles", "gDiff"))
     config.bDiff = int(workConfig.get("particles", "bDiff"))
 
+    config.innerRadius = int(workConfig.get("particles", "innerRadius"))
+    config.outerRadius = int(workConfig.get("particles", "outerRadius"))
+
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
     config.sparkleProb = float(workConfig.get("particles", "sparkleProb"))
-    config.fadeRateNewSystemThreshold = float(
-        workConfig.get("particles", "fadeRateNewSystemThreshold")
-    )
+    config.fadeRateNewSystemThreshold = float(workConfig.get("particles", "fadeRateNewSystemThreshold"))
 
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))

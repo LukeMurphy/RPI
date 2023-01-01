@@ -88,10 +88,14 @@ klimt = ([48, 48, 48],
          [200, 180, 8],
          [0, 0, 120])
 
+testPalette =([255,0,0],[255,100,100],[255,0,200])
+
 
 def getNamedPalette(arg, brtns=1, a=255):
     if arg == "klimt" :
     	return getKlimt(brtns, a)
+    if arg == "testPalette" :
+        return getTest(brtns, a)
 
 
 def getKlimt(brtns=1, a=255):
@@ -100,6 +104,14 @@ def getKlimt(brtns=1, a=255):
     )
 
     c = klimt[choice]
+    return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
+
+def getTest(brtns=1, a=255):
+    choice = round(
+        random.uniform(0, len((testPalette))-1)
+    )
+
+    c = testPalette[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
 

@@ -16,7 +16,6 @@ scrollSpeed = 0.0006
 stroopSpeed = 0.1
 steps = 2
 stroopSteps = 2
-stroopFontSize = 30
 fontSize = 14
 vOffset = -1
 opticalOpposites = True
@@ -89,15 +88,12 @@ class Block:
             self.config.minBrightness, self.config.brightness + 0.1
         )
         opticalOpposites = False if (random.random() > 0.5) else True
-        self.verticalTileSize = (
-            round(config.screenHeight / self.displayRows)
-            if self.displayRows != config.rows
-            else config.tileSize[1]
-        )
+        self.verticalTileSize = round(config.screenHeight / self.displayRows) if self.displayRows != config.rows else config.tileSize[1]
+        self.verticalTileSize = 32
 
         listToUse = config.wordsList
         if colorMode != True:
-            choice = round(random.uniform(8, len(config.wordsList)))
+            choice = round(random.uniform(1, len(config.wordsList)))
 
         if config.mode == "colors":
             choice = round(random.uniform(1, len(config.colorList)))
@@ -179,15 +175,18 @@ class Block:
 
         dims = [pixLen[0], pixLen[1]]
         if dims[1] < self.verticalTileSize:
-            dims[1] = self.verticalTileSize + 2
+            dims[1] = self.verticalTileSize + 4
 
-        vPadding = round(0.75 * config.tileSize[1])
 
-        if random.random() < .1:
+        vPadding = 5
+        hPadding = 5
+
+
+        if random.random() < config.verticalOrientationProb:
             self.orientation = 0
 
         if self.orientation == 1:
-            self.presentationImage = PIL.Image.new("RGBA", (dims[0] + vPadding, dims[1]))
+            self.presentationImage = PIL.Image.new("RGBA", (dims[0] + hPadding, dims[1]+ vPadding))
             self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
         else:
             self.presentationImage = PIL.Image.new("RGBA", (dims[1] + vPadding, round(dims[0]*1.5)))
@@ -196,8 +195,11 @@ class Block:
         draw = ImageDraw.Draw(self.presentationImage)
         iid = self.image.im.id
 
+
+        #print(("vPadding:{} orientation:{} vert:{}").format(vPadding,self.orientation,dims[1] ))
+
         if self.orientation == 1:
-            draw.rectangle((0, 0, dims[0] + config.tileSize[0], dims[1]), fill=bgColor)
+            draw.rectangle((0, 0, dims[0] + hPadding, dims[1] + vPadding), fill=bgColor)
 
             # Draw the text with "borders"
             indent = round(0.05 * config.tileSize[0])
@@ -212,30 +214,31 @@ class Block:
             draw.rectangle((0, 0, dims[1] - 5, round(dims[0]*1.5)), fill=bgColor)
             counter = 0
             # Generate vertical text
+
             for letter in colorWord:
                 # rough estimate to create vertical text
                 xD = 2
                 # "kerning ... hahhaha ;) "
                 if letter == "I":
-                    xD = 6 * int(stroopFontSize / 30)
+                    xD = 6 * int(self.fontSize / 30)
 
                 # Draw the text with "borders"
                 indent = xD
 
                 for i in range(1, self.shadowSize):
                     draw.text(
-                        (indent + -i, -i + counter * (stroopFontSize - 1)),
+                        (indent + -i, -i + counter * (self.fontSize - 1)),
                         letter,
                         (0, 0, 0),
                         font=font2,
                     )
                     draw.text(
-                        (indent + i, i + counter * (stroopFontSize - 1)),
+                        (indent + i, i + counter * (self.fontSize - 1)),
                         letter,
                         (0, 0, 0),
                         font=font2,
                     )
-                draw.text((xD, counter * (stroopFontSize - 1)), letter, clr, font=font)
+                draw.text((xD, counter * (self.fontSize - 1)), letter, clr, font=font)
                 counter += 1
 
         if nextRow == -1:
@@ -340,7 +343,7 @@ def makeBlock():
 
     block = Block()
     block.config = config
-    block.fontSize = config.stroopFontSize
+    block.fontSize = round(random.uniform(config.fontSizeMin,config.fontSizeMax))
     block.shadowSize = config.shadowSize
     block.displayRows = config.displayRows
     block.displayCols = config.displayCols
@@ -404,11 +407,11 @@ def main(run=True):
 
     print("Stroop2 What Color Loaded")
     simulBlocks = int(workConfig.get("stroop", "simulBlocks"))
-    config.fontSize = int(workConfig.get("stroop", "fontSize"))
     config.vOffset = int(workConfig.get("stroop", "vOffset"))
     config.stroopSpeed = float(workConfig.get("stroop", "stroopSpeed"))
     config.stroopSteps = float(workConfig.get("stroop", "stroopSteps"))
-    config.stroopFontSize = int(workConfig.get("stroop", "stroopFontSize"))
+    config.fontSizeMin = int(workConfig.get("stroop", "fontSizeMin"))
+    config.fontSizeMax = int(workConfig.get("stroop", "fontSizeMax"))
     config.shadowSize = int(workConfig.get("stroop", "shadowSize"))
     config.higherVariability = workConfig.getboolean("stroop", "higherVariability")
     config.verticalBg = workConfig.getboolean("stroop", "verticalBg")
@@ -420,6 +423,7 @@ def main(run=True):
     config.revealSpeedMin = int(workConfig.get("stroop", "revealSpeedMin"))
     config.moveProbability = float(workConfig.get("stroop", "moveProbability"))
     config.colorProbability = float(workConfig.get("stroop", "colorProbability"))
+    config.verticalOrientationProb = float(workConfig.get("stroop", "verticalOrientationProb"))
     config.wordsList = (workConfig.get("stroop", "wordsList")).split(",")
 
     config.colorProbabilityReturn = float(workConfig.get("stroop", "colorProbabilityReturn"))

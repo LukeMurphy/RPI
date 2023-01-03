@@ -38,6 +38,29 @@ nextRow = 0
 # For video out
 x = y = 0
 
+class Director:
+    """docstring for Director"""
+
+    slotRate = 0.5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+
+        self.checkTime()
+
+
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
@@ -426,6 +449,23 @@ def main(run=True):
     config.verticalOrientationProb = float(workConfig.get("stroop", "verticalOrientationProb"))
     config.wordsList = (workConfig.get("stroop", "wordsList")).split(",")
 
+    # managing speed of animation and framerate
+    config.directorController = Director(config)
+
+    try:
+        config.delay = float(workConfig.get("stroop", "delay"))
+    except Exception as e:
+        print(str(e))
+        config.delay = 0.01
+    try:
+        config.directorController.slotRate = float(
+            workConfig.get("stroop", "slotRate")
+        )
+    except Exception as e:
+        print(str(e))
+        print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
+        config.directorController.slotRate = 0.03
+
     config.colorProbabilityReturn = float(workConfig.get("stroop", "colorProbabilityReturn"))
     config.modeChangeProb = float(workConfig.get("stroop", "modeChangeProb"))
     config.colorList = ["RED", "GREEN", "BLUE", "YELLOW", "ORANGE", "VIOLET", "BLACK", "WHITE", "GRAY"]
@@ -447,9 +487,12 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("RUNNING adwords.py")
     print(bcolors.ENDC)
+
     while config.isRunning == True:
-        iterate()
-        time.sleep(config.stroopSpeed)
+        config.directorController.checkTime()
+        if config.directorController.advance == True:
+            iterate()
+        time.sleep(config.delay)
         if config.standAlone == False:
             config.callBack()
 

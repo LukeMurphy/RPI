@@ -35,6 +35,28 @@ yPos = 0
 bads = badpixels
 
 
+class Director:
+    """docstring for Director"""
+
+    slotRate = 0.5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+
+        self.checkTime()
+
+
 def main(run=True):
 	global config, workConfig, blocks, simulBlocks, bads
 	# gc.enable()
@@ -62,7 +84,6 @@ def main(run=True):
 	config.clrBlkWidthSet = int(workConfig.get("images", "clrBlkWidth"))
 	config.clrBlkHeightSet = int(workConfig.get("images", "clrBlkHeight"))
 
-
 	config.overlayxPosOrig = int(workConfig.get("images", "overlayxPos"))
 	config.overlayyPosOrig = int(workConfig.get("images", "overlayyPos"))
 	config.overlayxPos = int(workConfig.get("images", "overlayxPos"))
@@ -71,7 +92,6 @@ def main(run=True):
 	config.overlayChangePosProb = float(workConfig.get("images", "overlayChangePosProb"))
 	config.animateProb = float(workConfig.get("images", "animateProb"))
 	config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
-
 
 	try:
 		config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangeSizeProb"))
@@ -92,9 +112,8 @@ def main(run=True):
 	except Exception as e:
 		print(bcolors.FAIL + "** " + bcolors.BOLD)
 		config.overlayColor = None
-		config.colorOverlay = (0,200,0,150)
+		config.colorOverlay = (0, 200, 0, 150)
 		print(str(e))
-
 
 	try:
 		config.colorOverlayAlpha = int(workConfig.get("images", "colorOverlayAlpha"))
@@ -102,7 +121,7 @@ def main(run=True):
 		print(str(e))
 		config.colorOverlayAlpha = 250
 
-	print("------------------")	
+	print("------------------")
 
 	try:
 		config.pausePlayProb = float(workConfig.get("images", "pausePlayProb"))
@@ -236,12 +255,11 @@ def main(run=True):
 		print(str(e))
 		config.alterAsASCIIProb = 0
 
-
 	try:
-		if config.usePixelSort == True :
+		if config.usePixelSort == True:
 			config.pixelSortProbOn = float(workConfig.get("images", "pixelSortProbOn"))
 			config.pixelSortProbOff = float(workConfig.get("images", "pixelSortProbOff"))
-		else :
+		else:
 			config.pixelSortProbOn = 0
 			config.pixelSortProbOff = 0
 
@@ -250,8 +268,22 @@ def main(run=True):
 		config.pixelSortProbOn = 0
 		config.pixelSortProbOff = 0
 
+	# managing speed of animation and framerate
+	config.directorController = Director(config)
 
-		
+	try:
+		config.delay = float(workConfig.get("images", "delay"))
+	except Exception as e:
+		print(str(e))
+		config.delay = 0.02
+	try:
+		config.directorController.slotRate = float(workConfig.get("images", "slotRate"))
+	except Exception as e:
+		print(str(e))
+		print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
+		config.directorController.slotRate = 0.0
+
+
 	print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
 	config.fontSize = 8
@@ -297,17 +329,17 @@ def main(run=True):
 	config.glitchCount = 0
 	config.pausePlay = False
 
-	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+	# THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)
-	#### Need to add something like this at final render call  as well
-	''' 
+	# Need to add something like this at final render call  as well
+	'''
 		########### RENDERING AS A MOCKUP OR AS REAL ###########
 		if config.useDrawingPoints == True :
 			config.panelDrawing.canvasToUse = config.renderImageFull
 			config.panelDrawing.render()
 		else :
-			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-			#config.render(config.image, 0, 0)
+			# config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+			# config.render(config.image, 0, 0)
 			config.render(config.renderImageFull, 0, 0)
 	'''
 
@@ -322,8 +354,10 @@ def runWork():
 	# gc.enable()
 
 	while config.isRunning == True:
-		iterate()
-		time.sleep(config.playSpeed)
+		config.directorController.checkTime()
+		if config.directorController.advance == True:
+			iterate()
+			time.sleep(config.delay)
 		if config.standAlone == False:
 			config.callBack()
 
@@ -340,9 +374,9 @@ def performChanges():
 	x, y = config.workImage.size
 	x1, y1 = config.imgLoader.image.size
 
-	#config.workImageDraw = ImageDraw.Draw(config.workImage)
-	#config.workImageDraw.rectangle((0,0,256,256), fill=(100,0,0,200))
-	#config.workImage = Image.blend(config.workImage,config.imgLoader.image.convert("RGBA"),.5,)
+	# config.workImageDraw = ImageDraw.Draw(config.workImage)
+	# config.workImageDraw.rectangle((0,0,256,256), fill=(100,0,0,200))
+	# config.workImage = Image.blend(config.workImage,config.imgLoader.image.convert("RGBA"),.5,)
 
 	enhancer = ImageEnhance.Brightness(config.imgLoader.image.convert("RGBA"))
 	im_output = enhancer.enhance(config.brightness)
@@ -354,7 +388,7 @@ def performChanges():
 		config.imgLoader.image = config.imgLoader.imageOriginal.copy()
 		config.f.fadingDone = True
 		# print(config.glitchCount)
-		#print("RESET " + str(config.glitchCount/config.glitchCountRestFactor))
+		# print("RESET " + str(config.glitchCount/config.glitchCountRestFactor))
 		config.imgLoader.glitchCount = 0
 		config.imgLoader.imageGlitchCount = 0
 		config.imgLoader.imageGlitchCountLimit = round(random.uniform(2, config.imageGlitchCountLimit))
@@ -368,8 +402,8 @@ def performChanges():
 			0
 
 	if random.random() < config.overlayChangeProb:
-		#config.colorOverlay = colorutils.getRandomRGB()
-		#config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 1.0, 255,255)
+		# config.colorOverlay = colorutils.getRandomRGB()
+		# config.colorOverlay = colorutils.randomColorAlpha(config.brightness * 1.0, 255,255)
 		config.colorOverlay = colorutils.getRandomColorHSV(	0, 360, .65, 1.0, .5, .5, 0, 0, config.colorOverlayAlpha)
 
 	if random.random() < config.overlayChangeSizeProb:
@@ -389,7 +423,7 @@ def performChanges():
 	# but what the hell is human anyway? a giant collecion of other micro systems overwhich we
 	# have zero control except harm or termination
 	if random.random() < config.doingRefreshCountVariabilityReset:
-		#print("SPEED RESET")
+		# print("SPEED RESET")
 		config.f.doingRefreshCount = config.doingRefreshCount
 
 	# only do slow fast during animation play not during glitch
@@ -417,8 +451,8 @@ def performChanges():
 	)
 	'''
 
-	#en = ImageEnhance.Brightness(config.renderImageFull)
-	#config.renderImageFull = en.enhance(config.brightness)
+	# en = ImageEnhance.Brightness(config.renderImageFull)
+	# config.renderImageFull = en.enhance(config.brightness)
 	# config.renderImageFull.paste(config.renderImageFull)
 
 
@@ -433,8 +467,8 @@ def iterate(n=0):
 		config.panelDrawing.canvasToUse = config.f.blendedImage
 		config.panelDrawing.render()
 	else :
-		#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-		#config.render(config.image, 0, 0)
+		# config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+		# config.render(config.image, 0, 0)
 		config.render(config.f.blendedImage, 0, 0)
 
 
@@ -468,7 +502,7 @@ def iterate(n=0):
 			endY = round(random.uniform(8, config.filterRemapminVertSize) )
 			config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
 			config.remapImageBlockDestination = [startX,startY]
-			#print("swapping" + str(config.remapImageBlockSection))
+			# print("swapping" + str(config.remapImageBlockSection))
 
 	if random.random() < config.pixelSortProbOn :
 		config.usePixelSort = True
@@ -509,7 +543,7 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 	clrBlockDraw = ImageDraw.Draw(clrBlock)
 
 	# Color overlay on b/w PNG sprite
-	#clrBlockDraw.rectangle((0, 0, w, h), fill=(255, 255, 255))
+	# clrBlockDraw.rectangle((0, 0, w, h), fill=(255, 255, 255))
 	clrBlockDraw.rectangle(
 		(
 			config.overlayxPos,
@@ -544,7 +578,7 @@ def colorize(clr=(250, 0, 250, 255), recolorize=False):
 
 		if random.random() < config.alterAsASCIIProb:
 			alterAsASCII()
-		#config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
+		# config.workImage = ImageChops.add(clrBlock, config.workImage, .50, 1)
 		# imgTemp = imgTemp.convert(config.renderImageFull.mode)
 		# print(imgTemp.mode, clrBlock.mode, config.renderImageFull.mode)
 		# config.renderImageFull.paste(imgTemp,(0,0,w,h))
@@ -589,9 +623,9 @@ def alterAsASCII():
 	dest = open(destination_filename, 'w')
 
 	'''
-	#grayLevels = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,^`'."[::-1]
+	# grayLevels = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,^`'."[::-1]
 
-	#grayLevels = '...***@@@'
+	# grayLevels = '...***@@@'
 	grayLevels = ".'`,^:\";~-_+<>i!lI?/\|()1{}[]rcvunxzjftLCJUYXZO0Qoahkbdpqwm*WMB8&%$#@"
 
 
@@ -604,15 +638,15 @@ def alterAsASCII():
 	        densityLevel = (9 * (imageArray[i][j])) // 255
 	        densityLevel = (min(round(densityLevel), 8))
 	        fontColor = (200,140,0)
-	        #if random.random() < .5 : fontColor = tuple(map(lambda x: int(x * 3), imageOrig.getpixel((i, j)) ))
+	        # if random.random() < .5 : fontColor = tuple(map(lambda x: int(x * 3), imageOrig.getpixel((i, j)) ))
 
 
-	        #print(fontColor)
+	        # print(fontColor)
 	        config.workImageDraw.text((j*fctrx, i*fctry), grayLevels[densityLevel], fontColor, font=config.font)
-	        #print(grayLevels[densityLevel], end='')
-	        #dest.write(grayLevels[densityLevel])
-	    #print()
-	    #dest.write('\n')
+	        # print(grayLevels[densityLevel], end='')
+	        # dest.write(grayLevels[densityLevel])
+	    # print()
+	    # dest.write('\n')
 
 
 def redrawBackGround():

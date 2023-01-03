@@ -493,7 +493,6 @@ def waves():
 	config.travel += config.travelRate
 
 
-
 def runWork():
 	global config
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)

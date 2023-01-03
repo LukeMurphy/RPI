@@ -62,7 +62,6 @@ def main(run=True):
 	# gc.enable()
 
 	print("Image Piece Loaded")
-	config.playSpeed = float(workConfig.get("images", "playSpeed"))
 
 	config.imageToLoad = workConfig.get("images", "i1")
 	config.useBlanks = workConfig.getboolean("images", "useBlanks")

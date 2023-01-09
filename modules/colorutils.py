@@ -43,7 +43,23 @@ wheelBasic = [
     (255, 255, 0),
     (0, 125, 125),
     (0, 255, 0),
-    (0, 255, 1000),
+    (0, 255, 100),
+    (0, 255, 255),
+    (0, 0, 255),
+    (65, 0, 165),
+    (135, 0, 175),
+    (255, 0, 255),
+]
+
+
+wheelBasicLowGreen = [
+    (255, 0, 0),
+    (253, 83, 0),
+    (255, 153, 0),
+    (250, 188, 0),
+    (255, 255, 0),
+    (0, 125, 125),
+    (0, 200, 100),
     (0, 255, 255),
     (0, 0, 255),
     (65, 0, 165),
@@ -111,6 +127,8 @@ def getNamedPalette(arg, brtns=1, a=255):
     	return getKlimt(brtns, a)
     if arg == "colorWheel" :
         return getColorWheel(brtns, a)
+    if arg == "wheelBasicLowGreen" :
+        return getwheelBasicLowGreen(brtns, a)
     if arg == "testPalette" :
         return getTest(brtns, a)
 
@@ -129,6 +147,14 @@ def getColorWheel(brtns=1, a=255):
     )
 
     c = wheelBasic[choice]
+    return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
+
+def getwheelBasicLowGreen(brtns=1, a=255):
+    choice = round(
+        random.uniform(0, len((wheelBasicLowGreen))-1)
+    )
+
+    c = wheelBasicLowGreen[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
 def getTest(brtns=1, a=255):

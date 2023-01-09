@@ -88,6 +88,39 @@ class ParticleDot:
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
+class RadialSet:
+    def __init__(self, config, wBase):
+        self.config = config
+        self.x = 0
+        self.y = 0
+        self.wBase = wBase
+        self.drawRadialPolys = False
+
+    def makeRadialsSet(self, minNum=120, maxNum=300):
+        self.radialsArray = []
+        self.radials = round(random.uniform(minNum, maxNum))
+        self.rads = 2 * math.pi / self.radials
+
+        self.angleOffset = 0.0
+        self.angleOffsetSpeed = random.uniform(0, math.pi / 300)
+        innerRadius = self.wBase / 3
+        outerRadius = self.wBase
+        skipRatio = random.random() + 0.3
+
+        if minNum == 1 and maxNum == 1 :
+            self.radials = 1
+            self.rads = 2 * math.pi
+            self.angleOffsetSpeed = math.pi/290
+            innerRadius = 10
+
+        for i in range(0, self.radials):
+            ir = innerRadius + random.uniform(-50, 50)
+            outr = outerRadius + random.uniform(-50, 50)
+            skip = 0 if random.random() < skipRatio else 1
+            self.radialsArray.append([ir, outr, skip])
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 class ParticleSystem:
     def __init__(self, config):
@@ -101,7 +134,10 @@ class ParticleSystem:
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
 
+
+
     def setNewAttributes(self):
+        self.radialSets = []
         self.bands = round(random.uniform(12, 24))
         self.wBase = round(random.uniform(220, config.canvasWidth))
 
@@ -111,20 +147,14 @@ class ParticleSystem:
 
         self.drawRadialPolys = True if random.random() < .5 else False
 
-        self.radialsArray = []
-        self.radials = round(random.uniform(120, 300))
-        self.rads = 2 * math.pi / self.radials
+        radialSet = RadialSet(config, self.wBase)
+        radialSet.makeRadialsSet(120,300)
+        self.radialSets.append(radialSet)
 
-        self.angleOffset = 0.0
-        self.angleOffsetSpeed = random.uniform(0, math.pi / 300)
-        innerRadius = self.wBase / 3
-        outerRadius = self.wBase
-        skipRatio = random.random() + 0.3
-        for i in range(0, self.radials):
-            ir = innerRadius + random.uniform(-50, 50)
-            outr = outerRadius + random.uniform(-50, 50)
-            skip = 0 if random.random() < skipRatio else 1
-            self.radialsArray.append([ir, outr, skip])
+        # the 33s hand
+        radialSet = RadialSet(config, self.wBase)
+        radialSet.makeRadialsSet(1,1)
+        self.radialSets.append(radialSet)
 
     def setCenter(self):
         # initial center position
@@ -325,15 +355,19 @@ def drawBands(p):
     rBase = config.rBase
     gBase = config.gBase
     bBase = config.bBase
+    aBase = config.aBase
 
     rBase2 = config.rBase2
     gBase2 = config.gBase2
     bBase2 = config.bBase2
+    aBase2 = config.aBase2
 
     rDiff = config.rDiff
     gDiff = config.gDiff
     bDiff = config.bDiff
 
+
+    # Draw from the outside-in
     for i in range(0, p.bands):
 
         w = wBase - i * wDiff
@@ -348,37 +382,56 @@ def drawBands(p):
             else config.fadeRate
         )
 
-        config.draw.ellipse((x0, y0, x1, y1), fill=(4, 4, bBase, round(a)))
+        #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
 
+        '''
         if i == 1:
             config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
+        '''
 
-        if i == 0 or i == 12:
+        # Golden Rings
+        if i == 0 or i ==24:
             config.draw.ellipse(
-                (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, round(a))
+                (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2)
             )
+        else :
+            config.draw.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), bBase, round(a)))
+
         rBase += rDiff
         gBase += gDiff
         bBase += bDiff
+        aBase += aDiff
+
+        if rBase < 0 : rBase = 0
+        if gBase < 0 : gBase = 0
+        if bBase < 0 : bBase = 0
 
     i = 0
-    p.angleOffset += p.angleOffsetSpeed
-    polyArray = []
 
-    for n in range(0, len(p.radialsArray)):
-        a = i * p.rads + p.angleOffset
-        x0 = math.cos(a) * p.radialsArray[n][0] + p.x
-        y0 = math.sin(a) * p.radialsArray[n][0] + p.y
-        x1 = math.cos(a) * p.radialsArray[n][1] + p.x
-        y1 = math.sin(a) * p.radialsArray[n][1] + p.y
-        i += 1
-        polyArray.append((x0,y0))
-        polyArray.append((x1,y1))
-        if p.radialsArray[n][2] == 0:
-            config.draw.line((x0, y0, x1, y1), fill=(50, 30, 0, 75))
 
-    if p.drawRadialPolys == True:
-        config.draw.polygon(polyArray, fill=(50,10,0,10), outline=(50, 30, 0, 95))
+    for rSet in p.radialSets :
+
+        rSet.angleOffset += rSet.angleOffsetSpeed
+        polyArray = []
+        numLines  = len(rSet.radialsArray)
+
+        for n in range(0, numLines):
+            a = i * rSet.rads + rSet.angleOffset
+            x0 = math.cos(a) * rSet.radialsArray[n][0] + p.x
+            y0 = math.sin(a) * rSet.radialsArray[n][0] + p.y
+            x1 = math.cos(a) * rSet.radialsArray[n][1] + p.x
+            y1 = math.sin(a) * rSet.radialsArray[n][1] + p.y
+            i += 1
+            polyArray.append((x0,y0))
+            polyArray.append((x1,y1))
+            if rSet.radialsArray[n][2] == 0:
+                config.draw.line((x0, y0, x1, y1), fill=(50, 30, 0, config.radialAlpha))
+            if numLines == 1 :
+                config.draw.line((x0, y0, x1, y1), fill=(25, 23, 200, config.radialAlpha))
+
+
+        if rSet.drawRadialPolys == True:
+            config.draw.polygon(polyArray, fill=(50,10,0,10), outline=(50, 30, 0, config.radialAlpha+20))
 
 
 
@@ -469,17 +522,21 @@ def main(run=True):
         config.bgColorSets.append(bgColors)
 
     # choose the first bg color - generally the dark one
-    config.bgColor = config.bgColorSets[0]
+    config.bgColor = random.choice(config.bgColorSets)
+    #config.bgColor = config.bgColorSets[1]
 
     config.rBase = int(workConfig.get("particles", "rBase"))
     config.gBase = int(workConfig.get("particles", "gBase"))
     config.bBase = int(workConfig.get("particles", "bBase"))
+    config.aBase = int(workConfig.get("particles", "aBase"))
     config.rBase2 = int(workConfig.get("particles", "rBase2"))
     config.gBase2 = int(workConfig.get("particles", "gBase2"))
     config.bBase2 = int(workConfig.get("particles", "bBase2"))
+    config.aBase2 = int(workConfig.get("particles", "aBase2"))
     config.rDiff = int(workConfig.get("particles", "rDiff"))
     config.gDiff = int(workConfig.get("particles", "gDiff"))
     config.bDiff = int(workConfig.get("particles", "bDiff"))
+    config.radialAlpha = int(workConfig.get("particles", "radialAlpha"))
 
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))

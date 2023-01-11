@@ -132,8 +132,12 @@ def main(run=True):
     config.directorController = Director(config)
     config.directorController.slotRate = float(workConfig.get("forms", "slotRate"))
 
-    config.pregressive = True
-    config.cellSize = 10
+    config.progressive = (workConfig.getboolean("forms", "progressive"))
+    config.cellSize = int(workConfig.get("forms", "cellSize"))
+
+    # col, row
+    config.obstacle = [[0,0],[1,0],[0,2]]
+    config.obstacleIndex = [3,4,5,6,7,8,15,16,17,18,19,20,60,61,62,47,48,49]
 
     setupMaze()
 
@@ -146,6 +150,9 @@ def setupMaze():
     config.rows = round(config.canvasHeight / config.cellSize)
     config.cols = round(config.canvasWidth / config.cellSize)
     config.grid = []
+
+
+    print(("Rows {}  Cols {}  ").format(config.rows, config.cols))
 
     # config.cellSize = round(config.canvasWidth / config.cols)
 
@@ -183,25 +190,25 @@ def getAdjacentCells(n):
     # get south cell
     if rowPosition < config.rows - 1:
         cellIndex = (cell.row + 1) * config.cols + cell.col
-        if config.cells[cellIndex].cleared == False:
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex :
             adjacentCells.append([config.cells[cellIndex], "s"])
 
     # get north cell
     if rowPosition > 0:
         cellIndex = (cell.row - 1) * config.cols + cell.col
-        if config.cells[cellIndex].cleared == False:
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
             adjacentCells.append([config.cells[cellIndex], "n"])
 
     # get east cell
     if colPosition < config.cols - 1:
         cellIndex = cell.row * config.cols + cell.col + 1
-        if config.cells[cellIndex].cleared == False:
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
             adjacentCells.append([config.cells[cellIndex], "e"])
 
     # get west cell
     if colPosition < config.cols and colPosition > 0:
         cellIndex = cell.row * config.cols + cell.col - 1
-        if config.cells[cellIndex].cleared == False:
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
             adjacentCells.append([config.cells[cellIndex], "w"])
 
     return adjacentCells
@@ -217,7 +224,7 @@ def walkBack():
             config.leadCell = config.cellsCleared[i][0]
             found = True
             break
-    if found == True and config.pregressive == False:
+    if found == True and config.progressive == False:
         randomWalk()
 
 
@@ -252,12 +259,12 @@ def randomWalk():
             cellRef.e = 0
 
     if len(adjCells) == 0:
-        if len(config.cellsCleared) < config.rows * config.cols:
+        if len(config.cellsCleared) < config.rows * config.cols - len(config.obstacleIndex):
             walkBack()
-        elif config.pregressive == True:
-             time.sleep(1)
+        elif config.progressive == True:
+             time.sleep(6)
              setupMaze()
-    elif config.pregressive == False:
+    elif config.progressive == False:
         randomWalk()
 
 
@@ -266,11 +273,11 @@ def reDraw(config):
     config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.backgroundFlashcolor)
     n = 0
     w = 0
-    lineColor = (100, 100, 100, 200)
-    lineColor_s = (100, 100, 100, 200)
-    lineColor_n = (100, 100, 100, 200)
-    lineColor_e = (100, 100, 100, 200)
-    lineColor_w = (100, 100, 100, 200)
+    wallColor = (10, 50, 100, 200)
+    wallColor_s = (210, 210, 210, 200)
+    wallColor_n = (210, 210, 210, 200)
+    wallColor_e = (210, 210, 210, 200)
+    wallColor_w = (210, 210, 210, 200)
     for row in range(0, config.rows):
         for col in range(0, config.cols):
 
@@ -282,19 +289,23 @@ def reDraw(config):
                 yPos = cell.row * config.cellSize
                 # n north
                 if cell.n == 1:
-                    config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + w), fill=lineColor_e)
+                    config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + w), fill=wallColor)
+                    config.draw.rectangle((xPos, yPos-1, xPos + config.cellSize, yPos + w-1), fill=wallColor)
                 # s south
                 if cell.s == 1:
                     config.draw.rectangle((xPos, yPos + config.cellSize, xPos + config.cellSize,
-                                           yPos + config.cellSize + w), fill=lineColor_w)
+                                           yPos + config.cellSize + w), fill=wallColor)
                 # w west
                 if cell.w == 1:
-                    config.draw.rectangle((xPos, yPos, xPos + w, yPos + config.cellSize), fill=lineColor_n)
+                    config.draw.rectangle((xPos, yPos, xPos + w, yPos + config.cellSize), fill=wallColor)
+                    config.draw.rectangle((xPos+1, yPos, xPos + w + 1, yPos + config.cellSize), fill=wallColor)
                 # e east
                 if cell.e == 1:
                     config.draw.rectangle((xPos + config.cellSize, yPos, xPos + config.cellSize +
-                                           w, yPos + config.cellSize), fill=lineColor_n)
+                                           w, yPos + config.cellSize), fill=wallColor)
 
+            if n in config.obstacleIndex:
+                config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + config.cellSize), fill=wallColor)
 
 def drawPathsAfter(config):
     xPos = 0
@@ -310,6 +321,18 @@ def drawPathsAfter(config):
     yPoints = []
     xPoints2 = []
     yPoints2 = []
+
+    lineColor_n = (255, 0, 0, 10)
+    lineColor_s = (255, 255, 0, 10)
+    lineColor_e = (255, 0, 255, 10)
+    lineColor_w = (2, 255, 255, 10)
+
+    lineColor_n = (255, 0, 255, 1)
+    lineColor_s = (255, 0, 255, 1)
+    lineColor_e = (100, 10, 255, 1)
+    lineColor_w = (255, 0, 255, 1)
+
+
     for l in range(0, lines):
         xPoints.append(0)
         yPoints.append(0)
@@ -346,22 +369,22 @@ def drawPathsAfter(config):
             # for p in range(0, lines):
             # config.draw.line((xPoints[p], yPoints[p], xPoints2[p], yPoints2[p]), fill=(0, 200, 20, 100))
             if config.cellsCleared[n][1] == "n":
-                config.draw.line((xPos, yPos, xPos2, yPos2), fill=(255, 0, 0, 100))
+                config.draw.line((xPos, yPos, xPos2, yPos2), fill=lineColor_n)
 
 
 
             if config.cellsCleared[n][1] == "s" :
-                config.draw.line((xPos, yPos, xPos2, yPos2), fill=(255, 255, 0, 100))
+                config.draw.line((xPos, yPos, xPos2, yPos2), fill=lineColor_s)
 
 
 
             if config.cellsCleared[n][1] == "e" :
-                config.draw.line((xPos, yPos, xPos2, yPos2), fill=(255, 0, 255, 100))
+                config.draw.line((xPos, yPos, xPos2, yPos2), fill=lineColor_e)
 
 
 
             if config.cellsCleared[n][1] == "w" :
-                config.draw.line((xPos, yPos, xPos2, yPos2), fill=(2, 255, 255, 100))
+                config.draw.line((xPos, yPos, xPos2, yPos2), fill=lineColor_w)
 
 
 
@@ -443,7 +466,7 @@ def iterate():
     global config
     config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.backgroundColor)
 
-    if config.pregressive == True :
+    if config.progressive == True :
         randomWalk()
     reDraw(config)
     drawPathsAfter(config)

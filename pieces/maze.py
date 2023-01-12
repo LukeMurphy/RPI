@@ -137,7 +137,8 @@ def main(run=True):
 
     # col, row
 
-    config.obstacleIndex = (workConfig.get("forms", "obstacleIndex")).split(",")
+    obstacleIndexVals = (workConfig.get("forms", "obstacleIndex")).split(",")
+    config.obstacleIndex = list(int(i) for i in obstacleIndexVals)
     config.reDoDelay = float(workConfig.get("forms", "reDoDelay"))
     config.pWalls = int(workConfig.get("forms", "pWalls"))
     config.pLines = int(workConfig.get("forms", "pLines"))
@@ -397,20 +398,32 @@ def drawPathsAfter(config):
             if config.cellsCleared[n][1] == "n":
                 for l in range(-config.pLines,config.pLines):
                     config.draw.line((xPos+l, yPos, xPos2+l, yPos2), fill=lineColor_n)
+                if config.pLines == 0 :
+                    l = 0
+                    config.draw.line((xPos+l, yPos, xPos2+l, yPos2), fill=lineColor_n)
 
 
             if config.cellsCleared[n][1] == "s" :
                 for l in range(-config.pLines,config.pLines):
+                    config.draw.line((xPos+l, yPos, xPos2+l, yPos2), fill=lineColor_s)
+                if config.pLines == 0 :
+                    l = 0
                     config.draw.line((xPos+l, yPos, xPos2+l, yPos2), fill=lineColor_s)
 
 
             if config.cellsCleared[n][1] == "e" :
                 for l in range(-config.pLines,config.pLines):
                     config.draw.line((xPos, yPos+l, xPos2, yPos2+l), fill=lineColor_e)
+                if config.pLines == 0 :
+                    l = 0
+                    config.draw.line((xPos, yPos+l, xPos2, yPos2+l), fill=lineColor_e)
 
 
             if config.cellsCleared[n][1] == "w" :
                 for l in range(-config.pLines,config.pLines):
+                    config.draw.line((xPos, yPos+l, xPos2, yPos2+l), fill=lineColor_w)
+                if config.pLines == 0 :
+                    l = 0
                     config.draw.line((xPos, yPos+l, xPos2, yPos2+l), fill=lineColor_w)
 
 

@@ -130,10 +130,13 @@ def main(run=True):
     config.filterPatchProbOff = float(workConfig.get("forms", "filterPatchProbOff"))
 
     config.directorController = Director(config)
-    config.directorController.slotRate = float(workConfig.get("forms", "slotRate"))
+    config.slotRateMaker = float(workConfig.get("forms", "slotRateMaker"))
+    config.slotRateSolver = float(workConfig.get("forms", "slotRateSolver"))
+    config.directorController.slotRate = float(workConfig.get("forms", "slotRateMaker"))
 
     config.progressive = (workConfig.getboolean("forms", "progressive"))
-    config.cellSize = int(workConfig.get("forms", "cellSize"))
+    config.cellSizeMin = int(workConfig.get("forms", "cellSizeMin"))
+    config.cellSizeMax = int(workConfig.get("forms", "cellSizeMax"))
 
     # col, row
 
@@ -154,10 +157,14 @@ def main(run=True):
     config.saveImages = (workConfig.getboolean("forms", "saveImages"))
     config.outPutPath = workConfig.get("forms", "outPutPath")
 
-    config.complete = False
+    config.okColor = (0,150,0,150)
+    config.failColor = (255,0,0,150)
+    config.infoColor = (255,255,0,150)
+    config.infoColor2 = (0,255,255,150)
 
-    config.hidePath = True
+    config.recursionCount = 0
     setupMaze()
+
 
 def writeImage(renderImage, callBack):
     #baseName = "outputquad3/comp2_"
@@ -168,27 +175,44 @@ def writeImage(renderImage, callBack):
     callBack()
 
 
-
 def setupMaze():
 
+    config.complete = False
+    config.hidePath = True
+    config.done = False
+    config.solved = False
+
+    config.directorController.slotRate = config.slotRateMaker
+
+    config.delayTimer = Director(config)
+    config.slotRate = config.reDoDelay
+
     config.cellsCleared = []
+    config.cellsWalked = []
+    config.decisionCells = []
+    config.bridgeCells = []
     config.cells = []
 
-    config.cellSize = round(random.uniform(8,22))
+    config.cellSize = round(random.uniform(config.cellSizeMin,config.cellSizeMax))
     config.pLines = round(random.uniform(0,4))
     config.pWalls = round(random.uniform(0,4))
     config.hidePath = True if random.random() < .1 else False
 
-    config.cellSize = 32
-    config.pLines = 0
-    config.pWalls = 0
-    config.hidePath = False
+    config.backgroundColor = newColor()
+    config.backgroundFlashcolor = newColor()
+    config.wallColor_w = newColorAlt()
+
+    # config.cellSize = 24
+    # config.pLines = 0
+    # config.pWalls = 0
+    # config.hidePath = True
     config.fixedStart = True
 
     config.rows = round(config.canvasHeight / config.cellSize)
     config.cols = round(config.canvasWidth / config.cellSize)
     config.grid = []
 
+    config.finalPoint = config.cols - 1
 
 
     # config.cellSize = round(config.canvasWidth / config.cols)
@@ -205,6 +229,8 @@ def setupMaze():
             _c.i = row * config.cols + col
             _c.cleared = False
             _c.skip = False
+            _c.pathok = 0
+            _c.wallColor = tuple(int(i) for i in config.wallColor_w)
             if _c.i == 0:
                 _c.skip = True
 
@@ -225,9 +251,10 @@ def setupMaze():
         config.endCell = config.cols -1
         config.cells[config.endCell].s = 0
 
-    config.backgroundColor = newColor()
-    config.backgroundFlashcolor = newColor()
-    config.wallColor_w = newColorAlt()
+
+    config.leadSolverCell = config.leadCellInit
+
+
 
 
     # config.leadCell = 50
@@ -241,12 +268,199 @@ def setupMaze():
 
     randomWalk()
 
+# Recursive backtracker: This will find a solution, but it won't necessarily find the shortest solution.
+# It focuses on you, is fast for all types of Mazes, and uses stack space up to the size of the Maze.
+# Very simple: If you're at a wall (or an area you've already plotted), return failure, else if you're at the finish,
+# return success, else recursively try moving in the four directions. Plot a line when you try a new direction,
+# and erase a line when you return failure, and a single solution will be marked out when you hit success.
+# When backtracking, it's best to mark the space with a special visited value, so you don't visit it again
+# from a different direction. In Computer Science terms this is basically a depth first search. This method
+# will always find a solution if one exists, but it won't necessarily be the shortest solution. Note this a
+# lgorithm is commonly called "recursive backtracker", although the depth first search it uses only needs
+# some form of stack, and doesn't have to use actual recursion.
+
+
+def solver(n=-1):
+
+    n = config.leadSolverCell
+    changeCell = 0
+
+    if len(config.cellsWalked) < 1 :
+        config.lastGoodPoint = config.leadCellInit
+
+    if config.solved == False :
+        config.recursionCount +=1
+
+        if config.recursionCount < 200 :
+            if n == -1 :
+                cell = config.cells[config.leadCellInit]
+            elif n < len(config.cells) :
+                cell = config.cells[n]
+
+            # print(("leadCellInit {} n={} s={} e={} w={}").format(cell.i,cell.n,cell.s,cell.e,cell.w))
+
+            if cell.i == config.cols - 1 :
+                print("done")
+                config.cellsWalked.append(cell.i)
+                config.cellsWalked.append(config.finalPoint)
+                config.cells[config.finalPoint].pathok = 3
+                config.lastGoodPoint = cell.i
+                config.solved = True
+                rebuild()
+            else :
+                if cell.i not in config.cellsWalked :
+                    config.cellsWalked.append(cell.i)
+                    cell.wallColor = tuple(int(i) for i in config.wallColor_w)
+                    cell.pathok = 0
+                    availables = (getAdjacentOpenCells(cell.i))
+
+                    # at least one choice
+                    if len(availables) > 0 :
+                        choice = random.choice(availables)
+                        config.leadSolverCell = choice[0]
+                        # shows more than one choice avail
+                        if len(availables) > 1 :
+                            cell.pathok = 2
+                            config.decisionCells.append(cell.i)
+
+                        config.bridgeCells.append([cell.i,choice[0]])
+
+                        # not doeing a recursive solution...
+                        #solver(choice[0])
+                    else :
+                        cell.pathok = 1
+                        changeCell = config.cellsWalked.index(cell.i)
+
+                        print(("Some kind of end {}").format(changeCell))
+                        print("")
+                        walkBackCount = 0
+                        for x in range(len(config.cellsWalked)-1, 0, -1) :
+                            # mark the cells as bad paths
+                            if walkBackCount != 0 :
+                                config.cells[config.cellsWalked[x]].pathok = 1
+                            else:
+                                config.cells[config.cellsWalked[x]].pathok = 2
+                            availables = (getAdjacentOpenCells(config.cellsWalked[x]))
+                            walkBackCount +=1
+
+                            if len(availables) > 0 :
+                                print(("LAST end {}:{}").format(x,config.cellsWalked[x]))
+                                choice = random.choice(availables)
+                                config.leadSolverCell = choice[0]
+                                config.cells[config.cellsWalked[x]].pathok = 1
+                                config.bridgeCells.append([config.cellsWalked[x],choice[0]])
+                                break
+
+                else :
+                    print(("cant proceed {}").format(cell.i))
+
+
+def drawSolved():
+    lastRow =0
+    lastCol =0
+    lastPoint = len(config.cellsWalked )
+
+    for c in config.decisionCells :
+        config.cells[c].pathok = 4
+
+    for cref in config.bridgeCells :
+        c1 = config.cells[cref[0]]
+        c2 = config.cells[cref[1]]
+        xPos = c1.col * config.cellSize + config.cellSize/2
+        yPos = c1.row * config.cellSize + config.cellSize/2
+        xPos2 = c2.col * config.cellSize + config.cellSize/2
+        yPos2 = c2.row * config.cellSize + config.cellSize/2
+        config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.infoColor2)
+
+    for c in range(1, lastPoint):
+
+        cell = config.cells[config.cellsWalked[c-1]]
+        cell.wallColor = tuple(int(i) for i in config.wallColor_w)
+        xPos = cell.col * config.cellSize + config.cellSize/2
+        yPos = cell.row * config.cellSize + config.cellSize/2
+
+
+        cell2 = config.cells[config.cellsWalked[c]]
+        cell2.wallColor = tuple(int(i) for i in config.wallColor_w)
+        xPos2 = cell2.col * config.cellSize + config.cellSize/2
+        yPos2 = cell2.row * config.cellSize + config.cellSize/2
+
+        rowDiff = abs(yPos2 - yPos)
+        colDiff = abs(xPos2 - xPos)
+
+
+        dontDrawLine = True if (rowDiff > config.cellSize or colDiff > config.cellSize) or (rowDiff == config.cellSize and colDiff == config.cellSize) else False
+
+        if (dontDrawLine == False and cell.pathok == 1) :
+            config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.failColor)
+            config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
+        elif dontDrawLine == False or c == 1 or (config.solved == True and c == lastPoint-1)  :
+            config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.okColor)
+            config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
+        elif dontDrawLine == False and cell.pathok == 2 :
+            config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.infoColor)
+
+
+        # if cell.pathok == 0 :
+        #     config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.okColor)
+        # if cell.pathok == 1 :
+        #     config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.failColor)
+        # if cell.pathok == 2 :
+        #     config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.infoColor)
+        # if cell.pathok == 4 :
+        #     config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.infoColor2)
+        if cell.pathok == 3 :
+            config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.okColor)
+
+
+        lastCol = cell2.col
+        lastRow = cell2.row
+
+
+def getAdjacentOpenCells(n):
+    cell = config.cells[n]
+    adjacentCells = []
+    rowPosition = cell.row
+    colPosition = cell.col
+
+    # Bit of a bias here because it favors finding in the order
+    # e.g at the start cell it finds North a lot more often first ...
+
+    if cell.n == 0 :
+        c = cell.col + config.cols * (cell.row - 1)
+        config.cells[c].wallColor = tuple(int(i) for i in config.wallColor_w)
+        if c not in config.cellsWalked :
+            adjacentCells.append([c,"n"])
+
+    if cell.e == 0 :
+        c = (cell.col + 1) + config.cols * (cell.row)
+        config.cells[c].wallColor = tuple(int(i) for i in config.wallColor_w)
+        if c not in config.cellsWalked :
+            adjacentCells.append([c,"e"])
+
+    if cell.s == 0 :
+        c = cell.col + config.cols * (cell.row + 1)
+        config.cells[c].wallColor = tuple(int(i) for i in config.wallColor_w)
+        if c not in config.cellsWalked :
+            adjacentCells.append([c,"s"])
+
+    if cell.w == 0 :
+        c = (cell.col - 1) + config.cols * (cell.row)
+        config.cells[c].wallColor = tuple(int(i) for i in config.wallColor_w)
+        if c not in config.cellsWalked :
+            adjacentCells.append([c,"w"])
+
+    return adjacentCells
+
 
 def getAdjacentCells(n):
     cell = config.cells[n]
     adjacentCells = []
     rowPosition = cell.row
     colPosition = cell.col
+
+    # Bit of a bias here because it favors finding in the order
+    # e.g at the start cell it finds North a lot more often first ...
 
     # get south cell
     if rowPosition < config.rows - 1:
@@ -326,17 +540,30 @@ def randomWalk():
         elif config.progressive == True:
             config.complete == True
             if config.saveImages == True:
-                writeImage(config.image,restart)
+                writeImage(config.image,startSolving)
             else :
-                restart()
+                startSolving()
     elif config.progressive == False:
         randomWalk()
 
 
-def restart():
-    time.sleep(config.reDoDelay)
-    config.complete == False
-    setupMaze()
+def rebuild():
+
+    pass
+    # config.delayTimer.next()
+    # if config.delayTimer.advance == True :
+    #     setupMaze()
+
+
+def startSolving():
+    if config.done == False :
+        config.done = True
+        config.directorController.slotRate = config.slotRateSolver
+        config.decisionCells.append(config.leadCellInit)
+        config.wallColor_w = newColorAlt()
+
+        # for c in config.cells :
+        #     c.wallColor = tuple(int(i) for i in config.backgroundColor)
 
 
 def reDraw(config):
@@ -347,7 +574,6 @@ def reDraw(config):
         wallColor_e = tuple(config.wallColor_e)
         wallColor_w = tuple(config.wallColor_w)
         wallColor = tuple(int(i) for i in config.wallColor_w)
-        #config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.backgroundFlashcolor)
         config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.backgroundColor, outline=wallColor)
         n = 0
         w = 0
@@ -364,19 +590,19 @@ def reDraw(config):
                     # n north
                     if cell.n == 1:
                         for l in range(-config.pWalls, config.pWalls):
-                            config.draw.rectangle((xPos, yPos + l + correction, xPos + config.cellSize, yPos + w + l - correction), fill=wallColor)
+                            config.draw.rectangle((xPos, yPos + l + correction, xPos + config.cellSize, yPos + w + l - correction), fill=cell.wallColor)
                             #config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + w), fill=wallColor)
                     # s south
                     if cell.s == 1:
-                        config.draw.rectangle((xPos + correction, yPos + config.cellSize, xPos + config.cellSize - correction, yPos + config.cellSize + w), fill=wallColor)
+                        config.draw.rectangle((xPos + correction, yPos + config.cellSize, xPos + config.cellSize - correction, yPos + config.cellSize + w), fill=cell.wallColor)
                     # w west
                     if cell.w == 1:
                         for l in range(-config.pWalls, config.pWalls):
-                            config.draw.rectangle((xPos + l, yPos - correction, xPos + w + l, yPos + config.cellSize), fill=wallColor)
+                            config.draw.rectangle((xPos + l, yPos - correction, xPos + w + l, yPos + config.cellSize), fill=cell.wallColor)
                             #config.draw.rectangle((xPos, yPos, xPos + w, yPos + config.cellSize), fill=wallColor)
                     # e east
                     if cell.e == 1:
-                        config.draw.rectangle((xPos + config.cellSize, yPos, xPos + config.cellSize + w, yPos + config.cellSize), fill=wallColor)
+                        config.draw.rectangle((xPos + config.cellSize, yPos, xPos + config.cellSize + w, yPos + config.cellSize), fill=cell.wallColor)
 
                 if n in config.obstacleIndex:
                     config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + config.cellSize), fill=wallColor)
@@ -426,8 +652,8 @@ def drawPathsAfter(config):
 
         if (rowDiff > 1 or colDiff > 1) or (rowDiff == colDiff) or n == 0:
             # config.draw.line((xPos, yPos, xPos2, yPos2), fill=(0, 100, 0, 100))
-            config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=(255, 0, 0, 100))
-            config.draw.rectangle((xPos2-2, yPos2-2, xPos2+2, yPos2+2), fill=(0, 255, 0, 100))
+            # config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=(255, 0, 0, 100))
+            # config.draw.rectangle((xPos2-2, yPos2-2, xPos2+2, yPos2+2), fill=(0, 255, 0, 100))
             # config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=(0, 255, 0, 100))
             pass
         else:
@@ -480,6 +706,9 @@ def iterate():
         randomWalk()
     reDraw(config)
     drawPathsAfter(config)
+    if config.done == True :
+        solver()
+    drawSolved()
     #drawPaths(config)
 
     # Do the final rendering of the composited image

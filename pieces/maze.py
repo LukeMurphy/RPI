@@ -7,6 +7,7 @@ from modules import coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 #############################################
+
 class Timeout:
     """docstring for Timeout"""
     delay = 1
@@ -60,11 +61,32 @@ class Director:
     def next(self):
         self.checkTime()
 
+#############################################
 
-def newColor(arg=0):
+def newSolverColor(arg=0, adj=1.0):
+
+    cp = config.colorPalettes[0]
+    avgVal = (cp.bg_minValue + cp.bg_maxValue)/2
+
+    color =  colorutils.getRandomColorHSV(
+        arg,
+        arg,
+        1.0,
+        1.0,
+        avgVal * adj,
+        avgVal * adj,
+        cp.bg_dropHueMinValue,
+        cp.bg_dropHueMaxValue,
+        round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha))
+    )
+    return (round(color[0] ), round(color[1] ), round(color[2] ), color[3] )
+
+
+def newColor(arg=0, val=1):
 
     cp = config.colorPalettes[arg]
-    return colorutils.getRandomColorHSV(
+
+    color =  colorutils.getRandomColorHSV(
         cp.bg_minHue,
         cp.bg_maxHue,
         cp.bg_minSaturation,
@@ -76,10 +98,13 @@ def newColor(arg=0):
         round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha))
     )
 
+    return (round(color[0] * val), round(color[1] * val), round(color[2] * val), color[3] )
 
-def newColorAlt(arg=0):
+
+def newColorAlt(arg=0, val=1):
     cp = config.colorPalettes[arg]
-    return colorutils.getRandomColorHSV(
+
+    color =  colorutils.getRandomColorHSV(
         cp.lines_minHue,
         cp.lines_maxHue,
         cp.lines_minSaturation,
@@ -90,6 +115,8 @@ def newColorAlt(arg=0):
         cp.lines_dropHueMaxValue,
         round(random.uniform(cp.lines_minAlpha, cp.lines_maxAlpha))
     )
+
+    return (round(color[0] * val), round(color[1] * val), round(color[2] * val), color[3] )
 
 
 def main(run=True):
@@ -141,9 +168,6 @@ def main(run=True):
     backgroundColor = (workConfig.get("forms", "backgroundColor")).split(",")
     config.backgroundColor = tuple(int(x) for x in backgroundColor)
 
-    backgroundFlashcolor = (workConfig.get("forms", "backgroundFlashcolor")).split(",")
-    config.backgroundFlashcolor = tuple(int(x) for x in backgroundFlashcolor)
-
     config.filterPatchProb = float(workConfig.get("forms", "filterPatchProb"))
     config.filterPatchProbOff = float(workConfig.get("forms", "filterPatchProbOff"))
 
@@ -165,22 +189,16 @@ def main(run=True):
     config.pWallsMax = int(workConfig.get("forms", "pWallsMax"))
     config.pLinesMin = int(workConfig.get("forms", "pLinesMin"))
     config.pLinesMax = int(workConfig.get("forms", "pLinesMax"))
-    config.wallColor_s = (workConfig.get("forms", "wallColor_s")).split(",")
-    config.wallColor_w = (workConfig.get("forms", "wallColor_w")).split(",")
-    config.wallColor_n = (workConfig.get("forms", "wallColor_n")).split(",")
-    config.wallColor_e = (workConfig.get("forms", "wallColor_e")).split(",")
-    config.lineColor_s = (workConfig.get("forms", "lineColor_s")).split(",")
-    config.lineColor_w = (workConfig.get("forms", "lineColor_w")).split(",")
-    config.lineColor_n = (workConfig.get("forms", "lineColor_n")).split(",")
-    config.lineColor_e = (workConfig.get("forms", "lineColor_e")).split(",")
 
     config.saveImages = (workConfig.getboolean("forms", "saveImages"))
     config.outPutPath = workConfig.get("forms", "outPutPath")
 
-    config.okColor = (0,150,0,150)
-    config.failColor = (255,0,0,150)
-    config.infoColor = (255,255,0,150)
-    config.infoColor2 = (0,200,100,150)
+    config.pathValueAugment = float(workConfig.get("forms", "pathValueAugment"))
+
+    # config.okColor = tuple(int(i) for i in (workConfig.get("forms", "okColor")).split(","))
+    # config.failColor = tuple(int(i) for i in (workConfig.get("forms", "failColor")).split(","))
+    # config.infoColor = tuple(int(i) for i in (workConfig.get("forms", "infoColor")).split(","))
+    # config.infoColor2 = tuple(int(i) for i in (workConfig.get("forms", "infoColor2")).split(","))
 
     config.recursionCount = 0
     setupMaze()
@@ -195,13 +213,24 @@ def writeImage(renderImage, callBack):
     callBack()
 
 
+def setSolvePathColors():
+    config.okColor = newSolverColor(120, config.pathValueAugment)
+    config.failColor = newSolverColor(0, config.pathValueAugment)
+    config.infoColor = newSolverColor(40, config.pathValueAugment)
+    config.infoColor2 = newSolverColor(180, config.pathValueAugment)
+
+    print(("okColor = {}  failColor = {}").format(config.okColor,config.failColor))
+
+#############################################
+
 def setupMaze():
 
-    config.complete = False
+    config.doneMakingMaze = False
     config.hidePath = True
-    config.done = False
     config.solved = False
     config.debug = False
+    config.fixedStart = True
+    config.imageWasWritten = False
 
     config.directorController.slotRate = config.slotRateMaker
 
@@ -220,23 +249,30 @@ def setupMaze():
     config.hidePath = True if random.random() < .1 else False
 
     config.backgroundColor = newColor()
-    config.backgroundFlashcolor = newColor()
+
     config.wallColor_w = newColorAlt()
 
+    config.wallColor_n = newColorAlt()
+    config.wallColor_s = newColorAlt()
+    config.wallColor_e = newColorAlt()
+
+    config.lineColor_w = newColorAlt()
+    config.lineColor_n = newColorAlt()
+    config.lineColor_s = newColorAlt()
+    config.lineColor_e = newColorAlt()
+
+
     # config.cellSize = 20
-    # config.pLines = 0
-    # config.pWalls = 0
-    # config.hidePath = True
     # config.debug = True
-    config.fixedStart = True
+    config.pLines = 0
+    config.pWalls = 0
+    config.hidePath = True
 
     config.rows = round(config.canvasHeight / config.cellSize)
     config.cols = round(config.canvasWidth / config.cellSize)
     config.grid = []
 
     config.finalPoint = config.cols - 1
-
-
     # config.cellSize = round(config.canvasWidth / config.cols)
 
     for row in range(0, config.rows):
@@ -291,17 +327,124 @@ def setupMaze():
 
     randomWalk()
 
-# Recursive backtracker: This will find a solution, but it won't necessarily find the shortest solution.
-# It focuses on you, is fast for all types of Mazes, and uses stack space up to the size of the Maze.
-# Very simple: If you're at a wall (or an area you've already plotted), return failure, else if you're at the finish,
-# return success, else recursively try moving in the four directions. Plot a line when you try a new direction,
-# and erase a line when you return failure, and a single solution will be marked out when you hit success.
-# When backtracking, it's best to mark the space with a special visited value, so you don't visit it again
-# from a different direction. In Computer Science terms this is basically a depth first search. This method
-# will always find a solution if one exists, but it won't necessarily be the shortest solution. Note this a
-# lgorithm is commonly called "recursive backtracker", although the depth first search it uses only needs
-# some form of stack, and doesn't have to use actual recursion.
+    # Recursive backtracker: This will find a solution, but it won't necessarily find the shortest solution.
+    # It focuses on you, is fast for all types of Mazes, and uses stack space up to the size of the Maze.
+    # Very simple: If you're at a wall (or an area you've already plotted), return failure, else if you're at the finish,
+    # return success, else recursively try moving in the four directions. Plot a line when you try a new direction,
+    # and erase a line when you return failure, and a single solution will be marked out when you hit success.
+    # When backtracking, it's best to mark the space with a special visited value, so you don't visit it again
+    # from a different direction. In Computer Science terms this is basically a depth first search. This method
+    # will always find a solution if one exists, but it won't necessarily be the shortest solution. Note this a
+    # lgorithm is commonly called "recursive backtracker", although the depth first search it uses only needs
+    # some form of stack, and doesn't have to use actual recursion.
 
+
+def getAdjacentCells(n):
+    cell = config.cells[n]
+    adjacentCells = []
+    rowPosition = cell.row
+    colPosition = cell.col
+
+    # Bit of a bias here because it favors finding in the order
+    # e.g at the start cell it finds North a lot more often first ...
+
+    # get south cell
+    if rowPosition < config.rows - 1:
+        cellIndex = (cell.row + 1) * config.cols + cell.col
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex :
+            adjacentCells.append([config.cells[cellIndex], "s"])
+
+    # get north cell
+    if rowPosition > 0:
+        cellIndex = (cell.row - 1) * config.cols + cell.col
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
+            adjacentCells.append([config.cells[cellIndex], "n"])
+
+    # get east cell
+    if colPosition < config.cols - 1:
+        cellIndex = cell.row * config.cols + cell.col + 1
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
+            adjacentCells.append([config.cells[cellIndex], "e"])
+
+    # get west cell
+    if colPosition < config.cols and colPosition > 0:
+        cellIndex = cell.row * config.cols + cell.col - 1
+        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
+            adjacentCells.append([config.cells[cellIndex], "w"])
+
+    return adjacentCells
+
+
+def walkBack():
+    # for each previously cleared cell, if there are open
+    # adjacent cells, restart with that one
+    found = False
+    # this seems to make more complicated mazes with more
+    # chance for false paths vs picking up at last open cell
+    # for i in range(len(config.cellsCleared)-1, 0, -1):
+    # so start at beginning - a bit slower but maybe better
+    for i in range(0,len(config.cellsCleared)):
+        adjCells = getAdjacentCells(config.cellsCleared[i][0])
+        if len(adjCells) > 0:
+            config.leadCell = config.cellsCleared[i][0]
+            found = True
+            break
+    if found == True and config.progressive == False:
+        randomWalk()
+
+
+def randomWalk():
+    cell = config.cells[config.leadCell]
+    cell.cleared = True
+    adjCells = getAdjacentCells(config.leadCell)
+
+    if len(adjCells) > 0:
+        nextCell = round(random.uniform(0, len(adjCells)-1))
+        cellRef = adjCells[nextCell][0]
+        # need to figure the direction to clear the walls ...
+        direction = adjCells[nextCell][1]
+
+        config.leadCell = cellRef.i
+        config.cellsCleared.append([config.leadCell, direction])
+
+        if direction == "s":
+            cell.s = 0
+            cellRef.n = 0
+
+        if direction == "n":
+            cell.n = 0
+            cellRef.s = 0
+
+        if direction == "e":
+            cell.e = 0
+            cellRef.w = 0
+
+        if direction == "w":
+            cell.w = 0
+            cellRef.e = 0
+
+        # if random.random() < .25 :
+        #     cell.n = 0
+        #     cellRef.s = 0
+
+
+    if len(adjCells) == 0:
+        totalCellsToClear  = config.rows * config.cols - len(config.obstacleIndex) - 1
+        if len(config.cellsCleared) < totalCellsToClear:
+            if config.debug  == True:
+                print(("Cleared {}   {}").format( len(config.cellsCleared), totalCellsToClear))
+            walkBack()
+        elif config.progressive == True:
+            config.doneMakingMaze == True
+            if config.saveImages == True and config.imageWasWritten == False :
+                writeImage(config.image,startSolving)
+                config.imageWasWritten = True
+            else :
+                startSolving()
+    elif config.progressive == False:
+        randomWalk()
+
+#############################################
 
 def solver(n=-1):
 
@@ -326,7 +469,7 @@ def solver(n=-1):
         config.cells[config.finalPoint].pathok = 3
         config.lastGoodPoint = cell.i
         config.solved = True
-        rebuild()
+
     elif config.solved == False :
         if config.debug == True :
             print(("leadCellInit {} n={} s={} e={} w={}").format(cell.i,cell.n,cell.s,cell.e,cell.w))
@@ -425,10 +568,10 @@ def drawSolved():
 
         if (dontDrawLine == False and cell.pathok == 1) :
             config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.failColor)
-            config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
+            # config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
         elif dontDrawLine == False or c == 1 or (config.solved == True and c == lastPoint-1)  :
             config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.okColor)
-            config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
+            # config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
         elif dontDrawLine == False and cell.pathok == 2 :
             config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.infoColor)
 
@@ -485,131 +628,23 @@ def getAdjacentOpenCells(n):
     return adjacentCells
 
 
-def getAdjacentCells(n):
-    cell = config.cells[n]
-    adjacentCells = []
-    rowPosition = cell.row
-    colPosition = cell.col
-
-    # Bit of a bias here because it favors finding in the order
-    # e.g at the start cell it finds North a lot more often first ...
-
-    # get south cell
-    if rowPosition < config.rows - 1:
-        cellIndex = (cell.row + 1) * config.cols + cell.col
-        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex :
-            adjacentCells.append([config.cells[cellIndex], "s"])
-
-    # get north cell
-    if rowPosition > 0:
-        cellIndex = (cell.row - 1) * config.cols + cell.col
-        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
-            adjacentCells.append([config.cells[cellIndex], "n"])
-
-    # get east cell
-    if colPosition < config.cols - 1:
-        cellIndex = cell.row * config.cols + cell.col + 1
-        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
-            adjacentCells.append([config.cells[cellIndex], "e"])
-
-    # get west cell
-    if colPosition < config.cols and colPosition > 0:
-        cellIndex = cell.row * config.cols + cell.col - 1
-        if config.cells[cellIndex].cleared == False and cellIndex not in config.obstacleIndex:
-            adjacentCells.append([config.cells[cellIndex], "w"])
-
-    return adjacentCells
-
-
-def walkBack():
-    # for each previously cleared cell, if there are open
-    # adjacent cells, restart with that one
-    found = False
-    for i in range(len(config.cellsCleared)-1, 0, -1):
-        adjCells = getAdjacentCells(config.cellsCleared[i][0])
-        if len(adjCells) > 0:
-            config.leadCell = config.cellsCleared[i][0]
-            found = True
-            break
-    if found == True and config.progressive == False:
-        randomWalk()
-
-
-def randomWalk():
-    cell = config.cells[config.leadCell]
-    cell.cleared = True
-    adjCells = getAdjacentCells(config.leadCell)
-
-
-    if len(adjCells) > 0:
-        nextCell = round(random.uniform(0, len(adjCells)-1))
-        cellRef = adjCells[nextCell][0]
-        # need to figure the direction to clear the walls ...
-        direction = adjCells[nextCell][1]
-
-        config.leadCell = cellRef.i
-        config.cellsCleared.append([config.leadCell, direction])
-
-        if direction == "s":
-            cell.s = 0
-            cellRef.n = 0
-
-        if direction == "n":
-            cell.n = 0
-            cellRef.s = 0
-
-        if direction == "e":
-            cell.e = 0
-            cellRef.w = 0
-
-        if direction == "w":
-            cell.w = 0
-            cellRef.e = 0
-
-    if len(adjCells) == 0:
-        if len(config.cellsCleared) < config.rows * config.cols - len(config.obstacleIndex):
-            walkBack()
-        elif config.progressive == True:
-            config.complete == True
-            if config.saveImages == True:
-                writeImage(config.image,startSolving)
-            else :
-                startSolving()
-    elif config.progressive == False:
-        randomWalk()
-
-
-def rebuild():
-    if config.solved == True :
-        print("DOING rebuild")
-        # config.solved = False
-        # config.done = False
-        # reDraw(config)
-        # drawPathsAfter(config)
-        # config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
-        # time.sleep(config.reDoDelay)
-        # setupMaze()
-
-
-        # config.timeOut = Timeout(config)
-        # config.timeOut.delay = config.reDoDelay
-
-
 def startSolving():
-    if config.done == False :
+    if config.doneMakingMaze == False :
         print("STARTING TO SOLVE")
-        config.done = True
+        config.doneMakingMaze = True
+        config.imageWasWritten = False
         config.directorController.slotRate = config.slotRateSolver
         config.decisionCells.append(config.leadCellInit)
         config.wallColor_w = newColorAlt()
-
+        setSolvePathColors()
         # for c in config.cells :
         #     c.wallColor = tuple(int(i) for i in config.backgroundColor)
 
+#############################################
 
 def reDraw(config):
 
-    if config.complete == False :
+    if config.doneMakingMaze == False :
         wallColor_s = tuple(config.wallColor_s)
         wallColor_n = tuple(config.wallColor_n)
         wallColor_e = tuple(config.wallColor_e)
@@ -743,6 +778,8 @@ def drawPathsAfter(config):
         lastRow = c.row
         lastCol = c.col
 
+#############################################
+
 
 def iterate():
     global config
@@ -750,7 +787,7 @@ def iterate():
         randomWalk()
     reDraw(config)
     drawPathsAfter(config)
-    if config.done == True :
+    if config.doneMakingMaze == True :
         solver()
         drawSolved()
     # Do the final rendering of the composited image
@@ -767,8 +804,15 @@ def runWork():
         if config.directorController.advance == True:
             iterate()
             if config.solved == True :
+                if config.saveImages == True:
+                    writeImage(config.image,startSolving)
+                    config.imageWasWritten = True
+                else :
+                    startSolving()
                 time.sleep(config.reDoDelay)
                 setupMaze()
         time.sleep(config.redrawSpeed)
         if config.standAlone == False:
             config.callBack()
+
+#############################################

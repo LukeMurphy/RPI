@@ -66,15 +66,15 @@ class Director:
 def newSolverColor(arg=0, adj=1.0):
 
     cp = config.colorPalettes[0]
-    avgVal = (cp.bg_minValue + cp.bg_maxValue)/2
+    avgVal = (cp.lines_minValue + cp.lines_maxValue)/2
 
     color =  colorutils.getRandomColorHSV(
         arg,
         arg,
         1.0,
         1.0,
-        avgVal * adj,
-        avgVal * adj,
+        config.L  * adj,
+        config.L  * adj,
         cp.bg_dropHueMinValue,
         cp.bg_dropHueMaxValue,
         round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha))
@@ -83,10 +83,10 @@ def newSolverColor(arg=0, adj=1.0):
 
 
 def setSolvePathColors():
-    config.okColor = newSolverColor(120, config.pathValueAugment)
-    config.failColor = newSolverColor(0, config.pathValueAugment)
-    config.infoColor = newSolverColor(40, config.pathValueAugment)
-    config.infoColor2 = newSolverColor(180, config.pathValueAugment)
+    config.okColor = newSolverColor(120)
+    config.failColor = newSolverColor(0)
+    config.infoColor = newSolverColor(40)
+    config.infoColor2 = newSolverColor(180)
 
     # print(("okColor = {}  failColor = {}").format(config.okColor,config.failColor))
 
@@ -258,6 +258,12 @@ def drawLine(cellRefDirection,xPos,yPos,xPos2,yPos2,fillColor):
 
 #############################################
 
+
+def solveForL(r,g,b) :
+    L  = math.sqrt(0.299 * math.pow(r/255,2) + 0.587 * math.pow(g/255,2) + 0.114 * math.pow(b/255,2))
+    return L
+
+
 def setupMaze():
 
     config.doneMakingMaze = False
@@ -294,8 +300,24 @@ def setupMaze():
 
     config.backgroundColor = newColor()
 
-    config.wallColor_w = newColorAlt()
+    print(config.backgroundColor)
 
+    r = config.backgroundColor[0]
+    g = config.backgroundColor[1]
+    b = config.backgroundColor[2]
+
+    config.L  = solveForL(r,g,b) * config.pathValueAugment
+
+    print(config.L )
+
+    # cp = config.colorPalettes[0]
+    # cp.lines_minValue = config.L
+    # cp.lines_maxValue = config.L
+
+
+    # sqrt( 0.299*R^2 + 0.587*G^2 + 0.114*B^2 )
+
+    config.wallColor_w = newColorAlt()
     config.wallColor_n = newColorAlt()
     config.wallColor_s = newColorAlt()
     config.wallColor_e = newColorAlt()
@@ -304,6 +326,9 @@ def setupMaze():
     config.lineColor_n = newColorAlt()
     config.lineColor_s = newColorAlt()
     config.lineColor_e = newColorAlt()
+
+    print(config.wallColor_w )
+
 
 
     # config.cellSize = 20
@@ -332,7 +357,8 @@ def setupMaze():
             _c.cleared = False
             _c.skip = False
             _c.pathok = 0
-            _c.wallColor = tuple(int(i) for i in config.wallColor_w)
+            # _c.wallColor = tuple(int(i) for i in config.wallColor_w)
+            _c.wallColor = tuple(int(i) for i in config.backgroundColor)
             if _c.i == 0:
                 _c.skip = True
 
@@ -443,6 +469,8 @@ def randomWalk():
     cell.cleared = True
     adjCells = getAdjacentCells(config.leadCell)
 
+    cell.wallColor = tuple(int(i) for i in config.wallColor_w)
+
     if len(adjCells) > 0:
         nextCell = round(random.uniform(0, len(adjCells)-1))
         cellRef = adjCells[nextCell][0]
@@ -486,8 +514,8 @@ def randomWalk():
                 config.imageWasWritten = True
             else :
                 startSolving()
-    elif config.progressive == False:
-        randomWalk()
+    # elif config.progressive == False:
+    #     randomWalk()
 
 #############################################
 
@@ -688,11 +716,20 @@ def getAdjacentOpenCells(n):
 def startSolving():
     if config.doneMakingMaze == False :
         print("STARTING TO SOLVE")
+
+        for cell in config.cells :
+            cell.wallColor = tuple(int(i) for i in config.wallColor_w)
+
         config.doneMakingMaze = True
         config.imageWasWritten = False
         config.directorController.slotRate = config.slotRateSolver
         config.decisionCells.append(config.leadCellInit)
         config.wallColor_w = newColorAlt()
+        r = config.wallColor_w[0]
+        g = config.wallColor_w[1]
+        b = config.wallColor_w[2]
+
+        config.L  = solveForL(r,g,b) * config.pathValueAugment
         setSolvePathColors()
         # for c in config.cells :
         #     c.wallColor = tuple(int(i) for i in config.backgroundColor)

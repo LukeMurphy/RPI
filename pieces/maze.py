@@ -279,8 +279,17 @@ def setupMaze():
     config.cells = []
 
     config.cellSize = round(random.uniform(config.cellSizeMin,config.cellSizeMax))
-    config.pLines = round(random.uniform(config.pLinesMin,config.pLinesMax))
-    config.pWalls = round(random.uniform(config.pWallsMin,config.pWallsMax))
+
+
+    pLinesMax = config.pLinesMax
+    pWallsMax = config.pWallsMax
+
+    if config.cellSize < 12 :
+        pLinesMax = 3
+        pWallsMax = 3
+
+    config.pLines = round(random.uniform(config.pLinesMin,pLinesMax))
+    config.pWalls = round(random.uniform(config.pWallsMin,pWallsMax))
     config.hidePath = True if random.random() < .1 else False
 
     config.backgroundColor = newColor()

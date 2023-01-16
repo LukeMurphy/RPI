@@ -82,6 +82,15 @@ def newSolverColor(arg=0, adj=1.0):
     return (round(color[0] ), round(color[1] ), round(color[2] ), color[3] )
 
 
+def setSolvePathColors():
+    config.okColor = newSolverColor(120, config.pathValueAugment)
+    config.failColor = newSolverColor(0, config.pathValueAugment)
+    config.infoColor = newSolverColor(40, config.pathValueAugment)
+    config.infoColor2 = newSolverColor(180, config.pathValueAugment)
+
+    # print(("okColor = {}  failColor = {}").format(config.okColor,config.failColor))
+
+
 def newColor(arg=0, val=1):
 
     cp = config.colorPalettes[arg]
@@ -213,13 +222,39 @@ def writeImage(renderImage, callBack):
     callBack()
 
 
-def setSolvePathColors():
-    config.okColor = newSolverColor(120, config.pathValueAugment)
-    config.failColor = newSolverColor(0, config.pathValueAugment)
-    config.infoColor = newSolverColor(40, config.pathValueAugment)
-    config.infoColor2 = newSolverColor(180, config.pathValueAugment)
+def drawLine(cellRefDirection,xPos,yPos,xPos2,yPos2,fillColor):
+    correction = config.pLines - 1
 
-    print(("okColor = {}  failColor = {}").format(config.okColor,config.failColor))
+    if cellRefDirection == "n":
+        for l in range(-config.pLines,config.pLines):
+            config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=fillColor[0])
+        if config.pLines == 0 :
+            l = 0
+            config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=fillColor[0])
+
+
+    if cellRefDirection == "s" :
+        for l in range(-config.pLines,config.pLines):
+            config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=fillColor[1])
+        if config.pLines == 0 :
+            l = 0
+            config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=fillColor[1])
+
+
+    if cellRefDirection == "e" :
+        for l in range(-config.pLines,config.pLines):
+            config.draw.line((xPos - correction - 1, yPos + l, xPos2 + correction , yPos2 + l), fill=fillColor[2])
+        if config.pLines == 0 :
+            l = 0
+            config.draw.line((xPos, yPos + l, xPos2, yPos2 + l), fill=fillColor[2])
+
+
+    if cellRefDirection == "w" :
+        for l in range(-config.pLines,config.pLines):
+            config.draw.line((xPos + correction, yPos + l, xPos2 - correction - 1, yPos2 + l), fill=fillColor[3])
+        if config.pLines == 0 :
+            l = 0
+            config.draw.line((xPos, yPos + l, xPos2, yPos2 + l), fill=fillColor[3])
 
 #############################################
 
@@ -264,9 +299,9 @@ def setupMaze():
 
     # config.cellSize = 20
     # config.debug = True
-    config.pLines = 0
-    config.pWalls = 0
-    config.hidePath = True
+    # config.pLines = 0
+    # config.pWalls = 0
+    # config.hidePath = True
 
     config.rows = round(config.canvasHeight / config.cellSize)
     config.cols = round(config.canvasWidth / config.cellSize)
@@ -317,12 +352,13 @@ def setupMaze():
 
     # config.leadCell = 50
     print("----------")
-    print(("Cell size: {}").format(config.cellSize))
-    print(("Rows {}  Cols {}  ").format(config.rows, config.cols))
-    print(("Initial Cell: {}").format(config.leadCell))
-    print(("Finals Cell: {}").format(config.endCell))
-    print(("background:  {}").format(config.backgroundColor))
-    print(("wallColor_w:  {}").format(config.wallColor_w))
+    print("Building Maze")
+    # print(("Cell size: {}").format(config.cellSize))
+    # print(("Rows {}  Cols {}  ").format(config.rows, config.cols))
+    # print(("Initial Cell: {}").format(config.leadCell))
+    # print(("Finals Cell: {}").format(config.endCell))
+    # print(("background:  {}").format(config.backgroundColor))
+    # print(("wallColor_w:  {}").format(config.wallColor_w))
 
 
     randomWalk()
@@ -446,6 +482,17 @@ def randomWalk():
 
 #############################################
 
+
+def addBridgePoints(indexA = 0, indexB = 0, val = 0) :
+    rowDiff = abs(config.cells[indexA].row - config.cells[indexB].row)
+    colDiff = abs(config.cells[indexA].col - config.cells[indexB].col)
+
+    if (rowDiff > 1 or rowDiff > 1 or (rowDiff == 1 and colDiff ==1)) :
+        if config.debug == True : print(rowDiff, colDiff)
+    else :
+        config.bridgeCells.append([indexA,indexB,val])
+
+
 def solver(n=-1):
 
     n = config.leadSolverCell
@@ -463,7 +510,7 @@ def solver(n=-1):
     if cell.i == config.cols - 1 and config.solved == False :
         if config.debug == True :
             print(("leadCellInit {} n={} s={} e={} w={}").format(cell.i,cell.n,cell.s,cell.e,cell.w))
-            print("done")
+        print("done")
         config.cellsWalked.append(cell.i)
         config.cellsWalked.append(config.finalPoint)
         config.cells[config.finalPoint].pathok = 3
@@ -473,13 +520,18 @@ def solver(n=-1):
     elif config.solved == False :
         if config.debug == True :
             print(("leadCellInit {} n={} s={} e={} w={}").format(cell.i,cell.n,cell.s,cell.e,cell.w))
+
         if cell.i not in config.cellsWalked :
             config.cellsWalked.append(cell.i)
             cell.wallColor = tuple(int(i) for i in config.wallColor_w)
+
+            # assume this is an ok path for now
             cell.pathok = 0
+
+            # see if there is anything ahead that is ok
             availables = (getAdjacentOpenCells(cell.i))
 
-            # at least one choice
+            # if at least one choice
             if len(availables) > 0 :
                 choice = random.choice(availables)
                 config.leadSolverCell = choice[0]
@@ -488,24 +540,47 @@ def solver(n=-1):
                     cell.pathok = 2
                     config.decisionCells.append(cell.i)
 
-                config.bridgeCells.append([cell.i,choice[0]])
+                # config.bridgeCells.append([cell.i,choice[0],0])
+                addBridgePoints(cell.i,choice[0],0)
 
+                # otherwise mark this cell as a dead end and then
+                # walk back to the start of this branch and mark
+                # them all as bad paths ..
                 # not doeing a recursive solution...
-                #solver(choice[0])
+                # solver(choice[0])
             else :
                 cell.pathok = 1
-                changeCell = config.cellsWalked.index(cell.i)
+                addBridgePoints(cell.i,config.cellsWalked[-2],1)
 
                 if config.debug == True :
+                    changeCell = config.cellsWalked.index(cell.i)
                     print(("Some kind of end {}").format(changeCell))
-                # print("")
+                    print("")
+
                 walkBackCount = 0
-                for x in range(len(config.cellsWalked)-1, 0, -1) :
+                walkBacks = len(config.cellsWalked)
+                for x in range(walkBacks-1, 0, -1) :
                     # mark the cells as bad paths
                     if walkBackCount != 0 :
                         config.cells[config.cellsWalked[x]].pathok = 1
                     else:
                         config.cells[config.cellsWalked[x]].pathok = 2
+
+                    if x < walkBacks - 1 and x > 0:
+                        # remove/replace any paths that are not good in the stack
+                        testArg1 = [config.cellsWalked[x+1],config.cellsWalked[x],0]
+                        testArg2 = [config.cellsWalked[x],config.cellsWalked[x+1],0]
+
+                        if (testArg1 in config.bridgeCells) :
+                            config.bridgeCells.remove(testArg1)
+                            # addBridgePoints(testArg1[0],testArg1[1],1)
+                        if (testArg2 in config.bridgeCells) :
+                            config.bridgeCells.remove(testArg2)
+                            addBridgePoints(testArg2[0],testArg2[1],1)
+
+
+                    # if at any point in the walkback there is an available cell
+                    # to go to, stop the walk back are restart the path following there
                     availables = (getAdjacentOpenCells(config.cellsWalked[x]))
                     walkBackCount +=1
 
@@ -513,21 +588,12 @@ def solver(n=-1):
                         choice = random.choice(availables)
                         config.leadSolverCell = choice[0]
                         config.cells[config.cellsWalked[x]].pathok = 1
-                        config.bridgeCells.append([config.cellsWalked[x],choice[0]])
-
-                        if config.debug == True :
-                            test = getAdjacentOpenCells(config.leadSolverCell)
-
-                            if len(test) == 0 :
-                                print(("LAST end {} (cell index:{})  new lead = {}").format(x,config.cellsWalked[x],config.leadSolverCell ))
-                                print(config.cellsWalked)
-                            else :
-                                print(("ISSUES end {} (cell index:{})  new lead = {}").format(x,config.cellsWalked[x],config.leadSolverCell ))
-                                print(test)
-
+                        # make this bridge a decision marker
+                        addBridgePoints(config.cellsWalked[x],choice[0],2)
                         break
         else :
             print(("cant proceed {}").format(cell.i))
+            config.solved = True
 
 
 def drawSolved():
@@ -535,8 +601,10 @@ def drawSolved():
     lastCol =0
     lastPoint = len(config.cellsWalked )
 
-    for c in config.decisionCells :
-        config.cells[c].pathok = 4
+    correction = config.pLines - 1
+
+    # for c in config.decisionCells :
+    #     config.cells[c].pathok = 4
 
     for cref in config.bridgeCells :
         c1 = config.cells[cref[0]]
@@ -545,51 +613,31 @@ def drawSolved():
         yPos = c1.row * config.cellSize + config.cellSize/2
         xPos2 = c2.col * config.cellSize + config.cellSize/2
         yPos2 = c2.row * config.cellSize + config.cellSize/2
-        config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.infoColor2)
-
-    for c in range(1, lastPoint):
-
-        cell = config.cells[config.cellsWalked[c-1]]
-        cell.wallColor = tuple(int(i) for i in config.wallColor_w)
-        xPos = cell.col * config.cellSize + config.cellSize/2
-        yPos = cell.row * config.cellSize + config.cellSize/2
-
-
-        cell2 = config.cells[config.cellsWalked[c]]
-        cell2.wallColor = tuple(int(i) for i in config.wallColor_w)
-        xPos2 = cell2.col * config.cellSize + config.cellSize/2
-        yPos2 = cell2.row * config.cellSize + config.cellSize/2
 
         rowDiff = abs(yPos2 - yPos)
         colDiff = abs(xPos2 - xPos)
 
+        dontDraw = 0
+        if rowDiff > 0 and colDiff > 0 :
+            if config.debug == True :
+                print(("SHOULD NOT BE DRAWING ... {}").format(c1))
+            dontDraw = 1
 
-        dontDrawLine = True if (rowDiff > config.cellSize or colDiff > config.cellSize) or (rowDiff == config.cellSize and colDiff == config.cellSize) else False
-
-        if (dontDrawLine == False and cell.pathok == 1) :
-            config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.failColor)
-            # config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
-        elif dontDrawLine == False or c == 1 or (config.solved == True and c == lastPoint-1)  :
-            config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.okColor)
-            # config.draw.line((xPos+1, yPos+1, xPos2+1, yPos2+1), fill=(0, 0, 0, 100))
-        elif dontDrawLine == False and cell.pathok == 2 :
-            config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.infoColor)
-
-        if config.debug == True :
-            if cell.pathok == 0 :
-                config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.okColor)
-            if cell.pathok == 1 :
-                config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.failColor)
-            if cell.pathok == 2 :
-                config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.infoColor)
-            if cell.pathok == 4 :
-                config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.infoColor2)
-        if cell.pathok == 3 :
-            config.draw.rectangle((xPos-2, yPos-2, xPos+2, yPos+2), fill=config.okColor)
+        direction = "n"
+        if colDiff > 0 :
+            direction = "e"
+        # config.draw.line((xPos, yPos, xPos2, yPos2), fill=config.infoColor2)
 
 
-        lastCol = cell2.col
-        lastRow = cell2.row
+        colors = [config.infoColor2,config.infoColor2,config.infoColor2,config.infoColor2]
+
+        if cref[2] == 0 :
+            colors = [config.okColor,config.okColor,config.okColor,config.okColor]
+        if cref[2] == 1:
+            colors = [config.failColor,config.failColor,config.failColor,config.failColor]
+
+        if dontDraw == 0 :
+            drawLine(direction,xPos,yPos,xPos2,yPos2,colors)
 
 
 def getAdjacentOpenCells(n):
@@ -644,47 +692,50 @@ def startSolving():
 
 def reDraw(config):
 
-    if config.doneMakingMaze == False :
-        wallColor_s = tuple(config.wallColor_s)
-        wallColor_n = tuple(config.wallColor_n)
-        wallColor_e = tuple(config.wallColor_e)
-        wallColor_w = tuple(config.wallColor_w)
-        wallColor = tuple(int(i) for i in config.wallColor_w)
-        config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.backgroundColor, outline=wallColor)
-        n = 0
-        w = 0
+    # if config.doneMakingMaze == False :
+    wallColor_s = tuple(config.wallColor_s)
+    wallColor_n = tuple(config.wallColor_n)
+    wallColor_e = tuple(config.wallColor_e)
+    wallColor_w = tuple(config.wallColor_w)
+    wallColor = tuple(int(i) for i in config.wallColor_w)
+    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.backgroundColor, outline=wallColor)
+    n = 0
+    w = 0
 
-        correction = 0 if config.pWalls == 0 else config.pWalls - 1
+    correction = 0 if config.pWalls == 0 else config.pWalls - 1
 
-        for row in range(0, config.rows):
-            for col in range(0, config.cols):
-                n = row * config.cols + col
-                if n < config.rows * config.cols :
-                    cell = config.cells[n]
-                    xPos = cell.col * config.cellSize
-                    yPos = cell.row * config.cellSize
-                    # n north
-                    if cell.n == 1:
-                        for l in range(-config.pWalls, config.pWalls):
-                            config.draw.rectangle((xPos, yPos + l + correction, xPos + config.cellSize, yPos + w + l - correction), fill=cell.wallColor)
-                            #config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + w), fill=wallColor)
-                    # s south
-                    if cell.s == 1:
-                        config.draw.rectangle((xPos + correction, yPos + config.cellSize, xPos + config.cellSize - correction, yPos + config.cellSize + w), fill=cell.wallColor)
-                    # w west
-                    if cell.w == 1:
-                        for l in range(-config.pWalls, config.pWalls):
-                            config.draw.rectangle((xPos + l, yPos - correction, xPos + w + l, yPos + config.cellSize), fill=cell.wallColor)
-                            #config.draw.rectangle((xPos, yPos, xPos + w, yPos + config.cellSize), fill=wallColor)
-                    # e east
-                    if cell.e == 1:
-                        config.draw.rectangle((xPos + config.cellSize, yPos, xPos + config.cellSize + w, yPos + config.cellSize), fill=cell.wallColor)
+    for row in range(0, config.rows):
+        for col in range(0, config.cols):
+            n = row * config.cols + col
+            if n < config.rows * config.cols :
+                cell = config.cells[n]
+                xPos = cell.col * config.cellSize
+                yPos = cell.row * config.cellSize
+                # n north
+                if cell.n == 1:
+                    for l in range(-config.pWalls, config.pWalls):
+                        config.draw.rectangle((xPos, yPos + l + correction, xPos + config.cellSize, yPos + w + l - correction), fill=cell.wallColor)
+                        #config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + w), fill=wallColor)
 
-                if n in config.obstacleIndex:
-                    config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + config.cellSize), fill=wallColor)
+                # s south
+                if cell.s == 1:
+                    config.draw.rectangle((xPos + correction, yPos + config.cellSize, xPos + config.cellSize - correction, yPos + config.cellSize + w), fill=cell.wallColor)
 
-                if cell.pathok == 3 :
-                    config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + config.cellSize), fill=config.okColor)
+                # w west
+                if cell.w == 1:
+                    for l in range(-config.pWalls, config.pWalls):
+                        config.draw.rectangle((xPos + l, yPos - correction, xPos + w + l, yPos + config.cellSize), fill=cell.wallColor)
+                        #config.draw.rectangle((xPos, yPos, xPos + w, yPos + config.cellSize), fill=wallColor)
+
+                # e east
+                if cell.e == 1:
+                    config.draw.rectangle((xPos + config.cellSize, yPos, xPos + config.cellSize + w, yPos + config.cellSize), fill=cell.wallColor)
+
+            if n in config.obstacleIndex:
+                config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + config.cellSize), fill=wallColor)
+
+            if cell.pathok == 3 :
+                config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + config.cellSize), fill=config.okColor)
 
 
 def drawPathsAfter(config):
@@ -740,37 +791,7 @@ def drawPathsAfter(config):
             # config.draw.ellipse((xPos - config.cellSize/4, yPos- config.cellSize/4, xPos + config.cellSize/4, yPos + config.cellSize/4), fill=None, outline=(0, 100, 0, 100))
             # for p in range(0, lines):
 
-            if config.cellsCleared[n][1] == "n":
-                for l in range(-config.pLines,config.pLines):
-                    config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=lineColor_n)
-                if config.pLines == 0 :
-                    l = 0
-                    config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=lineColor_n)
-
-
-            if config.cellsCleared[n][1] == "s" :
-                for l in range(-config.pLines,config.pLines):
-                    config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=lineColor_s)
-                if config.pLines == 0 :
-                    l = 0
-                    config.draw.line((xPos + l, yPos, xPos2 + l, yPos2), fill=lineColor_s)
-
-
-            if config.cellsCleared[n][1] == "e" :
-                for l in range(-config.pLines,config.pLines):
-                    config.draw.line((xPos - correction - 1, yPos + l, xPos2 + correction , yPos2 + l), fill=lineColor_e)
-                if config.pLines == 0 :
-                    l = 0
-                    config.draw.line((xPos, yPos + l, xPos2, yPos2 + l), fill=lineColor_e)
-
-
-            if config.cellsCleared[n][1] == "w" :
-                for l in range(-config.pLines,config.pLines):
-                    config.draw.line((xPos + correction, yPos + l, xPos2 - correction - 1, yPos2 + l), fill=lineColor_w)
-                if config.pLines == 0 :
-                    l = 0
-                    config.draw.line((xPos, yPos + l, xPos2, yPos2 + l), fill=lineColor_w)
-
+            drawLine(config.cellsCleared[n][1],xPos,yPos,xPos2,yPos2,[lineColor_n,lineColor_s,lineColor_e,lineColor_w])
 
         xPos = xPos2
         yPos = yPos2

@@ -142,7 +142,7 @@ class ParticleSystem:
         self.wBase = round(random.uniform(config.PSRadiusMin, config.PSRadiusMax))
 
         self.xSpeed = random.random()  * config.PSXSpeed
-        self.ySpeed = random.random() * config.PSXSpeed
+        self.ySpeed = random.random() * config.PSYSpeed
 
         self.drawRadialPolys = True if random.random() < .5 else False
 
@@ -569,8 +569,8 @@ def main(run=True):
         config.PSYSpeed =  0
         config.PSRadiusFactor1 =  1.5
         config.PSRadiusFactor2 =  1.5
-        config.PSRadiusMax = config.canvasWidth
         config.PSRadiusMin = 220
+        config.PSRadiusMax = config.canvasWidth
 
     try:
         config.rRange = int(workConfig.get("particles","rRange"))

@@ -369,6 +369,10 @@ def iterate():
 	"""
 
 
+	if random.random() < config.blurChangeProb:
+		config.sectionBlurRadius = round(random.uniform(1,3))
+
+
 	if random.random() < config.filterRemappingProb:
 		if config.useFilters == True and config.filterRemapping == True:
 			config.filterRemap = True
@@ -638,9 +642,16 @@ def main(run=True):
 
 
 	try:
+		config.blurChangeProb = float(workConfig.get("collageShapes", "blurChangeProb"))
+	except Exception as e:
+		config.blurChangeProb = 0.0
+		print(e)
+
+
+	try:
 		config.lastOverlayBlur = float(workConfig.get("collageShapes", "lastOverlayBlur"))
 	except Exception as e:
-		config.lastOverlayBlur = 0 
+		config.lastOverlayBlur = 0.0
 		print(e)
 
 

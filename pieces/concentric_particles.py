@@ -139,11 +139,10 @@ class ParticleSystem:
     def setNewAttributes(self):
         self.radialSets = []
         self.bands = round(random.uniform(12, 24))
-        self.wBase = round(random.uniform(220, config.canvasWidth))
+        self.wBase = round(random.uniform(config.PSRadiusMin, config.PSRadiusMax))
 
-        self.xSpeed = random.random() / 2.0
-        self.ySpeed = random.random()
-        self.ySpeed = 0
+        self.xSpeed = random.random()  * config.PSXSpeed
+        self.ySpeed = random.random() * config.PSXSpeed
 
         self.drawRadialPolys = True if random.random() < .5 else False
 
@@ -209,7 +208,7 @@ class ParticleSystem:
                 config.canvasWidth * config.canvasWidth
                 + config.canvasHeight * config.canvasHeight
             )
-            * 1.5
+            * config.PSRadiusFactor1
         )
 
         self.radialBand = self.maxRadius / 12
@@ -425,13 +424,13 @@ def drawBands(p):
             polyArray.append((x0,y0))
             polyArray.append((x1,y1))
             if rSet.radialsArray[n][2] == 0:
-                config.draw.line((x0, y0, x1, y1), fill=(50, 30, 0, config.radialAlpha))
+                config.draw.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
             if numLines == 1 :
-                config.draw.line((x0, y0, x1, y1), fill=(25, 23, 200, config.radialAlpha))
+                config.draw.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
 
 
         if rSet.drawRadialPolys == True:
-            config.draw.polygon(polyArray, fill=(50,10,0,10), outline=(50, 30, 0, config.radialAlpha+20))
+            config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
 
 
 
@@ -538,6 +537,13 @@ def main(run=True):
     config.bDiff = int(workConfig.get("particles", "bDiff"))
     config.radialAlpha = int(workConfig.get("particles", "radialAlpha"))
 
+    config.radialRed = int(workConfig.get("particles", "radialRed"))
+    config.radialGreen = int(workConfig.get("particles", "radialGreen"))
+    config.radialBlue = int(workConfig.get("particles", "radialBlue"))
+    config.radial2Red = int(workConfig.get("particles", "radial2Red"))
+    config.radial2Green = int(workConfig.get("particles", "radial2Green"))
+    config.radial2Blue = int(workConfig.get("particles", "radial2Blue"))
+
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
     config.sparkleProb = float(workConfig.get("particles", "sparkleProb"))
@@ -548,6 +554,23 @@ def main(run=True):
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
+
+
+    try:
+        config.PSXSpeed = float(workConfig.get("particles", "PSXSpeed"))
+        config.PSYSpeed = float(workConfig.get("particles", "PSYSpeed"))
+        config.PSRadiusFactor1 = float(workConfig.get("particles", "PSRadiusFactor1"))
+        config.PSRadiusFactor2 = float(workConfig.get("particles", "PSRadiusFactor2"))
+        config.PSRadiusMin = float(workConfig.get("particles", "PSRadiusMin"))
+        config.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
+    except Exception as e:
+        print(str(e))
+        config.PSXSpeed = .5
+        config.PSYSpeed =  0
+        config.PSRadiusFactor1 =  1.5
+        config.PSRadiusFactor2 =  1.5
+        config.PSRadiusMax = config.canvasWidth
+        config.PSRadiusMin = 220
 
     try:
         config.rRange = int(workConfig.get("particles","rRange"))

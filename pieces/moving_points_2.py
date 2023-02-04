@@ -232,12 +232,11 @@ def iterate():
 
         angle = math.atan2(bar.ySpeed, bar.xSpeed)
 
-        radialFactor = 32
-        if bar.xPos > 300:
+        if bar.xPos > config.splitPoint:
 
             D = abs(bar.yPos - config.midStreamPoint)
 
-            radialFactor = D/config.midStreamPoint / 3
+            radialFactor = D/config.midStreamPoint / config.radialFactor
 
             bar.angleRate = math.pi * radialFactor
             if bar.yPos < config.midStreamPoint:
@@ -353,6 +352,8 @@ def main(run=True):
     config.xRangeMax = int(xRange[1])
 
     config.midStreamPoint = int(workConfig.get("Points", "midStreamPoint"))
+    config.splitPoint = int(workConfig.get("Points", "splitPoint"))
+    config.radialFactor = float(workConfig.get("Points", "radialFactor"))
 
     config.xSpeedRangeMin = float(workConfig.get("Points", "xSpeedRangeMin"))
     config.xSpeedRangeMax = float(workConfig.get("Points", "xSpeedRangeMax"))

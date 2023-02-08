@@ -26,7 +26,27 @@ from PIL import (
 
 global config
 
+class Director:
+	"""docstring for Director"""
 
+	slotRate = .5
+
+	def __init__(self, config):
+		super(Director, self).__init__()
+		self.config = config
+		self.tT = time.time()
+		self.slotRate = config.redrawSpeed
+
+	def checkTime(self):
+		if (time.time() - self.tT) >= self.slotRate:
+			self.tT = time.time()
+			self.advance = True
+		else:
+			self.advance = False
+
+	def next(self):
+
+		self.checkTime()
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 class DotGrid :
@@ -319,6 +339,10 @@ def init():
 	config.init = 0
 	config.initCount = 1
 
+	config.redrawSpeed = float(workConfig.get("spots", "redrawSpeed"))
+	config.refreshSpeed = float(workConfig.get("spots", "refreshSpeed"))
+	config.directorController = Director(config)
+
 	config.f = FaderObj()
 	config.f.doingRefreshCount = 2
 	config.f.setUp(config.renderImageFull, config.canvasImage)
@@ -336,8 +360,10 @@ def init():
 def runWork():
 	global config
 	while True:
-		iterate()
-		time.sleep(config.redrawSpeed)
+		config.directorController.checkTime()
+		if config.directorController.advance == True:
+			iterate()
+		time.sleep(config.refreshSpeed)
 
 
 def checkTime(dotGridsObj):

@@ -394,7 +394,7 @@ def drawBands(p):
                 (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2)
             )
         else :
-            config.draw.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), bBase, round(a)))
+            config.draw.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), round(bBase), round(a)))
 
         rBase += rDiff
         gBase += gDiff

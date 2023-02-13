@@ -340,7 +340,13 @@ def init():
 	config.initCount = 1
 
 	config.redrawSpeed = float(workConfig.get("spots", "redrawSpeed"))
-	config.refreshSpeed = float(workConfig.get("spots", "refreshSpeed"))
+
+	try:
+		config.refreshSpeed = float(workConfig.get("spots", "refreshSpeed"))
+	except Exception as e:
+		print(str(e))
+		config.refreshSpeed = config.redrawSpeed
+
 	config.directorController = Director(config)
 
 	config.f = FaderObj()

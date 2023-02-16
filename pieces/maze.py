@@ -77,7 +77,8 @@ def newSolverColor(arg=0, adj=1.0):
         config.L  * adj,
         cp.bg_dropHueMinValue,
         cp.bg_dropHueMaxValue,
-        round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha))
+        round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha)),
+        config.brightness
     )
     return (round(color[0] ), round(color[1] ), round(color[2] ), color[3] )
 
@@ -104,7 +105,8 @@ def newColor(arg=0, val=1):
         cp.bg_maxValue,
         cp.bg_dropHueMinValue,
         cp.bg_dropHueMaxValue,
-        round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha))
+        round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha)),
+        config.brightness
     )
 
     return (round(color[0] * val), round(color[1] * val), round(color[2] * val), color[3] )
@@ -122,7 +124,8 @@ def newColorAlt(arg=0, val=1):
         cp.lines_maxValue,
         cp.lines_dropHueMinValue,
         cp.lines_dropHueMaxValue,
-        round(random.uniform(cp.lines_minAlpha, cp.lines_maxAlpha))
+        round(random.uniform(cp.lines_minAlpha, cp.lines_maxAlpha)),
+        config.brightness
     )
 
     return (round(color[0] * val), round(color[1] * val), round(color[2] * val), color[3] )

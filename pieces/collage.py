@@ -89,7 +89,6 @@ class Shape:
 		# This will force the overlay color transition functions to use the
 		# configs for HSV
 
-
 		print(self.minHue,self.maxHue)
 		self.colOverlay.maxBrightness = 1
 		self.colOverlay.minHue = self.minHue
@@ -311,7 +310,7 @@ def redraw():
 		cR = config.lastOverLayColorRange
 		lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
 		#print(lastOverlayFill)
-		config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(5, 50)))
+		config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
 		#config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
 
 
@@ -524,16 +523,8 @@ def main(run=True):
 		print(e)
 		config.useVariablePixelSort = False
 
-	config.lastOverlayBox = (0, 0, 64, 32)
-	config.lastOverlayFill = (10, 0, 0, 10)
 
-	try:
-		config.lastOverLayColorRange = list(
-			map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(","))
-		)
-	except Exception as e:
-		print(str(e))
-		config.lastOverLayColorRange = (0,10,.5,1.0,.5,.5)
+
 
 	# If there are multiple collage shape sets this sets the time between changes and probability that happens
 	try:
@@ -628,6 +619,19 @@ def main(run=True):
 	# Always start with the first one, index 0
 	config.shapeGroupDisplayed = 0
 
+	try:
+		config.lastOverLayColorRange = list(
+			map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(","))
+		)
+	except Exception as e:
+		print(str(e))
+		config.lastOverLayColorRange = (0,10,.5,1.0,.5,.5)
+
+	try:
+		config.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayAlphaRange").split(",")))
+	except Exception as e:
+		print(str(e))
+		config.lastOverlayAlphaRange = (5,50)
 
 	try:
 		config.useLastOverlay = workConfig.getboolean("collageShapes", "forceLastOverlay")
@@ -638,15 +642,16 @@ def main(run=True):
 		config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 		config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(",")))
 	except Exception as e:
-		print(e)
-
+		print(str(e))
+		config.lastOverlayBox = (0, 0, 64, 32)
+		config.lastOverlayFill = (0, 0, 0, 0)
+		config.useLastOverlay = False
 
 	try:
 		config.blurChangeProb = float(workConfig.get("collageShapes", "blurChangeProb"))
 	except Exception as e:
 		config.blurChangeProb = 0.0
 		print(e)
-
 
 	try:
 		config.lastOverlayBlur = float(workConfig.get("collageShapes", "lastOverlayBlur"))

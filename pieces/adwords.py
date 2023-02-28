@@ -59,10 +59,7 @@ class Director:
 
         self.checkTime()
 
-
-
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
 
 class Block:
 
@@ -182,7 +179,7 @@ class Block:
             bgColor = colorutils.colorCompliment(clr, brightness)
 
         if config.mode == "words":
-       	    _bgColor = colorutils.getRandomColorHSV(0, 360, .4, 1.0, .5, 1.0)
+            _bgColor = colorutils.getRandomColorHSV(0, 360, .4, 1.0, .5, 1.0)
             bgColor = (round(_bgColor[0] * brightness),round(_bgColor[1] * brightness),round(_bgColor[2] * brightness),round(_bgColor[3] * 1.0))
 
         clr = tuple(round(a * brightness) for a in (clr))

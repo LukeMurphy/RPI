@@ -38,6 +38,7 @@ nextRow = 0
 # For video out
 x = y = 0
 
+
 class Director:
     """docstring for Director"""
 
@@ -59,7 +60,9 @@ class Director:
 
         self.checkTime()
 
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 class Block:
 
@@ -108,7 +111,8 @@ class Block:
             self.config.minBrightness, self.config.brightness + 0.1
         )
         opticalOpposites = False if (random.random() > 0.5) else True
-        self.verticalTileSize = round(config.screenHeight / self.displayRows) if self.displayRows != config.rows else config.tileSize[1]
+        self.verticalTileSize = round(
+            config.screenHeight / self.displayRows) if self.displayRows != config.rows else config.tileSize[1]
         self.verticalTileSize = 32
 
         listToUse = config.wordsList
@@ -118,8 +122,6 @@ class Block:
         if config.mode == "colors":
             choice = round(random.uniform(1, len(config.colorList)))
             listToUse = config.colorList
-
-
 
         # choice = 3 if (random.random() > .5) else 5
         # choice = 4 if (random.random() > .5) else 6
@@ -172,15 +174,18 @@ class Block:
             if colorWord == "BLACK":
                 bgColor = tuple(round(a * brightness) for a in ((0, 0, 0)))
             if colorWord == "WHITE":
-                bgColor = tuple(round(a * brightness) for a in ((250, 250, 250)))
+                bgColor = tuple(round(a * brightness)
+                                for a in ((250, 250, 250)))
             if colorWord == "GRAY":
-                bgColor = tuple(round(a * brightness) for a in ((200, 200, 200)))
+                bgColor = tuple(round(a * brightness)
+                                for a in ((200, 200, 200)))
         else:
             bgColor = colorutils.colorCompliment(clr, brightness)
 
         if config.mode == "words":
             _bgColor = colorutils.getRandomColorHSV(0, 360, .4, 1.0, .5, 1.0)
-            bgColor = (round(_bgColor[0] * brightness),round(_bgColor[1] * brightness),round(_bgColor[2] * brightness),round(_bgColor[3] * 1.0))
+            bgColor = (round(_bgColor[0] * brightness), round(_bgColor[1] * brightness), round(
+                _bgColor[2] * brightness), round(_bgColor[3] * 1.0))
 
         clr = tuple(round(a * brightness) for a in (clr))
 
@@ -198,29 +203,29 @@ class Block:
         if dims[1] < self.verticalTileSize:
             dims[1] = self.verticalTileSize + 4
 
-
         vPadding = 5
         hPadding = 5
-
 
         if random.random() < config.verticalOrientationProb:
             self.orientation = 0
 
         if self.orientation == 1:
-            self.presentationImage = PIL.Image.new("RGBA", (dims[0] + hPadding, dims[1]+ vPadding))
+            self.presentationImage = PIL.Image.new(
+                "RGBA", (dims[0] + hPadding, dims[1] + vPadding))
             self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
         else:
-            self.presentationImage = PIL.Image.new("RGBA", (dims[1] + vPadding, round(dims[0]*1.5)))
+            self.presentationImage = PIL.Image.new(
+                "RGBA", (dims[1] + vPadding, round(dims[0]*1.5)))
             self.image = PIL.Image.new("RGBA", (dims[0] + vPadding, 1))
 
         draw = ImageDraw.Draw(self.presentationImage)
         iid = self.image.im.id
 
-
-        #print(("vPadding:{} orientation:{} vert:{}").format(vPadding,self.orientation,dims[1] ))
+        # print(("vPadding:{} orientation:{} vert:{}").format(vPadding,self.orientation,dims[1] ))
 
         if self.orientation == 1:
-            draw.rectangle((0, 0, dims[0] + hPadding, dims[1] + vPadding), fill=bgColor)
+            draw.rectangle(
+                (0, 0, dims[0] + hPadding, dims[1] + vPadding), fill=bgColor)
 
             # Draw the text with "borders"
             indent = round(0.05 * config.tileSize[0])
@@ -232,7 +237,8 @@ class Block:
 
         else:
 
-            draw.rectangle((0, 0, dims[1] - 5, round(dims[0]*1.5)), fill=bgColor)
+            draw.rectangle(
+                (0, 0, dims[1] - 5, round(dims[0]*1.5)), fill=bgColor)
             counter = 0
             # Generate vertical text
 
@@ -259,11 +265,13 @@ class Block:
                         (0, 0, 0),
                         font=font2,
                     )
-                draw.text((xD, counter * (self.fontSize - 1)), letter, clr, font=font)
+                draw.text((xD, counter * (self.fontSize - 1)),
+                          letter, clr, font=font)
                 counter += 1
 
         if nextRow == -1:
-            vOffset = round(random.uniform(0, self.displayRows)) * self.verticalTileSize
+            vOffset = round(random.uniform(0, self.displayRows)
+                            ) * self.verticalTileSize
         else:
             vOffset = nextRow * self.verticalTileSize
 
@@ -278,14 +286,17 @@ class Block:
 
         self.y = vOffset
         # self.y = round(random.uniform(0,config.screenHeight))
-        self.x = round(random.uniform(-self.wd / 2, config.screenWidth - self.wd / 2))
+        self.x = round(random.uniform(-self.wd / 2,
+                       config.screenWidth - self.wd / 2))
         # self.x = config.screenWidth/2
 
         self.startx = self.x
         self.starty = self.y
 
-        self.dx = round(random.uniform(-self.speed, self.speed)) * self.speedMultiplier
-        self.dy = round(random.uniform(-self.speed, self.speed)) * self.speedMultiplier
+        self.dx = round(random.uniform(-self.speed, self.speed)
+                        ) * self.speedMultiplier
+        self.dy = round(random.uniform(-self.speed, self.speed)
+                        ) * self.speedMultiplier
 
         if self.dx == 0:
             self.dx = -1
@@ -295,7 +306,8 @@ class Block:
         self.endx = -self.wd if self.dx < 0 else config.screenWidth
         self.endy = -self.ht if self.dy < 0 else config.screenHeight
 
-        self.revealSpeed = round(random.uniform(self.revealSpeedMin, self.revealSpeedMax))
+        self.revealSpeed = round(random.uniform(
+            self.revealSpeedMin, self.revealSpeedMax))
 
         if self.orientation == 0:
             self.revealSpeed = self.revealSpeedMax * 2
@@ -364,7 +376,8 @@ def makeBlock():
 
     block = Block()
     block.config = config
-    block.fontSize = round(random.uniform(config.fontSizeMin,config.fontSizeMax))
+    block.fontSize = round(random.uniform(
+        config.fontSizeMin, config.fontSizeMax))
     block.shadowSize = config.shadowSize
     block.displayRows = config.displayRows
     block.displayCols = config.displayCols
@@ -402,7 +415,7 @@ def runStroop(run=True):
         numRuns = 1
         for i in range(0, numRuns):
             opticalOpposites = False if (opticalOpposites == True) else True
-            stroopSequence()
+            # stroopSequence()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -464,9 +477,11 @@ def main(run=True):
         print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
         config.directorController.slotRate = 0.03
 
-    config.colorProbabilityReturn = float(workConfig.get("stroop", "colorProbabilityReturn"))
+    config.colorProbabilityReturn = float(
+        workConfig.get("stroop", "colorProbabilityReturn"))
     config.modeChangeProb = float(workConfig.get("stroop", "modeChangeProb"))
-    config.colorList = ["RED", "GREEN", "BLUE", "YELLOW", "ORANGE", "VIOLET", "BLACK", "WHITE", "GRAY"]
+    config.colorList = ["RED", "GREEN", "BLUE", "YELLOW",
+                        "ORANGE", "VIOLET", "BLACK", "WHITE", "GRAY"]
     config.mode = "words"
     # for attr, value in config.__dict__.iteritems():print (attr, value)
     blocks = []
@@ -516,7 +531,8 @@ def iterate(n=0):
         if config.rendering == "out":
             # config.image = block.image.copy()
             try:
-                config.image.paste(block.image, (block.x, block.y), block.image)
+                config.image.paste(
+                    block.image, (block.x, block.y), block.image)
             except:
                 config.image.paste(block.image, (block.x, block.y))
 

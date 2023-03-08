@@ -497,6 +497,7 @@ def iterate():
 
 def main(run=True):
     global config
+    global workConfig
     global redrawSpeed
     global PS
 

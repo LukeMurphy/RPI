@@ -290,6 +290,7 @@ def iterate():
 
 def main(run=True):
     global config
+    global workConfig
     global fluddSquare
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)

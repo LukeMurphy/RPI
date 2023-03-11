@@ -19,6 +19,7 @@ global thrd, config
 
 def init():
 	global config
+	global workConfig
 	config.redrawSpeed = float(workConfig.get("animals", "redrawSpeed"))
 	config.redrawProbablility = float(workConfig.get("animals", "redrawProbablility"))
 	config.xVariance = float(workConfig.get("animals", "xVariance"))

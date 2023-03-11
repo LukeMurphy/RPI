@@ -526,7 +526,7 @@ def iterate():
 
 def main(run=True):
 	global config
-	
+	global workConfig
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)

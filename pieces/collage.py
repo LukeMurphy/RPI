@@ -411,6 +411,7 @@ def colorTransitionStarted(arg=None):
 def main(run=True):
 	global config
 	global shapeGroups
+	global workConfig
 
 	config.t1 = time.time()
 	config.t2 = time.time()

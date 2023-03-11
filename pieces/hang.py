@@ -262,7 +262,7 @@ def iterate():
 
 def main(run=True):
 	global config, threads, thrd
-
+	global workConfig
 	"""
 	# this tests for the power-down RPI switch
 	from cntrlscripts import stest

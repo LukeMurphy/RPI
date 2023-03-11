@@ -134,6 +134,7 @@ def newColorAlt(arg=0, val=1):
 def main(run=True):
     global config
     global expandingRingss
+    global workConfig
 
     expandingRingss = []
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

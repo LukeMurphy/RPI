@@ -278,6 +278,7 @@ def iterate():
 
 def main(run=True):
 	global config
+	global workConfig
 	config.rotationOrig = config.rotation
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 	config.draw = ImageDraw.Draw(config.image)

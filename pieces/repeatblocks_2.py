@@ -197,7 +197,7 @@ def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, m
 
 
 def buildPalette(config, index=0):
-
+	global workConfig
 	palette = config.palettes[index]
 
 	tLimitBase = int(workConfig.get(palette, "tLimitBase"))

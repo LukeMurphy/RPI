@@ -223,6 +223,7 @@ def iterate():
 
 def main(run=True):
 	global config
+	global workConfig
 
 	config.debug = workConfig.getboolean("gradients", "debug")
 

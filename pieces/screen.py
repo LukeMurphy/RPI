@@ -251,6 +251,7 @@ def showGrid():
 
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("---------------------")
 	print("Screen Loaded")
 

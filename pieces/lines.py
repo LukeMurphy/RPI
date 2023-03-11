@@ -295,6 +295,7 @@ def showLines():
 
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("---------------------")
 	print("Lines Loaded")
 

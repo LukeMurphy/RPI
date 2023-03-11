@@ -363,6 +363,7 @@ def remakePatternBlock(imageRef, direction):
 
 ## Setup and run functions
 def configureBackgroundScrolling():
+	global workConfig
 	print("configureBackgroundScrolling")
 	config.patternRows = int(workConfig.get("scroller", "patternRows"))
 	config.patternCols = int(workConfig.get("scroller", "patternCols"))
@@ -447,7 +448,7 @@ def configureBackgroundScrolling():
 
 def init():
 	global config
-
+	global workConfig
 	print("SINGLETON SCROLLER HOLDER INIT")
 
 	config.redrawSpeed = float(workConfig.get("scroller", "redrawSpeed"))

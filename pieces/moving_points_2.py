@@ -329,7 +329,7 @@ def iterate():
 
 def main(run=True):
     global config
-
+    global workConfig
     config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.draw = ImageDraw.Draw(config.image)
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

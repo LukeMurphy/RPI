@@ -166,6 +166,7 @@ def iterate():
 
 def main(run=True):
 	global config
+	global workConfig
 	config.redrawRate = .02
 
 	

@@ -283,6 +283,7 @@ def redrawGrid2():
 ## Setup and run functions
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("---------------------")
 	print("propagation Loaded")
 

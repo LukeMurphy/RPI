@@ -316,6 +316,7 @@ def drawPalette():
 
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("** ---------------------")
 	print("** Diag Loaded **")
 

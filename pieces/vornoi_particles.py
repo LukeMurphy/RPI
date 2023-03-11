@@ -491,6 +491,7 @@ def main(run=True):
     global config
     global redrawSpeed
     global PS
+    global workConfig
 
     config.minParticles = int(workConfig.get("particles", "minParticles"))
     config.maxParticles = int(workConfig.get("particles", "maxParticles"))

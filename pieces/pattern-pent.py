@@ -14,7 +14,7 @@ def marker(x, y, draw, f="red"):
 
 
 def getColorChanger():
-
+	global workConfig
 	colOverlay = coloroverlay.ColorOverlay(False)
 	colOverlay.randomSteps = False
 	colOverlay.timeTrigger = True
@@ -171,6 +171,7 @@ def showGrid():
 
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("---------------------")
 	print("Screen Loaded")
 

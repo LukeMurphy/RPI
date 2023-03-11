@@ -468,6 +468,7 @@ def colorSeeds():
 
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("---------------------")
 	print("SIGNAGE Loaded")
 

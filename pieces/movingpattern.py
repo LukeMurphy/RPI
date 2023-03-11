@@ -166,7 +166,7 @@ def iterate():
 
 def main(run=True):
 	global config
-	
+	global workConfig
 	config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.bufferImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

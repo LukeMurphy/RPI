@@ -179,6 +179,7 @@ def buildPalette(config, index=0):
 
 
 def buildLinePalette(config, index=0):
+    global workConfig
     palette = config.palettes[index]
     tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
     minHue = float(workConfig.get(palette, "line_minHue"))
@@ -209,6 +210,7 @@ def buildLinePalette(config, index=0):
 
 # This is not really used - for future use sometime
 def buildLinePalette2(config, index=0):
+    global workConfig
     palette = config.palettes[index]
     try:
         tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))

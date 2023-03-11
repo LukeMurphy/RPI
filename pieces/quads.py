@@ -9,6 +9,7 @@
 from modules.makeblocks import makeblockanimals  # , makedrawcarcas
 import random
 import time
+import math
 from collections import OrderedDict
 from modules.configuration import bcolors
 import numpy
@@ -20,6 +21,7 @@ global thrd, config
 
 def init():
 	global config
+	global workConfig
 	config.redrawSpeed = float(workConfig.get("animals", "redrawSpeed"))
 	config.redrawProbablility = float(workConfig.get("animals", "redrawProbablility"))
 	config.xVariance = float(workConfig.get("animals", "xVariance"))
@@ -217,7 +219,7 @@ def drawBackGround():
 			config.workImage = ImageChops.multiply(config.clrBlock, config.workImage)
 
 		except Exception as e:
-			print(e, clrBlock.mode, config.renderImageFull.mode)
+			print(e, config.clrBlock.mode, config.renderImageFull.mode)
 			pass
 
 	config.bgYpos += config.bgYStepSpeed
@@ -339,7 +341,7 @@ def iterate():
 			config.workImage = ImageChops.multiply(config.clrBlock, config.workImage)
 
 		except Exception as e:
-			print(e, clrBlock.mode, config.renderImageFull.mode)
+			print(e, config.clrBlock.mode, config.renderImageFull.mode)
 			pass
 	else:
 		config.workImage.paste(config.imageLayer, (0, 0), config.imageLayer)
@@ -357,4 +359,4 @@ def main(run=True):
 
 ### Kick off .......
 if __name__ == "__main__":
-	__main__()
+	main()

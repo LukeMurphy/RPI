@@ -255,6 +255,7 @@ class XOx:
 
 def main(run=True):
 	global config, directionOrder
+	global workConfig
 	print("---------------------")
 	print("CounterScroll Loaded")
 	colorutils.brightness = config.brightness

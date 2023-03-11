@@ -265,7 +265,7 @@ def iterate():
 
 def init():
 	global config
-
+	global workConfig
 	print("SINGLETON dotGrids HOLDER INIT")
 
 	config.redrawSpeed = float(workConfig.get("spots", "redrawSpeed"))

@@ -76,6 +76,7 @@ class Director:
 
 def main(run=True):
     global config, directionOrder, ps
+    global workConfig
     print("---------------------")
     print("Particles Loaded")
     colorutils.brightness = config.brightness

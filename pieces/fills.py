@@ -124,7 +124,7 @@ class Fill:
 
 
 def main(run=True):
-	global config
+	global config, workConfig
 
 	config.redrawRate = float(workConfig.get("fills", "redrawRate"))
 	config.saturation = float(workConfig.get("fills", "saturation"))

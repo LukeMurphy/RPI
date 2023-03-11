@@ -505,6 +505,7 @@ def iterate():
 def main(run=True):
 	global config
 	global fludds
+	global workConfig
 	fludds = []
 	config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 	config.draw = ImageDraw.Draw(config.image)

@@ -254,7 +254,7 @@ def iterate():
 
 def main(run=True):
 	global config
-
+	global workConfig
 	config.debug = workConfig.getboolean("gradients", "debug")
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))

@@ -230,6 +230,7 @@ def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, m
 
 
 def buildPalette(config,index=0):
+	global workConfig
 	palette = config.palettes[index]
 
 	tLimitBase = int(workConfig.get(palette, "tLimitBase"))
@@ -269,6 +270,7 @@ def buildPalette(config,index=0):
 
 def main(run=True):
 	global config
+	global workConfig
 	config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
 	config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
 	config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))

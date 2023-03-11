@@ -716,6 +716,7 @@ def remakePatternBlock(imageRef, direction):
 
 ## Setup and run functions
 def configureBackgroundScrolling():
+	global workConfig
 	print("configureBackgroundScrolling")
 	config.patternRows = int(workConfig.get("scroller", "patternRows"))
 	config.patternCols = int(workConfig.get("scroller", "patternCols"))
@@ -822,6 +823,7 @@ def configureBackgroundScrolling():
 
 
 def configureImageScrolling():
+	global workConfig
 	config.imageSpeed = float(workConfig.get("scroller", "imageSpeed"))
 	config.imageBlockImage = workConfig.get("scroller", "imageBlockImage")
 	config.imageBlockBuffer = int(workConfig.get("scroller", "imageBlockBuffer"))
@@ -848,6 +850,7 @@ def configureImageScrolling():
 
 
 def configureArrowScrolling():
+	global workConfig
 	config.arrowCols = int(workConfig.get("scroller", "arrowCols"))
 	config.lineThickness = int(workConfig.get("scroller", "lineThickness"))
 	config.arrowSpeed = int(workConfig.get("scroller", "arrowSpeed"))
@@ -867,6 +870,7 @@ def configureArrowScrolling():
 
 
 def configureMessageScrolling():
+	global workConfig
 	config.colorMode = workConfig.get("scroller", "colorMode")
 	config.sansSerif = workConfig.getboolean("scroller", "sansSerif")
 	config.fontSize = int(workConfig.get("scroller", "fontSize"))
@@ -901,6 +905,7 @@ def configureMessageScrolling():
 
 
 def configureAltTextScrolling():
+	global workConfig
 	config.colorMode = workConfig.get("scroller", "colorMode")
 	config.sansSerif = workConfig.getboolean("scroller", "sansSerif")
 	config.fontSize = int(workConfig.get("scroller", "fontSize"))
@@ -920,6 +925,7 @@ def configureAltTextScrolling():
 
 
 def configureImageOverlay():
+	global workConfig
 	config.overLayImage = workConfig.get("scroller", "overLayImage")
 	config.overLayXPos = int(workConfig.get("scroller", "overLayXPos"))
 	config.overLayYPos = int(workConfig.get("scroller", "overLayYPos"))
@@ -939,7 +945,7 @@ def configureImageOverlay():
 
 def init():
 	global config
-
+	global workConfig
 	print("SINGLETON SCROLLER HOLDER INIT")
 
 	config.redrawSpeed = float(workConfig.get("scroller", "redrawSpeed"))
@@ -1313,4 +1319,4 @@ def main(run=True):
 
 ### Kick off .......
 if __name__ == "__main__":
-	__main__()
+	main()

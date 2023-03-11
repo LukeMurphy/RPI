@@ -146,6 +146,7 @@ def iterate():
 
 def main(run=True):
 	global config
+	global workConfig
 	config.redrawRate = .02
 
 	config.lineDrawProb = 1.0

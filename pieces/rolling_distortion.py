@@ -153,6 +153,7 @@ def iterate(n=0):
 ## -------------------------------------------------##
 
 def main(run=True) :
+    global workConfig
     config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.workImageDraw = ImageDraw.Draw(config.workImage)
     config.playSpeed = .02

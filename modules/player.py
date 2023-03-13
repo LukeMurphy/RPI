@@ -27,7 +27,7 @@ from subprocess import call
 
 
 global thrd, config
-global imageTop, imageBottom, image, config, transWiring
+global imageTop, imageBottom, image, transWiring
 
 threads = []
 

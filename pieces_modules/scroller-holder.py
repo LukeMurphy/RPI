@@ -1082,4 +1082,4 @@ def main(config, workConfig, run=True):
 
 ### Kick off .......
 if __name__ == "__main__":
-	__main__()
+	main()

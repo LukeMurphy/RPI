@@ -4,8 +4,12 @@ import textwrap
 import time
 
 from modules import badpixels, coloroverlay, colorutils
-from pieces.workmodules.quilting import createpolysquarepieces
-from pieces.workmodules.quilting.colorset import ColorSet
+from modules.quilting import (
+	createpolypieces,
+	createstarpieces,
+	createtrianglepieces,
+)
+from modules.quilting.colorset import ColorSet
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -42,29 +46,42 @@ def restartPiece(config):
 	config.t1 = time.time()
 	config.t2 = time.time()
 
+	"""
+	## The "dark" color to the spokes
+	config.c1HueRange = randomRange(0,360,True)
+	config.c2SaturationRange = randomRange(.4,.95)
+	config.c1ValueRange = randomRange(.3,.5)
+	
+	# the light color on the 8 spokes / points
+	# these ones should always have the maximum variability
+	config.c2HueRange = (0,360) #randomRange(0,360,True)
+	config.c2SaturationRange = randomRange(.4,1)
+	config.c2ValueRange = randomRange(.8,1)
 
-	'''
+	## The background -- ie the squares etc
+	config.c3HueRange = randomRange(0,360,True)
+	config.c3SaturationRange = randomRange()
+	config.c3ValueRange = randomRange()
+	"""
 
-	## The top / base diamond / square
-	c1Range = round(random.uniform(0, 120))
-	config.c1HueRange = (c1Range, c1Range + 240)
-	config.c1SaturationRange = randomRange(0.4, 0.95)
-
-	vRange = random.uniform(0.2, 0.9)
-	config.c1ValueRange = randomRange(vRange, vRange + 0.1)
-
-	# the "Shaded" side
-	c2Range = round(random.uniform(0, 140))
-	config.c2HueRange = (c2Range, c2Range + 220)
-	config.c2SaturationRange = randomRange(0.4, 1)
-	config.c2ValueRange = randomRange(0.1, 0.5)
-
-	## The "bright side"
-	config.c3HueRange = config.c2HueRange
-	config.c3SaturationRange = randomRange(0.4, 0.999)
-	config.c3ValueRange = randomRange(0.5, 1)
-
-	'''
+	if random.random() < 0.25:
+		choice = round(random.uniform(1, 3))
+		print("Choice {0}".format(choice))
+		if choice == 1:
+			# ruby pink bgs
+			config.c3HueRange = (350, 40)
+			config.c3SaturationRange = (0.7, 1)
+			config.c3ValueRange = (0.4, 1)
+		elif choice == 2:
+			# blue bg
+			config.c3HueRange = (220, 260)
+			config.c3SaturationRange = (0.9, 1)
+			config.c3ValueRange = (0.3, 0.95)
+		else:
+			# saturated
+			config.c3HueRange = (0, 360)
+			config.c3SaturationRange = (0.8, 1)
+			config.c3ValueRange = (0.3, 1)
 
 	config.fillColorSet = []
 	config.fillColorSet.append(
@@ -80,49 +97,34 @@ def restartPiece(config):
 	if random.random() < config.resetSizeProbability:
 		config.rotation = random.uniform(-config.rotationRange, config.rotationRange)
 		config.doingRefresh = 0
-		config.doingRefreshCount = 100
-
-	if random.random() < config.resetSizeProbability / 8:
-		config.lines = True
-	else:
-		config.lines = False
-
-	# a lame attempt at "optimizing" the number or rows and cols that are drawn
-	# based on the size of the blocks ... ;[
+		config.doingRefreshCount = config.refreshCount
 
 	if random.random() < config.resetSizeProbability:
 		config.blockSize = round(
 			random.uniform(config.blockSizeMin, config.blockSizeMax)
 		)
 
-		if config.blockSize <= 11:
-			config.blockCols = config.blockColsMax
-			config.blockRows = config.blockRowsMax
-		else:
+		if config.blockSize >= 11:
 			config.blockCols = config.blockColsMin
 			config.blockRows = config.blockRowsMin
-
-		# print(config.blockSize, config.blockCols, config.blockRows)
+		else:
+			config.blockCols = config.blockColsMax
+			config.blockRows = config.blockRowsMax
 
 		config.blockLength = config.blockSize
 		config.blockHeight = config.blockSize
 		config.doingRefresh = 0
-		config.doingRefreshCount = 100
-		createpolysquarepieces.createPieces(config, True)
+		config.doingRefreshCount = config.refreshCount
+		createpolypieces.createPieces(config, True)
 
 	# poly specific
 	if random.random() < config.resetSizeProbability:
-		if config.randomness != 0:
-			config.randomness = random.uniform(
-				config.minRandomness, config.maxRandomness
-			)
-
-		# initialize crossfade - in this case 100 steps ...
+		config.randomness = random.uniform(0, config.randomnessBase)
 		config.doingRefresh = 0
-		config.doingRefreshCount = 100
+		config.doingRefreshCount = config.refreshCount
 
-	createpolysquarepieces.refreshPalette(config)
-	setInitialColors(config, True)
+	createpolypieces.refreshPalette(config)
+	setInitialColors(True)
 
 
 def setInitialColors(config, refresh=False):
@@ -138,9 +140,9 @@ def setInitialColors(config, refresh=False):
 
 
 def main(config, workConfig, run=True):
-
+	# global config, directionOrder,workConfig
 	print("---------------------")
-	print("POLYS Loaded")
+	print("QUILT Loaded")
 
 	config.brightness = float(workConfig.get("displayconfig", "brightness"))
 	colorutils.brightness = config.brightness
@@ -186,9 +188,6 @@ def main(config, workConfig, run=True):
 	config.blockRowsMax = int(workConfig.get("quilt", "blockRowsMax"))
 	config.blockColsMin = int(workConfig.get("quilt", "blockColsMin"))
 	config.blockColsMax = int(workConfig.get("quilt", "blockColsMax"))
-
-	# the amount to reduce the "vertical" blocks: allowable values are 1-5
-	config.elongation = int(workConfig.get("quilt", "elongation"))
 	config.blockCols = config.blockColsMax
 	config.blockRows = config.blockRowsMax
 
@@ -254,15 +253,6 @@ def main(config, workConfig, run=True):
 	config.blockLength = config.blockSize
 	config.blockHeight = config.blockSize
 
-	if config.blockSize <= 11:
-		config.blockCols = config.blockColsMax
-		config.blockRows = config.blockRowsMax
-	else:
-		config.blockCols = config.blockColsMin
-		config.blockRows = config.blockRowsMin
-
-	# print(config.blockSize, config.blockCols, config.blockRows)
-
 	config.canvasImage = Image.new(
 		"RGBA", (config.canvasImageWidth, config.canvasImageHeight)
 	)
@@ -280,10 +270,6 @@ def main(config, workConfig, run=True):
 		ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange)
 	)
 
-	config.randomness = 0
-	config.minRandomness = 0
-	config.maxRandomness = 0
-
 	try:
 		config.rotationRange = float(workConfig.get("quilt", "rotationRange"))
 	except Exception as e:
@@ -291,29 +277,24 @@ def main(config, workConfig, run=True):
 		print(e)
 
 	try:
-		config.randomness = int(workConfig.get("quilt", "randomness"))
-		try:
-			config.maxRandomness = int(workConfig.get("quilt", "maxRandomness"))
-		except Exception as e:
-			config.maxRandomness = config.randomness
-			print(e)
+		config.refreshCount = float(workConfig.get("quilt", "refreshCount"))
 	except Exception as e:
+		config.refreshCount = 100
 		print(e)
 
 	try:
-		config.minRandomness = int(workConfig.get("quilt", "minRandomness"))
+		config.randomness = int(workConfig.get("quilt", "randomness"))
+		config.randomnessBase = int(workConfig.get("quilt", "randomness"))
 	except Exception as e:
-		config.minRandomness = 0
+		config.randomness = 0
 		print(e)
 
-	## Draws a single colored block ....
 	try:
 		drawBlockCoordsRaw = list(
 			list((i).split(","))
 			for i in workConfig.get("drawBlock", "drawBlockCoords").split("|")
 		)
 		config.drawBlockCoords = []
-
 		for i in drawBlockCoordsRaw:
 			coords = tuple(int(ii) for ii in i)
 			config.drawBlockCoords.append(coords)
@@ -337,46 +318,41 @@ def main(config, workConfig, run=True):
 		config.drawBlock_c1ValueRange = tuple(
 			[float(i) for i in workConfig.get("drawBlock", "c1ValueRange").split(",")]
 		)
-		config.drawBlockColor = coloroverlay.ColorOverlay(False)
-		config.drawBlockColor.minHue = config.drawBlock_c1HueRange[0]
-		config.drawBlockColor.maxHue = config.drawBlock_c1HueRange[1]
-		config.drawBlockColor.minSaturation = config.drawBlock_c1SaturationRange[0]
-		config.drawBlockColor.maxSaturation = config.drawBlock_c1SaturationRange[1]
-		config.drawBlockColor.minValue = config.drawBlock_c1ValueRange[0]
-		config.drawBlockColor.maxValue = config.drawBlock_c1ValueRange[1]
-		config.drawBlockColor.colorTransitionSetup()
-		config.drawBlockColor.stepTransition()
 		config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 		config.drawBlock = True
-		f1 = lambda: config.canvasImageDraw.polygon(
-			config.drawBlockCoords,
-			fill=tuple(x for x in config.drawBlockColor.currentColor),
+		config.drawBlockShape = lambda: config.canvasImageDraw.polygon(
+			config.drawBlockCoords, fill=config.drawBlockFixedColor
 		)
-		f2 = lambda: config.drawBlockColor.stepTransition()
-		config.drawBlockShape = [f1, f2]
-
 	except Exception as e:
 		print(e)
 		config.drawBlock = False
-		config.drawBlockShape = []
+		config.drawBlockShape = lambda: True
 
-	createpolysquarepieces.createPieces(config)
+	createpolypieces.createPieces(config)
 
 	setInitialColors(config)
 
 	config.t1 = time.time()
 	config.t2 = time.time()
 
-	# initial crossfade settings
-	config.doingRefresh = 100
-	config.doingRefreshCount = 100
+	config.doingRefresh = config.refreshCount
+	config.doingRefreshCount = config.refreshCount
+
+	# if(run) : runWork()
+
+
+def runWork():
+	global blocks, config, XOs
+	# gc.enable()
+
+	while True:
+		iterate()
+		time.sleep(config.delay)
 
 
 def iterate(config):
-
+	# global config
 	config.outlineColorObj.stepTransition()
-
-	# print(config.doingRefresh)
 
 	# Need to do a crossfade
 	if config.doingRefresh < config.doingRefreshCount:
@@ -388,6 +364,7 @@ def iterate(config):
 			config.canvasImage,
 			config.doingRefresh / config.doingRefreshCount,
 		)
+		config.drawBlockShape()
 		config.render(crossFade, 0, 0)
 		config.doingRefresh += 1
 	else:
@@ -395,24 +372,13 @@ def iterate(config):
 		temp.paste(config.canvasImage, (0, 0), config.canvasImage)
 		if config.transformShape == True:
 			temp = transformImage(temp)
+		config.drawBlockShape()
 		config.render(temp, 0, 0)
 
 	for i in range(0, len(config.unitArray)):
 		obj = config.unitArray[i]
 		obj.update()
 		obj.render()
-
-		"""
-		if config.doingRefresh < config.doingRefreshCount and random.random() < .1 :
-			obj.render()
-			config.doingRefresh += 1
-		elif config.doingRefresh == config.doingRefreshCount :
-			obj.render()
-		"""
-
-	# For drawing a single color block or other lambda fcu
-	for fcu in config.drawBlockShape:
-		fcu()
 
 	config.t2 = time.time()
 	delta = config.t2 - config.t1

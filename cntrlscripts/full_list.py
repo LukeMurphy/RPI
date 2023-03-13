@@ -34,6 +34,7 @@ from tkmacosx import Button
 
 commadStringProc = ""
 JavaAppRunning = ""
+configPath = "/Users/lamshell/Documents/Dev/RPI/configs/"
 
 
 actionDict1 = [
@@ -60,10 +61,10 @@ def verify():
         selection = Lb1.curselection()[0]
         configSelected = actionDict1[selection]
         process = True
-    elif len(list(Lb2.curselection())) > 0:
-        selection = Lb2.curselection()[0]
-        configSelected = actionDict2[selection]
-        process = True
+    # elif len(list(Lb2.curselection())) > 0:
+    #     selection = Lb2.curselection()[0]
+    #     configSelected = actionDict2[selection]
+    #     process = True
     return (process, configSelected)
 
 
@@ -75,7 +76,7 @@ def execute(configToRun):
 
     print("--------------------------------------------")
     print("--------------------------------------------")
-    print(configToRun)
+    print(configToRun.split(configPath)[1])
     print("--------------------------------------------")
     print("--------------------------------------------")
     """Summary
@@ -87,15 +88,19 @@ def execute(configToRun):
     if ".cfg" in configToRun:
         if "multi" in configToRun:
             print("MULTIPLAYER STARTING >>>\n")
-            os.system(commadStringMultiPyth + configToRun + "&")
+            os.system(commadStringMultiPyth +
+                      configToRun.split(configPath)[1] + "&")
         if "--manifest" in configToRun:
-            print(commadStringSeqPyth + configToRun + "&")
-            os.system(commadStringSeqPyth + configToRun + "&")
+            print(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
+            os.system(commadStringSeqPyth +
+                      configToRun.split(configPath)[1] + "&")
         else:
-            os.system(commadStringPyth + configToRun + "&")
+            os.system(commadStringPyth +
+                      configToRun.split(configPath)[1] + "&")
     elif ".app" in configToRun:
-        os.system("open " + commadStringProc + configToRun)
-        JavaAppRunning = configToRun
+        os.system("open " + commadStringProc +
+                  configToRun.split(configPath)[1])
+        JavaAppRunning = configToRun.split(configPath)[1]
 
 
 def action():
@@ -117,7 +122,8 @@ def action2():
         os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
 
         if JavaAppRunning != "":
-            os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")
+            os.system("ps -ef | pgrep -f " + JavaAppRunning +
+                      " | xargs sudo kill -9;")
 
         configSelected = a[1]
         configToRun = configSelected[list(configSelected.keys())[0]]
@@ -147,10 +153,16 @@ def openFile():
     if a[0] == True:
         # os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
         configSelected = a[1]
-        os.system("open " + "configs/" + configSelected[list(configSelected.keys())[0]])
+        # os.system("open " + "configs/" + configSelected[list(configSelected.keys())[0]])
+        os.system("open " + configSelected[list(configSelected.keys())[0]])
 
+
+def returnFirstElement(l):
+    return l[0]
 
 # Generate list of configs:
+
+
 def returnSecondElement(l):
     """Summary
 
@@ -169,70 +181,75 @@ def getAllConfigFiles(dateSort=False, subsortDate=False):
     Args:
         dateSort (bool, optional): Description
     """
+
     global actionDict1, Lb1
-    configPath = "/Users/lamshell/Documents/Dev/RPI/configs/"
-    arr = os.listdir(configPath)
+    global configPath
+    # arr = os.listdir(configPath)
     # Sort the directories by name
-    arr.sort(reverse=False)
+    # arr.sort(reverse=False)
     fullList = []
     actionDict1 = []
 
-    for directory in arr:
-        if (
-            directory.find(".py") == -1
-            and directory.find(".DS_Store") == -1
-            and directory.find("_py") == -1
-            and directory.find("LED") == -1
-        ):
-            subArr = os.listdir(configPath + directory)
-            subDirectoryList = []
+    for root, dirs, files in os.walk(configPath, topdown=False):
+        for name in files:
+            fullPath = os.path.join(root, name)
+            if name.find(".cfg") > 0 and name.find(".py") == -1 and name.find(".DS_Store") == -1:
+                res = os.stat(fullPath)
+                fullList.append((os.path.join(root, name), res.st_mtime))
 
-            if dateSort == False:
-                subArr.sort(reverse=True)
+    # for directory in arr:
+    #     if (
+    #         directory.find(".py") == -1
+    #         and directory.find(".DS_Store") == -1
+    #         and directory.find("_py") == -1
+    #         and directory.find("LED") == -1
+    #     ):
+    #         subArr = os.listdir(configPath + directory)
+    #         subDirectoryList = []
 
-            for file in subArr:
-                if file.find(".DS_Store") == -1:
-                    shortPath = directory + "/" + file
-                    if os.path.isfile(configPath + shortPath):
-                        res = os.stat(configPath + shortPath)
-                        if dateSort == False:
-                            subDirectoryList.append((shortPath, res.st_mtime))
-                        else:
-                            fullList.append((shortPath, res.st_mtime))
+    #         if dateSort == False:
+    #             subArr.sort(reverse=True)
 
-            if dateSort == False:
-                # sorts by date within folder
-                if subsortDate == True:
-                    subDirectoryList.sort(key=returnSecondElement, reverse=True)
-                else:
-                    subDirectoryList.sort(reverse=False)
-                fullList.extend(subDirectoryList)
-                fullList.append({})
+    #         for file in subArr:
+    #             if file.find(".DS_Store") == -1:
+    #                 shortPath = directory + "/" + file
+    #                 if os.path.isfile(configPath + shortPath):
+    #                     res = os.stat(configPath + shortPath)
+    #                     if dateSort == False:
+    #                         subDirectoryList.append((shortPath, res.st_mtime))
+    #                     else:
+    #                         fullList.append((shortPath, res.st_mtime))
+
+    #         if dateSort == False:
+    #             # sorts by date within folder
+    #             if subsortDate == True:
+    #                 subDirectoryList.sort(key=returnSecondElement, reverse=True)
+    #             else:
+    #                 subDirectoryList.sort(reverse=False)
+    #             fullList.extend(subDirectoryList)
+    #             fullList.append({})
 
     # Sort the configs by date descending
     if dateSort == True:
         fullList.sort(key=returnSecondElement, reverse=True)
+    else:
+        fullList.sort(key=returnFirstElement, reverse=False)
 
+    lastfName = ""
+    fName = ""
     for f in fullList:
+        fName = f[0].split(configPath)[1].split('/')[0]
         if len(f) > 0:
-            tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("[%Y-%m-%d %H:%M]")
+            tsTxt = datetime.datetime.fromtimestamp(
+                f[1]).strftime("[%Y-%m-%d %H:%M]")
+            if fName != lastfName:
+                actionDict1.append({"": ""})
 
-            if dateSort == True:
-                display = f[0].split("/")
-                spacer = " \t\t\t\t"
-                if len(display[1]) > 26:
-                    spacer = " \t\t\t"
-                if len(display[1]) > 33:
-                    spacer = " \t"
-                if len(display[1]) < 20:
-                    spacer = " \t\t\t\t\t"
-                actionDict1.append(
-                    {display[1] + spacer + tsTxt + " \t" + display[0]: f[0]}
-                )
-                # actionDict1.append({ ""  : ""})
-            else:
-                actionDict1.append({tsTxt + "  " + f[0].split('/')[0] + "     " + f[0].split('/')[1]: f[0]})
-                # actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
+            lastfName = f[0].split(configPath)[1].split('/')[0]
+            actionDict1.append(
+                {tsTxt + "\t\t" + f[0].split(configPath)[1] + "     ": f[0]})
+            # actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
+
         else:
             actionDict1.append({"": ""})
 
@@ -347,10 +364,10 @@ sortbutton3 = Button(
 )
 sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 
-
 openbutton = Button(
     root, text="Open", width=120, bg="blue", fg="white", borderless=1, command=openFile
 )
+
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 getAllConfigFiles(False, True)

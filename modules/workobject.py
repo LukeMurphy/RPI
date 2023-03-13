@@ -511,6 +511,6 @@ class WorkObject:
 			+ bcolors.ENDC
 		)
 		importlib.invalidate_caches()
-		self.workModule = importlib.import_module("pieces." + str(self.config.workName))
+		self.workModule = importlib.import_module("" + str(self.config.workName))
 		print(">> WorkObject running main on work")
 		self.workModule.main(self.config, self.workConfig, False)

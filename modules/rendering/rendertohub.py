@@ -26,6 +26,7 @@ from PIL import (
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 global root
+global work, config
 memoryUsage = 0
 debug = False
 counter = 0

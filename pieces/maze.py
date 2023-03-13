@@ -214,6 +214,12 @@ def main(run=True):
     # config.infoColor2 = tuple(int(i) for i in (workConfig.get("forms", "infoColor2")).split(","))
 
     config.recursionCount = 0
+
+    try:
+        config.debug = workConfig.getboolean("forms","deBug")
+    except Exception as e:
+        print(str(e))
+        config.debug = True
     setupMaze()
 
 
@@ -273,7 +279,7 @@ def setupMaze():
     config.doneMakingMaze = False
     config.hidePath = True
     config.solved = False
-    config.debug = False
+    
     config.fixedStart = True
     config.imageWasWritten = False
 
@@ -592,11 +598,12 @@ def solver(n=-1):
             else :
                 cell.pathok = 1
                 addBridgePoints(cell.i,config.cellsWalked[-2],1)
+                # print(("Some kind of end {}").format('...walking back'))
 
-                if config.debug == True :
-                    changeCell = config.cellsWalked.index(cell.i)
-                    print(("Some kind of end {}").format(changeCell))
-                    print("")
+                # if config.debug == True :
+                changeCell = config.cellsWalked.index(cell.i)
+                print(("Some kind of end {} ... walking back").format(changeCell))
+                print("")
 
                 walkBackCount = 0
                 walkBacks = len(config.cellsWalked)

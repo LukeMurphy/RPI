@@ -91,7 +91,8 @@ sunset = dict(
     ltorange=(221, 144, 82),
     warmwht=(255, 255, 238),
 )
-sky = dict(coolblue=(254, 254, 248), ltblue=(190, 200, 202), grayblue=(182, 186, 182))
+sky = dict(coolblue=(254, 254, 248), ltblue=(
+    190, 200, 202), grayblue=(182, 186, 182))
 # sorted_sunset = {k: (sum(v)/3) for k, v in sunset.iteritems()}
 # sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), key=operator.itemgetter(1))
 
@@ -119,17 +120,17 @@ klimt = ([48, 48, 48],
          [200, 180, 8],
          [0, 0, 120])
 
-testPalette =([255,0,0],[255,100,100],[255,0,200])
+testPalette = ([255, 0, 0], [255, 100, 100], [255, 0, 200])
 
 
 def getNamedPalette(arg, brtns=1, a=255):
-    if arg == "klimt" :
-    	return getKlimt(brtns, a)
-    if arg == "colorWheel" :
+    if arg == "klimt":
+        return getKlimt(brtns, a)
+    if arg == "colorWheel":
         return getColorWheel(brtns, a)
-    if arg == "wheelBasicLowGreen" :
+    if arg == "wheelBasicLowGreen":
         return getwheelBasicLowGreen(brtns, a)
-    if arg == "testPalette" :
+    if arg == "testPalette":
         return getTest(brtns, a)
 
 
@@ -141,6 +142,7 @@ def getKlimt(brtns=1, a=255):
     c = klimt[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
+
 def getColorWheel(brtns=1, a=255):
     choice = round(
         random.uniform(0, len((wheelBasic))-1)
@@ -149,6 +151,7 @@ def getColorWheel(brtns=1, a=255):
     c = wheelBasic[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
+
 def getwheelBasicLowGreen(brtns=1, a=255):
     choice = round(
         random.uniform(0, len((wheelBasicLowGreen))-1)
@@ -156,6 +159,7 @@ def getwheelBasicLowGreen(brtns=1, a=255):
 
     c = wheelBasicLowGreen[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
+
 
 def getTest(brtns=1, a=255):
     choice = round(
@@ -309,13 +313,13 @@ def getRandomColorHSV(
     if h > 360.0:
         h -= 360.0
 
-    #print("New hue: " + str(h))
+    # print("New hue: " + str(h))
 
     # h = random.uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
     s = random.uniform(sMin, sMax)
     v = random.uniform(vMin, vMax)
-    #print(vMin, vMax, v)
+    # print(vMin, vMax, v)
     rgb = HSVToRGB(h, s, v)
     return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
 
@@ -354,7 +358,7 @@ def getRandomColorHSL(
     # print(hMin,hMax,degreeRange, h)
     s = random.uniform(sMin, sMax)
     l = random.uniform(lMin, lMax)
-    #print(lMin, lMax, l)
+    # print(lMin, lMax, l)
     rgb = HSVToRGB(h, s, l)
     return (rgb[0], rgb[1], rgb[2], a)
 
@@ -408,7 +412,8 @@ def closestRBYfromRGB(rgb):
     for n in range(0, len(wheel)):
         d = round(
             math.sqrt(
-                (r - wheel[n][0]) ** 2 + (g - wheel[n][1]) ** 2 + (b - wheel[n][2]) ** 2
+                (r - wheel[n][0]) ** 2 + (g - wheel[n]
+                                          [1]) ** 2 + (b - wheel[n][2]) ** 2
             )
         )
         dArray.append([n, d])

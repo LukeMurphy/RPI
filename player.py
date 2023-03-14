@@ -1,26 +1,23 @@
 #!/usr/bin/python
-"""Summary
+# """Summary
 
-Attributes:
-    args (TYPE): Description
-    parser (TYPE): Description
-    workconfig (TYPE): Description
-"""
+# Attributes:
+#     args (TYPE): Description
+#     parser (TYPE): Description
+#     workconfig (TYPE): Description
+# """
 
 import argparse
 import configparser
 import getopt
 import os
-import sys
 import time
-
-import noise
+import sys
 
 from configs import defaultpiece
-from modules import coloroverlay, colorutils, configuration, player
+from modules import configuration, player
 from modules.configuration import bcolors
-#from pieces.workmodules.particleobjects.particle import Particle
-#from pieces.workmodules.particleobjects.particlesystem import ParticleSystem
+
 from PIL import (
 	Image,
 	ImageChops,

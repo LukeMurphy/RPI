@@ -109,13 +109,13 @@ def setUp(config):
 		height=config.screenHeight + buff,
 	)
 
-	"""
-	cnvs2 = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=-4)
-	config.cnvs2 = cnvs2
-	config.cnvs2.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
-	config.cnvs2.pack()
-	config.cnvs2.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff, x=config.screenWidth + 2)
-	"""
+
+	# cnvs2 = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=-4)
+	# config.cnvs2 = cnvs2
+	# config.cnvs2.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
+	# config.cnvs2.pack()
+	# config.cnvs2.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff, x=config.screenWidth + 2)
+
 
 	# tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
 	tempImage = ImageTk.PhotoImage(config.renderImageFull)
@@ -191,15 +191,11 @@ def updateCanvas():
 	config.cnvs.update()
 
 
+	# config.cnvs2.delete("main")
+	# config.cnvs2._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
+	# config.cnvs2._image_id = config.cnvs2.create_image(canvasOffsetX -4, canvasOffsetY, image=config.cnvs2._image_tk, anchor='nw', tag="main")
+	# config.cnvs2.update()
 
-	
-
-	"""
-	config.cnvs2.delete("main")
-	config.cnvs2._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
-	config.cnvs2._image_id = config.cnvs2.create_image(canvasOffsetX -4, canvasOffsetY, image=config.cnvs2._image_tk, anchor='nw', tag="main")
-	config.cnvs2.update()
-	"""
 
 	# This *should* be more efficient
 	# config.cnvs.update_idletasks()
@@ -412,9 +408,8 @@ def render(
 
 	# ---- Overall image blurring  ---- #
 	if config.useBlur == True:
-		"""
-		config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-		"""
+		# config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+
 		crop = config.renderImageFull.crop(config.blurSection)
 		destination = (config.blurXOffset, config.blurYOffset)
 		crop = crop.convert("RGBA")
@@ -437,7 +432,6 @@ def render(
 		print(e)
 
 
-
 	if config.outputMode == 'gif' :
 		config.frameCount += 1
 		if config.frameCount >= config.frameCountLimit :
@@ -453,20 +447,6 @@ def render(
 			name =  "" + st + ".gif"
 			config.imageArrayForSaving[0].save(name,save_all=True, append_images=config.imageArrayForSaving[1:], optimize=True, duration=.5, loop=0)
 			config.imageArrayForSaving = []
-
-	"""
-	for i in range(0,40) :`
-		delta = 16
-		box = (0,i*delta,448,i*delta+delta)
-		crop = config.renderImageFull.crop(box)
-		crop = crop.convert("RGBA")
-		config.renderImageFull.paste(crop, (i*2 + config.angle, i*delta), crop)
-
-	config.torqueAngle += 1
-	
-	if config.torqueAngle > 1000064 :
-		config.torqueAngle = 0
-	"""
 
 	if updateCanvasCall:
 		updateCanvas()

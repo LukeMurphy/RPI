@@ -154,12 +154,20 @@ def rebuildPatternSequence(config):
 
     # for i in range(0,numberOfPatterns) :
     i = 0
+    iterateCount = 0
     usedPatterns = []
+    
+    # print(numberOfPatterns)
+    # Had to add an iterate couter because sometimes things
+    # just ran away and it all froze ....
+    
     while i < numberOfPatterns:
+        
+        # print(str("iterateCount count: {}").format(iterateCount))
         pattern = config.patterns[math.floor(
             random.uniform(0, len(config.patterns)))]
 
-        if pattern not in usedPatterns:
+        if pattern not in usedPatterns or iterateCount >= 256:
             if pattern not in (["shingles", "fishScales", "balls"]):
                 rotate = round(random.uniform(0, 1))
             else:
@@ -170,6 +178,7 @@ def rebuildPatternSequence(config):
             usedPatterns.append(pattern)
             lastPosition = position
             i += 1
+        iterateCount += 1
 
 
 def loadImageForBase():

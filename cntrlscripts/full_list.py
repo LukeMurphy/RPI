@@ -242,7 +242,7 @@ def getAllConfigFiles(dateSort=False, subsortDate=False):
         if len(f) > 0:
             tsTxt = datetime.datetime.fromtimestamp(
                 f[1]).strftime("[%Y-%m-%d %H:%M]")
-            if fName != lastfName:
+            if fName != lastfName and dateSort != True:
                 actionDict1.append({"": ""})
 
             lastfName = f[0].split(configPath)[1].split('/')[0]

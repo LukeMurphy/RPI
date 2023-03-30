@@ -46,9 +46,9 @@ class ParticleDot:
         fy = random.random() * p.fFactor + 1
         vx = math.cos(p.angle * n) * fx * direction
         vy = math.sin(p.angle * n) * fy * direction
-        r = int(random.uniform(0, config.rRange) * p.brightness)
-        g = int(random.uniform(0, config.gRange) * p.brightness)
-        b = int(random.uniform(0, config.bRange) * p.brightness)
+        r = int(random.uniform(config.rRangeMin, config.rRange) * p.brightness)
+        g = int(random.uniform(config.gRangeMin, config.gRange) * p.brightness)
+        b = int(random.uniform(config.bRangeMin, config.bRange) * p.brightness)
         radius = random.uniform(1, p.maxRadius)
 
 
@@ -389,7 +389,7 @@ def drawBands(p):
         '''
 
         # Golden Rings
-        if i == 0 or i ==24:
+        if i in config.goldenRingsArray:
             config.draw.ellipse(
                 (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2)
             )
@@ -577,11 +577,25 @@ def main(run=True):
         config.rRange = int(workConfig.get("particles","rRange"))
         config.gRange = int(workConfig.get("particles","gRange"))
         config.bRange = int(workConfig.get("particles","bRange"))
+        config.rRangeMin = int(workConfig.get("particles","rRangeMin"))
+        config.gRangeMin = int(workConfig.get("particles","gRangeMin"))
+        config.bRangeMin = int(workConfig.get("particles","bRangeMin"))
     except Exception as e:
         print(str(e))
         config.rRange = 255
         config.gRange = 200
         config.bRange = 255
+        config.rRangeMin = 0
+        config.gRangeMin = 0
+        config.bRangeMin = 0
+        
+        
+    try:
+        goldenRingsArray = workConfig.get("particles","goldenRingsArray").split(',')
+        config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
+    except Exception as e:
+        print(str(e))
+        config.goldenRingsArray = [0,24]
 
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

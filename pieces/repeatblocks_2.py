@@ -533,6 +533,11 @@ def iterate():
         baseName = config.outPutPath + str(currentTime)
         writeImage(baseName, renderImage=config.canvasImage)
 
+    if random.random() < .01 :
+        config.doSectionDisturbance = False
+    if random.random() < .01 :
+        config.doSectionDisturbance = True
+    
     # Rebuild the main pattern, halt any disturbances
     if random.random() < config.rebuildPatternProbability:
         config.doSectionDisturbance = False
@@ -812,6 +817,7 @@ def main(run=True):
 
     config.directorController = Director(config)
     config.directorController.slotRate = .03
+
 
     ''' 
 		########### Need to add something like this at final render call  as well

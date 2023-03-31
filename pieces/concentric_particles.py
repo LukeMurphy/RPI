@@ -4,7 +4,7 @@ import threading
 import time
 
 from modules import colorutils
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageChops
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -50,6 +50,7 @@ class ParticleDot:
         g = int(random.uniform(config.gRangeMin, config.gRange) * p.brightness)
         b = int(random.uniform(config.bRangeMin, config.bRange) * p.brightness)
         radius = random.uniform(1, p.maxRadius)
+        self.circuitCount = 0
 
 
         # Make radius fall into one of the systems bands - like quata
@@ -226,6 +227,7 @@ class ParticleSystem:
 
         if self.x > config.canvasWidth - round(self.wBase / 4):
             self.xSpeed = 0
+            
 
         for q in range(0, self.p):
             ref = self.particles[q]
@@ -243,6 +245,13 @@ class ParticleSystem:
                     # print(r, ref.radius, ref.orbit)
                     ref.mode = 0
 
+                # horizontal Continuity
+                if config.horizontalContinuity == True :
+                    if ref.xPos  > config.canvasWidth :
+                        ref.xPos = 0
+                        
+                    if ref.xPos  < 0 :
+                        ref.xPos  = config.canvasWidth   
             else:
                 ref.xPos = self.x + ref.radius/1 * math.cos(ref.angle) * 0.2
                 ref.yPos = self.y + ref.radius/1 * math.sin(ref.angle) * 0.2
@@ -289,11 +298,19 @@ class ParticleSystem:
             # if (q ==0) : print (particles[q]['c'][0])
             xDisplayPos = ref.xPos
             yDisplayPos = ref.yPos
+            
+            # horizontal Continuity
+            if config.horizontalContinuity == True :
+                if xDisplayPos  > config.canvasWidth :
+                    xDisplayPos = ref.xPos - config.canvasWidth
+                    
+                if xDisplayPos  < 0 :
+                    xDisplayPos  = config.canvasWidth  - ref.xPos
 
             if (
-                xDisplayPos < self.config.canvasWidth
-                and xDisplayPos > 0
-                and yDisplayPos > 0
+                xDisplayPos <= self.config.canvasWidth
+                and xDisplayPos >= 0
+                and yDisplayPos >= 0
                 and yDisplayPos <= config.canvasHeight
             ):
                 try:
@@ -329,12 +346,22 @@ class ParticleSystem:
             """
 			"""
             if (
-                xDisplayPos > config.canvasWidth
-                or yDisplayPos > config.canvasHeight
+
+                yDisplayPos > config.canvasHeight
                 or yDisplayPos < 0
-                or xDisplayPos < 0
+
             ):
                 ref.setUp(self, ref.id)
+            # if (
+            #     xDisplayPos > config.canvasWidth
+            #     or yDisplayPos > config.canvasHeight
+            #     or yDisplayPos < 0
+            #     or xDisplayPos < 0
+            # ):
+            #     ref.setUp(self, ref.id)
+
+
+
 
             if random.random() < config.particleResetProb:
                 ref.setUp(self, ref.id)
@@ -390,11 +417,11 @@ def drawBands(p):
 
         # Golden Rings
         if i in config.goldenRingsArray:
-            config.draw.ellipse(
-                (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2)
-            )
+            config.draw.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
+            config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
         else :
             config.draw.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), round(bBase), round(a)))
+            config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), round(bBase), round(a)))
 
         rBase += rDiff
         gBase += gDiff
@@ -425,12 +452,15 @@ def drawBands(p):
             polyArray.append((x1,y1))
             if rSet.radialsArray[n][2] == 0:
                 config.draw.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
+                config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
             if numLines == 1 :
                 config.draw.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
+                config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
 
 
         if rSet.drawRadialPolys == True:
             config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
+            config.drawOverFlow.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
 
 
 
@@ -465,7 +495,26 @@ def iterate():
             round(config.fadeRate),
         ),
     )
+    config.drawOverFlow.rectangle(
+        (0, 0, config.canvasWidth, config.canvasHeight),
+        fill=(
+            config.bgColor[0],
+            config.bgColor[1],
+            config.bgColor[2],
+            round(config.fadeRate),
+        ),
+    )
 
+    if config.horizontalContinuity == True :
+        # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
+        
+        xCrop  = round(config.canvasWidth)
+        xCrop2 = round(config.canvasWidth - config.canvasWidth/ config.horizontalOverlapFraction)
+        temp = config.imageOverFlow.crop((xCrop,0,xCrop + config.canvasWidth / config.horizontalOverlapFraction, config.canvasHeight))
+        temp2 = config.image.crop((xCrop2,0,config.canvasWidth, config.canvasHeight))
+        temp3 = ImageChops.add(config.image, temp, scale=1.0, offset = 0)
+        config.image.paste(temp3, (0,0), temp2)
+        
     drawBands(PS)
 
     PS.move()
@@ -490,6 +539,8 @@ def iterate():
                 PS.setNewAttributes()
                 PS.setUp()
 
+    
+         
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
     # Done
@@ -555,6 +606,21 @@ def main(run=True):
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
+    
+    try:
+        # comment: # for some towers the seam between the 
+        # start and end needs to become semi-continuous
+        # so I make the particles appear to move around the piece
+        # and overlap one side with some of the drawing
+        # if every thing was drawn pixel by pixel this would
+        # probably not need to be so complicated
+        config.horizontalContinuity = workConfig.getboolean("particles","horizontalContinuity")
+        config.horizontalOverlapFraction = int(workConfig.get("particles","horizontalOverlapFraction"))
+    except Exception as e:
+        print(str(e))
+        config.horizontalContinuity = False
+        config.horizontalOverlapFraction = 1
+    # end try
 
 
     try:
@@ -600,6 +666,10 @@ def main(run=True):
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
+    config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight))
+    config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
+    
+    
     PS = ParticleSystem(config)
     PS.setCenter()
     PS.setNewAttributes()

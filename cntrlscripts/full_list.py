@@ -235,17 +235,19 @@ def getAllConfigFiles(dateSort=False, subsortDate=False):
     else:
         fullList.sort(key=returnFirstElement, reverse=False)
 
-    lastfName = ""
+    lastDir = ""
     fName = ""
     for f in fullList:
         fName = f[0].split(configPath)[1].split('/')[0]
         if len(f) > 0:
             tsTxt = datetime.datetime.fromtimestamp(
                 f[1]).strftime("[%Y-%m-%d %H:%M]")
-            if fName != lastfName and dateSort != True:
+            
+            # and dateSort != True
+            if fName != lastDir :
                 actionDict1.append({"": ""})
 
-            lastfName = f[0].split(configPath)[1].split('/')[0]
+            lastDir = f[0].split(configPath)[1].split('/')[0]
             actionDict1.append(
                 {tsTxt + "\t\t" + f[0].split(configPath)[1] + "     ": f[0]})
             # actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
@@ -315,21 +317,12 @@ slogan = Button(
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
-slogan = Button(
-    root,
-    text="Stop All",
-    width=120,
-    bg="blue",
-    fg="white",
-    borderless=1,
-    command=stopAll,
+openbutton = Button(
+    root, text="Open", width=120, bg="blue", fg="white", borderless=1, command=openFile
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
+openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
-quitbutton = Button(
-    root, text="QUIT", width=120, bg="blue", fg="white", borderless=1, command=quit
-)
-quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 75)
+
 
 sortbutton1 = Button(
     root,
@@ -353,22 +346,32 @@ sortbutton2 = Button(
 )
 sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 
-sortbutton3 = Button(
+# sortbutton3 = Button(
+#     root,
+#     text="Sort by Folder+",
+#     width=120,
+#     bg="blue",
+#     fg="white",
+#     borderless=1,
+#     command=sortByFolderAndDate,
+# )
+# sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
+
+slogan = Button(
     root,
-    text="Sort by Folder+",
+    text="Stop All",
     width=120,
     bg="blue",
     fg="white",
     borderless=1,
-    command=sortByFolderAndDate,
+    command=stopAll,
 )
-sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
-openbutton = Button(
-    root, text="Open", width=120, bg="blue", fg="white", borderless=1, command=openFile
+quitbutton = Button(
+    root, text="QUIT", width=120, bg="blue", fg="white", borderless=1, command=quit
 )
-
-openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
+quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 getAllConfigFiles(False, True)
 

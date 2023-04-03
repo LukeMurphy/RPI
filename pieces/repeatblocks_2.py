@@ -110,6 +110,8 @@ def repeatImage(config, canvasImage):
     # tower configuration
 
     # config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    
+    extraOverlap = 4
 
     for c in range(0, config.cols):
         for r in range(0, config.rows):
@@ -118,12 +120,13 @@ def repeatImage(config, canvasImage):
                                              r * config.blockHeight + config.blockHeight), fill=config.bgColor, outline=config.bgColor)
             else:
                 temp = config.blockImage.copy()
+                # disabling for a moment 2023-04-01
                 temp = temp.rotate(90)
                 if c % 2 != 0 and config.rotateAltBlock == 1:
                     temp = temp.rotate(-90)
 
                 canvasImage.paste(
-                    temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
+                    temp, (c * config.blockWidth-c*extraOverlap, r * config.blockHeight-r*extraOverlap), temp)
                 # config.transitionImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
 
             if config.patternModelVariations == True:

@@ -111,7 +111,7 @@ def repeatImage(config, canvasImage):
 
     # config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     
-    extraOverlap = 4
+    extraOverlap = 0
 
     for c in range(0, config.cols):
         for r in range(0, config.rows):
@@ -126,7 +126,7 @@ def repeatImage(config, canvasImage):
                     temp = temp.rotate(-90)
 
                 canvasImage.paste(
-                    temp, (c * config.blockWidth-c*extraOverlap, r * config.blockHeight-r*extraOverlap), temp)
+                    temp, (c * config.blockWidth - c*extraOverlap, r * config.blockHeight - r*extraOverlap), temp)
                 # config.transitionImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
 
             if config.patternModelVariations == True:
@@ -674,6 +674,10 @@ def main(run=True):
         "movingpattern", "randomBlockWidth"))
     config.randomBlockHeight = int(workConfig.get(
         "movingpattern", "randomBlockHeight"))
+    
+    
+    config.decoBoxBandWidth = int(workConfig.get(
+        "movingpattern", "decoBoxBandWidth"))
 
     config.repeatProb = .99
 

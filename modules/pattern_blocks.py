@@ -303,7 +303,8 @@ def decoBoxes(config):
     count = 0
     numConcentricBoxes = config.blockWidth+1
     altLineColoring = True
-    w = 4
+    w = round(random.uniform(2,5))
+    w = config.decoBoxBandWidth
     width = config.blockWidth
 
     blockWidth = width
@@ -338,20 +339,26 @@ def decoBoxes(config):
             outline=(None), fill=outClr)
         count += 1
         
-    for c in range(0, 3):
-    	for r in range(0, 3):
+    for c in range(0, 4):
+    	for r in range(0, 4):
             # temp = temp.rotate(-45)
             xOff =  c*w
             yOff =  r*w
             temp.paste(temp2, (c * diagonal- xOff, r * diagonal-yOff), temp2)
 
+    szFactor = 1/3
     temp = temp.rotate(135, expand=True,)
-    
-    temp = temp.resize((width*3,width*4))
     # print(temp)
+    ex = 12
+    temp = temp.resize((round(width/szFactor)+ex,round(width/szFactor)+ex))
+    
+    # print(temp)
+    # print('')
     
     xOff = -round(width/1)
     yOff = -round(width/1)
+
+
     config.blockImage.paste(temp, (xOff, yOff), temp)
 
 

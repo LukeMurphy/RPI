@@ -297,7 +297,7 @@ def decoBoxes(config):
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
     
-    
+    # clr = config.bgColor 
     # clr = (50,50,50)
     # clr2 = (250,250,250)
     count = 0

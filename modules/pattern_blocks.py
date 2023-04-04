@@ -288,16 +288,16 @@ def concentricBoxes(config):
 def decoBoxes(config):
 
     clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
     )
     clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
     )
 
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
     
-    # clr = config.bgColor 
+    clr = config.bgColor 
     # clr = (50,50,50)
     # clr2 = (250,250,250)
     count = 0

@@ -122,6 +122,9 @@ def repeatImage(config, canvasImage):
                 temp = config.blockImage.copy()
                 # disabling for a moment 2023-04-01
                 temp = temp.rotate(90)
+                if config.patternModel == "waveScales" :
+                    temp = temp.rotate(-180)
+                    
                 if c % 2 != 0 and config.rotateAltBlock == 1:
                     temp = temp.rotate(-90)
 
@@ -279,10 +282,16 @@ def rebuildPatterns(arg=0):
 
     if c == 1:
         if config.numRowsRandomize == True:
+            # refresh pattern parameters
             config.numRows = round(random.uniform(1, 2))
             config.numShingleRows = round(random.uniform(1, 2))
+            config.numScaleRows = round(random.uniform(1, 2))
             dotRows = [1, 2, 4]
             config.numDotRows = dotRows[round(random.uniform(0, 2))]
+            config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
+            config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
+            
+            print( config.waveScaleRings, config.waveScaleSteps)
 
     if c == 2:
         newPalette = math.floor(random.uniform(0, len(config.palettes)))
@@ -667,6 +676,26 @@ def main(run=True):
 
     config.numConcentricBoxes = int(workConfig.get(
         "movingpattern", "numConcentricBoxes"))
+    
+    
+    config.numShingleRows = int(workConfig.get(
+        "movingpattern", "numShingleRows"))
+    try:
+        ringsRange = workConfig.get("movingpattern","ringsRange").split(",")
+        stepsRange = workConfig.get("movingpattern","stepsRange").split(",")
+        config.numScaleRows = int(workConfig.get("movingpattern","numScaleRows"))
+        config.stepsRange = tuple(map(lambda x: int(int(x)), stepsRange))
+        config.ringsRange = tuple(map(lambda x: int(int(x)), ringsRange))
+    except Exception as e:
+        print(str(e))
+        config.stepsRange = (1,1)
+        config.ringsRange = (1,1)
+        config.numScaleRows = config.numShingleRows
+    
+    config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
+    config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
+    print( config.waveScaleRings, config.waveScaleSteps)
+    # end try
 
     config.randomBlockProb = float(
         workConfig.get("movingpattern", "randomBlockProb"))
@@ -718,8 +747,6 @@ def main(run=True):
         "movingpattern", "numRowsRandomize"))
 
     config.numDotRows = int(workConfig.get("movingpattern", "numDotRows"))
-    config.numShingleRows = int(workConfig.get(
-        "movingpattern", "numShingleRows"))
 
     config.rebuildPatternProbability = float(
         workConfig.get("movingpattern", "rebuildPatternProbability"))

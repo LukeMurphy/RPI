@@ -156,6 +156,61 @@ def fishScales(config):
                 outline=(clr), fill=clr2)
 
 
+def waveScales(config):
+
+    clr = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+    )
+
+    clr2 = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+    )
+
+    clr3 = config.bgColor
+
+    config.blockDraw.rectangle(
+        (0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+
+    numRows = config.numScaleRows
+    numRows = 2
+    boxWidth = 2*config.blockWidth/numRows
+
+    rings = config.waveScaleRings 
+    step = config.waveScaleSteps
+
+    patternRows = numRows + 1
+    for r in range(patternRows, -patternRows, -1):
+        yPos = -2 + r * boxWidth
+        xOffSet = -boxWidth/2
+        yOffSet = boxWidth
+        y = boxWidth/4 - r * boxWidth/2
+        for i in range(0, 3):
+            xSizeOfBox = i * boxWidth
+            
+            for n in range(0, rings*step, step):
+                config.blockDraw.ellipse((
+                    xSizeOfBox + xOffSet + n,
+                    yPos + 0 + n + y,
+                    xSizeOfBox + xOffSet + boxWidth - n,
+                    yPos + yOffSet - n  + y),
+                    outline=(clr), fill=clr3)
+
+        xOffSet = 0
+        yOffSet = yOffSet / 2
+        y = boxWidth/2 - r * boxWidth/2
+
+        for i in range(0, 2):
+            xSizeOfBox = i * boxWidth
+            for n in range(0, rings*step, step):
+                config.blockDraw.ellipse((
+                    xSizeOfBox + xOffSet + n,
+                    yPos - yOffSet + n + y,
+                    xSizeOfBox + xOffSet + boxWidth - n,
+                    yPos + yOffSet - n + y),
+                    outline=(clr), fill=clr3)
+                
+
+
 def shingles(config):
     w = 4
     h = 4
@@ -296,33 +351,32 @@ def decoBoxes(config):
 
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-    
-    clr = config.bgColor 
+
+    clr = config.bgColor
     # clr = (50,50,50)
     # clr2 = (250,250,250)
     count = 0
     numConcentricBoxes = config.blockWidth+1
     altLineColoring = True
-    w = round(random.uniform(2,5))
+    w = round(random.uniform(2, 5))
     w = config.decoBoxBandWidth
     width = config.blockWidth
 
     blockWidth = width
     blockHeight = width
     halfSide = width/2
-    
+
     diagonal = round(math.sqrt(halfSide*halfSide*2))
     diagonal = width
-    
+
     temp = Image.new("RGBA", (width*3, width*3))
     tempDraw = ImageDraw.Draw(temp)
-    
+
     temp2 = Image.new("RGBA", (width, width))
     temp2Draw = ImageDraw.Draw(temp2)
-    
-    
+
     # print(diagonal)
-	
+
     for i in range(1, numConcentricBoxes, 1):
 
         if altLineColoring == True:
@@ -338,29 +392,27 @@ def decoBoxes(config):
             width-w*i),
             outline=(None), fill=outClr)
         count += 1
-        
+
     for c in range(0, 4):
-    	for r in range(0, 4):
+        for r in range(0, 4):
             # temp = temp.rotate(-45)
-            xOff =  c*w
-            yOff =  r*w
-            temp.paste(temp2, (c * diagonal- xOff, r * diagonal-yOff), temp2)
+            xOff = c*w
+            yOff = r*w
+            temp.paste(temp2, (c * diagonal - xOff, r * diagonal-yOff), temp2)
 
     szFactor = 1/3
     temp = temp.rotate(135, expand=True,)
     # print(temp)
     ex = 12
-    temp = temp.resize((round(width/szFactor)+ex,round(width/szFactor)+ex))
-    
+    temp = temp.resize((round(width/szFactor)+ex, round(width/szFactor)+ex))
+
     # print(temp)
     # print('')
-    
+
     xOff = -round(width/1)
     yOff = -round(width/1)
 
-
     config.blockImage.paste(temp, (xOff, yOff), temp)
-
 
 
 def randomizer(config):

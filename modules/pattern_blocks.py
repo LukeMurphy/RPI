@@ -210,7 +210,6 @@ def waveScales(config):
                     outline=(clr), fill=clr3)
                 
 
-
 def shingles(config):
     w = 4
     h = 4

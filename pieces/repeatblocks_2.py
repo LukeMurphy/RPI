@@ -5,6 +5,7 @@ import random
 import time
 import types
 from modules.configuration import bcolors
+from modules.movieClip import movieClip
 from modules import badpixels, coloroverlay, colorutils, panelDrawing, pattern_blocks
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
@@ -323,6 +324,8 @@ def rebuildSections():
     else:
         speedDeAcceleration = config.speedDeAccelerationBase
 
+    if config.diagonalMovement == False :
+        sectionDisturbanceDirection = 1 if random.random() < .5 else 0
     baseSpeed = config.baseSectionSpeed
     for i in range(0, config.numberOfSections):
         section = config.movingSections[i]
@@ -336,6 +339,14 @@ def rebuildSections():
             random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
         section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
                                 random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
+        
+        if config.diagonalMovement == False :
+            if sectionDisturbanceDirection == 1 :
+                section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,0]
+            else :
+                section.sectionSpeed = [0,random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
+                
+            
         section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
         section.actionCount = 0
         section.actionCountLimit = round(
@@ -520,6 +531,7 @@ def iterate():
     if config.sectionDisturbance == True and config.fader.fadingDone == True:
         disturber()
 
+        
     # a blurred section distrubance
     if config.useBlurSection == True:
         cp = config.canvasImage.copy()
@@ -569,11 +581,24 @@ def iterate():
 
     config.fader.fadeIn(config)
 
+    if config.useClipPlayer == True :
+        config.clipMain.loadFrame()
+        temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth,config.clipMain.clipHeight))
+        temp = temp.rotate(config.clipRotate,expand=True)
+     
+        config.image.paste(temp, (config.clipXPos, config.clipYPos), mask =config.clipMain.removalMask )
+        # config.image.paste(temp, (config.clipXPos, config.clipYPos), mask = temp )
+        
+        
+        
+        
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp1Draw = ImageDraw.Draw(temp1)
     temp1Draw.rectangle((0, 0, config.canvasWidth,
                         config.canvasHeight), fill=config.colOverlay.bgColor)
     temp1.paste(config.image, (0, 0), config.image)
+    
+    
     config.render(temp1, 0, 0, config.canvasWidth, config.canvasHeight)
     # Done
 
@@ -624,6 +649,15 @@ def setUpDisturbanceConfigs(configSet):
         workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
     config.rebuildImmediatelyAfterDone = (
         workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone"))
+    
+    try:
+        # comment: 
+        config.diagonalMovement = (
+        workConfig.getboolean(configSet, "diagonalMovement"))
+    except Exception as e:
+        print(str(e))
+        config.diagonalMovement = False
+    # end try
 
 
 def setupStableSections():
@@ -838,6 +872,23 @@ def main(run=True):
         workConfig.get("movingpattern", "loadAnImageProb"))
     config.imageSources = workConfig.get(
         "movingpattern", "imageSources").split(',')
+    
+    # ###########################################################################
+    # ####################### clip player instert ################################
+    try:
+        config.useClipPlayer = workConfig.getboolean("imageSequencePlayer", "useClipPlayer")
+        config.clipXPos = int(workConfig.get("imageSequencePlayer", "clipXPos"))
+        config.clipYPos = int(workConfig.get("imageSequencePlayer", "clipYPos"))
+        config.clipRotate = float(workConfig.get("imageSequencePlayer", "clipRotate"))
+        config.clipMain = movieClip(config)
+        config.clipMain.clipRotate = config.clipRotate
+        config.clipMain.setUp(workConfig)
+        
+        
+    except Exception as e:
+        print(str(e))
+        config.useClipPlayer = False
+    # ###########################################################################
 
     config.doneCount = 0
 

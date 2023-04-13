@@ -29,6 +29,25 @@ from PIL import (
 )
 import numpy as np
 
+class Director:
+    """docstring for Director"""
+
+    slotRate = .5
+
+    def __init__(self):
+        super(Director, self).__init__()
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+        self.checkTime()
+        
 
 class movieClip:
 
@@ -44,6 +63,8 @@ class movieClip:
     def __init__(self, config):
         print("Initializing clip player")
         self.config = config
+        self.directorController = Director()
+        
 
     def loadImage(self, arg, callback):
 
@@ -53,53 +74,55 @@ class movieClip:
         self.imageLayer.paste(image, (0, 0), image)
 
     def loadFrame(self):
+        self.directorController.checkTime()
+        if self.directorController.advance == True:
+
+            if random.random() < self.randomPauseProb :
+                self.paused = True
+
         
-        if random.random() < self.randomPauseProb :
-            self.paused = True
+            if self.paused == False:
+                self.loadImage(self.imageDirectory +
+                            str(self.currentFrame) + ".jpg", None)
+                self.currentFrame += 1
 
-    
-        if self.paused == False:
-            self.loadImage(self.imageDirectory +
-                           str(self.currentFrame) + ".jpg", None)
-            self.currentFrame += 1
+                if self.currentFrame >= self.frameCount:
+                    self.currentFrame = 0
 
-            if self.currentFrame >= self.frameCount:
-                self.currentFrame = 0
+            if random.random() < self.overlayChangeProb:
+                self.colorOverlay = colorutils.getRandomColorHSV(
+                    0, 360, .65, 1.0, .5, .5, 0, 0, self.colorOverlayAlpha)
 
-        if random.random() < self.overlayChangeProb:
-            self.colorOverlay = colorutils.getRandomColorHSV(
-                0, 360, .65, 1.0, .5, .5, 0, 0, self.colorOverlayAlpha)
+            if random.random() < self.overlayChangeSizeProb:
+                self.clrBlkWidth = round(
+                    random.uniform(5, self.clrBlkWidthSet * 1.25))
+                self.clrBlkHeight = round(
+                    random.uniform(5, self.clrBlkHeightSet * 1.25))
 
-        if random.random() < self.overlayChangeSizeProb:
-            self.clrBlkWidth = round(
-                random.uniform(5, self.clrBlkWidthSet * 1.25))
-            self.clrBlkHeight = round(
-                random.uniform(5, self.clrBlkHeightSet * 1.25))
+            if random.random() < self.overlayChangePosProb:
+                self.overlayxPos = round(
+                    random.uniform(0, 2 * self.canvasSize[0] / 3))
+                self.overlayyPos = round(
+                    random.uniform(0, 2 * self.canvasSize[1] / 3))
 
-        if random.random() < self.overlayChangePosProb:
-            self.overlayxPos = round(
-                random.uniform(0, 2 * self.canvasSize[0] / 3))
-            self.overlayyPos = round(
-                random.uniform(0, 2 * self.canvasSize[1] / 3))
+            if random.random() < self.overlayChangePosProb / 2.0:
+                self.overlayxPos = self.overlayxPosOrig
+                self.overlayyPos = self.overlayyPosOrig
 
-        if random.random() < self.overlayChangePosProb / 2.0:
-            self.overlayxPos = self.overlayxPosOrig
-            self.overlayyPos = self.overlayyPosOrig
+            self.colorize(self.colorOverlay)
 
-        self.colorize(self.colorOverlay)
+            for i in range(0, 10):
+                xC1 = round(random.uniform(0, 200))
+                yC1 = round(random.uniform(0, 200))
+                xC2 = 200 + xC1
+                yC2 = 200 + yC1
 
-        for i in range(0, 10):
-            xC1 = round(random.uniform(0, 200))
-            yC1 = round(random.uniform(0, 200))
-            xC2 = 200 + xC1
-            yC2 = 200 + yC1
-
-            temp = self.imageLayer.crop((xC1, yC1, xC2, yC2))
-            self.canvasImage.paste(temp, (xC1, yC1), temp)
-        
-        if self.paused == True :
-            if random.random() < 2 * self.randomUnPauseProb :
-                self.paused = False
+                temp = self.imageLayer.crop((xC1, yC1, xC2, yC2))
+                self.canvasImage.paste(temp, (xC1, yC1), temp)
+            
+            if self.paused == True :
+                if random.random() < 2 * self.randomUnPauseProb :
+                    self.paused = False
 
     def setUp(self, workConfig):
 
@@ -184,6 +207,9 @@ class movieClip:
         self.maskBoxHeight = int(workConfig.get("imageSequencePlayer", "maskBoxHeight"))
         self.maskBoxX = int(workConfig.get("imageSequencePlayer", "maskBoxX"))
         self.maskBoxY = int(workConfig.get("imageSequencePlayer", "maskBoxY"))
+        
+        self.delay = float(workConfig.get("imageSequencePlayer", "delay"))
+        self.directorController.slotRate = self.delay
 
         self.overLayMode = 0
         print(bcolors.OKBLUE + "** " + bcolors.BOLD)

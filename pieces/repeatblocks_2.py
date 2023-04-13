@@ -491,6 +491,16 @@ def iterate():
     )
 
     # redraw(config)
+    
+    
+    if config.useClipPlayer == True :
+        config.clipMain.loadFrame()
+        temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth,config.clipMain.clipHeight))
+        temp = temp.rotate(config.clipRotate,expand=True)
+     
+        config.image.paste(temp, (config.clipXPos, config.clipYPos), mask =config.clipMain.removalMask )
+        # config.image.paste(temp, (config.clipXPos, config.clipYPos), mask = temp )
+        
 
     repeatImage(config, config.patternImage)
 
@@ -581,14 +591,7 @@ def iterate():
 
     config.fader.fadeIn(config)
 
-    if config.useClipPlayer == True :
-        config.clipMain.loadFrame()
-        temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth,config.clipMain.clipHeight))
-        temp = temp.rotate(config.clipRotate,expand=True)
-     
-        config.image.paste(temp, (config.clipXPos, config.clipYPos), mask =config.clipMain.removalMask )
-        # config.image.paste(temp, (config.clipXPos, config.clipYPos), mask = temp )
-        
+
         
         
         

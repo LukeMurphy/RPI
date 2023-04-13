@@ -17,7 +17,7 @@ from PIL import (
     ImageTk,
 )
 
-from tkVideoPlayer import TkinterVideo
+# from tkVideoPlayer import TkinterVideo
 # from Tkinter import *
 # import tkMessageBox
 # import PIL.Image

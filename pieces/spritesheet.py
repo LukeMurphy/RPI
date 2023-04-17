@@ -34,7 +34,28 @@ yPos = 0
 
 bads = badpixels
 
+class Director:
+    """docstring for Director"""
 
+    slotRate = 0.5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+
+        self.checkTime()
+        
+        
 class spriteAnimation():
 
     frameWidth = 128
@@ -154,6 +175,25 @@ def main(run=True):
 
     print("SpriteSheet Player Piece Loaded")
     config.playSpeed = float(workConfig.get("images", "playSpeed"))
+    
+    # managing speed of animation and framerate
+    config.directorController = Director(config)
+
+    try:
+        config.delay = float(workConfig.get("images", "delay"))
+    except Exception as e:
+        print(str(e))
+        config.delay = 0.02
+    try:
+        config.directorController.slotRate = float(
+            workConfig.get("images", "slotRate"))
+    except Exception as e:
+        print(str(e))
+        print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
+        config.directorController.slotRate = 0.0
+    
+    
+    
     config.imageToLoad = workConfig.get("images", "i1")
 
     config.canvasImage = Image.new(
@@ -425,12 +465,14 @@ def runWork():
     print("Running image.py")
     print(bcolors.ENDC)
     # gc.enable()
-
     while config.isRunning == True:
-        iterate()
-        time.sleep(config.playSpeed)
+        config.directorController.checkTime()
+        if config.directorController.advance == True:
+            iterate()
+            time.sleep(config.delay)
         if config.standAlone == False:
             config.callBack()
+
 
 
 def iterate(n=0):

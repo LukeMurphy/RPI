@@ -144,6 +144,7 @@ def repeatImage(config, canvasImage):
             cntr += 1
 
     config.patternImage = canvasImage.copy()
+    # config.patternImage = transformImage(config.patternImage)
 
 
 def rebuildPatternSequence(config):
@@ -326,7 +327,9 @@ def rebuildSections():
 
     if config.diagonalMovement == False :
         sectionDisturbanceDirection = 1 if random.random() < .5 else 0
+        
     baseSpeed = config.baseSectionSpeed
+    
     for i in range(0, config.numberOfSections):
         section = config.movingSections[i]
         section.sectionRotation = random.uniform(
@@ -346,6 +349,13 @@ def rebuildSections():
             else :
                 section.sectionSpeed = [0,random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
                 
+        if config.randomDiagonal == False :
+            speed = random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal
+            
+            hComponent = math.cos(config.diagonalFixedAngle) * speed
+            vComponent = math.sin(config.diagonalFixedAngle) * speed
+            section.sectionSpeed = [hComponent,vComponent]
+
             
         section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
         section.actionCount = 0
@@ -497,7 +507,6 @@ def iterate():
         config.clipMain.loadFrame()
         temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth,config.clipMain.clipHeight))
         temp = temp.rotate(config.clipRotate,expand=True)
-     
         config.image.paste(temp, (config.clipXPos, config.clipYPos), mask =config.clipMain.removalMask )
         # config.image.paste(temp, (config.clipXPos, config.clipYPos), mask = temp )
         
@@ -593,17 +602,36 @@ def iterate():
 
 
         
-        
-        
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp1Draw = ImageDraw.Draw(temp1)
     temp1Draw.rectangle((0, 0, config.canvasWidth,
                         config.canvasHeight), fill=config.colOverlay.bgColor)
     temp1.paste(config.image, (0, 0), config.image)
     
+    if config.transformShape == True :
+        temp1 = transformImage(temp1)
     
-    config.render(temp1, 0, 0, config.canvasWidth, config.canvasHeight)
+    if config.canvasRotation != 0 :
+        temp1 = temp1.rotate(config.canvasRotation,0,True)
+        # temp1 = temp1.transform()
+    
+    config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
     # Done
+
+
+def transformImage(img):
+	width, height = img.size
+	m = -0.0
+	xshift = abs(m) * 420
+	new_width = width + int(round(xshift))
+
+	# img = img.transform(
+	# 	(new_width, height), Image.AFFINE, (1, -0.1, 0.0, -0.5, 1, 1), Image.BICUBIC
+	# )
+	img = img.transform(
+		(new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
+	)
+	return img
 
 
 def setUpDisturbanceConfigs(configSet):
@@ -657,6 +685,10 @@ def setUpDisturbanceConfigs(configSet):
         # comment: 
         config.diagonalMovement = (
         workConfig.getboolean(configSet, "diagonalMovement"))
+        config.randomDiagonal = (
+        workConfig.getboolean(configSet, "randomDiagonal"))
+        config.diagonalFixedAngle = float(
+        workConfig.get(configSet, "diagonalFixedAngle"))
     except Exception as e:
         print(str(e))
         config.diagonalMovement = False
@@ -710,6 +742,7 @@ def main(run=True):
 
     config.diamondUseTriangles = False
     config.diamondStep = int(workConfig.get("movingpattern", "diamondStep"))
+    
 
     config.numConcentricBoxes = int(workConfig.get(
         "movingpattern", "numConcentricBoxes"))
@@ -717,6 +750,17 @@ def main(run=True):
     
     config.numShingleRows = int(workConfig.get(
         "movingpattern", "numShingleRows"))
+    
+    try:
+        config.canvasRotation = float(workConfig.get("movingpattern", "canvasRotation"))
+        config.imgcanvasOffsetX = int(workConfig.get("movingpattern", "canvasOffsetX"))
+        config.imgcanvasOffsetY = int(workConfig.get("movingpattern", "canvasOffsetY"))
+    except Exception as e:
+        print(str(e))
+        config.canvasRotation = 0
+        config.imgcanvasOffsetX = 0
+        config.imgcanvasOffsetY = 0
+    # end try
     try:
         ringsRange = workConfig.get("movingpattern","ringsRange").split(",")
         stepsRange = workConfig.get("movingpattern","stepsRange").split(",")
@@ -728,6 +772,15 @@ def main(run=True):
         config.stepsRange = (1,1)
         config.ringsRange = (1,1)
         config.numScaleRows = config.numShingleRows
+        
+        
+    try:
+        config.transformShape = workConfig.getboolean("movingpattern", "transformShape")
+        transformTuples = workConfig.get("movingpattern", "transformTuples").split(",")
+        config.transformTuples = tuple([float(i) for i in transformTuples])
+    except Exception as e:
+        print(str(e))
+    # end try
     
     config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
     config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
@@ -834,8 +887,6 @@ def main(run=True):
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
     buildPalette(config, 0)
 
-    # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
-    panelDrawing.mockupBlock(config, workConfig)
 
     config.sectionDisturbance = (workConfig.getboolean(
         "movingpattern", "sectionDisturbance"))
@@ -906,6 +957,8 @@ def main(run=True):
     config.directorController = Director(config)
     config.directorController.slotRate = .03
 
+    # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+    panelDrawing.mockupBlock(config, workConfig)
 
     ''' 
 		########### Need to add something like this at final render call  as well

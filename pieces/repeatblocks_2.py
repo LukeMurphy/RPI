@@ -111,8 +111,9 @@ def repeatImage(config, canvasImage):
     # tower configuration
 
     # config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    
-    extraOverlap = 0
+
+    extraOverlapx = 0
+    extraOverlapy = 0
 
     for c in range(0, config.cols):
         for r in range(0, config.rows):
@@ -123,6 +124,9 @@ def repeatImage(config, canvasImage):
                 temp = config.blockImage.copy()
                 # disabling for a moment 2023-04-01
                 temp = temp.rotate(90)
+                if config.patternModel == "circlesPacked" :
+                    extraOverlapx = round(config.blockWidth / 8 )
+                    
                 if config.patternModel == "waveScales" :
                     temp = temp.rotate(-180)
                     
@@ -130,7 +134,7 @@ def repeatImage(config, canvasImage):
                     temp = temp.rotate(-90)
 
                 canvasImage.paste(
-                    temp, (c * config.blockWidth - c*extraOverlap, r * config.blockHeight - r*extraOverlap), temp)
+                    temp, (c * config.blockWidth - c*extraOverlapx, r * config.blockHeight - r*extraOverlapy), temp)
                 # config.transitionImage.paste(temp, (c * config.blockWidth-c, r * config.blockHeight-r), temp)
 
             if config.patternModelVariations == True:
@@ -612,7 +616,7 @@ def iterate():
         temp1 = transformImage(temp1)
     
     if config.canvasRotation != 0 :
-        temp1 = temp1.rotate(config.canvasRotation,0,True)
+        temp1 = temp1.rotate(config.canvasRotation,2,True)
         # temp1 = temp1.transform()
     
     config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)

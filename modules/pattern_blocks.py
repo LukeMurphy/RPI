@@ -115,6 +115,48 @@ def balls(config):
                 outline=(outline), fill=clr)
 
 
+def circlesPacked(config):
+    config.circlesPackedSize = 1
+    clr = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+    )
+
+    clr2 = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+    )
+
+    # config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=clr)
+
+    numRows = config.numDotRows
+    boxWidth = round(config.blockWidth * config.circlesPackedSize)
+    dotWidth = boxWidth/2
+    outline = clr
+    steps=2
+    yPos = 0
+    numLines = config.blockWidth - 1
+    for i in range(0, 4):
+        xPos = i * dotWidth * 1 - dotWidth/2
+        for r in range(0,numLines,steps):
+            config.blockDraw.ellipse((
+                r-1 + xPos,
+                r-1 + yPos,
+                xPos + dotWidth -1*r,
+                yPos + dotWidth-1*r),
+                outline=(outline), fill=config.bgColor)
+
+    yPos = 2 * dotWidth/2 * math.sin(2 * math.pi / 6) + 2
+
+    for i in range(0, 4):
+        xPos = i * dotWidth * 1
+        for r in range(0,numLines,steps):
+            config.blockDraw.ellipse((
+                r-1 + xPos,
+                r-1 + yPos,
+                xPos + dotWidth -1*r,
+                yPos + dotWidth-1*r),
+                outline=(outline), fill=config.bgColor)
+
+
 def fishScales(config):
     w = 4
     h = 4
@@ -267,14 +309,20 @@ def circles(config):
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
-    numLines = 1
-    for i in range(0, numLines):
-        config.blockDraw.ellipse((
-            i-1,
-            i-1,
-            config.blockWidth-1*i,
-            config.blockHeight-1*i),
-            outline=(clr), fill=clr2)
+    numLines = config.blockWidth - 1
+    steps = 3
+    for c in range(0,2):
+        for r in range(0,2):
+            xOff = c * config.blockWidth - config.blockWidth/2
+            yOff = r * config.blockHeight - config.blockHeight/2
+        
+            for i in range(0, numLines, steps):
+                config.blockDraw.ellipse((
+                    i-1 + xOff,
+                    i-1 + yOff,
+                    config.blockWidth-1*i + xOff,
+                    config.blockHeight-1*i + yOff),
+                    outline=(clr), fill=None)
 
 
 def bars(config):

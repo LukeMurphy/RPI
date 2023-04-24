@@ -223,7 +223,8 @@ def waveScales(config):
     patternRows = numRows + 1
     startFirstSet = 0
     
-    # config.altLineColoring = True
+    if config.linesOnly == True :
+        config.altLineColoring = False
     # step= 5
     if config.altLineColoring == True and step != 2 :
         lineToUse =  clr

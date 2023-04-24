@@ -705,15 +705,19 @@ def setUpDisturbanceConfigs(configSet):
         # comment: 
         config.diagonalMovement = (
         workConfig.getboolean(configSet, "diagonalMovement"))
+    except Exception as e:
+        print(str(e))
+        config.diagonalMovement = False
+    # end try
+
+    try:
         config.randomDiagonal = (
         workConfig.getboolean(configSet, "randomDiagonal"))
         config.diagonalFixedAngle = float(
         workConfig.get(configSet, "diagonalFixedAngle"))
     except Exception as e:
         print(str(e))
-        config.diagonalMovement = False
-    # end try
-
+        config.randomDiagonal = True
 
 def setupStableSections():
     config.stableSegments = []
@@ -795,11 +799,18 @@ def main(run=True):
         
         
     try:
+        config.linesOnly = workConfig.getboolean("movingpattern", "linesOnly")
+    except Exception as e:
+        print(str(e))
+        config.linesOnly = False
+        
+    try:
         config.transformShape = workConfig.getboolean("movingpattern", "transformShape")
         transformTuples = workConfig.get("movingpattern", "transformTuples").split(",")
         config.transformTuples = tuple([float(i) for i in transformTuples])
     except Exception as e:
         print(str(e))
+        config.transformShape = False
     # end try
     
     config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))

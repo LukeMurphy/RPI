@@ -168,7 +168,7 @@ def rebuildPatternSequence(config):
     lastPosition = 0
     totalSlots = config.rows * config.cols
 
-    if random.random() < .75:
+    if random.random() < config.altColoringProb:
         config.altLineColoring = True
     else:
         config.altLineColoring = False
@@ -200,6 +200,12 @@ def rebuildPatternSequence(config):
             lastPosition = position
             i += 1
         iterateCount += 1
+    
+    print("----------------------------------------------")
+    print(("New sequence {}").format(config.patternSequence))
+    print(("Using start pattern {}").format(config.patternModel))
+    print("----------------------------------------------")
+
 
 
 def loadImageForBase():
@@ -817,7 +823,7 @@ def main(run=True):
     config.xIncrementer = 0
     config.yIncrementer = 0
 
-    config.altLineColoring = True
+    config.altLineColoring = False
 
     ########################################################################
     # CREATE THE IMAGE HOLDERS
@@ -940,6 +946,13 @@ def main(run=True):
         workConfig.get("movingpattern", "loadAnImageProb"))
     config.imageSources = workConfig.get(
         "movingpattern", "imageSources").split(',')
+    
+    try:
+        config.altColoringProb = workConfig.getboolean("movingpattern","altColoringProb")
+    except Exception as e:
+        print(str(e))
+        config.altColoringProb = .5
+    # end try
     
     # ###########################################################################
     # ####################### clip player instert ################################

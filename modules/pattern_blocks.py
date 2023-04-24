@@ -221,12 +221,19 @@ def waveScales(config):
     step = config.waveScaleSteps
 
     patternRows = numRows + 1
-    # config.altLineColoring = True
+    startFirstSet = 0
     
-    if config.altLineColoring == True :
-        lineToUse =  None
+    # config.altLineColoring = True
+    # step= 5
+    if config.altLineColoring == True and step != 2 :
+        lineToUse =  clr
+        startFirstSet = 1
     else :
         lineToUse = clr
+    
+    # lineToUse = clr
+    # lineToUse = (255,0,0,204)
+    # print(lineToUse,clr, clr2, clr3,config.altLineColoring,step,rings)
     
     # print(config.altLineColoring)
     for r in range(patternRows, -patternRows, -1):
@@ -237,11 +244,11 @@ def waveScales(config):
         for i in range(0, 3):
             xSizeOfBox = i * boxWidth
             
-            for n in range(0, rings*step, step):
+            for n in range(startFirstSet, rings*step, step):
                 if config.altLineColoring == True :
                     eo = n % 2
                     if eo  == 1 :
-                        clrToUse = clr3
+                        clrToUse = clr
                     else :
                         clrToUse = clr2
                 else :
@@ -264,7 +271,7 @@ def waveScales(config):
                 if config.altLineColoring == True :
                     eo = n % 2
                     if eo  == 1 :
-                        clrToUse = clr3
+                        clrToUse = clr
                     else :
                         clrToUse = clr2
                 else :

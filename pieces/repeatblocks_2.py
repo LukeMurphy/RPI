@@ -99,6 +99,15 @@ def redraw(config):
 
     if config.patternModel == "bars":
         pattern_blocks.bars(config)
+        
+    if config.patternModel == "circles":
+        pattern_blocks.circles(config)
+        
+    if config.patternModel == "circlesPacked":
+        pattern_blocks.circlesPacked(config)
+        
+    if config.patternModel == "decoBoxes":
+        pattern_blocks.decoBoxes(config)
 
 
 def repeatImage(config, canvasImage):
@@ -159,7 +168,7 @@ def rebuildPatternSequence(config):
     lastPosition = 0
     totalSlots = config.rows * config.cols
 
-    if random.random() < .5:
+    if random.random() < .75:
         config.altLineColoring = True
     else:
         config.altLineColoring = False
@@ -616,7 +625,8 @@ def iterate():
         temp1 = transformImage(temp1)
     
     if config.canvasRotation != 0 :
-        temp1 = temp1.rotate(config.canvasRotation,2,True)
+        temp1 = temp1.rotate(config.canvasRotation,3,True)
+        temp1 = ImageEnhance.Contrast(temp1).enhance(1.20)
         # temp1 = temp1.transform()
     
     config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
@@ -957,6 +967,8 @@ def main(run=True):
     config.fader.yPos = 0
     config.fader.setUp()
     config.fader.image = config.canvasImage
+    
+    rebuildPatternSequence(config)
 
     config.directorController = Director(config)
     config.directorController.slotRate = .03

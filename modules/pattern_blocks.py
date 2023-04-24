@@ -221,6 +221,14 @@ def waveScales(config):
     step = config.waveScaleSteps
 
     patternRows = numRows + 1
+    # config.altLineColoring = True
+    
+    if config.altLineColoring == True :
+        lineToUse =  None
+    else :
+        lineToUse = clr
+    
+    # print(config.altLineColoring)
     for r in range(patternRows, -patternRows, -1):
         yPos = -2 + r * boxWidth
         xOffSet = -boxWidth/2
@@ -230,12 +238,21 @@ def waveScales(config):
             xSizeOfBox = i * boxWidth
             
             for n in range(0, rings*step, step):
+                if config.altLineColoring == True :
+                    eo = n % 2
+                    if eo  == 1 :
+                        clrToUse = clr3
+                    else :
+                        clrToUse = clr2
+                else :
+                        clrToUse = clr3
+                    
                 config.blockDraw.ellipse((
                     xSizeOfBox + xOffSet + n,
                     yPos + 0 + n + y,
                     xSizeOfBox + xOffSet + boxWidth - n,
                     yPos + yOffSet - n  + y),
-                    outline=(clr), fill=clr3)
+                    outline=(lineToUse), fill=clrToUse)
 
         xOffSet = 0
         yOffSet = yOffSet / 2
@@ -244,12 +261,21 @@ def waveScales(config):
         for i in range(0, 2):
             xSizeOfBox = i * boxWidth
             for n in range(0, rings*step, step):
+                if config.altLineColoring == True :
+                    eo = n % 2
+                    if eo  == 1 :
+                        clrToUse = clr3
+                    else :
+                        clrToUse = clr2
+                else :
+                        clrToUse = clr3
+                    
                 config.blockDraw.ellipse((
                     xSizeOfBox + xOffSet + n,
                     yPos - yOffSet + n + y,
                     xSizeOfBox + xOffSet + boxWidth - n,
                     yPos + yOffSet - n + y),
-                    outline=(clr), fill=clr3)
+                    outline=(lineToUse), fill=clrToUse)
                 
 
 def shingles(config):

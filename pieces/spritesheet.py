@@ -482,6 +482,9 @@ def iterate(n=0):
     config.colOverlay.stepTransition()
 
     bgColor = config.colOverlay.currentColor
+    # config.bg_alpha = 255
+    # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
+    #         bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
 
     config.canvasImage.paste(config.animationImage, (config.animationXOffset,
                              config.animationYOffset), config.animationImage)

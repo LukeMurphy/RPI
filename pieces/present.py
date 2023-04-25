@@ -123,6 +123,9 @@ def main(run=True):
 	path = config.path + "assets/imgs/"
 	imageList = config.imageList
 	glitchRate = config.glitchRate
+ 
+ 
+	config.verticalOrientation = 0
 
 	for i in range(0, config.unitCount):
 		dx = 0

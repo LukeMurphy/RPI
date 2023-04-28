@@ -184,29 +184,24 @@ def main(run=True):
 
     # managing speed of animation and framerate
     config.directorController = Director(config)
-    
+
     try:
         config.delay = float(workConfig.get("base-parameters", "delay"))
     except Exception as e:
         print(str(e))
         config.delay = 0.02
     try:
-        config.directorController.slotRate = float(
-            workConfig.get("base-parameters", "slotRate"))
+        config.directorController.slotRate = float(workConfig.get("base-parameters", "slotRate"))
     except Exception as e:
         print(str(e))
         print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
         config.directorController.slotRate = 0.0
 
     try:
-        config.filterRemapping = (
-            workConfig.getboolean("base-parameters", "filterRemapping"))
-        config.filterRemappingProb = float(
-            workConfig.get("base-parameters", "filterRemappingProb"))
-        config.filterRemapminHoriSize = int(
-            workConfig.get("base-parameters", "filterRemapminHoriSize"))
-        config.filterRemapminVertSize = int(
-            workConfig.get("base-parameters", "filterRemapminVertSize"))
+        config.filterRemapping = (workConfig.getboolean("base-parameters", "filterRemapping"))
+        config.filterRemappingProb = float(workConfig.get("base-parameters", "filterRemappingProb"))
+        config.filterRemapminHoriSize = int(workConfig.get("base-parameters", "filterRemapminHoriSize"))
+        config.filterRemapminVertSize = int(workConfig.get("base-parameters", "filterRemapminVertSize"))
     except Exception as e:
         print(str(e))
         config.filterRemapping = False
@@ -215,10 +210,8 @@ def main(run=True):
         config.filterRemapminVertSize = 24
 
     try:
-        config.filterRemapRangeX = int(
-            workConfig.get("base-parameters", "filterRemapRangeX"))
-        config.filterRemapRangeY = int(
-            workConfig.get("base-parameters", "filterRemapRangeY"))
+        config.filterRemapRangeX = int(workConfig.get("base-parameters", "filterRemapRangeX"))
+        config.filterRemapRangeY = int(workConfig.get("base-parameters", "filterRemapRangeY"))
     except Exception as e:
         print(str(e))
         config.filterRemapRangeX = config.canvasWidth
@@ -226,10 +219,8 @@ def main(run=True):
 
     try:
         if config.usePixelSort == True:
-            config.pixelSortProbOn = float(
-                workConfig.get("base-parameters", "pixelSortProbOn"))
-            config.pixelSortProbOff = float(
-                workConfig.get("base-parameters", "pixelSortProbOff"))
+            config.pixelSortProbOn = float(workConfig.get("base-parameters", "pixelSortProbOn"))
+            config.pixelSortProbOff = float(workConfig.get("base-parameters", "pixelSortProbOff"))
         else:
             config.pixelSortProbOn = 0
             config.pixelSortProbOff = 0
@@ -244,10 +235,10 @@ def main(run=True):
     config.canvasImage = Image.new(
         "RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
-    
+
     config.allPause = False
 
-    animationNames= workConfig.get("base-parameters", "animations").split(",")
+    animationNames = workConfig.get("base-parameters", "animations").split(",")
     playTimes = workConfig.get("base-parameters", "playTimes").split(",")
 
     config.animationNames = animationNames
@@ -264,17 +255,14 @@ def main(run=True):
         aConfig.imageToLoad = workConfig.get(a, "i1")
         aConfig.animationWidth = int(workConfig.get(a, "animationWidth"))
         aConfig.animationHeight = int(workConfig.get(a, "animationHeight"))
-        aConfig.resizeAnimationToFit = (
-            workConfig.getboolean(a, "resizeAnimationToFit"))
-        aConfig.animationImage = Image.new(
-            "RGBA", (aConfig.animationWidth, aConfig.animationHeight))
+        aConfig.resizeAnimationToFit = (workConfig.getboolean(a, "resizeAnimationToFit"))
+        aConfig.animationImage = Image.new("RGBA", (aConfig.animationWidth, aConfig.animationHeight))
         aConfig.animationImageDraw = ImageDraw.Draw(aConfig.animationImage)
 
         aConfig.animationArray = []
         aConfig.spriteSheet1 = loadImage(config.path + aConfig.imageToLoad)
 
-        aConfig.randomPlacement = (
-            workConfig.getboolean(a, "randomPlacement"))
+        aConfig.randomPlacement = (workConfig.getboolean(a, "randomPlacement"))
         aConfig.fixedPosition = (workConfig.getboolean(a, "fixedPosition"))
         aConfig.frameWidth = int(workConfig.get(a, "frameWidth"))
         aConfig.frameHeight = int(workConfig.get(a, "frameHeight"))
@@ -288,49 +276,35 @@ def main(run=True):
         aConfig.numberOfCells = int(workConfig.get(a, "numberOfCells"))
         aConfig.animSpeedMin = int(workConfig.get(a, "animSpeedMin"))
         aConfig.animSpeedMax = int(workConfig.get(a, "animSpeedMax"))
-        aConfig.animationRotation = float(
-            workConfig.get(a, "animationRotation"))
-        aConfig.animationRotationRateRange = float(
-            workConfig.get(a, "animationRotationRateRange"))
-        aConfig.animationRotationJitter = float(
-            workConfig.get(a, "animationRotationJitter"))
+        aConfig.animationRotation = float(workConfig.get(a, "animationRotation"))
+        aConfig.animationRotationRateRange = float(workConfig.get(a, "animationRotationRateRange"))
+        aConfig.animationRotationJitter = float(workConfig.get(a, "animationRotationJitter"))
         aConfig.animationXOffset = int(workConfig.get(a, "animationXOffset"))
         aConfig.animationYOffset = int(workConfig.get(a, "animationYOffset"))
-        aConfig.randomPlacemnetXRange = int(
-            workConfig.get(a, "randomPlacemnetXRange"))
-        aConfig.randomPlacemnetYRange = int(
-            workConfig.get(a, "randomPlacemnetYRange"))
+        aConfig.randomPlacemnetXRange = int(workConfig.get(a, "randomPlacemnetXRange"))
+        aConfig.randomPlacemnetYRange = int(workConfig.get(a, "randomPlacemnetYRange"))
 
         aConfig.bg_minHue = int(workConfig.get(a, "bg_minHue"))
         aConfig.bg_maxHue = int(workConfig.get(a, "bg_maxHue"))
-        aConfig.bg_minSaturation = float(
-            workConfig.get(a, "bg_minSaturation"))
-        aConfig.bg_maxSaturation = float(
-            workConfig.get(a, "bg_maxSaturation"))
+        aConfig.bg_minSaturation = float(workConfig.get(a, "bg_minSaturation"))
+        aConfig.bg_maxSaturation = float(workConfig.get(a, "bg_maxSaturation"))
         aConfig.bg_minValue = float(workConfig.get(a, "bg_minValue"))
         aConfig.bg_maxValue = float(workConfig.get(a, "bg_maxValue"))
-        aConfig.bg_dropHueMinValue = float(
-            workConfig.get(a, "bg_dropHueMinValue"))
-        aConfig.bg_dropHueMaxValue = float(
-            workConfig.get(a, "bg_dropHueMaxValue"))
+        aConfig.bg_dropHueMinValue = float(workConfig.get(a, "bg_dropHueMinValue"))
+        aConfig.bg_dropHueMaxValue = float(workConfig.get(a, "bg_dropHueMaxValue"))
         aConfig.bg_alpha = int(workConfig.get(a, "bg_alpha"))
 
-        aConfig.backgroundColorChangeProb = float(
-            workConfig.get(a, "backgroundColorChangeProb"))
+        aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb"))
         aConfig.changeAnimProb = float(workConfig.get(a, "changeAnimProb"))
         aConfig.pauseProb = float(workConfig.get(a, "pauseProb"))
         aConfig.unPauseProb = float(workConfig.get(a, "unPauseProb"))
-        aConfig.freezeGlitchProb = float(
-            workConfig.get(a, "freezeGlitchProb"))
-        aConfig.unFreezeGlitchProb = float(
-            workConfig.get(a, "unFreezeGlitchProb"))
+        aConfig.freezeGlitchProb = float(workConfig.get(a, "freezeGlitchProb"))
+        aConfig.unFreezeGlitchProb = float(workConfig.get(a, "unFreezeGlitchProb"))
 
         aConfig.glitching = True
 
-        aConfig.imageGlitchDisplacementHorizontal = int(
-            workConfig.get(a, "imageGlitchDisplacementHorizontal"))
-        aConfig.imageGlitchDisplacementVertical = int(
-            workConfig.get(a, "imageGlitchDisplacementVertical"))
+        aConfig.imageGlitchDisplacementHorizontal = int(workConfig.get(a, "imageGlitchDisplacementHorizontal"))
+        aConfig.imageGlitchDisplacementVertical = int(workConfig.get(a, "imageGlitchDisplacementVertical"))
 
         # Sets up color transitions
         aConfig.colOverlay = coloroverlay.ColorOverlay()
@@ -347,7 +321,6 @@ def main(run=True):
         aConfig.colOverlay.minHue = aConfig.bg_minHue
         aConfig.colOverlay.maxHue = aConfig.bg_maxHue
         aConfig.colOverlay.colorTransitionSetup()
-
 
         for i in range(0, aConfig.numberOfCells):
             anim = spriteAnimation(config)
@@ -369,13 +342,12 @@ def main(run=True):
 
         aConfig.imagePath = config.path + "/assets/imgs/"
         aConfig.imageList = [aConfig.imageToLoad]
-        
+
         config.animations.append(aConfig)
-    
+
     config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
     config.animationController.delay = 1.0
     config.animationController.slotRate = config.playTimes[0]
-
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -406,10 +378,8 @@ def glitchBox():
     # currentAnimation.imageGlitchDisplacementVertical = 32
     # currentAnimation.imageGlitchDisplacementHorizontal = 32
 
-    dx = round(random.uniform(-currentAnimation.imageGlitchDisplacementHorizontal,
-               currentAnimation.imageGlitchDisplacementHorizontal))
-    dy = round(random.uniform(-currentAnimation.imageGlitchDisplacementVertical,
-               currentAnimation.imageGlitchDisplacementVertical))
+    dx = round(random.uniform(-currentAnimation.imageGlitchDisplacementHorizontal,currentAnimation.imageGlitchDisplacementHorizontal))
+    dy = round(random.uniform(-currentAnimation.imageGlitchDisplacementVertical,currentAnimation.imageGlitchDisplacementVertical))
 
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
     sectionHeight = round(random.uniform(2, apparentHeight - dy))
@@ -436,11 +406,8 @@ def glitchBox():
 def reConfigAnimationCell(anim, aConfig):
     global config
 
-    anim.animSpeed = round(random.uniform(
-        anim.animSpeedMin, anim.animSpeedMax))
-    anim.animationRotation = aConfig.animationRotation + \
-        random.uniform(-aConfig.animationRotationJitter,
-                       aConfig.animationRotationJitter)
+    anim.animSpeed = round(random.uniform(anim.animSpeedMin, anim.animSpeedMax))
+    anim.animationRotation = aConfig.animationRotation + random.uniform(-aConfig.animationRotationJitter,aConfig.animationRotationJitter)
 
     if aConfig.animationRotation != 0:
         maxDim = max(anim.frameHeight, anim.frameWidth)
@@ -468,19 +435,14 @@ def reConfigAnimationCell(anim, aConfig):
     # random slicing of section to display
     anim.sliceXOffset = 0  # round(random.random() * anim.frameWidth)
     anim.sliceYOffset = 0  # round(random.random() * anim.frameHeight)
-    anim.sliceWidth = round(random.uniform(
-        aConfig.sliceWidthMin, aConfig.sliceWidth))
-    anim.sliceHeight = round(random.uniform(
-        aConfig.sliceHeightMin, aConfig.sliceHeight))
+    anim.sliceWidth = round(random.uniform(aConfig.sliceWidthMin, aConfig.sliceWidth))
+    anim.sliceHeight = round(random.uniform(aConfig.sliceHeightMin, aConfig.sliceHeight))
 
-    if anim.sliceWidth + anim.sliceXOffset > anim.frameWidth:
-        anim.sliceWidth = anim.frameWidth - anim.sliceXOffset
+    if anim.sliceWidth + anim.sliceXOffset > anim.frameWidth:anim.sliceWidth = anim.frameWidth - anim.sliceXOffset
 
-    if anim.sliceHeight + anim.sliceYOffset > anim.frameHeight:
-        anim.sliceHeight = anim.frameHeight - anim.sliceYOffset
+    if anim.sliceHeight + anim.sliceYOffset > anim.frameHeight:anim.sliceHeight = anim.frameHeight - anim.sliceYOffset
 
-    anim.animationRotationRate = random.uniform(
-        -aConfig.animationRotationRateRange, aConfig.animationRotationRateRange)
+    anim.animationRotationRate = random.uniform(-aConfig.animationRotationRateRange, aConfig.animationRotationRateRange)
 
 
 def runWork():
@@ -500,7 +462,7 @@ def runWork():
 def iterate(n=0):
     global config, blocks
     global xPos, yPos
-    
+
     currentAnimation = config.animations[config.currentAnimationIndex]
     currentAnimation.colOverlay.stepTransition()
     bgColor = currentAnimation.colOverlay.currentColor
@@ -521,12 +483,11 @@ def iterate(n=0):
             bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
         for anim in currentAnimation.animationArray:
-            
+
             try:
-                currentAnimation.animationImage.paste(
-                    anim.nextFrame(), (anim.xPos, anim.yPos), anim.nextFrame())
+                currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos, anim.yPos), anim.nextFrame())
                 # config.animationImage.paste(anim.nextFrame(), (0, 0), anim.nextFrame())
-                # comment: 
+                # comment:
             except Exception as e:
                 print(str(e))
             # end try
@@ -585,16 +546,14 @@ def iterate(n=0):
             currentAnimation.bg_minSaturation, currentAnimation.bg_maxSaturation,
             currentAnimation.bg_minValue, currentAnimation.bg_maxValue,
             currentAnimation.bg_dropHueMinValue, currentAnimation.bg_dropHueMaxValue, 255, config.brightness)
-        
-        
+
     config.animationController.checkTime()
     if config.animationController.advance == True:
         config.currentAnimationIndex += 1
-        if config.currentAnimationIndex >= len(config.animations) :
+        if config.currentAnimationIndex >= len(config.animations):
             config.currentAnimationIndex = 0
             config.animationController.slotRate = config.playTimes[0]
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
-
 
 
 def callBack():

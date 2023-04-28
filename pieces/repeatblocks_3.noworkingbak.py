@@ -38,14 +38,16 @@ class Fader:
 
     def fadeIn(self, config):
         config.fadeThruBlack = False
-        if self.fadingDone == False:
+        
+        if self.doingRefreshCount > 0 and self.fadingDone == False:
 
+            # print(str("Fading done: {} / {}").format(self.doingRefresh,self.doingRefreshCount))
             if self.testing == True:
                 self.testing = False
                 # print(self.fadingDone, self.doingRefresh)
 
             if self.doingRefresh < self.doingRefreshCount:
-
+                # print("corssfading")
                 if config.fadeThruBlack == True:
                     self.blankImage = Image.new(
                         "RGBA", (self.width, self.height))
@@ -66,6 +68,8 @@ class Fader:
                 self.doingRefresh = 0
                 self.blankImage = self.image.copy()
                 self.testing = True
+        else :
+            self.fadingDone =  True
 
 
 def redraw(config):
@@ -120,15 +124,19 @@ def repeatImage(config, canvasImage):
     # tower configuration
 
     # config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    
 
     extraOverlapx = 0
     extraOverlapy = 0
+    
+    patternBGColor = config.colOverlay.currentColor
+    patternBGColor = config.colOverlay.bgColor
 
     for c in range(0, config.cols):
         for r in range(0, config.rows):
             if cntr in config.skipBlocks:
                 config.canvasDraw.rectangle((c * config.blockWidth, r * config.blockHeight, c * config.blockWidth + config.blockWidth,
-                                             r * config.blockHeight + config.blockHeight), fill=config.bgColor, outline=config.bgColor)
+                                             r * config.blockHeight + config.blockHeight), fill=patternBGColor, outline=None)
             else:
                 temp = config.blockImage.copy()
                 # disabling for a moment 2023-04-01
@@ -163,7 +171,7 @@ def repeatImage(config, canvasImage):
 def rebuildPatternSequence(config):
 
     config.patternSequence = []
-    numberOfPatterns = round(random.uniform(2, 5))
+    numberOfPatterns = round(random.uniform(config.patternSequenceMin, config.patternSequenceMax))
     config.numConcentricBoxes = round(random.uniform(8, 18))
     lastPosition = 0
     totalSlots = config.rows * config.cols
@@ -205,7 +213,6 @@ def rebuildPatternSequence(config):
     print(("New sequence {}").format(config.patternSequence))
     print(("Using start pattern {}").format(config.patternModel))
     print("----------------------------------------------")
-
 
 
 def loadImageForBase():
@@ -300,6 +307,8 @@ def writeImage(baseName, renderImage):
 def rebuildPatterns(arg=0):
 
     c = round(random.uniform(1, 4))
+    
+    print("rebuilding patterns")
 
     if c == 1:
         if config.numRowsRandomize == True:
@@ -312,9 +321,8 @@ def rebuildPatterns(arg=0):
             config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
             config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
             
-            print( config.waveScaleRings, config.waveScaleSteps)
 
-    if c == 2:
+    if (random.random() < config.changePaletteWhenRebuildProb):
         newPalette = math.floor(random.uniform(0, len(config.palettes)))
         if newPalette == len(config.palettes):
             newPalette = 0
@@ -323,9 +331,14 @@ def rebuildPatterns(arg=0):
     if c >= 3:
         rebuildPatternSequence(config)
 
-    config.repeatDrawingMode = 1
-    config.fader.doingRefreshCount = 20
     rebuildSections()
+    config.repeatDrawingMode = 1
+    # config.fader.setUp()
+    config.fader.fadingDone = False
+    # config.fader.blankImage = config.canvasImage
+    config.fader.doingRefreshCount = 40
+    
+
 
 ###############################################
 
@@ -351,16 +364,11 @@ def rebuildSections():
     
     for i in range(0, config.numberOfSections):
         section = config.movingSections[i]
-        section.sectionRotation = random.uniform(
-            -config.sectionRotationRange, config.sectionRotationRange)
-        section.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])), round(
-            random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1]))]
-        section.sectionPlacementInit = [
-            section.sectionPlacement[0], section.sectionPlacement[1]]
-        section.sectionSize = [round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])), round(
-            random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
-        section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
-                                random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
+        section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
+        section.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])), round(random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1]))]
+        section.sectionPlacementInit = [section.sectionPlacement[0], section.sectionPlacement[1]]
+        section.sectionSize = [round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])), round(random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
+        section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
         
         if config.diagonalMovement == False :
             if sectionDisturbanceDirection == 1 :
@@ -368,9 +376,8 @@ def rebuildSections():
             else :
                 section.sectionSpeed = [0,random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
                 
-        if config.randomDiagonal == False :
+        if config.randomDiagonal == False and config.diagonalMovement == True :
             speed = random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal
-            
             hComponent = math.cos(config.diagonalFixedAngle) * speed
             vComponent = math.sin(config.diagonalFixedAngle) * speed
             section.sectionSpeed = [hComponent,vComponent]
@@ -420,9 +427,13 @@ def disturber():
     if config.doSectionDisturbance == True:
         if config.skipFramesCount >= config.skipFrames:
             config.skipFramesCount = 0
+            
+            print("disturbing")
 
             for i in range(0, config.numberOfSections):
                 sectionParams = config.movingSections[i]
+                
+                
                 if sectionParams.actionCount >= sectionParams.actionCountLimit:
                     # sectionParams.rotationSpeed = 0
                     # sectionParams.sectionSpeed[0] = 0
@@ -433,36 +444,28 @@ def disturber():
 
                     xPos = round(sectionParams.sectionPlacementInit[0])
                     yPos = round(sectionParams.sectionPlacementInit[1])
-                    section = config.canvasImage.crop(
-                        (xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+                    section = config.canvasImage.crop((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+					# section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
+					# sectionParams.sectionRotation += sectionParams.rotationSpeed
+
+                    config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(sectionParams.sectionPlacement[1])), section)
+                    config.canvasDraw.rectangle((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]) ,fill =None, outline = (100,0,0))
                     '''
-					section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
-					sectionParams.sectionRotation += sectionParams.rotationSpeed
 					'''
 
-                    config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
-                        sectionParams.sectionPlacement[1])), section)
-
-                    delta = (sectionParams.actionCountLimit -
-                             sectionParams.actionCount)/sectionParams.actionCountLimit
+                    delta = (sectionParams.actionCountLimit - sectionParams.actionCount)/sectionParams.actionCountLimit
                     # rads = (math.pi / 2) / sectionParams.actionCountLimit
                     # d = 1.0 - math.sin(sectionParams.actionCount * rads)
                     # d = 1.0 - math.pow(3, -.9 * delta)
 
                     d = math.pow(delta, 8)
                     d = 1
+                    
 
                     sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0] * d
                     sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1] * d
                     sectionParams.sectionSpeed[0] *= config.speedDeAcceleration
                     sectionParams.sectionSpeed[1] *= config.speedDeAcceleration
-
-                    '''
-					if sectionParams.sectionSpeed[0] != 0:
-						sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
-					if sectionParams.sectionSpeed[1] != 0:
-						sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
-					'''
 
                     # add some better easing
 
@@ -481,17 +484,19 @@ def disturber():
         for s in config.stableSegments:
 
             tempCrop = config.patternImage.crop((s[0], s[1], s[2], s[3]))
+            '''
+            '''
             config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
-    '''
-	tempCrop = config.patternImage.crop((0,0,256,32))
 
-	tempCrop = config.patternImage.crop((0,160,256,184))
-	config.canvasImage.paste(tempCrop, (0,160), tempCrop)	
+# tempCrop = config.patternImage.crop((0,0,256,32))
 
-	tempCrop = config.patternImage.crop((50,54,256,176))
-	config.canvasImage.paste(tempCrop, (50,54), tempCrop)	
-	'''
+# tempCrop = config.patternImage.crop((0,160,256,184))
+# config.canvasImage.paste(tempCrop, (0,160), tempCrop)	
+
+# tempCrop = config.patternImage.crop((50,54,256,176))
+# config.canvasImage.paste(tempCrop, (50,54), tempCrop)	
+
 
 
 def runWork():
@@ -568,7 +573,6 @@ def iterate():
     # paste over a section of the image on to itself and rotate
     if config.sectionDisturbance == True and config.fader.fadingDone == True:
         disturber()
-
         
     # a blurred section distrubance
     if config.useBlurSection == True:
@@ -579,14 +583,15 @@ def iterate():
         config.canvasImage = Image.composite(
             cp_blur, config.canvasImage, mask_blur)
 
-    if config.fader.fadingDone == True:
-        config.fader.fadingDone = False
-        config.fader.image = config.canvasImage
-        config.fader.doingRefreshCount = 0
-        # Rebuild the main pattern, halt any disturbances immediately - i.e. don't wait
-        if config.doneCount >= (config.numberOfSections) and config.rebuildImmediatelyAfterDone == True:
-            config.doSectionDisturbance = False
-            rebuildPatterns()
+    # if config.fader.fadingDone == True:
+    #     print("ACTION --------------")
+    #     config.fader.fadingDone = False
+    #     config.fader.image = config.canvasImage
+    #     config.fader.doingRefreshCount = 0
+    #     # Rebuild the main pattern, halt any disturbances immediately - i.e. don't wait
+    #     if config.doneCount >= (config.numberOfSections) and config.rebuildImmediatelyAfterDone == True:
+    #         config.doSectionDisturbance = False
+    #         rebuildPatterns()
 
     if config.doneCount >= config.numberOfSections and config.drawingPrinted == False and config.saveImages == True:
         config.fader.doingRefreshCount = 40
@@ -620,11 +625,13 @@ def iterate():
     config.fader.fadeIn(config)
 
 
-        
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp1Draw = ImageDraw.Draw(temp1)
-    temp1Draw.rectangle((0, 0, config.canvasWidth,
-                        config.canvasHeight), fill=config.colOverlay.bgColor)
+    if config.drawBGColorEachCycle == True :
+        temp1Draw.rectangle((0, 0, config.canvasWidth,config.canvasHeight), fill=config.colOverlay.currentColor)
+        '''
+        temp1Draw.rectangle((0, 0, config.canvasWidth,config.canvasHeight), fill=config.colOverlay.bgColor)
+        '''
     temp1.paste(config.image, (0, 0), config.image)
     
     if config.transformShape == True :
@@ -655,51 +662,32 @@ def transformImage(img):
 
 
 def setUpDisturbanceConfigs(configSet):
-    config.baseSectionSpeed = float(
-        workConfig.get(configSet, "baseSectionSpeed"))
-    config.sectionRotationRange = float(
-        workConfig.get(configSet, "sectionRotationRange"))
+    config.baseSectionSpeed = float(workConfig.get(configSet, "baseSectionSpeed"))
+    config.sectionRotationRange = float(workConfig.get(configSet, "sectionRotationRange"))
 
-    sectionPlacementXRange = workConfig.get(
-        configSet, "sectionPlacementXRange").split(",")
-    config.sectionPlacementXRange = tuple(
-        map(lambda x: int(int(x)), sectionPlacementXRange))
+    sectionPlacementXRange = workConfig.get(configSet, "sectionPlacementXRange").split(",")
+    config.sectionPlacementXRange = tuple(map(lambda x: int(int(x)), sectionPlacementXRange))
 
-    sectionPlacementYRange = workConfig.get(
-        configSet, "sectionPlacementYRange").split(",")
-    config.sectionPlacementYRange = tuple(
-        map(lambda x: int(int(x)), sectionPlacementYRange))
+    sectionPlacementYRange = workConfig.get(configSet, "sectionPlacementYRange").split(",")
+    config.sectionPlacementYRange = tuple(map(lambda x: int(int(x)), sectionPlacementYRange))
 
-    sectionWidthRange = workConfig.get(
-        configSet, "sectionWidthRange").split(",")
-    config.sectionWidthRange = tuple(
-        map(lambda x: int(int(x)), sectionWidthRange))
+    sectionWidthRange = workConfig.get(configSet, "sectionWidthRange").split(",")
+    config.sectionWidthRange = tuple(map(lambda x: int(int(x)), sectionWidthRange))
 
-    sectionHeightRange = workConfig.get(
-        configSet, "sectionHeightRange").split(",")
-    config.sectionHeightRange = tuple(
-        map(lambda x: int(int(x)), sectionHeightRange))
+    sectionHeightRange = workConfig.get(configSet, "sectionHeightRange").split(",")
+    config.sectionHeightRange = tuple(map(lambda x: int(int(x)), sectionHeightRange))
 
-    config.numberOfSections = int(
-        workConfig.get(configSet, "numberOfSections"))
-    config.sectionMovementCountMax = int(
-        workConfig.get(configSet, "sectionMovementCountMax"))
+    config.numberOfSections = int(workConfig.get(configSet, "numberOfSections"))
+    config.sectionMovementCountMax = int(workConfig.get(configSet, "sectionMovementCountMax"))
 
     config.stopProb = float(workConfig.get(configSet, "stopProbMax"))
-    config.sectionSpeedFactorHorizontal = float(
-        workConfig.get(configSet, "sectionSpeedFactorHorizontal"))
-    config.sectionSpeedFactorVertical = float(
-        workConfig.get(configSet, "sectionSpeedFactorVertical"))
-    config.speedDeAcceleration = float(
-        workConfig.get(configSet, "speedDeAcceleration"))
-    config.speedDeAccelerationBase = float(
-        workConfig.get(configSet, "speedDeAcceleration"))
-    config.redoSectionDisturbance = float(
-        workConfig.get(configSet, "redoSectionDisturbance"))
-    config.speedDeAccelerationUpperLimit = float(
-        workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
-    config.rebuildImmediatelyAfterDone = (
-        workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone"))
+    config.sectionSpeedFactorHorizontal = float(workConfig.get(configSet, "sectionSpeedFactorHorizontal"))
+    config.sectionSpeedFactorVertical = float(workConfig.get(configSet, "sectionSpeedFactorVertical"))
+    config.speedDeAcceleration = float(workConfig.get(configSet, "speedDeAcceleration"))
+    config.speedDeAccelerationBase = float(workConfig.get(configSet, "speedDeAcceleration"))
+    config.redoSectionDisturbance = float(workConfig.get(configSet, "redoSectionDisturbance"))
+    config.speedDeAccelerationUpperLimit = float(workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
+    config.rebuildImmediatelyAfterDone = (workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone"))
     
     try:
         # comment: 
@@ -718,6 +706,7 @@ def setUpDisturbanceConfigs(configSet):
     except Exception as e:
         print(str(e))
         config.randomDiagonal = True
+
 
 def setupStableSections():
     config.stableSegments = []
@@ -741,11 +730,9 @@ def main(run=True):
     config.cols = int(workConfig.get("movingpattern", "cols"))
     config.lineDiff = int(workConfig.get("movingpattern", "lineDiff"))
 
-    config.useDoubleLine = (workConfig.getboolean(
-        "movingpattern", "useDoubleLine"))
+    config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
 
-    config.randomizeSpeed = (workConfig.getboolean(
-        "movingpattern", "randomizeSpeed"))
+    config.randomizeSpeed = (workConfig.getboolean("movingpattern", "randomizeSpeed"))
 
     config.patternModel = (workConfig.get("movingpattern", "patternModel"))
     config.steps = int(workConfig.get("movingpattern", "steps"))
@@ -767,9 +754,7 @@ def main(run=True):
     config.diamondUseTriangles = False
     config.diamondStep = int(workConfig.get("movingpattern", "diamondStep"))
     
-
     config.numConcentricBoxes = int(workConfig.get("movingpattern", "numConcentricBoxes"))
-    
     
     config.numShingleRows = int(workConfig.get("movingpattern", "numShingleRows"))
     
@@ -820,6 +805,7 @@ def main(run=True):
     config.randomBlockWidth = int(workConfig.get("movingpattern", "randomBlockWidth"))
     config.randomBlockHeight = int(workConfig.get("movingpattern", "randomBlockHeight"))
     
+    
     config.decoBoxBandWidth = int(workConfig.get("movingpattern", "decoBoxBandWidth"))
 
     config.repeatProb = .99
@@ -853,8 +839,8 @@ def main(run=True):
 
     config.numRows = int(workConfig.get("movingpattern", "numRows"))
     config.numRowsRandomize = (workConfig.getboolean("movingpattern", "numRowsRandomize"))
-
     config.numDotRows = int(workConfig.get("movingpattern", "numDotRows"))
+
 
     config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
     config.patterns = workConfig.get("movingpattern", "patterns").split(",")
@@ -863,8 +849,19 @@ def main(run=True):
     patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
     config.patternSequence = []
     for i in range(0, len(patternSequence), 3):
-        config.patternSequence.append([patternSequence[i], int(    patternSequence[i+1]), int(patternSequence[i+2])])
+        config.patternSequence.append([patternSequence[i], int(patternSequence[i+1]), int(patternSequence[i+2])])
 
+    try:
+        config.patternSequenceMax = int(workConfig.get("movingpattern", "patternSequenceMax"))
+        config.patternSequenceMin = int(workConfig.get("movingpattern", "patternSequenceMin"))
+        # comment: 
+    except Exception as e:
+        print(str(e))
+        config.patternSequenceMin = 2
+        config.patternSequenceMax = 5
+    # end try
+    
+    
     config.usePixelSortRandomize = (workConfig.getboolean("movingpattern", "usePixelSortRandomize"))
 
     config.shingleVariation = (workConfig.getboolean("movingpattern", "shingleVariation"))
@@ -890,6 +887,13 @@ def main(run=True):
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
     buildPalette(config, 0)
+
+    try:
+        config.drawBGColorEachCycle = workConfig.getboolean("movingpattern", "drawBGColorEachCycle")
+    except Exception as e:
+        print(str(e))
+        config.drawBGColorEachCycle = True
+    # end try
 
 
     config.sectionDisturbance = (workConfig.getboolean("movingpattern", "sectionDisturbance"))
@@ -922,7 +926,13 @@ def main(run=True):
     config.imageSources = workConfig.get("movingpattern", "imageSources").split(',')
     
     try:
-        config.altColoringProb = workConfig.getboolean("movingpattern","altColoringProb")
+        config.changePaletteWhenRebuildProb = float(workConfig.get("movingpattern", "changePaletteWhenRebuildProb"))
+    except Exception as e:
+        print(str(e))
+        config.changePaletteWhenRebuildProb = .25
+    
+    try:
+        config.altColoringProb = float(workConfig.get("movingpattern","altColoringProb"))
     except Exception as e:
         print(str(e))
         config.altColoringProb = .5

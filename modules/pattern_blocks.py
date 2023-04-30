@@ -124,6 +124,7 @@ def circlesPacked(config):
     clr2 = tuple(
         int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
     )
+    
 
     # config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=clr)
 
@@ -171,10 +172,10 @@ def fishScales(config):
         int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
     )
 
-    clr2 = config.bgColor
+    clr3 = config.colOverlay.currentColor
 
     config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+        (0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
 
     numRows = config.numShingleRows
     boxWidth = config.blockWidth/numRows
@@ -187,7 +188,7 @@ def fishScales(config):
                 yPos,
                 i * boxWidth + boxWidth - boxWidth/2,
                 yPos + boxWidth),
-                outline=(clr), fill=clr2)
+                outline=(clr), fill=clr3)
 
         for i in range(0, 2):
             config.blockDraw.ellipse((
@@ -195,7 +196,7 @@ def fishScales(config):
                 yPos - boxWidth/2,
                 i * boxWidth + boxWidth,
                 yPos + boxWidth/2),
-                outline=(clr), fill=clr2)
+                outline=(clr), fill=clr3)
 
 
 def waveScales(config):
@@ -208,10 +209,11 @@ def waveScales(config):
         int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
     )
 
-    clr3 = config.bgColor
+    clr3 = config.colOverlay.currentColor
+
 
     config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+        (0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
 
     numRows = config.numScaleRows
     numRows = 2
@@ -249,7 +251,7 @@ def waveScales(config):
                 if config.altLineColoring == True :
                     eo = n % 2
                     if eo  == 1 :
-                        clrToUse = clr
+                        clrToUse = clr3
                     else :
                         clrToUse = clr2
                 else :
@@ -272,7 +274,7 @@ def waveScales(config):
                 if config.altLineColoring == True :
                     eo = n % 2
                     if eo  == 1 :
-                        clrToUse = clr
+                        clrToUse = clr3
                     else :
                         clrToUse = clr2
                 else :

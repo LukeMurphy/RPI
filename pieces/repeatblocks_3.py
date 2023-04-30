@@ -70,7 +70,173 @@ class Fader:
             self.fadingDone =  True
 
 
+class Holder:
+    def __init__(self):
+        pass
+
+
+class Director:
+    """docstring for Director"""
+
+    slotRate = .5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+        self.checkTime()
+
+
+###############################################
+
+
+def transformImage(img):
+	width, height = img.size
+	m = -0.0
+	xshift = abs(m) * 420
+	new_width = width + int(round(xshift))
+
+	# img = img.transform(
+	# 	(new_width, height), Image.AFFINE, (1, -0.1, 0.0, -0.5, 1, 1), Image.BICUBIC
+	# )
+	img = img.transform(
+		(new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
+	)
+	return img
+
+
+def writeImage(baseName, renderImage):
+    # baseName = "outputquad3/comp2_"
+    if config.saveImages == True:
+        fn = baseName+".png"
+        renderImage.save(fn)
+
+
+def setUpDisturbanceConfigs(configSet):
+    config.baseSectionSpeed = float(workConfig.get(configSet, "baseSectionSpeed"))
+    config.sectionRotationRange = float(workConfig.get(configSet, "sectionRotationRange"))
+
+    sectionPlacementXRange = workConfig.get(configSet, "sectionPlacementXRange").split(",")
+    config.sectionPlacementXRange = tuple(map(lambda x: int(int(x)), sectionPlacementXRange))
+
+    sectionPlacementYRange = workConfig.get(configSet, "sectionPlacementYRange").split(",")
+    config.sectionPlacementYRange = tuple(map(lambda x: int(int(x)), sectionPlacementYRange))
+
+    sectionWidthRange = workConfig.get(configSet, "sectionWidthRange").split(",")
+    config.sectionWidthRange = tuple(map(lambda x: int(int(x)), sectionWidthRange))
+
+    sectionHeightRange = workConfig.get(configSet, "sectionHeightRange").split(",")
+    config.sectionHeightRange = tuple(map(lambda x: int(int(x)), sectionHeightRange))
+
+    config.numberOfSections = int(workConfig.get(configSet, "numberOfSections"))
+    config.sectionMovementCountMax = int(workConfig.get(configSet, "sectionMovementCountMax"))
+
+    config.stopProb = float(workConfig.get(configSet, "stopProbMax"))
+    config.sectionSpeedFactorHorizontal = float(workConfig.get(configSet, "sectionSpeedFactorHorizontal"))
+    config.sectionSpeedFactorVertical = float(workConfig.get(configSet, "sectionSpeedFactorVertical"))
+    config.speedDeAcceleration = float(workConfig.get(configSet, "speedDeAcceleration"))
+    config.speedDeAccelerationBase = float(workConfig.get(configSet, "speedDeAcceleration"))
+    config.redoSectionDisturbance = float(workConfig.get(configSet, "redoSectionDisturbance"))
+    config.speedDeAccelerationUpperLimit = float(workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
+    config.rebuildImmediatelyAfterDone = (workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone"))
+    
+    try:
+        # comment: 
+        config.diagonalMovement = (
+        workConfig.getboolean(configSet, "diagonalMovement"))
+    except Exception as e:
+        print(str(e))
+        config.diagonalMovement = False
+    # end try
+
+    try:
+        config.randomDiagonal = (
+        workConfig.getboolean(configSet, "randomDiagonal"))
+        config.diagonalFixedAngle = float(
+        workConfig.get(configSet, "diagonalFixedAngle"))
+    except Exception as e:
+        print(str(e))
+        config.randomDiagonal = True
+
+
+def setupStableSections():
+    config.stableSegments = []
+    n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
+    minWidth = config.stableSectionsMinWidth
+    minHeight = config.stableSectionsMinHeight
+    for i in range(0, n):
+        xPos = round(random.uniform(0, config.canvasWidth))
+        xPos2 = round(random.uniform(xPos + minWidth, config.canvasWidth))
+        yPos = round(random.uniform(0, config.canvasHeight))
+        yPos2 = round(random.uniform(yPos + minHeight, config.canvasHeight))
+        config.stableSegments.append([xPos, yPos, xPos2, yPos2])
+
+
+def buildPalette(config, index=0):
+    global workConfig
+    palette = config.palettes[index]
+
+    print(str("New palette {}").format(palette))
+
+    # background
+    tLimitBase = int(workConfig.get(palette, "tLimitBase"))
+    minHue = float(workConfig.get(palette, "minHue"))
+    maxHue = float(workConfig.get(palette, "maxHue"))
+    minSaturation = float(workConfig.get(palette, "minSaturation"))
+    maxSaturation = float(workConfig.get(palette, "maxSaturation"))
+    minValue = float(workConfig.get(palette, "minValue"))
+    maxValue = float(workConfig.get(palette, "maxValue"))
+    # config.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+    config.colOverlay = Holder()
+    config.colOverlay.currentColor = [10, 10, 10, 100]
+    config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue, 0, 0,
+                                                                  round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
+    config.colOverlay.bgColor = colorutils.getRandomColorHSV(
+        minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+
+    #color 1
+    tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
+    minHue = float(workConfig.get(palette, "line_minHue"))
+    maxHue = float(workConfig.get(palette, "line_maxHue"))
+    minSaturation = float(workConfig.get(palette, "line_minSaturation"))
+    maxSaturation = float(workConfig.get(palette, "line_maxSaturation"))
+    minValue = float(workConfig.get(palette, "line_minValue"))
+    maxValue = float(workConfig.get(palette, "line_maxValue"))
+    # config.linecolOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+    config.linecolOverlay = Holder()
+    config.linecolOverlay.currentColor = [200, 10, 10]
+    config.linecolOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+    
+    #color 2
+    tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
+    minHue = float(workConfig.get(palette, "line2_minHue"))
+    maxHue = float(workConfig.get(palette, "line2_maxHue"))
+    minSaturation = float(workConfig.get(palette, "line2_minSaturation"))
+    maxSaturation = float(workConfig.get(palette, "line2_maxSaturation"))
+    minValue = float(workConfig.get(palette, "line2_minValue"))
+    maxValue = float(workConfig.get(palette, "line2_maxValue"))
+    # config.linecolOverlay2 = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+    config.linecolOverlay2 = Holder()
+    config.linecolOverlay2.currentColor = [10, 100, 10]
+    config.linecolOverlay2.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+
+    # config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,200)
+    # config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.colOverlay.currentColor)
+    # config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,10)
+
+
 def redraw(config):
+    
+    print(str("doing a redreaw: {}").format(config.patternModel))
 
     if config.patternModel == "wavePattern":
         pattern_blocks.wavePattern(config)
@@ -110,6 +276,9 @@ def redraw(config):
         
     if config.patternModel == "decoBoxes":
         pattern_blocks.decoBoxes(config)
+        
+    if config.patternModel == "waveScales":
+        pattern_blocks.waveScales(config)
 
 
 def repeatImage(config, canvasImage):
@@ -208,11 +377,10 @@ def rebuildPatternSequence(config):
             i += 1
         iterateCount += 1
     
-    print("----------------------------------------------")
-    print(("New sequence {}").format(config.patternSequence))
-    print(("Using start pattern {}").format(config.patternModel))
-    print("----------------------------------------------")
-
+    # print("----------------------------------------------")
+    # print(("New sequence {}").format(config.patternSequence))
+    # print(("Using start pattern {}").format(config.patternModel))
+    # print("----------------------------------------------")
 
 
 def loadImageForBase():
@@ -228,83 +396,9 @@ def loadImageForBase():
     config.canvasImage.paste(image, (0, 0))
 
 
-def getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue):
-    colOverlay = coloroverlay.ColorOverlay()
-    colOverlay.randomSteps = False
-    colOverlay.timeTrigger = True
-    colOverlay.tLimitBase = tLimitBase
-    colOverlay.maxBrightness = 1
-    colOverlay.steps = 50
-    colOverlay.minHue = minHue
-    colOverlay.maxHue = maxHue
-    colOverlay.minSaturation = minSaturation
-    colOverlay.maxSaturation = maxSaturation
-    colOverlay.minValue = minValue
-    colOverlay.maxValue = maxValue
-    colOverlay.colorTransitionSetup()
-    return colOverlay
-
-
-def buildPalette(config, index=0):
-    global workConfig
-    palette = config.palettes[index]
-
-    print(str("New palette {}").format(palette))
-
-    tLimitBase = int(workConfig.get(palette, "tLimitBase"))
-    minHue = float(workConfig.get(palette, "minHue"))
-    maxHue = float(workConfig.get(palette, "maxHue"))
-    minSaturation = float(workConfig.get(palette, "minSaturation"))
-    maxSaturation = float(workConfig.get(palette, "maxSaturation"))
-    minValue = float(workConfig.get(palette, "minValue"))
-    maxValue = float(workConfig.get(palette, "maxValue"))
-    # config.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-    config.colOverlay = Holder()
-    config.colOverlay.currentColor = [10, 10, 10, 100]
-    config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue, 0, 0,
-                                                                  round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
-    config.colOverlay.bgColor = colorutils.getRandomColorHSV(
-        minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-
-    tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
-    minHue = float(workConfig.get(palette, "line_minHue"))
-    maxHue = float(workConfig.get(palette, "line_maxHue"))
-    minSaturation = float(workConfig.get(palette, "line_minSaturation"))
-    maxSaturation = float(workConfig.get(palette, "line_maxSaturation"))
-    minValue = float(workConfig.get(palette, "line_minValue"))
-    maxValue = float(workConfig.get(palette, "line_maxValue"))
-    # config.linecolOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-    config.linecolOverlay = Holder()
-    config.linecolOverlay.currentColor = [200, 10, 10]
-    config.linecolOverlay.currentColor = colorutils.getRandomColorHSV(
-        minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-
-    tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
-    minHue = float(workConfig.get(palette, "line2_minHue"))
-    maxHue = float(workConfig.get(palette, "line2_maxHue"))
-    minSaturation = float(workConfig.get(palette, "line2_minSaturation"))
-    maxSaturation = float(workConfig.get(palette, "line2_maxSaturation"))
-    minValue = float(workConfig.get(palette, "line2_minValue"))
-    maxValue = float(workConfig.get(palette, "line2_maxValue"))
-    # config.linecolOverlay2 = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-    config.linecolOverlay2 = Holder()
-    config.linecolOverlay2.currentColor = [10, 100, 10]
-    config.linecolOverlay2.currentColor = colorutils.getRandomColorHSV(
-        minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
-
-    # config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,200)
-    # config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.colOverlay.currentColor)
-    # config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,10)
-
-
-def writeImage(baseName, renderImage):
-    # baseName = "outputquad3/comp2_"
-    if config.saveImages == True:
-        fn = baseName+".png"
-        renderImage.save(fn)
-
-
 def rebuildPatterns(arg=0):
+    
+    print("rebuildPattern Called")
 
     c = round(random.uniform(1, 4))
 
@@ -335,15 +429,12 @@ def rebuildPatterns(arg=0):
     config.fader.fadingDone = False
     config.fader.doingRefreshCount = 40
 
-###############################################
-
 
 def rebuildSections():
     global config
 
     if random.random() < config.changeDisturbanceSetProb:
-        setNumber = math.floor(random.uniform(
-            0, len(config.disturbanceConfigSets)))
+        setNumber = math.floor(random.uniform(0, len(config.disturbanceConfigSets)))
         setUpDisturbanceConfigs(config.disturbanceConfigSets[setNumber])
         # print("REBUILDSECTIONS RUNNING NOW: " + config.disturbanceConfigSets[setNumber])
 
@@ -386,40 +477,11 @@ def rebuildSections():
             
         section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
         section.actionCount = 0
-        section.actionCountLimit = round(
-            random.uniform(10, config.sectionMovementCountMax))
+        section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
         section.done = False
         section.stopProb = random.uniform(0, config.stopProb)
+        
     config.drawingPrinted = False
-
-
-#############################################
-
-
-class Holder:
-    def __init__(self):
-        pass
-
-
-class Director:
-    """docstring for Director"""
-
-    slotRate = .5
-
-    def __init__(self, config):
-        super(Director, self).__init__()
-        self.config = config
-        self.tT = time.time()
-
-    def checkTime(self):
-        if (time.time() - self.tT) >= self.slotRate:
-            self.tT = time.time()
-            self.advance = True
-        else:
-            self.advance = False
-
-    def next(self):
-        self.checkTime()
 
 
 def disturber():
@@ -486,8 +548,8 @@ def disturber():
         else:
             config.skipFramesCount += 1
 
+        # these are the sections that do not get smeared
         for s in config.stableSegments:
-
             tempCrop = config.patternImage.crop((s[0], s[1], s[2], s[3]))
             config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
@@ -529,7 +591,6 @@ def iterate():
 
     # redraw(config)
     
-    
     if config.useClipPlayer == True :
         config.clipMain.loadFrame()
         temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth,config.clipMain.clipHeight))
@@ -537,7 +598,6 @@ def iterate():
         config.image.paste(temp, (config.clipXPos, config.clipYPos), mask =config.clipMain.removalMask )
         # config.image.paste(temp, (config.clipXPos, config.clipYPos), mask = temp )
         
-
     repeatImage(config, config.patternImage)
 
     if config.repeatDrawingMode == 1:
@@ -613,10 +673,10 @@ def iterate():
         baseName = config.outPutPath + str(currentTime)
         writeImage(baseName, renderImage=config.canvasImage)
 
-    if random.random() < .01 :
-        config.doSectionDisturbance = False
-    if random.random() < .01 :
-        config.doSectionDisturbance = True
+    # if random.random() < .01 :
+    #     config.doSectionDisturbance = False
+    # if random.random() < .01 :
+    #     config.doSectionDisturbance = True
     
     # Rebuild the main pattern, halt any disturbances
     if random.random() < config.rebuildPatternProbability:
@@ -659,94 +719,18 @@ def iterate():
     # Done
 
 
-def transformImage(img):
-	width, height = img.size
-	m = -0.0
-	xshift = abs(m) * 420
-	new_width = width + int(round(xshift))
-
-	# img = img.transform(
-	# 	(new_width, height), Image.AFFINE, (1, -0.1, 0.0, -0.5, 1, 1), Image.BICUBIC
-	# )
-	img = img.transform(
-		(new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
-	)
-	return img
-
-
-def setUpDisturbanceConfigs(configSet):
-    config.baseSectionSpeed = float(workConfig.get(configSet, "baseSectionSpeed"))
-    config.sectionRotationRange = float(workConfig.get(configSet, "sectionRotationRange"))
-
-    sectionPlacementXRange = workConfig.get(configSet, "sectionPlacementXRange").split(",")
-    config.sectionPlacementXRange = tuple(map(lambda x: int(int(x)), sectionPlacementXRange))
-
-    sectionPlacementYRange = workConfig.get(configSet, "sectionPlacementYRange").split(",")
-    config.sectionPlacementYRange = tuple(map(lambda x: int(int(x)), sectionPlacementYRange))
-
-    sectionWidthRange = workConfig.get(configSet, "sectionWidthRange").split(",")
-    config.sectionWidthRange = tuple(map(lambda x: int(int(x)), sectionWidthRange))
-
-    sectionHeightRange = workConfig.get(configSet, "sectionHeightRange").split(",")
-    config.sectionHeightRange = tuple(map(lambda x: int(int(x)), sectionHeightRange))
-
-    config.numberOfSections = int(workConfig.get(configSet, "numberOfSections"))
-    config.sectionMovementCountMax = int(workConfig.get(configSet, "sectionMovementCountMax"))
-
-    config.stopProb = float(workConfig.get(configSet, "stopProbMax"))
-    config.sectionSpeedFactorHorizontal = float(workConfig.get(configSet, "sectionSpeedFactorHorizontal"))
-    config.sectionSpeedFactorVertical = float(workConfig.get(configSet, "sectionSpeedFactorVertical"))
-    config.speedDeAcceleration = float(workConfig.get(configSet, "speedDeAcceleration"))
-    config.speedDeAccelerationBase = float(workConfig.get(configSet, "speedDeAcceleration"))
-    config.redoSectionDisturbance = float(workConfig.get(configSet, "redoSectionDisturbance"))
-    config.speedDeAccelerationUpperLimit = float(workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
-    config.rebuildImmediatelyAfterDone = (workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone"))
-    
-    try:
-        # comment: 
-        config.diagonalMovement = (
-        workConfig.getboolean(configSet, "diagonalMovement"))
-    except Exception as e:
-        print(str(e))
-        config.diagonalMovement = False
-    # end try
-
-    try:
-        config.randomDiagonal = (
-        workConfig.getboolean(configSet, "randomDiagonal"))
-        config.diagonalFixedAngle = float(
-        workConfig.get(configSet, "diagonalFixedAngle"))
-    except Exception as e:
-        print(str(e))
-        config.randomDiagonal = True
-
-def setupStableSections():
-    config.stableSegments = []
-    n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
-    minWidth = config.stableSectionsMinWidth
-    minHeight = config.stableSectionsMinHeight
-    for i in range(0, n):
-        xPos = round(random.uniform(0, config.canvasWidth))
-        xPos2 = round(random.uniform(xPos + minWidth, config.canvasWidth))
-        yPos = round(random.uniform(0, config.canvasHeight))
-        yPos2 = round(random.uniform(yPos + minHeight, config.canvasHeight))
-        config.stableSegments.append([xPos, yPos, xPos2, yPos2])
-
-
 def main(run=True):
     global config
-    config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
+    
     config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
     config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
     config.rows = int(workConfig.get("movingpattern", "rows"))
     config.cols = int(workConfig.get("movingpattern", "cols"))
     config.lineDiff = int(workConfig.get("movingpattern", "lineDiff"))
 
-    config.useDoubleLine = (workConfig.getboolean(
-        "movingpattern", "useDoubleLine"))
+    config.useDoubleLine = (workConfig.getboolean("movingpattern", "useDoubleLine"))
 
-    config.randomizeSpeed = (workConfig.getboolean(
-        "movingpattern", "randomizeSpeed"))
+    config.randomizeSpeed = (workConfig.getboolean("movingpattern", "randomizeSpeed"))
 
     config.patternModel = (workConfig.get("movingpattern", "patternModel"))
     config.steps = int(workConfig.get("movingpattern", "steps"))
@@ -941,7 +925,7 @@ def main(run=True):
         config.changePaletteWhenRebuildProb = .25
         
     try:
-        config.altColoringProb = workConfig.getboolean("movingpattern","altColoringProb")
+        config.altColoringProb = float(workConfig.get("movingpattern","altColoringProb"))
     except Exception as e:
         print(str(e))
         config.altColoringProb = .5
@@ -956,9 +940,7 @@ def main(run=True):
         config.clipRotate = float(workConfig.get("imageSequencePlayer", "clipRotate"))
         config.clipMain = movieClip(config)
         config.clipMain.clipRotate = config.clipRotate
-        config.clipMain.setUp(workConfig)
-        
-        
+        config.clipMain.setUp(workConfig)     
     except Exception as e:
         print(str(e))
         config.useClipPlayer = False
@@ -977,7 +959,12 @@ def main(run=True):
     rebuildPatternSequence(config)
 
     config.directorController = Director(config)
-    config.directorController.slotRate = .03
+    config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
+    try: 
+        config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
+    except Exception as e:
+        print(str(e))
+        config.directorController.slotRate = .03
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

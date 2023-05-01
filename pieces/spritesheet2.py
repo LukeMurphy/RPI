@@ -118,9 +118,9 @@ class spriteAnimation():
                         frameSlice = frameSlice.rotate(
                             self.animationRotation, 0, 1)
 
-                    if config.brightness != 1.0:
+                    if self.config.brightness != 1.0:
                         enhancer = ImageEnhance.Brightness(frameSlice)
-                        frameSlice = enhancer.enhance(config.brightness)
+                        frameSlice = enhancer.enhance(self.config.brightness)
                     self.frameArray.append(frameSlice)
                     frame += 1
 
@@ -138,9 +138,9 @@ class spriteAnimation():
         if self.animationRotation != 0:
             frameSlice = frameSlice.rotate(self.animationRotation, 0, 1)
 
-        if config.brightness != 1.0:
+        if self.config.brightness != 1.0:
             enhancer = ImageEnhance.Brightness(frameSlice)
-            frameSlice = enhancer.enhance(config.brightness)
+            frameSlice = enhancer.enhance(self.config.brightness)
 
         if self.pause == False:
             self.playCount += self.step
@@ -479,8 +479,8 @@ def iterate(n=0):
             if random.random() < currentAnimation.freezeGlitchProb:
                 currentAnimation.glitching = False
     else:
-        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
-            bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
+        bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
+        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
         for anim in currentAnimation.animationArray:
 

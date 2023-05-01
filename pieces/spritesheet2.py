@@ -240,6 +240,7 @@ def main(run=True):
 
     animationNames = workConfig.get("base-parameters", "animations").split(",")
     playTimes = workConfig.get("base-parameters", "playTimes").split(",")
+    config.playInOrder = workConfig.getboolean("base-parameters", "playInOrder")
 
     config.animationNames = animationNames
     config.animations = []
@@ -549,11 +550,16 @@ def iterate(n=0):
 
     config.animationController.checkTime()
     if config.animationController.advance == True:
-        config.currentAnimationIndex += 1
-        if config.currentAnimationIndex >= len(config.animations):
-            config.currentAnimationIndex = 0
-            config.animationController.slotRate = config.playTimes[0]
+        if config.playInOrder == True:
+            config.currentAnimationIndex += 1
+            if config.currentAnimationIndex >= len(config.animations):
+                config.currentAnimationIndex = 0
+        else :
+            choice = math.floor(random.uniform(0,len(config.animations)))
+            config.currentAnimationIndex = choice
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
+        
+        config.animationController.slotRate = round(random.uniform(5,20))
 
 
 def callBack():

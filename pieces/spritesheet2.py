@@ -471,8 +471,7 @@ def iterate(n=0):
     # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
     #         bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
 
-    config.canvasImage.paste(currentAnimation.animationImage, (currentAnimation.animationXOffset,
-                             currentAnimation.animationYOffset), currentAnimation.animationImage)
+    config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
 
     if config.allPause == True:
         if currentAnimation.glitching == True:
@@ -486,7 +485,7 @@ def iterate(n=0):
         for anim in currentAnimation.animationArray:
 
             try:
-                currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos, anim.yPos), anim.nextFrame())
+                currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), anim.nextFrame())
                 # config.animationImage.paste(anim.nextFrame(), (0, 0), anim.nextFrame())
                 # comment:
             except Exception as e:

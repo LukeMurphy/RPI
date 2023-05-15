@@ -241,6 +241,16 @@ def main(run=True):
     animationNames = workConfig.get("base-parameters", "animations").split(",")
     playTimes = workConfig.get("base-parameters", "playTimes").split(",")
     config.playInOrder = workConfig.getboolean("base-parameters", "playInOrder")
+    try:
+        # comment: 
+        config.drawMoire = workConfig.getboolean("base-parameters", "drawMoire")
+        config.drawMoireProb = float(workConfig.get("base-parameters", "drawMoireProb"))
+        config.drawMoireProbOff = float(workConfig.get("base-parameters", "drawMoireProbOff"))
+    except Exception as e:
+        print(str(e))
+        config.drawMoire  = False
+        config.drawMoireProb = 0 
+        config.drawMoireProbOff = 0 
 
     config.animationNames = animationNames
     config.animations = []
@@ -481,6 +491,22 @@ def iterate(n=0):
     else:
         bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
         currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
+        if config.drawMoire == True : 
+            c1  = (150,50,0,150)
+            for ii in range (0,2):
+                xc = ii * 20 + 100
+                yc = ii * 20 + 100
+                for i in range(0, 80) :
+                    w = 400 - i * 6
+                    x0 = xc - w / 2
+                    y0 = yc - w / 2
+                    x1 = xc + w / 2
+                    y1 = yc + w / 2
+                    currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
+        
+        
+        
+        
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
         for anim in currentAnimation.animationArray:
 
@@ -505,6 +531,12 @@ def iterate(n=0):
         config.render(config.canvasImage, 0, 0,
                       config.canvasWidth, config.canvasHeight)
 
+    if random.random() < config.drawMoireProb:
+        config.drawMoire = True
+    if random.random() < config.drawMoireProbOff:
+        config.drawMoire = False
+        
+        
     if random.random() < config.filterRemappingProb:
         if random.random() < .5:
             config.filterRemapping == False

@@ -322,8 +322,6 @@ openbutton = Button(
 )
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
-
-
 sortbutton1 = Button(
     root,
     text="Sort By Date",
@@ -373,6 +371,7 @@ quitbutton = Button(
 )
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
-getAllConfigFiles(False, True)
+# sort by date = True,  
+getAllConfigFiles(True, True)
 
 root.mainloop()

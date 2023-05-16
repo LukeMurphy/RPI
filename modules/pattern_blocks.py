@@ -361,6 +361,64 @@ def circles(config):
                     outline=(clr), fill=None)
 
 
+def compass(config):
+
+    clr = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+    )
+    clr2 = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+    )
+
+    config.blockDraw.rectangle(
+        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+
+    count = 0
+    barWidth = 4
+    grid = round(config.blockWidth/16)
+    len1 = 5
+    len2 = 2
+    
+    origins  = ((0,0),
+                (config.blockWidth,0),
+                (round(config.blockWidth/2),round(config.blockWidth/2)),
+                (0,config.blockWidth),
+                (config.blockWidth,config.blockWidth),
+                )
+    
+    outlineClr = None
+    outlineClr = clr2
+    for i in range(0,5) :
+
+        midx = origins[i][0]
+        midy = origins[i][1]
+        
+        isoTriangle  =  ((midx - grid,midy),
+                        (midx,midy - len1 * grid),
+                        (midx + grid,midy),
+                        (midx, midy + len1 * grid),
+                        (midx - grid,midy),
+                        )
+        config.blockDraw.polygon(isoTriangle, fill = clr, outline=outlineClr)
+        isoTriangle  =  ((midx - grid * len1,midy),
+                        (midx,midy - grid),
+                        (midx + grid *len1,midy),
+                        (midx,midy + grid),
+                        (midx - grid * len1,midy),
+                        )
+        config.blockDraw.polygon(isoTriangle, fill = clr, outline=outlineClr)
+        isoTriangle  =  ((midx - grid * len2, midy - grid * len2),
+                        (midx, midy - grid),
+                        (midx + grid *len2, midy - grid * len2),
+                        (midx + grid, midy),
+                        (midx + grid * len2, midy + grid * len2),
+                        (midx, midy + grid),
+                        (midx - grid * len2, midy + grid * len2),
+                        (midx - grid, midy),
+                        )
+        config.blockDraw.polygon(isoTriangle, fill = clr, outline=outlineClr)
+        
+
 def bars(config):
 
     clr = tuple(

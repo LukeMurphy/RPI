@@ -314,14 +314,25 @@ def iterate():
     # where the tilted propping beam is 32 x 320 px and the horizontaly tilted beam is 32 x 256
     # the total picture is 384 wide but only showing approx 320 + 32 px
 
-    temp2 = temp2.crop((320, 0, 384, 384))
+    # temp2 = temp2.crop((320, 0, 384, 384))
+    # temp2 = temp2.rotate(90, 3, True)
+
+    # temp3 = temp1.rotate(180)
+    # temp3 = temp3.crop((64, 150, 384, 222))
+
+    # temp1.paste(temp3, (0, 128))
+    # temp1.paste(temp2, (0, 96))
+    
+    
+    temp2 = temp2.crop((360, 0, 440, 400))
     temp2 = temp2.rotate(90, 3, True)
 
-    temp3 = temp1.rotate(180)
-    temp3 = temp3.crop((64, 150, 384, 222))
+    # temp3 = temp1.rotate(0)
+    temp3 = temp1.crop((0, 160, 440, 200))
 
-    temp1.paste(temp3, (0, 128))
-    temp1.paste(temp2, (0, 96))
+    temp1.paste(temp2, (0, 100))
+    temp1.paste(temp3, (0, 160))
+
 
 
     config.render(temp1, 0, 0)

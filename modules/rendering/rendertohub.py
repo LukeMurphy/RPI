@@ -45,6 +45,7 @@ def update_duration():
 	if loc > 40:
 		config.videoplayer.seek(0)
 
+
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
     gc.enable()
@@ -152,7 +153,12 @@ def on_closing():
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-
+def writeImage(baseName, renderImage):
+    # baseName = "outputquad3/comp2_"
+    fn = baseName+".png"
+    renderImage.save(fn)
+        
+        
 def startWork(*args):
     # global config, work, root, counter
     global counter
@@ -466,6 +472,13 @@ def render(
             config.imageArrayForSaving[0].save(
                 name, save_all=True, append_images=config.imageArrayForSaving[1:], optimize=True, duration=.5, loop=0)
             config.imageArrayForSaving = []
+            
+    if config.saveToFile == True :
+        config.topDirector.checkTime()
+        if config.topDirector.advance == True :
+            currentTime = time.time()
+            baseName = config.outPutPath + str(currentTime)
+            writeImage(baseName, renderImage=config.renderImageFull)
 
     if updateCanvasCall:
         updateCanvas()

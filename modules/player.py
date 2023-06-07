@@ -31,6 +31,26 @@ global imageTop, imageBottom, image, transWiring
 
 threads = []
 
+class TopDirector:
+    """docstring for TopDirector"""
+
+    slotRate = .5
+
+    def __init__(self, config):
+        super(TopDirector, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+        self.checkTime()
+
 
 def configure(config, workconfig):
 	global path, tempImage, threads, thrd
@@ -446,7 +466,18 @@ def configure(config, workconfig):
 	config.minBrightness = float(workconfig.get("displayconfig", "minBrightness"))
 	config.work = workconfig.get("displayconfig", "work")
 	config.rendering = workconfig.get("displayconfig", "rendering")
-
+ 
+ 
+	try:
+		config.saveToFile = workconfig.getboolean("displayconfig", "saveToFile")
+		config.outPutPath = workconfig.get("displayconfig", "outPutPath")
+		config.timeToTakeInterval = float(workconfig.get("displayconfig", "timeToTakeInterval"))
+		config.topDirector = TopDirector(config)
+		config.topDirector.slotRate = config.timeToTakeInterval
+	except Exception as e:
+		print(str(e))
+		config.saveToFile = False
+	# end try
 
 	#############################################################################
 	# Create the image-canvas for the work if this is a stand-alone player!

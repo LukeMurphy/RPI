@@ -219,7 +219,7 @@ class ImageSprite:
 				pass
 				#self.image = self.image.rotate(-180)
 
-			self.imageOriginal = self.image.copy()
+			# self.imageOriginal = self.image.copy()
 			self.process()
 
 			self.imageCopy = Image.new(
@@ -396,7 +396,8 @@ class ImageSprite:
 
 				# print(tartClr)
 				region = region.point(lambda i: tartClr if (i >= 0 and i < 10) else i)
-    
+
+
 			self.image.paste(region, box)
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -497,6 +498,10 @@ class ImageSprite:
 		self.image = Image.open(arg, "r")
 		self.image.load()
 		self.imgHeight = self.image.getbbox()[3]
+  
+		self.imageOriginal = Image.open(arg, "r")
+		self.imageOriginal.load()
+  
 		return True
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

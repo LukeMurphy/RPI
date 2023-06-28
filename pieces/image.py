@@ -412,7 +412,8 @@ def performChanges():
 
     # RESETS for paused animation
     if config.imgLoader.holdAnimation == True and (config.imgLoader.imageGlitchCount > config.imgLoader.imageGlitchCountLimit or random.random() < config.releasePauseProb):
-        config.imgLoader.image = config.imgLoader.imageOriginal.copy()
+        config.imgLoader.image = config.imgLoader.imageOriginal
+        # config.imgLoader.image = config.imgLoader.imageOriginal.copy()
         config.f.fadingDone = True
         # print(config.glitchCount)
         # print("RESET " + str(config.glitchCount/config.glitchCountRestFactor))
@@ -421,8 +422,7 @@ def performChanges():
         config.imgLoader.imageGlitchCountLimit = round(
             random.uniform(2, config.imageGlitchCountLimit))
         config.imgLoader.holdAnimation = False
-        config.imgLoader.make(
-            config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
+        # config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
 
     if random.random() < config.overlayChangeProb:
         if config.verticalOrientation == 0:

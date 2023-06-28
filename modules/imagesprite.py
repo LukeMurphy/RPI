@@ -396,8 +396,7 @@ class ImageSprite:
 
 				# print(tartClr)
 				region = region.point(lambda i: tartClr if (i >= 0 and i < 10) else i)
-
-			# region = region.convert("P")
+    
 			self.image.paste(region, box)
 
 	"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

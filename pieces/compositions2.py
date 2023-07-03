@@ -68,7 +68,10 @@ def drawCompositions():
 	starty = 0
 
 	# Choose seam x point  -- ideally about 1/3 from left
-	xVariance = 100
+	# the 100 px spread around the 1/3 width should really be proportional to the overall size
+	# xVariance = round(random.uniform(config.canvasWidth - 50, config.canvasWidth + 50) / 3) 
+	xVarianceSpread = round(config.canvasWidth/6)
+	xVariance = round(random.uniform(config.canvasWidth - xVarianceSpread, config.canvasWidth + xVarianceSpread) / 3) 
 	config.flip = False
 
 	xSeam = int(
@@ -80,7 +83,7 @@ def drawCompositions():
 
 	angleRotation = random.uniform(-3, 3)
 
-	fills =(0,0,0,round(random.uniform(60,130)))
+	fills =(0,0,0,round(random.uniform(0,130)))
 
 	insetPoly = []
 	for p in config.inset_coords:

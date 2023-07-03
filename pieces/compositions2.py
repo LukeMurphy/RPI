@@ -91,9 +91,13 @@ def drawCompositions():
 	temp = Image.new("RGBA", (config.imageWidth, config.imageHeight))
 	drawtemp = ImageDraw.Draw(temp)
 	drawtemp.polygon(insetPoly, fill=fills)
-	temp = ScaleRotateTranslate(temp, angleRotation, None, None, None, True)
  
+	# previous interations did this
+	if config.insetRotate == True :
+		temp = ScaleRotateTranslate(temp, angleRotation, None, None, None, True)
+  
 	config.canvasImage.paste(temp, temp)
+ 
 
 	for n in range(0, config.numSquarePairs):
 		gray0 = round(random.uniform(0, 160) * config.brightness)
@@ -213,6 +217,13 @@ def main(run=True):
 		config.inset_coords.append((shapeCoords[c], shapeCoords[c + 1]))
 
 
+	try:
+		config.insetRotate = (workConfig.getboolean("compositions", "insetRotate"))
+		# comment: 
+	except Exception as e:
+		print(str(e))
+		config.insetRotate = True
+  
 	try:
 		config.useInsetColorControls = (workConfig.getboolean("compositions", "useInsetColorControls"))
 		# comment: 

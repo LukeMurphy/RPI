@@ -32,6 +32,32 @@ def ScaleRotateTranslate(
 	)
 
 
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+class Director:
+    """docstring for Director"""
+
+    slotRate = .5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.slotRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+        self.checkTime()
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
 def drawCompositions():
 
 	startx = config.imageWidth / 9
@@ -66,6 +92,7 @@ def drawCompositions():
 	drawtemp = ImageDraw.Draw(temp)
 	drawtemp.polygon(insetPoly, fill=fills)
 	temp = ScaleRotateTranslate(temp, angleRotation, None, None, None, True)
+ 
 	config.canvasImage.paste(temp, temp)
 
 	for n in range(0, config.numSquarePairs):
@@ -80,7 +107,20 @@ def drawCompositions():
 
 		if random.random() < 0.5:
 			fills[0] = (gray0, gray0, gray1, 255)
-
+   
+   
+		if config.useInsetColorControls == True :
+			fills[n] = colorutils.getRandomColorHSV(config.inset_minHue,
+                                           config.inset_maxHue,
+                                           config.inset_minSaturation,
+                                           config.inset_maxSaturation,
+											config.inset_minValue,
+											config.inset_maxValue,
+											config.inset_dropHueMin,
+											config.inset_dropHueMax,
+											255
+                                           )
+			
 		if n == 2:
 			wFactor *= 1.5
 
@@ -118,6 +158,7 @@ def drawCompositions():
 		temp = Image.new("RGBA", (config.imageWidth, config.imageHeight))
 		drawtemp = ImageDraw.Draw(temp)
 		drawtemp.rectangle((x1, y1, x2, y2), fill=fills[n])
+  
 		temp = ScaleRotateTranslate(temp, angleRotation, None, None, None, True)
 		config.canvasImage.paste(temp, temp)
 
@@ -140,9 +181,7 @@ def main(run=True):
 	config.canvasImageHeight = int(workConfig.get("compositions", "canvasImageHeight"))
 	config.refreshCount = int(workConfig.get("compositions", "refreshCount"))
 	config.timeToComplete = float(workConfig.get("compositions", "timeToComplete"))
-	config.cleanSlateProbability = float(
-		workConfig.get("compositions", "cleanSlateProbability")
-	)
+	config.cleanSlateProbability = float(workConfig.get("compositions", "cleanSlateProbability"))
 	config.filterPatchProb = float(workConfig.get("compositions", "filterPatchProb"))
 
 	config.imageWidth = config.canvasImageWidth
@@ -154,6 +193,15 @@ def main(run=True):
 	config.maxSaturation = float(workConfig.get("compositions", "maxSaturation"))
 	config.minValue = float(workConfig.get("compositions", "minValue"))
 	config.maxValue = float(workConfig.get("compositions", "maxValue"))
+	try:
+		config.dropHueMin = float(workConfig.get("compositions", "dropHueMin"))
+		config.dropHueMax = float(workConfig.get("compositions", "dropHueMax"))
+		# comment: 
+	except Exception as e:
+		print(str(e))
+		config.dropHueMin = 0
+		config.dropHueMax = 0
+	# end try
 
 
 	shapeCoords = list(
@@ -164,6 +212,15 @@ def main(run=True):
 	for c in range(0, len(shapeCoords), 2):
 		config.inset_coords.append((shapeCoords[c], shapeCoords[c + 1]))
 
+
+	try:
+		config.useInsetColorControls = (workConfig.getboolean("compositions", "useInsetColorControls"))
+		# comment: 
+	except Exception as e:
+		print(str(e))
+		config.useInsetColorControls = False
+
+  
 	config.inset_varX = int(workConfig.get("compositions", "inset_varX"))
 	config.inset_varY = int(workConfig.get("compositions", "inset_varY"))
 	config.inset_minHue = float(workConfig.get("compositions", "inset_minHue"))
@@ -173,11 +230,36 @@ def main(run=True):
 	config.inset_maxValue = float(workConfig.get("compositions", "inset_maxValue"))
 	config.inset_minValue = float(workConfig.get("compositions", "inset_minValue"))
 
+	try:
+		config.inset_dropHueMin = float(workConfig.get("compositions", "inset_dropHueMin"))
+		config.inset_dropHueMax = float(workConfig.get("compositions", "inset_dropHueMax"))
+		# comment: 
+	except Exception as e:
+		print(str(e))
+		config.inset_dropHueMin = 0
+		config.inset_dropHueMax = 0
+	# end try
+
 	print("Running")
 
-	config.bgColor = tuple(
-		int(i) for i in (workConfig.get("compositions", "bgColor").split(","))
-	)
+	try:
+		config.bgColor = tuple(
+			int(i) for i in (workConfig.get("compositions", "bgColor").split(","))
+		)
+		# comment: 
+	except Exception as e:
+		print(str(e))
+		config.bgColor = colorutils.getRandomColorHSV(
+			config.minHue,
+			config.maxHue,
+			config.minSaturation,
+			config.maxSaturation,
+			config.minValue,
+			config.maxValue,
+			config.dropHueMin,
+			config.dropHueMax,
+		)
+	# end try
 
 	config.numSquarePairs = 3
 
@@ -192,12 +274,24 @@ def main(run=True):
 		"RGBA", (config.canvasImageWidth, config.canvasImageHeight)
 	)
 	config.draw = ImageDraw.Draw(config.canvasImage)
+ 
 	config.draw.rectangle(
 		(0, 0, config.imageWidth, config.imageHeight), fill=config.bgColor
 	)
 
 	config.firstRun = True
 	config.flip = False
+ 
+ 
+	config.directorController = Director(config)
+ 
+	try :
+		config.directorController.slotRate = float(workConfig.get("compositions", "slotRate"))
+		config.directorController.delay = float(workConfig.get("compositions", "redrawSpeed"))
+	except Exception as e:
+		print(str(e))
+		config.directorController.slotRate = .02
+		config.directorController.delay = .02
 
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
 	panelDrawing.mockupBlock(config, workConfig)
@@ -237,6 +331,8 @@ def restartDrawing():
 			config.maxSaturation,
 			config.minValue,
 			config.maxValue,
+			config.dropHueMin,
+			config.dropHueMax,
 		)
 
 		# print(config.bgColor)
@@ -270,10 +366,14 @@ def runWork():
 	print("RUNNING compositions2.py")
 	print(bcolors.ENDC)
 	while config.isRunning == True:
-		iterate()
-		time.sleep(config.delay)
+		config.directorController.checkTime()
+		if config.directorController.advance == True:
+			iterate()
+			time.sleep(config.directorController.delay)
 		if config.standAlone == False :
 			config.callBack()
+
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 

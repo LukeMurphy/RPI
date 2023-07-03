@@ -83,7 +83,7 @@ def drawCompositions():
 
 	angleRotation = random.uniform(-3, 3)
 
-	fills =(0,0,0,round(random.uniform(0,130)))
+	fillsIn =(0,0,0,round(random.uniform(0,130)))
 
 	insetPoly = []
 	for p in config.inset_coords:
@@ -93,30 +93,19 @@ def drawCompositions():
 
 	temp = Image.new("RGBA", (config.imageWidth, config.imageHeight))
 	drawtemp = ImageDraw.Draw(temp)
-	drawtemp.polygon(insetPoly, fill=fills)
+	drawtemp.polygon(insetPoly, fill=fillsIn)
  
 	# previous interations did this
 	if config.insetRotate == True :
 		temp = ScaleRotateTranslate(temp, angleRotation, None, None, None, True)
   
 	config.canvasImage.paste(temp, temp)
+	fills = []
+
  
-
 	for n in range(0, config.numSquarePairs):
-		gray0 = round(random.uniform(0, 160) * config.brightness)
-		gray1 = round(random.uniform(0, 160) * config.brightness)
-		gray2 = round(random.uniform(0, 160) * config.brightness)
-		fills = [
-			(gray0, gray1, gray1, 255),
-			(gray1, gray1, gray1, 255),
-			(gray2, gray2, gray2, 255),
-		]
-
-		if random.random() < 0.5:
-			fills[0] = (gray0, gray0, gray1, 255)
-   
-   
 		if config.useInsetColorControls == True :
+			fills.append([0])
 			fills[n] = colorutils.getRandomColorHSV(config.inset_minHue,
                                            config.inset_maxHue,
                                            config.inset_minSaturation,
@@ -127,6 +116,20 @@ def drawCompositions():
 											config.inset_dropHueMax,
 											255
                                            )
+		else :
+			gray0 = round(random.uniform(0, 160) * config.brightness)
+			gray1 = round(random.uniform(0, 160) * config.brightness)
+			gray2 = round(random.uniform(0, 160) * config.brightness)
+			fills = [
+				(gray0, gray1, gray1, 255),
+				(gray1, gray1, gray1, 255),
+				(gray2, gray2, gray2, 255),
+			]
+
+			if random.random() < 0.5:
+				fills[0] = (gray0, gray0, gray1, 255)
+   
+   
 			
 		if n == 2:
 			wFactor *= 1.5
@@ -275,8 +278,15 @@ def main(run=True):
 		)
 	# end try
 
-	config.numSquarePairs = 3
 
+	try:
+		config.numSquarePairs = int(workConfig.get("compositions", "numSquarePairs"))
+		# comment: 
+	except Exception as e:
+		print(str(e))
+		config.numSquarePairs = 3
+ 
+ 
 	config.t1 = time.time()
 	config.t2 = time.time()
 

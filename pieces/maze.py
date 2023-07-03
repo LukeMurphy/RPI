@@ -80,14 +80,17 @@ def newSolverColor(arg=0, adj=1.0):
         round(random.uniform(cp.bg_minAlpha, cp.bg_maxAlpha)),
         config.brightness
     )
+    
+    # color =  colorutils.getRandomColorHSV(0,0,1.0,1.0,.9,.9)
     return (round(color[0] ), round(color[1] ), round(color[2] ), color[3] )
 
 
 def setSolvePathColors():
-    config.okColor = newSolverColor(120)
-    config.failColor = newSolverColor(0)
-    config.infoColor = newSolverColor(40)
-    config.infoColor2 = newSolverColor(180)
+    
+    config.okColor = newSolverColor(120,config.solveLineBrightnessFactor)
+    config.failColor = newSolverColor(0,config.solveLineBrightnessFactor)
+    config.infoColor = newSolverColor(40,config.solveLineBrightnessFactor)
+    config.infoColor2 = newSolverColor(180,config.solveLineBrightnessFactor)
 
     # print(("okColor = {}  failColor = {}").format(config.okColor,config.failColor))
 
@@ -207,6 +210,13 @@ def main(run=True):
     config.outPutPath = workConfig.get("forms", "outPutPath")
 
     config.pathValueAugment = float(workConfig.get("forms", "pathValueAugment"))
+    
+    try:
+        config.solveLineBrightnessFactor = float(workConfig.get("forms","solveLineBrightnessFactor"))
+    except Exception as e:
+        print(str(e))
+        config.solveLineBrightnessFactor = 1
+    
 
     # config.okColor = tuple(int(i) for i in (workConfig.get("forms", "okColor")).split(","))
     # config.failColor = tuple(int(i) for i in (workConfig.get("forms", "failColor")).split(","))
@@ -296,17 +306,17 @@ def setupMaze():
 
     config.cellSize = round(random.uniform(config.cellSizeMin,config.cellSizeMax))
 
-
-    pLinesMax = config.pLinesMax
-    pWallsMax = config.pWallsMax
-
     if config.cellSize < 12 :
         pLinesMax = 3
         pWallsMax = 3
 
+    pLinesMax = config.pLinesMax
+    pWallsMax = config.pWallsMax
+
+
     config.pLines = round(random.uniform(config.pLinesMin,pLinesMax))
     config.pWalls = round(random.uniform(config.pWallsMin,pWallsMax))
-    config.hidePath = True if random.random() < .1 else False
+    config.hidePath = True if random.random() < .9 else False
 
     config.backgroundColor = newColor()
 
@@ -810,10 +820,11 @@ def drawPathsAfter(config):
     correction = config.pLines - 1
 
     if config.hidePath == True :
-        lineColor_w = tuple(int(i) for i in config.backgroundColor)
-        lineColor_s = tuple(int(i) for i in config.backgroundColor)
-        lineColor_n = tuple(int(i) for i in config.backgroundColor)
-        lineColor_e = tuple(int(i) for i in config.backgroundColor)
+        iDiff = 40
+        lineColor_w = tuple(int(i - iDiff) for i in config.backgroundColor)
+        lineColor_s = tuple(int(i - iDiff) for i in config.backgroundColor)
+        lineColor_n = tuple(int(i - iDiff) for i in config.backgroundColor)
+        lineColor_e = tuple(int(i - iDiff) for i in config.backgroundColor)
 
 
     # startcell

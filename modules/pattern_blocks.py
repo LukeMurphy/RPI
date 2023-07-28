@@ -256,12 +256,21 @@ def waveScales(config):
                         clrToUse = clr2
                 else :
                         clrToUse = clr3
-                    
+                x0  =  xSizeOfBox + xOffSet + n   
+                x1  =  xSizeOfBox + xOffSet + boxWidth - n
+                y0 = yPos + 0 + n + y
+                y1 = yPos + yOffSet - n  + y
+                
+                if y1 < y0 :
+                    y1=y0
+                
+                if x1 < x0 :
+                    x1 = x0   
                 config.blockDraw.ellipse((
-                    xSizeOfBox + xOffSet + n,
-                    yPos + 0 + n + y,
-                    xSizeOfBox + xOffSet + boxWidth - n,
-                    yPos + yOffSet - n  + y),
+                    x0,
+                    y0,
+                    x1,
+                    y1),
                     outline=(lineToUse), fill=clrToUse)
 
         xOffSet = 0
@@ -279,12 +288,23 @@ def waveScales(config):
                         clrToUse = clr2
                 else :
                         clrToUse = clr3
+                        
+                x0 = xSizeOfBox + xOffSet + n
+                x1 = xSizeOfBox + xOffSet + boxWidth - n
+                y0 = yPos - yOffSet + n + y
+                y1 = yPos + yOffSet - n + y
+                
+                if x1 < x0 :
+                    x1 = x0
+                
+                if y1 < y0 :
+                    y1= y0
                     
                 config.blockDraw.ellipse((
-                    xSizeOfBox + xOffSet + n,
-                    yPos - yOffSet + n + y,
-                    xSizeOfBox + xOffSet + boxWidth - n,
-                    yPos + yOffSet - n + y),
+                    x0,
+                    y0,
+                    x1,
+                    y1),
                     outline=(lineToUse), fill=clrToUse)
                 
 
@@ -526,11 +546,20 @@ def decoBoxes(config):
                 outClr = clr
         else:
             outClr = clr
+         
+        x1 = width-w*i   
+        y1 = width-w*i
+        
+        if y1 < 0 :
+            y1 = 0
+
+        if x1 < 0 :
+            x1 = 0
         temp2Draw.rectangle((
             0,
             0,
-            width-w*i,
-            width-w*i),
+            x1,
+            y1),
             outline=(None), fill=outClr)
         count += 1
 

@@ -281,6 +281,53 @@ def getRandomColor(brtns=1):
     return (r, g, b)
 
 
+def getRandomColorHSVSaturated(
+        hMin=0.0,
+        hMax=360.0,
+        sMin=0.0,
+        sMax=1.0,
+        vMin=0.0,
+        vMax=1.0,
+        dropHueMin=0,
+        dropHueMax=0,
+        a=255,
+        brtns=1.0
+):
+
+    # adjust for 360 degrees ranges
+    degreeRange = hMax - hMin
+
+    if hMin > hMax:
+        degreeRange = 360.0 - hMin + hMax
+    h = hMin + random.uniform(0.0, degreeRange)
+
+    # an option to exclude a range of colors
+    if dropHueMax != dropHueMin:
+        h = hMin + random.uniform(0.0, degreeRange)
+        if h > 360.0:
+            h -= 360.0
+        while h > dropHueMin and h < dropHueMax:
+            h = hMin + random.uniform(0.0, degreeRange)
+            if h > 360.0:
+                h -= 360.0
+    if h > 360.0:
+        h -= 360.0
+
+    # print("New hue: " + str(h))
+
+    # h = random.uniform(hMin,hMax)
+    # print(hMin,hMax,degreeRange, h)
+    s = random.uniform(sMin, sMax)
+    
+    if s < .5 :
+        v = random.uniform(vMin, vMin + .4)
+    else :
+        v = random.uniform(vMin, vMax)
+    # print(vMin, vMax, v)
+    rgb = HSVToRGB(h, s, v)
+    # print(s,v)
+    return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
+
 def getRandomColorHSV(
         hMin=0.0,
         hMax=360.0,

@@ -106,7 +106,7 @@ def drawCompositions():
 	for n in range(0, config.numSquarePairs):
 		if config.useInsetColorControls == True :
 			fills.append([0])
-			fills[n] = colorutils.getRandomColorHSV(config.inset_minHue,
+			fills[n] = colorutils.getRandomColorHSVSaturated(config.inset_minHue,
                                            config.inset_maxHue,
                                            config.inset_minSaturation,
                                            config.inset_maxSaturation,
@@ -266,7 +266,7 @@ def main(run=True):
 		# comment: 
 	except Exception as e:
 		print(str(e))
-		config.bgColor = colorutils.getRandomColorHSV(
+		config.bgColor = colorutils.getRandomColorHSVSaturated(
 			config.minHue,
 			config.maxHue,
 			config.minSaturation,
@@ -348,7 +348,7 @@ def restartDrawing():
 	if random.random() < config.cleanSlateProbability or config.firstRun == True:
 		# grayLevel = round(random.uniform(20,70))
 		# config.bgColor = (grayLevel,grayLevel,grayLevel)
-		config.bgColor = colorutils.getRandomColorHSV(
+		config.bgColor = colorutils.getRandomColorHSVSaturated(
 			config.minHue,
 			config.maxHue,
 			config.minSaturation,

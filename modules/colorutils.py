@@ -324,7 +324,7 @@ def getRandomColorHSVSaturated(
     else :
         v = random.uniform(vMin, vMax)
     # print(vMin, vMax, v)
-    v = math.sqrt(s)
+    # v = math.sqrt(s)
     rgb = HSVToRGB(h, s, v)
     # print(s,v)
     return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)

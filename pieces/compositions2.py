@@ -150,7 +150,7 @@ def drawCompositions():
 				random.uniform(xSeam - startx * wFactor, xSeam - wVariance[1] * wFactor)
 			)
 			x2 = round(xSeam)
-			y1 = starty
+			y1 = starty - config.bottomOffsetModifier
 			y2 = round(random.uniform(y1 + hVariance[0], y1 + hVariance[1]))
 			if n == tiedToBottom:
 				y2 = config.imageHeight
@@ -167,6 +167,10 @@ def drawCompositions():
 
 		temp = Image.new("RGBA", (config.imageWidth, config.imageHeight))
 		drawtemp = ImageDraw.Draw(temp)
+		if y2<y1 :
+			y2=y1+5
+		if x2<x1 :
+			x2=x1+5
 		drawtemp.rectangle((x1, y1, x2, y2), fill=fills[n])
   
 		temp = ScaleRotateTranslate(temp, angleRotation, None, None, None, True)
@@ -211,6 +215,13 @@ def main(run=True):
 		print(str(e))
 		config.dropHueMin = 0
 		config.dropHueMax = 0
+	# end try
+ 
+	try:
+		config.bottomOffsetModifier = int(workConfig.get("compositions", "bottomOffsetModifier"))
+	except Exception as e:
+		print(str(e))
+		config.bottomOffsetModifier = 0
 	# end try
 
 

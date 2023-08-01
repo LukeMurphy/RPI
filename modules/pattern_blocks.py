@@ -371,13 +371,23 @@ def circles(config):
         for r in range(0,2):
             xOff = c * config.blockWidth - config.blockWidth/2
             yOff = r * config.blockHeight - config.blockHeight/2
-        
+            
+            
             for i in range(0, numLines, steps):
+                x1 = i-1 + xOff
+                y1 = i-1 + yOff
+                x2 = config.blockWidth-1*i + xOff
+                y2 = config.blockHeight-1*i + yOff
+                
+                if x2 < x1 :
+                    x2 = x1 + 1
+                if y2 < y1 :
+                    y2 = y1 + 1
                 config.blockDraw.ellipse((
-                    i-1 + xOff,
-                    i-1 + yOff,
-                    config.blockWidth-1*i + xOff,
-                    config.blockHeight-1*i + yOff),
+                    x1,
+                    y1,
+                    x2,
+                    y2),
                     outline=(clr), fill=None)
 
 

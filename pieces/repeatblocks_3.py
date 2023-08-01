@@ -198,9 +198,9 @@ def buildPalette(config, index=0):
     # config.colOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
     config.colOverlay = Holder()
     config.colOverlay.currentColor = [10, 10, 10, 100]
-    config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue, 0, 0,
+    config.colOverlay.currentColor = colorutils.getRandomColorHSVSaturated(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue, 0, 0,
                                                                   round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
-    config.colOverlay.bgColor = colorutils.getRandomColorHSV(
+    config.colOverlay.bgColor = colorutils.getRandomColorHSVSaturated(
         minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
     #color 1
@@ -214,7 +214,7 @@ def buildPalette(config, index=0):
     # config.linecolOverlay = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
     config.linecolOverlay = Holder()
     config.linecolOverlay.currentColor = [200, 10, 10]
-    config.linecolOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+    config.linecolOverlay.currentColor = colorutils.getRandomColorHSVSaturated(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
     
     #color 2
     tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
@@ -227,7 +227,7 @@ def buildPalette(config, index=0):
     # config.linecolOverlay2 = getConfigOverlay(tLimitBase, minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
     config.linecolOverlay2 = Holder()
     config.linecolOverlay2.currentColor = [10, 100, 10]
-    config.linecolOverlay2.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+    config.linecolOverlay2.currentColor = colorutils.getRandomColorHSVSaturated(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
 
     # config.colOverlay.currentColor = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,0,0,200)
     # config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = config.colOverlay.currentColor)

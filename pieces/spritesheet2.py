@@ -374,6 +374,10 @@ def main(run=True):
 			config.render(config.renderImageFull, 0, 0)
 	'''
 
+
+    config.debugSelf()
+
+    # print(config.__dict__)
     if run:
         runWork()
 
@@ -502,6 +506,11 @@ def iterate(n=0):
                     y0 = yc - w / 2
                     x1 = xc + w / 2
                     y1 = yc + w / 2
+                    
+                    if x1 < x0 :
+                        x1 = x0 +1
+                    if y1 < y0 :
+                        y1 = y0 +1
                     currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
         
         

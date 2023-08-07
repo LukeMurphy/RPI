@@ -161,7 +161,7 @@ def loadFromArguments(reloading=False, config=None):
 				# Default Work Instance ID
 				config.WRKINID = defaultpiece.defaultPieceToRun
 				# Default Local Path
-				config.path = "/Users/lamshell/Documents/Dev/RPI/"
+				config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
 				print(
 					bcolors.WARNING
 					+ "** Loading "

@@ -251,7 +251,7 @@ def updateCanvas():
             config.reloadConfig = False
 
         if config.delta2 <= 1:
-            commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -mname studio -cfg "
+            commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -mname studio -cfg "
             # os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
             # os.system(commadStringPyth + config.fileNameRaw + "&")
 

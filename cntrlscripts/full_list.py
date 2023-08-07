@@ -34,7 +34,7 @@ from tkmacosx import Button
 
 commadStringProc = ""
 JavaAppRunning = ""
-configPath = "/Users/lamshell/Documents/Dev/RPI/configs/"
+configPath = "/Users/lamshell/Documents/Dev/LEDELI/RPI/configs/"
 
 
 actionDict1 = [
@@ -70,9 +70,9 @@ def verify():
 
 def execute(configToRun):
 
-    commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-    commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
-    commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+    commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
+    commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
+    commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/sequence-player.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
 
     print("--------------------------------------------")
     print("--------------------------------------------")

@@ -382,6 +382,7 @@ def getRandomColorHSL(
         dropHueMin=0,
         dropHueMax=0,
         a=255,
+        brtns=1.0
 ):
 
     # adjust for 360 degrees ranges
@@ -407,8 +408,8 @@ def getRandomColorHSL(
     s = random.uniform(sMin, sMax)
     l = random.uniform(lMin, lMax)
     # print(lMin, lMax, l)
-    rgb = HSVToRGB(h, s, l)
-    return (rgb[0], rgb[1], rgb[2], a)
+    rgb = HSLToRGB(h, s, l)
+    return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
 
 
 def randomBaseColor(brtns=1):

@@ -4,6 +4,8 @@ import math
 import random
 import time
 import types
+
+
 from modules.configuration import bcolors
 from modules.movieClip import movieClip
 from modules import badpixels, coloroverlay, colorutils, panelDrawing, pattern_blocks

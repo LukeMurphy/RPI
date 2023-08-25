@@ -356,6 +356,23 @@ def main(run=True):
 
         config.animations.append(aConfig)
 
+    try:
+        config.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("base-parameters", "lastOverLayColorRange").split(",")))
+        config.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayAlphaRange").split(",")))
+        config.useLastOverlay = workConfig.getboolean("base-parameters", "forceLastOverlay")
+        config.useLastOverlayProb = float(workConfig.get("base-parameters", "useLastOverlayProb"))
+        config.lastOverlayBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayBox").split(",")))
+        config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+        config.lastOverlayBlur = float(workConfig.get("base-parameters", "lastOverlayBlur"))
+        # config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayFill").split(",")))
+    except Exception as e:
+        print(str(e))
+        config.lastOverlayBox = (0, 0, 64, 32)
+        config.lastOverlayFill = (0, 0, 0, 0)
+        config.useLastOverlay = False
+  
+  
     config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
     config.animationController.delay = 1.0
     config.animationController.slotRate = config.playTimes[0]
@@ -364,15 +381,15 @@ def main(run=True):
     panelDrawing.mockupBlock(config, workConfig)
     # Need to add something like this at final render call  as well
     ''' 
-		########### RENDERING AS A MOCKUP OR AS REAL ###########
-		if config.useDrawingPoints == True :
-			config.panelDrawing.canvasToUse = config.renderImageFull
-			config.panelDrawing.render()
-		else :
-			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-			#config.render(config.image, 0, 0)
-			config.render(config.renderImageFull, 0, 0)
-	'''
+        ########### RENDERING AS A MOCKUP OR AS REAL ###########
+        if config.useDrawingPoints == True :
+            config.panelDrawing.canvasToUse = config.renderImageFull
+            config.panelDrawing.render()
+        else :
+            #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+            #config.render(config.image, 0, 0)
+            config.render(config.renderImageFull, 0, 0)
+    '''
 
 
     config.debugSelf()
@@ -530,6 +547,25 @@ def iterate(n=0):
 
             if random.random() < currentAnimation.changeAnimProb:
                 reConfigAnimationCell(anim, currentAnimation)
+                
+                
+    if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:
+            # config.useLastOverlay = False if config.useLastOverlay == True  else True
+            # print("lastOVerlay")
+            xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
+            yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
+            config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+
+            cR = config.lastOverLayColorRange
+            # print(cR)
+            lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
+            # print(lastOverlayFill)
+            config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
+            #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
+            
+
+            currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:

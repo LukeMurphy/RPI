@@ -118,6 +118,7 @@ def transformImage(img):
 
 def writeImage(baseName, renderImage):
     # baseName = "outputquad3/comp2_"
+    print("Saving Image...")
     if config.saveImages == True:
         fn = baseName+".png"
         renderImage.save(fn)
@@ -668,6 +669,7 @@ def iterate():
             config.doSectionDisturbance = False
             rebuildPatterns()
 
+    # print(config.doneCount,config.numberOfSections,config.drawingPrinted)
     if config.doneCount >= config.numberOfSections and config.drawingPrinted == False and config.saveImages == True:
         config.fader.doingRefreshCount = 40
         config.drawingPrinted = True

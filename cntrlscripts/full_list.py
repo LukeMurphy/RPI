@@ -273,7 +273,7 @@ root.geometry(
     % (
         700,
         round(screen_height * 0.4),
-        round(2 * screen_width / 3),
+        round(screen_width -700),
         round(2 * screen_height / 3),
     )
 )

@@ -365,12 +365,14 @@ def main(run=True):
         config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
         config.lastOverlayBlur = float(workConfig.get("base-parameters", "lastOverlayBlur"))
+        config.lastOverlayFill = (0, 0, 0, 0)
         # config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayFill").split(",")))
     except Exception as e:
         print(str(e))
         config.lastOverlayBox = (0, 0, 64, 32)
         config.lastOverlayFill = (0, 0, 0, 0)
         config.useLastOverlay = False
+        config.useLastOverlayProb = 0
   
   
     config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
@@ -510,32 +512,31 @@ def iterate(n=0):
             if random.random() < currentAnimation.freezeGlitchProb:
                 currentAnimation.glitching = False
     else:
-        bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
-        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
-        if config.drawMoire == True : 
-            c1  = (150,50,0,150)
-            for ii in range (0,2):
-                xc = ii * 20 + 100
-                yc = ii * 20 + 100
-                for i in range(0, 80) :
-                    w = 400 - i * 6
-                    x0 = xc - w / 2
-                    y0 = yc - w / 2
-                    x1 = xc + w / 2
-                    y1 = yc + w / 2
-                    
-                    if x1 < x0 :
-                        x1 = x0 +1
-                    if y1 < y0 :
-                        y1 = y0 +1
-                    currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
         
         
         
         
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
         for anim in currentAnimation.animationArray:
-
+            bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
+            currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
+            if config.drawMoire == True : 
+                c1  = (150,50,0,150)
+                for ii in range (0,2):
+                    xc = ii * 20 + 100
+                    yc = ii * 20 + 100
+                    for i in range(0, 80) :
+                        w = 400 - i * 6
+                        x0 = xc - w / 2
+                        y0 = yc - w / 2
+                        x1 = xc + w / 2
+                        y1 = yc + w / 2
+                        
+                        if x1 < x0 :
+                            x1 = x0 +1
+                        if y1 < y0 :
+                            y1 = y0 +1
+                        currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
             try:
                 currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), anim.nextFrame())
                 # config.animationImage.paste(anim.nextFrame(), (0, 0), anim.nextFrame())

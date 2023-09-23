@@ -331,6 +331,9 @@ def main(run=True):
         aConfig.colOverlay.maxValue = aConfig.bg_maxValue
         aConfig.colOverlay.minHue = aConfig.bg_minHue
         aConfig.colOverlay.maxHue = aConfig.bg_maxHue
+        aConfig.colOverlay.dropHueMin = aConfig.bg_dropHueMinValue
+        aConfig.colOverlay.dropHueMax = aConfig.bg_dropHueMaxValue
+        
         aConfig.colOverlay.colorTransitionSetup()
 
         for i in range(0, aConfig.numberOfCells):
@@ -481,7 +484,7 @@ def reConfigAnimationCell(anim, aConfig):
 
 def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running image.py")
+    print("Running spritesheet2.py")
     print(bcolors.ENDC)
     # gc.enable()
     while config.isRunning == True:
@@ -500,9 +503,10 @@ def iterate(n=0):
     currentAnimation = config.animations[config.currentAnimationIndex]
     currentAnimation.colOverlay.stepTransition()
     bgColor = currentAnimation.colOverlay.currentColor
+    # bgColor = currentAnimation.bgBackGroundEndColor
     # config.bg_alpha = 255
     # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
-    #         bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
+    #         bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
 
     config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
 
@@ -512,9 +516,6 @@ def iterate(n=0):
             if random.random() < currentAnimation.freezeGlitchProb:
                 currentAnimation.glitching = False
     else:
-        
-        
-        
         
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
         for anim in currentAnimation.animationArray:
@@ -564,7 +565,6 @@ def iterate(n=0):
             config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
             #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
             
-
             currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
 
 
@@ -624,6 +624,11 @@ def iterate(n=0):
             currentAnimation.bg_minSaturation, currentAnimation.bg_maxSaturation,
             currentAnimation.bg_minValue, currentAnimation.bg_maxValue,
             currentAnimation.bg_dropHueMinValue, currentAnimation.bg_dropHueMaxValue, 255, config.brightness)
+        
+    if random.random() < currentAnimation.backgroundColorChangeProb/2.0:
+        bgColor = currentAnimation.colOverlay.currentColor
+        config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
+            bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
 
     config.animationController.checkTime()
     if config.animationController.advance == True:

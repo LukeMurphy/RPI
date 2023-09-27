@@ -522,7 +522,7 @@ def iterate(n=0):
             bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
             currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
             if config.drawMoire == True : 
-                c1  = (150,50,0,150)
+                c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
                 for ii in range (0,2):
                     xc = ii * 20 + 100
                     yc = ii * 20 + 100
@@ -562,7 +562,7 @@ def iterate(n=0):
             # print(cR)
             lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
             # print(lastOverlayFill)
-            config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
+            config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
             #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
             
             currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)

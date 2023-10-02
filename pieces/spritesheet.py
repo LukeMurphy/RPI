@@ -127,7 +127,7 @@ class spriteAnimation():
 
         if self.resizeAnimationToFit == True:
             frameSlice = frameSlice.resize(
-                (self.animationHeight, self.animationWidth))
+                ( self.animationWidth, self.animationHeight))
 
         if self.animationRotation != 0:
             frameSlice = frameSlice.rotate(self.animationRotation, 0, 1)

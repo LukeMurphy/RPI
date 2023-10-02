@@ -133,7 +133,7 @@ class spriteAnimation():
 
         if self.resizeAnimationToFit == True:
             frameSlice = frameSlice.resize(
-                (self.animationHeight, self.animationWidth))
+                (self.animationWidth,self.animationHeight))
 
         if self.animationRotation != 0:
             frameSlice = frameSlice.rotate(self.animationRotation, 0, 1)
@@ -628,7 +628,7 @@ def iterate(n=0):
     if random.random() < currentAnimation.backgroundColorChangeProb/2.0:
         bgColor = currentAnimation.colOverlay.currentColor
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
-            bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
+            round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha))
 
     config.animationController.checkTime()
     if config.animationController.advance == True:

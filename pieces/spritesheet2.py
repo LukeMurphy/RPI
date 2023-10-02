@@ -376,7 +376,15 @@ def main(run=True):
         config.lastOverlayFill = (0, 0, 0, 0)
         config.useLastOverlay = False
         config.useLastOverlayProb = 0
+        config.clearLastOverlayProb = 0
+        
+    
   
+    try:
+        config.clearLastOverlayProb = float(workConfig.get("base-parameters", "clearLastOverlayProb"))
+    except Exception as e:
+        print(str(e))
+        config.clearLastOverlayProb = 0
   
     config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
     config.animationController.delay = 1.0
@@ -556,14 +564,18 @@ def iterate(n=0):
             # print("lastOVerlay")
             xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
             yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
-            config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
-
-            cR = config.lastOverLayColorRange
-            # print(cR)
-            lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
-            # print(lastOverlayFill)
-            config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
-            #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
+            if random.random() < config.clearLastOverlayProb :
+                xPos = yPos = 0
+                config.lastOverlayBox = (xPos, yPos, xPos + config.canvasWidth, yPos + config.canvasHeight)
+                config.lastOverlayFill = (0,0,0,0)
+            else :
+                config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+                cR = config.lastOverLayColorRange
+                # print(cR)
+                lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
+                # print(lastOverlayFill)
+                config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
+                #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
             
             currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
 

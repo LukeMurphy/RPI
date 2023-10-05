@@ -103,6 +103,8 @@ class spriteAnimation():
         self.config = config
         self.imageFrame = Image.new(
             "RGBA", (self.frameWidth, self.frameHeight))
+        
+
 
     def prepSlices(self):
         frame = 0
@@ -267,7 +269,13 @@ def main(run=True):
         aConfig.animationWidth = int(workConfig.get(a, "animationWidth"))
         aConfig.animationHeight = int(workConfig.get(a, "animationHeight"))
         aConfig.resizeAnimationToFit = (workConfig.getboolean(a, "resizeAnimationToFit"))
+        aConfig.animationRotation = float(workConfig.get(a, "animationRotation"))
         aConfig.animationImage = Image.new("RGBA", (aConfig.animationWidth, aConfig.animationHeight))
+        
+        if abs(aConfig.animationRotation) == 90 :
+            aConfig.animationImage = Image.new("RGBA", (aConfig.animationHeight, aConfig.animationWidth))
+            
+        
         aConfig.animationImageDraw = ImageDraw.Draw(aConfig.animationImage)
 
         aConfig.animationArray = []
@@ -287,7 +295,6 @@ def main(run=True):
         aConfig.numberOfCells = int(workConfig.get(a, "numberOfCells"))
         aConfig.animSpeedMin = int(workConfig.get(a, "animSpeedMin"))
         aConfig.animSpeedMax = int(workConfig.get(a, "animSpeedMax"))
-        aConfig.animationRotation = float(workConfig.get(a, "animationRotation"))
         aConfig.animationRotationRateRange = float(workConfig.get(a, "animationRotationRateRange"))
         aConfig.animationRotationJitter = float(workConfig.get(a, "animationRotationJitter"))
         aConfig.animationXOffset = int(workConfig.get(a, "animationXOffset"))
@@ -547,6 +554,8 @@ def iterate(n=0):
                             y1 = y0 +1
                         currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
             try:
+                tempImageRef  = anim.nextFrame()
+                # print(currentAnimation.animationImage.size)
                 currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), anim.nextFrame())
                 # config.animationImage.paste(anim.nextFrame(), (0, 0), anim.nextFrame())
                 # comment:

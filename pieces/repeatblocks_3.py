@@ -202,9 +202,9 @@ def buildPalette(config, index=0):
     config.colOverlay = Holder()
     config.colOverlay.currentColor = [10, 10, 10, 100]
     config.colOverlay.currentColor = colorutils.getRandomColorHSVSaturated(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue, 0, 0,
-                                                                  round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
+                                                                  round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])), config.brightness)
     config.colOverlay.bgColor = colorutils.getRandomColorHSVSaturated(
-        minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue)
+        minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue,round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])) , config.brightness)
 
     #color 1
     tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
@@ -298,9 +298,10 @@ def repeatImage(config, canvasImage):
     extraOverlapx = 0
     extraOverlapy = 0
     
-    patternBGColor = config.bgColor
-    patternBGColor = config.colOverlay.bgColor
+    # patternBGColor = config.bgColor
+    # patternBGColor = config.colOverlay.bgColor
     patternBGColor = config.colOverlay.currentColor
+    
 
     for c in range(0, config.cols):
         for r in range(0, config.rows):

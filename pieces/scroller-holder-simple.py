@@ -190,7 +190,7 @@ def makeBackGround(drawRef, n=1):
 
 		if random.random() < config.addrndProb:
 
-			fillClr = colorutils.getRandomColorHSV(
+			fillClr = colorutils.getRandomColorHSVSaturated(
 			config.addrnd_minHue, config.addrnd_maxHue, 
 			config.addrnd_minSaturation, config.addrnd_maxSaturation, 
 			config.addrnd_minValue, config.addrnd_maxValue,
@@ -341,7 +341,7 @@ def remakePatternBlock(imageRef, direction):
 
 	config.patternColor = config.patternEndColor
 	if random.random() < config.backgroundColorChangeProb :
-		config.patternEndColor = colorutils.getRandomColorHSV(
+		config.patternEndColor = colorutils.getRandomColorHSVSaturated(
 				config.fg_minHue, config.fg_maxHue, 
 				config.fg_minSaturation, config.fg_maxSaturation, 
 				config.fg_minValue, config.fg_maxValue,
@@ -350,7 +350,7 @@ def remakePatternBlock(imageRef, direction):
 
 	config.bgBackGroundColor = config.bgBackGroundEndColor
 	if random.random() < config.backgroundColorChangeProb :
-		config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+		config.bgBackGroundEndColor = colorutils.getRandomColorHSVSaturated(
 				config.bg_minHue, config.bg_maxHue, 
 				config.bg_minSaturation, config.bg_maxSaturation, 
 				config.bg_minValue, config.bg_maxValue,
@@ -375,24 +375,24 @@ def configureBackgroundScrolling():
 	config.choiceArray = ["lines","pluses","regularLines","regularLines"]
 
 
-	config.bgBackGroundColor = colorutils.getRandomColorHSV(
+	config.bgBackGroundColor = colorutils.getRandomColorHSVSaturated(
 			config.bg_minHue, config.bg_maxHue, 
 			config.bg_minSaturation, config.bg_maxSaturation, 
 			config.bg_minValue, config.bg_maxValue,
 			config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
 
-	config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+	config.bgBackGroundEndColor = colorutils.getRandomColorHSVSaturated(
 			config.bg_minHue, config.bg_maxHue, 
 			config.bg_minSaturation, config.bg_maxSaturation, 
 			config.bg_minValue, config.bg_maxValue,
 			config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
 
-	config.patternColor = colorutils.getRandomColorHSV(
+	config.patternColor = colorutils.getRandomColorHSVSaturated(
 			config.fg_minHue, config.fg_maxHue, 
 			config.fg_minSaturation, config.fg_maxSaturation, 
 			config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
 
-	config.patternEndColor = colorutils.getRandomColorHSV(
+	config.patternEndColor = colorutils.getRandomColorHSVSaturated(
 			config.fg_minHue, config.fg_maxHue, 
 			config.fg_minSaturation, config.fg_maxSaturation, 
 			config.fg_minValue, config.fg_maxValue,

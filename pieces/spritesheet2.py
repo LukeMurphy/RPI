@@ -66,9 +66,9 @@ class spriteAnimation():
 
     frameWidth = 128
     frameHeight = 128
-    totalFrames = 24
-    frameCols = 4
-    frameRows = 5
+    totalFrames = 233
+    frameCols = 16
+    frameRows = 14
     sliceCol = 0
     sliceRow = 0
 
@@ -78,15 +78,11 @@ class spriteAnimation():
     sliceXOffset = 0
     sliceYOffset = 0
 
-    startFrame = 0
-    endFrame = 24
-    currentFrame = 0
+    frameCount = 0
     playCount = 0
     step = 1
     animSpeedMin = 2
     animSpeedMax = 4
-    
-    direction = 1
 
     animationRotation = 0
     animationRotationRate = 0
@@ -107,23 +103,19 @@ class spriteAnimation():
         self.config = config
         self.imageFrame = Image.new(
             "RGBA", (self.frameWidth, self.frameHeight))
+        
 
 
     def prepSlices(self):
         frame = 0
-        self.frameArray = []
-        for r in range(0, self.frameRows):
-            for c in range(0, self.frameCols):
-                if frame < self.totalFrames:
+        for c in range(0, self.frameCols):
+            for r in range(0, self.frameCols):
+                if frame < self.frameCount:
                     xPos = c * self.frameWidth + self.sliceXOffset
                     yPos = r * self.frameHeight + self.sliceYOffset
 
                     frameSlice = self.image.crop(
                         (xPos, yPos, xPos + self.sliceWidth, yPos + self.sliceHeight))
-                    
-                    if self.resizeAnimationToFit == True:
-                        frameSlice = frameSlice.resize((self.animationWidth,self.animationHeight))
-            
                     if self.animationRotation != 0:
                         frameSlice = frameSlice.rotate(
                             self.animationRotation, 0, 1)
@@ -133,38 +125,8 @@ class spriteAnimation():
                         frameSlice = enhancer.enhance(self.config.brightness)
                     self.frameArray.append(frameSlice)
                     frame += 1
-                    
 
-        print(" Prep Done ------------  ")
-        print(len(self.frameArray))
-        # exit()
-
-    def getNextFrame(self):
-        # img = self.frameArray[self.currentFrame]
-        if self.pause == False :
-            self.playCount += 1/self.animSpeed
-            if self.playCount % self.animSpeed == 0:
-                self.currentFrame += self.direction
-                
-                # print(self.currentFrame, self.endFrame)
-                
-            if self.currentFrame >= self.endFrame :
-                self.direction *= -1
-                self.currentFrame = self.endFrame - 1
-                
-                # if self.direction > 0 :
-                #     self.currentFrame = self.endFrame
-                
-            if self.currentFrame < self.startFrame :
-                self.direction *= -1   
-                self.currentFrame = self.startFrame 
-                # if self.direction < 0 :
-                #     self.currentFrame = self.startFrame
-
-    
     def nextFrame(self):
-        
-        print("Getting Next Frame")
         xPos = self.sliceCol * self.frameWidth + self.sliceXOffset
         yPos = self.sliceRow * self.frameHeight + self.sliceYOffset
 
@@ -192,17 +154,17 @@ class spriteAnimation():
 
             if self.playCount % self.animSpeed == 0:
                 self.sliceCol += self.step
-                self.currentFrame += self.step
+                self.frameCount += self.step
                 self.animationRotation += self.animationRotationRate
 
             if self.sliceCol >= self.frameCols:
                 self.sliceRow += 1
                 self.sliceCol = 0
 
-            if self.sliceRow >= self.frameRows or self.currentFrame > self.totalFrames:
+            if self.sliceRow >= self.frameRows or self.frameCount > self.totalFrames:
                 self.sliceRow = 0
                 self.sliceCol = 0
-                self.currentFrame = 0
+                self.frameCount = 0
                 self.playCount = 0
 
         return frameSlice
@@ -356,17 +318,7 @@ def main(run=True):
         aConfig.unPauseProb = float(workConfig.get(a, "unPauseProb"))
         aConfig.freezeGlitchProb = float(workConfig.get(a, "freezeGlitchProb"))
         aConfig.unFreezeGlitchProb = float(workConfig.get(a, "unFreezeGlitchProb"))
-        try:
-            # comment: 
-            aConfig.pauseOnFirstFrameProb = float(workConfig.get(a, "pauseOnFirstFrameProb"))
-            aConfig.pauseOnLastFrameProb = float(workConfig.get(a, "pauseOnLastFrameProb"))
-        except Exception as e:
-            print(str(e))
-            aConfig.pauseOnFirstFrameProb = 0.0
-            aConfig.pauseOnLastFrameProb = 0.0
-        
-        
-        
+
         aConfig.glitching = True
 
         aConfig.imageGlitchDisplacementHorizontal = int(workConfig.get(a, "imageGlitchDisplacementHorizontal"))
@@ -407,8 +359,6 @@ def main(run=True):
             anim.randomPlacement = aConfig.randomPlacement
 
             reConfigAnimationCell(anim, aConfig)
-            
-            anim.prepSlices()
             aConfig.animationArray.append(anim)
 
         aConfig.imagePath = config.path + "/assets/imgs/"
@@ -462,7 +412,7 @@ def main(run=True):
     '''
 
 
-    # config.debugSelf()
+    config.debugSelf()
 
     # print(config.__dict__)
     if run:
@@ -532,11 +482,7 @@ def reConfigAnimationCell(anim, aConfig):
     # random starting point in animation
     anim.sliceCol = round(random.random() * anim.frameCols)
     anim.sliceRow = round(random.random() * anim.frameRows)
-    anim.startFrame = anim.sliceCol + anim.sliceRow * aConfig.frameCols
-    anim.startFrame = 0
-    anim.endFrame = anim.totalFrames
-    anim.playCount = 0
-    # anim.currentFrame = anim.totalFrames - anim.playCount
+    anim.frameCount = anim.sliceCol + anim.sliceRow * aConfig.frameCols
 
     # random slicing of section to display
     anim.sliceXOffset = 0  # round(random.random() * anim.frameWidth)
@@ -607,54 +553,18 @@ def iterate(n=0):
                         if y1 < y0 :
                             y1 = y0 +1
                         currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
-            
             try:
-                # tempImageRef  = anim.nextFrame()
-                # currentAnimation.currentFrame = anim.currentFrame
-                # print(currentAnimation.totalFrames)
+                tempImageRef  = anim.nextFrame()
                 # print(currentAnimation.animationImage.size)
-                # currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), anim.nextFrame())
-                tempImageRef  = anim.frameArray[anim.currentFrame]
-                currentAnimation.animationImage.paste(tempImageRef, 
-                                                      (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), tempImageRef)
+                currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), anim.nextFrame())
                 # config.animationImage.paste(anim.nextFrame(), (0, 0), anim.nextFrame())
                 # comment:
-                
-                
-                if config.allPause == False :
-                    anim.getNextFrame()
-                    
-                    if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
-                        print("paused at start")
-                        anim.pause = True
-                        config.allPause = True
-            
-                    # print(anim.currentFrame,anim.endFrame-1)
-                    if random.random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame-1:
-                        print("paused at end")
-                        config.allPause = True
-                        anim.pause = True
-                        
-                    if (anim.pause == True or config.allPause == True) and random.random() < currentAnimation.unPauseProb :
-                        print("releasing animation")
-                        anim.pause = False
-                        config.allPause = False
-                        
-                    if random.random() < currentAnimation.pauseProb:
-                        print("pausing at frame:" + str(anim.currentFrame) )
-                        anim.pause = True
-                        config.allPause = True
-                        if random.random() < .5 :
-                            anim.direction *= -1
-
-                    
             except Exception as e:
                 print(str(e))
-                # pass
             # end try
             anim.pause = config.allPause
 
-            if random.random() < currentAnimation.changeAnimProb:      
+            if random.random() < currentAnimation.changeAnimProb:
                 reConfigAnimationCell(anim, currentAnimation)
                 
                 
@@ -719,15 +629,13 @@ def iterate(n=0):
     if random.random() < config.pixelSortProbOff:
         config.usePixelSort = False
 
-    # if random.random() < currentAnimation.pauseProb:
-    #     config.allPause = True
-    
+    if random.random() < currentAnimation.pauseProb:
+        config.allPause = True
 
     if config.allPause == True and random.random() < currentAnimation.unFreezeGlitchProb:
         currentAnimation.glitching = True
 
     if config.allPause == True and random.random() < currentAnimation.unPauseProb:
-        # print("un-pausing")
         config.allPause = False
 
     if random.random() < currentAnimation.backgroundColorChangeProb:
@@ -752,7 +660,6 @@ def iterate(n=0):
         else :
             choice = math.floor(random.uniform(0,len(config.animations)))
             config.currentAnimationIndex = choice
-        print("New Animation choice: " + str(choice))
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
         
         config.animationController.slotRate = round(random.uniform(5,20))

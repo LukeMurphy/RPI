@@ -87,6 +87,7 @@ class spriteAnimation():
     animSpeedMax = 4
     
     direction = 1
+    reversing = False
 
     animationRotation = 0
     animationRotationRate = 0
@@ -143,23 +144,27 @@ class spriteAnimation():
         # img = self.frameArray[self.currentFrame]
         if self.pause == False :
             self.playCount += 1/self.animSpeed
-            if self.playCount % self.animSpeed == 0:
-                self.currentFrame += self.direction
-                
-                # print(self.currentFrame, self.endFrame)
-                
-            if self.currentFrame >= self.endFrame :
-                self.direction *= -1
-                self.currentFrame = self.endFrame - 1
-                
-                # if self.direction > 0 :
-                #     self.currentFrame = self.endFrame
-                
-            if self.currentFrame < self.startFrame :
-                self.direction *= -1   
-                self.currentFrame = self.startFrame 
-                # if self.direction < 0 :
-                #     self.currentFrame = self.startFrame
+            if self.reversing == True :
+                if self.playCount % self.animSpeed == 0:
+                        self.currentFrame += self.direction
+                    
+                if self.currentFrame >= self.endFrame :
+                    self.direction *= -1
+                    self.currentFrame = self.endFrame - 1
+                    
+                    # if self.direction > 0 :
+                    #     self.currentFrame = self.endFrame
+                    
+                if self.currentFrame < self.startFrame :
+                    self.direction *= -1   
+                    self.currentFrame = self.startFrame 
+                    # if self.direction < 0 :
+                    #     self.currentFrame = self.startFrame
+            else :
+                if self.playCount % self.animSpeed == 0:
+                    self.currentFrame += 1
+                    if self.currentFrame >= self.endFrame :
+                        self.currentFrame = self.startFrame
 
     
     def nextFrame(self):
@@ -364,6 +369,13 @@ def main(run=True):
             print(str(e))
             aConfig.pauseOnFirstFrameProb = 0.0
             aConfig.pauseOnLastFrameProb = 0.0
+        try:
+            # comment: 
+            aConfig.reversing = workConfig.getboolean(a, "reversing")
+        except Exception as e:
+            print(str(e))
+            aConfig.reversing = False
+
         
         
         
@@ -405,6 +417,7 @@ def main(run=True):
             anim.animationHeight = aConfig.animationHeight
             anim.resizeAnimationToFit = aConfig.resizeAnimationToFit
             anim.randomPlacement = aConfig.randomPlacement
+            anim.reversing = aConfig.reversing
 
             reConfigAnimationCell(anim, aConfig)
             

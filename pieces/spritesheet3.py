@@ -650,12 +650,12 @@ def iterate(n=0):
                 anim.pause = True
                 
             if (anim.pause == True or config.allPause == True) and random.random() < currentAnimation.unPauseProb :
-                print("releasing animation")
+                # print("releasing animation")
                 anim.pause = False
                 config.allPause = False
                 
             if random.random() < currentAnimation.pauseProb:
-                print("pausing at frame:" + str(anim.currentFrame) )
+                # print("pausing at frame:" + str(anim.currentFrame) )
                 anim.pause = True
                 config.allPause = True
                 if random.random() < .5 :

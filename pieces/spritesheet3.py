@@ -143,7 +143,7 @@ class spriteAnimation():
     def getNextFrame(self):
         # img = self.frameArray[self.currentFrame]
         if self.pause == False :
-            self.playCount += 1/self.animSpeed
+            self.playCount += self.step
             if self.reversing == True :
                 if self.playCount % self.animSpeed == 0:
                         self.currentFrame += self.direction
@@ -166,10 +166,12 @@ class spriteAnimation():
                     if self.currentFrame >= self.endFrame :
                         self.currentFrame = self.startFrame
 
+    def nextFrameImg(self) :
+        return self.frameArray[self.currentFrame]
     
     def nextFrame(self):
         
-        print("Getting Next Frame")
+        
         xPos = self.sliceCol * self.frameWidth + self.sliceXOffset
         yPos = self.sliceRow * self.frameHeight + self.sliceYOffset
 
@@ -186,6 +188,7 @@ class spriteAnimation():
         if self.config.brightness != 1.0:
             enhancer = ImageEnhance.Brightness(frameSlice)
             frameSlice = enhancer.enhance(self.config.brightness)
+            
 
         if self.pause == False:
             self.playCount += self.step
@@ -225,7 +228,7 @@ def main(run=True):
     # gc.enable()
 
     print("SpriteSheet Player Piece Loaded")
-    config.playSpeed = float(workConfig.get("base-parameters", "playSpeed"))
+    # config.playSpeed = float(workConfig.get("base-parameters", "playSpeed"))
 
     # managing speed of animation and framerate
     config.directorController = Director(config)
@@ -336,8 +339,8 @@ def main(run=True):
         aConfig.sliceWidthMin = int(workConfig.get(a, "sliceWidthMin"))
         aConfig.sliceHeightMin = int(workConfig.get(a, "sliceHeightMin"))
         aConfig.numberOfCells = int(workConfig.get(a, "numberOfCells"))
-        aConfig.animSpeedMin = int(workConfig.get(a, "animSpeedMin"))
-        aConfig.animSpeedMax = int(workConfig.get(a, "animSpeedMax"))
+        aConfig.animSpeedMin = float(workConfig.get(a, "animSpeedMin"))
+        aConfig.animSpeedMax = float(workConfig.get(a, "animSpeedMax"))
         aConfig.animationRotationRateRange = float(workConfig.get(a, "animationRotationRateRange"))
         aConfig.animationRotationJitter = float(workConfig.get(a, "animationRotationJitter"))
         aConfig.animationXOffset = int(workConfig.get(a, "animationXOffset"))
@@ -377,8 +380,6 @@ def main(run=True):
             aConfig.reversing = False
 
         
-        
-        
         aConfig.glitching = True
 
         aConfig.imageGlitchDisplacementHorizontal = int(workConfig.get(a, "imageGlitchDisplacementHorizontal"))
@@ -403,26 +404,25 @@ def main(run=True):
         
         aConfig.colOverlay.colorTransitionSetup()
 
-        for i in range(0, aConfig.numberOfCells):
-            anim = spriteAnimation(config)
+        anim = spriteAnimation(config)
+        anim.frameWidth = aConfig.frameWidth
+        anim.frameHeight = aConfig.frameHeight
+        anim.totalFrames = aConfig.totalFrames
+        anim.frameCols = aConfig.frameCols
+        anim.frameRows = aConfig.frameRows
+        anim.animSpeedMin = aConfig.animSpeedMin
+        anim.animSpeedMax = aConfig.animSpeedMax
+        anim.animationWidth = aConfig.animationWidth
+        anim.animationHeight = aConfig.animationHeight
+        anim.resizeAnimationToFit = aConfig.resizeAnimationToFit
+        anim.randomPlacement = aConfig.randomPlacement
+        anim.reversing = aConfig.reversing
+        anim.currentFrame = 0
 
-            anim.frameWidth = aConfig.frameWidth
-            anim.frameHeight = aConfig.frameHeight
-            anim.totalFrames = aConfig.totalFrames
-            anim.frameCols = aConfig.frameCols
-            anim.frameRows = aConfig.frameRows
-            anim.animSpeedMin = aConfig.animSpeedMin
-            anim.animSpeedMax = aConfig.animSpeedMax
-            anim.animationWidth = aConfig.animationWidth
-            anim.animationHeight = aConfig.animationHeight
-            anim.resizeAnimationToFit = aConfig.resizeAnimationToFit
-            anim.randomPlacement = aConfig.randomPlacement
-            anim.reversing = aConfig.reversing
-
-            reConfigAnimationCell(anim, aConfig)
-            
-            anim.prepSlices()
-            aConfig.animationArray.append(anim)
+        reConfigAnimationCell(anim, aConfig)
+        anim.prepSlices()
+        # aConfig.animationArray.append(anim)
+        aConfig.anim = anim
 
         aConfig.imagePath = config.path + "/assets/imgs/"
         aConfig.imageList = [aConfig.imageToLoad]
@@ -549,7 +549,7 @@ def reConfigAnimationCell(anim, aConfig):
     anim.startFrame = 0
     anim.endFrame = anim.totalFrames
     anim.playCount = 0
-    # anim.currentFrame = anim.totalFrames - anim.playCount
+    anim.currentFrame = 0
 
     # random slicing of section to display
     anim.sliceXOffset = 0  # round(random.random() * anim.frameWidth)
@@ -566,7 +566,7 @@ def reConfigAnimationCell(anim, aConfig):
 
 def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running spritesheet2.py")
+    print("Running spritesheet3.py")
     print(bcolors.ENDC)
     # gc.enable()
     while config.isRunning == True:
@@ -576,11 +576,13 @@ def runWork():
             time.sleep(config.delay)
         if config.standAlone == False:
             config.callBack()
-
+            
 
 def iterate(n=0):
     global config, blocks
     global xPos, yPos
+     
+ 
 
     currentAnimation = config.animations[config.currentAnimationIndex]
     currentAnimation.colOverlay.stepTransition()
@@ -600,75 +602,74 @@ def iterate(n=0):
     else:
         
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
-        for anim in currentAnimation.animationArray:
-            bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
-            currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
-            if config.drawMoire == True : 
-                c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
-                for ii in range (0,2):
-                    xc = ii * 20 + 100
-                    yc = ii * 20 + 100
-                    for i in range(0, 80) :
-                        w = 400 - i * 6
-                        x0 = xc - w / 2
-                        y0 = yc - w / 2
-                        x1 = xc + w / 2
-                        y1 = yc + w / 2
-                        
-                        if x1 < x0 :
-                            x1 = x0 +1
-                        if y1 < y0 :
-                            y1 = y0 +1
-                        currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
-            
-            try:
-                # tempImageRef  = anim.nextFrame()
-                # currentAnimation.currentFrame = anim.currentFrame
-                # print(currentAnimation.totalFrames)
-                # print(currentAnimation.animationImage.size)
-                # currentAnimation.animationImage.paste(anim.nextFrame(), (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), anim.nextFrame())
-                tempImageRef  = anim.frameArray[anim.currentFrame]
-                currentAnimation.animationImage.paste(tempImageRef, 
-                                                      (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), tempImageRef)
-                # config.animationImage.paste(anim.nextFrame(), (0, 0), anim.nextFrame())
-                # comment:
-                
-                
-                if config.allPause == False :
-                    anim.getNextFrame()
+        anim = currentAnimation.anim
+        bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
+        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
+        if config.drawMoire == True : 
+            c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
+            for ii in range (0,2):
+                xc = ii * 20 + 100
+                yc = ii * 20 + 100
+                for i in range(0, 80) :
+                    w = 400 - i * 6
+                    x0 = xc - w / 2
+                    y0 = yc - w / 2
+                    x1 = xc + w / 2
+                    y1 = yc + w / 2
                     
-                    if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
-                        print("paused at start")
-                        anim.pause = True
-                        config.allPause = True
+                    if x1 < x0 :
+                        x1 = x0 +1
+                    if y1 < y0 :
+                        y1 = y0 +1
+                    currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
+        
+
+        # tempImageRef  = anim.nextFrame()
+        # tempImageRef  = anim.nextFrame()
+        # tempImageRef  = anim.nextFrame()
+        tempImageRef  = anim.nextFrameImg()
+        currentAnimation.animationImage.paste(tempImageRef, 
+                                                (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), 
+                                                tempImageRef)
+
+        
+        if config.allPause == False :
+            anim.getNextFrame()
+            anim.getNextFrame()
+            anim.getNextFrame()
             
-                    # print(anim.currentFrame,anim.endFrame-1)
-                    if random.random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame-1:
-                        print("paused at end")
-                        config.allPause = True
-                        anim.pause = True
-                        
-                    if (anim.pause == True or config.allPause == True) and random.random() < currentAnimation.unPauseProb :
-                        print("releasing animation")
-                        anim.pause = False
-                        config.allPause = False
-                        
-                    if random.random() < currentAnimation.pauseProb:
-                        print("pausing at frame:" + str(anim.currentFrame) )
-                        anim.pause = True
-                        config.allPause = True
-                        if random.random() < .5 :
-                            anim.direction *= -1
+            if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
+                print("paused at start")
+                anim.pause = True
+                config.allPause = True
+    
+            # print(anim.currentFrame,anim.endFrame-1)
+            if random.random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame-1:
+                print("paused at end")
+                config.allPause = True
+                anim.pause = True
+                
+            if (anim.pause == True or config.allPause == True) and random.random() < currentAnimation.unPauseProb :
+                print("releasing animation")
+                anim.pause = False
+                config.allPause = False
+                
+            if random.random() < currentAnimation.pauseProb:
+                print("pausing at frame:" + str(anim.currentFrame) )
+                anim.pause = True
+                config.allPause = True
+                if random.random() < .5 :
+                    anim.direction *= -1
 
-                    
-            except Exception as e:
-                print(str(e))
-                # pass
-            # end try
-            anim.pause = config.allPause
+                
+        # except Exception as e:
+        #     print(str(e))
+            # pass
+        # end try
+        anim.pause = config.allPause
 
-            if random.random() < currentAnimation.changeAnimProb:      
-                reConfigAnimationCell(anim, currentAnimation)
+        if random.random() < currentAnimation.changeAnimProb:      
+            reConfigAnimationCell(anim, currentAnimation)
                 
                 
     if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:

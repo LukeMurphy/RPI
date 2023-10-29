@@ -35,6 +35,11 @@ yPos = 0
 bads = badpixels
 
 
+# config.canvasImage is the final layer or image to be rendered
+# everything else gets pasted on to this image layer
+# the filtering happens to this canvasImage as well
+
+
 class Holder:
     def __init__(self, config):
         self.config = config
@@ -106,8 +111,7 @@ class spriteAnimation():
 
     def __init__(self, config):
         self.config = config
-        self.imageFrame = Image.new(
-            "RGBA", (self.frameWidth, self.frameHeight))
+        self.imageFrame = Image.new("RGBA", (self.frameWidth, self.frameHeight))
 
 
     def prepSlices(self):
@@ -166,55 +170,10 @@ class spriteAnimation():
                     if self.currentFrame >= self.endFrame :
                         self.currentFrame = self.startFrame
 
+    
     def nextFrameImg(self) :
         return self.frameArray[self.currentFrame]
     
-    def nextFrame(self):
-        
-        
-        xPos = self.sliceCol * self.frameWidth + self.sliceXOffset
-        yPos = self.sliceRow * self.frameHeight + self.sliceYOffset
-
-        frameSlice = self.image.crop(
-            (xPos, yPos, xPos + self.sliceWidth, yPos + self.sliceHeight))
-
-        if self.resizeAnimationToFit == True:
-            frameSlice = frameSlice.resize(
-                (self.animationWidth,self.animationHeight))
-
-        if self.animationRotation != 0:
-            frameSlice = frameSlice.rotate(self.animationRotation, 0, 1)
-
-        if self.config.brightness != 1.0:
-            enhancer = ImageEnhance.Brightness(frameSlice)
-            frameSlice = enhancer.enhance(self.config.brightness)
-            
-
-        if self.pause == False:
-            self.playCount += self.step
-
-            # This fakes the speed by repeating n number of frames per cycle
-            # i.e. if the animSpeed == 2, then for each cycle the same frame is
-            # shown twice before it advances - this can control smoothness or jittery
-            # or staccato as needed
-
-            if self.playCount % self.animSpeed == 0:
-                self.sliceCol += self.step
-                self.currentFrame += self.step
-                self.animationRotation += self.animationRotationRate
-
-            if self.sliceCol >= self.frameCols:
-                self.sliceRow += 1
-                self.sliceCol = 0
-
-            if self.sliceRow >= self.frameRows or self.currentFrame > self.totalFrames:
-                self.sliceRow = 0
-                self.sliceCol = 0
-                self.currentFrame = 0
-                self.playCount = 0
-
-        return frameSlice
-
 
 def loadImage(spriteSheet):
     image = Image.open(spriteSheet, "r")
@@ -280,8 +239,7 @@ def main(run=True):
 
     print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
-    config.canvasImage = Image.new(
-        "RGBA", (config.canvasWidth, config.canvasHeight))
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
     config.allPause = False
@@ -357,6 +315,7 @@ def main(run=True):
         aConfig.bg_dropHueMinValue = float(workConfig.get(a, "bg_dropHueMinValue"))
         aConfig.bg_dropHueMaxValue = float(workConfig.get(a, "bg_dropHueMaxValue"))
         aConfig.bg_alpha = int(workConfig.get(a, "bg_alpha"))
+        aConfig.bg_alpha_max = int(workConfig.get(a, "bg_alpha"))
 
         aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb"))
         aConfig.changeAnimProb = float(workConfig.get(a, "changeAnimProb"))
@@ -419,15 +378,15 @@ def main(run=True):
         anim.reversing = aConfig.reversing
         anim.currentFrame = 0
 
-        reConfigAnimationCell(anim, aConfig)
-        anim.prepSlices()
-        # aConfig.animationArray.append(anim)
-        aConfig.anim = anim
 
         aConfig.imagePath = config.path + "/assets/imgs/"
         aConfig.imageList = [aConfig.imageToLoad]
 
         config.animations.append(aConfig)
+        reConfigAnimationCell(anim, aConfig)
+        anim.prepSlices()
+        # aConfig.animationArray.append(anim)
+        aConfig.anim = anim
 
     try:
         config.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("base-parameters", "lastOverLayColorRange").split(",")))
@@ -517,6 +476,14 @@ def glitchBox():
         print(dx + sectionWidth, dy + sectionHeight)
     # end try
 
+def animationBackGroundFadeIn() :
+    currentAnimation = config.animations[config.currentAnimationIndex]
+    if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max :
+        currentAnimation.bg_alpha += 2
+    
+
+
+
 
 def reConfigAnimationCell(anim, aConfig):
     global config
@@ -564,6 +531,25 @@ def reConfigAnimationCell(anim, aConfig):
     anim.animationRotationRate = random.uniform(-aConfig.animationRotationRateRange, aConfig.animationRotationRateRange)
 
 
+def filterRemapCall(ovrd=False) :
+        config.filterRemap = True
+        # new version  more control but may require previous pieces to be re-worked
+        startX = round(random.uniform(0, config.filterRemapRangeX))
+        startY = round(random.uniform(0, config.filterRemapRangeY))
+        endX = round(random.uniform(8, config.filterRemapminHoriSize))
+        endY = round(random.uniform(8, config.filterRemapminVertSize))
+        
+        if ovrd == True :
+            startX = 0
+            startY = 0
+            endX = 200
+            endY = 200
+        config.remapImageBlockSection = [
+            startX, startY, startX + endX, startY + endY]
+        config.remapImageBlockDestination = [startX, startY]
+        # print("swapping" + str(config.remapImageBlockSection))
+
+
 def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running spritesheet3.py")
@@ -581,18 +567,18 @@ def runWork():
 def iterate(n=0):
     global config, blocks
     global xPos, yPos
-     
- 
 
     currentAnimation = config.animations[config.currentAnimationIndex]
     currentAnimation.colOverlay.stepTransition()
     bgColor = currentAnimation.colOverlay.currentColor
+    
     # bgColor = currentAnimation.bgBackGroundEndColor
     # config.bg_alpha = 255
     # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
     #         bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
 
     config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
+    animationBackGroundFadeIn()
 
     if config.allPause == True:
         if currentAnimation.glitching == True:
@@ -602,9 +588,12 @@ def iterate(n=0):
     else:
         
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
+        # animationBackGroundFadeIn()
         anim = currentAnimation.anim
         bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
-        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
+        
+        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill = bgColor)
+        
         if config.drawMoire == True : 
             c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
             for ii in range (0,2):
@@ -623,29 +612,29 @@ def iterate(n=0):
                         y1 = y0 +1
                     currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
         
-
-        # tempImageRef  = anim.nextFrame()
-        # tempImageRef  = anim.nextFrame()
-        # tempImageRef  = anim.nextFrame()
         tempImageRef  = anim.nextFrameImg()
         currentAnimation.animationImage.paste(tempImageRef, 
                                                 (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), 
                                                 tempImageRef)
 
-        
         if config.allPause == False :
+            
+            # doing this 3 times because this was how the v.2 version inadvertently did it - my bad - but also to 
+            # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at 
+            # at a more granular way
+            
             anim.getNextFrame()
             anim.getNextFrame()
             anim.getNextFrame()
             
             if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
-                print("paused at start")
+                # print("paused at start")
                 anim.pause = True
                 config.allPause = True
     
             # print(anim.currentFrame,anim.endFrame-1)
             if random.random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame-1:
-                print("paused at end")
+                # print("paused at end")
                 config.allPause = True
                 anim.pause = True
                 
@@ -671,7 +660,12 @@ def iterate(n=0):
         if random.random() < currentAnimation.changeAnimProb:      
             reConfigAnimationCell(anim, currentAnimation)
                 
-                
+            
+    # Draws the colored tiles over the animation image - 
+    # Note first versions drew this over the animation image but on 10-29-2023 I
+    # tested drawing it over the final image layer canvasImage instead - not sure
+    # if it really changes anything though
+    
     if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:
             # config.useLastOverlay = False if config.useLastOverlay == True  else True
             # print("lastOVerlay")
@@ -690,7 +684,9 @@ def iterate(n=0):
                 config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
                 #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
             
-            currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+            # do not delete - see note above
+            # currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+            config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
 
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
@@ -699,8 +695,7 @@ def iterate(n=0):
         config.panelDrawing.render()
     else:
         # config.render(config.image, 0, 0)
-        config.render(config.canvasImage, 0, 0,
-                      config.canvasWidth, config.canvasHeight)
+        config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
 
     if random.random() < config.drawMoireProb:
         config.drawMoire = True
@@ -716,16 +711,8 @@ def iterate(n=0):
 
     if random.random() < config.filterRemappingProb:
         if config.useFilters == True and config.filterRemapping == True:
-            config.filterRemap = True
-            # new version  more control but may require previous pieces to be re-worked
-            startX = round(random.uniform(0, config.filterRemapRangeX))
-            startY = round(random.uniform(0, config.filterRemapRangeY))
-            endX = round(random.uniform(8, config.filterRemapminHoriSize))
-            endY = round(random.uniform(8, config.filterRemapminVertSize))
-            config.remapImageBlockSection = [
-                startX, startY, startX + endX, startY + endY]
-            config.remapImageBlockDestination = [startX, startY]
-            # print("swapping" + str(config.remapImageBlockSection))
+            filterRemapCall()
+
 
     if random.random() < config.pixelSortProbOn:
         config.usePixelSort = True
@@ -759,18 +746,45 @@ def iterate(n=0):
 
     config.animationController.checkTime()
     if config.animationController.advance == True:
+        currentAnimation.glitching = False
+        
         if config.playInOrder == True:
             config.currentAnimationIndex += 1
             if config.currentAnimationIndex >= len(config.animations):
                 config.currentAnimationIndex = 0
+            # print("Next Animation : " + str(config.currentAnimationIndex))
         else :
             choice = math.floor(random.uniform(0,len(config.animations)))
             config.currentAnimationIndex = choice
-        print("New Animation choice: " + str(choice))
+            # print("New Animation choice: " + str(choice))
+        
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
         
-        config.animationController.slotRate = round(random.uniform(5,20))
+        currentAnimation = config.animations[config.currentAnimationIndex]
+        config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
+        
 
+        tempTest = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        tempTestDraw = ImageDraw.Draw(tempTest)
+        xPos  = round(random.uniform(0,config.canvasWidth))
+        yPos  = round(random.uniform(0,config.canvasHeight))
+        xPos2 = round(random.uniform(xPos,config.canvasWidth))
+        yPos2 = round(random.uniform(yPos,config.canvasHeight))
+        tempTestDraw.rectangle( (xPos,yPos,xPos2,yPos2), fill= (0,255,0,155))
+        
+        currentAnimation.anim.imageFrame.paste(tempTest,(0,0), tempTest)
+        config.canvasImage.paste(tempTest,(0,0), tempTest)
+        
+        currentAnimation.bg_alpha = 10
+        config.allPause = False
+        currentAnimation.anim.currentFrame = 0
+        # config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
+        # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+        
+        
+
+
+        
 
 def callBack():
     global config

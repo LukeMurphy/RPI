@@ -101,6 +101,8 @@ class spriteAnimation():
     resizeAnimationToFit = False
     animationWidth = 256
     animationHeight = 256
+    
+    name= "default"
 
     xPos = 0
     yPos = 0
@@ -140,8 +142,10 @@ class spriteAnimation():
                     frame += 1
                     
 
-        print(" Prep Done ------------  ")
-        print(len(self.frameArray))
+        print("------------  ")
+        print(self.name + " prep done")
+        print("Number of Frames:" + str(len(self.frameArray)))
+        print("------------\n")
         # exit()
 
     def getNextFrame(self):
@@ -377,7 +381,7 @@ def main(run=True):
         anim.randomPlacement = aConfig.randomPlacement
         anim.reversing = aConfig.reversing
         anim.currentFrame = 0
-
+        anim.name = aConfig.name
 
         aConfig.imagePath = config.path + "/assets/imgs/"
         aConfig.imageList = [aConfig.imageToLoad]

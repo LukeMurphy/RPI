@@ -261,6 +261,34 @@ def main(run=True):
         config.drawMoire  = False
         config.drawMoireProb = 0 
         config.drawMoireProbOff = 0 
+        
+        
+    try:
+        # comment: 
+        config.moireXPos = int(workConfig.get("base-parameters", "moireXPos"))
+        config.moireYPos = int(workConfig.get("base-parameters", "moireYPos"))
+        config.moireXDistance = int(workConfig.get("base-parameters", "moireXDistance"))
+        config.moireYDistance = int(workConfig.get("base-parameters", "moireYDistance"))
+    except Exception as e:
+        print(str(e))
+        config.moireXPos = 100
+        config.moireYPos = 100
+        config.moireXDistance = 100
+        config.moireYDistance = 100
+        
+        
+    try:
+        # comment: 
+        config.setMoireColor = workConfig.getboolean("base-parameters", "setMoireColor")
+        config.moireColorAltProb = float(workConfig.get("base-parameters", "moireColorAltProb"))
+        config.moireColor = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColor").split(",")))
+        config.moireColorAlt = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColorAlt").split(",")))
+
+    except Exception as e:
+        print(str(e))
+        config.setMoireColor  = False
+        
+    
 
     config.animationNames = animationNames
     config.animations = []
@@ -600,9 +628,16 @@ def iterate(n=0):
         
         if config.drawMoire == True : 
             c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
+            
+            if config.setMoireColor == True :
+                c1 = config.moireColor
+                
+                if random.random() < config.moireColorAltProb :
+                    c1 = config.moireColorAlt
+
             for ii in range (0,2):
-                xc = ii * 20 + 100
-                yc = ii * 20 + 100
+                xc = ii * config.moireXDistance + config.moireXPos
+                yc = ii * config.moireYDistance + config.moireYPos
                 for i in range(0, 80) :
                     w = 400 - i * 6
                     x0 = xc - w / 2

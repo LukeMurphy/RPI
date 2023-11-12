@@ -147,8 +147,8 @@ def iterate():
             # new version  more control but may require previous pieces to be re-worked
             startX = round(random.uniform(0, config.filterRemapRangeX))
             startY = round(random.uniform(0, config.filterRemapRangeY))
-            endX = round(random.uniform(8, config.filterRemapminHoriSize))
-            endY = round(random.uniform(8, config.filterRemapminVertSize))
+            endX = round(random.uniform(config.filterRemapMinHorizSize, config.filterRemapHorizSize))
+            endY = round(random.uniform(config.filterRemapMinVertiSize, config.filterRemapVertSize))
             config.remapImageBlockSection = [
                 startX, startY, startX + endX, startY + endY]
             config.remapImageBlockDestination = [startX, startY]
@@ -225,8 +225,10 @@ def main(run=True):
     config.backgroundColorChangeProb = float(workConfig.get("scrollingImage", "backgroundColorChangeProb"))
     config.filterRemapping = (workConfig.getboolean("scrollingImage", "filterRemapping"))
     config.filterRemappingProb = float(workConfig.get("scrollingImage", "filterRemappingProb"))
-    config.filterRemapminHoriSize = int(workConfig.get("scrollingImage", "filterRemapminHoriSize"))
-    config.filterRemapminVertSize = int(workConfig.get("scrollingImage", "filterRemapminVertSize"))
+    config.filterRemapHorizSize = int(workConfig.get("scrollingImage", "filterRemapHorizSize"))
+    config.filterRemapVertSize = int(workConfig.get("scrollingImage", "filterRemapVertSize"))
+    config.filterRemapMinVertiSize = int(workConfig.get("scrollingImage", "filterRemapMinVertiSize"))
+    config.filterRemapMinHorizSize = int(workConfig.get("scrollingImage", "filterRemapMinHorizSize"))
     
     config.directorController = Director(config)
     config.directorController.slotRate = float(workConfig.get("scrollingImage", "slotRate"))

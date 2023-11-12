@@ -638,8 +638,8 @@ def iterate(n=0):
             for ii in range (0,2):
                 xc = ii * config.moireXDistance + config.moireXPos
                 yc = ii * config.moireYDistance + config.moireYPos
-                for i in range(0, 80) :
-                    w = 400 - i * 6
+                for i in range(0, 180) :
+                    w = 800 - i * 6
                     x0 = xc - w / 2
                     y0 = yc - w / 2
                     x1 = xc + w / 2

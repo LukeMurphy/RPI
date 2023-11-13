@@ -90,6 +90,13 @@ def redraw():
     else:
         crop1 = config.bufferImage.crop((xPos, yPos, width, height)).convert('RGBA')
         config.canvasImage.paste(crop1, (0, 0), crop1)
+        crop1 = config.bufferImage2.crop((xPos, yPos, width, height)).convert('RGBA')
+        crop1 = crop1.rotate(180)
+        config.canvasImage.paste(crop1, (0, 0), crop1)
+        
+        # cropt1Temp = crop1.copy()
+        # cropt1Temp = cropt1Temp.rotate(180)
+        # config.canvasImage.paste(cropt1Temp, (0, 0), cropt1Temp)
         # print(str("xPos = {}").format(xPos))
         
     # crop2 = config.bufferImage.crop((0, config.scrollStep, config.colStop, config.rowStop)).convert('RGBA')
@@ -149,6 +156,8 @@ def iterate():
             startY = round(random.uniform(0, config.filterRemapRangeY))
             endX = round(random.uniform(config.filterRemapMinHorizSize, config.filterRemapHorizSize))
             endY = round(random.uniform(config.filterRemapMinVertiSize, config.filterRemapVertSize))
+            
+            # print(startX,endX,startY,endY)
             config.remapImageBlockSection = [
                 startX, startY, startX + endX, startY + endY]
             config.remapImageBlockDestination = [startX, startY]
@@ -229,6 +238,8 @@ def main(run=True):
     config.filterRemapVertSize = int(workConfig.get("scrollingImage", "filterRemapVertSize"))
     config.filterRemapMinVertiSize = int(workConfig.get("scrollingImage", "filterRemapMinVertiSize"))
     config.filterRemapMinHorizSize = int(workConfig.get("scrollingImage", "filterRemapMinHorizSize"))
+    config.filterRemapRangeX = int(workConfig.get("scrollingImage", "filterRemapRangeX"))
+    config.filterRemapRangeY = int(workConfig.get("scrollingImage", "filterRemapRangeY"))
     
     config.directorController = Director(config)
     config.directorController.slotRate = float(workConfig.get("scrollingImage", "slotRate"))
@@ -238,6 +249,8 @@ def main(run=True):
     
     im = Image.open(config.path + config.baseImage)
     config.bufferImage = im.copy()
+    config.bufferImage2 = im.copy()
+    config.bufferImage2 = config.bufferImage2.rotate(180)
     config.maxX = im.size[0]
     
     config.runCount = 0

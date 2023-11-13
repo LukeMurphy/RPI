@@ -102,7 +102,7 @@ def redraw():
 def runWork():
     global config
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running moving_image.py")
+    print("Running scrolling_image.py")
     print(bcolors.ENDC)
     
     while config.isRunning == True:
@@ -236,7 +236,7 @@ def main(run=True):
     config.mmPerPixel = int(workConfig.get("scrollingImage", "mmPerPixel"))
     config.mmSizeOfDrawing = int(workConfig.get("scrollingImage", "mmSizeOfDrawing"))
     
-    im = Image.open(config.baseImage)
+    im = Image.open(config.path + config.baseImage)
     config.bufferImage = im.copy()
     config.maxX = im.size[0]
     

@@ -520,12 +520,12 @@ def drawSqareSpiral():
 					obj.changeColor = False
 					obj.outlineColorObj = outlineColorObj
 
+					obj.minHue = config.redRange[0]
+					obj.maxHue = config.redRange[1]
 					obj.minSaturation = 0.5 * config.saturationRangeFactorLeft[0]
 					obj.maxSaturation = 1 * config.saturationRangeFactorLeft[1]
 					obj.minValue = leftValues[0]
 					obj.maxValue = leftValues[1]
-					obj.minHue = config.redRange[0]
-					obj.maxHue = config.redRange[1]
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
@@ -536,12 +536,12 @@ def drawSqareSpiral():
 					obj.changeColor = False
 					obj.outlineColorObj = outlineColorObj
 
+					obj.minHue = 0
+					obj.maxHue = 360
 					obj.minSaturation = 0.8 * config.saturationRangeFactorLeft[0]
 					obj.maxSaturation = 1 * config.saturationRangeFactorLeft[1]
 					obj.minValue = bottomValues[0]
 					obj.maxValue = bottomValues[1]
-					obj.minHue = 0
-					obj.maxHue = 360
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
@@ -553,12 +553,12 @@ def drawSqareSpiral():
 					obj.changeColor = False
 					obj.outlineColorObj = outlineColorObj
 
+					obj.minHue = 0
+					obj.maxHue = 360
 					obj.minSaturation = 0.7 * config.saturationRangeFactorRight[0]
 					obj.maxSaturation = 0.9 * config.saturationRangeFactorRight[1]
 					obj.minValue = rightValues[0]
 					obj.maxValue = rightValues[1]
-					obj.minHue = 0
-					obj.maxHue = 360
 
 					obj.setUp(n)
 					config.unitArray.append(obj)
@@ -570,12 +570,12 @@ def drawSqareSpiral():
 					obj.changeColor = False
 					obj.outlineColorObj = outlineColorObj
 
+					obj.minHue = config.redRange[0]
+					obj.maxHue = config.redRange[1]
 					obj.minSaturation = 0.7 * config.saturationRangeFactorRight[0]
 					obj.maxSaturation = 0.9 * config.saturationRangeFactorRight[1]
 					obj.minValue = topValues[0]
 					obj.maxValue = topValues[1]
-					obj.minHue = config.redRange[0]
-					obj.maxHue = config.redRange[1]
 
 					obj.setUp(n)
 					config.unitArray.append(obj)

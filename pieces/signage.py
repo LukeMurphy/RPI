@@ -115,8 +115,8 @@ def makeGrid():
             u.config = config
             u.tileSizeWidth = config.tileSizeWidth
             u.tileSizeHeight = config.tileSizeHeight
-            u.xPos = col * (config.tileSizeWidth + config.gridSpacing)
-            u.yPos = row * (config.tileSizeHeight + config.gridSpacing)
+            u.xPos = config.magingSpacing + col * (config.tileSizeWidth + config.gridSpacing)
+            u.yPos = config.magingSpacing + row * (config.tileSizeHeight + config.gridSpacing)
             u.row = row
             u.col = col
             u.coordinatedColorChange = config.coordinatedColorChange
@@ -634,9 +634,11 @@ def main(run=True):
         
     try:
         config.gridSpacing = int(workConfig.get("signage", "gridSpacing"))
+        config.magingSpacing = int(workConfig.get("signage", "magingSpacing"))
     except Exception as e:
         print(str(e))
         config.gridSpacing = 0
+        config.magingSpacing = 0
         
     try:
         config.choosePaletteForEachTile= workConfig.getboolean("signage", "choosePaletteForEachTile")

@@ -16,17 +16,19 @@ colorutils.brightness = 1
 def calculateNewSpeed() :
     if config.speedMPH != 0 :
         timeToComlete = 1 / config.speedMPH * (60 * 60) 
+        desiredTimeToComplete =  1 / config.speedMPH * (60 * 60)  
+        
         rate = config.directorController.slotRate
         numberOfCycles = timeToComlete  / rate
         newSpeed = round(config.maxX / numberOfCycles)
-        print(str("newSpeed = {}").format(newSpeed))
+        
+        print(str("Speed in pixels = {} pixels/second").format(newSpeed))
         config.speedX = newSpeed
         
-        desiredTimeToComplete =  1 / config.speedMPH * (60 * 60)  
-        print(str("desired = {} seconds").format(round(desiredTimeToComplete,4)))
+        # print(str("desired = {} seconds").format(round(desiredTimeToComplete,4)))
         if config.cycleCount > 0 :
             print(str("Desired Time per cycle = {}").format(round(desiredTimeToComplete/config.cycleCount, 6)))
-        print("----")
+        # print("----")
             
         # this changes the speed by changing the rate of change
         '''
@@ -51,9 +53,13 @@ def redraw():
     deltaX = config.maxX - config.scrollX
     
     config.cycleCount += 1
-    if width >= config.maxX and deltaX >= 0  :
+    
+    # print(width, config.maxX,deltaX)
+    if width >= config.maxX and deltaX >= (-config.scrollX)  :
         
-        # print(str("deltaX = {}").format(deltaX))
+        if deltaX < 0 : deltaX = 0
+        print(str("deltaX = {}").format(deltaX))
+        print(str("config.speedX = {}").format(config.speedX))
         
         crop1 = config.bufferImage.crop((xPos, yPos, deltaX + config.scrollX, height)).convert('RGBA')
         crop2 = config.bufferImage.crop((0, yPos, config.segmentWidth - deltaX, height)).convert('RGBA')
@@ -61,28 +67,27 @@ def redraw():
         config.canvasImage.paste(crop2, (deltaX, 0), crop2)
         
         # config.speedX = 1
-
-        if deltaX <= config.speedX :
-            config.t2 = time.time()
-            delta = config.t2 - config.t1
-            mph = 3600 * (config.maxX * config.mmPerPixel) / 1609344 / delta
-            kmph = 3600 * (config.maxX * config.mmPerPixel) / 1000000 / delta
-            
-            print("\n")
-            print(str("Time to complete 1 circuit = {}").format(round(delta, 4)))
-            print(str("MPH = {}").format(round(mph,4)))
-            print(str("KMPH = {}").format(round(kmph,4)))
-            print(str("config.cycleCount = {}").format(config.cycleCount))
-            print(str("Time per cycle = {}").format(round(delta/config.cycleCount, 6)))
-            
-            # if the rate of change is held the same, to change the speed, need to increase or decrease
-            # the pixels traveled per cycle
-            calculateNewSpeed()
-            
-            config.t1 = time.time()
-            config.scrollX = 0
-            xPos = 0
-            config.cycleCount = 0
+        # if deltaX <= config.speedX :
+        config.t2 = time.time()
+        delta = config.t2 - config.t1
+        mph = 3600 * (config.maxX * config.mmPerPixel) / 1609344 / delta
+        kmph = 3600 * (config.maxX * config.mmPerPixel) / 1000000 / delta
+        
+        print("\n")
+        print(str("Time to complete 1 circuit = {}").format(round(delta, 4)))
+        print(str("MPH = {}").format(round(mph,4)))
+        print(str("KMPH = {}").format(round(kmph,4)))
+        print(str("config.cycleCount = {}").format(config.cycleCount))
+        print(str("Time per cycle = {}").format(round(delta/config.cycleCount, 6)))
+        
+        # if the rate of change is held the same, to change the speed, need to increase or decrease
+        # the pixels traveled per cycle
+        calculateNewSpeed()
+        
+        config.t1 = time.time()
+        config.scrollX = 0
+        xPos = 0
+        config.cycleCount = 0
                     
 
                     
@@ -92,7 +97,7 @@ def redraw():
         config.canvasImage.paste(crop1, (0, 0), crop1)
         crop1 = config.bufferImage2.crop((xPos, yPos, width, height)).convert('RGBA')
         crop1 = crop1.rotate(180)
-        config.canvasImage.paste(crop1, (0, 0), crop1)
+        # config.canvasImage.paste(crop1, (0, 0), crop1)
         
         # cropt1Temp = crop1.copy()
         # cropt1Temp = cropt1Temp.rotate(180)
@@ -184,10 +189,14 @@ def main(run=True):
     try:
         # comment: 
         config.speedMPH = float(workConfig.get("scrollingImage", "speedMPH"))
-        config.speedKmPH = float(workConfig.get("scrollingImage", "speedKmPH"))
     except Exception as e:
         print(str(e))
         config.speedMPH = 0.0
+    try:
+        # comment: 
+        config.speedKmPH = float(workConfig.get("scrollingImage", "speedKmPH"))
+    except Exception as e:
+        print(str(e))
         config.speedKmPH = 0.0
     # end try
     
@@ -219,8 +228,8 @@ def main(run=True):
     config.colOverlay = coloroverlay.ColorOverlay()
     config.colOverlay.randomSteps = True
     config.colOverlay.timeTrigger = True
-    config.colOverlay.tLimitBase = 5
-    config.colOverlay.steps = 10
+    config.colOverlay.tLimitBase = 20
+    config.colOverlay.steps = 50
 
     config.colOverlay.maxBrightness = config.brightness
     config.colOverlay.minSaturation = config.bg_minSaturation
@@ -247,11 +256,14 @@ def main(run=True):
     config.mmPerPixel = int(workConfig.get("scrollingImage", "mmPerPixel"))
     config.mmSizeOfDrawing = int(workConfig.get("scrollingImage", "mmSizeOfDrawing"))
     
+    config.resizeHeight = int(workConfig.get("scrollingImage", "resizeHeight"))
+    
     im = Image.open(config.path + config.baseImage)
     config.bufferImage = im.copy()
     config.bufferImage2 = im.copy()
     config.bufferImage2 = config.bufferImage2.rotate(180)
     config.maxX = im.size[0]
+    config.maxY = im.size[1]
     
     config.runCount = 0
     config.cycleCount = 0
@@ -269,19 +281,26 @@ def main(run=True):
     # make it 1 mile in mm / pixels per mm
     config.newSize = round(config.mmSizeOfDrawing / config.mmPerPixel)
     config.maxX = config.newSize
-    print(str("Doing image resize to {}").format(config.newSize ))
-    config.bufferImage = config.bufferImage.resize((config.newSize,im.size[1]))
-    calculateNewSpeed()
+    print(str("Total mm distance = {} mm").format(config.mmSizeOfDrawing ))
+    print(str("Doing image resize to {} pixels").format(config.newSize ))
+    print(str("Physcial scale of pixels {} mm/pixel").format(config.mmPerPixel ))
+    print(str("Travel speed = {} MPH").format(config.speedMPH ))
+    # config.bufferImage = config.bufferImage.resize((config.newSize,im.size[1]))
+    
+    if config.resizeHeight > 1 :
+        config.bufferImage = config.bufferImage.resize((config.newSize,config.resizeHeight))
+    else:
+        config.bufferImage = config.bufferImage.resize((config.newSize,config.maxY))
+        
     
     
     if config.speedMPH != 0 :
         # try to calculate the distance/s speed to match MPH
-        
-        
         #config.speedX = (config.maxX * config.mmPerPixel/ 16099344  /config.directorController.slotRate)
-        print(str("Length of Image in Pixels = {}").format(config.maxX ))
-        print(str("Total mm distance = {}").format(config.maxX * config.mmPerPixel ))
-        print(str("Speed Calculated = {}").format(config.speedX))
+        calculateNewSpeed()
+        # print(str("Length of Image in Pixels = {}").format(config.maxX ))
+        # print(str("Speed Calculated = {}").format(config.speedX))
+        print("***\n")
     
     
     if run:

@@ -238,8 +238,8 @@ def main(run=True):
     config.colOverlay.maxValue = config.bg_maxValue
     config.colOverlay.minHue = config.bg_minHue
     config.colOverlay.maxHue = config.bg_maxHue
-    config.colOverlay.dropHueMax = config.bg_dropHueMinValue
-    config.colOverlay.dropHueMin = config.bg_dropHueMaxValue
+    config.colOverlay.dropHueMin = config.bg_dropHueMinValue
+    config.colOverlay.dropHueMax = config.bg_dropHueMaxValue
 
     config.colOverlay.colorTransitionSetup()
 

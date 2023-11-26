@@ -361,7 +361,7 @@ def getRandomColorHSV(
     if h > 360.0:
         h -= 360.0
 
-    # print("New hue: " + str(h))
+    # print("New hue: " + str(h) + " " + str(dropHueMin)+ " " + str(dropHueMax))
 
     # h = random.uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)

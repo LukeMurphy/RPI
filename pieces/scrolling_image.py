@@ -63,8 +63,8 @@ def redraw():
         
         crop1 = config.bufferImage.crop((xPos, yPos, deltaX + config.scrollX, height)).convert('RGBA')
         crop2 = config.bufferImage.crop((0, yPos, config.segmentWidth - deltaX, height)).convert('RGBA')
-        config.canvasImage.paste(crop1, (0, 0), crop1)
-        config.canvasImage.paste(crop2, (deltaX, 0), crop2)
+        config.canvasImage.paste(crop1, (config.xOffSet, config.yOffSet), crop1)
+        config.canvasImage.paste(crop2, (deltaX + config.xOffSet, config.yOffSet), crop2)
         
         # config.speedX = 1
         # if deltaX <= config.speedX :
@@ -94,7 +94,7 @@ def redraw():
                     
     else:
         crop1 = config.bufferImage.crop((xPos, yPos, width, height)).convert('RGBA')
-        config.canvasImage.paste(crop1, (0, 0), crop1)
+        config.canvasImage.paste(crop1, (config.xOffSet, config.yOffSet), crop1)
         crop1 = config.bufferImage2.crop((xPos, yPos, width, height)).convert('RGBA')
         crop1 = crop1.rotate(180)
         # config.canvasImage.paste(crop1, (0, 0), crop1)
@@ -211,6 +211,8 @@ def main(run=True):
     config.draw = ImageDraw.Draw(config.image)
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.xOffSet = int(workConfig.get("scrollingImage", "xOffSet"))
+    config.yOffSet = int(workConfig.get("scrollingImage", "yOffSet"))
 
     config.redrawSpeed = float(workConfig.get("scrollingImage", "redrawSpeed"))
     config.baseImage = (workConfig.get("scrollingImage", "baseImage"))

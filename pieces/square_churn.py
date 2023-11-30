@@ -9,8 +9,20 @@ from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
 
+class SkewedSquareUnit :
+    units = []
+    speed = 0
+    
+    rateA = 0
+    rateB = 0
+    rateC = 0
+    rateD = 0
 
-class unit:
+    def __init__(self, config):
+        self.config = config
+    
+
+class Unit:
 
     timeTrigger = True
     tLimitBase = 30
@@ -25,6 +37,10 @@ class unit:
 
     minHue = 0
     maxHue = 360
+    
+    varR = 100
+    
+    redrawBaseImageEachCycle = True
 
     def __init__(self, config):
         self.config = config
@@ -33,7 +49,6 @@ class unit:
         self.redraw = False
   
         self.canvas = Image.new('RGBA', (400,400))
-
         self.draw = ImageDraw.Draw(self.canvas)
 
         ## Like the "stiching" color and affects the overall "tone" of the piece
@@ -71,6 +86,9 @@ class unit:
 
         self.colOverlay.minHue = self.minHue
         self.colOverlay.maxHue = self.maxHue
+        
+        self.colOverlay.dropHueMin = self.dropHueMin
+        self.colOverlay.dropHueMax = self.dropHueMax
 
         ### This is the speed range of transitions in color
         ### Higher numbers means more possible steps so slower
@@ -91,6 +109,7 @@ class unit:
             int(a * self.brightness) for a in (self.colOverlay.currentColor)
         )
 
+    
     def update(self):
         # self.fillColorMode == "random" or
         if random.random() > config.colorPopProb:
@@ -101,7 +120,27 @@ class unit:
         else:
             self.changeColorFill()
 
+    
+    def makePoly(self) :
+        # varR = radius - i * radius/numberOfRings
+        parent = self.parent
+
+        A = (parent.centerPoint[0] + round(self.varR * math.cos(parent.angleA)),parent.centerPoint[1] + round(self.varR * math.sin(parent.angleA)))
+        B = (parent.centerPoint[0] + round(self.varR * math.cos(parent.angleB)),parent.centerPoint[1] + round(self.varR * math.sin(parent.angleB)))
+        C = (parent.centerPoint[0] + round(self.varR * math.cos(parent.angleC)),parent.centerPoint[1] + round(self.varR * math.sin(parent.angleC)))
+        D = (parent.centerPoint[0] + round(self.varR * math.cos(parent.angleD)),parent.centerPoint[1] + round(self.varR * math.sin(parent.angleD)))
+        E = (parent.centerPoint[0] + round(self.varR * math.cos(parent.angleA)),parent.centerPoint[1] + round(self.varR * math.sin(parent.angleA)))
+        # print(A,B,C,D)
+
+        self.poly = (A,B,C,D,E)
+
+   
     def renderPolys(self):
+        
+        if self.redrawBaseImageEachCycle == True :
+            self.canvas = Image.new('RGBA', (400,400))
+            self.draw = ImageDraw.Draw(self.canvas)
+
 
         if self.fillColorMode == "red":
             brightnessFactor = self.config.brightnessFactorDark
@@ -116,9 +155,9 @@ class unit:
             int(a * self.brightness) for a in (self.colOverlay.currentColor)
         )
 
-
         self.draw.polygon(self.poly, fill=self.fillColor, outline=None)
 
+    
     def render(self):
 
         if self.fillColorMode == "red":
@@ -134,24 +173,14 @@ class unit:
             int(a * self.brightness) for a in (self.colOverlay.currentColor)
         )
 
-        if self.lines == True:
-            self.draw.rectangle(
-                (
-                    (self.xPos, self.yPos),
-                    (self.xPos + self.blockLength, self.yPos + self.blockHeight),
-                ),
-                fill=self.fillColor,
-                outline=self.outlineColor,
-            )
-        else:
-            self.draw.rectangle(
-                (
-                    (self.xPos, self.yPos),
-                    (self.xPos + self.blockLength, self.yPos + self.blockHeight),
-                ),
-                fill=self.fillColor,
-                outline=None,
-            )
+        self.draw.rectangle(
+            (
+                (self.xPos, self.yPos),
+                (self.xPos + self.blockLength, self.yPos + self.blockHeight),
+            ),
+            fill=self.fillColor,
+            outline=None,
+        )
 
     ## Straight color change - deprecated - too blinky
     def changeColorFill(self):
@@ -218,6 +247,7 @@ def main(run=True):
 
     redRange = workConfig.get("squarerings", "redRange").split(",")
     config.redRange = tuple([int(i) for i in redRange])
+    
 
     try:
         saturationRangeFactorLeft = workConfig.get("squarerings", "saturationRangeFactorLeft").split(",")
@@ -233,26 +263,39 @@ def main(run=True):
 
     backgroundColor = workConfig.get("squarerings", "backgroundColor").split(",")
     config.backgroundColor = tuple([int(i) for i in backgroundColor])
+    
+    config.minHue = float(workConfig.get("squarerings", "minHue"))
+    config.maxHue = float(workConfig.get("squarerings", "maxHue"))
+    config.minSaturation = float(workConfig.get("squarerings", "minSaturation"))
+    config.maxSaturation = float(workConfig.get("squarerings", "maxSaturation"))
+    config.minValue = float(workConfig.get("squarerings", "minValue"))
+    config.maxValue = float(workConfig.get("squarerings", "maxValue"))
+    config.dropHueMin = float(workConfig.get("squarerings", "dropHueMin"))
+    config.dropHueMax = float(workConfig.get("squarerings", "dropHueMax"))
 
     config.numUnits = int(workConfig.get("squarerings", "numUnits"))
     config.minRadius = int(workConfig.get("squarerings", "minRadius"))
     config.maxRadius = int(workConfig.get("squarerings", "maxRadius"))
     config.minNumberOfRings = int(workConfig.get("squarerings", "minNumberOfRings"))
-    config.maxNumberOfRings = float(workConfig.get("squarerings", "maxNumberOfRings"))
+    config.maxNumberOfRings = int(workConfig.get("squarerings", "maxNumberOfRings"))
+    config.movementRate = float(workConfig.get("squarerings", "movementRate"))
+    
+    config.redrawBaseImageEachCycle = (workConfig.getboolean("squarerings", "redrawBaseImageEachCycle"))
+    config.probredrawBaseImageEachCycle = float(workConfig.get("squarerings", "probredrawBaseImageEachCycle"))
 
     config.cntrOffsetX = int(workConfig.get("squarerings", "cntrOffsetX"))
     config.cntrOffsetY = int(workConfig.get("squarerings", "cntrOffsetY"))
     config.delay = float(workConfig.get("squarerings", "delay"))
     config.colorPopProb = float(workConfig.get("squarerings", "colorPopProb"))
     config.brightnessFactorDark = float(workConfig.get("squarerings", "brightnessFactorDark"))
-    config.brightnessFactorLight = float(
-        workConfig.get("squarerings", "brightnessFactorLight")
-    )
-
+    config.brightnessFactorLight = float(workConfig.get("squarerings", "brightnessFactorLight"))
 
     config.polyDistortion = float(workConfig.get("squarerings", "polyDistortion"))
     config.polyDistortionMin = -config.polyDistortion
     config.polyDistortionMax = config.polyDistortion
+
+    config.polyDistortionChangeRateMin = float(workConfig.get("squarerings", "polyDistortionChangeRateMin"))
+    config.polyDistortionChangeRateMax = float(workConfig.get("squarerings", "polyDistortionChangeRateMax"))
 
     config.canvasImage = Image.new(
         "RGBA", (config.canvasImageWidth, config.canvasImageHeight)
@@ -283,6 +326,12 @@ def main(run=True):
 
 def restartPiece():
     del config.unitArray[:]
+    del config.squaresArray[:]
+    if random.random() < config.probredrawBaseImageEachCycle :
+        if random.random() < .5 :
+            config.redrawBaseImageEachCycle = False
+        else:
+            config.redrawBaseImageEachCycle = True
     drawSqareSpiral()
 
 
@@ -295,58 +344,78 @@ def drawSqareSpiral():
 
     cntrOffset = [config.cntrOffsetX, config.cntrOffsetY]
 
+    config.squaresArray = []
     config.unitArray = []
     
     for n in range (0,config.numUnits) :
-
-        radius = random.uniform(config.minRadius,config.maxRadius)
-        numberOfRings = round(random.uniform(config.minNumberOfRings,config.maxNumberOfRings))
-
-        angleA = 0 + random.uniform(-math.pi/config.polyDistortion, math.pi/config.polyDistortion)
-        angleB = math.pi / 2 + random.uniform(-math.pi/config.polyDistortion, math.pi/config.polyDistortion)
-        angleC = math.pi / 1 + random.uniform(-math.pi/config.polyDistortion, math.pi/config.polyDistortion)
-        angleD = 3 * math.pi / 2 + random.uniform(-math.pi/config.polyDistortion, math.pi/config.polyDistortion)
         
-        centerPoint = (round(random.uniform(0,config.canvasWidth)),round(random.uniform(0,config.canvasHeight)))
+        skewedSquare = SkewedSquareUnit(config)    
+        config.squaresArray.append(skewedSquare)
+        skewedSquare.unitArray = []
+        skewedSquare.speed = random.uniform(-config.movementRate,config.movementRate)
+
+        skewedSquare.radius = random.uniform(config.minRadius,config.maxRadius)
+        skewedSquare.numberOfRings = round(random.uniform(config.minNumberOfRings,config.maxNumberOfRings))
+
+        skewedSquare.angleA = 0 + random.uniform(-math.pi * config.polyDistortion, math.pi*config.polyDistortion)
+        skewedSquare.angleB = math.pi / 2 + random.uniform(-math.pi*config.polyDistortion, math.pi*config.polyDistortion)
+        skewedSquare.angleC = math.pi / 1 + random.uniform(-math.pi*config.polyDistortion, math.pi*config.polyDistortion)
+        skewedSquare.angleD = 3 * math.pi / 2 + random.uniform(-math.pi*config.polyDistortion, math.pi*config.polyDistortion)
         
-        for i in range(1,numberOfRings) :
+        skewedSquare.centerPoint = (round(random.uniform(0,config.canvasWidth)),round(random.uniform(0,config.canvasHeight)))
+        skewedSquare.xPos = 0
+        skewedSquare.yPos = 0
+        
+        rangeA = config.polyDistortionChangeRateMin
+        rangeB = config.polyDistortionChangeRateMax
+        
+        if random.random() < .3 :
+        
+            skewedSquare.rateA = math.pi * (random.uniform(rangeA,rangeB))
+            if random.random()> .85 : skewedSquare.rateA *= -1
+            skewedSquare.rateB = math.pi * (random.uniform(rangeA,rangeB))
+            if random.random()> .85 : skewedSquare.rateB *= -1
+            skewedSquare.rateC = math.pi * (random.uniform(rangeA,rangeB))
+            if random.random()> .85 : skewedSquare.rateC *= -1
+            skewedSquare.rateD = math.pi * (random.uniform(rangeA,rangeB))
+            if random.random()> .85 : skewedSquare.rateD *= -1
+        
+        for i in range(1,skewedSquare.numberOfRings) :
             
             outlineColorObj = coloroverlay.ColorOverlay()
             outlineColorObj.randomRange = (5.0, 30.0)
             outlineColorObj.colorTransitionSetup()
-            obj = unit(config)
+            obj = Unit(config)
             obj.fillColorMode = "red"
             obj.changeColor = False
             obj.outlineColorObj = outlineColorObj
-            obj.xPos = 1
-            obj.yPos = 1
+
 
             # This is the center square, so should be red, like the hearth it represents
-            obj.minHue = 0
-            obj.maxHue = 360
-            obj.minSaturation = 0.8
-            obj.maxSaturation = 1
-            obj.minValue = 0.1
-            obj.maxValue = 0.9
-            obj.minValue = 0.1
-            obj.maxValue = 0.9
+            obj.minHue = config.minHue
+            obj.maxHue = config.maxHue
+            obj.minSaturation = config.minSaturation
+            obj.maxSaturation = config.maxSaturation
+            obj.minValue = config.minValue
+            obj.maxValue = config.maxValue
+            obj.dropHueMin = config.dropHueMin
+            obj.dropHueMax = config.dropHueMax
+            
             
             if i % 2 == 0 :
-                obj.minValue = 0.0
-                obj.maxValue = 0.2
+                obj.minSaturation = 0
+                obj.maxSaturation = 0
+                obj.minValue = 0.6
+                obj.maxValue = 0.9
                 
-            varR = radius - i * radius/numberOfRings
-
-            A = (centerPoint[0] + round(varR * math.cos(angleA)),centerPoint[1] + round(varR * math.sin(angleA)))
-            B = (centerPoint[0] + round(varR * math.cos(angleB)),centerPoint[1] + round(varR * math.sin(angleB)))
-            C = (centerPoint[0] + round(varR * math.cos(angleC)),centerPoint[1] + round(varR * math.sin(angleC)))
-            D = (centerPoint[0] + round(varR * math.cos(angleD)),centerPoint[1] + round(varR * math.sin(angleD)))
-            E = (centerPoint[0] + round(varR * math.cos(angleA)),centerPoint[1] + round(varR * math.sin(angleA)))
-            # print(A,B,C,D)
-
-            obj.poly = (A,B,C,D,E)
+            obj.varR = skewedSquare.radius - i * skewedSquare.radius/skewedSquare.numberOfRings
+            obj.parent = skewedSquare
+            obj.redrawBaseImageEachCycle = config.redrawBaseImageEachCycle
+            
+            obj.makePoly()
             obj.setUp()
             config.unitArray.append(obj)
+            skewedSquare.unitArray.append(obj)
     
 
 def runWork():
@@ -365,17 +434,33 @@ def iterate():
     global config
     config.outlineColorObj.stepTransition()
 
-    for i in range(0, len(config.unitArray)):
-        obj = config.unitArray[i]
-        if random.random() > 0.98:
-            obj.outlineColorObj.stepTransition()
-        obj.update()
-        obj.renderPolys()
-        objTmp = (obj.canvas)
-        config.canvasImage.paste(objTmp,(obj.xPos,obj.yPos), objTmp)
-
-    temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    for u in range(0, len(config.squaresArray)):
+        parentRef  = config.squaresArray[u]
+        parentRef.angleA += parentRef.rateA
+        parentRef.angleB += parentRef.rateB
+        parentRef.angleC += parentRef.rateC
+        parentRef.angleD += parentRef.rateD
+        for i in range(0, len(parentRef.unitArray)):
+            obj = parentRef.unitArray[i]
+            if random.random() > 0.98:
+                obj.outlineColorObj.stepTransition()
+            
+            obj.update()
+            obj.makePoly()
+            obj.renderPolys()
+            objTmp = (obj.canvas)
+            config.canvasImage.paste(objTmp,(round(parentRef.xPos),round(parentRef.yPos)), objTmp)
+            
+        parentRef.xPos += parentRef.speed  
+        if parentRef.xPos < 0 :
+            parentRef.xPos = config.canvasWidth
+        if parentRef.xPos > config.canvasWidth :
+            parentRef.xPos = 0
+            
+        
+    temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     tDraw = ImageDraw.Draw(temp)
+    
     tDraw.rectangle(
         ((0, 0), (config.screenWidth, config.screenHeight)), fill=config.backgroundColor
     )

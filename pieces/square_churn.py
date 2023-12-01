@@ -272,6 +272,14 @@ def main(run=True):
     config.maxValue = float(workConfig.get("squarerings", "maxValue"))
     config.dropHueMin = float(workConfig.get("squarerings", "dropHueMin"))
     config.dropHueMax = float(workConfig.get("squarerings", "dropHueMax"))
+    config.alt_minHue = float(workConfig.get("squarerings", "alt_minHue"))
+    config.alt_maxHue = float(workConfig.get("squarerings", "alt_maxHue"))
+    config.alt_minSaturation = float(workConfig.get("squarerings", "alt_minSaturation"))
+    config.alt_maxSaturation = float(workConfig.get("squarerings", "alt_maxSaturation"))
+    config.alt_minValue = float(workConfig.get("squarerings", "alt_minValue"))
+    config.alt_maxValue = float(workConfig.get("squarerings", "alt_maxValue"))
+    config.alt_dropHueMin = float(workConfig.get("squarerings", "alt_dropHueMin"))
+    config.alt_dropHueMax = float(workConfig.get("squarerings", "alt_dropHueMax"))
 
     config.numUnits = int(workConfig.get("squarerings", "numUnits"))
     config.minRadius = int(workConfig.get("squarerings", "minRadius"))
@@ -403,10 +411,15 @@ def drawSqareSpiral():
             
             
             if i % 2 == 0 :
-                obj.minSaturation = 0
-                obj.maxSaturation = 0
-                obj.minValue = 0.6
-                obj.maxValue = 0.9
+                obj.minHue = config.alt_minHue
+                obj.maxHue = config.alt_maxHue
+                obj.minSaturation = config.alt_minSaturation
+                obj.maxSaturation = config.alt_maxSaturation
+                obj.minValue = config.alt_minValue
+                obj.maxValue = config.alt_maxValue
+                obj.dropHueMin = config.alt_dropHueMin
+                obj.dropHueMax = config.alt_dropHueMax
+
                 
             obj.varR = skewedSquare.radius - i * skewedSquare.radius/skewedSquare.numberOfRings
             obj.parent = skewedSquare

@@ -63,6 +63,7 @@ def timeChecker(sequenceConfig, config) :
 				pieceToPlay = 0
 
 		print("Piece Playing is: " + str(pieceToPlay))
+		print(sequenceConfig.workList[pieceToPlay])
 
 		sequenceConfig.currentPieceDuration = round(random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))
 		
@@ -73,15 +74,16 @@ def timeChecker(sequenceConfig, config) :
 
 		sequenceConfig.playCount=sequenceConfig.playCount+1
 
-		if sequenceConfig.playCount > sequenceConfig.repeatCountTrigger :
-			sequenceConfig.playCount = 0
+        # moved to a time-based re
+		# if sequenceConfig.playCount > sequenceConfig.repeatCountTrigger :
+		# 	sequenceConfig.playCount = 0
 
 		# wait for the player to load before cleaning up
 		time.sleep(1)
 
 		# Now check all the running python scripts and kill the one before the one that was just launched
 		# assumes only these two are running 
-		listOfProcs = check_output("ps -ef | pgrep -i python", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
+		listOfProcs = check_output("ps -ef | pgrep -f player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
 		print(bcolors.WARNING + "==========> count play : " + str(sequenceConfig.playCount))
 		print("Running python instances are :")
@@ -184,41 +186,41 @@ def loadSequenceFile():
 		sequenceConfig.fileName = argument
 		sequenceConfig.fileNameRaw = args.cfg
 
-		sequenceConfig.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
-		sequenceConfig.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))
+		# sequenceConfig.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
+		# sequenceConfig.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))
 
-		sequenceConfig.canvasOffsetX = int(workconfig.get("displayconfig", "canvasOffsetX"))
-		sequenceConfig.canvasOffsetY = int(workconfig.get("displayconfig", "canvasOffsetY"))
+		# sequenceConfig.canvasOffsetX = int(workconfig.get("displayconfig", "canvasOffsetX"))
+		# sequenceConfig.canvasOffsetY = int(workconfig.get("displayconfig", "canvasOffsetY"))
 
-		sequenceConfig.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
-		sequenceConfig.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
+		# sequenceConfig.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
+		# sequenceConfig.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
 
-		sequenceConfig.windowXOffset = int(workconfig.get("displayconfig", "windowXOffset"))
-		sequenceConfig.windowYOffset = int(workconfig.get("displayconfig", "windowYOffset"))
+		# sequenceConfig.windowXOffset = int(workconfig.get("displayconfig", "windowXOffset"))
+		# sequenceConfig.windowYOffset = int(workconfig.get("displayconfig", "windowYOffset"))
 
 
 		sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
 		sequenceConfig.commadStringPyth = (workconfig.get("displayconfig", "commadStringPyth"))
 		sequenceConfig.playOrder = 0 
 
-		try:
-			sequenceConfig.forceBGSwap  = (workconfig.getboolean("displayconfig", "forceBGSwap"))
-		except Exception as e:
-			print(str(e))
-			sequenceConfig.forceBGSwap  = False
+		# try:
+		# 	sequenceConfig.forceBGSwap  = (workconfig.getboolean("displayconfig", "forceBGSwap"))
+		# except Exception as e:
+		# 	print(str(e))
+		# 	sequenceConfig.forceBGSwap  = False
 
 		sequenceConfig.workListDirectory = workconfig.get("displayconfig", "workListDirectory")
 		sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
 		sequenceConfig.currentPieceDuration = 1
 		sequenceConfig.playCount = 0
 
-		try:
-			sequenceConfig.restartScript = workconfig.get("displayconfig", "restartScript")
-			sequenceConfig.repeatCountTrigger = int(workconfig.get("displayconfig", "repeatCountTrigger"))
-		except Exception as e:
-			print(str(e))
-			sequenceConfig.restartScript = '/cntrlscripts/restart_full_sequencer.sh'
-			sequenceConfig.repeatCountTrigger = 100
+		# try:
+		# 	sequenceConfig.restartScript = workconfig.get("displayconfig", "restartScript")
+		# 	sequenceConfig.repeatCountTrigger = int(workconfig.get("displayconfig", "repeatCountTrigger"))
+		# except Exception as e:
+		# 	print(str(e))
+		# 	sequenceConfig.restartScript = '/cntrlscripts/restart_full_sequencer.sh'
+		# 	sequenceConfig.repeatCountTrigger = 100
 
 
 		sequenceConfig.workList = []
@@ -239,6 +241,7 @@ def loadSequenceFile():
 		print("--------------------------------")
 		print("--------------------- WorkList")
 		print(sequenceConfig.workList)
+		print("--------------------------------")
 
 
 		sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)

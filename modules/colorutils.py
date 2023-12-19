@@ -313,7 +313,7 @@ def getRandomColorHSVSaturated(
     if h > 360.0:
         h -= 360.0
 
-    print("New hue: " + str(h) + " " + str(a))
+    # print("New hue: " + str(h) + " " + str(a))
 
     # h = random.uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)

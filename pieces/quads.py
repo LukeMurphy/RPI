@@ -253,9 +253,7 @@ def drawBackGround():
         config.bgYpos = 0
 
 
-def ScaleRotateTranslate(
-    image, angle, center=None, new_center=None, scale=None, expand=False
-):
+def ScaleRotateTranslate(image, angle, center=None, new_center=None, scale=None, expand=False):
     if center is None:
         return image.rotate(angle)
     angle = -angle / 180.0 * math.pi

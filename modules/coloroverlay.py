@@ -60,12 +60,12 @@ class ColorOverlay:
             self.currentColor = list(colorutils.randomColorAlpha(0.5, 0))
             self.currentColorRaw = list(colorutils.randomColorAlpha(0.5, 255))
             self.colorA = self.colorB = list(colorutils.randomColorAlpha(0.5, 0))
-
             # print(self.currentColorRaw)
 
     def checkTime(self):
         t = time.time()
         self.tDelta = t - self.t1
+        
 
     def setStartColor(self):
         self.colorA = colorutils.getRandomColorHSV(
@@ -108,13 +108,13 @@ class ColorOverlay:
             dropHueMax=self.dropHueMax,
         )
 
-        """
-        print("New Color B", self.colorB,  self.colorA)
-        print("New Color B", self.minHue, self.maxHue, 
-            self.minSaturation, self.maxSaturation,
-            self.minValue, self.maxValue)
-        print(self.dropHueMin, self.dropHueMax, self.tLimitBase)
-        """
+        # """
+        # print("New Color B", self.colorB,  self.colorA)
+        # print("New Color B", self.minHue, self.maxHue, 
+        #     self.minSaturation, self.maxSaturation,
+        #     self.minValue, self.maxValue)
+        # print(self.dropHueMin, self.dropHueMax, self.tLimitBase)
+        # """
 
     ## Transition starts
     def colorTransitionSetup(self, steps=0, newColor=None):

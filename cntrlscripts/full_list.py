@@ -195,7 +195,7 @@ def getAllConfigFiles(dateSort=False, subsortDate=False):
             fullPath = os.path.join(root, name)
             if name.find(".cfg") > 0 and name.find(".py") == -1 and name.find(".DS_Store") == -1:
                 res = os.stat(fullPath)
-                fullList.append((os.path.join(root, name), res.st_mtime))
+                fullList.append((os.path.join(root, name), res.st_mtime, name))
 
     # for directory in arr:
     #     if (
@@ -248,8 +248,8 @@ def getAllConfigFiles(dateSort=False, subsortDate=False):
                 actionDict1.append({"": ""})
 
             lastDir = f[0].split(configPath)[1].split('/')[0]
-            actionDict1.append(
-                {tsTxt + "\t\t" + f[0].split(configPath)[1] + "     ": f[0]})
+            # actionDict1.append({tsTxt + "\t\t" + f[0].split(configPath)[1] + " " + f[2]: f[0]})
+            actionDict1.append({tsTxt + "\t" + f[2] + "\t\t" + f[0].split(f[2])[0].split(configPath)[1] : f[0]})
             # actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
 
         else:
@@ -271,18 +271,20 @@ screen_height = root.winfo_screenheight()
 root.geometry(
     "%dx%d+%d+%d"
     % (
-        700,
-        round(screen_height * 0.4),
-        round(screen_width -700),
-        round(2 * screen_height / 3),
+        760,
+        round(screen_height * 0.6),
+        round(screen_width -800),
+        round(1 * screen_height / 2),
     )
 )
 
-Lb1 = Listbox(root, width=70, height=32)
+Lb1 = Listbox(root, width=70, height=42)
 
 
 for i, item in enumerate(actionDict1):
     Lb1.insert(END, " " + list(item.keys())[0])
+    Lb1.itemconfig(END, {"bg" : 'red'} )
+    # if len(list(item.keys())[0]) < 0 else "green"
 
 
 # Lb1.pack(side=tk.LEFT, padx=0, ipadx=10)
@@ -296,7 +298,7 @@ Lb1.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=Lb1.yview)
 
 topBtnPlace = 8
-leftBtnPlace = 540
+leftBtnPlace = 580
 
 # sort by directory is 1 sort all by date is 0
 sortDefault = 1

@@ -249,7 +249,7 @@ def getAllConfigFiles(dateSort=False, subsortDate=False):
 
             lastDir = f[0].split(configPath)[1].split('/')[0]
             # actionDict1.append({tsTxt + "\t\t" + f[0].split(configPath)[1] + " " + f[2]: f[0]})
-            actionDict1.append({tsTxt + "\t" + f[2] + "\t\t" + f[0].split(f[2])[0].split(configPath)[1] : f[0]})
+            actionDict1.append({tsTxt + "\t" + f[0].split(f[2])[0].split(configPath)[1]  + " \t\t\t\t \t\t\t\t" + f[2]: f[0]})
             # actionDict1.append({ "" + tsTxt  + "  " + f[0]  : f[0]})
 
         else:
@@ -278,7 +278,7 @@ root.geometry(
     )
 )
 
-Lb1 = Listbox(root, width=70, height=42)
+Lb1 = Listbox(root, width=90, height=42)
 
 
 for i, item in enumerate(actionDict1):

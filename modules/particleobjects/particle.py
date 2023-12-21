@@ -487,7 +487,8 @@ class Particle(object):
 				imageToPaste = imageToPaste.filter(
 					ImageFilter.GaussianBlur(radius=round(self.unitBlur))
 				)
-				self.unitBlur += 1
+                # This should be optional
+				# self.unitBlur += 1
 
 			### This produces trails
 			if self.ps.objTrails == True:

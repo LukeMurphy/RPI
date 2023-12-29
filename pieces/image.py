@@ -15,7 +15,7 @@ from random import shuffle
 from subprocess import call
 from modules.configuration import bcolors
 from modules.faderclass import FaderObj
-from modules import badpixels, colorutils, configuration, panelDrawing
+from modules import badpixels, colorutils, coloroverlay, configuration, panelDrawing
 from modules.imagesprite import ImageSprite
 from PIL import (
     Image,
@@ -308,6 +308,11 @@ def main(run=True):
     config.imgLoader.glitchChanceWhenPausedFactor = config.glitchChanceWhenPausedFactor
     config.imgLoader.config = config
     # processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
+    
+    
+    # This was added to allow the image and imageSprite files/classes
+    # to also play spriteSheets which are easier to manipulate than
+    # gif files
     # 
     try:
         config.imgLoader.frameWidth = int(workConfig.get("images", "frameWidth"))
@@ -326,13 +331,53 @@ def main(run=True):
         config.imgLoader.imageIsSpriteSheet = (workConfig.getboolean("images", "imageIsSpriteSheet"))
         config.imgLoader.loadImage(config.imagePath + config.imageList[0])
         config.imgLoader.setupSpriteSheetSlices()
+        print("ASSUMING THIS USES A SPRITESHEET")
     except Exception as e:
         print(str(e))
-        config.imageLoader.imageIsSpriteSheet = False
+        print("ASSUMING THIS DOES NOT USE A SPRITESHEET")
+        config.imgLoader.imageIsSpriteSheet = False
         
     
     if config.imgLoader.imageIsSpriteSheet == False :
         config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
+
+
+    try:
+        config.bg_minHue = int(workConfig.get("images", "bg_minHue"))
+        config.bg_maxHue = int(workConfig.get("images", "bg_maxHue"))
+        config.bg_minSaturation = float(workConfig.get("images", "bg_minSaturation"))
+        config.bg_maxSaturation = float(workConfig.get("images", "bg_maxSaturation"))
+        config.bg_minValue = float(workConfig.get("images", "bg_minValue"))
+        config.bg_maxValue = float(workConfig.get("images", "bg_maxValue"))
+        config.bg_dropHueMinValue = float(workConfig.get("images", "bg_dropHueMinValue"))
+        config.bg_dropHueMaxValue = float(workConfig.get("images", "bg_dropHueMaxValue"))
+        config.bg_alpha = int(workConfig.get("images", "bg_alpha"))
+        config.bg_alpha_max = int(workConfig.get("images", "bg_alpha"))
+        config.backgroundColorChangeProb = float(workConfig.get("images", "backgroundColorChangeProb"))
+        
+                # Sets up color transitions
+        config.colOverlay = coloroverlay.ColorOverlay()
+        config.colOverlay.randomSteps = True
+        config.colOverlay.timeTrigger = True
+        config.colOverlay.tLimitBase = 5
+        config.colOverlay.steps = 10
+
+        config.colOverlay.maxBrightness = config.brightness
+        config.colOverlay.minSaturation = config.bg_minSaturation
+        config.colOverlay.maxSaturation = config.bg_maxSaturation
+        config.colOverlay.minValue = config.bg_minValue
+        config.colOverlay.maxValue = config.bg_maxValue
+        config.colOverlay.minHue = config.bg_minHue
+        config.colOverlay.maxHue = config.bg_maxHue
+        config.colOverlay.dropHueMin = config.bg_dropHueMinValue
+        config.colOverlay.dropHueMax = config.bg_dropHueMaxValue
+        
+        config.colOverlay.colorTransitionSetup()
+        config.useBackGround = True
+    except Exception as e:
+        print(str(e))
+        config.useBackGround = False
+
 
 
     config.workImageOld = config.workImage.copy()
@@ -376,7 +421,8 @@ def runWork():
         if config.standAlone == False:
             config.callBack()
 
-
+        
+        
 def performChanges():
 
     if config.imgLoader.action == "play":
@@ -401,6 +447,13 @@ def performChanges():
 
     enhancer = ImageEnhance.Brightness(config.imgLoader.image.convert("RGBA"))
     im_output = enhancer.enhance(config.brightness)
+    
+    
+    if config.useBackGround == True :
+        config.colOverlay.stepTransition()
+        bgColor = config.colOverlay.currentColor
+        bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), config.bg_alpha)
+        config.workImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill = bgColor)
 
     config.workImage.paste(im_output, (0, 0), im_output)
 
@@ -482,6 +535,8 @@ def performChanges():
 def iterate(n=0):
     global config, blocks
     global xPos, yPos
+    
+
 
     config.f.fadeIn()
 

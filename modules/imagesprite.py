@@ -722,6 +722,7 @@ class ImageSprite:
                 yPos2 = yPos + self.sliceHeight
                 slice = self.imageOriginal.crop((xPos,yPos,xPos2,yPos2))
                 if self.resizeAnimationtoFit == True :
+                    # print("RESIZING")
                     slice = slice.resize((self.animationWidth, self.animationHeight))
                 self.sliceImages.append(slice)
     

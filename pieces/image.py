@@ -87,21 +87,17 @@ def main(run=True):
     config.overlayyPosOrig = int(workConfig.get("images", "overlayyPos"))
     config.overlayxPos = int(workConfig.get("images", "overlayxPos"))
     config.overlayyPos = int(workConfig.get("images", "overlayyPos"))
-    config.overlayChangeProb = float(
-        workConfig.get("images", "overlayChangeProb"))
-    config.overlayChangePosProb = float(
-        workConfig.get("images", "overlayChangePosProb"))
+    config.overlayChangeProb = float(workConfig.get("images", "overlayChangeProb"))
+    config.overlayChangePosProb = float(workConfig.get("images", "overlayChangePosProb"))
     config.animateProb = float(workConfig.get("images", "animateProb"))
     config.imageGlitchProb = float(workConfig.get("images", "imageGlitchProb"))
 
     try:
-        config.overlayChangeSizeProb = float(
-            workConfig.get("images", "overlayChangeSizeProb"))
+        config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangeSizeProb"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
-        config.overlayChangeSizeProb = float(
-            workConfig.get("images", "overlayChangePosProb"))
+        config.overlayChangeSizeProb = float(workConfig.get("images", "overlayChangePosProb"))
 
     print("------------------")
     try:
@@ -119,8 +115,7 @@ def main(run=True):
         print(str(e))
 
     try:
-        config.colorOverlayAlpha = int(
-            workConfig.get("images", "colorOverlayAlpha"))
+        config.colorOverlayAlpha = int(workConfig.get("images", "colorOverlayAlpha"))
     except Exception as e:
         print(str(e))
         config.colorOverlayAlpha = 250
@@ -129,16 +124,11 @@ def main(run=True):
 
     try:
         config.pausePlayProb = float(workConfig.get("images", "pausePlayProb"))
-        config.releasePauseProb = float(
-            workConfig.get("images", "releasePauseProb"))
-        config.imageGlitchDisplacementVerical = float(
-            workConfig.get("images", "imageGlitchDisplacementVerical"))
-        config.imageGlitchDisplacementHorizontal = int(
-            workConfig.get("images", "imageGlitchDisplacementHorizontal"))
-        config.imageGlitchCountLimit = int(
-            workConfig.get("images", "imageGlitchCountLimit"))
-        config.glitchChanceWhenPausedFactor = float(
-            workConfig.get("images", "glitchChanceWhenPausedFactor"))
+        config.releasePauseProb = float(workConfig.get("images", "releasePauseProb"))
+        config.imageGlitchDisplacementVerical = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
+        config.imageGlitchDisplacementHorizontal = int(workConfig.get("images", "imageGlitchDisplacementHorizontal"))
+        config.imageGlitchCountLimit = int(workConfig.get("images", "imageGlitchCountLimit"))
+        config.glitchChanceWhenPausedFactor = float(workConfig.get("images", "glitchChanceWhenPausedFactor"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
@@ -151,24 +141,20 @@ def main(run=True):
         config.glitchChanceWhenPausedFactor = 10.0
 
     try:
-        config.imageGlitchDisplacement = float(
-            workConfig.get("images", "imageGlitchDisplacementVerical"))
+        config.imageGlitchDisplacement = float(workConfig.get("images", "imageGlitchDisplacementVerical"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
         config.imageGlitchDisplacement = 15
 
     # Generate image holders
-    config.workImage = Image.new(
-        "RGBA", (config.canvasWidth, config.canvasHeight))
+    config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.workImageDraw = ImageDraw.Draw(config.workImage)
 
-    config.canvasImage = Image.new(
-        "RGBA", (config.canvasWidth * 10, config.canvasHeight))
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
     config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 
-    config.imageLayer = Image.new(
-        "RGBA", (config.canvasWidth * 10, config.canvasHeight))
+    config.imageLayer = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
     config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
 
     # Sets the image size  -- should probably be set to canvasHeight
@@ -177,10 +163,8 @@ def main(run=True):
     # New configs
     try:
         config.animateProb = float(workConfig.get("images", "animateProb"))
-        config.verticalOrientation = int(
-            workConfig.get("images", "verticalOrientation"))
-        config.resetProbability = float(
-            workConfig.get("images", "resetProbability"))
+        config.verticalOrientation = int(workConfig.get("images", "verticalOrientation"))
+        config.resetProbability = float(workConfig.get("images", "resetProbability"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
@@ -196,17 +180,14 @@ def main(run=True):
         config.resizeToFit = False
 
     try:
-        config.glitchCountRestFactor = float(
-            workConfig.get("images", "glitchCountRestFactor"))
+        config.glitchCountRestFactor = float(workConfig.get("images", "glitchCountRestFactor"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
         config.glitchCountRestFactor = 1000
 
     try:
-        config.forceGlitchFrameCount = int(
-            workConfig.get("images", "forceGlitchFrameCount")
-        )
+        config.forceGlitchFrameCount = int(workConfig.get("images", "forceGlitchFrameCount"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
@@ -222,15 +203,9 @@ def main(run=True):
         config.doingRefreshCount = 10
 
     try:
-        config.doingRefreshCountVariability = float(
-            workConfig.get("images", "doingRefreshCountVariability")
-        )
-        config.doingRefreshCountVariabilityReset = float(
-            workConfig.get("images", "doingRefreshCountVariabilityReset")
-        )
-        config.doingRefreshCountFastProb = float(
-            workConfig.get("images", "doingRefreshCountFastProb")
-        )
+        config.doingRefreshCountVariability = float(workConfig.get("images", "doingRefreshCountVariability"))
+        config.doingRefreshCountVariabilityReset = float(workConfig.get("images", "doingRefreshCountVariabilityReset"))
+        config.doingRefreshCountFastProb = float(workConfig.get("images", "doingRefreshCountFastProb"))
     except Exception as e:
         print(bcolors.FAIL + "** " + bcolors.BOLD)
         print(str(e))
@@ -246,14 +221,10 @@ def main(run=True):
         config.overLayMode = 1
 
     try:
-        config.filterRemapping = (
-            workConfig.getboolean("images", "filterRemapping"))
-        config.filterRemappingProb = float(
-            workConfig.get("images", "filterRemappingProb"))
-        config.filterRemapminHoriSize = int(
-            workConfig.get("images", "filterRemapminHoriSize"))
-        config.filterRemapminVertSize = int(
-            workConfig.get("images", "filterRemapminVertSize"))
+        config.filterRemapping = (workConfig.getboolean("images", "filterRemapping"))
+        config.filterRemappingProb = float(workConfig.get("images", "filterRemappingProb"))
+        config.filterRemapminHoriSize = int(workConfig.get("images", "filterRemapminHoriSize"))
+        config.filterRemapminVertSize = int(workConfig.get("images", "filterRemapminVertSize"))
     except Exception as e:
         print(str(e))
         config.filterRemapping = False
@@ -262,28 +233,23 @@ def main(run=True):
         config.filterRemapminVertSize = 24
 
     try:
-        config.filterRemapRangeX = int(
-            workConfig.get("images", "filterRemapRangeX"))
-        config.filterRemapRangeY = int(
-            workConfig.get("images", "filterRemapRangeY"))
+        config.filterRemapRangeX = int(workConfig.get("images", "filterRemapRangeX"))
+        config.filterRemapRangeY = int(workConfig.get("images", "filterRemapRangeY"))
     except Exception as e:
         print(str(e))
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
     try:
-        config.alterAsASCIIProb = float(
-            workConfig.get("images", "alterAsASCIIProb"))
+        config.alterAsASCIIProb = float(workConfig.get("images", "alterAsASCIIProb"))
     except Exception as e:
         print(str(e))
         config.alterAsASCIIProb = 0
 
     try:
         if config.usePixelSort == True:
-            config.pixelSortProbOn = float(
-                workConfig.get("images", "pixelSortProbOn"))
-            config.pixelSortProbOff = float(
-                workConfig.get("images", "pixelSortProbOff"))
+            config.pixelSortProbOn = float(workConfig.get("images", "pixelSortProbOn"))
+            config.pixelSortProbOff = float(workConfig.get("images", "pixelSortProbOff"))
         else:
             config.pixelSortProbOn = 0
             config.pixelSortProbOff = 0
@@ -302,8 +268,7 @@ def main(run=True):
         print(str(e))
         config.delay = 0.02
     try:
-        config.directorController.slotRate = float(
-            workConfig.get("images", "slotRate"))
+        config.directorController.slotRate = float(workConfig.get("images", "slotRate"))
     except Exception as e:
         print(str(e))
         print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
@@ -312,8 +277,7 @@ def main(run=True):
     print(bcolors.OKBLUE + "** " + bcolors.BOLD)
 
     config.fontSize = 8
-    config.font = ImageFont.truetype(
-        config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
+    config.font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
 
     config.imagePath = config.path + "/assets/imgs/"
     config.imageList = [config.imageToLoad]
@@ -344,8 +308,32 @@ def main(run=True):
     config.imgLoader.glitchChanceWhenPausedFactor = config.glitchChanceWhenPausedFactor
     config.imgLoader.config = config
     # processImage = True, resizeImage = True, randomizeDirection = True, randomizeColor = True
-    config.imgLoader.make(
-        config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
+    # 
+    try:
+        config.imgLoader.frameWidth = int(workConfig.get("images", "frameWidth"))
+        config.imgLoader.frameHeight = int(workConfig.get("images", "frameHeight"))
+        config.imgLoader.totalFrames = int(workConfig.get("images", "totalFrames"))
+        config.imgLoader.frameCols = int(workConfig.get("images", "frameCols"))
+        config.imgLoader.frameRows = int(workConfig.get("images", "frameRows"))
+        # slice parameters
+        config.imgLoader.sliceWidthMin = int(workConfig.get("images", "sliceWidthMin"))
+        config.imgLoader.sliceWidth = int(workConfig.get("images", "sliceWidth"))
+        config.imgLoader.sliceHeightMin = int(workConfig.get("images", "sliceHeightMin"))
+        config.imgLoader.sliceHeight = int(workConfig.get("images", "sliceHeight"))
+        config.imgLoader.animationWidth = int(workConfig.get("images", "animationWidth"))
+        config.imgLoader.animationHeight = int(workConfig.get("images", "animationHeight"))
+        config.imgLoader.resizeAnimationtoFit = (workConfig.getboolean("images", "resizeAnimationtoFit"))
+        config.imgLoader.imageIsSpriteSheet = (workConfig.getboolean("images", "imageIsSpriteSheet"))
+        config.imgLoader.loadImage(config.imagePath + config.imageList[0])
+        config.imgLoader.setupSpriteSheetSlices()
+    except Exception as e:
+        print(str(e))
+        config.imageLoader.imageIsSpriteSheet = False
+        
+    
+    if config.imgLoader.imageIsSpriteSheet == False :
+        config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
+
 
     config.workImageOld = config.workImage.copy()
     config.f = FaderObj()
@@ -394,10 +382,16 @@ def performChanges():
     if config.imgLoader.action == "play":
         if random.random() < config.animateProb:
             # holdAnimation
-            config.imgLoader.animate(False)
+            if config.imgLoader.imageIsSpriteSheet  == True :
+                config.imgLoader.animateSpriteSheet(False)
+            else :
+                config.imgLoader.animate(False)
         else:
-            config.imgLoader.animate(True)
-
+            if config.imgLoader.imageIsSpriteSheet  == True :
+                config.imgLoader.animateSpriteSheet(True)
+            else :
+                config.imgLoader.animate(True)
+                
     x, y = config.workImage.size
     x1, y1 = config.imgLoader.image.size
 
@@ -419,8 +413,7 @@ def performChanges():
         # print("RESET " + str(config.glitchCount/config.glitchCountRestFactor))
         config.imgLoader.glitchCount = 0
         config.imgLoader.imageGlitchCount = 0
-        config.imgLoader.imageGlitchCountLimit = round(
-            random.uniform(2, config.imageGlitchCountLimit))
+        config.imgLoader.imageGlitchCountLimit = round(random.uniform(2, config.imageGlitchCountLimit))
         config.imgLoader.holdAnimation = False
         # config.imgLoader.make(config.imagePath + config.imageList[0], 0, 0, False, config.resizeToFit, False, True)
 
@@ -437,16 +430,12 @@ def performChanges():
             0, 360, .65, 1.0, .5, .5, 0, 0, config.colorOverlayAlpha)
 
     if random.random() < config.overlayChangeSizeProb:
-        config.clrBlkWidth = round(
-            random.uniform(5, config.clrBlkWidthSet * 1.25))
-        config.clrBlkHeight = round(
-            random.uniform(5, config.clrBlkHeightSet * 1.25))
+        config.clrBlkWidth = round(random.uniform(5, config.clrBlkWidthSet * 1.25))
+        config.clrBlkHeight = round(random.uniform(5, config.clrBlkHeightSet * 1.25))
 
     if random.random() < config.overlayChangePosProb:
-        config.overlayxPos = round(
-            random.uniform(0, 2 * config.canvasWidth / 3))
-        config.overlayyPos = round(
-            random.uniform(0, 2 * config.canvasHeight / 3))
+        config.overlayxPos = round(random.uniform(0, 2 * config.canvasWidth / 3))
+        config.overlayyPos = round(random.uniform(0, 2 * config.canvasHeight / 3))
 
     if random.random() < config.overlayChangePosProb / 2.0:
         config.overlayxPos = config.overlayxPosOrig
@@ -532,8 +521,7 @@ def iterate(n=0):
             startY = round(random.uniform(0, config.filterRemapRangeY))
             endX = round(random.uniform(8, config.filterRemapminHoriSize))
             endY = round(random.uniform(8, config.filterRemapminVertSize))
-            config.remapImageBlockSection = [
-                startX, startY, startX + endX, startY + endY]
+            config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
             config.remapImageBlockDestination = [startX, startY]
             # print("swapping" + str(config.remapImageBlockSection))
 

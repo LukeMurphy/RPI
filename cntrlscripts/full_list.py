@@ -122,6 +122,8 @@ def action2():
         configToRun = configSelected[list(configSelected.keys())[0]]
         execute(configToRun)
 
+def clear() :
+    T.delete('1.0', '1.20')
 
 def stopAll():
     # print("Tkinter is easy to use!")
@@ -345,8 +347,13 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
 # Filter text box
-T = Text(root, height = 1, width = 82, bg="white", fg="black", bd=False)
+T = Text(root, height = 1, width = 32, bg="white", fg="black", bd=False, padx=2, pady =2)
 T.place(bordermode=OUTSIDE, x=2, y=2)
+clearButton = Button(
+    root, text="Clear", width=120, bg="green", fg="white", borderless=True, command=clear
+)
+clearButton.place(bordermode=OUTSIDE, x=280, y=2)
+
 
 # -------------------------------- #
 # sort by date = True,  

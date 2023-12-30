@@ -155,60 +155,60 @@ def main(run=True):
 	config.outlineColorObj.randomRange = (5.0, 30.0)
 	config.outlineColorObj.colorTransitionSetup()
 
-	config.quiltPattern = workConfig.get("quilt", "pattern")
+	config.quiltPattern = workConfig.get("quilt-polys", "pattern")
 
 	# these control the timing of the individual color transitions - longer is slower
-	config.transitionStepsMin = float(workConfig.get("quilt", "transitionStepsMin"))
-	config.transitionStepsMax = float(workConfig.get("quilt", "transitionStepsMax"))
+	config.transitionStepsMin = float(workConfig.get("quilt-polys", "transitionStepsMin"))
+	config.transitionStepsMax = float(workConfig.get("quilt-polys", "transitionStepsMax"))
 
 	# Some triangles will re-draw like a tick - on triangles quilt
-	config.resetTrianglesProb = float(workConfig.get("quilt", "resetTrianglesProb"))
+	config.resetTrianglesProb = float(workConfig.get("quilt-polys", "resetTrianglesProb"))
 
 	# The probability that at the beginning of a new quilt image the size of the
 	# elements will change
-	config.resetSizeProbability = float(workConfig.get("quilt", "resetSizeProbability"))
+	config.resetSizeProbability = float(workConfig.get("quilt-polys", "resetSizeProbability"))
 
 	# the time in seconds given before the quilt image resets to new parameters
-	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))
+	config.timeToComplete = int(workConfig.get("quilt-polys", "timeToComplete"))
 
-	config.transformShape = workConfig.getboolean("quilt", "transformShape")
-	transformTuples = workConfig.get("quilt", "transformTuples").split(",")
+	config.transformShape = workConfig.getboolean("quilt-polys", "transformShape")
+	transformTuples = workConfig.get("quilt-polys", "transformTuples").split(",")
 	config.transformTuples = tuple([float(i) for i in transformTuples])
 
-	redRange = workConfig.get("quilt", "redRange").split(",")
+	redRange = workConfig.get("quilt-polys", "redRange").split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
 	# the mins and maxes for the size of the units
-	config.gapSize = int(workConfig.get("quilt", "gapSize"))
-	config.blockSizeMin = int(workConfig.get("quilt", "blockSizeMin"))
-	config.blockSizeMax = int(workConfig.get("quilt", "blockSizeMax"))
+	config.gapSize = int(workConfig.get("quilt-polys", "gapSize"))
+	config.blockSizeMin = int(workConfig.get("quilt-polys", "blockSizeMin"))
+	config.blockSizeMax = int(workConfig.get("quilt-polys", "blockSizeMax"))
 	config.blockSize = round(random.uniform(config.blockSizeMin, config.blockSizeMax))
 
-	config.blockRowsMin = int(workConfig.get("quilt", "blockRowsMin"))
-	config.blockRowsMax = int(workConfig.get("quilt", "blockRowsMax"))
-	config.blockColsMin = int(workConfig.get("quilt", "blockColsMin"))
-	config.blockColsMax = int(workConfig.get("quilt", "blockColsMax"))
+	config.blockRowsMin = int(workConfig.get("quilt-polys", "blockRowsMin"))
+	config.blockRowsMax = int(workConfig.get("quilt-polys", "blockRowsMax"))
+	config.blockColsMin = int(workConfig.get("quilt-polys", "blockColsMin"))
+	config.blockColsMax = int(workConfig.get("quilt-polys", "blockColsMax"))
 	config.blockCols = config.blockColsMax
 	config.blockRows = config.blockRowsMax
 
 	# can adjust the quilt image offset
-	config.cntrOffsetX = int(workConfig.get("quilt", "cntrOffsetX"))
-	config.cntrOffsetY = int(workConfig.get("quilt", "cntrOffsetY"))
+	config.cntrOffsetX = int(workConfig.get("quilt-polys", "cntrOffsetX"))
+	config.cntrOffsetY = int(workConfig.get("quilt-polys", "cntrOffsetY"))
 
 	# frame rate
-	config.delay = float(workConfig.get("quilt", "delay"))
+	config.delay = float(workConfig.get("quilt-polys", "delay"))
 
 	# the probabilty that any triangle will pop to another color
-	config.colorPopProb = float(workConfig.get("quilt", "colorPopProb"))
+	config.colorPopProb = float(workConfig.get("quilt-polys", "colorPopProb"))
 
-	config.brightnessFactorDark = float(workConfig.get("quilt", "brightnessFactorDark"))
+	config.brightnessFactorDark = float(workConfig.get("quilt-polys", "brightnessFactorDark"))
 	config.brightnessFactorLight = float(
-		workConfig.get("quilt", "brightnessFactorLight")
+		workConfig.get("quilt-polys", "brightnessFactorLight")
 	)
-	config.lines = workConfig.getboolean("quilt", "lines")
-	config.patternPrecision = workConfig.getboolean("quilt", "patternPrecision")
+	config.lines = workConfig.getboolean("quilt-polys", "lines")
+	config.patternPrecision = workConfig.getboolean("quilt-polys", "patternPrecision")
 
-	config.activeSet = workConfig.get("quilt", "activeSet")
+	config.activeSet = workConfig.get("quilt-polys", "activeSet")
 
 	config.c1HueRange = tuple(
 		[float(i) for i in workConfig.get(config.activeSet, "c1HueRange").split(",")]
@@ -271,20 +271,20 @@ def main(run=True):
 	)
 
 	try:
-		config.rotationRange = float(workConfig.get("quilt", "rotationRange"))
+		config.rotationRange = float(workConfig.get("quilt-polys", "rotationRange"))
 	except Exception as e:
 		config.rotationRange = 0
 		print(e)
 
 	try:
-		config.refreshCount = float(workConfig.get("quilt", "refreshCount"))
+		config.refreshCount = float(workConfig.get("quilt-polys", "refreshCount"))
 	except Exception as e:
 		config.refreshCount = 100
 		print(e)
 
 	try:
-		config.randomness = int(workConfig.get("quilt", "randomness"))
-		config.randomnessBase = int(workConfig.get("quilt", "randomness"))
+		config.randomness = int(workConfig.get("quilt-polys", "randomness"))
+		config.randomnessBase = int(workConfig.get("quilt-polys", "randomness"))
 	except Exception as e:
 		config.randomness = 0
 		print(e)

@@ -212,18 +212,18 @@ def main(run=True):
 	config.outlineColorObj.randomRange = (5.0, 30.0)
 	config.outlineColorObj.colorTransitionSetup()
 
-	config.quiltPattern = workConfig.get("quilt", "pattern")
+	config.quiltPattern = workConfig.get("quilt-triangles", "pattern")
 
 	# these control the timing of the individual color transitions - longer is slower
-	config.transitionStepsMin = float(workConfig.get("quilt", "transitionStepsMin"))
-	config.transitionStepsMax = float(workConfig.get("quilt", "transitionStepsMax"))
+	config.transitionStepsMin = float(workConfig.get("quilt-triangles", "transitionStepsMin"))
+	config.transitionStepsMax = float(workConfig.get("quilt-triangles", "transitionStepsMax"))
 
 	try:
 		# Some triangles will re-draw like a tick - on triangles quilt
-		config.resetTrianglesProb = float(workConfig.get("quilt", "resetTrianglesProb"))
+		config.resetTrianglesProb = float(workConfig.get("quilt-triangles", "resetTrianglesProb"))
 		# The probability that at the beginning of a new quilt image the size of the
 		# elements will change
-		config.resetSizeProbability = float(workConfig.get("quilt", "resetSizeProbability"))
+		config.resetSizeProbability = float(workConfig.get("quilt-triangles", "resetSizeProbability"))
 	except Exception as e:
 		print(str(e))
 		config.resetTrianglesProb = .001
@@ -231,11 +231,11 @@ def main(run=True):
 
 
 	# the time in seconds given before the quilt image resets to new parameters
-	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))
+	config.timeToComplete = int(workConfig.get("quilt-triangles", "timeToComplete"))
 
 	try:
-		config.transformShape = workConfig.getboolean("quilt", "transformShape")
-		transformTuples = workConfig.get("quilt", "transformTuples").split(",")
+		config.transformShape = workConfig.getboolean("quilt-triangles", "transformShape")
+		transformTuples = workConfig.get("quilt-triangles", "transformTuples").split(",")
 		config.transformTuples = tuple([float(i) for i in transformTuples])
 
 		"""
@@ -255,50 +255,50 @@ def main(run=True):
 		print(e)
 		config.transformShape = False
 
-	redRange = workConfig.get("quilt", "redRange").split(",")
+	redRange = workConfig.get("quilt-triangles", "redRange").split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
 
 	try:
 		# the mins and maxes for the size of the units
-		config.gapSize = int(workConfig.get("quilt", "gapSize"))
-		config.blockSizeMin = int(workConfig.get("quilt", "blockSizeMin"))
-		config.blockSizeMax = int(workConfig.get("quilt", "blockSizeMax"))
+		config.gapSize = int(workConfig.get("quilt-triangles", "gapSize"))
+		config.blockSizeMin = int(workConfig.get("quilt-triangles", "blockSizeMin"))
+		config.blockSizeMax = int(workConfig.get("quilt-triangles", "blockSizeMax"))
 		config.blockSize = round(random.uniform(config.blockSizeMin, config.blockSizeMax))
 	except Exception as e:
 		print(str(e))
-		config.blockSize = int(workConfig.get("quilt", "blockSize"))
+		config.blockSize = int(workConfig.get("quilt-triangles", "blockSize"))
 
 
 	try:
-		config.blockRowsMin = int(workConfig.get("quilt", "blockRowsMin"))
-		config.blockRowsMax = int(workConfig.get("quilt", "blockRowsMax"))
-		config.blockColsMin = int(workConfig.get("quilt", "blockColsMin"))
-		config.blockColsMax = int(workConfig.get("quilt", "blockColsMax"))
+		config.blockRowsMin = int(workConfig.get("quilt-triangles", "blockRowsMin"))
+		config.blockRowsMax = int(workConfig.get("quilt-triangles", "blockRowsMax"))
+		config.blockColsMin = int(workConfig.get("quilt-triangles", "blockColsMin"))
+		config.blockColsMax = int(workConfig.get("quilt-triangles", "blockColsMax"))
 		config.blockCols = config.blockColsMax
 		config.blockRows = config.blockRowsMax
 	except Exception as e:
 		print(str(e))
-		config.blockCols = int(workConfig.get("quilt", "blockCols"))
-		config.blockRows = int(workConfig.get("quilt", "blockRows"))
+		config.blockCols = int(workConfig.get("quilt-triangles", "blockCols"))
+		config.blockRows = int(workConfig.get("quilt-triangles", "blockRows"))
 	# can adjust the quilt image offset
-	config.cntrOffsetX = int(workConfig.get("quilt", "cntrOffsetX"))
-	config.cntrOffsetY = int(workConfig.get("quilt", "cntrOffsetY"))
+	config.cntrOffsetX = int(workConfig.get("quilt-triangles", "cntrOffsetX"))
+	config.cntrOffsetY = int(workConfig.get("quilt-triangles", "cntrOffsetY"))
 
 	# frame rate
-	config.delay = float(workConfig.get("quilt", "delay"))
+	config.delay = float(workConfig.get("quilt-triangles", "delay"))
 
 	# the probabilty that any triangle will pop to another color
-	config.colorPopProb = float(workConfig.get("quilt", "colorPopProb"))
+	config.colorPopProb = float(workConfig.get("quilt-triangles", "colorPopProb"))
 
-	config.brightnessFactorDark = float(workConfig.get("quilt", "brightnessFactorDark"))
+	config.brightnessFactorDark = float(workConfig.get("quilt-triangles", "brightnessFactorDark"))
 	config.brightnessFactorLight = float(
-		workConfig.get("quilt", "brightnessFactorLight")
+		workConfig.get("quilt-triangles", "brightnessFactorLight")
 	)
-	config.lines = workConfig.getboolean("quilt", "lines")
-	config.patternPrecision = workConfig.getboolean("quilt", "patternPrecision")
+	config.lines = workConfig.getboolean("quilt-triangles", "lines")
+	config.patternPrecision = workConfig.getboolean("quilt-triangles", "patternPrecision")
 
-	config.activeSet = workConfig.get("quilt", "activeSet")
+	config.activeSet = workConfig.get("quilt-triangles", "activeSet")
 
 	config.c1HueRange = tuple(
 		[float(i) for i in workConfig.get(config.activeSet, "c1HueRange").split(",")]
@@ -365,13 +365,13 @@ def main(run=True):
 		createstarpieces.createPieces(config)
 
 	try:
-		config.usePresets = workConfig.getboolean("quilt", "usePresets")
+		config.usePresets = workConfig.getboolean("quilt-triangles", "usePresets")
 	except Exception as e:
 		print(e)
 		config.usePresets = True
 
 	try:
-		config.rotationRange = float(workConfig.get("quilt", "rotationRange"))
+		config.rotationRange = float(workConfig.get("quilt-triangles", "rotationRange"))
 	except Exception as e:
 		config.rotationRange = 0
 		print(e)

@@ -198,7 +198,8 @@ def renderCompositions():
     drawtemp = ImageDraw.Draw(temp)
     
     for i in range(0, len(config.drawingUnit.units)) :
-        drawtemp.rectangle(config.drawingUnit.units[i], fill=config.drawingUnit.unitFills[i])
+        # drawtemp.rectangle(config.drawingUnit.units[i], fill=config.drawingUnit.unitFills[i])
+        drawtemp.polygon(config.drawingUnit.units[i], fill=config.drawingUnit.unitFills[i])
         
     config.imageLayer.paste(temp, temp)
         
@@ -288,7 +289,21 @@ def drawCompositions():
             x2=x1+5
         # drawtemp.rectangle((x1, y1, x2, y2), fill=fills[n])
         
-        config.drawingUnit.units.append((x1, y1, x2, y2))
+        # config.drawingUnit.units.append((x1, y1, x2, y2))
+        # converted to drawing polygons to add more quandrange variations
+        
+        poly = []
+        xVar  = round(random.uniform(-10,20))
+        yVar  = round(random.uniform(-10,20))
+        poly.append((x1, y1))
+        poly.append((x2 + xVar, y1 + yVar))
+        poly.append((x2 + 0, y2 + yVar))
+        poly.append((x1, y2))
+
+        config.drawingUnit.units.append(poly)
+
+        
+        
         config.drawingUnit.unitFills.append(fills)
   
 

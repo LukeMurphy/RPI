@@ -228,21 +228,21 @@ def main(run=True):
 	config.outlineColorObj.randomRange = (5.0, 30.0)
 	config.outlineColorObj.colorTransitionSetup()
 
-	config.transitionStepsMin = float(workConfig.get("quilt", "transitionStepsMin"))
-	config.transitionStepsMax = float(workConfig.get("quilt", "transitionStepsMax"))
+	config.transitionStepsMin = float(workConfig.get("quilt-informal", "transitionStepsMin"))
+	config.transitionStepsMax = float(workConfig.get("quilt-informal", "transitionStepsMax"))
 
-	config.transformShape = workConfig.getboolean("quilt", "transformShape")
-	transformTuples = workConfig.get("quilt", "transformTuples").split(",")
+	config.transformShape = workConfig.getboolean("quilt-informal", "transformShape")
+	transformTuples = workConfig.get("quilt-informal", "transformTuples").split(",")
 	config.transformTuples = tuple([float(i) for i in transformTuples])
 
-	redRange = workConfig.get("quilt", "redRange").split(",")
+	redRange = workConfig.get("quilt-informal", "redRange").split(",")
 	config.redRange = tuple([int(i) for i in redRange])
 
 	try:
-		saturationRangeFactorLeft = workConfig.get("quilt", "saturationRangeFactorLeft").split(",")
+		saturationRangeFactorLeft = workConfig.get("quilt-informal", "saturationRangeFactorLeft").split(",")
 		config.saturationRangeFactorLeft = tuple([float(i) for i in saturationRangeFactorLeft])
 
-		saturationRangeFactorRight = workConfig.get("quilt", "saturationRangeFactorRight").split(",")
+		saturationRangeFactorRight = workConfig.get("quilt-informal", "saturationRangeFactorRight").split(",")
 		config.saturationRangeFactorRight = tuple([float(i) for i in saturationRangeFactorRight])
 	
 	except Exception as e:
@@ -250,35 +250,35 @@ def main(run=True):
 		config.saturationRangeFactorLeft = (1,1)
 		config.saturationRangeFactorRight = (1,1)
 
-	backgroundColor = workConfig.get("quilt", "backgroundColor").split(",")
+	backgroundColor = workConfig.get("quilt-informal", "backgroundColor").split(",")
 	config.backgroundColor = tuple([int(i) for i in backgroundColor])
 
-	config.numUnits = int(workConfig.get("quilt", "numUnits"))
-	config.hGapSize = int(workConfig.get("quilt", "hGapSize"))
-	config.vGapSize = int(workConfig.get("quilt", "vGapSize"))
-	config.blockSize = int(workConfig.get("quilt", "blockSize"))
-	config.blockLength = float(workConfig.get("quilt", "blockLength"))
-	config.blockHeight = float(workConfig.get("quilt", "blockHeight"))
-	config.blockRows = int(workConfig.get("quilt", "blockRows"))
-	config.blockCols = int(workConfig.get("quilt", "blockCols"))
-	config.cntrOffsetX = int(workConfig.get("quilt", "cntrOffsetX"))
-	config.cntrOffsetY = int(workConfig.get("quilt", "cntrOffsetY"))
-	config.delay = float(workConfig.get("quilt", "delay"))
-	config.colorPopProb = float(workConfig.get("quilt", "colorPopProb"))
-	config.brightnessFactorDark = float(workConfig.get("quilt", "brightnessFactorDark"))
+	config.numUnits = int(workConfig.get("quilt-informal", "numUnits"))
+	config.hGapSize = int(workConfig.get("quilt-informal", "hGapSize"))
+	config.vGapSize = int(workConfig.get("quilt-informal", "vGapSize"))
+	config.blockSize = int(workConfig.get("quilt-informal", "blockSize"))
+	config.blockLength = float(workConfig.get("quilt-informal", "blockLength"))
+	config.blockHeight = float(workConfig.get("quilt-informal", "blockHeight"))
+	config.blockRows = int(workConfig.get("quilt-informal", "blockRows"))
+	config.blockCols = int(workConfig.get("quilt-informal", "blockCols"))
+	config.cntrOffsetX = int(workConfig.get("quilt-informal", "cntrOffsetX"))
+	config.cntrOffsetY = int(workConfig.get("quilt-informal", "cntrOffsetY"))
+	config.delay = float(workConfig.get("quilt-informal", "delay"))
+	config.colorPopProb = float(workConfig.get("quilt-informal", "colorPopProb"))
+	config.brightnessFactorDark = float(workConfig.get("quilt-informal", "brightnessFactorDark"))
 	config.brightnessFactorLight = float(
-		workConfig.get("quilt", "brightnessFactorLight")
+		workConfig.get("quilt-informal", "brightnessFactorLight")
 	)
-	config.lines = workConfig.getboolean("quilt", "lines")
-	config.patternPrecision = workConfig.getboolean("quilt", "patternPrecision")
+	config.lines = workConfig.getboolean("quilt-informal", "lines")
+	config.patternPrecision = workConfig.getboolean("quilt-informal", "patternPrecision")
 
-	config.polyDistortion = float(workConfig.get("quilt", "polyDistortion"))
+	config.polyDistortion = float(workConfig.get("quilt-informal", "polyDistortion"))
 	config.polyDistortionMin = -config.polyDistortion
 	config.polyDistortionMax = config.polyDistortion
 
 	# stacking the decks a bit in favor of vertical lightening strike and regular
 	try:
-		config.opticalPatterns = workConfig.get("quilt","opticalPatterns").split(",")
+		config.opticalPatterns = workConfig.get("quilt-informal","opticalPatterns").split(",")
 	except Exception as e:
 		print(str(e))
 		config.opticalPatterns = ["Regular" , "Regular", "LighteningStrikeH", "LighteningStrikeH", "Diagonals", "LighteningStrikeH"]
@@ -294,7 +294,7 @@ def main(run=True):
 	config.canvasImage = Image.new(
 		"RGBA", (config.canvasImageWidth, config.canvasImageHeight)
 	)
-	config.timeToComplete = int(workConfig.get("quilt", "timeToComplete"))
+	config.timeToComplete = int(workConfig.get("quilt-informal", "timeToComplete"))
 	# config.timeToComplete = 60 #round(random.uniform(30,220))
 
 	### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS

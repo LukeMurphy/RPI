@@ -38,13 +38,13 @@ bads = badpixels
 # config.canvasImage is the final layer or image to be rendered
 # everything else gets pasted on to this image layer
 # the filtering happens to this canvasImage as well
-
+#----------------------------------------------------##----------------------------------------------------#
 
 class Holder:
     def __init__(self, config):
         self.config = config
 
-
+#----------------------------------------------------##----------------------------------------------------#
 class Director:
     """docstring for Director"""
 
@@ -66,7 +66,7 @@ class Director:
 
         self.checkTime()
 
-
+#----------------------------------------------------##----------------------------------------------------#
 class spriteAnimation():
 
     frameWidth = 128
@@ -115,7 +115,7 @@ class spriteAnimation():
         self.config = config
         self.imageFrame = Image.new("RGBA", (self.frameWidth, self.frameHeight))
 
-
+    #----------------------------------------------------##----------------------------------------------------#
     def prepSlices(self):
         frame = 0
         self.frameArray = []
@@ -147,7 +147,7 @@ class spriteAnimation():
         print("Number of Frames:" + str(len(self.frameArray)))
         print("------------\n")
         # exit()
-
+    #----------------------------------------------------##----------------------------------------------------#
     def getNextFrame(self):
         # img = self.frameArray[self.currentFrame]
         if self.pause == False :
@@ -174,18 +174,18 @@ class spriteAnimation():
                     if self.currentFrame >= self.endFrame :
                         self.currentFrame = self.startFrame
 
-    
+    #----------------------------------------------------##----------------------------------------------------#
     def nextFrameImg(self) :
         return self.frameArray[self.currentFrame]
     
-
+#----------------------------------------------------##----------------------------------------------------#
 def loadImage(spriteSheet):
     image = Image.open(spriteSheet, "r")
     image.load()
     imgHeight = image.getbbox()[3]
     return image
 
-
+#----------------------------------------------------##----------------------------------------------------#
 def main(run=True):
     global config, workConfig, blocks, simulBlocks, bads
     # gc.enable()
@@ -439,7 +439,14 @@ def main(run=True):
         config.useLastOverlayProb = 0
         config.clearLastOverlayProb = 0
         
-    
+    try:
+        config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
+        config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
+    except Exception as e:
+        print(str(e))
+        config.animationFrameXOffset = 0
+        config.animationFrameYOffset = 0
+    # end try
   
     try:
         config.clearLastOverlayProb = float(workConfig.get("base-parameters", "clearLastOverlayProb"))
@@ -472,7 +479,7 @@ def main(run=True):
     if run:
         runWork()
 
-
+#----------------------------------------------------##----------------------------------------------------#
 def glitchBox():
 
     global config
@@ -508,6 +515,8 @@ def glitchBox():
         print(dx + sectionWidth, dy + sectionHeight)
     # end try
 
+
+#----------------------------------------------------##----------------------------------------------------#
 def animationBackGroundFadeIn() :
     currentAnimation = config.animations[config.currentAnimationIndex]
     if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max :
@@ -515,8 +524,7 @@ def animationBackGroundFadeIn() :
     
 
 
-
-
+#----------------------------------------------------##----------------------------------------------------#
 def reConfigAnimationCell(anim, aConfig):
     global config
 
@@ -562,7 +570,7 @@ def reConfigAnimationCell(anim, aConfig):
 
     anim.animationRotationRate = random.uniform(-aConfig.animationRotationRateRange, aConfig.animationRotationRateRange)
 
-
+#----------------------------------------------------##----------------------------------------------------#
 def filterRemapCall(ovrd=False) :
         config.filterRemap = True
         # new version  more control but may require previous pieces to be re-worked
@@ -581,7 +589,7 @@ def filterRemapCall(ovrd=False) :
         config.remapImageBlockDestination = [startX, startY]
         # print("swapping" + str(config.remapImageBlockSection))
 
-
+#----------------------------------------------------##----------------------------------------------------#
 def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running spritesheet3.py")
@@ -595,7 +603,7 @@ def runWork():
         if config.standAlone == False:
             config.callBack()
             
-
+#----------------------------------------------------##----------------------------------------------------#
 def iterate(n=0):
     global config, blocks
     global xPos, yPos
@@ -609,7 +617,7 @@ def iterate(n=0):
     # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
     #         bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
 
-    config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
+    config.canvasImage.paste(currentAnimation.animationImage, (config.animationFrameXOffset,config.animationFrameYOffset), currentAnimation.animationImage)
     animationBackGroundFadeIn()
 
     if config.allPause == True:
@@ -791,11 +799,11 @@ def iterate(n=0):
             config.currentAnimationIndex += 1
             if config.currentAnimationIndex >= len(config.animations):
                 config.currentAnimationIndex = 0
-            # print("Next Animation : " + str(config.currentAnimationIndex))
+            print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
         else :
             choice = math.floor(random.uniform(0,len(config.animations)))
             config.currentAnimationIndex = choice
-            # print("New Animation choice: " + str(choice))
+            print("Next Animation : " + str(config.animations[choice].name))
         
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
         
@@ -811,8 +819,8 @@ def iterate(n=0):
         yPos2 = round(random.uniform(yPos,config.canvasHeight))
         tempTestDraw.rectangle( (xPos,yPos,xPos2,yPos2), fill= (0,255,0,155))
         
-        currentAnimation.anim.imageFrame.paste(tempTest,(0,0), tempTest)
-        config.canvasImage.paste(tempTest,(0,0), tempTest)
+        # currentAnimation.anim.imageFrame.paste(tempTest,(0,0), tempTest)
+        # config.canvasImage.paste(tempTest,(0,0), tempTest)
         
         currentAnimation.bg_alpha = 10
         config.allPause = False
@@ -824,7 +832,7 @@ def iterate(n=0):
 
 
         
-
+#----------------------------------------------------##----------------------------------------------------#
 def callBack():
     global config
     print("CALLBACK")

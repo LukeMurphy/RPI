@@ -98,7 +98,7 @@ def timeChecker(sequenceConfig, config) :
                     print(pVals)
                     print("")
                     if  'sequence_player.py' not in pVals[1]:
-                        if str(sequenceConfig.currentPID) != p :
+                        if str(sequenceConfig.currentPID) not in p :
                             print (str(sequenceConfig.currentPID) + " : Should be killing " + p)
                             subprocess.run(["kill " + p], shell=True, check=True)
             except Exception as e:

@@ -79,7 +79,7 @@ def timeChecker(sequenceConfig, config) :
         # 	sequenceConfig.playCount = 0
 
         # wait for the player to load before cleaning up
-        time.sleep(1)
+        time.sleep(3)
 
         # Now check all the running python scripts and kill the one before the one that was just launched
         # assumes only these two are running 

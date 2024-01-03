@@ -89,18 +89,15 @@ def timeChecker(sequenceConfig, config) :
             print(bcolors.WARNING + "==========> count play : " + str(sequenceConfig.playCount))
             print("Running python instances are :")
             print(listOfProcs)
-            
-            print(len(listOfProcs))
             print(len(str(sequenceConfig.currentPID)))
-            print(len(listOfProcs))
 
             try:
                 for p in listOfProcs[:-2] :
                     
                     pVals  = p.split(" ")
-                    print(p[0])
+                    print(pVals[0])
                     print("")
-                    if  'sequence_player.py' not in p[1]:
+                    if  'sequence_player.py' not in pVals[1]:
                         print (str(sequenceConfig.currentPID) + " : Should be killing " + p)
                         subprocess.run(["kill " + p], shell=True, check=True)
             except Exception as e:

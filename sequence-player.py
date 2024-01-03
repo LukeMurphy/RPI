@@ -91,7 +91,7 @@ def timeChecker(sequenceConfig, config) :
             print(listOfProcs)
 
             try:
-                for p in listOfProcs[:-2] :
+                for p in listOfProcs[:-1] :
                     print(p)
                     if p != str(sequenceConfig.currentPID) and p != "" and len(listOfProcs) > 2:
                         print (str(sequenceConfig.currentPID) + " : Should be killing " + p)

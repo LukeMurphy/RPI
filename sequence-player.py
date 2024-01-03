@@ -96,9 +96,11 @@ def timeChecker(sequenceConfig, config) :
 
             try:
                 for p in listOfProcs[:-2] :
-                    print(p)
+                    
+                    pVals  = p.split(" ")
+                    print(p[0])
                     print("")
-                    if p != str(sequenceConfig.currentPID) or p != "" or len(listOfProcs) > 2 or 'sequence_player.py' not in p:
+                    if  'sequence_player.py' not in p[1]:
                         print (str(sequenceConfig.currentPID) + " : Should be killing " + p)
                         subprocess.run(["kill " + p], shell=True, check=True)
             except Exception as e:

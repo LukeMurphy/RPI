@@ -84,7 +84,7 @@ def timeChecker(sequenceConfig, config) :
         # Now check all the running python scripts and kill the one before the one that was just launched
         # assumes only these two are running 
         try:
-            listOfProcs = check_output("ps -ef | pgrep -f player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
+            listOfProcs = check_output("ps -ef | pgrep -f 'player.py'", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
             print(bcolors.WARNING + "==========> count play : " + str(sequenceConfig.playCount))
             print("Running python instances are :")

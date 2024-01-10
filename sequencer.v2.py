@@ -97,7 +97,6 @@ def timeChecker(sequenceConfig, config) :
             print("----")
             
             if len(listToCheck) == 2  :
-            
                 # just kill the first in the list (i.e. the oldest player running)
                 # but this does not cover if there are more than two running ....
                 subprocess.run(["kill " + listToCheck[0]], shell=True, check=True)

@@ -713,7 +713,7 @@ def iterate(n=0):
     # tested drawing it over the final image layer canvasImage instead - not sure
     # if it really changes anything though
     
-    if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:
+    if random.random() < config.useLastOverlayProb and config.useLastOverlay == True and config.allPause == False:
             # config.useLastOverlay = False if config.useLastOverlay == True  else True
             # print("lastOVerlay")
             xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))

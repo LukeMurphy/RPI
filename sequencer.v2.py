@@ -87,21 +87,30 @@ def timeChecker(sequenceConfig, config) :
             listOfProcs = check_output("ps -ef | pgrep -f -a player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
             print(bcolors.WARNING + "==========> count play : " + str(sequenceConfig.playCount))
-            print("Running python instances are :")
+            print("Running player instances are :")
             print(listOfProcs)
             print(len(str(sequenceConfig.currentPID)))
-            
+            print("----")
             listToCheck = listOfProcs[:-2]
-
-            try:
-                for p in listToCheck :
-                    print("")
-                    if str(sequenceConfig.currentPID) not in p  and len(listToCheck) > 2:
-                        print (str(sequenceConfig.currentPID) + " : Should be killing " + p)
-                        subprocess.run(["kill " + p], shell=True, check=True)
-            except Exception as e:
-                print(str(e))
-            print(bcolors.ENDC)
+            print(listToCheck)
+            print(len(listToCheck))
+            print("----")
+            
+            if len(listToCheck) == 2  :
+            
+                # just kill the first in the list (i.e. the oldest player running)
+                # but this does not cover if there are more than two running ....
+                subprocess.run(["kill " + listToCheck[0]], shell=True, check=True)
+            elif len(listToCheck) > 2 :
+                try:
+                    for p in listToCheck[:-1] :
+                        if str(sequenceConfig.currentPID) not in p:
+                            print("")
+                            print (str(sequenceConfig.currentPID) + " : Should be killing " + p)
+                            subprocess.run(["kill " + p], shell=True, check=True)
+                except Exception as e:
+                    print(str(e))
+                print(bcolors.ENDC)
             # comment: 
         except Exception as e:
             print(str(e))

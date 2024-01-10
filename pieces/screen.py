@@ -36,6 +36,8 @@ class Director:
 
         self.checkTime()
 
+#----------------------------------------------------##----------------------------------------------------#
+
 class Crack:
 
     origin = [64, 32]
@@ -302,6 +304,14 @@ def showGrid():
     config.render(config.image, 0, 0)
 
 
+def drawBlackOut() :
+    if random.random() < .001 :
+        config.blackOutRectAlpha = round(random.uniform(240,255)) 
+    config.draw.rectangle(config.blackOutRect, fill=(0,0,0,config.blackOutRectAlpha))
+    config.render(config.image, 0, 0)
+    config.inBlackOut = True
+    
+
 def main(run=True):
     global config, directionOrder
     global workConfig
@@ -456,6 +466,22 @@ def main(run=True):
         print(str(e))
         config.pixelSortProbOn = 0
         config.pixelSortProbOff = 0
+        
+        
+        
+    config.blackOutRectAlpha = round(random.uniform(255,255))
+    config.inBlackOut  = False
+    try:
+        config.blackOutProb = float(workConfig.get("screenproject", "blackOutProb"))
+        config.blackOutProbOff = float(workConfig.get("screenproject", "blackOutProbOff"))
+        config.blackOutRectWidth = int(workConfig.get("screenproject", "blackOutBlock").split(",")[0])
+        config.blackOutRectHeight = int(workConfig.get("screenproject", "blackOutBlock").split(",")[1])
+        config.blackOutRect = (0,0,config.blackOutRectWidth,config.blackOutRectHeight)
+    except Exception as e:
+        print(str(e))
+        config.blackOutProb = .0
+        config.blackOutProbOff = .0
+
 
     config.crackArray = []
     for i in range(0, config.numCracks):
@@ -550,6 +576,20 @@ def iterate():
 
     if random.random() < config.pixelSortProbOff:
         config.usePixelSort = False
+        
+    if random.random() < config.blackOutProb and config.inBlackOut == False :
+        config.inBlackOut  = True
+        print("BlackOut")
+        
+    if random.random() < config.blackOutProbOff and config.inBlackOut == True :
+        config.inBlackOut  = False
+        print("BlackOut OFF")
+        
+    if config.inBlackOut  == True :
+        # config.pausing = True
+        drawBlackOut()
+        
+        
 
 
 def callBack():

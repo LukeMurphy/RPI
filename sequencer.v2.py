@@ -5,6 +5,7 @@ import configparser
 import getopt
 import os
 import sys
+import platform
 import time
 import math
 import random
@@ -68,8 +69,17 @@ def timeChecker(sequenceConfig, config) :
         sequenceConfig.currentPieceDuration = round(random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))
         
         # Launch the next player
-        commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
-        print("Command:  " + commandString)
+        # should be able to infer this without explicit specifications in the config
+        # commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
+        scriptsPath = os.getcwd() + "/"
+        commandString = "python3 " + scriptsPath + "player.py"  + " -cfg " + sequenceConfig.workList[pieceToPlay][0] + "&"
+        
+        print(bcolors.WARNING)
+        print("--------------------------------")
+        print("Sequencer is calling :\n" + commandString)
+        print("--------------------------------")
+        print(bcolors.ENDC)
+        
         os.system(commandString)
 
         sequenceConfig.playCount=sequenceConfig.playCount+1
@@ -86,14 +96,16 @@ def timeChecker(sequenceConfig, config) :
         try:
             listOfProcs = check_output("ps -ef | pgrep -f -a player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
 
-            print(bcolors.WARNING + "==========> count play : " + str(sequenceConfig.playCount))
-            print("Running player instances are :")
+            print(bcolors.WARNING)
+            print("--------------------------------")
+            print("Sequencer is killing off old window(s)")
+            print("count play : " + str(sequenceConfig.playCount))
+            print("Running player instances are : " + str(len(str(sequenceConfig.currentPID))))
             print(listOfProcs)
-            print(len(str(sequenceConfig.currentPID)))
             print("----")
             listToCheck = listOfProcs[:-2]
             print(listToCheck)
-            print(len(listToCheck))
+            # print(len(listToCheck))
             print("----")
             
             if len(listToCheck) == 2  :
@@ -104,15 +116,18 @@ def timeChecker(sequenceConfig, config) :
                 try:
                     for p in listToCheck[:-1] :
                         if str(sequenceConfig.currentPID) not in p:
-                            print("")
+                            len(str(sequenceConfig.currentPID))
                             print (str(sequenceConfig.currentPID) + " : Should be killing " + p)
+                            len(str(sequenceConfig.currentPID))
                             subprocess.run(["kill " + p], shell=True, check=True)
                 except Exception as e:
                     print(str(e))
-                print(bcolors.ENDC)
             # comment: 
+            print("--------------------------------")
+            print(bcolors.ENDC)
         except Exception as e:
             print(str(e))
+        
         # end try
 
 
@@ -140,15 +155,20 @@ def loadWorkConfig(work, sequenceConfig):
 
     argument = config.path + "/configs/" + sequenceConfig.workListDirectory + work[0]
 
-    print(bcolors.WARNING + "** ")
-    print("Sequencer: " + work[0] + ":" + argument)
+    print(bcolors.WARNING)
+    print("--------------------------------")
+    print("Sequencer: first work cfg " + work[0])
+    print("Sequencer: loading " + argument)
+    print("--------------------------------")
     print(bcolors.ENDC)
     workconfig.read(argument)
     config.fileName = argument
 
 
     sequenceConfig.currentPID = os.getpid()
+    print("--------------------------------")
     print("Sequence Player PID is: " + str(sequenceConfig.currentPID))
+    print("--------------------------------")
 
     fakeCallBack(sequenceConfig, config)
 
@@ -188,7 +208,12 @@ def loadSequenceFile():
 
         workconfig = configparser.ConfigParser()
 
-        print(bcolors.OKBLUE + "** " + str(args) + ""  + bcolors.ENDC)
+        print(bcolors.OKBLUE)
+        print("--------------------------------")
+        print("Inital Sequencer Arguments: \n" + str(args))
+        print("--------------------------------")
+        print(bcolors.ENDC) 
+        
         sequenceConfig = configuration.Config()
         sequenceConfig.startTime = time.time()
         sequenceConfig.currentTime = time.time()
@@ -196,48 +221,25 @@ def loadSequenceFile():
         sequenceConfig.path = args.path
 
         argument = sequenceConfig.path + "/configs/" + args.cfg  # + ".cfg"
-        print(bcolors.OKBLUE + "** " + argument + ""  + bcolors.ENDC)
+        
+        print(bcolors.OKBLUE)
+        print("--------------------------------")
+        print("-cfg sequencer argument: \n" + str(args))
+        print("--------------------------------")
+        print(bcolors.ENDC)
+
         workconfig.read(argument)
 
         sequenceConfig.fileName = argument
         sequenceConfig.fileNameRaw = args.cfg
 
-        # sequenceConfig.imageXOffset = int(workconfig.get("displayconfig", "imageXOffset"))
-        # sequenceConfig.imageYOffset = int(workconfig.get("displayconfig", "imageYOffset"))
-
-        # sequenceConfig.canvasOffsetX = int(workconfig.get("displayconfig", "canvasOffsetX"))
-        # sequenceConfig.canvasOffsetY = int(workconfig.get("displayconfig", "canvasOffsetY"))
-
-        # sequenceConfig.screenHeight = int(workconfig.get("displayconfig", "screenHeight"))
-        # sequenceConfig.screenWidth = int(workconfig.get("displayconfig", "screenWidth"))
-
-        # sequenceConfig.windowXOffset = int(workconfig.get("displayconfig", "windowXOffset"))
-        # sequenceConfig.windowYOffset = int(workconfig.get("displayconfig", "windowYOffset"))
-
-
         sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
-        sequenceConfig.commadStringPyth = (workconfig.get("displayconfig", "commadStringPyth"))
         sequenceConfig.playOrder = 0 
-
-        # try:
-        # 	sequenceConfig.forceBGSwap  = (workconfig.getboolean("displayconfig", "forceBGSwap"))
-        # except Exception as e:
-        # 	print(str(e))
-        # 	sequenceConfig.forceBGSwap  = False
 
         sequenceConfig.workListDirectory = workconfig.get("displayconfig", "workListDirectory")
         sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
         sequenceConfig.currentPieceDuration = 1
         sequenceConfig.playCount = 0
-
-        # try:
-        # 	sequenceConfig.restartScript = workconfig.get("displayconfig", "restartScript")
-        # 	sequenceConfig.repeatCountTrigger = int(workconfig.get("displayconfig", "repeatCountTrigger"))
-        # except Exception as e:
-        # 	print(str(e))
-        # 	sequenceConfig.restartScript = '/cntrlscripts/restart_full_sequencer.sh'
-        # 	sequenceConfig.repeatCountTrigger = 100
-
 
         sequenceConfig.workList = []
 
@@ -255,7 +257,7 @@ def loadSequenceFile():
             sequenceConfig.workList.append([work,minDuration,maxDuration,brightnessOverride])
 
         print("--------------------------------")
-        print("--------------------- WorkList")
+        print("WorkList:")
         print(sequenceConfig.workList)
         print("--------------------------------")
 
@@ -267,7 +269,6 @@ def loadSequenceFile():
         pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
         pieceToPlay = 0
         loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
-
 
         #sequenceConfig.mainAppWindow.run()
 

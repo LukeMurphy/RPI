@@ -9,7 +9,8 @@ import configparser
 import getopt
 import os
 import time
-# import sys
+import sys
+import platform
 
 from configs import defaultpiece
 from modules import configuration, player
@@ -61,7 +62,11 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-print(bcolors.OKBLUE + "** " + str(args) + ""  + bcolors.ENDC)
+print(bcolors.OKBLUE)
+print("--------------------------------")
+print("Inital Player Arguments: \n" + str(args))
+print("--------------------------------")
+print(bcolors.ENDC)
 
 
 
@@ -121,14 +126,17 @@ def loadFromArguments(reloading=False, config=None):
                 config.path = args[2]
                 argument = args[3]
                 """
-
                 config.initialArgs = args.cfg
-
                 config.MID = args.mname
                 config.path = args.path
+                
+                # Automating the config path a bit better
+                # assumes that if no -path is specified, it defaults to ./ so 
+                # just to be sure get the abs path
+                if config.path == './' :
+                    config.path = os.getcwd() + "/"
 
                 argument = config.path + "/configs/" + args.cfg  # + ".cfg"
-
                 workconfig.read(argument)
 
                 config.loadFromArguments = loadFromArguments
@@ -146,15 +154,18 @@ def loadFromArguments(reloading=False, config=None):
                 f = os.path.getmtime(argument)
                 config.delta = int((config.startTime - f))
                 config.deltaWorkFile = int((config.startTime - f))
-                print(
-                    bcolors.OKGREEN
-                    + "** "
-                    + str(argument)
-                    + " --> LAST MODIFIED DELTA: "
-                    + str(config.delta)
-                    + " **"
-                    + bcolors.ENDC
-                )
+                print(bcolors.OKGREEN)
+                
+                print("-----------------------------------------")
+                print ("script: sys.argv[0] is", repr(sys.argv[0]))
+                print ("script: __file__ is", repr(__file__))
+                print ("script: cwd is", repr(os.getcwd()))
+                print ("config: path  is", repr(args.path))
+                print ("config: path  is", args.path)
+                print ("-cfg argument: is", str(argument))
+                print ("Last Modified Delta: is", str(config.delta))
+                print("-----------------------------------------" + bcolors.ENDC)
+                
             else:
                 # Machine ID
                 config.MID = "local"

@@ -153,7 +153,7 @@ def loadWorkConfig(work, sequenceConfig):
     config.MID = ""
     config.path = sequenceConfig.path
 
-    argument = config.path + "/configs/" + sequenceConfig.workListDirectory + work[0]
+    argument = config.path + "/configs/" + work[0]
 
     print(bcolors.WARNING)
     print("--------------------------------")
@@ -252,7 +252,6 @@ def loadSequenceFile():
         sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
         sequenceConfig.playOrder = 0 
 
-        sequenceConfig.workListDirectory = workconfig.get("displayconfig", "workListDirectory")
         sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
         sequenceConfig.currentPieceDuration = 1
         sequenceConfig.playCount = 0

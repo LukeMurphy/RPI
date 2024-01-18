@@ -71,7 +71,7 @@ def timeChecker(sequenceConfig, config) :
         # Launch the next player
         # should be able to infer this without explicit specifications in the config
         # commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
-        scriptsPath = os.getcwd() + "/"
+        scriptsPath = __file__.replace('sequencer.v2.py','')+ "/"
         commandString = "python3 " + scriptsPath + "player.py"  + " -cfg " + sequenceConfig.workList[pieceToPlay][0] + "&"
         
         print(bcolors.WARNING)
@@ -172,6 +172,8 @@ def loadWorkConfig(work, sequenceConfig):
 
     fakeCallBack(sequenceConfig, config)
 
+
+
 def fakeCallBack(sequenceConfig, config) :
     while 1==1 :
         # checks the time every second - could configure this if really
@@ -219,12 +221,26 @@ def loadSequenceFile():
         sequenceConfig.currentTime = time.time()
         sequenceConfig.MID = args.mname
         sequenceConfig.path = args.path
+        
+        
+        print("-----------------------------------------")
+        print ("script: sys.argv[0] is", repr(sys.argv[0]))
+        print ("script: __file__ is", repr(__file__))
+        print ("script: cwd is", repr(os.getcwd()))
+        print ("config: path  is", repr(args.path))
+        
+        # Automating the config path a bit better
+        # assumes that if no -path is specified, it defaults to ./ so 
+        # just to be sure get the abs path
+        if sequenceConfig.path == './' :
+            sequenceConfig.path = __file__.replace('sequencer.v2.py','')+ "/"
+            
 
-        argument = sequenceConfig.path + "/configs/" + args.cfg  # + ".cfg"
+        argument = sequenceConfig.path + "configs/" + args.cfg  # + ".cfg"
         
         print(bcolors.OKBLUE)
         print("--------------------------------")
-        print("-cfg sequencer argument: \n" + str(args))
+        print("-cfg sequencer argument: \n" + str(argument))
         print("--------------------------------")
         print(bcolors.ENDC)
 

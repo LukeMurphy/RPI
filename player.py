@@ -134,7 +134,9 @@ def loadFromArguments(reloading=False, config=None):
                 # assumes that if no -path is specified, it defaults to ./ so 
                 # just to be sure get the abs path
                 if config.path == './' :
-                    config.path = os.getcwd() + "/"
+                    # config.path = os.getcwd() + "/"
+                    config.path = __file__.replace('player.py','')+ "/"
+                    
 
                 argument = config.path + "/configs/" + args.cfg  # + ".cfg"
                 workconfig.read(argument)

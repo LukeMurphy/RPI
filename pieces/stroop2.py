@@ -164,7 +164,7 @@ class Block:
 
         dims = [pixLen[0], pixLen[1]]
         if dims[1] < self.verticalTileSize:
-            dims[1] = self.verticalTileSize + 2
+            dims[1] = self.verticalTileSize + 0
 
         vPadding = round(0.75 * config.tileSize[1])
         self.presentationImage = PIL.Image.new("RGBA", (dims[0] + vPadding, dims[1]))

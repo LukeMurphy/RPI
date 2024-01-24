@@ -66,8 +66,8 @@ class ParticleDot:
         angle = p.angle * n
 
         if direction == -1:
-            xPos = round(random.uniform(0, config.canvasWidth))
-            yPos = round(random.uniform(0, config.canvasHeight))
+            xPos = round(random.uniform(0, config.imageCanvasWidth))
+            yPos = round(random.uniform(0, config.imageCanvasHeight))
             angle = math.atan2(yPos - p.y, xPos - p.x)
             vx = math.cos(angle) * fx * direction
             vy = math.sin(angle) * fy * direction
@@ -186,9 +186,6 @@ class ParticleSystem:
 
         self.brightness = self.config.brightness
         self.sparkleBrightness = self.config.brightness
-        
-        # this was overriding the config and I can't remember why
-        # so I'm setting it back
         # self.brightness = 0.9
         # self.sparkleBrightness = 0.8
 
@@ -209,8 +206,8 @@ class ParticleSystem:
         dy = config.canvasHeight - self.y
         self.maxRadius = (
             math.sqrt(
-                config.canvasWidth * config.canvasWidth
-                + config.canvasHeight * config.canvasHeight
+                config.imageCanvasWidth * config.imageCanvasWidth
+                + config.imageCanvasHeight * config.imageCanvasHeight
             )
             * config.PSRadiusFactor1
         )
@@ -250,11 +247,24 @@ class ParticleSystem:
 
                 # horizontal Continuity
                 if config.horizontalContinuity == True :
-                    if ref.xPos  > config.canvasWidth :
+                    if ref.xPos  > config.imageCanvasWidth :
                         ref.xPos = 0
                         
                     if ref.xPos  < 0 :
-                        ref.xPos  = config.canvasWidth   
+                        ref.xPos  = config.imageCanvasWidth   
+                # vertical Continuity
+                if config.verticalContinuity == True :
+                    if ref.xPos  > config.imageCanvasWidth :
+                        ref.xPos = 0
+                        
+                    if ref.xPos  < 0 :
+                        ref.xPos  = config.imageCanvasWidth   
+                        
+                    if ref.yPos  > config.imageCanvasHeight :
+                        ref.yPos = 0
+                        
+                    if ref.yPos  < 0 :
+                        ref.yPos  = config.imageCanvasHeight   
             else:
                 ref.xPos = self.x + ref.radius/1 * math.cos(ref.angle) * 0.2
                 ref.yPos = self.y + ref.radius/1 * math.sin(ref.angle) * 0.2
@@ -305,16 +315,29 @@ class ParticleSystem:
             # horizontal Continuity
             if config.horizontalContinuity == True :
                 if xDisplayPos  > config.canvasWidth :
-                    xDisplayPos = ref.xPos - config.canvasWidth
+                    xDisplayPos = ref.xPos - config.imageCanvasWidth
                     
                 if xDisplayPos  < 0 :
-                    xDisplayPos  = config.canvasWidth  - ref.xPos
+                    xDisplayPos  = config.imageCanvasWidth  - ref.xPos
+            # vertical Continuity
+            if config.verticalContinuity == True :
+                if xDisplayPos  > config.imageCanvasWidth :
+                    xDisplayPos = ref.xPos - config.imageCanvasWidth
+                    
+                if xDisplayPos  < 0 :
+                    xDisplayPos  = config.imageCanvasWidth  - ref.xPos
+                    
+                if yDisplayPos  > config.imageCanvasHeight :
+                    yDisplayPos = ref.yPos - config.imageCanvasHeight
+                    
+                if yDisplayPos  < 0 :
+                    yDisplayPos  = config.imageCanvasHeight  - ref.yPos
 
             if (
-                xDisplayPos <= self.config.canvasWidth
+                xDisplayPos <= self.config.imageCanvasWidth
                 and xDisplayPos >= 0
                 and yDisplayPos >= 0
-                and yDisplayPos <= config.canvasHeight
+                and yDisplayPos <= config.imageCanvasHeight
             ):
                 try:
 
@@ -350,7 +373,7 @@ class ParticleSystem:
 			"""
             if (
 
-                yDisplayPos > config.canvasHeight
+                yDisplayPos > config.imageCanvasHeight
                 or yDisplayPos < 0
 
             ):
@@ -490,7 +513,7 @@ def iterate():
     # Fade out the sparkle
 
     config.draw.rectangle(
-        (0, 0, config.canvasWidth, config.canvasHeight),
+        (0, 0, config.imageCanvasWidth, config.imageCanvasHeight),
         fill=(
             config.bgColor[0],
             config.bgColor[1],
@@ -499,7 +522,7 @@ def iterate():
         ),
     )
     config.drawOverFlow.rectangle(
-        (0, 0, config.canvasWidth, config.canvasHeight),
+        (0, 0, config.imageCanvasWidth, config.imageCanvasHeight),
         fill=(
             config.bgColor[0],
             config.bgColor[1],
@@ -507,16 +530,36 @@ def iterate():
             round(config.fadeRate),
         ),
     )
+    
+    config.drawOverFlow.rectangle((0,0,100,200), fill=(200,0,0))
 
     if config.horizontalContinuity == True :
         # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
         
-        xCrop  = round(config.canvasWidth)
-        xCrop2 = round(config.canvasWidth - config.canvasWidth/ config.horizontalOverlapFraction)
-        temp = config.imageOverFlow.crop((xCrop,0,xCrop + config.canvasWidth / config.horizontalOverlapFraction, config.canvasHeight))
-        temp2 = config.image.crop((xCrop2,0,config.canvasWidth, config.canvasHeight))
-        temp3 = ImageChops.add(config.image, temp, scale=1.0, offset = 0)
+        xCrop  = round(config.imageCanvasWidth)
+        xCrop2 = round(config.imageCanvasWidth - config.imageCanvasWidth/ config.horizontalOverlapFraction)
+        temp = config.imageOverFlow.crop((xCrop,0,xCrop + config.imageCanvasWidth / config.horizontalOverlapFraction, config.canvasHeight))
+        temp2 = config.drawingImage.crop((xCrop2,0,config.imageCanvasWidth, config.imageCanvasHeight))
+        temp3 = ImageChops.add(config.drawingImage, temp, scale=1.0, offset = 0)
         config.image.paste(temp3, (0,0), temp2)
+        
+        
+    if config.verticalContinuity == True :
+        # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
+        
+        yCrop  = round(config.imageCanvasHeight)
+        yCrop2 = round(config.imageCanvasHeight - config.imageCanvasHeight/ config.verticalOverlapFraction)
+        # print(yCrop2)
+        
+        
+        # temp = config.imageOverFlow.crop((0,yCrop,config.canvasWidth, yCrop + config.canvasHeight / config.verticalOverlapFraction))
+        # temp2 = config.image.crop((0,yCrop2,config.canvasWidth, config.canvasHeight))
+
+        temp = config.imageOverFlow.crop((0,yCrop,config.imageCanvasWidth,yCrop + config.imageCanvasHeight / config.verticalOverlapFraction))
+        temp2 = config.drawingImage.crop((0,yCrop2,config.imageCanvasWidth,config.imageCanvasHeight))
+        
+        temp3 = ImageChops.add(temp,config.drawingImage, scale=1.0, offset = 0)
+        config.drawingImage.paste(temp3, (0,0), temp2)
         
     drawBands(PS)
 
@@ -542,8 +585,7 @@ def iterate():
                 PS.setNewAttributes()
                 PS.setUp()
 
-    
-         
+    config.image.paste(config.drawingImage, (0,0),config.drawingImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
     # Done
@@ -610,6 +652,17 @@ def main(run=True):
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
     
+    
+    # set the actual drawing space
+    try:
+        config.imageCanvasWidth = int(workConfig.get("particles","imageCanvasWidth"))
+        config.imageCanvasHeight = int(workConfig.get("particles","imageCanvasHeight"))
+        
+    except Exception as e:
+        print(str(e))
+        config.imageCanvasWidth = config.canvasWidth
+        config.imageCanvasHeight = config.canvasHeight
+    
     try:
         # comment: # for some towers the seam between the 
         # start and end needs to become semi-continuous
@@ -623,6 +676,20 @@ def main(run=True):
         print(str(e))
         config.horizontalContinuity = False
         config.horizontalOverlapFraction = 1
+
+    try:
+        # comment: # for some towers the seam between the 
+        # start and end needs to become semi-continuous
+        # so I make the particles appear to move around the piece
+        # and overlap one side with some of the drawing
+        # if every thing was drawn pixel by pixel this would
+        # probably not need to be so complicated
+        config.verticalContinuity = workConfig.getboolean("particles","verticalContinuity")
+        config.verticalOverlapFraction = int(workConfig.get("particles","verticalOverlapFraction"))
+    except Exception as e:
+        print(str(e))
+        config.verticalContinuity = False
+        config.verticalOverlapFraction = 1
     # end try
 
 
@@ -668,8 +735,10 @@ def main(run=True):
 
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.draw = ImageDraw.Draw(config.image)
-    config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight))
+    config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
+    config.draw = ImageDraw.Draw(config.drawingImage)
+    
+    config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight * 2))
     config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
     
     

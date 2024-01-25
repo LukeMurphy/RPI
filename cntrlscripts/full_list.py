@@ -221,7 +221,9 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
     for i, item in enumerate(actionDict1):
         # print(list(item.keys())[0])
         ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
-        ListBoxOfConfigs.itemconfig(END, bg = "yellow" if list(item.keys())[0].find("prod/") > 0 else "white" )
+        ListBoxOfConfigs.itemconfig(END, bg = "#e7ffc4" if list(item.keys())[0].find("prod/") > 0 else "white" )
+        ListBoxOfConfigs.itemconfig(END, bg = "#b3e6f9" if list(item.keys())[0].find("dev/") > 0 else None )
+        ListBoxOfConfigs.itemconfig(END, bg = "#ef67ff" if list(item.keys())[0].find("screen_grid") > 0 else None )
 
 
 # -------------------------------- #
@@ -255,7 +257,7 @@ for i, item in enumerate(actionDict1):
     ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
     ListBoxOfConfigs.itemconfig(END, {"bg" : 'red'} )
 
-ListBoxOfConfigs.place(bordermode=OUTSIDE, x=2, y=10)
+ListBoxOfConfigs.place(bordermode=OUTSIDE, x=2, y=14)
 
 # -------------------------------- #
 scrollbar = Scrollbar(root)
@@ -347,7 +349,7 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
 # Filter text box
-T = Text(root, height = 1, width = 32, bg="white", fg="black", bd=False, padx=2, pady =2)
+T = Text(root, height = 1, width = 32, bg="white", fg="black", bd=False, padx=4, pady =4)
 T.place(bordermode=OUTSIDE, x=2, y=2)
 clearButton = Button(
     root, text="Clear", width=120, bg="green", fg="white", borderless=True, command=clear

@@ -773,6 +773,7 @@ def drawBackGround():
 
     if config.bgXpos > config.canvasWidth:
         config.bgXpos = -config.canvasWidth
+        makeBackGround(leadBGDraw)
 
     if config.bgYpos > 1 * config.canvasHeight and config.bgYStepSpeed > 0:
         config.workImage.paste(config.leadBG, (config.bgXpos, -1 * config.canvasHeight))

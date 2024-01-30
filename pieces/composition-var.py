@@ -497,6 +497,11 @@ def init():
     config.patternColsOffset = int(workConfig.get("compositions", "patternColsOffset"))
     config.bgYStepSpeed = int(workConfig.get("compositions", "bgYStepSpeed"))
     config.bgXStepSpeed = int(workConfig.get("compositions", "bgXStepSpeed"))
+    
+    config.yDivHeightAddition = int(workConfig.get("compositions", "yDivHeightAddition"))
+    config.xDivWidthAddition = int(workConfig.get("compositions", "xDivWidthAddition"))
+    
+
 
     config.pixSortXOffsetVal = config.pixSortXOffset
     config.colorTransitionRangeMin = float(workConfig.get("compositions", "colorTransitionRangeMin"))
@@ -567,6 +572,9 @@ def init():
 
         colorSetGroup = colorSets[n]        
         c = ColorSet()
+        
+        
+        c.name = colorSetGroup
         
         colorValsInsets = list(map(lambda x: x, workConfig.get(colorSetGroup, "insets").split(",")))
         colorValsBG = list(map(lambda x: x, workConfig.get(colorSetGroup, "bg").split(",")))
@@ -648,6 +656,7 @@ def init():
 def rebuildColorPalette():
     config.colorSetInUse  = math.floor(random.uniform(0,len(config.colorSets)))
     c = config.colorSets[config.colorSetInUse]
+    print("Changing color to ", c.name)
     config.colOverlayA.minHue = c.bg_minHue
     config.colOverlayA.maxHue = c.bg_maxHue
     config.colOverlayA.minSaturation = c.bg_minSaturation
@@ -701,8 +710,8 @@ def makeBackGround(drawRef, n=1):
     rows = config.patternRows * 2
     cols = config.patternCols * 2
 
-    xDiv = config.canvasWidth / cols  # - config.patternColsOffset
-    yDiv = config.canvasHeight / rows  # - config.patternRowsOffset
+    xDiv = config.canvasWidth / cols + config.xDivWidthAddition # - config.patternColsOffset
+    yDiv = config.canvasHeight / rows + config.yDivHeightAddition # - config.patternRowsOffset
 
     xStart = 0
     yStart = 0
@@ -712,9 +721,13 @@ def makeBackGround(drawRef, n=1):
     drawRef.rectangle(
         (0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgBackGroundColor
     )
+    
 
     ## Chevron pattern
     for r in range(0, rows):
+        # this is to get a little random overlap, less regular
+        nDisplace = round(random.uniform(-2,2))
+        zDisplace = round(random.uniform(-2,2))
         for c in range(0, cols):
             poly = []
             poly.append((xStart, yStart + yDiv))
@@ -722,6 +735,20 @@ def makeBackGround(drawRef, n=1):
             poly.append((xStart + xDiv + xDiv, yStart + yDiv))
             poly.append((xStart + xDiv, yStart + yDiv + yDiv))
             # if(n ==2) : color = (100,200,0,255)
+            
+            if c % 2 > 0 :
+                poly = []
+                poly.append((xStart + zDisplace, yStart  + nDisplace * c))
+                poly.append((xStart + zDisplace + xDiv , yStart  + nDisplace * c + yDiv + yDiv))
+                poly.append((xStart + zDisplace + xDiv  + 1 , yStart  + nDisplace * c + yDiv + yDiv))
+                poly.append((xStart + zDisplace + 1, yStart  + nDisplace * c))
+            else :
+                poly = []
+                poly.append((xStart + zDisplace  + xDiv, yStart  + nDisplace * c))
+                poly.append((xStart + zDisplace   , yStart  + nDisplace * c + yDiv + yDiv))
+                poly.append((xStart + zDisplace    + 1 , yStart  + nDisplace * c + yDiv + yDiv))
+                poly.append((xStart + zDisplace + xDiv + 1, yStart  + nDisplace * c))
+            
             if random.random() < config.patternDrawProb:
                 drawRef.polygon(
                     poly, fill=config.bgForeGroundColor

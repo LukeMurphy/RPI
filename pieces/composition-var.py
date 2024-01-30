@@ -706,6 +706,8 @@ def makeBackGround(drawRef, n=1):
 
     xStart = 0
     yStart = 0
+    
+    # config.bgBackGroundColor = (0,255,0,255)
 
     drawRef.rectangle(
         (0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgBackGroundColor

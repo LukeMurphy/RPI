@@ -456,6 +456,25 @@ def render(
     except Exception as e:
         print(e)
 
+    if config.overallResize == True :
+        # Testing a pseudo version of LED matrix display
+        # Sharpening kernel
+        kernel = [-1, -1, -1,
+            -1,  9, -1,
+            -1, -1, -1]
+        kernel_filter = ImageFilter.Kernel((3, 3), kernel, scale=1, offset=0)
+
+        iTemp = config.renderImageFull.copy()
+        factor = 3
+        (width, height) = (iTemp.width * factor, iTemp.height * factor)
+        iTemp = iTemp.resize((width, height))
+        # Sharpen the image
+        # iTemp = iTemp.filter(kernel_filter)
+        iTemp = iTemp.filter(ImageFilter.SHARPEN)
+        iTemp = iTemp.filter(ImageFilter.SHARPEN)
+        config.renderImageFull.paste(iTemp, (0,0))
+
+
     if config.outputMode == 'gif':
         config.frameCount += 1
         if config.frameCount >= config.frameCountLimit:
@@ -479,6 +498,11 @@ def render(
             currentTime = time.time()
             baseName = config.outPutPath + str(currentTime)
             writeImage(baseName, renderImage=config.renderImageFull)
+
+
+    
+
+
 
     if updateCanvasCall:
         updateCanvas()

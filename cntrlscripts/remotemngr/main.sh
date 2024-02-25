@@ -43,6 +43,7 @@ then
         if [[ $remotevalue == *'update' ]]
         then
             echo "==> RUN UPDATE <=="
+            ps -ef | pgrep -f player.py | xargs kill -9;
             git -C $path pull
         fi
         if [ $remotevalue != 'update' ]

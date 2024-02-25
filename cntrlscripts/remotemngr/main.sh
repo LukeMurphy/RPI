@@ -43,7 +43,7 @@ then
         if [[ $remotevalue == *'update' ]]
         then
             echo "==> RUN UPDATE <=="
-            # git -C ~/Dev/LEDELI/RPI/ pull
+            git -C $path pull
         fi
         if [ $remotevalue != 'update' ]
         then

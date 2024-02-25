@@ -8,8 +8,6 @@ remotevalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/2013
 remotevalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $brightnessFile)
 # status=$?
 
-
-
 # echo "\n*************"
 # echo $1
 # echo $2
@@ -35,26 +33,33 @@ then
     then
     runScript=1
     if [[ $configToUse == *"--manifest"* ]]
-    then player="sequence-player.py" 
+    then player="sequencer.v2.py" 
     fi
     execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
     fi
 
     if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]
     then
-
-        echo "==> NOT THE SAME or STARTING UP"
-        echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
-        echo $remotevalueControl > $path"cntrlscripts/remotemngr/localvaluecontrol.cfg"
-        configToUse=$remotevalue
-        brightnessConfig=$remotevalueControl
-        ps -ef | pgrep -f player.py | xargs kill -9;
-        if [[ $configToUse == *"--manifest"* ]]
-        then player="sequence-player.py" 
+        if [[ $remotevalue == *'update' ]]
+        then
+            echo "==> RUN UPDATE <=="
+            # git -C ~/Dev/LEDELI/RPI/ pull
         fi
-        execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
-        # config=$remotevalue
-        runScript=1
+        if [ $remotevalue != 'update' ]
+        then
+            echo "==> NOT THE SAME or STARTING UP"
+            echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
+            echo $remotevalueControl > $path"cntrlscripts/remotemngr/localvaluecontrol.cfg"
+            configToUse=$remotevalue
+            brightnessConfig=$remotevalueControl
+            ps -ef | pgrep -f player.py | xargs kill -9;
+            if [[ $configToUse == *"--manifest"* ]]
+            then player="sequence-player.py" 
+            fi
+            execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+            # config=$remotevalue
+            runScript=1
+        fi
     fi
     if [ $runScript -eq 1 ]
     then

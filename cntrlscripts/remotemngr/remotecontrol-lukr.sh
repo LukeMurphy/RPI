@@ -9,5 +9,5 @@ brightnessFile="http://www.lukelab.com/projects/rpi-controls/lukr-controlstatus.
 ## Set crontab -e to */1 * * * * /Documents/RPI/cntrlscripts/remotemngr/remotecontrol.sh
 DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
-#. "$DIR/main.sh"
-. "/home/lukr/Documents/RPI/cntrlscripts/remotemngr/main.sh"
+. "$DIR/main.sh"
+#. "/home/lukr/Documents/RPI/cntrlscripts/remotemngr/main.sh"

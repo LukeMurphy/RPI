@@ -751,6 +751,7 @@ def startSolving():
         b = config.wallColor_w[2]
 
         config.L  = solveForL(r,g,b) * config.pathValueAugment
+        time.sleep(config.reDoDelay)
         setSolvePathColors()
         # for c in config.cells :
         #     c.wallColor = tuple(int(i) for i in config.backgroundColor)
@@ -781,7 +782,14 @@ def reDraw(config):
                 # n north
                 if cell.n == 1:
                     for l in range(-config.pWalls, config.pWalls):
-                        config.draw.rectangle((xPos, yPos + l + correction, xPos + config.cellSize, yPos + w + l - correction), fill=cell.wallColor)
+                        xPos2 = xPos + config.cellSize
+                        yPos2 = yPos + w + l - correction
+                        
+                        if xPos2 < xPos : xPos2 = xPos
+                        if yPos2 < (yPos + l + correction) : yPos2 = yPos + l + correction
+                        
+                        
+                        config.draw.rectangle((xPos, yPos + l + correction, xPos2, yPos2), fill=cell.wallColor)
                         #config.draw.rectangle((xPos, yPos, xPos + config.cellSize, yPos + w), fill=wallColor)
 
                 # s south

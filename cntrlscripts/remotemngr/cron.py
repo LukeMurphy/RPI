@@ -12,7 +12,7 @@ import time
 # if the machine is under remote control
 
 initPath = './remotecontrol-remote-to-lukelab.sh'
-timeToCheck = 30
+timeToCheck = 15
 
 def runScript(arg='startup') :
     global initPath, timeToCheck

@@ -45,8 +45,8 @@ then
             echo "==> RUN UPDATE <=="
             ps -ef | pgrep -f player.py | xargs kill -9;
             git -C $path pull
-            # I won't immediately run the piece in case the git update takes a while
-            # just let the cron.py call the piece again
+            echo "x" > $path"cntrlscripts/remotemngr/localvalue.cfg"
+            echo "50" > $path"cntrlscripts/remotemngr/localvaluecontrol.cfg"
         fi
         if [ $remotevalue != 'update' ]
         then

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
-localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
-localvalueControl=$(cat $path"cntrlscripts/remotemngr/localvaluecontrol.cfg")
+localvalue=$(cat $localConfigNameFile)
+localvalueControl=$(cat $localControlConfigFileName)
 
 # set the remote to be a default
 remotevalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $pieceFileName)

@@ -11,20 +11,22 @@ import time
 # This is probably the file to set as the machine's startup desktop 
 # if the machine is under remote control
 
-initPath = './remotecontrol-remote-to-lukelab.sh startup'
+initPath = './remotecontrol-remote-to-lukelab.sh'
 timeToCheck = 30
 
-def runScript() :
+def runScript(arg='startup') :
     global initPath, timeToCheck
-    initPath = './remotecontrol-remote-to-lukelab.sh cron'
     try:
         # comment: 
-        os.system(initPath)
+        execCmd = initPath + " " + arg
+        print(execCmd)
+        os.system(execCmd)
     except Exception as e:
+        print("There was an issue:")
         print(str(e))
     # end try
     time.sleep(timeToCheck)
-    runScript()
+    runScript("cron")
     
     
-runScript()
+runScript('startup')

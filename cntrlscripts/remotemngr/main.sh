@@ -41,7 +41,7 @@ then
 
     if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]
     then
-        if [ $remotevalue = *'update' ]
+        if [ $remotevalue = 'update' ]
         then
             echo "==> RUN UPDATE <=="
             ps -ef | pgrep -f player.py | xargs kill -9;

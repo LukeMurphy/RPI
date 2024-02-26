@@ -11,7 +11,7 @@ import time
 # This is probably the file to set as the machine's startup desktop 
 # if the machine is under remote control
 
-initPath = './remotecontrol-remote-to-lukelab.sh'
+initPath = '/home/daemon90/Documents/remotemngr/remotecontrol-remote-to-lukelab.sh'
 timeToCheck = 15
 
 def runScript(arg='startup') :

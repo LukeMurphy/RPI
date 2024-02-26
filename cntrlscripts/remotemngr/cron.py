@@ -12,6 +12,7 @@ import time
 # if the machine is under remote control
 
 initPath = '/home/daemon90/Documents/remotemngr/remotecontrol-remote-to-lukelab.sh'
+initPath = '/Users/lamshell/Documents/Dev/LEDELI/RPI/cntrlscripts/remotemngr/remotecontrol-remote-to-lukelab.sh'
 timeToCheck = 15
 
 def runScript(arg='startup') :

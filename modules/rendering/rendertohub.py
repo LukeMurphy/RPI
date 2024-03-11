@@ -102,7 +102,7 @@ def setUp(config):
         root,
         width=config.screenWidth + buff,
         height=config.screenHeight + buff,
-        border=0,
+        border=0,cursor="none"
     )
     config.cnvs = cnvs
     config.cnvs.create_rectangle(

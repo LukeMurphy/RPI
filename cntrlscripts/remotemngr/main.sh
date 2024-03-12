@@ -8,6 +8,11 @@ remotevalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/2013
 remotevalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $brightnessFile)
 # status=$?
 
+
+# MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK
+# sudo visudo
+# user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown
+
 echo "\n*************"
 echo $1
 #echo $2
@@ -41,6 +46,14 @@ then
 
     if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]
     then
+        if [ $remotevalue = 'Shutdown' ]
+        then
+            echo "==>shutting down <=="
+            ps -ef | pgrep -f player.py | xargs kill -9;
+            echo "x" > $controlPath"localvalue.cfg"
+            echo "50" > $controlPath"localvaluecontrol.cfg"
+            echo admin000 | sudo -S shutdown -h now
+        fi
         if [ $remotevalue = 'update' ]
         then
             echo "==> RUN UPDATE <=="

@@ -5,7 +5,8 @@ import random
 import time
 import types
 
-
+import noise
+from noise import *
 from modules.configuration import bcolors
 from modules.movieClip import movieClip
 from modules import badpixels, coloroverlay, colorutils, panelDrawing, pattern_blocks
@@ -14,7 +15,40 @@ import numpy as np
 
 # This version substitutes the overlay disturbance with a slide-repeating of a section
 
+# Adding the wave deformation to get a slightly more organic 
+# pattern distortion - might be too much, too expected but 
+# is dreamy  4-3-2024
+
 ###############################################
+
+class WaveDeformer:
+    def transform(self, x, y):
+        y = y + config.waveAmplitude * math.sin(
+            (x + config.waveDeformXPos) / config.wavePeriodMod
+        ) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
+        return x, y
+
+    def transform_rectangle(self, x0, y0, x1, y1):
+        return (
+            *self.transform(x0, y0),
+            *self.transform(x0, y1),
+            *self.transform(x1, y1),
+            *self.transform(x1, y0),
+        )
+
+    def getmesh(self, img):
+        self.w, self.h = img.size
+
+        target_grid = []
+        for x in range(0, self.w, config.wavegridspace):
+            for y in range(0, self.h, config.wavegridspace):
+                target_grid.append(
+                    (x, y, x + config.wavegridspace, y + config.wavegridspace)
+                )
+
+        source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
+
+        return [t for t in zip(target_grid, source_grid)]
 
 
 class Fader:
@@ -102,18 +136,18 @@ class Director:
 
 
 def transformImage(img):
-	width, height = img.size
-	m = -0.0
-	xshift = abs(m) * 420
-	new_width = width + int(round(xshift))
+    width, height = img.size
+    m = -0.0
+    xshift = abs(m) * 420
+    new_width = width + int(round(xshift))
 
-	# img = img.transform(
-	# 	(new_width, height), Image.AFFINE, (1, -0.1, 0.0, -0.5, 1, 1), Image.BICUBIC
-	# )
-	img = img.transform(
-		(new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
-	)
-	return img
+    # img = img.transform(
+    # 	(new_width, height), Image.AFFINE, (1, -0.1, 0.0, -0.5, 1, 1), Image.BICUBIC
+    # )
+    img = img.transform(
+        (new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
+    )
+    return img
 
 
 def writeImage(baseName, renderImage):
@@ -510,9 +544,9 @@ def disturber():
                     section = config.canvasImage.crop(
                         (xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
                     '''
-					section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
-					sectionParams.sectionRotation += sectionParams.rotationSpeed
-					'''
+                    section = section.rotate(sectionParams.sectionRotation, Image.NEAREST, True)
+                    sectionParams.sectionRotation += sectionParams.rotationSpeed
+                    '''
 
                     config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
                         sectionParams.sectionPlacement[1])), section)
@@ -532,11 +566,11 @@ def disturber():
                     sectionParams.sectionSpeed[1] *= config.speedDeAcceleration
 
                     '''
-					if sectionParams.sectionSpeed[0] != 0:
-						sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
-					if sectionParams.sectionSpeed[1] != 0:
-						sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
-					'''
+                    if sectionParams.sectionSpeed[0] != 0:
+                        sectionParams.sectionSpeed[0] = delta/sectionParams.sectionSpeed[0] 
+                    if sectionParams.sectionSpeed[1] != 0:
+                        sectionParams.sectionSpeed[1] = delta/sectionParams.sectionSpeed[1] 
+                    '''
 
                     # add some better easing
 
@@ -558,14 +592,14 @@ def disturber():
             config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
     '''
-	tempCrop = config.patternImage.crop((0,0,256,32))
+    tempCrop = config.patternImage.crop((0,0,256,32))
 
-	tempCrop = config.patternImage.crop((0,160,256,184))
-	config.canvasImage.paste(tempCrop, (0,160), tempCrop)	
+    tempCrop = config.patternImage.crop((0,160,256,184))
+    config.canvasImage.paste(tempCrop, (0,160), tempCrop)	
 
-	tempCrop = config.patternImage.crop((50,54,256,176))
-	config.canvasImage.paste(tempCrop, (50,54), tempCrop)	
-	'''
+    tempCrop = config.patternImage.crop((50,54,256,176))
+    config.canvasImage.paste(tempCrop, (50,54), tempCrop)	
+    '''
 
 
 def runWork():
@@ -720,6 +754,12 @@ def iterate():
         temp1 = ImageEnhance.Contrast(temp1).enhance(1.20)
         # temp1 = temp1.transform()
     
+    if config.useWaveDistortion == True:
+        temp1 = ImageOps.deform(temp1, WaveDeformer())
+        config.waveDeformXPos += config.waveDeformXPosRate
+        if config.waveDeformXPos > config.screenWidth :
+            config.waveDeformXPos = 0
+    
     config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
     # Done
 
@@ -798,6 +838,20 @@ def main(run=True):
         print(str(e))
         config.transformShape = False
     # end try
+    
+    
+    try:
+        config.useWaveDistortion = workConfig.getboolean("movingpattern", "useWaveDistortion")
+        config.waveAmplitude = float(workConfig.get("movingpattern", "waveAmplitude"))
+        config.wavePeriodMod = float(workConfig.get("movingpattern", "wavePeriodMod"))
+        config.wavegridspace = int(workConfig.get("movingpattern", "wavegridspace"))
+        config.pNoiseMod = float(workConfig.get("movingpattern", "pNoiseMod"))
+        config.waveDeformXPosRate = float(workConfig.get("movingpattern", "waveDeformXPosRate"))
+        config.waveDeformXPos = 0
+    except Exception as e:
+        print(str(e))
+        config.useWaveDistortion = False
+  
     
     config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
     config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
@@ -975,17 +1029,17 @@ def main(run=True):
     panelDrawing.mockupBlock(config, workConfig)
 
     ''' 
-		########### Need to add something like this at final render call  as well
-			
-		########### RENDERING AS A MOCKUP OR AS REAL ###########
-		if config.useDrawingPoints == True :
-			config.panelDrawing.canvasToUse = config.renderImageFull
-			config.panelDrawing.render()
-		else :
-			#config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-			#config.render(config.image, 0, 0)
-			config.render(config.renderImageFull, 0, 0)
-	'''
+        ########### Need to add something like this at final render call  as well
+            
+        ########### RENDERING AS A MOCKUP OR AS REAL ###########
+        if config.useDrawingPoints == True :
+            config.panelDrawing.canvasToUse = config.renderImageFull
+            config.panelDrawing.render()
+        else :
+            #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+            #config.render(config.image, 0, 0)
+            config.render(config.renderImageFull, 0, 0)
+    '''
 
     if run:
         runWork()

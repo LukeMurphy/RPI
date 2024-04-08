@@ -141,6 +141,7 @@ class ParticleSystem:
         
         self.bandColors = [
         [50,10,50],
+        [120,90,90],
         [100,50,50],
         [100,120,20],
         [222,208,182],
@@ -463,11 +464,7 @@ def drawBands(p):
         if y1 < 0 or y1 < y0 :
             y1 = y0
 
-        a = (
-            round(config.fadeRate + aBase)
-            if config.fadeRate > aBase
-            else config.fadeRate
-        )
+        a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else config.fadeRate)
 
         #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
         
@@ -483,6 +480,9 @@ def drawBands(p):
         if i == 1:
             config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
         '''
+        
+        if i == 0 :
+            a = 20
         try :
             # Golden Rings
             if i in config.goldenRingsArray:

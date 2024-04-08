@@ -582,7 +582,7 @@ def makeBarColors() :
     
     for col in range(0, totalColumns):
         # barColor = colorutils.randomColorAlpha(config.brightness, 20,20)
-        barColor = colorutils.getRandomColorHSL(60,350,1.0,1.0,.250,.5,160,320,150,config.brightness)
+        barColor = colorutils.getRandomColorHSL(340,360,1.0,1.0,.250,.4,0,0,100,config.brightness)
         # barColor = colorutils.getRandomColorHSL(0,360,.5,1.0,.5,.5,0,0,80,config.brightness)
         config.barColors.append(barColor)
         colCount += 1
@@ -608,8 +608,8 @@ def makeBarColors() :
                 dyad.P2.endPoint = True
             config.dyads.append(dyad)
             
-    print (totalColumns)
-    print (len(config.dyads))
+    # print (totalColumns)
+    # print (len(config.dyads))
         
 
 def springs():
@@ -640,7 +640,7 @@ def springs():
         
     if random.random() < .005 : 
         makeBarColors()
-    elif random.random() < .01 : 
+    elif random.random() < .001 : 
         u = math.floor(random.uniform(0, numUnits))
         config.dyads[u].k = random.random()/2
         config.dyads[u].P1.fixed = False

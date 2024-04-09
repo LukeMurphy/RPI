@@ -7,6 +7,7 @@ import types
 import noise
 from noise import *
 from modules.configuration import bcolors
+from modules.palette import Palette
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter 
 
@@ -582,8 +583,11 @@ def makeBarColors() :
     
     for col in range(0, totalColumns):
         # barColor = colorutils.randomColorAlpha(config.brightness, 20,20)
-        barColor = colorutils.getRandomColorHSL(340,360,1.0,1.0,.250,.4,0,0,100,config.brightness)
         # barColor = colorutils.getRandomColorHSL(0,360,.5,1.0,.5,.5,0,0,80,config.brightness)
+        # barColor = colorutils.getRandomColorHSL(340,360,1.0,1.0,.250,.4,0,0,100,config.brightness)
+        
+        barColor = config.palette.chooseFromPalette(100,config.brightness)
+        
         config.barColors.append(barColor)
         colCount += 1
         
@@ -1048,6 +1052,9 @@ def main(run=True):
             #config.render(config.image, 0, 0)
             config.render(config.renderImageFull, 0, 0)
     '''
+
+    paletteList = (workConfig.get("noisescroller", "paletteSets")).split(",")
+    config.palette = Palette(paletteList, workConfig)
 
     makeBarColors()
 

@@ -516,7 +516,6 @@ def wavey():
     config.scroll += config.scrollRate
 
 
-
 class PointUnit :
     def __init__(self):
         self.x = 0
@@ -578,7 +577,7 @@ def makeBarColors() :
     config.dyads = []
     config.pointUnits = []
     colCount = 0
-    totalColumns = round(config.canvasWidth / config.colInterval) + 1
+    totalColumns = round((config.canvasWidth) / config.colInterval) + 1
     
     
     for col in range(0, totalColumns):
@@ -586,13 +585,13 @@ def makeBarColors() :
         # barColor = colorutils.getRandomColorHSL(0,360,.5,1.0,.5,.5,0,0,80,config.brightness)
         # barColor = colorutils.getRandomColorHSL(340,360,1.0,1.0,.250,.4,0,0,100,config.brightness)
         
-        barColor = config.palette.chooseFromPalette(100,config.brightness)
+        barColor = config.palette.chooseFromPalette(config.springColorAlpha,config.brightness)
         
         config.barColors.append(barColor)
         colCount += 1
         
         p = PointUnit()
-        p.x = col * config.colInterval
+        p.x = col * config.colInterval + config.springXPosStart
         config.pointUnits.append(p)
         
         if col > 0 :
@@ -610,6 +609,7 @@ def makeBarColors() :
                 dyad.P1.endPoint = True
             if col == totalColumns - 1 :
                 dyad.P2.endPoint = True
+                dyad.P2.x = col * config.colInterval + config.springXPosStart - config.springXPosEnd
             config.dyads.append(dyad)
             
     # print (totalColumns)
@@ -625,8 +625,8 @@ def springs():
     
     numUnits  = len(config.dyads)
     
-    fixedYPos = 100
-    fixedYHeight = 24
+    fixedYPos = config.fixedYPos
+    fixedYHeight = config.fixedYHeight
     
     for u in range(0,numUnits) :
         # print(u)
@@ -642,9 +642,9 @@ def springs():
         config.draw.rectangle(( xPos1, yPos1, xPos2, yPos2), fill =  unitRef.color)
         # config.draw.line(( xPos1, 50, xPos2, 50), fill =  (255,0,0))
         
-    if random.random() < .005 : 
+    if random.random() < config.changeColorSpringsProb : 
         makeBarColors()
-    elif random.random() < .001 : 
+    elif random.random() < config.changeSpringsProb : 
         u = math.floor(random.uniform(0, numUnits))
         config.dyads[u].k = random.random()/2
         config.dyads[u].P1.fixed = False
@@ -825,6 +825,32 @@ def main(run=True):
         map(lambda x: round(float(x) * config.brightness), config.bgColorVals))
 
     config.scrollRate = float(workConfig.get("noisescroller", "scrollRate"))
+    
+    try:
+        # comment: 
+        config.fixedYPos = float(workConfig.get("noisescroller", "fixedYPos"))
+        config.fixedYHeight = float(workConfig.get("noisescroller", "fixedYHeight"))
+        config.changeColorSpringsProb = float(workConfig.get("noisescroller", "changeColorSpringsProb"))
+        config.changeSpringsProb = float(workConfig.get("noisescroller", "changeSpringsProb"))
+        config.springColorAlpha = int(workConfig.get("noisescroller", "springColorAlpha"))
+        config.springXPosStart = int(workConfig.get("noisescroller", "springXPosStart"))
+        config.springYPosStart = int(workConfig.get("noisescroller", "springYPosStart"))
+        config.springXPosEnd = int(workConfig.get("noisescroller", "springXPosEnd"))
+        config.springYPosEnd = int(workConfig.get("noisescroller", "springYPosEnd"))
+
+    except Exception as e:
+        print(str(e))
+        config.fixedYPos = 100
+        config.fixedYHeight = 24
+        config.changeColorSpringsProb = .001
+        config.changeSpringsProb = .005
+        config.springColorAlpha = 100
+        config.springXPosStart = 8
+        config.springYPosStart = 8
+        config.springXPosEnd = 8
+        config.springYPosEnd = 8
+        
+    # end try
 
     try:
         config.lineFactor = float(workConfig.get("noisescroller", "lineFactor"))

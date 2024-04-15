@@ -134,6 +134,7 @@ class ParticleSystem:
         self.orientation = 1
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
+        self.useFixedBandColors = True
 
 
     def setNewAttributes(self):
@@ -145,7 +146,7 @@ class ParticleSystem:
         [100,50,50],
         [100,120,20],
         [222,208,182],
-        [240,74,52],
+        [170,74,52],
         [187,189,168],
         [129,137,158],
         [204,228,232],
@@ -159,12 +160,27 @@ class ParticleSystem:
         [27,38,83],
         [27,38,83],
         [27,38,83],
+
         ]
+
+        # adjusting the apparent brightness of some bands as they
+        # read over-bright - can be modified anytime
+        for c in range(0, len(self.bandColors)) :
+            color = self.bandColors[c]
+            sumOfColors = color[0] + color[1] + color[2]
+            if sumOfColors > 330 and c < 13 :
+                for cx in range(0,3):
+                    color[cx] *= .7
+                    
         
         self.bands = round(random.uniform(12, 24))
         self.wBase = round(random.uniform(config.PSRadiusMin, config.PSRadiusMax))
         
-        self.useFixedBandColors = True
+        if self.useFixedBandColors == True:
+                self.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.75))
+        
+        
+        
         if self.useFixedBandColors == True :
             self.bands = len(self.bandColors)
             self.wDiff = round(random.uniform(10,20))
@@ -254,6 +270,10 @@ class ParticleSystem:
 
         if self.x > config.canvasWidth - round(self.wBase / 4):
             self.xSpeed = 0
+        if self.y > config.canvasHeight - round(self.wBase / 8):
+            self.ySpeed = 0
+        if self.y < 0 - round(self.wBase / 4):
+            self.ySpeed = 0
             
 
         for q in range(0, self.p):
@@ -425,7 +445,11 @@ class ParticleSystem:
 
 def drawBands(p):
 
+    if p.useFixedBandColors == True and random.random() < .005 :
+        p.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.75))
+        
     wBase = p.wBase
+    
     wDiff = round(wBase / p.bands)
     
     if p.useFixedBandColors == True :
@@ -464,16 +488,16 @@ def drawBands(p):
         if y1 < 0 or y1 < y0 :
             y1 = y0
 
-        a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else config.fadeRate)
+        a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate))
 
         #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
         
         if p.useFixedBandColors == True :
             index = p.bands - i - 1
             # index = i
-            rBase = p.bandColors[index][0] * config.brightness
-            gBase = p.bandColors[index][1] * config.brightness
-            bBase = p.bandColors[index][2] * config.brightness
+            rBase = round(p.bandColors[index][0] * config.brightness)
+            gBase = round(p.bandColors[index][1] * config.brightness)
+            bBase = round(p.bandColors[index][2] * config.brightness)
             aBase = 255
 
         '''
@@ -490,14 +514,14 @@ def drawBands(p):
                 config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
             else :
                 if p.useFixedBandColors == True and index == 4 :
-                    config.draw.ellipse((x0, y0, x1, y1), outline=(round(rBase), round(gBase), round(bBase), round(a)))
-                    config.draw.ellipse((x0-1, y0-1, x1-1, y1-1), outline=(round(rBase), round(gBase), round(bBase), round(a)))
-                    config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(round(rBase), round(gBase), round(bBase), round(a)))
+                    config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
+                    # config.draw.ellipse((x0-1, y0-1, x1-1, y1-1), outline=(rBase, gBase, bBase, a))
+                    config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
                 else :
-                    config.draw.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), round(bBase), round(a)))
-                    config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(round(rBase), round(gBase), round(bBase), round(a)))
+                    config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
+                    config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
         except Exception as e :
-            print(str(e))
+            print("==>" + str(e))
 
         if p.useFixedBandColors == False :
             rBase += rDiff
@@ -632,6 +656,7 @@ def iterate():
             config.bgColor = random.choice(config.bgColorSets)
             # print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
             if random.random() < config.totalResetProb:
+                PS.useFixedBandColors = True if random.random() > .5 else False
                 PS.setCenter()
                 PS.setNewAttributes()
                 PS.setUp()

@@ -143,10 +143,10 @@ class ParticleSystem:
         self.bandColors = [
         [50,10,50],
         [120,90,90],
-        [100,50,50],
-        [100,120,20],
+        [120,50,50],
+        [50,120,90],
         [222,208,182],
-        [170,74,52],
+        [120,74,52],
         [187,189,168],
         [129,137,158],
         [204,228,232],
@@ -155,6 +155,26 @@ class ParticleSystem:
         [151,165,194],
         [89,113,175],
         [53,73,136],
+        [27,38,83],
+        [27,38,83],
+        [27,38,83],
+        [27,38,83],
+        [27,38,83],
+        ]
+        self.bandColors = [
+        [50,10,50],
+        [120,50,50],
+        [50,120,90],
+        [222,208,182],
+        [120,74,52],
+        [129,137,158],
+        [204,228,232],
+        [253,240,195],
+        [199,166,151],
+        [151,165,194],
+        [89,113,175],
+        [53,73,136],
+        [27,38,83],
         [27,38,83],
         [27,38,83],
         [27,38,83],
@@ -170,7 +190,7 @@ class ParticleSystem:
             sumOfColors = color[0] + color[1] + color[2]
             if sumOfColors > 330 and c < 13 :
                 for cx in range(0,3):
-                    color[cx] *= .7
+                    color[cx] *= .8
                     
         
         self.bands = round(random.uniform(12, 24))
@@ -446,7 +466,7 @@ class ParticleSystem:
 def drawBands(p):
 
     if p.useFixedBandColors == True and random.random() < .005 :
-        p.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.75))
+        p.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.85))
         
     wBase = p.wBase
     

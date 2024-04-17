@@ -172,9 +172,9 @@ class FlameUnit :
         
     def make(self) :
         self.flickerCount = 0
-        self.xOffset = round(random.uniform(0,config.canvasWidth)) - self.flickerRange
-        self.yOffset = round(random.uniform(0,config.canvasHeight)) - self.flickerRange
-        self.zOffset = round(random.uniform(0,config.canvasHeight)) - self.flickerRange
+        self.xOffset = round(random.uniform(config.xPositionOffset,config.canvasWidth)) - self.flickerRange
+        self.yOffset = round(random.uniform(config.yPositionOffset,config.canvasHeight)) - self.flickerRange
+        self.zOffset = round(random.uniform(config.yPositionOffset,config.canvasHeight)) - self.flickerRange
         self.diameter = round(random.uniform(self.diameterMin, self.diameterMax))
         
         self.flameDeltaX *= random.uniform(.8,1.2)
@@ -186,8 +186,6 @@ class FlameUnit :
         self.xMultiplierSize *= random.uniform(.8,1.2)
         self.yMultiplierSize *= random.uniform(.8,1.2)
         
-        
-        
         pseudoDepth = 1.0 
         if config.usePerspective == True :
             # sizeRatio = self.diameter/self.diameterMax
@@ -197,14 +195,15 @@ class FlameUnit :
             self.diameter = self.diameterMax * pseudoDepth
         
         alpha = round(random.uniform(40,255) * pseudoDepth)
-
-        
-        self.clr1 = colorutils.getRandomColorHSL(340,40,.50,1.0,.5,.55,0,0,alpha,1.0)
-        self.clr2 = colorutils.getRandomColorHSL(25,40,1.0,1.0,.45,.55,0,0,alpha,1.0)
-        self.clr3 = colorutils.getRandomColorHSL(190,300,1.0,1.0,.5,.85,0,0,alpha,1.0)
-        
-        self.clr3 = colorutils.getRandomColorHSL(25,55,1.0,1.0,.75,.85,0,0,round(alpha/2),1.0)
-
+   
+        # self.clr1 = colorutils.getRandomColorHSL(340,40,.50,1.0,.5,.55,0,0,alpha,1.0)
+        # self.clr2 = colorutils.getRandomColorHSL(25,40,1.0,1.0,.45,.55,0,0,alpha,1.0)
+        # self.clr3 = colorutils.getRandomColorHSL(190,300,1.0,1.0,.5,.85,0,0,alpha,1.0)
+        # self.clr3 = colorutils.getRandomColorHSL(25,55,1.0,1.0,.75,.85,0,0,round(alpha/2),1.0)
+            
+        self.clr1 = colorutils.getRandomColorHSL(config.clr1[0],config.clr1[1],config.clr1[2],config.clr1[3],config.clr1[4],config.clr1[5],0,0,alpha,1.0)
+        self.clr2 = colorutils.getRandomColorHSL(config.clr2[0],config.clr2[1],config.clr2[2],config.clr2[3],config.clr2[4],config.clr2[5],0,0,alpha,1.0)
+        self.clr3 = colorutils.getRandomColorHSL(config.clr3[0],config.clr3[1],config.clr3[2],config.clr3[3],config.clr3[4],config.clr3[5],0,0,round(alpha/2),1.0)
         self.flames = []
         
         centerxOffset = self.diameter/2
@@ -310,7 +309,7 @@ class FlameUnit :
         
         self.imageContainer.paste(rez, (round(boxX/2),round(boxY/2)), rez)
         
-        config.workImage.paste(self.imageContainer, (self.xOffset, self.yOffset), self.imageContainer)
+        config.workImage.paste(self.imageContainer, (round(self.xOffset), round(self.yOffset)), self.imageContainer)
     
         self.update()
 
@@ -351,6 +350,14 @@ def doDrawing() :
     config.renderImage = ImageChops.add(config.workImage2, config.workImage, scale=1.42, offset=0)
     config.workImage2 = config.workImage.copy()
     # alterImage()
+    
+
+    # res = config.renderImage.filter(ImageFilter.GaussianBlur(radius=2))
+    # enhancer = ImageEnhance.Sharpness(config.renderImage)
+    # res = enhancer.enhance(10.0) 
+    # res = res.filter(ImageFilter.GaussianBlur(radius=2))
+
+    # config.render(res, 0, 0)
     config.render(config.renderImage, 0, 0)
 
 ## -------------------------------------------------##
@@ -390,38 +397,45 @@ def main(run=True) :
     config.flameShape_1 = [[4,1],[5,6],[5,8],[4,8],[3,8],[3,6],[4,2],[4,1]]
     config.flameShape_1 = [[2,2],[5,1],[7,2],[8,4],[8,6],[3,8],[3,7],[2,8],[1,5]]
     config.flameShape_1 = [[2,3],[3,1.5],[4,1],[5,1],[8,3],[8,5],[7,2],[8,3],[8,5],[7,7],[5,8],[4,8],[2,7],[1,5],[1.5,3.5],[1,4]]
+        
+    config.bgColor = tuple(int(x) for x in (workConfig.get("distortion", "bgColor")).split(","))
+    config.clr1 = tuple(float(x) for x in (workConfig.get("distortion", "clr1")).split(","))
+    config.clr2 = tuple(float(x) for x in (workConfig.get("distortion", "clr2")).split(","))
+    config.clr3 = tuple(float(x) for x in (workConfig.get("distortion", "clr3")).split(","))
+    config.numberOfFlames = int(workConfig.get("distortion", "numberOfFlames"))
+    config.flamesPerUnit = int(workConfig.get("distortion", "flamesPerUnit"))
+    config.flameDeltaX = int(workConfig.get("distortion", "flameDeltaX"))
+    config.flameDelta = int(workConfig.get("distortion", "flameDelta"))
+    config.xOffset = int(workConfig.get("distortion", "xOffset"))
+    config.yOffset = int(workConfig.get("distortion", "yOffset"))
+    config.xPositionOffset = int(workConfig.get("distortion", "xPositionOffset"))
+    config.yPositionOffset = int(workConfig.get("distortion", "yPositionOffset"))
     
-    config.bgColor = (30,0,0,10)
-    config.numberOfFlames = 100
-    config.flamesPerUnit = 1
-    config.flameDeltaX = 0
-    config.flameDelta = 0
-    config.xOffset = 0
-    config.yOffset = 0
-    config.xMultiplierSize = 4
-    config.yMultiplierSize = 4
-    config.centerxOffset = 10
-    config.centeryOffset = 30
-    config.diameterMin = 10
-    config.diameterMax = 15
     
-    config.holderXSize = .65
-    config.holderYSize = .2
-    config.holderXOff = 10
-    config.holderYOff = 50
+    config.xMultiplierSize = float(workConfig.get("distortion", "xMultiplierSize"))
+    config.yMultiplierSize = float(workConfig.get("distortion", "yMultiplierSize"))
+    config.centerxOffset = float(workConfig.get("distortion", "centeryOffset"))
+    config.centeryOffset = float(workConfig.get("distortion", "centeryOffset"))
+    config.diameterMin = float(workConfig.get("distortion", "diameterMin"))
+    config.diameterMax = float(workConfig.get("distortion", "diameterMax"))
 
-    config.reMakeRate = .0001
-    config.flickerRange = 10
-    config.flickerRangeX = 3
-    config.flickerRangeY = 10
-    config.flickerRate = .01
-    config.stopFlickerProb = .03
-    config.changeRate = .1
-    config.winkOutProb = .15
-    config.flickerCountMax = 100
-    
-    config.usePerspective = False
-    config.perspectiveD = 40
+    config.holderXSize = float(workConfig.get("distortion", "holderXSize"))
+    config.holderYSize = float(workConfig.get("distortion", "holderYSize"))
+    config.holderXOff = float(workConfig.get("distortion", "holderXOff"))
+    config.holderYOff = float(workConfig.get("distortion", "holderYOff"))
+
+    config.reMakeRate = float(workConfig.get("distortion", "reMakeRate"))
+    config.flickerRange = float(workConfig.get("distortion", "flickerRange"))
+    config.flickerRangeX = float(workConfig.get("distortion", "flickerRangeX"))
+    config.flickerRangeY = float(workConfig.get("distortion", "flickerRangeY"))
+    config.flickerRate = float(workConfig.get("distortion", "flickerRate"))
+    config.stopFlickerProb = float(workConfig.get("distortion", "stopFlickerProb"))
+    config.changeRate = float(workConfig.get("distortion", "changeRate"))
+    config.winkOutProb = float(workConfig.get("distortion", "winkOutProb"))
+    config.flickerCountMax = float(workConfig.get("distortion", "flickerCountMax"))
+
+    config.usePerspective = (workConfig.getboolean("distortion", "usePerspective"))
+    config.perspectiveD = float(workConfig.get("distortion", "perspectiveD"))
         
 
     createFlames()     

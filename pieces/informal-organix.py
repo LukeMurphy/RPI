@@ -118,7 +118,7 @@ def alterImage() :
     yRange = config.canvasWidth
 
 
-    config.workImage = ImageOps.deform(config.img, WaveDeformer())
+    config.renderImage = ImageOps.deform(config.img, WaveDeformer())
 
     '''
     for y in range(config.canvasHeight):
@@ -144,69 +144,6 @@ def alterImage() :
 
 
 
-## -------------------------------------------------##
-
-def doDrawing() :
-    global config
-
-    config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
-
-    
-    for n in range(len(config.flameSets)) :
-        
-        refFlame = config.flameSets[n]
-        
-        numFlames = len(refFlame.flames)
-        for n in range(0,numFlames): 
-            flamePart = refFlame.flames[n]
-        
-            line_points = list(tuple(x) for x in flamePart[0])
-            line_points_small = list(tuple(x) for x in flamePart[1])
-            
-            refFlame.draw.polygon(line_points, fill=refFlame.clr2)
-            refFlame.draw.polygon(line_points_small, fill=refFlame.clr3)
-            flickerRange = 0
-            if random.random() < config.flickerRate :
-                flickerRange = 4
-            refFlame.draw.line(line_points, width=round(random.uniform(4,4 + flickerRange)), fill=refFlame.clr1, joint="curve")
-            
-
-        config.workImage.paste(refFlame.image, (refFlame.xOffset, refFlame.yOffset), refFlame.image)
-    
-        refFlame.update()
-
-        if random.random() < config.reMakeRate :
-            refFlame.make()
-    
-    # config.d += config.drate
-    # config.workImageDraw.rectangle((0,0,100,100), fill = (255,0,0,255))
-    # config.workImageDraw.rectangle((config.d,60,200,200), fill = (0,255,0,10))
-    
-    # if config.d >= 200 :
-    #     config.d = 0
-    #     # config.drate = 0
-    #     config.workImageDraw.rectangle((0,60,200,200), fill = (0,255,0,10))
-        
-    # if random.random() < .001 :
-    #     config.line_points.clear()
-    #     resetPoints() 
-    # config.workImageDraw.rectangle((x,y,x+100,y+100), fill = (255,0,0,100))
-    # config.renderImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.renderImage.paste(config.workImage, (0,0))
-
-    
-
-## -------------------------------------------------##
-
-def iterate(n=0):
-
-    doDrawing()
-    config.render(config.renderImage, 0, 0)
-    # alterImage()
-
-## -------------------------------------------------##
-
-
 class FlameUnit :
     def __init__(self):
         self.u = 0
@@ -218,19 +155,30 @@ class FlameUnit :
         self.xMultiplierSize = config.xMultiplierSize
         self.yMultiplierSize = config.yMultiplierSize
         
-        self.image = Image.new("RGBA", (400, 400))
+        self.imageContainer = Image.new("RGBA", (300, 300))
+        self.image = Image.new("RGBA", (160, 160))
         self.draw = ImageDraw.Draw(self.image)
-        
+        self.flickering = False
+        self.flickerRate = config.flickerRate
+        self.flickerRange = config.flickerRange
+        self.winkOutProb = config.winkOutProb
+        self.stopFlickerProb = config.stopFlickerProb
+        self.diameter = 0
+        self.diameterMin = 0
+        self.diameterMax = 0
+        self.centerxOffset = config.centeryOffset
+        self.centeryOffset = config.centeryOffset
+        self.flickerCount = 0
         
     def make(self) :
-        self.xOffset = round(random.uniform(0,config.canvasWidth))
-        self.yOffset = round(random.uniform(0,config.canvasHeight))
-        
-        xOffset = random.uniform(0,10)
-        yOffset = random.uniform(0,10)
+        self.flickerCount = 0
+        self.xOffset = round(random.uniform(0,config.canvasWidth)) - self.flickerRange
+        self.yOffset = round(random.uniform(0,config.canvasHeight)) - self.flickerRange
+        self.zOffset = round(random.uniform(0,config.canvasHeight)) - self.flickerRange
+        self.diameter = round(random.uniform(self.diameterMin, self.diameterMax))
         
         self.flameDeltaX *= random.uniform(.8,1.2)
-        mult = (config.canvasHeight/ (yOffset+1)/10)
+        mult = (config.canvasHeight/ (self.centeryOffset+1)/10)
         if mult > 3 :
             mult = 3.0
         self.flameDelta *= random.uniform(.8,1.2 )
@@ -238,19 +186,52 @@ class FlameUnit :
         self.xMultiplierSize *= random.uniform(.8,1.2)
         self.yMultiplierSize *= random.uniform(.8,1.2)
         
-        self.clr1 = colorutils.getRandomColorHSL(340,20,.50,1.0,.5,.5,0,0,190,1.0)
-        self.clr2 = colorutils.getRandomColorHSL(25,55,1.0,1.0,.5,.75,0,0,220,1.0)
-        self.clr3 = colorutils.getRandomColorHSL(190,300,1.0,1.0,.5,.85,0,0,70,1.0)
+        
+        
+        pseudoDepth = 1.0 
+        if config.usePerspective == True :
+            # sizeRatio = self.diameter/self.diameterMax
+            # pr = d / (d + dz)
+            pseudoDepth  = config.perspectiveD / ( config.perspectiveD  + self.zOffset +self.flickerRange)
+            self.yOffset = round(config.canvasHeight * pseudoDepth)
+            self.diameter = self.diameterMax * pseudoDepth
+        
+        alpha = round(random.uniform(40,255) * pseudoDepth)
+
+        
+        self.clr1 = colorutils.getRandomColorHSL(340,40,.50,1.0,.5,.55,0,0,alpha,1.0)
+        self.clr2 = colorutils.getRandomColorHSL(25,40,1.0,1.0,.45,.55,0,0,alpha,1.0)
+        self.clr3 = colorutils.getRandomColorHSL(190,300,1.0,1.0,.5,.85,0,0,alpha,1.0)
+        
+        self.clr3 = colorutils.getRandomColorHSL(25,55,1.0,1.0,.75,.85,0,0,round(alpha/2),1.0)
 
         self.flames = []
+        
+        centerxOffset = self.diameter/2
+        centeryOffset = self.diameter/2
         for n in range(0, self.flamesPerUnit) :
             line_points = []
             line_points_small = []
+            pts = 24
+            rads = math.pi * 2 /pts
+            for p in range(0,pts) :
+                line_points.append([centerxOffset + math.cos(p * rads) * self.diameter/2, centeryOffset+ math.sin(p * rads) * self.diameter/2])
+                line_points_small.append([centerxOffset + math.cos(p * rads) * self.diameter/8, centeryOffset+ math.sin(p * rads) * self.diameter/8])
+
+            line_points.append([centerxOffset + math.cos(0 * rads) * self.diameter/2, centeryOffset+ math.sin(0 * rads) * self.diameter/2])
+            line_points_small.append([centerxOffset + math.cos(0 * rads) * self.diameter/8, centeryOffset+ math.sin(0 * rads) * self.diameter/8])
+            
+            '''
             for p in self.flameShape_1 :
-                line_points.append([xOffset + p[0] * self.xMultiplierSize, yOffset + p[1] * self.yMultiplierSize])
+                line_points.append([self.centerxOffset + p[0] * self.xMultiplierSize, self.centeryOffset + p[1] * self.yMultiplierSize])
+                
             for p in self.flameShape_1 :
-                line_points_small.append([xOffset + 11 + p[0] * self.xMultiplierSize * .55 , yOffset + 30  + p[1] * self.yMultiplierSize * .5])
+                line_points_small.append([self.centerxOffset  + p[0] * self.xMultiplierSize * .55, self.centeryOffset + p[1] * self.yMultiplierSize * .5])
+                # line_points_small.append([xOffset + 1 + p[0] * self.xMultiplierSize * .55 , yOffset + 3 + p[1] * self.yMultiplierSize * .5])
+            '''
+                
             self.flames.append([line_points,line_points_small])
+          
             
     def update(self):
         
@@ -264,7 +245,77 @@ class FlameUnit :
                             self.flames[n][n2][n3][1] += random.uniform(-self.flameDelta,self.flameDelta)
 
 
+    def render(self) :
+        
+        if random.random() < self.flickerRate :
+            self.flickering =  True
+                
+        if random.random() < self.winkOutProb and self.flickering == True and self.flickerCount > config.flickerCountMax:
+            self.flickering =  False
+            self.make()
+            
+        if random.random() < self.stopFlickerProb:
+            self.flickering =  False
+            self.flickerCount = 0
+        
+        numFlames = len(self.flames)
+        
+        for n in range(0,numFlames): 
+            flamePart = self.flames[n]
+        
+            line_points = list(tuple(x) for x in flamePart[0])
+            line_points_small = list(tuple(x) for x in flamePart[1])
+            
+            # self.draw.polygon(line_points, fill=self.clr2)
+            # self.draw.ellipse((-self.diameter,-self.diameter,self.diameter*2,self.diameter*2), fill=config.bgColor)
+            self.draw.rectangle((0,0,300,300), fill=config.bgColor)
+            flickerRange = 0
+            flickerRangeX = 0
+            flickerRangeY = 0
+            if self.flickering == True :
+                flickerRangeX = self.flickerRangeX
+                flickerRangeY = self.flickerRangeY
+                self.flickerCount += 1
+                
+            centerxOffset = self.diameter/2 + self.flickerRangeX
+            centeryOffset = self.diameter/2 + self.flickerRangeY
+            
+            boxX = round(random.uniform(self.diameter,self.diameter + flickerRangeX)) 
+            boxY = round(random.uniform(self.diameter,self.diameter + flickerRangeY)) 
+            # horizontal & vertical centering
+            boxX0 = - boxX/2 + centerxOffset + self.centerxOffset
+            boxY0 = - boxY/2 + centeryOffset + self.centeryOffset
 
+            
+            # correction to make "base" of ellipse same as initial undistorted circle
+            yBase =  self.diameter - boxY
+            
+            shape = [(boxX0, boxY0 + yBase), (boxX + centerxOffset + self.centerxOffset, boxY + centeryOffset + yBase + self.centeryOffset)] 
+            
+            shape2 = [(boxX0 * config.holderXSize + config.holderXOff, 
+                       (boxY0 + yBase) * config.holderYSize + config.holderYOff), 
+                      ((boxX + centerxOffset + self.centerxOffset) * config.holderXSize + config.holderXOff, 
+                       (boxY + centeryOffset + yBase + self.centeryOffset) * config.holderYSize + config.holderYOff)] 
+            # self.draw.line(line_points, width=round(random.uniform(2,2 + flickerRange/2)), fill=self.clr1, joint="curve")
+            self.draw.ellipse(shape2, fill=self.clr3, outline=None)
+            self.draw.ellipse(shape, fill=self.clr2, outline=self.clr1)
+            # self.draw.polygon(line_points_small, fill=self.clr3)
+            
+        # enhancer = ImageEnhance.Sharpness(self.image)
+        # res = enhancer.enhance(10.0) 
+        
+        # res = self.image.filter(ImageFilter.GaussianBlur(radius=4))
+        # config.workImage.paste(res, (self.xOffset, self.yOffset), res)
+        rez = self.image.rotate(random.uniform(-2,2))
+        
+        self.imageContainer.paste(rez, (round(boxX/2),round(boxY/2)), rez)
+        
+        config.workImage.paste(self.imageContainer, (self.xOffset, self.yOffset), self.imageContainer)
+    
+        self.update()
+
+        if random.random() < config.reMakeRate :
+            self.make()
 
 
 
@@ -273,21 +324,54 @@ def createFlames() :
     config.flameSets = []
     for f in range(0, config.numberOfFlames) :
         _flame = FlameUnit()
+        _flame.diameterMin = config.diameterMin
+        _flame.diameterMax = config.diameterMax
+        _flame.centerxOffset  = config.centerxOffset 
+        _flame.centeryOffset  = config.centeryOffset 
+        
+        _flame.flickerRangeX  = config.flickerRangeX 
+        _flame.flickerRangeY  = config.flickerRangeY 
+        
         _flame.make()
         config.flameSets.append(_flame)
         
-        
-        
+
+
+## -------------------------------------------------##
+
+def doDrawing() :
+    global config
+
+    config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
+
+    for n in range(len(config.flameSets)) :
+        refFlame = config.flameSets[n]
+        refFlame.render()
+    
+    config.renderImage = ImageChops.add(config.workImage2, config.workImage, scale=1.42, offset=0)
+    config.workImage2 = config.workImage.copy()
+    # alterImage()
+    config.render(config.renderImage, 0, 0)
+
+## -------------------------------------------------##
+
+def iterate(n=0):
+    doDrawing()
+
+## -------------------------------------------------##
+
+     
 
 def main(run=True) :
     global workConfig, config
     
     config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.workImage2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.img =  config.workImage
     config.workImageDraw = ImageDraw.Draw(config.workImage)
     config.renderImageDraw = ImageDraw.Draw(config.renderImage)
-    config.clr = (180,0,0,7)
+    config.clr = (180,0,0,1)
     config.clr2 = (255,200,0,10)
     config.clr3 = (25,10,240,3)
     config.line_points = []
@@ -307,19 +391,38 @@ def main(run=True) :
     config.flameShape_1 = [[2,2],[5,1],[7,2],[8,4],[8,6],[3,8],[3,7],[2,8],[1,5]]
     config.flameShape_1 = [[2,3],[3,1.5],[4,1],[5,1],[8,3],[8,5],[7,2],[8,3],[8,5],[7,7],[5,8],[4,8],[2,7],[1,5],[1.5,3.5],[1,4]]
     
-    config.bgColor = (0,0,0,1)
-    config.numberOfFlames = 80
+    config.bgColor = (30,0,0,10)
+    config.numberOfFlames = 100
     config.flamesPerUnit = 1
-    config.flameDeltaX = .5
-    config.flameDelta = 2.5
+    config.flameDeltaX = 0
+    config.flameDelta = 0
     config.xOffset = 0
     config.yOffset = 0
-    config.xMultiplierSize = 6
-    config.yMultiplierSize = 7
+    config.xMultiplierSize = 4
+    config.yMultiplierSize = 4
+    config.centerxOffset = 10
+    config.centeryOffset = 30
+    config.diameterMin = 10
+    config.diameterMax = 15
     
+    config.holderXSize = .65
+    config.holderYSize = .2
+    config.holderXOff = 10
+    config.holderYOff = 50
+
     config.reMakeRate = .0001
-    config.flickerRate = .02
-    config.changeRate = .01
+    config.flickerRange = 10
+    config.flickerRangeX = 3
+    config.flickerRangeY = 10
+    config.flickerRate = .01
+    config.stopFlickerProb = .03
+    config.changeRate = .1
+    config.winkOutProb = .15
+    config.flickerCountMax = 100
+    
+    config.usePerspective = False
+    config.perspectiveD = 40
+        
 
     createFlames()     
 

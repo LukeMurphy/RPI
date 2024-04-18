@@ -187,23 +187,25 @@ class FlameUnit :
         self.yMultiplierSize *= random.uniform(.8,1.2)
         
         pseudoDepth = 1.0 
+        pseudoDepthAlpha = 1.0 
         if config.usePerspective == True :
             # sizeRatio = self.diameter/self.diameterMax
             # pr = d / (d + dz)
             pseudoDepth  = config.perspectiveD / ( config.perspectiveD  + self.zOffset +self.flickerRange)
+            pseudoDepthAlpha  = config.perspectiveD / ( config.perspectiveD  + self.zOffset + self.flickerRange) * 1.5
             self.yOffset = round(config.canvasHeight * pseudoDepth)
             self.diameter = self.diameterMax * pseudoDepth
         
-        alpha = round(random.uniform(40,255) * pseudoDepth)
+        alpha = round(random.uniform(40,255) * pseudoDepthAlpha)
    
         # self.clr1 = colorutils.getRandomColorHSL(340,40,.50,1.0,.5,.55,0,0,alpha,1.0)
         # self.clr2 = colorutils.getRandomColorHSL(25,40,1.0,1.0,.45,.55,0,0,alpha,1.0)
         # self.clr3 = colorutils.getRandomColorHSL(190,300,1.0,1.0,.5,.85,0,0,alpha,1.0)
         # self.clr3 = colorutils.getRandomColorHSL(25,55,1.0,1.0,.75,.85,0,0,round(alpha/2),1.0)
             
-        self.clr1 = colorutils.getRandomColorHSL(config.clr1[0],config.clr1[1],config.clr1[2],config.clr1[3],config.clr1[4],config.clr1[5],0,0,alpha,1.0)
-        self.clr2 = colorutils.getRandomColorHSL(config.clr2[0],config.clr2[1],config.clr2[2],config.clr2[3],config.clr2[4],config.clr2[5],0,0,alpha,1.0)
-        self.clr3 = colorutils.getRandomColorHSL(config.clr3[0],config.clr3[1],config.clr3[2],config.clr3[3],config.clr3[4],config.clr3[5],0,0,round(alpha/2),1.0)
+        self.clr1 = colorutils.getRandomColorHSL(config.clr1[0],config.clr1[1],config.clr1[2],config.clr1[3],config.clr1[4],config.clr1[5],config.clr1[6],config.clr1[7],alpha,1.0)
+        self.clr2 = colorutils.getRandomColorHSL(config.clr2[0],config.clr2[1],config.clr2[2],config.clr2[3],config.clr2[4],config.clr2[5],config.clr2[6],config.clr2[7],alpha,1.0)
+        self.clr3 = colorutils.getRandomColorHSL(config.clr3[0],config.clr3[1],config.clr3[2],config.clr3[3],config.clr3[4],config.clr3[5],config.clr3[6],config.clr3[7],round(alpha/2),1.0)
         self.flames = []
         
         centerxOffset = self.diameter/2

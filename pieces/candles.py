@@ -143,7 +143,6 @@ def alterImage() :
         config.xPos = 0
 
 
-
 class FlameUnit :
     def __init__(self):
         self.u = 0
@@ -174,7 +173,7 @@ class FlameUnit :
         self.flickerCount = 0
         self.xOffset = round(random.uniform(config.xPositionOffset,config.canvasWidth)) - self.flickerRange
         self.yOffset = round(random.uniform(config.yPositionOffset,config.canvasHeight)) - self.flickerRange
-        self.zOffset = round(random.uniform(config.yPositionOffset,config.canvasHeight)) - self.flickerRange
+        self.zOffset = round(random.uniform(config.yPositionOffset + 10,config.canvasHeight)) - self.flickerRange
         self.diameter = round(random.uniform(self.diameterMin, self.diameterMax))
         
         self.flameDeltaX *= random.uniform(.8,1.2)

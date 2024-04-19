@@ -132,16 +132,16 @@ class Fill:
             self.deltaVal = self.valTarget - self.val
             
             if self.val > 1:
-                self.val -= 1
+                self.val -= .01
             if self.val < 0:
-                self.val += 1
+                self.val += .01
 
             if abs(self.delta) < 1:
                 # self.hue = 0
                 # self.make()
-                self.hue = self.hueTarget
-                self.sat = self.satTarget
-                self.val = self.valTarget
+                # self.hue = self.hueTarget
+                # self.sat = self.satTarget
+                # self.val = self.valTarget
                 self.hold = True
 
 

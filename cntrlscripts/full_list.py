@@ -221,9 +221,9 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
     for i, item in enumerate(actionDict1):
         # print(list(item.keys())[0])
         ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
-        ListBoxOfConfigs.itemconfig(END, bg = "#e7ffc4" if list(item.keys())[0].find("prod/") > 0 else "white" )
-        ListBoxOfConfigs.itemconfig(END, bg = "#b3e6f9" if list(item.keys())[0].find("dev/") > 0 else None )
-        ListBoxOfConfigs.itemconfig(END, bg = "#ef67ff" if list(item.keys())[0].find("screen_grid") > 0 else None )
+        ListBoxOfConfigs.itemconfig(END, bg = "#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white" )
+        ListBoxOfConfigs.itemconfig(END, bg = "#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None )
+        ListBoxOfConfigs.itemconfig(END, bg = "#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None )
 
 
 # -------------------------------- #
@@ -276,7 +276,7 @@ slogan = Button(
     root,
     text="Stop & Run",
     width=120,
-    bg="blue",
+    bg="#497faa",
     fg="white",
     borderless=1,
     command=action2,
@@ -285,13 +285,13 @@ slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
 # -------------------------------- #
 slogan = Button(
-    root, text="Run", width=120, bg="blue", fg="white", borderless=1, command=action
+    root, text="Run", width=120, bg="#497faa", fg="white", borderless=1, command=action
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 # -------------------------------- #
 openbutton = Button(
-    root, text="Open", width=120, bg="blue", fg="white", borderless=1, command=openFile
+    root, text="Open", width=120, bg="#497faa", fg="white", borderless=1, command=openFile
 )
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
@@ -300,7 +300,7 @@ sortbutton1 = Button(
     root,
     text="Sort By Date",
     width=120,
-    bg="blue",
+    bg="#497faa",
     fg="white",
     borderless=1,
     command=sortByDate,
@@ -312,7 +312,7 @@ sortbutton2 = Button(
     root,
     text="Sort by Folder",
     width=120,
-    bg="blue",
+    bg="#497faa",
     fg="white",
     borderless=1,
     command=sortByFolder,
@@ -323,7 +323,7 @@ sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 #     root,
 #     text="Sort by Folder+",
 #     width=120,
-#     bg="blue",
+#     bg="#497faa",
 #     fg="white",
 #     borderless=1,
 #     command=sortByFolderAndDate,
@@ -334,7 +334,7 @@ slogan = Button(
     root,
     text="Stop All",
     width=120,
-    bg="blue",
+    bg="#497faa",
     fg="white",
     borderless=1,
     command=stopAll,
@@ -343,7 +343,7 @@ slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 # -------------------------------- #
 quitbutton = Button(
-    root, text="QUIT", width=120, bg="blue", fg="white", borderless=1, command=quit
+    root, text="QUIT", width=120, bg="#497faa", fg="white", borderless=1, command=quit
 )
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
@@ -352,7 +352,7 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 T = Text(root, height = 1, width = 32, bg="white", fg="black", bd=False, padx=4, pady =4)
 T.place(bordermode=OUTSIDE, x=2, y=2)
 clearButton = Button(
-    root, text="Clear", width=120, bg="green", fg="white", borderless=True, command=clear
+    root, text="Clear", width=120, bg="#497faa", fg="white", borderless=True, command=clear
 )
 clearButton.place(bordermode=OUTSIDE, x=280, y=2)
 

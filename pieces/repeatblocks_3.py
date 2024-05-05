@@ -318,6 +318,7 @@ def redraw(config):
         pattern_blocks.waveScales(config)
 
 
+
 def repeatImage(config, canvasImage):
     cntr = 0
     # 2021-06-28 Opted to build the repetition/tiling vertically instead of horizontally

@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 
 
+
 def runningSpiral(config):
     # 16px grid box spiral for now
     w = 4
@@ -388,7 +389,7 @@ def circles(config):
                     y1,
                     x2,
                     y2),
-                    outline=(clr), fill=None)
+                    outline=(clr), fill=config.bgColor)
 
 
 def compass(config):

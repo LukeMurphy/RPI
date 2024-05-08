@@ -245,6 +245,8 @@ def main(run=True):
 
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+    config.overLayLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.overlayDraw = ImageDraw.Draw(config.overLayLayer)
 
     config.allPause = False
 
@@ -515,14 +517,11 @@ def glitchBox():
         print(dx + sectionWidth, dy + sectionHeight)
     # end try
 
-
 #----------------------------------------------------##----------------------------------------------------#
 def animationBackGroundFadeIn() :
     currentAnimation = config.animations[config.currentAnimationIndex]
     if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max :
         currentAnimation.bg_alpha += 2
-    
-
 
 #----------------------------------------------------##----------------------------------------------------#
 def reConfigAnimationCell(anim, aConfig):
@@ -707,33 +706,37 @@ def iterate(n=0):
         if random.random() < currentAnimation.changeAnimProb:      
             reConfigAnimationCell(anim, currentAnimation)
                 
-            
+    compositeFinal = config.canvasImage
     # Draws the colored tiles over the animation image - 
     # Note first versions drew this over the animation image but on 10-29-2023 I
     # tested drawing it over the final image layer canvasImage instead - not sure
     # if it really changes anything though
     
     if random.random() < config.useLastOverlayProb and config.useLastOverlay == True and config.allPause == False:
-            # config.useLastOverlay = False if config.useLastOverlay == True  else True
-            # print("lastOVerlay")
-            xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
-            yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
-            if random.random() < config.clearLastOverlayProb :
-                xPos = yPos = 0
-                config.lastOverlayBox = (xPos, yPos, xPos + config.canvasWidth, yPos + config.canvasHeight)
-                config.lastOverlayFill = (0,0,0,0)
-            else :
-                config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
-                cR = config.lastOverLayColorRange
-                # print(cR)
-                lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
-                # print(lastOverlayFill)
-                config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
-                #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
-            
-            # do not delete - see note above
-            # currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
-            config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+        # config.useLastOverlay = False if config.useLastOverlay == True  else True
+        # print("lastOVerlay")
+        xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
+        yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
+        if random.random() < config.clearLastOverlayProb :
+            xPos = yPos = 0
+            config.lastOverlayBox = (xPos, yPos, xPos + config.canvasWidth, yPos + config.canvasHeight)
+            config.lastOverlayFill = (0,0,0,0)
+        else :
+            config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+            cR = config.lastOverLayColorRange
+            # print(cR)
+            lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
+            # print(lastOverlayFill)
+            config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
+            #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
+        
+        # do not delete - see note above
+        #currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+        #config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+        config.overlayDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+        
+        # compositeFinal = ImageChops.add( config.overLayLayer, config.canvasImage,.45, 1)
+        compositeFinal = ImageChops.difference(config.overLayLayer, config.canvasImage)
 
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
@@ -742,7 +745,7 @@ def iterate(n=0):
         config.panelDrawing.render()
     else:
         # config.render(config.image, 0, 0)
-        config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+        config.render(compositeFinal, 0, 0, config.canvasWidth, config.canvasHeight)
 
     if random.random() < config.drawMoireProb:
         config.drawMoire = True

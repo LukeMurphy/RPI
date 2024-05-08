@@ -440,7 +440,7 @@ def main(run=True):
         config.useLastOverlay = False
         config.useLastOverlayProb = 0
         config.clearLastOverlayProb = 0
-        
+    config.compositionMode = 3    
     try:
         config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
         config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
@@ -733,10 +733,16 @@ def iterate(n=0):
         # do not delete - see note above
         #currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
         #config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
-        config.overlayDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
         
-        # compositeFinal = ImageChops.add( config.overLayLayer, config.canvasImage,.45, 1)
-        compositeFinal = ImageChops.difference(config.overLayLayer, config.canvasImage)
+        if config.compositionMode == 0 :
+            config.overlayDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+        if config.compositionMode == 1 :
+            compositeFinal = ImageChops.add( config.overLayLayer, config.canvasImage,.45, 1)
+        if config.compositionMode == 2 :
+            compositeFinal = ImageChops.soft_light(config.canvasImage, config.overLayLayer)
+        if config.compositionMode == 3 :
+            compositeFinal = ImageChops.overlay(config.overLayLayer, config.canvasImage)
+
 
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
@@ -794,6 +800,8 @@ def iterate(n=0):
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
             round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha))
 
+    if random.random() <.1 :
+        config.compositionMode = math.floor(random.uniform(0,4))
     config.animationController.checkTime()
     if config.animationController.advance == True:
         currentAnimation.glitching = False

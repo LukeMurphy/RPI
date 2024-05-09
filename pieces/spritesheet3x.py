@@ -147,9 +147,7 @@ class spriteAnimation():
         print("Number of Frames:" + str(len(self.frameArray)))
         print("------------\n")
         # exit()
-    
     #----------------------------------------------------##----------------------------------------------------#
-    
     def getNextFrame(self):
         # img = self.frameArray[self.currentFrame]
         if self.pause == False :
@@ -177,7 +175,6 @@ class spriteAnimation():
                         self.currentFrame = self.startFrame
 
     #----------------------------------------------------##----------------------------------------------------#
-    
     def nextFrameImg(self) :
         return self.frameArray[self.currentFrame]
     
@@ -249,8 +246,8 @@ def main(run=True):
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     
-    config.overLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.overLayerDraw = ImageDraw.Draw(config.overLayer)
+    config.overLayLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.overlayDraw = ImageDraw.Draw(config.overLayLayer)
 
     config.allPause = False
 
@@ -352,7 +349,7 @@ def main(run=True):
         aConfig.bg_maxValue = float(workConfig.get(a, "bg_maxValue"))
         aConfig.bg_dropHueMinValue = float(workConfig.get(a, "bg_dropHueMinValue"))
         aConfig.bg_dropHueMaxValue = float(workConfig.get(a, "bg_dropHueMaxValue"))
-        aConfig.bg_alpha = int(workConfig.get(a, "bg_alpha"))
+        aConfig.bg_alpha = 0
         aConfig.bg_alpha_max = int(workConfig.get(a, "bg_alpha"))
 
         aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb"))
@@ -445,6 +442,12 @@ def main(run=True):
         config.useLastOverlayProb = 0
         config.clearLastOverlayProb = 0
         
+    config.compositionModeChangeProb = float(workConfig.get("base-parameters", "compositionModeChangeProb"))
+    config.compositionMode = 1
+    
+    # if config.compositionMode == 0 :
+    #     config.overlayDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill= (0,0,0,255))
+    
     try:
         config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
         config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
@@ -486,15 +489,19 @@ def main(run=True):
         runWork()
 
 #----------------------------------------------------##----------------------------------------------------#
-def glitchBox(imageRef, apparentWidth, apparentHeight,imageGlitchDisplacementHorizontal, imageGlitchDisplacementVertical):
+def glitchBox():
 
     global config
-
+    currentAnimation = config.animations[0]
     apparentWidth = config.canvasImage.size[0]
     apparentHeight = config.canvasImage.size[1]
+    apparentWidth = currentAnimation.animationWidth
+    apparentHeight = currentAnimation.animationWidth
+    # currentAnimation.imageGlitchDisplacementVertical = 32
+    # currentAnimation.imageGlitchDisplacementHorizontal = 32
 
-    dx = round(random.uniform(-imageGlitchDisplacementHorizontal,imageGlitchDisplacementHorizontal))
-    dy = round(random.uniform(-imageGlitchDisplacementVertical,imageGlitchDisplacementVertical))
+    dx = round(random.uniform(-currentAnimation.imageGlitchDisplacementHorizontal,currentAnimation.imageGlitchDisplacementHorizontal))
+    dy = round(random.uniform(-currentAnimation.imageGlitchDisplacementVertical,currentAnimation.imageGlitchDisplacementVertical))
 
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
     sectionHeight = round(random.uniform(2, apparentHeight - dy))
@@ -509,14 +516,13 @@ def glitchBox(imageRef, apparentWidth, apparentHeight,imageGlitchDisplacementHor
                 cx = 32
             if cy < 0:
                 cy = 32
-            cp1 = imageRef.crop((0, 0, cx, cy))
-            imageRef.paste(cp1, (round(dx), round(dy)))
+            cp1 = currentAnimation.animationImage.crop((0, 0, cx, cy))
+            currentAnimation.animationImage.paste(cp1, (round(dx), round(dy)))
         # comment:
     except Exception as e:
         print(str(e))
         print(dx + sectionWidth, dy + sectionHeight)
     # end try
-
 
 #----------------------------------------------------##----------------------------------------------------#
 def animationBackGroundFadeIn() :
@@ -622,28 +628,17 @@ def iterate(n=0):
 
     if config.allPause == True:
         if currentAnimation.glitching == True:
-            glitchBox(currentAnimation.animationImage,
-                      currentAnimation.animationWidth,
-                      currentAnimation.animationHeight,
-                      currentAnimation.imageGlitchDisplacementHorizontal,
-                      currentAnimation.imageGlitchDisplacementVertical)
+            glitchBox()
             if random.random() < currentAnimation.freezeGlitchProb:
                 currentAnimation.glitching = False
     else:
         
         # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
-        # animationBackGroundFadeIn()
+        animationBackGroundFadeIn()
         anim = currentAnimation.anim
         bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
         
-        # clears the animation frame
         currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill = bgColor)
-        
-        # for compositing
-        tempImageRef  = anim.nextFrameImg()
-        
-        if config.useLastOverlay == True :
-            currentAnimation.animationImage.paste(config.overLayer, (0,0), config.overLayer)
         
         if config.drawMoire == True : 
             c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
@@ -670,7 +665,7 @@ def iterate(n=0):
                         y1 = y0 +1
                     currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
         
-        # tempImageRef  = anim.nextFrameImg()
+        tempImageRef  = anim.nextFrameImg()
         currentAnimation.animationImage.paste(tempImageRef, (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), tempImageRef)
 
         if config.allPause == False :
@@ -684,90 +679,85 @@ def iterate(n=0):
             anim.getNextFrame()
             
             if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
-                print("paused at start")
+                # print("paused at start")
                 anim.pause = True
                 config.allPause = True
     
             # print(anim.currentFrame,anim.endFrame-1)
             if random.random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame-1:
-                print("paused at end")
+                # print("paused at end")
                 config.allPause = True
                 anim.pause = True
                 
             if (anim.pause == True or config.allPause == True) and random.random() < currentAnimation.unPauseProb :
-                print("releasing animation")
+                # print("releasing animation")
                 anim.pause = False
                 config.allPause = False
                 
             if random.random() < currentAnimation.pauseProb:
-                print("pausing at frame:" + str(anim.currentFrame) + " prob: " + str(currentAnimation.pauseProb))
+                # print("pausing at frame:" + str(anim.currentFrame) )
                 anim.pause = True
                 config.allPause = True
                 if random.random() < .5 :
                     anim.direction *= -1
 
                 
-        # except Exception as e:
-        #     print(str(e))
-            # pass
-        # end try
         anim.pause = config.allPause
 
         if random.random() < currentAnimation.changeAnimProb:      
             reConfigAnimationCell(anim, currentAnimation)
                 
-            
+    compositeFinal = config.canvasImage
     # Draws the colored tiles over the animation image - 
     # Note first versions drew this over the animation image but on 10-29-2023 I
     # tested drawing it over the final image layer canvasImage instead - not sure
     # if it really changes anything though
     
-    composite = config.canvasImage
-    
     if random.random() < config.useLastOverlayProb and config.useLastOverlay == True and config.allPause == False:
         # config.useLastOverlay = False if config.useLastOverlay == True  else True
-        # print("lastOVerlay")
-        # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
-        # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
-        
-        xPos = math.floor(random.uniform(0, config.canvasWidth))
-        yPos = math.floor(random.uniform(0, config.canvasHeight))
-        
-        config.tileSizeWidth = round(random.uniform(16,128))
-        config.tileSizeHeight = round(random.uniform(16,128))
-        
-        
+        print("lastOVerlay")
+        xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
+        yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
         if random.random() < config.clearLastOverlayProb :
+            print("clear lastOVerlay")
             xPos = yPos = 0
             config.lastOverlayBox = (xPos, yPos, xPos + config.canvasWidth, yPos + config.canvasHeight)
             config.lastOverlayFill = (0,0,0,0)
+            config.overLayLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+            config.overlayDraw = ImageDraw.Draw(config.overLayLayer)
+            
+            if config.compositionMode == 0 :
+                config.overlayDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill= (255,255,255,255))
+                
+                
         else :
             config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
             cR = config.lastOverLayColorRange
             # print(cR)
             lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
             # print(lastOverlayFill)
-            config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), 
-                                        round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), 
-                                        round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
+            config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
             #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
         
+        config.overlayDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
         # do not delete - see note above
-        # currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
-        # config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
-        config.overLayerDraw.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill)
+        #currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
+        #config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
         
-        for x in range(0,30):
-            glitchBox(config.overLayer, config.canvasWidth, config.canvasHeight, 10,10)
-            
-    if random.random() < config.clearLastOverlayProb :
-        config.overLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-        config.overLayerDraw = ImageDraw.Draw(config.overLayer)
-                
+    if config.compositionMode == 0 :
+        compositeFinal = ImageChops.screen( config.overLayLayer, config.canvasImage)
+        
+    if config.compositionMode == 1 :
+        compositeFinal = ImageChops.add( config.overLayLayer, config.canvasImage,.65, 1)
 
-    # if config.useLastOverlay == True :
-    #     # config.canvasImage.paste(config.overLayer, (0,0), config.overLayer)
-    #     composite = ImageChops.screen( config.overLayer, config.canvasImage)
+    if config.compositionMode == 2 :
+        compositeFinal = ImageChops.soft_light(config.canvasImage, config.overLayLayer)
+
+    if config.compositionMode == 3 :
+        compositeFinal = ImageChops.overlay(config.overLayLayer, config.canvasImage)
+
+
+
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:
@@ -775,12 +765,7 @@ def iterate(n=0):
         config.panelDrawing.render()
     else:
         # config.render(config.image, 0, 0)
-        # ===================== RENDERING ================================
-        
-        config.render(composite, 0, 0, config.canvasWidth, config.canvasHeight)
-        # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-        
-        # ===================== RENDERING ================================
+        config.render(compositeFinal, 0, 0, config.canvasWidth, config.canvasHeight)
 
     if random.random() < config.drawMoireProb:
         config.drawMoire = True
@@ -810,26 +795,42 @@ def iterate(n=0):
     
 
     if config.allPause == True and random.random() < currentAnimation.unFreezeGlitchProb:
-        print("glitching")
         currentAnimation.glitching = True
 
     if config.allPause == True and random.random() < currentAnimation.unPauseProb:
-        print("unpausing")
+        # print("un-pausing")
         config.allPause = False
 
     # if random.random() < currentAnimation.backgroundColorChangeProb:
     #     # config.bgBackGroundColor = config.bgBackGroundEndColor
-    #     currentAnimation.bgBackGroundEndColor = colorutils.getRandomColorHSV(
-    #         currentAnimation.bg_minHue, currentAnimation.bg_maxHue,
-    #         currentAnimation.bg_minSaturation, currentAnimation.bg_maxSaturation,
-    #         currentAnimation.bg_minValue, currentAnimation.bg_maxValue,
-    #         currentAnimation.bg_dropHueMinValue, currentAnimation.bg_dropHueMaxValue, 255, config.brightness)
+    #     print("Setting new BG Color for animation")
+    #     # currentAnimation.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+    #     #     currentAnimation.bg_minHue, currentAnimation.bg_maxHue,
+    #     #     currentAnimation.bg_minSaturation, currentAnimation.bg_maxSaturation,
+    #     #     currentAnimation.bg_minValue, currentAnimation.bg_maxValue,
+    #     #     currentAnimation.bg_dropHueMinValue, currentAnimation.bg_dropHueMaxValue, 10, config.brightness)
         
     # if random.random() < currentAnimation.backgroundColorChangeProb/2.0:
+    #     print("Clearing the canvas")
     #     bgColor = currentAnimation.colOverlay.currentColor
     #     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
     #         round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha))
 
+    if random.random() < config.compositionModeChangeProb :
+        config.compositionMode = math.floor(random.uniform(0,4))
+        print("New composition mode: " + str(config.compositionMode))
+        if config.compositionMode == 0 :
+            config.overlayDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill= (0,0,0,255))
+        if config.compositionMode == 1 :
+            config.overlayDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill= (0,0,0,0))
+        if config.compositionMode == 2 :
+            config.overlayDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill= (0,0,0,0))
+        if config.compositionMode == 3 :
+            config.overlayDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill= (0,0,0,0))
+        
+        
+        
+    
     config.animationController.checkTime()
     if config.animationController.advance == True:
         currentAnimation.glitching = False
@@ -849,13 +850,14 @@ def iterate(n=0):
         currentAnimation = config.animations[config.currentAnimationIndex]
         config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
         
-        # tempTest = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-        # tempTestDraw = ImageDraw.Draw(tempTest)
-        # xPos  = round(random.uniform(0,config.canvasWidth))
-        # yPos  = round(random.uniform(0,config.canvasHeight))
-        # xPos2 = round(random.uniform(xPos,config.canvasWidth))
-        # yPos2 = round(random.uniform(yPos,config.canvasHeight))
-        # tempTestDraw.rectangle( (xPos,yPos,xPos2,yPos2), fill= (0,255,0,155))
+
+        tempTest = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        tempTestDraw = ImageDraw.Draw(tempTest)
+        xPos  = round(random.uniform(0,config.canvasWidth))
+        yPos  = round(random.uniform(0,config.canvasHeight))
+        xPos2 = round(random.uniform(xPos,config.canvasWidth))
+        yPos2 = round(random.uniform(yPos,config.canvasHeight))
+        tempTestDraw.rectangle( (xPos,yPos,xPos2,yPos2), fill= (0,255,0,155))
         
         # currentAnimation.anim.imageFrame.paste(tempTest,(0,0), tempTest)
         # config.canvasImage.paste(tempTest,(0,0), tempTest)

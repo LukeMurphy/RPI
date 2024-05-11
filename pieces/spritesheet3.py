@@ -278,6 +278,8 @@ def main(run=True):
     config.clearLastOverlayProb = float(workConfig.get("base-parameters", "clearLastOverlayProb"))
     config.bgGlitchCyclesMin = float(workConfig.get("base-parameters", "bgGlitchCyclesMin"))
     config.bgGlitchCyclesMax = float(workConfig.get("base-parameters", "bgGlitchCyclesMax"))
+    config.bgGlitchDisplacementHorizontal = float(workConfig.get("base-parameters", "bgGlitchDisplacementHorizontal"))
+    config.bgGlitchDisplacementVertical = float(workConfig.get("base-parameters", "bgGlitchDisplacementVertical"))
 
     config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
     config.animationController.delay = 1.0
@@ -699,7 +701,7 @@ def iterate(n=0):
         
         glitchIterations = round(random.uniform(config.bgGlitchCyclesMin,config.bgGlitchCyclesMax))
         for x in range(0,glitchIterations):
-            glitchBox(config.overLayer, config.canvasWidth, config.canvasHeight, 10,10)
+            glitchBox(config.overLayer, config.canvasWidth, config.canvasHeight, config.bgGlitchDisplacementHorizontal,config.bgGlitchDisplacementVertical)
             
     if random.random() < config.clearLastOverlayProb :
         config.overLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

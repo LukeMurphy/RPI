@@ -198,38 +198,16 @@ def main(run=True):
 
     # managing speed of animation and framerate
     config.directorController = Director(config)
+    config.delay = float(workConfig.get("base-parameters", "delay"))
+    config.directorController.slotRate = float(workConfig.get("base-parameters", "slotRate"))
 
-    try:
-        config.delay = float(workConfig.get("base-parameters", "delay"))
-    except Exception as e:
-        print(str(e))
-        config.delay = 0.02
-    try:
-        config.directorController.slotRate = float(workConfig.get("base-parameters", "slotRate"))
-    except Exception as e:
-        print(str(e))
-        print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
-        config.directorController.slotRate = 0.0
+    config.filterRemapping = (workConfig.getboolean("base-parameters", "filterRemapping"))
+    config.filterRemappingProb = float(workConfig.get("base-parameters", "filterRemappingProb"))
+    config.filterRemapminHoriSize = int(workConfig.get("base-parameters", "filterRemapminHoriSize"))
+    config.filterRemapminVertSize = int(workConfig.get("base-parameters", "filterRemapminVertSize"))
+    config.filterRemapRangeX = int(workConfig.get("base-parameters", "filterRemapRangeX"))
+    config.filterRemapRangeY = int(workConfig.get("base-parameters", "filterRemapRangeY"))
 
-    try:
-        config.filterRemapping = (workConfig.getboolean("base-parameters", "filterRemapping"))
-        config.filterRemappingProb = float(workConfig.get("base-parameters", "filterRemappingProb"))
-        config.filterRemapminHoriSize = int(workConfig.get("base-parameters", "filterRemapminHoriSize"))
-        config.filterRemapminVertSize = int(workConfig.get("base-parameters", "filterRemapminVertSize"))
-    except Exception as e:
-        print(str(e))
-        config.filterRemapping = False
-        config.filterRemappingProb = 0.0
-        config.filterRemapminHoriSize = 24
-        config.filterRemapminVertSize = 24
-
-    try:
-        config.filterRemapRangeX = int(workConfig.get("base-parameters", "filterRemapRangeX"))
-        config.filterRemapRangeY = int(workConfig.get("base-parameters", "filterRemapRangeY"))
-    except Exception as e:
-        print(str(e))
-        config.filterRemapRangeX = config.canvasWidth
-        config.filterRemapRangeY = config.canvasHeight
 
     try:
         if config.usePixelSort == True:
@@ -257,50 +235,53 @@ def main(run=True):
     animationNames = workConfig.get("base-parameters", "animations").split(",")
     playTimes = workConfig.get("base-parameters", "playTimes").split(",")
     config.playInOrder = workConfig.getboolean("base-parameters", "playInOrder")
-    try:
-        # comment: 
-        config.drawMoire = workConfig.getboolean("base-parameters", "drawMoire")
-        config.drawMoireProb = float(workConfig.get("base-parameters", "drawMoireProb"))
-        config.drawMoireProbOff = float(workConfig.get("base-parameters", "drawMoireProbOff"))
-    except Exception as e:
-        print(str(e))
-        config.drawMoire  = False
-        config.drawMoireProb = 0 
-        config.drawMoireProbOff = 0 
-        
-        
-    try:
-        # comment: 
-        config.moireXPos = int(workConfig.get("base-parameters", "moireXPos"))
-        config.moireYPos = int(workConfig.get("base-parameters", "moireYPos"))
-        config.moireXDistance = int(workConfig.get("base-parameters", "moireXDistance"))
-        config.moireYDistance = int(workConfig.get("base-parameters", "moireYDistance"))
-    except Exception as e:
-        print(str(e))
-        config.moireXPos = 100
-        config.moireYPos = 100
-        config.moireXDistance = 100
-        config.moireYDistance = 100
-        
-        
-    try:
-        # comment: 
-        config.setMoireColor = workConfig.getboolean("base-parameters", "setMoireColor")
-        config.moireColorAltProb = float(workConfig.get("base-parameters", "moireColorAltProb"))
-        config.moireColor = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColor").split(",")))
-        config.moireColorAlt = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColorAlt").split(",")))
 
-    except Exception as e:
-        print(str(e))
-        config.setMoireColor  = False
-        
+    config.drawMoire = workConfig.getboolean("base-parameters", "drawMoire")
+    config.drawMoireProb = float(workConfig.get("base-parameters", "drawMoireProb"))
+    config.drawMoireProbOff = float(workConfig.get("base-parameters", "drawMoireProbOff"))
+
     
+    config.moireXPos = int(workConfig.get("base-parameters", "moireXPos"))
+    config.moireYPos = int(workConfig.get("base-parameters", "moireYPos"))
+    config.moireXDistance = int(workConfig.get("base-parameters", "moireXDistance"))
+    config.moireYDistance = int(workConfig.get("base-parameters", "moireYDistance"))
+    config.setMoireColor = workConfig.getboolean("base-parameters", "setMoireColor")
+    config.moireColorAltProb = float(workConfig.get("base-parameters", "moireColorAltProb"))
+    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColor").split(",")))
+    config.moireColorAlt = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColorAlt").split(",")))
 
     config.animationNames = animationNames
     config.animations = []
     config.currentAnimationIndex = 0
     config.animationController = Director(config)
 
+    config.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("base-parameters", "lastOverLayColorRange").split(",")))
+    config.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayAlphaRange").split(",")))
+    config.useLastOverlay = workConfig.getboolean("base-parameters", "forceLastOverlay")
+    config.useLastOverlayProb = float(workConfig.get("base-parameters", "useLastOverlayProb"))
+    config.lastOverlayBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayBox").split(",")))
+    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+    config.lastOverlayBlur = float(workConfig.get("base-parameters", "lastOverlayBlur"))
+    config.lastOverlayFill = (0, 0, 0, 0)
+    
+    
+    config.overlayTileSizeWidthMin = float(workConfig.get("base-parameters", "overlayTileSizeWidthMin"))
+    config.overlayTileSizeWidthMax = float(workConfig.get("base-parameters", "overlayTileSizeWidthMax"))
+    config.overlayTileSizeHeightMin = float(workConfig.get("base-parameters", "overlayTileSizeHeightMin"))
+    config.overlayTileSizeHeightMax = float(workConfig.get("base-parameters", "overlayTileSizeHeightMax"))
+    # config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayFill").split(",")))
+
+    config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
+    config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
+
+    config.clearLastOverlayProb = float(workConfig.get("base-parameters", "clearLastOverlayProb"))
+    config.bgGlitchCyclesMin = float(workConfig.get("base-parameters", "bgGlitchCyclesMin"))
+    config.bgGlitchCyclesMax = float(workConfig.get("base-parameters", "bgGlitchCyclesMax"))
+
+    config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
+    config.animationController.delay = 1.0
+    config.animationController.slotRate = config.playTimes[0]
     # ----------------------------------------------------------------------------
 
     for a in config.animationNames:
@@ -426,43 +407,7 @@ def main(run=True):
         # aConfig.animationArray.append(anim)
         aConfig.anim = anim
 
-    try:
-        config.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("base-parameters", "lastOverLayColorRange").split(",")))
-        config.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayAlphaRange").split(",")))
-        config.useLastOverlay = workConfig.getboolean("base-parameters", "forceLastOverlay")
-        config.useLastOverlayProb = float(workConfig.get("base-parameters", "useLastOverlayProb"))
-        config.lastOverlayBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayBox").split(",")))
-        config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-        config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-        config.lastOverlayBlur = float(workConfig.get("base-parameters", "lastOverlayBlur"))
-        config.lastOverlayFill = (0, 0, 0, 0)
-        # config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayFill").split(",")))
-    except Exception as e:
-        print(str(e))
-        config.lastOverlayBox = (0, 0, 64, 32)
-        config.lastOverlayFill = (0, 0, 0, 0)
-        config.useLastOverlay = False
-        config.useLastOverlayProb = 0
-        config.clearLastOverlayProb = 0
-        
-    try:
-        config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
-        config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
-    except Exception as e:
-        print(str(e))
-        config.animationFrameXOffset = 0
-        config.animationFrameYOffset = 0
-    # end try
-  
-    try:
-        config.clearLastOverlayProb = float(workConfig.get("base-parameters", "clearLastOverlayProb"))
-    except Exception as e:
-        print(str(e))
-        config.clearLastOverlayProb = 0
-  
-    config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
-    config.animationController.delay = 1.0
-    config.animationController.slotRate = config.playTimes[0]
+    
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -516,7 +461,6 @@ def glitchBox(imageRef, apparentWidth, apparentHeight,imageGlitchDisplacementHor
         print(str(e))
         print(dx + sectionWidth, dy + sectionHeight)
     # end try
-
 
 #----------------------------------------------------##----------------------------------------------------#
 def animationBackGroundFadeIn() :
@@ -612,11 +556,6 @@ def iterate(n=0):
     currentAnimation.colOverlay.stepTransition()
     bgColor = currentAnimation.colOverlay.currentColor
     
-    # bgColor = currentAnimation.bgBackGroundEndColor
-    # config.bg_alpha = 255
-    # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
-    #         bgColor[0], bgColor[1], bgColor[2], currentAnimation.bg_alpha))
-
     config.canvasImage.paste(currentAnimation.animationImage, (config.animationFrameXOffset,config.animationFrameYOffset), currentAnimation.animationImage)
     animationBackGroundFadeIn()
 
@@ -657,18 +596,19 @@ def iterate(n=0):
             for ii in range (0,2):
                 xc = ii * config.moireXDistance + config.moireXPos
                 yc = ii * config.moireYDistance + config.moireYPos
-                for i in range(0, 180) :
-                    w = 800 - i * 6
-                    x0 = xc - w / 2
-                    y0 = yc - w / 2
-                    x1 = xc + w / 2
-                    y1 = yc + w / 2
-                    
-                    if x1 < x0 :
-                        x1 = x0 +1
-                    if y1 < y0 :
-                        y1 = y0 +1
-                    currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
+                for i in range(0, 1200) :
+                    w = 3 * config.canvasWidth - i * 6
+                    if w > 1 :
+                        x0 = xc - w / 2
+                        y0 = yc - w / 2
+                        x1 = xc + w / 2
+                        y1 = yc + w / 2
+                        
+                        if x1 < x0 :
+                            x1 = x0 +1
+                        if y1 < y0 :
+                            y1 = y0 +1
+                        currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
         
         # tempImageRef  = anim.nextFrameImg()
         currentAnimation.animationImage.paste(tempImageRef, (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset), tempImageRef)
@@ -733,8 +673,8 @@ def iterate(n=0):
         xPos = math.floor(random.uniform(0, config.canvasWidth))
         yPos = math.floor(random.uniform(0, config.canvasHeight))
         
-        config.tileSizeWidth = round(random.uniform(16,128))
-        config.tileSizeHeight = round(random.uniform(16,128))
+        config.tileSizeWidth = round(random.uniform(config.overlayTileSizeWidthMin,config.overlayTileSizeWidthMax))
+        config.tileSizeHeight = round(random.uniform(config.overlayTileSizeHeightMin,config.overlayTileSizeHeightMax))
         
         
         if random.random() < config.clearLastOverlayProb :
@@ -757,7 +697,7 @@ def iterate(n=0):
         # config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
         config.overLayerDraw.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill)
         
-        glitchIterations = round(random.uniform(10,50))
+        glitchIterations = round(random.uniform(config.bgGlitchCyclesMin,config.bgGlitchCyclesMax))
         for x in range(0,glitchIterations):
             glitchBox(config.overLayer, config.canvasWidth, config.canvasHeight, 10,10)
             
@@ -818,18 +758,6 @@ def iterate(n=0):
         # print("unpausing")
         config.allPause = False
 
-    # if random.random() < currentAnimation.backgroundColorChangeProb:
-    #     # config.bgBackGroundColor = config.bgBackGroundEndColor
-    #     currentAnimation.bgBackGroundEndColor = colorutils.getRandomColorHSV(
-    #         currentAnimation.bg_minHue, currentAnimation.bg_maxHue,
-    #         currentAnimation.bg_minSaturation, currentAnimation.bg_maxSaturation,
-    #         currentAnimation.bg_minValue, currentAnimation.bg_maxValue,
-    #         currentAnimation.bg_dropHueMinValue, currentAnimation.bg_dropHueMaxValue, 255, config.brightness)
-        
-    # if random.random() < currentAnimation.backgroundColorChangeProb/2.0:
-    #     bgColor = currentAnimation.colOverlay.currentColor
-    #     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
-    #         round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha))
 
     config.animationController.checkTime()
     if config.animationController.advance == True:
@@ -850,16 +778,6 @@ def iterate(n=0):
         currentAnimation = config.animations[config.currentAnimationIndex]
         config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
         
-        # tempTest = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-        # tempTestDraw = ImageDraw.Draw(tempTest)
-        # xPos  = round(random.uniform(0,config.canvasWidth))
-        # yPos  = round(random.uniform(0,config.canvasHeight))
-        # xPos2 = round(random.uniform(xPos,config.canvasWidth))
-        # yPos2 = round(random.uniform(yPos,config.canvasHeight))
-        # tempTestDraw.rectangle( (xPos,yPos,xPos2,yPos2), fill= (0,255,0,155))
-        
-        # currentAnimation.anim.imageFrame.paste(tempTest,(0,0), tempTest)
-        # config.canvasImage.paste(tempTest,(0,0), tempTest)
         
         currentAnimation.bg_alpha = 10
         config.allPause = False

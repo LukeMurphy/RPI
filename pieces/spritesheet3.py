@@ -684,23 +684,23 @@ def iterate(n=0):
             anim.getNextFrame()
             
             if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
-                print("paused at start")
+                # print("paused at start")
                 anim.pause = True
                 config.allPause = True
     
             # print(anim.currentFrame,anim.endFrame-1)
             if random.random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame-1:
-                print("paused at end")
+                # print("paused at end")
                 config.allPause = True
                 anim.pause = True
                 
             if (anim.pause == True or config.allPause == True) and random.random() < currentAnimation.unPauseProb :
-                print("releasing animation")
+                # print("releasing animation")
                 anim.pause = False
                 config.allPause = False
                 
             if random.random() < currentAnimation.pauseProb:
-                print("pausing at frame:" + str(anim.currentFrame) + " prob: " + str(currentAnimation.pauseProb))
+                # print("pausing at frame:" + str(anim.currentFrame) + " prob: " + str(currentAnimation.pauseProb))
                 anim.pause = True
                 config.allPause = True
                 if random.random() < .5 :
@@ -757,7 +757,8 @@ def iterate(n=0):
         # config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
         config.overLayerDraw.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill)
         
-        for x in range(0,30):
+        glitchIterations = round(random.uniform(10,50))
+        for x in range(0,glitchIterations):
             glitchBox(config.overLayer, config.canvasWidth, config.canvasHeight, 10,10)
             
     if random.random() < config.clearLastOverlayProb :
@@ -810,11 +811,11 @@ def iterate(n=0):
     
 
     if config.allPause == True and random.random() < currentAnimation.unFreezeGlitchProb:
-        print("glitching")
+        # print("glitching")
         currentAnimation.glitching = True
 
     if config.allPause == True and random.random() < currentAnimation.unPauseProb:
-        print("unpausing")
+        # print("unpausing")
         config.allPause = False
 
     # if random.random() < currentAnimation.backgroundColorChangeProb:
@@ -838,11 +839,11 @@ def iterate(n=0):
             config.currentAnimationIndex += 1
             if config.currentAnimationIndex >= len(config.animations):
                 config.currentAnimationIndex = 0
-            print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
+            # print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
         else :
             choice = math.floor(random.uniform(0,len(config.animations)))
             config.currentAnimationIndex = choice
-            print("Next Animation : " + str(config.animations[choice].name))
+            # print("Next Animation : " + str(config.animations[choice].name))
         
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
         
@@ -867,7 +868,6 @@ def iterate(n=0):
         # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
         
         
-
 
         
 #----------------------------------------------------##----------------------------------------------------#

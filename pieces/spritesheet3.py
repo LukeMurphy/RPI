@@ -227,8 +227,10 @@ def main(run=True):
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     
-    config.overLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.overLayerDraw = ImageDraw.Draw(config.overLayer)
+    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+    
+    config.underLayerDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
 
     config.allPause = False
 
@@ -255,27 +257,26 @@ def main(run=True):
     config.currentAnimationIndex = 0
     config.animationController = Director(config)
 
-    config.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("base-parameters", "lastOverLayColorRange").split(",")))
-    config.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayAlphaRange").split(",")))
-    config.useLastOverlay = workConfig.getboolean("base-parameters", "forceLastOverlay")
-    config.useLastOverlayProb = float(workConfig.get("base-parameters", "useLastOverlayProb"))
-    config.lastOverlayBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayBox").split(",")))
+    config.bgBoxColorRange = list(map(lambda x: float(x), workConfig.get("base-parameters", "bgBoxColorRange").split(",")))
+    config.bgBoxAlphaRange = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxAlphaRange").split(",")))
+    config.usebgBox = workConfig.getboolean("base-parameters", "forcebgBox")
+    config.usebgBoxProb = float(workConfig.get("base-parameters", "usebgBoxProb"))
+    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxBox").split(",")))
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-    config.lastOverlayBlur = float(workConfig.get("base-parameters", "lastOverlayBlur"))
-    config.lastOverlayFill = (0, 0, 0, 0)
+    config.bgBoxFill = (100, 0, 80, 100)
     
     
-    config.overlayTileSizeWidthMin = float(workConfig.get("base-parameters", "overlayTileSizeWidthMin"))
-    config.overlayTileSizeWidthMax = float(workConfig.get("base-parameters", "overlayTileSizeWidthMax"))
-    config.overlayTileSizeHeightMin = float(workConfig.get("base-parameters", "overlayTileSizeHeightMin"))
-    config.overlayTileSizeHeightMax = float(workConfig.get("base-parameters", "overlayTileSizeHeightMax"))
-    # config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "lastOverlayFill").split(",")))
+    config.bgTileSizeWidthMin = float(workConfig.get("base-parameters", "bgTileSizeWidthMin"))
+    config.bgTileSizeWidthMax = float(workConfig.get("base-parameters", "bgTileSizeWidthMax"))
+    config.bgTileSizeHeightMin = float(workConfig.get("base-parameters", "bgTileSizeHeightMin"))
+    config.bgTileSizeHeightMax = float(workConfig.get("base-parameters", "bgTileSizeHeightMax"))
+    # config.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxFill").split(",")))
 
     config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
     config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
 
-    config.clearLastOverlayProb = float(workConfig.get("base-parameters", "clearLastOverlayProb"))
+    config.clearbgBoxProb = float(workConfig.get("base-parameters", "clearbgBoxProb"))
     config.bgGlitchCyclesMin = float(workConfig.get("base-parameters", "bgGlitchCyclesMin"))
     config.bgGlitchCyclesMax = float(workConfig.get("base-parameters", "bgGlitchCyclesMax"))
     config.bgGlitchDisplacementHorizontal = float(workConfig.get("base-parameters", "bgGlitchDisplacementHorizontal"))
@@ -445,6 +446,7 @@ def glitchBox(imageRef, apparentWidth, apparentHeight,imageGlitchDisplacementHor
 
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
     sectionHeight = round(random.uniform(2, apparentHeight - dy))
+    
 
     # 95% of the time they dance together as mirrors
     try:
@@ -572,7 +574,6 @@ def iterate(n=0):
                 currentAnimation.glitching = False
     else:
         
-        # config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(bgColor[0], bgColor[1], bgColor[2], config.bg_alpha))
         # animationBackGroundFadeIn()
         anim = currentAnimation.anim
         bgColor = (round(config.brightness * bgColor[0]), round(config.brightness * bgColor[1]), round(config.brightness * bgColor[2]), currentAnimation.bg_alpha)
@@ -583,8 +584,8 @@ def iterate(n=0):
         # for compositing
         tempImageRef  = anim.nextFrameImg()
         
-        if config.useLastOverlay == True :
-            currentAnimation.animationImage.paste(config.overLayer, (0,0), config.overLayer)
+        if config.usebgBox == True :
+            currentAnimation.animationImage.paste(config.underLayer, (0,0), config.underLayer)
         
         if config.drawMoire == True : 
             c1  = (round(config.brightness * 150),round(config.brightness * 50),round(config.brightness * 0),150)
@@ -666,51 +667,48 @@ def iterate(n=0):
     
     composite = config.canvasImage
     
-    if random.random() < config.useLastOverlayProb and config.useLastOverlay == True and config.allPause == False:
-        # config.useLastOverlay = False if config.useLastOverlay == True  else True
-        # print("lastOVerlay")
+    if random.random() < config.usebgBoxProb and config.usebgBox == True and config.allPause == False:
+        # config.usebgBox = False if config.usebgBox == True  else True
+        # print("bgBox")
         # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
         # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
         
         xPos = math.floor(random.uniform(0, config.canvasWidth))
         yPos = math.floor(random.uniform(0, config.canvasHeight))
         
-        config.tileSizeWidth = round(random.uniform(config.overlayTileSizeWidthMin,config.overlayTileSizeWidthMax))
-        config.tileSizeHeight = round(random.uniform(config.overlayTileSizeHeightMin,config.overlayTileSizeHeightMax))
+        config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin,config.bgTileSizeWidthMax))
+        config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin,config.bgTileSizeHeightMax))
         
         
-        if random.random() < config.clearLastOverlayProb :
+        if random.random() < config.clearbgBoxProb :
             xPos = yPos = 0
-            config.lastOverlayBox = (xPos, yPos, xPos + config.canvasWidth, yPos + config.canvasHeight)
-            config.lastOverlayFill = (0,0,0,0)
+            config.bgBoxBox = (xPos, yPos, xPos + config.canvasWidth, yPos + config.canvasHeight)
+            config.bgBoxFill = (0,0,0,0)
         else :
-            config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
-            cR = config.lastOverLayColorRange
+            config.bgBoxBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+            cR = config.bgBoxColorRange
             # print(cR)
-            lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
-            # print(lastOverlayFill)
-            config.lastOverlayFill = (round(config.brightness * lastOverlayFill[0]), 
-                                        round(config.brightness * lastOverlayFill[1]), round(config.brightness * lastOverlayFill[2]), 
-                                        round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
-            #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
+            bgBoxFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
+            # print(bgBoxFill)
+            config.bgBoxFill = (round(config.brightness * bgBoxFill[0]), 
+                                        round(config.brightness * bgBoxFill[1]), round(config.brightness * bgBoxFill[2]), 
+                                        round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])))
+
         
-        # do not delete - see note above
-        # currentAnimation.animationImageDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
-        # config.canvasDraw.rectangle(config.lastOverlayBox, fill= config.lastOverlayFill)
-        config.overLayerDraw.rectangle(config.lastOverlayBox, fill = config.lastOverlayFill)
+        config.underLayerDraw.rectangle(config.bgBoxBox, fill = config.bgBoxFill)
         
         glitchIterations = round(random.uniform(config.bgGlitchCyclesMin,config.bgGlitchCyclesMax))
         for x in range(0,glitchIterations):
-            glitchBox(config.overLayer, config.canvasWidth, config.canvasHeight, config.bgGlitchDisplacementHorizontal,config.bgGlitchDisplacementVertical)
+            glitchBox(config.underLayer, config.canvasWidth, config.canvasHeight, config.bgGlitchDisplacementHorizontal,config.bgGlitchDisplacementVertical)
             
-    if random.random() < config.clearLastOverlayProb :
-        config.overLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-        config.overLayerDraw = ImageDraw.Draw(config.overLayer)
+    if random.random() < config.clearbgBoxProb :
+        config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.underLayerDraw = ImageDraw.Draw(config.underLayer)
                 
 
-    # if config.useLastOverlay == True :
-    #     # config.canvasImage.paste(config.overLayer, (0,0), config.overLayer)
-    #     composite = ImageChops.screen( config.overLayer, config.canvasImage)
+    # if config.usebgBox == True :
+    #     # config.canvasImage.paste(config.underLayer, (0,0), config.underLayer)
+    #     composite = ImageChops.screen( config.underLayer, config.canvasImage)
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:

@@ -47,6 +47,14 @@ class Holder:
 #----------------------------------------------------##----------------------------------------------------#
 class Director:
     """docstring for Director"""
+    
+    # slotRate is the period between events
+    # this is just an interval timer but the main
+    # interate function has a delay set in the config - usually about .02 seconds
+    # so every .02 seconds this class instance is checked to see if the interval 
+    # of time that equals the "slotRate" has been passed, and if it has, the 
+    # class sets the advance to True and the calling function has to reset the
+    # advance to False
 
     slotRate = 0.5
 
@@ -56,7 +64,12 @@ class Director:
         self.tT = time.time()
 
     def checkTime(self):
-        if (time.time() - self.tT) >= self.slotRate:
+        delta = (time.time() - self.tT)
+        
+        # if self.slotRate > 1 :
+        #     print(delta)
+        
+        if delta  >= self.slotRate:
             self.tT = time.time()
             self.advance = True
         else:
@@ -283,7 +296,7 @@ def main(run=True):
     config.bgGlitchDisplacementVertical = float(workConfig.get("base-parameters", "bgGlitchDisplacementVertical"))
 
     config.playTimes = tuple(map(lambda x: int(int(x)), playTimes))
-    config.animationController.delay = 1.0
+    # config.animationController.delay = 1.0
     config.animationController.slotRate = config.playTimes[0]
     # ----------------------------------------------------------------------------
 
@@ -767,16 +780,15 @@ def iterate(n=0):
             config.currentAnimationIndex += 1
             if config.currentAnimationIndex >= len(config.animations):
                 config.currentAnimationIndex = 0
-            # print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
+            print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
         else :
             choice = math.floor(random.uniform(0,len(config.animations)))
             config.currentAnimationIndex = choice
-            # print("Next Animation : " + str(config.animations[choice].name))
+            print("Next Animation : " + str(config.animations[choice].name))
         
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
-        
         currentAnimation = config.animations[config.currentAnimationIndex]
-        config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
+        # config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
         
         
         currentAnimation.bg_alpha = 10

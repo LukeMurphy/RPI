@@ -173,7 +173,9 @@ def fishScales(config):
         int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
     )
 
-    clr3 = config.colOverlay.currentColor
+    clr3 = tuple(
+        int(a * config.brightness) for a in (config.colOverlay.currentColor)
+    )
 
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)

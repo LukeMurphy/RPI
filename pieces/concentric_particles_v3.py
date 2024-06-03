@@ -42,8 +42,8 @@ class ParticleDot:
         # variation in initial velocity
         direction = 1 if p.directionProb < 0.5 else -1
         orbit = True if p.orbitProb <= config.orbitProb else False
-        fx = random.random() * p.fFactor + 1
-        fy = random.random() * p.fFactor + 1
+        fx = random.SystemRandom().random() * p.fFactor + 1
+        fy = random.SystemRandom().random() * p.fFactor + 1
         vx = math.cos(p.angle * n) * fx * direction
         vy = math.sin(p.angle * n) * fy * direction
         r = int(random.uniform(config.rRangeMin, config.rRange) * p.brightness)
@@ -91,7 +91,7 @@ class ParticleDot:
         self.rSpeed = rSpeed
         self.mode = 1
         self.orbit = orbit
-        self.sizeNum = 1 if random.random() < 0.5 else 2
+        self.sizeNum = 1 if random.SystemRandom().random() < 0.5 else 2
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -113,7 +113,7 @@ class RadialSet:
         self.angleOffsetSpeed = random.uniform(0, math.pi / 300)
         innerRadius = self.wBase / 3
         outerRadius = self.wBase
-        skipRatio = random.random() + 0.3
+        skipRatio = random.SystemRandom().random() + 0.3
 
         if minNum == 1 and maxNum == 1 :
             self.radials = 1
@@ -124,7 +124,7 @@ class RadialSet:
         for i in range(0, self.radials):
             ir = innerRadius + random.uniform(-50, 50)
             outr = outerRadius + random.uniform(-50, 50)
-            skip = 0 if random.random() < skipRatio else 1
+            skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
 
@@ -183,13 +183,8 @@ class ParticleSystem:
         [53,73,136],
         [27,38,83],
         [27,38,83],
-        [27,38,83],
-        [27,38,83],
-        [27,38,83],
-        [27,38,83],
         [27,38,253],
         [27,38,253],
-
         ]
 
         self._bandColors = [
@@ -226,10 +221,10 @@ class ParticleSystem:
             # self.bands = len(self.bandColors)
             self.wDiff = round(random.uniform(config.bandWidthMin,config.bandWidthMax))
         
-        self.xSpeed = random.random()  * config.PSXSpeed
-        self.ySpeed = random.random() * config.PSYSpeed
+        self.xSpeed = random.SystemRandom().random()  * config.PSXSpeed
+        self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
 
-        self.drawRadialPolys = True if random.random() < .5 else False
+        self.drawRadialPolys = True if random.SystemRandom().random() < .5 else False
 
         radialSet = RadialSet(config, self.wBase)
         radialSet.makeRadialsSet(120,300)
@@ -265,7 +260,7 @@ class ParticleSystem:
         """
 		if config.rotation != 0:
 			approxVisibleArea = self.config.canvasWidth * 0.6
-			ran = random.random() * approxVisibleArea
+			ran = random.SystemRandom().random() * approxVisibleArea
 			ran = 64 + random.uniform(-96, 96)
 			self.x = int(ran + self.config.canvasWidth / 2)
 		"""
@@ -389,13 +384,13 @@ class ParticleSystem:
             """
 			# a pixel wind changes the cascade
 			if self.config.sideWind and sumOfClrs > 100:
-				config.vx = round(2 - random.random() * 4)
+				config.vx = round(2 - random.SystemRandom().random() * 4)
 				ref.vx = config.vx
 				self.deacellerationx = 0.75
 			"""
 
             # Sparkles !!
-            if random.random() < config.sparkleProb:
+            if random.SystemRandom().random() < config.sparkleProb:
                 r = int(220 * self.sparkleBrightness)
                 g = int(220 * self.sparkleBrightness)
                 b = int(255 * self.sparkleBrightness)
@@ -481,7 +476,7 @@ class ParticleSystem:
 
 
 
-            if random.random() < config.particleResetProb:
+            if random.SystemRandom().random() < config.particleResetProb:
                 ref.setUp(self, ref.id)
 
 
@@ -490,7 +485,7 @@ class ParticleSystem:
 
 def drawBands(p):
 
-    if p.useFixedBandColors == True and random.random() < .005 :
+    if p.useFixedBandColors == True and random.SystemRandom().random() < .005 :
         p.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.85))
         
     wBase = p.wBase
@@ -695,7 +690,7 @@ def iterate():
     PS.move()
 
     config.fadeRate += config.fadeRateDelta
-    # if random.random() < config.totalResetProb:
+    # if random.SystemRandom().random() < config.totalResetProb:
     #     PS.setUp()
 
     if config.fadeRate > 255:
@@ -709,8 +704,8 @@ def iterate():
             # bgChoice = math.floor(random.uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
             print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
-            if random.random() < config.totalResetProb:
-                PS.useFixedBandColors = True if random.random() < config.useFixedBandColorsProb else False
+            if random.SystemRandom().random() < config.totalResetProb:
+                PS.useFixedBandColors = True if random.SystemRandom().random() < config.useFixedBandColorsProb else False
                 PS.setCenter()
                 PS.setNewAttributes()
                 PS.setUp()

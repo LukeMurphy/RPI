@@ -136,7 +136,7 @@ def getNamedPalette(arg, brtns=1, a=255):
 
 def getKlimt(brtns=1, a=255):
     choice = round(
-        random.uniform(0, len((klimt))-1)
+        random.SystemRandom().uniform(0, len((klimt))-1)
     )
 
     c = klimt[choice]
@@ -145,7 +145,7 @@ def getKlimt(brtns=1, a=255):
 
 def getColorWheel(brtns=1, a=255):
     choice = round(
-        random.uniform(0, len((wheelBasic))-1)
+        random.SystemRandom().uniform(0, len((wheelBasic))-1)
     )
 
     c = wheelBasic[choice]
@@ -154,7 +154,7 @@ def getColorWheel(brtns=1, a=255):
 
 def getwheelBasicLowGreen(brtns=1, a=255):
     choice = round(
-        random.uniform(0, len((wheelBasicLowGreen))-1)
+        random.SystemRandom().uniform(0, len((wheelBasicLowGreen))-1)
     )
 
     c = wheelBasicLowGreen[choice]
@@ -163,7 +163,7 @@ def getwheelBasicLowGreen(brtns=1, a=255):
 
 def getTest(brtns=1, a=255):
     choice = round(
-        random.uniform(0, len((testPalette))-1)
+        random.SystemRandom().uniform(0, len((testPalette))-1)
     )
 
     c = testPalette[choice]
@@ -174,11 +174,11 @@ def getRedShiftedColors(brtns=1):
     global brightness, sunset, sorted_sunset
     if brtns == 1:
         brtns = brightness
-    r = round((random.uniform(0, 255)) * brtns)
-    g = round((random.uniform(0, 50)) * brtns)
-    b = round((random.uniform(0, 50)) * brtns)
+    r = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    g = round((random.SystemRandom().uniform(0, 50)) * brtns)
+    b = round((random.SystemRandom().uniform(0, 50)) * brtns)
     rRange = 255 - r
-    r = round(r + random.uniform(0, rRange))
+    r = round(r + random.SystemRandom().uniform(0, rRange))
     return (r, g, b)
 
 
@@ -186,7 +186,7 @@ def getSunsetColors(brtns=1):
     global brightness, sunset, sorted_sunset
     if brtns == 1:
         brtns = brightness
-    indx = math.floor(random.uniform(0, len(sunset)))
+    indx = math.floor(random.SystemRandom().uniform(0, len(sunset)))
 
     vals = list(sunset.values())
     clr = vals[indx]
@@ -200,7 +200,7 @@ def getRandomRGB(brtns=1):
     global brightness, rgbColorWheel, rgbWheel
     if brtns == 1:
         brtns = brightness
-    indx = math.floor(random.uniform(0, len(rgbWheel)))
+    indx = math.floor(random.SystemRandom().uniform(0, len(rgbWheel)))
     clr = rgbWheel[indx]
     r = round(clr[0] * brtns)
     g = round(clr[1] * brtns)
@@ -212,7 +212,7 @@ def getRandomColorWheel(brtns=1):
     global brightness, colorWheel, wheel
     if brtns == 1:
         brtns = brightness
-    indx = math.floor(random.uniform(0, len(colorWheel)))
+    indx = math.floor(random.SystemRandom().uniform(0, len(colorWheel)))
     clr = wheel[indx]
     r = round(clr[0] * brtns)
     g = round(clr[1] * brtns)
@@ -224,9 +224,9 @@ def randomColor(brtns=1):
     global brightness
     if brtns == 1:
         brtns = brightness
-    r = round((random.uniform(0, 255)) * brtns)
-    g = round((random.uniform(0, 255)) * brtns)
-    b = round((random.uniform(0, 255)) * brtns)
+    r = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    g = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    b = round((random.SystemRandom().uniform(0, 255)) * brtns)
     return (r, g, b, 255)
 
 
@@ -235,13 +235,13 @@ def randomYellowsAlpha(brtns=1, maxTransparency=255, minTransparency=0, sMax=1.0
     if brtns == 1:
         brtns = brightness
 
-    h = (random.uniform(42, 60))
-    s = (random.uniform(sMin, sMax))
+    h = (random.SystemRandom().uniform(42, 60))
+    s = (random.SystemRandom().uniform(sMin, sMax))
     v = .5
 
     col = HSVToRGB(h, s, v, a=255)
 
-    a = round(random.uniform(minTransparency, maxTransparency))
+    a = round(random.SystemRandom().uniform(minTransparency, maxTransparency))
     return (col[0], col[1], col[2], a)
 
 
@@ -249,10 +249,10 @@ def randomColorAlpha(brtns=1, maxTransparency=255, minTransparency=0):
     global brightness
     if brtns == 1:
         brtns = brightness
-    r = round((random.uniform(0, 255)) * brtns)
-    g = round((random.uniform(0, 255)) * brtns)
-    b = round((random.uniform(0, 255)) * brtns)
-    a = round(random.uniform(minTransparency, maxTransparency))
+    r = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    g = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    b = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    a = round(random.SystemRandom().uniform(minTransparency, maxTransparency))
     return (r, g, b, a)
 
 
@@ -260,10 +260,10 @@ def randomGrayAlpha(brtns=1, maxTransparency=255, minTransparency=0):
     global brightness
     if brtns == 1:
         brtns = brightness
-    r = round((random.uniform(0, 255)) * brtns)
+    r = round((random.SystemRandom().uniform(0, 255)) * brtns)
     g = r
     b = r
-    a = round(random.uniform(minTransparency, maxTransparency))
+    a = round(random.SystemRandom().uniform(minTransparency, maxTransparency))
     return (r, g, b, a)
 
 # Yup, same function that should have been called this
@@ -274,9 +274,9 @@ def getRandomColor(brtns=1):
     global brightness
     if brtns == 1:
         brtns = brightness
-    r = round((random.uniform(0, 255)) * brtns)
-    g = round((random.uniform(0, 255)) * brtns)
-    b = round((random.uniform(0, 255)) * brtns)
+    r = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    g = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    b = round((random.SystemRandom().uniform(0, 255)) * brtns)
     a = 255
     return (r, g, b)
 
@@ -299,15 +299,15 @@ def getRandomColorHSVSaturated(
 
     if hMin > hMax:
         degreeRange = 360.0 - hMin + hMax
-    h = hMin + random.uniform(0.0, degreeRange)
+    h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
 
     # an option to exclude a range of colors
     if dropHueMax != dropHueMin:
-        h = hMin + random.uniform(0.0, degreeRange)
+        h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
         if h > 360.0:
             h -= 360.0
         while h > dropHueMin and h < dropHueMax:
-            h = hMin + random.uniform(0.0, degreeRange)
+            h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
             if h > 360.0:
                 h -= 360.0
     if h > 360.0:
@@ -315,14 +315,14 @@ def getRandomColorHSVSaturated(
 
     # print("New hue: " + str(h) + " " + str(a))
 
-    # h = random.uniform(hMin,hMax)
+    # h = random.SystemRandom().uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
-    s = random.uniform(sMin, sMax)
+    s = random.SystemRandom().uniform(sMin, sMax)
     
     if s < .5 :
-        v = random.uniform(vMin, vMin + .4)
+        v = random.SystemRandom().uniform(vMin, vMin + .4)
     else :
-        v = random.uniform(vMin, vMax)
+        v = random.SystemRandom().uniform(vMin, vMax)
     # print(vMin, vMax, v)
     # v = math.sqrt(s)
     rgb = HSVToRGB(h, s, v)
@@ -347,25 +347,25 @@ def getRandomColorHSV(
 
     if hMin > hMax:
         degreeRange = 360.0 - hMin + hMax
-    h = hMin + random.uniform(0.0, degreeRange)
+    h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
 
     # an option to exclude a range of colors
     if dropHueMax != dropHueMin:
-        h = hMin + random.uniform(0.0, degreeRange)
+        h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
         if h > 360.0:
             h -= 360.0
         while h > dropHueMin and h < dropHueMax:
-            h = hMin + random.uniform(0.0, degreeRange)
+            h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
             if h > 360.0:
                 h -= 360.0
     if h > 360.0:
         h -= 360.0
 
 
-    # h = random.uniform(hMin,hMax)
+    # h = random.SystemRandom().uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
-    s = random.uniform(sMin, sMax)
-    v = random.uniform(vMin, vMax)
+    s = random.SystemRandom().uniform(sMin, sMax)
+    v = random.SystemRandom().uniform(vMin, vMax)
     # print("\nNew hue: " + str(round(h)) + " " + str(dropHueMin)+ " " + str(dropHueMax) + " " + str(s) + " " + str(v) )
     # print(vMin, vMax, v)
     rgb = HSVToRGB(h, s, v)
@@ -390,7 +390,7 @@ def getRandomColorHSL(
 
     if hMin > hMax:
         degreeRange = 360.0 - hMin + hMax
-    h = hMin + random.uniform(0.0, degreeRange)
+    h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
 
     if h > 360.0:
         h -= 360.0
@@ -399,14 +399,14 @@ def getRandomColorHSL(
     if dropHueMax != dropHueMin:
         h = dropHueMin + 1
         while h > dropHueMin and h < dropHueMax:
-            h = hMin + random.uniform(0.0, degreeRange)
+            h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
             if h > 360.0:
                 h -= 360.0
 
-    # h = random.uniform(hMin,hMax)
+    # h = random.SystemRandom().uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
-    s = random.uniform(sMin, sMax)
-    l = random.uniform(lMin, lMax)
+    s = random.SystemRandom().uniform(sMin, sMax)
+    l = random.SystemRandom().uniform(lMin, lMax)
     # print(lMin, lMax, l)
     rgb = HSLToRGB(h, s, l)
     return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
@@ -416,9 +416,9 @@ def randomBaseColor(brtns=1):
     global brightness
     if brtns == 1:
         brtns = brightness
-    b = round((random.uniform(0, 255)) * brtns)
-    r = round((random.uniform(0, 100)) * brtns)
-    g = round((random.uniform(0, 100)) * brtns)
+    b = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    r = round((random.SystemRandom().uniform(0, 100)) * brtns)
+    g = round((random.SystemRandom().uniform(0, 100)) * brtns)
     return (r, g, b)
 
 
@@ -442,7 +442,7 @@ def randomGray(brtns=1):
     global brightness
     if brtns == 1:
         brtns = brightness
-    grey = round((random.uniform(0, 255)) * brtns)
+    grey = round((random.SystemRandom().uniform(0, 255)) * brtns)
     r = grey
     g = grey
     b = grey
@@ -597,6 +597,6 @@ def changeColor(rnd=False):
             r = 255
             b = 0
     else:
-        r = round(random.uniform(0, 255) * brightness)
-        g = round(random.uniform(0, 255) * brightness)
-        b = round(random.uniform(0, 255) * brightness)
+        r = round(random.SystemRandom().uniform(0, 255) * brightness)
+        g = round(random.SystemRandom().uniform(0, 255) * brightness)
+        b = round(random.SystemRandom().uniform(0, 255) * brightness)

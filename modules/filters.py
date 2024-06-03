@@ -126,11 +126,11 @@ def pixelSort(imageToModify, config):
 			if pixSortDirection == "lateral":
 				pixSortyStart = b * pixSortboxHeight
 				if b > 0:
-					pixSortyStart += pixSortgap * b * random.random()
+					pixSortyStart += pixSortgap * b * random.SystemRandom().random()
 			else:
 				pixSortxStart = b * pixSortboxWidth
 				if b > 0:
-					pixSortxStart += pixSortgap * b * random.random()
+					pixSortxStart += pixSortgap * b * random.SystemRandom().random()
 
 			varx = int(random.uniform(-pixSortDrawVariance, pixSortDrawVariance))
 
@@ -140,13 +140,13 @@ def pixelSort(imageToModify, config):
 			# then there is a tendancy to draw solid blocks of color repeatedly. This is closer to the
 			# condition when a single LED panel is totally whacked vs a line of LEDS is whacked ;)
 
-			colorSampleColor = (10, 10, 10)  # colorutils.getRandomRGB(random.random())
+			colorSampleColor = (10, 10, 10)  # colorutils.getRandomRGB(random.SystemRandom().random())
 			colorSampleColorAlpha = (
 				10,
 				10,
 				10,
 				10,
-			)  # colorutils.getRandomRGB(random.random())
+			)  # colorutils.getRandomRGB(random.SystemRandom().random())
 			if pixSortDirection == "lateral":
 				## i.e. draw horizontal lines
 				boxRange = int(pixSortboxHeight)
@@ -158,7 +158,7 @@ def pixelSort(imageToModify, config):
 
 				var = int(random.uniform(0, pixSortSampleVariance))
 
-				if random.random() < pixSortprobGetNextColor or i == 0:
+				if random.SystemRandom().random() < pixSortprobGetNextColor or i == 0:
 					# take a sample point color
 					if pixSortDirection == "lateral":
 						### Sample UP
@@ -200,8 +200,8 @@ def pixelSort(imageToModify, config):
 							print(colorSample)
 
 				# Once in a little while, the color is just random
-				if random.random() < randomColorProbabilty:
-					colorSampleColor = colorutils.getRandomRGB(random.random())
+				if random.SystemRandom().random() < randomColorProbabilty:
+					colorSampleColor = colorutils.getRandomRGB(random.SystemRandom().random())
 
 				colorSampleColorAlpha = tuple(int(c) for c in colorSampleColor)
 
@@ -210,7 +210,7 @@ def pixelSort(imageToModify, config):
 				# print(colorSampleColorAlpha)
 				# Variable probability that the line will even draw. Lower probability means more
 				# glitchy lines
-				if random.random() < pixSortprobDraw and colorSampleColor != (0, 0, 0):
+				if random.SystemRandom().random() < pixSortprobDraw and colorSampleColor != (0, 0, 0):
 					if pixSortDirection == "lateral":
 						tempDraw.line(
 							(

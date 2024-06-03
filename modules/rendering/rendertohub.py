@@ -343,7 +343,7 @@ def render(
             )
 
     if config.usePixelSort == True and config.pixelSortRotatesWithImage == True:
-        if random.random() < config.pixelSortAppearanceProb:
+        if random.SystemRandom().random() < config.pixelSortAppearanceProb:
             config.renderImageFull = pixelSort(config.renderImageFull, config)
 
     if config.rotation != 0:
@@ -356,7 +356,7 @@ def render(
 
     # ---- Pixel Sort Type Effect ---- #
     if config.usePixelSort and config.pixelSortRotatesWithImage == False:
-        if random.random() < config.pixelSortAppearanceProb:
+        if random.SystemRandom().random() < config.pixelSortAppearanceProb:
             config.renderImageFull = pixelSort(config.renderImageFull, config)
 
             # crop = config.renderImageFull.crop()

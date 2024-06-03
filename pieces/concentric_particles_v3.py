@@ -49,6 +49,10 @@ class ParticleDot:
         r = int(random.uniform(config.rRangeMin, config.rRange) * p.brightness)
         g = int(random.uniform(config.gRangeMin, config.gRange) * p.brightness)
         b = int(random.uniform(config.bRangeMin, config.bRange) * p.brightness)
+        
+        
+        
+        
         radius = random.uniform(1, p.maxRadius)
         self.circuitCount = 0
 
@@ -78,6 +82,9 @@ class ParticleDot:
         self.vx = vx
         self.vy = vy
         self.clr = [r, g, b]
+        pClrRange = config.particleColorRange
+        clr = colorutils.getRandomColorHSVSaturated(pClrRange[0],pClrRange[1],pClrRange[2],pClrRange[3],pClrRange[4],pClrRange[5])
+        self.clr = [clr[0],clr[1],clr[2]]
         self.done = 0
         self.angle = angle
         self.radius = radius
@@ -180,8 +187,26 @@ class ParticleSystem:
         [27,38,83],
         [27,38,83],
         [27,38,83],
+        [27,38,253],
+        [27,38,253],
 
         ]
+
+        self._bandColors = [
+        [255,0,0],
+        [255,255,0],
+        [2,255,0],
+        [2,0,250],
+        [255,0,250],
+
+        [255,0,0],
+        [255,255,0],
+        [2,255,0],
+        [2,0,250],
+        [255,0,250],
+        
+        ]
+
 
         # adjusting the apparent brightness of some bands as they
         # read over-bright - can be modified anytime
@@ -193,17 +218,13 @@ class ParticleSystem:
                     color[cx] *= .8
                     
         
-        self.bands = round(random.uniform(12, 24))
+        self.bands = round(random.uniform(config.PSMinBands, config.PSMaxBands))
         self.wBase = round(random.uniform(config.PSRadiusMin, config.PSRadiusMax))
         
         if self.useFixedBandColors == True:
-                self.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.75))
-        
-        
-        
-        if self.useFixedBandColors == True :
-            self.bands = len(self.bandColors)
-            self.wDiff = round(random.uniform(10,20))
+            self.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.75))
+            # self.bands = len(self.bandColors)
+            self.wDiff = round(random.uniform(config.bandWidthMin,config.bandWidthMax))
         
         self.xSpeed = random.random()  * config.PSXSpeed
         self.ySpeed = random.random() * config.PSYSpeed
@@ -214,6 +235,10 @@ class ParticleSystem:
         radialSet.makeRadialsSet(120,300)
         self.radialSets.append(radialSet)
 
+        # self.bands = 20
+        # self.wDiff = 30
+        # print(self.bands)
+        
         # the 33s hand
         radialSet = RadialSet(config, self.wBase)
         radialSet.makeRadialsSet(1,1)
@@ -292,7 +317,7 @@ class ParticleSystem:
             self.xSpeed = 0
         if self.y > config.canvasHeight - round(self.wBase / 8):
             self.ySpeed = 0
-        if self.y < 0 - round(self.wBase / 4):
+        if self.y < 0 - 2:
             self.ySpeed = 0
             
 
@@ -494,6 +519,8 @@ def drawBands(p):
     
     
     # Draw from the outside-in
+    colorBandIndex = 0
+    goldenBandIndex = 0
     for i in range(0, p.bands):
             
         w = wBase - i * wDiff
@@ -513,17 +540,24 @@ def drawBands(p):
         #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
         
         if p.useFixedBandColors == True :
-            index = p.bands - i - 1
+            # index = p.bands - i - 1
+            index = colorBandIndex
             # index = i
             rBase = round(p.bandColors[index][0] * config.brightness)
             gBase = round(p.bandColors[index][1] * config.brightness)
             bBase = round(p.bandColors[index][2] * config.brightness)
             aBase = 255
+            colorBandIndex += 1
+            
+            if colorBandIndex >= len(p.bandColors) :
+                colorBandIndex = 0
 
         '''
         if i == 1:
             config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
         '''
+        # Should try to interleave the bands so that the fixed color bands integrate better
+        # with the prescribed golden ones
         
         if i == 0 :
             a = 20
@@ -674,9 +708,9 @@ def iterate():
             # renew the particle dots that travel
             # bgChoice = math.floor(random.uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
-            # print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
+            print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
             if random.random() < config.totalResetProb:
-                PS.useFixedBandColors = True if random.random() > .5 else False
+                PS.useFixedBandColors = True if random.random() < config.useFixedBandColorsProb else False
                 PS.setCenter()
                 PS.setNewAttributes()
                 PS.setUp()
@@ -804,6 +838,15 @@ def main(run=True):
         config.PSRadiusFactor2 =  1.5
         config.PSRadiusMin = 220
         config.PSRadiusMax = config.canvasWidth
+        
+    try:
+        config.PSMinBands = int(workConfig.get("particles", "PSMinBands"))
+        config.PSMaxBands = int(workConfig.get("particles", "PSMaxBands"))
+    except Exception as e:
+        print(str(e))
+        config.PSMinBands = 12
+        config.PSMaxBands = 24
+    # end try
 
     try:
         config.rRange = int(workConfig.get("particles","rRange"))
@@ -822,12 +865,34 @@ def main(run=True):
         config.bRangeMin = 0
         
         
+    particleColorRangeVals  = workConfig.get("particles","particleColorRange").split(",")
+    config.particleColorRange = list(float(i) for  i in particleColorRangeVals)
+        
+    try:
+        config.bandWidthMin = int(workConfig.get("particles","bandWidthMin"))
+        config.bandWidthMax = int(workConfig.get("particles","bandWidthMax"))
+    except Exception as e:
+        print(str(e))
+        config.bandWidthMin = 10
+        config.bandWidthMax = 24
+    # end try
+        
+        
     try:
         goldenRingsArray = workConfig.get("particles","goldenRingsArray").split(',')
         config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
     except Exception as e:
         print(str(e))
         config.goldenRingsArray = [0,24]
+        
+        
+    try:
+        config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
+    except Exception as e:
+        print(str(e))
+        config.useFixedBandColorsProb = .5
+        
+    # end try
 
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

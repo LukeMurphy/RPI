@@ -46,32 +46,30 @@ class ParticleDot:
         fy = random.SystemRandom().random() * p.fFactor + 1
         vx = math.cos(p.angle * n) * fx * direction
         vy = math.sin(p.angle * n) * fy * direction
-        r = int(random.uniform(config.rRangeMin, config.rRange) * p.brightness)
-        g = int(random.uniform(config.gRangeMin, config.gRange) * p.brightness)
-        b = int(random.uniform(config.bRangeMin, config.bRange) * p.brightness)
+        r = int(random.SystemRandom().uniform(config.rRangeMin, config.rRange) * p.brightness)
+        g = int(random.SystemRandom().uniform(config.gRangeMin, config.gRange) * p.brightness)
+        b = int(random.SystemRandom().uniform(config.bRangeMin, config.bRange) * p.brightness)
         
         
-        
-        
-        radius = random.uniform(1, p.maxRadius)
+        radius = random.SystemRandom().uniform(1, p.maxRadius)
         self.circuitCount = 0
 
 
         # Make radius fall into one of the systems bands - like quata
 
-        radialBand = round(random.uniform(1,12))
+        radialBand = round(random.SystemRandom().uniform(1,12))
 
         radius = p.radialBand * radialBand
 
-        rSpeed = random.uniform(100, 200) / radius / 10.0
+        rSpeed = random.SystemRandom().uniform(100, 200) / radius / 10.0
 
         xPos = p.x
         yPos = p.y
         angle = p.angle * n
 
         if direction == -1:
-            xPos = round(random.uniform(0, config.imageCanvasWidth))
-            yPos = round(random.uniform(0, config.imageCanvasHeight))
+            xPos = round(random.SystemRandom().uniform(0, config.imageCanvasWidth))
+            yPos = round(random.SystemRandom().uniform(0, config.imageCanvasHeight))
             angle = math.atan2(yPos - p.y, xPos - p.x)
             vx = math.cos(angle) * fx * direction
             vy = math.sin(angle) * fy * direction
@@ -106,11 +104,11 @@ class RadialSet:
 
     def makeRadialsSet(self, minNum=120, maxNum=300):
         self.radialsArray = []
-        self.radials = round(random.uniform(minNum, maxNum))
+        self.radials = round(random.SystemRandom().uniform(minNum, maxNum))
         self.rads = 2 * math.pi / self.radials
 
         self.angleOffset = 0.0
-        self.angleOffsetSpeed = random.uniform(0, math.pi / 300)
+        self.angleOffsetSpeed = random.SystemRandom().uniform(0, math.pi / 300)
         innerRadius = self.wBase / 3
         outerRadius = self.wBase
         skipRatio = random.SystemRandom().random() + 0.3
@@ -122,8 +120,8 @@ class RadialSet:
             innerRadius = 10
 
         for i in range(0, self.radials):
-            ir = innerRadius + random.uniform(-50, 50)
-            outr = outerRadius + random.uniform(-50, 50)
+            ir = innerRadius + random.SystemRandom().uniform(-50, 50)
+            outr = outerRadius + random.SystemRandom().uniform(-50, 50)
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
@@ -176,6 +174,14 @@ class ParticleSystem:
         [120,74,52],
         [129,137,158],
         [204,228,232],
+        
+        [50,10,50],
+        [120,50,50],
+        [50,120,90],
+        [222,208,182],
+        [120,74,52],
+        [129,137,158],
+        [204,228,232],
         [253,240,195],
         [199,166,151],
         [151,165,194],
@@ -184,7 +190,7 @@ class ParticleSystem:
         [27,38,83],
         [27,38,83],
         [27,38,253],
-        [27,38,253],
+
         ]
 
         self._bandColors = [
@@ -213,13 +219,17 @@ class ParticleSystem:
                     color[cx] *= .8
                     
         
-        self.bands = round(random.uniform(config.PSMinBands, config.PSMaxBands))
-        self.wBase = round(random.uniform(config.PSRadiusMin, config.PSRadiusMax))
+        # The rings around the center
+        self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
+        self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
+        self.bandWidthsSet = []
+        for b in range(0, self.bands) :
+            self.bandWidthsSet.append(round(random.SystemRandom().uniform(config.PSFixedColorRadiusDiffMin,config.PSFixedColorRadiusDiffMax)))
         
         if self.useFixedBandColors == True:
-            self.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.75))
+            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusFixedColorMin, config.PSRadiusMax))
             # self.bands = len(self.bandColors)
-            self.wDiff = round(random.uniform(config.bandWidthMin,config.bandWidthMax))
+            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin,config.bandWidthMax))
         
         self.xSpeed = random.SystemRandom().random()  * config.PSXSpeed
         self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
@@ -239,29 +249,31 @@ class ParticleSystem:
         radialSet.makeRadialsSet(1,1)
         self.radialSets.append(radialSet)
 
+    
     def setCenter(self):
         # initial center position
-        self.x = round(random.uniform(self.initXRange[0], self.initXRange[1]))
-        self.y = round(random.uniform(self.initYRange[0], self.initYRange[1]))
+        self.x = round(random.SystemRandom().uniform(self.initXRange[0], self.initXRange[1]))
+        self.y = round(random.SystemRandom().uniform(self.initYRange[0], self.initYRange[1]))
 
+    
     def setUp(self):
 
-        self.directionProb = random.uniform(0.4, 0.6)
+        self.directionProb = random.SystemRandom().uniform(0.4, 0.6)
         self.orbitProb = config.orbitProb
         # Number of sparks
-        self.p = int(5 + (random.uniform(config.minParticles, config.maxParticles)))
+        self.p = int(5 + (random.SystemRandom().uniform(config.minParticles, config.maxParticles)))
         self.angle = 2 * math.pi / self.p
 
         config.numberDone = round(self.p / 5)
 
         # Speed factor
-        self.fFactor = int(random.uniform(config.speedFactorMin, config.speedFactorMax))
+        self.fFactor = int(random.SystemRandom().uniform(config.speedFactorMin, config.speedFactorMax))
 
         """
 		if config.rotation != 0:
 			approxVisibleArea = self.config.canvasWidth * 0.6
 			ran = random.SystemRandom().random() * approxVisibleArea
-			ran = 64 + random.uniform(-96, 96)
+			ran = 64 + random.SystemRandom().uniform(-96, 96)
 			self.x = int(ran + self.config.canvasWidth / 2)
 		"""
 
@@ -274,15 +286,15 @@ class ParticleSystem:
 
         # speed that each light fades to black / sparkle
 
-        self.decr_r = round(random.uniform(0.25, 1))
-        self.decr_g = round(random.uniform(0.25, 1))
-        self.decr_b = round(random.uniform(0.25, 1))
+        self.decr_r = round(random.SystemRandom().uniform(0.25, 1))
+        self.decr_g = round(random.SystemRandom().uniform(0.25, 1))
+        self.decr_b = round(random.SystemRandom().uniform(0.25, 1))
 
         # vertical deacelleration
-        self.deacelleration = random.uniform(0.8, 0.99)
+        self.deacelleration = random.SystemRandom().uniform(0.8, 0.99)
 
         # horizontal deacelleration
-        self.deacellerationx = random.uniform(0.8, 0.95)
+        self.deacellerationx = random.SystemRandom().uniform(0.8, 0.95)
 
 
         dx = config.canvasWidth - self.x
@@ -303,6 +315,7 @@ class ParticleSystem:
             pDot.setUp(self, n)
             self.particles.append(pDot)
 
+    
     def move(self):
 
         self.x += self.xSpeed
@@ -484,9 +497,6 @@ class ParticleSystem:
 
 
 def drawBands(p):
-
-    if p.useFixedBandColors == True and random.SystemRandom().random() < .005 :
-        p.wBase = round(random.uniform(config.PSRadiusMin *.75, config.PSRadiusMax *.85))
         
     wBase = p.wBase
     
@@ -494,6 +504,7 @@ def drawBands(p):
     
     if p.useFixedBandColors == True :
         wDiff = p.wDiff
+        # print(wDiff, p.bands, wBase)
 
     aBase = 0
     aDiff = 10
@@ -517,6 +528,9 @@ def drawBands(p):
     colorBandIndex = 0
     goldenBandIndex = 0
     for i in range(0, p.bands):
+        
+        if p.useFixedBandColors == True :
+            wDiff = p.bandWidthsSet[i]
             
         w = wBase - i * wDiff
 
@@ -695,13 +709,13 @@ def iterate():
 
     if config.fadeRate > 255:
         config.fadeRate = 30
-        config.fadeRateDelta = random.uniform(0.1, 2)
+        config.fadeRateDelta = random.SystemRandom().uniform(0.1, 2)
 
         if config.fadeRateDelta <= config.fadeRateNewSystemThreshold:
             # when the system reaches a visible chaotic crescendo that will last a few seconds, remake the system
             # behind the chaos and start again - choose a new background, reset the center, set new radial attributes
             # renew the particle dots that travel
-            # bgChoice = math.floor(random.uniform(0,len(config.bgColorSets)))
+            # bgChoice = math.floor(random.SystemRandom().uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
             print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
             if random.SystemRandom().random() < config.totalResetProb:
@@ -769,9 +783,7 @@ def main(run=True):
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
     config.sparkleProb = float(workConfig.get("particles", "sparkleProb"))
-    config.fadeRateNewSystemThreshold = float(
-        workConfig.get("particles", "fadeRateNewSystemThreshold")
-    )
+    config.fadeRateNewSystemThreshold = float(workConfig.get("particles", "fadeRateNewSystemThreshold"))
 
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
@@ -788,60 +800,40 @@ def main(run=True):
         config.imageCanvasWidth = config.canvasWidth
         config.imageCanvasHeight = config.canvasHeight
     
-    try:
-        # comment: # for some towers the seam between the 
-        # start and end needs to become semi-continuous
-        # so I make the particles appear to move around the piece
-        # and overlap one side with some of the drawing
-        # if every thing was drawn pixel by pixel this would
-        # probably not need to be so complicated
-        config.horizontalContinuity = workConfig.getboolean("particles","horizontalContinuity")
-        config.horizontalOverlapFraction = int(workConfig.get("particles","horizontalOverlapFraction"))
-    except Exception as e:
-        print(str(e))
-        config.horizontalContinuity = False
-        config.horizontalOverlapFraction = 1
-
-    try:
-        # comment: # for some towers the seam between the 
-        # start and end needs to become semi-continuous
-        # so I make the particles appear to move around the piece
-        # and overlap one side with some of the drawing
-        # if every thing was drawn pixel by pixel this would
-        # probably not need to be so complicated
-        config.verticalContinuity = workConfig.getboolean("particles","verticalContinuity")
-        config.verticalOverlapFraction = int(workConfig.get("particles","verticalOverlapFraction"))
-    except Exception as e:
-        print(str(e))
-        config.verticalContinuity = False
-        config.verticalOverlapFraction = 1
-    # end try
 
 
-    try:
-        config.PSXSpeed = float(workConfig.get("particles", "PSXSpeed"))
-        config.PSYSpeed = float(workConfig.get("particles", "PSYSpeed"))
-        config.PSRadiusFactor1 = float(workConfig.get("particles", "PSRadiusFactor1"))
-        config.PSRadiusFactor2 = float(workConfig.get("particles", "PSRadiusFactor2"))
-        config.PSRadiusMin = float(workConfig.get("particles", "PSRadiusMin"))
-        config.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
-    except Exception as e:
-        print(str(e))
-        config.PSXSpeed = .5
-        config.PSYSpeed =  0
-        config.PSRadiusFactor1 =  1.5
-        config.PSRadiusFactor2 =  1.5
-        config.PSRadiusMin = 220
-        config.PSRadiusMax = config.canvasWidth
-        
-    try:
-        config.PSMinBands = int(workConfig.get("particles", "PSMinBands"))
-        config.PSMaxBands = int(workConfig.get("particles", "PSMaxBands"))
-    except Exception as e:
-        print(str(e))
-        config.PSMinBands = 12
-        config.PSMaxBands = 24
-    # end try
+    # comment: # for some towers the seam between the 
+    # start and end needs to become semi-continuous
+    # so I make the particles appear to move around the piece
+    # and overlap one side with some of the drawing
+    # if every thing was drawn pixel by pixel this would
+    # probably not need to be so complicated
+    config.horizontalContinuity = workConfig.getboolean("particles","horizontalContinuity")
+    config.horizontalOverlapFraction = int(workConfig.get("particles","horizontalOverlapFraction"))
+
+    config.verticalContinuity = workConfig.getboolean("particles","verticalContinuity")
+    config.verticalOverlapFraction = int(workConfig.get("particles","verticalOverlapFraction"))
+
+
+    config.PSXSpeed = float(workConfig.get("particles", "PSXSpeed"))
+    config.PSYSpeed = float(workConfig.get("particles", "PSYSpeed"))
+    config.PSRadiusFactor1 = float(workConfig.get("particles", "PSRadiusFactor1"))
+    config.PSRadiusFactor2 = float(workConfig.get("particles", "PSRadiusFactor2"))
+    config.PSRadiusMin = float(workConfig.get("particles", "PSRadiusMin"))
+    config.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
+    config.PSMinBands = int(workConfig.get("particles", "PSMinBands"))
+    config.PSMaxBands = int(workConfig.get("particles", "PSMaxBands"))
+    config.PSRadiusFixedColorMin = int(workConfig.get("particles", "PSRadiusFixedColorMin"))
+
+    config.bandWidthMin = int(workConfig.get("particles","bandWidthMin"))
+    config.bandWidthMax = int(workConfig.get("particles","bandWidthMax"))
+    config.PSFixedColorRadiusDiffMin = int(workConfig.get("particles","PSFixedColorRadiusDiffMin"))
+    config.PSFixedColorRadiusDiffMax = int(workConfig.get("particles","PSFixedColorRadiusDiffMax"))
+
+    goldenRingsArray = workConfig.get("particles","goldenRingsArray").split(',')
+    config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
+    
+    config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
 
     try:
         config.rRange = int(workConfig.get("particles","rRange"))
@@ -863,31 +855,8 @@ def main(run=True):
     particleColorRangeVals  = workConfig.get("particles","particleColorRange").split(",")
     config.particleColorRange = list(float(i) for  i in particleColorRangeVals)
         
-    try:
-        config.bandWidthMin = int(workConfig.get("particles","bandWidthMin"))
-        config.bandWidthMax = int(workConfig.get("particles","bandWidthMax"))
-    except Exception as e:
-        print(str(e))
-        config.bandWidthMin = 10
-        config.bandWidthMax = 24
-    # end try
+
         
-        
-    try:
-        goldenRingsArray = workConfig.get("particles","goldenRingsArray").split(',')
-        config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
-    except Exception as e:
-        print(str(e))
-        config.goldenRingsArray = [0,24]
-        
-        
-    try:
-        config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
-    except Exception as e:
-        print(str(e))
-        config.useFixedBandColorsProb = .5
-        
-    # end try
 
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))

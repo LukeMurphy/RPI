@@ -167,6 +167,7 @@ class ParticleSystem:
         [27,38,83],
         ]
         self.bandColors = [
+        [0,0,0],
         [50,10,50],
         [120,50,50],
         [50,120,90],
@@ -527,78 +528,90 @@ def drawBands(p):
     # Draw from the outside-in
     colorBandIndex = 0
     goldenBandIndex = 0
+
+
+    calculatedRingSize = wBase/p.bands
+
     for i in range(0, p.bands):
         
         if p.useFixedBandColors == True :
             wDiff = p.bandWidthsSet[i]
             
         w = wBase - i * wDiff
-
-        x0 = p.x - w / 2
-        y0 = p.y - w / 2
-        x1 = p.x + w / 2
-        y1 = p.y + w / 2
         
-        if x1 < 0 or x1 < x0 :
-            x1 = x0
-        if y1 < 0 or y1 < y0 :
-            y1 = y0
-
-        a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate))
-
-        #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
+        if p.useFixedBandColors == True or random.SystemRandom().random() < .33 :
+            w = (p.bands - i) * calculatedRingSize
         
-        if p.useFixedBandColors == True :
-            # index = p.bands - i - 1
-            index = colorBandIndex
-            # index = i
-            rBase = round(p.bandColors[index][0] * config.brightness)
-            gBase = round(p.bandColors[index][1] * config.brightness)
-            bBase = round(p.bandColors[index][2] * config.brightness)
-            aBase = 255
-            colorBandIndex += 1
+        if w > 10 :
+            x0 = p.x - w / 2
+            y0 = p.y - w / 2
+            x1 = p.x + w / 2
+            y1 = p.y + w / 2
             
-            if colorBandIndex >= len(p.bandColors) :
-                colorBandIndex = 0
+            if x1 < 0 or x1 < x0 :
+                x1 = x0
+            if y1 < 0 or y1 < y0 :
+                y1 = y0
 
-        '''
-        if i == 1:
-            config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
-        '''
-        # Should try to interleave the bands so that the fixed color bands integrate better
-        # with the prescribed golden ones
-        
-        if i == 0 :
-            a = 20
-        try :
-            # Golden Rings
-            if i in config.goldenRingsArray:
-                config.draw.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
-                config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
-            else :
-                if p.useFixedBandColors == True and index == 4 :
-                    config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
-                    # config.draw.ellipse((x0-1, y0-1, x1-1, y1-1), outline=(rBase, gBase, bBase, a))
-                    config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
+            a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate))
+
+            #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
+            
+            
+            if p.useFixedBandColors == True :
+                # index = p.bands - i - 1
+                index = colorBandIndex
+                # index = i
+                
+                rBase = round(p.bandColors[index][0] * config.brightness)
+                gBase = round(p.bandColors[index][1] * config.brightness)
+                bBase = round(p.bandColors[index][2] * config.brightness)
+                aBase = 255
+                colorBandIndex += 1
+                
+                if colorBandIndex >= len(p.bandColors) :
+                    colorBandIndex = 0
+
+    
+            '''
+            if i == 1:
+                config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
+            '''
+            # Should try to interleave the bands so that the fixed color bands integrate better
+            # with the prescribed golden ones
+            
+            if i == 0 :
+                a = 20
+            try :
+                # Golden Rings
+                if i in config.goldenRingsArray:
+                    config.draw.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
+                    config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
                 else :
-                    config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                    config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-        except Exception as e :
-            print("==>" + str(e))
+                    if p.useFixedBandColors == True and index == 4 :
+                        config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
+                        # config.draw.ellipse((x0-1, y0-1, x1-1, y1-1), outline=(rBase, gBase, bBase, a))
+                        config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
+                    else :
+                        config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
+                        config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
+            except Exception as e :
+                print("==>" + str(e))
 
-        if p.useFixedBandColors == False :
-            rBase += rDiff
-            gBase += gDiff
-            bBase += bDiff
-            aBase += aDiff
+            if p.useFixedBandColors == False :
+                rBase += rDiff
+                gBase += gDiff
+                bBase += bDiff
+                aBase += aDiff
 
-        if rBase < 0 : rBase = 0
-        if gBase < 0 : gBase = 0
-        if bBase < 0 : bBase = 0
+            if rBase < 0 : rBase = 0
+            if gBase < 0 : gBase = 0
+            if bBase < 0 : bBase = 0
 
     i = 0
 
 
+    
     for rSet in p.radialSets :
 
         rSet.angleOffset += rSet.angleOffsetSpeed
@@ -625,7 +638,7 @@ def drawBands(p):
         if rSet.drawRadialPolys == True:
             config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
             config.drawOverFlow.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
-
+    
 
 
 

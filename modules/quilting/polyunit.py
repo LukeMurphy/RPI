@@ -43,7 +43,7 @@ class Unit:
 		self.yPos = 0
 		self.redraw = False
 
-		self.draw = ImageDraw.Draw(config.canvasImage)
+		self.draw = ImageDraw.Draw(config.image)
 
 		## Like the "stiching" color and affects the overall "tone" of the piece
 		self.outlineColor = config.outlineColorObj.currentColor

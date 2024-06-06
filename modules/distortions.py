@@ -118,14 +118,14 @@ def setUpDisturbanceConfigs(configSet, config, workConfig):
 def setupStableSections(config):
     # print("setupStableSections RUNNING NOW")
     config.stableSegments = []
-    n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
+    n = round(random.SystemRandom().uniform(config.stableSectionsMin, config.stableSectionsMax))
     minWidth = config.stableSectionsMinWidth
     minHeight = config.stableSectionsMinHeight
     for i in range(0, n):
-        xPos = round(random.uniform(0, config.canvasWidth))
-        xPos2 = round(random.uniform(xPos + minWidth, config.canvasWidth))
-        yPos = round(random.uniform(0, config.canvasHeight))
-        yPos2 = round(random.uniform(yPos + minHeight, config.canvasHeight))
+        xPos = round(random.SystemRandom().uniform(0, config.canvasWidth))
+        xPos2 = round(random.SystemRandom().uniform(xPos + minWidth, config.canvasWidth))
+        yPos = round(random.SystemRandom().uniform(0, config.canvasHeight))
+        yPos2 = round(random.SystemRandom().uniform(yPos + minHeight, config.canvasHeight))
         config.stableSegments.append([xPos, yPos, xPos2, yPos2])
     
 
@@ -133,53 +133,53 @@ def rebuildSections(config):
     # global config
 
     # print("REBUILDSECTIONS RUNNING NOW")
-    if random.random() < config.changeDisturbanceSetProb:
-        setNumber = math.floor(random.uniform(0, len(config.disturbanceConfigSets)))
+    if random.SystemRandom().random() < config.changeDisturbanceSetProb:
+        setNumber = math.floor(random.SystemRandom().uniform(0, len(config.disturbanceConfigSets)))
         setUpDisturbanceConfigs(config.disturbanceConfigSets[setNumber],config.distortionConfigRef, config.distortionworkConfigRef)
         # print("REBUILDSECTIONS NEW RUNNING NOW: " + config.disturbanceConfigSets[setNumber])
 
-    if random.random() < .5:
+    if random.SystemRandom().random() < .5:
         config.speedDeAcceleration = config.speedDeAccelerationUpperLimit
     else:
         speedDeAcceleration = config.speedDeAccelerationBase
 
     if config.diagonalMovement == False :
-        sectionDisturbanceDirection = 1 if random.random() < .5 else 0
+        sectionDisturbanceDirection = 1 if random.SystemRandom().random() < .5 else 0
         
     baseSpeed = config.baseSectionSpeed
     
     for i in range(0, config.numberOfSections):
         section = config.movingSections[i]
-        section.sectionRotation = random.uniform(
+        section.sectionRotation = random.SystemRandom().uniform(
             -config.sectionRotationRange, config.sectionRotationRange)
-        section.sectionPlacement = [round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])), round(
-            random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1]))]
+        section.sectionPlacement = [round(random.SystemRandom().uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])), round(
+            random.SystemRandom().uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1]))]
         section.sectionPlacementInit = [
             section.sectionPlacement[0], section.sectionPlacement[1]]
-        section.sectionSize = [round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])), round(
-            random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
-        section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
-                                random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
+        section.sectionSize = [round(random.SystemRandom().uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])), round(
+            random.SystemRandom().uniform(config.sectionHeightRange[0], config.sectionHeightRange[1]))]
+        section.sectionSpeed = [random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
+                                random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
         
         if config.diagonalMovement == False :
             if sectionDisturbanceDirection == 1 :
-                section.sectionSpeed = [random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,0]
+                section.sectionSpeed = [random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,0]
             else :
-                section.sectionSpeed = [0,random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
+                section.sectionSpeed = [0,random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
                 
         if config.randomDiagonal == False and config.diagonalMovement == True :
-            speed = random.uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal
+            speed = random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal
             
             hComponent = math.cos(config.diagonalFixedAngle) * speed
             vComponent = math.sin(config.diagonalFixedAngle) * speed
             section.sectionSpeed = [hComponent,vComponent]
 
             
-        section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
+        section.rotationSpeed = random.SystemRandom().uniform(-baseSpeed, baseSpeed)
         section.actionCount = 0
-        section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
+        section.actionCountLimit = round(random.SystemRandom().uniform(10, config.sectionMovementCountMax))
         section.done = False
-        section.stopProb = random.uniform(0, config.stopProb)
+        section.stopProb = random.SystemRandom().uniform(0, config.stopProb)
         
     config.drawingPrinted = False
 
@@ -193,7 +193,7 @@ def disturber(config):
 
             if sectionParams.actionCount < sectionParams.actionCountLimit:
                 
-                # print("RUNNING disturb " + str(random.random()))
+                # print("RUNNING disturb " + str(random.SystemRandom().random()))
 
                 xPos = round(sectionParams.sectionPlacementInit[0])
                 yPos = round(sectionParams.sectionPlacementInit[1])
@@ -217,11 +217,11 @@ def disturber(config):
 
                 sectionParams.actionCount += 1
 
-                if random.random() < sectionParams.stopProb:
+                if random.SystemRandom().random() < sectionParams.stopProb:
                     sectionParams.rotationSpeed = 0
-                if random.random() < sectionParams.stopProb:
+                if random.SystemRandom().random() < sectionParams.stopProb:
                     sectionParams.sectionSpeed[0] = 0
-                if random.random() < sectionParams.stopProb:
+                if random.SystemRandom().random() < sectionParams.stopProb:
                     sectionParams.sectionSpeed[1] = 0
                     
                 # config.canvasDraw.rectangle((round(sectionParams.sectionPlacement[0]), 
@@ -314,27 +314,27 @@ def additonalSetup(config, workConfig):
 
 
 def iterationFunction(config):
-    if random.random() < config.stableSectionsChangeProb:
+    if random.SystemRandom().random() < config.stableSectionsChangeProb:
         # print("resetting stable sections IN ITERATE")
         rebuildSections(config)
         setupStableSections(config)
 
     # paste over a section of the image on to itself and rotate
     if config.doSectionDisturbance == True:
-        # print("Calling disturb " + str(random.random()))
+        # print("Calling disturb " + str(random.SystemRandom().random()))
         disturber(config)
     else :
         config.canvasImage.paste(config.image,(0,0),config.image)
 
     # print("quilts ",config.render, config.instanceNumber)
     # Rebuild the main pattern, halt any disturbances
-    if random.random() < config.rebuildPatternProbability and config.doSectionDisturbance == True:
+    if random.SystemRandom().random() < config.rebuildPatternProbability and config.doSectionDisturbance == True:
         # print("Setting disturb to off")
         config.doSectionDisturbance = False
         rebuildSections(config)
 
     # RANDOM OVERLAY REPETITION DISTURBANCE
-    if random.random() < config.redoSectionDisturbance :
+    if random.SystemRandom().random() < config.redoSectionDisturbance :
         # print("rebuilding disturb sections, truning disturb on")
         rebuildSections(config)
         config.doSectionDisturbance = True

@@ -41,8 +41,8 @@ def transformImage(img):
 # for b's range - but this way it makes for some more
 # mixed up results
 def randomRange(A=0, B=1, rounding=False):
-    a = random.uniform(A, B)
-    b = random.uniform(A, B)
+    a = random.SystemRandom().uniform(A, B)
+    b = random.SystemRandom().uniform(A, B)
     if rounding == False:
         return (a, b)
     else:
@@ -72,7 +72,7 @@ def restartPiece():
     """
 
     if random.random() < 0.25:
-        choice = round(random.uniform(1, 3))
+        choice = round(random.SystemRandom().uniform(1, 3))
         print("Choice {0}".format(choice))
         if choice == 1:
             # ruby pink bgs
@@ -102,13 +102,13 @@ def restartPiece():
     )
 
     if random.random() < config.resetSizeProbability:
-        config.rotation = random.uniform(-config.rotationRange, config.rotationRange)
+        config.rotation = random.SystemRandom().uniform(-config.rotationRange, config.rotationRange)
         # config.doingRefresh = 0
         # config.doingRefreshCount = config.refreshCount
 
     if random.random() < config.resetSizeProbability:
         config.blockSize = round(
-            random.uniform(config.blockSizeMin, config.blockSizeMax)
+            random.SystemRandom().uniform(config.blockSizeMin, config.blockSizeMax)
         )
 
         if config.blockSize >= 11:
@@ -126,7 +126,7 @@ def restartPiece():
 
     # poly specific
     if random.random() < config.resetSizeProbability:
-        config.randomness = random.uniform(0, config.randomnessBase)
+        config.randomness = random.SystemRandom().uniform(0, config.randomnessBase)
         # config.doingRefresh = 0
         # config.doingRefreshCount = config.refreshCount
 
@@ -202,7 +202,7 @@ def main(run=True):
     config.gapSize = int(workConfig.get("quilt-polys", "gapSize"))
     config.blockSizeMin = int(workConfig.get("quilt-polys", "blockSizeMin"))
     config.blockSizeMax = int(workConfig.get("quilt-polys", "blockSizeMax"))
-    config.blockSize = round(random.uniform(config.blockSizeMin, config.blockSizeMax))
+    config.blockSize = round(random.SystemRandom().uniform(config.blockSizeMin, config.blockSizeMax))
 
     config.blockRowsMin = int(workConfig.get("quilt-polys", "blockRowsMin"))
     config.blockRowsMax = int(workConfig.get("quilt-polys", "blockRowsMax"))

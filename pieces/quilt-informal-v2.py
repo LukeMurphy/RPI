@@ -114,7 +114,7 @@ class unit:
 
     def update(self):
         # self.fillColorMode == "random" or
-        if random.random() > config.colorPopProb:
+        if random.SystemRandom().random() > config.colorPopProb:
             self.colOverlay.stepTransition()
             self.fillColor = tuple(
                 int(a * self.brightness) for a in self.colOverlay.currentColor
@@ -182,10 +182,10 @@ class unit:
         if self.changeColor == True:
             if self.fillColorMode == "random":
                 self.fillColor = colorutils.randomColor(
-                    random.uniform(0.01, self.brightness)
+                    random.SystemRandom().uniform(0.01, self.brightness)
                 )
                 self.outlineColor = colorutils.getRandomRGB(
-                    random.uniform(0.01, self.brightness)
+                    random.SystemRandom().uniform(0.01, self.brightness)
                 )
             else:
                 self.fillColor = colorutils.getRandomColorHSV(
@@ -340,22 +340,22 @@ def drawSquareSpiral():
             rangeChange = (config.polyDistortionMin, config.polyDistortionMax)
 
             for i in range(1, turns):
-                x = i * b1 + cntr[0] + random.uniform(rangeChange[0], rangeChange[1])
-                y = i * b2 + cntr[1]  # + random.uniform(rangeChange[0],rangeChange[1])
+                x = i * b1 + cntr[0] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                y = i * b2 + cntr[1]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 A.append((x, y))
 
-                x = -i * b1 + cntr[0]  # + random.uniform(rangeChange[0],rangeChange[1])
-                y = i * b2 + cntr[1] + random.uniform(rangeChange[0], rangeChange[1])
+                x = -i * b1 + cntr[0]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
+                y = i * b2 + cntr[1] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
                 A.append((x, y))
 
-                x = -i * b1 + cntr[0] + random.uniform(rangeChange[0], rangeChange[1])
-                y = -i * b2 + cntr[1]  # + random.uniform(rangeChange[0],rangeChange[1])
+                x = -i * b1 + cntr[0] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                y = -i * b2 + cntr[1]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 A.append((x, y))
 
                 x = (i + 1) * b1 + cntr[
                     0
-                ]  # + random.uniform(rangeChange[0],rangeChange[1])
-                y = -i * b2 + cntr[1] + random.uniform(rangeChange[0], rangeChange[1])
+                ]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
+                y = -i * b2 + cntr[1] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
                 A.append((x, y))
 
             B = [(item[0] - b1, item[1]) for item in A]
@@ -458,16 +458,16 @@ def drawSquareSpiral():
 
 def restartPiece():
 
-    config.polyDistortionMin = -random.uniform(1, config.polyDistortion + 1)
-    config.polyDistortionMax = random.uniform(1, config.polyDistortion + 1)
+    config.polyDistortionMin = -random.SystemRandom().uniform(1, config.polyDistortion + 1)
+    config.polyDistortionMax = random.SystemRandom().uniform(1, config.polyDistortion + 1)
 
     del config.unitArray[:]
 
-    p = math.floor(random.uniform(0, len(config.opticalPatterns)))
+    p = math.floor(random.SystemRandom().uniform(0, len(config.opticalPatterns)))
 
     config.opticalPattern = config.opticalPatterns[p]
  
-    if random.random() < config.sizeFactorChangeProb :
+    if random.SystemRandom().random() < config.sizeFactorChangeProb :
         config.sizeFactor = 2.0
     else :
         config.sizeFactor = 1.0
@@ -581,12 +581,12 @@ def main(run=True):
     # config.blockLength = config.blockSize
     # config.blockHeight = config.blockSize
 
-    p = math.floor(random.uniform(0, len(config.opticalPatterns)))
+    p = math.floor(random.SystemRandom().uniform(0, len(config.opticalPatterns)))
     config.opticalPattern = config.opticalPatterns[p]
 
 
     config.timeToComplete = int(workConfig.get("quilt-informal", "timeToComplete"))
-    # config.timeToComplete = 60 #round(random.uniform(30,220))
+    # config.timeToComplete = 60 #round(random.SystemRandom().uniform(30,220))
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -648,7 +648,7 @@ def iterate():
 
     for i in range(0, len(config.unitArray)):
         obj = config.unitArray[i]
-        if random.random() > 0.98:
+        if random.SystemRandom().random() > 0.98:
             obj.outlineColorObj.stepTransition()
         obj.update()
         obj.renderPolys()

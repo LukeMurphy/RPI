@@ -59,14 +59,14 @@ def timeChecker(sequenceConfig, config) :
                 sequenceConfig.playOrder = 0
             pieceToPlay = sequenceConfig.playOrder
         else :
-            pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)))
+            pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList)))
             if pieceToPlay == len(sequenceConfig.workList) :
                 pieceToPlay = 0
 
         print("Piece Playing is: " + str(pieceToPlay))
         print(sequenceConfig.workList[pieceToPlay])
 
-        sequenceConfig.currentPieceDuration = round(random.uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))
+        sequenceConfig.currentPieceDuration = round(random.SystemRandom().uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))
         
         # Launch the next player
         # should be able to infer this without explicit specifications in the config
@@ -281,7 +281,7 @@ def loadSequenceFile():
         sequenceConfig.mainAppWindow.setUp()
         sequenceConfig.mainAppWindow.createMainCanvas()
 
-        pieceToPlay = round(random.uniform(0, len(sequenceConfig.workList)-1))
+        pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList)-1))
         pieceToPlay = 0
         loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 

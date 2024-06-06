@@ -35,8 +35,8 @@ def transformImage(img):
 # for b's range - but this way it makes for some more
 # mixed up results
 def randomRange(A=0, B=1, rounding=False):
-    a = random.uniform(A, B)
-    b = random.uniform(A, B)
+    a = random.SystemRandom().uniform(A, B)
+    b = random.SystemRandom().uniform(A, B)
     if rounding == False:
         return (a, b)
     else:
@@ -70,8 +70,8 @@ def restartPiece():
             # stars: CENTER SQUARE
             config.c3HueRange = newHueRange
             config.c3ValueRange = randomRange()
-            if random.random() < 0.25:
-                choice = round(random.uniform(1, 3))
+            if random.SystemRandom().random() < 0.25:
+                choice = round(random.SystemRandom().uniform(1, 3))
                 # print ("Choice {0}".format(choice))
                 if choice == 1:
                     # yellow centers
@@ -110,7 +110,7 @@ def restartPiece():
 
             # triangles:  the star center diamond
             # newHueRange = randomRange(0,360,True)
-            if random.random() < 0.5:
+            if random.SystemRandom().random() < 0.5:
                 newHueRange = randomRange(0, 360, True)
             newSaturationRange = randomRange()
             newValueRange = randomRange()
@@ -146,10 +146,10 @@ def restartPiece():
         ColorSet(config.c3HueRange, config.c3SaturationRange, config.c3ValueRange)
     )
 
-    if random.random() < config.resetSizeProbability:
+    if random.SystemRandom().random() < config.resetSizeProbability:
         if config.quiltPattern == "stars":
             config.blockSize = round(
-                random.uniform(config.blockSizeMin, config.blockSizeMax)
+                random.SystemRandom().uniform(config.blockSizeMin, config.blockSizeMax)
             )
             if config.blockSize >= 11:
                 config.blockCols = config.blockColsMin
@@ -161,7 +161,7 @@ def restartPiece():
                 createstarpieces.createPieces(config, False)
         else:
             config.blockSize = round(
-                random.uniform(config.blockSizeMin, config.blockSizeMax)
+                random.SystemRandom().uniform(config.blockSizeMin, config.blockSizeMax)
             )
             if config.blockSize >= 16:
                 config.blockCols = config.blockColsMin
@@ -183,8 +183,8 @@ def restartPiece():
         createtrianglepieces.refreshPalette(config)
         setInitialColors(True)
 
-    if random.random() < 0.5:
-        config.rotation = random.uniform(-config.rotationRange, config.rotationRange)
+    if random.SystemRandom().random() < 0.5:
+        config.rotation = random.SystemRandom().uniform(-config.rotationRange, config.rotationRange)
 
 
 def setInitialColors(refresh=False):
@@ -283,7 +283,7 @@ def main(run=True):
         config.gapSize = int(workConfig.get("quilt-triangles", "gapSize"))
         config.blockSizeMin = int(workConfig.get("quilt-triangles", "blockSizeMin"))
         config.blockSizeMax = int(workConfig.get("quilt-triangles", "blockSizeMax"))
-        config.blockSize = round(random.uniform(config.blockSizeMin, config.blockSizeMax))
+        config.blockSize = round(random.SystemRandom().uniform(config.blockSizeMin, config.blockSizeMax))
     except Exception as e:
         print(str(e))
         config.blockSize = int(workConfig.get("quilt-triangles", "blockSize"))

@@ -304,6 +304,9 @@ def additonalSetup(config, workConfig):
     config.stableSectionsMinHeight = int(workConfig.get("additonalSetup", "stableSectionsMinHeight"))
     config.stableSectionsChangeProb = float(workConfig.get("additonalSetup", "stableSectionsChangeProb"))
     setupStableSections(config)
+    
+    config.doingRefresh = 100
+    config.doingRefreshCount = 100
 
     config.movingSections = []
     for i in range(0, config.numberOfSections):

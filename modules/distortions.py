@@ -236,9 +236,33 @@ def disturber(config):
 
 
         # these are the sections that do not get smeared
-        for s in config.stableSegments:
-            tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
-            config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+        
+        
+        if config.doingRefresh < config.doingRefreshCount:
+            tempCanvasImage  = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+            for s in config.stableSegments:
+                tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
+                # config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+                tempCanvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+            
+            # print("Crossfadings: " +  str(config.doingRefresh))
+            # new blend in over a couple steps
+            crossFade = Image.blend(
+                config.canvasImage,
+                tempCanvasImage,
+                config.doingRefresh / config.doingRefreshCount,
+            )
+            config.doingRefresh +=1
+            config.canvasImage.paste(crossFade, (0,0), crossFade)
+
+        else :
+            # print("pasting")
+            for s in config.stableSegments:
+                tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
+                config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+            
+            
+        
 
 
 def additonalSetup(config, workConfig):
@@ -316,6 +340,8 @@ def iterationFunction(config):
         config.doSectionDisturbance = True
         
 def resetFunction(config):
+    
+        # config.doingRefresh = 1
         rebuildSections(config)
         setupStableSections(config)
         disturber(config)

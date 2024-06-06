@@ -103,8 +103,8 @@ def restartPiece():
 
     if random.random() < config.resetSizeProbability:
         config.rotation = random.uniform(-config.rotationRange, config.rotationRange)
-        config.doingRefresh = 0
-        config.doingRefreshCount = config.refreshCount
+        # config.doingRefresh = 0
+        # config.doingRefreshCount = config.refreshCount
 
     if random.random() < config.resetSizeProbability:
         config.blockSize = round(
@@ -120,15 +120,15 @@ def restartPiece():
 
         config.blockLength = config.blockSize
         config.blockHeight = config.blockSize
-        config.doingRefresh = 0
-        config.doingRefreshCount = config.refreshCount
+        # config.doingRefresh = 0
+        # config.doingRefreshCount = config.refreshCount
         createpolypieces.createPieces(config, True)
 
     # poly specific
     if random.random() < config.resetSizeProbability:
         config.randomness = random.uniform(0, config.randomnessBase)
-        config.doingRefresh = 0
-        config.doingRefreshCount = config.refreshCount
+        # config.doingRefresh = 0
+        # config.doingRefreshCount = config.refreshCount
 
     createpolypieces.refreshPalette(config)
     setInitialColors(True)
@@ -322,7 +322,7 @@ def main(run=True):
 
     config.doingRefresh = config.refreshCount
     config.doingRefreshCount = config.refreshCount
- 
+    config.doingCrossFade = False
  
     distortions.additonalSetup(config, workConfig)
     

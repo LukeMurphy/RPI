@@ -468,15 +468,15 @@ def restartPiece():
     config.opticalPattern = config.opticalPatterns[p]
  
     if random.SystemRandom().random() < config.sizeFactorChangeProb :
-        config.sizeFactor = 2.0
+        config.sizeFactor = config.extraSizeMultiplier
     else :
-        config.sizeFactor = 1.0
+        config.sizeFactor = config.baseSizeMultiplier
     
     config.blockLength = config.blockLengthBase * config.sizeFactor
     config.blockHeight = config.blockHeightBase * config.sizeFactor
         
 
-    #print(config.opticalPattern)
+    # print(config.opticalPattern + " " + str(config.sizeFactor))
 
     drawSquareSpiral()
 
@@ -570,11 +570,10 @@ def main(run=True):
         config.opticalPatterns = ["Regular" , "Regular", "LighteningStrikeH", "LighteningStrikeH", "Diagonals", "LighteningStrikeH"]
     
     # Chance that when the Quilt rebuilds the pattern doubles in size 
-    try:
-        config.sizeFactorChangeProb = float(workConfig.get("quilt-informal","sizeFactorChangeProb"))
-    except Exception as e:
-        print(str(e))
-        config.sizeFactorChangeProb = 0.0
+    config.sizeFactorChangeProb = float(workConfig.get("quilt-informal","sizeFactorChangeProb"))
+    config.baseSizeMultiplier = float(workConfig.get("quilt-informal","baseSizeMultiplier"))
+    config.extraSizeMultiplier = float(workConfig.get("quilt-informal","extraSizeMultiplier"))
+
     # "LighteningStrikeH"  aka Charlie Brown sweater ...
 
     # for now, all squares

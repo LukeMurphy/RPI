@@ -31,12 +31,10 @@ class Lsys :
     # + - are angle changes
     
     
-    Axiom = "FFFF"
+    Axiom = "F"
     Rule1 = "BB"
     segmentLength = 18
     segmentDecrement = .9
-    # Every F gets replaced with this
-    Rule1 = "BB"
     # Every B gets replaced with this
     Rule2 = "B(+F)(-F)B(+F)(-F)B(+F)(-F)F(F++F+F)"	
     
@@ -45,36 +43,35 @@ class Lsys :
     
     
      # simple tree no extra branches
-    # Rule2 = "B(+B)(-B)"
+    Rule2 = "B(+B)(-B)"
     
     # tree with 3 splits
-    # Rule2 = "B(B)(+F)(-F)"
+    Rule2 = "B(B)(+F)(-F)"
     
     # simple tree no extra branches
-    # Rule2 = "B(B)(+B)(-B)"
+    Rule2 = "B(B)(+B)(-B)"
 
-    # 
-    # Rule2 = "B(B)(+B(+B))(-B(-B))"
+    Rule2 = "B(B)(+B(+B))(-B(-B))"
     
-    # Rule2 = "B(B(FB)(++FB)(--FB))"
+    Rule2 = "B(B(FB)(++FB)(--FB))"
     
-    # Rule2 = "B(-FFFF)(+FFFF)(FFF)"
+    Rule2 = "B(-FF)(+FF)(BFF)"
     
-    recursionLimit = 3
-    segmentLength = 18
-    segmentDecrement = .95
+    recursionLimit = 5
+    segmentLength = 12
+    segmentDecrement = .9
     # simple branching tree 1 split
-    Axiom = "F"
-    Rule1 = "BB"
+    # Axiom = "F"
+    # Rule1 = "BB"
     # most basic binary tree
-    Rule2 = "B(+F)(-F)"
-    Rule2 = "B(+FFF)(-FFF)(BFBF)"
+    # Rule2 = "B(+F)(-F)"
+    # Rule2 = "B(+FFF)(-FFF)(BFBF)"
 
     # Etruscan Tree
-    recursionLimit = 3
-    segmentLength = 18
-    segmentDecrement = .97
-    Rule2 = "B(+F)(-F)(B(B(+F)(-F)(B(B(+F)(-F)(B(B(+F)(-F)B))))))"
+    # recursionLimit = 3
+    # segmentLength = 18
+    # segmentDecrement = .97
+    # Rule2 = "B(+F)(-F)(B(B(+F)(-F)(B(B(+F)(-F)(B(B(+F)(-F)B))))))"
     
 
     useRandom = False

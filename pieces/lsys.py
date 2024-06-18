@@ -15,6 +15,7 @@ class LPoint :
         self.scale = 1
         self.isTerminal = 0
         self.angle = 0
+        self.angleDisplay = 0
         self.segmentLength = 1
     
 
@@ -132,6 +133,7 @@ class Lsys :
         lpt.xPos = 0
         lpt.yPos = 0
         lpt.angle = -math.pi/2
+        lpt.angleDisplay = -math.pi/2
         lpt.scale = 1
         lpt.isTerminal = 0
         lpt.name = ""
@@ -150,9 +152,9 @@ class Lsys :
             
             if instruction not in ("(",")") :
                 if instruction == "+" :
-                    a += math.pi/4 * random.uniform(.7,1.4)
+                    a += math.pi/4 * random.uniform(.9,1.1)
                 if instruction == "-" :
-                    a -= math.pi/4 * random.uniform(.7,1.4)
+                    a -= math.pi/4 * random.uniform(.9,1.1)
                 if instruction == "F" :
                     xPos += self.segmentLength * d * math.cos(a) * 2
                     yPos += self.segmentLength * d * math.sin(a) * 2
@@ -160,6 +162,7 @@ class Lsys :
                     lpt.xPos = xPos
                     lpt.yPos = yPos
                     lpt.angle = a
+                    lpt.angleDisplay = a
                     lpt.scale = d
                     lpt.isTerminal = c
                     lpt.name = "F"
@@ -173,6 +176,7 @@ class Lsys :
                     lpt.xPos = xPos
                     lpt.yPos = yPos
                     lpt.angle = a
+                    lpt.angleDisplay = a * random.uniform(.9,1.1)
                     lpt.scale = d
                     lpt.isTerminal = c
                     lpt.name = "B"
@@ -208,7 +212,7 @@ class Lsys :
 def drawLines(arg) :
     if config.rendered == False :
         # print("running")
-        config.imageDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (100,100,100,255))
+        config.imageDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (220,210,200,210))
         for i in range(0, len(L.drawingPoints)):
             xPos = L.drawingPoints[i].xPos + 200
             yPos = L.drawingPoints[i].yPos + 500
@@ -218,7 +222,7 @@ def drawLines(arg) :
             temp = Image.new("RGBA", (config.segmentLength*2, config.segmentLength*2))
             tDraw = ImageDraw.Draw(temp)
             
-            angle = round((math.pi/2  - L.drawingPoints[i].angle) * 180/math.pi)
+            angle = round((math.pi/2  - L.drawingPoints[i].angleDisplay) * 180/math.pi)
             
             if abs(angle) != 90 :
                 angle -= 90

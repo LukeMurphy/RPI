@@ -72,7 +72,10 @@ class Lsys :
     # segmentLength = 18
     # segmentDecrement = .97
     # Rule2 = "B(+F)(-F)(B(B(+F)(-F)(B(B(+F)(-F)(B(B(+F)(-F)B))))))"
-    
+
+
+
+
 
     useRandom = False
     foliage = True
@@ -80,6 +83,19 @@ class Lsys :
     angle = math.pi/4
     branchPoint = []
     drawingPoints = []    
+    
+    
+    
+    
+    # Axiom = "F+B-B"
+    # Rule1 = "BB"
+    # segmentLength = 10
+    # segmentDecrement = .90
+    # # Every B gets replaced with this
+    # Rule2 = "F-B"
+    # angle = 60 * math.pi/180
+    # recursionLimit = 7
+    
     
     def __init__(self, config) :
         print("========================")
@@ -149,9 +165,9 @@ class Lsys :
             
             if instruction not in ("(",")") :
                 if instruction == "+" :
-                    a += math.pi/4 * random.uniform(.9,1.1)
+                    a += math.pi/4 #* random.uniform(.9,1.1)
                 if instruction == "-" :
-                    a -= math.pi/4 * random.uniform(.9,1.1)
+                    a -= math.pi/4 #* random.uniform(.9,1.1)
                 if instruction == "F" :
                     xPos += self.segmentLength * d * math.cos(a) * 2
                     yPos += self.segmentLength * d * math.sin(a) * 2
@@ -173,7 +189,7 @@ class Lsys :
                     lpt.xPos = xPos
                     lpt.yPos = yPos
                     lpt.angle = a
-                    lpt.angleDisplay = a * random.uniform(.9,1.1)
+                    lpt.angleDisplay = a #* random.uniform(.9,1.1)
                     lpt.scale = d
                     lpt.isTerminal = c
                     lpt.name = "B"

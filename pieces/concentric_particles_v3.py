@@ -140,6 +140,9 @@ class ParticleSystem:
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
         self.useFixedBandColors = True
+        self.bandWVariabilityProb = .005
+        self.xMaxFactor = 4
+        self.yMaxFactor = 4
 
 
     def setNewAttributes(self):
@@ -234,6 +237,9 @@ class ParticleSystem:
         
         self.xSpeed = random.SystemRandom().random()  * config.PSXSpeed
         self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
+        
+        self.xMaxFactor = config.xMaxFactor
+        self.yMaxFactor = config.yMaxFactor
 
         self.drawRadialPolys = True if random.SystemRandom().random() < .5 else False
 
@@ -322,9 +328,9 @@ class ParticleSystem:
         self.x += self.xSpeed
         self.y += self.ySpeed
 
-        if self.x > config.canvasWidth - round(self.wBase / 4):
+        if self.x > config.canvasWidth - round(self.wBase / self.xMaxFactor):
             self.xSpeed = 0
-        if self.y > config.canvasHeight - round(self.wBase / 8):
+        if self.y > config.canvasHeight - round(self.wBase / self.yMaxFactor):
             self.ySpeed = 0
         if self.y < 0 - 2:
             self.ySpeed = 0
@@ -539,7 +545,7 @@ def drawBands(p):
             
         w = wBase - i * wDiff
         
-        if p.useFixedBandColors == True or random.SystemRandom().random() < .33 :
+        if p.useFixedBandColors == True or random.SystemRandom().random() < p.bandWVariabilityProb:
             w = (p.bands - i) * calculatedRingSize
         
         if w > 10 :
@@ -847,6 +853,14 @@ def main(run=True):
     config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
     
     config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
+    try:
+        config.xMaxFactor = float(workConfig.get("particles","xMaxFactor"))
+        config.yMaxFactor = float(workConfig.get("particles","yMaxFactor"))
+        
+    except Exception as e:
+        print(str(e))
+        config.xMaxFactor = 4
+        config.yMaxFactor = 8
 
     try:
         config.rRange = int(workConfig.get("particles","rRange"))

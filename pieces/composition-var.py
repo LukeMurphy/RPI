@@ -553,6 +553,13 @@ def init():
     except Exception as e:
         print(e)
         config.filterPatchProb = 0.0
+    try:
+        config.filterPatchMinWidth = float(workConfig.get("compositions", "filterPatchMinWidth"))
+        config.filterPatchMinHeight = float(workConfig.get("compositions", "filterPatchMinHeight"))
+    except Exception as e:
+        print(e)
+        config.filterPatchMinWidth = 60
+        config.filterPatchMinHeight = 60
     
     config.directorController = Director(config)
  
@@ -800,8 +807,8 @@ def iterate():
     
     if random.random() < config.filterPatchProb:
         #print("should be remapping")
-        minWidth = round(random.uniform(60,config.canvasWidth))
-        minHeight = round(random.uniform(60,config.canvasHeight))
+        minWidth = round(random.uniform(config.filterPatchMinWidth,config.canvasWidth))
+        minHeight = round(random.uniform(config.filterPatchMinHeight,config.canvasHeight))
         x1 = round(random.uniform(0,config.canvasWidth))
         x2 = round(random.uniform(x1 + minWidth ,config.canvasWidth))
         y1 = round(random.uniform(0,config.canvasHeight))

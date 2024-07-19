@@ -153,23 +153,25 @@ class ParticleSystem:
         [120,90,90],
         [120,50,50],
         [50,120,90],
+              [151,165,194],
+
         [222,208,182],
         [120,74,52],
         [187,189,168],
         [129,137,158],
         [204,228,232],
         [253,240,195],
+        
         [199,166,151],
         [151,165,194],
         [89,113,175],
         [53,73,136],
         [27,38,83],
         [27,38,83],
-        [27,38,83],
-        [27,38,83],
-        [27,38,83],
+
         ]
-        self.bandColors = [
+        self.__bandColors = [
+             
         [0,0,0],
         [50,10,50],
         [120,50,50],
@@ -178,6 +180,7 @@ class ParticleSystem:
         [120,74,52],
         [129,137,158],
         [204,228,232],
+
         
         [50,10,50],
         [120,50,50],
@@ -194,46 +197,72 @@ class ParticleSystem:
         [27,38,83],
         [27,38,83],
         [27,38,253],
+        
 
         ]
 
         self._bandColors = [
         [255,0,0],
         [255,255,0],
-        [2,255,0],
-        [2,0,250],
+        [0,255,0],
+        [0,255,255],
+        [0,0,250],
         [255,0,250],
 
-        [255,0,0],
-        [255,255,0],
-        [2,255,0],
-        [2,0,250],
-        [255,0,250],
-        
+
+    
         ]
 
 
+                    
+        # created transition bands
+        
+        self.bandColorsAdjusted = []
+        bandColorSteps = 3
+        self.bandColors.reverse()
+        
+        for c in range(0, len(self.bandColors)-1) :
+            color1 = self.bandColors[c]
+            color2 = self.bandColors[c + 1]
+            
+            rDiff = (color2[0] - color1[0]) / bandColorSteps
+            gDiff = (color2[1] - color1[1]) / bandColorSteps
+            bDiff = (color2[2] - color1[2]) / bandColorSteps
+            
+            for i in range(0, bandColorSteps) :
+                self.bandColorsAdjusted.append([
+                    round(color1[0] + rDiff * i),
+                    round(color1[1] + gDiff * i),
+                    round(color1[2] + bDiff * i)
+                                                ])
+                
+
         # adjusting the apparent brightness of some bands as they
         # read over-bright - can be modified anytime
-        for c in range(0, len(self.bandColors)) :
-            color = self.bandColors[c]
+        for c in range(0, len(self.bandColorsAdjusted)) :
+            color = self.bandColorsAdjusted[c]
             sumOfColors = color[0] + color[1] + color[2]
             if sumOfColors > 330 and c < 13 :
                 for cx in range(0,3):
                     color[cx] *= .8
-                    
+        # self.bandColorsAdjusted = self.bandColors.copy()        
         
         # The rings around the center
         self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
         self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
+        
+        self.bands = bandColorSteps * len(self.bandColors)
+        
+        print(self.bands)
+        
         self.bandWidthsSet = []
         for b in range(0, self.bands) :
             self.bandWidthsSet.append(round(random.SystemRandom().uniform(config.PSFixedColorRadiusDiffMin,config.PSFixedColorRadiusDiffMax)))
         
         if self.useFixedBandColors == True:
-            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusFixedColorMin, config.PSRadiusMax))
+            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
             # self.bands = len(self.bandColors)
-            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin,config.bandWidthMax))
+            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
         
         self.xSpeed = random.SystemRandom().random()  * config.PSXSpeed
         self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
@@ -537,6 +566,7 @@ def drawBands(p):
 
 
     calculatedRingSize = wBase/p.bands
+    
 
     for i in range(0, p.bands):
         
@@ -560,6 +590,9 @@ def drawBands(p):
                 y1 = y0
 
             a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate))
+            
+            # OVERRIDE
+            a = 255
 
             #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
             
@@ -569,13 +602,13 @@ def drawBands(p):
                 index = colorBandIndex
                 # index = i
                 
-                rBase = round(p.bandColors[index][0] * config.brightness)
-                gBase = round(p.bandColors[index][1] * config.brightness)
-                bBase = round(p.bandColors[index][2] * config.brightness)
+                rBase = round(p.bandColorsAdjusted[index][0] * config.brightness)
+                gBase = round(p.bandColorsAdjusted[index][1] * config.brightness)
+                bBase = round(p.bandColorsAdjusted[index][2] * config.brightness)
                 aBase = 255
                 colorBandIndex += 1
                 
-                if colorBandIndex >= len(p.bandColors) :
+                if colorBandIndex >= len(p.bandColorsAdjusted) :
                     colorBandIndex = 0
 
     
@@ -585,16 +618,17 @@ def drawBands(p):
             '''
             # Should try to interleave the bands so that the fixed color bands integrate better
             # with the prescribed golden ones
-            
+      
             if i == 0 :
                 a = 20
             try :
                 # Golden Rings
-                if i in config.goldenRingsArray:
+                if i in config.goldenRingsArray and p.useFixedBandColors == False:
                     config.draw.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
                     config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
                 else :
-                    if p.useFixedBandColors == True and index == 4 :
+                    # OVERRIDE 
+                    if p.useFixedBandColors == True and index == 4:
                         config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
                         # config.draw.ellipse((x0-1, y0-1, x1-1, y1-1), outline=(rBase, gBase, bBase, a))
                         config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))

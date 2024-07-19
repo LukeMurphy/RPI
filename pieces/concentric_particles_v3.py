@@ -253,7 +253,7 @@ class ParticleSystem:
         
         self.bands = bandColorSteps * len(self.bandColors)
         
-        print(self.bands)
+        # print(self.bands)
         
         self.bandWidthsSet = []
         for b in range(0, self.bands) :
@@ -567,7 +567,7 @@ def drawBands(p):
 
     calculatedRingSize = wBase/p.bands
     
-
+    # print("----")
     for i in range(0, p.bands):
         
         if p.useFixedBandColors == True :
@@ -577,8 +577,11 @@ def drawBands(p):
         
         if p.useFixedBandColors == True or random.SystemRandom().random() < p.bandWVariabilityProb:
             w = (p.bands - i) * calculatedRingSize
+            
+            
+        # print(round(w))
         
-        if w > 10 :
+        if w != 0 :
             x0 = p.x - w / 2
             y0 = p.y - w / 2
             x1 = p.x + w / 2
@@ -592,7 +595,7 @@ def drawBands(p):
             a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate))
             
             # OVERRIDE
-            a = 255
+            # a = 255
 
             #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
             
@@ -619,8 +622,9 @@ def drawBands(p):
             # Should try to interleave the bands so that the fixed color bands integrate better
             # with the prescribed golden ones
       
-            if i == 0 :
+            if i < 5 :
                 a = 20
+                config.draw.ellipse( (x0, y0, x1, y1), fill=(255,0,0,255) )
             try :
                 # Golden Rings
                 if i in config.goldenRingsArray and p.useFixedBandColors == False:
@@ -628,13 +632,16 @@ def drawBands(p):
                     config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
                 else :
                     # OVERRIDE 
-                    if p.useFixedBandColors == True and index == 4:
-                        config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
-                        # config.draw.ellipse((x0-1, y0-1, x1-1, y1-1), outline=(rBase, gBase, bBase, a))
+                    if p.useFixedBandColors == True and index == 1:
+                        config.draw.ellipse((x0, y0, x1, y1), fill =(rBase, gBase, bBase, a))
+                        # config.draw.ellipse((x0, y0, x1, y1), outline =(rBase, gBase, bBase, a))
                         config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
                     else :
                         config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
                         config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
+                        
+                    if i > p.bands - 3 and p.useFixedBandColors == True:
+                        config.draw.ellipse( (x0, y0, x1, y1), fill=(20,60,125,50) )
             except Exception as e :
                 print("==>" + str(e))
 

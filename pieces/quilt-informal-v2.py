@@ -645,12 +645,14 @@ def iterate():
     global config
     config.outlineColorObj.stepTransition()
 
-    for i in range(0, len(config.unitArray)):
-        obj = config.unitArray[i]
-        if random.SystemRandom().random() > 0.98:
-            obj.outlineColorObj.stepTransition()
-        obj.update()
-        obj.renderPolys()
+
+    if config.doSectionDisturbance == False :
+        for i in range(0, len(config.unitArray)):
+            obj = config.unitArray[i]
+            if random.SystemRandom().random() > 0.98:
+                obj.outlineColorObj.stepTransition()
+            obj.update()
+            obj.renderPolys()
         
     # quilt is rendered to the config.image image each cycle
     

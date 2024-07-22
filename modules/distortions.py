@@ -194,6 +194,7 @@ def disturber(config):
             if sectionParams.actionCount < sectionParams.actionCountLimit:
                 
                 # print("RUNNING disturb " + str(random.SystemRandom().random()))
+                config.doingSectionDisturbance = True
 
                 xPos = round(sectionParams.sectionPlacementInit[0])
                 yPos = round(sectionParams.sectionPlacementInit[1])
@@ -233,7 +234,8 @@ def disturber(config):
                 # if sectionParams.rotationSpeed == 0 and sectionParams.sectionSpeed[0] == 0 and sectionParams.sectionSpeed[1] == 0 :
                 #     config.doSectionDisturbance = False
                 #     print("Turned off disturb - distrub done")
-
+            else :
+                config.doingSectionDisturbance = False
 
         # these are the sections that do not get smeared
         
@@ -337,6 +339,9 @@ def iterationFunction(config):
         rebuildSections(config)
 
     # RANDOM OVERLAY REPETITION DISTURBANCE
+    if random.SystemRandom().random() < config.redoSectionDisturbance :
+        config.doingSectionDisturbance = False
+        
     if random.SystemRandom().random() < config.redoSectionDisturbance :
         # print("rebuilding disturb sections, truning disturb on")
         rebuildSections(config)

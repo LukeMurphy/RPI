@@ -614,6 +614,7 @@ def main(run=True):
     config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     
+    config.doingSectionDisturbance = False
     distortions.additonalSetup(config, workConfig)
     
     config.blockImage = Image.new("RGBA", (config.dblockWidth, config.dblockHeight))
@@ -646,7 +647,7 @@ def iterate():
     config.outlineColorObj.stepTransition()
 
 
-    if config.doSectionDisturbance == False :
+    if config.doingSectionDisturbance == False :
         for i in range(0, len(config.unitArray)):
             obj = config.unitArray[i]
             if random.SystemRandom().random() > 0.98:

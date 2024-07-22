@@ -8,6 +8,13 @@ from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
+from threading import Timer  
+ 
+def setTimeout(fn, ms, *args, **kwargs): 
+    t = Timer(ms / 1000., fn, args=args, kwargs=kwargs) 
+    t.start() 
+    return t 
+
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
 
@@ -208,6 +215,8 @@ def drawSquareSpiral():
 
     config.t1 = time.time()
     config.t2 = time.time()
+    
+    setTimeout(resetToAllowDistortion, 3000)
 
     cntrOffset = [config.cntrOffsetX, config.cntrOffsetY]
 
@@ -456,7 +465,15 @@ def drawSquareSpiral():
                     pass
 
 
+def resetToAllowDistortion() :
+    config.rebuildingPattern = False
+    # print("restartPiece has finished its call")
+
 def restartPiece():
+    
+    config.doSectionDisturbance = False
+    config.doingSectionDisturbance = False
+    config.rebuildingPattern = True
 
     config.polyDistortionMin = -random.SystemRandom().uniform(1, config.polyDistortion + 1)
     config.polyDistortionMax = random.SystemRandom().uniform(1, config.polyDistortion + 1)
@@ -479,6 +496,12 @@ def restartPiece():
     # print(config.opticalPattern + " " + str(config.sizeFactor))
 
     drawSquareSpiral()
+    
+    
+    
+    
+    
+    
 
 
 def transformImage(img):
@@ -615,6 +638,7 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     
     config.doingSectionDisturbance = False
+    config.rebuildingPattern = True
     distortions.additonalSetup(config, workConfig)
     
     config.blockImage = Image.new("RGBA", (config.dblockWidth, config.dblockHeight))

@@ -186,7 +186,7 @@ def rebuildSections(config):
 
 def disturber(config):
 
-    if config.doSectionDisturbance == True:
+    if config.doSectionDisturbance == True and config.rebuildingPattern == False:
 
         for i in range(0, config.numberOfSections):
             sectionParams = config.movingSections[i]

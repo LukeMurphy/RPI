@@ -95,7 +95,7 @@ def setUpDisturbanceConfigs(configSet, config, workConfig):
     config.redoSectionDisturbance = float(workConfig.get(configSet, "redoSectionDisturbance"))
     config.speedDeAccelerationUpperLimit = float(workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
     config.rebuildImmediatelyAfterDone = (workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone"))
-    
+    config.rebuildingPattern = False
     try:
         # comment: 
         config.diagonalMovement = (

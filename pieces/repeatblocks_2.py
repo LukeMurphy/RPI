@@ -70,6 +70,9 @@ class Fader:
 
 def redraw(config):
 
+    if config.patternModel == "shellScales":
+        pattern_blocks.shellScales(config)
+        
     if config.patternModel == "wavePattern":
         pattern_blocks.wavePattern(config)
 

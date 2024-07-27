@@ -26,12 +26,12 @@ class Fader:
 					self.doingRefresh / self.doingRefreshCount,
 				)
 				cf = self.crossFade.rotate(self.rotation ,0,1)
-				config.image.paste(
+				config.canvasImage.paste(
 					cf, (self.xPos, self.yPos), cf
 				)
 				self.doingRefresh += 1
 			else:
-				config.image.paste(self.image, (self.xPos, self.yPos), self.image)
+				config.canvasImage.paste(self.image, (self.xPos, self.yPos), self.image)
 				self.fadingDone = True
 
 
@@ -203,11 +203,11 @@ def iterate():
 
 	# Do the final rendering of the composited image
 
-	temp = config.image.copy()
+	temp = config.canvasImage.copy()
 
 	if config.rotateDrawing != 0 :
 		temp = temp.rotate(config.rotateDrawing)
-	config.render(temp, 0, 0, config.screenWidth, config.screenHeight)
+	config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
 
 	'''
 	## Vary the rate of change sometimes after initial startup has filled the frame
@@ -228,7 +228,8 @@ def main(run=True):
 	config.debug = workConfig.getboolean("gradients", "debug")
 
 	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	config.draw = ImageDraw.Draw(config.image)
+	config.canvasImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+	config.draw = ImageDraw.Draw(config.canvasImage)
 
 	config.vOffset = int(workConfig.get("gradients", "vOffset"))
 	config.steps = int(workConfig.get("gradients", "steps"))

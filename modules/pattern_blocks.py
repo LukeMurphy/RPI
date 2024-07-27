@@ -202,6 +202,200 @@ def fishScales(config):
                 outline=(clr), fill=clr3)
 
 
+def shellScales(config):
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    clr = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+    )
+
+    clr2 = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+    )
+
+    clr3 = tuple(
+        int(a * config.brightness) for a in (config.colOverlay.currentColor)
+    )
+
+    config.blockDraw.rectangle(
+        (0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
+
+    numRows = config.numShingleRows
+    boxWidth = config.blockWidth/numRows
+
+    numLines = round(config.waveScaleRings * 1.0)
+    numLinesHalf = round(numLines/2)
+    rads = math.pi * 2 /numLines
+    radius = boxWidth/2
+    for r in range(numRows, -1, -1):
+        yPos = -2 + r * boxWidth
+        for i in range(0, 3):
+            config.blockDraw.ellipse((
+                i * boxWidth - boxWidth/2,
+                yPos,
+                i * boxWidth + boxWidth - boxWidth/2,
+                yPos + boxWidth),
+                outline=(clr), fill=clr3)
+            
+            for q in range(-numLinesHalf,numLinesHalf) :
+                angle = rads * q
+                x0 = i * boxWidth
+                y0 = yPos
+                xP = i * boxWidth                  + radius * math.cos(angle)
+                yP = yPos + boxWidth - boxWidth/2  + radius * math.sin(angle)
+                
+                clrToUse = clr
+                if q % 2 == 0 :
+                    clrToUse = clr2
+                config.blockDraw.line((
+                    x0,
+                    y0,
+                    xP,
+                    yP), fill=(clrToUse))
+                
+                # config.blockDraw.ellipse((x0 ,y0+ boxWidth/2,x0+4,y0+ boxWidth/2 +4), fill=(255,0,0))
+            
+
+        for i in range(0, 2):
+            config.blockDraw.ellipse((
+                i * boxWidth,
+                yPos - boxWidth/2,
+                i * boxWidth + boxWidth,
+                yPos + boxWidth/2),
+                outline=(clr), fill=clr3)
+            
+            
+            for q in range(-numLinesHalf,numLinesHalf) :
+                angle = rads * q
+                x0 = i * boxWidth + boxWidth/2
+                y0 = yPos - boxWidth/2 
+                xP = i * boxWidth + boxWidth/2       + radius * math.cos(angle)
+                yP = yPos + boxWidth  - boxWidth/1   + radius * math.sin(angle)
+                
+                clrToUse = clr
+                if q % 2 == 0 :
+                    clrToUse = clr2
+                config.blockDraw.line((
+                    x0,
+                    y0,
+                    xP,
+                    yP), fill=(clrToUse))
+                
+                # config.blockDraw.ellipse((x0 ,y0+ boxWidth/2,x0+4,y0+ boxWidth/2 +4), fill=(255,0,0))
+
+
+def ellipses(config):
+
+    clr = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+    )
+
+    clr2 = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+    )
+
+    clr3 = config.colOverlay.currentColor
+
+
+    config.blockDraw.rectangle(
+        (0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
+
+    numRows = config.numScaleRows
+    numRows = 2
+    boxWidth = 2*config.blockWidth/numRows
+
+    rings = config.waveScaleRings 
+    step = config.waveScaleSteps
+
+    patternRows = numRows + 1
+    startFirstSet = 0
+    
+    if config.linesOnly == True :
+        config.altLineColoring = False
+    # step= 5
+    if config.altLineColoring == True and step != 2 :
+        lineToUse =  clr
+        startFirstSet = 1
+    else :
+        lineToUse = clr
+    
+    # lineToUse = clr
+    # lineToUse = (255,0,0,204)
+    # print(lineToUse,clr, clr2, clr3,config.altLineColoring,step,rings)
+    
+    # print(config.altLineColoring)
+    for r in range(patternRows, -patternRows, -1):
+        yPos = -2 + r * boxWidth
+        xOffSet = -boxWidth/2
+        yOffSet = boxWidth
+        y = boxWidth/4 - r * boxWidth/2
+        for i in range(0, 3):
+            xSizeOfBox = i * boxWidth
+            
+            for n in range(startFirstSet, rings*step, step):
+                if config.altLineColoring == True :
+                    eo = n % 2
+                    if eo  == 1 :
+                        clrToUse = clr3
+                    else :
+                        clrToUse = clr2
+                else :
+                        clrToUse = clr3
+                x0  =  xSizeOfBox + xOffSet + n   -n
+                x1  =  xSizeOfBox + xOffSet + boxWidth - n 
+                y0 = yPos + 0 + n + y - y
+                y1 = yPos + yOffSet - n  + 0
+                
+                if y1 < y0 :
+                    y1=y0
+                
+                if x1 < x0 :
+                    x1 = x0   
+                config.blockDraw.ellipse((
+                    x0,
+                    y0,
+                    x1,
+                    y1),
+                    outline=(lineToUse), fill=clrToUse)
+
+        xOffSet = 0
+        yOffSet = yOffSet / 2
+        y = boxWidth/2 - r * boxWidth/2
+
+        for i in range(0, 2):
+            xSizeOfBox = i * boxWidth
+            for n in range(0, rings*step, step):
+                if config.altLineColoring == True :
+                    eo = n % 2
+                    if eo  == 1 :
+                        clrToUse = clr3
+                    else :
+                        clrToUse = clr2
+                else :
+                        clrToUse = clr3
+                        
+                x0 = xSizeOfBox + xOffSet + n -n
+                x1 = xSizeOfBox + xOffSet + boxWidth - n + 20
+                y0 = yPos - yOffSet + n + y-y
+                y1 = yPos + yOffSet - n + y-y
+                
+                if x1 < x0 :
+                    x1 = x0
+                
+                if y1 < y0 :
+                    y1= y0
+                    
+                config.blockDraw.ellipse((
+                    x0,
+                    y0,
+                    x1,
+                    y1),
+                    outline=(lineToUse), fill=clrToUse)
+                
+
 def waveScales(config):
 
     clr = tuple(

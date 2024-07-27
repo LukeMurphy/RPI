@@ -274,6 +274,12 @@ def buildPalette(config, index=0):
 def redraw(config):
     
     print(str("doing a redreaw: {}").format(config.patternModel))
+    
+    if config.patternModel == "ellipses":
+        pattern_blocks.ellipses(config)
+        
+    if config.patternModel == "shellScales":
+        pattern_blocks.shellScales(config)
 
     if config.patternModel == "wavePattern":
         pattern_blocks.wavePattern(config)
@@ -351,7 +357,7 @@ def repeatImage(config, canvasImage):
                 if config.patternModel == "circlesPacked" :
                     extraOverlapx = round(config.blockWidth / 8 )
                     
-                if config.patternModel == "waveScales" :
+                if config.patternModel == "waveScales" or config.patternModel == "shellScales"  :
                     temp = temp.rotate(-180)
                     
                 if c % 2 != 0 and config.rotateAltBlock == 1:

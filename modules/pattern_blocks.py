@@ -994,3 +994,64 @@ def wavePattern(config):
         config.xIncrementer = -0
     if config.yIncrementer >= config.blockHeight - 4:
         config.yIncrementer = 0
+
+
+def wavePattern2(config):
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    clr = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
+    )
+    clr2 = tuple(
+        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
+    )
+
+    config.blockDraw.rectangle(
+        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
+
+    numPoints = round(config.blockWidth)
+    amplitude = config.amplitude
+    yOffset = config.yOffset
+    amplitude2 = config.amplitude2
+    yOffset2 = config.yOffset2
+    steps = config.steps
+    steps2 = config.steps2
+    rads = 2 * 22/7 / numPoints
+    
+
+    for iy in range(-numPoints, numPoints*2, steps*2):
+        for i in range(0, numPoints, steps):
+            angle = (i + config.xIncrementer) * rads
+            angle2 = (i + config.xIncrementer + steps) * rads
+            a = (i, math.sin(angle) * amplitude + yOffset + iy)
+            b = (i + steps, math.sin(angle) * amplitude + yOffset + iy)
+            c = (i + steps, math.sin(angle2) * amplitude + yOffset + iy)
+
+            if c[1] < a[1]:
+                b = (i, math.sin(angle2) * amplitude + yOffset)
+            # config.blockDraw.polygon((a, b, c, a), fill=None, outline=clr)
+            config.blockDraw.line((a, c), fill=clr)
+
+    # phase = round(config.blockWidth/config.phaseFactor)
+    # for i in range(0, numPoints, steps2):
+    #     angle = (i - config.speedFactor*config.xIncrementer + phase) * rads
+    #     angle2 = (i - config.speedFactor *
+    #               config.xIncrementer + phase + steps2) * rads
+    #     a = (i, math.cos(angle) * amplitude2 + yOffset2)
+    #     b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
+    #     c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
+
+    #     if c[1] < a[1]:
+    #         b = (i, math.cos(angle2) * amplitude2 + yOffset2)
+    #     config.blockDraw.polygon((a, b, c, a), fill=clr2, outline=None)
+
+    # config.xIncrementer += config.xSpeed
+    # config.yIncrementer += config.ySpeed
+
+    if config.xIncrementer >= config.blockWidth * 1:
+        config.xIncrementer = -0
+    if config.yIncrementer >= config.blockHeight - 4:
+        config.yIncrementer = 0

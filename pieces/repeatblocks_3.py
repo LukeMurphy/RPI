@@ -284,6 +284,9 @@ def redraw(config):
     if config.patternModel == "wavePattern":
         pattern_blocks.wavePattern(config)
 
+    if config.patternModel == "wavePattern2":
+        pattern_blocks.wavePattern2(config)
+
     if config.patternModel == "reMove":
         pattern_blocks.reMove(config)
 
@@ -322,6 +325,9 @@ def redraw(config):
         
     if config.patternModel == "waveScales":
         pattern_blocks.waveScales(config)
+        
+    if config.patternModel == "compass":
+        pattern_blocks.compass(config)
 
 
 

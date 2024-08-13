@@ -249,7 +249,7 @@ def buildPalette(config, index=0):
 
 def redraw(config):
     
-    print(str("doing a redreaw: {}").format(config.patternModel))
+    # print(str("doing a redraw: {}").format(config.patternModel))
     
     if config.patternModel == "ellipses":
         pattern_blocks.ellipses(config)
@@ -425,7 +425,7 @@ def loadImageForBase():
 
 def rebuildPatterns(arg=0):
     
-    print("rebuildPattern Called")
+    # print("rebuildPattern Called")
 
     c = round(random.uniform(1, 4))
 
@@ -683,6 +683,27 @@ def iterate():
         cp_blur = cp.filter(ImageFilter.GaussianBlur(config.cp_blur_amt))
         config.canvasImage = Image.composite(
             cp_blur, config.canvasImage, mask_blur)
+        
+    if random.random() < config.filterRemappingProb:
+        if config.useFilters == True and config.filterRemapping == True:
+            config.filterRemap = True
+
+            # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
+            # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
+            # endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
+            # endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+            # new version  more control but may require previous pieces to be re-worked
+            startX = round(random.uniform(0, config.filterRemapRangeX))
+            startY = round(random.uniform(0, config.filterRemapRangeY))
+            endX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
+            endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
+            config.remapImageBlockSection = [
+                startX,
+                startY,
+                startX + endX,
+                startY + endY,
+            ]
+            config.remapImageBlockDestination = [startX, startY]
 
     if config.fader.fadingDone == True:
         config.fader.fadingDone = False
@@ -979,6 +1000,30 @@ def main(run=True):
         config.altColoringProb = .5
     # end try
     
+
+    try:
+        config.filterRemapping = workConfig.getboolean("movingpattern", "filterRemapping")
+        config.filterRemappingProb = float(workConfig.get("movingpattern", "filterRemappingProb"))
+        config.filterRemapMinHoriSize = int(workConfig.get("movingpattern", "filterRemapMinHoriSize"))
+        config.filterRemapMinVertSize = int(workConfig.get("movingpattern", "filterRemapMinVertSize"))
+        config.filterRemapMaxHoriSize = int(workConfig.get("movingpattern", "filterRemapMaxHoriSize"))
+        config.filterRemapMaxVertSize = int(workConfig.get("movingpattern", "filterRemapMaxVertSize"))
+        config.filterRemapRangeY = int(workConfig.get("movingpattern", "filterRemapRangeY"))
+        config.filterRemapRangeX = int(workConfig.get("movingpattern", "filterRemapRangeX"))
+    except Exception as e:
+        print(str(e))
+        config.filterRemapping = False
+        config.filterRemappingProb = 0.0
+        config.filterRemapMinHoriSize = 24
+        config.filterRemapMinVertSize = 24
+        config.filterRemapMaxHoriSize = 24
+        config.filterRemapMaxVertSize = 24
+        config.filterRemapRangeX = config.canvasWidth
+        config.filterRemapRangeY = config.canvasHeight
+
+
+        
+           
     # ###########################################################################
     # ####################### clip player instert ################################
     try:

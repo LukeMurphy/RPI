@@ -16,6 +16,8 @@ from subprocess import call
 from modules import configuration
 from modules.configuration import bcolors
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

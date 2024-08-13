@@ -9,7 +9,8 @@ from modules import badpixels, coloroverlay, colorutils
 from modules.quilting import createstarpieces, createtrianglepieces
 from modules.quilting.colorset import ColorSet
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 from modules import distortions
 
 
@@ -219,7 +220,10 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     
     
-
+    config.directorController = Director(config)
+    config.redrawSpeed = float(workConfig.get("quilt-triangles", "redrawSpeed"))
+    config.directorController.slotRate = float(workConfig.get("quilt-triangles", "slotRate"))
+    
     config.brightness = float(workConfig.get("displayconfig", "brightness"))
     colorutils.brightness = config.brightness
     config.canvasImageWidth = config.screenWidth

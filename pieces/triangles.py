@@ -4,6 +4,9 @@ import threading
 import time
 from modules.configuration import bcolors
 from modules import colorutils
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
+
 #!/usr/bin/env python3
 """
 Minimal delaunay2D test

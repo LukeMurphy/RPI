@@ -7,6 +7,8 @@ from noise import *
 from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 from threading import Timer  
  
@@ -498,12 +500,6 @@ def restartPiece():
     drawSquareSpiral()
     
     
-    
-    
-    
-    
-
-
 def transformImage(img):
     width, height = img.size
     m = -0.5
@@ -523,6 +519,11 @@ def main(run=True):
     global config, directionOrder, workConfig
     print("---------------------")
     print("QUILT Loaded")
+    
+    
+    config.directorController = Director(config)
+    config.redrawSpeed = float(workConfig.get("quilt-informal", "redrawSpeed"))
+    config.directorController.slotRate = float(workConfig.get("quilt-informal", "slotRate"))
 
     config.brightness = float(workConfig.get("displayconfig", "brightness"))
     colorutils.brightness = config.brightness

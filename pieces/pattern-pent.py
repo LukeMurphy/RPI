@@ -7,6 +7,8 @@ from threading import Timer
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 
 def marker(x, y, draw, f="red"):

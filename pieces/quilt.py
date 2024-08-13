@@ -5,7 +5,8 @@ import time
 from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 class unit:
 

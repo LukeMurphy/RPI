@@ -18,6 +18,8 @@ from PIL import (
 )
 import noise
 from noise import *
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -50,28 +52,6 @@ class WaveDeformer:
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
 
         return [t for t in zip(target_grid, source_grid)]
-
-
-class Director:
-    """docstring for Director"""
-
-    slotRate = 0.5
-
-    def __init__(self, config):
-        super(Director, self).__init__()
-        self.config = config
-        self.tT = time.time()
-
-    def checkTime(self):
-        if (time.time() - self.tT) >= self.slotRate:
-            self.tT = time.time()
-            self.advance = True
-        else:
-            self.advance = False
-
-    def next(self):
-
-        self.checkTime()
 
 
 def main(run=True):

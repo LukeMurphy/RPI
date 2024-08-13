@@ -24,29 +24,11 @@ from PIL import (
 	ImagePalette,
 )
 
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
+
 global config
 
-class Director:
-	"""docstring for Director"""
-
-	slotRate = .5
-
-	def __init__(self, config):
-		super(Director, self).__init__()
-		self.config = config
-		self.tT = time.time()
-		self.slotRate = config.redrawSpeed
-
-	def checkTime(self):
-		if (time.time() - self.tT) >= self.slotRate:
-			self.tT = time.time()
-			self.advance = True
-		else:
-			self.advance = False
-
-	def next(self):
-
-		self.checkTime()
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 class DotGrid :

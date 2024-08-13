@@ -8,6 +8,8 @@ from threading import Timer
 
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 ## Image layers

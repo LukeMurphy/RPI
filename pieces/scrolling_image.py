@@ -9,6 +9,9 @@ from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
+
 
 lastRate = 0
 colorutils.brightness = 1
@@ -126,28 +129,7 @@ def runWork():
             config.callBack()
 
 
-class Director:
-    """docstring for Director"""
 
-    slotRate = .5
-    delay = .5
-
-    def __init__(self, config):
-        super(Director, self).__init__()
-        self.config = config
-        self.tT = time.time()
-
-    def checkTime(self):
-        if (time.time() - self.tT) >= self.slotRate:
-            self.tT = time.time()
-            self.advance = True
-        else:
-            self.advance = False
-
-    def next(self):
-        self.checkTime()
-        
-        
 def iterate():
     global config
     redraw()

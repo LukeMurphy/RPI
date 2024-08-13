@@ -13,7 +13,8 @@ from modules.quilting import (
 )
 from modules.quilting.colorset import ColorSet
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 from modules import distortions
 
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
@@ -162,7 +163,9 @@ def main(run=True):
     config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     
-    
+    config.directorController = Director(config)
+    config.redrawSpeed = float(workConfig.get("quilt-polys", "redrawSpeed"))
+    config.directorController.slotRate = float(workConfig.get("quilt-polys", "slotRate"))
 
     config.brightness = float(workConfig.get("displayconfig", "brightness"))
     colorutils.brightness = config.brightness

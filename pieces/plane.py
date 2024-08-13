@@ -17,6 +17,8 @@ from modules.configuration import bcolors
 from modules import configuration
 from modules.imagesprite import ImageSprite
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

@@ -28,6 +28,9 @@ from PIL import (
     ImagePalette,
 )
 import numpy as np
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
+
 
 xPos = 320
 yPos = 0
@@ -38,46 +41,8 @@ bads = badpixels
 # config.canvasImage is the final layer or image to be rendered
 # everything else gets pasted on to this image layer
 # the filtering happens to this canvasImage as well
-#----------------------------------------------------##----------------------------------------------------#
-
-class Holder:
-    def __init__(self, config):
-        self.config = config
 
 #----------------------------------------------------##----------------------------------------------------#
-class Director:
-    """docstring for Director"""
-    
-    # slotRate is the period between events
-    # this is just an interval timer but the main
-    # interate function has a delay set in the config - usually about .02 seconds
-    # so every .02 seconds this class instance is checked to see if the interval 
-    # of time that equals the "slotRate" has been passed, and if it has, the 
-    # class sets the advance to True and the calling function has to reset the
-    # advance to False
-
-    slotRate = 0.5
-
-    def __init__(self, config):
-        super(Director, self).__init__()
-        self.config = config
-        self.tT = time.time()
-
-    def checkTime(self):
-        delta = (time.time() - self.tT)
-        
-        # if self.slotRate > 1 :
-        #     print(delta)
-        
-        if delta  >= self.slotRate:
-            self.tT = time.time()
-            self.advance = True
-        else:
-            self.advance = False
-
-    def next(self):
-
-        self.checkTime()
 
 #----------------------------------------------------##----------------------------------------------------#
 class spriteAnimation():

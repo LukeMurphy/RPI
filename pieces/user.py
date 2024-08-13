@@ -5,6 +5,8 @@ import time
 from modules.configuration import bcolors
 import PIL.Image
 from PIL import Image, ImageDraw
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 centerx = 0  # config.screenWidth/2
 centery = 0  # 32

@@ -30,7 +30,8 @@ from PIL import (
 # from configs import localconfig
 
 
-
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

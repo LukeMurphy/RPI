@@ -5,6 +5,8 @@ import time
 from modules.configuration import bcolors
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageChops
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 
 '''

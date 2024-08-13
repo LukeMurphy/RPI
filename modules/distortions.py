@@ -7,32 +7,7 @@ from noise import *
 from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
-
-class Holder:
-    def __init__(self):
-        pass
-
-
-class Director:
-    """docstring for Director"""
-
-    slotRate = .5
-
-    def __init__(self, config):
-        super(Director, self).__init__()
-        self.config = config
-        self.tT = time.time()
-
-    def checkTime(self):
-        if (time.time() - self.tT) >= self.slotRate:
-            self.tT = time.time()
-            self.advance = True
-        else:
-            self.advance = False
-
-    def next(self):
-        self.checkTime()
+from modules.holder_director import Holder 
 
 
 class WaveDeformer:
@@ -263,18 +238,11 @@ def disturber(config):
                 tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
                 config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
             
-            
-        
-
 
 def additonalSetup(config, workConfig):
     
     config.distortionConfigRef = config
     config.distortionworkConfigRef = workConfig
-    
-    config.directorController = Director(config)
-    config.redrawSpeed = float(workConfig.get("additonalSetup", "redrawSpeed"))
-    config.directorController.slotRate = float(workConfig.get("additonalSetup", "slotRate"))
 
     config.dblockWidth = int(workConfig.get("additonalSetup", "blockWidth"))
     config.dblockHeight = int(workConfig.get("additonalSetup", "blockHeight"))
@@ -347,6 +315,7 @@ def iterationFunction(config):
         rebuildSections(config)
         config.doSectionDisturbance = True
         
+
 def resetFunction(config):
     
         # config.doingRefresh = 1

@@ -8,8 +8,11 @@ import types
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.configuration import bcolors
+
 from modules.holder_director import Holder 
 from modules.holder_director import Director 
+
+from modules import distortions
 
 lastRate = 0
 colorutils.brightness = 1
@@ -395,8 +398,26 @@ def iterate():
             config.remapImageBlockDestination = [startX,startY]
 
 
+    if config.sectionDisturbance == True :
+        distortions.iterationFunction(config)
 
-    config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+    temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    temp1Draw = ImageDraw.Draw(temp1)
+
+    config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
+    temp1.paste(config.image, (0, 0), config.image)
+    
+
+    if config.useWaveDistortion == True:
+        temp1 = ImageOps.deform(temp1, distortions.WaveDeformer(config))
+        config.waveDeformXPos += config.waveDeformXPosRate
+        if config.waveDeformXPos > config.screenWidth :
+            config.waveDeformXPos = 0
+    
+    config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
+    # Done
+
+    # config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
     # Done
 
@@ -439,6 +460,17 @@ def main(run=True):
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
     config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    
+
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+    config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    
+    config.doingSectionDisturbance = False
+    config.rebuildingPattern = True
+    distortions.additonalSetup(config, workConfig)
+    
 
     try:
         config.useLastOverlay = workConfig.getboolean("displayconfig", "useLastOverlay")

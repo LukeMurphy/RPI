@@ -10,6 +10,8 @@ from noise import *
 from modules.configuration import bcolors
 from modules.movieClip import movieClip
 from modules import badpixels, coloroverlay, colorutils, panelDrawing, pattern_blocks
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 
@@ -106,33 +108,7 @@ class Fader:
             self.fadingDone =  True
 
 
-class Holder:
-    def __init__(self):
-        pass
 
-
-class Director:
-    """docstring for Director"""
-
-    slotRate = .5
-
-    def __init__(self, config):
-        super(Director, self).__init__()
-        self.config = config
-        self.tT = time.time()
-
-    def checkTime(self):
-        if (time.time() - self.tT) >= self.slotRate:
-            self.tT = time.time()
-            self.advance = True
-        else:
-            self.advance = False
-
-    def next(self):
-        self.checkTime()
-
-
-###############################################
 
 
 def transformImage(img):

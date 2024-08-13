@@ -7,6 +7,8 @@ import time
 import PIL.Image
 from modules import colorutils
 from PIL import Image, ImageDraw
+from modules.holder_director import Holder 
+from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

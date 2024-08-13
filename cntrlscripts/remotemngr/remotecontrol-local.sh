@@ -1,10 +1,12 @@
 #!/bin/sh
 # Changes based on machine setup
-path="/Users/lamshell/Documents/Dev/RPI/"
-configGroup="/p4-4x4/"
+path="/Users/lamshell/Documents/Dev/LEDELI/RPI/"
+configGroup=""
 machine="local"
-pieceFileName="http://lukelab/projects/rpi-controls/local-status.cfg"
-brightnessFile="http://lukelab/projects/rpi-controls/local-controlstatus.cfg"
+pieceFileName="http://localhost:8888/projects/rpi-controls/local-status.cfg"
+brightnessFile="http://localhost:8888/projects/rpi-controls/local-controlstatus.cfg"
+pieceFileName="https://lukelab.com/projects/rpi-controls/boca/local-status.cfg"
+brightnessFile="https://lukelab.com/projects/rpi-controls/boca/local-controlstatus.cfg"
 
 ## Set crontab -e to */1 * * * * /Documents/RPI/cntrlscripts/remotemngr/remotecontrol.sh
 DIR="${BASH_SOURCE%/*}"

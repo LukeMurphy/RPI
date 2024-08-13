@@ -1,0 +1,1 @@
+This directory should be copied to a folder outside this repo and configured there!

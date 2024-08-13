@@ -1,96 +1,89 @@
 #!/bin/sh
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
-localvalue=$(cat $path"cntrlscripts/remotemngr/localvalue.cfg")
-localvalueControl=$(cat $path"cntrlscripts/remotemngr/localvaluecontrol.cfg")
+localvalue=$(cat $localConfigNameFile)
+localvalueControl=$(cat $localControlConfigFileName)
 
 # set the remote to be a default
 remotevalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $pieceFileName)
 remotevalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" $brightnessFile)
-status=$?
+# status=$?
 
-#echo $status
 
+# MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK
+# sudo visudo
+# user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown
+
+echo "\n*************"
+echo $1
+#echo $2
+echo $localConfigNameFile
+echo $localvalue
+echo $remotevalue
+echo $controlPath
+echo "*************\n"
+
+runScript=0
+player="player.py"
 # if curl is ok, set the remote value
-if [ $status -eq 0 ]
+
+if [ $1 =  "startup" ] || [ $1 = "cron" ]
 then
-		echo "OK -- CHECKINGs..."
-		echo "Remote value:" $remotevalue   
-		echo "local value:" $localvalue
-		echo "Remote brightness:" $remotevalueControl
-		echo "Local brightness:" $localvalueControl
-fi
+                echo "OK -- CHECKINGs..."
+                echo "local value:" $localvalue
+                echo "Local brightness:" $localvalueControl
+                echo "Remote value:" $remotevalue
+                echo "Remote brightness:" $remotevalueControl
+        configToUse=$localvalue
+        brightnessConfig=$localvalueControl
+    if [ $1 = 'startup' ]
+    then
+    runScript=1
+    if [ $configToUse = *"--manifest"* ]
+    then player="sequencer.v2.py" 
+    fi
+    execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+    fi
 
-startingup="0"
-if [ $# -ne 0 ]
-	then
-	if test $1 = "startup"
-	then
-		startingup="1"
-	fi
-fi
-
-# choose the piece to play
-if [ $remotevalue != $localvalue ] || [ "$startingup" -eq "1" ] || [ $remotevalueControl != $localvalueControl ]
-then
-
-	echo "NOT THE SAME or STARTING UP"
-	echo $remotevalue > $path"cntrlscripts/remotemngr/localvalue.cfg"
-	echo $remotevalueControl > $path"cntrlscripts/remotemngr/localvaluecontrol.cfg"
-	
-	ps -ef | pgrep python | xargs kill -9;
-
-
-	if test $remotevalue = "fludd"
-	then
-		config="fludd.cfg"
-	fi
-
-	if test  $remotevalue = "marquee"
-	then
-		config="marquee.cfg"
-	fi
-
-	if test  $remotevalue = "repaint"
-	then
-		config="repaint.cfg"
-	fi
-
-	if test  $remotevalue = "flames"
-	then
-		config="img-hub.cfg"
-	fi
-
-	if test  $remotevalue = "machine"
-	then
-		config="machine.cfg"
-	fi
-
-	if test  $remotevalue = "hang"
-	then
-		config="hang.cfg"
-	fi
-
-	if test  $remotevalue = "stroop2"
-	then
-		config="stroop2.cfg"
-	fi
-
-	if test  $remotevalue = "XOs"
-	then
-		config="XOs.cfg"
-	fi    
-
-	if test  $remotevalue = "counter"
-	then
-		config="counter.cfg"
-	fi
-	
-	if test  $remotevalue = "repeater"
-	then
-		config="repeater.cfg"
-	fi
-
-execString=$path"player.py -mname "$machine" -path "$path" -cfg "$configGroup$config" -brightnessOverride "$remotevalueControl
-echo $execString
-DISPLAY=:0 python $execString&
+    if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]
+    then
+        if [ $remotevalue = 'Shutdown' ]
+        then
+            echo "==>shutting down <=="
+            ps -ef | pgrep -f player.py | xargs kill -9;
+            echo "x" > $controlPath"localvalue.cfg"
+            echo "50" > $controlPath"localvaluecontrol.cfg"
+            echo admin000 | sudo -S shutdown -h now
+        fi
+        if [ $remotevalue = 'update' ]
+        then
+            echo "==> RUN UPDATE <=="
+            ps -ef | pgrep -f player.py | xargs kill -9;
+            git -C $path pull
+            echo "x" > $controlPath"localvalue.cfg"
+            echo "50" > $controlPath"localvaluecontrol.cfg"
+        fi
+        if [ $remotevalue != 'update' ]
+        then
+            echo "==> NOT THE SAME or STARTING UP"
+            echo $remotevalue > $controlPath"localvalue.cfg"
+            echo $remotevalueControl > $controlPath"localvaluecontrol.cfg"
+            configToUse=$remotevalue
+            brightnessConfig=$remotevalueControl
+            ps -ef | pgrep -f player.py | xargs kill -9;
+            if [ $configToUse == *"--manifest"* ]
+            then player="sequence-player.py"
+            fi
+            execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+            # config=$remotevalue
+            runScript=1
+        fi
+    fi
+    if [ $runScript -eq 1 ]
+    then
+        echo "==> Will run:"
+        echo $execString
+        echo "\n\n"
+        # export DISPLAY=:0; /usr/bin/python3 $execString&
+        python3 $execString&
+    fi
 fi

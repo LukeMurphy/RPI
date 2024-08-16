@@ -45,6 +45,12 @@ def update_duration():
 	if loc > 40:
 		config.videoplayer.seek(0)
 
+def key_handler(event):
+        global config
+        # print(event.char, event.keysym, event.keycode)
+        if event.keycode == 822083616 :
+            config.spaceBarAction()
+            saveImageToFile()
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
@@ -114,6 +120,10 @@ def setUp(config):
         width=config.screenWidth + buff,
         height=config.screenHeight + buff,
     )
+    
+
+    if config.saveToFile == True :
+        root.bind("<Key>", key_handler, config)
 
     # cnvs2 = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=-4)
     # config.cnvs2 = cnvs2
@@ -495,13 +505,7 @@ def render(
     if config.saveToFile == True :
         config.topDirector.checkTime()
         if config.topDirector.advance == True :
-            currentTime = time.time()
-            baseName = config.outPutPath + str(currentTime)
-            writeImage(baseName, renderImage=config.renderImageFull)
-
-
-    
-
+            saveImageToFile()
 
 
     if updateCanvasCall:
@@ -548,5 +552,9 @@ def remappingFunctionTemp():
 def drawBeforeConversion():
     return True
 
-
+def saveImageToFile() :
+    print("Saving image to file")
+    currentTime = time.time()
+    baseName = config.outPutPath + str(currentTime)
+    writeImage(baseName, renderImage=config.renderImageFull)
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

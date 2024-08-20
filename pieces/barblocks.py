@@ -8,6 +8,12 @@ from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
+import os
+
+import beepy as beeper
+beeper.beep(sound=1) # integer as argument
+
+
 
 
 class Block:
@@ -261,6 +267,7 @@ def buildGrid(config):
     if cols > 80:
         cols = 80
 
+    
     print("---- buildGrid --")
     print(("Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}").format(
         rows, cols, config.paletteIndex, config.usePaletteOverride, config.mixedPalettes))
@@ -503,6 +510,8 @@ def iterate():
         sectionBlurRadius = 1
 
     if random.random() < config.changeGridProb:
+        
+        beeper.beep(sound=1) # integer as argument
         # change the palette - used if the mixed palettes option is False and the
         # palette override is False
         config.paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
@@ -532,11 +541,11 @@ def iterate():
         print("Running a :" + str(config.gridOptions[index]))
         eval(config.gridOptions[index])(config)
 
-    if random.random() < config.changeQuiverProb:
-        if random.random() < 0.75:
+    if random.random() < config.changeQuiverOnProb:
             config.deltaXVal = round(random.uniform(0, config.deltaVal))
             config.deltaYVal = round(random.uniform(0, config.deltaVal))
-        else:
+            
+    if random.random() < config.changeQuiverOffProb:
             # a bit more often, things just go still
             config.deltaXVal = config.deltaYVal = 0
 
@@ -565,6 +574,19 @@ def main(run=True):
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
     config.changeGridProb = float(workConfig.get("movingpattern", "changeGridProb"))
     config.changeQuiverProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
+    
+    
+    
+    try:
+        config.changeQuiverOnProb = float(workConfig.get("movingpattern", "changeQuiverOnProb"))
+        config.changeQuiverOffProb = float(workConfig.get("movingpattern", "changeQuiverOffProb"))
+        # comment: 
+    except Exception as e:
+        print(str(e))
+        config.changeQuiverOnProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
+        config.changeQuiverOffProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
+    # end try
+    
     config.rotationVariation = float(
         workConfig.get("movingpattern", "rotationVariation")
     )

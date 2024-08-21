@@ -10,8 +10,8 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 import os
 
-import beepy as beeper
-beeper.beep(sound=1) # integer as argument
+# import beepy as beeper
+# beeper.beep(sound=1) # integer as argument
 
 
 
@@ -511,7 +511,7 @@ def iterate():
 
     if random.random() < config.changeGridProb:
         
-        beeper.beep(sound=1) # integer as argument
+        # beeper.beep(sound=1) # integer as argument
         # change the palette - used if the mixed palettes option is False and the
         # palette override is False
         config.paletteIndex = math.floor(random.uniform(0, len(config.palettes)))

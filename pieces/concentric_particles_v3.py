@@ -79,6 +79,11 @@ class RadialSet:
         self.y = 0
         self.wBase = wBase
         self.drawRadialPolys = False
+        self.radialSetMinNum = 120
+        self.radialSetMaxNum = 300
+        self.radialSetInnerRadiusFactor = 3
+        self.radialSetInnerRadiusRange = [-100,50]
+        self.radialSetOuterRadiusRange = [-50,50]
 
     def makeRadialsSet(self, minNum=120, maxNum=300):
         self.radialsArray = []
@@ -87,7 +92,7 @@ class RadialSet:
 
         self.angleOffset = 0.0
         self.angleOffsetSpeed = random.SystemRandom().uniform(0, math.pi / 300)
-        innerRadius = self.wBase / 4
+        innerRadius = self.wBase / self.radialSetInnerRadiusFactor
         outerRadius = self.wBase
         skipRatio = random.SystemRandom().random() + 0.3
 
@@ -98,8 +103,8 @@ class RadialSet:
             innerRadius = 10
 
         for i in range(0, self.radials):
-            ir = innerRadius + random.SystemRandom().uniform(-100, 50)
-            outr = outerRadius + random.SystemRandom().uniform(-50, 50)
+            ir = innerRadius + random.SystemRandom().uniform(self.radialSetInnerRadiusRange[0], self.radialSetInnerRadiusRange[1])
+            outr = outerRadius + random.SystemRandom().uniform( self.radialSetOuterRadiusRange[0],  self.radialSetOuterRadiusRange[1])
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
@@ -240,12 +245,16 @@ class ParticleSystem:
         self.drawRadialPolys = True if random.SystemRandom().random() < .5 else False
 
         radialSet = RadialSet(config, self.wBase)
-        radialSet.makeRadialsSet(120,300)
+        
+        
+        radialSet.radialSetMinNum = config.radialSetMinNum 
+        radialSet.radialSetMaxNum = config.radialSetMaxNum
+        radialSet.radialSetInnerRadiusFactor = config.radialSetInnerRadiusFactor
+        radialSet.radialSetInnerRadiusRange = config.radialSetInnerRadiusRange 
+        radialSet.radialSetOuterRadiusRange = config.radialSetOuterRadiusRange 
+    
+        radialSet.makeRadialsSet(config.radialSetMinNum,config.radialSetMaxNum)
         self.radialSets.append(radialSet)
-
-        # self.bands = 20
-        # self.wDiff = 30
-        # print(self.bands)
         
         # the 33s hand
         radialSet = RadialSet(config, self.wBase)
@@ -812,6 +821,23 @@ def main(run=True):
     config.radial2Red = int(workConfig.get("particles", "radial2Red"))
     config.radial2Green = int(workConfig.get("particles", "radial2Green"))
     config.radial2Blue = int(workConfig.get("particles", "radial2Blue"))
+    
+    
+    try:
+        config.radialSetMinNum = int(workConfig.get("particles", "radialSetMinNum"))
+        config.radialSetMaxNum = int(workConfig.get("particles", "radialSetMaxNum"))
+        config.radialSetInnerRadiusFactor = int(workConfig.get("particles", "radialSetInnerRadiusFactor"))
+        config.radialSetInnerRadiusRange = list(int(x) for x in (workConfig.get("particles", "radialSetInnerRadiusRange").split(",")))
+        config.radialSetOuterRadiusRange = list(int(x) for x in (workConfig.get("particles", "radialSetOuterRadiusRange").split(",")))
+    except Exception as e:
+        print(str(e))
+        config.radialSetMinNum = 120
+        config.radialSetMaxNum = 300
+        config.radialSetInnerRadiusFactor = 4
+        config.radialSetInnerRadiusRange = -100,50
+        config.radialSetOuterRadiusRange = -50,50 
+    
+    
 
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
@@ -832,7 +858,6 @@ def main(run=True):
         print(str(e))
         config.imageCanvasWidth = config.canvasWidth
         config.imageCanvasHeight = config.canvasHeight
-    
 
 
     # comment: # for some towers the seam between the 
@@ -903,9 +928,6 @@ def main(run=True):
     particleColorRangeVals  = workConfig.get("particles","particleColorRange").split(",")
     config.particleColorRange = list(float(i) for  i in particleColorRangeVals)
         
-
-        
-
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))

@@ -222,6 +222,7 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
         # print(list(item.keys())[0])
         ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
         ListBoxOfConfigs.itemconfig(END, bg = "#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white" )
+        ListBoxOfConfigs.itemconfig(END, bg = "#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None )
         ListBoxOfConfigs.itemconfig(END, bg = "#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None )
         ListBoxOfConfigs.itemconfig(END, bg = "#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None )
 

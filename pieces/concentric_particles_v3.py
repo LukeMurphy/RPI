@@ -87,7 +87,7 @@ class RadialSet:
 
         self.angleOffset = 0.0
         self.angleOffsetSpeed = random.SystemRandom().uniform(0, math.pi / 300)
-        innerRadius = self.wBase / 3
+        innerRadius = self.wBase / 4
         outerRadius = self.wBase
         skipRatio = random.SystemRandom().random() + 0.3
 
@@ -98,7 +98,7 @@ class RadialSet:
             innerRadius = 10
 
         for i in range(0, self.radials):
-            ir = innerRadius + random.SystemRandom().uniform(-50, 50)
+            ir = innerRadius + random.SystemRandom().uniform(-100, 50)
             outr = outerRadius + random.SystemRandom().uniform(-50, 50)
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
@@ -117,7 +117,7 @@ class ParticleSystem:
         self.orientation = 1
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
-        self.useFixedBandColors = False
+        self.useFixedBandColors = True
         self.bandWVariabilityProb = .005
         self.xMaxFactor = 4
         self.yMaxFactor = 4

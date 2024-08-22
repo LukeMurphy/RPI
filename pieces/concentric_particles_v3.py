@@ -117,7 +117,7 @@ class ParticleSystem:
         self.orientation = 1
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
-        self.useFixedBandColors = True
+        self.useFixedBandColors = False
         self.bandWVariabilityProb = .005
         self.xMaxFactor = 4
         self.yMaxFactor = 4

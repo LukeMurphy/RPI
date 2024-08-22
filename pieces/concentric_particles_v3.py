@@ -96,7 +96,7 @@ class RadialSet:
         self.angleOffsetSpeed = random.SystemRandom().uniform(0, math.pi / 300)
         
         radialSetInnerRadiusFactor = self.radialSetInnerRadiusFactor
-        if self.useFixedBandColors == False :
+        if self.useFixedBandColors == True :
             # self.radialSetInnerRadiusRange[0] = self.radialSetOuterRadiusRange[0]
             radialSetInnerRadiusFactor =  self.radialSetInnerRadiusFactorFixedBands
             
@@ -118,7 +118,7 @@ class RadialSet:
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
-        print(f"innerRadius = {innerRadius}")
+        print(f"wBase {self.wBase} innerRadius = {innerRadius}")
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -256,10 +256,10 @@ class ParticleSystem:
         self.drawRadialPolys = True if random.SystemRandom().random() < .5 else False
 
         radialSet = RadialSet(config, self.wBase)
-        
         radialSet.radialSetMinNum = config.radialSetMinNum 
         radialSet.radialSetMaxNum = config.radialSetMaxNum
         radialSet.radialSetInnerRadiusFactor = config.radialSetInnerRadiusFactor
+        radialSet.radialSetInnerRadiusFactorFixedBands = config.radialSetInnerRadiusFactorFixedBands
         radialSet.radialSetInnerRadiusRange = config.radialSetInnerRadiusRange 
         radialSet.radialSetOuterRadiusRange = config.radialSetOuterRadiusRange 
         radialSet.useFixedBandColors = self.useFixedBandColors 
@@ -661,10 +661,10 @@ def drawBands(p):
 
         for n in range(0, numLines):
             a = i * rSet.rads + rSet.angleOffset
-            x0 = math.cos(a) * rSet.radialsArray[n][0] + p.x
-            y0 = math.sin(a) * rSet.radialsArray[n][0] + p.y
-            x1 = math.cos(a) * rSet.radialsArray[n][1] + p.x
-            y1 = math.sin(a) * rSet.radialsArray[n][1] + p.y
+            x0 = round(math.cos(a) * rSet.radialsArray[n][0] + p.x)
+            y0 = round(math.sin(a) * rSet.radialsArray[n][0] + p.y)
+            x1 = round(math.cos(a) * rSet.radialsArray[n][1] + p.x)
+            y1 = round(math.sin(a) * rSet.radialsArray[n][1] + p.y)
             i += 1
             polyArray.append((x0,y0))
             polyArray.append((x1,y1))
@@ -838,7 +838,7 @@ def main(run=True):
         config.radialSetMinNum = int(workConfig.get("particles", "radialSetMinNum"))
         config.radialSetMaxNum = int(workConfig.get("particles", "radialSetMaxNum"))
         config.radialSetInnerRadiusFactor = int(workConfig.get("particles", "radialSetInnerRadiusFactor"))
-        config.radialSetInnerRadiusFactorFixedBands = int(workConfig.get("particles", "radialSetInnerRadiusFactorFixedBands"))
+        config.radialSetInnerRadiusFactorFixedBands = float(workConfig.get("particles", "radialSetInnerRadiusFactorFixedBands"))
         config.radialSetInnerRadiusRange = list(int(x) for x in (workConfig.get("particles", "radialSetInnerRadiusRange").split(",")))
         config.radialSetOuterRadiusRange = list(int(x) for x in (workConfig.get("particles", "radialSetOuterRadiusRange").split(",")))
     except Exception as e:

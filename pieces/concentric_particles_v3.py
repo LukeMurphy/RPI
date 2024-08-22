@@ -311,13 +311,18 @@ class ParticleSystem:
 
         self.radialBand = self.maxRadius / 12
 
-
         for n in range(0, self.p):
             pDot = ParticleDot()
             pDot.setUp(self, n)
             self.particles.append(pDot)
+            
+            
+        print("----------------")
+        print(f"PS.useFixedBandColors : {self.useFixedBandColors}")
+        print(f"config.bgColor: {config.bgColor} config.fadeRateDelta:{config.fadeRateDelta}")
+        print(f"PS.bands: {self.bands} PS.wDiff: {self.wDiff}  PS.wBase: {self.wBase}")
+        print("----------------")
 
-        print(f"bands {self.bands}")
          
     def move(self):
 
@@ -750,12 +755,7 @@ def iterate():
                 PS.setCenter()
                 PS.setNewAttributes()
                 PS.setUp()
-                print("----------------")
-                print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
-                print(PS.bands)
-                print(PS.wDiff)
-                print(PS.wBase)
-                print("----------------")
+
 
     config.image.paste(config.drawingImage, (0,0),config.drawingImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)

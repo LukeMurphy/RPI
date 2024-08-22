@@ -117,7 +117,7 @@ class ParticleSystem:
         self.orientation = 1
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
-        self.useFixedBandColors = False
+        self.useFixedBandColors = True
         self.bandWVariabilityProb = .005
         self.xMaxFactor = 4
         self.yMaxFactor = 4
@@ -127,10 +127,11 @@ class ParticleSystem:
     def setNewAttributes(self):
         self.radialSets = []
         
-                # The rings around the center
+        # The rings around the center
         if self.useFixedBandColors == False:
             self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
             self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
+            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
         
         if self.useFixedBandColors == True:
             self.bandColors = [
@@ -221,10 +222,10 @@ class ParticleSystem:
                         color[cx] *= .8
 
         
- 
             self.bands = bandColorSteps * len(self.bandColors)
-            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
+            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin + config.PSRadiusFixedColorMinInternalRadius, config.PSRadiusMax + config.PSRadiusFixedColorMinInternalRadius))
             self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
+
             
             self.bandWidthsSet = []
             for b in range(0, self.bands) :

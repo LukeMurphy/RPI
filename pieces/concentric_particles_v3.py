@@ -512,11 +512,12 @@ class ParticleSystem:
 
 def drawBands(p):
         
-    wBase = p.wBase
+    wBase = p.wBase 
     
     wDiff = round(wBase / p.bands)
     
     if p.useFixedBandColors == True :
+        wBase = p.wBase - config.PSRadiusFixedColorMinInternalRadius
         wDiff = p.wDiff
         # print(wDiff, p.bands, wBase)
 
@@ -556,7 +557,10 @@ def drawBands(p):
         if p.useFixedBandColors == True or random.SystemRandom().random() < p.bandWVariabilityProb:
             w = (p.bands - i) * calculatedRingSize
             
-            
+        
+        if w < config.PSRadiusFixedColorMinInternalRadius :
+            w = config.PSRadiusFixedColorMinInternalRadius
+        
         # print(round(w))
         
         if w != 0 :
@@ -861,7 +865,7 @@ def main(run=True):
     config.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
     config.PSMinBands = int(workConfig.get("particles", "PSMinBands"))
     config.PSMaxBands = int(workConfig.get("particles", "PSMaxBands"))
-    config.PSRadiusFixedColorMin = int(workConfig.get("particles", "PSRadiusFixedColorMin"))
+    # config.PSRadiusFixedColorMin = int(workConfig.get("particles", "PSRadiusFixedColorMin"))
 
     config.bandWidthMin = int(workConfig.get("particles","bandWidthMin"))
     config.bandWidthMax = int(workConfig.get("particles","bandWidthMax"))
@@ -872,6 +876,13 @@ def main(run=True):
     config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
     
     config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
+    
+    try:
+        config.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles","PSRadiusFixedColorMinInternalRadius"))
+    except Exception as e :
+        print(str(e))
+        config.PSRadiusFixedColorMinInternalRadius = 1   
+         
     try:
         config.xMaxFactor = float(workConfig.get("particles","xMaxFactor"))
         config.yMaxFactor = float(workConfig.get("particles","yMaxFactor"))

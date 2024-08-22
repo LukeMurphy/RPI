@@ -219,6 +219,8 @@ class ParticleSystem:
             pDot = ParticleDot()
             pDot.setUp(self, n)
             self.particles.append(pDot)
+            
+        print(f"bands {self.bands}")
 
     def move(self):
 
@@ -608,7 +610,7 @@ def main(run=True):
     config.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
     config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
 
-    config.systemRotation = float(workConfig.get("particles", "systemRotation"))
+    # config.systemRotation = float(workConfig.get("particles", "systemRotation"))
 
     bgColorSets = (workConfig.get("particles", "bgColorSets")).split(",")
     config.bgColorSets = []

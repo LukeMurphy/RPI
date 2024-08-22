@@ -117,131 +117,119 @@ class ParticleSystem:
         self.orientation = 1
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
-        self.useFixedBandColors = True
+        self.useFixedBandColors = False
         self.bandWVariabilityProb = .005
         self.xMaxFactor = 4
         self.yMaxFactor = 4
+        self.wDiff = 17
 
-
+        
     def setNewAttributes(self):
         self.radialSets = []
         
-        self.bandColors = [
-        [50,10,50],
-        [120,90,90],
-        [120,50,50],
-        [50,120,90],
-              [151,165,194],
-
-        [222,208,182],
-        [120,74,52],
-        [187,189,168],
-        [129,137,158],
-        [204,228,232],
-        [253,240,195],
-        
-        [199,166,151],
-        [151,165,194],
-        [89,113,175],
-        [53,73,136],
-        [27,38,83],
-        [27,38,83],
-
-        ]
-        self.__bandColors = [
-             
-        [0,0,0],
-        [50,10,50],
-        [120,50,50],
-        [50,120,90],
-        [222,208,182],
-        [120,74,52],
-        [129,137,158],
-        [204,228,232],
-
-        
-        [50,10,50],
-        [120,50,50],
-        [50,120,90],
-        [222,208,182],
-        [120,74,52],
-        [129,137,158],
-        [204,228,232],
-        [253,240,195],
-        [199,166,151],
-        [151,165,194],
-        [89,113,175],
-        [53,73,136],
-        [27,38,83],
-        [27,38,83],
-        [27,38,253],
-        
-
-        ]
-
-        self._bandColors = [
-        [255,0,0],
-        [255,255,0],
-        [0,255,0],
-        [0,255,255],
-        [0,0,250],
-        [255,0,250],
-
-
-    
-        ]
-
-
-                    
-        # created transition bands
-        
-        self.bandColorsAdjusted = []
-        bandColorSteps = 3
-        self.bandColors.reverse()
-        
-        for c in range(0, len(self.bandColors)-1) :
-            color1 = self.bandColors[c]
-            color2 = self.bandColors[c + 1]
-            
-            rDiff = (color2[0] - color1[0]) / bandColorSteps
-            gDiff = (color2[1] - color1[1]) / bandColorSteps
-            bDiff = (color2[2] - color1[2]) / bandColorSteps
-            
-            for i in range(0, bandColorSteps) :
-                self.bandColorsAdjusted.append([
-                    round(color1[0] + rDiff * i),
-                    round(color1[1] + gDiff * i),
-                    round(color1[2] + bDiff * i)
-                                                ])
-                
-
-        # adjusting the apparent brightness of some bands as they
-        # read over-bright - can be modified anytime
-        for c in range(0, len(self.bandColorsAdjusted)) :
-            color = self.bandColorsAdjusted[c]
-            sumOfColors = color[0] + color[1] + color[2]
-            if sumOfColors > 330 and c < 13 :
-                for cx in range(0,3):
-                    color[cx] *= .8
-        # self.bandColorsAdjusted = self.bandColors.copy()        
-        
-        # The rings around the center
-        self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
-        self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
-        
-        self.bands = bandColorSteps * len(self.bandColors)
-        
-        # print(self.bands)
-        
-        self.bandWidthsSet = []
-        for b in range(0, self.bands) :
-            self.bandWidthsSet.append(round(random.SystemRandom().uniform(config.PSFixedColorRadiusDiffMin,config.PSFixedColorRadiusDiffMax)))
+                # The rings around the center
+        if self.useFixedBandColors == False:
+            self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
+            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
         
         if self.useFixedBandColors == True:
-            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
-            # self.bands = len(self.bandColors)
-            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
+            self.bandColors = [
+                [50,10,50],
+                [120,90,90],
+                [120,50,50],
+                [50,120,90],
+                [151,165,194],
+
+                [222,208,182],
+                [120,74,52],
+                [187,189,168],
+                [129,137,158],
+                [204,228,232],
+                [253,240,195],
+                
+                [199,166,151],
+                [151,165,194],
+                [89,113,175],
+                [53,73,136],
+                [27,38,83],
+                [27,38,83],
+
+            ]
+            # self.__bandColors = [
+            #     [0,0,0],
+            #     [50,10,50],
+            #     [120,50,50],
+            #     [50,120,90],
+            #     [222,208,182],
+            #     [120,74,52],
+            #     [129,137,158],
+            #     [204,228,232],
+
+                
+            #     [50,10,50],
+            #     [120,50,50],
+            #     [50,120,90],
+            #     [222,208,182],
+            #     [120,74,52],
+            #     [129,137,158],
+            #     [204,228,232],
+            #     [253,240,195],
+            #     [199,166,151],
+            #     [151,165,194],
+            #     [89,113,175],
+            #     [53,73,136],
+            #     [27,38,83],
+            #     [27,38,83],
+            #     [27,38,253],
+            # ]
+
+            # self._bandColors = [
+            #     [255,0,0],
+            #     [255,255,0],
+            #     [0,255,0],
+            #     [0,255,255],
+            #     [0,0,250],
+            #     [255,0,250],
+            # ]
+
+            # created transition bands
+            self.bandColorsAdjusted = []
+            bandColorSteps = 3
+            self.bandColors.reverse()
+            
+            for c in range(0, len(self.bandColors)-1) :
+                color1 = self.bandColors[c]
+                color2 = self.bandColors[c + 1]
+                
+                rDiff = (color2[0] - color1[0]) / bandColorSteps
+                gDiff = (color2[1] - color1[1]) / bandColorSteps
+                bDiff = (color2[2] - color1[2]) / bandColorSteps
+                
+                for i in range(0, bandColorSteps) :
+                    self.bandColorsAdjusted.append([
+                        round(color1[0] + rDiff * i),
+                        round(color1[1] + gDiff * i),
+                        round(color1[2] + bDiff * i)
+                                                    ])
+            # adjusting the apparent brightness of some bands as they
+            # read over-bright - can be modified anytime
+            for c in range(0, len(self.bandColorsAdjusted)) :
+                color = self.bandColorsAdjusted[c]
+                sumOfColors = color[0] + color[1] + color[2]
+                if sumOfColors > 330 and c < 13 :
+                    for cx in range(0,3):
+                        color[cx] *= .8
+
         
+ 
+            self.bands = bandColorSteps * len(self.bandColors)
+            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
+            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
+            
+            self.bandWidthsSet = []
+            for b in range(0, self.bands) :
+                self.bandWidthsSet.append(round(random.SystemRandom().uniform(config.PSFixedColorRadiusDiffMin,config.PSFixedColorRadiusDiffMax)))
+            
         self.xSpeed = random.SystemRandom().random()  * config.PSXSpeed
         self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
         
@@ -329,7 +317,8 @@ class ParticleSystem:
             pDot.setUp(self, n)
             self.particles.append(pDot)
 
-    
+        print(f"bands {self.bands}")
+         
     def move(self):
 
         self.x += self.xSpeed
@@ -513,7 +502,6 @@ class ParticleSystem:
 def drawBands(p):
         
     wBase = p.wBase 
-    
     wDiff = round(wBase / p.bands)
     
     if p.useFixedBandColors == True :
@@ -543,7 +531,6 @@ def drawBands(p):
     colorBandIndex = 0
     goldenBandIndex = 0
 
-
     calculatedRingSize = wBase/p.bands
     
     # print("----")
@@ -556,10 +543,9 @@ def drawBands(p):
         
         if p.useFixedBandColors == True or random.SystemRandom().random() < p.bandWVariabilityProb:
             w = (p.bands - i) * calculatedRingSize
-            
         
-        if w < config.PSRadiusFixedColorMinInternalRadius :
-            w = config.PSRadiusFixedColorMinInternalRadius
+            if w < config.PSRadiusFixedColorMinInternalRadius :
+                w = config.PSRadiusFixedColorMinInternalRadius
         
         # print(round(w))
         
@@ -604,7 +590,7 @@ def drawBands(p):
             # Should try to interleave the bands so that the fixed color bands integrate better
             # with the prescribed golden ones
       
-            if i < 5 :
+            if i < 0 :
                 a = 20
                 config.draw.ellipse( (x0, y0, x1, y1), fill=(255,0,0,255) )
             try :
@@ -759,12 +745,17 @@ def iterate():
             # renew the particle dots that travel
             # bgChoice = math.floor(random.SystemRandom().uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
-            print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
             if random.SystemRandom().random() < config.totalResetProb:
                 PS.useFixedBandColors = True if random.SystemRandom().random() < config.useFixedBandColorsProb else False
                 PS.setCenter()
                 PS.setNewAttributes()
                 PS.setUp()
+                print("----------------")
+                print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
+                print(PS.bands)
+                print(PS.wDiff)
+                print(PS.wBase)
+                print("----------------")
 
     config.image.paste(config.drawingImage, (0,0),config.drawingImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
@@ -789,7 +780,6 @@ def main(run=True):
     config.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
     config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
 
-    config.systemRotation = float(workConfig.get("particles", "systemRotation"))
 
     bgColorSets = (workConfig.get("particles", "bgColorSets")).split(",")
     config.bgColorSets = []

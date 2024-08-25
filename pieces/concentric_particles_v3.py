@@ -120,7 +120,9 @@ class RadialSet:
 
         print(f"wBase {self.wBase} innerRadius = {innerRadius}")
 
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 class ParticleSystem:
     def __init__(self, config):
@@ -158,6 +160,11 @@ class ParticleSystem:
                 [151,165,194],
 
                 [222,208,182],
+                [10,90,150],
+                [10,80,0],
+                [100,90,0],
+                [100,0,0],
+                [100,0,0],
                 [120,74,52],
                 [187,189,168],
                 [129,137,158],
@@ -680,8 +687,6 @@ def drawBands(p):
             config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
             config.drawOverFlow.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
     
-
-
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

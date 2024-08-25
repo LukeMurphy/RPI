@@ -152,69 +152,8 @@ class ParticleSystem:
             self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
         
         if self.useFixedBandColors == True:
-            self.bandColors = [
-                [50,10,50],
-                [120,90,90],
-                [120,50,50],
-                [50,120,90],
-                [151,165,194],
+            self.bandColors = config.bandColors
 
-                [222,208,182],
-                [10,90,150],
-                [10,80,0],
-                [100,90,0],
-                [100,0,0],
-                [100,0,0],
-                [120,74,52],
-                [187,189,168],
-                [129,137,158],
-                [204,228,232],
-                [253,240,195],
-                
-                [199,166,151],
-                [151,165,194],
-                [89,113,175],
-                [53,73,136],
-                [27,38,83],
-                [27,38,83],
-
-            ]
-            # self.__bandColors = [
-            #     [0,0,0],
-            #     [50,10,50],
-            #     [120,50,50],
-            #     [50,120,90],
-            #     [222,208,182],
-            #     [120,74,52],
-            #     [129,137,158],
-            #     [204,228,232],
-
-                
-            #     [50,10,50],
-            #     [120,50,50],
-            #     [50,120,90],
-            #     [222,208,182],
-            #     [120,74,52],
-            #     [129,137,158],
-            #     [204,228,232],
-            #     [253,240,195],
-            #     [199,166,151],
-            #     [151,165,194],
-            #     [89,113,175],
-            #     [53,73,136],
-            #     [27,38,83],
-            #     [27,38,83],
-            #     [27,38,253],
-            # ]
-
-            # self._bandColors = [
-            #     [255,0,0],
-            #     [255,255,0],
-            #     [0,255,0],
-            #     [0,255,255],
-            #     [0,0,250],
-            #     [255,0,250],
-            # ]
 
             # created transition bands
             self.bandColorsAdjusted = []
@@ -912,6 +851,41 @@ def main(run=True):
     config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
     
     try:
+        bandColorsRaw  = workConfig.get("particles","bandColors").split("|")
+        config.bandColors = []
+        for n in bandColorsRaw :
+            config.bandColors.append(list(int(x) for x in n.split(",")))
+        
+        # comment: 
+    except Exception as e:
+        print(str(e))
+        config.bandColors = [
+            [50,10,50],
+            [120,90,90],
+            [120,50,50],
+            [50,120,90],
+            [151,165,194],
+
+            [222,208,182],
+            [10,90,150],
+            [10,80,0],
+            [80,90,0],
+            [80,0,0],
+            [120,74,52],
+            [187,189,168],
+            [129,137,158],
+            [204,228,232],
+            [253,240,195],
+
+            [199,166,151],
+            [151,165,194],
+            [89,113,175],
+            [53,73,136],
+            [27,38,83],
+            [27,38,83]]
+        
+    
+    try:
         config.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles","PSRadiusFixedColorMinInternalRadius"))
     except Exception as e :
         print(str(e))
@@ -947,6 +921,8 @@ def main(run=True):
     config.particleColorRange = list(float(i) for  i in particleColorRangeVals)
         
 
+        
+        
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
     config.draw = ImageDraw.Draw(config.drawingImage)

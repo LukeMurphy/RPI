@@ -850,6 +850,8 @@ def main(run=True):
     
     config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
     
+    
+    
     try:
         bandColorsRaw  = workConfig.get("particles","bandColors").split("|")
         config.bandColors = []

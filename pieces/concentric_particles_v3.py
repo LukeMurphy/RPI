@@ -158,7 +158,6 @@ class ParticleSystem:
             # created transition bands
             self.bandColorsAdjusted = []
             bandColorSteps = 3
-            self.bandColors.reverse()
             
             for c in range(0, len(self.bandColors)-1) :
                 color1 = self.bandColors[c]
@@ -885,7 +884,9 @@ def main(run=True):
             [53,73,136],
             [27,38,83],
             [27,38,83]]
-        
+
+    # only has to happen once, I had it happening every turn
+    config.bandColors.reverse()
     
     try:
         config.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles","PSRadiusFixedColorMinInternalRadius"))

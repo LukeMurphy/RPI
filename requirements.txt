@@ -17,7 +17,7 @@ ink==0.0.1
 mutagen==1.46.0
 noise==1.2.2
 numpy==1.25.1
-opencv-python==4.7.0.72
+opencv-python==4.8.1.78
 Pillow==10.3.0
 pycodestyle==2.10.0
 pycparser==2.21

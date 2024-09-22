@@ -8,7 +8,8 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.holder_director import Holder 
 from modules.holder_director import Director 
 
-
+from scipy.spatial import Voronoi
+import numpy as np
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -60,7 +61,7 @@ class ParticleDot:
         self.angle = angle
         self.radius = radius
         self.rSpeed = rSpeed
-        self.mode = 1
+        self.mode = 0
         self.orbit = orbit
         self.sizeNum = 1 if random.random() < 0.5 else 2
 
@@ -83,9 +84,9 @@ class ParticleSystem:
         self.bands = round(random.uniform(12, 24))
         self.wBase = round(random.uniform(220, config.canvasWidth))
 
-        self.xSpeed = random.random() / 2.0
-        self.ySpeed = random.random()
-        self.ySpeed = 0
+        self.xSpeed = random.random() * config.particleXSpeed
+        self.ySpeed = random.random() * config.particleYSpeed
+        # self.ySpeed = 0
 
         self.radialsArray = []
         self.radials = round(random.uniform(120, 300))
@@ -275,10 +276,10 @@ class ParticleSystem:
             """
 			"""
             if (
-                xDisplayPos > config.canvasWidth
-                or yDisplayPos > config.canvasHeight
-                or yDisplayPos < 0
-                or xDisplayPos < 0
+                xDisplayPos > config.xRange 
+                or yDisplayPos > config.yRange
+                or yDisplayPos < -config.yRange
+                or xDisplayPos < -config.xRange
             ):
                 ref.setUp(self, ref.id)
 
@@ -286,17 +287,52 @@ class ParticleSystem:
                 ref.setUp(self, ref.id)
 
 
-        for y in range(0,config.imgy,config.step):
-            for x in range(0,config.imgx,config.step):
-                dmin = math.hypot(config.imgx - 1, config.imgy - 1)
-                j = -1
-                for i in range(config.num_cells):
-                    ref = self.particles[i]
-                    d = math.hypot(ref.xPos - x, ref.yPos - y)
-                    if d < dmin:
-                        dmin = d
-                        j = i
-                config.draw.rectangle((x,y,x+config.step,y+config.step), fill = (config.nr[j], config.ng[j], config.nb[j],90))
+
+        # for y in range(0,config.imgy,config.resolutionOfSquares):
+        #     for x in range(0,config.imgx,config.resolutionOfSquares):
+        #         dmin = math.hypot(config.imgx - 1, config.imgy - 1)
+        #         j = -1
+        #         for i in range(config.num_cells):
+        #             ref = self.particles[i]
+        #             d = math.hypot(ref.xPos - x, ref.yPos - y)
+        #             if d < dmin:
+        #                 dmin = d
+        #                 j = i
+
+        #         config.draw.rectangle((x,y,x+config.resolutionOfSquares,y+config.resolutionOfSquares), fill = (config.nr[j], config.ng[j], config.nb[j],90))
+ 
+        pointsArray = []
+        for i in range(config.num_cells):
+            ref = self.particles[i]
+            pointsArray.append([ref.xPos,ref.yPos])
+            # config.draw.rectangle((ref.xPos,ref.yPos,ref.xPos+3,ref.yPos+3), fill=(200,200,200,255))
+            
+        points = np.array(pointsArray)
+        vor = Voronoi(points)
+        
+        vVertices = vor.vertices
+        vRegions = vor.regions
+        vPoints = vor.points
+        vPointRegion = (vor.point_region).tolist()
+        
+
+        j = 0
+        clrIndex = 0
+        for region in vRegions:
+            for i in range(0, len(vPointRegion)) :
+                if j == vPointRegion[i] :
+                    break
+
+            if -1 not in region:
+                polygon = [tuple(vVertices[p].tolist()) for p in region]
+                if len(polygon) > 0 and i < config.num_cells :
+                    config.draw.polygon(polygon, outline=(40,0,0,155), width = 2 , fill = (config.nr[i], config.ng[i], config.nb[i],round(config.fadeRate))) 
+                    # config.draw.polygon(polygon, outline=(100,0,0,255), width = 1 , fill = None) 
+            j+=1
+            
+        # exit()
+
+        
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -372,29 +408,32 @@ def drawBands(p):
 
 
 
-def generate_voronoi_diagram(width, height, num_cells):
+# def generate_voronoi_diagram(width, height, num_cells):
 
-    for i in range(config.num_cells):
-        config.nx[i] += config.nvx[i]
-        config.ny[i] += config.nvy[i]
+#     for i in range(config.num_cells):
+#         config.nx[i] += config.nvx[i]
+#         config.ny[i] += config.nvy[i]
 
-        if config.nx[i] > config.canvasWidth or config.nx[i] < -2 :
-            config.nvx[i] *= -1
-        if config.ny[i] > config.canvasHeight or config.ny[i] < -2 :
-            config.nvy[i] *= -1
+#         if config.nx[i] > config.canvasWidth or config.nx[i] < -2 :
+#             config.nvx[i] *= -1
+#         if config.ny[i] > config.canvasHeight or config.ny[i] < -2 :
+#             config.nvy[i] *= -1
 
-    for y in range(0,config.imgy,config.step):
-        for x in range(0,config.imgx,config.step):
-            dmin = math.hypot(config.imgx - 1, config.imgy - 1)
-            j = -1
-            for i in range(config.num_cells):
-                d = math.hypot(config.nx[i] - x, config.ny[i] - y)
-                if d < dmin:
-                    dmin = d
-                    j = i
-            #putpixel((x, y), (nr[j], ng[j], nb[j]))
-            #putpixel((x, y), (nr[j], ng[j], nb[j]))
-            config.draw.rectangle((x,y,x+config.step,y+config.step), fill = (config.nr[j], config.ng[j], config.nb[j]))
+#     for y in range(0,config.imgy,config.resolutionOfSquares):
+#         for x in range(0,config.imgx,config.resolutionOfSquares):
+#             dmin = math.hypot(config.imgx - 1, config.imgy - 1)
+#             j = -1
+#             for i in range(config.num_cells):
+#                 d = math.hypot(config.nx[i] - x, config.ny[i] - y)
+#                 if d < dmin:
+#                     dmin = d
+#                     j = i
+#             #putpixel((x, y), (nr[j], ng[j], nb[j]))
+#             #putpixel((x, y), (nr[j], ng[j], nb[j]))
+            
+            
+#             config.draw.rectangle((x,y,x+config.resolutionOfSquares,y+config.resolutionOfSquares), fill = (config.nr[j], config.ng[j], config.nb[j]))
+#             # config.draw.line((x,y,x+config.resolutionOfSquares,y+config.resolutionOfSquares), fill = (0,0,0),width = 1)
 
 
 
@@ -427,14 +466,15 @@ def iterate():
             config.bgColor[0],
             config.bgColor[1],
             config.bgColor[2],
-            round(config.fadeRate),
+            255
+            # round(config.fadeRate),
         ),
     )
 
 
     PS.move()
 
-    drawBands(PS)
+    # drawBands(PS)
 
     #generate_voronoi_diagram(256, 256, 70)
 
@@ -477,6 +517,8 @@ def main(run=True):
 
     config.speedFactorMin = float(workConfig.get("particles", "speedFactorMin"))
     config.speedFactorMax = float(workConfig.get("particles", "speedFactorMax"))
+    config.particleXSpeed = float(workConfig.get("particles", "particleXSpeed"))
+    config.particleYSpeed = float(workConfig.get("particles", "particleYSpeed"))
 
     config.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
     config.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
@@ -507,6 +549,8 @@ def main(run=True):
 
     config.innerRadius = int(workConfig.get("particles", "innerRadius"))
     config.outerRadius = int(workConfig.get("particles", "outerRadius"))
+    config.xRange = int(workConfig.get("particles", "xRange"))
+    config.yRange = int(workConfig.get("particles", "yRange"))
 
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
@@ -522,7 +566,7 @@ def main(run=True):
 
 
     config.num_cells = config.maxParticles
-    config.step = 7
+    config.resolutionOfSquares = int(workConfig.get("particles", "resolutionOfSquares"))
 
     config.imgx, config.imgy = config.image.size
     config.nx = []
@@ -533,10 +577,59 @@ def main(run=True):
     config.ng = []
     config.nb = []
 
+    colorSet = [
+        [255,0,0],
+        [45,0,120],
+        [195,0,50],
+        [255,0,0],
+        [195,0,50],
+        [105,90,0],
+        [255,220,0],
+        [0,110,70],
+        [0,210,70],
+        [0,10,255],
+        [50,10,155],
+        [0,10,255],
+        [50,10,155],
+        
+        [71,70,67],
+        [18,50,205],
+        [169,92,79],
+        [217,7,56],
+        [92,107,76],
+        [136,25,36],
+        [0,171,112],
+        [249,229,116],
+
+
+        [105,0,0],
+        [195,0,50],
+        [170,80,80],
+        [255,80,90],
+        [195,0,50],
+        [169,32,39],
+        [217,7,56],
+        [249,100,116],
+    ]
+    
+    _colorSet = [
+        [255,0,0],
+        [155,0,0],
+        [105,0,0],
+        [195,0,50],
+        [170,80,80],
+        [255,80,90],
+        [195,0,50],
+        [169,32,39],
+        [217,7,56],
+        [249,100,116],
+        ]
+        # [231,231,240],
+        # [219,196,176],
 
     for i in range(config.num_cells):
-        config.nx.append(random.randrange(config.imgx))
-        config.ny.append(random.randrange(config.imgy))
+        config.nx.append(random.randrange(-config.xRange,config.xRange))
+        config.ny.append(random.randrange(-config.yRange,config.yRange))
         config.nvx.append(random.randrange(-2,2))
         config.nvy.append(random.randrange(-2,2))
 
@@ -546,9 +639,15 @@ def main(run=True):
         ng.append(c[1])
         nb.append(c[2])
         '''
-        config.nr.append(random.randrange(256))
-        config.ng.append(random.randrange(256))
-        config.nb.append(random.randrange(256))
+        # config.nr.append(random.randrange(256))
+        # config.ng.append(random.randrange(256))
+        # config.nb.append(random.randrange(256))
+        
+        clr = colorSet[round(random.uniform(0,len(colorSet)-1))]
+        config.nr.append(clr[0])
+        config.ng.append(clr[1])
+        config.nb.append(clr[2])
+        
 
     PS = ParticleSystem(config)
     PS.setCenter()

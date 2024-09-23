@@ -38,7 +38,10 @@ class ParticleDot:
 
         radius = p.radialBand * radialBand
 
-        rSpeed = random.uniform(100, 200) / radius / 100.0
+        rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax)
+        
+        if config.rSpeedRadialProportional == True:
+            rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax)/ radius * 100.0
 
         xPos = p.x
         yPos = p.y
@@ -71,6 +74,10 @@ class ParticleDot:
 
 class ParticleSystem:
     def __init__(self, config):
+        print()
+        print("===================")
+        print("New Particle System")
+        print()
         self.config = config
         self.x = 0
         self.y = 0
@@ -109,7 +116,6 @@ class ParticleSystem:
         self.y = round(random.uniform(self.initYRange[0], self.initYRange[1]))
 
     def setUp(self):
-
         self.directionProb = random.uniform(0.4, 0.6)
         self.orbitProb = config.orbitProb
         # Number of sparks
@@ -160,11 +166,16 @@ class ParticleSystem:
         )
 
         self.radialBand = self.maxRadius / 12
-
+         
+        if random.random() < .5 :
+            config.movementMode = 0
+        else :
+            config.movementMode = 1
 
         for n in range(0, self.p):
             pDot = ParticleDot()
             pDot.setUp(self, n)
+            pDot.mode = config.movementMode 
             self.particles.append(pDot)
 
     def move(self):
@@ -172,8 +183,8 @@ class ParticleSystem:
         self.x += self.xSpeed
         self.y += self.ySpeed
 
-        if self.x > config.canvasWidth - round(self.wBase / 4):
-            self.xSpeed = 0
+        # if self.x > config.canvasWidth - round(self.wBase / 4):
+        #     self.xSpeed = 0
 
         for q in range(0, self.p):
             ref = self.particles[q]
@@ -187,7 +198,7 @@ class ParticleSystem:
 
                 r = round(math.sqrt(dx * dx + dy * dy))
 
-                if r > ref.radius/2 and ref.orbit == True:
+                if r > ref.radius/1 and ref.orbit == True:
                     # print(r, ref.radius, ref.orbit)
                     ref.mode = 0
 
@@ -245,7 +256,6 @@ class ParticleSystem:
                 and yDisplayPos <= config.canvasHeight
             ):
                 try:
-
                     if ref.sizeNum == 2:
                         config.draw.rectangle(
                             (
@@ -273,8 +283,6 @@ class ParticleSystem:
                 except Exception as e:
                     print(str(e))
 
-            """
-			"""
             if (
                 xDisplayPos > config.xRange 
                 or yDisplayPos > config.yRange
@@ -301,6 +309,8 @@ class ParticleSystem:
 
         #         config.draw.rectangle((x,y,x+config.resolutionOfSquares,y+config.resolutionOfSquares), fill = (config.nr[j], config.ng[j], config.nb[j],90))
  
+ 
+        # Draw the Voronoi cells 
         pointsArray = []
         for i in range(config.num_cells):
             ref = self.particles[i]
@@ -315,7 +325,6 @@ class ParticleSystem:
         vPoints = vor.points
         vPointRegion = (vor.point_region).tolist()
         
-
         j = 0
         clrIndex = 0
         for region in vRegions:
@@ -326,7 +335,11 @@ class ParticleSystem:
             if -1 not in region:
                 polygon = [tuple(vVertices[p].tolist()) for p in region]
                 if len(polygon) > 0 and i < config.num_cells :
-                    config.draw.polygon(polygon, outline=(40,0,0,155), width = 2 , fill = (config.nr[i], config.ng[i], config.nb[i],round(config.fadeRate))) 
+                    
+                    if withinRange(self.particles[j].xPos, self.x, 3) and withinRange(self.particles[j].yPos, self.y, 3) :
+                        pass
+                    else :
+                        config.draw.polygon(polygon, outline=(40,0,0,155), width = 2 , fill = (config.nr[i], config.ng[i], config.nb[i],round(config.fadeRate))) 
                     # config.draw.polygon(polygon, outline=(100,0,0,255), width = 1 , fill = None) 
             j+=1
             
@@ -337,6 +350,14 @@ class ParticleSystem:
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
+def withinRange(arg, target, diff) :
+    val = round(arg)
+    test1 = round(target + diff)
+    test2 = round(target - diff)
+    if val <= test1 and val >= test2 :
+        return True
+    else :
+        return False
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -501,6 +522,19 @@ def iterate():
                 PS.setNewAttributes()
                 PS.setUp()
 
+    # dithering movement
+    if random.random() < config.filterRemappingProb:
+        config.useFilters = True
+        config.remapImageBlock = True
+
+        startX = round(random.uniform(0, config.filterRemapRangeX))
+        startY = round(random.uniform(0, config.filterRemapRangeY))
+        endX = round(random.uniform(4, config.filterRemapminHoriSize))
+        endY = round(random.uniform(4, config.filterRemapminVertSize))
+        config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+        config.remapImageBlockDestination = [startX, startY]
+
+            
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
     # Done
@@ -519,6 +553,10 @@ def main(run=True):
     config.speedFactorMax = float(workConfig.get("particles", "speedFactorMax"))
     config.particleXSpeed = float(workConfig.get("particles", "particleXSpeed"))
     config.particleYSpeed = float(workConfig.get("particles", "particleYSpeed"))
+    
+    config.rSpeedMin = float(workConfig.get("particles", "rSpeedMin"))
+    config.rSpeedMax = float(workConfig.get("particles", "rSpeedMax"))
+    config.rSpeedRadialProportional = (workConfig.getboolean("particles", "rSpeedRadialProportional"))
 
     config.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
     config.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
@@ -563,6 +601,23 @@ def main(run=True):
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
+    
+
+    try:
+        config.filterRemapping = workConfig.getboolean("particles", "filterRemapping")
+        config.filterRemappingProb = float(workConfig.get("particles", "filterRemappingProb"))
+        config.filterRemapminHoriSize = int(workConfig.get("particles", "filterRemapminHoriSize"))
+        config.filterRemapminVertSize = int(workConfig.get("particles", "filterRemapminVertSize"))
+        config.filterRemapRangeX = int(workConfig.get("particles", "filterRemapRangeX"))
+        config.filterRemapRangeY = int(workConfig.get("particles", "filterRemapRangeY"))
+    except Exception as e:
+        print(str(e))
+        config.filterRemapping = False
+        config.filterRemappingProb = 0.0
+        config.filterRemapminHoriSize = 24
+        config.filterRemapminVertSize = 24
+        config.filterRemapRangeX = config.canvasWidth
+        config.filterRemapRangeY = config.canvasHeight
 
 
     config.num_cells = config.maxParticles
@@ -577,7 +632,7 @@ def main(run=True):
     config.ng = []
     config.nb = []
 
-    colorSet = [
+    colorSetA = [
         [255,0,0],
         [45,0,120],
         [195,0,50],
@@ -626,10 +681,51 @@ def main(run=True):
         ]
         # [231,231,240],
         # [219,196,176],
+        
+    colorSetB = [
+        [255,0,0],
+        [195,0,50],
+        [208, 88, 94],
+        [208, 85, 88],
+        [208, 77, 68],
+        [208, 88, 94],
+        [208, 79, 75],
+        [177, 79, 68],
+        [224, 160, 160],
+        [128, 128, 96],
+        [160, 128, 96],
+        [160, 160, 128],
+        [192, 160, 128],
+        [192, 128, 128],
+        [224, 160, 128],
+        [224, 192, 160],
+        [160, 128, 128],
+        [224, 128, 128],
+        [192, 96, 96],
+        [128, 96, 96],
+        [192, 128, 96],
+        [255, 160, 160],
+        [192, 64, 64],
+        [160, 96, 96],
+        [192, 160, 160],
+        [96, 96, 64],
+        [128, 96, 64],
+        [255, 192, 160],
+        [224, 96, 96],
+        [255, 192, 192],
+        [224, 128, 96],
+        [192, 96, 64],
+        [128, 160, 128],
+        [224, 192, 192],
+        [96, 128, 96],
+        [224, 128, 160],
+        [160, 64, 64],
+        [128, 128, 64],
+    ]
 
     for i in range(config.num_cells):
-        config.nx.append(random.randrange(-config.xRange,config.xRange))
-        config.ny.append(random.randrange(-config.yRange,config.yRange))
+        config.nx.append(random.randrange(-config.xRange/4,1.25 * config.xRange))
+        config.ny.append(random.randrange(-config.yRange/4,1.25 * config.yRange))
         config.nvx.append(random.randrange(-2,2))
         config.nvy.append(random.randrange(-2,2))
 
@@ -643,12 +739,17 @@ def main(run=True):
         # config.ng.append(random.randrange(256))
         # config.nb.append(random.randrange(256))
         
-        clr = colorSet[round(random.uniform(0,len(colorSet)-1))]
+        if random.random() < .5 :
+            clr = colorSetA[round(random.uniform(0,len(colorSetA)-1))]
+        else :    
+            clr = colorSetB[round(random.uniform(0,len(colorSetB)-1))]
+        
+        
         config.nr.append(clr[0])
         config.ng.append(clr[1])
         config.nb.append(clr[2])
         
-
+    config.movementMode = 0
     PS = ParticleSystem(config)
     PS.setCenter()
     PS.setNewAttributes()

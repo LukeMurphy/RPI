@@ -97,11 +97,13 @@ def setupStableSections(config):
     minWidth = config.stableSectionsMinWidth
     minHeight = config.stableSectionsMinHeight
     for i in range(0, n):
-        xPos = round(random.SystemRandom().uniform(0, config.canvasWidth))
+        xPos = round(random.SystemRandom().uniform(0, config.canvasWidth - 0))
         xPos2 = round(random.SystemRandom().uniform(xPos + minWidth, config.canvasWidth))
-        yPos = round(random.SystemRandom().uniform(0, config.canvasHeight))
+        yPos = round(random.SystemRandom().uniform(0, config.canvasHeight - 0))
         yPos2 = round(random.SystemRandom().uniform(yPos + minHeight, config.canvasHeight))
         config.stableSegments.append([xPos, yPos, xPos2, yPos2])
+
+    # print(config.stableSegments)
     
 
 def rebuildSections(config):
@@ -179,6 +181,9 @@ def disturber(config):
 
                 config.canvasImage.paste(section, (round(sectionParams.sectionPlacement[0]), round(
                     sectionParams.sectionPlacement[1])), section)
+                
+
+                # config.canvasDraw.rectangle((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]), fill= None, outline = (0,255,250,100))
 
                 # delta = (sectionParams.actionCountLimit - sectionParams.actionCount)/sectionParams.actionCountLimit
                 # d = math.pow(delta, 8)
@@ -217,10 +222,13 @@ def disturber(config):
         
         if config.doingRefresh < config.doingRefreshCount:
             tempCanvasImage  = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+            tempCanvasImageDraw = ImageDraw.Draw(tempCanvasImage)
             for s in config.stableSegments:
                 tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
+
                 # config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
                 tempCanvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+                # tempCanvasImageDraw.rectangle((s[0], s[1], s[2], s[3]), outline=(2,255,0), fill=(100,0,0))
             
             # print("Crossfadings: " +  str(config.doingRefresh))
             # new blend in over a couple steps
@@ -236,7 +244,10 @@ def disturber(config):
             # print("pasting")
             for s in config.stableSegments:
                 tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
+                tempCanvasImageDraw = ImageDraw.Draw(tempCrop)
+                # tempCanvasImageDraw.rectangle((s[0], s[1], s[2], s[3]), outline=(2,255,0), fill=(0,0,100,100))
                 config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+
             
 
 def additonalSetup(config, workConfig):
@@ -275,8 +286,16 @@ def additonalSetup(config, workConfig):
     config.stableSectionsChangeProb = float(workConfig.get("additonalSetup", "stableSectionsChangeProb"))
     setupStableSections(config)
     
-    config.doingRefresh = 100
-    config.doingRefreshCount = 100
+
+    try:
+        # comment: 
+        config.doingRefresh = int(workConfig.get("additonalSetup", "doingRefresh"))
+        config.doingRefreshCount = int(workConfig.get("additonalSetup", "doingRefreshCount"))
+    except Exception as e:
+        print(str(e))
+        config.doingRefresh = 100
+        config.doingRefreshCount = 100
+    # end try
 
     config.movingSections = []
     for i in range(0, config.numberOfSections):

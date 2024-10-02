@@ -198,6 +198,9 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
 
     lastDir = ""
     fName = ""
+
+    actionDict1.append({"": ""})
+
     for f in fullList:
         fName = f[0].split(configPath)[1].split('/')[0]
         if len(f) > 0:
@@ -209,7 +212,7 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
             currDirLevel2 = f[0].split(configPath)[1].split('/')[1]
             if currDirLevel2.find(".cfg") <= 0 :
                     currentDir = currentDir + "/" + currDirLevel2
-            if currentDir != lastDir :
+            if currentDir != lastDir and dateSort == False :
                 actionDict1.append({"": ""})
                 lastDir = currentDir
 

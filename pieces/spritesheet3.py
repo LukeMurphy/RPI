@@ -132,29 +132,33 @@ class spriteAnimation():
     
     def getNextFrame(self):
         # img = self.frameArray[self.currentFrame]
-        if self.pause == False :
-            self.playCount += self.step
-            if self.reversing == True :
-                if self.playCount % self.animSpeed == 0:
-                        self.currentFrame += self.direction
-                    
-                if self.currentFrame >= self.endFrame :
-                    self.direction *= -1
-                    self.currentFrame = self.endFrame - 1
-                    
-                    # if self.direction > 0 :
-                    #     self.currentFrame = self.endFrame
-                    
-                if self.currentFrame < self.startFrame :
-                    self.direction *= -1   
-                    self.currentFrame = self.startFrame 
-                    # if self.direction < 0 :
-                    #     self.currentFrame = self.startFrame
-            else :
-                if self.playCount % self.animSpeed == 0:
-                    self.currentFrame += 1
+
+        if self.totalFrames == 1 :
+            self.currentFrame = 0
+        else :
+            if self.pause == False :
+                self.playCount += self.step
+                if self.reversing == True :
+                    if self.playCount % self.animSpeed == 0:
+                            self.currentFrame += self.direction
+                        
                     if self.currentFrame >= self.endFrame :
-                        self.currentFrame = self.startFrame
+                        self.direction *= -1
+                        self.currentFrame = self.endFrame - 1
+                        
+                        # if self.direction > 0 :
+                        #     self.currentFrame = self.endFrame
+                        
+                    if self.currentFrame < self.startFrame :
+                        self.direction *= -1   
+                        self.currentFrame = self.startFrame 
+                        # if self.direction < 0 :
+                        #     self.currentFrame = self.startFrame
+                else :
+                    if self.playCount % self.animSpeed == 0:
+                        self.currentFrame += 1
+                        if self.currentFrame >= self.endFrame :
+                            self.currentFrame = self.startFrame
 
     #----------------------------------------------------##----------------------------------------------------#
     
@@ -268,6 +272,7 @@ def main(run=True):
 
     try:
         config.preGlitchNumber = int(workConfig.get("base-parameters", "preGlitchNumber"))
+        config.preGlitchNumberMin = int(workConfig.get("base-parameters", "preGlitchNumberMin"))
         config.preGlitchReset = float(workConfig.get("base-parameters", "preGlitchReset"))
     except Exception as e:
         config.preGlitchNumber = 2
@@ -610,8 +615,6 @@ def iterate(n=0):
             # doing this 3 times because this was how the v.2 version inadvertently did it - my bad - but also to 
             # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at 
             # at a more granular way
-            
-
 
             # print("fetching")
             anim.getNextFrame()
@@ -771,29 +774,18 @@ def iterate(n=0):
         currentAnimation.preDistorted = False
 
         if currentAnimation.totalFrames ==  1:
-            if random.SystemRandom().random() < config.preGlitchReset :
-                tempImageRef = currentAnimation.anim.firstFrame.copy()
-                currentAnimation.anim.currentFrame = tempImageRef
-                print("Should be reset")
-                for i in range(0,config.preGlitchNumber):
-                    glitchBox(tempImageRef,currentAnimation.animationWidth,
-                                currentAnimation.animationHeight,
-                                currentAnimation.imageGlitchDisplacementHorizontal,
-                                currentAnimation.imageGlitchDisplacementVertical)
-
-            else :
-                print("Going")
-                tempImageRef = currentAnimation.anim.nextFrameImg()
-
-                for i in range(0,config.preGlitchNumber):
-                    glitchBox(tempImageRef,currentAnimation.animationWidth,
+            tempImageRef = currentAnimation.anim.nextFrameImg()
+            # currentAnimation.anim.currentFrame = tempImageRef
+            # print("Should be reset")
+            glitchyCycles = random.SystemRandom().randrange(config.preGlitchNumberMin,config.preGlitchNumber)
+            # print(glitchyCycles)
+            for i in range(0,glitchyCycles):
+                glitchBox(tempImageRef,currentAnimation.animationWidth,
                             currentAnimation.animationHeight,
                             currentAnimation.imageGlitchDisplacementHorizontal,
                             currentAnimation.imageGlitchDisplacementVertical)
 
-                
-
-            currentAnimation.preDistorted = True
+        currentAnimation.preDistorted = True
         # config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
         
         

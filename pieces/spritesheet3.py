@@ -37,7 +37,6 @@ yPos = 0
 
 bads = badpixels
 
-
 # config.canvasImage is the final layer or image to be rendered
 # everything else gets pasted on to this image layer
 # the filtering happens to this canvasImage as well
@@ -423,8 +422,7 @@ def glitchBox(imageRef, apparentWidth, apparentHeight,imageGlitchDisplacementHor
     dy = round(random.uniform(-imageGlitchDisplacementVertical,imageGlitchDisplacementVertical))
 
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
-    sectionHeight = round(random.uniform(2, apparentHeight - dy))
-    
+    sectionHeight = round(random.uniform(2, apparentHeight - dy))    
 
     # 95% of the time they dance together as mirrors
     try:
@@ -539,7 +537,7 @@ def iterate(n=0):
     bgColor = currentAnimation.colOverlay.currentColor
     
     config.canvasImage.paste(currentAnimation.animationImage, (config.animationFrameXOffset,config.animationFrameYOffset), currentAnimation.animationImage)
-    animationBackGroundFadeIn()
+    # animationBackGroundFadeIn()
 
     if config.allPause == True:
         if currentAnimation.glitching == True:
@@ -561,6 +559,14 @@ def iterate(n=0):
         
         # for compositing
         tempImageRef  = anim.nextFrameImg()
+        if anim.totalFrames ==  1 :
+            for i in range(0,20):
+                glitchBox(tempImageRef,currentAnimation.animationWidth,
+                        currentAnimation.animationHeight,
+                        10,
+                        10)
+
+
         
         if config.usebgBox == True :
             currentAnimation.animationImage.paste(config.underLayer, (0,0), config.underLayer)
@@ -600,9 +606,11 @@ def iterate(n=0):
             # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at 
             # at a more granular way
             
-            anim.getNextFrame()
-            anim.getNextFrame()
-            anim.getNextFrame()
+
+            if anim.totalFrames > 1 :
+                anim.getNextFrame()
+                anim.getNextFrame()
+                anim.getNextFrame()
             
             if random.random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
                 # print("paused at start")
@@ -761,10 +769,10 @@ def iterate(n=0):
         currentAnimation.anim.currentFrame = 0
         # config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
         # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-        
-        
+        # currentAnimation.glitching = True
+        # config.allPause = True
 
-        
+
 #----------------------------------------------------##----------------------------------------------------#
 def callBack():
     global config

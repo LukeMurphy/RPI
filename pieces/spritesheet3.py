@@ -612,11 +612,11 @@ def iterate(n=0):
             # at a more granular way
             
 
-            if anim.totalFrames > 1 or random.SystemRandom().random() < .10 :
-                print("fetching")
-                anim.getNextFrame()
-                anim.getNextFrame()
-                anim.getNextFrame()
+
+            # print("fetching")
+            anim.getNextFrame()
+            anim.getNextFrame()
+            anim.getNextFrame()
             
             if random.SystemRandom().random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
                 # print("paused at start")

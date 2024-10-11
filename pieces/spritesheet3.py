@@ -273,10 +273,11 @@ def main(run=True):
     try:
         config.preGlitchNumber = int(workConfig.get("base-parameters", "preGlitchNumber"))
         config.preGlitchNumberMin = int(workConfig.get("base-parameters", "preGlitchNumberMin"))
-        config.preGlitchReset = float(workConfig.get("base-parameters", "preGlitchReset"))
+        config.preGlitchRedo = float(workConfig.get("base-parameters", "preGlitchRedo"))
     except Exception as e:
+        config.preGlitchNumberMin = 1
         config.preGlitchNumber = 2
-        config.preGlitchReset = .5
+        config.preGlitchRedo = .5
         
 
     # ----------------------------------------------------------------------------
@@ -784,6 +785,15 @@ def iterate(n=0):
                             currentAnimation.animationHeight,
                             currentAnimation.imageGlitchDisplacementHorizontal,
                             currentAnimation.imageGlitchDisplacementVertical)
+            
+            if random.SystemRandom().random() < config.preGlitchRedo :
+                print("second round")
+                for i in range(0,glitchyCycles):
+                    glitchBox(tempImageRef,currentAnimation.animationWidth,
+                                currentAnimation.animationHeight,
+                                currentAnimation.imageGlitchDisplacementHorizontal,
+                                currentAnimation.imageGlitchDisplacementVertical)
+
 
         currentAnimation.preDistorted = True
         # config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))

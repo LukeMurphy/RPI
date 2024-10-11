@@ -767,11 +767,11 @@ def iterate(n=0):
             config.currentAnimationIndex += 1
             if config.currentAnimationIndex >= len(config.animations):
                 config.currentAnimationIndex = 0
-            print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
+            # print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
         else :
             choice = math.floor(random.uniform(0,len(config.animations)))
             config.currentAnimationIndex = choice
-            print("Next Animation : " + str(config.animations[choice].name))
+            # print("Next Animation : " + str(config.animations[choice].name))
 
         
         config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
@@ -780,7 +780,7 @@ def iterate(n=0):
 
         if currentAnimation.totalFrames ==  1:
             if random.SystemRandom().random() < .5:      
-                print("Repasting in the original")
+                # print("Repasting in the original")
                 currentAnimation.anim.frameArray[0] = currentAnimation.anim.firstFrame.copy()
 
 
@@ -796,7 +796,7 @@ def iterate(n=0):
                             currentAnimation.imageGlitchDisplacementVertical)
             
             if random.SystemRandom().random() < config.preGlitchRedo :
-                print("second round")
+                # print("second round")
                 for i in range(0,glitchyCycles):
                     glitchBox(tempImageRef,currentAnimation.animationWidth,
                                 currentAnimation.animationHeight,

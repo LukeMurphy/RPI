@@ -654,7 +654,8 @@ def iterate(n=0):
 
         if random.SystemRandom().random() < currentAnimation.changeAnimProb:      
             reConfigAnimationCell(anim, currentAnimation)
-                
+
+
             
     # Draws the colored tiles over the animation image - 
     # Note first versions drew this over the animation image but on 10-29-2023 I
@@ -697,6 +698,9 @@ def iterate(n=0):
         for x in range(0,glitchIterations):
             glitchBox(config.underLayer, config.canvasWidth, config.canvasHeight, config.bgGlitchDisplacementHorizontal,config.bgGlitchDisplacementVertical)
             
+    
+    
+    
     if random.SystemRandom().random() < config.clearbgBoxProb :
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
@@ -775,6 +779,11 @@ def iterate(n=0):
         currentAnimation.preDistorted = False
 
         if currentAnimation.totalFrames ==  1:
+            if random.SystemRandom().random() < .5:      
+                print("Repasting in the original")
+                currentAnimation.anim.frameArray[0] = currentAnimation.anim.firstFrame.copy()
+
+
             tempImageRef = currentAnimation.anim.nextFrameImg()
             # currentAnimation.anim.currentFrame = tempImageRef
             # print("Should be reset")

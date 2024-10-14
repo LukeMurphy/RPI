@@ -136,7 +136,8 @@ class ParticleSystem:
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
         self.useFixedBandColors = True
-        self.bandWVariabilityProb = .005
+        # there is really no need for this to change the bands randomly
+        self.bandWVariabilityProb = .00
         self.xMaxFactor = 4
         self.yMaxFactor = 4
         self.wDiff = 17

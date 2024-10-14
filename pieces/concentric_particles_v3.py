@@ -580,7 +580,9 @@ def drawBands(p):
                         config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
                         
                     if i > p.bands - 3 and p.useFixedBandColors == True:
-                        config.draw.ellipse( (x0, y0, x1, y1), fill=(20,60,125,50) )
+                        # config.draw.ellipse( (x0, y0, x1, y1), fill=(250,60,525,150) )
+                        # config.draw.ellipse( (x0, y0, x1, y1), fill=(20,60,125,150) )
+                        config.draw.ellipse( (x0, y0, x1, y1), fill=(6,46,104,150) )
             except Exception as e :
                 print("==>" + str(e))
 

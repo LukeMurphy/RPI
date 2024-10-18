@@ -95,6 +95,9 @@ class ParticleSystem:
         self.initXRange = [config.initXRangeMin, config.initXRangeMax]
         self.initYRange = [config.initYRangeMin, config.initYRangeMax]
 
+        self.brightness = config.brightness
+
+
     def setNewAttributes(self):
         self.bands = round(random.uniform(12, 24))
         self.wBase = round(random.uniform(220, config.canvasWidth))
@@ -147,7 +150,7 @@ class ParticleSystem:
 
         self.brightness = self.config.brightness
         self.sparkleBrightness = self.config.brightness
-        self.brightness = 0.9
+
         self.sparkleBrightness = 0.8
 
         # speed that each light fades to black / sparkle
@@ -692,9 +695,9 @@ def main(run=True):
             clr = colorSetB[round(random.uniform(0,len(colorSetB)-1))]
         
         # clr = colorutils.randomColor()
-        config.nr.append(clr[0])
-        config.ng.append(clr[1])
-        config.nb.append(clr[2])
+        config.nr.append(round(clr[0] * config.brightness))
+        config.ng.append(round(clr[1] * config.brightness))
+        config.nb.append(round(clr[2] * config.brightness))
         
     config.movementMode = 0
     PS = ParticleSystem(config)

@@ -33,8 +33,8 @@ class ParticleDot:
         b = int(random.uniform(0, 255) * p.brightness)
         radius = random.uniform(1, p.maxRadius)
 
-        vx = fx * directionx
-        vy = fy * directiony
+        vx = fx * directionx * config.particleXSpeed
+        vy = fy * directiony * config.particleYSpeed
 
         # Make radius fall into one of the systems bands - like quanta
 
@@ -104,7 +104,8 @@ class ParticleSystem:
 
         self.xSpeed = random.random() * config.particleXSpeed
         self.ySpeed = random.random() * config.particleYSpeed
-        # self.ySpeed = 0
+        self.xSpeed = 0
+        self.ySpeed = 0
 
         self.radialsArray = []
         self.radials = round(random.uniform(120, 300))
@@ -676,8 +677,8 @@ def main(run=True):
     for i in range(config.num_cells):
         config.nx.append(random.randrange(-config.xRange/4,1.25 * config.xRange))
         config.ny.append(random.randrange(-config.yRange/4,1.25 * config.yRange))
-        config.nvx.append(random.randrange(-2,2))
-        config.nvy.append(random.randrange(-2,2))
+        config.nvx.append(random.randrange(-2,2) )
+        config.nvy.append(random.randrange(-2,2) )
 
 
         '''

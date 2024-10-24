@@ -102,7 +102,7 @@ class ParticleSystem:
         self.bands = round(random.uniform(12, 24))
         self.wBase = round(random.uniform(220, config.canvasWidth))
 
-        self.xSpeed = random.random() * config.particleXSpeed
+        self.xSpeed = random.SystemRandom().random() * config.particleXSpeed
         self.ySpeed = random.random() * config.particleYSpeed
         self.xSpeed = 0
         self.ySpeed = 0
@@ -193,8 +193,10 @@ class ParticleSystem:
 
     def move(self):
 
+        # the whole system
         self.x += self.xSpeed
         self.y += self.ySpeed
+
 
         # if self.x > config.canvasWidth - round(self.wBase / 4):
         #     self.xSpeed = 0
@@ -203,9 +205,13 @@ class ParticleSystem:
             ref = self.particles[q]
 
             ref.mode  = 1
+
+
             if ref.mode == 1:
-                ref.xPos += ref.vx
-                ref.yPos += ref.vy
+
+                if random.SystemRandom().random() < config.chanceParticleWillMoveEachCycle :
+                    ref.xPos += ref.vx
+                    ref.yPos += ref.vy
 
                 dx = ref.xPos - self.x
                 dy = ref.yPos - self.y
@@ -375,70 +381,6 @@ def withinRange(arg, target, diff) :
         return False
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
-
-def drawBands(p):
-
-    wBase = p.wBase
-    wDiff = round(wBase / p.bands)
-
-    aBase = 0
-    aDiff = 10
-
-    rBase = config.rBase
-    gBase = config.gBase
-    bBase = config.bBase
-
-    rBase2 = config.rBase2
-    gBase2 = config.gBase2
-    bBase2 = config.bBase2
-
-    rDiff = config.rDiff
-    gDiff = config.gDiff
-    bDiff = config.bDiff
-
-    for i in range(0, p.bands):
-
-        w = wBase - i * wDiff
-        x0 = p.x - w / 2
-        y0 = p.y - w / 2
-        x1 = p.x + w / 2
-        y1 = p.y + w / 2
-
-        a = (
-            round(config.fadeRate + aBase)
-            if config.fadeRate > aBase
-            else config.fadeRate
-        )
-
-        '''
-        config.draw.ellipse((x0, y0, x1, y1), fill=(4, 4, bBase, round(a)))
-
-        if i == 1:
-            config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
-
-        if i == 0 or i == 12:
-            config.draw.ellipse(
-                (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, round(a))
-            )
-        '''
-        rBase += rDiff
-        gBase += gDiff
-        bBase += bDiff
-
-    i = 0
-    p.angleOffset += p.angleOffsetSpeed
-    for n in range(0, len(p.radialsArray)):
-        a = i * p.rads + p.angleOffset
-        x0 = math.cos(a) * p.radialsArray[n][0] + p.x
-        y0 = math.sin(a) * p.radialsArray[n][0] + p.y
-        x1 = math.cos(a) * p.radialsArray[n][1] + p.x
-        y1 = math.sin(a) * p.radialsArray[n][1] + p.y
-        i += 1
-        if p.radialsArray[n][2] == 0:
-            config.draw.line((x0, y0, x1, y1), fill=(250, 180, 0, 55))
-
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -502,7 +444,7 @@ def iterate():
             config.bgColor[0],
             config.bgColor[1],
             config.bgColor[2],
-            255
+            10
             # round(config.fadeRate),
         ),
     )
@@ -605,6 +547,7 @@ def main(run=True):
     config.xRange = int(workConfig.get("particles", "xRange"))
     config.yRange = int(workConfig.get("particles", "yRange"))
 
+    config.chanceParticleWillMoveEachCycle = float(workConfig.get("particles", "chanceParticleWillMoveEachCycle"))
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.lineAlpha = float(workConfig.get("particles", "lineAlpha"))
     config.cellAlpha = float(workConfig.get("particles", "cellAlpha"))

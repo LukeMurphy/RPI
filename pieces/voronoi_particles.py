@@ -276,6 +276,9 @@ class ParticleSystem:
                 and yDisplayPos <= config.canvasHeight
             ):
                 try:
+                    # for Voronoi stained glass we'll not
+                    # draw the particles - distracting
+                    particleAlpha = 0
                     if ref.sizeNum == 2:
                         config.draw.rectangle(
                             (
@@ -284,7 +287,7 @@ class ParticleSystem:
                                 round(xDisplayPos) + 1,
                                 round(yDisplayPos) + 0,
                             ),
-                            fill=(r, g, b, 255),
+                            fill=(r, g, b, particleAlpha),
                         )
                     else:
                         config.draw.rectangle(
@@ -294,7 +297,7 @@ class ParticleSystem:
                                 round(xDisplayPos) + 0,
                                 round(yDisplayPos) + 0,
                             ),
-                            fill=(r, g, b, 255),
+                            fill=(r, g, b, particleAlpha),
                         )
                     # config.image.putpixel((round(xDisplayPos), round(yDisplayPos)), (r, g, b))
                     # config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)), (r, g, b))
@@ -444,7 +447,7 @@ def iterate():
             config.bgColor[0],
             config.bgColor[1],
             config.bgColor[2],
-            10
+            config.bgColorAlpha
             # round(config.fadeRate),
         ),
     )
@@ -532,6 +535,7 @@ def main(run=True):
     # choose the first bg color - generally the dark one
     config.bgColor = config.bgColorSets[0]
 
+    config.bgColorAlpha = int(workConfig.get("particles", "bgColorAlpha"))
     config.rBase = int(workConfig.get("particles", "rBase"))
     config.gBase = int(workConfig.get("particles", "gBase"))
     config.bBase = int(workConfig.get("particles", "bBase"))

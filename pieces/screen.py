@@ -248,7 +248,7 @@ def showGrid():
                             # Once in a little while, the color is just random
                             if random.random() < config.randomColorSampleProb:
                                 colorSampleColor = colorutils.getRandomRGB(
-                                    random.random()
+                                    random.random() * config.brightness
                                 )
 
                             if (

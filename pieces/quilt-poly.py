@@ -373,6 +373,10 @@ def iterate():
 	else:
 		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 		temp.paste(config.canvasImage, (0, 0), config.canvasImage)
+
+		td = ImageDraw.Draw(temp)
+
+		td.rectangle((0,0,200,300), fill=(100,0,0))
 		if config.transformShape == True:
 			temp = transformImage(temp)
 		config.drawBlockShape()

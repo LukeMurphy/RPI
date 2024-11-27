@@ -38,7 +38,7 @@ then
     if [ $1 = 'startup' ]
     then
     runScript=1
-    if [ $configToUse = *"--manifest"* ]
+    if [[ $configToUse = *'--manifest.cfg'* ]]
     then player="sequencer.v2.py" 
     fi
     execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig

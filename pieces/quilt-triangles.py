@@ -443,14 +443,19 @@ def iterate():
 	global config
 	config.outlineColorObj.stepTransition()
 
+	# broke this thing when used the below code back-ported from the v2 version 
+	# so fixing it back .... config.image is the main canvas being rendered
+
 	# Need to do a crossfade
 	if config.doingRefresh < config.doingRefreshCount:
 		# print("crossfade...",  config.doingRefresh/config.doingRefreshCount)
 		if config.doingRefresh == 0:
-			config.snapShot = config.canvasImage.copy()
+			config.snapShot = config.image.copy()
+			# config.snapShot = config.canvasImage.copy()
 		crossFade = Image.blend(
 			config.snapShot,
-			config.canvasImage,
+			config.image,
+			# config.canvasImage,
 			config.doingRefresh / config.doingRefreshCount,
 		)
 		config.drawBlockShape()
@@ -458,7 +463,9 @@ def iterate():
 		config.doingRefresh += 1
 	else:
 		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
-		temp.paste(config.canvasImage, (0, 0), config.canvasImage)
+		temp.paste(config.image, (0, 0), config.image)
+		# temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
+		# temp.paste(config.canvasImage, (0, 0), config.canvasImage)
 		if config.transformShape == True:
 			temp = transformImage(temp)
 		config.drawBlockShape()

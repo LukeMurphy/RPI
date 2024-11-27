@@ -353,6 +353,7 @@ def runWork():
 		if config.standAlone == False :
 			config.callBack()
 
+
 def iterate():
 	global config
 	config.outlineColorObj.stepTransition()
@@ -361,22 +362,30 @@ def iterate():
 	if config.doingRefresh < config.doingRefreshCount:
 		# print("crossfade...",  config.doingRefresh/config.doingRefreshCount)
 		if config.doingRefresh == 0:
-			config.snapShot = config.canvasImage.copy()
+			config.snapShot = config.image.copy()
+			# config.snapShot = config.canvasImage.copy()
 		crossFade = Image.blend(
 			config.snapShot,
-			config.canvasImage,
+			config.image,
+			# config.canvasImage,
 			config.doingRefresh / config.doingRefreshCount,
 		)
 		config.drawBlockShape()
 		config.render(crossFade, 0, 0)
 		config.doingRefresh += 1
 	else:
+
+		# config.canvasImage.paste(config.image, (0,0))
+
 		temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
-		temp.paste(config.canvasImage, (0, 0), config.canvasImage)
+		temp.paste(config.image, (0, 0), config.image)
 
-		td = ImageDraw.Draw(temp)
+		# broke this thing when used the below code back-ported from the v2 version 
+		# so fixing it back .... config.image is the main canvas being rendered
+		# temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
+		# temp.paste(config.canvasImage, (0, 0), config.canvasImage)
 
-		td.rectangle((0,0,200,300), fill=(100,0,0))
+
 		if config.transformShape == True:
 			temp = transformImage(temp)
 		config.drawBlockShape()

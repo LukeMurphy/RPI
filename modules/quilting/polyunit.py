@@ -223,6 +223,8 @@ class Unit:
 			fillColor = (fillColorList[0], fillColorList[1], fillColorList[2], 255)
 			self.draw.polygon(coords, fill=fillColor, outline=outline)
 
+			
+
 	def render(self):
 
 		if self.fillColorMode == "red":

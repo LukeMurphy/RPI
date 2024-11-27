@@ -389,7 +389,7 @@ def render(
         crop = config.renderImageFull.crop(config.remapImageBlockSection2)
         if config.remapImageBlockSection2Rotation != 0:
             crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSection2Rotation)
+            crop = crop.rotate(config.remapImageBlockSection2Rotation,resample=Image.NEAREST,expand=1)
         crop = crop.convert("RGBA")
         config.renderImageFull.paste(
             crop, config.remapImageBlockDestination2, crop)
@@ -398,7 +398,7 @@ def render(
         crop = config.renderImageFull.crop(config.remapImageBlockSection3)
         if config.remapImageBlockSection3Rotation != 0:
             crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSection3Rotation)
+            crop = crop.rotate(config.remapImageBlockSection3Rotation,resample=Image.NEAREST,expand=1)
         crop = crop.convert("RGBA")
         config.renderImageFull.paste(
             crop, config.remapImageBlockDestination3, crop)
@@ -407,7 +407,7 @@ def render(
         crop = config.renderImageFull.crop(config.remapImageBlockSection4)
         if config.remapImageBlockSection4Rotation != 0:
             crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSection4Rotation)
+            crop = crop.rotate(config.remapImageBlockSection4Rotation,resample=Image.NEAREST,expand=1)
         crop = crop.convert("RGBA")
         config.renderImageFull.paste(
             crop, config.remapImageBlockDestination4, crop)
@@ -416,7 +416,7 @@ def render(
         crop = config.renderImageFull.crop(config.remapImageBlockSection5)
         if config.remapImageBlockSection5Rotation != 0:
             crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSection5Rotation)
+            crop = crop.rotate(config.remapImageBlockSection5Rotation,resample=Image.NEAREST,expand=1)
         crop = crop.convert("RGBA")
         config.renderImageFull.paste(
             crop, config.remapImageBlockDestination5, crop)
@@ -425,7 +425,7 @@ def render(
         crop = config.renderImageFull.crop(config.remapImageBlockSection6)
         if config.remapImageBlockSection6Rotation != 0:
             crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSection6Rotation)
+            crop = crop.rotate(config.remapImageBlockSection6Rotation,resample=Image.NEAREST,expand=1)
         crop = crop.convert("RGBA")
         config.renderImageFull.paste(
             crop, config.remapImageBlockDestination6, crop)
@@ -434,7 +434,7 @@ def render(
         crop = config.renderImageFull.crop(config.remapImageBlockSection7)
         if config.remapImageBlockSection7Rotation != 0:
             crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSection7Rotation)
+            crop = crop.rotate(config.remapImageBlockSection7Rotation,resample=Image.NEAREST,expand=1)
         crop = crop.convert("RGBA")
         config.renderImageFull.paste(
             crop, config.remapImageBlockDestination7, crop)

@@ -24,9 +24,13 @@ def calculateNewSpeed() :
         rate = config.directorController.slotRate
         numberOfCycles = timeToComlete  / rate
         newSpeed = round(config.maxX / numberOfCycles)
-        
-        print(str("Speed in pixels = {} pixels/second").format(newSpeed))
         config.speedX = newSpeed
+        
+        print(str("Cycles of drawing / second = {} repeat/second").format(1/config.directorController.slotRate))
+        print(str("Time to complete one full turn = {} seconds").format(timeToComlete))
+        print(str("Number of cycles it will take to complete = {}").format(numberOfCycles))
+        print(str("Speed in pixels (the amount the drawing moves accross the total screen each cyle) = {} pixels/second").format(newSpeed))
+        print(str("Physical speed accross lights = {} pixel-mm/second").format(newSpeed * config.mmPerPixel))
         
         # print(str("desired = {} seconds").format(round(desiredTimeToComplete,4)))
         if config.cycleCount > 0 :
@@ -268,10 +272,11 @@ def main(run=True):
     # make it 1 mile in mm / pixels per mm
     config.newSize = round(config.mmSizeOfDrawing / config.mmPerPixel)
     config.maxX = config.newSize
+    
     print(str("Total mm distance = {} mm").format(config.mmSizeOfDrawing ))
-    print(str("Doing image resize to {} pixels").format(config.newSize ))
     print(str("Physcial scale of pixels {} mm/pixel").format(config.mmPerPixel ))
-    print(str("Travel speed = {} MPH").format(config.speedMPH ))
+    print(str("Doing image resize to {} pixels to match the dots/mm of the panels").format(config.newSize ))
+    print(str("Travel speed aiming for = {} MPH").format(config.speedMPH ))
     # config.bufferImage = config.bufferImage.resize((config.newSize,im.size[1]))
     
     if config.resizeHeight > 1 :

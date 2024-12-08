@@ -77,7 +77,7 @@ def newColorAlt2():
     )
 
 
-def generateInitialImage(dims):
+def generateUnitImage(dims):
     image = Image.new("RGBA", (config.blockWidth, config.blockHeight))
     draw = ImageDraw.Draw(image)
 
@@ -106,14 +106,14 @@ def removeFromAvailable(lastX ,lastY, unitFills):
                 if config.availableSpots[ii][0] == w and config.availableSpots[ii][1] == h :
                     config.availableSpots[ii][2] = False
 
-def linearPlacer(doSort = False):
-    if doSort : config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=False)
+def linearPlacer(doSort = False, reversedSort = False):
+    if doSort : config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=reversedSort)
 
     lastX = 0
     lastY = 0
     lastHighest = 0
     for i in range(0, len(config.unitFills)):
-        img = generateInitialImage(config.unitFills[i])
+        img = generateUnitImage(config.unitFills[i])
 
         if (lastX + config.unitFills[i][0] + 0) > config.canvasWidth :
             lastX = 0
@@ -131,14 +131,14 @@ def linearPlacer(doSort = False):
         if config.unitFills[i][1] >= lastHighest:
             lastHighest = config.unitFills[i][1]
 
-def simplePlacer(doSort = False):
+def simplePlacer(doSort = False, reversedSort = False):
     if doSort : 
-        config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=False)
+        config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=reversedSort)
     lastX = 0
     lastY = 0
     lastHighest = 0
     for i in range(0, len(config.unitFills)):
-        img = generateInitialImage(config.unitFills[i])
+        img = generateUnitImage(config.unitFills[i])
 
         # searchRadius = math.ceil(math.sqrt(config.unitFills[i][0]*config.unitFills[i][0] + config.unitFills[i][1]*config.unitFills[i][1]))
         # print(searchRadius)
@@ -180,8 +180,9 @@ def drawGrid():
     # linearPlacer(True)
     # linearPlacer(False)
 
-    doSort = False if random.SystemRandom().random() < .95 else True
-    simplePlacer(doSort)
+    doSort = True if random.SystemRandom().random() < config.doSortProb else False
+    reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
+    simplePlacer(doSort, reversedSort)
 
     # FOR DEBUGGING!
     # for i in range(0, len(config.availableSpots)) :
@@ -410,11 +411,13 @@ def main(run=True):
 
 
     config.gridSize = 5
-    config.unitsToDraw = 250
+    config.unitsToDraw = 120
     config.minW = 1
-    config.maxW = 5
+    config.maxW = 10
     config.minH = 3
-    config.maxH = 8
+    config.maxH = 10
+    config.doSortProb = .5
+    config.reversedSortProb = .5
 
 
     rebuildGrid()

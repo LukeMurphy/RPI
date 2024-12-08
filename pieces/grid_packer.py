@@ -414,11 +414,11 @@ def main(run=True):
 
 
     config.gridSize = 5
-    config.unitsToDraw = 600
+    config.unitsToDraw = 400
     config.minW = 1
     config.maxW = 4
-    config.minH = 2
-    config.maxH = 4
+    config.minH = 4
+    config.maxH = 8
     config.doSortProb = .05
     config.reversedSortProb = .5
 
@@ -427,7 +427,7 @@ def main(run=True):
     # higher = more full color rectangles
     config.drawFullColorUnit = .01
     # lower more single color
-    config.drawLeftTriangleColorUnit = .90
+    config.drawLeftTriangleColorUnit = .70
     # lower = more black/bg
     config.drawGreyTriangleUnit = .9
     # lower = more black/bg on left

@@ -82,22 +82,23 @@ def generateUnitImage(dims):
     draw = ImageDraw.Draw(image)
 
     clr = colorutils.getRandomColor()
-    if random.SystemRandom().random() < .1 :
+    if random.SystemRandom().random() < config.drawFullColorUnit :
         # draw.rectangle((0,0,dims[0], dims[1]), fill=(255,0,0,200))
         draw.rectangle((0,0,dims[0], dims[1]), fill=clr)
     else :
-        if random.SystemRandom().random() < .55 :
+        if random.SystemRandom().random() < config.drawLeftTriangleColorUnit :
             draw.polygon(((0,0),(dims[0], dims[1]),(0, dims[1])), fill=clr)
             # draw.polygon(((0,0),(dims[0], dims[1]),(0, dims[1])), fill=(255,0,0,200))
-            if random.SystemRandom().random() < .95 :
+            if random.SystemRandom().random() < config.drawGreyTriangleUnit :
                 draw.polygon(((0,0),(dims[0], dims[1]),(dims[0], 0)), fill=(255,255,250,200))
         else :
             draw.polygon(((0, dims[1]),(dims[0], 0),(dims[0],dims[1])), fill=(255,255,255,200))
-            if random.SystemRandom().random() < .85 :
+            if random.SystemRandom().random() < config.drawRedTriangleUnit :
                 draw.polygon(((0, dims[1]),(dims[0], 0),(0,0)), fill=(255,0,0,200))
 
 
     return image
+
 
 def removeFromAvailable(lastX ,lastY, unitFills):
     for h in range(lastY, lastY+unitFills[1], config.gridSize) :
@@ -105,6 +106,7 @@ def removeFromAvailable(lastX ,lastY, unitFills):
             for ii in range(0, len(config.availableSpots)) :
                 if config.availableSpots[ii][0] == w and config.availableSpots[ii][1] == h :
                     config.availableSpots[ii][2] = False
+
 
 def linearPlacer(doSort = False, reversedSort = False):
     if doSort : config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=reversedSort)
@@ -152,20 +154,21 @@ def simplePlacer(doSort = False, reversedSort = False):
                 eX = config.availableSpots[s][0] + config.unitFills[i][0]
                 keepGoing = True
                 for h in range (sY, eY ,config.gridSize ) :
-                    for w in range (sX, eX,config.gridSize ) :
-                        if keepGoing :
-                            indx = -1
-                            try :
-                                indx = config.availableSpots.index([w,h,True])
-                            except ValueError :
+                    if keepGoing :
+                        for w in range (sX, eX,config.gridSize ) :
+                            if keepGoing :
                                 indx = -1
-                                # print("not found")
-                            if indx != -1 : 
-                                canFit = True
-                                insertIndex = s
-                            else :
-                                canFit = False
-                                keepGoing = False
+                                try :
+                                    indx = config.availableSpots.index([w,h,True])
+                                except ValueError :
+                                    indx = -1
+                                    # print("not found")
+                                if indx != -1 : 
+                                    canFit = True
+                                    insertIndex = s
+                                else :
+                                    canFit = False
+                                    keepGoing = False
 
                 if canFit :
                     break
@@ -411,13 +414,26 @@ def main(run=True):
 
 
     config.gridSize = 5
-    config.unitsToDraw = 120
+    config.unitsToDraw = 600
     config.minW = 1
-    config.maxW = 10
-    config.minH = 3
-    config.maxH = 10
-    config.doSortProb = .5
+    config.maxW = 4
+    config.minH = 2
+    config.maxH = 4
+    config.doSortProb = .05
     config.reversedSortProb = .5
+
+
+
+    # higher = more full color rectangles
+    config.drawFullColorUnit = .01
+    # lower more single color
+    config.drawLeftTriangleColorUnit = .90
+    # lower = more black/bg
+    config.drawGreyTriangleUnit = .9
+    # lower = more black/bg on left
+    config.drawRedTriangleUnit = .9
+
+
 
 
     rebuildGrid()

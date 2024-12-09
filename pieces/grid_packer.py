@@ -35,7 +35,7 @@ class Director:
         self.checkTime()
 
 
-def newColor():
+def newBGClr():
     return colorutils.getRandomColorHSV(
         config.bg_minHue,
         config.bg_maxHue,
@@ -49,31 +49,44 @@ def newColor():
     )
 
 
-def newColorAlt():
+def newClr():
     return colorutils.getRandomColorHSV(
-        config.line1_minHue,
-        config.line1_maxHue,
-        config.line1_minSaturation,
-        config.line1_maxSaturation,
-        config.line1_minValue,
-        config.line1_maxValue,
-        config.line1_dropHueMinValue,
-        config.line1_dropHueMaxValue,
-        round(random.uniform(config.line1_minAlpha, config.line1_maxAlpha)),
+        config.clr1_minHue,
+        config.clr1_maxHue,
+        config.clr1_minSaturation,
+        config.clr1_maxSaturation,
+        config.clr1_minValue,
+        config.clr1_maxValue,
+        config.clr1_dropHueMinValue,
+        config.clr1_dropHueMaxValue,
+        round(random.uniform(config.clr1_minAlpha, config.clr1_maxAlpha)),
     )
 
 
-def newColorAlt2():
+def newClr2():
     return colorutils.getRandomColorHSV(
-        config.line2_minHue,
-        config.line2_maxHue,
-        config.line2_minSaturation,
-        config.line2_maxSaturation,
-        config.line2_minValue,
-        config.line2_maxValue,
-        config.line2_dropHueMinValue,
-        config.line2_dropHueMaxValue,
-        round(random.uniform(config.line2_minAlpha, config.line2_maxAlpha)),
+        config.clr2_minHue,
+        config.clr2_maxHue,
+        config.clr2_minSaturation,
+        config.clr2_maxSaturation,
+        config.clr2_minValue,
+        config.clr2_maxValue,
+        config.clr2_dropHueMinValue,
+        config.clr2_dropHueMaxValue,
+        round(random.uniform(config.clr2_minAlpha, config.clr2_maxAlpha)),
+    )
+
+def newClr3():
+    return colorutils.getRandomColorHSV(
+        config.clr3_minHue,
+        config.clr3_maxHue,
+        config.clr3_minSaturation,
+        config.clr3_maxSaturation,
+        config.clr3_minValue,
+        config.clr3_maxValue,
+        config.clr3_dropHueMinValue,
+        config.clr3_dropHueMaxValue,
+        round(random.uniform(config.clr3_minAlpha, config.clr3_maxAlpha)),
     )
 
 
@@ -81,20 +94,80 @@ def generateUnitImage(dims):
     image = Image.new("RGBA", (config.blockWidth, config.blockHeight))
     draw = ImageDraw.Draw(image)
 
-    clr = colorutils.getRandomColor()
-    if random.SystemRandom().random() < config.drawFullColorUnit :
-        # draw.rectangle((0,0,dims[0], dims[1]), fill=(255,0,0,200))
-        draw.rectangle((0,0,dims[0], dims[1]), fill=clr)
-    else :
-        if random.SystemRandom().random() < config.drawLeftTriangleColorUnit :
-            draw.polygon(((0,0),(dims[0], dims[1]),(0, dims[1])), fill=clr)
-            # draw.polygon(((0,0),(dims[0], dims[1]),(0, dims[1])), fill=(255,0,0,200))
-            if random.SystemRandom().random() < config.drawGreyTriangleUnit :
-                draw.polygon(((0,0),(dims[0], dims[1]),(dims[0], 0)), fill=(255,255,250,200))
-        else :
-            draw.polygon(((0, dims[1]),(dims[0], 0),(dims[0],dims[1])), fill=(255,255,255,200))
+    # if random.SystemRandom().random() < config.drawFullColorUnit :
+    #     draw.rectangle((0,0,dims[0], dims[1]), fill=clr)
+    # else :
+    #     if random.SystemRandom().random() < config.drawLeftTriangle :
+    #         draw.polygon(((0,0),(dims[0], dims[1]),(0, dims[1])), fill=clr)
+    #         # draw.polygon(((0,0),(dims[0], dims[1]),(0, dims[1])), fill=(255,0,0,200))
+    #         if random.SystemRandom().random() < config.drawGreyTriangleUnit :
+    #             draw.polygon(((0,0),(dims[0], dims[1]),(dims[0], 0)), fill=clr2)
+    #     else :
+    #         draw.polygon(((0, dims[1]),(dims[0], 0),(dims[0],dims[1])), fill=clr2)
+    #         if random.SystemRandom().random() < config.drawRedTriangleUnit :
+    #             draw.polygon(((0, dims[1]),(dims[0], 0),(0,0)), fill=clr3)
+
+
+
+    cntrPt = [dims[0]/2, dims[1]/2]
+
+
+    if random.SystemRandom().random() < config.drawTwoTrianglesProb :
+
+        if random.SystemRandom().random() < config.drawLeftTriangle :
+            # triangle slop L to R
+            clr_t1 = newClr()
+
             if random.SystemRandom().random() < config.drawRedTriangleUnit :
-                draw.polygon(((0, dims[1]),(dims[0], 0),(0,0)), fill=(255,0,0,200))
+                clr_t1 = newClr3()
+
+
+            clr_t2 = clr_t1
+            if random.SystemRandom().random() < config.drawGreyTriangleUnit :
+                clr_t3  = newClr2()
+            else :
+                clr_t3 = newClr()
+
+            clr_t4 = clr_t3
+        else :
+            # triangle slop R to L
+            clr_t1 = newClr()
+            clr_t2 = newClr()
+
+            if random.SystemRandom().random() < config.drawRedTriangleUnit :
+                clr_t1 = newClr3()
+
+
+
+            clr_t3 = clr_t1
+            clr_t4 = clr_t2
+
+
+    else:
+        clr_t1 = newClr()
+        clr_t2 = newClr()
+        clr_t3 = newClr()
+        clr_t4 = newClr()
+
+        # butterfly
+        clr_t1 = newClr()
+        clr_t3 = newClr()
+
+        if random.SystemRandom().random() < config.drawGreyTriangleUnit :
+            clr_t3 = newClr2()
+
+        clr_t2 = clr_t3
+        clr_t4 = clr_t1
+
+
+    # t1
+    draw.polygon(((0,0),(dims[0], 0),(cntrPt[0], cntrPt[1])), fill=clr_t1)
+    # t2
+    draw.polygon(((0,0),(cntrPt[0], cntrPt[1]),(0, dims[1])), fill=clr_t2)
+    # # t3
+    draw.polygon(((dims[0], 0),(cntrPt[0], cntrPt[1]),(dims[0], dims[1])), fill=clr_t3)
+    # # t4
+    draw.polygon(((0, dims[1]),(cntrPt[0], cntrPt[1]),(dims[0], dims[1])), fill=clr_t4)
 
 
     return image
@@ -133,15 +206,18 @@ def linearPlacer(doSort = False, reversedSort = False):
         if config.unitFills[i][1] >= lastHighest:
             lastHighest = config.unitFills[i][1]
 
+
 def simplePlacer(doSort = False, reversedSort = False):
     if doSort : 
         config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=reversedSort)
     lastX = 0
     lastY = 0
     lastHighest = 0
-    for i in range(0, len(config.unitFills)):
-        img = generateUnitImage(config.unitFills[i])
 
+    unitIndex = config.unitIndex
+    # for unitIndex in range(0, len(config.unitFills)):
+    if unitIndex < len(config.unitFills):
+        img = generateUnitImage(config.unitFills[unitIndex])
         # searchRadius = math.ceil(math.sqrt(config.unitFills[i][0]*config.unitFills[i][0] + config.unitFills[i][1]*config.unitFills[i][1]))
         # print(searchRadius)
         insertIndex = 0
@@ -149,9 +225,9 @@ def simplePlacer(doSort = False, reversedSort = False):
         for s in range(0, len(config.availableSpots)) :
             if config.availableSpots[s][2] :
                 sY = config.availableSpots[s][1]
-                eY = config.availableSpots[s][1] + config.unitFills[i][1]
+                eY = config.availableSpots[s][1] + config.unitFills[unitIndex][1]
                 sX = config.availableSpots[s][0]
-                eX = config.availableSpots[s][0] + config.unitFills[i][0]
+                eX = config.availableSpots[s][0] + config.unitFills[unitIndex][0]
                 keepGoing = True
                 for h in range (sY, eY ,config.gridSize ) :
                     if keepGoing :
@@ -176,16 +252,21 @@ def simplePlacer(doSort = False, reversedSort = False):
 
         if canFit :
             config.image.paste(img,(config.availableSpots[insertIndex][0] ,config.availableSpots[insertIndex][1]),img)
-            removeFromAvailable(config.availableSpots[insertIndex][0] ,config.availableSpots[insertIndex][1], config.unitFills[i])
+            removeFromAvailable(config.availableSpots[insertIndex][0] ,config.availableSpots[insertIndex][1], config.unitFills[unitIndex])
 
 
 def drawGrid():
     # linearPlacer(True)
     # linearPlacer(False)
+    # simplePlacer(doSort, reversedSort)
 
-    doSort = True if random.SystemRandom().random() < config.doSortProb else False
-    reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
-    simplePlacer(doSort, reversedSort)
+    if config.unitIndex < len(config.unitFills):
+        simplePlacer(config.doSort, config.reversedSort)
+
+    config.unitIndex += 1
+
+    # if (config.unitIndex >= len(config.unitFills)) :
+    #     config.unitIndex = 0
 
     # FOR DEBUGGING!
     # for i in range(0, len(config.availableSpots)) :
@@ -194,8 +275,7 @@ def drawGrid():
 
 
 def reDraw(config):
-        if random.SystemRandom().random() < .1:
-            rebuildGrid()
+        rebuildGrid()
         setUp()
         drawGrid()
 
@@ -206,17 +286,18 @@ def iterate():
 
     config.director.checkTime()
     if config.director.advance == True:
+        drawGrid()
         # config.draw.rectangle(
         #     (0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor
         # )
      
-        # Do the final rendering of the composited image
         if random.random() < config.bgFlashRate:
             config.draw.rectangle(
                 (0, 0, config.screenWidth, config.screenHeight),
-                fill=config.backgroundFlashcolor,
+                fill=config.bgColor,
             )
             reDraw(config)
+        # Do the final rendering of the composited image
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
     if random.random() < config.filterPatchProb:
@@ -246,39 +327,9 @@ def iterate():
 
 
 def setUp():
-    config.blockWidth = round(
-        random.uniform(config.blockWidthMin, config.blockWidthMax)
-    )
-    config.blockHeight = round(
-        random.uniform(config.blockHeightMin, config.blockHeightMax)
-    )
-    config.colGap = round(
-        random.uniform(config.blockColSpacingMin, config.blockColSpacingMax)
-    )
-    config.rowGap = round(
-        random.uniform(config.blockRowSpacingMin, config.blockRowSpacingMax)
-    )
-    config.angle = 0
-    config.gridAngleIncrement = random.uniform(
-        config.gridAngleIncrementMin, config.gridAngleIncrementMax
-    )
-    config.spiralAngleIncrement = random.uniform(
-        config.spiralAngleIncrementMin, config.spiralAngleIncrementMax
-    )
-    config.repeatFactor = random.uniform(config.repeatFactorMin, config.repeatFactorMax)
-
-    config.lineAColor = newColor()
-    config.lineBColor = newColorAlt()
-    config.lineCColor = newColorAlt2()
-
-    config.gridCols = round(config.canvasWidth / config.blockWidth) + 2
-    config.gridRows = round(config.canvasHeight / config.blockHeight) + 2
-
-    # config.expandPaste = True if random.random() > .5 else False
-    # config.figureType = "boxes" if random.random() > .5 else "lines"
-    # config.patternType = "spiral" if random.random() > .5 else "grid"
-    # config.elementNumber = round(random.uniform(1,3))
+    config.bgColor = newBGClr()
     config.availableSpots = []
+
     for h in range(0, config.canvasHeight, config.gridSize) :
         for w in range(0, config.canvasWidth, config.gridSize) :
             config.availableSpots.append([w,h,True])
@@ -290,6 +341,10 @@ def rebuildGrid():
     for i in range(0,config.unitsToDraw ) :
         config.unitFills.append((round(random.SystemRandom().uniform(config.minW,config.maxW))* config.gridSize, round(random.SystemRandom().uniform(config.minH,config.maxH))* config.gridSize) )
 
+    config.unitIndex = 0
+
+    config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
+    config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
 
 def main(run=True):
     global config
@@ -301,6 +356,7 @@ def main(run=True):
     config.draw = ImageDraw.Draw(config.image)
 
     config.redrawSpeed = float(workConfig.get("forms", "redrawSpeed"))
+    config.slotRate = float(workConfig.get("forms", "slotRate"))
 
     config.bg_minHue = float(workConfig.get("forms", "bg_minHue"))
     config.bg_maxHue = float(workConfig.get("forms", "bg_maxHue"))
@@ -313,96 +369,40 @@ def main(run=True):
     config.bg_minAlpha = float(workConfig.get("forms", "bg_minAlpha"))
     config.bg_maxAlpha = float(workConfig.get("forms", "bg_maxAlpha"))
 
-    config.line1_minHue = float(workConfig.get("forms", "line1_minHue"))
-    config.line1_maxHue = float(workConfig.get("forms", "line1_maxHue"))
-    config.line1_minSaturation = float(workConfig.get("forms", "line1_minSaturation"))
-    config.line1_maxSaturation = float(workConfig.get("forms", "line1_maxSaturation"))
-    config.line1_minValue = float(workConfig.get("forms", "line1_minValue"))
-    config.line1_maxValue = float(workConfig.get("forms", "line1_maxValue"))
-    config.line1_dropHueMinValue = float(
-        workConfig.get("forms", "line1_dropHueMinValue")
-    )
-    config.line1_dropHueMaxValue = float(
-        workConfig.get("forms", "line1_dropHueMaxValue")
-    )
-    config.line1_minAlpha = float(workConfig.get("forms", "line1_minAlpha"))
-    config.line1_maxAlpha = float(workConfig.get("forms", "line1_maxAlpha"))
+    config.clr1_minHue = float(workConfig.get("forms", "clr1_minHue"))
+    config.clr1_maxHue = float(workConfig.get("forms", "clr1_maxHue"))
+    config.clr1_minSaturation = float(workConfig.get("forms", "clr1_minSaturation"))
+    config.clr1_maxSaturation = float(workConfig.get("forms", "clr1_maxSaturation"))
+    config.clr1_minValue = float(workConfig.get("forms", "clr1_minValue"))
+    config.clr1_maxValue = float(workConfig.get("forms", "clr1_maxValue"))
+    config.clr1_dropHueMinValue = float(workConfig.get("forms", "clr1_dropHueMinValue"))
+    config.clr1_dropHueMaxValue = float(workConfig.get("forms", "clr1_dropHueMaxValue"))
+    config.clr1_minAlpha = float(workConfig.get("forms", "clr1_minAlpha"))
+    config.clr1_maxAlpha = float(workConfig.get("forms", "clr1_maxAlpha"))
 
-    config.line2_minHue = float(workConfig.get("forms", "line2_minHue"))
-    config.line2_maxHue = float(workConfig.get("forms", "line2_maxHue"))
-    config.line2_minSaturation = float(workConfig.get("forms", "line2_minSaturation"))
-    config.line2_maxSaturation = float(workConfig.get("forms", "line2_maxSaturation"))
-    config.line2_minValue = float(workConfig.get("forms", "line2_minValue"))
-    config.line2_maxValue = float(workConfig.get("forms", "line2_maxValue"))
-    config.line2_dropHueMinValue = float(
-        workConfig.get("forms", "line2_dropHueMinValue")
-    )
-    config.line2_dropHueMaxValue = float(
-        workConfig.get("forms", "line2_dropHueMaxValue")
-    )
-    config.line2_minAlpha = float(workConfig.get("forms", "line2_minAlpha"))
-    config.line2_maxAlpha = float(workConfig.get("forms", "line2_maxAlpha"))
+    config.clr2_minHue = float(workConfig.get("forms", "clr2_minHue"))
+    config.clr2_maxHue = float(workConfig.get("forms", "clr2_maxHue"))
+    config.clr2_minSaturation = float(workConfig.get("forms", "clr2_minSaturation"))
+    config.clr2_maxSaturation = float(workConfig.get("forms", "clr2_maxSaturation"))
+    config.clr2_minValue = float(workConfig.get("forms", "clr2_minValue"))
+    config.clr2_maxValue = float(workConfig.get("forms", "clr2_maxValue"))
+    config.clr2_dropHueMinValue = float( workConfig.get("forms", "clr2_dropHueMinValue"))
+    config.clr2_dropHueMaxValue = float(workConfig.get("forms", "clr2_dropHueMaxValue"))
+    config.clr2_minAlpha = float(workConfig.get("forms", "clr2_minAlpha"))
+    config.clr2_maxAlpha = float(workConfig.get("forms", "clr2_maxAlpha"))
 
-    config.blockSpeedMultiplier = float(workConfig.get("forms", "blockSpeedMultiplier"))
-    config.blockSpeedMin = (
-        float(workConfig.get("forms", "blockSpeedMin")) * config.blockSpeedMultiplier
-    )
-    config.blockSpeedMax = (
-        float(workConfig.get("forms", "blockSpeedMax")) * config.blockSpeedMultiplier
-    )
-    config.blockSpeed2Min = (
-        float(workConfig.get("forms", "blockSpeed2Min")) * config.blockSpeedMultiplier
-    )
-    config.blockSpeed2Max = (
-        float(workConfig.get("forms", "blockSpeed2Max")) * config.blockSpeedMultiplier
-    )
+    config.clr3_minHue = float(workConfig.get("forms", "clr3_minHue"))
+    config.clr3_maxHue = float(workConfig.get("forms", "clr3_maxHue"))
+    config.clr3_minSaturation = float(workConfig.get("forms", "clr3_minSaturation"))
+    config.clr3_maxSaturation = float(workConfig.get("forms", "clr3_maxSaturation"))
+    config.clr3_minValue = float(workConfig.get("forms", "clr3_minValue"))
+    config.clr3_maxValue = float(workConfig.get("forms", "clr3_maxValue"))
+    config.clr3_dropHueMinValue = float( workConfig.get("forms", "clr3_dropHueMinValue"))
+    config.clr3_dropHueMaxValue = float(workConfig.get("forms", "clr3_dropHueMaxValue"))
+    config.clr3_minAlpha = float(workConfig.get("forms", "clr3_minAlpha"))
+    config.clr3_maxAlpha = float(workConfig.get("forms", "clr3_maxAlpha"))
+
     config.bgFlashRate = float(workConfig.get("forms", "bgFlashRate"))
-
-    config.blockColSpacingMin = int(workConfig.get("forms", "blockColSpacingMin"))
-    config.blockColSpacingMax = int(workConfig.get("forms", "blockColSpacingMax"))
-    config.blockRowSpacingMin = int(workConfig.get("forms", "blockRowSpacingMin"))
-    config.blockRowSpacingMax = int(workConfig.get("forms", "blockRowSpacingMax"))
-    config.blockWidthMin = int(workConfig.get("forms", "blockWidthMin"))
-    config.blockWidthMax = int(workConfig.get("forms", "blockWidthMax"))
-    config.blockHeightMin = int(workConfig.get("forms", "blockHeightMin"))
-    config.blockHeightMax = int(workConfig.get("forms", "blockHeightMax"))
-
-    config.xPosInit = int(workConfig.get("forms", "xPosInit"))
-    config.yPosInit = int(workConfig.get("forms", "yPosInit"))
-
-    config.gridAngleIncrementMin = float(
-        workConfig.get("forms", "gridAngleIncrementMin")
-    )
-    config.gridAngleIncrementMax = float(
-        workConfig.get("forms", "gridAngleIncrementMax")
-    )
-    config.spiralAngleIncrementMin = float(
-        workConfig.get("forms", "spiralAngleIncrementMin")
-    )
-    config.spiralAngleIncrementMax = float(
-        workConfig.get("forms", "spiralAngleIncrementMax")
-    )
-
-    config.repeatFactorMin = float(workConfig.get("forms", "repeatFactorMin"))
-    config.repeatFactorMax = float(workConfig.get("forms", "repeatFactorMax"))
-    config.expandPaste = workConfig.getboolean("forms", "expandPaste")
-
-    config.sAngleRate = math.pi / float(workConfig.get("forms", "sAngleRate"))
-    config.initialRadius = int(workConfig.get("forms", "initialRadius"))
-    config.sRadiusRate = float(workConfig.get("forms", "sRadiusRate"))
-    config.sRadiusRateChange = float(workConfig.get("forms", "sRadiusRateChange"))
-    config.radiusMutiplier = float(workConfig.get("forms", "radiusMutiplier"))
-
-    config.patternType = workConfig.get("forms", "patternType")
-    config.figureType = workConfig.get("forms", "figureType")
-    config.elementNumber = int(workConfig.get("forms", "elementNumber"))
-    config.boxSize = int(workConfig.get("forms", "boxSize"))
-
-    # background color - higher the
-    # alpha = less persistent images
-    backgroundColor = (workConfig.get("forms", "backgroundColor")).split(",")
-    config.backgroundColor = tuple(int(x) for x in backgroundColor)
-
     backgroundFlashcolor = (workConfig.get("forms", "backgroundFlashcolor")).split(",")
     config.backgroundFlashcolor = tuple(int(x) for x in backgroundFlashcolor)
 
@@ -410,34 +410,40 @@ def main(run=True):
     config.filterPatchProbOff = float(workConfig.get("forms", "filterPatchProbOff"))
 
     config.director = Director(config)
-    config.director.slotRate = config.blockSpeedMin
 
 
-    config.gridSize = 5
-    config.unitsToDraw = 400
-    config.minW = 1
-    config.maxW = 4
-    config.minH = 4
-    config.maxH = 8
-    config.doSortProb = .05
-    config.reversedSortProb = .5
+    config.gridSize = int(workConfig.get("forms", "gridSize"))
+    config.unitsToDraw = int(workConfig.get("forms", "unitsToDraw"))
+    config.minW = int(workConfig.get("forms", "minW"))
+    config.maxW = int(workConfig.get("forms", "maxW"))
+    config.minH = int(workConfig.get("forms", "minH"))
+    config.maxH = int(workConfig.get("forms", "maxH"))
+    config.doSortProb = float(workConfig.get("forms", "doSortProb"))
+    config.reversedSortProb = float(workConfig.get("forms", "reversedSortProb"))
 
+    config.blockWidth = config.maxW * config.gridSize
+    config.blockHeight = config.maxH * config.gridSize
 
 
     # higher = more full color rectangles
-    config.drawFullColorUnit = .01
+    config.drawFullColorUnit = float(workConfig.get("forms", "drawFullColorUnit"))
     # lower more single color
-    config.drawLeftTriangleColorUnit = .70
+    config.drawLeftTriangle = float(workConfig.get("forms", "drawLeftTriangle"))
     # lower = more black/bg
-    config.drawGreyTriangleUnit = .9
+    config.drawGreyTriangleUnit = float(workConfig.get("forms", "drawGreyTriangleUnit"))
     # lower = more black/bg on left
-    config.drawRedTriangleUnit = .9
+    config.drawRedTriangleUnit = float(workConfig.get("forms", "drawRedTriangleUnit"))
+
+    config.drawTwoTrianglesProb = float(workConfig.get("forms", "drawTwoTrianglesProb"))
 
 
+    config.unitIndex = 0
 
+    config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
+    config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
 
-    rebuildGrid()
     setUp()
+    rebuildGrid()
     drawGrid()
 
 

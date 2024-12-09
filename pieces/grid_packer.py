@@ -141,8 +141,6 @@ def generateUnitImage(dims):
 
             clr_t3 = clr_t1
             clr_t4 = clr_t2
-
-
     else:
         clr_t1 = newClr()
         clr_t2 = newClr()
@@ -159,6 +157,12 @@ def generateUnitImage(dims):
         clr_t2 = clr_t3
         clr_t4 = clr_t1
 
+    if random.SystemRandom().random() < config.drawFullColorUnit :
+        clr_t2 = clr_t1
+        clr_t3 = clr_t1
+        clr_t4 = clr_t1
+
+
 
     # t1
     draw.polygon(((0,0),(dims[0], 0),(cntrPt[0], cntrPt[1])), fill=clr_t1)
@@ -168,7 +172,17 @@ def generateUnitImage(dims):
     draw.polygon(((dims[0], 0),(cntrPt[0], cntrPt[1]),(dims[0], dims[1])), fill=clr_t3)
     # # t4
     draw.polygon(((0, dims[1]),(cntrPt[0], cntrPt[1]),(dims[0], dims[1])), fill=clr_t4)
+    
+    
+    clr_t1a = newClr()
+    # clr_t1a = clr_t2
 
+    if random.SystemRandom().random() < config.drawConcentricEllipse :
+        radius = [dims[0],dims[1]]
+        for ii in range( 1, 5) :
+            radius[0] = 1/8 * ii * dims[0]
+            radius[1] = 1/8 * ii * dims[1]
+            draw.ellipse(((cntrPt[0]-radius[0], cntrPt[1]-radius[1]),(cntrPt[0] + radius[0], cntrPt[1] + radius[1])), fill=None, outline=clr_t1a, width=3)
 
     return image
 
@@ -435,6 +449,8 @@ def main(run=True):
     config.drawRedTriangleUnit = float(workConfig.get("forms", "drawRedTriangleUnit"))
 
     config.drawTwoTrianglesProb = float(workConfig.get("forms", "drawTwoTrianglesProb"))
+
+    config.drawConcentricEllipse = float(workConfig.get("forms", "drawConcentricEllipse"))
 
 
     config.unitIndex = 0

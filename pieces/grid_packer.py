@@ -76,6 +76,7 @@ def newClr2():
         round(random.uniform(config.clr2_minAlpha, config.clr2_maxAlpha)),
     )
 
+
 def newClr3():
     return colorutils.getRandomColorHSV(
         config.clr3_minHue,
@@ -147,6 +148,7 @@ def generateUnitImage(dims):
         clr_t3 = newClr()
         clr_t4 = newClr()
 
+            
         # butterfly
         clr_t1 = newClr()
         clr_t3 = newClr()
@@ -156,6 +158,9 @@ def generateUnitImage(dims):
 
         clr_t2 = clr_t3
         clr_t4 = clr_t1
+
+        if random.SystemRandom().random() < config.drawLeftTriangle :
+            clr_t1 = config.bgColor
 
     if random.SystemRandom().random() < config.drawFullColorUnit :
         clr_t2 = clr_t1
@@ -179,9 +184,9 @@ def generateUnitImage(dims):
 
     if random.SystemRandom().random() < config.drawConcentricEllipse :
         radius = [dims[0],dims[1]]
-        for ii in range( 1, 5) :
-            radius[0] = 1/8 * ii * dims[0]
-            radius[1] = 1/8 * ii * dims[1]
+        for ii in range( 5 , 5 - config.concentricENum, -1) :
+            radius[0] = 1/8 * (ii - 1) * dims[0]
+            radius[1] = 1/8 * (ii - 1) * dims[1]
             draw.ellipse(((cntrPt[0]-radius[0], cntrPt[1]-radius[1]),(cntrPt[0] + radius[0], cntrPt[1] + radius[1])), fill=None, outline=clr_t1a, width=3)
 
     return image
@@ -305,11 +310,11 @@ def iterate():
         #     (0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor
         # )
      
-        if random.random() < config.bgFlashRate:
-            config.draw.rectangle(
-                (0, 0, config.screenWidth, config.screenHeight),
-                fill=config.bgColor,
-            )
+        if random.random() < config.bgFlashRate :
+            # config.draw.rectangle(
+            #     (0, 0, config.screenWidth, config.screenHeight),
+            #     fill=config.bgColor,
+            # )
             reDraw(config)
         # Do the final rendering of the composited image
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
@@ -353,12 +358,17 @@ def rebuildGrid():
     config.unitFills = []
 
     for i in range(0,config.unitsToDraw ) :
-        config.unitFills.append((round(random.SystemRandom().uniform(config.minW,config.maxW))* config.gridSize, round(random.SystemRandom().uniform(config.minH,config.maxH))* config.gridSize) )
+        if config.allSquare :
+            wd = round(random.SystemRandom().uniform(config.minW,config.maxW))* config.gridSize
+            config.unitFills.append((wd,wd) )
+        else :
+            config.unitFills.append((round(random.SystemRandom().uniform(config.minW,config.maxW))* config.gridSize, round(random.SystemRandom().uniform(config.minH,config.maxH))* config.gridSize) )
 
     config.unitIndex = 0
 
     config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
     config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
+
 
 def main(run=True):
     global config
@@ -451,15 +461,20 @@ def main(run=True):
     config.drawTwoTrianglesProb = float(workConfig.get("forms", "drawTwoTrianglesProb"))
 
     config.drawConcentricEllipse = float(workConfig.get("forms", "drawConcentricEllipse"))
+    config.concentricENum = int(workConfig.get("forms", "concentricENum"))
 
 
     config.unitIndex = 0
+    config.allSquare = False
 
     config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
     config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
 
+
     setUp()
     rebuildGrid()
+    config.bgColor = newBGClr()
+    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight),fill=config.bgColor)
     drawGrid()
 
 

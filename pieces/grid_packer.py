@@ -90,6 +90,19 @@ def newClr3():
         round(random.uniform(config.clr3_minAlpha, config.clr3_maxAlpha)),
     )
 
+def newClr4():
+    return colorutils.getRandomColorHSV(
+        config.clr4_minHue,
+        config.clr4_maxHue,
+        config.clr4_minSaturation,
+        config.clr4_maxSaturation,
+        config.clr4_minValue,
+        config.clr4_maxValue,
+        config.clr4_dropHueMinValue,
+        config.clr4_dropHueMaxValue,
+        round(random.uniform(config.clr4_minAlpha, config.clr4_maxAlpha)),
+    )
+
 
 def generateUnitImage(dims):
     image = Image.new("RGBA", (config.blockWidth, config.blockHeight))
@@ -167,6 +180,8 @@ def generateUnitImage(dims):
         clr_t3 = clr_t1
         clr_t4 = clr_t1
 
+        
+
 
 
     # t1
@@ -188,6 +203,10 @@ def generateUnitImage(dims):
             radius[0] = 1/8 * (ii - 1) * dims[0]
             radius[1] = 1/8 * (ii - 1) * dims[1]
             draw.ellipse(((cntrPt[0]-radius[0], cntrPt[1]-radius[1]),(cntrPt[0] + radius[0], cntrPt[1] + radius[1])), fill=None, outline=clr_t1a, width=3)
+
+    if config.drawFullUnitOutline:
+        otlineClr = newClr4()
+        draw.rectangle((0,0,dims[0], dims[1]), fill=None, outline=otlineClr, width=3)
 
     return image
 
@@ -426,6 +445,17 @@ def main(run=True):
     config.clr3_minAlpha = float(workConfig.get("forms", "clr3_minAlpha"))
     config.clr3_maxAlpha = float(workConfig.get("forms", "clr3_maxAlpha"))
 
+    config.clr4_minHue = float(workConfig.get("forms", "clr4_minHue"))
+    config.clr4_maxHue = float(workConfig.get("forms", "clr4_maxHue"))
+    config.clr4_minSaturation = float(workConfig.get("forms", "clr4_minSaturation"))
+    config.clr4_maxSaturation = float(workConfig.get("forms", "clr4_maxSaturation"))
+    config.clr4_minValue = float(workConfig.get("forms", "clr4_minValue"))
+    config.clr4_maxValue = float(workConfig.get("forms", "clr4_maxValue"))
+    config.clr4_dropHueMinValue = float( workConfig.get("forms", "clr4_dropHueMinValue"))
+    config.clr4_dropHueMaxValue = float(workConfig.get("forms", "clr4_dropHueMaxValue"))
+    config.clr4_minAlpha = float(workConfig.get("forms", "clr4_minAlpha"))
+    config.clr4_maxAlpha = float(workConfig.get("forms", "clr4_maxAlpha"))
+
     config.bgFlashRate = float(workConfig.get("forms", "bgFlashRate"))
     backgroundFlashcolor = (workConfig.get("forms", "backgroundFlashcolor")).split(",")
     config.backgroundFlashcolor = tuple(int(x) for x in backgroundFlashcolor)
@@ -465,7 +495,8 @@ def main(run=True):
 
 
     config.unitIndex = 0
-    config.allSquare = False
+    config.allSquare = workConfig.getboolean("forms", "allSquare")
+    config.drawFullUnitOutline = workConfig.getboolean("forms", "drawFullUnitOutline")
 
     config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
     config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False

@@ -90,6 +90,7 @@ def newClr3():
         round(random.uniform(config.clr3_minAlpha, config.clr3_maxAlpha)),
     )
 
+
 def newClr4():
     return colorutils.getRandomColorHSV(
         config.clr4_minHue,
@@ -135,7 +136,6 @@ def generateUnitImage(dims):
             if random.SystemRandom().random() < config.drawRedTriangleUnit :
                 clr_t1 = newClr3()
 
-
             clr_t2 = clr_t1
             if random.SystemRandom().random() < config.drawGreyTriangleUnit :
                 clr_t3  = newClr2()
@@ -164,7 +164,7 @@ def generateUnitImage(dims):
             
         # butterfly
         clr_t1 = newClr()
-        clr_t3 = newClr()
+        clr_t3 = newClr2()
 
         if random.SystemRandom().random() < config.drawGreyTriangleUnit :
             clr_t3 = newClr2()
@@ -179,8 +179,6 @@ def generateUnitImage(dims):
         clr_t2 = clr_t1
         clr_t3 = clr_t1
         clr_t4 = clr_t1
-
-        
 
 
 
@@ -389,118 +387,122 @@ def rebuildGrid():
     config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
 
 
-def main(run=True):
-    global config
-    global expandingRingss
-    global workConfig
+def loadConfigSet(setName) :
 
-    expandingRingss = []
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.draw = ImageDraw.Draw(config.image)
+    config.redrawSpeed = float(workConfig.get(setName, "redrawSpeed"))
+    config.slotRate = float(workConfig.get(setName, "slotRate"))
 
-    config.redrawSpeed = float(workConfig.get("forms", "redrawSpeed"))
-    config.slotRate = float(workConfig.get("forms", "slotRate"))
+    config.bg_minHue = float(workConfig.get(setName, "bg_minHue"))
+    config.bg_maxHue = float(workConfig.get(setName, "bg_maxHue"))
+    config.bg_minSaturation = float(workConfig.get(setName, "bg_minSaturation"))
+    config.bg_maxSaturation = float(workConfig.get(setName, "bg_maxSaturation"))
+    config.bg_minValue = float(workConfig.get(setName, "bg_minValue"))
+    config.bg_maxValue = float(workConfig.get(setName, "bg_maxValue"))
+    config.bg_dropHueMinValue = float(workConfig.get(setName, "bg_dropHueMinValue"))
+    config.bg_dropHueMaxValue = float(workConfig.get(setName, "bg_dropHueMaxValue"))
+    config.bg_minAlpha = float(workConfig.get(setName, "bg_minAlpha"))
+    config.bg_maxAlpha = float(workConfig.get(setName, "bg_maxAlpha"))
 
-    config.bg_minHue = float(workConfig.get("forms", "bg_minHue"))
-    config.bg_maxHue = float(workConfig.get("forms", "bg_maxHue"))
-    config.bg_minSaturation = float(workConfig.get("forms", "bg_minSaturation"))
-    config.bg_maxSaturation = float(workConfig.get("forms", "bg_maxSaturation"))
-    config.bg_minValue = float(workConfig.get("forms", "bg_minValue"))
-    config.bg_maxValue = float(workConfig.get("forms", "bg_maxValue"))
-    config.bg_dropHueMinValue = float(workConfig.get("forms", "bg_dropHueMinValue"))
-    config.bg_dropHueMaxValue = float(workConfig.get("forms", "bg_dropHueMaxValue"))
-    config.bg_minAlpha = float(workConfig.get("forms", "bg_minAlpha"))
-    config.bg_maxAlpha = float(workConfig.get("forms", "bg_maxAlpha"))
+    config.clr1_minHue = float(workConfig.get(setName, "clr1_minHue"))
+    config.clr1_maxHue = float(workConfig.get(setName, "clr1_maxHue"))
+    config.clr1_minSaturation = float(workConfig.get(setName, "clr1_minSaturation"))
+    config.clr1_maxSaturation = float(workConfig.get(setName, "clr1_maxSaturation"))
+    config.clr1_minValue = float(workConfig.get(setName, "clr1_minValue"))
+    config.clr1_maxValue = float(workConfig.get(setName, "clr1_maxValue"))
+    config.clr1_dropHueMinValue = float(workConfig.get(setName, "clr1_dropHueMinValue"))
+    config.clr1_dropHueMaxValue = float(workConfig.get(setName, "clr1_dropHueMaxValue"))
+    config.clr1_minAlpha = float(workConfig.get(setName, "clr1_minAlpha"))
+    config.clr1_maxAlpha = float(workConfig.get(setName, "clr1_maxAlpha"))
 
-    config.clr1_minHue = float(workConfig.get("forms", "clr1_minHue"))
-    config.clr1_maxHue = float(workConfig.get("forms", "clr1_maxHue"))
-    config.clr1_minSaturation = float(workConfig.get("forms", "clr1_minSaturation"))
-    config.clr1_maxSaturation = float(workConfig.get("forms", "clr1_maxSaturation"))
-    config.clr1_minValue = float(workConfig.get("forms", "clr1_minValue"))
-    config.clr1_maxValue = float(workConfig.get("forms", "clr1_maxValue"))
-    config.clr1_dropHueMinValue = float(workConfig.get("forms", "clr1_dropHueMinValue"))
-    config.clr1_dropHueMaxValue = float(workConfig.get("forms", "clr1_dropHueMaxValue"))
-    config.clr1_minAlpha = float(workConfig.get("forms", "clr1_minAlpha"))
-    config.clr1_maxAlpha = float(workConfig.get("forms", "clr1_maxAlpha"))
+    config.clr2_minHue = float(workConfig.get(setName, "clr2_minHue"))
+    config.clr2_maxHue = float(workConfig.get(setName, "clr2_maxHue"))
+    config.clr2_minSaturation = float(workConfig.get(setName, "clr2_minSaturation"))
+    config.clr2_maxSaturation = float(workConfig.get(setName, "clr2_maxSaturation"))
+    config.clr2_minValue = float(workConfig.get(setName, "clr2_minValue"))
+    config.clr2_maxValue = float(workConfig.get(setName, "clr2_maxValue"))
+    config.clr2_dropHueMinValue = float( workConfig.get(setName, "clr2_dropHueMinValue"))
+    config.clr2_dropHueMaxValue = float(workConfig.get(setName, "clr2_dropHueMaxValue"))
+    config.clr2_minAlpha = float(workConfig.get(setName, "clr2_minAlpha"))
+    config.clr2_maxAlpha = float(workConfig.get(setName, "clr2_maxAlpha"))
 
-    config.clr2_minHue = float(workConfig.get("forms", "clr2_minHue"))
-    config.clr2_maxHue = float(workConfig.get("forms", "clr2_maxHue"))
-    config.clr2_minSaturation = float(workConfig.get("forms", "clr2_minSaturation"))
-    config.clr2_maxSaturation = float(workConfig.get("forms", "clr2_maxSaturation"))
-    config.clr2_minValue = float(workConfig.get("forms", "clr2_minValue"))
-    config.clr2_maxValue = float(workConfig.get("forms", "clr2_maxValue"))
-    config.clr2_dropHueMinValue = float( workConfig.get("forms", "clr2_dropHueMinValue"))
-    config.clr2_dropHueMaxValue = float(workConfig.get("forms", "clr2_dropHueMaxValue"))
-    config.clr2_minAlpha = float(workConfig.get("forms", "clr2_minAlpha"))
-    config.clr2_maxAlpha = float(workConfig.get("forms", "clr2_maxAlpha"))
+    config.clr3_minHue = float(workConfig.get(setName, "clr3_minHue"))
+    config.clr3_maxHue = float(workConfig.get(setName, "clr3_maxHue"))
+    config.clr3_minSaturation = float(workConfig.get(setName, "clr3_minSaturation"))
+    config.clr3_maxSaturation = float(workConfig.get(setName, "clr3_maxSaturation"))
+    config.clr3_minValue = float(workConfig.get(setName, "clr3_minValue"))
+    config.clr3_maxValue = float(workConfig.get(setName, "clr3_maxValue"))
+    config.clr3_dropHueMinValue = float( workConfig.get(setName, "clr3_dropHueMinValue"))
+    config.clr3_dropHueMaxValue = float(workConfig.get(setName, "clr3_dropHueMaxValue"))
+    config.clr3_minAlpha = float(workConfig.get(setName, "clr3_minAlpha"))
+    config.clr3_maxAlpha = float(workConfig.get(setName, "clr3_maxAlpha"))
 
-    config.clr3_minHue = float(workConfig.get("forms", "clr3_minHue"))
-    config.clr3_maxHue = float(workConfig.get("forms", "clr3_maxHue"))
-    config.clr3_minSaturation = float(workConfig.get("forms", "clr3_minSaturation"))
-    config.clr3_maxSaturation = float(workConfig.get("forms", "clr3_maxSaturation"))
-    config.clr3_minValue = float(workConfig.get("forms", "clr3_minValue"))
-    config.clr3_maxValue = float(workConfig.get("forms", "clr3_maxValue"))
-    config.clr3_dropHueMinValue = float( workConfig.get("forms", "clr3_dropHueMinValue"))
-    config.clr3_dropHueMaxValue = float(workConfig.get("forms", "clr3_dropHueMaxValue"))
-    config.clr3_minAlpha = float(workConfig.get("forms", "clr3_minAlpha"))
-    config.clr3_maxAlpha = float(workConfig.get("forms", "clr3_maxAlpha"))
+    config.clr4_minHue = float(workConfig.get(setName, "clr4_minHue"))
+    config.clr4_maxHue = float(workConfig.get(setName, "clr4_maxHue"))
+    config.clr4_minSaturation = float(workConfig.get(setName, "clr4_minSaturation"))
+    config.clr4_maxSaturation = float(workConfig.get(setName, "clr4_maxSaturation"))
+    config.clr4_minValue = float(workConfig.get(setName, "clr4_minValue"))
+    config.clr4_maxValue = float(workConfig.get(setName, "clr4_maxValue"))
+    config.clr4_dropHueMinValue = float( workConfig.get(setName, "clr4_dropHueMinValue"))
+    config.clr4_dropHueMaxValue = float(workConfig.get(setName, "clr4_dropHueMaxValue"))
+    config.clr4_minAlpha = float(workConfig.get(setName, "clr4_minAlpha"))
+    config.clr4_maxAlpha = float(workConfig.get(setName, "clr4_maxAlpha"))
 
-    config.clr4_minHue = float(workConfig.get("forms", "clr4_minHue"))
-    config.clr4_maxHue = float(workConfig.get("forms", "clr4_maxHue"))
-    config.clr4_minSaturation = float(workConfig.get("forms", "clr4_minSaturation"))
-    config.clr4_maxSaturation = float(workConfig.get("forms", "clr4_maxSaturation"))
-    config.clr4_minValue = float(workConfig.get("forms", "clr4_minValue"))
-    config.clr4_maxValue = float(workConfig.get("forms", "clr4_maxValue"))
-    config.clr4_dropHueMinValue = float( workConfig.get("forms", "clr4_dropHueMinValue"))
-    config.clr4_dropHueMaxValue = float(workConfig.get("forms", "clr4_dropHueMaxValue"))
-    config.clr4_minAlpha = float(workConfig.get("forms", "clr4_minAlpha"))
-    config.clr4_maxAlpha = float(workConfig.get("forms", "clr4_maxAlpha"))
-
-    config.bgFlashRate = float(workConfig.get("forms", "bgFlashRate"))
-    backgroundFlashcolor = (workConfig.get("forms", "backgroundFlashcolor")).split(",")
+    config.bgFlashRate = float(workConfig.get(setName, "bgFlashRate"))
+    backgroundFlashcolor = (workConfig.get(setName, "backgroundFlashcolor")).split(",")
     config.backgroundFlashcolor = tuple(int(x) for x in backgroundFlashcolor)
 
-    config.filterPatchProb = float(workConfig.get("forms", "filterPatchProb"))
-    config.filterPatchProbOff = float(workConfig.get("forms", "filterPatchProbOff"))
+    config.filterPatchProb = float(workConfig.get(setName, "filterPatchProb"))
+    config.filterPatchProbOff = float(workConfig.get(setName, "filterPatchProbOff"))
 
     config.director = Director(config)
 
 
-    config.gridSize = int(workConfig.get("forms", "gridSize"))
-    config.unitsToDraw = int(workConfig.get("forms", "unitsToDraw"))
-    config.minW = int(workConfig.get("forms", "minW"))
-    config.maxW = int(workConfig.get("forms", "maxW"))
-    config.minH = int(workConfig.get("forms", "minH"))
-    config.maxH = int(workConfig.get("forms", "maxH"))
-    config.doSortProb = float(workConfig.get("forms", "doSortProb"))
-    config.reversedSortProb = float(workConfig.get("forms", "reversedSortProb"))
+    config.gridSize = int(workConfig.get(setName, "gridSize"))
+    config.unitsToDraw = int(workConfig.get(setName, "unitsToDraw"))
+    config.minW = int(workConfig.get(setName, "minW"))
+    config.maxW = int(workConfig.get(setName, "maxW"))
+    config.minH = int(workConfig.get(setName, "minH"))
+    config.maxH = int(workConfig.get(setName, "maxH"))
+    config.doSortProb = float(workConfig.get(setName, "doSortProb"))
+    config.reversedSortProb = float(workConfig.get(setName, "reversedSortProb"))
 
     config.blockWidth = config.maxW * config.gridSize
     config.blockHeight = config.maxH * config.gridSize
 
 
     # higher = more full color rectangles
-    config.drawFullColorUnit = float(workConfig.get("forms", "drawFullColorUnit"))
+    config.drawFullColorUnit = float(workConfig.get(setName, "drawFullColorUnit"))
     # lower more single color
-    config.drawLeftTriangle = float(workConfig.get("forms", "drawLeftTriangle"))
+    config.drawLeftTriangle = float(workConfig.get(setName, "drawLeftTriangle"))
     # lower = more black/bg
-    config.drawGreyTriangleUnit = float(workConfig.get("forms", "drawGreyTriangleUnit"))
+    config.drawGreyTriangleUnit = float(workConfig.get(setName, "drawGreyTriangleUnit"))
     # lower = more black/bg on left
-    config.drawRedTriangleUnit = float(workConfig.get("forms", "drawRedTriangleUnit"))
+    config.drawRedTriangleUnit = float(workConfig.get(setName, "drawRedTriangleUnit"))
 
-    config.drawTwoTrianglesProb = float(workConfig.get("forms", "drawTwoTrianglesProb"))
+    config.drawTwoTrianglesProb = float(workConfig.get(setName, "drawTwoTrianglesProb"))
 
-    config.drawConcentricEllipse = float(workConfig.get("forms", "drawConcentricEllipse"))
-    config.concentricENum = int(workConfig.get("forms", "concentricENum"))
+    config.drawConcentricEllipse = float(workConfig.get(setName, "drawConcentricEllipse"))
+    config.concentricENum = int(workConfig.get(setName, "concentricENum"))
 
 
     config.unitIndex = 0
-    config.allSquare = workConfig.getboolean("forms", "allSquare")
-    config.drawFullUnitOutline = workConfig.getboolean("forms", "drawFullUnitOutline")
+    config.allSquare = workConfig.getboolean(setName, "allSquare")
+    config.drawFullUnitOutline = workConfig.getboolean(setName, "drawFullUnitOutline")
 
     config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
     config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
 
+
+def main(run=True):
+    global config
+    global expandingRingss
+    global workConfig
+
+    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.draw = ImageDraw.Draw(config.image)
+
+    config.configSets = workConfig.get("forms", "sets").split(",")
+    loadConfigSet(config.configSets[0])
 
     setUp()
     rebuildGrid()

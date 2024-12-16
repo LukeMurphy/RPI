@@ -659,13 +659,13 @@ def emitParticle(i=None):
                 config.pFillRange[2], config.pFillRange[3], 
                 config.pFillRange[4], config.pFillRange[5], 
                 0, 0, 
-                int(config.pFillRange[6]))
+                int(config.pFillRange[6]), ps.config.brightness)
             p.outlineColor = colorutils.getRandomColorHSV(
                 config.pOutlineRange[0], config.pOutlineRange[1], 
                 config.pOutlineRange[2], config.pOutlineRange[3], 
                 config.pOutlineRange[4], config.pOutlineRange[5], 
                 0, 0, 
-                int(config.pOutlineRange[6]))
+                int(config.pOutlineRange[6]), ps.config.brightness)
 
         if random.random() < config.useSecondColorProb:
             p.fillColor = config.fillColor2  # (240,150,0,100)

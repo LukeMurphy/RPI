@@ -426,6 +426,13 @@ def main(run=True):
     # config.debugSelf()
 
     # print(config.__dict__)
+
+    if config.brightness < 1.0 :
+        delta = config.ditherFilterBrightness - config.brightness
+        config.ditherFilterBrightness -= delta/4
+        print(config.ditherFilterBrightness)
+
+
     if run:
         runWork()
 

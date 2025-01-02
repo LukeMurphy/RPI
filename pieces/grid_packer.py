@@ -1,4 +1,9 @@
 # ################################################### #
+# This piece does a dirty grid packing algorithm, mostly un-optimized
+# that can look like some kind of 60's wrapping paper or nothing at all
+# I thought it would be ineresting but can't find a good use yet - maybe
+# thousands of them would be intersting but probably not
+
 import math
 import random
 import time
@@ -122,36 +127,31 @@ def generateUnitImage(dims):
     #         if random.SystemRandom().random() < config.drawRedTriangleUnit :
     #             draw.polygon(((0, dims[1]),(dims[0], 0),(0,0)), fill=clr3)
 
+    cntrPt = [dims[0] / 2, dims[1] / 2]
 
+    if random.SystemRandom().random() < config.drawTwoTrianglesProb:
 
-    cntrPt = [dims[0]/2, dims[1]/2]
-
-
-    if random.SystemRandom().random() < config.drawTwoTrianglesProb :
-
-        if random.SystemRandom().random() < config.drawLeftTriangle :
+        if random.SystemRandom().random() < config.drawLeftTriangle:
             # triangle slop L to R
             clr_t1 = newClr()
 
-            if random.SystemRandom().random() < config.drawRedTriangleUnit :
+            if random.SystemRandom().random() < config.drawRedTriangleUnit:
                 clr_t1 = newClr3()
 
             clr_t2 = clr_t1
-            if random.SystemRandom().random() < config.drawGreyTriangleUnit :
-                clr_t3  = newClr2()
-            else :
+            if random.SystemRandom().random() < config.drawGreyTriangleUnit:
+                clr_t3 = newClr2()
+            else:
                 clr_t3 = newClr()
 
             clr_t4 = clr_t3
-        else :
+        else:
             # triangle slop R to L
             clr_t1 = newClr()
             clr_t2 = newClr()
 
-            if random.SystemRandom().random() < config.drawRedTriangleUnit :
+            if random.SystemRandom().random() < config.drawRedTriangleUnit:
                 clr_t1 = newClr3()
-
-
 
             clr_t3 = clr_t1
             clr_t4 = clr_t2
@@ -161,64 +161,85 @@ def generateUnitImage(dims):
         clr_t3 = newClr()
         clr_t4 = newClr()
 
-            
         # butterfly
         clr_t1 = newClr()
         clr_t3 = newClr2()
 
-        if random.SystemRandom().random() < config.drawGreyTriangleUnit :
+        if random.SystemRandom().random() < config.drawGreyTriangleUnit:
             clr_t3 = newClr2()
 
         clr_t2 = clr_t3
         clr_t4 = clr_t1
 
-        if random.SystemRandom().random() < config.drawLeftTriangle :
+        if random.SystemRandom().random() < config.drawLeftTriangle:
             clr_t1 = config.bgColor
 
-    if random.SystemRandom().random() < config.drawFullColorUnit :
+    if random.SystemRandom().random() < config.drawFullColorUnit:
         clr_t2 = clr_t1
         clr_t3 = clr_t1
         clr_t4 = clr_t1
 
-
-
     # t1
-    draw.polygon(((0,0),(dims[0], 0),(cntrPt[0], cntrPt[1])), fill=clr_t1)
+    draw.polygon(((0, 0), (dims[0], 0), (cntrPt[0], cntrPt[1])), fill=clr_t1)
     # t2
-    draw.polygon(((0,0),(cntrPt[0], cntrPt[1]),(0, dims[1])), fill=clr_t2)
+    draw.polygon(((0, 0), (cntrPt[0], cntrPt[1]), (0, dims[1])), fill=clr_t2)
     # # t3
-    draw.polygon(((dims[0], 0),(cntrPt[0], cntrPt[1]),(dims[0], dims[1])), fill=clr_t3)
+    draw.polygon(
+        ((dims[0], 0), (cntrPt[0], cntrPt[1]), (dims[0], dims[1])), fill=clr_t3
+    )
     # # t4
-    draw.polygon(((0, dims[1]),(cntrPt[0], cntrPt[1]),(dims[0], dims[1])), fill=clr_t4)
-    
-    
+    draw.polygon(
+        ((0, dims[1]), (cntrPt[0], cntrPt[1]), (dims[0], dims[1])), fill=clr_t4
+    )
+
     clr_t1a = newClr()
     # clr_t1a = clr_t2
 
-    if random.SystemRandom().random() < config.drawConcentricEllipse :
-        radius = [dims[0],dims[1]]
-        for ii in range( 5 , 5 - config.concentricENum, -1) :
-            radius[0] = 1/8 * (ii - 1) * dims[0]
-            radius[1] = 1/8 * (ii - 1) * dims[1]
-            draw.ellipse(((cntrPt[0]-radius[0], cntrPt[1]-radius[1]),(cntrPt[0] + radius[0], cntrPt[1] + radius[1])), fill=None, outline=clr_t1a, width=3)
+    if random.SystemRandom().random() < config.drawConcentricEllipse:
+        radius = [dims[0], dims[1]]
+        for ii in range(5, 5 - config.concentricENum, -1):
+            radius[0] = 1 / 8 * (ii - 1) * dims[0]
+            radius[1] = 1 / 8 * (ii - 1) * dims[1]
+            draw.ellipse(
+                (
+                    (cntrPt[0] - radius[0], cntrPt[1] - radius[1]),
+                    (cntrPt[0] + radius[0], cntrPt[1] + radius[1]),
+                ),
+                fill=None,
+                outline=clr_t1a,
+                width=3,
+            )
 
     if config.drawFullUnitOutline:
         otlineClr = newClr4()
-        draw.rectangle((0,0,dims[0], dims[1]), fill=None, outline=otlineClr, width=3)
+        draw.rectangle(
+            (0, 0, dims[0], dims[1]),
+            fill=None,
+            outline=otlineClr,
+            width=config.outlineWidth,
+        )
+        
+    image = image.rotate(config.randomRotation  -  2 * config.randomRotation * random.SystemRandom().random())
 
     return image
 
 
-def removeFromAvailable(lastX ,lastY, unitFills):
-    for h in range(lastY, lastY+unitFills[1], config.gridSize) :
-        for w in range(lastX, lastX+unitFills[0],  config.gridSize) :
-            for ii in range(0, len(config.availableSpots)) :
-                if config.availableSpots[ii][0] == w and config.availableSpots[ii][1] == h :
+def removeFromAvailable(lastX, lastY, unitFills):
+    for h in range(lastY, lastY + unitFills[1], config.gridSize):
+        for w in range(lastX, lastX + unitFills[0], config.gridSize):
+            for ii in range(0, len(config.availableSpots)):
+                if (
+                    config.availableSpots[ii][0] == w
+                    and config.availableSpots[ii][1] == h
+                ):
                     config.availableSpots[ii][2] = False
 
 
-def linearPlacer(doSort = False, reversedSort = False):
-    if doSort : config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=reversedSort)
+def linearPlacer(doSort=False, reversedSort=False):
+    if doSort:
+        config.unitFills = sorted(
+            config.unitFills, key=lambda w: w[0] * w[1], reverse=reversedSort
+        )
 
     lastX = 0
     lastY = 0
@@ -226,26 +247,28 @@ def linearPlacer(doSort = False, reversedSort = False):
     for i in range(0, len(config.unitFills)):
         img = generateUnitImage(config.unitFills[i])
 
-        if (lastX + config.unitFills[i][0] + 0) > config.canvasWidth :
+        if (lastX + config.unitFills[i][0] + 0) > config.canvasWidth:
             lastX = 0
             lastY += lastHighest
-            removeFromAvailable(lastX ,lastY, config.unitFills[i])
+            removeFromAvailable(lastX, lastY, config.unitFills[i])
             lastHighest = config.unitFills[i][1]
-            config.image.paste(img,(lastX ,lastY),img)
+            config.image.paste(img, (lastX, lastY), img)
 
             lastX += config.unitFills[i][0] + 0
-        else :
-            config.image.paste(img,(lastX ,lastY),img)
-            removeFromAvailable(lastX ,lastY, config.unitFills[i])
+        else:
+            config.image.paste(img, (lastX, lastY), img)
+            removeFromAvailable(lastX, lastY, config.unitFills[i])
             lastX += config.unitFills[i][0] + 0
 
         if config.unitFills[i][1] >= lastHighest:
             lastHighest = config.unitFills[i][1]
 
 
-def simplePlacer(doSort = False, reversedSort = False):
-    if doSort : 
-        config.unitFills = sorted(config.unitFills, key=lambda w: w[0] * w[1] , reverse=reversedSort)
+def simplePlacer(doSort=False, reversedSort=False):
+    if doSort:
+        config.unitFills = sorted(
+            config.unitFills, key=lambda w: w[0] * w[1], reverse=reversedSort
+        )
     lastX = 0
     lastY = 0
     lastHighest = 0
@@ -258,62 +281,87 @@ def simplePlacer(doSort = False, reversedSort = False):
         # print(searchRadius)
         insertIndex = 0
         canFit = False
-        for s in range(0, len(config.availableSpots)) :
-            if config.availableSpots[s][2] :
+
+        for s in range(config.maxStartPoint, len(config.availableSpots)):
+            if config.availableSpots[s][2]:
                 sY = config.availableSpots[s][1]
                 eY = config.availableSpots[s][1] + config.unitFills[unitIndex][1]
                 sX = config.availableSpots[s][0]
                 eX = config.availableSpots[s][0] + config.unitFills[unitIndex][0]
                 keepGoing = True
-                for h in range (sY, eY ,config.gridSize ) :
-                    if keepGoing :
-                        for w in range (sX, eX,config.gridSize ) :
-                            if keepGoing :
+                for h in range(sY, eY, config.gridSize):
+                    if keepGoing:
+                        for w in range(sX, eX, config.gridSize):
+                            if keepGoing:
                                 indx = -1
-                                try :
-                                    indx = config.availableSpots.index([w,h,True])
-                                except ValueError :
+                                try:
+                                    indx = config.availableSpots.index([w, h, True])
+                                except ValueError:
                                     indx = -1
                                     # print("not found")
-                                if indx != -1 : 
+                                if indx != -1:
                                     canFit = True
                                     insertIndex = s
-                                else :
+                                else:
                                     canFit = False
                                     keepGoing = False
 
-                if canFit :
+                if canFit:
                     break
 
-
-        if canFit :
-            config.image.paste(img,(config.availableSpots[insertIndex][0] ,config.availableSpots[insertIndex][1]),img)
-            removeFromAvailable(config.availableSpots[insertIndex][0] ,config.availableSpots[insertIndex][1], config.unitFills[unitIndex])
+        if canFit:
+            if s > len(config.availableSpots) / 3 and s > config.maxStartPoint:
+                config.maxStartPoint = s - 100
+                # print(f"new start @{config.maxStartPoint}")
+            config.image.paste(
+                img,
+                (
+                    config.availableSpots[insertIndex][0],
+                    config.availableSpots[insertIndex][1],
+                ),
+                img,
+            )
+            removeFromAvailable(
+                config.availableSpots[insertIndex][0],
+                config.availableSpots[insertIndex][1],
+                config.unitFills[unitIndex],
+            )
 
 
 def drawGrid():
     # linearPlacer(True)
     # linearPlacer(False)
     # simplePlacer(doSort, reversedSort)
-
     if config.unitIndex < len(config.unitFills):
+        t1 = time.process_time()
         simplePlacer(config.doSort, config.reversedSort)
+        config.unitIndex += 1
 
-    config.unitIndex += 1
+        t2 = time.process_time() - t1
+        if t2 > config.maxTime:
+            config.maxTime = t2
 
-    # if (config.unitIndex >= len(config.unitFills)) :
-    #     config.unitIndex = 0
+        # if (config.unitIndex >= len(config.unitFills)) :
+        #     config.unitIndex = 0
 
-    # FOR DEBUGGING!
-    # for i in range(0, len(config.availableSpots)) :
-    #     if(config.availableSpots[i][2]) : 
-    #         config.draw.rectangle((config.availableSpots[i][0], config.availableSpots[i][1],config.availableSpots[i][0]+1, config.availableSpots[i][1]+1), fill=(0,0,255))
+        # FOR DEBUGGING!
+        # config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,155,0))
+        # availSpotCount = 0
+        # for i in range(0, len(config.availableSpots)) :
+        #     if(config.availableSpots[i][2]) :
+        #         availSpotCount += 1
+        #         config.draw.rectangle((config.availableSpots[i][0], config.availableSpots[i][1],config.availableSpots[i][0]+1, config.availableSpots[i][1]+1), fill=(0,0,15), outline=(0,0,255))
+        # size of avail: {availSpotCount}"
+        # print(f"Current index {config.unitIndex} processed : {round(config.maxTime*1000)/1000}")
+    else:
+        if random.random() < config.bgFlashRate:
+            reDraw(config)
 
 
 def reDraw(config):
-        rebuildGrid()
-        setUp()
-        drawGrid()
+    rebuildGrid()
+    setUp()
+    drawGrid()
 
 
 def iterate():
@@ -326,13 +374,13 @@ def iterate():
         # config.draw.rectangle(
         #     (0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor
         # )
-     
-        if random.random() < config.bgFlashRate :
-            # config.draw.rectangle(
-            #     (0, 0, config.screenWidth, config.screenHeight),
-            #     fill=config.bgColor,
-            # )
-            reDraw(config)
+
+        # if random.random() < config.bgFlashRate :
+        # config.draw.rectangle(
+        #     (0, 0, config.screenWidth, config.screenHeight),
+        #     fill=config.bgColor,
+        # )
+        # reDraw(config)
         # Do the final rendering of the composited image
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
@@ -366,28 +414,43 @@ def setUp():
     config.bgColor = newBGClr()
     config.availableSpots = []
 
-    for h in range(0, config.canvasHeight, config.gridSize) :
-        for w in range(0, config.canvasWidth, config.gridSize) :
-            config.availableSpots.append([w,h,True])
+    for h in range(0, config.canvasHeight, config.gridSize):
+        for w in range(0, config.canvasWidth, config.gridSize):
+            config.availableSpots.append([w, h, True])
 
 
 def rebuildGrid():
     config.unitFills = []
+    config.maxStartPoint = 0
 
-    for i in range(0,config.unitsToDraw ) :
-        if config.allSquare :
-            wd = round(random.SystemRandom().uniform(config.minW,config.maxW))* config.gridSize
-            config.unitFills.append((wd,wd) )
-        else :
-            config.unitFills.append((round(random.SystemRandom().uniform(config.minW,config.maxW))* config.gridSize, round(random.SystemRandom().uniform(config.minH,config.maxH))* config.gridSize) )
+    for i in range(0, config.unitsToDraw):
+        if config.allSquare:
+            wd = (
+                round(random.SystemRandom().uniform(config.minW, config.maxW))
+                * config.gridSize
+            )
+            config.unitFills.append((wd, wd))
+        else:
+            config.unitFills.append(
+                (
+                    round(random.SystemRandom().uniform(config.minW, config.maxW))
+                    * config.gridSize,
+                    round(random.SystemRandom().uniform(config.minH, config.maxH))
+                    * config.gridSize,
+                )
+            )
 
     config.unitIndex = 0
 
-    config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
-    config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
+    config.doSort = (
+        True if random.SystemRandom().random() < config.doSortProb else False
+    )
+    config.reversedSort = (
+        True if random.SystemRandom().random() < config.reversedSortProb else False
+    )
 
 
-def loadConfigSet(setName) :
+def loadConfigSet(setName):
 
     config.redrawSpeed = float(workConfig.get(setName, "redrawSpeed"))
     config.slotRate = float(workConfig.get(setName, "slotRate"))
@@ -420,7 +483,7 @@ def loadConfigSet(setName) :
     config.clr2_maxSaturation = float(workConfig.get(setName, "clr2_maxSaturation"))
     config.clr2_minValue = float(workConfig.get(setName, "clr2_minValue"))
     config.clr2_maxValue = float(workConfig.get(setName, "clr2_maxValue"))
-    config.clr2_dropHueMinValue = float( workConfig.get(setName, "clr2_dropHueMinValue"))
+    config.clr2_dropHueMinValue = float(workConfig.get(setName, "clr2_dropHueMinValue"))
     config.clr2_dropHueMaxValue = float(workConfig.get(setName, "clr2_dropHueMaxValue"))
     config.clr2_minAlpha = float(workConfig.get(setName, "clr2_minAlpha"))
     config.clr2_maxAlpha = float(workConfig.get(setName, "clr2_maxAlpha"))
@@ -431,7 +494,7 @@ def loadConfigSet(setName) :
     config.clr3_maxSaturation = float(workConfig.get(setName, "clr3_maxSaturation"))
     config.clr3_minValue = float(workConfig.get(setName, "clr3_minValue"))
     config.clr3_maxValue = float(workConfig.get(setName, "clr3_maxValue"))
-    config.clr3_dropHueMinValue = float( workConfig.get(setName, "clr3_dropHueMinValue"))
+    config.clr3_dropHueMinValue = float(workConfig.get(setName, "clr3_dropHueMinValue"))
     config.clr3_dropHueMaxValue = float(workConfig.get(setName, "clr3_dropHueMaxValue"))
     config.clr3_minAlpha = float(workConfig.get(setName, "clr3_minAlpha"))
     config.clr3_maxAlpha = float(workConfig.get(setName, "clr3_maxAlpha"))
@@ -442,10 +505,12 @@ def loadConfigSet(setName) :
     config.clr4_maxSaturation = float(workConfig.get(setName, "clr4_maxSaturation"))
     config.clr4_minValue = float(workConfig.get(setName, "clr4_minValue"))
     config.clr4_maxValue = float(workConfig.get(setName, "clr4_maxValue"))
-    config.clr4_dropHueMinValue = float( workConfig.get(setName, "clr4_dropHueMinValue"))
+    config.clr4_dropHueMinValue = float(workConfig.get(setName, "clr4_dropHueMinValue"))
     config.clr4_dropHueMaxValue = float(workConfig.get(setName, "clr4_dropHueMaxValue"))
     config.clr4_minAlpha = float(workConfig.get(setName, "clr4_minAlpha"))
     config.clr4_maxAlpha = float(workConfig.get(setName, "clr4_maxAlpha"))
+    config.outlineWidth = int(workConfig.get(setName, "outlineWidth"))
+    config.randomRotation = float(workConfig.get(setName, "randomRotation"))
 
     config.bgFlashRate = float(workConfig.get(setName, "bgFlashRate"))
     backgroundFlashcolor = (workConfig.get(setName, "backgroundFlashcolor")).split(",")
@@ -455,7 +520,6 @@ def loadConfigSet(setName) :
     config.filterPatchProbOff = float(workConfig.get(setName, "filterPatchProbOff"))
 
     config.director = Director(config)
-
 
     config.gridSize = int(workConfig.get(setName, "gridSize"))
     config.unitsToDraw = int(workConfig.get(setName, "unitsToDraw"))
@@ -469,6 +533,13 @@ def loadConfigSet(setName) :
     config.blockWidth = config.maxW * config.gridSize
     config.blockHeight = config.maxH * config.gridSize
 
+    config.unitsToDraw = round(
+        config.canvasWidth
+        / ((config.maxW + config.minW) / 2 * config.gridSize)
+        * config.canvasHeight
+        / ((config.minH + config.maxH) / 2 * config.gridSize)
+    )
+    print("total units possible: {}", config.unitsToDraw)
 
     # higher = more full color rectangles
     config.drawFullColorUnit = float(workConfig.get(setName, "drawFullColorUnit"))
@@ -484,19 +555,25 @@ def loadConfigSet(setName) :
     config.drawConcentricEllipse = float(workConfig.get(setName, "drawConcentricEllipse"))
     config.concentricENum = int(workConfig.get(setName, "concentricENum"))
 
-
     config.unitIndex = 0
     config.allSquare = workConfig.getboolean(setName, "allSquare")
     config.drawFullUnitOutline = workConfig.getboolean(setName, "drawFullUnitOutline")
 
-    config.doSort = True if random.SystemRandom().random() < config.doSortProb else False
-    config.reversedSort = True if random.SystemRandom().random() < config.reversedSortProb else False
+    config.doSort = (
+        True if random.SystemRandom().random() < config.doSortProb else False
+    )
+    config.reversedSort = (
+        True if random.SystemRandom().random() < config.reversedSortProb else False
+    )
 
 
 def main(run=True):
     global config
     global expandingRingss
     global workConfig
+
+    config.maxTime = 0
+    config.maxStartPoint = 0
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
@@ -507,7 +584,9 @@ def main(run=True):
     setUp()
     rebuildGrid()
     config.bgColor = newBGClr()
-    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight),fill=config.bgColor)
+    config.draw.rectangle(
+        (0, 0, config.screenWidth, config.screenHeight), fill=config.bgColor
+    )
     drawGrid()
 
 
@@ -519,4 +598,3 @@ def runWork():
     while True:
         iterate()
         time.sleep(config.redrawSpeed)
- 

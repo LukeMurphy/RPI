@@ -53,6 +53,12 @@ class Point:
             self.direction = -1
 
         self.direction = 1
+        self.xPos = round(random.uniform(config.xRangeMin, config.xRangeMax))
+        self.yPos = round(random.uniform(config.yRangeMin, config.yRangeMax))
+        if random.random() < config.chanceParticleComesFromOppositeSide:
+            self.xPos = round(random.uniform(config.canvasWidth - config.xRangeMin, config.canvasWidth - config.xRangeMax))
+            self.direction = -1
+            
         self.xSpeed = random.uniform(config.xSpeedRangeMin, config.xSpeedRangeMax)
         self.ySpeed = random.uniform(config.ySpeedRangeMin, config.ySpeedRangeMax)
 
@@ -63,8 +69,6 @@ class Point:
         self.xSpeedInit = self.xSpeed
         self.ySpeedInit = self.ySpeed
 
-        self.xPos = round(random.uniform(config.xRangeMin, config.xRangeMax))
-        self.yPos = round(random.uniform(config.yRangeMin, config.yRangeMax))
 
         dx = self.xPos
         dy = self.yPos
@@ -203,7 +207,7 @@ def runWork():
 def iterate():
     global config
 
-    config.draw.rectangle((0, 0, 400, 400), fill=(
+    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(
         config.fillColor[0], config.fillColor[1], config.fillColor[2], config.fillColorAlpha))
 
     # Run through the elements to update
@@ -282,10 +286,12 @@ def iterate():
 
         startX = round(random.uniform(0, config.filterRemapRangeX))
         startY = round(random.uniform(0, config.filterRemapRangeY))
-        endX = round(random.uniform(128, config.filterRemapminHoriSize))
-        endY = round(random.uniform(64, config.filterRemapminVertSize))
+        endX = round(random.uniform(config.filterRemapminMinHoriSize, config.filterRemapminHoriSize + startX))
+        endY = round(random.uniform(config.filterRemapminMinVertSize, config.filterRemapminVertSize +  startY))
         config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
         config.remapImageBlockDestination = [startX, startY]
+        print(config.remapImageBlockSection)
+        print(config.remapImageBlockDestination)
 
 
     temp1 = config.image.copy()
@@ -305,14 +311,14 @@ def iterate():
     # temp1.paste(temp2, (0, 96))
     
     
-    temp2 = temp2.crop((360, 0, 440, 400))
-    temp2 = temp2.rotate(90, 3, True)
+    # temp2 = temp2.crop((360, 0, 440, 400))
+    # temp2 = temp2.rotate(90, 3, True)
 
     # temp3 = temp1.rotate(0)
-    temp3 = temp1.crop((0, 160, 440, 200))
+    # temp3 = temp1.crop((0, 160, 440, 200))
 
-    temp1.paste(temp2, (0, 100))
-    temp1.paste(temp3, (0, 160))
+    # temp1.paste(temp2, (0, 100))
+    # temp1.paste(temp3, (0, 160))
 
 
 
@@ -353,29 +359,16 @@ def main(run=True):
     config.ySpeedRangeMax = float(workConfig.get("Points", "ySpeedRangeMax"))
     config.speedRange = float(workConfig.get("Points", "speedRange"))
 
-    try:
-        config.changeMovementProb = float(workConfig.get("Points", "changeMovementProb"))
-    except Exception as e:
-        print(str(e))
-        config.changeMovementProb = .001
+    config.chanceParticleComesFromOppositeSide = float(workConfig.get("Points", "chanceParticleComesFromOppositeSide"))
+    config.changeMovementProb = float(workConfig.get("Points", "changeMovementProb"))
+
 
     config.noXMovement = False
     config.noYMovement = False
 
+    config.colorChangeProb = float(workConfig.get("Points", "colorChangeProb"))
+    config.changeShapeProb = float(workConfig.get("Points", "changeShapeProb"))
 
-
-
-    try:
-        config.colorChangeProb = float(workConfig.get("Points", "colorChangeProb"))
-    except Exception as e:
-        print(str(e))
-        config.colorChangeProb = .003
-
-    try:
-        config.changeShapeProb = float(workConfig.get("Points", "changeShapeProb"))
-    except Exception as e:
-        print(str(e))
-        config.changeShapeProb = .001
 
     config.movementModel = (workConfig.get("Points", "movementModel"))
 
@@ -429,6 +422,8 @@ def main(run=True):
     config.filterRemappingProb = float(workConfig.get("Points", "filterRemappingProb"))
     config.filterRemapRangeX = int(workConfig.get("Points", "filterRemapRangeX"))
     config.filterRemapRangeY = int(workConfig.get("Points", "filterRemapRangeY"))
+    config.filterRemapminMinHoriSize = int(workConfig.get("Points", "filterRemapminMinHoriSize"))
+    config.filterRemapminMinVertSize = int(workConfig.get("Points", "filterRemapminMinVertSize"))
     config.filterRemapminHoriSize = int(workConfig.get("Points", "filterRemapminHoriSize"))
     config.filterRemapminVertSize = int(workConfig.get("Points", "filterRemapminVertSize"))
     config.blurImageBlockSection = [0, 0, 0, 0]

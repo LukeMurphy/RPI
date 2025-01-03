@@ -460,8 +460,8 @@ def main(run=True):
             map(lambda x: (float(x) * config.brightness), pOutlineRange)
         )
     except Exception as e:
+        print(f"error : {str(e)} with pUseHSV")
         config.pUseHSV = False
-        print(str(e))
 
     # second color for some particles
     try:

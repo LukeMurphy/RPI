@@ -2,6 +2,10 @@
 configGroup=""
 machine="local"
 
+# MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK
+# sudo visudo
+# user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown
+
 # Where the player and configs all live -- changes based on machine setup
 path="/home/daemon102/Documents/RPI/"
 

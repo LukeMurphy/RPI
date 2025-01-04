@@ -93,7 +93,7 @@ def loadFromArguments(reloading=False, config=None):
     """
     # global config, workconfig, path, tempImage, threads, thrd
 
-    print(bcolors.OKBLUE + "** RELOADING: " + str(reloading) + bcolors.ENDC)
+    print(f"{bcolors.OKBLUE}** RELOADING: {str(reloading)}{bcolors.ENDC}")
 
     if reloading is False:
         try:
@@ -129,16 +129,16 @@ def loadFromArguments(reloading=False, config=None):
                 config.initialArgs = args.cfg
                 config.MID = args.mname
                 config.path = args.path
-                
+
                 # Automating the config path a bit better
                 # assumes that if no -path is specified, it defaults to ./ so 
                 # just to be sure get the abs path
                 if config.path == './' :
                     # config.path = os.getcwd() + "/"
                     config.path = __file__.replace('player.py','')+ "/"
-                    
 
-                argument = config.path + "/configs/" + args.cfg  # + ".cfg"
+
+                argument = f"{config.path}/configs/{args.cfg}"
                 workconfig.read(argument)
 
                 config.loadFromArguments = loadFromArguments
@@ -157,17 +157,17 @@ def loadFromArguments(reloading=False, config=None):
                 config.delta = int((config.startTime - f))
                 config.deltaWorkFile = int((config.startTime - f))
                 print(bcolors.OKGREEN)
-                
+
                 print("-----------------------------------------")
                 print ("script: sys.argv[0] is", repr(sys.argv[0]))
                 print ("script: __file__ is", repr(__file__))
                 print ("script: cwd is", repr(os.getcwd()))
                 print ("config: path  is", repr(args.path))
                 print ("config: path  is", args.path)
-                print ("-cfg argument: is", str(argument))
-                print ("Last Modified Delta: is", str(config.delta))
-                print("-----------------------------------------" + bcolors.ENDC)
-                
+                print("-cfg argument: is", argument)
+                print("Last Modified Delta: is", config.delta)
+                print(f"-----------------------------------------{bcolors.ENDC}")
+
             else:
                 # Machine ID
                 config.MID = "local"
@@ -185,7 +185,7 @@ def loadFromArguments(reloading=False, config=None):
                     + " to run. **"
                     + bcolors.ENDC
                 )
-                workconfig.read(config.path + "configs/" + config.WRKINID + ".cfg")
+                workconfig.read(f"{config.path}configs/{config.WRKINID}" + ".cfg")
                 print(bcolors.OKGREEN + "** ")
                 for c in workconfig:
                     print(c)

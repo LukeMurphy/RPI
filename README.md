@@ -93,4 +93,19 @@ X-GNOME-Autostart-Delay=1
 ```
 
 
+Overview
+This Python script, player.py, is the main entry point for running LED art installations. It loads configuration files, initializes the system, and starts the artwork playback. It supports command-line arguments for specifying the configuration file, machine name, and an optional brightness override. The script is designed to be run directly and also supports reloading configurations.
 
+Key Components
+Configuration Loading: The script uses the configparser library to parse configuration files (.cfg). It prioritizes command-line arguments for specifying the config file path. If no configuration is provided via command line, it defaults to a hardcoded path and configuration. The configuration files contain settings for the artwork.
+Command-line Arguments: The script uses argparse to handle command-line arguments:
+-mname: Specifies the machine name (defaults to "local").
+-path: Specifies the base directory for relative paths (defaults to "./").
+-cfg: Specifies the path to the configuration file (required).
+-brightnessOverride: An optional argument to override the brightness specified in the configuration file.
+loadFromArguments() function: This function is the core of the initialization process. It reads the command-line arguments, loads the specified configuration file, and initializes the config object with the loaded settings. It also handles reloading configurations when called with the reloading parameter set to True.
+player.configure(): This function, imported from the modules.player module, is called by loadFromArguments() to set up the artwork based on the loaded configuration. This is where the specific artwork logic is initialized and started.
+main() function: The entry point of the script. It calls loadFromArguments() to start the process.
+Default Configuration: If no -cfg argument is provided, the script defaults to loading a configuration specified by defaultpiece.defaultPieceToRun within the configs directory. This allows for a fallback behavior when no configuration is explicitly specified.
+Error Handling: Basic error handling is implemented using try...except blocks to catch configuration loading errors.
+Path Resolution: The script uses __file__ to determine the absolute path of the script's location, which is used to resolve relative paths in the configuration. This ensures that the script can be run from different locations without issues.

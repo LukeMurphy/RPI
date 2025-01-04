@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import math
 import random
 import textwrap
@@ -18,7 +19,7 @@ from PIL import (
 )
 import noise
 from noise import *
-from modules.holder_director import Holder 
+from modules.holder_director import Holder
 from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -42,16 +43,16 @@ class WaveDeformer:
     def getmesh(self, img):
         self.w, self.h = img.size
 
-        target_grid = []
-        for x in range(0, self.w, config.wavegridspace):
-            for y in range(0, self.h, config.wavegridspace):
-                target_grid.append(
-                    (x, y, x + config.wavegridspace, y + config.wavegridspace)
-                )
-
+        target_grid = [
+            (x, y, x + config.wavegridspace, y + config.wavegridspace)
+            for x, y in itertools.product(
+                range(0, self.w, config.wavegridspace),
+                range(0, self.h, config.wavegridspace),
+            )
+        ]
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
 
-        return [t for t in zip(target_grid, source_grid)]
+        return list(zip(target_grid, source_grid))
 
 
 def main(run=True):
@@ -102,7 +103,7 @@ def main(run=True):
             workConfig.get("particleSystem", "changechangeCohesionProb")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.changechangeCohesionProb = 0.0005
 
     ps.useFlocking = workConfig.getboolean("particleSystem", "useFlocking")
@@ -153,7 +154,7 @@ def main(run=True):
         )
         config.renderDiagnosticsCall = renderDiagnosticsCall
     except Exception as e:
-        print(str(e))
+        print(e)
         config.renderDiagnostics = False
 
     # managing speed of animation and framerate
@@ -162,7 +163,7 @@ def main(run=True):
     try:
         config.delay = float(workConfig.get("particleSystem", "delay"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.delay = 0.01
         ps.delay = 0.01
     try:
@@ -170,32 +171,32 @@ def main(run=True):
             workConfig.get("particleSystem", "slotRate")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
         config.directorController.slotRate = 0.03
 
     try:
         ps.meanderFactor = float(workConfig.get("particleSystem", "meanderFactor"))
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.meanderFactor = 1.0
 
     try:
         ps.meanderFactor2 = float(workConfig.get("particleSystem", "meanderFactor2"))
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.meanderFactor2 = 90.0
 
     try:
         ps.meanderDirection = int(workConfig.get("particleSystem", "meanderDirection"))
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.meanderDirection = 0
 
     try:
         ps.objTrails = workConfig.getboolean("particleSystem", "objTrails")
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.objTrails = True
 
     try:
@@ -231,7 +232,7 @@ def main(run=True):
         config.colOverlayA.colorTransitionSetup()
 
     except Exception as e:
-        print(str(e))
+        print(e)
         config.bgTransitions = False
 
     try:
@@ -239,7 +240,7 @@ def main(run=True):
             "particleSystem", "linearMotionAlsoHorizontal"
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.linearMotionAlsoHorizontal = True
 
     try:
@@ -568,7 +569,7 @@ def main(run=True):
 
     config.xPos = 0
 
-    for i in range(0, ps.numUnits):
+    for i in range(ps.numUnits):
         emitParticle()
 
     setUp()
@@ -673,10 +674,45 @@ def emitParticle(i=None):
             p.extraOutlineColor = config.extraOutlineColor2
 
         if config.pixelsGoGray == True:
-            p.greyRate = random.uniform(config.greyRate / 4, config.greyRate)
-            # p.greyRate = config.greyRate
+            _extracted_from_emitParticle_94(config, p)
+    if ps.movement == "linearMotion":
 
-            """
+        _extracted_from_emitParticle_158(config, p, ps)
+    if i != None:
+        ps.unitArray[i] = p
+    else:
+        ps.unitArray.append(p)
+
+
+# TODO Rename this here and in `emitParticle`
+def _extracted_from_emitParticle_158(config, p, ps):
+    p.xPosR = int(random.uniform(0, config.canvasWidth))
+    p.yPosR = int(random.uniform(0, config.canvasHeight))
+    # config.canvasHeight/3 - p.objHeight/4 #
+
+    directions = [0, math.pi, math.pi / 2, -math.pi / 2]
+    origins = [
+        (-p.objWidth, p.yPosR),
+        (config.canvasWidth + p.objWidth, p.yPosR),
+        (p.xPosR, -p.objHeight),
+        (p.xPosR, config.canvasHeight + p.objHeight),
+    ]
+    dirVal = round(random.uniform(0, 1))
+
+    if ps.linearMotionAlsoHorizontal == True:
+        dirVal = round(random.uniform(0, 3))
+
+    p.direction = directions[dirVal]
+    p.xPosR = origins[dirVal][0]
+    p.yPosR = origins[dirVal][1]
+
+
+# TODO Rename this here and in `emitParticle`
+def _extracted_from_emitParticle_94(config, p):
+    p.greyRate = random.uniform(config.greyRate / 4, config.greyRate)
+    # p.greyRate = config.greyRate
+
+    """
 			0.2989, 0.5870, 0.1140
 			from BT.601 : Studio encoding parameters of digital television for standard 4:3 and wide screen 16:9 aspect ratios
 
@@ -690,77 +726,50 @@ def emitParticle(i=None):
 
 			"""
 
-            if config.pixelsGoGrayModel == 3:
-                # BT.601
-                rRatio = 0.2989
-                gRatio = 0.5870
-                bRatio = 0.1140
-            elif config.pixelsGoGrayModel == 2:
-                # Luminosity
-                rRatio = 0.21
-                gRatio = 0.72
-                bRatio = 0.07
-            else:
-                # Average
-                rRatio = 0.33
-                gRatio = 0.33
-                bRatio = 0.33
-
-            p.outlineGrey = (
-                rRatio * p.outlineColor[0]
-                + gRatio * p.outlineColor[1]
-                + bRatio * p.outlineColor[2]
-            )
-            p.outlineGreyRate = [
-                (p.outlineGrey - p.outlineColor[0]) / p.greyRate,
-                (p.outlineGrey - p.outlineColor[1]) / p.greyRate,
-                (p.outlineGrey - p.outlineColor[2]) / p.greyRate,
-            ]
-
-            p.fillGrey = (
-                rRatio * p.fillColor[0]
-                + gRatio * p.fillColor[1]
-                + bRatio * p.fillColor[2]
-            )
-
-            p.fillGreyRate = [
-                (p.fillGrey - p.fillColor[0]) / p.greyRate,
-                (p.fillGrey - p.fillColor[1]) / p.greyRate,
-                (p.fillGrey - p.fillColor[2]) / p.greyRate,
-            ]
-
-            # print("Fill", p.fillColor)
-            # print("Fill Grey, GreayRate",p.fillGrey, p.fillGreyRate )
-
-            p.fillColorRawValues = tuple(float(i) for i in p.fillColor)
-            p.outlineColorRawValues = tuple(float(i) for i in p.outlineColor)
-
-    if ps.movement == "linearMotion":
-
-        p.xPosR = int(random.uniform(0, config.canvasWidth))
-        p.yPosR = int(random.uniform(0, config.canvasHeight))
-        # config.canvasHeight/3 - p.objHeight/4 #
-
-        directions = [0, math.pi, math.pi / 2, -math.pi / 2]
-        origins = [
-            (-p.objWidth, p.yPosR),
-            (config.canvasWidth + p.objWidth, p.yPosR),
-            (p.xPosR, -p.objHeight),
-            (p.xPosR, config.canvasHeight + p.objHeight),
-        ]
-        dirVal = round(random.uniform(0, 1))
-
-        if ps.linearMotionAlsoHorizontal == True:
-            dirVal = round(random.uniform(0, 3))
-
-        p.direction = directions[dirVal]
-        p.xPosR = origins[dirVal][0]
-        p.yPosR = origins[dirVal][1]
-
-    if i != None:
-        ps.unitArray[i] = p
+    if config.pixelsGoGrayModel == 2:
+        # Luminosity
+        rRatio = 0.21
+        gRatio = 0.72
+        bRatio = 0.07
+    elif config.pixelsGoGrayModel == 3:
+        # BT.601
+        rRatio = 0.2989
+        gRatio = 0.5870
+        bRatio = 0.1140
     else:
-        ps.unitArray.append(p)
+        # Average
+        rRatio = 0.33
+        gRatio = 0.33
+        bRatio = 0.33
+
+    p.outlineGrey = (
+        rRatio * p.outlineColor[0]
+        + gRatio * p.outlineColor[1]
+        + bRatio * p.outlineColor[2]
+    )
+    p.outlineGreyRate = [
+        (p.outlineGrey - p.outlineColor[0]) / p.greyRate,
+        (p.outlineGrey - p.outlineColor[1]) / p.greyRate,
+        (p.outlineGrey - p.outlineColor[2]) / p.greyRate,
+    ]
+
+    p.fillGrey = (
+        rRatio * p.fillColor[0]
+        + gRatio * p.fillColor[1]
+        + bRatio * p.fillColor[2]
+    )
+
+    p.fillGreyRate = [
+        (p.fillGrey - p.fillColor[0]) / p.greyRate,
+        (p.fillGrey - p.fillColor[1]) / p.greyRate,
+        (p.fillGrey - p.fillColor[2]) / p.greyRate,
+    ]
+
+    # print("Fill", p.fillColor)
+    # print("Fill Grey, GreayRate",p.fillGrey, p.fillGreyRate )
+
+    p.fillColorRawValues = tuple(float(i) for i in p.fillColor)
+    p.outlineColorRawValues = tuple(float(i) for i in p.outlineColor)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -853,7 +862,6 @@ def brightnessChanger():
 def setUp():
     global config
     colorize()
-    pass
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -861,7 +869,7 @@ def setUp():
 
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("RUNNING Particle System pieces/singletons/particles.py")
     print(bcolors.ENDC)
 
@@ -924,7 +932,7 @@ def iterate():
                 ps.unitArray.remove(p)
 
                 if len(ps.unitArray) < config.numUnits + 0:
-                    for i in range(0, ps.reEmitNumber):
+                    for i in range(ps.reEmitNumber):
                         emitParticle()
             else:
                 emitParticle(i=ps.unitArray.index(p))
@@ -942,32 +950,9 @@ def iterate():
     # disturb the eveness of things ..
 
     if random.random() < config.optionallegacyToggleProb:
-        if config.legacyUnsharpMask == True:
-            config.legacyUnsharpMask = False
-        else:
-            config.legacyUnsharpMask = True
-
-    if random.random() < config.filterRemappingProb:
-        if config.useFilters == True and config.filterRemapping == True:
-            config.filterRemap = True
-
-            # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
-            # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
-            # endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
-            # endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
-            # new version  more control but may require previous pieces to be re-worked
-            startX = round(random.uniform(0, config.filterRemapRangeX))
-            startY = round(random.uniform(0, config.filterRemapRangeY))
-            endX = round(random.uniform(4, config.filterRemapminHoriSize))
-            endY = round(random.uniform(4, config.filterRemapminVertSize))
-            config.remapImageBlockSection = [
-                startX,
-                startY,
-                startX + endX,
-                startY + endY,
-            ]
-            config.remapImageBlockDestination = [startX, startY]
-
+        config.legacyUnsharpMask = config.legacyUnsharpMask != True
+    if random.random() < config.filterRemappingProb and (config.useFilters == True and config.filterRemapping == True):
+        _extracted_from_iterate_68(config)
     if (
         random.random() < ps.changechangeCohesionProb
         and ps.changeCohesion == True
@@ -998,17 +983,16 @@ def iterate():
     if config.transformShape == True:
         config.image = transformImage(config.image)
 
-    if config.pixelSortProbChange != 0:
-        if random.random() < config.pixelSortProbChange:
-            config.pixSortprobDraw = random.uniform(
-                config.pixelSortProbChangeMin, config.pixelSortProbChangeMax
-            )
+    if config.pixelSortProbChange != 0 and random.random() < config.pixelSortProbChange:
+        config.pixSortprobDraw = random.uniform(
+            config.pixelSortProbChangeMin, config.pixelSortProbChangeMax
+        )
 
     if config.torqueRate != 0:
         xDist = 0
         rows = round(config.canvasHeight / config.torqueDelta)
 
-        for i in range(0, rows):
+        for i in range(rows):
             # counter speed - i.e. faster at top
             # xDist = 1 + (rows -i)/config.torqueRate
             xDist = 1 + (i) / config.torqueRate
@@ -1060,14 +1044,34 @@ def iterate():
     if config.useDrawingPoints == True:
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
+    elif config.useWaveDistortion == False:
+        config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     else:
+        config.xPos += 1
+        config.workImage = ImageOps.deform(config.image, WaveDeformer())
+        config.render(config.workImage, 0, 0)
 
-        if config.useWaveDistortion == False:
-            config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
-        else:
-            config.xPos += 1
-            config.workImage = ImageOps.deform(config.image, WaveDeformer())
-            config.render(config.workImage, 0, 0)
+
+# TODO Rename this here and in `iterate`
+def _extracted_from_iterate_68(config):
+    config.filterRemap = True
+
+    # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
+    # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
+    # endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
+    # endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+    # new version  more control but may require previous pieces to be re-worked
+    startX = round(random.uniform(0, config.filterRemapRangeX))
+    startY = round(random.uniform(0, config.filterRemapRangeY))
+    endX = round(random.uniform(4, config.filterRemapminHoriSize))
+    endY = round(random.uniform(4, config.filterRemapminVertSize))
+    config.remapImageBlockSection = [
+        startX,
+        startY,
+        startX + endX,
+        startY + endY,
+    ]
+    config.remapImageBlockDestination = [startX, startY]
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

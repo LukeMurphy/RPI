@@ -1,3 +1,4 @@
+import contextlib
 import math
 import random
 import textwrap
@@ -7,15 +8,17 @@ from noise import *
 from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.holder_director import Holder 
-from modules.holder_director import Director 
+from modules.holder_director import Holder
+from modules.holder_director import Director
 
-from threading import Timer  
- 
-def setTimeout(fn, ms, *args, **kwargs): 
-    t = Timer(ms / 1000., fn, args=args, kwargs=kwargs) 
-    t.start() 
-    return t 
+from threading import Timer
+
+
+def setTimeout(fn, ms, *args, **kwargs):
+    t = Timer(ms / 1000.0, fn, args=args, kwargs=kwargs)
+    t.start()
+    return t
+
 
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
@@ -23,6 +26,7 @@ def setTimeout(fn, ms, *args, **kwargs):
 from modules import distortions
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 class unit:
 
@@ -209,15 +213,13 @@ class unit:
                 self.colOverlay.colorA = self.fillColor
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
 def drawSquareSpiral():
 
     global config
 
     config.t1 = time.time()
     config.t2 = time.time()
-    
+
     setTimeout(resetToAllowDistortion, 3000)
 
     cntrOffset = [config.cntrOffsetX, config.cntrOffsetY]
@@ -246,37 +248,43 @@ def drawSquareSpiral():
 
     """
 
-    for rows in range(0, config.blockRows):
+    for rows in range(config.blockRows):
 
-        for cols in range(0, config.blockCols):
+        for cols in range(config.blockCols):
 
-            if opticalPattern == "LighteningStrike":
-
+            if opticalPattern == "Diagonals":
+                if cols % 2 > 0 and rows % 2 > 0 or cols % 2 <= 0 and rows % 2 <= 0:
+                    topValues = darkValues
+                    rightValues = darkValues
+                    bottomValues = lightValues
+                    leftValues = lightValues
+                else:
+                    topValues = lightValues
+                    rightValues = lightValues
+                    bottomValues = darkValues
+                    leftValues = darkValues
+            elif opticalPattern == "LighteningStrike":
                 if cols % 2 > 0:
                     if rows % 2 > 0:
                         topValues = lightValues
                         rightValues = darkValues
                         bottomValues = darkValues
-                        leftValues = lightValues
                     else:
                         topValues = darkValues
                         rightValues = darkValues
                         bottomValues = lightValues
-                        leftValues = lightValues
+                    leftValues = lightValues
                 else:
                     if rows % 2 > 0:
                         topValues = darkValues
                         rightValues = lightValues
                         bottomValues = lightValues
-                        leftValues = darkValues
                     else:
                         topValues = lightValues
                         rightValues = lightValues
                         bottomValues = darkValues
-                        leftValues = darkValues
-
+                    leftValues = darkValues
             elif opticalPattern == "LighteningStrikeH":
-
                 if cols % 2 == 0:
                     if rows % 2 == 0:
                         topValues = lightValues
@@ -300,32 +308,7 @@ def drawSquareSpiral():
                         bottomValues = lightValues
                         leftValues = lightValues
 
-            elif opticalPattern == "Diagonals":
-
-                if cols % 2 > 0:
-                    if rows % 2 > 0:
-                        topValues = darkValues
-                        rightValues = darkValues
-                        bottomValues = lightValues
-                        leftValues = lightValues
-                    else:
-                        topValues = lightValues
-                        rightValues = lightValues
-                        bottomValues = darkValues
-                        leftValues = darkValues
-                else:
-                    if rows % 2 > 0:
-                        topValues = lightValues
-                        rightValues = lightValues
-                        bottomValues = darkValues
-                        leftValues = darkValues
-                    else:
-                        topValues = darkValues
-                        rightValues = darkValues
-                        bottomValues = lightValues
-                        leftValues = lightValues
             else:
-
                 topValues = lightValues
                 rightValues = lightValues
                 bottomValues = darkValues
@@ -351,22 +334,44 @@ def drawSquareSpiral():
             rangeChange = (config.polyDistortionMin, config.polyDistortionMax)
 
             for i in range(1, turns):
-                x = i * b1 + cntr[0] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
-                y = i * b2 + cntr[1]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
+                x = (
+                    i * b1
+                    + cntr[0]
+                    + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                )
+                y = (
+                    i * b2 + cntr[1]
+                )  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 A.append((x, y))
 
-                x = -i * b1 + cntr[0]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
-                y = i * b2 + cntr[1] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                x = (
+                    -i * b1 + cntr[0]
+                )  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
+                y = (
+                    i * b2
+                    + cntr[1]
+                    + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                )
                 A.append((x, y))
 
-                x = -i * b1 + cntr[0] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
-                y = -i * b2 + cntr[1]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
+                x = (
+                    -i * b1
+                    + cntr[0]
+                    + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                )
+                y = (
+                    -i * b2 + cntr[1]
+                )  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 A.append((x, y))
 
                 x = (i + 1) * b1 + cntr[
                     0
                 ]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
-                y = -i * b2 + cntr[1] + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                y = (
+                    -i * b2
+                    + cntr[1]
+                    + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
+                )
                 A.append((x, y))
 
             B = [(item[0] - b1, item[1]) for item in A]
@@ -390,9 +395,8 @@ def drawSquareSpiral():
 
             n = 1
 
-
-            for i in range(0, turns):
-                try:
+            for _ in range(turns):
+                with contextlib.suppress(Exception):
                     # LEFT
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
                     obj = unit(config)
@@ -462,44 +466,70 @@ def drawSquareSpiral():
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
 
                     n += 4
-                except Exception as e:
-                    # print(e)
-                    pass
+                    obj.setUp(n)
+                    config.unitArray.append(obj)
+                    # draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
+
+                    # TOP
+                    obj = unit(config)
+                    obj.poly = (B[n + 1], A[n + 5], B[n + 6], A[n + 2])
+                    obj.changeColor = False
+                    obj.outlineColorObj = outlineColorObj
+
+                    obj.minHue = config.redRange[0]
+                    obj.maxHue = config.redRange[1]
+                    obj.minSaturation = 0.7 * config.saturationRangeFactorRight[0]
+                    obj.maxSaturation = 0.9 * config.saturationRangeFactorRight[1]
+                    obj.minValue = topValues[0]
+                    obj.maxValue = topValues[1]
+
+                    obj.setUp(n)
+                    config.unitArray.append(obj)
+                    # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
+
+                    n += 4
+                # except Exception as e:
+                #     print(e)
+                #     pass
 
 
-def resetToAllowDistortion() :
+def resetToAllowDistortion():
     config.rebuildingPattern = False
     # print("restartPiece has finished its call")
 
+
 def restartPiece():
-    
+
     config.doSectionDisturbance = False
     config.doingSectionDisturbance = False
     config.rebuildingPattern = True
 
-    config.polyDistortionMin = -random.SystemRandom().uniform(1, config.polyDistortion + 1)
-    config.polyDistortionMax = random.SystemRandom().uniform(1, config.polyDistortion + 1)
+    config.polyDistortionMin = -random.SystemRandom().uniform(
+        1, config.polyDistortion + 1
+    )
+    config.polyDistortionMax = random.SystemRandom().uniform(
+        1, config.polyDistortion + 1
+    )
 
     del config.unitArray[:]
 
     p = math.floor(random.SystemRandom().uniform(0, len(config.opticalPatterns)))
 
     config.opticalPattern = config.opticalPatterns[p]
- 
-    if random.SystemRandom().random() < config.sizeFactorChangeProb :
+
+    if random.SystemRandom().random() < config.sizeFactorChangeProb:
         config.sizeFactor = config.extraSizeMultiplier
-    else :
+    else:
         config.sizeFactor = config.baseSizeMultiplier
-    
+
     config.blockLength = config.blockLengthBase * config.sizeFactor
     config.blockHeight = config.blockHeightBase * config.sizeFactor
-        
 
     # print(config.opticalPattern + " " + str(config.sizeFactor))
 
     drawSquareSpiral()
-    
-    
+
+
 def transformImage(img):
     width, height = img.size
     m = -0.5
@@ -519,11 +549,12 @@ def main(run=True):
     global config, directionOrder, workConfig
     print("---------------------")
     print("QUILT Loaded")
-    
-    
+
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("quilt-informal", "redrawSpeed"))
-    config.directorController.slotRate = float(workConfig.get("quilt-informal", "slotRate"))
+    config.directorController.slotRate = float(
+        workConfig.get("quilt-informal", "slotRate")
+    )
 
     config.brightness = float(workConfig.get("displayconfig", "brightness"))
     colorutils.brightness = config.brightness
@@ -536,30 +567,42 @@ def main(run=True):
     config.outlineColorObj.randomRange = (5.0, 30.0)
     config.outlineColorObj.colorTransitionSetup()
 
-    config.transitionStepsMin = float(workConfig.get("quilt-informal", "transitionStepsMin"))
-    config.transitionStepsMax = float(workConfig.get("quilt-informal", "transitionStepsMax"))
+    config.transitionStepsMin = float(
+        workConfig.get("quilt-informal", "transitionStepsMin")
+    )
+    config.transitionStepsMax = float(
+        workConfig.get("quilt-informal", "transitionStepsMax")
+    )
 
     config.transformShape = workConfig.getboolean("quilt-informal", "transformShape")
     transformTuples = workConfig.get("quilt-informal", "transformTuples").split(",")
-    config.transformTuples = tuple([float(i) for i in transformTuples])
+    config.transformTuples = tuple(float(i) for i in transformTuples)
 
     redRange = workConfig.get("quilt-informal", "redRange").split(",")
-    config.redRange = tuple([int(i) for i in redRange])
+    config.redRange = tuple(int(i) for i in redRange)
 
     try:
-        saturationRangeFactorLeft = workConfig.get("quilt-informal", "saturationRangeFactorLeft").split(",")
-        config.saturationRangeFactorLeft = tuple([float(i) for i in saturationRangeFactorLeft])
+        saturationRangeFactorLeft = workConfig.get(
+            "quilt-informal", "saturationRangeFactorLeft"
+        ).split(",")
+        config.saturationRangeFactorLeft = tuple(
+            float(i) for i in saturationRangeFactorLeft
+        )
 
-        saturationRangeFactorRight = workConfig.get("quilt-informal", "saturationRangeFactorRight").split(",")
-        config.saturationRangeFactorRight = tuple([float(i) for i in saturationRangeFactorRight])
-    
+        saturationRangeFactorRight = workConfig.get(
+            "quilt-informal", "saturationRangeFactorRight"
+        ).split(",")
+        config.saturationRangeFactorRight = tuple(
+            float(i) for i in saturationRangeFactorRight
+        )
+
     except Exception as e:
-        print(str(e))
-        config.saturationRangeFactorLeft = (1,1)
-        config.saturationRangeFactorRight = (1,1)
+        print(e)
+        config.saturationRangeFactorLeft = (1, 1)
+        config.saturationRangeFactorRight = (1, 1)
 
     backgroundColor = workConfig.get("quilt-informal", "backgroundColor").split(",")
-    config.backgroundColor = tuple([int(i) for i in backgroundColor])
+    config.backgroundColor = tuple(int(i) for i in backgroundColor)
 
     config.numUnits = int(workConfig.get("quilt-informal", "numUnits"))
     config.hGapSize = int(workConfig.get("quilt-informal", "hGapSize"))
@@ -575,12 +618,16 @@ def main(run=True):
     config.cntrOffsetY = int(workConfig.get("quilt-informal", "cntrOffsetY"))
     config.delay = float(workConfig.get("quilt-informal", "delay"))
     config.colorPopProb = float(workConfig.get("quilt-informal", "colorPopProb"))
-    config.brightnessFactorDark = float(workConfig.get("quilt-informal", "brightnessFactorDark"))
+    config.brightnessFactorDark = float(
+        workConfig.get("quilt-informal", "brightnessFactorDark")
+    )
     config.brightnessFactorLight = float(
         workConfig.get("quilt-informal", "brightnessFactorLight")
     )
     config.lines = workConfig.getboolean("quilt-informal", "lines")
-    config.patternPrecision = workConfig.getboolean("quilt-informal", "patternPrecision")
+    config.patternPrecision = workConfig.getboolean(
+        "quilt-informal", "patternPrecision"
+    )
 
     config.polyDistortion = float(workConfig.get("quilt-informal", "polyDistortion"))
     config.polyDistortionMin = -config.polyDistortion
@@ -588,15 +635,30 @@ def main(run=True):
 
     # stacking the decks a bit in favor of vertical lightening strike and regular
     try:
-        config.opticalPatterns = workConfig.get("quilt-informal","opticalPatterns").split(",")
+        config.opticalPatterns = workConfig.get(
+            "quilt-informal", "opticalPatterns"
+        ).split(",")
     except Exception as e:
-        print(str(e))
-        config.opticalPatterns = ["Regular" , "Regular", "LighteningStrikeH", "LighteningStrikeH", "Diagonals", "LighteningStrikeH"]
-    
-    # Chance that when the Quilt rebuilds the pattern doubles in size 
-    config.sizeFactorChangeProb = float(workConfig.get("quilt-informal","sizeFactorChangeProb"))
-    config.baseSizeMultiplier = float(workConfig.get("quilt-informal","baseSizeMultiplier"))
-    config.extraSizeMultiplier = float(workConfig.get("quilt-informal","extraSizeMultiplier"))
+        print(e)
+        config.opticalPatterns = [
+            "Regular",
+            "Regular",
+            "LighteningStrikeH",
+            "LighteningStrikeH",
+            "Diagonals",
+            "LighteningStrikeH",
+        ]
+
+    # Chance that when the Quilt rebuilds the pattern doubles in size
+    config.sizeFactorChangeProb = float(
+        workConfig.get("quilt-informal", "sizeFactorChangeProb")
+    )
+    config.baseSizeMultiplier = float(
+        workConfig.get("quilt-informal", "baseSizeMultiplier")
+    )
+    config.extraSizeMultiplier = float(
+        workConfig.get("quilt-informal", "extraSizeMultiplier")
+    )
 
     # "LighteningStrikeH"  aka Charlie Brown sweater ...
 
@@ -607,14 +669,13 @@ def main(run=True):
     p = math.floor(random.SystemRandom().uniform(0, len(config.opticalPatterns)))
     config.opticalPattern = config.opticalPatterns[p]
 
-
     config.timeToComplete = int(workConfig.get("quilt-informal", "timeToComplete"))
     # config.timeToComplete = 60 #round(random.SystemRandom().uniform(30,220))
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
     #### Need to add something like this at final render call  as well
-    ''' 
+    """ 
         ########### RENDERING AS A MOCKUP OR AS REAL ###########
         if config.useDrawingPoints == True :
             config.panelDrawing.canvasToUse = config.renderImageFull
@@ -623,10 +684,10 @@ def main(run=True):
             #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
             #config.render(config.image, 0, 0)
             config.render(config.renderImageFull, 0, 0)
-    '''
+    """
 
     # createPieces()
-    
+
     ########################################################################
     # CREATE THE IMAGE HOLDERS
     # canvasImage will get the drawing
@@ -635,16 +696,18 @@ def main(run=True):
 
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
-    config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.disturbanceImage = Image.new(
+        "RGBA", (config.canvasWidth, config.canvasHeight)
+    )
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    
+
     config.doingSectionDisturbance = False
     config.rebuildingPattern = True
     distortions.additonalSetup(config, workConfig)
-    
+
     config.blockImage = Image.new("RGBA", (config.dblockWidth, config.dblockHeight))
     config.blockDraw = ImageDraw.Draw(config.blockImage)
-    
+
     drawSquareSpiral()
 
     ########################################################################
@@ -652,10 +715,10 @@ def main(run=True):
     if run:
         runWork()
 
-        
+
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("RUNNING quilt-informal.py")
     print(bcolors.ENDC)
     while config.isRunning == True:
@@ -671,54 +734,60 @@ def iterate():
     global config
     config.outlineColorObj.stepTransition()
 
-
-    if config.doingSectionDisturbance == False :
-        for i in range(0, len(config.unitArray)):
+    if config.doingSectionDisturbance == False:
+        for i in range(len(config.unitArray)):
             obj = config.unitArray[i]
             if random.SystemRandom().random() > 0.98:
                 obj.outlineColorObj.stepTransition()
             obj.update()
             obj.renderPolys()
-        
+
     # quilt is rendered to the config.image image each cycle
-    
+
     temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     tDraw = ImageDraw.Draw(temp)
-    tDraw.rectangle(((0, 0), (config.screenWidth, config.screenHeight)), fill=config.backgroundColor)
+    tDraw.rectangle(
+        ((0, 0), (config.screenWidth, config.screenHeight)), fill=config.backgroundColor
+    )
 
     if config.transformShape == True:
         temp = transformImage(temp)
-        
-    if config.sectionDisturbance == True :
+
+    if config.sectionDisturbance == True:
         distortions.iterationFunction(config)
-        
+
     # previous non-disturbing iteration just rendered the temp image
     # config.render(temp, 0, 0)
-    
+
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp1Draw = ImageDraw.Draw(temp1)
 
     config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
     temp1.paste(config.image, (0, 0), config.image)
-    
-    if config.transformShape == True :
+
+    if config.transformShape == True:
         temp1 = transformImage(temp1)
-    
-    
+
     if config.useWaveDistortion == True:
         temp1 = ImageOps.deform(temp1, distortions.WaveDeformer(config))
         config.waveDeformXPos += config.waveDeformXPosRate
-        if config.waveDeformXPos > config.screenWidth :
+        if config.waveDeformXPos > config.screenWidth:
             config.waveDeformXPos = 0
-    
-    config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
+
+    config.render(
+        temp1,
+        config.imgcanvasOffsetX,
+        config.imgcanvasOffsetY,
+        config.canvasWidth,
+        config.canvasHeight,
+    )
     # Done
 
     config.t2 = time.time()
     delta = config.t2 - config.t1
 
     if delta > config.timeToComplete:
-        if config.sectionDisturbance == True :
+        if config.sectionDisturbance == True:
             # these functions are run to restart disturber
             distortions.resetFunction(config)
 

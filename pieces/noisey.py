@@ -1,5 +1,6 @@
 # ################################################### #
 import argparse
+import itertools
 import math
 import random
 import time
@@ -30,7 +31,6 @@ class WaveDeformer:
             *self.transform(x1, y1),
             *self.transform(x1, y0),
         )
-
     def getmesh(self, img):
         self.w, self.h = img.size
 
@@ -43,6 +43,7 @@ class WaveDeformer:
 
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
 
+        return list(zip(target_grid, source_grid))
         return [t for t in zip(target_grid, source_grid)]
 
 
@@ -181,7 +182,7 @@ def renderRingLines():
     a = 80
     brtns = config.brightness
 
-    for col in range(0, config.numRings):
+    for col in range(config.numRings):
         x = math.cos(col * rads) * ra + config.xOffset
         # x = col + config.xOffset
         y = math.sin(col * rads) * ra + config.yOffset
@@ -242,11 +243,11 @@ def rings():
     gDelta = 1 + 1/config.rgbSplitFactor
     bDelta = 1 + 1/config.rgbSplitFactor + 1/config.rgbSplitFactor
 
-    for row in range(0, config.numRings):
+    for row in range(config.numRings):
         points = config.pointsMin + row * config.pointsMin
         rads = 2 * math.pi / points
         ra = config.radiusMin * row + config.radiusMin
-        for col in range(0, points):
+        for col in range(points):
             x = math.cos(col * rads) * ra + config.xOffset
             y = math.sin(col * rads) * ra + config.yOffset
 
@@ -366,7 +367,7 @@ def ringScribbles():
 
     angleDecrement = config.angleDecrementBase
 
-    for col in range(0, totalPoints):
+    for col in range(totalPoints):
 
         x = math.cos(col * rads) * ra + config.xOffset
         # x = col + config.xOffset
@@ -571,38 +572,35 @@ class Dyad :
              self.P2.fixed = False
              
 
-def makeBarColors() :
+def makeBarColors():
     global config
     config.barColors = []
     config.dyads = []
     config.pointUnits = []
     colCount = 0
     totalColumns = round((config.canvasWidth) / config.colInterval) + 1
-    
-    
-    for col in range(0, totalColumns):
+
+
+    for col in range(totalColumns):
         # barColor = colorutils.randomColorAlpha(config.brightness, 20,20)
         # barColor = colorutils.getRandomColorHSL(0,360,.5,1.0,.5,.5,0,0,80,config.brightness)
         # barColor = colorutils.getRandomColorHSL(340,360,1.0,1.0,.250,.4,0,0,100,config.brightness)
-        
+
         barColor = config.palette.chooseFromPalette(config.springColorAlpha,config.brightness)
-        
+
         config.barColors.append(barColor)
         colCount += 1
-        
+
         p = PointUnit()
         p.x = col * config.colInterval + config.springXPosStart
         config.pointUnits.append(p)
-        
-        if col > 0 :
+
+        if col > 0:
             dyad = Dyad()
             dyad.color = barColor
             dyad.k = random.random()/2
-            
-            if col == 1 :
-                dyad.k = .1
-            else :
-                dyad.k = .2
+
+            dyad.k = .1 if col == 1 else .2
             dyad.P1 = config.pointUnits[col-1]
             dyad.P2 = p
             if col == 1 :
@@ -628,7 +626,7 @@ def springs():
     fixedYPos = config.fixedYPos
     fixedYHeight = config.fixedYHeight
     
-    for u in range(0,numUnits) :
+    for u in range(numUnits) :
         # print(u)
         unitRef = config.dyads[u]
         unitRef.update()
@@ -662,7 +660,7 @@ def waves():
     rowRads = 2*math.pi / config.waveLines
     count = 0
     countIncr = 1
-    for row in range(0, config.waveLines):
+    for row in range(config.waveLines):
         r = 10
         g = 120
         b = 250
@@ -714,36 +712,19 @@ def waves():
             # b = 50
 
             # config.draw.rectangle((x, y, x+1, y+1), fill=(r,g,b,150))
-            if col != 0:
-                
-    
-                # config.draw.rectangle(( x, y, x + config.colInterval, y+10), fill = (200,0,0,100))
-                # config.draw.rectangle(( x, 0, round(x + y/config.colInterval), 200), fill = (200,0,0,10))
-                
-                # yPos1 = config.yOffset -  y
-                # yPos2 = y + config.yOffset
-                
-                # if yPos2 >= yPos1 :
-                #     config.draw.rectangle(( x, yPos1, x + config.colInterval, yPos2), fill = (200,0,0,100))
-                # else :    
-                #     config.draw.rectangle(( x, yPos2, x + config.colInterval, yPos1), fill = (200,0,0,100))
-                
-                if row == 0 :
-                    
-                    maxWidth  = config.colInterval/config.canvasWidth * 32
-                    yPos1 = config.yOffset - 32
-                    yPos2 = config.yOffset + 32
-                    # xPos1 = lastx[0]
-                    d = round((abs(f)* maxWidth))
-                    if d < 0 : d = 1
-                    # d=2
-
-                    xPos1 = round(x - d/2)
-                    xPos2 = round(x + d/2)
-                    config.draw.rectangle(( xPos1, yPos1, xPos2, yPos2), fill = config.barColors[colorCount])
-                    colorCount += 1
-                    
-                # config.draw.line((lastx[0], lasty[0], x, y), fill=getColor(r, g, b, alpha))
+            if col != 0 and row == 0:
+                maxWidth  = config.colInterval/config.canvasWidth * 32
+                yPos1 = config.yOffset - 32
+                yPos2 = config.yOffset + 32
+                # xPos1 = lastx[0]
+                d = round((abs(f)* maxWidth))
+                if d < 0 : d = 1
+                # d=2
+            
+                xPos1 = round(x - d/2)
+                xPos2 = round(x + d/2)
+                config.draw.rectangle(( xPos1, yPos1, xPos2, yPos2), fill = config.barColors[colorCount])
+                colorCount += 1
                 
                 
             lastx = [x, xPos2, x]
@@ -1034,7 +1015,7 @@ def main(run=True):
                               (100, 220, 255), (10, 120, 255), (100, 90, 90)]
 
     config.assignedLineColors = []
-    for row in range(0, config.waveLines):
+    for row in range(config.waveLines)
         choice = math.floor(random.uniform(0, len(config.lineColors)))
         if random.random() < .001:
             r = round(random.uniform(0, 255))

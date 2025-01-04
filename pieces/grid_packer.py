@@ -4,6 +4,7 @@
 # I thought it would be ineresting but can't find a good use yet - maybe
 # thousands of them would be intersting but probably not
 
+import itertools
 import math
 import random
 import time
@@ -225,14 +226,13 @@ def generateUnitImage(dims):
 
 
 def removeFromAvailable(lastX, lastY, unitFills):
-    for h in range(lastY, lastY + unitFills[1], config.gridSize):
-        for w in range(lastX, lastX + unitFills[0], config.gridSize):
-            for ii in range(0, len(config.availableSpots)):
-                if (
-                    config.availableSpots[ii][0] == w
-                    and config.availableSpots[ii][1] == h
-                ):
-                    config.availableSpots[ii][2] = False
+    for h, w in itertools.product(range(lastY, lastY + unitFills[1], config.gridSize), range(lastX, lastX + unitFills[0], config.gridSize)):
+        for ii in range(len(config.availableSpots)):
+            if (
+                config.availableSpots[ii][0] == w
+                and config.availableSpots[ii][1] == h
+            ):
+                config.availableSpots[ii][2] = False
 
 
 def linearPlacer(doSort=False, reversedSort=False):
@@ -244,7 +244,7 @@ def linearPlacer(doSort=False, reversedSort=False):
     lastX = 0
     lastY = 0
     lastHighest = 0
-    for i in range(0, len(config.unitFills)):
+    for i in range(len(config.unitFills)):
         img = generateUnitImage(config.unitFills[i])
 
         if (lastX + config.unitFills[i][0] + 0) > config.canvasWidth:
@@ -254,12 +254,10 @@ def linearPlacer(doSort=False, reversedSort=False):
             lastHighest = config.unitFills[i][1]
             config.image.paste(img, (lastX, lastY), img)
 
-            lastX += config.unitFills[i][0] + 0
         else:
             config.image.paste(img, (lastX, lastY), img)
             removeFromAvailable(lastX, lastY, config.unitFills[i])
-            lastX += config.unitFills[i][0] + 0
-
+        lastX += config.unitFills[i][0] + 0
         if config.unitFills[i][1] >= lastHighest:
             lastHighest = config.unitFills[i][1]
 
@@ -353,9 +351,8 @@ def drawGrid():
         #         config.draw.rectangle((config.availableSpots[i][0], config.availableSpots[i][1],config.availableSpots[i][0]+1, config.availableSpots[i][1]+1), fill=(0,0,15), outline=(0,0,255))
         # size of avail: {availSpotCount}"
         # print(f"Current index {config.unitIndex} processed : {round(config.maxTime*1000)/1000}")
-    else:
-        if random.random() < config.bgFlashRate:
-            reDraw(config)
+    elif random.random() < config.bgFlashRate:
+        reDraw(config)
 
 
 def reDraw(config):
@@ -385,45 +382,58 @@ def iterate():
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
     if random.random() < config.filterPatchProb:
-        # print("should be remapping")
-        config.useFilters = True
-        x1 = round(random.uniform(0, config.canvasWidth))
-        x2 = round(random.uniform(x1, config.canvasWidth))
-        y1 = round(random.uniform(0, config.canvasHeight))
-        y2 = round(random.uniform(y1, config.canvasHeight))
-
-        config.remapImageBlock = True
-        config.remapImageBlockSection = (x1, y1, x2, y2)
-        config.remapImageBlockDestination = (x1, y1)
-
+        _extracted_from_iterate_23(config)
     # Don't want the patch to always be there - just little interruptions
     if random.random() < config.filterPatchProbOff:
-        # print("turning off remapping")
-        config.useFilters = False
-        x1 = 0
-        x2 = 0
-        y1 = 0
-        y2 = 0
+        _extracted_from_iterate_(config)
 
-        config.remapImageBlock = True
-        config.remapImageBlockSection = (x1, y1, x2, y2)
-        config.remapImageBlockDestination = (x1, y1)
+
+# TODO Rename this here and in `iterate`
+def _extracted_from_iterate_(config):
+    # print("turning off remapping")
+    config.useFilters = False
+    x2 = 0
+    y1 = 0
+    y2 = 0
+
+    config.remapImageBlock = True
+    x1 = 0
+    config.remapImageBlockSection = (x1, y1, x2, y2)
+    config.remapImageBlockDestination = (x1, y1)
+
+
+# TODO Rename this here and in `iterate`
+def _extracted_from_iterate_23(config):
+    # print("should be remapping")
+    config.useFilters = True
+    x1 = round(random.uniform(0, config.canvasWidth))
+    x2 = round(random.uniform(x1, config.canvasWidth))
+    y1 = round(random.uniform(0, config.canvasHeight))
+    y2 = round(random.uniform(y1, config.canvasHeight))
+
+    config.remapImageBlock = True
+    config.remapImageBlockSection = (x1, y1, x2, y2)
+    config.remapImageBlockDestination = (x1, y1)
 
 
 def setUp():
     config.bgColor = newBGClr()
     config.availableSpots = []
 
-    for h in range(0, config.canvasHeight, config.gridSize):
-        for w in range(0, config.canvasWidth, config.gridSize):
-            config.availableSpots.append([w, h, True])
+    config.availableSpots.extend(
+        [w, h, True]
+        for h, w in itertools.product(
+            range(0, config.canvasHeight, config.gridSize),
+            range(0, config.canvasWidth, config.gridSize),
+        )
+    )
 
 
 def rebuildGrid():
     config.unitFills = []
     config.maxStartPoint = 0
 
-    for i in range(0, config.unitsToDraw):
+    for _ in range(config.unitsToDraw):
         if config.allSquare:
             wd = (
                 round(random.SystemRandom().uniform(config.minW, config.maxW))
@@ -442,12 +452,8 @@ def rebuildGrid():
 
     config.unitIndex = 0
 
-    config.doSort = (
-        True if random.SystemRandom().random() < config.doSortProb else False
-    )
-    config.reversedSort = (
-        True if random.SystemRandom().random() < config.reversedSortProb else False
-    )
+    config.doSort = random.SystemRandom().random() < config.doSortProb
+    config.reversedSort = random.SystemRandom().random() < config.reversedSortProb
 
 
 def loadConfigSet(setName):
@@ -559,12 +565,12 @@ def loadConfigSet(setName):
     config.allSquare = workConfig.getboolean(setName, "allSquare")
     config.drawFullUnitOutline = workConfig.getboolean(setName, "drawFullUnitOutline")
 
-    config.doSort = (
-        True if random.SystemRandom().random() < config.doSortProb else False
-    )
-    config.reversedSort = (
-        True if random.SystemRandom().random() < config.reversedSortProb else False
-    )
+    config.doSort = random.SystemRandom().random() < config.doSortProb
+    # above is simplified version of below - keeping for ref ...
+    # config.reversedSort = (
+    #     True if random.SystemRandom().random() < config.reversedSortProb else False
+    # )
+    config.reversedSort = random.SystemRandom().random() < config.reversedSortProb
 
 
 def main(run=True):
@@ -592,7 +598,7 @@ def main(run=True):
 
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("Running slots.py")
     print(bcolors.ENDC)
     while True:

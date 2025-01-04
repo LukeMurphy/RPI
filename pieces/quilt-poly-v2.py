@@ -44,10 +44,7 @@ def transformImage(img):
 def randomRange(A=0, B=1, rounding=False):
     a = random.SystemRandom().uniform(A, B)
     b = random.SystemRandom().uniform(A, B)
-    if rounding == False:
-        return (a, b)
-    else:
-        return (round(a), round(b))
+    return (a, b) if rounding == False else (round(a), round(b))
 
 
 def restartPiece():
@@ -137,9 +134,9 @@ def restartPiece():
 
 def setInitialColors(refresh=False):
     ## Better initial color when piece is turned on
-    for i in range(0, len(config.unitArray)):
+    for i in range(len(config.unitArray)):
         obj = config.unitArray[i]
-        for c in range(0, len(obj.polys)):
+        for c in range(len(obj.polys)):
             colOverlay = obj.polys[c][1]
             colOverlay.colorB = colorutils.randomColor(config.brightness * 0.8)
             colOverlay.colorA = colorutils.randomColor(config.brightness * 0.8)
@@ -151,7 +148,7 @@ def main(run=True):
     global config, directionOrder, workConfig
     print("---------------------")
     print("QUILT Loaded")
-    
+
     ########################################################################
     # CREATE THE IMAGE HOLDERS
     # canvasImage will get the drawing
@@ -162,7 +159,7 @@ def main(run=True):
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    
+
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("quilt-polys", "redrawSpeed"))
     config.directorController.slotRate = float(workConfig.get("quilt-polys", "slotRate"))
@@ -196,10 +193,10 @@ def main(run=True):
 
     config.transformShape = workConfig.getboolean("quilt-polys", "transformShape")
     transformTuples = workConfig.get("quilt-polys", "transformTuples").split(",")
-    config.transformTuples = tuple([float(i) for i in transformTuples])
+    config.transformTuples = tuple(float(i) for i in transformTuples)
 
     redRange = workConfig.get("quilt-polys", "redRange").split(",")
-    config.redRange = tuple([int(i) for i in redRange])
+    config.redRange = tuple(int(i) for i in redRange)
 
     # the mins and maxes for the size of the units
     config.gapSize = int(workConfig.get("quilt-polys", "gapSize"))
@@ -231,17 +228,50 @@ def main(run=True):
 
     config.activeSet = workConfig.get("quilt-polys", "activeSet")
 
-    config.c1HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, "c1HueRange").split(",")])
-    config.c1SaturationRange = tuple([    float(i)    for i in workConfig.get(config.activeSet, "c1SaturationRange").split(",")])
-    config.c1ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, "c1ValueRange").split(",")])
+    config.c1HueRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c1HueRange").split(",")
+    )
+    config.c1SaturationRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c1SaturationRange").split(
+            ","
+        )
+    )
+    config.c1ValueRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c1ValueRange").split(",")
+    )
 
-    config.c2HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, "c2HueRange").split(",")])
-    config.c2SaturationRange = tuple([    float(i)    for i in workConfig.get(config.activeSet, "c2SaturationRange").split(",")])
-    config.c2ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, "c2ValueRange").split(",")])
+    config.c2HueRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c2HueRange").split(",")
+    )
+    config.c2SaturationRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c2SaturationRange").split(
+            ","
+        )
+    )
+    config.c2ValueRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c2ValueRange").split(",")
+    )
 
-    config.c3HueRange = tuple([float(i) for i in workConfig.get(config.activeSet, "c3HueRange").split(",")])
-    config.c3SaturationRange = tuple([    float(i)    for i in workConfig.get(config.activeSet, "c3SaturationRange").split(",")])
-    config.c3ValueRange = tuple([float(i) for i in workConfig.get(config.activeSet, "c3ValueRange").split(",")])
+    config.c3HueRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c3HueRange").split(",")
+    )
+    config.c3SaturationRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c3SaturationRange").split(
+            ","
+        )
+    )
+    config.c3ValueRange = tuple(
+        float(i)
+        for i in workConfig.get(config.activeSet, "c3ValueRange").split(",")
+    )
 
     # for now, all squares
     config.blockLength = config.blockSize
@@ -276,41 +306,39 @@ def main(run=True):
         print(e)
 
     try:
-        drawBlockCoordsRaw = list(
+        drawBlockCoordsRaw = [
             list((i).split(","))
             for i in workConfig.get("drawBlock", "drawBlockCoords").split("|")
-        )
+        ]
         config.drawBlockCoords = []
-        for i in drawBlockCoordsRaw:
-            coords = tuple(int(ii) for ii in i)
-            config.drawBlockCoords.append(coords)
+        config.drawBlockCoords.extend(
+            tuple(int(ii) for ii in i) for i in drawBlockCoordsRaw
+        )
         config.drawBlockCoords = tuple(config.drawBlockCoords)
 
         config.drawBlockFixedColor = tuple(
-            [
-                int(i)
-                for i in workConfig.get("drawBlock", "drawBlockFixedColor").split(",")
-            ]
+            int(i)
+            for i in workConfig.get("drawBlock", "drawBlockFixedColor").split(",")
         )
         config.drawBlock_c1HueRange = tuple(
-            [float(i) for i in workConfig.get("drawBlock", "c1HueRange").split(",")]
+            float(i)
+            for i in workConfig.get("drawBlock", "c1HueRange").split(",")
         )
         config.drawBlock_c1SaturationRange = tuple(
-            [
-                float(i)
-                for i in workConfig.get("drawBlock", "c1SaturationRange").split(",")
-            ]
+            float(i)
+            for i in workConfig.get("drawBlock", "c1SaturationRange").split(",")
         )
         config.drawBlock_c1ValueRange = tuple(
-            [float(i) for i in workConfig.get("drawBlock", "c1ValueRange").split(",")]
+            float(i)
+            for i in workConfig.get("drawBlock", "c1ValueRange").split(",")
         )
-        
+
         config.canvasImageDraw = ImageDraw.Draw(config.image)
         config.drawBlock = True
         config.drawBlockShape = lambda: config.canvasImageDraw.polygon(
             config.drawBlockCoords, fill=config.drawBlockFixedColor
         )
-        
+
     except Exception as e:
         print(e)
         config.drawBlock = False
@@ -326,17 +354,19 @@ def main(run=True):
     config.doingRefresh = config.refreshCount
     config.doingRefreshCount = config.refreshCount
     config.doingCrossFade = False
- 
+
     distortions.additonalSetup(config, workConfig)
-    
+
 
     if run:
+        runWork()
+        runWork()
         runWork()
 
 
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("RUNNING quilt-poly-v2.py")
     print(bcolors.ENDC)
     while config.isRunning == True:
@@ -373,11 +403,10 @@ def iterate():
     #     config.drawBlockShape()
     #     config.render(temp, 0, 0)
 
-    for i in range(0, len(config.unitArray)):
+    for i in range(len(config.unitArray)):
         obj = config.unitArray[i]
         obj.update()
         obj.render()
-         
         
     if config.sectionDisturbance == True :
         distortions.iterationFunction(config)

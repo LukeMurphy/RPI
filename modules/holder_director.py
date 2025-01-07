@@ -1,6 +1,5 @@
 # Generic classes for adding config info and managing timing for
 # animation vs simple delays in loops etc
-
 import argparse
 import math
 import random
@@ -11,7 +10,6 @@ class Holder:
     def __init__(self, *args, **kwargs):
         if args != None:
             self.config = args
-
 
 class Director:
     """docstring for Director"""

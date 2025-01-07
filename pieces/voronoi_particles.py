@@ -1,18 +1,14 @@
 import math
 import random
-import threading
 import time
 
-from modules import colorutils
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.holder_director import Holder
+from PIL import Image, ImageDraw
 from modules.holder_director import Director
 
 from scipy.spatial import Voronoi
 import numpy as np
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
 
 class ParticleDot:
     def __init__(self):
@@ -79,7 +75,6 @@ class ParticleDot:
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
 
 class ParticleSystem:
     def __init__(self, config):
@@ -273,7 +268,6 @@ class ParticleSystem:
         self.drawVoronoi()
 
 
-
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 def withinRange(arg, target, diff):
@@ -282,6 +276,19 @@ def withinRange(arg, target, diff):
     test2 = round(target - diff)
     return val <= test1 and val >= test2
 
+# an override
+def structuredSetup():
+    xD = 0
+    yD = 0
+    for i in range(1, len(PS.particles), 2):
+        p = PS.particles[i]
+        p2 = PS.particles[i - 1]
+        p.xPos = 10 + xD
+        p.yPos = 400 - yD
+        p2.xPos = 300 - xD
+        p2.yPos = 400 - yD
+        yD += 30
+        xD += 20
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -357,20 +364,6 @@ def filterRemapImage(config):
         )
         config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
         config.remapImageBlockDestination = [startX, startY]
-
-
-def structuredSetup():
-    xD = 0
-    yD = 0
-    for i in range(1, len(PS.particles), 2):
-        p = PS.particles[i]
-        p2 = PS.particles[i - 1]
-        p.xPos = 10 + xD
-        p.yPos = 400 - yD
-        p2.xPos = 300 - xD
-        p2.yPos = 400 - yD
-        yD += 30
-        xD += 20
 
 
 def main(run=True):

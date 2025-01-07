@@ -7,7 +7,10 @@ from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
-
+# This is a port / version of a Javascript piece Modern Drawing Maker
+# lines start and split when they encounter the trail of a previously drawn line
+# the first version was in Flash I think and had continuous lines over points with
+# smoothing - these versions have to use discrete blocks
 class Line:
 
 	pointArray = []
@@ -108,7 +111,7 @@ class Line:
 			x1 = self.nextPoint[0]
 			y1 = self.nextPoint[1]
 
-						
+
 
 		#if self.done == False:
 
@@ -119,9 +122,7 @@ class Line:
 		l = math.sqrt(dx * dx + dy * dy)
 		s = l * self.widthMultiplier / (self.branchCount / 2 + 1)
 
-		if s < 4:
-			s = 4
-
+		s = max(s, 4)
 		#self.config.canvasDraw.rectangle((x0,y0,x1 + s,y1 + s), fill=self.lineColor)
 		'''
 		self.config.canvasDraw.ellipse(
@@ -132,15 +133,15 @@ class Line:
 		w = (config.initWidth -  self.branchCount) * .75
 
 
-		if w <= 1 : w = 1
+		w = max(w, 1)
 		angle = math.atan2(dy,dx)
 		angle2 = -math.pi/2 + angle
 		x0b = x0 + w * math.cos(angle2) * w
 		y0b = y0 + w * math.sin(angle2) * w
-		
+
 		x1b = x1 + w * math.cos(angle2) * w
 		y1b = y1 + w * math.sin(angle2) * w
-		
+
 
 		tempImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
 		tempImageDraw = ImageDraw.Draw(tempImage)
@@ -201,7 +202,7 @@ def showLines():
 	numberOfLines =  len(config.linesArray)
 	newLines = []
 
-	for i in range(0, numberOfLines):
+	for i in range(numberOfLines):
 		ref = config.linesArray[i]
 
 		if ref.done == False:
@@ -214,7 +215,7 @@ def showLines():
 						config.pointArray.append(pr)
 
 
-	for i in range(0, numberOfLines):
+	for i in range(numberOfLines):
 		ref = config.linesArray[i]
 		currentAngle = ref.angle
 
@@ -278,12 +279,9 @@ def showLines():
 	config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
 	config.render(config.image, round(config.imageOffsetX), round(config.imageOffsetY))
 
-	n=0
-	for l in config.linesArray:
+	for n, l in enumerate(config.linesArray):
 		if l.done == True :
 			config.linesArray.pop(n)
-		n+=1
-
 	'''
 	if numberOfLines >= config.trimLimit:
 		for i in range(0, config.trim):
@@ -360,7 +358,7 @@ def setUp():
 
 	# print(config.linesArray)
 
-	for i in range(0, config.simultaneousLines):
+	for i in range(config.simultaneousLines):
 		l = Line(config, False)
 		l.lineNumber = i
 		l.lineColor = colorutils.randomColorAlpha(1.0,50,255)

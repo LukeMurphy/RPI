@@ -1,14 +1,8 @@
 import math
 import random
-import textwrap
-import time
 import noise
-from noise import *
-from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils, panelDrawing
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from PIL import Image
 from modules.holder_director import Holder 
-
 
 class WaveDeformer:
     def __init__(self, config):
@@ -96,7 +90,7 @@ def setupStableSections(config):
     n = round(random.SystemRandom().uniform(config.stableSectionsMin, config.stableSectionsMax))
     minWidth = config.stableSectionsMinWidth
     minHeight = config.stableSectionsMinHeight
-    for i in range(0, n):
+    for _ in range(0, n):
         xPos = round(random.SystemRandom().uniform(0, config.canvasWidth - 0))
         xPos2 = round(random.SystemRandom().uniform(xPos + minWidth, config.canvasWidth))
         yPos = round(random.SystemRandom().uniform(0, config.canvasHeight - 0))
@@ -117,10 +111,10 @@ def rebuildSections(config):
 
     if random.SystemRandom().random() < .5:
         config.speedDeAcceleration = config.speedDeAccelerationUpperLimit
-    else:
-        speedDeAcceleration = config.speedDeAccelerationBase
+    # else:
+    #     speedDeAcceleration = config.speedDeAccelerationBase
 
-    if config.diagonalMovement == False :
+    if not config.diagonalMovement :
         sectionDisturbanceDirection = 1 if random.SystemRandom().random() < .5 else 0
         
     baseSpeed = config.baseSectionSpeed
@@ -138,13 +132,13 @@ def rebuildSections(config):
         section.sectionSpeed = [random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,
                                 random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
         
-        if config.diagonalMovement == False :
+        if not config.diagonalMovement  :
             if sectionDisturbanceDirection == 1 :
                 section.sectionSpeed = [random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal,0]
             else :
                 section.sectionSpeed = [0,random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorVertical]
                 
-        if config.randomDiagonal == False and config.diagonalMovement == True :
+        if not config.randomDiagonal and config.diagonalMovement :
             speed = random.SystemRandom().uniform(-baseSpeed, baseSpeed)/config.sectionSpeedFactorHorizontal
             
             hComponent = math.cos(config.diagonalFixedAngle) * speed
@@ -163,7 +157,7 @@ def rebuildSections(config):
 
 def disturber(config):
 
-    if config.doSectionDisturbance == True and config.rebuildingPattern == False:
+    if config.doSectionDisturbance and not config.rebuildingPattern :
 
         for i in range(0, config.numberOfSections):
             sectionParams = config.movingSections[i]
@@ -222,7 +216,7 @@ def disturber(config):
         
         if config.doingRefresh < config.doingRefreshCount:
             tempCanvasImage  = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-            tempCanvasImageDraw = ImageDraw.Draw(tempCanvasImage)
+            # tempCanvasImageDraw = ImageDraw.Draw(tempCanvasImage)
             for s in config.stableSegments:
                 tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
 
@@ -244,7 +238,7 @@ def disturber(config):
             # print("pasting")
             for s in config.stableSegments:
                 tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
-                tempCanvasImageDraw = ImageDraw.Draw(tempCrop)
+                # tempCanvasImageDraw = ImageDraw.Draw(tempCrop)
                 # tempCanvasImageDraw.rectangle((s[0], s[1], s[2], s[3]), outline=(2,255,0), fill=(0,0,100,100))
                 config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
@@ -298,7 +292,7 @@ def additonalSetup(config, workConfig):
     # end try
 
     config.movingSections = []
-    for i in range(0, config.numberOfSections):
+    for _ in range(0, config.numberOfSections):
         section = Holder()
         config.movingSections.append(section)
         
@@ -312,7 +306,7 @@ def iterationFunction(config):
         setupStableSections(config)
 
     # paste over a section of the image on to itself and rotate
-    if config.doSectionDisturbance == True:
+    if config.doSectionDisturbance:
         # print("Calling disturb " + str(random.SystemRandom().random()))
         disturber(config)
     else :
@@ -320,7 +314,7 @@ def iterationFunction(config):
 
     # print("quilts ",config.render, config.instanceNumber)
     # Rebuild the main pattern, halt any disturbances
-    if random.SystemRandom().random() < config.rebuildPatternProbability and config.doSectionDisturbance == True:
+    if random.SystemRandom().random() < config.rebuildPatternProbability and config.doSectionDisturbance:
         # print("Setting disturb to off")
         config.doSectionDisturbance = False
         rebuildSections(config)

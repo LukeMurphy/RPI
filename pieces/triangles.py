@@ -1,21 +1,18 @@
 import math
 import random
-import threading
 import time
+from PIL import Image, ImageDraw
+from libs.delaunay2D import Delaunay2D
 from modules.configuration import bcolors
 from modules import colorutils
-from modules.holder_director import Holder
-from modules.holder_director import Director
+# from modules.holder_director import Director
+import numpy as np
 
 #!/usr/bin/env python3
 """
 Minimal delaunay2D test
 See: http://github.com/jmespadero/pyDelaunay2D
 """
-import numpy as np
-from libs.delaunay2D import Delaunay2D
-
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 
 """
@@ -40,7 +37,7 @@ class Fader:
         self.fadingDone = False
 
     def fadeIn(self, config):
-        if self.fadingDone == False:
+        if not self.fadingDone :
             if self.doingRefresh < self.doingRefreshCount:
                 self.blankImage = Image.new("RGBA", (self.width, self.height))
                 self.crossFade = Image.blend(
@@ -164,10 +161,10 @@ def runWork():
     print("---------")
     print(vr)
 
-    while config.isRunning == True:
+    while config.isRunning :
         iterate()
         time.sleep(config.redrawRate)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -313,7 +310,7 @@ def main(run=True):
     config.outlineColorAlpha = round(
         random.uniform(config.leadEdgeAlpahMin, config.leadEdgeAlpahMax)
     )
-    yPos = 0
+    # yPos = 0
     config.barArray = []
 
     config.colorSets = []

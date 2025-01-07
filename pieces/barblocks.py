@@ -1,20 +1,13 @@
 # ################################################### #
-import argparse
 import math
 import random
 import time
-import types
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils, panelDrawing
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
-import numpy as np
-import os
-
+from modules import coloroverlay, colorutils, panelDrawing
+from PIL import Image, ImageDraw
+# import numpy
 # import beepy as beeper
 # beeper.beep(sound=1) # integer as argument
-
-
-
 
 class Block:
     def __init__(self, config, i):
@@ -80,7 +73,7 @@ class Block:
             y2 = i * (self.barWidth + self.gap) + self.barWidth + self.polyDeltaY
 
             # self.blockDraw.rectangle((x1,y1,x2,y2),outline=(None), fill=outClr)
-            if self.config.drawOutlines == True:
+            if self.config.drawOutlines :
                 self.blockDraw.polygon(
                     ((x1, y1), (x2, y1), (x2, y2), (x1, y2)),
                     outline=(clr2),
@@ -118,7 +111,7 @@ def getConfigOverlay(palette, forceSelction=False):
     colOverlay.timeTrigger = True
     colOverlay.maxBrightness = 1
     colOverlay.steps = 50
-    if forceSelction == False:
+    if not forceSelction :
         colOverlay.minHue = palette[0]
         colOverlay.maxHue = palette[1]
         colOverlay.minSaturation = palette[2]
@@ -133,7 +126,7 @@ def getConfigOverlay(palette, forceSelction=False):
         # This needs to be configurable
         fixedPaletteIndex = config.fixedPaletteIndex
 
-        if config.mixedPalettes == True:
+        if config.mixedPalettes :
             fixedPaletteIndex = round(random.uniform(0, len(config.paletteOverrideNames)-1))
 
         paletteColor = colorutils.getNamedPalette(config.paletteOverrideNames[fixedPaletteIndex])
@@ -260,7 +253,7 @@ def buildGrid(config):
     count = 0
     config.barBlocks = []
     delta = 0
-    sizes = [16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128]
+    # sizes = [16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128]
     rows = round(config.canvasHeight / config.blockHeight) * 1
     cols = round(config.canvasWidth / config.blockWidth)
 
@@ -333,7 +326,7 @@ def buildGrid(config):
                     )
 
                 paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
-                if config.mixedPalettes == True:
+                if config.mixedPalettes :
                     paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
                 else:
                     paletteIndex = config.paletteIndex
@@ -380,7 +373,7 @@ def buildOverlapGrid(config):
     for i in range(0, len(availableCoords)):
         index = math.floor(random.uniform(0, len(config.sizeArray)))
         blockWidth = config.sizeArray[index]
-        blockHeight = config.blockWidth
+        # blockHeight = config.blockWidth
         barBlockUnit = Block(config, count)
         barBlockUnit.blockWidth = round(
             random.uniform(blockWidth - delta, blockWidth + delta)
@@ -405,7 +398,7 @@ def buildOverlapGrid(config):
             )
 
         paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
-        if config.mixedPalettes == True:
+        if config.mixedPalettes :
             paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
         else:
             paletteIndex = config.paletteIndex
@@ -436,7 +429,7 @@ def buildUniformGrid(config):
 
     for r in range(0, rows):
         lastX = 0
-        for c in range(0, cols):
+        for _ in range(0, cols):
             barBlockUnit = Block(config, count)
             barBlockUnit.blockWidth = round(
                 random.uniform(blockWidth - delta, blockWidth + delta)
@@ -463,7 +456,7 @@ def buildUniformGrid(config):
                     random.uniform(-config.rotationVariation, config.rotationVariation)
                 )
 
-            if config.mixedPalettes == True:
+            if config.mixedPalettes :
                 paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
             else:
                 paletteIndex = config.paletteIndex
@@ -503,11 +496,11 @@ def iterate():
         y2 = round(random.uniform(y1, config.canvasHeight))
 
         config.useBlur = True
-        blurXOffset = x1
-        blurYOffset = y1
-        blurSectionWidth = x2
-        blurSectionHeight = y2
-        sectionBlurRadius = 1
+        config.blurXOffset = x1
+        config.blurYOffset = y1
+        config.blurSectionWidth = x2
+        config.blurSectionHeight = y2
+        config.sectionBlurRadius = 1
 
     if random.random() < config.changeGridProb:
         
@@ -549,7 +542,7 @@ def iterate():
             # a bit more often, things just go still
             config.deltaXVal = config.deltaYVal = 0
 
-    if config.useDrawingPoints == True:
+    if config.useDrawingPoints :
         config.panelDrawing.canvasToUse = config.canvasImage
         config.panelDrawing.render()
     else:
@@ -562,10 +555,10 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running barblocks.py")
     print(bcolors.ENDC)
-    while config.isRunning == True:
+    while config.isRunning :
         iterate()
         time.sleep(config.redrawSpeed)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -696,7 +689,7 @@ def main(run=True):
         # Need to add something like this at final render call  as well
 
         ########### RENDERING AS A MOCKUP OR AS REAL ###########
-        if config.useDrawingPoints == True :
+        if config.useDrawingPoints  :
             config.panelDrawing.canvasToUse = config.renderImageFull
             config.panelDrawing.render()
         else :

@@ -1,14 +1,10 @@
 import math
 import random
-import threading
 import time
 from modules.configuration import bcolors
 from modules import colorutils, coloroverlay
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
-from modules.holder_director import Holder 
+from PIL import Image, ImageDraw
 from modules.holder_director import Director 
-
-
 
 
 class Fader:
@@ -19,7 +15,7 @@ class Fader:
         print("Fader")
 
     def fadeIn(self, config):
-        if self.fadingDone == False:
+        if not self.fadingDone :
             if self.doingRefresh < self.doingRefreshCount:
                 self.blankImage = Image.new("RGBA", (self.width, self.height))
                 self.crossFade = Image.blend(
@@ -70,8 +66,8 @@ class Point:
         self.ySpeedInit = self.ySpeed
 
 
-        dx = self.xPos
-        dy = self.yPos
+        # dx = self.xPos
+        # dy = self.yPos
         self.angle = 0
 
         # self.xSpeed = math.cos(self.angle) * self.speed
@@ -136,7 +132,7 @@ class Point:
             round(self.config.colorAlpha/factorVal)
         )
 
-        if self.colOverlay.complete == True:
+        if self.colOverlay.complete :
             self.setColors()
 
     def render(self, angle=0):
@@ -195,12 +191,12 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running moving_points.py")
     print(bcolors.ENDC)
-    while config.isRunning == True:
+    while config.isRunning :
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance :
             iterate()
         time.sleep(config.redrawRate)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -244,22 +240,22 @@ def iterate():
 
         if bar.xPos > config.canvasWidth + bar.barLength:
             bar.xPos = -bar.barLength
-            if bar.remakeOnExit == True:
+            if bar.remakeOnExit :
                 bar.remake()
 
         if bar.xPos < - bar.barLength:
             bar.xPos = config.canvasWidth + bar.barLength
-            if bar.remakeOnExit == True:
+            if bar.remakeOnExit :
                 bar.remake()
 
         if bar.yPos < -bar.barLength:
             bar.yPos = config.canvasHeight + bar.barLength
-            if bar.remakeOnExit == True:
+            if bar.remakeOnExit :
                 bar.remake()
 
         if bar.yPos > config.canvasHeight + bar.barLength:
             bar.yPos = -bar.barLength
-            if bar.remakeOnExit == True:
+            if bar.remakeOnExit :
                 bar.remake()
 
 
@@ -295,7 +291,7 @@ def iterate():
 
 
     temp1 = config.image.copy()
-    temp2 = config.image.copy()
+    # temp2 = config.image.copy()
 
     # This is all very specific to a setup with 2 beams in a T formation
     # where the tilted propping beam is 32 x 320 px and the horizontaly tilted beam is 32 x 256
@@ -435,7 +431,7 @@ def main(run=True):
 
     # ------------------------------------- #
     # initialize and place the first set
-    for i in range(0, config.numberOfPoints):
+    for _ in range(0, config.numberOfPoints):
         bar = Point(config)
         bar.yPos = round(random.uniform(config.yRangeMin, config.yRangeMax))
         bar.xPos = round(random.uniform(config.xRangeMin, config.xRangeMax))

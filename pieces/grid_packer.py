@@ -5,12 +5,11 @@
 # thousands of them would be intersting but probably not
 
 import itertools
-import math
 import random
 import time
 from modules.configuration import bcolors
-from modules import coloroverlay, colorutils
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from modules import colorutils
+from PIL import Image, ImageDraw
 
 
 class Director:
@@ -267,9 +266,6 @@ def simplePlacer(doSort=False, reversedSort=False):
         config.unitFills = sorted(
             config.unitFills, key=lambda w: w[0] * w[1], reverse=reversedSort
         )
-    lastX = 0
-    lastY = 0
-    lastHighest = 0
 
     unitIndex = config.unitIndex
     # for unitIndex in range(0, len(config.unitFills)):
@@ -366,7 +362,7 @@ def iterate():
     # config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
     config.director.checkTime()
-    if config.director.advance == True:
+    if config.director.advance :
         drawGrid()
         # config.draw.rectangle(
         #     (0, 0, config.screenWidth, config.screenHeight), fill=config.backgroundColor

@@ -1,11 +1,9 @@
-import argparse
-import datetime
 import math
 import random
 import time
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from PIL import Image, ImageDraw
 
 
 #----------------------------------------------------##----------------------------------------------------#
@@ -63,7 +61,7 @@ class Crack:
 
         xRange = self.config.canvasWidth / self.pointsCount
 
-        a = 0
+        # a = 0
         slope = 0
 
         for i in range(0, self.pointsCount):
@@ -127,7 +125,7 @@ def filterRemapCall(ovrd=False) :
         endX = round(random.uniform(8, config.filterRemapminHoriSize))
         endY = round(random.uniform(8, config.filterRemapminVertSize))
         
-        if ovrd == True :
+        if ovrd :
             startX = 0
             startY = 0
             endX = 200
@@ -181,7 +179,7 @@ def showGrid():
     config.sampleVariationX = 5
     config.sampleVariationY = 0
     for i in range(0, len(config.crackArray)):
-        if i < 3 and config.drawCracks == True:
+        if i < 3 and config.drawCracks:
             config.crackArray[i].render()
 
         ## Draw vertical lines from one line to the next
@@ -274,8 +272,10 @@ def showGrid():
                                 < config.probDrawVertLines
                                 * config.probabilityMultiplier
                             ):
-                                if x2 < x : x2 = x + 10
-                                if y2 < y : y2 = y + 10
+                                if x2 < x :
+                                    x2 = x + 10
+                                if y2 < y :
+                                    y2 = y + 10
                                 config.canvasDraw.line(
                                     (x, y, x, y2), fill=colorSampleColor
                                 )
@@ -285,8 +285,10 @@ def showGrid():
                                 < config.probDrawBoxes * config.probabilityMultiplier
                             ):
 
-                                if x2 < x : x2 = x + 10
-                                if y2 < y : y2 = y + 10
+                                if x2 < x :
+                                    x2 = x + 10
+                                if y2 < y :
+                                    y2 = y + 10
                                 
 
                                 config.canvasDraw.rectangle(
@@ -295,7 +297,7 @@ def showGrid():
                                     outline=colorSampleColor,
                                 )
 
-    if config.pausing == False:
+    if not config.pausing :
         config.image.paste(
             config.canvasImage,
             (config.imageXOffset, config.imageYOffset),
@@ -418,7 +420,7 @@ def main(run=True):
         print("loading : ", path)
         if config.bgImage.load():
             config.bgImage = config.bgImage.convert("RGBA")
-        imgHeight = config.bgImage.getbbox()[3]
+        # imgHeight = config.bgImage.getbbox()[3]
     except Exception as e:
         print(str(e))
         config.bgImage = None
@@ -455,7 +457,7 @@ def main(run=True):
         config.filterRemapRangeY = config.canvasHeight
 
     try:
-        if config.usePixelSort == True:
+        if config.usePixelSort:
             config.pixelSortProbOn = float(workConfig.get("screenproject", "pixelSortProbOn"))
             config.pixelSortProbOff = float(workConfig.get("screenproject", "pixelSortProbOff"))
         else:
@@ -484,7 +486,7 @@ def main(run=True):
 
 
     config.crackArray = []
-    for i in range(0, config.numCracks):
+    for _ in range(0, config.numCracks):
         obj = Crack(config)
         obj.origin = [config.canvasWidth, config.canvasHeight]
         obj.origin = [config.origin[0], config.origin[1]]
@@ -511,12 +513,12 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("RUNNING Screen.py")
     print(bcolors.ENDC)
-    while config.isRunning == True:
+    while config.isRunning:
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance:
             iterate()
             time.sleep(config.delay)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -527,7 +529,7 @@ def iterate():
     if (
         random.random() < config.unpauseProb / 2
         and config.probabilityMultiplierRange > 1
-        and config.pausing == False
+        and not config.pausing
     ):
         config.probabilityMultiplier = random.uniform(
             1.1, config.probabilityMultiplierRange
@@ -536,16 +538,16 @@ def iterate():
     if random.random() < config.pauseProb * 4:
         config.probabilityMultiplier = 1
 
-    if random.random() < config.pauseProb and config.usePause == True:
+    if random.random() < config.pauseProb and config.usePause:
         config.pausing = True
         showGrid()
-    elif config.pausing == False:
+    elif not config.pausing:
         showGrid()
 
-    if random.random() < config.unpauseProb and config.pausing == True:
+    if random.random() < config.unpauseProb and config.pausing:
         config.pausing = False
 
-    if config.usePause == False:
+    if not config.usePause:
         showGrid()
 
     if random.random() < config.crackChangeProb:
@@ -554,14 +556,14 @@ def iterate():
         config.crackArray[c].origin = [config.origin[0], config.origin[1]]
         config.crackArray[c].setUp()
         
-    if random.random() < config.filterRemappingProb:
-        if random.random() < .5:
-            config.filterRemapping == False
-        else:
-            config.filterRemapping == True
+    # if random.random() < config.filterRemappingProb:
+    #     if random.random() < .5:
+    #         not config.filterRemapping
+    #     else:
+    #         config.filterRemapping
 
     if random.random() < config.filterRemappingProb:
-        if config.useFilters == True and config.filterRemapping == True:
+        if config.useFilters and config.filterRemapping:
             filterRemapCall()
 
 
@@ -577,15 +579,15 @@ def iterate():
     if random.random() < config.pixelSortProbOff:
         config.usePixelSort = False
         
-    if random.random() < config.blackOutProb and config.inBlackOut == False :
+    if random.random() < config.blackOutProb and not config.inBlackOut :
         config.inBlackOut  = True
         print("BlackOut")
         
-    if random.random() < config.blackOutProbOff and config.inBlackOut == True :
+    if random.random() < config.blackOutProbOff and config.inBlackOut :
         config.inBlackOut  = False
         print("BlackOut OFF")
         
-    if config.inBlackOut  == True :
+    if config.inBlackOut  :
         # config.pausing = True
         drawBlackOut()
         

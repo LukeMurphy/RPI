@@ -1,19 +1,12 @@
-import math
 import random
-import textwrap
 import time
-import noise
-from noise import *
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import coloroverlay, colorutils
 from modules.quilting import (
     createpolypieces,
-    createstarpieces,
-    createtrianglepieces,
 )
 from modules.quilting.colorset import ColorSet
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.holder_director import Holder 
+from PIL import Image,ImageDraw,ImageOps
 from modules.holder_director import Director 
 from modules import distortions
 
@@ -44,7 +37,7 @@ def transformImage(img):
 def randomRange(A=0, B=1, rounding=False):
     a = random.SystemRandom().uniform(A, B)
     b = random.SystemRandom().uniform(A, B)
-    return (a, b) if rounding == False else (round(a), round(b))
+    return (a, b) if not rounding else (round(a), round(b))
 
 
 def restartPiece():
@@ -369,12 +362,12 @@ def runWork():
     print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("RUNNING quilt-poly-v2.py")
     print(bcolors.ENDC)
-    while config.isRunning == True:
+    while config.isRunning :
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance :
             iterate()
         time.sleep(config.redrawSpeed)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -398,7 +391,7 @@ def iterate():
     # else:
     #     temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
     #     temp.paste(config.image, (0, 0), config.image)
-    #     if config.transformShape == True:
+    #     if config.transformShape :
     #         temp = transformImage(temp)
     #     config.drawBlockShape()
     #     config.render(temp, 0, 0)
@@ -408,23 +401,23 @@ def iterate():
         obj.update()
         obj.render()
         
-    if config.sectionDisturbance == True :
+    if config.sectionDisturbance  :
         distortions.iterationFunction(config)
             
     # previous non-disturbing iteration just rendered the temp image
     # config.render(temp, 0, 0)
     
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    temp1Draw = ImageDraw.Draw(temp1)
+    # temp1Draw = ImageDraw.Draw(temp1)
 
     config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
     temp1.paste(config.image, (0, 0), config.image)
     
-    if config.transformShape == True :
+    if config.transformShape  :
         temp1 = transformImage(temp1)
     
     
-    if config.useWaveDistortion == True:
+    if config.useWaveDistortion :
         temp1 = ImageOps.deform(temp1, distortions.WaveDeformer(config))
         config.waveDeformXPos += config.waveDeformXPosRate
         if config.waveDeformXPos > config.screenWidth :
@@ -439,7 +432,7 @@ def iterate():
     delta = config.t2 - config.t1
 
     if delta > config.timeToComplete:
-        if config.sectionDisturbance == True :
+        if config.sectionDisturbance  :
             # these functions are run to restart disturber
             distortions.resetFunction(config)
         

@@ -1,13 +1,13 @@
 import os
-from os import listdir
-from os.path import isfile, join, isdir
+# from os import listdir
+# from os.path import isfile, join, isdir
 from os import walk
 import datetime
-import subprocess
-import sys
+# import subprocess
+# import sys
 import tkinter as tk
 from tkinter import *
-import tkmacosx
+# import tkmacosx
 from tkmacosx import Button
 
 # from tk import Button
@@ -83,18 +83,14 @@ def execute(configToRun):
     if ".cfg" in configToRun:
         if "multi" in configToRun:
             print("MULTIPLAYER STARTING >>>\n")
-            os.system(commadStringMultiPyth +
-                      configToRun.split(configPath)[1] + "&")
+            os.system(commadStringMultiPyth + configToRun.split(configPath)[1] + "&")
         if "--manifest" in configToRun:
             print(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
-            os.system(commadStringSeqPyth +
-                      configToRun.split(configPath)[1] + "&")
+            os.system(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
         else:
-            os.system(commadStringPyth +
-                      configToRun.split(configPath)[1] + "&")
+            os.system(commadStringPyth + configToRun.split(configPath)[1] + "&")
     elif ".app" in configToRun:
-        os.system("open " + commadStringProc +
-                  configToRun.split(configPath)[1])
+        os.system("open " + commadStringProc + configToRun.split(configPath)[1])
         JavaAppRunning = configToRun.split(configPath)[1]
 
 
@@ -115,15 +111,16 @@ def action2():
         os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
 
         if JavaAppRunning != "":
-            os.system("ps -ef | pgrep -f " + JavaAppRunning +
-                      " | xargs sudo kill -9;")
+            os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")
 
         configSelected = a[1]
         configToRun = configSelected[list(configSelected.keys())[0]]
         execute(configToRun)
 
-def clear() :
-    T.delete('1.0', '1.20')
+
+def clear():
+    T.delete("1.0", "1.20")
+
 
 def stopAll():
     # print("Tkinter is easy to use!")
@@ -131,12 +128,12 @@ def stopAll():
 
 
 def sortByDate():
-    filterText = (T.get("1.0", "end-1c"))
+    filterText = T.get("1.0", "end-1c")
     getAllConfigFiles(True, False, filterText)
 
 
 def sortByFolder():
-    filterText = (T.get("1.0", "end-1c"))
+    filterText = T.get("1.0", "end-1c")
     getAllConfigFiles(False, False, filterText)
 
 
@@ -156,6 +153,7 @@ def openFile():
 def returnFirstElement(l):
     return l[0]
 
+
 # Generate list of configs:
 
 
@@ -163,7 +161,7 @@ def returnSecondElement(l):
     return l[1]
 
 
-def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
+def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
 
     global actionDict1, ListBoxOfConfigs
     global configPath
@@ -172,23 +170,26 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
     # arr.sort(reverse=False)
     fullList = []
     actionDict1 = []
-    
+
     filterResults = False
-    if len(filterText) > 1 :
+    if len(filterText) > 1:
         filterResults = True
-        
+
     for root, dirs, files in os.walk(configPath, topdown=False):
         for name in files:
             fullPath = os.path.join(root, name)
-            if name.find(".cfg") > 0 and name.find(".py") == -1 and name.find(".DS_Store") == -1:
+            if (
+                name.find(".cfg") > 0
+                and name.find(".py") == -1
+                and name.find(".DS_Store") == -1
+            ):
                 res = os.stat(fullPath)
-                
-                if filterResults == False :
+
+                if filterResults == False:
                     fullList.append((os.path.join(root, name), res.st_mtime, name))
-                if filterResults == True :
+                if filterResults == True:
                     if name.find(filterText) > 0 or fullPath.find(filterText) > 0:
                         fullList.append((os.path.join(root, name), res.st_mtime, name))
-
 
     # Sort the configs by date descending
     if dateSort == True:
@@ -202,21 +203,29 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
     actionDict1.append({"": ""})
 
     for f in fullList:
-        fName = f[0].split(configPath)[1].split('/')[0]
+        fName = f[0].split(configPath)[1].split("/")[0]
         if len(f) > 0:
             tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("%Y-%m-%d [%H:%M]")
             tsTxtVals = tsTxt.split(" ")
-            
+
             # and dateSort != True
-            currentDir = f[0].split(configPath)[1].split('/')[0]
-            currDirLevel2 = f[0].split(configPath)[1].split('/')[1]
-            if currDirLevel2.find(".cfg") <= 0 :
-                    currentDir = currentDir + "/" + currDirLevel2
-            if currentDir != lastDir and dateSort == False :
+            currentDir = f[0].split(configPath)[1].split("/")[0]
+            currDirLevel2 = f[0].split(configPath)[1].split("/")[1]
+            if currDirLevel2.find(".cfg") <= 0:
+                currentDir = currentDir + "/" + currDirLevel2
+            if currentDir != lastDir and dateSort == False:
                 actionDict1.append({"": ""})
                 lastDir = currentDir
 
-            actionDict1.append({tsTxt + "\t\t" + f[0].split(f[2])[0].split(configPath)[1]  + " \t\t\t\t \t\t\t\t" + f[2]: f[0]})
+            actionDict1.append(
+                {
+                    tsTxt
+                    + "\t\t"
+                    + f[0].split(f[2])[0].split(configPath)[1]
+                    + " \t\t\t\t \t\t\t\t"
+                    + f[2]: f[0]
+                }
+            )
         else:
             actionDict1.append({"": ""})
 
@@ -224,11 +233,21 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText = ""):
     for i, item in enumerate(actionDict1):
         # print(list(item.keys())[0])
         ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
-        ListBoxOfConfigs.itemconfig(END, bg = "#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white" )
-        ListBoxOfConfigs.itemconfig(END, bg = "#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None )
-        ListBoxOfConfigs.itemconfig(END, bg = "#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None )
-        ListBoxOfConfigs.itemconfig(END, bg = "#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None )
-        ListBoxOfConfigs.itemconfig(END, bg = "#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None )
+        ListBoxOfConfigs.itemconfig(
+            END, bg="#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white"
+        )
+        ListBoxOfConfigs.itemconfig(
+            END, bg="#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None
+        )
+        ListBoxOfConfigs.itemconfig(
+            END, bg="#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None
+        )
+        ListBoxOfConfigs.itemconfig(
+            END, bg="#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None
+        )
+        ListBoxOfConfigs.itemconfig(
+            END, bg="#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None
+        )
 
 
 # -------------------------------- #
@@ -246,7 +265,7 @@ root.geometry(
     % (
         760,
         round(screen_height * 0.6),
-        round(screen_width -800),
+        round(screen_width - 800),
         round(1 * screen_height / 2),
     )
 )
@@ -256,11 +275,13 @@ root.config(bg="white")
 
 # -------------------------------- #
 # Setup the main listBox widget
-ListBoxOfConfigs = Listbox(root, width=90, height=42, bg="white", foreground="black", bd = False)
+ListBoxOfConfigs = Listbox(
+    root, width=90, height=42, bg="white", foreground="black", bd=False
+)
 
 for i, item in enumerate(actionDict1):
     ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
-    ListBoxOfConfigs.itemconfig(END, {"bg" : 'red'} )
+    ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
 
 ListBoxOfConfigs.place(bordermode=OUTSIDE, x=2, y=14)
 
@@ -296,7 +317,13 @@ slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 # -------------------------------- #
 openbutton = Button(
-    root, text="Open", width=120, bg="#497faa", fg="white", borderless=1, command=openFile
+    root,
+    text="Open",
+    width=120,
+    bg="#497faa",
+    fg="white",
+    borderless=1,
+    command=openFile,
 )
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
@@ -354,16 +381,22 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
 # Filter text box
-T = Text(root, height = 1, width = 32, bg="white", fg="black", bd=False, padx=4, pady =4)
+T = Text(root, height=1, width=32, bg="white", fg="black", bd=False, padx=4, pady=4)
 T.place(bordermode=OUTSIDE, x=2, y=2)
 clearButton = Button(
-    root, text="Clear", width=120, bg="#497faa", fg="white", borderless=True, command=clear
+    root,
+    text="Clear",
+    width=120,
+    bg="#497faa",
+    fg="white",
+    borderless=True,
+    command=clear,
 )
 clearButton.place(bordermode=OUTSIDE, x=280, y=2)
 
 
 # -------------------------------- #
-# sort by date = True,  
+# sort by date = True,
 getAllConfigFiles(True, True)
 
 # -------------------------------- #

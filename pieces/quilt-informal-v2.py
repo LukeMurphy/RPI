@@ -1,18 +1,14 @@
 import contextlib
 import math
 import random
-import textwrap
 import time
-import noise
-from noise import *
-from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils, panelDrawing
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.holder_director import Holder
-from modules.holder_director import Director
-
+# from noise import *
 from threading import Timer
-
+from PIL import Image,  ImageDraw, ImageOps
+from modules.configuration import bcolors
+from modules import distortions
+from modules import coloroverlay, colorutils, panelDrawing
+from modules.holder_director import Director
 
 def setTimeout(fn, ms, *args, **kwargs):
     t = Timer(ms / 1000.0, fn, args=args, kwargs=kwargs)
@@ -23,7 +19,7 @@ def setTimeout(fn, ms, *args, **kwargs):
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
 
-from modules import distortions
+
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -150,7 +146,7 @@ class unit:
             int(a * self.brightness) for a in (self.colOverlay.currentColor)
         )
 
-        if self.lines == True:
+        if self.lines :
             self.draw.polygon(self.poly, fill=self.fillColor)
         else:
             self.draw.polygon(self.poly, fill=self.fillColor, outline=None)
@@ -170,7 +166,7 @@ class unit:
             int(a * self.brightness) for a in (self.colOverlay.currentColor)
         )
 
-        if self.lines == True:
+        if self.lines :
             self.draw.rectangle(
                 (
                     (self.xPos, self.yPos),
@@ -192,7 +188,7 @@ class unit:
     ## Straight color change - deprecated - too blinky
     def changeColorFill(self):
 
-        if self.changeColor == True:
+        if self.changeColor :
             if self.fillColorMode == "random":
                 self.fillColor = colorutils.randomColor(
                     random.SystemRandom().uniform(0.01, self.brightness)
@@ -227,8 +223,8 @@ def drawSquareSpiral():
     config.unitArray = []
 
     ## Alignment perfect setup
-    if config.patternPrecision == True:
-        sizeAdjustor = 1
+    # if config.patternPrecision :
+    #     sizeAdjustor = 1
 
     n = 0
     # @todo
@@ -240,10 +236,10 @@ def drawSquareSpiral():
 
     """
     LIGHTENING PATTERN
-     dark right dark bottom   dark top. dark right
-     dark top  dark left.   dark right. dark bottom
+    dark right dark bottom   dark top. dark right
+    dark top  dark left.   dark right. dark bottom
 
-     repeat .....
+    repeat .....
 
 
     """
@@ -677,7 +673,7 @@ def main(run=True):
     #### Need to add something like this at final render call  as well
     """ 
         ########### RENDERING AS A MOCKUP OR AS REAL ###########
-        if config.useDrawingPoints == True :
+        if config.useDrawingPoints  :
             config.panelDrawing.canvasToUse = config.renderImageFull
             config.panelDrawing.render()
         else :
@@ -721,12 +717,12 @@ def runWork():
     print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("RUNNING quilt-informal.py")
     print(bcolors.ENDC)
-    while config.isRunning == True:
+    while config.isRunning :
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance :
             iterate()
         time.sleep(config.redrawSpeed)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -734,7 +730,7 @@ def iterate():
     global config
     config.outlineColorObj.stepTransition()
 
-    if config.doingSectionDisturbance == False:
+    if not config.doingSectionDisturbance :
         for i in range(len(config.unitArray)):
             obj = config.unitArray[i]
             if random.SystemRandom().random() > 0.98:
@@ -750,25 +746,25 @@ def iterate():
         ((0, 0), (config.screenWidth, config.screenHeight)), fill=config.backgroundColor
     )
 
-    if config.transformShape == True:
+    if config.transformShape :
         temp = transformImage(temp)
 
-    if config.sectionDisturbance == True:
+    if config.sectionDisturbance :
         distortions.iterationFunction(config)
 
     # previous non-disturbing iteration just rendered the temp image
     # config.render(temp, 0, 0)
 
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    temp1Draw = ImageDraw.Draw(temp1)
+    # temp1Draw = ImageDraw.Draw(temp1)
 
     config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
     temp1.paste(config.image, (0, 0), config.image)
 
-    if config.transformShape == True:
+    if config.transformShape :
         temp1 = transformImage(temp1)
 
-    if config.useWaveDistortion == True:
+    if config.useWaveDistortion :
         temp1 = ImageOps.deform(temp1, distortions.WaveDeformer(config))
         config.waveDeformXPos += config.waveDeformXPosRate
         if config.waveDeformXPos > config.screenWidth:
@@ -787,7 +783,7 @@ def iterate():
     delta = config.t2 - config.t1
 
     if delta > config.timeToComplete:
-        if config.sectionDisturbance == True:
+        if config.sectionDisturbance :
             # these functions are run to restart disturber
             distortions.resetFunction(config)
 

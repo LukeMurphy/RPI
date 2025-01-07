@@ -1,11 +1,13 @@
 #!/usr/bin/python
-import PIL.Image
-from PIL import Image, ImageDraw, ImageMath, ImageEnhance
-from PIL import ImageChops
+# import PIL.Image
+from PIL import Image, ImageDraw
+# from PIL import ImageChops
 
 # from modules import colorutils
 # Import the essentials to everything
-import time, random, math
+import time
+import random
+import math
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -60,7 +62,7 @@ class Lsys:
         print("========================")
         print("Init Lsys")
         self.config = config
-        strg = ""
+        # strg = ""
 
         # F draws a terminal line
         # B draws a line
@@ -103,14 +105,14 @@ class Lsys:
         self.xPos = self.origin["xPos"]
         self.yPos = self.origin["yPos"]
 
-    def redraw(self, e):
-        if incrStart < strg.length - incrRange:
-            produceDrawingPoints()
+    # def redraw(self, e):
+    #     if incrStart < strg.length - incrRange:
+    #         produceDrawingPoints()
 
     def parse(self, arg):
         self.finalString = arg
         self.c += 1
-        l = len(self.Rule2)
+        # l = len(self.Rule2)
         if self.c < self.iternations + 1:
             arg = arg.replace("G", self.Rule1)
             arg = arg.replace("F", self.Rule2)
@@ -123,7 +125,7 @@ class Lsys:
         a = -math.pi / 2
         decriment = 1
         decrimentWidth = 1
-        c = 0
+        # c = 0
 
         lpt = LPoint()
         lpt.xPos = 0
@@ -148,19 +150,19 @@ class Lsys:
         lastBranchPoint = self.branchPoints[0]
         lastPoint = config.nodeSets[len(config.nodeSets) - 1][1]
 
-        lastxPos = xPos
-        lastyPos = yPos
+        # lastxPos = xPos
+        # lastyPos = yPos
 
         for i in range(len(self.strg)):
             instruction = self.strg[i]
 
             if instruction not in ("(", ")"):
                 if instruction == "+":
-                    a += config.baseAngle + random.uniform(
+                    a += config.baseAngle + random.SystemRandom.uniform(
                         -config.angleRange * math.pi, config.angleRange * math.pi
                     )
                 elif instruction == "-":
-                    a -= config.baseAngle + random.uniform(
+                    a -= config.baseAngle + random.SystemRandom.uniform(
                         -config.angleRange * math.pi, config.angleRange * math.pi
                     )
                 elif instruction == "G" or instruction == "F":
@@ -188,8 +190,8 @@ class Lsys:
                     self.drawingPoints.append(lpt)
 
                     lastPoint = lpt
-                    lastxPos = xPos
-                    lastyPos = yPos
+                    # lastxPos = xPos
+                    # lastyPos = yPos
 
             if instruction == "(":
                 lastBranchPoint = lpt
@@ -203,7 +205,7 @@ class Lsys:
                 decrimentWidth *= self.segmentWidthDecrement
 
             elif instruction == ")":
-                c = 0  # self.branchPoints[-1].isTerminal
+                # c = 0  # self.branchPoints[-1].isTerminal
 
                 xPos = self.branchPoints[-1].xPos
                 yPos = self.branchPoints[-1].yPos
@@ -285,9 +287,9 @@ def drawLines(arg):
                 ),
                 fill=(250, 250, 0, 100),
             )
-            if random.random() < 0.002:
-                p1.xPos += (5 - random.random() * 10) * (1 - p1.scale)
-                p1.yPos += (5 - random.random() * 10) * (1 - p1.scale)
+            if random.SystemRandom.random() < 0.002:
+                p1.xPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
+                p1.yPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
 
         # draws the branch juntions
         if p1.isBranch == 1 and p1.isTerminal == 0:
@@ -302,9 +304,9 @@ def drawLines(arg):
                 fill=(150, 0, 0, 100),
             )
 
-            if random.random() < 0.001:
-                p1.xPos += (5 - random.random() * 10) * (1 - p1.scale)
-                p1.yPos += (5 - random.random() * 10) * (1 - p1.scale)
+            if random.SystemRandom.random() < 0.001:
+                p1.xPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
+                p1.yPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
 
     # for i in range(len(config.branchPoints)):
     #     pRef = config.branchPoints[i]
@@ -447,8 +449,8 @@ def runWork():
 def iterate():
     global config, L, pos, runRun
     config.director.checkTime()
-    if config.director.advance == True:
-        if config.rendered == False:
+    if config.director.advance :
+        if not config.rendered :
             L.produceDrawingPoints()
         drawLines(L)
         config.render(config.image, 0, 0, 192, 192)

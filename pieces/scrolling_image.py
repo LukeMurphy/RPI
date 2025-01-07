@@ -1,17 +1,10 @@
 # ################################################### #
-import argparse
-import math
 import random
 import time
-import types
-import numpy as np
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
-from modules.holder_director import Holder 
+from modules import coloroverlay, colorutils
+from PIL import Image, ImageDraw
 from modules.holder_director import Director 
-
 
 lastRate = 0
 colorutils.brightness = 1
@@ -64,7 +57,8 @@ def redraw():
     # print(width, config.maxX,deltaX)
     if width >= config.maxX and deltaX >= (-config.scrollX)  :
         
-        if deltaX < 0 : deltaX = 0
+        if deltaX < 0 :
+            deltaX = 0
         print(str("deltaX = {}").format(deltaX))
         print(str("config.speedX = {}").format(config.speedX))
         
@@ -124,12 +118,12 @@ def runWork():
     print("Running scrolling_image.py")
     print(bcolors.ENDC)
     
-    while config.isRunning == True:
+    while config.isRunning:
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance:
             iterate()
             time.sleep(config.directorController.delay)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -140,7 +134,7 @@ def iterate():
     
     
     if random.random() < config.filterRemappingProb:
-        if config.useFilters == True and config.filterRemapping == True:
+        if config.useFilters and config.filterRemapping:
             config.filterRemap = True
             # new version  more control but may require previous pieces to be re-worked
             startX = round(random.uniform(0, config.filterRemapRangeX))

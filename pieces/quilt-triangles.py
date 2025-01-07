@@ -1,12 +1,10 @@
-import math
 import random
-import textwrap
 import time
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils
+from modules import  coloroverlay, colorutils
 from modules.quilting import createstarpieces, createtrianglepieces
 from modules.quilting.colorset import ColorSet
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from PIL import Image, ImageDraw
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -32,7 +30,7 @@ def transformImage(img):
 def randomRange(A=0, B=1, rounding=False):
 	a = random.uniform(A, B)
 	b = random.uniform(A, B)
-	if rounding == False:
+	if not rounding :
 		return (a, b)
 	else:
 		return (round(a), round(b))
@@ -42,7 +40,7 @@ def restartPiece():
 	config.t1 = time.time()
 	config.t2 = time.time()
 
-	if config.usePresets == True:
+	if config.usePresets :
 
 		if config.quiltPattern == "stars":
 			newHueRange = randomRange(0, 360, True)
@@ -432,10 +430,10 @@ def runWork():
 	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
 	print("RUNNING quilt-triangles.py")
 	print(bcolors.ENDC)
-	while config.isRunning == True:
+	while config.isRunning :
 		iterate()
 		time.sleep(config.delay)
-		if config.standAlone == False :
+		if not config.standAlone :
 			config.callBack()
 
 
@@ -466,7 +464,7 @@ def iterate():
 		temp.paste(config.image, (0, 0), config.image)
 		# temp = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
 		# temp.paste(config.canvasImage, (0, 0), config.canvasImage)
-		if config.transformShape == True:
+		if config.transformShape :
 			temp = transformImage(temp)
 		config.drawBlockShape()
 		config.render(temp, 0, 0)

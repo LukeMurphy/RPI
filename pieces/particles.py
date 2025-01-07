@@ -1,8 +1,7 @@
-import datetime
 import itertools
 import math
 import random
-import textwrap
+
 import time
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils, panelDrawing
@@ -12,14 +11,12 @@ from PIL import (
     Image,
     ImageChops,
     ImageDraw,
-    ImageEnhance,
     ImageFilter,
     ImageFont,
     ImageOps,
 )
 import noise
-from noise import *
-from modules.holder_director import Holder
+# from noise import *
 from modules.holder_director import Director 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -558,7 +555,7 @@ def main(run=True):
     # Need to add something like this at final render call  as well
     """
 		########### RENDERING AS A MOCKUP OR AS REAL ###########
-		if config.useDrawingPoints == True :
+		if config.useDrawingPoints  :
 			config.panelDrawing.canvasToUse = config.renderImageFull
 			config.panelDrawing.render()
 		else :
@@ -569,7 +566,7 @@ def main(run=True):
 
     config.xPos = 0
 
-    for i in range(ps.numUnits):
+    for _ in range(ps.numUnits):
         emitParticle()
 
     setUp()
@@ -609,12 +606,12 @@ def emitParticle(i=None):
 
     if ps.movement == "fire":
         p.direction = random.uniform(0, 180) * math.pi / 180
-        if ps.oneDirection == True:
+        if ps.oneDirection :
             p.direction = 1
 
     if ps.movement == "travel":
         p.direction = random.uniform(0, 360) * math.pi / 180
-        if ps.oneDirection == True:
+        if ps.oneDirection :
             p.direction = 1
 
     """
@@ -654,7 +651,7 @@ def emitParticle(i=None):
         p.outlineColor = config.outlineColor  # (100,0,0,100)
         p.extraOutlineColor = config.extraOutlineColor
 
-        if config.pUseHSV == True:
+        if config.pUseHSV :
             p.fillColor = colorutils.getRandomColorHSV(
                 config.pFillRange[0], config.pFillRange[1], 
                 config.pFillRange[2], config.pFillRange[3], 
@@ -673,12 +670,12 @@ def emitParticle(i=None):
             p.outlineColor = config.outlineColor2  # (100,0,0,100)
             p.extraOutlineColor = config.extraOutlineColor2
 
-        if config.pixelsGoGray == True:
+        if config.pixelsGoGray :
             _extracted_from_emitParticle_94(config, p)
     if ps.movement == "linearMotion":
 
         _extracted_from_emitParticle_158(config, p, ps)
-    if i != None:
+    if i is not None:
         ps.unitArray[i] = p
     else:
         ps.unitArray.append(p)
@@ -699,7 +696,7 @@ def _extracted_from_emitParticle_158(config, p, ps):
     ]
     dirVal = round(random.uniform(0, 1))
 
-    if ps.linearMotionAlsoHorizontal == True:
+    if ps.linearMotionAlsoHorizontal :
         dirVal = round(random.uniform(0, 3))
 
     p.direction = directions[dirVal]
@@ -824,8 +821,8 @@ def colorize():
 
 def brightnessChanger():
     global config, ps
-    if config.brightnessVariation == True:
-        if config.brightnessVariationTransition == False:
+    if config.brightnessVariation :
+        if not config.brightnessVariationTransition :
             if random.random() < config.brightnessVariationProb:
                 config.destinationBrightness = random.uniform(
                     0.1, config.baseBrightness
@@ -873,12 +870,12 @@ def runWork():
     print("RUNNING Particle System pieces/singletons/particles.py")
     print(bcolors.ENDC)
 
-    while config.isRunning == True:
+    while config.isRunning :
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance :
             iterate()
         time.sleep(config.delay)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -890,7 +887,7 @@ def iterate():
 
     brightnessChanger()
 
-    if config.bgTransitions == True:
+    if config.bgTransitions :
         config.colOverlayA.stepTransition(alpha=config.colOverlayA.bgTransparency)
         config.bgColor = tuple(
             int(a * config.brightness) for a in config.colOverlayA.currentColor
@@ -903,14 +900,14 @@ def iterate():
         outline=None,
     )
 
-    if config.useOverOnBG == True:
+    if config.useOverOnBG :
         config.image.paste(
             config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
         )
 
     """
 	# ORIG PLACEMENT
-	if config.useOverLay == True:
+	if config.useOverLay :
 		# config.image = ImageChops.multiply(config.clrBlock, config.image)
 		config.image.paste(
 			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
@@ -925,14 +922,14 @@ def iterate():
         if p.objHeight > 200:
             p.remove = True
 
-        if p.remove == True:
+        if p.remove :
             # print("REMOVING",ps.unitArray.index(p),len(ps.unitArray))
 
-            if ps.fixedUnitArray == False:
+            if not ps.fixedUnitArray:
                 ps.unitArray.remove(p)
 
                 if len(ps.unitArray) < config.numUnits + 0:
-                    for i in range(ps.reEmitNumber):
+                    for _ in range(ps.reEmitNumber):
                         emitParticle()
             else:
                 emitParticle(i=ps.unitArray.index(p))
@@ -949,13 +946,14 @@ def iterate():
     # to move the dithered sparkle around a bit to
     # disturb the eveness of things ..
 
-    if random.random() < config.optionallegacyToggleProb:
-        config.legacyUnsharpMask = config.legacyUnsharpMask != True
-    if random.random() < config.filterRemappingProb and (config.useFilters == True and config.filterRemapping == True):
-        _extracted_from_iterate_68(config)
+    # if random.random() < config.optionallegacyToggleProb:
+    #     config.legacyUnsharpMask = config.legacyUnsharpMask != True
+
+    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping ):
+        remapDitherFilteredParts(config)
     if (
         random.random() < ps.changechangeCohesionProb
-        and ps.changeCohesion == True
+        and ps.changeCohesion
         and ps.movement == "travel"
     ):
         if random.random() > 0.5:
@@ -974,13 +972,13 @@ def iterate():
             ImageFilter.GaussianBlur(radius=config.overallBlur)
         )
         # This needs to be reset
-        if config.legacyUnsharpMask == True:
+        if config.legacyUnsharpMask :
             config.image = config.image.filter(
                 ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1)
             )
         config.draw = ImageDraw.Draw(config.image)
 
-    if config.transformShape == True:
+    if config.transformShape :
         config.image = transformImage(config.image)
 
     if config.pixelSortProbChange != 0 and random.random() < config.pixelSortProbChange:
@@ -1011,7 +1009,7 @@ def iterate():
 
     # print("particles ",config.render, config.instanceNumber)
 
-    if config.useOverLayEnhanced == True:
+    if config.useOverLayEnhanced :
         # config.image = ImageChops.multiply(config.clrBlock, config.image)
         # config.image = ImageChops.invert(config.image)
 
@@ -1035,16 +1033,16 @@ def iterate():
             temp, (config.overlayxPos, config.overlayyPos), config.clrBlock
         )
 
-    elif config.useOverLay == True:
+    elif config.useOverLay :
         config.image.paste(
             config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
         )
 
     # RENDERING AS A MOCKUP OR AS REAL
-    if config.useDrawingPoints == True:
+    if config.useDrawingPoints :
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
-    elif config.useWaveDistortion == False:
+    elif not config.useWaveDistortion :
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     else:
         config.xPos += 1
@@ -1053,7 +1051,7 @@ def iterate():
 
 
 # TODO Rename this here and in `iterate`
-def _extracted_from_iterate_68(config):
+def remapDitherFilteredParts(config):
     config.filterRemap = True
 
     # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )

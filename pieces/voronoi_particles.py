@@ -40,7 +40,7 @@ class ParticleDot:
 
         rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax) * direction
 
-        if config.rSpeedRadialProportional == True:
+        if config.rSpeedRadialProportional :
             rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax) / radius * 100.0 * direction
 
         xPos = PSref.x + round(random.uniform(0, config.canvasWidth))
@@ -146,8 +146,8 @@ class ParticleSystem:
         # horizontal deacelleration
         self.deacellerationx = random.uniform(0.8, 0.95)
 
-        dx = config.canvasWidth - self.x
-        dy = config.canvasHeight - self.y
+        # dx = config.canvasWidth - self.x
+        # dy = config.canvasHeight - self.y
         self.maxRadius = (
             math.sqrt(
                 config.canvasWidth * config.canvasWidth
@@ -177,10 +177,10 @@ class ParticleSystem:
                     ref.xPos += ref.vx
                     ref.yPos += ref.vy
 
-                dx = ref.xPos - self.x
-                dy = ref.yPos - self.y
+                # dx = ref.xPos - self.x
+                # dy = ref.yPos - self.y
 
-                r = round(math.sqrt(dx * dx + dy * dy))
+                # r = round(math.sqrt(dx * dx + dy * dy))
 
                 # if r > ref.radius/1 and ref.orbit:
                 #     # print(r, ref.radius, ref.orbit)
@@ -216,10 +216,10 @@ class ParticleSystem:
 
         vVertices = vor.vertices
         vRegions = vor.regions
-        vPoints = vor.points
+        # vPoints = vor.points
         vPointRegion = (vor.point_region).tolist()
 
-        clrIndex = 0
+        # clrIndex = 0
         for j, region in enumerate(vRegions):
             for i in range(len(vPointRegion)):
                 if j == vPointRegion[i]:
@@ -298,7 +298,7 @@ def runWork():
     redrawSpeed = 0.02
     while True:
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance :
             iterate()
         time.sleep(redrawSpeed)
 

@@ -1,10 +1,7 @@
 import math
 import random
-import threading
 import time
-
-from modules import colorutils
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageChops
+from PIL import Image, ImageDraw, ImageChops
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -114,7 +111,7 @@ class RadialSet:
             self.angleOffsetSpeed = math.pi/290
             innerRadius = 10
 
-        for i in range(0, self.radials):
+        for _ in range(0, self.radials):
             ir = innerRadius + random.uniform(-50, 50)
             outr = outerRadius + random.uniform(-50, 50)
             skip = 0 if random.random() < skipRatio else 1
@@ -202,8 +199,8 @@ class ParticleSystem:
         self.deacellerationx = random.uniform(0.8, 0.95)
 
 
-        dx = config.canvasWidth - self.x
-        dy = config.canvasHeight - self.y
+        # dx = config.canvasWidth - self.x
+        # dy = config.canvasHeight - self.y
         self.maxRadius = (
             math.sqrt(
                 config.imageCanvasWidth * config.imageCanvasWidth
@@ -243,19 +240,19 @@ class ParticleSystem:
 
                 r = round(math.sqrt(dx * dx + dy * dy))
 
-                if r > ref.radius/2 and ref.orbit == True:
+                if r > ref.radius/2 and ref.orbit :
                     # print(r, ref.radius, ref.orbit)
                     ref.mode = 0
 
                 # horizontal Continuity
-                if config.horizontalContinuity == True :
+                if config.horizontalContinuity  :
                     if ref.xPos  > config.imageCanvasWidth :
                         ref.xPos = 0
                         
                     if ref.xPos  < 0 :
                         ref.xPos  = config.imageCanvasWidth   
                 # vertical Continuity
-                if config.verticalContinuity == True :
+                if config.verticalContinuity  :
                     if ref.xPos  > config.imageCanvasWidth :
                         ref.xPos = 0
                         
@@ -290,11 +287,11 @@ class ParticleSystem:
             g = self.particles[q].clr[1]
             b = self.particles[q].clr[2]
 
-            sumOfClrs = (
-                self.particles[q].clr[0]
-                + self.particles[q].clr[1]
-                + self.particles[q].clr[2]
-            )
+            # sumOfClrs = (
+            #     self.particles[q].clr[0]
+            #     + self.particles[q].clr[1]
+            #     + self.particles[q].clr[2]
+            # )
 
             """
 			# a pixel wind changes the cascade
@@ -315,14 +312,14 @@ class ParticleSystem:
             yDisplayPos = ref.yPos
             
             # horizontal Continuity
-            if config.horizontalContinuity == True :
+            if config.horizontalContinuity  :
                 if xDisplayPos  > config.canvasWidth :
                     xDisplayPos = ref.xPos - config.imageCanvasWidth
                     
                 if xDisplayPos  < 0 :
                     xDisplayPos  = config.imageCanvasWidth  - ref.xPos
             # vertical Continuity
-            if config.verticalContinuity == True :
+            if config.verticalContinuity  :
                 if xDisplayPos  > config.imageCanvasWidth :
                     xDisplayPos = ref.xPos - config.imageCanvasWidth
                     
@@ -413,7 +410,7 @@ def drawBands(p):
 
     rBase2 = config.rBase2
     gBase2 = config.gBase2
-    bBase2 = config.bBase2
+    # bBase2 = config.bBase2
     aBase2 = config.aBase2
 
     rDiff = config.rDiff
@@ -456,9 +453,12 @@ def drawBands(p):
         bBase += bDiff
         aBase += aDiff
 
-        if rBase < 0 : rBase = 0
-        if gBase < 0 : gBase = 0
-        if bBase < 0 : bBase = 0
+        if rBase < 0 :
+            rBase = 0
+        if gBase < 0 :
+            gBase = 0
+        if bBase < 0 :
+            bBase = 0
 
     i = 0
 
@@ -486,7 +486,7 @@ def drawBands(p):
                 config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
 
 
-        if rSet.drawRadialPolys == True:
+        if rSet.drawRadialPolys :
             config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
             config.drawOverFlow.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
 
@@ -502,7 +502,7 @@ def runWork():
     redrawSpeed = 0.02
     while True:
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance :
             iterate()
         time.sleep(redrawSpeed)
 
@@ -535,7 +535,7 @@ def iterate():
     
     config.drawOverFlow.rectangle((0,0,100,200), fill=(200,0,0))
 
-    if config.horizontalContinuity == True :
+    if config.horizontalContinuity  :
         # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
         
         xCrop  = round(config.imageCanvasWidth)
@@ -546,7 +546,7 @@ def iterate():
         config.image.paste(temp3, (0,0), temp2)
         
         
-    if config.verticalContinuity == True :
+    if config.verticalContinuity  :
         # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
         
         yCrop  = round(config.imageCanvasHeight)

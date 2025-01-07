@@ -10,7 +10,7 @@ import getopt
 import os
 import time
 import sys
-import platform
+
 
 from configs import defaultpiece
 from modules import configuration, player
@@ -148,7 +148,7 @@ def loadFromArguments(reloading=False, config=None):
 
                 # Optional 4th argument to override the brightness set in the
                 # config
-                if args.brightnessOverride != None:
+                if args.brightnessOverride is not None:
                     brightnessOverride = args.brightnessOverride
                     config.brightness = float(float(brightnessOverride) / 100)
                     config.brightnessOverride = float(float(brightnessOverride) / 100)

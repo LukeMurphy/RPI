@@ -1,40 +1,21 @@
 #!/usr/bin/python
 # import modules
-import datetime
-import gc
-import getopt
-import importlib
-import io
 import math
-import os
 import random
-import sys
-import textwrap
 import time
-from random import shuffle
-from subprocess import call
 from modules.configuration import bcolors
-from modules.faderclass import FaderObj
-from modules import badpixels, colorutils, coloroverlay, configuration, panelDrawing
-from modules.imagesprite import ImageSprite
+from modules import badpixels, colorutils, coloroverlay, panelDrawing
 from PIL import (
     Image,
-    ImageChops,
-    ImageFont,
     ImageDraw,
     ImageEnhance,
-    ImageFilter,
-    ImageMath,
-    ImagePalette,
 )
-import numpy as np
+# import numpy as np
 from modules.holder_director import Holder
 from modules.holder_director import Director
 
-
 xPos = 320
 yPos = 0
-
 bads = badpixels
 
 # config.canvasImage is the final layer or image to be rendered
@@ -107,7 +88,7 @@ class spriteAnimation:
                         (xPos, yPos, xPos + self.sliceWidth, yPos + self.sliceHeight)
                     )
 
-                    if self.resizeAnimationToFit == True:
+                    if self.resizeAnimationToFit:
                         frameSlice = frameSlice.resize(
                             (self.animationWidth, self.animationHeight)
                         )
@@ -137,9 +118,9 @@ class spriteAnimation:
 
         if self.totalFrames == 1:
             self.currentFrame = 0
-        elif self.pause == False:
+        elif not self.pause :
             self.playCount += self.step
-            if self.reversing == True:
+            if self.reversing:
                 if self.playCount % self.animSpeed == 0:
                     self.currentFrame += self.direction
 
@@ -170,7 +151,7 @@ class spriteAnimation:
 def loadImage(spriteSheet):
     image = Image.open(spriteSheet, "r")
     image.load()
-    imgHeight = image.getbbox()[3]
+    # imgHeight = image.getbbox()[3]
     return image
 
 
@@ -207,7 +188,7 @@ def main(run=True):
     )
 
     try:
-        if config.usePixelSort == True:
+        if config.usePixelSort:
             config.pixelSortProbOn = float(
                 workConfig.get("base-parameters", "pixelSortProbOn")
             )
@@ -343,6 +324,7 @@ def main(run=True):
         )
         config.preGlitchRedo = float(workConfig.get("base-parameters", "preGlitchRedo"))
     except Exception as e:
+        print(e)
         config.preGlitchNumberMin = 1
         config.preGlitchNumber = 2
         config.preGlitchRedo = 0.5
@@ -494,7 +476,7 @@ def main(run=True):
     # Need to add something like this at final render call  as well
     """ 
         ########### RENDERING AS A MOCKUP OR AS REAL ###########
-        if config.useDrawingPoints == True :
+        if config.useDrawingPoints  :
             config.panelDrawing.canvasToUse = config.renderImageFull
             config.panelDrawing.render()
         else :
@@ -586,7 +568,7 @@ def reConfigAnimationCell(anim, aConfig):
     anim.image = aConfig.spriteSheet1
 
     # Placement on the canvas
-    if anim.randomPlacement == True:
+    if anim.randomPlacement:
         anim.xPos = round(
             random.SystemRandom().random() * aConfig.randomPlacemnetXRange
         )
@@ -594,7 +576,7 @@ def reConfigAnimationCell(anim, aConfig):
             random.SystemRandom().random() * aConfig.randomPlacemnetYRange
         )
 
-    # if config.fixedPosition == True:
+    # if config.fixedPosition :
     #     anim.xPos = config.animationXOffset
     #     anim.yPos = config.animationYOffset
 
@@ -638,7 +620,7 @@ def filterRemapCall(ovrd=False):
     endX = round(random.uniform(8, config.filterRemapminHoriSize))
     endY = round(random.uniform(8, config.filterRemapminVertSize))
 
-    if ovrd == True:
+    if ovrd:
         startX = 0
         startY = 0
         endX = 200
@@ -654,12 +636,12 @@ def runWork():
     print("Running spritesheet3.py")
     print(bcolors.ENDC)
     # gc.enable()
-    while config.isRunning == True:
+    while config.isRunning:
         config.directorController.checkTime()
-        if config.directorController.advance == True:
+        if config.directorController.advance:
             iterate()
             time.sleep(config.delay)
-        if config.standAlone == False:
+        if not config.standAlone :
             config.callBack()
 
 
@@ -679,8 +661,8 @@ def iterate(n=0):
     )
     animationBackGroundFadeIn()
 
-    if config.allPause == True:
-        if currentAnimation.glitching == True:
+    if config.allPause:
+        if currentAnimation.glitching:
             glitchBox(
                 currentAnimation.animationImage,
                 currentAnimation.animationWidth,
@@ -709,12 +691,12 @@ def iterate(n=0):
         # for compositing
         tempImageRef = anim.nextFrameImg()
 
-        if config.usebgBox == True:
+        if config.usebgBox:
             currentAnimation.animationImage.paste(
                 config.underLayer, (0, 0), config.underLayer
             )
 
-        if config.drawMoire == True:
+        if config.drawMoire:
             c1 = (
                 round(config.brightness * 150),
                 round(config.brightness * 50),
@@ -722,7 +704,7 @@ def iterate(n=0):
                 150,
             )
 
-            if config.setMoireColor == True:
+            if config.setMoireColor:
                 c1 = config.moireColor
 
                 if random.SystemRandom().random() < config.moireColorAltProb:
@@ -757,7 +739,7 @@ def iterate(n=0):
             tempImageRef,
         )
 
-        if config.allPause == False:
+        if not config.allPause :
 
             # doing this 3 times because this was how the v.2 version inadvertently did it - my bad - but also to
             # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at
@@ -786,7 +768,7 @@ def iterate(n=0):
                 anim.pause = True
 
             if (
-                anim.pause == True or config.allPause == True
+                anim.pause or config.allPause
             ) and random.SystemRandom().random() < currentAnimation.unPauseProb:
                 # print("releasing animation")
                 anim.pause = False
@@ -817,10 +799,10 @@ def iterate(n=0):
 
     if (
         random.SystemRandom().random() < config.usebgBoxProb
-        and config.usebgBox == True
-        and config.allPause == False
+        and config.usebgBox
+        and not config.allPause
     ):
-        # config.usebgBox = False if config.usebgBox == True  else True
+        # config.usebgBox = False if config.usebgBox   else True
         # print("bgBox")
         # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
         # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
@@ -871,7 +853,7 @@ def iterate(n=0):
         glitchIterations = round(
             random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax)
         )
-        for x in range(glitchIterations):
+        for _ in range(glitchIterations):
             glitchBox(
                 config.underLayer,
                 config.canvasWidth,
@@ -884,12 +866,12 @@ def iterate(n=0):
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-    # if config.usebgBox == True :
+    # if config.usebgBox  :
     #     # config.canvasImage.paste(config.underLayer, (0,0), config.underLayer)
     #     composite = ImageChops.screen( config.underLayer, config.canvasImage)
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
-    if config.useDrawingPoints == True:
+    if config.useDrawingPoints:
         config.panelDrawing.canvasToUse = config.f.blendedImage
         config.panelDrawing.render()
     else:
@@ -906,14 +888,14 @@ def iterate(n=0):
     if random.SystemRandom().random() < config.drawMoireProbOff:
         config.drawMoire = False
 
-    if random.SystemRandom().random() < config.filterRemappingProb:
-        if random.SystemRandom().random() < 0.5:
-            config.filterRemapping == False
-        else:
-            config.filterRemapping == True
+    # if random.SystemRandom().random() < config.filterRemappingProb:
+    #     if random.SystemRandom().random() < 0.5:
+    #         not config.filterRemapping
+    #     else:
+    #         config.filterRemapping
 
     if random.SystemRandom().random() < config.filterRemappingProb and (
-        config.useFilters == True and config.filterRemapping == True
+        config.useFilters and config.filterRemapping
     ):
         filterRemapCall()
 
@@ -927,24 +909,24 @@ def iterate(n=0):
     #     config.allPause = True
 
     if (
-        config.allPause == True
+        config.allPause
         and random.SystemRandom().random() < currentAnimation.unFreezeGlitchProb
     ):
         # print("glitching")
         currentAnimation.glitching = True
 
     if (
-        config.allPause == True
+        config.allPause
         and random.SystemRandom().random() < currentAnimation.unPauseProb
     ):
         # print("unpausing")
         config.allPause = False
 
     config.animationController.checkTime()
-    if config.animationController.advance == True:
+    if config.animationController.advance:
         currentAnimation.glitching = False
 
-        if config.playInOrder == True:
+        if config.playInOrder:
             config.currentAnimationIndex += 1
             if config.currentAnimationIndex >= len(config.animations):
                 config.currentAnimationIndex = 0
@@ -974,7 +956,7 @@ def iterate(n=0):
                 config.preGlitchNumberMin, config.preGlitchNumber
             )
             # print(glitchyCycles)
-            for i in range(glitchyCycles):
+            for _ in range(glitchyCycles):
                 glitchBox(
                     tempImageRef,
                     currentAnimation.animationWidth,
@@ -985,7 +967,7 @@ def iterate(n=0):
 
             if random.SystemRandom().random() < config.preGlitchRedo:
                 # print("second round")
-                for i in range(glitchyCycles):
+                for _ in range(glitchyCycles):
                     glitchBox(
                         tempImageRef,
                         currentAnimation.animationWidth,

@@ -33,7 +33,7 @@ class ParticleDot:
         vy = fy * directiony * config.particleYSpeed
 
         # Initially, make radius fall into one of the systems bands - like quanta
-        radialBand = round(random.uniform(1, 12))
+        radialBand = round(random.uniform(1, config.numOrbits))
         radius = PSref.radialBand * radialBand
         # radius = random.uniform(1, PSref.maxRadius)
         rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax) * direction
@@ -160,7 +160,7 @@ class ParticleSystem:
         #     * .5
         # )
         self.maxRadius = config.maxRadius
-        self.radialBand = self.maxRadius / 12
+        self.radialBand = self.maxRadius / config.numOrbits
 
         for n in range(self.numParticles):
             pDot = ParticleDot()
@@ -464,6 +464,12 @@ def main(run=True):
     config.rSpeedRadialProportional = workConfig.getboolean(
         "particles", "rSpeedRadialProportional"
     )
+
+    try:
+        config.numOrbits = int(workConfig.get("particles", "numOrbits"))
+    except Exception as e:
+        print(e)
+        config.numOrbits = 12
 
     try:
         config.movementMode = int(workConfig.get("particles", "movementMode"))

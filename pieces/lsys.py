@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # import PIL.Image
 from PIL import Image, ImageDraw
+
 # from PIL import ImageChops
 
 # from modules import colorutils
@@ -158,11 +159,11 @@ class Lsys:
 
             if instruction not in ("(", ")"):
                 if instruction == "+":
-                    a += config.baseAngle + random.SystemRandom.uniform(
+                    a += config.baseAngle + random.SystemRandom().uniform(
                         -config.angleRange * math.pi, config.angleRange * math.pi
                     )
                 elif instruction == "-":
-                    a -= config.baseAngle + random.SystemRandom.uniform(
+                    a -= config.baseAngle + random.SystemRandom().uniform(
                         -config.angleRange * math.pi, config.angleRange * math.pi
                     )
                 elif instruction == "G" or instruction == "F":
@@ -229,9 +230,19 @@ def drawLines(arg):
     # if config.rendered != False:
     #     return
     # print("running")
+
     config.imageDraw.rectangle(
-        (0, 0, config.canvasWidth, config.canvasHeight), fill=(220, 210, 200, 100)
+        (0, 0, config.canvasWidth, config.canvasHeight),
+        fill=(
+            config.bgColor[0],
+            config.bgColor[1],
+            config.bgColor[2],
+            round(config.bgColorAlpha),
+        ),
     )
+
+    if config.bgColorAlpha > 1 :
+        config.bgColorAlpha -= .1
 
     for i in range(len(L.drawingPoints)):
         # Draws trunks and branches
@@ -247,7 +258,7 @@ def drawLines(arg):
                 p2.yPos + config.lsysOrigin[1],
             ),
             width=lineWidth,
-            fill=(0, 0, 0, 100),
+            fill=config.lineColor,
         )
         # l = round(math.hypot(p2.xPos - p1.xPos, p2.yPos - p1.yPos))
 
@@ -263,7 +274,7 @@ def drawLines(arg):
 
         # if abs(angleDeg) != 90:
         #     angleDeg -= 90
-            
+
         # temp2 = temp.rotate(angleDeg, expand=1)
         # # temp2 = temp
         # config.image.paste(
@@ -285,11 +296,11 @@ def drawLines(arg):
                     p1.xPos + eD + config.lsysOrigin[0],
                     p1.yPos + eD + config.lsysOrigin[1],
                 ),
-                fill=(250, 250, 0, 100),
+                fill=config.endColor,
             )
-            if random.SystemRandom.random() < 0.002:
-                p1.xPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
-                p1.yPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
+            if random.SystemRandom().random() < config.movementProb1:
+                p1.xPos += (5 - random.SystemRandom().random() * 10) * (1 - p1.scale)
+                p1.yPos += (5 - random.SystemRandom().random() * 10) * (1 - p1.scale)
 
         # draws the branch juntions
         if p1.isBranch == 1 and p1.isTerminal == 0:
@@ -301,12 +312,12 @@ def drawLines(arg):
                     p1.xPos + eD + config.lsysOrigin[0],
                     p1.yPos + eD + config.lsysOrigin[1],
                 ),
-                fill=(150, 0, 0, 100),
+                fill=config.branchPointColor,
             )
 
-            if random.SystemRandom.random() < 0.001:
-                p1.xPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
-                p1.yPos += (5 - random.SystemRandom.random() * 10) * (1 - p1.scale)
+            if random.SystemRandom().random() < config.movementProb2:
+                p1.xPos += (5 - random.SystemRandom().random() * 10) * (1 - p1.scale)
+                p1.yPos += (5 - random.SystemRandom().random() * 10) * (1 - p1.scale)
 
     # for i in range(len(config.branchPoints)):
     #     pRef = config.branchPoints[i]
@@ -405,8 +416,25 @@ def main(run=True):
     )
     config.baseAngle = math.pi / 180 * float(workConfig.get("lsys", "baseAngle"))
     config.angleRange = float(workConfig.get("lsys", "angleRange"))
+    config.movementProb1 = float(workConfig.get("lsys", "movementProb1"))
+    config.movementProb2 = float(workConfig.get("lsys", "movementProb2"))
+    config.bgColorAlpha = int(workConfig.get("lsys", "bgColorAlpha"))
     config.lsysOrigin = list(
         map(lambda x: int(int(x)), workConfig.get("lsys", "lsysOrigin").split(","))
+    )
+    config.bgColor = tuple(
+        map(lambda x: int(int(x)), workConfig.get("lsys", "bgColor").split(","))
+    )
+    config.lineColor = tuple(
+        map(lambda x: int(int(x)), workConfig.get("lsys", "lineColor").split(","))
+    )
+    config.endColor = tuple(
+        map(lambda x: int(int(x)), workConfig.get("lsys", "endColor").split(","))
+    )
+    config.branchPointColor = tuple(
+        map(
+            lambda x: int(int(x)), workConfig.get("lsys", "branchPointColor").split(",")
+        )
     )
     config.useRandom = workConfig.getboolean("lsys", "useRandom")
     config.foliage = workConfig.getboolean("lsys", "foliage")
@@ -431,6 +459,7 @@ def setUp():
     config.draw = ImageDraw.Draw(config.canvasImage)
     config.id = config.image.im.id
     config.director = Director(config)
+    config.director.slotRate = config.slotRate
     L = Lsys(config)
 
 
@@ -441,6 +470,7 @@ def runWork():
     global runRun
     while True:
         iterate()
+        time.sleep(config.redrawRate)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -449,11 +479,14 @@ def runWork():
 def iterate():
     global config, L, pos, runRun
     config.director.checkTime()
-    if config.director.advance :
-        if not config.rendered :
+    if config.director.advance:
+        if not config.rendered:
             L.produceDrawingPoints()
         drawLines(L)
-        config.render(config.image, 0, 0, 192, 192)
+        config.render(config.image, 0, 0)
+        if random.SystemRandom().random() < 0.003:
+            config.rendered = False
+            config.bgColorAlpha = 10
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

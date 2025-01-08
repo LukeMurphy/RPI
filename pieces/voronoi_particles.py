@@ -2,13 +2,14 @@ import math
 import random
 import time
 
+import numpy as np
 from PIL import Image, ImageDraw
+from scipy.spatial import Voronoi
+
 from modules.holder_director import Director
 
-from scipy.spatial import Voronoi
-import numpy as np
-
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 class ParticleDot:
     def __init__(self):
@@ -40,15 +41,20 @@ class ParticleDot:
 
         rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax) * direction
 
-        if config.rSpeedRadialProportional :
-            rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax) / radius * 100.0 * direction
+        if config.rSpeedRadialProportional:
+            rSpeed = (
+                random.uniform(config.rSpeedMin, config.rSpeedMax)
+                / radius
+                * 100.0
+                * direction
+            )
 
         xPos = PSref.x + round(random.uniform(0, config.canvasWidth))
         yPos = PSref.y + round(random.uniform(0, config.canvasHeight))
-        
+
         angle = PSref.angle * n
-        
-        if PSref.movementMode == 0 :
+
+        if PSref.movementMode == 0:
             xPos = round(random.uniform(0, config.canvasWidth))
             yPos = round(random.uniform(0, config.canvasHeight))
 
@@ -69,12 +75,16 @@ class ParticleDot:
         self.angle = angle
         self.radius = radius
         self.rSpeed = rSpeed
-        self.movementMode = 0
+        # self.movementMode = 0
         self.orbit = orbit
         self.sizeNum = 1 if random.random() < 0.5 else 2
+    
+    def setNewAttributes(self) :
+        pass
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 class ParticleSystem:
     def __init__(self, config):
@@ -95,6 +105,7 @@ class ParticleSystem:
         self.directionProb = random.uniform(0, 1)
 
     def setNewAttributes(self):
+        self.movementMode = config.movementMode
         self.bands = round(random.uniform(12, 24))
         self.wBase = round(random.uniform(220, config.canvasWidth))
 
@@ -113,17 +124,22 @@ class ParticleSystem:
         innerRadius = self.wBase / 3
         outerRadius = self.wBase
         skipRatio = random.random() + 0.3
+
         for _ in range(self.radials):
             ir = innerRadius + random.uniform(-config.innerRadius, config.innerRadius)
             outr = outerRadius + random.uniform(-config.innerRadius, config.outerRadius)
             skip = 0 if random.random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
-    
     def setCenter(self):
         # initial center position
         self.x = round(random.uniform(self.initXRange[0], self.initXRange[1]))
         self.y = round(random.uniform(self.initYRange[0], self.initYRange[1]))
+
+
+    def resetParticles(self) :
+        for pRef in self.particles:
+            pRef.movementMode = self.movementMode
 
     
     def setUp(self):
@@ -164,16 +180,11 @@ class ParticleSystem:
             pDot.movementMode = self.movementMode
             self.particles.append(pDot)
 
-    
-    def moveParticles(self):
-        for q in range(self.numParticles):
-            ref = self.particles[q]
 
+    def moveParticles(self):
+        for ref in self.particles :
             if ref.movementMode == 0:
-                if (
-                    random.SystemRandom().random()
-                    < config.chanceParticleWillMove
-                ):
+                if random.SystemRandom().random() < config.chanceParticleWillMove:
                     ref.xPos += ref.vx
                     ref.yPos += ref.vy
 
@@ -201,7 +212,6 @@ class ParticleSystem:
 
             if random.random() < config.particleResetProb:
                 ref.setUp(self, ref.id)
-
 
     def drawVoronoi(self):
         # Draw the Voronoi cells
@@ -259,7 +269,7 @@ class ParticleSystem:
                 ),
                 fill=(200, 0, 0, 255),
             )
-        
+
     def move(self):
         # the whole system
         self.x += self.xSpeed
@@ -270,11 +280,13 @@ class ParticleSystem:
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
+
 def withinRange(arg, target, diff):
     val = round(arg)
     test1 = round(target + diff)
     test2 = round(target - diff)
     return val <= test1 and val >= test2
+
 
 # an override
 def structuredSetup():
@@ -290,7 +302,53 @@ def structuredSetup():
         yD += 30
         xD += 20
 
+
+def filterRemapImage(config):
+    if config.filterRemapping:
+        config.useFilters = True
+        config.remapImageBlock = False
+
+        startX = round(random.uniform(0, config.filterRemapRangeX))
+        startY = round(random.uniform(0, config.filterRemapRangeY))
+        endX = round(
+            random.uniform(config.filterRemapMinHorzSize, config.filterRemapMaxHorzSize)
+        )
+        endY = round(
+            random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize)
+        )
+        config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+        config.remapImageBlockDestination = [startX, startY]
+
+
+def changePalettes():
+    config.colorSetA = config.colorSets[math.floor(random.SystemRandom().random() *  len(config.colorSets))]
+    config.colorSetB = config.colorSets[math.floor(random.SystemRandom().random() *  len(config.colorSets))]
+    setColors()
+
+
+def setColors() :
+    for i in range(config.num_cells):
+        clr = (
+            config.colorSetA[round(random.uniform(0, len(config.colorSetA) - 1))]
+            if random.random() < 0.50
+            else config.colorSetB[round(random.uniform(0, len(config.colorSetB) - 1))]
+        )
+        # clr = colorutils.randomColor()
+        config.nr[i] = (round(clr[0] * config.brightness))
+        config.ng[i] = (round(clr[1] * config.brightness))
+        config.nb[i] = (round(clr[2] * config.brightness))
+
+
+def resetSystem():
+        if random.SystemRandom().random() < config.changeMovementModeProb :
+            config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
+
+        PS.setNewAttributes()
+        PS.setCenter()
+        PS.resetParticles()
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
 
 def runWork():
     global redrawSpeed
@@ -298,8 +356,18 @@ def runWork():
     redrawSpeed = 0.02
     while True:
         config.directorController.checkTime()
-        if config.directorController.advance :
+        if config.directorController.advance:
             iterate()
+        if config.changeColorSetTime > 0:
+            config.paletteController.checkTime()
+            if config.paletteController.advance:
+                changePalettes()
+        if config.totalResetTime > 0:
+            config.systemController.checkTime()
+            if config.systemController.advance:
+                resetSystem()
+
+
         time.sleep(redrawSpeed)
 
 
@@ -323,8 +391,6 @@ def iterate():
     # drawBands(PS)
 
     config.fadeRate += config.fadeRateDelta
-    # if random.random() < config.totalResetProb:
-    #     PS.setUp()
 
     if config.fadeRate > 255:
         config.fadeRate = 30
@@ -336,11 +402,7 @@ def iterate():
             # renew the particle dots that travel
             # bgChoice = math.floor(random.uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
-            # print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
-            if random.random() < config.totalResetProb:
-                PS.setCenter()
-                PS.setNewAttributes()
-                PS.setUp()
+            print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
@@ -348,22 +410,6 @@ def iterate():
 
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
-
-def filterRemapImage(config):
-    if config.filterRemapping :
-        config.useFilters = True
-        config.remapImageBlock = False
-
-        startX = round(random.uniform(0, config.filterRemapRangeX))
-        startY = round(random.uniform(0, config.filterRemapRangeY))
-        endX = round(
-            random.uniform(config.filterRemapMinHorzSize, config.filterRemapMaxHorzSize)
-        )
-        endY = round(
-            random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize)
-        )
-        config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-        config.remapImageBlockDestination = [startX, startY]
 
 
 def main(run=True):
@@ -386,18 +432,24 @@ def main(run=True):
         "particles", "rSpeedRadialProportional"
     )
 
+    try:
+        config.movementMode = int(workConfig.get("particles", "movementMode"))
+    except Exception as e:
+        print(e)
+        config.movementMode = 0
+
     config.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
     config.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
     config.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
     config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
 
     config.systemRotation = float(workConfig.get("particles", "systemRotation"))
-    
+
     try:
         config.directionProb = float(workConfig.get("particles", "directionProb"))
     except Exception as e:
         print(e)
-        config.directionProb = .5
+        config.directionProb = 0.5
 
     bgColorSets = (workConfig.get("particles", "bgColorSets")).split(",")
     config.bgColorSets = []
@@ -422,7 +474,14 @@ def main(run=True):
     except Exception as e:
         print(e)
         config.chanceParticleWillMove = 1.0
-        
+    try:
+        config.changeMovementModeProb = float(
+            workConfig.get("particles", "changeMovementModeProb")
+        )
+    except Exception as e:
+        print(e)
+        config.changeMovementModeProb = .0
+
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.lineAlpha = float(workConfig.get("particles", "lineAlpha"))
     config.cellAlpha = float(workConfig.get("particles", "cellAlpha"))
@@ -433,7 +492,18 @@ def main(run=True):
     )
 
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
-    config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
+
+    try :
+        config.totalResetTime = float(workConfig.get("particles", "totalResetTime"))
+
+    except Exception as e:
+        print(e)
+        config.totalResetTime = 33
+
+    if config.totalResetTime > 0 :
+        config.systemController = Director(config)
+        config.systemController.slotRate = config.totalResetTime
+
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -469,6 +539,38 @@ def main(run=True):
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
+
+    config.colorSets = []
+
+    try:
+        config.colorGroupsList = workConfig.get("particles", "colorGroups").split(",")
+        config.mixColorSets = workConfig.getboolean("particles", "mixColorSets")
+        config.changeColorSetTime = float(
+            workConfig.get("particles", "changeColorSetTime")
+        )
+        config.paletteController = Director(config)
+        config.paletteController.slotRate = config.changeColorSetTime
+    except Exception as e:
+        print(e)
+        config.colorGroupsList = ["colorSetA", "colorSetB"]
+        config.mixColorSets = False
+        config.changeColorSetTime = 0
+
+
+    for grp in config.colorGroupsList :
+        rawColorSetAVals = workConfig.get("particles", grp).replace("\n", "")
+        rawColorSetAVals = rawColorSetAVals.replace(" ", "")
+        colorSetAVals = rawColorSetAVals.split("|")
+        colorSet = []
+        for element in colorSetAVals:
+            if element != "":
+                clr = [int(x) for x in element.split(",")]
+                colorSet.append(clr)
+        config.colorSets.append(colorSet)
+
+    config.colorSetA = config.colorSets[0]
+    config.colorSetB = config.colorSets[1]
+
     config.num_cells = config.maxParticles
     # config.resolutionOfSquares = int(workConfig.get("particles", "resolutionOfSquares"))
 
@@ -480,54 +582,17 @@ def main(run=True):
     config.nr = []
     config.ng = []
     config.nb = []
-    
-    
-    try:
-        colorGroups = workConfig.get("particles", "colorGroups").split(",")
-    except Exception as e:
-        print(e)
-        colorGroups = ["colorSetA","colorSetB"]
-
-    #  for now, just have two color sets to blend the colors
-    rawColorSetAVals = workConfig.get("particles", colorGroups[0]).replace("\n", "")
-    rawColorSetAVals = rawColorSetAVals.replace(" ", "")
-    colorSetAVals = rawColorSetAVals.split("|")
-    colorSetA = []
-    for element in colorSetAVals:
-        if element != "":
-            clr = [int(x) for x in element.split(",")]
-            colorSetA.append(clr)
-
-    rawColorSetBVals = workConfig.get("particles", colorGroups[1]).replace("\n", "")
-    rawColorSetBVals = rawColorSetBVals.replace(" ", "")
-    colorSetBVals = rawColorSetBVals.split("|")
-    colorSetB = []
-    for element in colorSetBVals:
-        if element != "":
-            clr = [int(x) for x in element.split(",")]
-            colorSetB.append(clr)
 
     for _ in range(config.num_cells):
         config.nx.append(random.randrange(-config.xRange / 4, 1.25 * config.xRange))
         config.ny.append(random.randrange(-config.yRange / 4, 1.25 * config.yRange))
         config.nvx.append(random.randrange(-2, 2))
         config.nvy.append(random.randrange(-2, 2))
+        config.nr.append(50)
+        config.ng.append(50)
+        config.nb.append(50)
 
-        clr = (
-            colorSetA[round(random.uniform(0, len(colorSetA) - 1))]
-            if random.random() < 0.50
-            else colorSetB[round(random.uniform(0, len(colorSetB) - 1))]
-        )
-        # clr = colorutils.randomColor()
-        config.nr.append(round(clr[0] * config.brightness))
-        config.ng.append(round(clr[1] * config.brightness))
-        config.nb.append(round(clr[2] * config.brightness))
-
-    try:
-        config.movementMode = int(workConfig.get("particles", "movementMode"))
-    except Exception as e:
-        print(e)
-        config.movementMode = 0
+    setColors()
 
     PS = ParticleSystem(config)
     PS.setCenter()
@@ -535,10 +600,15 @@ def main(run=True):
     PS.setUp()
 
     # structuredSetup()
+    try:
+        config.slotRate = float(workConfig.get("particles", "slotRate"))
+    except Exception as e:
+        print(e)
+        config.slotRate = 0.03
 
     # managing speed of animation and framerate
     config.directorController = Director(config)
-    config.directorController.slotRate = 0.03
+    config.directorController.slotRate = config.slotRate
 
     if run:
         runWork()

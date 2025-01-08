@@ -1,4 +1,5 @@
 import os
+
 # from os import listdir
 # from os.path import isfile, join, isdir
 # from os import walk
@@ -7,17 +8,18 @@ import os
 # import sys
 import time
 
-# This is probably the file to set as the machine's startup desktop 
+# This is probably the file to set as the machine's startup desktop
 # if the machine is under remote control
 
-initPath = '/home/daemon102/Documents/remotemngr/remotecontrol-remote-to-lukelab.sh'
+initPath = "/home/daemon102/Documents/remotemngr/remotecontrol-remote-to-lukelab.sh"
 # initPath = '/Users/lamshell/Documents/Dev/LEDELI/remotemngr/remotecontrol-remote-to-lukelab.sh'
 timeToCheck = 15
 
-def runScript(arg='startup') :
+
+def runScript(arg="startup"):
     global initPath, timeToCheck
     try:
-        # comment: 
+        # comment:
         execCmd = initPath + " " + arg
         print(execCmd)
         os.system(execCmd)
@@ -27,6 +29,6 @@ def runScript(arg='startup') :
     # end try
     time.sleep(timeToCheck)
     runScript("cron")
-    
-    
-runScript('startup')
+
+
+runScript("startup")

@@ -1,16 +1,26 @@
 import os
+
 # from os import listdir
 # from os.path import isfile, join, isdir
-from os import walk
+# from os import walk
 import datetime
+
 # import subprocess
 # import sys
 import tkinter as tk
-from tkinter import *
+from tkinter import Listbox
+from tkinter import Scrollbar
+from tkinter import Text
+from tkinter import Button
+from tkinter import END
+from tkinter import OUTSIDE
+from tkinter import RIGHT
+from tkinter import BOTH
+from tkinter import font
+
 # import tkmacosx
 from tkmacosx import Button
 
-# from tk import Button
 
 """Summary
 
@@ -74,10 +84,9 @@ def execute(configToRun):
     print(configToRun.split(configPath)[1])
     print("--------------------------------------------")
     print("--------------------------------------------")
-    """Summary
-
-	Args:
-	    configToRun (TYPE): Description
+    """
+    Summary
+	Args:vconfigToRun (TYPE): Description
 	"""
     global JavaAppRunning
     if ".cfg" in configToRun:
@@ -96,7 +105,7 @@ def execute(configToRun):
 
 def action():
     a = verify()
-    if a[0] == True:
+    if a[0]:
         # os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
         configSelected = a[1]
         configToRun = configSelected[list(configSelected.keys())[0]]
@@ -106,7 +115,7 @@ def action():
 def action2():
     global JavaAppRunning
     a = verify()
-    if a[0] == True:
+    if a[0]:
         os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
         os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
 
@@ -143,22 +152,22 @@ def sortByFolderAndDate():
 
 def openFile():
     a = verify()
-    if a[0] == True:
+    if a[0]:
         # os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
         configSelected = a[1]
         # os.system("open " + "configs/" + configSelected[list(configSelected.keys())[0]])
         os.system("open " + configSelected[list(configSelected.keys())[0]])
 
 
-def returnFirstElement(l):
-    return l[0]
+def returnFirstElement(arg):
+    return arg[0]
 
 
 # Generate list of configs:
 
 
-def returnSecondElement(l):
-    return l[1]
+def returnSecondElement(arg):
+    return arg[1]
 
 
 def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
@@ -184,36 +193,35 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
                 and name.find(".DS_Store") == -1
             ):
                 res = os.stat(fullPath)
-
-                if filterResults == False:
+                if not filterResults:
                     fullList.append((os.path.join(root, name), res.st_mtime, name))
-                if filterResults == True:
+                if filterResults:
                     if name.find(filterText) > 0 or fullPath.find(filterText) > 0:
                         fullList.append((os.path.join(root, name), res.st_mtime, name))
 
     # Sort the configs by date descending
-    if dateSort == True:
+    if dateSort:
         fullList.sort(key=returnSecondElement, reverse=True)
     else:
         fullList.sort(key=returnFirstElement, reverse=False)
 
     lastDir = ""
-    fName = ""
+    # fName = ""
 
     actionDict1.append({"": ""})
 
     for f in fullList:
-        fName = f[0].split(configPath)[1].split("/")[0]
+        # fName = f[0].split(configPath)[1].split("/")[0]
         if len(f) > 0:
             tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("%Y-%m-%d [%H:%M]")
-            tsTxtVals = tsTxt.split(" ")
+            # tsTxtVals = tsTxt.split(" ")
 
             # and dateSort != True
             currentDir = f[0].split(configPath)[1].split("/")[0]
             currDirLevel2 = f[0].split(configPath)[1].split("/")[1]
             if currDirLevel2.find(".cfg") <= 0:
                 currentDir = currentDir + "/" + currDirLevel2
-            if currentDir != lastDir and dateSort == False:
+            if currentDir != lastDir and not dateSort:
                 actionDict1.append({"": ""})
                 lastDir = currentDir
 
@@ -230,7 +238,7 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
             actionDict1.append({"": ""})
 
     ListBoxOfConfigs.delete(0, END)
-    for i, item in enumerate(actionDict1):
+    for _, item in enumerate(actionDict1):
         # print(list(item.keys())[0])
         ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
         ListBoxOfConfigs.itemconfig(
@@ -279,7 +287,7 @@ ListBoxOfConfigs = Listbox(
     root, width=90, height=42, bg="white", foreground="black", bd=False
 )
 
-for i, item in enumerate(actionDict1):
+for _, item in enumerate(actionDict1):
     ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
     ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
 

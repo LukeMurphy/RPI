@@ -28,17 +28,14 @@ class ParticleDot:
         r = int(random.uniform(0, 255) * PSref.brightness)
         g = int(random.uniform(0, 200) * PSref.brightness)
         b = int(random.uniform(0, 255) * PSref.brightness)
-        radius = random.uniform(1, PSref.maxRadius)
 
         vx = fx * directionx * config.particleXSpeed
         vy = fy * directiony * config.particleYSpeed
 
-        # Make radius fall into one of the systems bands - like quanta
-
+        # Initially, make radius fall into one of the systems bands - like quanta
         radialBand = round(random.uniform(1, 12))
-
         radius = PSref.radialBand * radialBand
-
+        # radius = random.uniform(1, PSref.maxRadius)
         rSpeed = random.uniform(config.rSpeedMin, config.rSpeedMax) * direction
 
         if config.rSpeedRadialProportional:
@@ -49,10 +46,13 @@ class ParticleDot:
                 * direction
             )
 
-        xPos = PSref.x + round(random.uniform(0, config.canvasWidth))
-        yPos = PSref.y + round(random.uniform(0, config.canvasHeight))
+        # xPos = round(random.uniform(0, config.canvasWidth))
+        # yPos = round(random.uniform(0, config.canvasHeight))
+        # angle = PSref.angle * n
 
-        angle = PSref.angle * n
+        angle = 2 * math.pi * random.SystemRandom().random()
+        xPos = PSref.x + radius * math.cos(angle) 
+        yPos = PSref.y + radius * math.sin(angle) 
 
         if PSref.movementMode == 0:
             xPos = round(random.uniform(0, config.canvasWidth))
@@ -103,33 +103,16 @@ class ParticleSystem:
         self.movementMode = config.movementMode
         self.brightness = config.brightness
         self.directionProb = random.uniform(0, 1)
+        
 
     def setNewAttributes(self):
         self.movementMode = config.movementMode
-        self.bands = round(random.uniform(12, 24))
-        self.wBase = round(random.uniform(220, config.canvasWidth))
+        self.wBase = round(random.uniform(10, config.outerRadius))
 
         self.directionProb = config.directionProb
-        self.xSpeed = random.SystemRandom().random() * config.particleXSpeed
-        self.ySpeed = random.random() * config.particleYSpeed
-        self.xSpeed = 0
-        self.ySpeed = 0
+        self.xSpeed = random.SystemRandom().random() * config.systemSpeed
+        self.ySpeed = random.SystemRandom().random() * config.systemSpeed
 
-        self.radialsArray = []
-        self.radials = round(random.uniform(120, 300))
-        self.rads = 2 * math.pi / self.radials
-
-        self.angleOffset = 0.0
-        self.angleOffsetSpeed = random.uniform(0, math.pi / 300)
-        innerRadius = self.wBase / 3
-        outerRadius = self.wBase
-        skipRatio = random.random() + 0.3
-
-        for _ in range(self.radials):
-            ir = innerRadius + random.uniform(-config.innerRadius, config.innerRadius)
-            outr = outerRadius + random.uniform(-config.innerRadius, config.outerRadius)
-            skip = 0 if random.random() < skipRatio else 1
-            self.radialsArray.append([ir, outr, skip])
 
     def setCenter(self):
         # initial center position
@@ -138,8 +121,13 @@ class ParticleSystem:
 
 
     def resetParticles(self) :
+        # after they have drifted, calculate new parameters
         for pRef in self.particles:
             pRef.movementMode = self.movementMode
+            dx = pRef.xPos - self.x
+            dy = pRef.yPos - self.y
+            pRef.radius = round(math.sqrt(dx * dx + dy * dy))
+            pRef.angle = math.atan2(dy,dx)
 
     
     def setUp(self):
@@ -164,16 +152,16 @@ class ParticleSystem:
 
         # dx = config.canvasWidth - self.x
         # dy = config.canvasHeight - self.y
-        self.maxRadius = (
-            math.sqrt(
-                config.canvasWidth * config.canvasWidth
-                + config.canvasHeight * config.canvasHeight
-            )
-            * 2.5
-        )
-
+        # self.maxRadius = (
+        #     math.sqrt(
+        #         config.canvasWidth * config.canvasWidth
+        #         + config.canvasHeight * config.canvasHeight
+        #     )
+        #     * .5
+        # )
+        self.maxRadius = config.maxRadius
         self.radialBand = self.maxRadius / 12
-        # config.movementMode = 0 if random.random() < 0.5 else 1
+
         for n in range(self.numParticles):
             pDot = ParticleDot()
             pDot.setUp(self, n)
@@ -197,22 +185,27 @@ class ParticleSystem:
                 #     # print(r, ref.radius, ref.orbit)
                 #     ref.mode = 0
 
+                if (
+                    ref.xPos >= config.xRange
+                    or ref.xPos <= 0
+                ):
+                    ref.vx *= -1
+                if (
+                    ref.yPos >= config.yRange
+                    or ref.yPos <= 0
+                ):
+                    # ref.setUp(self, ref.id)
+                    ref.vy *= -1
             else:
-                ref.xPos = self.x + ref.radius / 1 * math.cos(ref.angle) * 0.2
-                ref.yPos = self.y + ref.radius / 1 * math.sin(ref.angle) * 0.2
+                ref.xPos = self.x + ref.radius * math.cos(ref.angle) 
+                ref.yPos = self.y + ref.radius * math.sin(ref.angle) 
                 ref.angle += ref.rSpeed
 
-            if (
-                ref.xPos > config.xRange
-                or ref.yPos > config.yRange
-                or ref.yPos < -config.yRange
-                or ref.xPos < -config.xRange
-            ):
-                ref.setUp(self, ref.id)
 
-            if random.random() < config.particleResetProb:
-                ref.setUp(self, ref.id)
+            # if random.random() < config.particleResetProb:
+            #     ref.setUp(self, ref.id)
 
+    
     def drawVoronoi(self):
         # Draw the Voronoi cells
         pointsArray = []
@@ -257,6 +250,7 @@ class ParticleSystem:
                         ),
                     )
 
+    
     def drawParticlesDots(self):
         for q in range(self.numParticles):
             ref = self.particles[q]
@@ -264,18 +258,20 @@ class ParticleSystem:
                 (
                     round(ref.xPos),
                     round(ref.yPos),
-                    round(ref.xPos) + 10,
-                    round(ref.yPos) + 10,
+                    round(ref.xPos) + 1,
+                    round(ref.yPos) + 1,
                 ),
                 fill=(200, 0, 0, 255),
             )
 
+    
     def move(self):
         # the whole system
         self.x += self.xSpeed
         self.y += self.ySpeed
         self.moveParticles()
         self.drawVoronoi()
+        # self.drawParticlesDots()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -339,13 +335,48 @@ def setColors() :
         config.nb[i] = (round(clr[2] * config.brightness))
 
 
-def resetSystem():
-        if random.SystemRandom().random() < config.changeMovementModeProb :
-            config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
+def initializeParameters() :
+    config.nx = []
+    config.ny = []
+    config.nvx = []
+    config.nvy = []
+    config.nr = []
+    config.ng = []
+    config.nb = []
 
-        PS.setNewAttributes()
-        PS.setCenter()
-        PS.resetParticles()
+    for _ in range(config.num_cells):
+        config.nx.append(random.randrange(-config.xRange / 4, 1.25 * config.xRange))
+        config.ny.append(random.randrange(-config.yRange / 4, 1.25 * config.yRange))
+        config.nvx.append(random.randrange(-2, 2))
+        config.nvy.append(random.randrange(-2, 2))
+        config.nr.append(50)
+        config.ng.append(50)
+        config.nb.append(50)
+
+
+def resetSystem(fullReset = False):
+        global PS, config
+        
+        if not fullReset :
+            # if random.SystemRandom().random() < config.changeMovementModeProb :
+            #     config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
+
+            config.movementMode = 1 if config.movementMode == 0 else 0
+            print(f"new sys {config.movementMode }")
+            PS.setNewAttributes()
+            # PS.setCenter()
+            PS.resetParticles()
+        else :
+            initializeParameters()
+            setColors()
+
+            PS = ParticleSystem(config)
+            PS.setCenter()
+            PS.setNewAttributes()
+            PS.setUp()
+
+
+
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -362,10 +393,14 @@ def runWork():
             config.paletteController.checkTime()
             if config.paletteController.advance:
                 changePalettes()
+        if config.changeTime > 0:
+            config.changeTimeController.checkTime()
+            if config.changeTimeController.advance:
+                resetSystem(False)
         if config.totalResetTime > 0:
             config.systemController.checkTime()
             if config.systemController.advance:
-                resetSystem()
+                resetSystem(True)
 
 
         time.sleep(redrawSpeed)
@@ -388,7 +423,6 @@ def iterate():
     )
 
     PS.move()
-    # drawBands(PS)
 
     config.fadeRate += config.fadeRateDelta
 
@@ -402,14 +436,13 @@ def iterate():
             # renew the particle dots that travel
             # bgChoice = math.floor(random.uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
-            print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
+            # print(f"ALL NEW {config.bgColor}  {config.fadeRateDelta}")
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
         filterRemapImage(config)
 
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
-
 
 
 def main(run=True):
@@ -444,6 +477,18 @@ def main(run=True):
     config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
 
     config.systemRotation = float(workConfig.get("particles", "systemRotation"))
+
+    try :
+        config.maxRadius = float(workConfig.get("particles", "maxRadius"))
+    except Exception as e:
+        print(e)
+        config.maxRadius = config.canvasWidth / 2
+
+    try :
+        config.systemSpeed = float(workConfig.get("particles", "systemSpeed"))
+    except Exception as e:
+        print(e)
+        config.systemSpeed = 0
 
     try:
         config.directionProb = float(workConfig.get("particles", "directionProb"))
@@ -495,14 +540,23 @@ def main(run=True):
 
     try :
         config.totalResetTime = float(workConfig.get("particles", "totalResetTime"))
-
     except Exception as e:
         print(e)
         config.totalResetTime = 33
 
+    try :
+        config.changeTime = float(workConfig.get("particles", "changeTime"))
+    except Exception as e:
+        print(e)
+        config.changeTime = 10
+
     if config.totalResetTime > 0 :
         config.systemController = Director(config)
         config.systemController.slotRate = config.totalResetTime
+
+    if config.changeTime > 0 :
+        config.changeTimeController = Director(config)
+        config.changeTimeController.slotRate = config.changeTime
 
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
 
@@ -572,32 +626,9 @@ def main(run=True):
     config.colorSetB = config.colorSets[1]
 
     config.num_cells = config.maxParticles
-    # config.resolutionOfSquares = int(workConfig.get("particles", "resolutionOfSquares"))
-
     config.imgx, config.imgy = config.image.size
-    config.nx = []
-    config.ny = []
-    config.nvx = []
-    config.nvy = []
-    config.nr = []
-    config.ng = []
-    config.nb = []
 
-    for _ in range(config.num_cells):
-        config.nx.append(random.randrange(-config.xRange / 4, 1.25 * config.xRange))
-        config.ny.append(random.randrange(-config.yRange / 4, 1.25 * config.yRange))
-        config.nvx.append(random.randrange(-2, 2))
-        config.nvy.append(random.randrange(-2, 2))
-        config.nr.append(50)
-        config.ng.append(50)
-        config.nb.append(50)
-
-    setColors()
-
-    PS = ParticleSystem(config)
-    PS.setCenter()
-    PS.setNewAttributes()
-    PS.setUp()
+    resetSystem(True)
 
     # structuredSetup()
     try:

@@ -1,6 +1,5 @@
 import math
 import random
-from sys import exception
 import time
 
 import numpy as np

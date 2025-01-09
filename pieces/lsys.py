@@ -217,7 +217,7 @@ class Lsys:
 
                 self.branchPoints = self.branchPoints[:-1]
 
-        print(len(self.drawingPoints))
+        # print(len(self.drawingPoints))
         # print(len(self.branchPoints))
 
 
@@ -241,8 +241,8 @@ def drawLines(arg):
         ),
     )
 
-    if config.bgColorAlpha > 1 :
-        config.bgColorAlpha -= .1
+    if config.bgColorAlpha > 1:
+        config.bgColorAlpha -= 0.1
 
     for i in range(len(L.drawingPoints)):
         # Draws trunks and branches
@@ -400,6 +400,19 @@ def drawLines(arg):
     config.rendered = True
 
 
+def blankTheCanvas():
+    if random.SystemRandom().random() < 0.5 :
+        config.imageDraw.rectangle(
+            (0, 0, config.canvasWidth, config.canvasHeight),
+            fill=(43, 76, 117, 80),
+        )
+    else :
+        config.imageDraw.rectangle(
+            (0, 0, config.canvasWidth, config.canvasHeight),
+            fill=(0, 0, 0, 240),
+        )
+
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
@@ -436,6 +449,10 @@ def main(run=True):
             lambda x: int(int(x)), workConfig.get("lsys", "branchPointColor").split(",")
         )
     )
+    config.reBuildTime = tuple(
+        map(lambda x: float(x), workConfig.get("lsys", "reBuildTime").split(","))
+    )
+
     config.useRandom = workConfig.getboolean("lsys", "useRandom")
     config.foliage = workConfig.getboolean("lsys", "foliage")
     config.Axiom = workConfig.get("lsys", "Axiom")
@@ -460,6 +477,11 @@ def setUp():
     config.id = config.image.im.id
     config.director = Director(config)
     config.director.slotRate = config.slotRate
+
+    config.rebuidDirector = Director(config)
+    config.rebuidDirector.slotRate = random.SystemRandom().uniform(
+        config.reBuildTime[0], config.reBuildTime[1]
+    )
     L = Lsys(config)
 
 
@@ -478,15 +500,26 @@ def runWork():
 
 def iterate():
     global config, L, pos, runRun
+    config.rebuidDirector.checkTime()
     config.director.checkTime()
     if config.director.advance:
         if not config.rendered:
             L.produceDrawingPoints()
         drawLines(L)
-        config.render(config.image, 0, 0)
-        if random.SystemRandom().random() < 0.003:
+        if config.rebuidDirector.advance:
             config.rendered = False
-            config.bgColorAlpha = 10
+            if random.SystemRandom().random() < 0.25:
+                blankTheCanvas()
+            else :
+                if random.SystemRandom().random() < 0.25:
+                    config.bgColorAlpha = 50
+                else:
+                    config.bgColorAlpha = 1
+
+            config.rebuidDirector.slotRate = random.SystemRandom().uniform(
+                config.reBuildTime[0], config.reBuildTime[1]
+            )
+        config.render(config.image, 0, 0)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

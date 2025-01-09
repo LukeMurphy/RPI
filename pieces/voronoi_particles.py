@@ -1,5 +1,6 @@
 import math
 import random
+from sys import exception
 import time
 
 import numpy as np
@@ -51,8 +52,8 @@ class ParticleDot:
         # angle = PSref.angle * n
 
         angle = 2 * math.pi * random.SystemRandom().random()
-        xPos = PSref.x + radius * math.cos(angle) 
-        yPos = PSref.y + radius * math.sin(angle) 
+        xPos = PSref.x + radius * math.cos(angle)
+        yPos = PSref.y + radius * math.sin(angle)
 
         if PSref.movementMode == 0:
             xPos = round(random.uniform(0, config.canvasWidth))
@@ -78,8 +79,8 @@ class ParticleDot:
         # self.movementMode = 0
         self.orbit = orbit
         self.sizeNum = 1 if random.random() < 0.5 else 2
-    
-    def setNewAttributes(self) :
+
+    def setNewAttributes(self):
         pass
 
 
@@ -103,7 +104,6 @@ class ParticleSystem:
         self.movementMode = config.movementMode
         self.brightness = config.brightness
         self.directionProb = random.uniform(0, 1)
-        
 
     def setNewAttributes(self):
         self.movementMode = config.movementMode
@@ -113,23 +113,20 @@ class ParticleSystem:
         self.xSpeed = random.SystemRandom().random() * config.systemSpeed
         self.ySpeed = random.SystemRandom().random() * config.systemSpeed
 
-
     def setCenter(self):
         # initial center position
         self.x = round(random.uniform(self.initXRange[0], self.initXRange[1]))
         self.y = round(random.uniform(self.initYRange[0], self.initYRange[1]))
 
-
-    def resetParticles(self) :
+    def resetParticles(self):
         # after they have drifted, calculate new parameters
         for pRef in self.particles:
             pRef.movementMode = self.movementMode
             dx = pRef.xPos - self.x
             dy = pRef.yPos - self.y
             pRef.radius = round(math.sqrt(dx * dx + dy * dy))
-            pRef.angle = math.atan2(dy,dx)
+            pRef.angle = math.atan2(dy, dx)
 
-    
     def setUp(self):
         self.orbitProb = config.orbitProb
         # Number of sparks
@@ -168,9 +165,8 @@ class ParticleSystem:
             pDot.movementMode = self.movementMode
             self.particles.append(pDot)
 
-
     def moveParticles(self):
-        for ref in self.particles :
+        for ref in self.particles:
             if ref.movementMode == 0:
                 if random.SystemRandom().random() < config.chanceParticleWillMove:
                     ref.xPos += ref.vx
@@ -185,27 +181,19 @@ class ParticleSystem:
                 #     # print(r, ref.radius, ref.orbit)
                 #     ref.mode = 0
 
-                if (
-                    ref.xPos >= config.xRange
-                    or ref.xPos <= 0
-                ):
+                if ref.xPos >= config.xRange or ref.xPos <= 0:
                     ref.vx *= -1
-                if (
-                    ref.yPos >= config.yRange
-                    or ref.yPos <= 0
-                ):
+                if ref.yPos >= config.yRange or ref.yPos <= 0:
                     # ref.setUp(self, ref.id)
                     ref.vy *= -1
             else:
-                ref.xPos = self.x + ref.radius * math.cos(ref.angle) 
-                ref.yPos = self.y + ref.radius * math.sin(ref.angle) 
+                ref.xPos = self.x + ref.radius * math.cos(ref.angle)
+                ref.yPos = self.y + ref.radius * math.sin(ref.angle)
                 ref.angle += ref.rSpeed
-
 
             # if random.random() < config.particleResetProb:
             #     ref.setUp(self, ref.id)
 
-    
     def drawVoronoi(self):
         # Draw the Voronoi cells
         pointsArray = []
@@ -250,7 +238,6 @@ class ParticleSystem:
                         ),
                     )
 
-    
     def drawParticlesDots(self):
         for q in range(self.numParticles):
             ref = self.particles[q]
@@ -264,7 +251,6 @@ class ParticleSystem:
                 fill=(200, 0, 0, 255),
             )
 
-    
     def move(self):
         # the whole system
         self.x += self.xSpeed
@@ -317,12 +303,16 @@ def filterRemapImage(config):
 
 
 def changePalettes():
-    config.colorSetA = config.colorSets[math.floor(random.SystemRandom().random() *  len(config.colorSets))]
-    config.colorSetB = config.colorSets[math.floor(random.SystemRandom().random() *  len(config.colorSets))]
+    config.colorSetA = config.colorSets[
+        math.floor(random.SystemRandom().random() * len(config.colorSets))
+    ]
+    config.colorSetB = config.colorSets[
+        math.floor(random.SystemRandom().random() * len(config.colorSets))
+    ]
     setColors()
 
 
-def setColors() :
+def setColors():
     for i in range(config.num_cells):
         clr = (
             config.colorSetA[round(random.uniform(0, len(config.colorSetA) - 1))]
@@ -330,12 +320,12 @@ def setColors() :
             else config.colorSetB[round(random.uniform(0, len(config.colorSetB) - 1))]
         )
         # clr = colorutils.randomColor()
-        config.nr[i] = (round(clr[0] * config.brightness))
-        config.ng[i] = (round(clr[1] * config.brightness))
-        config.nb[i] = (round(clr[2] * config.brightness))
+        config.nr[i] = round(clr[0] * config.brightness)
+        config.ng[i] = round(clr[1] * config.brightness)
+        config.nb[i] = round(clr[2] * config.brightness)
 
 
-def initializeParameters() :
+def initializeParameters():
     config.nx = []
     config.ny = []
     config.nvx = []
@@ -354,28 +344,26 @@ def initializeParameters() :
         config.nb.append(50)
 
 
-def resetSystem(fullReset = False):
-        global PS, config
-        
-        if not fullReset :
-            # if random.SystemRandom().random() < config.changeMovementModeProb :
-            #     config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
+def resetSystem(fullReset=False):
+    global PS, config
 
-            config.movementMode = 1 if config.movementMode == 0 else 0
-            print(f"new sys {config.movementMode }")
-            PS.setNewAttributes()
-            # PS.setCenter()
-            PS.resetParticles()
-        else :
-            initializeParameters()
-            setColors()
+    if not fullReset:
+        # if random.SystemRandom().random() < config.changeMovementModeProb :
+        #     config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
 
-            PS = ParticleSystem(config)
-            PS.setCenter()
-            PS.setNewAttributes()
-            PS.setUp()
+        config.movementMode = 1 if config.movementMode == 0 else 0
+        print(f"new sys {config.movementMode }")
+        PS.setNewAttributes()
+        # PS.setCenter()
+        PS.resetParticles()
+    else:
+        initializeParameters()
+        setColors()
 
-
+        PS = ParticleSystem(config)
+        PS.setCenter()
+        PS.setNewAttributes()
+        PS.setUp()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -401,7 +389,6 @@ def runWork():
             config.systemController.checkTime()
             if config.systemController.advance:
                 resetSystem(True)
-
 
         time.sleep(redrawSpeed)
 
@@ -484,13 +471,13 @@ def main(run=True):
 
     config.systemRotation = float(workConfig.get("particles", "systemRotation"))
 
-    try :
+    try:
         config.maxRadius = float(workConfig.get("particles", "maxRadius"))
     except Exception as e:
         print(e)
         config.maxRadius = config.canvasWidth / 2
 
-    try :
+    try:
         config.systemSpeed = float(workConfig.get("particles", "systemSpeed"))
     except Exception as e:
         print(e)
@@ -531,7 +518,7 @@ def main(run=True):
         )
     except Exception as e:
         print(e)
-        config.changeMovementModeProb = .0
+        config.changeMovementModeProb = 0.0
 
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.lineAlpha = float(workConfig.get("particles", "lineAlpha"))
@@ -544,23 +531,23 @@ def main(run=True):
 
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
 
-    try :
+    try:
         config.totalResetTime = float(workConfig.get("particles", "totalResetTime"))
     except Exception as e:
         print(e)
         config.totalResetTime = 33
 
-    try :
+    try:
         config.changeTime = float(workConfig.get("particles", "changeTime"))
     except Exception as e:
         print(e)
         config.changeTime = 10
 
-    if config.totalResetTime > 0 :
+    if config.totalResetTime > 0:
         config.systemController = Director(config)
         config.systemController.slotRate = config.totalResetTime
 
-    if config.changeTime > 0 :
+    if config.changeTime > 0:
         config.changeTimeController = Director(config)
         config.changeTimeController.slotRate = config.changeTime
 
@@ -599,7 +586,6 @@ def main(run=True):
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
-
     config.colorSets = []
 
     try:
@@ -616,8 +602,7 @@ def main(run=True):
         config.mixColorSets = False
         config.changeColorSetTime = 0
 
-
-    for grp in config.colorGroupsList :
+    for grp in config.colorGroupsList:
         rawColorSetAVals = workConfig.get("particles", grp).replace("\n", "")
         rawColorSetAVals = rawColorSetAVals.replace(" ", "")
         colorSetAVals = rawColorSetAVals.split("|")

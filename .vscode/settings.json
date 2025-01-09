@@ -1,6 +1,9 @@
 {
   "editor.defaultFormatter": "ms-python.python",
   "[python]": {
-    "editor.defaultFormatter": "trunk.io"
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
   }
 }

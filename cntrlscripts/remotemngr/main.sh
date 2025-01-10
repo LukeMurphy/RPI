@@ -39,6 +39,9 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             player="sequencer.v2.py"
         fi
         execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+
+
+        
         echo "==============   =====================\n"
         echo "==============   =====================\n"
         echo "==============   =====================\n"

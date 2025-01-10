@@ -35,6 +35,9 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     brightnessConfig=$localvalueControl
     if [ $1 = 'startup' ]; then
         echo "==============   =====================\n"
+        echo "==============   =====================\n"
+        echo "==============   =====================\n"
+        echo "==============   =====================\n"
         echo $path$player
         echo $configToUse
         echo "==============   =====================\n"

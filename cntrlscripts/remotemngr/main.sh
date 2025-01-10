@@ -34,6 +34,10 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     configToUse=$localvalue
     brightnessConfig=$localvalueControl
     if [ $1 = 'startup' ]; then
+        echo "==============   =====================\n"
+        echo $path$player
+        echo $configToUse
+        echo "==============   =====================\n"
         runScript=1
         if [[ $configToUse == *'--manifest.cfg'* ]]; then
             player="sequencer.v2.py"
@@ -41,10 +45,6 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
     fi
 
-    echo "==============   =====================\n"
-    echo $path$player
-    echo $configToUse
-    echo "==============   =====================\n"
 
     if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]; then
         if [ $remotevalue = 'Shutdown' ]; then

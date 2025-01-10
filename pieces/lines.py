@@ -5,6 +5,7 @@ import time
 # from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageDraw
+from modules import configuration
 
 
 # This is a port / version of a Javascript piece Modern Drawing Maker
@@ -349,7 +350,6 @@ def main(run=True):
     config.f6 = getColorChanger()
 
     config.imageRotation = 0.0001
-
     setUp()
 
 
@@ -383,6 +383,7 @@ def setUp():
 
     # config.draw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
     # config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = config.bgColor)
+    # config.debugSelf()
 
 
 def runWork():

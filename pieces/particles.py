@@ -16,8 +16,9 @@ from PIL import (
     ImageOps,
 )
 import noise
+
 # from noise import *
-from modules.holder_director import Director 
+from modules.holder_director import Director
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -571,6 +572,8 @@ def main(run=True):
 
     setUp()
 
+    config.debugSelf()
+
     if run:
         runWork()
 
@@ -606,12 +609,12 @@ def emitParticle(i=None):
 
     if ps.movement == "fire":
         p.direction = random.uniform(0, 180) * math.pi / 180
-        if ps.oneDirection :
+        if ps.oneDirection:
             p.direction = 1
 
     if ps.movement == "travel":
         p.direction = random.uniform(0, 360) * math.pi / 180
-        if ps.oneDirection :
+        if ps.oneDirection:
             p.direction = 1
 
     """
@@ -651,26 +654,38 @@ def emitParticle(i=None):
         p.outlineColor = config.outlineColor  # (100,0,0,100)
         p.extraOutlineColor = config.extraOutlineColor
 
-        if config.pUseHSV :
+        if config.pUseHSV:
             p.fillColor = colorutils.getRandomColorHSV(
-                config.pFillRange[0], config.pFillRange[1], 
-                config.pFillRange[2], config.pFillRange[3], 
-                config.pFillRange[4], config.pFillRange[5], 
-                0, 0, 
-                int(config.pFillRange[6]), ps.config.brightness)
+                config.pFillRange[0],
+                config.pFillRange[1],
+                config.pFillRange[2],
+                config.pFillRange[3],
+                config.pFillRange[4],
+                config.pFillRange[5],
+                0,
+                0,
+                int(config.pFillRange[6]),
+                ps.config.brightness,
+            )
             p.outlineColor = colorutils.getRandomColorHSV(
-                config.pOutlineRange[0], config.pOutlineRange[1], 
-                config.pOutlineRange[2], config.pOutlineRange[3], 
-                config.pOutlineRange[4], config.pOutlineRange[5], 
-                0, 0, 
-                int(config.pOutlineRange[6]), ps.config.brightness)
+                config.pOutlineRange[0],
+                config.pOutlineRange[1],
+                config.pOutlineRange[2],
+                config.pOutlineRange[3],
+                config.pOutlineRange[4],
+                config.pOutlineRange[5],
+                0,
+                0,
+                int(config.pOutlineRange[6]),
+                ps.config.brightness,
+            )
 
         if random.random() < config.useSecondColorProb:
             p.fillColor = config.fillColor2  # (240,150,0,100)
             p.outlineColor = config.outlineColor2  # (100,0,0,100)
             p.extraOutlineColor = config.extraOutlineColor2
 
-        if config.pixelsGoGray :
+        if config.pixelsGoGray:
             _extracted_from_emitParticle_94(config, p)
     if ps.movement == "linearMotion":
 
@@ -696,7 +711,7 @@ def _extracted_from_emitParticle_158(config, p, ps):
     ]
     dirVal = round(random.uniform(0, 1))
 
-    if ps.linearMotionAlsoHorizontal :
+    if ps.linearMotionAlsoHorizontal:
         dirVal = round(random.uniform(0, 3))
 
     p.direction = directions[dirVal]
@@ -751,9 +766,7 @@ def _extracted_from_emitParticle_94(config, p):
     ]
 
     p.fillGrey = (
-        rRatio * p.fillColor[0]
-        + gRatio * p.fillColor[1]
-        + bRatio * p.fillColor[2]
+        rRatio * p.fillColor[0] + gRatio * p.fillColor[1] + bRatio * p.fillColor[2]
     )
 
     p.fillGreyRate = [
@@ -821,8 +834,8 @@ def colorize():
 
 def brightnessChanger():
     global config, ps
-    if config.brightnessVariation :
-        if not config.brightnessVariationTransition :
+    if config.brightnessVariation:
+        if not config.brightnessVariationTransition:
             if random.random() < config.brightnessVariationProb:
                 config.destinationBrightness = random.uniform(
                     0.1, config.baseBrightness
@@ -870,12 +883,12 @@ def runWork():
     print("RUNNING Particle System pieces/singletons/particles.py")
     print(bcolors.ENDC)
 
-    while config.isRunning :
+    while config.isRunning:
         config.directorController.checkTime()
-        if config.directorController.advance :
+        if config.directorController.advance:
             iterate()
         time.sleep(config.delay)
-        if not config.standAlone :
+        if not config.standAlone:
             config.callBack()
 
 
@@ -887,7 +900,7 @@ def iterate():
 
     brightnessChanger()
 
-    if config.bgTransitions :
+    if config.bgTransitions:
         config.colOverlayA.stepTransition(alpha=config.colOverlayA.bgTransparency)
         config.bgColor = tuple(
             int(a * config.brightness) for a in config.colOverlayA.currentColor
@@ -900,7 +913,7 @@ def iterate():
         outline=None,
     )
 
-    if config.useOverOnBG :
+    if config.useOverOnBG:
         config.image.paste(
             config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
         )
@@ -922,7 +935,7 @@ def iterate():
         if p.objHeight > 200:
             p.remove = True
 
-        if p.remove :
+        if p.remove:
             # print("REMOVING",ps.unitArray.index(p),len(ps.unitArray))
 
             if not ps.fixedUnitArray:
@@ -949,7 +962,9 @@ def iterate():
     # if random.random() < config.optionallegacyToggleProb:
     #     config.legacyUnsharpMask = config.legacyUnsharpMask != True
 
-    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping ):
+    if random.random() < config.filterRemappingProb and (
+        config.useFilters and config.filterRemapping
+    ):
         remapDitherFilteredParts(config)
     if (
         random.random() < ps.changechangeCohesionProb
@@ -972,13 +987,13 @@ def iterate():
             ImageFilter.GaussianBlur(radius=config.overallBlur)
         )
         # This needs to be reset
-        if config.legacyUnsharpMask :
+        if config.legacyUnsharpMask:
             config.image = config.image.filter(
                 ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1)
             )
         config.draw = ImageDraw.Draw(config.image)
 
-    if config.transformShape :
+    if config.transformShape:
         config.image = transformImage(config.image)
 
     if config.pixelSortProbChange != 0 and random.random() < config.pixelSortProbChange:
@@ -1009,7 +1024,7 @@ def iterate():
 
     # print("particles ",config.render, config.instanceNumber)
 
-    if config.useOverLayEnhanced :
+    if config.useOverLayEnhanced:
         # config.image = ImageChops.multiply(config.clrBlock, config.image)
         # config.image = ImageChops.invert(config.image)
 
@@ -1033,16 +1048,16 @@ def iterate():
             temp, (config.overlayxPos, config.overlayyPos), config.clrBlock
         )
 
-    elif config.useOverLay :
+    elif config.useOverLay:
         config.image.paste(
             config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
         )
 
     # RENDERING AS A MOCKUP OR AS REAL
-    if config.useDrawingPoints :
+    if config.useDrawingPoints:
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
-    elif not config.useWaveDistortion :
+    elif not config.useWaveDistortion:
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     else:
         config.xPos += 1

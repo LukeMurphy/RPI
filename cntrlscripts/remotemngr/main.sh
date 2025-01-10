@@ -39,12 +39,18 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             player="sequencer.v2.py"
         fi
         execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+
+
+        
+        echo "==============   =====================\n"
+        echo "==============   =====================\n"
+        echo "==============   =====================\n"
+        echo $path$player
+        echo $configToUse
+        echo $execString
+        echo "==============   =====================\n"
     fi
 
-    echo "==============   =====================\n"
-    echo $path$player
-    echo $configToUse
-    echo "==============   =====================\n"
 
     if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]; then
         if [ $remotevalue = 'Shutdown' ]; then

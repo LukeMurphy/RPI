@@ -4,13 +4,17 @@ import time
 import tkinter as tk
 
 from modules.filters import *
+import gc
+import PIL
+import PIL.Image
+import PIL.ImageTk
+import numpy
+
 from PIL import (
     Image,
-    ImageChops,
     ImageDraw,
     ImageEnhance,
     ImageFilter,
-    ImageFont,
     ImageTk,
 )
 

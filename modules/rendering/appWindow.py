@@ -45,7 +45,7 @@ class AppWindow:
         self.canvasOffsetX = 4
         self.canvasOffsetY = 7
         self.buff = 8
-        gc.enable()
+        # gc.enable()
         if self.masterConfig.MID == "studio-mac":
             self.masterConfig.path = "./"
             windowOffset = [1900, 20]

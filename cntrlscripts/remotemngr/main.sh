@@ -33,23 +33,18 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     echo "Remote brightness:" $remotevalueControl
     configToUse=$localvalue
     brightnessConfig=$localvalueControl
+    sub="--manifest.cfg"
     if [ $1 = 'startup' ]; then
         runScript=1
-        if [[ $configToUse == *'--manifest.cfg'* ]]; then
-            player="sequencer.v2.py"
-        fi
-        if [[ $configToUse = *"--manifest.cfg"* ]]; then
-            player="sequencer.v2.py"
-        fi
+        case "$configToUse" in
+                *"$sub"*)
+                player="sequencer.v2.py"
+                echo "MATCH";;
+                *)
+                echo "NO MATCH"
+                ;;
+        esac
         execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
-
-        echo "==============   =====================\n"
-        echo "==============   =====================\n"
-        echo "==============   =====================\n"
-        echo $path$player
-        echo $configToUse
-        echo $execString
-        echo "==============   =====================\n"
     fi
 
 

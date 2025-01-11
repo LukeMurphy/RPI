@@ -1,9 +1,8 @@
 {
-  "editor.defaultFormatter": "ms-python.python",
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
-  },
-  "[properties]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+    "python.createEnvironment.contentButton": "show",
+    "python.autoComplete.extraPaths": [
+        "/Users/lamshell/Documents/Dev/LEDELI/RPI",
+        "/Users/lamshell/Documents/Dev/LEDELI/RPI/modules/"
+    ],
+    "python.globalModuleInstallation": false
 }

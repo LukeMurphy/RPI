@@ -476,6 +476,7 @@ def iterate():
 
     redraw(config)
 
+    
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
@@ -491,16 +492,17 @@ def iterate():
 
     if random.random() < config.blurPatchProb:
         x1 = round(random.uniform(0, config.canvasWidth / 2))
-        x2 = round(random.uniform(x1, config.canvasWidth))
         y1 = round(random.uniform(0, config.canvasHeight / 2))
-        y2 = round(random.uniform(y1, config.canvasHeight))
+        x2 = round(random.uniform(0, config.canvasWidth))
+        y2 = round(random.uniform(0, config.canvasHeight))
 
         config.useBlur = True
         config.blurXOffset = x1
         config.blurYOffset = y1
         config.blurSectionWidth = x2
         config.blurSectionHeight = y2
-        config.sectionBlurRadius = 1
+        config.sectionBlurRadius = 3
+
 
     if random.random() < config.changeGridProb:
         
@@ -533,7 +535,7 @@ def iterate():
             index = 0
         print("Running a :" + str(config.gridOptions[index]))
         eval(config.gridOptions[index])(config)
-
+    
     if random.random() < config.changeQuiverOnProb:
             config.deltaXVal = round(random.uniform(0, config.deltaVal))
             config.deltaYVal = round(random.uniform(0, config.deltaVal))
@@ -542,11 +544,13 @@ def iterate():
             # a bit more often, things just go still
             config.deltaXVal = config.deltaYVal = 0
 
-    if config.useDrawingPoints :
-        config.panelDrawing.canvasToUse = config.canvasImage
-        config.panelDrawing.render()
-    else:
-        config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+    
+    # if config.useDrawingPoints :
+    #     config.panelDrawing.canvasToUse = config.canvasImage
+    #     config.panelDrawing.render()
+    # else:
+    #     config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+    config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
     # Done
 
 
@@ -567,8 +571,6 @@ def main(run=True):
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
     config.changeGridProb = float(workConfig.get("movingpattern", "changeGridProb"))
     config.changeQuiverProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
-    
-    
     
     try:
         config.changeQuiverOnProb = float(workConfig.get("movingpattern", "changeQuiverOnProb"))

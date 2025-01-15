@@ -453,7 +453,13 @@ def render(
     # ---- Overall image blurring  ---- #
     if config.useBlur:
         # config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-
+        config.blurSection = (
+            config.blurXOffset,
+            config.blurYOffset,
+            config.blurXOffset + config.blurSectionWidth,
+            config.blurYOffset + config.blurSectionHeight,
+        )
+        
         crop = config.renderImageFull.crop(config.blurSection)
         destination = (config.blurXOffset, config.blurYOffset)
         crop = crop.convert("RGBA")

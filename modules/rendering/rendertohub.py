@@ -257,6 +257,8 @@ def updateCanvas():
                         + config.initialArgs
                         + "&"
                     )
+                    
+                    exit()
                 # commadStringPyth = ""
                 # os.system(commadStringPyth + config.initialArgs + "&")
 

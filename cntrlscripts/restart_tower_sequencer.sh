@@ -16,7 +16,7 @@ echo "*****************************"
 echo "*****************************"
 
 ps -ef | pgrep -f player | xargs sudo kill -9;
-ps -ef | pgrep -f player | xargs sudo kill -9;
+
 sleep 1
 
 python3 /Users/lamshell/Documents/Dev/RPI/sequence-player.py -mname d57 -path /Users/lamshell/Documents/Dev/RPI/ -cfg prod/seq-tower-line--manifest.cfg

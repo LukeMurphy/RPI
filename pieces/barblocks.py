@@ -261,10 +261,10 @@ def buildGrid(config):
         cols = 80
 
     
-    print("---- buildGrid --")
-    print(("Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}").format(
-        rows, cols, config.paletteIndex, config.usePaletteOverride, config.mixedPalettes))
-    print("------")
+    # print("---- buildGrid --")
+    # print(("Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}").format(
+    #     rows, cols, config.paletteIndex, config.usePaletteOverride, config.mixedPalettes))
+    # print("------")
 
     gridSize = 8
     availableCoords = []
@@ -493,8 +493,8 @@ def iterate():
     if random.random() < config.blurPatchProb:
         x1 = round(random.uniform(0, config.canvasWidth / 2))
         y1 = round(random.uniform(0, config.canvasHeight / 2))
-        x2 = round(random.uniform(0, config.canvasWidth))
-        y2 = round(random.uniform(0, config.canvasHeight))
+        x2 = round(random.uniform(5, config.canvasWidth))
+        y2 = round(random.uniform(5, config.canvasHeight))
 
         config.useBlur = True
         config.blurXOffset = x1
@@ -503,6 +503,14 @@ def iterate():
         config.blurSectionHeight = y2
         config.sectionBlurRadius = 3
 
+        config.blurSection = (
+            config.blurXOffset,
+            config.blurYOffset,
+            config.blurXOffset + config.blurSectionWidth,
+            config.blurYOffset + config.blurSectionHeight,
+        )
+
+        # print(config.blurSection)
 
     if random.random() < config.changeGridProb:
         

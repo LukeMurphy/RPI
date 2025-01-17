@@ -454,18 +454,18 @@ def render(
     # ---- Overall image blurring  ---- #
     if config.useBlur:
         # config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-        config.blurSection = (
-            config.blurXOffset,
-            config.blurYOffset,
-            config.blurXOffset + config.blurSectionWidth,
-            config.blurYOffset + config.blurSectionHeight,
-        )
+        # config.blurSection = (
+        #     config.blurXOffset,
+        #     config.blurYOffset,
+        #     config.blurXOffset + config.blurSectionWidth,
+        #     config.blurYOffset + config.blurSectionHeight,
+        # )
         
-        crop = config.renderImageFull.crop(config.blurSection)
-        destination = (config.blurXOffset, config.blurYOffset)
-        crop = crop.convert("RGBA")
-        crop = crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-        config.renderImageFull.paste(crop, destination, crop)
+        config._render_crop = config.renderImageFull.crop(config.blurSection)
+        config._render_destination = (config.blurXOffset, config.blurYOffset)
+        config._render_crop = config._render_crop.convert("RGBA")
+        config._render_crop = config._render_crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+        config.renderImageFull.paste(config._render_crop, config._render_destination, config._render_crop)
 
     if config.renderDiagnostics:
         config.renderDiagnosticsCall()

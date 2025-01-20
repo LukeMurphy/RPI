@@ -199,7 +199,6 @@ class ParticleSystem:
         for i in range(config.num_cells):
             ref = self.particles[i]
             pointsArray.append([ref.xPos, ref.yPos])
-            # config.draw.rectangle((ref.xPos,ref.yPos,ref.xPos+3,ref.yPos+3), fill=(200,200,200,255))
 
         points = np.array(pointsArray)
         vor = Voronoi(points)
@@ -256,7 +255,9 @@ class ParticleSystem:
         self.y += self.ySpeed
         self.moveParticles()
         self.drawVoronoi()
-        # self.drawParticlesDots()
+        
+        if config.showParticlePostions :
+            self.drawParticlesDots()
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -271,17 +272,39 @@ def withinRange(arg, target, diff):
 
 # an override
 def structuredSetup():
-    xD = 0
-    yD = 0
-    for i in range(1, len(PS.particles), 2):
-        p = PS.particles[i]
-        p2 = PS.particles[i - 1]
-        p.xPos = 10 + xD
-        p.yPos = 400 - yD
-        p2.xPos = 300 - xD
-        p2.yPos = 400 - yD
-        yD += 30
-        xD += 20
+    xD = 18
+    yD = 5
+    rows= math.floor(math.sqrt(len(PS.particles)))
+    # print(f"rows = {rows}")
+    cols = rows
+    i = 0
+    rads = math.pi / cols * 1
+    for r in range(rows):
+        for c in range(cols):
+            xD = round(config.canvasWidth/2 + (math.cos(rads * c)) * config.canvasWidth/2)
+            p = PS.particles[i]
+            p2 = PS.particles[i - 1]
+            p.xPos = 1 + xD 
+            p.yPos = 1 + yD * r
+            # p2.xPos = 300 - xD
+            # p2.yPos = 400 - yD
+            # yD += 30
+            # xD += 20
+            p.movementMode = 0
+            p2.movementMode = 0
+            i += 1
+        yD+=2
+        # for i in range(1, len(PS.particles), 2):
+    #     p = PS.particles[i]
+    #     p2 = PS.particles[i - 1]
+    #     p.xPos = 10 + xD
+    #     p.yPos = 400 - yD
+    #     p2.xPos = 300 - xD
+    #     p2.yPos = 400 - yD
+    #     yD += 30
+    #     xD += 20
+    #     p.movementMode = 0
+    #     p2.movementMode = 0
 
 
 def filterRemapImage(config):
@@ -351,10 +374,17 @@ def resetSystem(fullReset=False):
         #     config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
 
         config.movementMode = 1 if config.movementMode == 0 else 0
-        print(f"new sys {config.movementMode }")
+        if config.movementMode == 0 and random.SystemRandom().random() < .5 :
+            config.useStructuredSetup = True if config.useStructuredSetup == False else False
+        else :
+            config.useStructuredSetup = False
+
         PS.setNewAttributes()
         # PS.setCenter()
         PS.resetParticles()
+
+        if config.useStructuredSetup :
+            structuredSetup()
     else:
         initializeParameters()
         setColors()
@@ -364,6 +394,10 @@ def resetSystem(fullReset=False):
         PS.setNewAttributes()
         PS.setUp()
 
+        if config.useStructuredSetup :
+            structuredSetup()
+
+    # print(f"new sys {config.movementMode }  useStructuredSetup {config.useStructuredSetup}")
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -450,6 +484,18 @@ def main(run=True):
     config.rSpeedRadialProportional = workConfig.getboolean(
         "particles", "rSpeedRadialProportional"
     )
+
+    try:
+        config.showParticlePostions = (workConfig.getboolean("particles", "showParticlePostions"))
+    except Exception as e:
+        print(e)
+        config.showParticlePostions = False
+
+    try:
+        config.useStructuredSetup = (workConfig.getboolean("particles", "useStructuredSetup"))
+    except Exception as e:
+        print(e)
+        config.useStructuredSetup = False
 
     try:
         config.numOrbits = int(workConfig.get("particles", "numOrbits"))
@@ -620,7 +666,7 @@ def main(run=True):
 
     resetSystem(True)
 
-    # structuredSetup()
+
     try:
         config.slotRate = float(workConfig.get("particles", "slotRate"))
     except Exception as e:

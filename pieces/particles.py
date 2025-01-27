@@ -91,7 +91,11 @@ def setColorsByPalette():
     config.bg_bgRangeB = ref.bg_bgRangeB
     config.bg_randomRange = ref.bg_randomRange
     config.bg_transparencyRange = ref.bg_transparencyRange
-    config.bg_bgTransparency = round(random.random()* (config.bg_transparencyRange[1] - config.bg_transparencyRange[0]) + config.bg_transparencyRange[0])
+    config.bg_bgTransparency = round(
+        random.random()
+        * (config.bg_transparencyRange[1] - config.bg_transparencyRange[0])
+        + config.bg_transparencyRange[0]
+    )
     config.bg_tLimitBase = ref.bg_tLimitBase
     config.bg_minHue = ref.bg_minHue
     config.bg_maxHue = ref.bg_maxHue
@@ -140,8 +144,7 @@ def doColorManagementSetup():
         print(e)
         ps.objTrails = True
 
-
- # ------- Palette management introduce 2025-01-27 --------------
+    # ------- Palette management introduce 2025-01-27 --------------
     try:
         config.usePalettes = workConfig.getboolean("particleSystem", "usePalettes")
         config.paletteList = workConfig.get("particleSystem", "palettes").split(",")
@@ -170,7 +173,14 @@ def doColorManagementSetup():
             _p.bg_bgTransitions = workConfig.getboolean(_palette, "bg_bgTransitions")
             _p.bg_bgRangeA = float(workConfig.get(_palette, "bg_bgRangeA"))
             _p.bg_bgRangeB = float(workConfig.get(_palette, "bg_bgRangeB"))
-            _p.bg_randomRange = [_p.bg_bgRangeA,_p.bg_bgRangeB]
+            _p.bg_randomRange = [_p.bg_bgRangeA, _p.bg_bgRangeB]
+            _p.bg_transparencyRange = tuple(
+                map(
+                    lambda x: (float(x)),
+                    workConfig.get(_palette, "bg_transparencyRange").split(","),
+                )
+            )
+            
             _p.bg_tLimitBase = float(workConfig.get(_palette, "bg_tLimitBase"))
             _p.bg_minHue = float(workConfig.get(_palette, "bg_minHue"))
             _p.bg_maxHue = float(workConfig.get(_palette, "bg_maxHue"))
@@ -189,9 +199,8 @@ def doColorManagementSetup():
     except Exception as e:
         print("\n___________ ISSUES WITH PALETTE SETUP ______________\n")
         print(str(e))
-        print("\n___________ ISSUES WITH PALETTE SETUP ______________\n")
+        print("\n___________ _________________________ ______________\n")
         config.usePalettes = False
-
 
     try:
         config.pUseHSV = workConfig.getboolean("particleSystem", "pUseHSV")
@@ -205,40 +214,60 @@ def doColorManagementSetup():
         )
     except Exception as e:
         print(str(e))
-        config.pUseHSV = False
+        if not config.usePalettes :
+            config.pUseHSV = False
 
-    
     try:
-        config.bg_bgTransitions = workConfig.getboolean("particleSystem", "bgTransitions")
+        config.bg_bgTransitions = workConfig.getboolean(
+            "particleSystem", "bgTransitions"
+        )
     except Exception as e:
         print(str(e))
         config.bg_bgTransitions = False
 
-
     if not config.usePalettes and config.pUseHSV:
-        config.bg_bgTransitions = workConfig.getboolean("particleSystem", "bgTransitions")
+        config.bg_bgTransitions = workConfig.getboolean(
+            "particleSystem", "bgTransitions"
+        )
         config.bg_bgRangeA = int(workConfig.get("particleSystem", "bgRangeA"))
         config.bg_bgRangeB = int(workConfig.get("particleSystem", "bgRangeB"))
         config.bg_randomRange = [config.bg_bgRangeA, config.bg_bgRangeB]
         config.bg_minHue = int(workConfig.get("particleSystem", "hueMin"))
         config.bg_maxHue = int(workConfig.get("particleSystem", "hueMax"))
-        config.bg_minValue = .1
+        config.bg_minValue = 0.1
         config.bg_maxValue = float(workConfig.get("particleSystem", "maxBrightness"))
-        config.bg_maxBrightness = float(workConfig.get("particleSystem", "maxBrightness"))
-        config.bg_bgTransparency = float(workConfig.get("particleSystem", "bgTransparency"))
+        config.bg_maxBrightness = float(
+            workConfig.get("particleSystem", "maxBrightness")
+        )
+        config.bg_bgTransparency = float(
+            workConfig.get("particleSystem", "bgTransparency")
+        )
 
         try:
-            config.bg_transparencyRange = workConfig.get("particleSystem", "bg_transparencyRange").split(",")
-            config.bg_bgTransparency = round(random.random() * (int(config.bg_transparencyRange[1]) - int(config.bg_transparencyRange[0])) + int(config.bg_transparencyRange[0]))
+            config.bg_transparencyRange = workConfig.get(
+                "particleSystem", "bg_transparencyRange"
+            ).split(",")
+            config.bg_bgTransparency = round(
+                random.random()
+                * (
+                    int(config.bg_transparencyRange[1])
+                    - int(config.bg_transparencyRange[0])
+                )
+                + int(config.bg_transparencyRange[0])
+            )
         except Exception as e:
             print(str(e))
 
         try:
-            config.bg_minSaturation = float(workConfig.get("particleSystem", "minSaturation"))
-            config.bg_maxSaturation = float(workConfig.get("particleSystem", "maxSaturation"))
+            config.bg_minSaturation = float(
+                workConfig.get("particleSystem", "minSaturation")
+            )
+            config.bg_maxSaturation = float(
+                workConfig.get("particleSystem", "maxSaturation")
+            )
             # comment:
         except Exception as e:
-            config.bg_minSaturation = .1
+            config.bg_minSaturation = 0.1
             config.bg_maxSaturation = 1.0
             print(str(e))
 
@@ -248,13 +277,11 @@ def doColorManagementSetup():
         config.bg_timeTrigger = True
         try:
             config.bg_tLimitBase = int(workConfig.get("particleSystem", "tLimitBase"))
-            # comment: 
+            # comment:
         except Exception as e:
             print(str(e))
             config.bg_tLimitBase = 50
         setColors()
-
-
 
     if not config.usePalettes:
         try:
@@ -263,7 +290,9 @@ def doColorManagementSetup():
                 map(lambda x: int(int(x) * config.brightness), fillColorVals)
             )
 
-            outlineColorVals = (workConfig.get("particleSystem", "outlineColor")).split(",")
+            outlineColorVals = (workConfig.get("particleSystem", "outlineColor")).split(
+                ","
+            )
             config.particle_outlineColor = tuple(
                 map(lambda x: int(int(x) * config.brightness), outlineColorVals)
             )
@@ -285,15 +314,14 @@ def doColorManagementSetup():
             print(str(e))
             config.extraOutlineColor = None
 
-
         # second color for some particles
         try:
             config.useSecondColorProb = float(
                 workConfig.get("particleSystem", "useSecondColorProb")
             )
-            config.fillColorVals2 = (workConfig.get("particleSystem", "fillColor2")).split(
-                ","
-            )
+            config.fillColorVals2 = (
+                workConfig.get("particleSystem", "fillColor2")
+            ).split(",")
             config.fillColor2 = tuple(
                 map(lambda x: int(int(x) * config.brightness), config.fillColorVals2)
             )
@@ -327,7 +355,6 @@ def doColorManagementSetup():
             config.fillColor2 = config.particle_fillColor
             config.outlineColor2 = config.particle_outlineColor
 
-
     """
 	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
 	Because colors are more interesting against gray, because everything goes gray
@@ -350,7 +377,7 @@ def doColorManagementSetup():
     except Exception as e:
         print(str(e))
         config.jumpToGray = True
-        if not config.pixelsGoGray :
+        if not config.pixelsGoGray:
             config.jumpToGray = False
 
     try:
@@ -376,14 +403,12 @@ def main(run=True):
     config.canvasImageHeight -= 4
     config.numUnits = 60
 
-    """
-	config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
-	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
-	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
-	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
-	"""
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+	# config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
+	# config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
+	# config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
+	# config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
+
 
     config.canvasImage = Image.new(
         "RGBA", (config.canvasImageWidth, config.canvasImageHeight)
@@ -392,8 +417,6 @@ def main(run=True):
     config.font = ImageFont.truetype(
         config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
     )
-
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
     ps = ParticleSystem(config)
     ps.unitArray = []
@@ -477,6 +500,7 @@ def main(run=True):
         print(e)
         config.delay = 0.01
         ps.delay = 0.01
+        
     try:
         config.directorController.slotRate = float(
             workConfig.get("particleSystem", "slotRate")
@@ -660,9 +684,11 @@ def main(run=True):
         ps.rndSizeFactorMax = 1.5
 
     # -------------  DO COLOR MANAGEMENT SETUP ---------------#
+    ''' ----------------------------------------------------  '''
+    
     doColorManagementSetup()
 
-
+    ''' ----------------------------------------------------  '''
     # -------------  DO COLOR MANAGEMENT SETUP ---------------#
 
     ps.unitBlur = int(workConfig.get("particleSystem", "unitBlur"))
@@ -779,15 +805,15 @@ def emitParticle(i=None):
             p.direction = 1
 
     # """
-	# p.direction = random.uniform(
-	# 	math.pi + math.pi / 2 - config.variance,
-	# 	math.pi + math.pi / 2 + config.variance
-	# )
+    # p.direction = random.uniform(
+    # 	math.pi + math.pi / 2 - config.variance,
+    # 	math.pi + math.pi / 2 + config.variance
+    # )
 
-	# p.direction = random.uniform(-math.pi,math.pi)
+    # p.direction = random.uniform(-math.pi,math.pi)
 
-	# p.direction = random.uniform(0,360) * math.pi/180
-	# """
+    # p.direction = random.uniform(0,360) * math.pi/180
+    # """
 
     p.v = random.uniform(ps.speedMin, ps.speedMax)
     p.xWind = config.xWind
@@ -795,12 +821,56 @@ def emitParticle(i=None):
     p.pixelsGoGray = config.pixelsGoGray
     p.jumpToGray = config.jumpToGray
 
-    if ps.objColor == "rnd":
-        p.fillColor = colorutils.randomColor(ps.config.brightness)
-        p.outlineColor = colorutils.getSunsetColors(ps.config.brightness / 2)
+    if config.pUseHSV:
+        transparency = int(config.particle_fillRange[6])
+        try:
+            transMin = config.particle_fillRange[6]
+            transMax = config.particle_fillRange[7]
+            transparency = round(random.random() * (transMax - transMin) + transMin)
+        except Exception as e:
+            print(f"transparency range on particle_fillRange:  {str(e)}")
 
-    if ps.objColor == "alphaRandom":
-        p.fillColor = colorutils.randomColorAlpha(
+        p.fillColor = colorutils.getRandomColorHSV(
+            config.particle_fillRange[0],
+            config.particle_fillRange[1],
+            config.particle_fillRange[2],
+            config.particle_fillRange[3],
+            config.particle_fillRange[4],
+            config.particle_fillRange[5],
+            0,
+            0,
+            transparency,
+            ps.config.brightness,
+        )
+
+        transparency = int(config.particle_outlineRange[6])
+        try:
+            transMin = config.particle_outlineRange[6]
+            transMax = config.particle_outlineRange[7]
+            transparency = round(random.random() * (transMax - transMin) + transMin)
+        except Exception as e:
+            print(f"transparency range on particle_fillRange:  {str(e)}")
+
+        p.outlineColor = colorutils.getRandomColorHSV(
+            config.particle_outlineRange[0],
+            config.particle_outlineRange[1],
+            config.particle_outlineRange[2],
+            config.particle_outlineRange[3],
+            config.particle_outlineRange[4],
+            config.particle_outlineRange[5],
+            0,
+            0,
+            transparency,
+            ps.config.brightness,
+        )
+    else:
+
+        if ps.objColor == "rnd":
+            p.fillColor = colorutils.randomColor(ps.config.brightness)
+            p.outlineColor = colorutils.getSunsetColors(ps.config.brightness / 2)
+
+        if ps.objColor == "alphaRandom":
+            p.fillColor = colorutils.randomColorAlpha(
             ps.config.brightness,
             int(random.uniform(ps.transparencyRange[0], ps.transparencyRange[1])),
         )
@@ -809,63 +879,17 @@ def emitParticle(i=None):
             int(random.uniform(ps.transparencyRange[0], ps.transparencyRange[1])),
         )
 
-    else:
-        if config.pUseHSV:
+        p.fillColor = config.particle_fillColor  # (240,150,0,100)
+        p.outlineColor = config.particle_outlineColor  # (100,0,0,100)
+        p.extraOutlineColor = config.extraOutlineColor
 
-            transparency = int(config.particle_fillRange[6])
-            try:
-                transMin  =  config.particle_fillRange[6]
-                transMax  =  config.particle_fillRange[7]
-                transparency = round(random.random() * (transMax - transMin) + transMin)
-            except Exception as e:
-                print(f"transparency range on particle_fillRange:  {str(e)}")
+        if random.random() < config.useSecondColorProb:
+            p.fillColor = config.fillColor2  # (240,150,0,100)
+            p.outlineColor = config.outlineColor2  # (100,0,0,100)
+            p.extraOutlineColor = config.extraOutlineColor2
 
-
-            p.fillColor = colorutils.getRandomColorHSV(
-                config.particle_fillRange[0],
-                config.particle_fillRange[1],
-                config.particle_fillRange[2],
-                config.particle_fillRange[3],
-                config.particle_fillRange[4],
-                config.particle_fillRange[5],
-                0,
-                0,
-                transparency,
-                ps.config.brightness,
-            )
-
-            transparency = int(config.particle_outlineRange[6])
-            try:
-                transMin  =  config.particle_outlineRange[6]
-                transMax  =  config.particle_outlineRange[7]
-                transparency = round(random.random() * (transMax - transMin) + transMin)
-            except Exception as e:
-                print(f"transparency range on particle_fillRange:  {str(e)}")
-
-            p.outlineColor = colorutils.getRandomColorHSV(
-                config.particle_outlineRange[0],
-                config.particle_outlineRange[1],
-                config.particle_outlineRange[2],
-                config.particle_outlineRange[3],
-                config.particle_outlineRange[4],
-                config.particle_outlineRange[5],
-                0,
-                0,
-                transparency,
-                ps.config.brightness,
-            )
-        else :
-            p.fillColor = config.particle_fillColor  # (240,150,0,100)
-            p.outlineColor = config.particle_outlineColor  # (100,0,0,100)
-            p.extraOutlineColor = config.extraOutlineColor
-
-            if random.random() < config.useSecondColorProb:
-                p.fillColor = config.fillColor2  # (240,150,0,100)
-                p.outlineColor = config.outlineColor2  # (100,0,0,100)
-                p.extraOutlineColor = config.extraOutlineColor2
-
-        if config.pixelsGoGray:
-            makePixGoGray(config, p)
+    if config.pixelsGoGray:
+        makePixGoGray(config, p)
 
         # p.fillColor = (200,0,0,200)
         # print(p.fillColor)
@@ -1093,16 +1117,16 @@ def iterate():
         )
 
     # """
-	# # ORIG PLACEMENT
-	# if config.useOverLay :
-	# 	# config.image = ImageChops.multiply(config.clrBlock, config.image)
-	# 	config.image.paste(
-	# 		config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
-	# 	)
-	# """
+    # # ORIG PLACEMENT
+    # if config.useOverLay :
+    # 	# config.image = ImageChops.multiply(config.clrBlock, config.image)
+    # 	config.image.paste(
+    # 		config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
+    # 	)
+    # """
 
-    if config.usePalettes :
-        if random.random() < config.paletteChangeProb :
+    if config.usePalettes:
+        if random.random() < config.paletteChangeProb:
             config.paletteIndex = math.floor(random.random() * len(config.palettes))
             setColorsByPalette()
 
@@ -1144,7 +1168,7 @@ def iterate():
         config.useFilters and config.filterRemapping
     ):
         remapDitherFilteredParts(config)
-    
+
     if (
         random.random() < ps.changechangeCohesionProb
         and ps.changeCohesion

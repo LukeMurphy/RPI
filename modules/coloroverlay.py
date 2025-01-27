@@ -62,6 +62,7 @@ class ColorOverlay:
             self.colorA = self.colorB = list(colorutils.randomColorAlpha(0.5, 0))
             # print(self.currentColorRaw)
 
+    
     def checkTime(self):
         t = time.time()
         self.tDelta = t - self.t1
@@ -80,9 +81,11 @@ class ColorOverlay:
         )
 
         """
-        print("New Color A", self.colorA)
+        print(f"New minHue A: {self.minHue}")
+        print(f"New Color A: {self.colorA}")
         """
 
+    
     def getNewColor(self):
         # self.colorB = colorutils.randomColor()
         ## Vaguely more control of the color parameters ...
@@ -136,6 +139,7 @@ class ColorOverlay:
 
         self.colorTransitionSetupValues(steps)
 
+    
     def colorTransitionSetupValues(self, steps=0):
         #### Setting up for color transitions
         self.gotoNextTransition = False
@@ -154,6 +158,7 @@ class ColorOverlay:
         # Create random number of transition steps
         # if(steps == 0 or self.randomSteps == True) :
         self.steps = round(random.uniform(self.randomRange[0], self.randomRange[1]))
+        # print(f"coloroverlay self.steps = {self.steps}")
 
         self.tLimit = (
             round(random.uniform(self.tLimitBase / 2, self.tLimitBase * 1.5)) + 1
@@ -233,6 +238,7 @@ class ColorOverlay:
             except AttributeError as e:
                 pass
 
+    
     def callBackStarted(self):
         try:
             if self.configRef != None:
@@ -242,7 +248,10 @@ class ColorOverlay:
         except AttributeError as e:
             pass
 
-    def stepTransition(self, autoReset=False, alpha=255):
+    
+    def stepTransition(self, autoReset=False, alpha=-1):
+
+        # print(f"coloroverlay: self.rateOfColorChange {self.rateOfColorChange}")
 
         self.currentColorRaw = [
             self.currentColorRaw[0] + self.rateOfColorChange[0],
@@ -258,12 +267,17 @@ class ColorOverlay:
             self.currentColorRaw[3] = 0
             self.rateOfColorChange[3] = 0
 
+        if alpha != -1 :
+            self.currentColorRaw[3] = alpha
+
         self.currentColor = [
             round(self.currentColorRaw[0]),
             round(self.currentColorRaw[1]),
             round(self.currentColorRaw[2]),
             round(self.currentColorRaw[3]),
         ]
+
+        # print(self.currentColor)
 
         self.step += 1
         self.checkTime()
@@ -285,11 +299,11 @@ class ColorOverlay:
                 self.rateOfColorChange[i] = 0
                 # print("Color reached", i)
                 # self.currentColor[i] = self.colorB[i]
-                """
-                print("Color reached", i)
-                for ii in range (0,3):
-                    print(ii, " current:", self.currentColorRaw[ii], " destination:",self.colorB[ii]," rate:", self.rateOfColorChange[ii])
-                """
+
+                # print("Color reached", i)
+                # for ii in range (0,3):
+                #     print(ii, " current:", self.currentColorRaw[ii], " destination:",self.colorB[ii]," rate:", self.rateOfColorChange[ii])
+
 
         if (
             self.rateOfColorChange[0] == 0
@@ -303,5 +317,6 @@ class ColorOverlay:
             # if(autoReset == True or self.gotoNextTransition == True) :
             #     self.colorTransitionSetup(self.steps)
 
+    
     def getPercentageDone(self):
         return self.step / self.steps

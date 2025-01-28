@@ -36,6 +36,7 @@ class PaletteObj:
     bg_maxSaturation = 1.0
     bg_minValue = 0.1
     bg_maxValue = 0.8
+    paletteName = "default"
 
     def setup():
         pass
@@ -44,44 +45,13 @@ class PaletteObj:
 
 
 # -----------------------------------------------------------
-class WaveDeformer:
-    def transform(self, x, y):
-        y = y + config.waveAmplitude * math.sin(
-            (x + config.xPos) / config.wavePeriodMod
-        ) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
-        return x, y
-
-    def transform_rectangle(self, x0, y0, x1, y1):
-        return (
-            *self.transform(x0, y0),
-            *self.transform(x0, y1),
-            *self.transform(x1, y1),
-            *self.transform(x1, y0),
-        )
-
-    def getmesh(self, img):
-        self.w, self.h = img.size
-
-        target_grid = [
-            (x, y, x + config.wavegridspace, y + config.wavegridspace)
-            for x, y in itertools.product(
-                range(0, self.w, config.wavegridspace),
-                range(0, self.h, config.wavegridspace),
-            )
-        ]
-        source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
-
-        return list(zip(target_grid, source_grid))
-
-
-# -----------------------------------------------------------
 def setColorsByPalette():
 
     print(" ---------------------------------------- ")
     print(" ------------ new palette --------------- ")
-    print(f"New palette: {config.paletteIndex}")
 
     ref = config.palettes[config.paletteIndex]
+    print(f"New palette: {config.paletteIndex} {ref.name}")
     # print(f"ref.bg_minHue {ref.bg_minHue}")
     # print(f"ref.particle_fillRange {ref.particle_fillRange}")
     config.particle_fillRange = ref.particle_fillRange
@@ -104,12 +74,16 @@ def setColorsByPalette():
     config.bg_minValue = ref.bg_minValue
     config.bg_maxValue = ref.bg_maxValue
     config.bg_maxBrightness = ref.bg_maxBrightness
+    config.overallBlur = ref.overallBlur
+
+    ps.unitBlur = ref.unitBlur
+
 
     print(" ---------------------------------------- ")
     print(" ------------ SETTING COLORS ------------")
-    print(f"config.bg_minHue = {config.bg_minHue} ")
-    print(f"config.bg_maxHue = {config.bg_maxHue} ")
-    print(f"config.particle_fillRange = {config.particle_fillRange}")
+    # print(f"config.bg_minHue = {config.bg_minHue} ")
+    # print(f"config.bg_maxHue = {config.bg_maxHue} ")
+    # print(f"config.particle_fillRange = {config.particle_fillRange}")
 
     setColors()
 
@@ -135,6 +109,7 @@ def setColors():
 
     print(" ------------- SET COLORS CALLED ------------ ")
 
+
 # -----------------------------------------------------------
 # ******************* COLOR MANAGEMENT **********************
 def doColorManagementSetup():
@@ -146,7 +121,6 @@ def doColorManagementSetup():
 
     # ------- Palette management introduce 2025-01-27 --------------
 
-    config.usePalettes = workConfig.getboolean("particleSystem", "usePalettes")
     config.paletteList = workConfig.get("particleSystem", "palettes").split(",")
     config.paletteChangeProb = float(
         workConfig.get("particleSystem", "paletteChangeProb")
@@ -190,13 +164,15 @@ def doColorManagementSetup():
         _p.bg_maxValue = float(workConfig.get(_palette, "bg_maxValue"))
         # legacy
         _p.bg_maxBrightness = 1.0
+        _p.overallBlur = int(workConfig.get(_palette, "overallBlur"))
+        _p.unitBlur = int(workConfig.get(_palette, "unitBlur"))
+        _p.name = _palette
 
         config.palettes.append(_p)
 
     # just in case this gets set wrongly .....
     config.pUseHSV = True
     setColorsByPalette()
-
 
     """
 	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
@@ -314,9 +290,7 @@ def main(run=True):
         ps.loadedImageCopy = ps.loadedImage.copy()
 
     try:
-        config.renderDiagnostics = workConfig.getboolean(
-            "particleSystem", "renderDiagnostics"
-        )
+        config.renderDiagnostics = workConfig.getboolean("particleSystem", "renderDiagnostics")
         config.renderDiagnosticsCall = renderDiagnosticsCall
     except Exception as e:
         print(e)
@@ -324,75 +298,33 @@ def main(run=True):
 
     # managing speed of animation and framerate
     config.directorController = Director(config)
+    config.delay = float(workConfig.get("particleSystem", "delay"))
+    config.directorController.slotRate = float(workConfig.get("particleSystem", "slotRate"))
+    config.particleWinkOutXMin = float(workConfig.get("particleSystem", "particleWinkOutXMin"))
+    config.particleWinkOutYMin = float(workConfig.get("particleSystem", "particleWinkOutYMin"))
+    config.restartProb = float(workConfig.get("particleSystem", "restartProb"))
 
-    try:
-        config.delay = float(workConfig.get("particleSystem", "delay"))
-    except Exception as e:
-        print(e)
-        config.delay = 0.01
-        ps.delay = 0.01
 
-    try:
-        config.directorController.slotRate = float(
-            workConfig.get("particleSystem", "slotRate")
-        )
-    except Exception as e:
-        print(e)
-        print("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
-        config.directorController.slotRate = 0.03
+    ps.meanderFactor = float(workConfig.get("particleSystem", "meanderFactor"))
+    ps.meanderFactor2 = float(workConfig.get("particleSystem", "meanderFactor2"))
+    ps.meanderDirection = int(workConfig.get("particleSystem", "meanderDirection"))
+    ps.linearMotionAlsoHorizontal = workConfig.getboolean("particleSystem", "linearMotionAlsoHorizontal")
+    ps.oneDirection = workConfig.getboolean("particleSystem", "oneDirection")
+    ps.fixedUnitArray = workConfig.getboolean("particleSystem", "fixedUnitArray")
+    ps.reEmitNumber = int(workConfig.get("particleSystem", "reEmitNumber"))
 
-    try:
-        ps.meanderFactor = float(workConfig.get("particleSystem", "meanderFactor"))
-    except Exception as e:
-        print(e)
-        ps.meanderFactor = 1.0
 
-    try:
-        ps.meanderFactor2 = float(workConfig.get("particleSystem", "meanderFactor2"))
-    except Exception as e:
-        print(e)
-        ps.meanderFactor2 = 90.0
-
-    try:
-        ps.meanderDirection = int(workConfig.get("particleSystem", "meanderDirection"))
-    except Exception as e:
-        print(e)
-        ps.meanderDirection = 0
-
-    try:
-        ps.linearMotionAlsoHorizontal = workConfig.getboolean(
-            "particleSystem", "linearMotionAlsoHorizontal"
-        )
-    except Exception as e:
-        print(e)
-        ps.linearMotionAlsoHorizontal = True
-
-    try:
-        ps.oneDirection = workConfig.getboolean("particleSystem", "oneDirection")
-    except Exception as e:
-        print(str(e))
-        ps.oneDirection = False
-
-    try:
-        ps.reEmitNumber = int(workConfig.get("particleSystem", "reEmitNumber"))
-    except Exception as e:
-        print(str(e))
-        ps.reEmitNumber = 2
-
-    try:
-        ps.fixedUnitArray = workConfig.getboolean("particleSystem", "fixedUnitArray")
-    except Exception as e:
-        print(str(e))
-        ps.fixedUnitArray = False
-
-    try:
-        ps.transparencyRange = workConfig.get(
-            "particleSystem", "transparencyRange"
-        ).split(",")
-        ps.transparencyRange = tuple(map(lambda x: int(int(x)), ps.transparencyRange))
-    except Exception as e:
-        print(str(e))
-        ps.transparencyRange = (10, 200)
+    # old defaults
+    # ps.meanderFactor = 1.0
+    # ps.meanderFactor2 = 90.0
+    # ps.meanderDirection = 0
+    # ps.linearMotionAlsoHorizontal = True
+    # ps.oneDirection = False
+    # ps.reEmitNumber = 2
+    # ps.fixedUnitArray = False
+    # config.particleWinkOutXMin = 5
+    # config.particleWinkOutYMin = 5
+    # config.restartProb = 0
 
     try:
         config.transformShape = workConfig.getboolean(
@@ -418,17 +350,36 @@ def main(run=True):
         print(str(e))
         config.xWind = 0
 
+    ps.movement = workConfig.get("particleSystem", "movement")
+    ps.objColor = workConfig.get("particleSystem", "objColor")
+    ps.objWidth = int(workConfig.get("particleSystem", "objWidth"))
+    ps.objHeight = int(workConfig.get("particleSystem", "objHeight"))
+    ps.widthRate = float(workConfig.get("particleSystem", "widthRate"))
+    ps.heightRate = float(workConfig.get("particleSystem", "heightRate"))
+
     try:
-        config.particleWinkOutXMin = float(
-            workConfig.get("particleSystem", "particleWinkOutXMin")
+        ps.objWidthMin = int(workConfig.get("particleSystem", "objWidthMin"))
+        ps.objWidthMax = int(workConfig.get("particleSystem", "objWidthMax"))
+        ps.objHeightMin = int(workConfig.get("particleSystem", "objHeightMin"))
+        ps.objHeightMax = int(workConfig.get("particleSystem", "objHeightMax"))
+    except Exception as e:
+        print(str(e))
+        ps.objWidthMax = ps.objWidth
+        ps.objHeightMax = ps.objHeight
+        ps.objWidthMin = ps.objWidth
+        ps.objHeightMin = ps.objHeight
+
+    try:
+        ps.rndSizeFactorMin = float(
+            workConfig.get("particleSystem", "rndSizeFactorMin")
         )
-        config.particleWinkOutYMin = float(
-            workConfig.get("particleSystem", "particleWinkOutYMin")
+        ps.rndSizeFactorMax = float(
+            workConfig.get("particleSystem", "rndSizeFactorMax")
         )
     except Exception as e:
         print(str(e))
-        config.particleWinkOutXMin = 5
-        config.particleWinkOutYMin = 5
+        ps.rndSizeFactorMin = 0.5
+        ps.rndSizeFactorMax = 1.5
 
     try:
         config.pixelSortProbChange = float(
@@ -443,12 +394,6 @@ def main(run=True):
     except Exception as e:
         print(str(e))
         config.pixelSortProbChange = 0
-
-    try:
-        config.restartProb = float(workConfig.get("particleSystem", "restartProb"))
-    except Exception as e:
-        print(str(e))
-        config.restartProb = 0
 
     try:
         config.filterRemapping = workConfig.getboolean(
@@ -482,38 +427,6 @@ def main(run=True):
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
-    ps.movement = workConfig.get("particleSystem", "movement")
-    ps.objColor = workConfig.get("particleSystem", "objColor")
-    ps.objWidth = int(workConfig.get("particleSystem", "objWidth"))
-    ps.objHeight = int(workConfig.get("particleSystem", "objHeight"))
-    ps.widthRate = float(workConfig.get("particleSystem", "widthRate"))
-    ps.heightRate = float(workConfig.get("particleSystem", "heightRate"))
-    config.variance = float(workConfig.get("particleSystem", "variance"))
-
-    try:
-        ps.objWidthMin = int(workConfig.get("particleSystem", "objWidthMin"))
-        ps.objWidthMax = int(workConfig.get("particleSystem", "objWidthMax"))
-        ps.objHeightMin = int(workConfig.get("particleSystem", "objHeightMin"))
-        ps.objHeightMax = int(workConfig.get("particleSystem", "objHeightMax"))
-    except Exception as e:
-        print(str(e))
-        ps.objWidthMax = ps.objWidth
-        ps.objHeightMax = ps.objHeight
-        ps.objWidthMin = ps.objWidth
-        ps.objHeightMin = ps.objHeight
-
-    try:
-        ps.rndSizeFactorMin = float(
-            workConfig.get("particleSystem", "rndSizeFactorMin")
-        )
-        ps.rndSizeFactorMax = float(
-            workConfig.get("particleSystem", "rndSizeFactorMax")
-        )
-    except Exception as e:
-        print(str(e))
-        ps.rndSizeFactorMin = 0.5
-        ps.rndSizeFactorMax = 1.5
-
     # -------------  DO COLOR MANAGEMENT SETUP ---------------#
     """ ----------------------------------------------------  """
 
@@ -521,9 +434,6 @@ def main(run=True):
 
     """ ----------------------------------------------------  """
     # -------------  DO COLOR MANAGEMENT SETUP ---------------#
-
-    ps.unitBlur = int(workConfig.get("particleSystem", "unitBlur"))
-    config.overallBlur = int(workConfig.get("particleSystem", "overallBlur"))
 
     try:
         config.legacyUnsharpMask = workConfig.getboolean(
@@ -574,16 +484,16 @@ def main(run=True):
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
     # Need to add something like this at final render call  as well
-    """
-		########### RENDERING AS A MOCKUP OR AS REAL ###########
-		if config.useDrawingPoints  :
-			config.panelDrawing.canvasToUse = config.renderImageFull
-			config.panelDrawing.render()
-		else :
-			# config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-			# config.render(config.image, 0, 0)
-			config.render(config.renderImageFull, 0, 0)
-	"""
+    # """
+	# 	########### RENDERING AS A MOCKUP OR AS REAL ###########
+	# 	if config.useDrawingPoints  :
+	# 		config.panelDrawing.canvasToUse = config.renderImageFull
+	# 		config.panelDrawing.render()
+	# 	else :
+	# 		# config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+	# 		# config.render(config.image, 0, 0)
+	# 		config.render(config.renderImageFull, 0, 0)
+	# """
 
     config.xPos = 0
 
@@ -623,8 +533,6 @@ def emitParticle(i=None):
         - p.objHeight
     )
 
-    # variance = math.pi/3
-
     if ps.movement == "fire":
         p.direction = random.uniform(0, 180) * math.pi / 180
         if ps.oneDirection:
@@ -635,89 +543,44 @@ def emitParticle(i=None):
         if ps.oneDirection:
             p.direction = 1
 
-    # """
-    # p.direction = random.uniform(
-    # 	math.pi + math.pi / 2 - config.variance,
-    # 	math.pi + math.pi / 2 + config.variance
-    # )
-
-    # p.direction = random.uniform(-math.pi,math.pi)
-
-    # p.direction = random.uniform(0,360) * math.pi/180
-    # """
-
     p.v = random.uniform(ps.speedMin, ps.speedMax)
     p.xWind = config.xWind
 
     p.pixelsGoGray = config.pixelsGoGray
     p.jumpToGray = config.jumpToGray
 
-    if config.pUseHSV:
-        transparency = int(config.particle_fillRange[6])
-        try:
-            transMin = config.particle_fillRange[6]
-            transMax = config.particle_fillRange[7]
-            transparency = round(random.random() * (transMax - transMin) + transMin)
-        except Exception as e:
-            print(f"transparency range on particle_fillRange:  {str(e)}")
+    transMin = config.particle_fillRange[6]
+    transMax = config.particle_fillRange[7]
+    transparency = round(random.random() * (transMax - transMin) + transMin)
+    p.fillColor = colorutils.getRandomColorHSV(
+        config.particle_fillRange[0],
+        config.particle_fillRange[1],
+        config.particle_fillRange[2],
+        config.particle_fillRange[3],
+        config.particle_fillRange[4],
+        config.particle_fillRange[5],
+        0,
+        0,
+        transparency,
+        ps.config.brightness,
+    )
 
-        p.fillColor = colorutils.getRandomColorHSV(
-            config.particle_fillRange[0],
-            config.particle_fillRange[1],
-            config.particle_fillRange[2],
-            config.particle_fillRange[3],
-            config.particle_fillRange[4],
-            config.particle_fillRange[5],
-            0,
-            0,
-            transparency,
-            ps.config.brightness,
-        )
+    transMin = config.particle_outlineRange[6]
+    transMax = config.particle_outlineRange[7]
+    transparency = round(random.random() * (transMax - transMin) + transMin)
+    p.outlineColor = colorutils.getRandomColorHSV(
+        config.particle_outlineRange[0],
+        config.particle_outlineRange[1],
+        config.particle_outlineRange[2],
+        config.particle_outlineRange[3],
+        config.particle_outlineRange[4],
+        config.particle_outlineRange[5],
+        0,
+        0,
+        transparency,
+        ps.config.brightness,
+    )
 
-        transparency = int(config.particle_outlineRange[6])
-        try:
-            transMin = config.particle_outlineRange[6]
-            transMax = config.particle_outlineRange[7]
-            transparency = round(random.random() * (transMax - transMin) + transMin)
-        except Exception as e:
-            print(f"transparency range on particle_fillRange:  {str(e)}")
-
-        p.outlineColor = colorutils.getRandomColorHSV(
-            config.particle_outlineRange[0],
-            config.particle_outlineRange[1],
-            config.particle_outlineRange[2],
-            config.particle_outlineRange[3],
-            config.particle_outlineRange[4],
-            config.particle_outlineRange[5],
-            0,
-            0,
-            transparency,
-            ps.config.brightness,
-        )
-    else:
-
-        if ps.objColor == "rnd":
-            p.fillColor = colorutils.randomColor(ps.config.brightness)
-            p.outlineColor = colorutils.getSunsetColors(ps.config.brightness / 2)
-
-        if ps.objColor == "alphaRandom":
-            p.fillColor = colorutils.randomColorAlpha(
-                ps.config.brightness,
-                int(random.uniform(ps.transparencyRange[0], ps.transparencyRange[1])),
-            )
-        p.outlineColor = colorutils.randomColorAlpha(
-            ps.config.brightness,
-            int(random.uniform(ps.transparencyRange[0], ps.transparencyRange[1])),
-        )
-
-        p.fillColor = config.particle_fillColor  # (240,150,0,100)
-        p.outlineColor = config.particle_outlineColor  # (100,0,0,100)
-        p.extraOutlineColor = config.extraOutlineColor
-
-        if random.random() < config.useSecondColorProb:
-            p.fillColor = config.fillColor2  # (240,150,0,100)
-            p.outlineColor = config.outlineColor2  # (100,0,0,100)
-            p.extraOutlineColor = config.extraOutlineColor2
 
     if config.pixelsGoGray:
         makePixGoGray(config, p)
@@ -732,6 +595,37 @@ def emitParticle(i=None):
         ps.unitArray[i] = p
     else:
         ps.unitArray.append(p)
+
+
+# -----------------------------------------------------------
+class WaveDeformer:
+    def transform(self, x, y):
+        y = y + config.waveAmplitude * math.sin(
+            (x + config.xPos) / config.wavePeriodMod
+        ) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
+        return x, y
+
+    def transform_rectangle(self, x0, y0, x1, y1):
+        return (
+            *self.transform(x0, y0),
+            *self.transform(x0, y1),
+            *self.transform(x1, y1),
+            *self.transform(x1, y0),
+        )
+
+    def getmesh(self, img):
+        self.w, self.h = img.size
+
+        target_grid = [
+            (x, y, x + config.wavegridspace, y + config.wavegridspace)
+            for x, y in itertools.product(
+                range(0, self.w, config.wavegridspace),
+                range(0, self.h, config.wavegridspace),
+            )
+        ]
+        source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
+
+        return list(zip(target_grid, source_grid))
 
 
 # -----------------------------------------------------------
@@ -956,10 +850,9 @@ def iterate():
     # 	)
     # """
 
-    if config.usePalettes:
-        if random.random() < config.paletteChangeProb:
-            config.paletteIndex = math.floor(random.random() * len(config.palettes))
-            setColorsByPalette()
+    if random.random() < config.paletteChangeProb:
+        config.paletteIndex = math.floor(random.random() * len(config.palettes))
+        setColorsByPalette()
 
     for p in ps.unitArray:
         p.update()

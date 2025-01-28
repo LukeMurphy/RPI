@@ -80,10 +80,9 @@ class ColorOverlay:
             dropHueMax=self.dropHueMax,
         )
 
-        """
-        print(f"New minHue A: {self.minHue}")
-        print(f"New Color A: {self.colorA}")
-        """
+        # print(f"New minHue A: {self.minHue}")
+        # print(f"New minHue A: {self.maxHue}")
+        # print(f"New Color A: {self.colorA}")
 
     
     def getNewColor(self):

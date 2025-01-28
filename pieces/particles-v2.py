@@ -24,19 +24,25 @@ from pieces.maze import ColorPalette
 
 # -----------------------------------------------------------
 class PaletteObj:
-    particle_fillRange = [180, 180, 0.80, 1.0, 0.5, 1.0, 220]
     particle_outlineRange = [180, 180, 0.50, 1.0, 0.3, 1.0, 200]
+    particle_fillRange = [180, 180, 0.80, 1.0, 0.5, 1.0, 220]
+
+    paletteName = "default"
     bg_bgTransitions = True
     bg_bgRangeA = 10
     bg_bgRangeB = 30
     bg_tLimitBase = 20
-    bg_minHue = 210
-    bg_maxHue = 355
-    bg_minSaturation = 0.8
-    bg_maxSaturation = 1.0
-    bg_minValue = 0.1
-    bg_maxValue = 0.8
-    paletteName = "default"
+
+    bf_fillRange = [180,180,1.0,1.0,1.0,1.0,100,100]
+    # bg_minHue = 210
+    # bg_maxHue = 355
+    # bg_minSaturation = 0.8
+    # bg_maxSaturation = 1.0
+    # bg_minValue = 0.1
+    # bg_maxValue = 0.8
+
+    overallBlur = 0
+    unitBlur = 0
 
     def setup():
         pass
@@ -46,60 +52,29 @@ class PaletteObj:
 
 # -----------------------------------------------------------
 def setColorsByPalette():
-
-    print(" ---------------------------------------- ")
-    print(" ------------ new palette --------------- ")
-
-    ref = config.palettes[config.paletteIndex]
-    print(f"New palette: {config.paletteIndex} {ref.name}")
-    # print(f"ref.bg_minHue {ref.bg_minHue}")
-    # print(f"ref.particle_fillRange {ref.particle_fillRange}")
-    config.particle_fillRange = ref.particle_fillRange
-    config.particle_outlineRange = ref.particle_outlineRange
-    config.bg_bgTransitions = ref.bg_bgTransitions
-    config.bg_bgRangeA = ref.bg_bgRangeA
-    config.bg_bgRangeB = ref.bg_bgRangeB
-    config.bg_randomRange = ref.bg_randomRange
-    config.bg_transparencyRange = ref.bg_transparencyRange
+    #  -----------------------------------------------
+    paletteRef = config.palettes[config.paletteIndex]
+    config.bg_bgTransitions = paletteRef.bg_bgTransitions
     config.bg_bgTransparency = round(
         random.random()
-        * (config.bg_transparencyRange[1] - config.bg_transparencyRange[0])
-        + config.bg_transparencyRange[0]
+        * (paletteRef.bg_transparencyRange[1] - paletteRef.bg_transparencyRange[0])
+        + paletteRef.bg_transparencyRange[0]
     )
-    config.bg_tLimitBase = ref.bg_tLimitBase
-    config.bg_minHue = ref.bg_minHue
-    config.bg_maxHue = ref.bg_maxHue
-    config.bg_minSaturation = ref.bg_minSaturation
-    config.bg_maxSaturation = ref.bg_maxSaturation
-    config.bg_minValue = ref.bg_minValue
-    config.bg_maxValue = ref.bg_maxValue
-    config.bg_maxBrightness = ref.bg_maxBrightness
-    config.overallBlur = ref.overallBlur
+    config.bg_maxBrightness = paletteRef.bg_maxBrightness
+    config.bg_tLimitBase = paletteRef.bg_tLimitBase
+    config.overallBlur = paletteRef.overallBlur
+    ps.unitBlur = paletteRef.unitBlur
 
-    ps.unitBlur = ref.unitBlur
-
-
-    print(" ---------------------------------------- ")
-    print(" ------------ SETTING COLORS ------------")
-    # print(f"config.bg_minHue = {config.bg_minHue} ")
-    # print(f"config.bg_maxHue = {config.bg_maxHue} ")
-    # print(f"config.particle_fillRange = {config.particle_fillRange}")
-
-    setColors()
-
-
-# -----------------------------------------------------------
-def setColors():
     config.bgColorOverlay = coloroverlay.ColorOverlay()
-    config.bgColorOverlay.randomRange = config.bg_randomRange
-    config.bgColorOverlay.minHue = config.bg_minHue
-    config.bgColorOverlay.maxHue = config.bg_maxHue
-    config.bgColorOverlay.minSaturation = config.bg_minSaturation
-    config.bgColorOverlay.maxSaturation = config.bg_maxSaturation
-    config.bgColorOverlay.minValue = config.bg_minValue
-    config.bgColorOverlay.maxValue = config.bg_maxValue
-    config.bgColorOverlay.maxBrightness = config.bg_maxBrightness
-    config.bgColorOverlay.tLimitBase = config.bg_tLimitBase
+    config.bgColorOverlay.randomRange = paletteRef.bg_randomRange
+    config.bgColorOverlay.minHue = paletteRef.bg_fillRange[0]
+    config.bgColorOverlay.maxHue = paletteRef.bg_fillRange[1]
+    config.bgColorOverlay.minSaturation = paletteRef.bg_fillRange[2]
+    config.bgColorOverlay.maxSaturation = paletteRef.bg_fillRange[3]
+    config.bgColorOverlay.minValue = paletteRef.bg_fillRange[4]
+    config.bgColorOverlay.maxValue = paletteRef.bg_fillRange[5]
+    config.bgColorOverlay.maxBrightness = paletteRef.bg_maxBrightness
+    config.bgColorOverlay.tLimitBase = paletteRef.bg_tLimitBase
     config.bgColorOverlay.randomSteps = True
     config.bgColorOverlay.timeTrigger = True
 
@@ -107,7 +82,10 @@ def setColors():
     config.bgColorOverlay.setStartColor()
     config.bgColorOverlay.getNewColor()
 
-    print(" ------------- SET COLORS CALLED ------------ ")
+    print(" ---------------------------------------- ")
+    print(" ------------ new palette --------------- ")
+    print(f" palette {paletteRef.name}\n {paletteRef.bg_fillRange}\n {paletteRef.particle_fillRange}")
+    print(" ---------------------------------------- ")
 
 
 # -----------------------------------------------------------
@@ -130,83 +108,84 @@ def doColorManagementSetup():
 
     for _palette in config.paletteList:
         _p = PaletteObj()
-        _p.particle_fillRange = tuple(
+        _p.particle_fillRange = list(
             map(
-                lambda x: (float(x) * config.brightness),
+                lambda x: (float(x) ),
                 workConfig.get(_palette, "particle_fillRange").split(","),
             )
         )
+        _p.particle_fillRange[4] *= config.brightness
+        _p.particle_fillRange[5] *= config.brightness
 
-        _p.particle_outlineRange = tuple(
+
+        _p.particle_outlineRange = list(
             map(
-                lambda x: (float(x) * config.brightness),
+                lambda x: (float(x) ),
                 workConfig.get(_palette, "particle_outlineRange").split(","),
             )
         )
+        _p.particle_outlineRange[4] *= config.brightness
+        _p.particle_outlineRange[5] *= config.brightness
+
+        _p.bg_fillRange = list(
+            map(
+                lambda x: (float(x) ),
+                workConfig.get(_palette, "bg_fillRange").split(","),
+            )
+        )
+        _p.bg_fillRange[4] *= config.brightness
+        _p.bg_fillRange[5] *= config.brightness
 
         _p.bg_bgTransitions = workConfig.getboolean(_palette, "bg_bgTransitions")
         _p.bg_bgRangeA = float(workConfig.get(_palette, "bg_bgRangeA"))
         _p.bg_bgRangeB = float(workConfig.get(_palette, "bg_bgRangeB"))
         _p.bg_randomRange = [_p.bg_bgRangeA, _p.bg_bgRangeB]
-        _p.bg_transparencyRange = tuple(
-            map(
-                lambda x: (float(x)),
-                workConfig.get(_palette, "bg_transparencyRange").split(","),
-            )
-        )
-
         _p.bg_tLimitBase = float(workConfig.get(_palette, "bg_tLimitBase"))
-        _p.bg_minHue = float(workConfig.get(_palette, "bg_minHue"))
-        _p.bg_maxHue = float(workConfig.get(_palette, "bg_maxHue"))
-        _p.bg_minSaturation = float(workConfig.get(_palette, "bg_minSaturation"))
-        _p.bg_maxSaturation = float(workConfig.get(_palette, "bg_maxSaturation"))
-        _p.bg_minValue = float(workConfig.get(_palette, "bg_minValue"))
-        _p.bg_maxValue = float(workConfig.get(_palette, "bg_maxValue"))
-        # legacy
-        _p.bg_maxBrightness = 1.0
         _p.overallBlur = int(workConfig.get(_palette, "overallBlur"))
         _p.unitBlur = int(workConfig.get(_palette, "unitBlur"))
         _p.name = _palette
+        _p.bg_maxBrightness = 1.0
+        _p.bg_transparencyRange = [_p.bg_fillRange[6],_p.bg_fillRange[7]]
+
+
+
+
+        """
+        Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
+        Because colors are more interesting against gray, because everything goes gray
+        Rate of desaturation is set as greyRate
+        Sorry about schitzoid spelling of grey-gray
+        """
+
+        try:
+            _p.pixelsGoGray = workConfig.getboolean(_palette, "pixelsGoGray")
+            _p.greyRate = float(workConfig.get(_palette, "greyRate"))
+        except Exception as e:
+            print(str(e))
+            _p.pixelsGoGray = False
+
+        # ok this may seem screwy, but because I made an error a while ago, the jumpToGray
+        # effect is actually default ... so if you want gradual turn to gray, it must be set
+        # actively. blurp. ugh.
+        try:
+            _p.jumpToGray = workConfig.getboolean(_palette, "jumpToGray")
+        except Exception as e:
+            print(str(e))
+            _p.jumpToGray = True
+            if not _p.pixelsGoGray:
+                _p.jumpToGray = False
+
+        try:
+            _p.pixelsGoGrayModel = int(
+                workConfig.get(_palette, "pixelsGoGrayModel")
+            )
+        except Exception as e:
+            print(str(e))
+            _p.pixelsGoGray = False
 
         config.palettes.append(_p)
 
-    # just in case this gets set wrongly .....
-    config.pUseHSV = True
     setColorsByPalette()
-
-    """
-	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
-	Because colors are more interesting against gray, because everything goes gray
-	Rate of desaturation is set as greyRate
-	Sorry about schitzoid spelling of grey-gray
-	"""
-
-    try:
-        config.pixelsGoGray = workConfig.getboolean("particleSystem", "pixelsGoGray")
-        config.greyRate = float(workConfig.get("particleSystem", "greyRate"))
-    except Exception as e:
-        print(str(e))
-        config.pixelsGoGray = False
-
-    # ok this may seem screwy, but because I made an error a while ago, the jumpToGray
-    # effect is actually default ... so if you want gradual turn to gray, it must be set
-    # actively. blurp. ugh.
-    try:
-        config.jumpToGray = workConfig.getboolean("particleSystem", "jumpToGray")
-    except Exception as e:
-        print(str(e))
-        config.jumpToGray = True
-        if not config.pixelsGoGray:
-            config.jumpToGray = False
-
-    try:
-        config.pixelsGoGrayModel = int(
-            workConfig.get("particleSystem", "pixelsGoGrayModel")
-        )
-    except Exception as e:
-        print(str(e))
-        # config.pixelsGoGrayModel = 3
-        config.pixelsGoGray = False
 
 
 # -----------------------------------------------------------
@@ -511,6 +490,8 @@ def main(run=True):
 # -----------------------------------------------------------
 def emitParticle(i=None):
     global config, ps
+    paletteRef = config.palettes[config.paletteIndex]
+
     p = Particle(ps)
     p.objWidth = round(random.uniform(ps.objWidthMin, ps.objWidthMax))
     p.objHeight = round(random.uniform(ps.objHeightMin, ps.objHeightMax))
@@ -546,35 +527,35 @@ def emitParticle(i=None):
     p.v = random.uniform(ps.speedMin, ps.speedMax)
     p.xWind = config.xWind
 
-    p.pixelsGoGray = config.pixelsGoGray
-    p.jumpToGray = config.jumpToGray
+    p.pixelsGoGray = paletteRef.pixelsGoGray
+    p.jumpToGray = paletteRef.jumpToGray
 
-    transMin = config.particle_fillRange[6]
-    transMax = config.particle_fillRange[7]
+    transMin = paletteRef.particle_fillRange[6]
+    transMax = paletteRef.particle_fillRange[7]
     transparency = round(random.random() * (transMax - transMin) + transMin)
     p.fillColor = colorutils.getRandomColorHSV(
-        config.particle_fillRange[0],
-        config.particle_fillRange[1],
-        config.particle_fillRange[2],
-        config.particle_fillRange[3],
-        config.particle_fillRange[4],
-        config.particle_fillRange[5],
+        paletteRef.particle_fillRange[0],
+        paletteRef.particle_fillRange[1],
+        paletteRef.particle_fillRange[2],
+        paletteRef.particle_fillRange[3],
+        paletteRef.particle_fillRange[4],
+        paletteRef.particle_fillRange[5],
         0,
         0,
         transparency,
         ps.config.brightness,
     )
 
-    transMin = config.particle_outlineRange[6]
-    transMax = config.particle_outlineRange[7]
+    transMin = paletteRef.particle_outlineRange[6]
+    transMax = paletteRef.particle_outlineRange[7]
     transparency = round(random.random() * (transMax - transMin) + transMin)
     p.outlineColor = colorutils.getRandomColorHSV(
-        config.particle_outlineRange[0],
-        config.particle_outlineRange[1],
-        config.particle_outlineRange[2],
-        config.particle_outlineRange[3],
-        config.particle_outlineRange[4],
-        config.particle_outlineRange[5],
+        paletteRef.particle_outlineRange[0],
+        paletteRef.particle_outlineRange[1],
+        paletteRef.particle_outlineRange[2],
+        paletteRef.particle_outlineRange[3],
+        paletteRef.particle_outlineRange[4],
+        paletteRef.particle_outlineRange[5],
         0,
         0,
         transparency,
@@ -582,7 +563,7 @@ def emitParticle(i=None):
     )
 
 
-    if config.pixelsGoGray:
+    if paletteRef.pixelsGoGray:
         makePixGoGray(config, p)
 
         # p.fillColor = (200,0,0,200)
@@ -653,7 +634,8 @@ def linearMotionAction(config, p, ps):
 
 # -----------------------------------------------------------
 def makePixGoGray(config, p):
-    p.greyRate = random.uniform(config.greyRate / 4, config.greyRate)
+    paletteRef = config.palettes[config.paletteIndex]
+    p.greyRate = random.uniform(paletteRef.greyRate / 4, paletteRef.greyRate)
     # p.greyRate = config.greyRate
 
     """
@@ -670,12 +652,12 @@ def makePixGoGray(config, p):
 
 			"""
 
-    if config.pixelsGoGrayModel == 2:
+    if paletteRef.pixelsGoGrayModel == 2:
         # Luminosity
         rRatio = 0.21
         gRatio = 0.72
         bRatio = 0.07
-    elif config.pixelsGoGrayModel == 3:
+    elif paletteRef.pixelsGoGrayModel == 3:
         # BT.601
         rRatio = 0.2989
         gRatio = 0.5870
@@ -822,9 +804,9 @@ def iterate():
 
     if config.bg_bgTransitions:
         config.bgColorOverlay.stepTransition(alpha=config.bg_bgTransparency)
-        # config.bgColorOverlay.stepTransition()
+
         config.bgColor = tuple(
-            int(a * config.brightness) for a in config.bgColorOverlay.currentColor
+            round(a) for a in config.bgColorOverlay.currentColor
         )
 
     # config.bgColor = (100,0,80,10)

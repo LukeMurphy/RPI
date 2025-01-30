@@ -226,8 +226,8 @@ class ParticleSystem:
                 ):
                     config.draw.polygon(
                         polygon,
-                        outline=(40, 0, 0, round(config.lineAlpha)),
-                        width=2,
+                        outline=(config.lineColor[0], config.lineColor[1], config.lineColor[2], round(config.lineAlpha)),
+                        width=config.lineWidth,
                         fill=(
                             config.nr[i],
                             config.ng[i],
@@ -255,8 +255,8 @@ class ParticleSystem:
         self.y += self.ySpeed
         self.moveParticles()
         self.drawVoronoi()
-        
-        if config.showParticlePostions :
+
+        if config.showParticlePostions:
             self.drawParticlesDots()
 
 
@@ -274,17 +274,19 @@ def withinRange(arg, target, diff):
 def structuredSetup():
     xD = 18
     yD = 5
-    rows= math.floor(math.sqrt(len(PS.particles)))
+    rows = math.floor(math.sqrt(len(PS.particles)))
     # print(f"rows = {rows}")
     cols = rows
     i = 0
     rads = math.pi / cols * 1
     for r in range(rows):
         for c in range(cols):
-            xD = round(config.canvasWidth/2 + (math.cos(rads * c)) * config.canvasWidth/2)
+            xD = round(
+                config.canvasWidth / 2 + (math.cos(rads * c)) * config.canvasWidth / 2
+            )
             p = PS.particles[i]
             p2 = PS.particles[i - 1]
-            p.xPos = 1 + xD 
+            p.xPos = 1 + xD
             p.yPos = 1 + yD * r
             # p2.xPos = 300 - xD
             # p2.yPos = 400 - yD
@@ -293,7 +295,7 @@ def structuredSetup():
             p.movementMode = 0
             p2.movementMode = 0
             i += 1
-        yD+=2
+        yD += 2
         # for i in range(1, len(PS.particles), 2):
     #     p = PS.particles[i]
     #     p2 = PS.particles[i - 1]
@@ -374,16 +376,18 @@ def resetSystem(fullReset=False):
         #     config.movementMode = 1 if random.SystemRandom().random() < .5 else 0
 
         config.movementMode = 1 if config.movementMode == 0 else 0
-        if config.movementMode == 0 and random.SystemRandom().random() < .5 :
-            config.useStructuredSetup = True if config.useStructuredSetup == False else False
-        else :
+        if config.movementMode == 0 and random.SystemRandom().random() < 0.5:
+            config.useStructuredSetup = (
+                True if config.useStructuredSetup == False else False
+            )
+        else:
             config.useStructuredSetup = False
 
         PS.setNewAttributes()
         # PS.setCenter()
         PS.resetParticles()
 
-        if config.useStructuredSetup :
+        if config.useStructuredSetup:
             structuredSetup()
     else:
         initializeParameters()
@@ -394,10 +398,11 @@ def resetSystem(fullReset=False):
         PS.setNewAttributes()
         PS.setUp()
 
-        if config.useStructuredSetup :
+        if config.useStructuredSetup:
             structuredSetup()
 
     # print(f"new sys {config.movementMode }  useStructuredSetup {config.useStructuredSetup}")
+
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -486,13 +491,17 @@ def main(run=True):
     )
 
     try:
-        config.showParticlePostions = (workConfig.getboolean("particles", "showParticlePostions"))
+        config.showParticlePostions = workConfig.getboolean(
+            "particles", "showParticlePostions"
+        )
     except Exception as e:
         print(e)
         config.showParticlePostions = False
 
     try:
-        config.useStructuredSetup = (workConfig.getboolean("particles", "useStructuredSetup"))
+        config.useStructuredSetup = workConfig.getboolean(
+            "particles", "useStructuredSetup"
+        )
     except Exception as e:
         print(e)
         config.useStructuredSetup = False
@@ -502,6 +511,18 @@ def main(run=True):
     except Exception as e:
         print(e)
         config.numOrbits = 12
+    
+    try:
+        config.lineWidth = int(workConfig.get("particles", "lineWidth"))
+        config.lineColor = list( 
+            map(
+                lambda x : int(x), workConfig.get("particles", "lineColor").split(",")
+                )
+            )
+    except Exception as e:
+        print(e)
+        config.lineWidth = 2
+        config.lineColor = [40,0,0]
 
     try:
         config.movementMode = int(workConfig.get("particles", "movementMode"))
@@ -665,7 +686,6 @@ def main(run=True):
     config.imgx, config.imgy = config.image.size
 
     resetSystem(True)
-
 
     try:
         config.slotRate = float(workConfig.get("particles", "slotRate"))

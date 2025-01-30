@@ -5,9 +5,83 @@ import time
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageDraw
+
 # import numpy
 # import beepy as beeper
 # beeper.beep(sound=1) # integer as argument
+
+class Palette:
+    tLimitBase = 0
+    minHue = 0
+    maxHue = 0
+    minSaturation = 0
+    maxSaturation = 0
+    minValue = 0
+    maxValue = 0
+    dropHueMin = 0
+    dropHueMax = 0
+    dropHueMax = 0
+    dropHueMin = 0
+
+    l_tLimitBase = 0
+    l_minHue = 0
+    l_maxHue = 0
+    l_minSaturation = 0
+    l_maxSaturation = 0
+    l_minValue = 0
+    l_maxValue = 0
+    l_dropHueMin = 0
+    l_dropHueMax = 0
+    l_dropHueMax = 0
+    l_dropHueMin = 0
+
+    l2_tLimitBase = 0
+    l2_minHue = 0
+    l2_maxHue = 0
+    l2_minSaturation = 0
+    l2_maxSaturation = 0
+    l2_minValue = 0
+    l2_maxValue = 0
+    l2_dropHueMin = 0
+    l2_dropHueMax = 0
+    l2_dropHueMax = 0
+    l2_dropHueMin = 0
+
+
+    def __init__(self):
+        pass
+
+
+    def getBarColors(self) :
+        return [
+            self.minHue,
+            self.maxHue,
+            self.minSaturation,
+            self.maxSaturation,
+            self.minValue,
+            self.maxValue,
+            self.dropHueMin,
+            self.dropHueMax,
+            self.dropHueMax,
+            self.dropHueMin,
+            self.tLimitBase,
+        ]
+    
+    def getLineColors(self) :
+        return [
+            self.l_minHue,
+            self.l_maxHue,
+            self.l_minSaturation,
+            self.l_maxSaturation,
+            self.l_minValue,
+            self.l_maxValue,
+            self.l_dropHueMin,
+            self.l_dropHueMax,
+            self.l_dropHueMax,
+            self.l_dropHueMin,
+            self.l_tLimitBase,
+        ]
+
 
 class Block:
     def __init__(self, config, i):
@@ -30,14 +104,14 @@ class Block:
         self.polyDeltaX = 0
         self.polyDeltaY = 0
 
-    def setUp(self, paletteArray, linePaletteArray):
+    def setUp(self, palette, linePalette):
         self.blockImage = Image.new("RGBA", (self.blockWidth, self.blockHeight))
         self.blockDraw = ImageDraw.Draw(self.blockImage)
 
         # [minHue,maxHue,minSaturation,maxSaturation,minValue,maxValue,tLimitBase]
 
-        self.colOverlay = getConfigOverlay(paletteArray, config.usePaletteOverride)
-        self.colOverlay2 = getConfigOverlay(linePaletteArray, config.usePaletteOverride)
+        self.colOverlay = getConfigOverlay(palette, config.usePaletteOverride)
+        self.colOverlay2 = getConfigOverlay(linePalette, config.usePaletteOverride)
 
     def bars(self):
 
@@ -73,7 +147,7 @@ class Block:
             y2 = i * (self.barWidth + self.gap) + self.barWidth + self.polyDeltaY
 
             # self.blockDraw.rectangle((x1,y1,x2,y2),outline=(None), fill=outClr)
-            if self.config.drawOutlines :
+            if self.config.drawOutlines:
                 self.blockDraw.polygon(
                     ((x1, y1), (x2, y1), (x2, y2), (x1, y2)),
                     outline=(clr2),
@@ -105,13 +179,12 @@ def redraw(config):
 
 
 def getConfigOverlay(palette, forceSelction=False):
-
     colOverlay = coloroverlay.ColorOverlay()
     colOverlay.randomSteps = False
     colOverlay.timeTrigger = True
     colOverlay.maxBrightness = 1
     colOverlay.steps = 50
-    if not forceSelction :
+    if not forceSelction:
         colOverlay.minHue = palette[0]
         colOverlay.maxHue = palette[1]
         colOverlay.minSaturation = palette[2]
@@ -122,20 +195,22 @@ def getConfigOverlay(palette, forceSelction=False):
         colOverlay.dropHueMax = palette[7]
         colOverlay.tLimitBase = palette[8]
     else:
-
         # This needs to be configurable
         fixedPaletteIndex = config.fixedPaletteIndex
 
-        if config.mixedPalettes :
-            fixedPaletteIndex = round(random.uniform(0, len(config.paletteOverrideNames)-1))
+        if config.mixedPalettes:
+            fixedPaletteIndex = round(
+                random.uniform(0, len(config.paletteOverrideNames) - 1)
+            )
 
-        paletteColor = colorutils.getNamedPalette(config.paletteOverrideNames[fixedPaletteIndex])
-        #print(("fixedPaletteIndex: {} palette name: {}  paletteColor: {}").format(fixedPaletteIndex, config.paletteOverrideNames[fixedPaletteIndex], paletteColor))
+        paletteColor = colorutils.getNamedPalette(
+            config.paletteOverrideNames[fixedPaletteIndex]
+        )
+        # print(("fixedPaletteIndex: {} palette name: {}  paletteColor: {}").format(fixedPaletteIndex, config.paletteOverrideNames[fixedPaletteIndex], paletteColor))
 
         paletteColorHSV = colorutils.rgb_to_hsv(
             paletteColor[0], paletteColor[1], paletteColor[2]
         )
-
 
         colOverlay.minHue = paletteColorHSV[0]
         colOverlay.maxHue = paletteColorHSV[0]
@@ -147,104 +222,77 @@ def getConfigOverlay(palette, forceSelction=False):
     colOverlay.colorTransitionSetup()
     return colOverlay
 
+def getLinePalette(rex, indx):
+    paletteObj = config.workingPalettes[indx]
+    return paletteObj.getBarColors()
 
-def buildPalette(config, index=0):
-    palette = config.palettes[index]
-    tLimitBase = int(workConfig.get(palette, "tLimitBase"))
-    minHue = float(workConfig.get(palette, "minHue"))
-    maxHue = float(workConfig.get(palette, "maxHue"))
-    minSaturation = float(workConfig.get(palette, "minSaturation"))
-    maxSaturation = float(workConfig.get(palette, "maxSaturation"))
-    minValue = float(workConfig.get(palette, "minValue"))
-    maxValue = float(workConfig.get(palette, "maxValue"))
-    try:
-        dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
-        dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
-    except Exception as e:
-        print(str(e))
-        dropHueMax = 0
-        dropHueMin = 0
-    return [
-        minHue,
-        maxHue,
-        minSaturation,
-        maxSaturation,
-        minValue,
-        maxValue,
-        dropHueMin,
-        dropHueMax,
-        tLimitBase,
-    ]
+def getPalette(configRef, indx):
+    paletteObj = config.workingPalettes[indx]
+    # print(f"Returning colors for {paletteObj.name}")
+    return paletteObj.getLineColors()
 
 
-def buildLinePalette(config, index=0):
+def makePalette(palette, paletteObj):
     global workConfig
-    palette = config.palettes[index]
-    tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
-    minHue = float(workConfig.get(palette, "line_minHue"))
-    maxHue = float(workConfig.get(palette, "line_maxHue"))
-    minSaturation = float(workConfig.get(palette, "line_minSaturation"))
-    maxSaturation = float(workConfig.get(palette, "line_maxSaturation"))
-    minValue = float(workConfig.get(palette, "line_minValue"))
-    maxValue = float(workConfig.get(palette, "line_maxValue"))
+    print(f"Loading palette {palette}")
+    paletteObj.tLimitBase = int(workConfig.get(palette, "tLimitBase"))
+    paletteObj.minHue = float(workConfig.get(palette, "minHue"))
+    paletteObj.maxHue = float(workConfig.get(palette, "maxHue"))
+    paletteObj.minSaturation = float(workConfig.get(palette, "minSaturation"))
+    paletteObj.maxSaturation = float(workConfig.get(palette, "maxSaturation"))
+    paletteObj.minValue = float(workConfig.get(palette, "minValue"))
+    paletteObj.maxValue = float(workConfig.get(palette, "maxValue"))
     try:
-        dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
-        dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
+        paletteObj.dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
+        paletteObj.dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
     except Exception as e:
         print(str(e))
-        dropHueMax = 0
-        dropHueMin = 0
-    return [
-        minHue,
-        maxHue,
-        minSaturation,
-        maxSaturation,
-        minValue,
-        maxValue,
-        dropHueMin,
-        dropHueMax,
-        tLimitBase,
-    ]
+        paletteObj.dropHueMax = 0
+        paletteObj.dropHueMin = 0
 
 
-# This is not really used - for future use sometime
-def buildLinePalette2(config, index=0):
-    global workConfig
-    palette = config.palettes[index]
+def makeLinePalette(palette, paletteObj):
+    paletteObj.l_tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
+    paletteObj.l_minHue = float(workConfig.get(palette, "line_minHue"))
+    paletteObj.l_maxHue = float(workConfig.get(palette, "line_maxHue"))
+    paletteObj.l_minSaturation = float(workConfig.get(palette, "line_minSaturation"))
+    paletteObj.l_maxSaturation = float(workConfig.get(palette, "line_maxSaturation"))
+    paletteObj.l_minValue = float(workConfig.get(palette, "line_minValue"))
+    paletteObj.l_maxValue = float(workConfig.get(palette, "line_maxValue"))
     try:
-        tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
-        minHue = float(workConfig.get(palette, "line2_minHue"))
-        maxHue = float(workConfig.get(palette, "line2_maxHue"))
-        minSaturation = float(workConfig.get(palette, "line2_minSaturation"))
-        maxSaturation = float(workConfig.get(palette, "line2_maxSaturation"))
-        minValue = float(workConfig.get(palette, "line2_minValue"))
-        maxValue = float(workConfig.get(palette, "line2_maxValue"))
-        dropHueMin = float(workConfig.get(palette, "line2_dropHueMin"))
-        dropHueMax = float(workConfig.get(palette, "line2_dropHueMax"))
+        paletteObj.l_dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
+        paletteObj.l_dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
     except Exception as e:
         print(str(e))
-        tLimitBase = 0
-        minHue = 0
-        maxHue = 0
-        minSaturation = 0
-        maxSaturation = 0
-        minValue = 0
-        maxValue = 0
-        dropHueMin = 0
-        dropHueMax = 0
-        dropHueMax = 0
-        dropHueMin = 0
-    return [
-        minHue,
-        maxHue,
-        minSaturation,
-        maxSaturation,
-        minValue,
-        maxValue,
-        dropHueMin,
-        dropHueMax,
-        tLimitBase,
-    ]
+        paletteObj.l_dropHueMax = 0
+        paletteObj.l_dropHueMin = 0
+
+
+def makeLine2Palette(palette, paletteObj):
+    # This is not really used - for future use sometime
+    try:
+        paletteObj.l2_tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
+        paletteObj.l2_minHue = float(workConfig.get(palette, "line2_minHue"))
+        paletteObj.l2_maxHue = float(workConfig.get(palette, "line2_maxHue"))
+        paletteObj.l2_minSaturation = float(workConfig.get(palette, "line2_minSaturation"))
+        paletteObj.l2_maxSaturation = float(workConfig.get(palette, "line2_maxSaturation"))
+        paletteObj.l2_minValue = float(workConfig.get(palette, "line2_minValue"))
+        paletteObj.l2_maxValue = float(workConfig.get(palette, "line2_maxValue"))
+        paletteObj.l2_dropHueMin = float(workConfig.get(palette, "line2_dropHueMin"))
+        paletteObj.l2_dropHueMax = float(workConfig.get(palette, "line2_dropHueMax"))
+    except Exception as e:
+        print(str(e))
+        paletteObj.l2_tLimitBase = 0
+        paletteObj.l2_minHue = 0
+        paletteObj.l2_maxHue = 0
+        paletteObj.l2_minSaturation = 0
+        paletteObj.l2_maxSaturation = 0
+        paletteObj.l2_minValue = 0
+        paletteObj.l2_maxValue = 0
+        paletteObj.l2_dropHueMin = 0
+        paletteObj.l2_dropHueMax = 0
+        paletteObj.l2_dropHueMax = 0
+        paletteObj.l2_dropHueMin = 0
 
 
 # Builds flexible grid
@@ -260,7 +308,6 @@ def buildGrid(config):
     if cols > 80:
         cols = 80
 
-    
     # print("---- buildGrid --")
     # print(("Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}").format(
     #     rows, cols, config.paletteIndex, config.usePaletteOverride, config.mixedPalettes))
@@ -326,13 +373,13 @@ def buildGrid(config):
                     )
 
                 paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
-                if config.mixedPalettes :
+                if config.mixedPalettes:
                     paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
                 else:
                     paletteIndex = config.paletteIndex
                 barBlockUnit.setUp(
-                    buildPalette(config, paletteIndex),
-                    buildLinePalette(config, paletteIndex),
+                    getPalette(config, paletteIndex),
+                    getLinePalette(config, paletteIndex),
                 )
 
                 config.barBlocks.append(barBlockUnit)
@@ -359,9 +406,18 @@ def buildOverlapGrid(config):
     rows = 7
     cols = 7
 
-    print("---- buildOverlapGrid --")
-    print(("Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}").format(
-        rows, cols, config.paletteIndex, config.usePaletteOverride, config.mixedPalettes))
+    # print("---- buildOverlapGrid --")
+    # print(
+    #     (
+    #         "Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}"
+    #     ).format(
+    #         rows,
+    #         cols,
+    #         config.paletteIndex,
+    #         config.usePaletteOverride,
+    #         config.mixedPalettes,
+    #     )
+    # )
 
     gridSize = 32
     availableCoords = []
@@ -398,14 +454,14 @@ def buildOverlapGrid(config):
             )
 
         paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
-        if config.mixedPalettes :
+        if config.mixedPalettes:
             paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
         else:
             paletteIndex = config.paletteIndex
 
         barBlockUnit.setUp(
-                buildPalette(config, paletteIndex),
-                buildLinePalette(config, paletteIndex))
+            getPalette(config, paletteIndex), getLinePalette(config, paletteIndex)
+        )
         config.barBlocks.append(barBlockUnit)
         count += 1
 
@@ -423,9 +479,18 @@ def buildUniformGrid(config):
     rows = round(config.canvasHeight / blockHeight) * 2
     cols = round(config.canvasWidth / blockWidth)
 
-    print("----> buildUniformGrid --")
-    print(("Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}").format(
-        rows, cols, config.paletteIndex, config.usePaletteOverride, config.mixedPalettes))
+    # print("----> buildUniformGrid --")
+    # print(
+    #     (
+    #         "Rows:{}  cols:{} paletteIndex:{} overridePalette:{}  mixedPalettes:{}"
+    #     ).format(
+    #         rows,
+    #         cols,
+    #         config.paletteIndex,
+    #         config.usePaletteOverride,
+    #         config.mixedPalettes,
+    #     )
+    # )
 
     for r in range(0, rows):
         lastX = 0
@@ -456,14 +521,15 @@ def buildUniformGrid(config):
                     random.uniform(-config.rotationVariation, config.rotationVariation)
                 )
 
-            if config.mixedPalettes :
+            if config.mixedPalettes:
                 paletteIndex = math.floor(random.uniform(0, len(config.palettes)))
             else:
                 paletteIndex = config.paletteIndex
 
             barBlockUnit.setUp(
-                buildPalette(config, paletteIndex),
-                buildLinePalette(config, paletteIndex))
+                getPalette(config, paletteIndex),
+                getLinePalette(config, paletteIndex),
+            )
             config.barBlocks.append(barBlockUnit)
             count += 1
 
@@ -472,11 +538,11 @@ def iterate():
     global config
     config.colOverlay.stepTransition()
 
-    config.bgColor = tuple(round(a * config.brightness) for a in (config.colOverlay.currentColor))
+    config.bgColor = tuple(
+        round(a * config.brightness) for a in (config.colOverlay.currentColor)
+    )
 
     redraw(config)
-
-    
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
@@ -513,7 +579,7 @@ def iterate():
         # print(config.blurSection)
 
     if random.random() < config.changeGridProb:
-        
+
         # beeper.beep(sound=1) # integer as argument
         # change the palette - used if the mixed palettes option is False and the
         # palette override is False
@@ -526,7 +592,9 @@ def iterate():
 
         if random.random() < config.paletteOverrideProb:
             config.usePaletteOverride = True
-            config.fixedPaletteIndex = round(random.uniform(0, len(config.paletteOverrideNames)-1))
+            config.fixedPaletteIndex = round(
+                random.uniform(0, len(config.paletteOverrideNames) - 1)
+            )
         else:
             config.usePaletteOverride = False
 
@@ -537,22 +605,23 @@ def iterate():
         else:
             config.mixedPalettes = False
 
+        print(f"Change Build : {config.palettes[config.paletteIndex]}")
+
         # choose the layout
         index = math.floor(random.random() * len(config.gridOptions))
         if index > len(config.gridOptions):
             index = 0
         print("Running a :" + str(config.gridOptions[index]))
         eval(config.gridOptions[index])(config)
-    
-    if random.random() < config.changeQuiverOnProb:
-            config.deltaXVal = round(random.uniform(0, config.deltaVal))
-            config.deltaYVal = round(random.uniform(0, config.deltaVal))
-            
-    if random.random() < config.changeQuiverOffProb:
-            # a bit more often, things just go still
-            config.deltaXVal = config.deltaYVal = 0
 
-    
+    if random.random() < config.changeQuiverOnProb:
+        config.deltaXVal = round(random.uniform(0, config.deltaVal))
+        config.deltaYVal = round(random.uniform(0, config.deltaVal))
+
+    if random.random() < config.changeQuiverOffProb:
+        # a bit more often, things just go still
+        config.deltaXVal = config.deltaYVal = 0
+
     # if config.useDrawingPoints :
     #     config.panelDrawing.canvasToUse = config.canvasImage
     #     config.panelDrawing.render()
@@ -567,10 +636,10 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running barblocks.py")
     print(bcolors.ENDC)
-    while config.isRunning :
+    while config.isRunning:
         iterate()
         time.sleep(config.redrawSpeed)
-        if not config.standAlone :
+        if not config.standAlone:
             config.callBack()
 
 
@@ -579,17 +648,25 @@ def main(run=True):
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
     config.changeGridProb = float(workConfig.get("movingpattern", "changeGridProb"))
     config.changeQuiverProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
-    
+
     try:
-        config.changeQuiverOnProb = float(workConfig.get("movingpattern", "changeQuiverOnProb"))
-        config.changeQuiverOffProb = float(workConfig.get("movingpattern", "changeQuiverOffProb"))
-        # comment: 
+        config.changeQuiverOnProb = float(
+            workConfig.get("movingpattern", "changeQuiverOnProb")
+        )
+        config.changeQuiverOffProb = float(
+            workConfig.get("movingpattern", "changeQuiverOffProb")
+        )
+        # comment:
     except Exception as e:
         print(str(e))
-        config.changeQuiverOnProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
-        config.changeQuiverOffProb = float(workConfig.get("movingpattern", "changeQuiverProb"))
+        config.changeQuiverOnProb = float(
+            workConfig.get("movingpattern", "changeQuiverProb")
+        )
+        config.changeQuiverOffProb = float(
+            workConfig.get("movingpattern", "changeQuiverProb")
+        )
     # end try
-    
+
     config.rotationVariation = float(
         workConfig.get("movingpattern", "rotationVariation")
     )
@@ -655,8 +732,13 @@ def main(run=True):
         config.deltaYVal = 1
         config.deltaVal = 1
 
+
+    # ---------------------------------------
+
     try:
-        config.mixedPaletteProb = float(workConfig.get("movingpattern", "mixedPaletteProb"))
+        config.mixedPaletteProb = float(
+            workConfig.get("movingpattern", "mixedPaletteProb")
+        )
         config.mixedPalettes = False
     except Exception as e:
         print(str(e))
@@ -664,8 +746,12 @@ def main(run=True):
         config.mixedPaletteProb = 1.0
 
     try:
-        config.paletteOverrideNames = workConfig.get("movingpattern", "paletteOverrideNames").split(",")
-        config.paletteOverrideProb = float(workConfig.get("movingpattern", "paletteOverrideProb"))
+        config.paletteOverrideNames = workConfig.get(
+            "movingpattern", "paletteOverrideNames"
+        ).split(",")
+        config.paletteOverrideProb = float(
+            workConfig.get("movingpattern", "paletteOverrideProb")
+        )
         config.usePaletteOverride = True
         config.fixedPaletteIndex = 0
     except Exception as e:
@@ -674,39 +760,53 @@ def main(run=True):
         config.paletteOverrideProb = 0.0
         config.fixedPaletteIndex = 0
 
+    config.palettes = workConfig.get("movingpattern", "palettes").split(",")
+
+    config.workingPalettes = []
+
+    for _p in config.palettes :
+        plt = Palette()
+        plt.name = _p
+        makePalette(plt.name, plt)
+        makeLinePalette(plt.name, plt)
+        config.workingPalettes.append(plt)
+
+
+    # Right now the background is controlled by the first palette in the list of
+    # palettes to use
+    config.paletteIndex = 0
+    config.colOverlay = getConfigOverlay(
+        getPalette(config, config.paletteIndex), config.usePaletteOverride
+    )
+
+    # ---------------------------------------
+
     config.gridOptions = ["buildGrid", "buildGrid", "buildUniformGrid"]
 
     index = math.floor(random.random() * len(config.gridOptions))
     if index > len(config.gridOptions):
         index = 0
 
-    config.palettes = workConfig.get("movingpattern", "palettes").split(",")
-
-    # Right now the background is controlled by the first palette in the list of
-    # palettes to use
-    config.colOverlay = getConfigOverlay(buildPalette(config, 0), config.usePaletteOverride)
 
     print("Running a :" + str(config.gridOptions[index]))
-
-    config.paletteIndex = 0
 
     eval(config.gridOptions[index])(config)
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
-    panelDrawing.mockupBlock(config, workConfig)
+    # panelDrawing.mockupBlock(config, workConfig)
 
-    """
-        # Need to add something like this at final render call  as well
+    # """
+    #     # Need to add something like this at final render call  as well
 
-        ########### RENDERING AS A MOCKUP OR AS REAL ###########
-        if config.useDrawingPoints  :
-            config.panelDrawing.canvasToUse = config.renderImageFull
-            config.panelDrawing.render()
-        else :
-            # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-            # config.render(config.image, 0, 0)
-            config.render(config.renderImageFull, 0, 0)
-    """
+    #     ########### RENDERING AS A MOCKUP OR AS REAL ###########
+    #     if config.useDrawingPoints  :
+    #         config.panelDrawing.canvasToUse = config.renderImageFull
+    #         config.panelDrawing.render()
+    #     else :
+    #         # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+    #         # config.render(config.image, 0, 0)
+    #         config.render(config.renderImageFull, 0, 0)
+    # """
 
     if run:
         runWork()

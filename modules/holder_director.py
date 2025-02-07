@@ -19,6 +19,8 @@ class Director:
     # advance to False
 
     slotRate = .5
+    actionDelay = .5
+    loopDelay = .03
 
     def __init__(self, config):
         super(Director, self).__init__()

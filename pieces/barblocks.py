@@ -2,10 +2,10 @@
 import math
 import random
 import time
+from PIL import Image, ImageDraw
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils, panelDrawing
-from PIL import Image, ImageDraw
-
+from modules.holder_director import Director 
 # import numpy
 # import beepy as beeper
 # beeper.beep(sound=1) # integer as argument
@@ -222,9 +222,11 @@ def getConfigOverlay(palette, forceSelction=False):
     colOverlay.colorTransitionSetup()
     return colOverlay
 
+
 def getLinePalette(rex, indx):
     paletteObj = config.workingPalettes[indx]
     return paletteObj.getBarColors()
+
 
 def getPalette(configRef, indx):
     paletteObj = config.workingPalettes[indx]
@@ -637,7 +639,9 @@ def runWork():
     print("Running barblocks.py")
     print(bcolors.ENDC)
     while config.isRunning:
-        iterate()
+        config.directorController.checkTime()
+        if config.directorController.advance:
+            iterate()
         time.sleep(config.redrawSpeed)
         if not config.standAlone:
             config.callBack()
@@ -791,6 +795,18 @@ def main(run=True):
     print("Running a :" + str(config.gridOptions[index]))
 
     eval(config.gridOptions[index])(config)
+
+    # managing speed of animation and framerate
+    config.directorController = Director(config)
+
+    try:
+        # comment: 
+        config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
+    except Exception as e:
+        print(f"slotRate not defined {e} : defaulting to 0.03")
+        config.directorController.slotRate = 0.03
+    # end try
+
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     # panelDrawing.mockupBlock(config, workConfig)

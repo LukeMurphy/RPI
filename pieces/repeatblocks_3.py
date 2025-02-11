@@ -640,16 +640,16 @@ def setupPatterns():
     
     try:
         config.changePaletteWhenRebuildProb = float(workConfig.get("movingpattern", "changePaletteWhenRebuildProb"))
-        config.changeFullPaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changeFullPaletteWhenChangingPatternProb"))
     except Exception as e:
         print(str(e))
         config.changePaletteWhenRebuildProb = 0.25
-        config.changeFullPaletteWhenChangingPatternProb = 0.25
     try:
+        config.changeFullPaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changeFullPaletteWhenChangingPatternProb"))
         config.changePaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changePaletteWhenChangingPatternProb"))
     except Exception as e:
         print(str(e))
-        config.changePaletteWhenRebuildProb = 0.0
+        config.changeFullPaletteWhenChangingPatternProb = 0.0
+        config.changePaletteWhenChangingPatternProb = 0.0
 
     try:
         config.patternIterateCount = int(workConfig.get("movingpattern", "patternIterateCount"))

@@ -475,7 +475,7 @@ def changeSinglePalette(index=0):
 
 def setPalette(config, index=0):
     paletteObj = config.paletteList[index]
-    print(f"New palette {paletteObj.paletteName}")
+    # print(f"New palette {paletteObj.paletteName}")
     config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay,0,0,round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay,0,0,round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
@@ -504,7 +504,6 @@ def setupPalettes() :
 
 #--------------------- PATTERNS     ---------------------
 def buildPatternSequence(config):
-
     config.patternSequence = []
     numberOfPatterns = round(random.uniform(config.patternSequenceMin, config.patternSequenceMax))
     lastPosition = 0
@@ -529,17 +528,24 @@ def buildPatternSequence(config):
 
     while i < numberOfPatterns:
         pattern = config.patterns[math.floor(random.uniform(0, len(config.patterns)))]
-        if pattern not in usedPatterns or iterateCount >= 256:
+        if pattern not in usedPatterns or iterateCount >= config.patternIterateCount:
             if pattern not in (["shingles", "fishScales", "balls"]):
                 rotate = round(random.uniform(0, 1))
             else:
                 rotate = 0
             slotsLeft = totalSlots - lastPosition
-            position = round(random.uniform(lastPosition, slotsLeft - 1))
+
+            if config.positionRange == 0 :
+                position = round(random.uniform(lastPosition, slotsLeft - 1))
+            else :
+                position = round(random.uniform(lastPosition, lastPosition + config.positionRange))
             
-            if random.random() < .99 :
+            if random.SystemRandom().random() <= config.changePaletteWhenChangingPatternProb :
+                if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb :
+                    config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
                 _tempPalette = changeSinglePalette(config.currentPaletteIndex)
-                print(f"_tempPalette   {_tempPalette.linecolOverlay.currentColor}")
+
+                # print(f"_tempPalette   {_tempPalette.linecolOverlay.currentColor}")
             else :
                 _tempPalette = config.paletteList[config.currentPaletteIndex]
 
@@ -549,11 +555,11 @@ def buildPatternSequence(config):
             i += 1
         iterateCount += 1
 
-    print("----------------------------------------------")
-    print((f"New sequence {config.patternSequence}"))
+    # print("----------------------------------------------")
+    # print((f"New sequence {config.patternSequence}"))
 
     # for s in config.patternSequence:
-    #     print(f"{s[0]} {s[3].linecolOverlay.currentColor}")
+    #     print(f"{s[0]} {s[1]} {s[3].linecolOverlay.currentColor}")
 
 
     # print(("Using start pattern {}").format(config.patternModel))
@@ -561,8 +567,7 @@ def buildPatternSequence(config):
 
 
 def rebuildPatterns(arg=0):
-
-    print("rebuildPattern Called")
+    # print("rebuildPattern Called")
     c = round(random.uniform(1, 4))
     if c == 1:
         if config.numRowsRandomize:
@@ -617,7 +622,48 @@ def setupPatterns():
         config.patternSequenceMin = 2
         config.patternSequenceMax = 5
     
+    try:
+        config.positionRange = int(workConfig.get("movingpattern", "positionRange"))
+    except Exception as e:
+        print(str(e))
+        config.positionRange = 0
+
+
+    config.rotateAltBlock = 0
+
+    config.numRows = int(workConfig.get("movingpattern", "numRows"))
+    config.numRowsRandomize = workConfig.getboolean("movingpattern", "numRowsRandomize")
+
+    config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
+
+    config.usePixelSortRandomize = workConfig.getboolean("movingpattern", "usePixelSortRandomize")
     
+    try:
+        config.changePaletteWhenRebuildProb = float(workConfig.get("movingpattern", "changePaletteWhenRebuildProb"))
+        config.changeFullPaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changeFullPaletteWhenChangingPatternProb"))
+    except Exception as e:
+        print(str(e))
+        config.changePaletteWhenRebuildProb = 0.25
+        config.changeFullPaletteWhenChangingPatternProb = 0.25
+    try:
+        config.changePaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changePaletteWhenChangingPatternProb"))
+    except Exception as e:
+        print(str(e))
+        config.changePaletteWhenRebuildProb = 0.0
+
+    try:
+        config.patternIterateCount = int(workConfig.get("movingpattern", "patternIterateCount"))
+    except Exception as e:
+        print(f"{e}")
+        config.patternIterateCount = 256
+
+
+    try:
+        config.altColoringProb = float(workConfig.get("movingpattern", "altColoringProb"))
+    except Exception as e:
+        print(str(e))
+        config.altColoringProb = 0.5
+
     try:
         ringsRange = workConfig.get("movingpattern", "ringsRange").split(",")
         stepsRange = workConfig.get("movingpattern", "stepsRange").split(",")
@@ -1016,8 +1062,6 @@ def main(run=True):
         config.canvasRotation = 0
         config.imgcanvasOffsetX = 0
         config.imgcanvasOffsetY = 0
-    # end try
-
 
     config.repeatProb = 0.99
 
@@ -1025,34 +1069,6 @@ def main(run=True):
     config.drawingPrinted = True
     config.saveImages = workConfig.getboolean("movingpattern", "saveImages")
     config.outPutPath = workConfig.get("movingpattern", "outPutPath")
-
-
-    config.rotateAltBlock = 0
-
-    config.numRows = int(workConfig.get("movingpattern", "numRows"))
-    config.numRowsRandomize = workConfig.getboolean("movingpattern", "numRowsRandomize")
-
-    config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
-
-    config.usePixelSortRandomize = workConfig.getboolean("movingpattern", "usePixelSortRandomize")
-    
-    try:
-        config.changePaletteWhenRebuildProb = float(workConfig.get("movingpattern", "changePaletteWhenRebuildProb"))
-    except Exception as e:
-        print(str(e))
-        config.changePaletteWhenRebuildProb = 0.25
-    try:
-        config.changePaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changePaletteWhenChangingPatternProb"))
-    except Exception as e:
-        print(str(e))
-        config.changePaletteWhenRebuildProb = 0.0
-
-    try:
-        config.altColoringProb = float(workConfig.get("movingpattern", "altColoringProb"))
-    except Exception as e:
-        print(str(e))
-        config.altColoringProb = 0.5
-
     try:
         config.drawBGColorEachCycle = workConfig.getboolean("movingpattern", "drawBGColorEachCycle")
     except Exception as e:

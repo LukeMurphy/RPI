@@ -19,7 +19,8 @@ from copy import copy, deepcopy
 
 ###############################################
 
-#--------------------- CLASSES     ---------------------
+
+# --------------------- CLASSES     ---------------------
 class WaveDeformer:
     def transform(self, x, y):
         y = y + config.waveAmplitude * math.sin((x + config.waveDeformXPos) / config.wavePeriodMod) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
@@ -95,7 +96,7 @@ class Fader:
             self.fadingDone = True
 
 
-#--------------------- UTILS       ---------------------
+# --------------------- UTILS       ---------------------
 def transformImage(img):
     width, height = img.size
     m = -0.0
@@ -130,7 +131,7 @@ def loadImageForBase():
     config.canvasImage.paste(image, (0, 0))
 
 
-#--------------------- DISTURBANCES  ---------------------
+# --------------------- DISTURBANCES  ---------------------
 # loads the disturbance configs and calls the disturbance
 # setup functions
 def setupDisturbances():
@@ -155,7 +156,6 @@ def setupDisturbances():
         print(str(e))
         config.useWaveDistortion = False
 
-   
     config.sectionDisturbance = workConfig.getboolean("movingpattern", "sectionDisturbance")
     config.doSectionDisturbance = False
     config.disturbanceConfigSets = (workConfig.get("movingpattern", "disturbanceConfigSets")).split(",")
@@ -177,6 +177,7 @@ def setupDisturbances():
         section = Holder()
         config.movingSections.append(section)
     rebuildSections()
+
 
 # loads the disturbance configs
 def setUpDisturbanceConfigs(configSet):
@@ -234,6 +235,7 @@ def setupStableSections():
         yPos = round(random.uniform(0, config.canvasHeight))
         yPos2 = round(random.uniform(yPos + minHeight, config.canvasHeight))
         config.stableSegments.append([xPos, yPos, xPos2, yPos2])
+
 
 # changes what disturbance sections are doing
 def rebuildSections():
@@ -301,6 +303,7 @@ def rebuildSections():
         section.stopProb = random.uniform(0, config.stopProb)
 
     config.drawingPrinted = False
+
 
 # performs the disturbances
 def disturber():
@@ -394,8 +397,8 @@ def disturber():
     """
 
 
-#--------------------- PALETTES      ---------------------
-def setCurrentColor(palettObjValsRef, dropHueMin=0,dropHueMax=0,alpha=255) :
+# --------------------- PALETTES      ---------------------
+def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
     currentColor = colorutils.getRandomColorHSVSaturated(
         palettObjValsRef.minHue,
         palettObjValsRef.maxHue,
@@ -406,7 +409,7 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0,dropHueMax=0,alpha=255) :
         dropHueMin,
         dropHueMax,
         alpha,
-        config.brightness
+        config.brightness,
     )
     return currentColor
 
@@ -467,7 +470,7 @@ def changeSinglePalette(index=0):
     _paletteObjLocal.linecolOverlay2 = copy(paletteObj.linecolOverlay2)
     _paletteObjLocal.linecolOverlay.currentColor = copy(paletteObj.linecolOverlay.currentColor)
     _paletteObjLocal.linecolOverlay2.currentColor = copy(paletteObj.linecolOverlay2.currentColor)
-    _paletteObjLocal.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay,0,0,round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
+    _paletteObjLocal.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     _paletteObjLocal.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
     _paletteObjLocal.linecolOverlay2.currentColor = setCurrentColor(paletteObj.linecolOverlay2)
     return _paletteObjLocal
@@ -476,13 +479,13 @@ def changeSinglePalette(index=0):
 def setPalette(config, index=0):
     paletteObj = config.paletteList[index]
     # print(f"New palette {paletteObj.paletteName}")
-    config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay,0,0,round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
-    config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay,0,0,round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
+    config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
+    config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
     config.linecolOverlay2.currentColor = setCurrentColor(paletteObj.linecolOverlay2)
 
 
-def setupPalettes() :
+def setupPalettes():
     config.palettes = workConfig.get("movingpattern", "palettes").split(",")
     config.paletteConfigs = workConfig.get("movingpattern", "palettes").split(",")
 
@@ -502,7 +505,7 @@ def setupPalettes() :
     setPalette(config, config.currentPaletteIndex)
 
 
-#--------------------- PATTERNS     ---------------------
+# --------------------- PATTERNS     ---------------------
 def buildPatternSequence(config):
     config.patternSequence = []
     numberOfPatterns = round(random.uniform(config.patternSequenceMin, config.patternSequenceMax))
@@ -515,7 +518,6 @@ def buildPatternSequence(config):
         config.altLineColoring = False
 
     config.numConcentricBoxes = round(random.uniform(8, 18))
-
 
     # for i in range(0,numberOfPatterns) :
     # print(numberOfPatterns)
@@ -535,18 +537,18 @@ def buildPatternSequence(config):
                 rotate = 0
             slotsLeft = totalSlots - lastPosition
 
-            if config.positionRange == 0 :
+            if config.positionRange == 0:
                 position = round(random.uniform(lastPosition, slotsLeft - 1))
-            else :
+            else:
                 position = round(random.uniform(lastPosition, lastPosition + config.positionRange))
-            
-            if random.SystemRandom().random() <= config.changePaletteWhenChangingPatternProb :
-                if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb :
+
+            if random.SystemRandom().random() <= config.changePaletteWhenChangingPatternProb:
+                if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb:
                     config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
                 _tempPalette = changeSinglePalette(config.currentPaletteIndex)
 
                 # print(f"_tempPalette   {_tempPalette.linecolOverlay.currentColor}")
-            else :
+            else:
                 _tempPalette = config.paletteList[config.currentPaletteIndex]
 
             config.patternSequence.append([pattern, position, rotate, _tempPalette])
@@ -560,7 +562,6 @@ def buildPatternSequence(config):
 
     # for s in config.patternSequence:
     #     print(f"{s[0]} {s[1]} {s[3].linecolOverlay.currentColor}")
-
 
     # print(("Using start pattern {}").format(config.patternModel))
     # print("----------------------------------------------")
@@ -621,42 +622,33 @@ def setupPatterns():
         print(str(e))
         config.patternSequenceMin = 2
         config.patternSequenceMax = 5
-    
-    try:
-        config.positionRange = int(workConfig.get("movingpattern", "positionRange"))
-    except Exception as e:
-        print(str(e))
-        config.positionRange = 0
-
 
     config.rotateAltBlock = 0
 
     config.numRows = int(workConfig.get("movingpattern", "numRows"))
     config.numRowsRandomize = workConfig.getboolean("movingpattern", "numRowsRandomize")
-
     config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
-
     config.usePixelSortRandomize = workConfig.getboolean("movingpattern", "usePixelSortRandomize")
-    
+
     try:
         config.changePaletteWhenRebuildProb = float(workConfig.get("movingpattern", "changePaletteWhenRebuildProb"))
     except Exception as e:
         print(str(e))
         config.changePaletteWhenRebuildProb = 0.25
+
     try:
         config.changeFullPaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changeFullPaletteWhenChangingPatternProb"))
         config.changePaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changePaletteWhenChangingPatternProb"))
-    except Exception as e:
-        print(str(e))
-        config.changeFullPaletteWhenChangingPatternProb = 0.0
-        config.changePaletteWhenChangingPatternProb = 0.0
-
-    try:
+        config.positionRange = int(workConfig.get("movingpattern", "positionRange"))
         config.patternIterateCount = int(workConfig.get("movingpattern", "patternIterateCount"))
     except Exception as e:
-        print(f"{e}")
+        print(
+            f"\n ==>  {e} \n ==> new configurations for more variation controls: \n changeFullPaletteWhenChangingPatternProb \n changeFullPaletteWhenChangingPatternProb \n positionRange \n patternIterateCount \n <===\n"
+        )
+        config.changeFullPaletteWhenChangingPatternProb = 0.0
+        config.changePaletteWhenChangingPatternProb = 0.0
+        config.positionRange = 0
         config.patternIterateCount = 256
-
 
     try:
         config.altColoringProb = float(workConfig.get("movingpattern", "altColoringProb"))
@@ -682,17 +674,16 @@ def setupPatterns():
         print(str(e))
         config.linesOnly = False
 
-   
     config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
     config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
-    print(config.waveScaleRings, config.waveScaleSteps)
+    # print(config.waveScaleRings, config.waveScaleSteps)
     # end try
 
     config.randomBlockProb = float(workConfig.get("movingpattern", "randomBlockProb"))
     config.randomBlockWidth = int(workConfig.get("movingpattern", "randomBlockWidth"))
     config.randomBlockHeight = int(workConfig.get("movingpattern", "randomBlockHeight"))
     config.decoBoxBandWidth = int(workConfig.get("movingpattern", "decoBoxBandWidth"))
-    
+
     config.diamondUseTriangles = False
     config.diamondStep = int(workConfig.get("movingpattern", "diamondStep"))
 
@@ -725,7 +716,8 @@ def setupPatterns():
     config.yIncrementer = 0
     config.altLineColoring = False
 
-#--------------------- LOOP ACTIONS  ---------------------
+
+# --------------------- LOOP ACTIONS  ---------------------
 def redraw(config):
 
     # print(str("doing a redraw: {}").format(config.patternModel))
@@ -842,10 +834,10 @@ def drawRepeatedPatternImage(config, canvasImage):
                         config.patternModel = s[0]
                         config.rotateAltBlock = s[2]
                         func = eval("pattern_blocks." + s[0])
-                        if len(s) == 4 :
+                        if len(s) == 4:
                             # print(f" {s} | color: {s[3].linecolOverlay.currentColor}  ")
                             func(config, s[3])
-                        else :
+                        else:
                             func(config)
 
             _counter += 1
@@ -867,7 +859,7 @@ def runWork():
         if not config.standAlone:
             config.callBack()
 
-    
+
 def iterate():
     global config
     # config.colOverlay.stepTransition()
@@ -1052,7 +1044,7 @@ def main(run=True):
 
     skipBlocks = (workConfig.get("movingpattern", "skipBlocks")).split(",")
     config.skipBlocks = tuple(map(lambda x: int(int(x)), skipBlocks))
-    
+
     try:
         config.canvasRotation = float(workConfig.get("movingpattern", "canvasRotation"))
         config.imgcanvasOffsetX = int(workConfig.get("movingpattern", "canvasOffsetX"))
@@ -1097,7 +1089,7 @@ def main(run=True):
     config.transitionImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
     ########################################################################
-    
+
     config.useBlurSection = workConfig.getboolean("movingpattern", "useBlurSection")
     config.blurSectionWidth = int(workConfig.get("movingpattern", "blurSectionWidth"))
     config.blurSectionHeight = int(workConfig.get("movingpattern", "blurSectionHeight"))
@@ -1121,7 +1113,6 @@ def main(run=True):
     config.mask_blur_amt = config.mask_blur_amt
     config.cp_blur_amt = config.cp_blur_amt
 
-
     try:
         config.filterRemapping = workConfig.getboolean("movingpattern", "filterRemapping")
         config.filterRemappingProb = float(workConfig.get("movingpattern", "filterRemappingProb"))
@@ -1142,8 +1133,6 @@ def main(run=True):
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
-    
-    
     # ###########################################################################
     # ####################### clip player instert ################################
     try:
@@ -1182,15 +1171,14 @@ def main(run=True):
     try:
         config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
     except Exception as e:
-        print(str(e))
+        print(f"{e} <== adjust config to use slotRate!! <===")
         config.directorController.slotRate = 0.03
-
 
     # """
     # # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     # panelDrawing.mockupBlock(config, workConfig)
     #     ########### Need to add something like this at final render call  as well
-            
+
     #     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     #     if config.useDrawingPoints  :
     #         config.panelDrawing.canvasToUse = config.renderImageFull

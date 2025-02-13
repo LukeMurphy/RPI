@@ -478,7 +478,7 @@ def changeSinglePalette(index=0):
 
 def setPalette(config, index=0):
     paletteObj = config.paletteList[index]
-    # print(f"New palette {paletteObj.paletteName}")
+    print(f"New palette {paletteObj.paletteName}")
     config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)

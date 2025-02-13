@@ -19,8 +19,6 @@ class Palette:
     minValue = 0
     maxValue = 0
     dropHueMin = 0
-    dropHueMax = 0
-    dropHueMax = 0
     dropHueMin = 0
 
     l_tLimitBase = 0
@@ -32,8 +30,6 @@ class Palette:
     l_maxValue = 0
     l_dropHueMin = 0
     l_dropHueMax = 0
-    l_dropHueMax = 0
-    l_dropHueMin = 0
 
     l2_tLimitBase = 0
     l2_minHue = 0
@@ -44,8 +40,6 @@ class Palette:
     l2_maxValue = 0
     l2_dropHueMin = 0
     l2_dropHueMax = 0
-    l2_dropHueMax = 0
-    l2_dropHueMin = 0
 
 
     def __init__(self):
@@ -62,8 +56,6 @@ class Palette:
             self.maxValue,
             self.dropHueMin,
             self.dropHueMax,
-            self.dropHueMax,
-            self.dropHueMin,
             self.tLimitBase,
         ]
     
@@ -77,9 +69,20 @@ class Palette:
             self.l_maxValue,
             self.l_dropHueMin,
             self.l_dropHueMax,
-            self.l_dropHueMax,
-            self.l_dropHueMin,
             self.l_tLimitBase,
+        ]
+
+    def getLineColors2(self) :
+        return [
+            self.l2_minHue,
+            self.l2_maxHue,
+            self.l2_minSaturation,
+            self.l2_maxSaturation,
+            self.l2_minValue,
+            self.l2_maxValue,
+            self.l2_dropHueMin,
+            self.l2_dropHueMax,
+            self.l2_tLimitBase,
         ]
 
 
@@ -178,13 +181,13 @@ def redraw(config):
         b.colOverlay2.stepTransition()
 
 
-def getConfigOverlay(palette, forceSelction=False):
+def getConfigOverlay(palette, forceSelection=False):
     colOverlay = coloroverlay.ColorOverlay()
     colOverlay.randomSteps = False
     colOverlay.timeTrigger = True
     colOverlay.maxBrightness = 1
     colOverlay.steps = 50
-    if not forceSelction:
+    if not forceSelection:
         colOverlay.minHue = palette[0]
         colOverlay.maxHue = palette[1]
         colOverlay.minSaturation = palette[2]
@@ -245,10 +248,11 @@ def makePalette(palette, paletteObj):
     paletteObj.minValue = float(workConfig.get(palette, "minValue"))
     paletteObj.maxValue = float(workConfig.get(palette, "maxValue"))
     try:
-        paletteObj.dropHueMin = float(workConfig.get(palette, "line_dropHueMin"))
-        paletteObj.dropHueMax = float(workConfig.get(palette, "line_dropHueMax"))
+        paletteObj.dropHueMin = float(workConfig.get(palette, "dropHueMin"))
+        paletteObj.dropHueMax = float(workConfig.get(palette, "dropHueMax"))
     except Exception as e:
-        print(str(e))
+        print("\n------------------------------")
+        print(f"Check palette config:{palette} {e}")
         paletteObj.dropHueMax = 0
         paletteObj.dropHueMin = 0
 

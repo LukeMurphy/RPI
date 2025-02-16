@@ -161,7 +161,7 @@ def doColorManagementSetup():
             _p.pixelsGoGray = workConfig.getboolean(_palette, "pixelsGoGray")
             _p.greyRate = float(workConfig.get(_palette, "greyRate"))
         except Exception as e:
-            print(str(e))
+            print(e)
             _p.pixelsGoGray = False
 
         # ok this may seem screwy, but because I made an error a while ago, the jumpToGray
@@ -170,7 +170,7 @@ def doColorManagementSetup():
         try:
             _p.jumpToGray = workConfig.getboolean(_palette, "jumpToGray")
         except Exception as e:
-            print(str(e))
+            print(e)
             _p.jumpToGray = True
             if not _p.pixelsGoGray:
                 _p.jumpToGray = False
@@ -180,7 +180,7 @@ def doColorManagementSetup():
                 workConfig.get(_palette, "pixelsGoGrayModel")
             )
         except Exception as e:
-            print(str(e))
+            print(e)
             _p.pixelsGoGray = False
 
         config.palettes.append(_p)
@@ -263,7 +263,7 @@ def main(run=True):
         ps.objImageAlphaBlend = float(
             workConfig.get("particleSystem", "objImageAlphaBlend")
         )
-        arg = config.path + "assets/" + ps.objImage
+        arg = f"{config.path}assets/{ps.objImage}"
         ps.loadedImage = Image.open(arg, "r")
         ps.loadedImage.load()
         ps.loadedImageCopy = ps.loadedImage.copy()
@@ -310,23 +310,23 @@ def main(run=True):
             "particleSystem", "transformShape"
         )
         transformTuples = workConfig.get("particleSystem", "transformTuples").split(",")
-        config.transformTuples = tuple([float(i) for i in transformTuples])
+        config.transformTuples = tuple(float(i) for i in transformTuples)
     except Exception as e:
-        print(str(e))
+        print(e)
         config.transformShape = False
 
     try:
         config.torqueDelta = int(workConfig.get("particleSystem", "torqueDelta"))
         config.torqueRate = float(workConfig.get("particleSystem", "torqueRate"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.torqueDelta = 0
         config.torqueRate = 0
 
     try:
         config.xWind = float(workConfig.get("particleSystem", "xWind"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.xWind = 0
 
     ps.movement = workConfig.get("particleSystem", "movement")
@@ -342,7 +342,7 @@ def main(run=True):
         ps.objHeightMin = int(workConfig.get("particleSystem", "objHeightMin"))
         ps.objHeightMax = int(workConfig.get("particleSystem", "objHeightMax"))
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.objWidthMax = ps.objWidth
         ps.objHeightMax = ps.objHeight
         ps.objWidthMin = ps.objWidth
@@ -356,7 +356,7 @@ def main(run=True):
             workConfig.get("particleSystem", "rndSizeFactorMax")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         ps.rndSizeFactorMin = 0.5
         ps.rndSizeFactorMax = 1.5
 
@@ -371,7 +371,7 @@ def main(run=True):
             workConfig.get("displayconfig", "pixelSortProbChangeMax")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         config.pixelSortProbChange = 0
 
     try:
@@ -388,7 +388,7 @@ def main(run=True):
             workConfig.get("particleSystem", "filterRemapminVertSize")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         config.filterRemapping = False
         config.filterRemappingProb = 0.0
         config.filterRemapminHoriSize = 24
@@ -402,7 +402,7 @@ def main(run=True):
             workConfig.get("particleSystem", "filterRemapminHoriMinSize")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         config.filterRemapminHoriMinSize = 4
         config.filterRemapminVertMinSize = 4
     # end try
@@ -415,7 +415,7 @@ def main(run=True):
             workConfig.get("particleSystem", "filterRemapRangeY")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
@@ -435,7 +435,7 @@ def main(run=True):
             workConfig.get("particleSystem", "optionallegacyToggleProb")
         )
     except Exception as e:
-        print(str(e))
+        print(e)
         config.legacyUnsharpMask = True
         config.optionallegacyToggleProb = 0
 
@@ -448,7 +448,7 @@ def main(run=True):
         config.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
         config.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.useWaveDistortion = False
 
     config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
@@ -469,7 +469,7 @@ def main(run=True):
         )
         config.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
     except Exception as e:
-        print(str(e))
+        print(e)
         config.useOverLayEnhanced = False
         config.useOverOnBG = False
 
@@ -756,24 +756,7 @@ def colorize():
 def brightnessChanger():
     global config, ps
     if config.brightnessVariation:
-        if not config.brightnessVariationTransition:
-            if random.random() < config.brightnessVariationProb:
-                config.destinationBrightness = random.uniform(
-                    0.1, config.baseBrightness
-                )
-                config.destinationBrightness = 0.1
-                config.brightnessDelta = (
-                    config.destinationBrightness - config.brightness
-                ) / 100
-                config.brightnessVariationTransition = True
-                print(
-                    "New brightness:",
-                    config.brightness,
-                    config.destinationBrightness,
-                    config.brightnessDelta,
-                )
-
-        else:
+        if config.brightnessVariationTransition:
             config.brightness += config.brightnessDelta
             ps.config.brightness = config.brightness
             if (
@@ -785,6 +768,23 @@ def brightnessChanger():
             ):
                 config.brightnessVariationTransition = False
                 print(config.brightness)
+
+        else:
+            if random.random() < config.brightnessVariationProb:
+                config.destinationBrightness = random.uniform(
+                    0.1, config.baseBrightness
+                )
+                config.brightnessVariationTransition = True
+                config.destinationBrightness = 0.1
+                config.brightnessDelta = (
+                    config.destinationBrightness - config.brightness
+                ) / 100
+                print(
+                    "New brightness:",
+                    config.brightness,
+                    config.destinationBrightness,
+                    config.brightnessDelta,
+                )
 
 
 # -----------------------------------------------------------
@@ -809,42 +809,28 @@ def runWork():
             config.callBack()
 
 
-# -----------------------------------------------------------
 def iterate():
     global config, ps
 
     brightnessChanger()
+    _update_background(config)
+    _update_particles(config, ps)
+    _handle_remapping_and_effects(config, ps)
+    _render_image(config)
 
+
+def _update_background(config):
     if config.bg_bgTransitions:
         config.bgColorOverlay.stepTransition(alpha=config.bg_bgTransparency)
+        config.bgColor = tuple(round(a) for a in config.bgColorOverlay.currentColor)
 
-        config.bgColor = tuple(
-            round(a) for a in config.bgColorOverlay.currentColor
-        )
-
-    # config.bgColor = (100,0,80,10)
-    # Fade trails or not...
-    # print(config.bgColor)
-    config.draw.rectangle(
-        (0, 0, config.canvasWidth - 1, config.canvasHeight - 1),
-        fill=config.bgColor,
-        outline=None,
-    )
+    config.draw.rectangle((0, 0, config.canvasWidth - 1, config.canvasHeight - 1), fill=config.bgColor, outline=None)
 
     if config.useOverOnBG:
-        config.image.paste(
-            config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
-        )
+        config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
 
-    # """
-    # # ORIG PLACEMENT
-    # if config.useOverLay :
-    # 	# config.image = ImageChops.multiply(config.clrBlock, config.image)
-    # 	config.image.paste(
-    # 		config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
-    # 	)
-    # """
 
+def _update_particles(config, ps):
     if random.random() < config.paletteChangeProb:
         config.paletteIndex = math.floor(random.random() * len(config.palettes))
         setColorsByPalette()
@@ -853,129 +839,62 @@ def iterate():
         p.update()
         p.render()
 
-        if p.objHeight > 200:
-            p.remove = True
-
-        if p.remove:
-            # print("REMOVING",ps.unitArray.index(p),len(ps.unitArray))
-
-            if not ps.fixedUnitArray:
+        if p.objHeight > 200 or p.remove:
+            if ps.fixedUnitArray:
+                emitParticle(i=ps.unitArray.index(p))
+            else:
                 ps.unitArray.remove(p)
-
-                if len(ps.unitArray) < config.numUnits + 0:
+                if len(ps.unitArray) < config.numUnits:
                     for _ in range(ps.reEmitNumber):
                         emitParticle()
-            else:
-                emitParticle(i=ps.unitArray.index(p))
 
     if random.random() < config.restartProb:
         for p in ps.unitArray:
             p.remove = True
-        config.draw.rectangle(
-            (0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 200)
-        )
+        config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 200))
         config.renderImageFull.paste(config.image)
 
-    # This was added for the stair steps fire line
-    # to move the dithered sparkle around a bit to
-    # disturb the eveness of things ..
 
-    # if random.random() < config.optionallegacyToggleProb:
-    #     config.legacyUnsharpMask = config.legacyUnsharpMask != True
-
-    if random.random() < config.filterRemappingProb and (
-        config.useFilters and config.filterRemapping
-    ):
+def _handle_remapping_and_effects(config, ps):
+    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
         remapDitherFilteredParts(config)
 
-    if (
-        random.random() < ps.changechangeCohesionProb
-        and ps.changeCohesion
-        and ps.movement == "travel"
-    ):
+    if random.random() < ps.changechangeCohesionProb and ps.changeCohesion and ps.movement == "travel":
         if random.random() > 0.5:
             ps.cohesionDistance = random.uniform(10, 150)
-
-            # ps.repelDistance = random.uniform(1, ps.cohesionDistance )
         else:
             ps.repelDistance = random.uniform(0, 10)
-            # ps.cohesionDistance = random.uniform(ps.repelDistance * 2 ,200 )
-            # ps.repelFactor = random.uniform(0,10)
-
-        # print(ps.cohesionDistance, ps.repelDistance)
 
     if config.overallBlur > 0:
-        config.image = config.image.filter(
-            ImageFilter.GaussianBlur(radius=config.overallBlur)
-        )
-        # This needs to be reset
+        config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
         if config.legacyUnsharpMask:
-            config.image = config.image.filter(
-                ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1)
-            )
+            config.image = config.image.filter(ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1))
         config.draw = ImageDraw.Draw(config.image)
 
     if config.transformShape:
         config.image = transformImage(config.image)
 
     if config.pixelSortProbChange != 0 and random.random() < config.pixelSortProbChange:
-        config.pixSortprobDraw = random.uniform(
-            config.pixelSortProbChangeMin, config.pixelSortProbChangeMax
-        )
+        config.pixSortprobDraw = random.uniform(config.pixelSortProbChangeMin, config.pixelSortProbChangeMax)
 
     if config.torqueRate != 0:
-        xDist = 0
         rows = round(config.canvasHeight / config.torqueDelta)
-
         for i in range(rows):
-            # counter speed - i.e. faster at top
-            # xDist = 1 + (rows -i)/config.torqueRate
-            xDist = 1 + (i) / config.torqueRate
+            x_dist = 1 + (i) / config.torqueRate
+            box = (0, i * config.torqueDelta, 448, i * config.torqueDelta + config.torqueDelta)
+            crop = config.renderImageFull.crop(box).convert("RGBA")
+            config.renderImageFull.paste(crop, (round(x_dist), i * config.torqueDelta), crop)
 
-            box = (
-                0,
-                i * config.torqueDelta,
-                448,
-                i * config.torqueDelta + config.torqueDelta,
-            )
-            crop = config.renderImageFull.crop(box)
-            crop = crop.convert("RGBA")
-            config.renderImageFull.paste(
-                crop, (round(xDist), i * config.torqueDelta), crop
-            )
 
-    # print("particles ",config.render, config.instanceNumber)
-
+def _render_image(config):
     if config.useOverLayEnhanced:
-        # config.image = ImageChops.multiply(config.clrBlock, config.image)
-        # config.image = ImageChops.invert(config.image)
-
-        # config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
-
-        # temp = ImageChops.lighter(config.clrBlock, config.image)
-        # temp = temp.crop((config.overlayxPos, config.overlayyPos,config.clrBlkWidth,config.clrBlkHeight))
-
-        temp = config.image.crop(
-            (
-                config.overlayxPos,
-                config.overlayyPos,
-                config.clrBlkWidth,
-                config.clrBlkHeight,
-            )
-        )
+        temp = config.image.crop((config.overlayxPos, config.overlayyPos, config.clrBlkWidth, config.clrBlkHeight))
         temp = ImageChops.invert(temp)
         temp = ImageChops.multiply(temp, config.clrBlock)
-
-        config.image.paste(
-            temp, (config.overlayxPos, config.overlayyPos), config.clrBlock
-        )
-
+        config.image.paste(temp, (config.overlayxPos, config.overlayyPos), config.clrBlock)
     elif config.useOverLay:
-        config.image.paste(
-            config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
-        )
+        config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
 
-    # RENDERING AS A MOCKUP OR AS REAL
     if config.useDrawingPoints:
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
@@ -1042,6 +961,5 @@ def renderDiagnosticsCall():
 def callBack():
     global config
     return True
-
 
 # -----------------------------------------------------------

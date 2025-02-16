@@ -292,17 +292,16 @@ def drawSquareSpiral():
                         rightValues = lightValues
                         bottomValues = lightValues
                         leftValues = darkValues
+                elif rows % 2 == 0:
+                    topValues = lightValues
+                    rightValues = lightValues
+                    bottomValues = darkValues
+                    leftValues = darkValues
                 else:
-                    if rows % 2 == 0:
-                        topValues = lightValues
-                        rightValues = lightValues
-                        bottomValues = darkValues
-                        leftValues = darkValues
-                    else:
-                        topValues = darkValues
-                        rightValues = darkValues
-                        bottomValues = lightValues
-                        leftValues = lightValues
+                    topValues = darkValues
+                    rightValues = darkValues
+                    bottomValues = lightValues
+                    leftValues = lightValues
 
             else:
                 topValues = lightValues
@@ -484,7 +483,6 @@ def drawSquareSpiral():
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
 
                     n += 4
-                # except Exception as e:
                 #     print(e)
                 #     pass
 

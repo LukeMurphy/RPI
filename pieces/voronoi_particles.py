@@ -279,7 +279,7 @@ def structuredSetup():
     cols = rows
     i = 0
     rads = math.pi / cols * 1
-    for r in range(rows):
+    for r in range(cols):
         for c in range(cols):
             xD = round(
                 config.canvasWidth / 2 + (math.cos(rads * c)) * config.canvasWidth / 2
@@ -359,13 +359,18 @@ def initializeParameters():
     config.nb = []
 
     for _ in range(config.num_cells):
-        config.nx.append(random.randrange(-config.xRange / 4, 1.25 * config.xRange))
-        config.ny.append(random.randrange(-config.yRange / 4, 1.25 * config.yRange))
-        config.nvx.append(random.randrange(-2, 2))
-        config.nvy.append(random.randrange(-2, 2))
-        config.nr.append(50)
-        config.ng.append(50)
-        config.nb.append(50)
+        _setCellAttributes()
+
+
+# TODO Rename this here and in `initializeParameters`
+def _setCellAttributes():
+    config.nx.append(random.randrange(-config.xRange / 4, 1.25 * config.xRange))
+    config.ny.append(random.randrange(-config.yRange / 4, 1.25 * config.yRange))
+    config.nvx.append(random.randrange(-2, 2))
+    config.nvy.append(random.randrange(-2, 2))
+    config.nr.append(50)
+    config.ng.append(50)
+    config.nb.append(50)
 
 
 def resetSystem(fullReset=False):
@@ -377,9 +382,7 @@ def resetSystem(fullReset=False):
 
         config.movementMode = 1 if config.movementMode == 0 else 0
         if config.movementMode == 0 and random.SystemRandom().random() < 0.5:
-            config.useStructuredSetup = (
-                True if config.useStructuredSetup == False else False
-            )
+            config.useStructuredSetup = config.useStructuredSetup == False
         else:
             config.useStructuredSetup = False
 
@@ -387,19 +390,22 @@ def resetSystem(fullReset=False):
         # PS.setCenter()
         PS.resetParticles()
 
-        if config.useStructuredSetup:
-            structuredSetup()
     else:
-        initializeParameters()
-        setColors()
+        regularParticleSetup()
+    if config.useStructuredSetup:
+        structuredSetup()
 
-        PS = ParticleSystem(config)
-        PS.setCenter()
-        PS.setNewAttributes()
-        PS.setUp()
 
-        if config.useStructuredSetup:
-            structuredSetup()
+# TODO Rename this here and in `resetSystem`
+def regularParticleSetup():
+    global PS, config
+    initializeParameters()
+    setColors()
+
+    PS = ParticleSystem(config)
+    PS.setCenter()
+    PS.setNewAttributes()
+    PS.setUp()
 
     # print(f"new sys {config.movementMode }  useStructuredSetup {config.useStructuredSetup}")
 
@@ -412,23 +418,28 @@ def runWork():
     global PS
     redrawSpeed = 0.02
     while True:
-        config.directorController.checkTime()
-        if config.directorController.advance:
-            iterate()
-        if config.changeColorSetTime > 0:
-            config.paletteController.checkTime()
-            if config.paletteController.advance:
-                changePalettes()
-        if config.changeTime > 0:
-            config.changeTimeController.checkTime()
-            if config.changeTimeController.advance:
-                resetSystem(False)
-        if config.totalResetTime > 0:
-            config.systemController.checkTime()
-            if config.systemController.advance:
-                resetSystem(True)
+        _loopChecksAndActions(redrawSpeed)
 
-        time.sleep(redrawSpeed)
+
+# TODO Rename this here and in `runWork`
+def _loopChecksAndActions(redrawSpeed):
+    config.directorController.checkTime()
+    if config.directorController.advance:
+        iterate()
+    if config.changeColorSetTime > 0:
+        config.paletteController.checkTime()
+        if config.paletteController.advance:
+            changePalettes()
+    if config.changeTime > 0:
+        config.changeTimeController.checkTime()
+        if config.changeTimeController.advance:
+            resetSystem(False)
+    if config.totalResetTime > 0:
+        config.systemController.checkTime()
+        if config.systemController.advance:
+            resetSystem(True)
+
+    time.sleep(redrawSpeed)
 
 
 def iterate():
@@ -470,6 +481,143 @@ def iterate():
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
 
+def main(run=True):
+    """Initializes and runs the Voronoi particle system."""
+    global config
+    global redrawSpeed
+    global PS
+    global workConfig
+
+    _load_particle_config(config)
+    _load_background_config(config)
+    _load_rendering_config(config)
+    _load_filter_config(config)
+    _load_color_config(config)
+    _initialize_system(config)
+
+    if run:
+        runWork()
+
+
+def _load_particle_config(config):
+    """Loads particle-related configuration parameters."""
+    config.minParticles = int(workConfig.get("particles", "minParticles"))
+    config.maxParticles = int(workConfig.get("particles", "maxParticles"))
+    config.speedFactorMin = float(workConfig.get("particles", "speedFactorMin"))
+    config.speedFactorMax = float(workConfig.get("particles", "speedFactorMax"))
+    config.particleXSpeed = float(workConfig.get("particles", "particleXSpeed"))
+    config.particleYSpeed = float(workConfig.get("particles", "particleYSpeed"))
+    config.rSpeedMin = float(workConfig.get("particles", "rSpeedMin"))
+    config.rSpeedMax = float(workConfig.get("particles", "rSpeedMax"))
+    config.rSpeedRadialProportional = workConfig.getboolean("particles", "rSpeedRadialProportional")
+    config.showParticlePostions = workConfig.getboolean("particles", "showParticlePostions", fallback=False)
+    config.numOrbits = int(workConfig.get("particles", "numOrbits", fallback=12))
+
+    config.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
+    config.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
+    config.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
+    config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
+    config.systemRotation = float(workConfig.get("particles", "systemRotation"))
+    config.systemSpeed = float(workConfig.get("particles", "systemSpeed", fallback=0))
+    config.directionProb = float(workConfig.get("particles", "directionProb", fallback=0.5))
+    config.maxRadius = float(workConfig.get("particles", "maxRadius", fallback=config.canvasWidth / 2))
+    config.innerRadius = int(workConfig.get("particles", "innerRadius"))
+    config.outerRadius = int(workConfig.get("particles", "outerRadius"))
+    config.xRange = int(workConfig.get("particles", "xRange"))
+    config.yRange = int(workConfig.get("particles", "yRange"))
+
+    config.useStructuredSetup = workConfig.getboolean("particles", "useStructuredSetup", fallback=False)
+    config.movementMode = int(workConfig.get("particles", "movementMode", fallback=0))
+    config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
+    config.chanceParticleWillMove = float(workConfig.get("particles", "chanceParticleWillMove", fallback=1.0))
+    config.changeMovementModeProb = float(workConfig.get("particles", "changeMovementModeProb", fallback=0.0))
+    config.orbitProb = float(workConfig.get("particles", "orbitProb"))
+
+
+def _load_background_config(config):
+    """Loads background-related configuration parameters."""
+    bgColorSets = workConfig.get("particles", "bgColorSets").split(",")
+    config.bgColorSets = []
+    for bg in bgColorSets:
+        bgColor = workConfig.get(bg, "bgColor").split(",")
+        bgColors = [int(x) for x in bgColor]
+        config.bgColorSets.append(bgColors)
+    config.bgColor = config.bgColorSets[0]
+    config.bgColorAlpha = int(workConfig.get("particles", "bgColorAlpha"))
+
+
+def _load_rendering_config(config):
+    """Loads rendering-related configuration parameters."""
+    config.fadeRate = float(workConfig.get("particles", "fadeRate"))
+    config.lineAlpha = float(workConfig.get("particles", "lineAlpha"))
+    config.lineWidth = int(workConfig.get("particles", "lineWidth", fallback=2))
+    config.lineColor = list(map(int, workConfig.get("particles", "lineColor", fallback="40,0,0").split(",")))
+    config.cellAlpha = float(workConfig.get("particles", "cellAlpha"))
+    config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
+    config.fadeRateNewSystemThreshold = float(workConfig.get("particles", "fadeRateNewSystemThreshold"))
+
+    config.totalResetTime = float(workConfig.get("particles", "totalResetTime", fallback=33))
+    config.changeTime = float(workConfig.get("particles", "changeTime", fallback=10))
+
+    if config.totalResetTime > 0:
+        config.systemController = Director(config)
+        config.systemController.slotRate = config.totalResetTime
+
+    if config.changeTime > 0:
+        config.changeTimeController = Director(config)
+        config.changeTimeController.slotRate = config.changeTime
+
+    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.draw = ImageDraw.Draw(config.image)
+
+
+def _load_filter_config(config):
+    """Loads filter-related configuration parameters."""
+    config.filterRemapping = workConfig.getboolean("particles", "filterRemapping", fallback=False)
+    config.filterRemappingProb = float(workConfig.get("particles", "filterRemappingProb", fallback=0.0))
+    config.filterRemapMinHorzSize = int(workConfig.get("particles", "filterRemapMinHorzSize", fallback=24))
+    config.filterRemapMinVertSize = int(workConfig.get("particles", "filterRemapMinVertSize", fallback=24))
+    config.filterRemapMaxHorzSize = int(workConfig.get("particles", "filterRemapMaxHorzSize", fallback=24))
+    config.filterRemapMaxVertSize = int(workConfig.get("particles", "filterRemapMaxVertSize", fallback=24))
+    config.filterRemapRangeX = int(workConfig.get("particles", "filterRemapRangeX", fallback=config.canvasWidth))
+    config.filterRemapRangeY = int(workConfig.get("particles", "filterRemapRangeY", fallback=config.canvasHeight))
+
+
+def _load_color_config(config):
+    """Loads color-related configuration parameters."""
+    config.colorSets = []
+    config.colorGroupsList = workConfig.get("particles", "colorGroups", fallback="colorSetA,colorSetB").split(",")
+    config.mixColorSets = workConfig.getboolean("particles", "mixColorSets", fallback=False)
+    config.changeColorSetTime = float(workConfig.get("particles", "changeColorSetTime", fallback=0))
+
+    if config.changeColorSetTime > 0:
+        config.paletteController = Director(config)
+        config.paletteController.slotRate = config.changeColorSetTime
+
+    for grp in config.colorGroupsList:
+        rawColorSetAVals = workConfig.get("particles", grp).replace("\n", "").replace(" ", "")
+        colorSetAVals = rawColorSetAVals.split("|")
+        colorSet = []
+        for element in colorSetAVals:
+            if element != "":
+                clr = [int(x) for x in element.split(",")]
+                colorSet.append(clr)
+        config.colorSets.append(colorSet)
+
+    config.colorSetA = config.colorSets[0]
+    config.colorSetB = config.colorSets[1]
+    config.num_cells = config.maxParticles
+    config.imgx, config.imgy = config.image.size
+
+
+def _initialize_system(config):
+    """Initializes the particle system and related parameters."""
+    global PS
+    resetSystem(True)
+    config.slotRate = float(workConfig.get("particles", "slotRate", fallback=0.03))
+    config.directorController = Director(config)
+    config.directorController.slotRate = config.slotRate
+'''
 def main(run=True):
     global config
     global redrawSpeed
@@ -699,3 +847,4 @@ def main(run=True):
 
     if run:
         runWork()
+'''

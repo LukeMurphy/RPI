@@ -566,7 +566,7 @@ def rebuildPatterns(arg=0):
     rebuildSections()
     config.repeatDrawingMode = 1
     config.fader.fadingDone = False
-    config.fader.doingRefreshCount = 40
+    config.fader.doingRefreshCount = config.faderDoingRefreshCount
 
 
 # TODO Rename this here and in `rebuildPatterns`
@@ -1061,9 +1061,9 @@ def setupPolyOverlay() :  # sourcery skip: extract-method
         config.polyOverlay = ColorOverlay()
         config.polyOverlay.randomSteps = True
         config.polyOverlay.timeTrigger = True
-        config.polyOverlay.tLimitBase = 5
-        config.polyOverlay.tLimit = 30
-        config.polyOverlay.steps = 50
+        config.polyOverlay.tLimitBase = int(workConfig.get("movingpattern", "poly_tLimitBase"))
+        config.polyOverlay.tLimit = int(workConfig.get("movingpattern", "poly_tLimit"))
+        config.polyOverlay.steps = int(workConfig.get("movingpattern", "poly_steps"))
         config.usePolygonOverlay = workConfig.getboolean("movingpattern", "usePolygonOverlay")
         config.polyOverlay.minHue = int(workConfig.get("movingpattern", "poly_minHue"))
         config.polyOverlay.maxHue = int(workConfig.get("movingpattern", "poly_maxHue"))
@@ -1212,6 +1212,7 @@ def main(run=True):
     config.fader.yPos = 0
     config.fader.setUp()
     config.fader.image = config.canvasImage
+    config.faderDoingRefreshCount = int(workConfig.get("movingpattern", "faderDoingRefreshCount"))
 
     # ###########################################################################
     setupPolyOverlay()

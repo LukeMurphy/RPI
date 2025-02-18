@@ -19,11 +19,6 @@ def setTimeout(fn, ms, *args, **kwargs):
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
 
-
-
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
-
 class unit:
 
     timeTrigger = True
@@ -312,7 +307,7 @@ def drawSquareSpiral():
             hDelta = config.numUnits * config.blockLength * 2 + config.hGapSize
             vDelta = config.numUnits * config.blockHeight * 2 + config.vGapSize
 
-            cntr = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]
+            _center = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]
             outlineColorObj = coloroverlay.ColorOverlay()
             outlineColorObj.randomRange = (5.0, 30.0)
             outlineColorObj.colorTransitionSetup()
@@ -321,8 +316,8 @@ def drawSquareSpiral():
 
             ## Archimedean spiral is  r = a + b * theta
             turns = config.numUnits + 1
-            b1 = config.blockLength
-            b2 = config.blockHeight
+            _blockLength = config.blockLength
+            _blockHeight = config.blockHeight
 
             A = []
             B = []
@@ -330,46 +325,46 @@ def drawSquareSpiral():
 
             for i in range(1, turns):
                 x = (
-                    i * b1
-                    + cntr[0]
+                    i * _blockLength
+                    + _center[0]
                     + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
                 )
                 y = (
-                    i * b2 + cntr[1]
+                    i * _blockHeight + _center[1]
                 )  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 A.append((x, y))
 
                 x = (
-                    -i * b1 + cntr[0]
+                    -i * _blockLength + _center[0]
                 )  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 y = (
-                    i * b2
-                    + cntr[1]
+                    i * _blockHeight
+                    + _center[1]
                     + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
                 )
                 A.append((x, y))
 
                 x = (
-                    -i * b1
-                    + cntr[0]
+                    -i * _blockLength
+                    + _center[0]
                     + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
                 )
                 y = (
-                    -i * b2 + cntr[1]
+                    -i * _blockHeight + _center[1]
                 )  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 A.append((x, y))
 
-                x = (i + 1) * b1 + cntr[
+                x = (i + 1) * _blockLength + _center[
                     0
                 ]  # + random.SystemRandom().uniform(rangeChange[0],rangeChange[1])
                 y = (
-                    -i * b2
-                    + cntr[1]
+                    -i * _blockHeight
+                    + _center[1]
                     + random.SystemRandom().uniform(rangeChange[0], rangeChange[1])
                 )
                 A.append((x, y))
 
-            B = [(item[0] - b1, item[1]) for item in A]
+            B = [(_item[0] - _blockLength*1.25, _item[1]) for _item in A]
 
             obj = unit(config)
             obj.fillColorMode = "red"
@@ -379,9 +374,9 @@ def drawSquareSpiral():
 
             # This is the center square, so should be red, like the hearth it represents
             obj.minSaturation = 0.8
-            obj.maxSaturation = 1
+            obj.maxSaturation = 1.0
             obj.minValue = 0.1
-            obj.maxValue = 0.9
+            obj.maxValue = 1.0
             obj.minHue = 0
             obj.maxHue = 36
 
@@ -459,32 +454,8 @@ def drawSquareSpiral():
                     obj.setUp(n)
                     config.unitArray.append(obj)
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
-
                     n += 4
-                    obj.setUp(n)
-                    config.unitArray.append(obj)
-                    # draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
 
-                    # TOP
-                    obj = unit(config)
-                    obj.poly = (B[n + 1], A[n + 5], B[n + 6], A[n + 2])
-                    obj.changeColor = False
-                    obj.outlineColorObj = outlineColorObj
-
-                    obj.minHue = config.redRange[0]
-                    obj.maxHue = config.redRange[1]
-                    obj.minSaturation = 0.7 * config.saturationRangeFactorRight[0]
-                    obj.maxSaturation = 0.9 * config.saturationRangeFactorRight[1]
-                    obj.minValue = topValues[0]
-                    obj.maxValue = topValues[1]
-
-                    obj.setUp(n)
-                    config.unitArray.append(obj)
-                    # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
-
-                    n += 4
-                #     print(e)
-                #     pass
 
 
 def resetToAllowDistortion():
@@ -519,7 +490,7 @@ def restartPiece():
     config.blockLength = config.blockLengthBase * config.sizeFactor
     config.blockHeight = config.blockHeightBase * config.sizeFactor
 
-    # print(config.opticalPattern + " " + str(config.sizeFactor))
+    print(f"{config.opticalPattern} {str(config.sizeFactor)}")
 
     drawSquareSpiral()
 

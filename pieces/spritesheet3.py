@@ -539,7 +539,7 @@ def filterRemapCall(ovrd=False):
 
 # ----------------------------------------------------##----------------------------------------------------#
 def runWork():
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print(f"{bcolors.OKGREEN} ** {bcolors.BOLD}")
     print("Running spritesheet3.py")
     print(bcolors.ENDC)
     # gc.enable()
@@ -581,108 +581,7 @@ def iterate(n=0):
                 currentAnimation.glitching = False
     else:
 
-        # animationBackGroundFadeIn()
-        anim = currentAnimation.anim
-        bgColor = (
-            round(config.brightness * bgColor[0]),
-            round(config.brightness * bgColor[1]),
-            round(config.brightness * bgColor[2]),
-            currentAnimation.bg_alpha,
-        )
-
-        # clears the animation frame
-        currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
-
-        # for compositing
-        tempImageRef = anim.nextFrameImg()
-
-        if config.usebgBox:
-            currentAnimation.animationImage.paste(config.underLayer, (0, 0), config.underLayer)
-
-        if config.drawMoire:
-            c1 = (
-                round(config.brightness * 150),
-                round(config.brightness * 50),
-                round(config.brightness * 0),
-                150,
-            )
-
-            if config.setMoireColor:
-                c1 = config.moireColor
-
-                if random.SystemRandom().random() < config.moireColorAltProb:
-                    c1 = config.moireColorAlt
-
-            for ii in range(2):
-                xc = ii * config.moireXDistance + config.moireXPos
-                yc = ii * config.moireYDistance + config.moireYPos
-                for i in range(1200):
-                    w = 3 * config.canvasWidth - i * 6
-                    if w > 1:
-                        x0 = xc - w / 2
-                        y0 = yc - w / 2
-                        x1 = xc + w / 2
-                        y1 = yc + w / 2
-
-                        if x1 < x0:
-                            x1 = x0 + 1
-                        if y1 < y0:
-                            y1 = y0 + 1
-                        currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
-
-        # tempImageRef  = anim.nextFrameImg()
-        currentAnimation.animationImage.paste(
-            tempImageRef,
-            (
-                anim.xPos + currentAnimation.animationXOffset,
-                anim.yPos + currentAnimation.animationYOffset,
-            ),
-            tempImageRef,
-        )
-
-        if not config.allPause:
-
-            # doing this 3 times because this was how the v.2 version inadvertently did it - my bad - but also to
-            # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at
-            # at a more granular way
-
-            # print("fetching")
-            anim.getNextFrame()
-            anim.getNextFrame()
-            anim.getNextFrame()
-
-            if random.SystemRandom().random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
-                # print("paused at start")
-                anim.pause = True
-                config.allPause = True
-
-            # print(anim.currentFrame,anim.endFrame-1)
-            if random.SystemRandom().random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame - 1:
-                # print("paused at end")
-                config.allPause = True
-                anim.pause = True
-
-            if (anim.pause or config.allPause) and random.SystemRandom().random() < currentAnimation.unPauseProb:
-                # print("releasing animation")
-                anim.pause = False
-                config.allPause = False
-
-            if random.SystemRandom().random() < currentAnimation.pauseProb:
-                # print("pausing at frame:" + str(anim.currentFrame) + " prob: " + str(currentAnimation.pauseProb))
-                anim.pause = True
-                config.allPause = True
-                if random.SystemRandom().random() < 0.5:
-                    anim.direction *= -1
-
-        # except Exception as e:
-        #     print(str(e))
-        # pass
-        # end try
-        anim.pause = config.allPause
-
-        if random.SystemRandom().random() < currentAnimation.changeAnimProb:
-            reConfigAnimationCell(anim, currentAnimation)
-
+        _moireOverLay(currentAnimation, config, bgColor)
     # Draws the colored tiles over the animation image -
     # Note first versions drew this over the animation image but on 10-29-2023 I
     # tested drawing it over the final image layer canvasImage instead - not sure
@@ -691,56 +590,7 @@ def iterate(n=0):
     composite = config.canvasImage
 
     if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox and not config.allPause:
-        # config.usebgBox = False if config.usebgBox   else True
-        # print("bgBox")
-        # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
-        # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
-
-        xPos = math.floor(random.uniform(0, config.canvasWidth))
-        yPos = math.floor(random.uniform(0, config.canvasHeight))
-
-        config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
-        config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
-
-        if random.SystemRandom().random() < config.clearbgBoxProb:
-            xPos = yPos = 0
-            config.bgBoxBox = (
-                xPos,
-                yPos,
-                xPos + config.canvasWidth,
-                yPos + config.canvasHeight,
-            )
-            config.bgBoxFill = (0, 0, 0, 0)
-        else:
-            config.bgBoxBox = (
-                xPos,
-                yPos,
-                xPos + config.tileSizeWidth,
-                yPos + config.tileSizeHeight,
-            )
-            cR = config.bgBoxColorRange
-            # print(cR)
-            bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
-            # print(bgBoxFill)
-            config.bgBoxFill = (
-                round(config.brightness * bgBoxFill[0]),
-                round(config.brightness * bgBoxFill[1]),
-                round(config.brightness * bgBoxFill[2]),
-                round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
-            )
-
-        config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
-
-        glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
-        for _ in range(glitchIterations):
-            glitchBox(
-                config.underLayer,
-                config.canvasWidth,
-                config.canvasHeight,
-                config.bgGlitchDisplacementHorizontal,
-                config.bgGlitchDisplacementVertical,
-            )
-
+        _bgColorsFilling(config)
     if random.SystemRandom().random() < config.clearbgBoxProb:
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
@@ -795,32 +645,47 @@ def iterate(n=0):
 
     config.animationController.checkTime()
     if config.animationController.advance:
-        currentAnimation.glitching = False
+        _drawNextFrames(currentAnimation, config)
 
-        if config.playInOrder:
-            config.currentAnimationIndex += 1
-            if config.currentAnimationIndex >= len(config.animations):
-                config.currentAnimationIndex = 0
-            # print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
-        else:
-            choice = math.floor(random.uniform(0, len(config.animations)))
-            config.currentAnimationIndex = choice
-            # print("Next Animation : " + str(config.animations[choice].name))
 
-        config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
-        currentAnimation = config.animations[config.currentAnimationIndex]
-        currentAnimation.preDistorted = False
+def _drawNextFrames(currentAnimation, config):
+    currentAnimation.glitching = False
 
-        if currentAnimation.totalFrames == 1:
-            if random.SystemRandom().random() < 0.5:
-                # print("Repasting in the original")
-                currentAnimation.anim.frameArray[0] = currentAnimation.anim.firstFrame.copy()
+    if config.playInOrder:
+        config.currentAnimationIndex += 1
+        if config.currentAnimationIndex >= len(config.animations):
+            config.currentAnimationIndex = 0
+        # print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
+    else:
+        choice = math.floor(random.uniform(0, len(config.animations)))
+        config.currentAnimationIndex = choice
+        # print("Next Animation : " + str(config.animations[choice].name))
 
-            tempImageRef = currentAnimation.anim.nextFrameImg()
-            # currentAnimation.anim.currentFrame = tempImageRef
-            # print("Should be reset")
-            glitchyCycles = random.SystemRandom().randrange(config.preGlitchNumberMin, config.preGlitchNumber)
-            # print(glitchyCycles)
+    config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
+    currentAnimation = config.animations[config.currentAnimationIndex]
+    currentAnimation.preDistorted = False
+
+    if currentAnimation.totalFrames == 1:
+        if random.SystemRandom().random() < 0.5:
+            # print("Repasting in the original")
+            currentAnimation.anim.frameArray[0] = currentAnimation.anim.firstFrame.copy()
+
+        tempImageRef = currentAnimation.anim.nextFrameImg()
+        # currentAnimation.anim.currentFrame = tempImageRef
+        # print("Should be reset")
+        glitchyCycles = random.SystemRandom().randrange(config.preGlitchNumberMin, config.preGlitchNumber)
+        # print(glitchyCycles)
+        for _ in range(glitchyCycles):
+            glitchBox(
+                tempImageRef,
+                currentAnimation.animationWidth,
+                currentAnimation.animationHeight,
+                currentAnimation.imageGlitchDisplacementHorizontal,
+                currentAnimation.imageGlitchDisplacementVertical,
+            )
+
+        if random.SystemRandom().random() < config.preGlitchRedo:
+            # print("second round")
             for _ in range(glitchyCycles):
                 glitchBox(
                     tempImageRef,
@@ -830,23 +695,167 @@ def iterate(n=0):
                     currentAnimation.imageGlitchDisplacementVertical,
                 )
 
-            if random.SystemRandom().random() < config.preGlitchRedo:
-                # print("second round")
-                for _ in range(glitchyCycles):
-                    glitchBox(
-                        tempImageRef,
-                        currentAnimation.animationWidth,
-                        currentAnimation.animationHeight,
-                        currentAnimation.imageGlitchDisplacementHorizontal,
-                        currentAnimation.imageGlitchDisplacementVertical,
-                    )
+    currentAnimation.preDistorted = True
+    # config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
 
-        currentAnimation.preDistorted = True
-        # config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
+    currentAnimation.bg_alpha = 10
+    config.allPause = False
+    currentAnimation.anim.currentFrame = 0
 
-        currentAnimation.bg_alpha = 10
+
+def _bgColorsFilling(config):
+    # config.usebgBox = False if config.usebgBox   else True
+    # print("bgBox")
+    # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
+    # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
+
+    xPos = math.floor(random.uniform(0, config.canvasWidth))
+    yPos = math.floor(random.uniform(0, config.canvasHeight))
+
+    config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
+    config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
+
+    if random.SystemRandom().random() < config.clearbgBoxProb:
+        xPos = yPos = 0
+        config.bgBoxBox = (
+            xPos,
+            yPos,
+            xPos + config.canvasWidth,
+            yPos + config.canvasHeight,
+        )
+        config.bgBoxFill = (0, 0, 0, 0)
+    else:
+        config.bgBoxBox = (
+            xPos,
+            yPos,
+            xPos + config.tileSizeWidth,
+            yPos + config.tileSizeHeight,
+        )
+        cR = config.bgBoxColorRange
+        # print(cR)
+        bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
+        # print(bgBoxFill)
+        config.bgBoxFill = (
+            round(config.brightness * bgBoxFill[0]),
+            round(config.brightness * bgBoxFill[1]),
+            round(config.brightness * bgBoxFill[2]),
+            round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
+        )
+
+    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+
+    glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
+    for _ in range(glitchIterations):
+        glitchBox(
+            config.underLayer,
+            config.canvasWidth,
+            config.canvasHeight,
+            config.bgGlitchDisplacementHorizontal,
+            config.bgGlitchDisplacementVertical,
+        )
+
+
+
+def _moireOverLay(currentAnimation, config, bgColor):
+    """Applies moire pattern and animates the current animation."""
+    _draw_background(currentAnimation, config, bgColor)
+    _draw_moire_pattern(currentAnimation, config)
+    _paste_animation_frame(currentAnimation)
+
+    if not config.allPause:
+        _animate(currentAnimation.anim, currentAnimation, config)
+
+    currentAnimation.anim.pause = config.allPause
+
+    if random.SystemRandom().random() < currentAnimation.changeAnimProb:
+        reConfigAnimationCell(currentAnimation.anim, currentAnimation)
+
+
+def _draw_background(currentAnimation, config, bgColor):
+    """Draws the background color on the animation image."""
+    bgColor = (
+        round(config.brightness * bgColor[0]),
+        round(config.brightness * bgColor[1]),
+        round(config.brightness * bgColor[2]),
+        currentAnimation.bg_alpha,
+    )
+    currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
+
+    if config.usebgBox:
+        currentAnimation.animationImage.paste(config.underLayer, (0, 0), config.underLayer)
+
+
+def _draw_moire_pattern(currentAnimation, config):
+    """Draws the moire pattern if enabled."""
+    if not config.drawMoire:
+        return
+
+    c1 = (round(config.brightness * 150), round(config.brightness * 50), 0, 150)
+    if config.setMoireColor:
+        c1 = config.moireColor
+        if random.SystemRandom().random() < config.moireColorAltProb:
+            c1 = config.moireColorAlt
+
+    for ii in range(2):
+        xc = ii * config.moireXDistance + config.moireXPos
+        yc = ii * config.moireYDistance + config.moireYPos
+        for i in range(1200):
+            w = 3 * config.canvasWidth - i * 6
+            if w > 1:
+                x0 = xc - w / 2
+                y0 = yc - w / 2
+                x1 = xc + w / 2
+                y1 = yc + w / 2
+
+                x1 = max(x0 + 1, x1)
+                y1 = max(y0 + 1, y1)
+
+                currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
+
+
+def _paste_animation_frame(currentAnimation):
+    """Pastes the current animation frame onto the animation image."""
+    anim = currentAnimation.anim
+    tempImageRef = anim.nextFrameImg()
+    currentAnimation.animationImage.paste(
+        tempImageRef,
+        (anim.xPos + currentAnimation.animationXOffset, anim.yPos + currentAnimation.animationYOffset),
+        tempImageRef,
+    )
+
+
+def _animate(anim, currentAnimation, config):
+    # doing this 3 times because this was how the v.2 version inadvertently did it - my bad - but also to
+    # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at
+    # at a more granular way
+
+    # print("fetching")
+    anim.getNextFrame()
+    anim.getNextFrame()
+    anim.getNextFrame()
+
+    if random.SystemRandom().random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
+        # print("paused at start")
+        anim.pause = True
+        config.allPause = True
+
+    # print(anim.currentFrame,anim.endFrame-1)
+    if random.SystemRandom().random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame - 1:
+        # print("paused at end")
+        config.allPause = True
+        anim.pause = True
+
+    if (anim.pause or config.allPause) and random.SystemRandom().random() < currentAnimation.unPauseProb:
+        # print("releasing animation")
+        anim.pause = False
         config.allPause = False
-        currentAnimation.anim.currentFrame = 0
+
+    if random.SystemRandom().random() < currentAnimation.pauseProb:
+        # print("pausing at frame:" + str(anim.currentFrame) + " prob: " + str(currentAnimation.pauseProb))
+        anim.pause = True
+        config.allPause = True
+        if random.SystemRandom().random() < 0.5:
+            anim.direction *= -1
         # config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
         # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
         # currentAnimation.glitching = True

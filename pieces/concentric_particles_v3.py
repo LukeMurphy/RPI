@@ -19,7 +19,7 @@ class ParticleDot:
     def setUp(self, p, n):
         # variation in initial velocity
         direction = 1 if p.directionProb < 0.5 else -1
-        orbit = True if p.orbitProb <= config.orbitProb else False
+        orbit = p.orbitProb <= config.orbitProb
         fx = random.SystemRandom().random() * p.fFactor + 1
         fy = random.SystemRandom().random() * p.fFactor + 1
         vx = math.cos(p.angle * n) * fx * direction
@@ -27,8 +27,8 @@ class ParticleDot:
         r = int(random.SystemRandom().uniform(config.rRangeMin, config.rRange) * p.brightness)
         g = int(random.SystemRandom().uniform(config.gRangeMin, config.gRange) * p.brightness)
         b = int(random.SystemRandom().uniform(config.bRangeMin, config.bRange) * p.brightness)
-        
-        
+
+
         radius = random.SystemRandom().uniform(1, p.maxRadius)
         self.circuitCount = 0
 
@@ -112,7 +112,7 @@ class RadialSet:
             self.angleOffsetSpeed = math.pi/290
             innerRadius = 10
 
-        for _ in range(0, self.radials):
+        for _ in range(self.radials):
             ir = innerRadius + random.SystemRandom().uniform(self.radialSetInnerRadiusRange[0], self.radialSetInnerRadiusRange[1])
             outr = outerRadius + random.SystemRandom().uniform( self.radialSetOuterRadiusRange[0],  self.radialSetOuterRadiusRange[1])
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
@@ -145,78 +145,90 @@ class ParticleSystem:
         
     def setNewAttributes(self):
         self.radialSets = []
-        
+
         # The rings around the center
         if not self.useFixedBandColors :
             self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
             self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
             self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
-        
+
         if self.useFixedBandColors:
-            self.bandColors = config.bandColors
-
-
-            # created transition bands
-            self.bandColorsAdjusted = []
-            bandColorSteps = 3
-            
-            for c in range(0, len(self.bandColors)-1) :
-                color1 = self.bandColors[c]
-                color2 = self.bandColors[c + 1]
-                
-                rDiff = (color2[0] - color1[0]) / bandColorSteps
-                gDiff = (color2[1] - color1[1]) / bandColorSteps
-                bDiff = (color2[2] - color1[2]) / bandColorSteps
-                
-                for i in range(0, bandColorSteps) :
-                    self.bandColorsAdjusted.append([
-                        round(color1[0] + rDiff * i),
-                        round(color1[1] + gDiff * i),
-                        round(color1[2] + bDiff * i)
-                                                    ])
-            # adjusting the apparent brightness of some bands as they
-            # read over-bright - can be modified anytime
-            for c in range(0, len(self.bandColorsAdjusted)) :
-                color = self.bandColorsAdjusted[c]
-                sumOfColors = color[0] + color[1] + color[2]
-                if sumOfColors > 330 and c < 13 :
-                    for cx in range(0,3):
-                        color[cx] *= .8
-
-        
-            self.bands = bandColorSteps * len(self.bandColors)
-            self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin + config.PSRadiusFixedColorMinInternalRadius, config.PSRadiusMax + config.PSRadiusFixedColorMinInternalRadius))
-            self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
-
-            
-            self.bandWidthsSet = []
-            for _ in range(0, self.bands) :
-                self.bandWidthsSet.append(round(random.SystemRandom().uniform(config.PSFixedColorRadiusDiffMin,config.PSFixedColorRadiusDiffMax)))
-            
+            self._extracted_from_setNewAttributes_11()
         self.xSpeed = random.SystemRandom().random()  * config.PSXSpeed
         self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
-        
+
         self.xMaxFactor = config.xMaxFactor
         self.yMaxFactor = config.yMaxFactor
 
-        self.drawRadialPolys = True if random.SystemRandom().random() < .5 else False
+        self.drawRadialPolys = random.SystemRandom().random() < .5
 
         radialSet = RadialSet(config, self.wBase)
-        radialSet.radialSetMinNum = config.radialSetMinNum 
+        radialSet.radialSetMinNum = config.radialSetMinNum
         radialSet.radialSetMaxNum = config.radialSetMaxNum
         radialSet.radialSetInnerRadiusFactor = config.radialSetInnerRadiusFactor
         radialSet.radialSetInnerRadiusFactorFixedBands = config.radialSetInnerRadiusFactorFixedBands
-        radialSet.radialSetInnerRadiusRange = config.radialSetInnerRadiusRange 
-        radialSet.radialSetOuterRadiusRange = config.radialSetOuterRadiusRange 
+        radialSet.radialSetInnerRadiusRange = config.radialSetInnerRadiusRange
+        radialSet.radialSetOuterRadiusRange = config.radialSetOuterRadiusRange
         radialSet.useFixedBandColors = self.useFixedBandColors 
-    
+
         radialSet.makeRadialsSet(config.radialSetMinNum,config.radialSetMaxNum)
         self.radialSets.append(radialSet)
-        
+
         # the 33s hand
         radialSet = RadialSet(config, self.wBase)
         radialSet.makeRadialsSet(1,1)
         self.radialSets.append(radialSet)
+
+    # TODO Rename this here and in `setNewAttributes`
+    def _extracted_from_setNewAttributes_11(self):
+        self.bandColors = config.bandColors
+
+
+        # created transition bands
+        self.bandColorsAdjusted = []
+        bandColorSteps = 3
+
+        for c in range(len(self.bandColors)-1):
+            color1 = self.bandColors[c]
+            color2 = self.bandColors[c + 1]
+
+            rDiff = (color2[0] - color1[0]) / bandColorSteps
+            gDiff = (color2[1] - color1[1]) / bandColorSteps
+            bDiff = (color2[2] - color1[2]) / bandColorSteps
+
+            self.bandColorsAdjusted.extend(
+                [
+                    round(color1[0] + rDiff * i),
+                    round(color1[1] + gDiff * i),
+                    round(color1[2] + bDiff * i),
+                ]
+                for i in range(bandColorSteps)
+            )
+        # adjusting the apparent brightness of some bands as they
+        # read over-bright - can be modified anytime
+        for c in range(len(self.bandColorsAdjusted)) :
+            color = self.bandColorsAdjusted[c]
+            sumOfColors = color[0] + color[1] + color[2]
+            if sumOfColors > 330 and c < 13 :
+                for cx in range(3):
+                    color[cx] *= .8
+
+
+        self.bands = bandColorSteps * len(self.bandColors)
+        self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin + config.PSRadiusFixedColorMinInternalRadius, config.PSRadiusMax + config.PSRadiusFixedColorMinInternalRadius))
+        self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
+
+
+        self.bandWidthsSet = []
+        self.bandWidthsSet.extend(
+            round(
+                random.SystemRandom().uniform(
+                    config.PSFixedColorRadiusDiffMin,
+                    config.PSFixedColorRadiusDiffMax,
+                )
+            )
+            for _ in range(self.bands)
+        )
 
     
     def setCenter(self):
@@ -278,7 +290,7 @@ class ParticleSystem:
 
         self.radialBand = self.maxRadius / 12
 
-        for n in range(0, self.p):
+        for n in range(self.p):
             pDot = ParticleDot()
             pDot.setUp(self, n)
             self.particles.append(pDot)
@@ -292,7 +304,12 @@ class ParticleSystem:
 
          
     def move(self):
+        self._update_position()
+        for q in range(self.p):
+            self._update_particle(q)
 
+
+    def _update_position(self):
         self.x += self.xSpeed
         self.y += self.ySpeed
 
@@ -300,337 +317,189 @@ class ParticleSystem:
             self.xSpeed = 0
         if self.y > config.canvasHeight - round(self.wBase / self.yMaxFactor):
             self.ySpeed = 0
-        if self.y < 0 - 2:
+        if self.y < -2:
             self.ySpeed = 0
-            
-
-        for q in range(0, self.p):
-            ref = self.particles[q]
-
-            if ref.mode == 1:
-                ref.xPos += ref.vx
-                ref.yPos += ref.vy
-
-                dx = ref.xPos - self.x
-                dy = ref.yPos - self.y
-
-                r = round(math.sqrt(dx * dx + dy * dy))
-
-                if r > ref.radius/2 and ref.orbit:
-                    # print(r, ref.radius, ref.orbit)
-                    ref.mode = 0
-
-                # horizontal Continuity
-                if config.horizontalContinuity :
-                    if ref.xPos  > config.imageCanvasWidth :
-                        ref.xPos = 0
-                        
-                    if ref.xPos  < 0 :
-                        ref.xPos  = config.imageCanvasWidth   
-                # vertical Continuity
-                if config.verticalContinuity :
-                    if ref.xPos  > config.imageCanvasWidth :
-                        ref.xPos = 0
-                        
-                    if ref.xPos  < 0 :
-                        ref.xPos  = config.imageCanvasWidth   
-                        
-                    if ref.yPos  > config.imageCanvasHeight :
-                        ref.yPos = 0
-                        
-                    if ref.yPos  < 0 :
-                        ref.yPos  = config.imageCanvasHeight   
-            else:
-                ref.xPos = self.x + ref.radius/1 * math.cos(ref.angle) * 0.2
-                ref.yPos = self.y + ref.radius/1 * math.sin(ref.angle) * 0.2
-                ref.angle += ref.rSpeed
-
-            """
-			"""
-
-            self.particles[q].clr[0] = self.particles[q].clr[0] - self.decr_r
-            self.particles[q].clr[1] = self.particles[q].clr[1] - self.decr_g
-            self.particles[q].clr[2] = self.particles[q].clr[2] - self.decr_b
-
-            if self.particles[q].clr[0] <= 0:
-                self.particles[q].clr[0] = 0
-            if self.particles[q].clr[1] <= 0:
-                self.particles[q].clr[1] = 0
-            if self.particles[q].clr[2] <= 0:
-                self.particles[q].clr[2] = 0
-
-            r = self.particles[q].clr[0]
-            g = self.particles[q].clr[1]
-            b = self.particles[q].clr[2]
-
-            # sumOfClrs = (
-            #     self.particles[q].clr[0]
-            #     + self.particles[q].clr[1]
-            #     + self.particles[q].clr[2]
-            # )
-
-            """
-			# a pixel wind changes the cascade
-			if self.config.sideWind and sumOfClrs > 100:
-				config.vx = round(2 - random.SystemRandom().random() * 4)
-				ref.vx = config.vx
-				self.deacellerationx = 0.75
-			"""
-
-            # Sparkles !!
-            if random.SystemRandom().random() < config.sparkleProb:
-                r = int(220 * self.sparkleBrightness)
-                g = int(220 * self.sparkleBrightness)
-                b = int(255 * self.sparkleBrightness)
-
-            # if (q ==0) : print (particles[q]['c'][0])
-            xDisplayPos = ref.xPos
-            yDisplayPos = ref.yPos
-            
-            # horizontal Continuity
-            if config.horizontalContinuity :
-                if xDisplayPos  > config.canvasWidth :
-                    xDisplayPos = ref.xPos - config.imageCanvasWidth
-                    
-                if xDisplayPos  < 0 :
-                    xDisplayPos  = config.imageCanvasWidth  - ref.xPos
-            # vertical Continuity
-            if config.verticalContinuity :
-                if xDisplayPos  > config.imageCanvasWidth :
-                    xDisplayPos = ref.xPos - config.imageCanvasWidth
-                    
-                if xDisplayPos  < 0 :
-                    xDisplayPos  = config.imageCanvasWidth  - ref.xPos
-                    
-                if yDisplayPos  > config.imageCanvasHeight :
-                    yDisplayPos = ref.yPos - config.imageCanvasHeight
-                    
-                if yDisplayPos  < 0 :
-                    yDisplayPos  = config.imageCanvasHeight  - ref.yPos
-
-            if (
-                xDisplayPos <= self.config.imageCanvasWidth
-                and xDisplayPos >= 0
-                and yDisplayPos >= 0
-                and yDisplayPos <= config.imageCanvasHeight
-            ):
-                try:
-
-                    if ref.sizeNum == 2:
-                        config.draw.rectangle(
-                            (
-                                round(xDisplayPos),
-                                round(yDisplayPos),
-                                round(xDisplayPos) + 1,
-                                round(yDisplayPos) + 0,
-                            ),
-                            fill=(r, g, b, 255),
-                        )
-                    else:
-                        config.draw.rectangle(
-                            (
-                                round(xDisplayPos),
-                                round(yDisplayPos),
-                                round(xDisplayPos) + 0,
-                                round(yDisplayPos) + 0,
-                            ),
-                            fill=(r, g, b, 255),
-                        )
-                    # faster procesor, better c subroutines and maybe we could do it this way ...
-                    # config.image.putpixel((round(xDisplayPos), round(yDisplayPos)), (r, g, b))
-                    # config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)), (r, g, b))
-                    # config.image.putpixel((round(xDisplayPos), round(yDisplayPos)+1), (r, g, b))
-                    # config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)+1), (r, g, b))
-                except Exception as e:
-                    print(str(e))
-
-            """
-			"""
-            if (
-
-                yDisplayPos > config.imageCanvasHeight
-                or yDisplayPos < 0
-
-            ):
-                ref.setUp(self, ref.id)
-            # if (
-            #     xDisplayPos > config.canvasWidth
-            #     or yDisplayPos > config.canvasHeight
-            #     or yDisplayPos < 0
-            #     or xDisplayPos < 0
-            # ):
-            #     ref.setUp(self, ref.id)
 
 
+    def _update_particle(self, q):
+        ref = self.particles[q]
+
+        if ref.mode == 1:
+            self._move_particle_linear(ref)
+        else:
+            self._move_particle_orbit(ref)
+
+        self._update_particle_color(q)
+        self._draw_particle(ref, q)
+
+        if random.SystemRandom().random() < config.particleResetProb:
+            ref.setUp(self, ref.id)
 
 
-            if random.SystemRandom().random() < config.particleResetProb:
-                ref.setUp(self, ref.id)
+    def _move_particle_linear(self, ref):
+        ref.xPos += ref.vx
+        ref.yPos += ref.vy
+
+        dx = ref.xPos - self.x
+        dy = ref.yPos - self.y
+        r = round(math.sqrt(dx * dx + dy * dy))
+
+        if r > ref.radius / 2 and ref.orbit:
+            ref.mode = 0
+
+        if config.horizontalContinuity:
+            ref.xPos %= config.imageCanvasWidth
+        if config.verticalContinuity:
+            ref.xPos %= config.imageCanvasWidth
+            ref.yPos %= config.imageCanvasHeight
+
+
+    def _move_particle_orbit(self, ref):
+        ref.xPos = self.x + ref.radius/1 * math.cos(ref.angle) * 0.2
+        ref.yPos = self.y + ref.radius/1 * math.sin(ref.angle) * 0.2
+        ref.angle += ref.rSpeed
+
+
+    def _update_particle_color(self, q):
+        for i in range(3):
+            self.particles[q].clr[i] = max(0, self.particles[q].clr[i] - getattr(self, "decr_" + "rgb"[i]))
+
+        if random.SystemRandom().random() < config.sparkleProb:
+            self.particles[q].clr = [int(220 * self.sparkleBrightness)] * 2 + [int(255 * self.sparkleBrightness)]
+
+
+    def _draw_particle(self, ref, q):
+        xDisplayPos = ref.xPos
+        yDisplayPos = ref.yPos
+
+        if config.horizontalContinuity:
+            xDisplayPos %= config.canvasWidth
+        if config.verticalContinuity:
+            xDisplayPos %= config.imageCanvasWidth
+            yDisplayPos %= config.imageCanvasHeight
+
+        if (0 <= xDisplayPos <= self.config.imageCanvasWidth and 0 <= yDisplayPos <= config.imageCanvasHeight):
+            try:
+                if ref.sizeNum == 2:
+                    config.draw.rectangle(
+                        (round(xDisplayPos), round(yDisplayPos), round(xDisplayPos) + 1, round(yDisplayPos)),
+                        fill=tuple(self.particles[q].clr + [255]),
+                    )
+                else:
+                    config.draw.rectangle(
+                        (round(xDisplayPos), round(yDisplayPos), round(xDisplayPos), round(yDisplayPos)),
+                        fill=tuple(self.particles[q].clr + [255]),
+                    )
+            except Exception as e:
+                print(e)
+
+        if yDisplayPos > config.imageCanvasHeight or yDisplayPos < 0:
+            ref.setUp(self, ref.id)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-
 def drawBands(p):
-        
-    wBase = p.wBase 
+    _draw_concentric_rings(p)
+    _draw_radial_lines(p)
+
+
+def _draw_concentric_rings(p):
+    for i in range(p.bands):
+        _draw_ring(p, i)
+
+
+def _draw_ring(p, i):
+    w = _calculate_ring_width(p, i)
+    if w > 0:
+        x0, y0, x1, y1 = _calculate_ellipse_coords(p.x, p.y, w)
+        a = round(max(config.fadeRate, config.aBase))
+        colorBandIndex = i % len(p.bandColorsAdjusted)  # Ensure colorBandIndex stays in bounds
+
+        if p.useFixedBandColors:
+            r, g, b, a = _get_fixed_band_color(p, colorBandIndex)
+
+        if i in config.goldenRingsArray and not p.useFixedBandColors:
+            _draw_ellipse(config.draw, x0, y0, x1, y1, config.rBase2, config.gBase2, config.bBase, config.aBase2)
+            _draw_ellipse(config.drawOverFlow, x0, y0, x1, y1, config.rBase2, config.gBase2, config.bBase, config.aBase2)
+        elif p.useFixedBandColors and colorBandIndex == 1:
+            _draw_ellipse(config.draw, x0, y0, x1, y1, r, g, b, a, outline=True)
+            _draw_ellipse(config.drawOverFlow, x0, y0, x1, y1, r, g, b, a, outline=True)
+        else:
+            _draw_ellipse(config.draw, x0, y0, x1, y1, config.rBase, config.gBase, config.bBase, a)
+            _draw_ellipse(config.drawOverFlow, x0, y0, x1, y1, config.rBase, config.gBase, config.bBase, a)
+
+        if i > p.bands - 3 and p.useFixedBandColors:
+            _draw_ellipse(config.draw, x0, y0, x1, y1, 6, 46, 104, 150)
+
+
+def _calculate_ring_width(p, i):
+    wBase = p.wBase
     wDiff = round(wBase / p.bands)
-    
-    if p.useFixedBandColors :
-        wBase = p.wBase - config.PSRadiusFixedColorMinInternalRadius
+    calculatedRingSize = wBase / p.bands
+
+    if p.useFixedBandColors:
+        wBase -= config.PSRadiusFixedColorMinInternalRadius
         wDiff = p.wDiff
-        # print(wDiff, p.bands, wBase)
 
-    aBase = 0
-    aDiff = 10
+    w = wBase - i * wDiff
+    if p.useFixedBandColors or random.SystemRandom().random() < p.bandWVariabilityProb:
+        w = max(config.PSRadiusFixedColorMinInternalRadius, (p.bands - i) * calculatedRingSize)
+    return w
 
-    rBase = config.rBase
-    gBase = config.gBase
-    bBase = config.bBase
-    aBase = config.aBase
 
-    rBase2 = config.rBase2
-    gBase2 = config.gBase2
-    # bBase2 = config.bBase2
-    aBase2 = config.aBase2
-
-    rDiff = config.rDiff
-    gDiff = config.gDiff
-    bDiff = config.bDiff
-    
-    
-    # Draw from the outside-in
-    colorBandIndex = 0
-    # goldenBandIndex = 0
-
-    calculatedRingSize = wBase/p.bands
-    
-    # print("----")
-    for i in range(0, p.bands):
-        
-        if p.useFixedBandColors :
-            wDiff = p.bandWidthsSet[i]
-            
-        w = wBase - i * wDiff
-        
-        if p.useFixedBandColors or random.SystemRandom().random() < p.bandWVariabilityProb:
-            w = (p.bands - i) * calculatedRingSize
-        
-            if w < config.PSRadiusFixedColorMinInternalRadius :
-                w = config.PSRadiusFixedColorMinInternalRadius
-        
-        # print(round(w))
-        
-        if w != 0 :
-            x0 = p.x - w / 2
-            y0 = p.y - w / 2
-            x1 = p.x + w / 2
-            y1 = p.y + w / 2
-            
-            if x1 < 0 or x1 < x0 :
-                x1 = x0
-            if y1 < 0 or y1 < y0 :
-                y1 = y0
-
-            a = (round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate))
-            
-            # OVERRIDE
-            # a = 255
-
-            #config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
-            
-            
-            if p.useFixedBandColors :
-                # index = p.bands - i - 1
-                index = colorBandIndex
-                # index = i
-                
-                rBase = round(p.bandColorsAdjusted[index][0] * config.brightness)
-                gBase = round(p.bandColorsAdjusted[index][1] * config.brightness)
-                bBase = round(p.bandColorsAdjusted[index][2] * config.brightness)
-                aBase = 255
-                colorBandIndex += 1
-                
-                if colorBandIndex >= len(p.bandColorsAdjusted) :
-                    colorBandIndex = 0
-
-    
-            '''
-            if i == 1:
-                config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
-            '''
-            # Should try to interleave the bands so that the fixed color bands integrate better
-            # with the prescribed golden ones
-      
-            if i < 0 :
-                a = 20
-                config.draw.ellipse( (x0, y0, x1, y1), fill=(255,0,0,255) )
-            try :
-                # Golden Rings
-                if i in config.goldenRingsArray and not p.useFixedBandColors :
-                    config.draw.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
-                    config.drawOverFlow.ellipse( (x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2) )
-                else :
-                    # OVERRIDE 
-                    if p.useFixedBandColors and index == 1:
-                        config.draw.ellipse((x0, y0, x1, y1), fill =(rBase, gBase, bBase, a))
-                        # config.draw.ellipse((x0, y0, x1, y1), outline =(rBase, gBase, bBase, a))
-                        config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
-                    else :
-                        config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                        config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                        
-                    if i > p.bands - 3 and p.useFixedBandColors:
-                        # config.draw.ellipse( (x0, y0, x1, y1), fill=(250,60,525,150) )
-                        # config.draw.ellipse( (x0, y0, x1, y1), fill=(20,60,125,150) )
-                        config.draw.ellipse( (x0, y0, x1, y1), fill=(6,46,104,150) )
-            except Exception as e :
-                print("==>" + str(e))
-
-            if not p.useFixedBandColors :
-                rBase += rDiff
-                gBase += gDiff
-                bBase += bDiff
-                aBase += aDiff
-
-            if rBase < 0 :
-                rBase = 0
-            if gBase < 0 :
-                gBase = 0
-            if bBase < 0 :
-                bBase = 0
-
+def _draw_radial_lines(p):
     i = 0
-    
-    for rSet in p.radialSets :
-
+    for rSet in p.radialSets:
         rSet.angleOffset += rSet.angleOffsetSpeed
         polyArray = []
-        numLines  = len(rSet.radialsArray)
+        numLines = len(rSet.radialsArray)
 
-        for n in range(0, numLines):
+        for n in range(numLines):
             a = i * rSet.rads + rSet.angleOffset
             x0 = round(math.cos(a) * rSet.radialsArray[n][0] + p.x)
             y0 = round(math.sin(a) * rSet.radialsArray[n][0] + p.y)
             x1 = round(math.cos(a) * rSet.radialsArray[n][1] + p.x)
             y1 = round(math.sin(a) * rSet.radialsArray[n][1] + p.y)
             i += 1
-            polyArray.append((x0,y0))
-            polyArray.append((x1,y1))
+            polyArray.extend(((x0, y0), (x1, y1)))
+
             if rSet.radialsArray[n][2] == 0:
                 config.draw.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
                 config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
-            if numLines == 1 :
+            if numLines == 1:
                 config.draw.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
                 config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
 
-
         if rSet.drawRadialPolys:
-            config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
-            config.drawOverFlow.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue,10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha+20))
-    
+            config.draw.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue, 10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha + 20))
+            config.drawOverFlow.polygon(polyArray, fill=(config.radialRed, config.radialGreen, config.radialBlue, 10), outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha + 20))
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+def _calculate_ellipse_coords(cx, cy, w):
+    x0 = cx - w / 2
+    y0 = cy - w / 2
+    x1 = cx + w / 2
+    y1 = cy + w / 2
+    x1 = max(x0, x1 if x1 >= 0 else x0)
+    y1 = max(y0, y1 if y1 >= 0 else y0)
+    return x0, y0, x1, y1
+
+
+def _get_fixed_band_color(p, index):
+    rBase = round(p.bandColorsAdjusted[index][0] * config.brightness)
+    gBase = round(p.bandColorsAdjusted[index][1] * config.brightness)
+    bBase = round(p.bandColorsAdjusted[index][2] * config.brightness)
+    aBase = 255
+    return rBase, gBase, bBase, aBase
+
+
+def _draw_ellipse(draw_obj, x0, y0, x1, y1, r, g, b, a, outline=False):
+    fill_arg = (r, g, b, a)
+    outline_arg = None
+    if outline:
+        fill_arg, outline_arg = None, fill_arg
+    draw_obj.ellipse((x0, y0, x1, y1), fill=fill_arg, outline=outline_arg)
 
 
 def runWork():
@@ -644,6 +513,8 @@ def runWork():
         time.sleep(redrawSpeed)
 
 
+def iterate():
+    global config
 def iterate():
     global config
     global PS
@@ -669,37 +540,13 @@ def iterate():
             round(config.fadeRate),
         ),
     )
-    
+
     config.drawOverFlow.rectangle((0,0,100,200), fill=(200,0,0))
 
-    if config.horizontalContinuity :
-        # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
-        
-        xCrop  = round(config.imageCanvasWidth)
-        xCrop2 = round(config.imageCanvasWidth - config.imageCanvasWidth/ config.horizontalOverlapFraction)
-        temp = config.imageOverFlow.crop((xCrop,0,xCrop + config.imageCanvasWidth / config.horizontalOverlapFraction, config.canvasHeight))
-        temp2 = config.drawingImage.crop((xCrop2,0,config.imageCanvasWidth, config.imageCanvasHeight))
-        temp3 = ImageChops.add(config.drawingImage, temp, scale=1.0, offset = 0)
-        config.image.paste(temp3, (0,0), temp2)
-        
-        
-    if config.verticalContinuity :
-        # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
-        
-        yCrop  = round(config.imageCanvasHeight)
-        yCrop2 = round(config.imageCanvasHeight - config.imageCanvasHeight/ config.verticalOverlapFraction)
-        # print(yCrop2)
-        
-        
-        # temp = config.imageOverFlow.crop((0,yCrop,config.canvasWidth, yCrop + config.canvasHeight / config.verticalOverlapFraction))
-        # temp2 = config.image.crop((0,yCrop2,config.canvasWidth, config.canvasHeight))
-
-        temp = config.imageOverFlow.crop((0,yCrop,config.imageCanvasWidth,yCrop + config.imageCanvasHeight / config.verticalOverlapFraction))
-        temp2 = config.drawingImage.crop((0,yCrop2,config.imageCanvasWidth,config.imageCanvasHeight))
-        
-        temp3 = ImageChops.add(temp,config.drawingImage, scale=1.0, offset = 0)
-        config.drawingImage.paste(temp3, (0,0), temp2)
-        
+    if config.horizontalContinuity:
+        _horizontalContinuityDraw(config)
+    if config.verticalContinuity:
+        _verticalContinuityDraw(config)
     drawBands(PS)
 
     PS.move()
@@ -719,7 +566,10 @@ def iterate():
             # bgChoice = math.floor(random.SystemRandom().uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
             if random.SystemRandom().random() < config.totalResetProb:
-                PS.useFixedBandColors = True if random.SystemRandom().random() < config.useFixedBandColorsProb else False
+                PS.useFixedBandColors = (
+                    random.SystemRandom().random()
+                    < config.useFixedBandColorsProb
+                )
                 PS.setCenter()
                 PS.setNewAttributes()
                 PS.setUp()
@@ -728,7 +578,36 @@ def iterate():
     config.image.paste(config.drawingImage, (0,0),config.drawingImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
-    # Done
+
+# TODO Rename this here and in `iterate`
+def _verticalContinuityDraw(config):
+    # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
+
+    yCrop  = round(config.imageCanvasHeight)
+    yCrop2 = round(config.imageCanvasHeight - config.imageCanvasHeight/ config.verticalOverlapFraction)
+    # print(yCrop2)
+
+
+    # temp = config.imageOverFlow.crop((0,yCrop,config.canvasWidth, yCrop + config.canvasHeight / config.verticalOverlapFraction))
+    # temp2 = config.image.crop((0,yCrop2,config.canvasWidth, config.canvasHeight))
+
+    temp = config.imageOverFlow.crop((0,yCrop,config.imageCanvasWidth,yCrop + config.imageCanvasHeight / config.verticalOverlapFraction))
+    temp2 = config.drawingImage.crop((0,yCrop2,config.imageCanvasWidth,config.imageCanvasHeight))
+
+    temp3 = ImageChops.add(temp,config.drawingImage, scale=1.0, offset = 0)
+    config.drawingImage.paste(temp3, (0,0), temp2)
+
+
+# TODO Rename this here and in `iterate`
+def _horizontalContinuityDraw(config):
+    # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
+
+    xCrop  = round(config.imageCanvasWidth)
+    xCrop2 = round(config.imageCanvasWidth - config.imageCanvasWidth/ config.horizontalOverlapFraction)
+    temp = config.imageOverFlow.crop((xCrop,0,xCrop + config.imageCanvasWidth / config.horizontalOverlapFraction, config.canvasHeight))
+    temp2 = config.drawingImage.crop((xCrop2,0,config.imageCanvasWidth, config.imageCanvasHeight))
+    temp3 = ImageChops.add(config.drawingImage, temp, scale=1.0, offset = 0)
+    config.image.paste(temp3, (0,0), temp2)
 
 
 def main(run=True):
@@ -753,7 +632,7 @@ def main(run=True):
     config.bgColorSets = []
     for bg in bgColorSets:
         bgColor = (workConfig.get(bg, "bgColor")).split(",")
-        bgColors = list(int(x) for x in bgColor)
+        bgColors = [int(x) for x in bgColor]
         config.bgColorSets.append(bgColors)
 
     # choose the first bg color - generally the dark one
@@ -779,25 +658,39 @@ def main(run=True):
     config.radial2Red = int(workConfig.get("particles", "radial2Red"))
     config.radial2Green = int(workConfig.get("particles", "radial2Green"))
     config.radial2Blue = int(workConfig.get("particles", "radial2Blue"))
-    
-    
+
+
     try:
         config.radialSetMinNum = int(workConfig.get("particles", "radialSetMinNum"))
         config.radialSetMaxNum = int(workConfig.get("particles", "radialSetMaxNum"))
         config.radialSetInnerRadiusFactor = int(workConfig.get("particles", "radialSetInnerRadiusFactor"))
         config.radialSetInnerRadiusFactorFixedBands = float(workConfig.get("particles", "radialSetInnerRadiusFactorFixedBands"))
-        config.radialSetInnerRadiusRange = list(int(x) for x in (workConfig.get("particles", "radialSetInnerRadiusRange").split(",")))
-        config.radialSetOuterRadiusRange = list(int(x) for x in (workConfig.get("particles", "radialSetOuterRadiusRange").split(",")))
+        config.radialSetInnerRadiusRange = [
+            int(x)
+            for x in (
+                workConfig.get("particles", "radialSetInnerRadiusRange").split(
+                    ","
+                )
+            )
+        ]
+        config.radialSetOuterRadiusRange = [
+            int(x)
+            for x in (
+                workConfig.get("particles", "radialSetOuterRadiusRange").split(
+                    ","
+                )
+            )
+        ]
     except Exception as e:
-        print(str(e))
+        print(e)
         config.radialSetMinNum = 120
         config.radialSetMaxNum = 300
         config.radialSetInnerRadiusFactor = 3
         config.radialSetInnerRadiusFactorFixedBands = 4
         config.radialSetInnerRadiusRange = -100,50
         config.radialSetOuterRadiusRange = -50,50 
-    
-    
+
+
 
     config.fadeRate = float(workConfig.get("particles", "fadeRate"))
     config.fadeRateDelta = float(workConfig.get("particles", "fadeRateDelta"))
@@ -807,15 +700,15 @@ def main(run=True):
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
-    
-    
+
+
     # set the actual drawing space
     try:
         config.imageCanvasWidth = int(workConfig.get("particles","imageCanvasWidth"))
         config.imageCanvasHeight = int(workConfig.get("particles","imageCanvasHeight"))
-        
+
     except Exception as e:
-        print(str(e))
+        print(e)
         config.imageCanvasWidth = config.canvasWidth
         config.imageCanvasHeight = config.canvasHeight
 
@@ -849,21 +742,19 @@ def main(run=True):
     config.PSFixedColorRadiusDiffMax = int(workConfig.get("particles","PSFixedColorRadiusDiffMax"))
 
     goldenRingsArray = workConfig.get("particles","goldenRingsArray").split(',')
-    config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
-    
+    config.goldenRingsArray = [int(x) for x in goldenRingsArray]
+
     config.useFixedBandColorsProb = float(workConfig.get("particles","useFixedBandColorsProb"))
-    
-    
-    
+
+
+
     try:
         bandColorsRaw  = workConfig.get("particles","bandColors").split("|")
         config.bandColors = []
-        for n in bandColorsRaw :
-            config.bandColors.append(list(int(x) for x in n.split(",")))
-        
-        # comment: 
+        config.bandColors.extend([int(x) for x in n.split(",")] for n in bandColorsRaw)
+            # comment: 
     except Exception as e:
-        print(str(e))
+        print(e)
         config.bandColors = [
             [50,10,50],
             [120,90,90],
@@ -891,19 +782,19 @@ def main(run=True):
 
     # only has to happen once, I had it happening every turn
     config.bandColors.reverse()
-    
+
     try:
         config.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles","PSRadiusFixedColorMinInternalRadius"))
-    except Exception as e :
-        print(str(e))
+    except Exception as e:
+        print(e)
         config.PSRadiusFixedColorMinInternalRadius = 1   
-         
+
     try:
         config.xMaxFactor = float(workConfig.get("particles","xMaxFactor"))
         config.yMaxFactor = float(workConfig.get("particles","yMaxFactor"))
-        
+
     except Exception as e:
-        print(str(e))
+        print(e)
         config.xMaxFactor = 4
         config.yMaxFactor = 8
 
@@ -915,35 +806,40 @@ def main(run=True):
         config.gRangeMin = int(workConfig.get("particles","gRangeMin"))
         config.bRangeMin = int(workConfig.get("particles","bRangeMin"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.rRange = 255
         config.gRange = 200
         config.bRange = 255
         config.rRangeMin = 0
         config.gRangeMin = 0
         config.bRangeMin = 0
-        
-        
-    particleColorRangeVals  = workConfig.get("particles","particleColorRange").split(",")
-    config.particleColorRange = list(float(i) for  i in particleColorRangeVals)
-        
 
-        
-        
+
+    particleColorRangeVals  = workConfig.get("particles","particleColorRange").split(",")
+    config.particleColorRange = [float(i) for  i in particleColorRangeVals]
+
+
+
+
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
     config.draw = ImageDraw.Draw(config.drawingImage)
-    
+
     config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight * 2))
     config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
-    
-    
+
+
     PS = ParticleSystem(config)
     PS.setCenter()
     PS.setNewAttributes()
     PS.setUp()
 
     # managing speed of animation and framerate
+    config.directorController = Director(config)
+    config.directorController.slotRate = 0.03
+
+    if run:
+        runWork()    # managing speed of animation and framerate
     config.directorController = Director(config)
     config.directorController.slotRate = 0.03
 

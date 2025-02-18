@@ -127,8 +127,8 @@ def repeatImage(config, canvasImage):
     extraOverlapx = 0
     extraOverlapy = 0
 
-    for c in range(0, config.cols):
-        for r in range(0, config.rows):
+    for c in range(config.cols):
+        for r in range(config.rows):
             if cntr in config.skipBlocks:
                 config.canvasDraw.rectangle((c * config.blockWidth, r * config.blockHeight, c * config.blockWidth + config.blockWidth,
                                              r * config.blockHeight + config.blockHeight), fill=config.bgColor, outline=config.bgColor)
@@ -304,18 +304,16 @@ def rebuildPatterns(arg=0):
 
     c = round(random.uniform(1, 4))
 
-    if c == 1:
-        if config.numRowsRandomize == True:
-            # refresh pattern parameters
-            config.numRows = round(random.uniform(1, 2))
-            config.numShingleRows = round(random.uniform(1, 2))
-            config.numScaleRows = round(random.uniform(1, 2))
-            dotRows = [1, 2, 4]
-            config.numDotRows = dotRows[round(random.uniform(0, 2))]
-            config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
-            config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
-            
-            print( config.waveScaleRings, config.waveScaleSteps)
+    if c == 1 and config.numRowsRandomize == True:
+        config.numRows = round(random.uniform(1, 2))
+        config.numShingleRows = round(random.uniform(1, 2))
+        config.numScaleRows = round(random.uniform(1, 2))
+        dotRows = [1, 2, 4]
+        config.numDotRows = dotRows[round(random.uniform(0, 2))]
+        config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
+        config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
+        
+        print( config.waveScaleRings, config.waveScaleSteps)
 
     if c == 2:
         newPalette = math.floor(random.uniform(0, len(config.palettes)))
@@ -352,7 +350,7 @@ def rebuildSections():
         
     baseSpeed = config.baseSectionSpeed
     
-    for i in range(0, config.numberOfSections):
+    for i in range(config.numberOfSections):
         section = config.movingSections[i]
         section.sectionRotation = random.uniform(
             -config.sectionRotationRange, config.sectionRotationRange)
@@ -424,7 +422,7 @@ def disturber():
         if config.skipFramesCount >= config.skipFrames:
             config.skipFramesCount = 0
 
-            for i in range(0, config.numberOfSections):
+            for i in range(config.numberOfSections):
                 sectionParams = config.movingSections[i]
                 if sectionParams.actionCount >= sectionParams.actionCountLimit:
                     # sectionParams.rotationSpeed = 0
@@ -613,12 +611,11 @@ def iterate():
         config.doSectionDisturbance = True
         rebuildSections()
 
-    if config.shingleVariation == True:
-        if random.random() < config.redoSectionDisturbance:
-            config.shingleVariationAmount = round(
-                random.uniform(0, config.shingleVariationRange))
-            config.doSectionDisturbance == True
-            rebuildSections()
+    if config.shingleVariation == True and random.random() < config.redoSectionDisturbance:
+        config.shingleVariationAmount = round(
+            random.uniform(0, config.shingleVariationRange))
+        config.doSectionDisturbance == True
+        rebuildSections()
 
     config.fader.fadeIn(config)
 
@@ -727,7 +724,7 @@ def setupStableSections():
     n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
     minWidth = config.stableSectionsMinWidth
     minHeight = config.stableSectionsMinHeight
-    for i in range(0, n):
+    for i in range(n):
         xPos = round(random.uniform(0, config.canvasWidth))
         xPos2 = round(random.uniform(xPos + minWidth, config.canvasWidth))
         yPos = round(random.uniform(0, config.canvasHeight))
@@ -865,7 +862,7 @@ def main(run=True):
     config.patternModelVariations = workConfig.getboolean("movingpattern", "patternModelVariations")
     patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
     config.patternSequence = []
-    for i in range(0, len(patternSequence), 3):
+    for i in range(len(patternSequence), 3):
         config.patternSequence.append([patternSequence[i], int(    patternSequence[i+1]), int(patternSequence[i+2])])
 
     config.usePixelSortRandomize = (workConfig.getboolean("movingpattern", "usePixelSortRandomize"))
@@ -912,7 +909,7 @@ def main(run=True):
     setupStableSections()
 
     config.movingSections = []
-    for i in range(0, config.numberOfSections):
+    for i in range(config.numberOfSections):
         section = Holder()
         config.movingSections.append(section)
     rebuildSections()

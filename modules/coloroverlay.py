@@ -1,3 +1,4 @@
+import contextlib
 import math
 import random
 import time
@@ -131,7 +132,7 @@ class ColorOverlay:
             pass
         """
 
-        if newColor == None:
+        if newColor is None:
             self.getNewColor()
         else:
             self.colorB = newColor
@@ -228,24 +229,20 @@ class ColorOverlay:
     
     def callBackDone(self):
         if self.complete == True:
-            try:
-                if self.configRef != None:
-                    self.callBackDoneMethod(self.configRef)
-                else:
+            with contextlib.suppress(AttributeError):
+                if self.configRef is None:
                     self.callBackDoneMethod()
 
-            except AttributeError as e:
-                pass
+                else:
+                    self.callBackDoneMethod(self.configRef)
 
     
     def callBackStarted(self):
-        try:
-            if self.configRef != None:
-                self.callBackStartedMethod(self.configRef)
-            else:
+        with contextlib.suppress(AttributeError):
+            if self.configRef is None:
                 self.callBackStartedMethod()
-        except AttributeError as e:
-            pass
+            else:
+                self.callBackStartedMethod(self.configRef)
 
     
     def stepTransition(self, autoReset=False, alpha=-1):

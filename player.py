@@ -11,7 +11,6 @@ import os
 import time
 import sys
 
-
 from configs import defaultpiece
 from modules import configuration, player
 from modules.configuration import bcolors
@@ -97,118 +96,117 @@ def loadFromArguments(reloading=False, config=None):
 
     if reloading is False:
         try:
-            ###
-            # Expects 3 arguments:
-            # 		name-of-machine
-            #       the local path
-            # 		the config file to load
-
-            # args = sys.argv
-            # print("Arguments passed to player.py:")
-            # print(args)
-
-            config = configuration.Config()
-            config.startTime = time.time()
-            config.currentTime = time.time()
-            config.reloadConfig = False
-            config.doingReload = False
-            config.checkForConfigChanges = False
-            config.brightnessOverride = None
-            config.standAlone = True
-            config.isRunning = True
-
-            # Load the default work
-
-            if args.cfg is not None:
-
-                """
-                config.MID = args[1]
-                config.path = args[2]
-                argument = args[3]
-                """
-                config.initialArgs = args.cfg
-                config.MID = args.mname
-                config.path = args.path
-
-                # Automating the config path a bit better
-                # assumes that if no -path is specified, it defaults to ./ so 
-                # just to be sure get the abs path
-                if config.path == './' :
-                    # config.path = os.getcwd() + "/"
-                    config.path = __file__.replace('player.py','')+ "/"
-
-
-                argument = f"{config.path}/configs/{args.cfg}"
-                workconfig.read(argument)
-
-                config.loadFromArguments = loadFromArguments
-                config.fileName = argument
-                config.fileNameRaw = args.cfg
-
-
-                # Optional 4th argument to override the brightness set in the
-                # config
-                if args.brightnessOverride is not None:
-                    brightnessOverride = args.brightnessOverride
-                    config.brightness = float(float(brightnessOverride) / 100)
-                    config.brightnessOverride = float(float(brightnessOverride) / 100)
-
-                f = os.path.getmtime(argument)
-                config.delta = int((config.startTime - f))
-                config.deltaWorkFile = int((config.startTime - f))
-                print(bcolors.OKGREEN)
-
-                print("-----------------------------------------")
-                print ("script: sys.argv[0] is", repr(sys.argv[0]))
-                print ("script: __file__ is", repr(__file__))
-                print ("script: cwd is", repr(os.getcwd()))
-                print ("config: path  is", repr(args.path))
-                print ("config: path  is", args.path)
-                print("-cfg argument: is", argument)
-                print("Last Modified Delta: is", config.delta)
-                print(f"-----------------------------------------{bcolors.ENDC}")
-
-            else:
-                # Machine ID
-                config.MID = "local"
-                # Default Work Instance ID
-                config.WRKINID = defaultpiece.defaultPieceToRun
-                # Default Local Path
-                config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
-                print(
-                    bcolors.WARNING
-                    + "** Loading "
-                    + config.path
-                    + "configs/"
-                    + config.WRKINID
-                    + ".cfg"
-                    + " to run. **"
-                    + bcolors.ENDC
-                )
-                workconfig.read(f"{config.path}configs/{config.WRKINID}" + ".cfg")
-                print(bcolors.OKGREEN + "** ")
-                for c in workconfig:
-                    print(c)
-                    for a in workconfig[c]:
-                        print("\t" + str(a) + ":  " + str(workconfig.get(c, a)))
-                print("**" + bcolors.ENDC)
-
-            # ****************************************** #
-            # Sets off the piece based on loading the intitail configs #
-            # ****************************************** #
-
-            player.configure(config, workconfig)
-
+            _initializeConfiguration(loadFromArguments)
         except getopt.GetoptError as err:
             # print help information and exit:
-            print("Error:" + str(err))
+            print(f"Error:{str(err)}")
     else:
         print("\n** RELOADING NOW: " + config.fileName)
         workconfig.read(config.fileName)
         player.configure(config, workconfig)
 
 
-# """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+def _initializeConfiguration(loadFromArguments):
+    ###
+    # Expects 3 arguments:
+    # 		name-of-machine
+    #       the local path
+    # 		the config file to load
+
+    # args = sys.argv
+    # print("Arguments passed to player.py:")
+    # print(args)
+
+    config = configuration.Config()
+    config.startTime = time.time()
+    config.currentTime = time.time()
+    config.doingReload = False
+    config.brightnessOverride = None
+    config.standAlone = True
+    config.isRunning = True
+
+    config.reloadConfig = False
+    config.checkForConfigChanges = False
+    # Load the default work
+
+    if args.cfg is not None:
+        _parseArgs(config, loadFromArguments)
+    else:
+        _printConfigsLoaded(config)
+    # ****************************************** #
+    # Sets off the piece based on loading the intitail configs #
+    # ****************************************** #
+
+    player.configure(config, workconfig)
+
+
+def _printConfigsLoaded(config):
+    # Machine ID
+    config.MID = "local"
+    # Default Work Instance ID
+    config.WRKINID = defaultpiece.defaultPieceToRun
+    # Default Local Path
+    config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
+    print(
+        f"{bcolors.WARNING}** Loading {config.path}configs/{config.WRKINID}.cfg to run. **{bcolors.ENDC}"
+    )
+    workconfig.read(f"{config.path}configs/{config.WRKINID}.cfg")
+    print(f"{bcolors.OKGREEN}** ")
+    for c in workconfig:
+        print(c)
+        for a in workconfig[c]:
+            print("\t" + str(a) + ":  " + str(workconfig.get(c, a)))
+    print(f"**{bcolors.ENDC}")
+
+
+def _parseArgs(config, loadFromArguments):
+    """
+    config.MID = args[1]
+    config.path = args[2]
+    argument = args[3]
+    """
+    config.initialArgs = args.cfg
+    config.MID = args.mname
+    config.path = args.path
+
+    # Automating the config path a bit better
+    # assumes that if no -path is specified, it defaults to ./ so 
+    # just to be sure get the abs path
+    if config.path == './' :
+        # config.path = os.getcwd() + "/"
+        config.path = __file__.replace('player.py','')+ "/"
+
+
+    argument = f"{config.path}/configs/{args.cfg}"
+    workconfig.read(argument)
+
+    config.loadFromArguments = loadFromArguments
+    config.fileName = argument
+    config.fileNameRaw = args.cfg
+
+
+    # Optional 4th argument to override the brightness set in the
+    # config
+    if args.brightnessOverride is not None:
+        brightnessOverride = args.brightnessOverride
+        config.brightness = float(float(brightnessOverride) / 100)
+        config.brightnessOverride = float(float(brightnessOverride) / 100)
+
+    f = os.path.getmtime(argument)
+    config.delta = int((config.startTime - f))
+    config.deltaWorkFile = int((config.startTime - f))
+    print(bcolors.OKGREEN)
+
+    print("-----------------------------------------")
+    print ("script: sys.argv[0] is", repr(sys.argv[0]))
+    print ("script: __file__ is", repr(__file__))
+    print ("script: cwd is", repr(os.getcwd()))
+    print ("config: path  is", repr(args.path))
+    print ("config: path  is", args.path)
+    print("-cfg argument: is", argument)
+    print("Last Modified Delta: is", config.delta)
+    print(f"-----------------------------------------{bcolors.ENDC}")
 
 
 def main():

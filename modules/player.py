@@ -55,7 +55,7 @@ class TopDirector:
 def configure(config, workconfig):
     global path, tempImage, threads, thrd
     # gc.enable()
-    print(bcolors.WARNING + "** Setting PLAYER config values **" + bcolors.ENDC)
+    print(f"{bcolors.WARNING}** Setting PLAYER config values **{bcolors.ENDC}")
 
 
     ### Sets up for testing live config chages
@@ -65,7 +65,7 @@ def configure(config, workconfig):
         )
     except Exception as e:
         print(bcolors.FAIL + "** " +  str(e))
-        config.checkForConfigChanges = False	
+        config.checkForConfigChanges = False
     ### Sets up for testing live config chages DOING FULL RELOAD
     try:
         config.doFullReloadOnChange = workconfig.getboolean(
@@ -466,13 +466,13 @@ def configure(config, workconfig):
     config.minBrightness = float(workconfig.get("displayconfig", "minBrightness"))
     config.work = workconfig.get("displayconfig", "work")
     config.rendering = workconfig.get("displayconfig", "rendering")
- 
+
     try:
         config.overallResize = workconfig.getboolean("displayconfig", "overallResize")
     except Exception as e:
         print(str(e))
         config.overallResize = False
- 
+
     try:
         config.saveToFile = workconfig.getboolean("displayconfig", "saveToFile")
         config.outPutPath = workconfig.get("displayconfig", "outPutPath")
@@ -486,7 +486,7 @@ def configure(config, workconfig):
 
     #############################################################################
     # Create the image-canvas for the work if this is a stand-alone player!
-    
+
     if  config.standAlone == False :
         pass
     else :
@@ -498,7 +498,7 @@ def configure(config, workconfig):
     config.image = PIL.Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.draw = ImageDraw.Draw(config.image)
     config.renderDraw = ImageDraw.Draw(config.renderImageFull)
-    
+
     #############################################################################
 
     # Setting up based on how the work is displayed

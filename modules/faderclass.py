@@ -21,7 +21,7 @@ class FaderObj:
 
 		# targetImage = config.image
 
-	def fadeIn(self):
+	def fadeIn(self, _doPaste = False):
 		if self.fadingDone == False:
 
 			if self.doingRefresh < self.doingRefreshCount:
@@ -39,7 +39,9 @@ class FaderObj:
 					self.endImage,
 					self.doingRefresh / self.doingRefreshCount
 				)
-				# self.targetImage.paste(self.crossFade, (self.xPos, self.yPos), self.crossFade)
+
+				if _doPaste :
+					self.targetImage.paste(self.blendedImage, (self.xPos, self.yPos), self.blendedImage)
 				self.doingRefresh += 1
 
 			else:

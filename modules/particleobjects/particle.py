@@ -236,83 +236,90 @@ class Particle(object):
         self.yPosR += self.dy
 
     def checkForBorderCollisions(self):
-        if self.ps.borderCollisions == True:
-            collide = False
-
-            if self.xPosR > self.ps.config.canvasWidth + self.objWidth:
-                self.v *= self.ps.collisionDamping
-                self.changeColor()
-                if self.ps.useFlocking == True:
-                    self.direction -= math.pi
-                else:
-                    self.direction = math.pi - self.direction
-                if self.ps.expireOnExit == True:
-                    self.remove = True
-                else:
-                    self.xPosR = self.ps.config.canvasWidth - self.objWidth
-                    self.xPos = self.ps.config.canvasWidth - self.objWidth
-
-            if self.xPosR < -3 * self.objWidth:
-                self.v *= self.ps.collisionDamping
-                self.changeColor()
-                if self.ps.useFlocking == True:
-                    self.direction -= math.pi
-                else:
-                    self.direction = math.pi - self.direction
-                if self.ps.expireOnExit == True:
-                    self.remove = True
-                else:
-                    self.xPosR = 0
-                    self.xPos = 0
-
-            if (
-                self.yPosR > self.ps.config.canvasHeight + self.objHeight
-                and self.ps.ignoreBottom == False
-            ):
-                self.v *= self.ps.collisionDamping
-                self.changeColor()
-                if self.ps.useFlocking == True:
-                    self.direction -= math.pi
-                else:
-                    self.direction = 2 * math.pi - self.direction
-                if self.ps.expireOnExit == True:
-                    self.remove = True
-                else:
-                    self.yPosR = self.ps.config.canvasHeight - self.objHeight
-                    self.yPos = self.ps.config.canvasHeight - self.objHeight
-
-            if self.yPosR < -1 * self.objHeight:  # -3 * self.objHeight
-                self.v *= self.ps.collisionDamping
-                self.changeColor()
-                if self.ps.useFlocking == True:
-                    self.direction -= math.pi
-                else:
-                    self.direction = 2 * math.pi - self.direction
-                if self.ps.expireOnExit == True:
-                    self.remove = True
-                else:
-                    self.yPosR = 0
-                    self.yPos = 0
-
+        """Checks for collisions with the borders of the canvas and updates particle position and properties accordingly."""
+        if self.ps.borderCollisions:
+            self._handle_border_collisions()
         else:
-            if self.xPosR > self.ps.config.canvasWidth:
-                self.xPosR = 0
-                self.xPos = 0
-                self.changeColor()
-            if self.yPosR > self.ps.config.canvasHeight:
-                self.yPosR = 0
-                self.yPos = 0
-                self.changeColor()
+            self._handle_border_wrap()
 
-            if self.xPosR < 0:
-                self.xPosR = self.ps.config.canvasWidth
-                self.xPos = self.ps.config.canvasWidth
-                self.changeColor()
 
-            if self.yPosR < 0:
-                self.yPosR = self.ps.config.canvasHeight
-                self.yPos = self.ps.config.canvasHeight
-                self.changeColor()
+    def _handle_border_collisions(self):
+        """Handles collisions with canvas borders by changing particle direction and color."""
+        if self.xPosR > self.ps.config.canvasWidth + self.objWidth:
+            self._reverse_horizontal_direction()
+            if self.ps.expireOnExit:
+                self.remove = True
+            else:
+                self.xPosR = self.xPos = self.ps.config.canvasWidth - self.objWidth
+
+        if self.xPosR < -3 * self.objWidth:
+            self._reverse_horizontal_direction()
+            if self.ps.expireOnExit:
+                self.remove = True
+            else:
+                self.xPosR = self.xPos = 0
+
+        if self.yPosR > self.ps.config.canvasHeight + self.objHeight and not self.ps.ignoreBottom:
+            self._reverse_vertical_direction()
+            if self.ps.expireOnExit:
+                self.remove = True
+            else:
+                self.yPosR = self.yPos = self.ps.config.canvasHeight - self.objHeight
+
+        if self.yPosR < -1 * self.objHeight:
+            self._reverse_vertical_direction()
+            if self.ps.expireOnExit:
+                self.remove = True
+            else:
+                self.yPosR = self.yPos = 0
+
+
+    def _handle_border_wrap(self):
+        """Handles wrapping of particles around canvas borders."""
+        if self.xPosR > self.ps.config.canvasWidth:
+            self.xPosR = self.xPos = 0
+            self.changeColor()
+        if self.yPosR > self.ps.config.canvasHeight:
+            self.yPosR = self.yPos = 0
+            self.changeColor()
+        if self.xPosR < 0:
+            self.xPosR = self.xPos = self.ps.config.canvasWidth
+            self.changeColor()
+        if self.yPosR < 0:
+            self.yPosR = self.yPos = self.ps.config.canvasHeight
+            self.changeColor()
+
+
+    def _reverse_horizontal_direction(self):
+        """Reverses the horizontal direction of the particle and changes its color."""
+        self.v *= self.ps.collisionDamping
+        self.changeColor()
+        self.direction = self.direction - math.pi if self.ps.useFlocking else math.pi - self.direction
+
+
+    def _reverse_vertical_direction(self):
+        """Reverses the vertical direction of the particle and changes its color."""
+        self.v *= self.ps.collisionDamping
+        self.changeColor()
+        self.direction = self.direction - math.pi if self.ps.useFlocking else 2 * math.pi - self.direction
+
+    # # TODO Rename this here and in `checkForBorderCollisions`
+    # def _extracted_from_checkForBorderCollisions_35(self):
+    #     self.v *= self.ps.collisionDamping
+    #     self.changeColor()
+    #     if self.ps.useFlocking == True:
+    #         self.direction -= math.pi
+    #     else:
+    #         self.direction = 2 * math.pi - self.direction
+
+    # # TODO Rename this here and in `checkForBorderCollisions`
+    # def _extracted_from_checkForBorderCollisions_6(self):
+    #     self.v *= self.ps.collisionDamping
+    #     self.changeColor()
+    #     if self.ps.useFlocking == True:
+    #         self.direction -= math.pi
+    #     else:
+    #         self.direction = math.pi - self.direction
 
     def update(self):
 
@@ -348,21 +355,58 @@ class Particle(object):
             self.checkMyBuddies()
 
     def isBetween(self, n, a, b, d=0):
-        if n >= (a - d) and n <= (b + d):
-            return True
-        else:
-            return False
+        return n >= (a - d) and n <= (b + d)
 
     def render(self):
-        if self.remove != True:
-            xPos = int(self.xPosR - self.image.size[0] / 2)
+        if self.remove == True:
+            return
+        xPos = int(self.xPosR - self.image.size[0] / 2)
+        yPos = int(self.yPosR - self.image.size[1] / 2)
+
+        self.createParticleImage()
+
+        if self.pixelsGoGray == True:
+
+            self._extracted_from_render_10()
+        if self.ps.objType == "poly":
+            xPos = int(self.xPosR - self.image.size[0] / 1.5)
             yPos = int(self.yPosR - self.image.size[1] / 2)
+            self.drawPoly()
 
-            self.createParticleImage()
+        elif self.ps.objType == "ellipse":
+            self.drawOval()
 
-            if self.pixelsGoGray == True:
+        elif self.ps.objType == "image":
+            self.drawImage()
 
-                """
+        else:
+            self.drawRectangle()
+
+        imageToPaste = self.image
+
+        if self.ps.movement == "travel" and self.ps.objType != "other":
+
+            angle = 180
+            imageToPaste = self.image.rotate(angle, expand=True)
+            angle = 90 - math.degrees(self.direction)
+            imageToPaste = self.image.rotate(angle, expand=True)
+
+        if self.ps.unitBlur > 0:
+            imageToPaste = imageToPaste.filter(
+                ImageFilter.GaussianBlur(radius=round(self.unitBlur))
+            )
+            # This should be optional
+            # self.unitBlur += 1
+
+        ### This produces trails
+        if self.ps.objTrails == True:
+            self.ps.config.image.paste(imageToPaste, (xPos, yPos))
+        else:
+            self.ps.config.image.paste(imageToPaste, (xPos, yPos), imageToPaste)
+
+    # TODO Rename this here and in `render`
+    def _extracted_from_render_10(self):
+        """
                 # REALLY this should be outlineColorRawValues being changed
                 # but it seems to look better like this
 
@@ -388,56 +432,56 @@ class Particle(object):
                 self.fillColor = (round(self.FillR), round(self.FillG), round(self.FillB), self.fillColor[3])
                 """
 
-                # REALLY this should be outlineColorRawValues being changed
-                # but it seems to look better like this
+        # REALLY this should be outlineColorRawValues being changed
+        # but it seems to look better like this
 
-                gr_o = round(self.outlineGrey)
-                r_o = self.outlineColor[0] + self.outlineGreyRate[0]
-                g_o = self.outlineColor[1] + self.outlineGreyRate[1]
-                b_o = self.outlineColor[2] + self.outlineGreyRate[2]
+        gr_o = round(self.outlineGrey)
+        r_o = self.outlineColor[0] + self.outlineGreyRate[0]
+        g_o = self.outlineColor[1] + self.outlineGreyRate[1]
+        b_o = self.outlineColor[2] + self.outlineGreyRate[2]
 
-                rr_o = round(r_o)
-                rb_o = round(b_o)
-                rg_o = round(g_o)
+        rr_o = round(r_o)
+        rb_o = round(b_o)
+        rg_o = round(g_o)
 
-                if self.isBetween(
-                    rr_o, gr_o, gr_o, abs(round(self.outlineGreyRate[0]))
-                ):
-                    self.outlineGreyRate[0] = 0
-                if self.isBetween(
-                    rg_o, gr_o, gr_o, abs(round(self.outlineGreyRate[1]))
-                ):
-                    self.outlineGreyRate[1] = 0
-                if self.isBetween(
-                    rb_o, gr_o, gr_o, abs(round(self.outlineGreyRate[2]))
-                ):
-                    self.outlineGreyRate[2] = 0
+        if self.isBetween(
+            rr_o, gr_o, gr_o, abs(round(self.outlineGreyRate[0]))
+        ):
+            self.outlineGreyRate[0] = 0
+        if self.isBetween(
+            rg_o, gr_o, gr_o, abs(round(self.outlineGreyRate[1]))
+        ):
+            self.outlineGreyRate[1] = 0
+        if self.isBetween(
+            rb_o, gr_o, gr_o, abs(round(self.outlineGreyRate[2]))
+        ):
+            self.outlineGreyRate[2] = 0
 
-                gr = round(self.fillGrey)
-                r = self.fillColorRawValues[0] + self.fillGreyRate[0]
-                g = self.fillColorRawValues[1] + self.fillGreyRate[1]
-                b = self.fillColorRawValues[2] + self.fillGreyRate[2]
+        gr = round(self.fillGrey)
+        r = self.fillColorRawValues[0] + self.fillGreyRate[0]
+        g = self.fillColorRawValues[1] + self.fillGreyRate[1]
+        b = self.fillColorRawValues[2] + self.fillGreyRate[2]
 
-                rr = round(r)
-                rb = round(b)
-                rg = round(g)
+        rr = round(r)
+        rb = round(b)
+        rg = round(g)
 
-                if self.isBetween(rr, gr, gr, abs(round(self.fillGreyRate[0]))):
-                    self.fillGreyRate[0] = 0
-                if self.isBetween(rg, gr, gr, abs(round(self.fillGreyRate[1]))):
-                    self.fillGreyRate[1] = 0
-                if self.isBetween(rb, gr, gr, abs(round(self.fillGreyRate[2]))):
-                    self.fillGreyRate[2] = 0
+        if self.isBetween(rr, gr, gr, abs(round(self.fillGreyRate[0]))):
+            self.fillGreyRate[0] = 0
+        if self.isBetween(rg, gr, gr, abs(round(self.fillGreyRate[1]))):
+            self.fillGreyRate[1] = 0
+        if self.isBetween(rb, gr, gr, abs(round(self.fillGreyRate[2]))):
+            self.fillGreyRate[2] = 0
 
-                # if self.jumpToGray == False :
-                self.outlineColorRawValues = (r_o, g_o, b_o, self.outlineColor[3])
-                self.outlineColor = (rr_o, rg_o, rb_o, self.outlineColor[3])
+        # if self.jumpToGray == False :
+        self.outlineColorRawValues = (r_o, g_o, b_o, self.outlineColor[3])
+        self.outlineColor = (rr_o, rg_o, rb_o, self.outlineColor[3])
 
-                # if self.jumpToGray == False :
-                self.fillColorRawValues = (r, g, b, self.fillColor[3])
-                self.fillColor = (rr, rg, rb, self.fillColor[3])
+        # if self.jumpToGray == False :
+        self.fillColorRawValues = (r, g, b, self.fillColor[3])
+        self.fillColor = (rr, rg, rb, self.fillColor[3])
 
-                """
+        """
 				if self.fillGreyRate[0] == 0 and self.fillGreyRate[1] == 0 and self.fillGreyRate[2] == 0 :
 					print("d0ne", self.fillGrey)
 					self.outlineColor = (
@@ -454,63 +498,25 @@ class Particle(object):
 					)
 				"""
 
-            if self.ps.objType == "poly":
-                xPos = int(self.xPosR - self.image.size[0] / 1.5)
-                yPos = int(self.yPosR - self.image.size[1] / 2)
-                self.drawPoly()
-
-            elif self.ps.objType == "ellipse":
-                self.drawOval()
-
-            elif self.ps.objType == "image":
-                self.drawImage()
-
-            else:
-                self.drawRectangle()
-
-            imageToPaste = self.image
-
-            if self.ps.movement == "travel" and self.ps.objType != "other":
-
-                angle = 180
-                imageToPaste = self.image.rotate(angle, expand=True)
-                angle = 90 - math.degrees(self.direction)
-                imageToPaste = self.image.rotate(angle, expand=True)
-
-            if self.ps.unitBlur > 0:
-                imageToPaste = imageToPaste.filter(
-                    ImageFilter.GaussianBlur(radius=round(self.unitBlur))
-                )
-                # This should be optional
-                # self.unitBlur += 1
-
-            ### This produces trails
-            if self.ps.objTrails == True:
-                self.ps.config.image.paste(imageToPaste, (xPos, yPos))
-            else:
-                self.ps.config.image.paste(imageToPaste, (xPos, yPos), imageToPaste)
-
     def drawPoly(self):
 
         h = self.objWidth
         b = self.objWidth
         c = self.objHeight  # "height"
 
-        poly = []
-        poly.append((round(h) - 0, 0))
-        poly.append((round(h) - 4, round(c / 4)))
-        poly.append((round(h) - 6, round(c / 3)))
-        poly.append((round(h) - 4, round(c / 2)))
-        poly.append((round(h) - 0, round(c / 2)))
-        poly.append((round(h) + 4, round(c / 3)))
-        poly.append((round(h) + 6, round(c / 4)))
-        poly.append((round(h) + 4, round(c / 2)))
+        poly = [
+            (round(h) - 0, 0),
+            (round(h) - 4, round(c / 4)),
+            (round(h) - 6, round(c / 3)),
+            (round(h) - 4, round(c / 2)),
+            (round(h) - 0, round(c / 2)),
+            (round(h) + 4, round(c / 3)),
+            (round(h) + 6, round(c / 4)),
+            (round(h) + 4, round(c / 2)),
+        ]
         self.draw.polygon(poly, fill=self.fillColor, outline=self.outlineColor)
 
-        poly2 = []
-        poly2.append((round(h) + -0, 0))
-        poly2.append((round(h) + 4, -8))
-        poly2.append((round(h) + 4, 8))
+        poly2 = [(round(h) + -0, 0), (round(h) + 4, -8), (round(h) + 4, 8)]
         self.draw.polygon(poly2, fill=self.fillColor, outline=None)
 
         # self.draw.rectangle((0, 0, round(self.objWidth) ,round(self.objHeight)), fill=self.fillColor, outline=self.outlineColor)
@@ -571,15 +577,15 @@ class Particle(object):
                     centerY += pal.yPosR
                     count += 1
                     distianceProportion = 1  # ( distance/ps.cohesionDistance)
-                    # distianceProportion = 1 - distance / ps.cohesionDistance
-                    ## Get your pals average direction
-                    if distance < ps.cohesionDistance and distance > ps.repelDistance:
-                        directionTotal += pal.direction * distianceProportion
-                    ## Get your pals average direction but back off
-                    if distance < ps.cohesionDistance and distance < ps.repelDistance:
-                        directionTotal -= (
-                            pal.direction * distianceProportion * ps.repelFactor
-                        )
+                # distianceProportion = 1 - distance / ps.cohesionDistance
+                ## Get your pals average direction
+                if distance < ps.cohesionDistance and distance > ps.repelDistance:
+                    directionTotal += pal.direction * distianceProportion
+                ## Get your pals average direction but back off
+                if distance < ps.cohesionDistance and distance < ps.repelDistance:
+                    directionTotal -= (
+                        pal.direction * distianceProportion * ps.repelFactor
+                    )
 
         if count > 1:
             directionTotal = directionTotal / count

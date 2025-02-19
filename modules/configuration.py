@@ -63,7 +63,7 @@ class Config:
     rotation = 0
 
     def __init__(self):
-        print(bcolors.WARNING + "** Config instance init" + bcolors.ENDC)
+        print(f"{bcolors.WARNING}** Config instance init{bcolors.ENDC}")
         #print("** Config instance init")
   
     def debugSelf(self) :
@@ -82,3 +82,7 @@ class Config:
 
     def spaceBarAction(self) :
         print("SPACE BAR PRESSED")
+
+    
+    def __getattribute__(self, name):
+        return super().__getattribute__(name)

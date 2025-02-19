@@ -109,8 +109,6 @@ class ImageSprite :
 	colorModes = ["colorWheel","random","colorRGB"]
 
 	def __init__(self, config, iid=0) :
-
-		print("ImageSprite v1 Initiated")
 		self.iid = iid
 		self.config = config
 
@@ -118,6 +116,7 @@ class ImageSprite :
 		self.clrUtils.brightness = self.config.brightness
 
 		self.brightnessFactor = config.minBrightness
+		pass
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''	
 	## This is called every time an object moves off the screen
@@ -190,13 +189,12 @@ class ImageSprite :
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
-	def process(self):
+	def process(self) :
 		change = 1
-		#print("Processing...."  + self.colorMode)
+		#print("Processing....")
 		#print("-----------")
 
-
-		if self.processImage:
+		if(self.processImage) :
 			if(self.resizeImage) :
 				#change = random.uniform(.1,1.2) * self.scalingFactor
 				change = random.uniform(self.resizeMin,self.resizeMax) * self.scalingFactor
@@ -206,21 +204,8 @@ class ImageSprite :
 
 			brt = random.random() + self.config.minBrightness
 
-			if self.colorMode == "rangeControlled" :
-				clr = self.clrUtils.getRandomColorHSV(
-						self.clrRange_minHue,
-						self.clrRange_maxHue,
-						self.clrRange_minSaturation,
-						self.clrRange_maxSaturation,
-						self.clrRange_minValue,
-						self.clrRange_maxValue,
-						self.clrRange_dropHueMinValue ,
-						self.clrRange_dropHueMaxValue,
-						255,
-						brt)
-
 			# This was really just set up for the multiple-planes piece
-			if self.randomizeColor:
+			if(self.randomizeColor) :
 
 				# "Optical" or RBY Color Wheel
 				if(self.colorMode == "colorWheel") : 
@@ -234,14 +219,14 @@ class ImageSprite :
 					clr = self.clrUtils.wheel[clrIndex]
 
 				# RGB Color Wheel
-				if (self.colorMode == "colorRGB"): 
+				if(self.colorMode == "colorRGB") : 
 					clrIndex = int(random.random() * len(self.clrUtils.rgbColorWheel))
-					if self.colorModeDirectional: 
-						clrIndex = (
-							int(random.uniform(3, len(self.clrUtils.rgbColorWheel)))
-							if (self.dX < 0)
-							else int(random.uniform(0, 3))
-						)
+					if(self.colorModeDirectional) :
+						# Ones from LEFT are different
+						if (self.dX < 0) : 
+							clrIndex  = int(random.uniform(3,len(self.clrUtils.rgbColorWheel)))
+						else :
+							clrIndex  = int(random.uniform(0,3))
 					clr = self.clrUtils.rgbWheel[clrIndex]
 
 				# Specific palette
@@ -251,32 +236,23 @@ class ImageSprite :
 				if(self.colorMode == "random") : 
 					clr = self.clrUtils.randomColor(brt)
 
-				# Any HSV color
-				if self.colorMode == "hsvFlame":
-					clr = self.clrUtils.getRandomColorHSV(350,60,.8,1.0,.8,1.0,0,0,255,brt)
+			else :
+				r = int(random.uniform(200,255))
+				g = int(random.uniform(0,100))
+				b = int(random.uniform(0,10))
+				a = 255
+				if (random.random() > .5) :
+					r = int(random.uniform(0,100))
+					b = int(random.uniform(200,255))
+				clr = (r,g,b,a)
 
-
-			else:
-				clr = self._extracted_from_process_68()
-			#print("Colorizing ...." )
-			#print(clr)
+			#print("Colorizing ....")
 			#print("-----------")
 			self.colorize(clr)
 
 			# Not so great - yOffset is rendered useless by this  ....
 			if(self.processImage and self.yOffsetChange) : 
 				self.yOffset = int(random.uniform(self.config.screenHeight/2-self.yOffsetFactor * change, self.config.screenHeight/2 + self.yOffsetFactor) )
-
-	# TODO Rename this here and in `process`
-	def _extracted_from_process_68(self):
-		r = int(random.uniform(200,255))
-		g = int(random.uniform(0,100))
-		b = int(random.uniform(0,10))
-		a = 255
-		if (random.random() > .5) :
-			r = int(random.uniform(0,100))
-			b = int(random.uniform(200,255))
-		return r, g, b, a
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
@@ -349,7 +325,7 @@ class ImageSprite :
 				region = region.point(lambda i: tartClr  if (i >= 0 and i < 10 ) else i)
 		
 			#region = region.convert("P")
-			self.image.paste(region, box, region)
+			self.image.paste(region, box)
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -369,7 +345,7 @@ class ImageSprite :
 		# 95% of the time they dance together as mirrors
 		if(random.random() < .97) :
 			cp1 = self.image.crop((dx, 0, dx + sectionWidth, sectionHeight))
-			self.image.paste( cp1, (int(0 + dx), int(0 + dy)), cp1)	
+			self.image.paste( cp1, (int(0 + dx), int(0 + dy)))	
 
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -383,15 +359,14 @@ class ImageSprite :
 	
 	def remove(self, arrayList) :
 		arrayList.remove(self)
-
+		pass
 	
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 	
 	def move(self) :
-
 		if(self.setForRemoval!=True) :
 			#self.image.paste(self.presentationImage, (0,0))
-			
+
 			self.xPos += self.dX
 			self.yPos += self.dY
 
@@ -438,7 +413,6 @@ class ImageSprite :
 				self.blinkNum = int(random.uniform(32,256))
 				self.blinkCount = 0
 				self.blinkStationary = True if (random.random() > .15) else False
-				
 
 			if(self.blink) :
 				self.blinkCount += 1
@@ -508,7 +482,7 @@ class ImageSprite :
 	''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 	def panImage(self) :
-		
+
 		self.jitter = False
 
 		# this doesnt work because it just draws to the existing size of the loaded image ... so gets cut off
@@ -584,12 +558,13 @@ class ImageSprite :
 			self.image.seek(0)
 			#print("fail", frame)
 			skipTime = True
+			pass
 
 		self.frameCount += 1
 
 		if(random.random() < self.config.imageGlitchProb or forceGlitch) :
 			r = int(random.uniform(2,10))
-			for i in range(r) :
+			for i in range(0,r) :
 				self.glitchBox(-self.config.imageGlitchDisplacement, self.config.imageGlitchDisplacement)
 
 

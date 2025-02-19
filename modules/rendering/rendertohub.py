@@ -69,12 +69,10 @@ def setUp(config):
         config.path = "./"
         windowOffset = [1900, 20]
         windowOffset = [2560, 24]
-        windowOffset = [config.windowXOffset, config.windowYOffset]
-        # windowOffset = [4,45]
+            # windowOffset = [4,45]
     else:
         windowOffset = [-1, 13]
-        windowOffset = [config.windowXOffset, config.windowYOffset]
-
+    windowOffset = [config.windowXOffset, config.windowYOffset]
     # -----> this is somewhat arbitrary - just to get the things aligned
     # after rotation
     # if(config.rotation == 90) : canvasOffsetY = -25
@@ -91,16 +89,13 @@ def setUp(config):
     root.overrideredirect(False)
 
     try:
-        if config.useDrawingPoints:
-            # screen_width = root.winfo_screenwidth()
-            # screen_height = root.winfo_screenheight()
-            # root.geometry("%dx%d+%d+%d" % (600, round(.9*screen_height), round(3*screen_width/4), round(0*screen_height/3)))
-            root.geometry("%dx%d+%d+%d" % (w, h, x, y))
-        else:
-            root.geometry("%dx%d+%d+%d" % (w, h, x, y))
+        # screen_width = root.winfo_screenwidth()
+        # screen_height = root.winfo_screenheight()
+        # root.geometry("%dx%d+%d+%d" % (600, round(.9*screen_height), round(3*screen_width/4), round(0*screen_height/3)))
+        root.geometry("%dx%d+%d+%d" % (w, h, x, y))
     except Exception as e:
         root.geometry("%dx%d+%d+%d" % (w, h, x, y))
-        print(str(e))
+        print(e)
 
     # root.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -171,7 +166,7 @@ def on_closing():
 
 def writeImage(baseName, renderImage):
     # baseName = "outputquad3/comp2_"
-    fn = baseName + ".png"
+    fn = f"{baseName}.png"
     renderImage.save(fn)
 
 
@@ -187,7 +182,6 @@ def startWork(*args):
         t.start()
     except tk.TclError as details:
         print(details)
-        pass
         exit()
 
     # work.runWork()
@@ -237,37 +231,42 @@ def updateCanvas():
     ############################################################
 
     if config.checkForConfigChanges:
-        currentTime = time.time()
-        f = os.path.getmtime(config.fileName)
-        f2 = os.path.getmtime(config.path + "pieces/" + config.work + ".py")
-        config.delta = currentTime - f
-        config.delta2 = currentTime - f2
+        _extracted_from_updateCanvas_42(config)
 
-        if config.delta <= 1 or config.delta2 <= 1:
-            if not config.reloadConfig:
-                print("** LAST MODIFIED DELTA: " + str(config.delta) + " **")
-                print("** LAST MODIFIED DELTA: " + str(config.initialArgs) + " **")
-                # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
-                if config.doFullReloadOnChange:
-                    os.system(
-                        config.path
-                        + "/cntrlscripts/restart_player_dev.sh"
-                        + " "
-                        + config.initialArgs
-                        + "&"
-                    )
-                    
-                # commadStringPyth = ""
-                # os.system(commadStringPyth + config.initialArgs + "&")
+# TODO Rename this here and in `updateCanvas`
+def _extracted_from_updateCanvas_42(config):
+    currentTime = time.time()
+    f = os.path.getmtime(config.fileName)
+    f2 = os.path.getmtime(f"{config.path}pieces/{config.work}.py")
+    config.delta = currentTime - f
+    config.delta2 = currentTime - f2
 
-                else:
-                    config.doingReload = True
-                    # NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
-                    config.loadFromArguments(True, config)
-            config.reloadConfig = True
-        else:
-            config.reloadConfig = False
+    if config.delta <= 1 or config.delta2 <= 1:
+        if not config.reloadConfig:
+            print(f"** LAST MODIFIED DELTA: {str(config.delta)} **")
+            print(f"** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
+            # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
+
+            if config.doFullReloadOnChange:
+                os.system(
+                    config.path
+                    + "/cntrlscripts/restart_player_dev.sh"
+                    + " "
+                    + config.initialArgs
+                    + "&"
+                )
+
+            # commadStringPyth = ""
+            # os.system(commadStringPyth + config.initialArgs + "&")
+
+            else:
+                config.doingReload = True
+                # NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
+                config.loadFromArguments(True, config)
+        config.reloadConfig = True
+    else:
+        config.reloadConfig = False
 
         # if config.delta2 <= 1:
         #     commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -mname studio -cfg "
@@ -276,7 +275,171 @@ def updateCanvas():
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+def _applyDitherFilter(xOffset, yOffset):
+    if not config.useFilters:
+        return
+    if config.filterRemap:
+        _ditherReMapPrep(xOffset, yOffset)
+    else:
+        config.renderImageFull = ditherFilter(
+            config.renderImageFull, xOffset, yOffset, config
+        )
 
+
+def _ditherReMapPrep(xOffset, yOffset):
+    config.tempImage = config.renderImageFull.copy()
+    config.tempImage = ditherFilter(config.tempImage, xOffset, yOffset, config)
+    crop = config.tempImage.crop(config.remapImageBlockSection)
+    crop = crop.convert("RGBA")
+    if config.ditherFilterBrightness != 1.0:
+        crop = ImageEnhance.Brightness(crop).enhance(
+            config.ditherFilterBrightness
+        )
+    config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
+
+# remapImageBlock = False
+# remapImageBlockSection = 0,0,320,32
+# remapImageBlockDestination = 0,0
+# remapImageBlockSectionRotation = 0
+
+# remapImageBlock2 = True  
+# remapImageBlockSection2 = 320,0, 640,32
+# remapImageBlockDestination2 = 0,32
+# remapImageBlockSection2Rotation = 0
+def _reMapBlock(sectionName):
+    _name = "remapImageBlock"
+    _num = sectionName.split(_name)[1]
+    _section = config.__getattribute__(f"{_name}Section{_num}")
+    _sectionDestination = config.__getattribute__(f"{_name}Destination{_num}")
+    _sectionRotation = config.__getattribute__(f"{_name}Section{_num}Rotation")
+
+    crop = config.renderImageFull.crop(_section)
+    if _sectionRotation != 0:
+        crop = crop.convert("RGBA")
+        crop = crop.rotate(_sectionRotation, resample=Image.NEAREST, expand=1)
+    crop = crop.convert("RGBA")
+    config.renderImageFull.paste(crop, _sectionDestination, crop)
+
+def _doReMappingBlocks():
+    if config.remapImageBlock:
+        _reMapBlock("remapImageBlock")
+
+    if config.remapImageBlock2:
+        _reMapBlock("remapImageBlock2")
+
+    if config.remapImageBlock3:
+        _reMapBlock("remapImageBlock3")
+
+    if config.remapImageBlock4:
+        _reMapBlock("remapImageBlock4")
+
+    if config.remapImageBlock5:
+        _reMapBlock("remapImageBlock5")
+
+    if config.remapImageBlock6:
+        _reMapBlock("remapImageBlock6")
+
+    if config.remapImageBlock7:
+        _reMapBlock("remapImageBlock7")
+
+def _blurringCall():
+    if not config.useBlur:
+        return
+    # config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+    # config.blurSection = (
+    #     config.blurXOffset,
+    #     config.blurYOffset,
+    #     config.blurXOffset + config.blurSectionWidth,
+    #     config.blurYOffset + config.blurSectionHeight,
+    # )
+
+    config._render_crop = config.renderImageFull.crop(config.blurSection)
+    config._render_destination = (config.blurXOffset, config.blurYOffset)
+    config._render_crop = config._render_crop.convert("RGBA")
+    config._render_crop = config._render_crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
+    config.renderImageFull.paste(config._render_crop, config._render_destination, config._render_crop)
+
+def _lastOverLay():
+    try:
+        if config.useLastOverlay:
+            config.renderDrawOver.rectangle(
+                config.lastOverlayBox, fill=config.lastOverlayFill, outline=None
+            )
+            # config.renderDrawOver.rectangle(config.lastOverlayBox, fill=(255,0,0,255), outline=None)
+            if config.lastOverlayBlur > 0:
+                config.renderImageFullOverlay = config.renderImageFullOverlay.filter(
+                    ImageFilter.GaussianBlur(radius=config.lastOverlayBlur)
+                )
+            config.renderImageFull.paste(
+                config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
+            )
+    except Exception as e:
+        print(e)
+
+def _overallResize():
+    if not config.overallResize:
+        return
+    # Testing a pseudo version of LED matrix display
+    # Sharpening kernel
+    # kernel = [-1, -1, -1, -1, 9, -1, -1, -1, -1]
+    # kernel_filter = ImageFilter.Kernel((3, 3), kernel, scale=1, offset=0)
+
+    iTemp = config.renderImageFull.copy()
+    factor = 3
+    (width, height) = (iTemp.width * factor, iTemp.height * factor)
+    iTemp = iTemp.resize((width, height))
+    # Sharpen the image
+    # iTemp = iTemp.filter(kernel_filter)
+    iTemp = iTemp.filter(ImageFilter.SHARPEN)
+    iTemp = iTemp.filter(ImageFilter.SHARPEN)
+    config.renderImageFull.paste(iTemp, (0, 0))
+
+def _saveToFileCall():
+    if config.outputMode == "gif":
+        config.frameCount += 1
+        if config.frameCount >= config.frameCountLimit:
+            config.imageArrayForSaving.append(config.renderImageFull)
+            config.frameCount = 0
+
+        if len(config.imageArrayForSaving) > 500:
+            ts = time.time()
+            st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
+            # name = config.work + "_" + st + "_video.avi"
+            # /Users/lamshell/Documents/Dev/RPI/build/
+            name = f"{st}.gif"
+            config.imageArrayForSaving[0].save(
+                name,
+                save_all=True,
+                append_images=config.imageArrayForSaving[1:],
+                optimize=True,
+                duration=0.5,
+                loop=0,
+            )
+            config.imageArrayForSaving = []
+
+    if config.saveToFile:
+        config.topDirector.checkTime()
+        if config.topDirector.advance:
+            saveImageToFile()
+
+
+def _forceBlueGreenSwap():
+    if not config.forceBGSwap:
+        return
+    data = numpy.array(imageToRender)
+    try:
+        im_rgb = data[:, :, [0, 2, 1, 3]]
+    except Exception as e:
+        print(e)
+        im_rgb = data[:, :, [0, 2, 1]]
+
+    data2 = numpy.array(im_rgb)
+    imageToRender = Image.fromarray(data2)
+
+def _renderDiagnostics():
+    if not config.renderDiagnostics:
+        return
+    config.renderDiagnosticsCall()
 
 def render(
     imageToRender,
@@ -291,21 +454,14 @@ def render(
     # global memoryUsage
     # global config, debug
 
+    # Adding this to account for some issues with pasting in RGB on RGBA ...
+    if imageToRender.mode == "RGB" :
+        imageToRender = imageToRender.convert("RGBA")
+        
     # Render to canvas
     # This needs to be optomized !!!!!!
 
-    if config.forceBGSwap:
-        data = numpy.array(imageToRender)
-
-        try:
-            im_rgb = data[:, :, [0, 2, 1, 3]]
-        except Exception as e:
-            print(e)
-            im_rgb = data[:, :, [0, 2, 1]]
-
-        data2 = numpy.array(im_rgb)
-
-        imageToRender = Image.fromarray(data2)
+    _forceBlueGreenSwap()
 
     if config.rotation != 0:
         if config.fullRotation:
@@ -326,7 +482,6 @@ def render(
         config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
     # config.drawBeforeConversion()
-
     # config.renderImageFull.paste(config.renderImageFull2)
 
     config.renderImageFull = config.renderImageFull.convert("RGB")
@@ -343,191 +498,26 @@ def render(
     # enhancer = ImageEnhance.Brightness(config.renderImageFull)
     # config.renderImageFull = enhancer.enhance(.75)
 
-    if config.useFilters:
+    _applyDitherFilter(xOffset, yOffset)
 
-        if config.filterRemap:
-            config.tempImage = config.renderImageFull.copy()
-            config.tempImage = ditherFilter(config.tempImage, xOffset, yOffset, config)
-            crop = config.tempImage.crop(config.remapImageBlockSection)
-            crop = crop.convert("RGBA")
-            if config.ditherFilterBrightness != 1.0:
-                crop = ImageEnhance.Brightness(crop).enhance(
-                    config.ditherFilterBrightness
-                )
-            config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
-        else:
-            config.renderImageFull = ditherFilter(
-                config.renderImageFull, xOffset, yOffset, config
-            )
+    if config.usePixelSort and config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:
+        config.renderImageFull = pixelSort(config.renderImageFull, config)
 
-    if config.usePixelSort and config.pixelSortRotatesWithImage:
-        if random.SystemRandom().random() < config.pixelSortAppearanceProb:
-            config.renderImageFull = pixelSort(config.renderImageFull, config)
-
-    if config.rotation != 0:
-        if config.rotationTrailing or config.fullRotation:
-            # This rotates the image that is painted back to where it was
-            # basically same thing as rotating the image to be pasted in
-            # except in some cases, more trailing is created
-            config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+    if config.rotation != 0 and (config.rotationTrailing or config.fullRotation):
+        config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
     # ---- Pixel Sort Type Effect ---- #
-    if config.usePixelSort and not config.pixelSortRotatesWithImage:
-        if random.SystemRandom().random() < config.pixelSortAppearanceProb:
-            config.renderImageFull = pixelSort(config.renderImageFull, config)
-
-            # crop = config.renderImageFull.crop()
-            # crop = crop.convert("RGBA")
-            # crop =  pixelSort(crop, config)
-            # config.renderImageFull = config.renderImageFull.convert("RGBA")
-            # config.renderImageFull.paste(crop)
+    if config.usePixelSort and not config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:
+        config.renderImageFull = pixelSort(config.renderImageFull, config)
 
     # ---- Remap sections of image to accommodate odd panels ---- #
-    if config.remapImageBlock:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection)
-        if config.remapImageBlockSectionRotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(config.remapImageBlockSectionRotation)
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
-
-    if config.remapImageBlock2:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection2)
-        if config.remapImageBlockSection2Rotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(
-                config.remapImageBlockSection2Rotation, resample=Image.NEAREST, expand=1
-            )
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination2, crop)
-
-    if config.remapImageBlock3:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection3)
-        if config.remapImageBlockSection3Rotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(
-                config.remapImageBlockSection3Rotation, resample=Image.NEAREST, expand=1
-            )
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination3, crop)
-
-    if config.remapImageBlock4:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection4)
-        if config.remapImageBlockSection4Rotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(
-                config.remapImageBlockSection4Rotation, resample=Image.NEAREST, expand=1
-            )
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination4, crop)
-
-    if config.remapImageBlock5:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection5)
-        if config.remapImageBlockSection5Rotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(
-                config.remapImageBlockSection5Rotation, resample=Image.NEAREST, expand=1
-            )
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination5, crop)
-
-    if config.remapImageBlock6:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection6)
-        if config.remapImageBlockSection6Rotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(
-                config.remapImageBlockSection6Rotation, resample=Image.NEAREST, expand=1
-            )
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination6, crop)
-
-    if config.remapImageBlock7:
-        crop = config.renderImageFull.crop(config.remapImageBlockSection7)
-        if config.remapImageBlockSection7Rotation != 0:
-            crop = crop.convert("RGBA")
-            crop = crop.rotate(
-                config.remapImageBlockSection7Rotation, resample=Image.NEAREST, expand=1
-            )
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, config.remapImageBlockDestination7, crop)
-
+    _doReMappingBlocks()
     # ---- Overall image blurring  ---- #
-    if config.useBlur:
-        # config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-        # config.blurSection = (
-        #     config.blurXOffset,
-        #     config.blurYOffset,
-        #     config.blurXOffset + config.blurSectionWidth,
-        #     config.blurYOffset + config.blurSectionHeight,
-        # )
-        
-        config._render_crop = config.renderImageFull.crop(config.blurSection)
-        config._render_destination = (config.blurXOffset, config.blurYOffset)
-        config._render_crop = config._render_crop.convert("RGBA")
-        config._render_crop = config._render_crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-        config.renderImageFull.paste(config._render_crop, config._render_destination, config._render_crop)
-
-    if config.renderDiagnostics:
-        config.renderDiagnosticsCall()
-
-    try:
-        if config.useLastOverlay:
-            config.renderDrawOver.rectangle(
-                config.lastOverlayBox, fill=config.lastOverlayFill, outline=None
-            )
-            # config.renderDrawOver.rectangle(config.lastOverlayBox, fill=(255,0,0,255), outline=None)
-            if config.lastOverlayBlur > 0:
-                config.renderImageFullOverlay = config.renderImageFullOverlay.filter(
-                    ImageFilter.GaussianBlur(radius=config.lastOverlayBlur)
-                )
-            config.renderImageFull.paste(
-                config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
-            )
-    except Exception as e:
-        print(e)
-
-    if config.overallResize:
-        # Testing a pseudo version of LED matrix display
-        # Sharpening kernel
-        # kernel = [-1, -1, -1, -1, 9, -1, -1, -1, -1]
-        # kernel_filter = ImageFilter.Kernel((3, 3), kernel, scale=1, offset=0)
-
-        iTemp = config.renderImageFull.copy()
-        factor = 3
-        (width, height) = (iTemp.width * factor, iTemp.height * factor)
-        iTemp = iTemp.resize((width, height))
-        # Sharpen the image
-        # iTemp = iTemp.filter(kernel_filter)
-        iTemp = iTemp.filter(ImageFilter.SHARPEN)
-        iTemp = iTemp.filter(ImageFilter.SHARPEN)
-        config.renderImageFull.paste(iTemp, (0, 0))
-
-    if config.outputMode == "gif":
-        config.frameCount += 1
-        if config.frameCount >= config.frameCountLimit:
-            config.imageArrayForSaving.append(config.renderImageFull)
-            config.frameCount = 0
-
-        if len(config.imageArrayForSaving) > 500:
-            ts = time.time()
-            st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
-            # name = config.work + "_" + st + "_video.avi"
-            # /Users/lamshell/Documents/Dev/RPI/build/
-            name = "" + st + ".gif"
-            config.imageArrayForSaving[0].save(
-                name,
-                save_all=True,
-                append_images=config.imageArrayForSaving[1:],
-                optimize=True,
-                duration=0.5,
-                loop=0,
-            )
-            config.imageArrayForSaving = []
-
-    if config.saveToFile:
-        config.topDirector.checkTime()
-        if config.topDirector.advance:
-            saveImageToFile()
+    _blurringCall()
+    _renderDiagnostics()
+    _lastOverLay()
+    _overallResize()
+    _saveToFileCall()
 
     if updateCanvasCall:
         updateCanvas()
@@ -543,10 +533,10 @@ def render(
 
 
 def remappingFunctionTemp():
-    for i in range(0, 4):
-        # Map the one below to the next set of 4
-        pix = 16
-        colWidth = 128
+    # Map the one below to the next set of 4
+    pix = 16
+    colWidth = 128
+    for i in range(4):
         row = i
         cropRow = i * 2 + 1
 

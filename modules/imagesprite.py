@@ -419,7 +419,7 @@ class ImageSprite:
                 region = region.point(lambda i: tartClr if (i >= 0 and i < 10) else i)
 
 
-            self.image.paste(region, box)
+            self.image.paste(region, box, region)
 
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -461,7 +461,7 @@ class ImageSprite:
             # 95% of the time they dance together as mirrors
             if random.random() < 0.97:
                 cp1 = self.image.crop((0, 0, dx + sectionWidth, sectionHeight))
-                self.image.paste(cp1, (round(dx), round(0 + dy)))
+                self.image.paste(cp1, (round(dx), round(0 + dy)), cp1)
 
 
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

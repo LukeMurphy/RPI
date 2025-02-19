@@ -152,7 +152,7 @@ def setupDisturbances():
     # end try
 
     try:
-        _extracted_from_setupDisturbances_12()
+        _setWaveDistortionParams()
     except Exception as e:
         print(e)
         config.useWaveDistortion = False
@@ -181,7 +181,7 @@ def setupDisturbances():
 
 
 # TODO Rename this here and in `setupDisturbances`
-def _extracted_from_setupDisturbances_12():
+def _setWaveDistortionParams():
     config.useWaveDistortion = workConfig.getboolean("movingpattern", "useWaveDistortion")
     config.waveAmplitude = float(workConfig.get("movingpattern", "waveAmplitude"))
     config.wavePeriodMod = float(workConfig.get("movingpattern", "wavePeriodMod"))
@@ -1026,12 +1026,12 @@ def renderComposite(_img):
     config.render(_img, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
 
 
-# --------------------- LOOP ACTIONS  ---------------------
+# ----------------- OVERLAY ACTIONS  ---------------------
 def shapeOverLayFunction(temp1):
     temp2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp2Draw = ImageDraw.Draw(temp2)
     # actual shape
-    if random.random() < 0.01:
+    if random.random() < 0.003:
         config.polyBase[0][0] += random.uniform(-3, 3)
         config.polyBase[1][0] += random.uniform(-3, 3)
         config.polyBase[2][0] += random.uniform(-3, 3)

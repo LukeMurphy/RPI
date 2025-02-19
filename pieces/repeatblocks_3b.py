@@ -555,7 +555,7 @@ def rebuildPatterns(arg=0):
     # print("rebuildPattern Called")
     c = round(random.uniform(1, 4))
     if c == 1 and config.numRowsRandomize:
-        _extracted_from_rebuildPatterns_5()
+        _rowsAndDotsSettings()
     if c == 2 or (random.random() < config.changePaletteWhenRebuildProb):
         config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
         if config.currentPaletteIndex == len(config.palettes):
@@ -572,8 +572,7 @@ def rebuildPatterns(arg=0):
     config.fader.doingRefreshCount = config.faderDoingRefreshCount
 
 
-# TODO Rename this here and in `rebuildPatterns`
-def _extracted_from_rebuildPatterns_5():
+def _rowsAndDotsSettings():
     config.numRows = round(random.uniform(1, 2))
     config.numShingleRows = round(random.uniform(1, 2))
     config.numScaleRows = round(random.uniform(1, 2))
@@ -871,13 +870,29 @@ def _update_background_color():
     config.bgColor = tuple(round(a * config.brightness) for a in config.colOverlay.currentColor)
 
 
+def _loadClipPlayerConfigs():
+    # ####################### clip player instert ################################
+    try:
+        config.useClipPlayer = workConfig.getboolean("imageSequencePlayer", "useClipPlayer")
+        config.clipXPos = int(workConfig.get("imageSequencePlayer", "clipXPos"))
+        config.clipYPos = int(workConfig.get("imageSequencePlayer", "clipYPos"))
+        config.clipRotate = float(workConfig.get("imageSequencePlayer", "clipRotate"))
+        config.clipMain = movieClip(config)
+        config.clipMain.clipRotate = config.clipRotate
+        config.clipMain.setUp(workConfig)
+    except Exception as e:
+        print(f"{e} \n")
+        config.useClipPlayer = False
+
+
 def _handle_clip_player():
     """Loads and pastes a frame from the clip player if enabled."""
-    if config.useClipPlayer:
-        config.clipMain.loadFrame()
-        temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth, config.clipMain.clipHeight))
-        temp = temp.rotate(config.clipRotate, expand=True)
-        config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
+    if not config.useClipPlayer:
+        return
+    config.clipMain.loadFrame()
+    temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth, config.clipMain.clipHeight))
+    temp = temp.rotate(config.clipRotate, expand=True)
+    config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
 
 
 def _draw_and_process_pattern():
@@ -1020,6 +1035,7 @@ def _transform_and_render_image(temp1):
 
     renderComposite(temp1)
 
+
 def renderComposite(_img):
     if config.usePolygonOverlay :
         _img = shapeOverLayFunction(_img)
@@ -1031,7 +1047,7 @@ def shapeOverLayFunction(temp1):
     temp2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp2Draw = ImageDraw.Draw(temp2)
     # actual shape
-    if random.random() < 0.003:
+    if random.random() < config.polyOverlayChangeProb:
         config.polyBase[0][0] += random.uniform(-3, 3)
         config.polyBase[1][0] += random.uniform(-3, 3)
         config.polyBase[2][0] += random.uniform(-3, 3)
@@ -1058,6 +1074,33 @@ def shapeOverLayFunction(temp1):
     temp1.paste(temp2, (0,0), temp2)
     return temp1
 
+
+def _loadFilterRemapping():
+    try:
+        _loadFilterRemappingConfigs()
+    except Exception as e:
+        print(e)
+        config.filterRemapping = False
+        config.filterRemappingProb = 0.0
+        config.filterRemapMinHoriSize = 24
+        config.filterRemapMinVertSize = 24
+        config.filterRemapMaxHoriSize = 24
+        config.filterRemapMaxVertSize = 24
+        config.filterRemapRangeX = config.canvasWidth
+        config.filterRemapRangeY = config.canvasHeight
+
+
+# TODO Rename this here and in `_loadFilterRemapping`
+def _loadFilterRemappingConfigs():
+    config.filterRemapping = workConfig.getboolean("movingpattern", "filterRemapping")
+    config.filterRemappingProb = float(workConfig.get("movingpattern", "filterRemappingProb"))
+    config.filterRemapMinHoriSize = int(workConfig.get("movingpattern", "filterRemapMinHoriSize"))
+    config.filterRemapMinVertSize = int(workConfig.get("movingpattern", "filterRemapMinVertSize"))
+    config.filterRemapMaxHoriSize = int(workConfig.get("movingpattern", "filterRemapMaxHoriSize"))
+    config.filterRemapMaxVertSize = int(workConfig.get("movingpattern", "filterRemapMaxVertSize"))
+    config.filterRemapRangeY = int(workConfig.get("movingpattern", "filterRemapRangeY"))
+    config.filterRemapRangeX = int(workConfig.get("movingpattern", "filterRemapRangeX"))
+
 def setupPolyOverlay() :  # sourcery skip: extract-method
     config.usePolygonOverlay = False
     try:
@@ -1078,6 +1121,7 @@ def setupPolyOverlay() :  # sourcery skip: extract-method
         config.polyOverlay.setStartColor()
         config.polyOverlay.getNewColor()
         config.polyOverlay.colorTransitionSetup()
+        config.polyOverlayChangeProb = float(workConfig.get("movingpattern", "polyOverlayChangeProb", fallback=0.003))
         _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
         print(_polyBaseVals)
         config.polyBase = []
@@ -1172,39 +1216,11 @@ def main(run=True):
     config.mask_blur_amt = config.mask_blur_amt
     config.cp_blur_amt = config.cp_blur_amt
 
-    try:
-        config.filterRemapping = workConfig.getboolean("movingpattern", "filterRemapping")
-        config.filterRemappingProb = float(workConfig.get("movingpattern", "filterRemappingProb"))
-        config.filterRemapMinHoriSize = int(workConfig.get("movingpattern", "filterRemapMinHoriSize"))
-        config.filterRemapMinVertSize = int(workConfig.get("movingpattern", "filterRemapMinVertSize"))
-        config.filterRemapMaxHoriSize = int(workConfig.get("movingpattern", "filterRemapMaxHoriSize"))
-        config.filterRemapMaxVertSize = int(workConfig.get("movingpattern", "filterRemapMaxVertSize"))
-        config.filterRemapRangeY = int(workConfig.get("movingpattern", "filterRemapRangeY"))
-        config.filterRemapRangeX = int(workConfig.get("movingpattern", "filterRemapRangeX"))
-    except Exception as e:
-        print(e)
-        config.filterRemapping = False
-        config.filterRemappingProb = 0.0
-        config.filterRemapMinHoriSize = 24
-        config.filterRemapMinVertSize = 24
-        config.filterRemapMaxHoriSize = 24
-        config.filterRemapMaxVertSize = 24
-        config.filterRemapRangeX = config.canvasWidth
-        config.filterRemapRangeY = config.canvasHeight
+    _loadFilterRemapping()
 
     # ###########################################################################
     # ####################### clip player instert ################################
-    try:
-        config.useClipPlayer = workConfig.getboolean("imageSequencePlayer", "useClipPlayer")
-        config.clipXPos = int(workConfig.get("imageSequencePlayer", "clipXPos"))
-        config.clipYPos = int(workConfig.get("imageSequencePlayer", "clipYPos"))
-        config.clipRotate = float(workConfig.get("imageSequencePlayer", "clipRotate"))
-        config.clipMain = movieClip(config)
-        config.clipMain.clipRotate = config.clipRotate
-        config.clipMain.setUp(workConfig)
-    except Exception as e:
-        print(e)
-        config.useClipPlayer = False
+    _loadClipPlayerConfigs()
     # ###########################################################################
 
     config.doneCount = 0

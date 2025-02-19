@@ -29,10 +29,11 @@ from PIL import (
 )
 import numpy as np
 
+
 class Director:
     """docstring for Director"""
 
-    slotRate = .5
+    slotRate = 0.5
 
     def __init__(self):
         super(Director, self).__init__()
@@ -47,7 +48,7 @@ class Director:
 
     def next(self):
         self.checkTime()
-        
+
 
 class movieClip:
 
@@ -61,10 +62,9 @@ class movieClip:
     clipRotate = 0
 
     def __init__(self, config):
-        print("Initializing clip player")
+        print("\nInitializing clip player")
         self.config = config
         self.directorController = Director()
-        
 
     def loadImage(self, arg, callback):
 
@@ -77,33 +77,26 @@ class movieClip:
         self.directorController.checkTime()
         if self.directorController.advance == True:
 
-            if random.random() < self.randomPauseProb :
+            if random.random() < self.randomPauseProb:
                 self.paused = True
 
-        
             if self.paused == False:
-                self.loadImage(self.imageDirectory +
-                            str(self.currentFrame) + ".jpg", None)
+                self.loadImage(self.imageDirectory + str(self.currentFrame) + ".jpg", None)
                 self.currentFrame += 1
 
                 if self.currentFrame >= self.frameCount:
                     self.currentFrame = 0
 
             if random.random() < self.overlayChangeProb:
-                self.colorOverlay = colorutils.getRandomColorHSV(
-                    0, 360, .65, 1.0, .5, .5, 0, 0, self.colorOverlayAlpha)
+                self.colorOverlay = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.5, 0, 0, self.colorOverlayAlpha)
 
             if random.random() < self.overlayChangeSizeProb:
-                self.clrBlkWidth = round(
-                    random.uniform(5, self.clrBlkWidthSet * 1.25))
-                self.clrBlkHeight = round(
-                    random.uniform(5, self.clrBlkHeightSet * 1.25))
+                self.clrBlkWidth = round(random.uniform(5, self.clrBlkWidthSet * 1.25))
+                self.clrBlkHeight = round(random.uniform(5, self.clrBlkHeightSet * 1.25))
 
             if random.random() < self.overlayChangePosProb:
-                self.overlayxPos = round(
-                    random.uniform(0, 2 * self.canvasSize[0] / 3))
-                self.overlayyPos = round(
-                    random.uniform(0, 2 * self.canvasSize[1] / 3))
+                self.overlayxPos = round(random.uniform(0, 2 * self.canvasSize[0] / 3))
+                self.overlayyPos = round(random.uniform(0, 2 * self.canvasSize[1] / 3))
 
             if random.random() < self.overlayChangePosProb / 2.0:
                 self.overlayxPos = self.overlayxPosOrig
@@ -111,7 +104,7 @@ class movieClip:
 
             self.colorize(self.colorOverlay)
 
-            for i in range(0, 10):
+            for _ in range(10):
                 xC1 = round(random.uniform(0, 200))
                 yC1 = round(random.uniform(0, 200))
                 xC2 = 200 + xC1
@@ -119,105 +112,78 @@ class movieClip:
 
                 temp = self.imageLayer.crop((xC1, yC1, xC2, yC2))
                 self.canvasImage.paste(temp, (xC1, yC1), temp)
-            
-            if self.paused == True :
-                if random.random() < 2 * self.randomUnPauseProb :
-                    self.paused = False
+
+            if self.paused == True and random.random() < 2 * self.randomUnPauseProb:
+                self.paused = False
 
     def setUp(self, workConfig):
 
         print("Image Sequence Player Piece Loaded")
         config = self.config
-        
-        self.videoWidth = int(
-            workConfig.get("imageSequencePlayer", "videoWidth"))
-        self.videoHeight = int(
-            workConfig.get("imageSequencePlayer", "videoHeight"))
-        self.clipWidth = int(
-            workConfig.get("imageSequencePlayer", "clipWidth"))
-        self.clipHeight = int(
-            workConfig.get("imageSequencePlayer", "clipHeight"))
-        
-        self.canvasSize = (self.videoWidth,self.videoHeight)
+
+        self.videoWidth = int(workConfig.get("imageSequencePlayer", "videoWidth"))
+        self.videoHeight = int(workConfig.get("imageSequencePlayer", "videoHeight"))
+        self.clipWidth = int(workConfig.get("imageSequencePlayer", "clipWidth"))
+        self.clipHeight = int(workConfig.get("imageSequencePlayer", "clipHeight"))
+
+        self.canvasSize = (self.videoWidth, self.videoHeight)
 
         # Generate image holders
-        self.workImage = Image.new(
-            "RGBA", (self.canvasSize[0], self.canvasSize[1]))
+        self.workImage = Image.new("RGBA", (self.canvasSize[0], self.canvasSize[1]))
         self.workImageDraw = ImageDraw.Draw(self.workImage)
 
-        self.canvasImage = Image.new(
-            "RGBA", (self.canvasSize[0] * 1, self.canvasSize[1]))
+        self.canvasImage = Image.new("RGBA", (self.canvasSize[0] * 1, self.canvasSize[1]))
         self.canvasImageDraw = ImageDraw.Draw(self.canvasImage)
 
-        self.imageLayer = Image.new(
-            "RGBA", (self.canvasSize[0] * 1, self.canvasSize[1]))
+        self.imageLayer = Image.new("RGBA", (self.canvasSize[0] * 1, self.canvasSize[1]))
         self.imageLayerDraw = ImageDraw.Draw(self.canvasImage)
 
         # Sets the image size  -- should probably be set to canvasHeight
         self.channelHeight = self.canvasSize[1]
 
-        self.imageDirectory = workConfig.get(
-            "imageSequencePlayer", "imageDirectory")
-        self.frameCount = int(
-            workConfig.get("imageSequencePlayer", "frameCount"))
+        self.imageDirectory = workConfig.get("imageSequencePlayer", "imageDirectory")
+        self.frameCount = int(workConfig.get("imageSequencePlayer", "frameCount"))
         self.currentFrame = 0
         self.imageDirectory = self.imageDirectory
         self.imageLayer = self.imageLayer
 
-        self.clrBlkWidth = int(workConfig.get(
-            "imageSequencePlayer", "clrBlkWidth"))
-        self.clrBlkHeight = int(workConfig.get(
-            "imageSequencePlayer", "clrBlkHeight"))
-        self.clrBlkWidthSet = int(
-            workConfig.get("imageSequencePlayer", "clrBlkWidth"))
-        self.clrBlkHeightSet = int(
-            workConfig.get("imageSequencePlayer", "clrBlkHeight"))
+        self.clrBlkWidth = int(workConfig.get("imageSequencePlayer", "clrBlkWidth"))
+        self.clrBlkHeight = int(workConfig.get("imageSequencePlayer", "clrBlkHeight"))
+        self.clrBlkWidthSet = int(workConfig.get("imageSequencePlayer", "clrBlkWidth"))
+        self.clrBlkHeightSet = int(workConfig.get("imageSequencePlayer", "clrBlkHeight"))
 
+        self.overlayxPosOrig = int(workConfig.get("imageSequencePlayer", "overlayxPos"))
+        self.overlayyPosOrig = int(workConfig.get("imageSequencePlayer", "overlayyPos"))
+        self.overlayxPos = int(workConfig.get("imageSequencePlayer", "overlayxPos"))
+        self.overlayyPos = int(workConfig.get("imageSequencePlayer", "overlayyPos"))
+        self.overlayChangeProb = float(workConfig.get("imageSequencePlayer", "overlayChangeProb"))
+        self.overlayChangePosProb = float(workConfig.get("imageSequencePlayer", "overlayChangePosProb"))
+        self.overlayChangeSizeProb = float(workConfig.get("imageSequencePlayer", "overlayChangeSizeProb"))
+        self.randomPauseProb = float(workConfig.get("imageSequencePlayer", "randomPauseProb"))
+        self.randomUnPauseProb = float(workConfig.get("imageSequencePlayer", "randomUnPauseProb"))
 
-        self.overlayxPosOrig = int(
-            workConfig.get("imageSequencePlayer", "overlayxPos"))
-        self.overlayyPosOrig = int(
-            workConfig.get("imageSequencePlayer", "overlayyPos"))
-        self.overlayxPos = int(workConfig.get(
-            "imageSequencePlayer", "overlayxPos"))
-        self.overlayyPos = int(workConfig.get(
-            "imageSequencePlayer", "overlayyPos"))
-        self.overlayChangeProb = float(
-            workConfig.get("imageSequencePlayer", "overlayChangeProb"))
-        self.overlayChangePosProb = float(
-            workConfig.get("imageSequencePlayer", "overlayChangePosProb"))
-        self.overlayChangeSizeProb = float(
-            workConfig.get("imageSequencePlayer", "overlayChangeSizeProb"))
-        self.randomPauseProb = float(
-            workConfig.get("imageSequencePlayer", "randomPauseProb"))
-        self.randomUnPauseProb = float(
-            workConfig.get("imageSequencePlayer", "randomUnPauseProb"))
-
-        overlayColor = workConfig.get(
-            "imageSequencePlayer", "overlayColor").split(',')
+        overlayColor = workConfig.get("imageSequencePlayer", "overlayColor").split(",")
 
         self.overlayColor = tuple(map(lambda x: int(x), overlayColor))
         self.colorOverlay = self.overlayColor
 
-        self.colorOverlayAlpha = int(
-            workConfig.get("imageSequencePlayer", "colorOverlayAlpha"))
-        
-        
+        self.colorOverlayAlpha = int(workConfig.get("imageSequencePlayer", "colorOverlayAlpha"))
+
         self.maskBoxWidth = int(workConfig.get("imageSequencePlayer", "maskBoxWidth"))
         self.maskBoxHeight = int(workConfig.get("imageSequencePlayer", "maskBoxHeight"))
         self.maskBoxX = int(workConfig.get("imageSequencePlayer", "maskBoxX"))
         self.maskBoxY = int(workConfig.get("imageSequencePlayer", "maskBoxY"))
-        
+
         self.delay = float(workConfig.get("imageSequencePlayer", "delay"))
         self.directorController.slotRate = self.delay
 
         self.overLayMode = 0
-        print(bcolors.OKBLUE + "** " + bcolors.BOLD)
-        
-        self.removalMask = Image.new("RGBA", (self.clipWidth,self.clipHeight))
+        print(f"{bcolors.OKBLUE}** {bcolors.BOLD}")
+
+        self.removalMask = Image.new("RGBA", (self.clipWidth, self.clipHeight))
         removalMaskDraw = ImageDraw.Draw(self.removalMask)
-        removalMaskDraw.rectangle((0,0,self.clipWidth,self.clipHeight), fill = (200,0,0,255))
-        removalMaskDraw.rectangle((self.maskBoxX,self.maskBoxY,self.maskBoxX + self.maskBoxWidth,self.maskBoxY + self.maskBoxHeight), fill = (200,0,0,0))
+        removalMaskDraw.rectangle((0, 0, self.clipWidth, self.clipHeight), fill=(200, 0, 0, 255))
+        removalMaskDraw.rectangle((self.maskBoxX, self.maskBoxY, self.maskBoxX + self.maskBoxWidth, self.maskBoxY + self.maskBoxHeight), fill=(200, 0, 0, 0))
         self.removalMask = self.removalMask.rotate(self.clipRotate, 0, expand=1)
 
     def colorize(self, clr=(250, 0, 250, 255), recolorize=False):
@@ -245,15 +211,14 @@ class movieClip:
 
             if self.overLayMode == 0:
                 imgTemp = ImageChops.add_modulo(clrBlock, self.imageLayer)
-                if random.random() < .001:
+                if random.random() < 0.001:
                     self.overLayMode = 1
             else:
                 imgTemp = ImageChops.darker(clrBlock, self.imageLayer)
-                if random.random() < .001:
+                if random.random() < 0.001:
                     self.overLayMode = 0
 
             self.imageLayer.paste(imgTemp, (0, 0), imgTemp)
 
         except Exception as e:
             print(e, clrBlock.mode, self.config.renderImageFull.mode)
-            pass

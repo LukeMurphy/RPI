@@ -19,6 +19,9 @@ from copy import copy, deepcopy
 # pattern distortion - might be too much, too expected but
 # is dreamy  4-3-2024
 
+# major refactoring along with pattern_blocks.py 2025-02-19
+
+
 ###############################################
 
 

@@ -9,9 +9,8 @@ from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.configuration import bcolors
 
-from modules.holder_director import Holder 
-from modules.holder_director import Director 
-
+from modules.holder_director import Holder
+from modules.holder_director import Director
 from modules import distortions
 
 lastRate = 0
@@ -57,7 +56,7 @@ class Shape:
     nothing = "void"
     varianceMode = "independent"
     prisimBrightness = 0.5
-
+    alpha = 255
     steps = 20
 
     def __init__(self, config, i=0):
@@ -114,9 +113,7 @@ class Shape:
         self.colOverlay.setStartColor()
         self.colOverlay.getNewColor()
 
-        self.fillColor = tuple(
-            int(a * self.config.brightness) for a in self.colOverlay.currentColor
-        )
+        self.fillColor = tuple(int(a * self.config.brightness) for a in self.colOverlay.currentColor)
 
         self.widthDelta = 0
         self.heightDelta = 0
@@ -130,9 +127,7 @@ class Shape:
         return False
 
     def setNewBox(self):
-        self.draw.rectangle(
-            (0, 0, self.boxMax, self.boxHeight), fill=(0, 0, 0, 255), outline=None
-        )
+        self.draw.rectangle((0, 0, self.boxMax, self.boxHeight), fill=(0, 0, 0, 255), outline=None)
         self.poly = []
         for p in self.coords:
             xPos = self.varX + round(p[0] + random.uniform(-self.varX, self.varX))
@@ -143,16 +138,15 @@ class Shape:
 
         self.colOverlay.stepTransition()
         self.fillColor = []
-        for i in range(0, 3):
-            self.fillColor.append(
-                round(self.colOverlay.currentColor[i] * self.config.brightness)
-            )
-        self.fillColor.append(255)
+        self.fillColor.extend(
+            round(self.colOverlay.currentColor[i] * self.config.brightness)
+            for i in range(3)
+        )
+
+        self.fillColor.append(self.alpha)
         self.fillColor = tuple(int(a) for a in self.fillColor)
 
-        self.draw.rectangle(
-            (0, 0, self.boxMax, self.boxHeight), fill=(0, 0, 0, 10), outline=None
-        )
+        self.draw.rectangle((0, 0, self.boxMax, self.boxHeight), fill=(0, 0, 0, 10), outline=None)
         if self.varX == -1:
             self.draw.ellipse(
                 (self.poly[0][0], self.poly[0][1], self.poly[2][0], self.poly[2][1]),
@@ -170,158 +164,136 @@ class Shape:
 
 
 def redraw():
-    global config, shapeGroups
+    global config
+
+    shapes = config.shapeGroups[config.shapeGroupDisplayed]
+
+    _handle_shape_tweening(config, shapes)
+
+    if config.shapeTweening == 0:
+        _draw_shapes_and_handle_changes(config, shapes)
+
+    _handle_pixel_sort(config)
+    _handle_bad_pixels(config)
+    _handle_filter_patch(config)
+    _handle_last_overlay(config)
 
 
+def _handle_shape_tweening(config, shapes):
+    if config.shapeTweening == 1:
+        config.shapeTweening = 2
+        _generate_transition_state(config, shapes)
+        if config.useTweenTriggers:
+            colorTransitionStarted()
 
-    ## Each Fludd-square is generated as an image and then pasted into its correct
-    ## place in the grid - or off-grid maybe sometime
+    if config.shapeTweening == 2:
+        _perform_tweening(config)
 
-    """
-    config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,10), outline=None)
+
+def _generate_transition_state(config, shapes):
     for shapeElement in shapes:
         shapeElement.transition()
         img = shapeElement.tempImage.convert("RGBA")
         config.destinationImage.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
-        config.image.paste(config.destinationImage, (0,0), config.destinationImage)
-        if random.random() < config.changeBoxProb:
-            if shapeElement.varX == 0 and shapeElement.varY == 0 :
-                pass
-            else :
-                shapeElement.setNewBox()
-                #print("new box: " + shapeElement.name)
-    """
-    shapes = config.shapeGroups[config.shapeGroupDisplayed]
 
-    if config.shapeTweening == 1:
-        config.shapeTweening = 2
 
-        ## Generate state to transition to...
-        for shapeElement in shapes:
-            shapeElement.transition()
-            img = shapeElement.tempImage.convert("RGBA")
-            config.destinationImage.paste(
-                img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img
-            )
+def _perform_tweening(config):
+    config.tweenCount += 1
+    alpha = config.tweenCount / config.tweenCountMax
+    composited = Image.blend(config.image, config.destinationImage, alpha=alpha)
+    config.image.paste(composited, (0, 0), composited)
 
-        if config.useTweenTriggers == True:
-            colorTransitionStarted()
+    if config.tweenCount > config.tweenCountMax / 2:
+        config.tweenCount = 0
+        config.shapeTweening = 0
+        if config.useTweenTriggers:
+            colorTransitionDone()
 
-    if config.shapeTweening == 2:
-        config.tweenCount += 1
-        config.destinationImage
-        alpha = config.tweenCount / config.tweenCountMax
-        composited = Image.blend(config.image, config.destinationImage, alpha=alpha)
-        config.image.paste(composited, (0, 0), composited)
 
-        # Really an alpha of .5 is good enough to allow full redraw
-        if config.tweenCount > config.tweenCountMax / 2:
-            config.tweenCount = 0
-            config.shapeTweening = 0
-            if config.useTweenTriggers == True:
-                colorTransitionDone()
-            # print("Tweening Done")
-            # print("")
+def _draw_shapes_and_handle_changes(config, shapes):
+    shapeToChange = -1
+    for sCount, shapeElement in enumerate(shapes):
+        if random.random() < shapeElement.changeBoxProb:
+            shapeToChange = sCount
+    for shapeCount, shapeElement in enumerate(shapes):
+        shapeElement.transition()
+        img = shapeElement.tempImage.convert("RGBA")
+        config.image.paste(img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img)
+        if (shapeElement.varX != 0 or shapeElement.varY != 0) and shapeCount == shapeToChange:
+            shapeElement.setNewBox()
+            config.shapeTweening = 1
 
-    if config.shapeTweening == 0:
-        shapeToChange = -1
 
-        sCount = 0
-        for shapeElement in shapes:
-            if random.random() < shapeElement.changeBoxProb:
-                shapeToChange = sCount
-            sCount += 1
-            #print(shapeToChange)
-
-        shapeCount = 0
-        for shapeElement in shapes:
-            shapeElement.transition()
-            img = shapeElement.tempImage.convert("RGBA")
-            config.image.paste(
-                img, (shapeElement.shapeXPosition, shapeElement.shapeYPosition), img
-            )
-            if (
-                (shapeElement.varX != 0
-                or shapeElement.varY != 0)
-                and shapeCount == shapeToChange
-            ):
-                shapeElement.setNewBox()
-                # print("new box: " + shapeElement.name)
-                config.shapeTweening = 1
-            shapeCount += 1
-
-    '''
-    # Disabling in favor of patched dithering
-    if config.useVariableFilter == True:
-        if random.random() < config.variableFilterProb:
-            config.useFilters = False if config.useFilters == True else True
-    '''
-
-    if config.useVariablePixelSort == True:
-
-        if (
-            random.random() < config.variablePixelProbOff
-            and config.usePixelSort == True
-        ):
+def _handle_pixel_sort(config):
+    if config.useVariablePixelSort:
+        if random.random() < config.variablePixelProbOff and config.usePixelSort:
             config.usePixelSort = False
 
-        if random.random() < config.variablePixelProb and config.usePixelSort == False:
-            # config.usePixelSort = False if config.usePixelSort == True else True
+        if random.random() < config.variablePixelProb and not config.usePixelSort:
             config.usePixelSort = True
-            if config.usePixelSort == True:
-                # config.useLastOverlay = False
-                config.renderImageFullOverlay = Image.new(
-                    "RGBA", (config.canvasWidth, config.canvasHeight)
-                )
+            if config.usePixelSort:
+                config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
                 config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
             else:
                 config.useLastOverlay = True
 
-    if config.useBadPixels == True:
+
+def _handle_bad_pixels(config):
+    if config.useBadPixels:
         badpixels.drawBlanks(config.image, False)
         if random.random() > 0.999:
             badpixels.setBlanksOnScreen()
 
+
+def _handle_filter_patch(config):
     if random.random() < config.filterPatchProb:
-        #print("should be remapping")
-        x1 = round(random.uniform(0,config.canvasWidth))
-        x2 = round(random.uniform(x1,config.canvasWidth))
-        y1 = round(random.uniform(0,config.canvasHeight))
-        y2 = round(random.uniform(y1,config.canvasHeight))
+        _remap_image_block(config)
 
-        config.remapImageBlock = True
-        config.remapImageBlockSection = (x1, y1, x2, y2)
-        config.remapImageBlockDestination = (x1, y1)
+    if random.random() < config.filterPatchProb * 1.0 and config.filterPatchProb > 0.0:
+        _reset_remap_image_block(config)
 
-    # Don't want the patch to always be there - just little interruptions
-    if random.random() < config.filterPatchProb * 1.0 and config.filterPatchProb > 0.0 :
-        #print("turning off remapping")
-        x1 = 0
-        x2 = 0
-        y1 = 0
-        y2 = 0
 
-        config.remapImageBlock = True
-        config.remapImageBlockSection = (x1, y1, x2, y2)
-        config.remapImageBlockDestination = (x1, y1)
+def _handle_last_overlay(config):
+    if random.random() < config.useLastOverlayProb and config.useLastOverlay:
+        _draw_last_overlay(config)
 
-    if random.random() < config.useLastOverlayProb and config.useLastOverlay == True:
-        # config.useLastOverlay = False if config.useLastOverlay == True  else True
-        #print("lastOVerlay")
-        xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
-        yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
-        config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
 
-        cR = config.lastOverLayColorRange
-        lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
-        #print(lastOverlayFill)
-        config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])))
-        #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
+def _remap_image_block(config):
+    x1 = round(random.uniform(0, config.canvasWidth))
+    x2 = round(random.uniform(x1, config.canvasWidth))
+    y1 = round(random.uniform(0, config.canvasHeight))
+    y2 = round(random.uniform(y1, config.canvasHeight))
+
+    config.remapImageBlock = True
+    config.remapImageBlockSection = (x1, y1, x2, y2)
+    config.remapImageBlockDestination = (x1, y1)
+
+
+def _reset_remap_image_block(config):
+    config.remapImageBlock = True
+    config.remapImageBlockSection = (0, 0, 0, 0)
+    config.remapImageBlockDestination = (0, 0)
+
+
+def _draw_last_overlay(config):
+    xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
+    yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
+    config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+
+    cR = config.lastOverLayColorRange
+    lastOverlayFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
+
+    config.lastOverlayFill = (
+        lastOverlayFill[0],
+        lastOverlayFill[1],
+        lastOverlayFill[2],
+        round(random.uniform(config.lastOverlayAlphaRange[0], config.lastOverlayAlphaRange[1])),
+    )
 
 
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
     print("RUNNING collage.py")
     print(bcolors.ENDC)
     while config.isRunning == True:
@@ -337,21 +309,21 @@ def iterate():
     global config
     redraw()
 
-    if len(config.shapeGroups) > 1 :
+    if len(config.shapeGroups) > 1:
         config.t1 = time.time()
 
-        if (config.t1 - config.t2) > config.timeBetweenSetChanges :
+        if (config.t1 - config.t2) > config.timeBetweenSetChanges:
             ## Beeps ... for debugging
-            #print(chr(7))
+            # print(chr(7))
             config.t2 = time.time()
             if random.random() < config.probablilitySetChanges:
-                newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))
+                newIndex = math.floor(random.uniform(0, len(config.shapeGroups)))
 
                 # ensure the next index is different ...
-                while newIndex == config.shapeGroupDisplayed :
-                    newIndex = math.floor(random.uniform(0,len(config.shapeGroups)))
+                while newIndex == config.shapeGroupDisplayed:
+                    newIndex = math.floor(random.uniform(0, len(config.shapeGroups)))
                 config.shapeGroupDisplayed = newIndex
-                print("--> New Set:" + str(newIndex))
+                print(f"--> New Set:{str(newIndex)}")
 
     """
     ## Paste an alpha of the next image, wait a few ms 
@@ -375,30 +347,12 @@ def iterate():
     config.render(config.canvasImage, 0, 0, config.image)
     """
 
-
     if random.random() < config.blurChangeProb:
-        config.sectionBlurRadius = round(random.uniform(1,3))
+        config.sectionBlurRadius = round(random.uniform(1, 3))
 
-
-    if random.random() < config.filterRemappingProb:
-        if config.useFilters == True and config.filterRemapping == True:
-            config.filterRemap = True
-            #print("Doing remap filter")
-
-            #startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
-            #startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
-            #endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
-            #endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
-            # new version  more control but may require previous pieces to be re-worked
-            startX = round(random.uniform(0,config.filterRemapRangeX) )
-            startY = round(random.uniform(0,config.filterRemapRangeY) )
-            endX = round(random.uniform(4, config.filterRemapminHoriSize) )
-            endY = round(random.uniform(4, config.filterRemapminVertSize) )
-            config.remapImageBlockSection = [startX,startY,startX + endX, startY + endY]
-            config.remapImageBlockDestination = [startX,startY]
-
-
-    if config.sectionDisturbance == True :
+    if random.random() < config.filterRemappingProb and (config.useFilters == True and config.filterRemapping == True):
+        _newFilterRemapping(config)
+    if config.sectionDisturbance == True:
         distortions.iterationFunction(config)
 
     temp1 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -406,15 +360,31 @@ def iterate():
 
     config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
     temp1.paste(config.image, (0, 0), config.image)
-    
 
     if config.useWaveDistortion == True:
         temp1 = ImageOps.deform(temp1, distortions.WaveDeformer(config))
         config.waveDeformXPos += config.waveDeformXPosRate
-        if config.waveDeformXPos > config.screenWidth :
+        if config.waveDeformXPos > config.screenWidth:
             config.waveDeformXPos = 0
-    
+
     config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
+
+
+def _newFilterRemapping(config):
+    config.filterRemap = True
+    # print("Doing remap filter")
+
+    # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
+    # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
+    # endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
+    # endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+    # new version  more control but may require previous pieces to be re-worked
+    startX = round(random.uniform(0, config.filterRemapRangeX))
+    startY = round(random.uniform(0, config.filterRemapRangeY))
+    endX = round(random.uniform(4, config.filterRemapminHoriSize))
+    endY = round(random.uniform(4, config.filterRemapminVertSize))
+    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+    config.remapImageBlockDestination = [startX, startY]
     # Done
 
     # config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -437,99 +407,78 @@ def colorTransitionStarted(arg=None):
 
 
 def main(run=True):
-    global config
-    global shapeGroups
-    global workConfig
+    global config, shapeGroups, workConfig
 
+    _initialize_config(config, workConfig)
+    _initialize_shapes(config, workConfig)
+    _initialize_overlay_settings(config, workConfig)
+
+    if run:
+        runWork()
+
+
+def _initialize_config(config, workConfig):
     config.t1 = time.time()
     config.t2 = time.time()
-    
-    # managing speed of animation and framerate
+
     config.directorController = Director(config)
-    try :
+    try:
         config.delay = float(workConfig.get("collageShapes", "delay"))
         config.directorController.slotRate = float(workConfig.get("collageShapes", "slotRate"))
     except Exception as e:
         print(e)
-        config.delay = .03
-        config.directorController.slotRate = .04
-        
-        
+        config.delay = 0.03
+        config.directorController.slotRate = 0.04
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
     config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    
 
-    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    
+
     config.doingSectionDisturbance = False
     config.rebuildingPattern = True
-    distortions.additonalSetup(config, workConfig)
-    
 
     try:
-        config.useLastOverlay = workConfig.getboolean("displayconfig", "useLastOverlay")
-        config.useLastOverlayProb = float(
-            workConfig.get("displayconfig", "useLastOverlayProb")
-        )
+        testForDistortionSetup = workConfig.get("distortionsConfigs", "sectionDisturbance")
+        distortions.distortionsConfigs(config, workConfig)
     except Exception as e:
-        print(e)
-        config.useLastOverlay = False
-        config.useLastOverlayProb = 0.001
+        print(f" ==> No distortionsConfigs or sectionDisturbance: {e}")
+        config.sectionDisturbance = False
+        config.useWaveDistortion = False
+        config.imgcanvasOffsetX = 0
+        config.imgcanvasOffsetY = 0
+    # end try
 
-    config.transitionStepsMin = int(
-        workConfig.get("collageShapes", "transitionStepsMin")
-    )
-    config.transitionStepsMax = int(
-        workConfig.get("collageShapes", "transitionStepsMax")
-    )
-    config.changeBoxProb = float(workConfig.get("collageShapes", "changeBoxProb"))
-    config.redrawSpeed = float(workConfig.get("collageShapes", "redrawSpeed"))
+    _load_config_value(config, workConfig, "displayconfig", "useLastOverlay", False, bool)
+    _load_config_value(config, workConfig, "displayconfig", "useLastOverlayProb", 0.001, float)
+
+    _load_config_value(config, workConfig, "collageShapes", "transitionStepsMin", 0, int)
+    _load_config_value(config, workConfig, "collageShapes", "transitionStepsMax", 0, int)
+    _load_config_value(config, workConfig, "collageShapes", "changeBoxProb", 0.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "redrawSpeed", 0.0, float)
+
     config.shapeTweening = 0
     config.tweenCount = 0
-    config.tweenCountMax = int(workConfig.get("collageShapes", "tweenCountMax"))
-    config.colOverlaytLimitBase = int(
-        workConfig.get("collageShapes", "colOverlaytLimitBase")
-    )
-    config.colOverlaySteps = int(workConfig.get("collageShapes", "colOverlaySteps"))
+    _load_config_value(config, workConfig, "collageShapes", "tweenCountMax", 0, int)
+    _load_config_value(config, workConfig, "collageShapes", "colOverlaytLimitBase", 0, int)
+    _load_config_value(config, workConfig, "collageShapes", "colOverlaySteps", 0, int)
     config.useBadPixels = False
 
-    try:
-        config.useTransitionCallbacks = workConfig.getboolean(
-            "collageShapes", "useTransitionCallbacks"
-        )
-    except Exception as e:
-        print(e)
-        config.useTransitionCallbacks = False
-
-    try:
-        config.useTweenTriggers = workConfig.getboolean(
-            "collageShapes", "useTweenTriggers"
-        )
-    except Exception as e:
-        print(e)
-        config.useTweenTriggers = False
+    _load_config_value(config, workConfig, "collageShapes", "useTransitionCallbacks", False, bool)
+    _load_config_value(config, workConfig, "collageShapes", "useTweenTriggers", False, bool)
 
     try:
         config.triggersVals = workConfig.get("collageShapes", "triggers")
-        config.triggers = list(
-            map(
-                lambda x: int(x), workConfig.get("collageShapes", "triggers").split(",")
-            )
-        )
+        config.triggers = list(map(lambda x: int(x), config.triggersVals.split(",")))
     except Exception as e:
         print(e)
         config.triggers = []
 
     try:
-        badpixels.numberOfDeadPixels = int(
-            workConfig.get("collageShapes", "numberOfDeadPixels")
-        )
+        badpixels.numberOfDeadPixels = int(workConfig.get("collageShapes", "numberOfDeadPixels"))
         badpixels.config = config
         badpixels.sizeTarget = list(config.image.size)
         badpixels.setBlanksOnScreen()
@@ -537,121 +486,71 @@ def main(run=True):
     except Exception as e:
         print(e)
 
-    try:
-        config.filterPatchProb = float(workConfig.get("collageShapes", "filterPatchProb"))
-    except Exception as e:
-        print(e)
-        config.filterPatchProb = 0.0
-    
+    _load_config_value(config, workConfig, "collageShapes", "filterPatchProb", 0.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "useVariableFilter", False, bool)
+    _load_config_value(config, workConfig, "collageShapes", "variableFilterProb", 0.0, float)
+
+    _load_config_value(config, workConfig, "collageShapes", "useVariablePixelSort", False, bool)
+    _load_config_value(config, workConfig, "collageShapes", "variablePixelProb", 0.0, float)
 
     try:
-        config.useVariableFilter = workConfig.getboolean("collageShapes", "useVariableFilter")
-        config.variableFilterProb = float(workConfig.get("collageShapes", "variableFilterProb"))
-        # config.useFilters = True
-        # config.usePixelSort = True
+        config.variablePixelProbOff = float(workConfig.get("collageShapes", "variablePixelProbOff"))
     except Exception as e:
         print(e)
-        config.useVariableFilter = False
+        config.variablePixelProbOff = config.variablePixelProb
 
-    try:
-        config.useVariablePixelSort = workConfig.getboolean(
-            "collageShapes", "useVariablePixelSort"
-        )
-        config.variablePixelProb = float(
-            workConfig.get("collageShapes", "variablePixelProb")
-        )
-        try:
-            config.variablePixelProbOff = float(
-                workConfig.get("collageShapes", "variablePixelProbOff")
-            )
-        except Exception as e:
-            print(e)
-            config.variablePixelProbOff = config.variablePixelProb
-        # config.useFilters = True
-        # config.usePixelSort = True
-    except Exception as e:
-        print(e)
-        config.useVariablePixelSort = False
-
-
-
-
-    # If there are multiple collage shape sets this sets the time between changes and probability that happens
     try:
         config.timeBetweenSetChanges = float(workConfig.get("collageShapes", "timeBetweenSetChanges"))
         config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
     except Exception as e:
         config.timeBetweenSetChanges = 60.0
-        config.probablilitySetChanges = 1.0 
+        config.probablilitySetChanges = 1.0
         print(e)
-        print("Setting times to " + str(config.timeBetweenSetChanges) + " " + str(config.probablilitySetChanges ))
+        print(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
+
+    config.shapeSets = list(map(lambda x: x, workConfig.get("collageShapes", "sets").split(",")))
 
 
-    config.shapeSets = list(
-        map(lambda x: x, workConfig.get("collageShapes", "sets").split(","))
-    )
-
+def _initialize_shapes(config, workConfig):
     config.shapeGroups = []
 
-
-    for n in range(0, len(config.shapeSets)):
-
-        shapeSetGroup = list(
-            map(lambda x: x, workConfig.get("collageShapes", config.shapeSets[n]).split(","))
-        )
-
+    for item in config.shapeSets:
+        shapeSetGroup = list(map(lambda x: x, workConfig.get("collageShapes", item).split(",")))
         shapeGroupList = []
 
-        for i in range(0, len(shapeSetGroup)):
-
+        for i in range(len(shapeSetGroup)):
             shapeDetails = shapeSetGroup[i]
             shape = Shape(config)
 
             shape.varX = float(workConfig.get(shapeDetails, "varX"))
             shape.varY = float(workConfig.get(shapeDetails, "varY"))
 
-            shapePosition = list(
-                map(lambda x: int(x), workConfig.get(shapeDetails, "position").split(","))
-            )
+            shapePosition = list(map(lambda x: int(x), workConfig.get(shapeDetails, "position").split(",")))
             shape.shapeXPosition = shapePosition[0]
             shape.shapeYPosition = shapePosition[1]
-            shape.name = "S_" + str(i)
+            shape.name = f"S_{str(i)}"
 
-            shapeCoords = list(
-                map(lambda x: int(x), workConfig.get(shapeDetails, "coords").split(","))
-            )
+            shapeCoords = list(map(lambda x: int(x), workConfig.get(shapeDetails, "coords").split(",")))
             shape.coords = []
 
-            for c in range(0, len(shapeCoords), 2):
-                shape.coords.append((shapeCoords[c], shapeCoords[c + 1]))
+            shape.coords.extend((shapeCoords[c], shapeCoords[c + 1]) for c in range(0, len(shapeCoords), 2))
+
+            _load_config_value(shape, workConfig, shapeDetails, "minHue", 0, float)
+            _load_config_value(shape, workConfig, shapeDetails, "maxHue", 360, float)
+            _load_config_value(shape, workConfig, shapeDetails, "maxSaturation", 1, float)
+            _load_config_value(shape, workConfig, shapeDetails, "minSaturation", 0.1, float)
+            _load_config_value(shape, workConfig, shapeDetails, "maxValue", 1, float)
+            _load_config_value(shape, workConfig, shapeDetails, "minValue", 0.1, float)
+            _load_config_value(shape, workConfig, shapeDetails, "alpha", 255, float)
 
             try:
-                shape.minHue = float(workConfig.get(shapeDetails, "minHue"))
-                shape.maxHue = float(workConfig.get(shapeDetails, "maxHue"))
-                shape.maxSaturation = float(workConfig.get(shapeDetails, "maxSaturation"))
-                shape.minSaturation = float(workConfig.get(shapeDetails, "minSaturation"))
-                shape.maxValue = float(workConfig.get(shapeDetails, "maxValue"))
-                shape.minValue = float(workConfig.get(shapeDetails, "minValue"))
-
+                shape.changeBoxProb = float(workConfig.get(shapeDetails, "changeBoxProb"))
             except Exception as e:
                 print(e)
-                shape.minHue = 0
-                shape.maxHue = 360
-                shape.maxSaturation = 1
-                shape.minSaturation = 0.1
-                shape.maxValue = 1
-                shape.minValue = 0.1
-
-            # addding individual change probabilities to each shape
-            try:
-                shape.changeBoxProb  = float(workConfig.get(shapeDetails, "changeBoxProb"))
-            except Exception as e:
-                print(str(e))
-                shape.changeBoxProb  = config.changeBoxProb
+                shape.changeBoxProb = config.changeBoxProb
 
             shape.setUp()
 
-            # A couple overrides ...
             shape.colOverlay.tLimitBase = config.colOverlaytLimitBase
             shape.colOverlay.steps = config.colOverlaySteps
             shape.colOverlay.colorTransitionSetupValues()
@@ -660,57 +559,48 @@ def main(run=True):
                 shape.colOverlay.setCallBackDoneMethod(colorTransitionDone)
                 shape.colOverlay.setCallBackStartedMethod(colorTransitionStarted)
 
-            # shape.callBackDone = types.MethodType(callBackDone, shape)
             shape.reDraw()
             shapeGroupList.append(shape)
 
         config.shapeGroups.append(shapeGroupList)
 
-    # Always start with the first one, index 0
     config.shapeGroupDisplayed = 0
 
+
+def _initialize_overlay_settings(config, workConfig):
     try:
-        config.lastOverLayColorRange = list(
-            map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(","))
-        )
+        config.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(",")))
     except Exception as e:
-        print(str(e))
-        config.lastOverLayColorRange = (0,10,.5,1.0,.5,.5)
+        print(e)
+        config.lastOverLayColorRange = (0, 10, 0.5, 1.0, 0.5, 0.5)
 
     try:
         config.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayAlphaRange").split(",")))
     except Exception as e:
-        print(str(e))
-        config.lastOverlayAlphaRange = (5,50)
+        print(e)
+        config.lastOverlayAlphaRange = (5, 50)
+
+    _load_config_value(config, workConfig, "collageShapes", "forceLastOverlay", False, bool)
+    _load_config_value(config, workConfig, "collageShapes", "useLastOverlayProb", 0.0, float)
 
     try:
-        config.useLastOverlay = workConfig.getboolean("collageShapes", "forceLastOverlay")
-        config.useLastOverlayProb = float(workConfig.get("collageShapes", "useLastOverlayProb"))
-        config.useLastOverlayProb = float(workConfig.get("collageShapes", "useLastOverlayProb"))
         config.lastOverlayBox = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayBox").split(",")))
         config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-        config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(",")))
+        config.lastOverlayFill = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(",")))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.lastOverlayBox = (0, 0, 64, 32)
         config.lastOverlayFill = (0, 0, 0, 0)
         config.useLastOverlay = False
 
+    _load_config_value(config, workConfig, "collageShapes", "blurChangeProb", 0.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "lastOverlayBlur", 0.0, float)
+
+
+def _load_config_value(obj, workConfig, section, option, default, type_converter):
     try:
-        config.blurChangeProb = float(workConfig.get("collageShapes", "blurChangeProb"))
+        setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        config.blurChangeProb = 0.0
         print(e)
-
-    try:
-        config.lastOverlayBlur = float(workConfig.get("collageShapes", "lastOverlayBlur"))
-    except Exception as e:
-        config.lastOverlayBlur = 0.0
-        print(e)
-
-
-    
-
-    if run:
-        runWork()
+        setattr(obj, option, default)

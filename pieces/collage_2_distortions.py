@@ -249,7 +249,7 @@ def _handle_filter_patch(config):
     if random.random() < config.filterPatchProb:
         _remap_image_block(config)
 
-    if random.random() < config.filterPatchProb * 1.0 and config.filterPatchProb > 0.0:
+    if random.random() < config.filterPatchProb * .50 and config.filterPatchProb > 0.0:
         _reset_remap_image_block(config)
 
 
@@ -259,10 +259,10 @@ def _handle_last_overlay(config):
 
 
 def _remap_image_block(config):
-    x1 = round(random.uniform(0, config.canvasWidth))
-    x2 = round(random.uniform(x1, config.canvasWidth))
-    y1 = round(random.uniform(0, config.canvasHeight))
-    y2 = round(random.uniform(y1, config.canvasHeight))
+    x1 = round(random.uniform(0, config.canvasWidth - + config.minFilterPatchWidth))
+    x2 = round(random.uniform(x1 + config.minFilterPatchWidth, config.canvasWidth + config.minFilterPatchWidth))
+    y1 = round(random.uniform(0, config.canvasHeight - + config.minFilterPatchHeight))
+    y2 = round(random.uniform(y1 + config.minFilterPatchHeight, config.canvasHeight + config.minFilterPatchHeight))
 
     config.remapImageBlock = True
     config.remapImageBlockSection = (x1, y1, x2, y2)
@@ -487,6 +487,9 @@ def _initialize_config(config, workConfig):
         print(e)
 
     _load_config_value(config, workConfig, "collageShapes", "filterPatchProb", 0.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "minFilterPatchWidth", 0.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "minFilterPatchHeight", 0.0, float)
+
     _load_config_value(config, workConfig, "collageShapes", "useVariableFilter", False, bool)
     _load_config_value(config, workConfig, "collageShapes", "variableFilterProb", 0.0, float)
 

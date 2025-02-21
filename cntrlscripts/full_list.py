@@ -62,7 +62,7 @@ def verify():
     global actionDict1
     process = False
     configSelected = None
-    if len(list(ListBoxOfConfigs.curselection())) > 0:
+    if list(ListBoxOfConfigs.curselection()):
         selection = ListBoxOfConfigs.curselection()[0]
         configSelected = actionDict1[selection]
         process = True
@@ -74,10 +74,6 @@ def verify():
 
 
 def execute(configToRun):
-
-    commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
-    commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
-    commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/sequencer.v2.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
 
     print("--------------------------------------------")
     print("--------------------------------------------")
@@ -92,14 +88,18 @@ def execute(configToRun):
     if ".cfg" in configToRun:
         if "multi" in configToRun:
             print("MULTIPLAYER STARTING >>>\n")
+            commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
             os.system(commadStringMultiPyth + configToRun.split(configPath)[1] + "&")
         if "--manifest" in configToRun:
+            commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/sequencer.v2.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
+
             print(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
             os.system(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
         else:
+            commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
             os.system(commadStringPyth + configToRun.split(configPath)[1] + "&")
     elif ".app" in configToRun:
-        os.system("open " + commadStringProc + configToRun.split(configPath)[1])
+        os.system(f"open {commadStringProc}{configToRun.split(configPath)[1]}")
         JavaAppRunning = configToRun.split(configPath)[1]
 
 
@@ -120,7 +120,7 @@ def action2():
         os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
 
         if JavaAppRunning != "":
-            os.system("ps -ef | pgrep -f " + JavaAppRunning + " | xargs sudo kill -9;")
+            os.system(f"ps -ef | pgrep -f {JavaAppRunning} | xargs sudo kill -9;")
 
         configSelected = a[1]
         configToRun = configSelected[list(configSelected.keys())[0]]
@@ -156,7 +156,7 @@ def openFile():
         # os.system('ps -ef | pgrep -f player | xargs sudo kill -9;')
         configSelected = a[1]
         # os.system("open " + "configs/" + configSelected[list(configSelected.keys())[0]])
-        os.system("open " + configSelected[list(configSelected.keys())[0]])
+        os.system(f"open {configSelected[list(configSelected.keys())[0]]}")
 
 
 def returnFirstElement(arg):
@@ -171,91 +171,83 @@ def returnSecondElement(arg):
 
 
 def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
+    global actionDict1, ListBoxOfConfigs, configPath
 
-    global actionDict1, ListBoxOfConfigs
-    global configPath
-    # arr = os.listdir(configPath)
-    # Sort the directories by name
-    # arr.sort(reverse=False)
-    fullList = []
-    actionDict1 = []
+    fullList = _get_config_files(configPath, filterText)
 
-    filterResults = False
-    if len(filterText) > 1:
-        filterResults = True
-
-    for root, dirs, files in os.walk(configPath, topdown=False):
-        for name in files:
-            fullPath = os.path.join(root, name)
-            if (
-                name.find(".cfg") > 0
-                and name.find(".py") == -1
-                and name.find(".DS_Store") == -1
-            ):
-                res = os.stat(fullPath)
-                if not filterResults:
-                    fullList.append((os.path.join(root, name), res.st_mtime, name))
-                if filterResults:
-                    if name.find(filterText) > 0 or fullPath.find(filterText) > 0:
-                        fullList.append((os.path.join(root, name), res.st_mtime, name))
-
-    # Sort the configs by date descending
     if dateSort:
         fullList.sort(key=returnSecondElement, reverse=True)
     else:
         fullList.sort(key=returnFirstElement, reverse=False)
 
-    lastDir = ""
-    # fName = ""
-
-    actionDict1.append({"": ""})
-
-    for f in fullList:
-        # fName = f[0].split(configPath)[1].split("/")[0]
-        if len(f) > 0:
-            tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("%Y-%m-%d [%H:%M]")
-            # tsTxtVals = tsTxt.split(" ")
-
-            # and dateSort != True
-            currentDir = f[0].split(configPath)[1].split("/")[0]
-            currDirLevel2 = f[0].split(configPath)[1].split("/")[1]
-            if currDirLevel2.find(".cfg") <= 0:
-                currentDir = currentDir + "/" + currDirLevel2
-            if currentDir != lastDir and not dateSort:
-                actionDict1.append({"": ""})
-                lastDir = currentDir
-
-            actionDict1.append(
-                {
-                    tsTxt
-                    + "\t\t"
-                    + f[0].split(f[2])[0].split(configPath)[1]
-                    + " \t\t\t\t \t\t\t\t"
-                    + f[2]: f[0]
-                }
-            )
-        else:
-            actionDict1.append({"": ""})
+    actionDict1 = _create_action_dict(fullList, dateSort, configPath)
 
     ListBoxOfConfigs.delete(0, END)
-    for _, item in enumerate(actionDict1):
+    for item in actionDict1:
+        _update_listbox(ListBoxOfConfigs, item)
+
+
+def _get_config_files(configPath, filterText):
+    fullList = []
+    filterResults = len(filterText) > 1
+    for root, dirs, files in os.walk(configPath, topdown=False):
+        for name in files:
+            fullPath = os.path.join(root, name)
+            if name.endswith(".cfg") and not name.endswith(".py") and name != ".DS_Store":
+                res = os.stat(fullPath)
+                if not filterResults:
+                    fullList.append((fullPath, res.st_mtime, name))
+                elif name.find(filterText) > 0 or fullPath.find(filterText) > 0:
+                    fullList.append((fullPath, res.st_mtime, name))
+    return fullList
+
+
+def _create_action_dict(fullList, dateSort, configPath):
+    actionDict = [{"": ""}]
+    lastDir = ""
+    for f in fullList:
+        if f:
+            tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("%Y-%m-%d [%H:%M]")
+            currentDir = os.path.dirname(f[0].split(configPath)[1]).lstrip("/")
+            if currentDir != lastDir and not dateSort:
+                actionDict.append({"": ""})
+                lastDir = currentDir
+            actionDict.append({f"{tsTxt}\t\t{currentDir} \t\t\t\t \t\t\t\t{f[2]}": f[0]})
+        else:
+            actionDict.append({"": ""})
+    return actionDict
+
+
+def _update_listbox(ListBoxOfConfigs, item):
+    ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
+    key = list(item.keys())[0]
+    ListBoxOfConfigs.itemconfig(END, bg="#ffbbea" if "prod" in key else "white")
+    ListBoxOfConfigs.itemconfig(END, bg="#58fc00" if "dev_forms" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg="#58fcbd" if "dev" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg="#ccFF00" if "dev_ondeck" in key else None)
+    # ListBoxOfConfigs.itemconfig(END, bg="#cfff3" if "dev_ondeck" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg="#eeeeee" if "screen_grid" in key else None)
+
+
+# TODO Rename this here and in `getAllConfigFiles`
+def _extracted_from_getAllConfigFiles_(ListBoxOfConfigs, item):
         # print(list(item.keys())[0])
-        ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
-        ListBoxOfConfigs.itemconfig(
-            END, bg="#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white"
-        )
-        ListBoxOfConfigs.itemconfig(
-            END, bg="#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None
-        )
-        ListBoxOfConfigs.itemconfig(
-            END, bg="#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None
-        )
-        ListBoxOfConfigs.itemconfig(
-            END, bg="#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None
-        )
-        ListBoxOfConfigs.itemconfig(
-            END, bg="#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None
-        )
+    ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
+    ListBoxOfConfigs.itemconfig(
+        END, bg="#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white"
+    )
+    ListBoxOfConfigs.itemconfig(
+        END, bg="#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None
+    )
+    ListBoxOfConfigs.itemconfig(
+        END, bg="#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None
+    )
+    ListBoxOfConfigs.itemconfig(
+        END, bg="#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None
+    )
+    ListBoxOfConfigs.itemconfig(
+        END, bg="#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None
+    )
 
 
 # -------------------------------- #
@@ -287,8 +279,8 @@ ListBoxOfConfigs = Listbox(
     root, width=90, height=42, bg="white", foreground="black", bd=False
 )
 
-for _, item in enumerate(actionDict1):
-    ListBoxOfConfigs.insert(END, " " + list(item.keys())[0])
+for item in actionDict1:
+    ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
     ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
 
 ListBoxOfConfigs.place(bordermode=OUTSIDE, x=2, y=14)

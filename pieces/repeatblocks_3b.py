@@ -972,6 +972,9 @@ def _handle_fading_and_rebuild():
             config.doSectionDisturbance = False
             rebuildPatterns()
 
+    if random.random() < config.resetProbability:
+        _loadPolyOverlaybaseValues()
+
 
 def _save_image_if_done():
     """Saves the image if all sections are done and not already saved."""
@@ -1101,6 +1104,16 @@ def _loadFilterRemappingConfigs():
     config.filterRemapRangeY = int(workConfig.get("movingpattern", "filterRemapRangeY"))
     config.filterRemapRangeX = int(workConfig.get("movingpattern", "filterRemapRangeX"))
 
+
+def _loadPolyOverlaybaseValues():
+    _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
+    print(_polyBaseVals)
+    config.polyBase = []
+    for _a in _polyBaseVals:
+        _ps = list(map(lambda x: int(x), _a.split(",")))
+        config.polyBase.append(_ps)
+
+
 def setupPolyOverlay() :  # sourcery skip: extract-method
     config.usePolygonOverlay = False
     try:
@@ -1122,12 +1135,7 @@ def setupPolyOverlay() :  # sourcery skip: extract-method
         config.polyOverlay.getNewColor()
         config.polyOverlay.colorTransitionSetup()
         config.polyOverlayChangeProb = float(workConfig.get("movingpattern", "polyOverlayChangeProb", fallback=0.003))
-        _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
-        print(_polyBaseVals)
-        config.polyBase = []
-        for _a in _polyBaseVals:
-            _ps = list(map(lambda x: int(x), _a.split(",")))
-            config.polyBase.append(_ps)
+        _loadPolyOverlaybaseValues()
         print(config.polyBase)
     except Exception as e:
         print(f" ==> Not using custom polygon overlay {e}")
@@ -1136,6 +1144,7 @@ def setupPolyOverlay() :  # sourcery skip: extract-method
 
 def main(run=True):
     global config
+    print("\n main() called")
 
     config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
     config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
@@ -1148,15 +1157,9 @@ def main(run=True):
     skipBlocks = (workConfig.get("movingpattern", "skipBlocks")).split(",")
     config.skipBlocks = tuple(map(lambda x: int(x), skipBlocks))
 
-    try:
-        config.canvasRotation = float(workConfig.get("movingpattern", "canvasRotation"))
-        config.imgcanvasOffsetX = int(workConfig.get("movingpattern", "canvasOffsetX"))
-        config.imgcanvasOffsetY = int(workConfig.get("movingpattern", "canvasOffsetY"))
-    except Exception as e:
-        print(e)
-        config.canvasRotation = 0
-        config.imgcanvasOffsetX = 0
-        config.imgcanvasOffsetY = 0
+    _load_config_value(config, workConfig, "movingpattern", "canvasRotation", 0.00, float)
+    _load_config_value(config, workConfig, "movingpattern", "imgcanvasOffsetX", 0, int)
+    _load_config_value(config, workConfig, "movingpattern", "imgcanvasOffsetY", 0, int)
 
     config.repeatProb = 0.99
 
@@ -1164,11 +1167,8 @@ def main(run=True):
     config.drawingPrinted = True
     config.saveImages = workConfig.getboolean("movingpattern", "saveImages")
     config.outPutPath = workConfig.get("movingpattern", "outPutPath")
-    try:
-        config.drawBGColorEachCycle = workConfig.getboolean("movingpattern", "drawBGColorEachCycle")
-    except Exception as e:
-        print(e)
-        config.drawBGColorEachCycle = True
+
+    _load_config_value(config, workConfig, "movingpattern", "drawBGColorEachCycle", True, bool)
 
     config.repeatDrawingMode = 1
     config.loadAnImageProb = float(workConfig.get("movingpattern", "loadAnImageProb"))
@@ -1215,6 +1215,8 @@ def main(run=True):
     )
     config.mask_blur_amt = config.mask_blur_amt
     config.cp_blur_amt = config.cp_blur_amt
+
+    _load_config_value(config, workConfig, "movingpattern", "resetProbability", 0.0001, float)
 
     _loadFilterRemapping()
 
@@ -1269,4 +1271,10 @@ def main(run=True):
         runWork()
 
 
+def _load_config_value(obj, workConfig, section, option, default, type_converter):
+    try:
+        setattr(obj, option, type_converter(workConfig.get(section, option)))
+    except Exception as e:
+        print(e)
+        setattr(obj, option, default)
 ###############################################

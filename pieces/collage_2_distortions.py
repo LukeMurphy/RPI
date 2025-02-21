@@ -370,6 +370,11 @@ def iterate():
 
     config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
 
+    if random.random() < config.resetProbability :
+        print("\n  resetting things")
+        _initialize_shapes(config, workConfig)
+        _initialize_overlay_settings(config, workConfig)
+
 
 def _newFilterRemapping(config):
     config.filterRemap = True
@@ -460,6 +465,7 @@ def _initialize_config(config, workConfig):
     _load_config_value(config, workConfig, "collageShapes", "transitionStepsMax", 0, int)
     _load_config_value(config, workConfig, "collageShapes", "changeBoxProb", 0.0, float)
     _load_config_value(config, workConfig, "collageShapes", "redrawSpeed", 0.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "resetProbability", 0.0001, float)
 
     config.shapeTweening = 0
     config.tweenCount = 0
@@ -470,6 +476,7 @@ def _initialize_config(config, workConfig):
 
     _load_config_value(config, workConfig, "collageShapes", "useTransitionCallbacks", False, bool)
     _load_config_value(config, workConfig, "collageShapes", "useTweenTriggers", False, bool)
+
 
     try:
         config.triggersVals = workConfig.get("collageShapes", "triggers")

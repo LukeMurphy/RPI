@@ -278,7 +278,8 @@ def _reset_remap_image_block(config):
 def _draw_last_overlay(config):
     xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
     yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
-    config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+    # config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
+    config.lastOverlayBox = (xPos, yPos, xPos + config.lastOverlayBox[0], yPos + config.lastOverlayBox[1])
 
     cR = config.lastOverLayColorRange
     lastOverlayFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
@@ -400,7 +401,7 @@ def colorTransitionDone(arg=None):
 
 
 def colorTransitionStarted(arg=None):
-    # print("colorTransition   Started ")
+    print("colorTransition   Started ")
     if config.useTransitionCallbacks == True:
         config.useFilters = True
         config.usePixelSort = False
@@ -507,7 +508,7 @@ def _initialize_config(config, workConfig):
         config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
     except Exception as e:
         config.timeBetweenSetChanges = 60.0
-        config.probablilitySetChanges = 1.0
+        config.probablilitySetChanges = .0
         print(e)
         print(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
 

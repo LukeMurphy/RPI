@@ -256,7 +256,6 @@ def distortionsConfigs(config, workConfig):
     config.pNoiseMod = float(workConfig.get("distortionsConfigs", "pNoiseMod"))
     config.waveDeformXPosRate = float(workConfig.get("distortionsConfigs", "waveDeformXPosRate"))
     config.waveDeformXPos = 0
-
     config.sectionDisturbance = workConfig.getboolean("distortionsConfigs", "sectionDisturbance")
     config.doSectionDisturbance = False
     config.disturbanceConfigSets = (workConfig.get("distortionsConfigs", "disturbanceConfigSets")).split(",")

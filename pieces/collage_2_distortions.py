@@ -371,10 +371,15 @@ def iterate():
     config.render(temp1, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
 
     if random.random() < config.resetProbability :
-        print("\n  resetting things")
-        _initialize_shapes(config, workConfig)
-        _initialize_overlay_settings(config, workConfig)
+        _imageReset()
 
+def _imageReset():
+    img = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    tempDraw = ImageDraw.Draw(img)
+    tempDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=(0,0,0,200))
+    config.destinationImage.paste(img, (0, 0), img)
+    _initialize_shapes(config, workConfig)
+    _initialize_overlay_settings(config, workConfig)
 
 def _newFilterRemapping(config):
     config.filterRemap = True
@@ -414,6 +419,7 @@ def colorTransitionStarted(arg=None):
 
 def main(run=True):
     global config, shapeGroups, workConfig
+    print("\n Main Init:")
 
     _initialize_config(config, workConfig)
     _initialize_shapes(config, workConfig)
@@ -426,15 +432,11 @@ def main(run=True):
 def _initialize_config(config, workConfig):
     config.t1 = time.time()
     config.t2 = time.time()
-
     config.directorController = Director(config)
-    try:
-        config.delay = float(workConfig.get("collageShapes", "delay"))
-        config.directorController.slotRate = float(workConfig.get("collageShapes", "slotRate"))
-    except Exception as e:
-        print(e)
-        config.delay = 0.03
-        config.directorController.slotRate = 0.04
+    _load_config_value(config, workConfig, "collageShapes", "delay", 0.03, float)
+    _load_config_value(config, workConfig, "collageShapes", "slotRate", 0.04, float)
+    config.directorController.delay = config.delay
+    config.directorController.slotRate = config.slotRate
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -460,7 +462,6 @@ def _initialize_config(config, workConfig):
 
     _load_config_value(config, workConfig, "displayconfig", "useLastOverlay", False, bool)
     _load_config_value(config, workConfig, "displayconfig", "useLastOverlayProb", 0.001, float)
-
     _load_config_value(config, workConfig, "collageShapes", "transitionStepsMin", 0, int)
     _load_config_value(config, workConfig, "collageShapes", "transitionStepsMax", 0, int)
     _load_config_value(config, workConfig, "collageShapes", "changeBoxProb", 0.0, float)
@@ -475,6 +476,10 @@ def _initialize_config(config, workConfig):
     config.useBadPixels = False
 
     _load_config_value(config, workConfig, "collageShapes", "useTransitionCallbacks", False, bool)
+    _load_config_value(config, workConfig, "collageShapes", "useTweenTriggers", False, bool)
+
+
+
     _load_config_value(config, workConfig, "collageShapes", "useTweenTriggers", False, bool)
 
 
@@ -510,14 +515,17 @@ def _initialize_config(config, workConfig):
         print(e)
         config.variablePixelProbOff = config.variablePixelProb
 
-    try:
-        config.timeBetweenSetChanges = float(workConfig.get("collageShapes", "timeBetweenSetChanges"))
-        config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
-    except Exception as e:
-        config.timeBetweenSetChanges = 60.0
-        config.probablilitySetChanges = .0
-        print(e)
-        print(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
+
+    _load_config_value(config, workConfig, "collageShapes", "timeBetweenSetChanges", 60.0, float)
+    _load_config_value(config, workConfig, "collageShapes", "probablilitySetChanges", 0.0, float)
+    # try:
+    #     config.timeBetweenSetChanges = float(workConfig.get("collageShapes", "timeBetweenSetChanges"))
+    #     config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
+    # except Exception as e:
+    #     config.timeBetweenSetChanges = 60.0
+    #     config.probablilitySetChanges = .0
+    #     print(e)
+    #     print(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
 
     config.shapeSets = list(map(lambda x: x, workConfig.get("collageShapes", "sets").split(",")))
 
@@ -613,5 +621,5 @@ def _load_config_value(obj, workConfig, section, option, default, type_converter
     try:
         setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        print(e)
+        print(f"=> Failed to set {section}.{option} {e}")
         setattr(obj, option, default)

@@ -1106,12 +1106,16 @@ def _loadFilterRemappingConfigs():
 
 
 def _loadPolyOverlaybaseValues():
-    _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
-    print(_polyBaseVals)
-    config.polyBase = []
-    for _a in _polyBaseVals:
-        _ps = list(map(lambda x: int(x), _a.split(",")))
-        config.polyBase.append(_ps)
+    try:
+        _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
+        print(_polyBaseVals)
+        config.polyBase = []
+        for _a in _polyBaseVals:
+            _ps = list(map(lambda x: int(x), _a.split(",")))
+            config.polyBase.append(_ps)
+    except Exception as e:
+        print(e)
+        config.polyBase = []
 
 
 def setupPolyOverlay() :  # sourcery skip: extract-method

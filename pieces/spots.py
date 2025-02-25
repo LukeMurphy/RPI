@@ -35,7 +35,7 @@ class DotGrid :
 	
 	def __init__(self):
 		self.clrs = [(255,0,0,255), (0,255,0,255), (0,0,255,255)]
-		self.dotGridsArray = list()
+		self.dotGridsArray = []
 		self.width = 256
 		self.height = 256
 
@@ -47,8 +47,8 @@ class DotGrid :
 
 
 
-	def setUp(self) :
-		self.dotGridsArray = list()
+	def setUp(self):
+		self.dotGridsArray = []
 		self.workImage = Image.new("RGBA", (self.width, self.height))
 		self.draw = ImageDraw.Draw(self.workImage)
 		#self.draw.rectangle((0,0,self.width,self.height), fill=self.bgColor)
@@ -61,12 +61,12 @@ class DotGrid :
 		self.dotImageArray = [self.dotImage1, self.dotImage2, self.dotImage3]
 		self.hideDotRate = 0
 
-		for i in range(0,3) :
+		for i in range(3):
 			n = 0
 			workImage = self.dotImageArray[i]
 			draw = ImageDraw.Draw(workImage)
-			for c in range(0,self.cols):
-				for r in range(0,self.rows):
+			for c in range(self.cols):
+				for r in range(self.rows):
 					xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
 					yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
 					#self.dotGridsArray.append(list())
@@ -82,21 +82,15 @@ class DotGrid :
 
 					if self.dotVariationByColor == True :
 						dotVariation = random.random() * self.dotVariation
-					d.dotSize = self.dotSize + dotVariation
-					d.spreadX = self.spreadX #+ i * 5
-					d.spreadY = self.spreadY
-	
-					if n in self.hideDotsList : 
-						d.visible = False
-					else :
-						d.visible = True
+					self._extracted_from_change_36(dotVariation, d)
+					d.visible = n not in self.hideDotsList
 					d.setUp()
 					d.drawOval()
 					self.dotGridsArray.append(d)
 					n += 1
 
 
-	def change(self) :
+	def change(self):
 
 		self.workImage = Image.new("RGBA", (self.width, self.height))
 		self.draw = ImageDraw.Draw(self.workImage)
@@ -109,25 +103,23 @@ class DotGrid :
 		self.hideDotRate = 0
 
 		dNum  = 0
-		for i in range(0,3) :
-			n = 0
+		n = 0
+		for i in range(3):
 			workImage = self.dotImageArray[i]
 			draw = ImageDraw.Draw(workImage)
-			for c in range(0,self.cols):
-				for r in range(0,self.rows):
+			for c in range(self.cols):
+				for r in range(self.rows):
 					d = self.dotGridsArray[dNum]
 					d.workImage = workImage
 					d.draw = draw
 
-					if random.random() < self.changeDotRate :
+					if random.random() < self.changeDotRate:
 						xVariation = self.gridVariation - 2 * self.gridVariation * random.random()
 						yVariation = self.gridVariation - 2 * self.gridVariation * random.random()
 						dotVariation = random.random() * self.dotVariation
 						d.xOffSet = (self.dotSize + self.packing) * c + xVariation * (i-2) * 1 + self.colsXOffset
 						d.yOffSet = (self.dotSize + self.packing) * r + yVariation * (2-i) * 1 + self.rowsYOffset
-						d.dotSize = self.dotSize + dotVariation
-						d.spreadX = self.spreadX #+ i * 5
-						d.spreadY = self.spreadY
+						self._extracted_from_change_36(dotVariation, d)
 						d.setUp()
 
 					d.drawOval()
@@ -138,6 +130,12 @@ class DotGrid :
 		self.workImage = ImageChops.add_modulo(self.workImage , self.dotImageArray[1])
 		self.workImage = ImageChops.add_modulo(self.workImage , self.dotImageArray[2])
 		self.workImage = self.workImage.filter(ImageFilter.GaussianBlur(radius=self.blurRadius))
+
+	# TODO Rename this here and in `setUp` and `change`
+	def _extracted_from_change_36(self, dotVariation, d):
+		d.dotSize = self.dotSize + dotVariation
+		d.spreadX = self.spreadX
+		d.spreadY = self.spreadY
 
 
 
@@ -183,8 +181,8 @@ def processImage():
 	config.canvasImage.paste(config.dotGrid.workImage, (0,0))
 
 
-def getColor(r,g,b,a) :
-	clr = list( round(i * config.brightness) for i in [r,g,b])
+def getColor(r,g,b,a):
+	clr = [round(i * config.brightness) for i in [r,g,b]]
 	clr.append(a)
 	return tuple(clr)
 
@@ -194,31 +192,15 @@ def iterate():
 	# config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
 	# config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
 
-	
+
 	if config.useFadeThruAnimation == True:
 		if config.f.fadingDone == True:
 
-			config.renderImageFullOld = config.renderImageFull.copy()
-			config.renderImageFull.paste(
-				config.canvasImage,
-				(config.imageXOffset, config.imageYOffset),
-				config.canvasImage,
-			)
-			config.f.xPos = config.imageXOffset
-			config.f.yPos = config.imageYOffset
-			# config.renderImageFull = config.renderImageFull.convert("RGBA")
-			# renderImageFull = renderImageFull.convert("RGBA")
-			config.f.setUp(
-				config.renderImageFullOld.convert("RGBA"),
-				config.canvasImage.convert("RGBA"),
-			)
-			processImage()
-
-
+			_extracted_from_iterate_11(config)
 		config.f.fadeIn()
 		config.render(config.f.blendedImage, 0, 0)
 		config.init += config.initCount
-		
+
 		# This is to get a faster initial fade-in then when done
 		# set it to the right fade-through count
 		if config.init > 18 and config.initCount > 0 :
@@ -243,6 +225,25 @@ def iterate():
 		config.dotGrid.dotVariation = config.dotVariation
 		#print(config.dotVariation)
 		config.dotGrid.setUp()
+
+
+# TODO Rename this here and in `iterate`
+def _extracted_from_iterate_11(config):
+	config.renderImageFullOld = config.renderImageFull.copy()
+	config.renderImageFull.paste(
+		config.canvasImage,
+		(config.imageXOffset, config.imageYOffset),
+		config.canvasImage,
+	)
+	config.f.xPos = config.imageXOffset
+	config.f.yPos = config.imageYOffset
+	# config.renderImageFull = config.renderImageFull.convert("RGBA")
+	# renderImageFull = renderImageFull.convert("RGBA")
+	config.f.setUp(
+		config.renderImageFullOld.convert("RGBA"),
+		config.canvasImage.convert("RGBA"),
+	)
+	processImage()
 
 
 def init():
@@ -284,7 +285,7 @@ def init():
 	config.dotVariation = float(workConfig.get("spots", "dotVariation"))
 	config.dotVariationChangeProb = float(workConfig.get("spots", "dotVariationChangeProb"))
 	config.dotVariationByColor = (workConfig.getboolean("spots", "dotVariationByColor"))
-	config.imageXOffset = 0 
+	config.imageXOffset = 0
 	config.imageYOffset = 0
 
 
@@ -326,7 +327,7 @@ def init():
 	try:
 		config.refreshSpeed = float(workConfig.get("spots", "refreshSpeed"))
 	except Exception as e:
-		print(str(e))
+		print(e)
 		config.refreshSpeed = config.redrawSpeed
 
 	config.directorController = Director(config)
@@ -370,4 +371,4 @@ def main(run=True):
 
 ### Kick off .......
 if __name__ == "__main__":
-	__main__()
+	main()

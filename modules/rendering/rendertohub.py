@@ -423,7 +423,7 @@ def _saveToFileCall():
             saveImageToFile()
 
 
-def _forceBlueGreenSwap():
+def _forceBlueGreenSwap(imageToRender):
     if not config.forceBGSwap:
         return
     data = numpy.array(imageToRender)
@@ -435,6 +435,7 @@ def _forceBlueGreenSwap():
 
     data2 = numpy.array(im_rgb)
     imageToRender = Image.fromarray(data2)
+    return imageToRender
 
 def _renderDiagnostics():
     if not config.renderDiagnostics:
@@ -461,7 +462,8 @@ def render(
     # Render to canvas
     # This needs to be optomized !!!!!!
 
-    _forceBlueGreenSwap()
+    if config.forceBGSwap:
+        imageToRender = _forceBlueGreenSwap(imageToRender)
 
     if config.rotation != 0:
         if config.fullRotation:

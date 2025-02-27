@@ -457,7 +457,6 @@ def drawSquareSpiral():
                     n += 4
 
 
-
 def resetToAllowDistortion():
     config.rebuildingPattern = False
     # print("restartPiece has finished its call")
@@ -668,7 +667,7 @@ def main(run=True):
 
     config.doingSectionDisturbance = False
     config.rebuildingPattern = True
-    distortions.additonalSetup(config, workConfig)
+    distortions.distortionsConfigs(config, workConfig)
 
     config.blockImage = Image.new("RGBA", (config.dblockWidth, config.dblockHeight))
     config.blockDraw = ImageDraw.Draw(config.blockImage)

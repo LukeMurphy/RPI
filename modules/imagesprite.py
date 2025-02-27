@@ -461,6 +461,7 @@ class ImageSprite:
             # 95% of the time they dance together as mirrors
             if random.random() < 0.97:
                 cp1 = self.image.crop((0, 0, dx + sectionWidth, sectionHeight))
+                cp1 = cp1.convert('RGBA')
                 self.image.paste(cp1, (round(dx), round(0 + dy)), cp1)
 
 

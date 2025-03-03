@@ -159,6 +159,11 @@ def openFile():
         os.system(f"open {configSelected[list(configSelected.keys())[0]]}")
 
 
+def ondeck(arg):
+    getAllConfigFiles(dateSort=True, subsortDate=True, filterText=arg)
+
+
+
 def returnFirstElement(arg):
     return arg[0]
 
@@ -229,25 +234,15 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.itemconfig(END, bg="#eeeeee" if "screen_grid" in key else None)
 
 
-# TODO Rename this here and in `getAllConfigFiles`
-def _extracted_from_getAllConfigFiles_(ListBoxOfConfigs, item):
-        # print(list(item.keys())[0])
-    ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
-    ListBoxOfConfigs.itemconfig(
-        END, bg="#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white"
-    )
-    ListBoxOfConfigs.itemconfig(
-        END, bg="#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None
-    )
-    ListBoxOfConfigs.itemconfig(
-        END, bg="#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None
-    )
-    ListBoxOfConfigs.itemconfig(
-        END, bg="#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None
-    )
-    ListBoxOfConfigs.itemconfig(
-        END, bg="#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None
-    )
+# # TODO Rename this here and in `getAllConfigFiles`
+# def _extracted_from_getAllConfigFiles_(ListBoxOfConfigs, item):
+#     # print(list(item.keys())[0])
+#     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
+#     ListBoxOfConfigs.itemconfig(END, bg="#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white")
+#     ListBoxOfConfigs.itemconfig(END, bg="#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None)
+#     ListBoxOfConfigs.itemconfig(END, bg="#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None)
+#     ListBoxOfConfigs.itemconfig(END, bg="#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None)
+#     ListBoxOfConfigs.itemconfig(END, bg="#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None)
 
 
 # -------------------------------- #
@@ -264,7 +259,8 @@ root.geometry(
     "%dx%d+%d+%d"
     % (
         760,
-        round(screen_height * 0.6),
+        420,
+        # round(screen_height * 0.6),
         round(screen_width - 800),
         round(1 * screen_height / 2),
     )
@@ -275,9 +271,7 @@ root.config(bg="white")
 
 # -------------------------------- #
 # Setup the main listBox widget
-ListBoxOfConfigs = Listbox(
-    root, width=90, height=42, bg="white", foreground="black", bd=False
-)
+ListBoxOfConfigs = Listbox(root, width=90, height=42, bg="white", foreground="black", bd=False)
 
 for item in actionDict1:
     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
@@ -310,9 +304,7 @@ slogan = Button(
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
 # -------------------------------- #
-slogan = Button(
-    root, text="Run", width=120, bg="#497faa", fg="white", borderless=1, command=action
-)
+slogan = Button(root, text="Run", width=120, bg="#497faa", fg="white", borderless=1, command=action)
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 # -------------------------------- #
@@ -374,10 +366,18 @@ slogan = Button(
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 # -------------------------------- #
-quitbutton = Button(
-    root, text="QUIT", width=120, bg="#497faa", fg="white", borderless=1, command=quit
-)
+quitbutton = Button(root, text="QUIT", width=120, bg="#497faa", fg="white", borderless=1, command=quit)
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
+
+# -------------------------------- #
+ondeckButton = Button(root, text="On Deck", width=120, bg="#497faa", fg="white", borderless=1, command=lambda:ondeck("ondeck"))
+ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
+
+prodButton = Button(root, text="Production", width=120, bg="#497faa", fg="white", borderless=1, command=lambda:ondeck("prod"))
+prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 275)
+
+devButton = Button(root, text="Dev", width=120, bg="#497faa", fg="white", borderless=1, command=lambda:ondeck("dev"))
+devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 300)
 
 # -------------------------------- #
 # Filter text box

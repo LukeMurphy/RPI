@@ -225,6 +225,7 @@ def fishScales(config, paletteObj=None):
                 yPos + boxWidth/2),
                 outline=(clr), fill=clr3)
 
+
 def shellScales(config, paletteObj=None):
     clr, clr2, clr3 = _get_colors(config, paletteObj)
 
@@ -291,6 +292,7 @@ def _draw_offset_row_of_ellipses(config, yPos, boxWidth, clr, clr3, numLinesHalf
             yP = yPos + boxWidth - boxWidth + radius * math.sin(angle)  # Corrected yP calculation
             clrToUse = clr2 if q % 2 == 0 else clr
             config.blockDraw.line((x0, y0, xP, yP), fill=clrToUse)
+
 
 def ellipses(config, paletteObj=None):
     clr, clr2, clr3 = _get_colors(config, paletteObj)
@@ -624,7 +626,6 @@ def bars(config, paletteObj=None):
         count += 1
 
 
-
 def coloredBlocks(config, paletteObj=None):
     clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
     clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
@@ -636,6 +637,7 @@ def coloredBlocks(config, paletteObj=None):
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr, outline=None)
+    # config.blockDraw.rectangle((5, 5, 10, 15), fill=(255,0,0,255), outline=None)
 
     # count = 0
     # barWidth = 4
@@ -670,12 +672,11 @@ def concentricBoxes(config, paletteObj=None):
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+
 
     count = 0
 
-    for i in range(config.numConcentricBoxes, 2):
+    for i in range(0,config.numConcentricBoxes, 2):
 
         if config.altLineColoring == True:
             outClr = clr2
@@ -683,6 +684,7 @@ def concentricBoxes(config, paletteObj=None):
                 outClr = clr
         else:
             outClr = clr
+
         config.blockDraw.rectangle((
             i-1,
             i-1,
@@ -690,7 +692,6 @@ def concentricBoxes(config, paletteObj=None):
             config.blockHeight-1*i),
             outline=(outClr), fill=None)
         count += 1
-
 
 
 def decoBoxes(config, paletteObj=None):
@@ -779,10 +780,10 @@ def randomizer2(config, paletteObj=None):
     h = config.randomBlockHeight
 
 
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
+
+    clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=clr, outline=None)

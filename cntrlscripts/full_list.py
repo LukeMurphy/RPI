@@ -22,6 +22,20 @@ from tkinter import font
 from tkmacosx import Button
 
 
+_defaultClr = "#5d7982"
+_stopAndRun = "#004f62"
+_quitClr = "#74144c"
+_stopAllClr = "#9e1b67"
+
+_prodColor = "#e4fff3"
+_devFormsClr = "#58fc00"
+_devClr = "#58fcbd"
+_devFormsClr = "#58fc00"
+_devOnDeckClr = "#ccFF00"
+_screenGridClr = "#eeeeee"
+
+
+
 """Summary
 
 Attributes:
@@ -223,15 +237,15 @@ def _create_action_dict(fullList, dateSort, configPath):
     return actionDict
 
 
+
 def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
     key = list(item.keys())[0]
-    ListBoxOfConfigs.itemconfig(END, bg="#ffbbea" if "prod" in key else "white")
-    ListBoxOfConfigs.itemconfig(END, bg="#58fc00" if "dev_forms" in key else None)
-    ListBoxOfConfigs.itemconfig(END, bg="#58fcbd" if "dev" in key else None)
-    ListBoxOfConfigs.itemconfig(END, bg="#ccFF00" if "dev_ondeck" in key else None)
-    # ListBoxOfConfigs.itemconfig(END, bg="#cfff3" if "dev_ondeck" in key else None)
-    ListBoxOfConfigs.itemconfig(END, bg="#eeeeee" if "screen_grid" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_prodColor if "prod" in key else "white")
+    ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "dev_forms" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_devClr if "dev/" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_screenGridClr if "screen_grid" in key else None)
 
 
 # # TODO Rename this here and in `getAllConfigFiles`
@@ -296,7 +310,7 @@ slogan = Button(
     root,
     text="Stop & Run",
     width=120,
-    bg="#497faa",
+    bg=_stopAndRun,
     fg="white",
     borderless=1,
     command=action2,
@@ -304,7 +318,7 @@ slogan = Button(
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
 # -------------------------------- #
-slogan = Button(root, text="Run", width=120, bg="#497faa", fg="white", borderless=1, command=action)
+slogan = Button(root, text="Run", width=120, bg=_stopAndRun, fg="white", borderless=1, command=action)
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 # -------------------------------- #
@@ -312,7 +326,7 @@ openbutton = Button(
     root,
     text="Open",
     width=120,
-    bg="#497faa",
+    bg=_defaultClr,
     fg="white",
     borderless=1,
     command=openFile,
@@ -324,7 +338,7 @@ sortbutton1 = Button(
     root,
     text="Sort By Date",
     width=120,
-    bg="#497faa",
+    bg=_defaultClr,
     fg="white",
     borderless=1,
     command=sortByDate,
@@ -336,7 +350,7 @@ sortbutton2 = Button(
     root,
     text="Sort by Folder",
     width=120,
-    bg="#497faa",
+    bg=_defaultClr,
     fg="white",
     borderless=1,
     command=sortByFolder,
@@ -347,7 +361,7 @@ sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 #     root,
 #     text="Sort by Folder+",
 #     width=120,
-#     bg="#497faa",
+#     bg=_defaultClr,
 #     fg="white",
 #     borderless=1,
 #     command=sortByFolderAndDate,
@@ -358,7 +372,7 @@ slogan = Button(
     root,
     text="Stop All",
     width=120,
-    bg="#497faa",
+    bg=_stopAllClr,
     fg="white",
     borderless=1,
     command=stopAll,
@@ -366,17 +380,17 @@ slogan = Button(
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 # -------------------------------- #
-quitbutton = Button(root, text="QUIT", width=120, bg="#497faa", fg="white", borderless=1, command=quit)
+quitbutton = Button(root, text="QUIT", width=120, bg=_quitClr, fg="white", borderless=1, command=quit)
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
-ondeckButton = Button(root, text="On Deck", width=120, bg="#497faa", fg="white", borderless=1, command=lambda:ondeck("ondeck"))
+ondeckButton = Button(root, text="On Deck", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("ondeck"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
-prodButton = Button(root, text="Production", width=120, bg="#497faa", fg="white", borderless=1, command=lambda:ondeck("prod"))
+prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda:ondeck("prod"))
 prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 275)
 
-devButton = Button(root, text="Dev", width=120, bg="#497faa", fg="white", borderless=1, command=lambda:ondeck("dev"))
+devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda:ondeck("dev"))
 devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 300)
 
 # -------------------------------- #
@@ -387,7 +401,7 @@ clearButton = Button(
     root,
     text="Clear",
     width=120,
-    bg="#497faa",
+    bg=_defaultClr,
     fg="white",
     borderless=True,
     command=clear,

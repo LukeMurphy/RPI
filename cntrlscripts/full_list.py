@@ -23,7 +23,8 @@ from tkmacosx import Button
 
 
 _defaultClr = "#5d7982"
-_stopAndRun = "#007f62"
+_defaultClr = "#029eed"
+_stopAndRun = "#0277ed"
 _quitClr = "#74144c"
 _stopAllClr = "#9e1b67"
 
@@ -332,7 +333,7 @@ sortbutton1 = Button(
     borderless=1,
     command=sortByDate,
 )
-sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
+sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 75)
 
 # -------------------------------- #
 sortbutton2 = Button(
@@ -344,7 +345,7 @@ sortbutton2 = Button(
     borderless=1,
     command=sortByFolder,
 )
-sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
+sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 
 # sortbutton3 = Button(
 #     root,
@@ -357,6 +358,17 @@ sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 # )
 # sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
+# -------------------------------- #
+ondeckButton = Button(root, text="On Deck", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("ondeck"))
+ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
+
+prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda:ondeck("prod"))
+prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
+
+devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda:ondeck("dev"))
+devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
+
+# -------------------------------- #
 slogan = Button(
     root,
     text="Stop All",
@@ -366,21 +378,13 @@ slogan = Button(
     borderless=1,
     command=stopAll,
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
 quitbutton = Button(root, text="QUIT", width=120, bg=_quitClr, fg="white", borderless=1, command=quit)
-quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
+quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
 
-# -------------------------------- #
-ondeckButton = Button(root, text="On Deck", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("ondeck"))
-ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
-prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda:ondeck("prod"))
-prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 275)
-
-devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda:ondeck("dev"))
-devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 300)
 
 # -------------------------------- #
 # Filter text box

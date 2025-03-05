@@ -78,10 +78,10 @@ def setColorsByPalette():
     config.bgColorOverlay.setStartColor()
     config.bgColorOverlay.getNewColor()
 
-    print(" ---------------------------------------- ")
-    print(" ------------ new palette --------------- ")
-    print(f" palette {paletteRef.name}\n {paletteRef.bg_fillRange}\n {paletteRef.particle_fillRange}")
-    print(" ---------------------------------------- ")
+    # print(" ---------------------------------------- ")
+    # print(" ------------ new palette --------------- ")
+    # print(f" palette {paletteRef.name}\n {paletteRef.bg_fillRange}\n {paletteRef.particle_fillRange}")
+    # print(" ---------------------------------------- ")
 
 
 # -----------------------------------------------------------

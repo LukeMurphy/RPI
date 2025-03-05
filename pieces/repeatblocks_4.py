@@ -521,33 +521,13 @@ def _set_initial_pattern_config(config):
     config.iterateCount = 0
 
 
-def _bak_generate_pattern_sequence(config):
-    i = 0
-    _runningCount = 0
-    while i < config.numberOfPatterns:
-        pattern = config.patterns[math.floor(random.uniform(0, len(config.patterns)))]
-        if pattern not in config.usedPatterns or config.iterateCount >= config.patternIterateCount:
-            rotate = 0 if pattern in (["shingles", "fishScales", "balls"]) else round(random.uniform(0, 1))
-            position = _get_pattern_position(config)
-
-            _runningCount += position - config.lastPosition
-            print(f"position {pattern} {position} {config.lastPosition} {_runningCount}")
-
-            _tempPalette = _get_temp_palette(config)
-            config.patternSequence.append([pattern, position, rotate, _tempPalette])
-            config.usedPatterns.append(pattern)
-            config.lastPosition = position
-            i += 1
-        config.iterateCount += 1
-
-
 # this really needs to change to be more readable and predictable ....
 # there are n number of slots, just fill each one and change randomly etc
 # as they all get filled up
 def _generate_pattern_sequence(config):
 
     _baseProb = config.patternChangeWhenBuilding * config.totalSlots / 100
-    pattern = config.patterns[math.floor(random.uniform(0, len(config.patterns)))]
+    _patternSelected = config.patterns[math.floor(random.uniform(0, len(config.patterns)))]
     _tempPalette = _get_temp_palette(config)
 
     # for i in range(config.totalSlots):
@@ -555,19 +535,19 @@ def _generate_pattern_sequence(config):
     for c in range(config.cols):
         for r in range(config.rows):
             if random.random() < _baseProb:
-                pattern = config.patterns[math.floor(random.uniform(0, len(config.patterns)))]
+                _patternSelected = config.patterns[math.floor(random.uniform(0, len(config.patterns)))]
                 _tempPalette = _get_temp_palette(config)
 
-            rotate = 0 if pattern in (["shingles", "fishScales", "balls"]) else round(random.uniform(0, 1))
-            position = _iterCount
-            _pattern = pattern
+            _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls"]) else round(random.uniform(0, 1))
+            _position = _iterCount
+            _pattern = _patternSelected
 
             if config.useBorderPattern and (c == 0 or r == 0 or c == (config.cols - 1) or r == (config.rows - 1)):
                 _pattern = config.borderPattern
 
-            config.patternSequence.append([_pattern, position, rotate, _tempPalette, [c, r]])
+            config.patternSequence.append([_pattern, _position, _rotate, _tempPalette, [c, r]])
             config.usedPatterns.append(_pattern)
-            # config.lastPosition = position
+            # config.lastPosition = _position
             _iterCount += 1
 
 
@@ -615,7 +595,16 @@ def rebuildPatterns(arg=0):
 
     rebuildSections()
     config.repeatDrawingMode = 1
+
+
     config.fader.fadingDone = False
+
+
+
+    config.fader.crossFade = config.image.copy()
+
+
+
     config.fader.doingRefreshCount = config.faderDoingRefreshCount
 
 
@@ -631,8 +620,8 @@ def _rowsAndDotsSettings():
 
 def setupPatterns():
     config.patterns = workConfig.get("movingpattern", "patterns").split(",")
-    config.patternModelVariations = workConfig.getboolean("movingpattern", "patternModelVariations")
-    config.patternModel = workConfig.get("movingpattern", "patternModel")
+    _load_config_value(config, workConfig, "movingpattern", "patternModelVariations", True, bool)
+    _load_config_value(config, workConfig, "movingpattern", "patternModel", None, str)
 
     patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
     config.patternSequence = []
@@ -644,49 +633,26 @@ def setupPatterns():
         ]
         for i in range(0, len(patternSequence), 3)
     )
-    try:
-        config.patternSequenceMax = int(workConfig.get("movingpattern", "patternSequenceMax"))
-        config.patternSequenceMin = int(workConfig.get("movingpattern", "patternSequenceMin"))
-        # comment:
-    except Exception as e:
-        print(e)
-        config.patternSequenceMin = 2
-        config.patternSequenceMax = 5
+
+    _load_config_value(config, workConfig, "movingpattern", "patternSequenceMax", 2, int)
+    _load_config_value(config, workConfig, "movingpattern", "patternSequenceMin", 5, int)
 
     config.rotateAltBlock = 0
 
-    config.numRows = int(workConfig.get("movingpattern", "numRows"))
-    config.numRowsRandomize = workConfig.getboolean("movingpattern", "numRowsRandomize")
-    config.rebuildPatternProbability = float(workConfig.get("movingpattern", "rebuildPatternProbability"))
-    config.usePixelSortRandomize = workConfig.getboolean("movingpattern", "usePixelSortRandomize")
+    _load_config_value(config, workConfig, "movingpattern", "numRows", 5, int)
+    _load_config_value(config, workConfig, "movingpattern", "numRowsRandomize", False, bool)
+    _load_config_value(config, workConfig, "movingpattern", "usePixelSortRandomize", True, bool)
+    _load_config_value(config, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
 
-    try:
-        config.changePaletteWhenRebuildProb = float(workConfig.get("movingpattern", "changePaletteWhenRebuildProb"))
-    except Exception as e:
-        print(e)
-        config.changePaletteWhenRebuildProb = 0.25
-
-    try:
-        config.patternChangeWhenBuilding = float(workConfig.get("movingpattern", "patternChangeWhenBuilding"))
-        config.changeFullPaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changeFullPaletteWhenChangingPatternProb"))
-        config.changePaletteWhenChangingPatternProb = float(workConfig.get("movingpattern", "changePaletteWhenChangingPatternProb"))
-        # config.positionRange = int(workConfig.get("movingpattern", "positionRange"))
-        # config.patternIterateCount = int(workConfig.get("movingpattern", "patternIterateCount"))
-    except Exception as e:
-        print(
-            f"\n ==>  {e} \n ==> new configurations for more variation controls: \n changeFullPaletteWhenChangingPatternProb \n changeFullPaletteWhenChangingPatternProb \n positionRange \n patternIterateCount \n <===\n"
-        )
-        config.changeFullPaletteWhenChangingPatternProb = 0.0
-        config.changePaletteWhenChangingPatternProb = 0.0
-        config.patternChangeWhenBuilding = 0.0
-        # config.positionRange = 0
-        # config.patternIterateCount = 256
-
-    try:
-        config.altColoringProb = float(workConfig.get("movingpattern", "altColoringProb"))
-    except Exception as e:
-        print(e)
-        config.altColoringProb = 0.5
+    # --------------------- PATTERN CHANGE   ---------------------
+    # higher = more variation in patterns
+    # e.g. .2 is 20% chance each new block will change to a
+    # new pattern
+    _load_config_value(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
 
     try:
         ringsRange = workConfig.get("movingpattern", "ringsRange").split(",")
@@ -700,11 +666,8 @@ def setupPatterns():
         config.ringsRange = (1, 1)
         config.numScaleRows = config.numShingleRows
 
-    try:
-        config.linesOnly = workConfig.getboolean("movingpattern", "linesOnly")
-    except Exception as e:
-        print(e)
-        config.linesOnly = False
+    # affects patterns to use just lines w/o fills
+    _load_config_value(config, workConfig, "movingpattern", "linesOnly", False, bool)
 
     try:
         config.borderPattern = workConfig.get("movingpattern", "borderPattern")
@@ -720,38 +683,36 @@ def setupPatterns():
     # print(config.waveScaleRings, config.waveScaleSteps)
     # end try
 
-    config.randomBlockProb = float(workConfig.get("movingpattern", "randomBlockProb"))
-    config.randomBlockWidth = int(workConfig.get("movingpattern", "randomBlockWidth"))
-    config.randomBlockHeight = int(workConfig.get("movingpattern", "randomBlockHeight"))
-    config.decoBoxBandWidth = int(workConfig.get("movingpattern", "decoBoxBandWidth"))
+    # for the randomizer
+    _load_config_value(config, workConfig, "movingpattern", "randomBlockProb", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "randomBlockWidth", 10, int)
+    _load_config_value(config, workConfig, "movingpattern", "randomBlockHeight", 10, int)
+    _load_config_value(config, workConfig, "movingpattern", "decoBoxBandWidth", 10, int)
 
     config.diamondUseTriangles = False
-    config.diamondStep = int(workConfig.get("movingpattern", "diamondStep"))
-
-    config.numConcentricBoxes = int(workConfig.get("movingpattern", "numConcentricBoxes"))
-
-    config.numShingleRows = int(workConfig.get("movingpattern", "numShingleRows"))
-
-    config.amplitude = int(workConfig.get("movingpattern", "amplitude"))
-    config.amplitude2 = int(workConfig.get("movingpattern", "amplitude2"))
-    config.shingleVariation = workConfig.getboolean("movingpattern", "shingleVariation")
-    config.shingleVariationRange = int(workConfig.get("movingpattern", "shingleVariationRange"))
+    _load_config_value(config, workConfig, "movingpattern", "diamondStep", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "numConcentricBoxes", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "numShingleRows", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "amplitude", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "amplitude2", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "shingleVariation", False, bool)
+    _load_config_value(config, workConfig, "movingpattern", "shingleVariationRange", 1, int)
     config.shingleVariationAmount = config.shingleVariationRange
 
-    config.numDotRows = int(workConfig.get("movingpattern", "numDotRows"))
+    _load_config_value(config, workConfig, "movingpattern", "numDotRows", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "speedFactor", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "phaseFactor", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "xSpeed", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "ySpeed", 0.0, float)
+    config.ySpeedInit = config.ySpeed
 
-    config.speedFactor = float(workConfig.get("movingpattern", "speedFactor"))
-    config.phaseFactor = float(workConfig.get("movingpattern", "phaseFactor"))
-    config.xSpeed = float(workConfig.get("movingpattern", "xSpeed"))
-    config.ySpeed = float(workConfig.get("movingpattern", "ySpeed"))
-    config.ySpeedInit = float(workConfig.get("movingpattern", "ySpeed"))
+    _load_config_value(config, workConfig, "movingpattern", "lineDiff", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "useDoubleLine", False, bool)
+    _load_config_value(config, workConfig, "movingpattern", "randomizeSpeed", False, bool)
 
-    config.lineDiff = int(workConfig.get("movingpattern", "lineDiff"))
-    config.useDoubleLine = workConfig.getboolean("movingpattern", "useDoubleLine")
-    config.randomizeSpeed = workConfig.getboolean("movingpattern", "randomizeSpeed")
-
-    config.steps = int(workConfig.get("movingpattern", "steps"))
-    config.steps2 = int(workConfig.get("movingpattern", "steps2"))
+    # used in pattern_blocks code
+    _load_config_value(config, workConfig, "movingpattern", "steps", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "steps2", 1, int)
 
     config.xIncrementer = 0
     config.yIncrementer = 0
@@ -835,10 +796,7 @@ def drawRepeatedPatternImage(config, canvasImage):
     for i in range(config.totalSlots):
         if config.patternModelVariations:
             _apply_pattern_variations(config, i)
-        _draw_block(config, canvasImage, 
-                    config.patternSequence[i][4][0], 
-                    config.patternSequence[i][4][1], 
-                    i, extraOverlapx, extraOverlapy)
+        _draw_block(config, canvasImage, config.patternSequence[i][4][0], config.patternSequence[i][4][1], i, extraOverlapx, extraOverlapy)
 
     config.patternImage = canvasImage.copy()
 
@@ -897,14 +855,14 @@ def runWork():
 def iterate():
     """Performs a single iteration of the animation."""
     global config
-
     _update_background_color()
     _handle_clip_player()
     _draw_and_process_pattern()
     _handle_disturbances()
     _handle_filter_remapping()
     _handle_fading_and_rebuild()
-    _save_image_if_done()
+    if config.saveImages:
+        _save_image_if_done()
     _handle_pattern_rebuild()
     _handle_section_disturbances()
     _handle_shingle_variation()
@@ -1025,7 +983,7 @@ def _handle_fading_and_rebuild():
 
 def _save_image_if_done():
     """Saves the image if all sections are done and not already saved."""
-    if config.doneCount >= config.numberOfSections and not config.drawingPrinted and config.saveImages:
+    if config.doneCount >= config.numberOfSections and not config.drawingPrinted:
         config.fader.doingRefreshCount = 40
         config.drawingPrinted = True
         currentTime = time.time()
@@ -1099,14 +1057,14 @@ def renderComposite(_img):
     if config.usePolygonOverlay:
         _img = shapeOverLayFunction(_img)
 
-    # config.render(_img, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
 
-    config.destinationImage.paste(_img, (0, 0), _img)
-    config.destinationImage.paste(config.patternImage, (280, 0), config.patternImage)
-    config.destinationImage.paste(config.fader.crossFade, (0, 280), config.fader.crossFade)
-    config.destinationImage.paste(config.fader.image, (280, 280), config.fader.image)
+    # config.destinationImage.paste(_img, (0, 0), _img)
+    # config.destinationImage.paste(config.patternImage, (280, 0), config.patternImage)
+    # config.destinationImage.paste(config.fader.crossFade, (0, 280), config.fader.crossFade)
+    # config.destinationImage.paste(config.fader.image, (280, 280), config.fader.image)
+    # config.render(config.destinationImage, 0, 0)
 
-    config.render(config.destinationImage, 0, 0)
+    config.render(_img, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
 
 
 # ----------------- OVERLAY ACTIONS  ---------------------
@@ -1233,13 +1191,14 @@ def main(run=True):
 
     # if/when saving images
     config.drawingPrinted = True
-    config.saveImages = workConfig.getboolean("movingpattern", "saveImages")
-    config.outPutPath = workConfig.get("movingpattern", "outPutPath")
+    _load_config_value(config, workConfig, "movingpattern", "saveImages", False, bool)
+
+    _load_config_value(config, workConfig, "movingpattern", "outPutPath", "", str)
 
     _load_config_value(config, workConfig, "movingpattern", "drawBGColorEachCycle", True, bool)
 
     config.repeatDrawingMode = 1
-    config.loadAnImageProb = float(workConfig.get("movingpattern", "loadAnImageProb"))
+    _load_config_value(config, workConfig, "movingpattern", "loadAnImageProb", 0.0, float)
     config.imageSources = workConfig.get("movingpattern", "imageSources").split(",")
     ########################################################################
     # CREATE THE IMAGE HOLDERS
@@ -1261,13 +1220,13 @@ def main(run=True):
 
     ########################################################################
 
-    config.useBlurSection = workConfig.getboolean("movingpattern", "useBlurSection")
-    config.blurSectionWidth = int(workConfig.get("movingpattern", "blurSectionWidth"))
-    config.blurSectionHeight = int(workConfig.get("movingpattern", "blurSectionHeight"))
-    config.blurSectionXPos = int(workConfig.get("movingpattern", "blurSectionXPos"))
-    config.blurSectionYPos = int(workConfig.get("movingpattern", "blurSectionYPos"))
-    config.mask_blur_amt = int(workConfig.get("movingpattern", "mask_blur_amt"))
-    config.cp_blur_amt = int(workConfig.get("movingpattern", "cp_blur_amt"))
+    _load_config_value(config, workConfig, "movingpattern", "useBlurSection", False, bool)
+    _load_config_value(config, workConfig, "movingpattern", "blurSectionWidth", 0, int)
+    _load_config_value(config, workConfig, "movingpattern", "blurSectionHeight", 0, int)
+    _load_config_value(config, workConfig, "movingpattern", "blurSectionXPos", 0, int)
+    _load_config_value(config, workConfig, "movingpattern", "blurSectionYPos", 0, int)
+    _load_config_value(config, workConfig, "movingpattern", "mask_blur_amt", 0, int)
+    _load_config_value(config, workConfig, "movingpattern", "cp_blur_amt", 0, int)
 
     config.mask = Image.new("L", config.canvasImage.size, 0)
     config.mask_draw = ImageDraw.Draw(config.mask)
@@ -1341,9 +1300,12 @@ def main(run=True):
 
 def _load_config_value(obj, workConfig, section, option, default, type_converter):
     try:
-        setattr(obj, option, type_converter(workConfig.get(section, option)))
+        if type_converter == bool :
+            setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
+        else :
+            setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        print(e)
+        print(f" ==> Config value not loaded: {option} \n  {e}")
         setattr(obj, option, default)
 
 

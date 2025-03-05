@@ -23,7 +23,7 @@ from tkmacosx import Button
 
 
 _defaultClr = "#5d7982"
-_stopAndRun = "#004f62"
+_stopAndRun = "#007f62"
 _quitClr = "#74144c"
 _stopAllClr = "#9e1b67"
 
@@ -246,17 +246,6 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.itemconfig(END, bg=_devClr if "dev/" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_screenGridClr if "screen_grid" in key else None)
-
-
-# # TODO Rename this here and in `getAllConfigFiles`
-# def _extracted_from_getAllConfigFiles_(ListBoxOfConfigs, item):
-#     # print(list(item.keys())[0])
-#     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
-#     ListBoxOfConfigs.itemconfig(END, bg="#ffeeea" if list(item.keys())[0].find("prod/") > 0 else "white")
-#     ListBoxOfConfigs.itemconfig(END, bg="#58fc00" if list(item.keys())[0].find("dev_forms/") > 0 else None)
-#     ListBoxOfConfigs.itemconfig(END, bg="#cffcf3" if list(item.keys())[0].find("dev_ondeck/") > 0 else None)
-#     ListBoxOfConfigs.itemconfig(END, bg="#58fcbd" if list(item.keys())[0].find("dev/") > 0 else None)
-#     ListBoxOfConfigs.itemconfig(END, bg="#eeeeee" if list(item.keys())[0].find("screen_grid") > 0 else None)
 
 
 # -------------------------------- #

@@ -471,25 +471,17 @@ def changeSinglePalette(index=0):
 
 
 def setPalette(config, index=0):
-        
     paletteObj = config.paletteList[index]
-    print(f" ==> New palette {paletteObj.paletteName}")
-
+    print(f"New palette {paletteObj.paletteName}")
     config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
     config.linecolOverlay2.currentColor = setCurrentColor(paletteObj.linecolOverlay2)
 
 
-def setupPalettes(_pset = 0):
-
-    config.paletteSets = workConfig.get("movingpattern", "paletteSets").split("|")
-    # print(f"config.paletteSets {config.paletteSets}")
-    # config.palettes = workConfig.get("movingpattern", "palettes").split(",")
-    # config.paletteConfigs = workConfig.get("movingpattern", "palettes").split(",")
-    config.palettes = config.paletteSets[_pset].split(",")
-    config.paletteConfigs = config.paletteSets[_pset].split(",")
-
+def setupPalettes():
+    config.palettes = workConfig.get("movingpattern", "palettes").split(",")
+    config.paletteConfigs = workConfig.get("movingpattern", "palettes").split(",")
 
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
@@ -585,10 +577,9 @@ def _print_pattern_sequence(config):
     print(f"Using start pattern {config.patternModel}")
     print("----------------------------------------------")
 
-# TODO: really should load all the palettes rather than go back to disk each time 
-# the palette group changes ....
+
 def rebuildPatterns(arg=0):
-    print(" ==> rebuildPatterns called")
+    print("rebuildPattern Called")
     c = round(random.uniform(1, 4))
     if c == 1 and config.numRowsRandomize:
         _rowsAndDotsSettings()
@@ -597,12 +588,6 @@ def rebuildPatterns(arg=0):
         if config.currentPaletteIndex == len(config.palettes):
             config.currentPaletteIndex = 0
         # buildPalette(config, newPalette)
-
-
-        if random.random() < config.paletteSetChangeProbability :
-            _choice = math.floor(random.random() * len(config.paletteSets))
-            setupPalettes(_choice)
-
         setPalette(config, config.currentPaletteIndex)
 
     if c >= 3:
@@ -610,16 +595,8 @@ def rebuildPatterns(arg=0):
 
     rebuildSections()
     config.repeatDrawingMode = 1
-
-
     config.fader.fadingDone = False
-
-
-
     config.fader.crossFade = config.image.copy()
-
-
-
     config.fader.doingRefreshCount = config.faderDoingRefreshCount
 
 
@@ -664,7 +641,6 @@ def setupPatterns():
     # higher = more variation in patterns
     # e.g. .2 is 20% chance each new block will change to a
     # new pattern
-    _load_config_value(config, workConfig, "movingpattern", "paletteSetChangeProbability", 0.50, float)
     _load_config_value(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
@@ -707,6 +683,7 @@ def setupPatterns():
 
     config.diamondUseTriangles = False
     _load_config_value(config, workConfig, "movingpattern", "diamondStep", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "numConcentricBoxes", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "maxnumConcentricBoxes", 8, int)
     _load_config_value(config, workConfig, "movingpattern", "numShingleRows", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "amplitude", 1, int)
@@ -739,60 +716,61 @@ def setupPatterns():
 
 
 def redraw(config):
+    pass
     # print(str("doing a redraw: {}").format(config.patternModel))
-    if config.patternModel == "ellipses":
-        pattern_blocks.ellipses(config)
+    # if config.patternModel == "ellipses":
+    #     pattern_blocks.ellipses(config)
 
-    if config.patternModel == "shellScales":
-        pattern_blocks.shellScales(config)
+    # if config.patternModel == "shellScales":
+    #     pattern_blocks.shellScales(config)
 
-    if config.patternModel == "wavePattern":
-        pattern_blocks.wavePattern(config)
+    # if config.patternModel == "wavePattern":
+    #     pattern_blocks.wavePattern(config)
 
-    if config.patternModel == "wavePattern2":
-        pattern_blocks.wavePattern2(config)
+    # if config.patternModel == "wavePattern2":
+    #     pattern_blocks.wavePattern2(config)
 
-    if config.patternModel == "reMove":
-        pattern_blocks.reMove(config)
+    # if config.patternModel == "reMove":
+    #     pattern_blocks.reMove(config)
 
-    if config.patternModel == "diagonalMove":
-        pattern_blocks.diagonalMove(config)
+    # if config.patternModel == "diagonalMove":
+    #     pattern_blocks.diagonalMove(config)
 
-    if config.patternModel == "randomizer":
-        pattern_blocks.randomizer(config)
+    # if config.patternModel == "randomizer":
+    #     pattern_blocks.randomizer(config)
 
-    if config.patternModel == "runningSpiral":
-        pattern_blocks.runningSpiral(config)
+    # if config.patternModel == "runningSpiral":
+    #     pattern_blocks.runningSpiral(config)
 
-    if config.patternModel == "concentricBoxes":
-        pattern_blocks.concentricBoxes(config)
+    # if config.patternModel == "concentricBoxes":
+    #     pattern_blocks.concentricBoxes(config)
 
-    if config.patternModel == "diamond":
-        pattern_blocks.diamond(config)
+    # if config.patternModel == "diamond":
+    #     pattern_blocks.diamond(config)
 
-    if config.patternModel == "shingles":
-        pattern_blocks.shingles(config)
+    # if config.patternModel == "shingles":
+    #     pattern_blocks.shingles(config)
 
-    if config.patternModel == "balls":
-        pattern_blocks.balls(config)
+    # if config.patternModel == "balls":
+    #     pattern_blocks.balls(config)
 
-    if config.patternModel == "bars":
-        pattern_blocks.bars(config)
+    # if config.patternModel == "bars":
+    #     pattern_blocks.bars(config)
 
-    if config.patternModel == "circles":
-        pattern_blocks.circles(config)
+    # if config.patternModel == "circles":
+    #     pattern_blocks.circles(config)
 
-    if config.patternModel == "circlesPacked":
-        pattern_blocks.circlesPacked(config)
+    # if config.patternModel == "circlesPacked":
+    #     pattern_blocks.circlesPacked(config)
 
-    if config.patternModel == "decoBoxes":
-        pattern_blocks.decoBoxes(config)
+    # if config.patternModel == "decoBoxes":
+    #     pattern_blocks.decoBoxes(config)
 
-    if config.patternModel == "waveScales":
-        pattern_blocks.waveScales(config)
+    # if config.patternModel == "waveScales":
+    #     pattern_blocks.waveScales(config)
 
-    if config.patternModel == "compass":
-        pattern_blocks.compass(config)
+    # if config.patternModel == "compass":
+    #     pattern_blocks.compass(config)
 
 
 # 2021-06-28 Opted to build the repetition/tiling vertically instead of horizontally
@@ -993,7 +971,7 @@ def _handle_fading_and_rebuild():
             config.doSectionDisturbance = False
             rebuildPatterns()
 
-    if random.random() < config.resetProbability and config.usePolygonOverlay:
+    if random.random() < config.resetProbability:
         _loadPolyOverlaybaseValues()
 
 

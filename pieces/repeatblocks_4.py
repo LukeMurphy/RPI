@@ -471,17 +471,25 @@ def changeSinglePalette(index=0):
 
 
 def setPalette(config, index=0):
+        
     paletteObj = config.paletteList[index]
-    print(f"New palette {paletteObj.paletteName}")
+    print(f" ==> New palette {paletteObj.paletteName}")
+
     config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
     config.linecolOverlay2.currentColor = setCurrentColor(paletteObj.linecolOverlay2)
 
 
-def setupPalettes():
-    config.palettes = workConfig.get("movingpattern", "palettes").split(",")
-    config.paletteConfigs = workConfig.get("movingpattern", "palettes").split(",")
+def setupPalettes(_pset = 0):
+
+    config.paletteSets = workConfig.get("movingpattern", "paletteSets").split("|")
+    # print(f"config.paletteSets {config.paletteSets}")
+    # config.palettes = workConfig.get("movingpattern", "palettes").split(",")
+    # config.paletteConfigs = workConfig.get("movingpattern", "palettes").split(",")
+    config.palettes = config.paletteSets[_pset].split(",")
+    config.paletteConfigs = config.paletteSets[_pset].split(",")
+
 
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
@@ -515,7 +523,7 @@ def _set_initial_pattern_config(config):
     config.numberOfPatterns = numberOfPatterns
     config.totalSlots = config.rows * config.cols
     config.altLineColoring = random.random() < config.altColoringProb
-    config.numConcentricBoxes = round(random.uniform(8, 18))
+    config.numConcentricBoxes = round(random.uniform(8, config.maxnumConcentricBoxes))
     config.lastPosition = 0
     config.usedPatterns = []
     config.iterateCount = 0
@@ -577,9 +585,10 @@ def _print_pattern_sequence(config):
     print(f"Using start pattern {config.patternModel}")
     print("----------------------------------------------")
 
-
+# TODO: really should load all the palettes rather than go back to disk each time 
+# the palette group changes ....
 def rebuildPatterns(arg=0):
-    print("rebuildPattern Called")
+    print(" ==> rebuildPatterns called")
     c = round(random.uniform(1, 4))
     if c == 1 and config.numRowsRandomize:
         _rowsAndDotsSettings()
@@ -588,6 +597,12 @@ def rebuildPatterns(arg=0):
         if config.currentPaletteIndex == len(config.palettes):
             config.currentPaletteIndex = 0
         # buildPalette(config, newPalette)
+
+
+        if random.random() < config.paletteSetChangeProbability :
+            _choice = math.floor(random.random() * len(config.paletteSets))
+            setupPalettes(_choice)
+
         setPalette(config, config.currentPaletteIndex)
 
     if c >= 3:
@@ -649,6 +664,7 @@ def setupPatterns():
     # higher = more variation in patterns
     # e.g. .2 is 20% chance each new block will change to a
     # new pattern
+    _load_config_value(config, workConfig, "movingpattern", "paletteSetChangeProbability", 0.50, float)
     _load_config_value(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
@@ -691,7 +707,7 @@ def setupPatterns():
 
     config.diamondUseTriangles = False
     _load_config_value(config, workConfig, "movingpattern", "diamondStep", 1, int)
-    _load_config_value(config, workConfig, "movingpattern", "numConcentricBoxes", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "maxnumConcentricBoxes", 8, int)
     _load_config_value(config, workConfig, "movingpattern", "numShingleRows", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "amplitude", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "amplitude2", 1, int)
@@ -977,7 +993,7 @@ def _handle_fading_and_rebuild():
             config.doSectionDisturbance = False
             rebuildPatterns()
 
-    if random.random() < config.resetProbability:
+    if random.random() < config.resetProbability and config.usePolygonOverlay:
         _loadPolyOverlaybaseValues()
 
 

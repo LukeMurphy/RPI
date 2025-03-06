@@ -526,6 +526,7 @@ def circles(config, paletteObj=None):
                     y2),
                     outline=(clr), fill=config.bgColor)
         
+
 def compass(config,paletteObj=None):
     clr = tuple(
         int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
@@ -672,11 +673,9 @@ def concentricBoxes(config, paletteObj=None):
     config.blockDraw.rectangle(
         (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
-
-
     count = 0
 
-    for i in range(0,config.numConcentricBoxes, 2):
+    for i in range(0, config.numConcentricBoxes, 2):
 
         if config.altLineColoring == True:
             outClr = clr2
@@ -684,14 +683,17 @@ def concentricBoxes(config, paletteObj=None):
                 outClr = clr
         else:
             outClr = clr
-
-        config.blockDraw.rectangle((
-            i-1,
-            i-1,
-            config.blockWidth-1*i,
-            config.blockHeight-1*i),
-            outline=(outClr), fill=None)
-        count += 1
+            
+        try:
+            config.blockDraw.rectangle((
+                i-1,
+                i-1,
+                config.blockWidth-1*i,
+                config.blockHeight-1*i),
+                outline=(outClr), fill=None)
+            count += 1
+        except Exception as e:
+            print(f"Concentric boxes error prob too many {e}")
 
 
 def decoBoxes(config, paletteObj=None):

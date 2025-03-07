@@ -11,7 +11,6 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 
 
-
 def runningSpiral(config, paletteObj=None):
     # 16px grid box spiral for now
     w = 4
@@ -19,21 +18,16 @@ def runningSpiral(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
 
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     lineMult = config.lineDiff * 2
     numLines = round(config.blockWidth / config.lineDiff * 2)
@@ -42,7 +36,7 @@ def runningSpiral(config, paletteObj=None):
     direction = 1
     distance = 1
 
-    mid = [config.blockWidth/2-1, config.blockHeight/2-1]
+    mid = [config.blockWidth / 2 - 1, config.blockHeight / 2 - 1]
 
     p1 = [mid[0], mid[1]]
     p2 = [mid[0], mid[1]]
@@ -85,60 +79,46 @@ def balls(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
 
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
-    
-    if paletteObj != None :
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
+
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     numRows = config.numDotRows
     boxWidth = config.blockWidth
     density = numRows * 4
-    dotWidth = boxWidth/2/numRows - 2
+    dotWidth = boxWidth / 2 / numRows - 2
     outline = None
 
     for r in range(numRows):
 
         for i in range(density):
             yPos = r * (dotWidth * 2) + r * 4
-            config.blockDraw.ellipse((
-                i * 2 * boxWidth/density - boxWidth/density,
-                yPos,
-                i * 2 * boxWidth/density - boxWidth/density + dotWidth,
-                yPos + dotWidth),
-                outline=(outline), fill=clr)
+            config.blockDraw.ellipse(
+                (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth), outline=(outline), fill=clr
+            )
 
         for i in range(density):
-            config.blockDraw.ellipse((
-                i * 2 * boxWidth/density,
-                yPos + 2 * boxWidth/density,
-                i * 2 * boxWidth/density + dotWidth,
-                yPos + 2 * boxWidth/density + dotWidth),
-                outline=(outline), fill=clr)
+            config.blockDraw.ellipse(
+                (i * 2 * boxWidth / density, yPos + 2 * boxWidth / density, i * 2 * boxWidth / density + dotWidth, yPos + 2 * boxWidth / density + dotWidth),
+                outline=(outline),
+                fill=clr,
+            )
 
 
 def circlesPacked(config, paletteObj=None):
     config.circlesPackedSize = 1
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
 
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
-    
-    
-    if paletteObj != None :
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
+
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
@@ -147,32 +127,55 @@ def circlesPacked(config, paletteObj=None):
 
     numRows = config.numDotRows
     boxWidth = round(config.blockWidth * config.circlesPackedSize)
-    dotWidth = boxWidth/2
+    dotWidth = boxWidth / 2
     outline = clr
-    steps=2
+    steps = 2
     yPos = 0
     numLines = config.blockWidth - 1
     for i in range(4):
-        xPos = i * dotWidth * 1 - dotWidth/2
-        for r in range(0,numLines,steps):
-            config.blockDraw.ellipse((
-                r-1 + xPos,
-                r-1 + yPos,
-                xPos + dotWidth -1*r,
-                yPos + dotWidth-1*r),
-                outline=(outline), fill=config.bgColor)
+        xPos = i * dotWidth * 1 - dotWidth / 2
+        for r in range(0, numLines, steps):
+            config.blockDraw.ellipse((r - 1 + xPos, r - 1 + yPos, xPos + dotWidth - 1 * r, yPos + dotWidth - 1 * r), outline=(outline), fill=config.bgColor)
 
-    yPos = 2 * dotWidth/2 * math.sin(2 * math.pi / 6) + 2
+    yPos = 2 * dotWidth / 2 * math.sin(2 * math.pi / 6) + 2
 
     for i in range(4):
         xPos = i * dotWidth * 1
-        for r in range(0,numLines,steps):
-            config.blockDraw.ellipse((
-                r-1 + xPos,
-                r-1 + yPos,
-                xPos + dotWidth -1*r,
-                yPos + dotWidth-1*r),
-                outline=(outline), fill=config.bgColor)
+        for r in range(0, numLines, steps):
+            config.blockDraw.ellipse((r - 1 + xPos, r - 1 + yPos, xPos + dotWidth - 1 * r, yPos + dotWidth - 1 * r), outline=(outline), fill=config.bgColor)
+
+
+def shingles(config, paletteObj=None):
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
+
+    clr2 = config.bgColor
+
+    if paletteObj is not None:
+        # print(f"paletteObj == {paletteObj.linecolOverlay.currentColor}")
+        clr = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
+        clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
+        clr3 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+
+    numRows = config.numShingleRows
+    boxWidth = config.blockWidth / numRows
+    shingleWidth = config.blockWidth / numRows - config.shingleVariationAmount
+
+    for r in range(numRows, -1, -1):
+        yPos = -1 + r * boxWidth
+
+        for i in range(3):
+            config.blockDraw.rectangle((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + shingleWidth - boxWidth / 2, yPos + boxWidth - 1), outline=(clr), fill=clr2)
+        for i in range(2):
+            config.blockDraw.rectangle((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + shingleWidth, yPos + boxWidth / 2 - 1), outline=(clr), fill=clr2)
 
 
 def fishScales(config, paletteObj=None):
@@ -181,49 +184,30 @@ def fishScales(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
 
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    clr3 = tuple(
-        int(a * config.brightness) for a in (config.colOverlay.currentColor)
-    )
+    clr3 = tuple(int(a * config.brightness) for a in (config.colOverlay.currentColor))
 
-    if paletteObj != None :
+    if paletteObj != None:
         # print(f"paletteObj == {paletteObj.linecolOverlay.currentColor}")
         clr = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr3 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-
-
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
 
     numRows = config.numShingleRows
-    boxWidth = config.blockWidth/numRows
+    boxWidth = config.blockWidth / numRows
 
     for r in range(numRows, -1, -1):
         yPos = -2 + r * boxWidth
         for i in range(3):
-            config.blockDraw.ellipse((
-                i * boxWidth - boxWidth/2,
-                yPos,
-                i * boxWidth + boxWidth - boxWidth/2,
-                yPos + boxWidth),
-                outline=(clr), fill=clr3)
+            config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(clr), fill=clr3)
 
         for i in range(2):
-            config.blockDraw.ellipse((
-                i * boxWidth,
-                yPos - boxWidth/2,
-                i * boxWidth + boxWidth,
-                yPos + boxWidth/2),
-                outline=(clr), fill=clr3)
+            config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(clr), fill=clr3)
 
 
 def shellScales(config, paletteObj=None):
@@ -258,12 +242,7 @@ def _get_colors(config, paletteObj):
 
 def _draw_row_of_ellipses(config, yPos, boxWidth, clr, clr3, numLinesHalf, rads, radius, clr2):
     for i in range(3):
-        config.blockDraw.ellipse((
-            i * boxWidth - boxWidth / 2,
-            yPos,
-            i * boxWidth + boxWidth - boxWidth / 2,
-            yPos + boxWidth),
-            outline=clr, fill=clr3)
+        config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=clr, fill=clr3)
 
         for q in range(-numLinesHalf, numLinesHalf):
             angle = rads * q
@@ -277,12 +256,7 @@ def _draw_row_of_ellipses(config, yPos, boxWidth, clr, clr3, numLinesHalf, rads,
 
 def _draw_offset_row_of_ellipses(config, yPos, boxWidth, clr, clr3, numLinesHalf, rads, radius, clr2):
     for i in range(2):
-        config.blockDraw.ellipse((
-            i * boxWidth,
-            yPos - boxWidth / 2,
-            i * boxWidth + boxWidth,
-            yPos + boxWidth / 2),
-            outline=clr, fill=clr3)
+        config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=clr, fill=clr3)
 
         for q in range(-numLinesHalf, numLinesHalf):
             angle = rads * q
@@ -361,7 +335,7 @@ def _get_colors(config, paletteObj):
         clr = tuple(int(a) for a in paletteObj.linecolOverlay.currentColor)
         clr2 = tuple(int(a) for a in paletteObj.linecolOverlay2.currentColor)
     return clr, clr2, clr3
-                
+
 
 def waveScales(config, paletteObj=None):
     clr, clr2, clr3 = _get_colors(config, paletteObj)
@@ -420,7 +394,8 @@ def _draw_ellipse(config, x0, y0, x1, y1, lineToUse, clrToUse):
     y1 = max(y1, y0)
     config.blockDraw.ellipse((x0, y0, x1, y1), outline=lineToUse, fill=clrToUse)
 
-'''
+
+"""
 def __get_colors(config, paletteObj):
     clr = tuple(int(a * config.brightness) for a in config.linecolOverlay.currentColor)
     clr2 = tuple(int(a * config.brightness) for a in config.linecolOverlay2.currentColor)
@@ -479,133 +454,116 @@ def __get_colors(config, paletteObj):
                 outline=(clr), fill=clr2)
     w = 4
     h = 4
-'''
+"""
+
+
 def circles(config, paletteObj=None):
     w = 4
     h = 4
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     numLines = config.blockWidth - 1
     steps = 3
-    for c in range(0,2):
-        for r in range(0,2):
-            xOff = c * config.blockWidth - config.blockWidth/2
-            yOff = r * config.blockHeight - config.blockHeight/2
-            
-            
-            for i in range(0, numLines, steps):
-                x1 = i-1 + xOff
-                y1 = i-1 + yOff
-                x2 = config.blockWidth-1*i + xOff
-                y2 = config.blockHeight-1*i + yOff
-                
-                if x2 < x1 :
-                    x2 = x1 + 1
-                if y2 < y1 :
-                    y2 = y1 + 1
-                config.blockDraw.ellipse((
-                    x1,
-                    y1,
-                    x2,
-                    y2),
-                    outline=(clr), fill=config.bgColor)
-        
-def compass(config,paletteObj=None):
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    for c in range(2):
+        for r in range(2):
+            xOff = c * config.blockWidth - config.blockWidth / 2
+            yOff = r * config.blockHeight - config.blockHeight / 2
 
-        
-    if paletteObj != None :
+            for i in range(0, numLines, steps):
+                x1 = i - 1 + xOff
+                y1 = i - 1 + yOff
+                x2 = config.blockWidth - 1 * i + xOff
+                y2 = config.blockHeight - 1 * i + yOff
+
+                if x2 < x1:
+                    x2 = x1 + 1
+                if y2 < y1:
+                    y2 = y1 + 1
+                config.blockDraw.ellipse((x1, y1, x2, y2), outline=(clr), fill=config.bgColor)
+
+
+def compass(config, paletteObj=None):
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
+
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     count = 0
     barWidth = 4
-    grid = round(config.blockWidth/16)
+    grid = round(config.blockWidth / 16)
     len1 = 5
     len2 = 2
-    
-    origins  = ((0,0),
-                (config.blockWidth,0),
-                (round(config.blockWidth/2),round(config.blockWidth/2)),
-                (0,config.blockWidth),
-                (config.blockWidth,config.blockWidth),
-                )
-    
+
+    origins = (
+        (0, 0),
+        (config.blockWidth, 0),
+        (round(config.blockWidth / 2), round(config.blockWidth / 2)),
+        (0, config.blockWidth),
+        (config.blockWidth, config.blockWidth),
+    )
+
     outlineClr = None
     outlineClr = clr2
-    for i in range(0,5) :
+    for i in range(5):
 
         midx = origins[i][0]
         midy = origins[i][1]
-        
-        isoTriangle  =  ((midx - grid,midy),
-                        (midx,midy - len1 * grid),
-                        (midx + grid,midy),
-                        (midx, midy + len1 * grid),
-                        (midx - grid,midy),
-                        )
-        config.blockDraw.polygon(isoTriangle, fill = clr, outline=outlineClr)
-        isoTriangle  =  ((midx - grid * len1,midy),
-                        (midx,midy - grid),
-                        (midx + grid *len1,midy),
-                        (midx,midy + grid),
-                        (midx - grid * len1,midy),
-                        )
-        config.blockDraw.polygon(isoTriangle, fill = clr, outline=outlineClr)
-        isoTriangle  =  ((midx - grid * len2, midy - grid * len2),
-                        (midx, midy - grid),
-                        (midx + grid *len2, midy - grid * len2),
-                        (midx + grid, midy),
-                        (midx + grid * len2, midy + grid * len2),
-                        (midx, midy + grid),
-                        (midx - grid * len2, midy + grid * len2),
-                        (midx - grid, midy),
-                        )
-        config.blockDraw.polygon(isoTriangle, fill = clr, outline=outlineClr)
-        
+
+        isoTriangle = (
+            (midx - grid, midy),
+            (midx, midy - len1 * grid),
+            (midx + grid, midy),
+            (midx, midy + len1 * grid),
+            (midx - grid, midy),
+        )
+        config.blockDraw.polygon(isoTriangle, fill=clr, outline=outlineClr)
+        isoTriangle = (
+            (midx - grid * len1, midy),
+            (midx, midy - grid),
+            (midx + grid * len1, midy),
+            (midx, midy + grid),
+            (midx - grid * len1, midy),
+        )
+        config.blockDraw.polygon(isoTriangle, fill=clr, outline=outlineClr)
+        isoTriangle = (
+            (midx - grid * len2, midy - grid * len2),
+            (midx, midy - grid),
+            (midx + grid * len2, midy - grid * len2),
+            (midx + grid, midy),
+            (midx + grid * len2, midy + grid * len2),
+            (midx, midy + grid),
+            (midx - grid * len2, midy + grid * len2),
+            (midx - grid, midy),
+        )
+        config.blockDraw.polygon(isoTriangle, fill=clr, outline=outlineClr)
+
 
 def bars(config, paletteObj=None):
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
-
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     count = 0
     barWidth = 4
@@ -617,12 +575,7 @@ def bars(config, paletteObj=None):
                 outClr = clr
         else:
             outClr = clr
-        config.blockDraw.rectangle((
-            0,
-            i * barWidth,
-            config.blockWidth-1,
-            i * barWidth),
-            outline=(outClr), fill=None)
+        config.blockDraw.rectangle((0, i * barWidth, config.blockWidth - 1, i * barWidth), outline=(outClr), fill=None)
         count += 1
 
 
@@ -630,8 +583,7 @@ def coloredBlocks(config, paletteObj=None):
     clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
     clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
@@ -650,29 +602,22 @@ def coloredBlocks(config, paletteObj=None):
     #     else:
     #         outClr = clr
 
-    #     outClr = None  
+    #     outClr = None
     #     # config.blockDraw.rectangle((0,i * barWidth,config.blockWidth-1,i * barWidth), outline=(outClr), fill=None)
     #     count += 1
 
 
 def concentricBoxes(config, paletteObj=None):
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-
-
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     count = 0
 
@@ -684,14 +629,9 @@ def concentricBoxes(config, paletteObj=None):
                 outClr = clr
         else:
             outClr = clr
-            
+
         try:
-            config.blockDraw.rectangle((
-                i-1,
-                i-1,
-                config.blockWidth-1*i,
-                config.blockHeight-1*i),
-                outline=(outClr), fill=None)
+            config.blockDraw.rectangle((i - 1, i - 1, config.blockWidth - 1 * i, config.blockHeight - 1 * i), outline=(outClr), fill=None)
             count += 1
         except Exception as e:
             print(f"Concentric boxes error prob too many {e}")
@@ -699,23 +639,18 @@ def concentricBoxes(config, paletteObj=None):
 
 def decoBoxes(config, paletteObj=None):
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
 
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     clr = config.bgColor
-    numConcentricBoxes = config.blockWidth+1
+    numConcentricBoxes = config.blockWidth + 1
     altLineColoring = True
     w = round(random.uniform(2, 5))
     w = config.decoBoxBandWidth
@@ -723,12 +658,12 @@ def decoBoxes(config, paletteObj=None):
 
     blockWidth = width
     blockHeight = width
-    halfSide = width/2
+    halfSide = width / 2
 
-    diagonal = round(math.sqrt(halfSide*halfSide*2))
+    diagonal = round(math.sqrt(halfSide * halfSide * 2))
     diagonal = width
 
-    temp = Image.new("RGBA", (width*3, width*3))
+    temp = Image.new("RGBA", (width * 3, width * 3))
     tempDraw = ImageDraw.Draw(temp)
 
     temp2 = Image.new("RGBA", (width, width))
@@ -745,34 +680,32 @@ def decoBoxes(config, paletteObj=None):
         else:
             outClr = clr
 
-        x1 = width-w*i
-        y1 = width-w*i
+        x1 = width - w * i
+        y1 = width - w * i
 
         y1 = max(y1, 0)
         x1 = max(x1, 0)
-        temp2Draw.rectangle((
-            0,
-            0,
-            x1,
-            y1),
-            outline=(None), fill=outClr)
+        temp2Draw.rectangle((0, 0, x1, y1), outline=(None), fill=outClr)
     for c, r in itertools.product(range(4), range(4)):
         # temp = temp.rotate(-45)
-        xOff = c*w
-        yOff = r*w
-        temp.paste(temp2, (c * diagonal - xOff, r * diagonal-yOff), temp2)
+        xOff = c * w
+        yOff = r * w
+        temp.paste(temp2, (c * diagonal - xOff, r * diagonal - yOff), temp2)
 
-    szFactor = 1/3
-    temp = temp.rotate(135, expand=True,)
+    szFactor = 1 / 3
+    temp = temp.rotate(
+        135,
+        expand=True,
+    )
     # print(temp)
     ex = 12
-    temp = temp.resize((round(width/szFactor)+ex, round(width/szFactor)+ex))
+    temp = temp.resize((round(width / szFactor) + ex, round(width / szFactor) + ex))
 
     # print(temp)
     # print('')
 
-    xOff = -round(width/1)
-    yOff = -round(width/1)
+    xOff = -round(width / 1)
+    yOff = -round(width / 1)
 
     config.blockImage.paste(temp, (xOff, yOff), temp)
 
@@ -782,14 +715,11 @@ def randomizer2(config, paletteObj=None):
     w = config.randomBlockWidth
     h = config.randomBlockHeight
 
-
-
     clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
     clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
     clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=clr, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr, outline=None)
 
     rows = config.blockHeight
     cols = config.blockWidth
@@ -804,10 +734,9 @@ def randomizer2(config, paletteObj=None):
 
     for r in range(0, rows, hStep):
         for c in range(0, cols, step):
-            clr = colorutils.getRandomRGB(config.brightness/2)
+            clr = colorutils.getRandomRGB(config.brightness / 2)
             if random.random() < config.randomBlockProb:
-                config.blockDraw.rectangle(
-                    (c, r, w+c, h+r), fill=(clr), outline=None)
+                config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
 
 def randomizer(config, paletteObj=None):
@@ -815,8 +744,7 @@ def randomizer(config, paletteObj=None):
     w = config.randomBlockWidth
     h = config.randomBlockHeight
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     rows = config.blockHeight
     cols = config.blockWidth
@@ -831,10 +759,9 @@ def randomizer(config, paletteObj=None):
 
     for r in range(0, rows, hStep):
         for c in range(0, cols, step):
-            clr = colorutils.getRandomRGB(config.brightness/2)
+            clr = colorutils.getRandomRGB(config.brightness / 2)
             if random.random() < config.randomBlockProb:
-                config.blockDraw.rectangle(
-                    (c, r, w+c, h+r), fill=(clr), outline=None)
+                config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
 
 def diamond(config, paletteObj=None):
@@ -842,13 +769,11 @@ def diamond(config, paletteObj=None):
     if paletteObj is not None:
         clr = tuple(int(a) for a in paletteObj.linecolOverlay.currentColor)
 
-
     x = config.xIncrementer
     y = config.yIncrementer
 
     # needs to be in odd grid
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     step = config.diamondStep
     row = 1
@@ -856,26 +781,26 @@ def diamond(config, paletteObj=None):
     w = 0
     h = 0
     rows = config.numRows
-    blockHeight = round(config.blockHeight/rows)
-    mid = round(blockHeight/2)
+    blockHeight = round(config.blockHeight / rows)
+    mid = round(blockHeight / 2)
 
     for rw in range(rows):
         for c in range(rows):
-            for i in range(0, blockHeight, step*2):
-                for r in range(0, row):
-                    x = r + mid - row/2 + c * blockHeight
+            for i in range(0, blockHeight, step * 2):
+                for r in range(row):
+                    x = r + mid - row / 2 + c * blockHeight
                     y = i + config.yIncrementer + rw * blockHeight
 
-                    if y >= blockHeight*rows:
-                        y -= blockHeight*rows
+                    if y >= blockHeight * rows:
+                        y -= blockHeight * rows
 
                     if (r % 2) != 1:
-                        config.blockDraw.rectangle(
-                            (x, y, w+x, h+y), fill=(clr), outline=None)
+                        config.blockDraw.rectangle((x, y, w + x, h + y), fill=(clr), outline=None)
+
                 if config.diamondUseTriangles == False:
                     row = 2 * i + step + delta
-                    if i > (blockHeight/2):
-                        row = round(2 * (blockHeight-i)) + delta
+                    if i > (blockHeight / 2):
+                        row = round(2 * (blockHeight - i)) + delta
                         # delta += -2
                 else:
                     row = i + step
@@ -884,21 +809,18 @@ def diamond(config, paletteObj=None):
 def diagonalMove(config, paletteObj=None):
     clr = (255, 0, 0, 210)
 
-    
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
-
 
     w = 4
     h = 4
     x = config.xIncrementer
     y = config.yIncrementer
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
-    config.blockDraw.rectangle((x, y, w+x, h+y), fill=(clr), outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((x, y, w + x, h + y), fill=(clr), outline=None)
     config.xIncrementer += 1
     config.yIncrementer += 1
 
@@ -917,21 +839,15 @@ def reMove(config, paletteObj=None):
 
     bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[3], 255)
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     lineMult = config.lineDiff * 2
     numLines = round(config.blockWidth / config.lineDiff * 2)
@@ -939,20 +855,27 @@ def reMove(config, paletteObj=None):
     y1 = 0
     for i in range(numLines):
 
-        x1 = -2*config.blockWidth + config.xIncrementer + i * lineMult
-        x2 = -2*config.blockWidth + config.blockWidth + config.xIncrementer + i * lineMult
+        x1 = -2 * config.blockWidth + config.xIncrementer + i * lineMult
+        x2 = -2 * config.blockWidth + config.blockWidth + config.xIncrementer + i * lineMult
         y2 = config.blockHeight
 
         config.blockDraw.line((x1, y1, x2, y2), fill=(clr))
         if config.useDoubleLine == True:
-            config.blockDraw.line((-2*config.blockWidth + config.xIncrementer + i * lineMult + 1, 0, -2*config.blockWidth +
-                                   config.blockWidth + config.xIncrementer + i * lineMult + 1, config.blockHeight), fill=(clr2))
+            config.blockDraw.line(
+                (
+                    -2 * config.blockWidth + config.xIncrementer + i * lineMult + 1,
+                    0,
+                    -2 * config.blockWidth + config.blockWidth + config.xIncrementer + i * lineMult + 1,
+                    config.blockHeight,
+                ),
+                fill=(clr2),
+            )
 
     config.xIncrementer += 0  # config.xSpeed
     config.yIncrementer += 0
 
-    '''
-	'''
+    """
+    """
     if config.xIncrementer > (config.blockWidth + 0):
         config.xIncrementer = -config.xSpeed
     if config.yIncrementer >= config.blockHeight - 4:
@@ -965,19 +888,14 @@ def wavePattern(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
-    if paletteObj != None :
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
 
     numPoints = round(config.blockWidth)
     amplitude = config.amplitude
@@ -986,7 +904,7 @@ def wavePattern(config, paletteObj=None):
     yOffset2 = config.yOffset2
     steps = config.steps
     steps2 = config.steps2
-    rads = 2 * 22/7 / numPoints
+    rads = 2 * 22 / 7 / numPoints
 
     for i in range(0, numPoints, steps):
         angle = (i + config.xIncrementer) * rads
@@ -999,11 +917,10 @@ def wavePattern(config, paletteObj=None):
             b = (i, math.sin(angle2) * amplitude + yOffset)
         config.blockDraw.polygon((a, b, c, a), fill=clr, outline=None)
 
-    phase = round(config.blockWidth/config.phaseFactor)
+    phase = round(config.blockWidth / config.phaseFactor)
     for i in range(0, numPoints, steps2):
-        angle = (i - config.speedFactor*config.xIncrementer + phase) * rads
-        angle2 = (i - config.speedFactor *
-                  config.xIncrementer + phase + steps2) * rads
+        angle = (i - config.speedFactor * config.xIncrementer + phase) * rads
+        angle2 = (i - config.speedFactor * config.xIncrementer + phase + steps2) * rads
         a = (i, math.cos(angle) * amplitude2 + yOffset2)
         b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
         c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
@@ -1027,20 +944,15 @@ def wavePattern2(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay.currentColor)
-    )
-    clr2 = tuple(
-        int(a * config.brightness) for a in (config.linecolOverlay2.currentColor)
-    )
+    clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay.currentColor))
+    clr2 = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))
 
-    if paletteObj != None :
+    if paletteObj != None:
         clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
         clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
         clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
 
-    config.blockDraw.rectangle(
-        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
 
     numPoints = round(config.blockWidth)
     amplitude = config.amplitude
@@ -1049,10 +961,9 @@ def wavePattern2(config, paletteObj=None):
     yOffset2 = config.yOffset2
     steps = config.steps
     steps2 = config.steps2
-    rads = 2 * 22/7 / numPoints
-    
+    rads = 2 * 22 / 7 / numPoints
 
-    for iy in range(-numPoints, numPoints*2, steps*2):
+    for iy in range(-numPoints, numPoints * 2, steps * 2):
         for i in range(0, numPoints, steps):
             angle = (i + config.xIncrementer) * rads
             angle2 = (i + config.xIncrementer + steps) * rads
@@ -1085,4 +996,3 @@ def wavePattern2(config, paletteObj=None):
         config.xIncrementer = -0
     if config.yIncrementer >= config.blockHeight - 4:
         config.yIncrementer = 0
-

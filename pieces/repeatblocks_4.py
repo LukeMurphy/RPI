@@ -140,6 +140,34 @@ def loadImageForBase():
     config.canvasImage.paste(image, (0, 0))
 
 
+# ####################### clip player instert ################################
+def _loadClipPlayerConfigs():
+    _load_config_value(config, workConfig, "imageSequencePlayer", "useClipPlayer", False, bool)
+    _load_config_value(config, workConfig, "imageSequencePlayer", "clipXPos", 1, int)
+    _load_config_value(config, workConfig, "imageSequencePlayer", "clipYPos", 1, int)
+    _load_config_value(config, workConfig, "imageSequencePlayer", "clipRotate", 0, float)
+    _load_config_value(config, workConfig, "imageSequencePlayer", "steps", 1, int)
+    _load_config_value(config, workConfig, "imageSequencePlayer", "steps", 1, int)
+
+    try:
+        config.clipMain = movieClip(config)
+        config.clipMain.clipRotate = config.clipRotate
+        config.clipMain.setUp(workConfig)
+    except Exception as e:
+        print(f"{e} \n")
+        config.useClipPlayer = False
+
+
+def _handle_clip_player():
+    """Loads and pastes a frame from the clip player if enabled."""
+    if not config.useClipPlayer:
+        return
+    config.clipMain.loadFrame()
+    temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth, config.clipMain.clipHeight))
+    temp = temp.rotate(config.clipRotate, expand=True)
+    config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
+
+
 # --------------------- DISTURBANCES  ---------------------
 # loads the disturbance configs and calls the disturbance
 # setup functions
@@ -502,23 +530,33 @@ def setupPalettes():
 
 
 # --------------------- PATTERNS     ---------------------
+
+
 def buildPatternSequence(config):
     config.patternSequence = []
-    _set_initial_pattern_config(config)
+    config.usedPatterns = []
+
+    if random.random() < config.blockSizeChangeProb :
+
+        config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
+        config.blockHeight = config.blockWidth 
+
+        config.rows = math.floor(config.canvasHeight / config.blockHeight)
+        config.cols = math.floor(config.canvasWidth / config.blockWidth)
+
+
+
+
+    config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
+    config.blockDraw = ImageDraw.Draw(config.blockImage)
+        
+    config.totalSlots = config.rows * config.cols
+    config.altLineColoring = random.random() < config.altColoringProb
+    config.numConcentricBoxes = round(random.uniform(config.minnumConcentricBoxes, config.maxnumConcentricBoxes))
     _generate_pattern_sequence(config)
     # _print_pattern_sequence(config)
     config.borderDrawn = False
 
-
-def _set_initial_pattern_config(config):
-    numberOfPatterns = round(random.uniform(config.patternSequenceMin, config.patternSequenceMax))
-    config.numberOfPatterns = numberOfPatterns
-    config.totalSlots = config.rows * config.cols
-    config.altLineColoring = random.random() < config.altColoringProb
-    config.numConcentricBoxes = round(random.uniform(8, config.maxnumConcentricBoxes))
-    config.lastPosition = 0
-    config.usedPatterns = []
-    config.iterateCount = 0
 
 
 # this really needs to change to be more readable and predictable ....
@@ -549,15 +587,6 @@ def _generate_pattern_sequence(config):
             config.usedPatterns.append(_pattern)
             # config.lastPosition = _position
             _iterCount += 1
-
-
-def _get_pattern_position(config):
-    slotsLeft = config.totalSlots - config.lastPosition
-    return (
-        round(random.uniform(config.lastPosition, slotsLeft - 1))
-        if config.positionRange == 0
-        else round(random.uniform(config.lastPosition, config.lastPosition + config.positionRange))
-    )
 
 
 def _get_temp_palette(config):
@@ -617,34 +646,24 @@ def setupPatterns():
 
     patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
     config.patternSequence = []
-    config.patternSequence.extend(
-        [
-            patternSequence[i],
-            int(patternSequence[i + 1]),
-            int(patternSequence[i + 2]),
-        ]
-        for i in range(0, len(patternSequence), 3)
-    )
 
     _load_config_value(config, workConfig, "movingpattern", "patternSequenceMax", 2, int)
     _load_config_value(config, workConfig, "movingpattern", "patternSequenceMin", 5, int)
 
     config.rotateAltBlock = 0
 
-    _load_config_value(config, workConfig, "movingpattern", "numRows", 5, int)
-    _load_config_value(config, workConfig, "movingpattern", "numRowsRandomize", False, bool)
-    _load_config_value(config, workConfig, "movingpattern", "usePixelSortRandomize", True, bool)
-    _load_config_value(config, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
-    _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
 
     # --------------------- PATTERN CHANGE   ---------------------
     # higher = more variation in patterns
     # e.g. .2 is 20% chance each new block will change to a
     # new pattern
+    _load_config_value(config, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
 
     try:
         ringsRange = workConfig.get("movingpattern", "ringsRange").split(",")
@@ -658,6 +677,9 @@ def setupPatterns():
         config.ringsRange = (1, 1)
         config.numScaleRows = config.numShingleRows
 
+    _load_config_value(config, workConfig, "movingpattern", "numRows", 5, int)
+    _load_config_value(config, workConfig, "movingpattern", "numRowsRandomize", False, bool)
+    
     # affects patterns to use just lines w/o fills
     _load_config_value(config, workConfig, "movingpattern", "linesOnly", False, bool)
 
@@ -676,6 +698,7 @@ def setupPatterns():
     # end try
 
     # for the randomizer
+    _load_config_value(config, workConfig, "movingpattern", "usePixelSortRandomize", True, bool)
     _load_config_value(config, workConfig, "movingpattern", "randomBlockProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "randomBlockWidth", 10, int)
     _load_config_value(config, workConfig, "movingpattern", "randomBlockHeight", 10, int)
@@ -683,7 +706,7 @@ def setupPatterns():
 
     config.diamondUseTriangles = False
     _load_config_value(config, workConfig, "movingpattern", "diamondStep", 1, int)
-    _load_config_value(config, workConfig, "movingpattern", "numConcentricBoxes", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "minnumConcentricBoxes", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "maxnumConcentricBoxes", 8, int)
     _load_config_value(config, workConfig, "movingpattern", "numShingleRows", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "amplitude", 1, int)
@@ -714,63 +737,26 @@ def setupPatterns():
 
 # --------------------- LOOP ACTIONS  ---------------------
 
+def iterate():
+    """Performs a single iteration of the animation."""
+    global config
+    _update_background_color()
+    _handle_clip_player()
 
-def redraw(config):
-    pass
-    # print(str("doing a redraw: {}").format(config.patternModel))
-    # if config.patternModel == "ellipses":
-    #     pattern_blocks.ellipses(config)
+    _draw_and_process_pattern()
 
-    # if config.patternModel == "shellScales":
-    #     pattern_blocks.shellScales(config)
+    _handle_disturbances()
+    _handle_filter_remapping()
+    _handle_fading_and_rebuild()
+    if config.saveImages:
+        _save_image_if_done()
+    _handle_pattern_rebuild()
+    _handle_section_disturbances()
+    _handle_shingle_variation()
 
-    # if config.patternModel == "wavePattern":
-    #     pattern_blocks.wavePattern(config)
+    temp1 = _draw_background_and_paste_image()
+    _transform_and_render_image(temp1)
 
-    # if config.patternModel == "wavePattern2":
-    #     pattern_blocks.wavePattern2(config)
-
-    # if config.patternModel == "reMove":
-    #     pattern_blocks.reMove(config)
-
-    # if config.patternModel == "diagonalMove":
-    #     pattern_blocks.diagonalMove(config)
-
-    # if config.patternModel == "randomizer":
-    #     pattern_blocks.randomizer(config)
-
-    # if config.patternModel == "runningSpiral":
-    #     pattern_blocks.runningSpiral(config)
-
-    # if config.patternModel == "concentricBoxes":
-    #     pattern_blocks.concentricBoxes(config)
-
-    # if config.patternModel == "diamond":
-    #     pattern_blocks.diamond(config)
-
-    # if config.patternModel == "shingles":
-    #     pattern_blocks.shingles(config)
-
-    # if config.patternModel == "balls":
-    #     pattern_blocks.balls(config)
-
-    # if config.patternModel == "bars":
-    #     pattern_blocks.bars(config)
-
-    # if config.patternModel == "circles":
-    #     pattern_blocks.circles(config)
-
-    # if config.patternModel == "circlesPacked":
-    #     pattern_blocks.circlesPacked(config)
-
-    # if config.patternModel == "decoBoxes":
-    #     pattern_blocks.decoBoxes(config)
-
-    # if config.patternModel == "waveScales":
-    #     pattern_blocks.waveScales(config)
-
-    # if config.patternModel == "compass":
-    #     pattern_blocks.compass(config)
 
 
 # 2021-06-28 Opted to build the repetition/tiling vertically instead of horizontally
@@ -832,66 +818,9 @@ def _apply_pattern_variations(config, _counter):
     func(config, s[3])
 
 
-def runWork():
-    global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("Running repeatblocks.py")
-    print(bcolors.ENDC)
-    while config.isRunning:
-        config.directorController.checkTime()
-        if config.directorController.advance:
-            iterate()
-        time.sleep(config.redrawSpeed)
-        if not config.standAlone:
-            config.callBack()
-
-
-def iterate():
-    """Performs a single iteration of the animation."""
-    global config
-    _update_background_color()
-    _handle_clip_player()
-    _draw_and_process_pattern()
-    _handle_disturbances()
-    _handle_filter_remapping()
-    _handle_fading_and_rebuild()
-    if config.saveImages:
-        _save_image_if_done()
-    _handle_pattern_rebuild()
-    _handle_section_disturbances()
-    _handle_shingle_variation()
-    temp1 = _draw_background_and_paste_image()
-    _transform_and_render_image(temp1)
-
-
 def _update_background_color():
     """Updates the background color based on current palette."""
     config.bgColor = tuple(round(a * config.brightness) for a in config.colOverlay.currentColor)
-
-
-def _loadClipPlayerConfigs():
-    # ####################### clip player instert ################################
-    try:
-        config.useClipPlayer = workConfig.getboolean("imageSequencePlayer", "useClipPlayer")
-        config.clipXPos = int(workConfig.get("imageSequencePlayer", "clipXPos"))
-        config.clipYPos = int(workConfig.get("imageSequencePlayer", "clipYPos"))
-        config.clipRotate = float(workConfig.get("imageSequencePlayer", "clipRotate"))
-        config.clipMain = movieClip(config)
-        config.clipMain.clipRotate = config.clipRotate
-        config.clipMain.setUp(workConfig)
-    except Exception as e:
-        print(f"{e} \n")
-        config.useClipPlayer = False
-
-
-def _handle_clip_player():
-    """Loads and pastes a frame from the clip player if enabled."""
-    if not config.useClipPlayer:
-        return
-    config.clipMain.loadFrame()
-    temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth, config.clipMain.clipHeight))
-    temp = temp.rotate(config.clipRotate, expand=True)
-    config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
 
 
 def _draw_and_process_pattern():
@@ -907,7 +836,6 @@ def _draw_and_process_pattern():
 
 def _redraw_and_load_image(config):
     """Redraws the pattern and optionally loads a new image."""
-    redraw(config)
 
     if random.random() < config.loadAnImageProb:
         loadImageForBase()
@@ -1051,7 +979,6 @@ def renderComposite(_img):
     if config.usePolygonOverlay:
         _img = shapeOverLayFunction(_img)
 
-
     # config.destinationImage.paste(_img, (0, 0), _img)
     # config.destinationImage.paste(config.patternImage, (280, 0), config.patternImage)
     # config.destinationImage.paste(config.fader.crossFade, (0, 280), config.fader.crossFade)
@@ -1109,16 +1036,15 @@ def _loadFilterRemapping():
         config.filterRemapRangeY = config.canvasHeight
 
 
-# TODO Rename this here and in `_loadFilterRemapping`
 def _loadFilterRemappingConfigs():
-    config.filterRemapping = workConfig.getboolean("movingpattern", "filterRemapping")
-    config.filterRemappingProb = float(workConfig.get("movingpattern", "filterRemappingProb"))
-    config.filterRemapMinHoriSize = int(workConfig.get("movingpattern", "filterRemapMinHoriSize"))
-    config.filterRemapMinVertSize = int(workConfig.get("movingpattern", "filterRemapMinVertSize"))
-    config.filterRemapMaxHoriSize = int(workConfig.get("movingpattern", "filterRemapMaxHoriSize"))
-    config.filterRemapMaxVertSize = int(workConfig.get("movingpattern", "filterRemapMaxVertSize"))
-    config.filterRemapRangeY = int(workConfig.get("movingpattern", "filterRemapRangeY"))
-    config.filterRemapRangeX = int(workConfig.get("movingpattern", "filterRemapRangeX"))
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapping", False, bool)
+    _load_config_value(config, workConfig, "movingpattern", "stefilterRemappingProbps", 0, float)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
 
 
 def _loadPolyOverlaybaseValues():
@@ -1162,17 +1088,22 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         config.usePolygonOverlay = False
 
 
+# ----------------- INITIAL ACTIONS  ---------------------
+
 def main(run=True):
     global config
     print("\n main() called")
 
-    config.blockWidth = int(workConfig.get("movingpattern", "blockWidth"))
-    config.blockHeight = int(workConfig.get("movingpattern", "blockHeight"))
-    config.rows = int(workConfig.get("movingpattern", "rows"))
-    config.cols = int(workConfig.get("movingpattern", "cols"))
-
-    config.yOffset = int(workConfig.get("movingpattern", "yOffset"))
-    config.yOffset2 = int(workConfig.get("movingpattern", "yOffset2"))
+    _load_config_value(config, workConfig, "movingpattern", "blockWidth", 32, int)
+    _load_config_value(config, workConfig, "movingpattern", "blockHeight", 32, int)
+    _load_config_value(config, workConfig, "movingpattern", "blockWidthMin", 32, int)
+    _load_config_value(config, workConfig, "movingpattern", "blockWidthMax", 32, int)
+    _load_config_value(config, workConfig, "movingpattern", "rows", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "cols", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "yOffset", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "yOffset2", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "", 1, int)
 
     skipBlocks = (workConfig.get("movingpattern", "skipBlocks")).split(",")
     config.skipBlocks = tuple(map(lambda x: int(x), skipBlocks))
@@ -1186,9 +1117,7 @@ def main(run=True):
     # if/when saving images
     config.drawingPrinted = True
     _load_config_value(config, workConfig, "movingpattern", "saveImages", False, bool)
-
     _load_config_value(config, workConfig, "movingpattern", "outPutPath", "", str)
-
     _load_config_value(config, workConfig, "movingpattern", "drawBGColorEachCycle", True, bool)
 
     config.repeatDrawingMode = 1
@@ -1254,7 +1183,8 @@ def main(run=True):
     config.fader.yPos = 0
     config.fader.setUp()
     config.fader.image = config.canvasImage
-    config.faderDoingRefreshCount = int(workConfig.get("movingpattern", "faderDoingRefreshCount"))
+    _load_config_value(config, workConfig, "movingpattern", "faderDoingRefreshCount", 5, int)
+
 
     # ###########################################################################
     setupPolyOverlay()
@@ -1267,6 +1197,7 @@ def main(run=True):
 
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
+
     try:
         config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
     except Exception as e:
@@ -1292,11 +1223,26 @@ def main(run=True):
         runWork()
 
 
+def runWork():
+    global config
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
+    print("Running repeatblocks.py")
+    print(bcolors.ENDC)
+    while config.isRunning:
+        config.directorController.checkTime()
+        if config.directorController.advance:
+            iterate()
+        time.sleep(config.redrawSpeed)
+        if not config.standAlone:
+            config.callBack()
+
+
+
 def _load_config_value(obj, workConfig, section, option, default, type_converter):
     try:
-        if type_converter == bool :
+        if type_converter == bool:
             setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
-        else :
+        else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
         print(f" ==> Config value not loaded: {option} \n  {e}")

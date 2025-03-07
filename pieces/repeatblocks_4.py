@@ -1105,9 +1105,6 @@ def main(run=True):
     _load_config_value(config, workConfig, "movingpattern", "", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "", 1, int)
 
-    skipBlocks = (workConfig.get("movingpattern", "skipBlocks")).split(",")
-    config.skipBlocks = tuple(map(lambda x: int(x), skipBlocks))
-
     _load_config_value(config, workConfig, "movingpattern", "canvasRotation", 0.00, float)
     _load_config_value(config, workConfig, "movingpattern", "imgcanvasOffsetX", 0, int)
     _load_config_value(config, workConfig, "movingpattern", "imgcanvasOffsetY", 0, int)

@@ -538,13 +538,21 @@ def buildPatternSequence(config):
 
     if random.random() < config.blockSizeChangeProb :
 
-        config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
-        config.blockHeight = config.blockWidth 
+        if config.blockSizeChangeAlwaysUseMax :
+            config.blockWidth = config.blockWidthMax 
+            config.blockHeight = config.blockWidthMax 
+            
+        else :
+            config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
+            config.blockHeight = config.blockWidth 
+    else :
+        config.blockWidth = config.blockWidthMin 
+        config.blockHeight = config.blockWidthMin 
 
-        config.rows = math.floor(config.canvasHeight / config.blockHeight)
-        config.cols = math.floor(config.canvasWidth / config.blockWidth)
+    config.rows = round(config.canvasHeight / config.blockHeight) 
+    config.cols = round(config.canvasWidth / config.blockWidth) 
 
-
+    # print(f"cols(x) rows(y) {config.cols} {config.rows}")
 
 
     config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
@@ -608,7 +616,7 @@ def _print_pattern_sequence(config):
 
 
 def rebuildPatterns(arg=0):
-    print("rebuildPattern Called")
+    # print("rebuildPattern Called")
     c = round(random.uniform(1, 4))
     if c == 1 and config.numRowsRandomize:
         _rowsAndDotsSettings()
@@ -664,6 +672,7 @@ def setupPatterns():
     _load_config_value(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
+    _load_config_value(config, workConfig, "movingpattern", "blockSizeChangeAlwaysUseMax", False, bool)
 
     try:
         ringsRange = workConfig.get("movingpattern", "ringsRange").split(",")
@@ -730,8 +739,10 @@ def setupPatterns():
     _load_config_value(config, workConfig, "movingpattern", "steps", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "steps2", 1, int)
 
-    config.xIncrementer = 0
-    config.yIncrementer = 0
+
+    _load_config_value(config, workConfig, "movingpattern", "xIncrementer", 1, int)
+    _load_config_value(config, workConfig, "movingpattern", "yIncrementer", 1, int)
+
     config.altLineColoring = False
 
 
@@ -976,8 +987,11 @@ def _transform_and_render_image(temp1):
 
 
 def renderComposite(_img):
+    """ FINAL RENDERING CALL """
     if config.usePolygonOverlay:
         _img = shapeOverLayFunction(_img)
+
+    # uncomment for all temp canvas layers to show 
 
     # config.destinationImage.paste(_img, (0, 0), _img)
     # config.destinationImage.paste(config.patternImage, (280, 0), config.patternImage)
@@ -1232,7 +1246,6 @@ def runWork():
         time.sleep(config.redrawSpeed)
         if not config.standAlone:
             config.callBack()
-
 
 
 def _load_config_value(obj, workConfig, section, option, default, type_converter):

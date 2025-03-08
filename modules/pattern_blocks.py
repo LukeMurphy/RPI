@@ -766,14 +766,17 @@ def randomizer(config, paletteObj=None):
 
 def diamond(config, paletteObj=None):
     clr = tuple(int(a * config.brightness) for a in config.linecolOverlay.currentColor)
+    clr2 = tuple(int(a * config.brightness) for a in config.colOverlay.currentColor)
     if paletteObj is not None:
         clr = tuple(int(a) for a in paletteObj.linecolOverlay.currentColor)
+        clr2 = tuple(int(a) for a in paletteObj.colOverlay.currentColor)
 
     x = config.xIncrementer
     y = config.yIncrementer
 
     # needs to be in odd grid
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
+    config.blockDraw.rectangle(
+        (0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
     step = config.diamondStep
     row = 1
@@ -781,29 +784,34 @@ def diamond(config, paletteObj=None):
     w = 0
     h = 0
     rows = config.numRows
-    blockHeight = round(config.blockHeight / rows)
-    mid = round(blockHeight / 2)
+    blockHeight = round(config.blockHeight/rows)
+    mid = round(blockHeight/2)
 
     for rw in range(rows):
         for c in range(rows):
-            for i in range(0, blockHeight, step * 2):
-                for r in range(row):
-                    x = r + mid - row / 2 + c * blockHeight
+            for i in range(0, blockHeight, step*2):
+                for r in range(0, row, 1):
+                    x = r + mid - row/2 + c * blockHeight
                     y = i + config.yIncrementer + rw * blockHeight
 
-                    if y >= blockHeight * rows:
-                        y -= blockHeight * rows
+                    if y >= blockHeight*rows:
+                        y -= blockHeight*rows
 
                     if (r % 2) != 1:
-                        config.blockDraw.rectangle((x, y, w + x, h + y), fill=(clr), outline=None)
-
+                        config.blockDraw.rectangle(
+                            (x, y, w+x, h+y), fill=(clr), outline=None)
                 if config.diamondUseTriangles == False:
                     row = 2 * i + step + delta
-                    if i > (blockHeight / 2):
-                        row = round(2 * (blockHeight - i)) + delta
+                    if i > (blockHeight/2):
+                        row = round(2 * (blockHeight-i)) + delta
                         # delta += -2
                 else:
                     row = i + step
+
+    config.yIncrementer += config.ySpeed
+
+    if config.yIncrementer >= blockHeight*2:
+        config.yIncrementer = 0
 
 
 def diagonalMove(config, paletteObj=None):

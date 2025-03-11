@@ -106,7 +106,7 @@ def panImage() :
 	if(useBlink == True and random.random() > .9985) :
 		blink = False
 		blinkNum = int(random.uniform(7,23))
-		for blk in range (0, blinkNum) :
+		for blk in range (blinkNum) :
 			draw.rectangle((0,0, image.size[0] ,image.size[1]), fill = (0))
 			if(blink) :
 				#config.render(imageCopy, int(xOffset + xPos), int(yOffset  + yPos), image.size[0], image.size[1], False)
@@ -178,7 +178,6 @@ def animate(randomizeTiming = False, frameLimit = 3) :
 		image.seek(0)
 		#print("fail", frame)
 		skipTime = True
-		pass
 
 	if(skipTime == False) :
 		if(randomizeTiming) :
@@ -216,7 +215,7 @@ def init():
 				presentImage()        
 			count += 1
 		except KeyboardInterrupt:
-			print "Stopping...."
+			print ("Stopping....")
 			exit()
 			break
 
@@ -231,7 +230,7 @@ def start(img="", setvX = 0, setvY = 0):
 
 	vX = setvX
 	vY = setvY
-	
+
 	'''
 	if (action == "play") : 
 		#xOffset = yOffset = 0
@@ -246,9 +245,9 @@ def start(img="", setvX = 0, setvY = 0):
 		if(img=="") : img = config.path + "/imgs/drawings/206_thumbnail25.gif"
 	'''
 
-	debugMessage("Trying to load " + img)    
+	debugMessage(f"Trying to load {img}")    
 
-	if(loadImage(img)) :
+	if (loadImage(img)):
 		# scale to the WIDTH of the screen
 		if(image.size[0] != config.screenWidth and resizeToWidth) :
 			ratio = float(config.screenWidth)/ image.size[0]
@@ -256,8 +255,8 @@ def start(img="", setvX = 0, setvY = 0):
 		imageCopy = Image.new("RGBA", (image.size[0], image.size[1]))
 
 		imageCopy.paste(image, (0, 0))
-		debugMessage( img + " loaded")
-		#init()
+		debugMessage(f"{img} loaded")
+			#init()
 	else:
 		debugMessage ("could not load")
 

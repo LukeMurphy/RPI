@@ -72,11 +72,21 @@ class Palette :
             
         # print(self.paletteRangeList)
         
-    def chooseFromPalette(self,a,brtns) :
+    def chooseFromPalette(self,a,brtns):
         i = math.floor(random.uniform(0, len(self.paletteRangeList)))
         hslRange = self.paletteRangeList[i]
-        color = colorutils.getRandomColorHSL(hslRange[0],hslRange[1],hslRange[2],hslRange[3],hslRange[4],hslRange[5],0,0,a,brtns)
-        return color
+        return colorutils.getRandomColorHSL(
+            hslRange[0],
+            hslRange[1],
+            hslRange[2],
+            hslRange[3],
+            hslRange[4],
+            hslRange[5],
+            0,
+            0,
+            a,
+            brtns,
+        )
     
     
         

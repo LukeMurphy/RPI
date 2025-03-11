@@ -506,6 +506,13 @@ def setPalette(config, index=0):
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
     config.linecolOverlay2.currentColor = setCurrentColor(paletteObj.linecolOverlay2)
 
+    # if zero palette mixing is desired, force the patterns to rebuild
+    # this is a bit of an extreme but was having trouble preventing the
+    # palette mixing and making unpleasant combinations
+
+    if config.changePaletteWhenChangingPatternProb == 0.0 :
+        buildPatternSequence(config)
+
 
 def setupPalettes():
     config.palettes = workConfig.get("movingpattern", "palettes").split(",")
@@ -564,7 +571,6 @@ def buildPatternSequence(config):
     _generate_pattern_sequence(config)
     # _print_pattern_sequence(config)
     config.borderDrawn = False
-
 
 
 # this really needs to change to be more readable and predictable ....
@@ -686,6 +692,7 @@ def setupPatterns():
         config.ringsRange = (1, 1)
         config.numScaleRows = config.numShingleRows
 
+    _load_config_value(config, workConfig, "movingpattern", "patternOrientation", 0, float)
     _load_config_value(config, workConfig, "movingpattern", "numRows", 5, int)
     _load_config_value(config, workConfig, "movingpattern", "numRowsRandomize", False, bool)
     
@@ -807,6 +814,12 @@ def _draw_block(config, canvasImage, c, r, _counter, extraOverlapx, extraOverlap
 
     if c % 2 != 0 and config.rotateAltBlock == 1:
         _temp = _temp.rotate(-90)
+
+    # forces the patterns to align to a certain rotation
+    # useful instead of rotation the whole piece etc
+    if config.patternOrientation != 0 :
+        _temp = _temp.rotate(config.patternOrientation)
+
 
     # _tempDraw = ImageDraw.Draw(canvasImage)
     # _tempDrawB = ImageDraw.Draw(_temp)

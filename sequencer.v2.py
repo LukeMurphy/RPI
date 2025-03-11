@@ -63,7 +63,7 @@ def timeChecker(sequenceConfig, config):
             if pieceToPlay == len(sequenceConfig.workList) :
                 pieceToPlay = 0
 
-        print(f"Piece Playing is: {str(pieceToPlay)}")
+        print(f"Piece Playing is: {pieceToPlay}")
         print(sequenceConfig.workList[pieceToPlay])
 
         sequenceConfig.currentPieceDuration = round(random.SystemRandom().uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))

@@ -99,7 +99,7 @@ def timeChecker(sequenceConfig, config):
             print(bcolors.WARNING)
             print("--------------------------------")
             print("Sequencer is killing off old window(s)")
-            print(f"count play : {str(sequenceConfig.playCount)}")
+            print(f"count play : {sequenceConfig.playCount}")
             print(f"Running player instances are : {len(str(sequenceConfig.currentPID))}")
             print(listOfProcs)
             print("----")

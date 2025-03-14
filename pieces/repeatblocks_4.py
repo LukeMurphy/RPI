@@ -819,6 +819,9 @@ def _draw_block(config, canvasImage, c, r, _counter, extraOverlapx, extraOverlap
     # useful instead of rotation the whole piece etc
     if config.patternOrientation != 0 :
         _temp = _temp.rotate(config.patternOrientation)
+        
+    if config.blockRotation != 0 :
+        _temp = _temp.rotate(config.blockRotation)
 
 
     # _tempDraw = ImageDraw.Draw(canvasImage)
@@ -1132,6 +1135,7 @@ def main(run=True):
     _load_config_value(config, workConfig, "movingpattern", "", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "", 1, int)
 
+    _load_config_value(config, workConfig, "movingpattern", "blockRotation", 0.00, float)
     _load_config_value(config, workConfig, "movingpattern", "canvasRotation", 0.00, float)
     _load_config_value(config, workConfig, "movingpattern", "imgcanvasOffsetX", 0, int)
     _load_config_value(config, workConfig, "movingpattern", "imgcanvasOffsetY", 0, int)
@@ -1268,7 +1272,7 @@ def _load_config_value(obj, workConfig, section, option, default, type_converter
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        print(f" ==> Config value not loaded: {option} \n  {e}")
+        print(f" ==> Config value not loaded: {option} \n  {e}\n")
         setattr(obj, option, default)
 
 

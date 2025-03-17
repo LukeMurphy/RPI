@@ -22,6 +22,7 @@ class Director:
     actionDelay = .5
     loopDelay = .03
     redrawSpeed = 0.02
+    advance = False
 
     def __init__(self, config):
         super(Director, self).__init__()

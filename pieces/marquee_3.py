@@ -1,370 +1,380 @@
 # ################################################### #
 import math
 import random
+import sys
 import time
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
-
-class MarqueeBlock:
-
-	velocity = [0, 0]
-	position = [0, 0]
-
-	def __init__(self):
-		pass
-
-	def setUp(self):
-		pass
+from modules.holder_director import Holder
+from modules.holder_director import Director
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageChops
 
 
 class Marquee:
 
-	perimeter = []
-	initPoints = [0, 0]
-	innerWidth = 100
-	innerHeight = 100
-	marqueeBlockCount = 10
-	gap = 0
-	randomRange = 255
-	pattern = []
-	rightMessUpFactor = 1
-	alt = False
-	marqueeBlocks = []
-	direction = 1
+    pattern = []
+    perimeter = []
+    clrs = []
+    p0 = []
 
-	def __init__(self):
-		print("New Marquee")
+    innerWidth = 0
+    innerHeight = 0
+    marqueeWidth = 0
+    step = 1
+    offset = 0
+    speed = 1
 
-	def setUp(self):
-		self.colOverlayA = coloroverlay.ColorOverlay()
-		self.colOverlayB = coloroverlay.ColorOverlay()
-		self.colOverlayA.randomRange = (10.0, self.randomRange)
-		self.colOverlayB.randomRange = (10.0, self.randomRange)
-		self.perimeter = []
+    reverse = False
+    proportionalPatternSize = False
 
-		w = self.innerWidth
-		h = self.innerHeight
+    # colOverlayA = coloroverlay.ColorOverlay()
+    # colOverlayB = coloroverlay.ColorOverlay()
 
-		self.marqueeBlockLength = round(w / self.marqueeBlockCount)
+    def __init__(self):
+        self.p0 = []
 
-		self.speed = 0.3
+    def setUp(self):
+        pass
 
-		# self.marqueeBlockCount = round(self.innerWidth / self.marqueeWidth)
+    ## Creates a series of little boxes -- not efficient but useful if you wanted to make some kind of chasing
+    ## gradient marquee and better to get animation travel speed down as slow as possible
 
-		# for i in range (self.initPoints[1], self.initPoints[1] + round(h/self.step)) :
-		#     self.perimeter.append([self.initPoints[0] + w, i * self.step])
+    def makeMarquee(self):
 
-		## adding vert and horizontal velocity
+        o = 0
+        self.perimeter = []
+        # self.stepSize = round(self.step / self.marqueeWidth)
+        self.stepSize = round( self.marqueeWidth / self.step )
+        if self.stepSize == 0:
+            self.stepSize = 1
 
-		# RiGHT
-		for i in range(0, self.marqueeBlockCount * 2 + 1):
-			marqueeBlock = MarqueeBlock()
-			marqueeBlock.initPosition = (self.initPoints[0] + w, self.initPoints[1])
-			marqueeBlock.velocity = [0, self.speed * self.direction]
-			marqueeBlock.position = [
-				self.initPoints[0] + w,
-				self.initPoints[1] + i * self.marqueeBlockLength,
-			]
-			marqueeBlock.blockWidth = self.marqueeWidth
-			marqueeBlock.blockHeight = self.marqueeBlockLength
-			if i % 2 > 0:
-				marqueeBlock.clr = self.colOverlayB
-			else:
-				marqueeBlock.clr = self.colOverlayA
+        if self.proportionalPatternSize:
+            self.stepSize = 1
 
-			self.perimeter.append(marqueeBlock)
+        # self.stepSize = 5
 
-		# LEFT
-		for i in range(0, self.marqueeBlockCount * 2 + 1):
-			marqueeBlock = MarqueeBlock()
-			marqueeBlock.initPosition = (self.initPoints[0], self.initPoints[1])
-			marqueeBlock.velocity = [0, -self.speed * self.direction]
-			marqueeBlock.position = [
-				self.initPoints[0],
-				self.initPoints[1] + i * self.marqueeBlockLength,
-			]
-			marqueeBlock.blockWidth = self.marqueeWidth
-			marqueeBlock.blockHeight = self.marqueeBlockLength
-			if i % 2 > 0:
-				marqueeBlock.clr = self.colOverlayB
-			else:
-				marqueeBlock.clr = self.colOverlayA
+        self.speed = max(1/self.stepSize, 1)
+        self.speed = 1
+        self.stepSize = 1
 
-			self.perimeter.append(marqueeBlock)
+        # Right
+        self.perimeter.extend(
+            [self.p0[0] + self.innerWidth, i, self.marqueeWidth, self.stepSize]
+            for i in range(
+                self.p0[1],
+                self.p0[1] + self.innerHeight + self.marqueeWidth,
+                self.stepSize,
+            )
+        )
+        # Bottom
+        self.perimeter.extend([i, self.p0[1] + self.innerHeight, self.stepSize, self.marqueeWidth] for i in range(self.p0[0] + self.innerWidth - 1, self.p0[0] - 1, -self.stepSize))
+        # Left
+        self.perimeter.extend([self.p0[0], i, self.marqueeWidth, self.stepSize] for i in range(self.p0[1] + self.innerHeight, self.p0[1], -self.stepSize))
+        # Top
+        self.perimeter.extend(
+            [i, self.p0[1], self.stepSize, self.marqueeWidth]
+            for i in range(
+                self.p0[0],
+                self.p0[0] + self.innerWidth + self.marqueeWidth,
+                self.stepSize,
+            )
+        )
 
-		# TOP
-		for i in range(0, self.marqueeBlockCount * 2 + 1):
-			marqueeBlock = MarqueeBlock()
-			marqueeBlock.initPosition = (self.initPoints[0], self.initPoints[1])
-			marqueeBlock.position = [
-				self.initPoints[0] + i * self.marqueeBlockLength,
-				self.initPoints[1],
-			]
-			marqueeBlock.velocity = [self.speed * self.direction, 0]
-			marqueeBlock.blockWidth = self.marqueeBlockLength
-			marqueeBlock.blockHeight = self.marqueeWidth
-			if i % 2 > 0:
-				marqueeBlock.clr = self.colOverlayB
-			else:
-				marqueeBlock.clr = self.colOverlayA
+    def advance(self):
+        l = len(self.pattern)
 
-			self.perimeter.append(marqueeBlock)
+        patternA = self.pattern[: l - round(self.offset)]
+        patternB = self.pattern[(l - round(self.offset)) : l]
+        pattern = patternB + patternA
 
-		for i in range(0, self.marqueeBlockCount * 2 + 1):
-			marqueeBlock = MarqueeBlock()
-			marqueeBlock.initPosition = (self.initPoints[0], self.initPoints[1] + h)
-			marqueeBlock.position = [
-				self.initPoints[0] + i * self.marqueeBlockLength,
-				self.initPoints[1] + h,
-			]
-			marqueeBlock.velocity = [-self.speed * self.direction, 0]
-			marqueeBlock.blockWidth = self.marqueeBlockLength
-			marqueeBlock.blockHeight = self.marqueeWidth
-			if i % 2 > 0:
-				marqueeBlock.clr = self.colOverlayB
-			else:
-				marqueeBlock.clr = self.colOverlayA
+        count = 0
 
-			self.perimeter.append(marqueeBlock)
+        perim = self.perimeter
+        if self.reverse == True:
+            perim = reversed(self.perimeter)
+
+        try:
+            for p in perim:
+                if pattern[count] == 1:
+                    clr = self.colOverlayA.currentColor
+                else:
+                    clr = self.colOverlayB.currentColor
+                self.configDraw.rectangle(
+                    (p[0], p[1], p[0] + p[2], p[1] + p[3]),
+                    outline=None,
+                    fill=(round(clr[0]),round(clr[1]),round(clr[2]),100),
+                )
+                count += 1
+                if count >= len(pattern):
+                    count = 0
+        except Exception as e:
+            print(e)
+            print(f"self.colOverlayA.currentColor: {self.colOverlayA.currentColor} self.colOverlayB.currentColor : {self.colOverlayB.currentColor}")
+            sys.exit()
+
+        self.offset += self.speed
+        if self.offset >= len(pattern):
+            self.offset = 0
+
+        self.colOverlayA.stepTransition()
+        self.colOverlayB.stepTransition()
+
+
+def setTwoColors():
+    colOverlayA = coloroverlay.ColorOverlay()
+    colOverlayB = coloroverlay.ColorOverlay()
+
+    colOverlayA.minHue = config.palettes[config.usePalette][0]
+    colOverlayA.maxHue = config.palettes[config.usePalette][1]
+    colOverlayB.minHue = config.palettes[config.usePalette][2]
+    colOverlayB.maxHue = config.palettes[config.usePalette][3]
+
+    colOverlayA.randomRange = (config.randomRangeMin, config.randomRangeMax)
+    colOverlayB.randomRange = (config.randomRangeMin, config.randomRangeMax)
+
+    colOverlayA.steps = 250
+    colOverlayA.tLimit = 25
+    colOverlayA.tLimitBase = 25
+    colOverlayB.steps = 250
+    colOverlayB.tLimit = 20
+    colOverlayB.tLimitBase = 20
+
+    colOverlayA.colorTransitionSetup()
+    colOverlayB.colorTransitionSetup()
+
+    return (colOverlayA, colOverlayB)
 
 
 def init():
-	global config
+    global config
 
-	config.draw.rectangle(
-		(0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 255)
-	)
+    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 255))
+    config.bgColor = coloroverlay.ColorOverlay()
+    config.bgColor.randomRange = (config.randomRangeMin, config.randomRangeMax)
+    config.bgColor.colorTransitionSetup()
 
-	config.bgColor = coloroverlay.ColorOverlay()
-	config.bgColor.randomRange = (10.0, config.randomRange / 2)
-	config.marquees = []
+    ## The pattern controls the dash size - each 1 or 0 represents the width of one small
+    ## building block for the two-color dash
 
-	marqueeWidth = config.marqueeWidth
-	mwPrev = marqueeWidth
-	innerWidth = config.screenWidth - marqueeWidth
-	innerHeight = config.screenHeight - marqueeWidth
-	p0 = [0, 0]
+    # pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    # if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    # pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
+    # pattern = [1,1,1,0,0,0]
+    # pattern = [1,0,1,0,0,1,0,0,1,0,1]
 
-	for i in range(0, config.marqueeNum):
-		clrs = [colorutils.randomColor(), colorutils.getRandomRGB()]
-		colOverlayA = coloroverlay.ColorOverlay()
-		colOverlayB = coloroverlay.ColorOverlay()
+    pattern = []
+    pattern.extend(1 for _ in range(config.baseDashSize))
+    pattern.extend((0 for _ in range(config.baseDashSize)))
 
-		colOverlayA.randomRange = (10.0, config.randomRange)
-		colOverlayB.randomRange = (10.0, config.randomRange)
+    p0 = [config.imageXOffset, config.imageYOffset]
+    marqueeWidth = config.marqueeWidth
+    innerWidth = config.screenWidth - marqueeWidth
+    innerHeight = config.screenHeight - marqueeWidth
+    marqueeWidthPrev = marqueeWidth
 
-		# if(i%2 == 0) : mw = mwPrev - decrement
+    step = config.step
+    decrement = config.decrement
 
-		if i != 0:
-			marqueeWidth = round(mwPrev - config.decrement)
+    config.marquees = []
 
-		if marqueeWidth <= 2:
-			marqueeWidth = 2
+    unitColors = setTwoColors()
 
-		if innerWidth < 32 or i > 6:
-			config.step = config.step
+    # If this is 1 then offsets the gap...
+    eveningGap = 2
 
-		marquee = Marquee()
-		marquee.offSet = 0
-		marquee.config = config
-		marquee.initPoints = p0
-		marquee.innerWidth = innerWidth
-		marquee.innerHeight = innerHeight
-		marquee.marqueeWidth = marqueeWidth
+    for i in range(config.marqueeNum):
 
-		marquee.marqueeBlockCount = 10 - i
-		marquee.step = config.step
-		marquee.clrs = clrs
-		if i % 2 > 0:
-			marquee.direction = -1
-		marquee.setUp()
+        clrs = [colorutils.randomColor(), colorutils.randomColorAlpha(255, 255)]
 
-		config.marquees.append(marquee)
+        if config.mulitColor == True:
+            unitColors = setTwoColors()
 
-		## This creates the total points
-		p0[0] += marqueeWidth + config.gap
-		p0[1] += marqueeWidth + config.gap
-		mwPrev = marqueeWidth
+        if i != 0:
+            marqueeWidth = marqueeWidthPrev - decrement
 
-		innerWidth = innerWidth - 2 * (marqueeWidth) - config.gap + config.decrement
-		innerHeight = innerHeight - 2 * (marqueeWidth) - config.gap + config.decrement
+        marqueeWidth = max(marqueeWidth, 2)
+        if innerWidth < 32 or i > 6:
+            step = 1
 
-		if config.gap > 0:
-			innerWidth -= config.decrement
-			innerHeight -= config.decrement
+        mq = Marquee()
+        mq.pattern = pattern
+        mq.p0 = p0
+        mq.innerWidth = innerWidth
+        mq.innerHeight = innerHeight
+        mq.marqueeWidth = marqueeWidth
+        mq.step = i+1 if config.proportionalPatternSize else config.step
+        mq.clrs = clrs
+        mq.colOverlayA = unitColors[0]
+        mq.colOverlayB = unitColors[1]
+        mq.configDraw = config.draw
+        mq.reverse = i % 2 > 0
+        mq.proportionalPatternSize = config.proportionalPatternSize
 
-		if marqueeWidth == 2:
-			innerWidth -= 1
-			innerHeight -= 1
+        mq.makeMarquee()
+        config.marquees.append(mq)
 
+        p0[0] += marqueeWidth + config.gap
+        p0[1] += marqueeWidth + config.gap
+        marqueeWidthPrev = marqueeWidth + 1
 
-def drawText(xPos=0, yPos=0, messageString="", crossout=False):
-	global config
-	# Draw the text with "borders"
-	indent = int(0.05 * config.tileSize[0])
-	for i in range(1, config.shadowSize):
-		config.draw.text((indent + -i, -i), messageString, (0, 0, 0), font=config.font)
-		config.draw.text((indent + i, i), messageString, (0, 0, 0), font=config.font)
+        innerWidth = innerWidth - 2 * (marqueeWidth) - config.gap * eveningGap + decrement
+        innerHeight = innerHeight - 2 * (marqueeWidth) - config.gap * eveningGap + decrement
 
-	config.draw.text((xPos, yPos), messageString, config.clr, font=config.font)
-	if crossout == True:
-		# config.draw.line((xPos, yPos + config.fontSize, xPos + config.fontSize/1.5, yPos - config.fontSize/8), fill=config.clr)
-		config.draw.line(
-			(
-				xPos,
-				yPos + config.fontSize / 1.5,
-				xPos + config.fontSize / 1.5,
-				yPos + config.fontSize / 1.5,
-			),
-			fill=config.clr,
-		)
+        if config.gap > 0:
+            innerWidth -= decrement
+            innerHeight -= decrement
+
+        if marqueeWidth == 2:
+            innerWidth -= 1
+            innerHeight -= 1
+
+        if len(pattern) >= 4 and random.random() > 0.1:
+            pattern = pattern[1:]
+            pattern = pattern[:-1]
 
 
-def drawMarquee():
-	global config
-	drawText(10, 10, str(config.offset))
-	pass
+def animate():
 
 
-def drawElement():
-	global config
-	return True
-
+    config.bgColor.stepTransition()
+    bgColor = tuple(round(c) for c in config.bgColor.currentColor)
+    # config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 10))
+    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=bgColor)
+    for mq in config.marquees:
+        mq.advance()
 
 def redraw():
-	global config
+    global config
+    mcount = 0
 
-	bgColor = tuple(int(c) for c in config.bgColor.currentColor)
-	config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=bgColor)
-	config.bgColor.stepTransition()
+    # config.interImage1 = Image.blend(config.interImage1, config.image, 1/config.interImages)
 
-	mcount = 0
-	for m in config.marquees:
+    if config.interImageState == 0 :
+        # config.displayImage.paste(config.image, (0,0), config.image)
+        # animate()
+        # print("Animate")
+        # config.interImage1 = Image.blend(config.interImage1, config.image, 1/config.interImages)
+        # config.interImage1.paste(config.displayImage, (0,0), config.displayImage)
+        temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
+    if config.interImageState > 0:
+        temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
 
-		l = len(m.pattern)
-		patternA = m.pattern[0 : (l - m.offSet)]
-		patternB = m.pattern[(l - m.offSet) : l]
-		pattern = patternB + patternA
 
-		perim = m.perimeter
+    config.interImageState += 1
+    if config.interImageState == config.interImages :
+        animate()
+        config.interImageState = 0
+        # config.interImage1.paste(config.image, (0,0), config.image)
+        # temp.paste(config.image, (0,0), config.image)
+        # animate()
+        config.displayImage.paste(config.image, (0,0), config.image)
+        # print("paste\n")
 
-		if mcount % 2 > 0:
-			perim = reversed(m.perimeter)
-
-		count = 0
-		for p in perim:
-
-			clr = p.clr.currentColor
-			x = p.position[0]
-			y = p.position[1]
-			blockWidth = p.blockWidth
-			blockHeight = p.blockHeight
-
-			config.draw.rectangle(
-				(x, y, round(x + blockWidth), round(y + blockHeight)),
-				outline=None,
-				fill=tuple(int(c) for c in clr),
-			)
-
-			p.position[0] += p.velocity[0]
-			p.position[1] += p.velocity[1]
-
-			if p.position[1] > m.innerHeight + p.blockHeight:
-				p.position[1] = p.initPosition[1] - m.marqueeWidth
-
-			if p.position[1] < p.initPosition[1] - p.blockHeight:
-				p.position[1] = m.innerHeight
-
-			if p.position[0] > m.innerWidth + p.blockWidth:
-				p.position[0] = p.initPosition[0] - m.marqueeWidth
-
-			if p.position[0] < p.initPosition[0]:
-				p.position[0] = m.innerWidth  # - p.blockWidth
-
-		p.clr.stepTransition()
+    
+    config.render(temp, 0, 0, config.screenWidth, config.screenHeight)
+    # config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 
 def runWork():
-	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-	print("Running marquee_3.py")
-	print(bcolors.ENDC)
-	while True:
-		iterate()
-		time.sleep(config.redrawSpeed)
-		# time.sleep(random.random() * config.redrawSpeed)
+    global config
+    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
+    print("Running marquee_2.py")
+    print(bcolors.ENDC)
+
+    while config.isRunning:
+        config.directorController.checkTime()
+        if config.directorController.advance:
+            iterate()
+        time.sleep(config.redrawSpeed)
+        if config.standAlone == False:
+            config.callBack()
 
 
 def iterate():
-	global config
-	redraw()
-	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+    global config
+    # animate()
+    redraw()
+    checkTime()
+
+    if config.marqueeTimerDelta > config.changePaletteInterval:
+        if random.random() < 0.5:
+            palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
+            config.usePalette = list(config.palettes.keys())[palette]
+            # print("New Palette:{}".format(config.usePalette))
+        config.marqueeTimerDelta = 0
+        config.marqueeTimer1 = time.time()
 
 
 def main(run=True):
-	global config
-	global workConfig
-	config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-	config.draw = ImageDraw.Draw(config.image)
-	config.redrawSpeed = float(workConfig.get("marquee", "redrawSpeed"))
-	config.randomRange = float(workConfig.get("marquee", "randomRange"))
-	config.fontSize = int(workConfig.get("marquee", "fontSize"))
-	config.marqueeWidth = int(workConfig.get("marquee", "marqueeWidth"))
-	config.gap = int(workConfig.get("marquee", "gap"))
-	config.step = float(workConfig.get("marquee", "step"))
-	config.decrement = int(workConfig.get("marquee", "decrement"))
-	config.marqueeNum = int(workConfig.get("marquee", "marqueeNum"))
-	config.shadowSize = int(workConfig.get("marquee", "shadowSize"))
-	config.font = ImageFont.truetype(
-		config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
-	)
-	config.clr = (255, 0, 0)
-	config.textPosY = 40
-	config.textPosX = 120
+    global config
+    global workConfig
+    config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.displayImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.interImage1 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.interImage2 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.interImage3 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.interImage4 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.interImageState = 0
 
-	config.clr = colorutils.randomColor(1)
-	config.fontSize = int(random.uniform(10, 50))
-	config.fontSize = 10
-	config.font = ImageFont.truetype(
-		config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
-	)
 
-	config.alphabet = [
-		"a",
-		"b",
-		"c",
-		"d",
-		"e",
-		"f",
-		"g",
-		"h",
-		"i",
-		"j",
-		"k",
-		"l",
-		"m",
-		"n",
-		"o",
-		"p",
-		"q",
-		"r",
-		"s",
-		"t",
-		"u",
-		"v",
-		"w",
-		"x",
-		"y",
-		"z",
-	]
-	config.word = "FEAR"
-	colorutils.brightness = float(workConfig.get("displayconfig", "brightness"))
-	config.messageString = config.word
-	config.xOffset = 15
+    config.draw = ImageDraw.Draw(config.image)
+    config.redrawSpeed = float(workConfig.get("marquee", "redrawSpeed"))
+    config.marqueeWidth = int(workConfig.get("marquee", "marqueeWidth"))
+    config.baseDashSize = int(workConfig.get("marquee", "baseDashSize"))
+    config.gap = int(workConfig.get("marquee", "gap"))
+    config.step = int(workConfig.get("marquee", "step"))
+    config.changePaletteInterval = int(workConfig.get("marquee", "changePaletteInterval"))
+    config.decrement = int(workConfig.get("marquee", "decrement"))
+    config.marqueeNum = int(workConfig.get("marquee", "marqueeNum"))
+    config.randomRangeMin = int(workConfig.get("marquee", "randomRangeMin"))
+    config.randomRangeMax = int(workConfig.get("marquee", "randomRangeMax"))
+    config.mulitColor = workConfig.getboolean("marquee", "mulitColor")
+    config.proportionalPatternSize = workConfig.getboolean("marquee", "proportionalPatternSize")
 
-	init()
+    colorutils.brightness = float(workConfig.get("displayconfig", "brightness"))
+    config.xOffset = 15
 
-	if run:
-		runWork()
+    config.palettes = {
+        "all": [0, 360, 0, 360],
+        "all2": [0, 180, 180, 360],
+        "warm-cool": [0, 40, 140, 180],
+        "desert": [0, 40, 40, 80],
+        "winter": [180, 200, 200, 240],
+        "winter2": [190, 210, 210, 230],
+        "wintersun": [30, 50, 180, 240],
+    }
+
+    if not config.mulitColor:
+        # Only two colors so the palettes are not really applicable
+        config.palettes = {"all": [0, 360, 0, 360], "all2": [0, 180, 180, 360]}
+
+    config.palettes = {"warm-all": [340, 36, 340, 36], "warm-all2": [350, 45, 350, 36]}
+
+    config.usePalette = list(config.palettes.keys())[1]
+
+    config.marqueeTimerDelta = 0
+    config.marqueeTimer1 = time.time()
+
+
+    config.directorController = Director(config)
+    config.redrawSpeed = float(workConfig.get("marquee", "redrawSpeed"))
+    config.directorController.slotRate = float(workConfig.get("marquee", "slotRate"))
+    config.interImages = int(workConfig.get("marquee", "interImages"))
+
+    config.animationController = Director(config)
+    config.animationController.slotRate = .1
+
+
+    init()
+
+    if run:
+        runWork()
+
+
+def checkTime():
+    global config
+    t = time.time()
+    config.marqueeTimerDelta = t - config.marqueeTimer1
+
+
+#########

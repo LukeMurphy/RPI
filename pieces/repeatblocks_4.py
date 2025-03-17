@@ -1272,7 +1272,7 @@ def _load_config_value(obj, workConfig, section, option, default, type_converter
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        print(f" ==> Config value not loaded: {option} \n  {e}\n")
+        print(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}\n")
         setattr(obj, option, default)
 
 

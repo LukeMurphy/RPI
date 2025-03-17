@@ -330,7 +330,7 @@ def _load_work_module(config, workconfig):
         work.config.isRPI = True
         renderUsingIDAFruitHat(work)
     elif config.rendering == "hub":
-        renderUsingLINSNHub(work)
+        renderAsAnimationWindow(work)
     elif config.rendering == "out":
         renderUsingFFMPEG(work)
 
@@ -377,7 +377,7 @@ def renderUsingIDAFruitHat(work):
     work.main()
 
 
-def renderUsingLINSNHub(work):
+def renderAsAnimationWindow(work):
 
     from modules.rendering import rendertohub
     import threading

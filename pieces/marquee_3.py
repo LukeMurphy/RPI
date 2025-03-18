@@ -26,7 +26,11 @@ class Marquee:
 
     reverse = False
     proportionalPatternSize = False
+    aliasMode = True
 
+    advanceStep = 0
+    advanceStepMax = 2
+    aliasAlpha = 255
     # colOverlayA = coloroverlay.ColorOverlay()
     # colOverlayB = coloroverlay.ColorOverlay()
 
@@ -93,26 +97,38 @@ class Marquee:
         if self.reverse == True:
             perim = reversed(self.perimeter)
 
-        try:
-            for p in perim:
-                if pattern[count] == 1:
-                    clr = self.colOverlayA.currentColor
-                else:
-                    clr = self.colOverlayB.currentColor
-                self.configDraw.rectangle(
-                    (p[0], p[1], p[0] + p[2], p[1] + p[3]),
-                    outline=None,
-                    fill=(round(clr[0]),round(clr[1]),round(clr[2]),100),
-                )
-                count += 1
-                if count >= len(pattern):
-                    count = 0
-        except Exception as e:
-            print(e)
-            print(f"self.colOverlayA.currentColor: {self.colOverlayA.currentColor} self.colOverlayB.currentColor : {self.colOverlayB.currentColor}")
-            sys.exit()
+        _alpha = round(255 * self.advanceStep/self.advanceStepMax)
 
-        self.offset += self.speed
+        if not self.aliasMode :
+            _alpha = 255
+
+        for p in perim:
+            if pattern[count] == 1:
+                clr = self.colOverlayA.currentColor
+            else:
+                clr = self.colOverlayB.currentColor
+            self.configDraw.rectangle(
+                (p[0], p[1], p[0] + p[2], p[1] + p[3]),
+                outline=None,
+                fill=(round(clr[0]),round(clr[1]),round(clr[2]),_alpha),
+            )
+            if self.aliasMode :
+                self.configDraw.rectangle(
+                    (p[0]-1, p[1]-1, p[0] + p[2] + 1, p[1] + p[3] + 1),
+                    outline=None,
+                    fill=(round(clr[0]),round(clr[1]),round(clr[2]),round(self.aliasAlpha)),
+                )
+            count += 1
+            if count >= len(pattern):
+                count = 0
+
+        if self.advanceStep == self.advanceStepMax - 2 :
+            self.offset += self.speed
+            self.advanceStep = 0
+        else :
+            self.offset += 0
+            self.advanceStep += 1
+
         if self.offset >= len(pattern):
             self.offset = 0
 
@@ -209,7 +225,9 @@ def init():
         mq.configDraw = config.draw
         mq.reverse = i % 2 > 0
         mq.proportionalPatternSize = config.proportionalPatternSize
-
+        mq.advanceStepMax = config.advanceStepMax
+        mq.aliasMode = config.aliasMode
+        mq.aliasAlpha = config.aliasAlpha
         mq.makeMarquee()
         config.marquees.append(mq)
 
@@ -234,45 +252,48 @@ def init():
 
 
 def animate():
+    config.animationController.checkTime()
+    if config.animationController.advance:
+        config.bgColor.stepTransition()
+        bgColor = tuple(round(c) for c in config.bgColor.currentColor)
+        # config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 10))
+        config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=bgColor)
+        for mq in config.marquees:
+            mq.advance()
 
-
-    config.bgColor.stepTransition()
-    bgColor = tuple(round(c) for c in config.bgColor.currentColor)
-    # config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 10))
-    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=bgColor)
-    for mq in config.marquees:
-        mq.advance()
 
 def redraw():
     global config
     mcount = 0
 
-    # config.interImage1 = Image.blend(config.interImage1, config.image, 1/config.interImages)
+    # if config.interImages != 0:
 
-    if config.interImageState == 0 :
-        # config.displayImage.paste(config.image, (0,0), config.image)
-        # animate()
-        # print("Animate")
-        # config.interImage1 = Image.blend(config.interImage1, config.image, 1/config.interImages)
-        # config.interImage1.paste(config.displayImage, (0,0), config.displayImage)
-        temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
-    if config.interImageState > 0:
-        temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
+    #     # config.interImage1 = Image.blend(config.interImage1, config.image, 1/config.interImages)
+
+    #     if config.interImageState == 0 :
+    #         # config.displayImage.paste(config.image, (0,0), config.image)
+    #         # animate()
+    #         # print("Animate")
+    #         # config.interImage1 = Image.blend(config.interImage1, config.image, 1/config.interImages)
+    #         # config.interImage1.paste(config.displayImage, (0,0), config.displayImage)
+    #         temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
+    #     if config.interImageState > 0:
+    #         temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
 
 
-    config.interImageState += 1
-    if config.interImageState == config.interImages :
-        animate()
-        config.interImageState = 0
-        # config.interImage1.paste(config.image, (0,0), config.image)
-        # temp.paste(config.image, (0,0), config.image)
-        # animate()
-        config.displayImage.paste(config.image, (0,0), config.image)
-        # print("paste\n")
-
-    
-    config.render(temp, 0, 0, config.screenWidth, config.screenHeight)
-    # config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+    #     config.interImageState += 1
+    #     if config.interImageState == config.interImages :
+    #         animate()
+    #         config.interImageState = 0
+    #         # config.interImage1.paste(config.image, (0,0), config.image)
+    #         # temp.paste(config.image, (0,0), config.image)
+    #         # animate()
+    #         config.displayImage.paste(config.image, (0,0), config.image)
+    #         # print("paste\n")
+    #     config.render(temp, 0, 0, config.screenWidth, config.screenHeight)
+    # else :
+    animate()
+    config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 
 
 def runWork():
@@ -311,9 +332,6 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.displayImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.interImage1 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.interImage2 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.interImage3 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.interImage4 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.interImageState = 0
 
 
@@ -322,7 +340,17 @@ def main(run=True):
     config.marqueeWidth = int(workConfig.get("marquee", "marqueeWidth"))
     config.baseDashSize = int(workConfig.get("marquee", "baseDashSize"))
     config.gap = int(workConfig.get("marquee", "gap"))
+    
     config.step = int(workConfig.get("marquee", "step"))
+    config.advanceStepMax = int(workConfig.get("marquee", "advanceStepMax"))
+    config.aliasAlpha = int(workConfig.get("marquee", "aliasAlpha"))
+    config.aliasMode = workConfig.getboolean("marquee", "aliasMode")
+    if not config.aliasMode :
+        config.advanceStepMax = 2
+    config.animationRate = float(workConfig.get("marquee", "animationRate"))
+    # config.interImages = int(workConfig.get("marquee", "interImages"))
+    
+    config.proportionalPatternSize = workConfig.getboolean("marquee", "proportionalPatternSize")
     config.changePaletteInterval = int(workConfig.get("marquee", "changePaletteInterval"))
     config.decrement = int(workConfig.get("marquee", "decrement"))
     config.marqueeNum = int(workConfig.get("marquee", "marqueeNum"))
@@ -355,14 +383,12 @@ def main(run=True):
     config.marqueeTimerDelta = 0
     config.marqueeTimer1 = time.time()
 
-
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("marquee", "redrawSpeed"))
     config.directorController.slotRate = float(workConfig.get("marquee", "slotRate"))
-    config.interImages = int(workConfig.get("marquee", "interImages"))
 
     config.animationController = Director(config)
-    config.animationController.slotRate = .1
+    config.animationController.slotRate = config.animationRate
 
 
     init()

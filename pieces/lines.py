@@ -53,9 +53,7 @@ class Line:
             self.angleIncrement = 0
         else:
             angleIncrementDirection = 1 if random.SystemRandom().random() > 0.5 else -1
-            self.angleIncrement = (
-                angleIncrementDirection * math.pi / self.config.angleIncrement
-            )
+            self.angleIncrement = angleIncrementDirection * math.pi / self.config.angleIncrement
 
         side = -1
 
@@ -88,14 +86,8 @@ class Line:
         self.nextPoint = [x, y]
 
     def calculateNextPoint(self):
-        self.nextPoint[0] = (
-            self.lastPoint[0]
-            + self.segmentLength * math.cos(self.angle) * self.direction
-        )
-        self.nextPoint[1] = (
-            self.lastPoint[1]
-            + self.segmentLength * math.sin(self.angle) * self.direction
-        )
+        self.nextPoint[0] = self.lastPoint[0] + self.segmentLength * math.cos(self.angle) * self.direction
+        self.nextPoint[1] = self.lastPoint[1] + self.segmentLength * math.sin(self.angle) * self.direction
         self.angle += self.angleIncrement
 
     def drawLine(self):
@@ -155,15 +147,9 @@ class Line:
 
         self.lastPoint = self.nextPoint
 
-        if (
-            x1 > self.config.canvasWidth + self.widthMultiplier + 3
-            or x1 < 0 - self.widthMultiplier - 3
-        ):
+        if x1 > self.config.canvasWidth + self.widthMultiplier + 3 or x1 < 0 - self.widthMultiplier - 3:
             self.done = True
-        if (
-            y1 > self.config.canvasHeight + self.widthMultiplier + 3
-            or y1 < 0 - self.widthMultiplier - 3
-        ):
+        if y1 > self.config.canvasHeight + self.widthMultiplier + 3 or y1 < 0 - self.widthMultiplier - 3:
             self.done = True
 
         if len(self.pointArray) > 3:
@@ -229,17 +215,9 @@ def showLines():
                 if random.SystemRandom().random() < config.branchProb:
                     # split off at right angle
                     """ """
-                    ref.angle = (
-                        currentAngle
-                        + math.pi / 2
-                        + random.SystemRandom().uniform(-math.pi / 8, math.pi / 8)
-                    )
+                    ref.angle = currentAngle + math.pi / 2 + random.SystemRandom().uniform(-math.pi / 8, math.pi / 8)
                     if random.SystemRandom().random() < 0.5:
-                        ref.angle = (
-                            currentAngle
-                            - math.pi / 2
-                            + random.SystemRandom().uniform(-math.pi / 8, math.pi / 8)
-                        )
+                        ref.angle = currentAngle - math.pi / 2 + random.SystemRandom().uniform(-math.pi / 8, math.pi / 8)
                     ref.lastPoint = midPoint
                     ref.nextPoint = midPoint
                     ref.done = False
@@ -247,10 +225,7 @@ def showLines():
                     ref.lineColor = ref.lineColor
                     ref.branchCount = ref.branchCount + 1
                     config.lineCount += 1
-                    if (
-                        random.SystemRandom().random() < config.doubleBranchProb
-                        and len(config.linesArray) < config.simultaneousLines
-                    ):
+                    if random.SystemRandom().random() < config.doubleBranchProb and len(config.linesArray) < config.simultaneousLines:
 
                         newLines.append(
                             [
@@ -314,9 +289,7 @@ def main(run=True):
     config.rows = int(workConfig.get("lines", "rows"))
     config.cols = int(workConfig.get("lines", "cols"))
     config.bgColorVals = (workConfig.get("lines", "bgColor")).split(",")
-    config.bgColor = tuple(
-        map(lambda x: int(int(x) * config.brightness), config.bgColorVals)
-    )
+    config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness), config.bgColorVals))
 
     config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.draw = ImageDraw.Draw(config.image)
@@ -333,9 +306,7 @@ def main(run=True):
     config.doubleBranchProb = float(workConfig.get("lines", "doubleBranchProb"))
     config.angleIncrementMin = int(workConfig.get("lines", "angleIncrementMin"))
     config.angleIncrementMax = int(workConfig.get("lines", "angleIncrementMax"))
-    config.activeLineInterceptLimit = int(
-        workConfig.get("lines", "activeLineInterceptLimit")
-    )
+    config.activeLineInterceptLimit = int(workConfig.get("lines", "activeLineInterceptLimit"))
     config.lineCountLimit = int(workConfig.get("lines", "lineCountLimit"))
     config.segmentLength = float(workConfig.get("lines", "segmentLength"))
     config.branchCountLimit = int(workConfig.get("lines", "branchCountLimit"))
@@ -357,16 +328,12 @@ def setUp():
     global config
 
     config.lineCount = 0
-    config.canvasDraw.rectangle(
-        (0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor
-    )
+    config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
     config.pointArray = [[0, 0]]
     config.linesArray = []
     config.stop = False
 
-    config.angleIncrement = random.SystemRandom().uniform(
-        config.angleIncrementMax, config.angleIncrementMax
-    )
+    config.angleIncrement = random.SystemRandom().uniform(config.angleIncrementMax, config.angleIncrementMax)
 
     # print(config.linesArray)
 

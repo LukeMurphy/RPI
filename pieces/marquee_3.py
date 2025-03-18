@@ -3,6 +3,8 @@ import math
 import random
 import sys
 import time
+
+from numpy import true_divide
 from modules.configuration import bcolors
 from modules import coloroverlay, colorutils
 from modules.holder_director import Holder
@@ -48,7 +50,7 @@ class Marquee:
         o = 0
         self.perimeter = []
         # self.stepSize = round(self.step / self.marqueeWidth)
-        self.stepSize = round( self.marqueeWidth / self.step )
+        self.stepSize = round(self.marqueeWidth / self.step)
         if self.stepSize == 0:
             self.stepSize = 1
 
@@ -57,7 +59,7 @@ class Marquee:
 
         # self.stepSize = 5
 
-        self.speed = max(1/self.stepSize, 1)
+        self.speed = max(1 / self.stepSize, 1)
         self.speed = 1
         self.stepSize = 1
 
@@ -97,9 +99,12 @@ class Marquee:
         if self.reverse == True:
             perim = reversed(self.perimeter)
 
-        _alpha = round(255 * self.advanceStep/self.advanceStepMax)
+        # not really needed with the pasting of the lower alpha rectangle
+        # on top of each section
+        # _alpha = round(255 * self.advanceStep/self.advanceStepMax)
+        _alpha = 255
 
-        if not self.aliasMode :
+        if not self.aliasMode:
             _alpha = 255
 
         for p in perim:
@@ -110,22 +115,23 @@ class Marquee:
             self.configDraw.rectangle(
                 (p[0], p[1], p[0] + p[2], p[1] + p[3]),
                 outline=None,
-                fill=(round(clr[0]),round(clr[1]),round(clr[2]),_alpha),
+                fill=(round(clr[0]), round(clr[1]), round(clr[2]), _alpha),
             )
-            if self.aliasMode :
+            if self.aliasMode:
+                # just x pseudo anti-aliasing for now
                 self.configDraw.rectangle(
-                    (p[0]-1, p[1]-1, p[0] + p[2] + 1, p[1] + p[3] + 1),
+                    (p[0] - 1, p[1] - 1, p[0] + p[2] + 0, p[1] + p[3] + 0),
                     outline=None,
-                    fill=(round(clr[0]),round(clr[1]),round(clr[2]),round(self.aliasAlpha)),
+                    fill=(round(clr[0]), round(clr[1]), round(clr[2]), round(self.aliasAlpha)),
                 )
             count += 1
             if count >= len(pattern):
                 count = 0
 
-        if self.advanceStep == self.advanceStepMax - 2 :
+        if self.advanceStep == self.advanceStepMax - 2:
             self.offset += self.speed
             self.advanceStep = 0
-        else :
+        else:
             self.offset += 0
             self.advanceStep += 1
 
@@ -136,14 +142,19 @@ class Marquee:
         self.colOverlayB.stepTransition()
 
 
-def setTwoColors():
+def setTwoColors(_index = 0):
+
     colOverlayA = coloroverlay.ColorOverlay()
     colOverlayB = coloroverlay.ColorOverlay()
 
-    colOverlayA.minHue = config.palettes[config.usePalette][0]
-    colOverlayA.maxHue = config.palettes[config.usePalette][1]
-    colOverlayB.minHue = config.palettes[config.usePalette][2]
-    colOverlayB.maxHue = config.palettes[config.usePalette][3]
+    _palette1 = config.palettes[_index][0]
+    _palette2 = config.palettes[_index][1]
+
+    colOverlayA.minHue = _palette1.minHue
+    colOverlayA.maxHue = _palette1.maxHue
+
+    colOverlayB.minHue = _palette2.minHue
+    colOverlayB.maxHue = _palette2.maxHue
 
     colOverlayA.randomRange = (config.randomRangeMin, config.randomRangeMax)
     colOverlayB.randomRange = (config.randomRangeMin, config.randomRangeMax)
@@ -155,15 +166,48 @@ def setTwoColors():
     colOverlayB.tLimit = 20
     colOverlayB.tLimitBase = 20
 
-    colOverlayA.minSaturation = .9
-    colOverlayA.maxSaturation = 1.0
-    colOverlayA.minValue = .4
-    colOverlayA.maxValue = .6
+    colOverlayA.minSaturation = _palette1.minSaturation
+    colOverlayA.maxSaturation = _palette1.maxSaturation
+    colOverlayA.minValue = _palette1.minValue 
+    colOverlayA.maxValue = _palette1.maxValue
+
+    colOverlayB.minSaturation = _palette2.minSaturation
+    colOverlayB.maxSaturation = _palette2.maxSaturation
+    colOverlayB.minValue = _palette2.minValue 
+    colOverlayB.maxValue = _palette2.maxValue 
 
     colOverlayA.colorTransitionSetup()
     colOverlayB.colorTransitionSetup()
 
     return (colOverlayA, colOverlayB)
+
+
+def loadPalette(_paletteName):
+    paletteObj = Holder()
+    # background
+    # tLimitBase = int(workConfig.get(palette, "tLimitBase"))
+    paletteObj.minHue = float(workConfig.get(_paletteName, "minHue"))
+    paletteObj.maxHue = float(workConfig.get(_paletteName, "maxHue"))
+    paletteObj.minSaturation = float(workConfig.get(_paletteName, "minSaturation"))
+    paletteObj.maxSaturation = float(workConfig.get(_paletteName, "maxSaturation"))
+    paletteObj.minValue = float(workConfig.get(_paletteName, "minValue"))
+    paletteObj.maxValue = float(workConfig.get(_paletteName, "maxValue"))
+    paletteObj.name = _paletteName
+    return paletteObj
+
+
+def changePalettes():
+    # palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
+    # config.usePalette = list(config.palettes.keys())[palette]
+    # print("New Palette:{}".format(config.usePalette))
+
+    _newPaletteIndex = math.floor(random.uniform(0,len(config.palettes)))
+    for _m in config.marquees:
+        # print(f"marqee {_m} {_m.colOverlayA} {_m.colOverlayB}")
+        newUnitColors = setTwoColors(_newPaletteIndex)
+        _m.colOverlayA = newUnitColors[0]
+        _m.colOverlayB = newUnitColors[1]
+
 
 
 def init():
@@ -197,7 +241,6 @@ def init():
     decrement = config.decrement
 
     config.marquees = []
-
     unitColors = setTwoColors()
 
     # If this is 1 then offsets the gap...
@@ -207,7 +250,7 @@ def init():
 
         clrs = [colorutils.randomColor(), colorutils.randomColorAlpha(255, 255)]
 
-        if config.mulitColor == True:
+        if config.multiColor :
             unitColors = setTwoColors()
 
         if i != 0:
@@ -223,7 +266,7 @@ def init():
         mq.innerWidth = innerWidth
         mq.innerHeight = innerHeight
         mq.marqueeWidth = marqueeWidth
-        mq.step = i+1 if config.proportionalPatternSize else config.step
+        mq.step = i + 1 if config.proportionalPatternSize else config.step
         mq.clrs = clrs
         mq.colOverlayA = unitColors[0]
         mq.colOverlayB = unitColors[1]
@@ -285,7 +328,6 @@ def redraw():
     #     if config.interImageState > 0:
     #         temp = Image.blend(config.displayImage, config.image, config.interImageState/config.interImages)
 
-
     #     config.interImageState += 1
     #     if config.interImageState == config.interImages :
     #         animate()
@@ -324,9 +366,8 @@ def iterate():
 
     if config.marqueeTimerDelta > config.changePaletteInterval:
         if random.random() < 0.5:
-            palette = math.floor(random.uniform(0, len(list(config.palettes.keys()))))
-            config.usePalette = list(config.palettes.keys())[palette]
-            # print("New Palette:{}".format(config.usePalette))
+            changePalettes()
+
         config.marqueeTimerDelta = 0
         config.marqueeTimer1 = time.time()
 
@@ -339,51 +380,50 @@ def main(run=True):
     config.interImage1 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.interImageState = 0
 
-
     config.draw = ImageDraw.Draw(config.image)
     config.redrawSpeed = float(workConfig.get("marquee", "redrawSpeed"))
     config.marqueeWidth = int(workConfig.get("marquee", "marqueeWidth"))
     config.baseDashSize = int(workConfig.get("marquee", "baseDashSize"))
     config.gap = int(workConfig.get("marquee", "gap"))
-    
+
     config.step = int(workConfig.get("marquee", "step"))
     config.advanceStepMax = int(workConfig.get("marquee", "advanceStepMax"))
     config.aliasAlpha = int(workConfig.get("marquee", "aliasAlpha"))
     config.aliasMode = workConfig.getboolean("marquee", "aliasMode")
-    if not config.aliasMode :
+    if not config.aliasMode:
         config.advanceStepMax = 2
     config.animationRate = float(workConfig.get("marquee", "animationRate"))
     # config.interImages = int(workConfig.get("marquee", "interImages"))
-    
+
     config.proportionalPatternSize = workConfig.getboolean("marquee", "proportionalPatternSize")
+    config.multiColor = workConfig.getboolean("marquee", "multiColor")
     config.changePaletteInterval = int(workConfig.get("marquee", "changePaletteInterval"))
     config.decrement = int(workConfig.get("marquee", "decrement"))
     config.marqueeNum = int(workConfig.get("marquee", "marqueeNum"))
     config.randomRangeMin = int(workConfig.get("marquee", "randomRangeMin"))
     config.randomRangeMax = int(workConfig.get("marquee", "randomRangeMax"))
-    config.mulitColor = workConfig.getboolean("marquee", "mulitColor")
     config.proportionalPatternSize = workConfig.getboolean("marquee", "proportionalPatternSize")
 
     colorutils.brightness = float(workConfig.get("displayconfig", "brightness"))
     config.xOffset = 15
 
-    config.palettes = {
-        "all": [0, 360, 0, 360],
-        "all2": [0, 180, 180, 360],
-        "warm-cool": [0, 40, 140, 180],
-        "desert": [0, 40, 40, 80],
-        "winter": [180, 200, 200, 240],
-        "winter2": [190, 210, 210, 230],
-        "wintersun": [30, 50, 180, 240],
-    }
 
-    if not config.mulitColor:
-        # Only two colors so the palettes are not really applicable
-        config.palettes = {"all": [0, 360, 0, 360], "all2": [0, 180, 180, 360]}
+    config.paletteSets = workConfig.get("marquee", "paletteSets").split("|")
+    config.paletteSetNames = workConfig.get("marquee", "paletteSets").split(",")
+    config.palettes = []
 
-    config.palettes = {"warm-all": [340, 36, 340, 36], "warm-all2": [350, 45, 350, 36]}
+    for _ps in config.paletteSets:
+        _paletteSetNames = _ps.split(",")
+        _palette = []
+        for i in range(2):
+            _psm = _paletteSetNames[i].replace(" ", "")
+            _p = loadPalette(_psm)
+            _palette.append(_p)
+            print(f" ==> Loaded this palette (grouped in twos): {_p.name}")
+        config.palettes.append(_palette)
 
-    config.usePalette = list(config.palettes.keys())[1]
+    # has to be 0 or multiple of two 0,2,4 etc less that total palettes loaded
+    config.paletteIndex = 0
 
     config.marqueeTimerDelta = 0
     config.marqueeTimer1 = time.time()
@@ -395,11 +435,11 @@ def main(run=True):
     config.animationController = Director(config)
     config.animationController.slotRate = config.animationRate
 
-
     init()
 
     if run:
         runWork()
+
 
 
 def checkTime():

@@ -87,25 +87,13 @@ class Marquee:
         )
 
     def advance(self):
+        count = 0
+        perim = reversed(self.perimeter) if self.reverse == True else self.perimeter
+        _alpha = 255
         l = len(self.pattern)
-
         patternA = self.pattern[: l - round(self.offset)]
         patternB = self.pattern[(l - round(self.offset)) : l]
         pattern = patternB + patternA
-
-        count = 0
-
-        perim = self.perimeter
-        if self.reverse == True:
-            perim = reversed(self.perimeter)
-
-        # not really needed with the pasting of the lower alpha rectangle
-        # on top of each section
-        # _alpha = round(255 * self.advanceStep/self.advanceStepMax)
-        _alpha = 255
-
-        if not self.aliasMode:
-            _alpha = 255
 
         for p in perim:
             if pattern[count] == 1:
@@ -143,12 +131,11 @@ class Marquee:
 
 
 def setTwoColors(_index = 0):
+    _palette1 = config.palettes[_index][0]
+    _palette2 = config.palettes[_index][1]
 
     colOverlayA = coloroverlay.ColorOverlay()
     colOverlayB = coloroverlay.ColorOverlay()
-
-    _palette1 = config.palettes[_index][0]
-    _palette2 = config.palettes[_index][1]
 
     colOverlayA.minHue = _palette1.minHue
     colOverlayA.maxHue = _palette1.maxHue
@@ -208,24 +195,33 @@ def changePalettes():
         _m.colOverlayA = newUnitColors[0]
         _m.colOverlayB = newUnitColors[1]
 
+    setBackgroundColor(newUnitColors[0])
 
+    if random.random() < config.rebuildAllProb and config.maxRandomGap != 0:
+        config.marqueeGap = math.floor(random.random() * config.maxRandomGap)
+        init()
+    
+
+def setBackgroundColor(_overlay = None):
+    if _overlay :
+        config.bgColor = _overlay
+    else :
+        config.bgColor = coloroverlay.ColorOverlay()
+        config.bgColor.randomRange = (config.randomRangeMin, config.randomRangeMax)
+        config.bgColor.colorTransitionSetup()
+
+## The pattern controls the dash size - each 1 or 0 represents the width of one small
+## building block for the two-color dash
+
+# pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+# if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+# pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
+# pattern = [1,1,1,0,0,0]
+# pattern = [1,0,1,0,0,1,0,0,1,0,1]
 
 def init():
     global config
-
     config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 255))
-    config.bgColor = coloroverlay.ColorOverlay()
-    config.bgColor.randomRange = (config.randomRangeMin, config.randomRangeMax)
-    config.bgColor.colorTransitionSetup()
-
-    ## The pattern controls the dash size - each 1 or 0 represents the width of one small
-    ## building block for the two-color dash
-
-    # pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    # if(config.step > 2) : pattern = [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    # pattern = [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0]
-    # pattern = [1,1,1,0,0,0]
-    # pattern = [1,0,1,0,0,1,0,0,1,0,1]
 
     pattern = []
     pattern.extend(1 for _ in range(config.baseDashSize))
@@ -241,13 +237,15 @@ def init():
     decrement = config.decrement
 
     config.marquees = []
-    unitColors = setTwoColors()
+
+    _newPaletteIndex = math.floor(random.uniform(0,len(config.palettes)))
+    unitColors = setTwoColors(_newPaletteIndex)
+    setBackgroundColor(unitColors[0])
 
     # If this is 1 then offsets the gap...
     eveningGap = 2
 
     for i in range(config.marqueeNum):
-
         clrs = [colorutils.randomColor(), colorutils.randomColorAlpha(255, 255)]
 
         if config.multiColor :
@@ -279,14 +277,14 @@ def init():
         mq.makeMarquee()
         config.marquees.append(mq)
 
-        p0[0] += marqueeWidth + config.gap
-        p0[1] += marqueeWidth + config.gap
+        p0[0] += marqueeWidth + config.marqueeGap
+        p0[1] += marqueeWidth + config.marqueeGap
         marqueeWidthPrev = marqueeWidth + 1
 
-        innerWidth = innerWidth - 2 * (marqueeWidth) - config.gap * eveningGap + decrement
-        innerHeight = innerHeight - 2 * (marqueeWidth) - config.gap * eveningGap + decrement
+        innerWidth = innerWidth - 2 * (marqueeWidth) - config.marqueeGap * eveningGap + decrement
+        innerHeight = innerHeight - 2 * (marqueeWidth) - config.marqueeGap * eveningGap + decrement
 
-        if config.gap > 0:
+        if config.marqueeGap > 0:
             innerWidth -= decrement
             innerHeight -= decrement
 
@@ -384,7 +382,9 @@ def main(run=True):
     config.redrawSpeed = float(workConfig.get("marquee", "redrawSpeed"))
     config.marqueeWidth = int(workConfig.get("marquee", "marqueeWidth"))
     config.baseDashSize = int(workConfig.get("marquee", "baseDashSize"))
-    config.gap = int(workConfig.get("marquee", "gap"))
+    config.marqueeGap = int(workConfig.get("marquee", "gap"))
+    config.maxRandomGap = int(workConfig.get("marquee", "maxRandomGap"))
+    config.rebuildAllProb = float(workConfig.get("marquee", "rebuildAllProb"))
 
     config.step = int(workConfig.get("marquee", "step"))
     config.advanceStepMax = int(workConfig.get("marquee", "advanceStepMax"))
@@ -407,7 +407,6 @@ def main(run=True):
     colorutils.brightness = float(workConfig.get("displayconfig", "brightness"))
     config.xOffset = 15
 
-
     config.paletteSets = workConfig.get("marquee", "paletteSets").split("|")
     config.paletteSetNames = workConfig.get("marquee", "paletteSets").split(",")
     config.palettes = []
@@ -422,8 +421,6 @@ def main(run=True):
             print(f" ==> Loaded this palette (grouped in twos): {_p.name}")
         config.palettes.append(_palette)
 
-    # has to be 0 or multiple of two 0,2,4 etc less that total palettes loaded
-    config.paletteIndex = 0
 
     config.marqueeTimerDelta = 0
     config.marqueeTimer1 = time.time()
@@ -439,7 +436,6 @@ def main(run=True):
 
     if run:
         runWork()
-
 
 
 def checkTime():

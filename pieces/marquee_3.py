@@ -155,6 +155,11 @@ def setTwoColors():
     colOverlayB.tLimit = 20
     colOverlayB.tLimitBase = 20
 
+    colOverlayA.minSaturation = .9
+    colOverlayA.maxSaturation = 1.0
+    colOverlayA.minValue = .4
+    colOverlayA.maxValue = .6
+
     colOverlayA.colorTransitionSetup()
     colOverlayB.colorTransitionSetup()
 

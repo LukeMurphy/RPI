@@ -198,7 +198,7 @@ def changePalettes():
     setBackgroundColor(newUnitColors[0])
 
     if random.random() < config.rebuildAllProb and config.maxRandomGap != 0:
-        config.marqueeGap = math.floor(random.random() * config.maxRandomGap)
+        config.marqueeGap = round(random.uniform(1, config.maxRandomGap))
         init()
     
 

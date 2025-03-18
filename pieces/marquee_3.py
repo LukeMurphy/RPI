@@ -86,6 +86,7 @@ class Marquee:
             )
         )
 
+
     def advance(self):
         count = 0
         perim = reversed(self.perimeter) if self.reverse == True else self.perimeter
@@ -95,11 +96,15 @@ class Marquee:
         patternB = self.pattern[(l - round(self.offset)) : l]
         pattern = patternB + patternA
 
+        self.colOverlayA.stepTransition()
+        self.colOverlayB.stepTransition()
+
         for p in perim:
             if pattern[count] == 1:
                 clr = self.colOverlayA.currentColor
             else:
                 clr = self.colOverlayB.currentColor
+            # print(clr)
             self.configDraw.rectangle(
                 (p[0], p[1], p[0] + p[2], p[1] + p[3]),
                 outline=None,
@@ -126,45 +131,39 @@ class Marquee:
         if self.offset >= len(pattern):
             self.offset = 0
 
-        self.colOverlayA.stepTransition()
-        self.colOverlayB.stepTransition()
 
 
-def setTwoColors(_index = 0):
+
+def setTwoColors(_index = 0):  # sourcery skip: extract-duplicate-method
     _palette1 = config.palettes[_index][0]
-    _palette2 = config.palettes[_index][1]
-
     colOverlayA = coloroverlay.ColorOverlay()
-    colOverlayB = coloroverlay.ColorOverlay()
-
     colOverlayA.minHue = _palette1.minHue
     colOverlayA.maxHue = _palette1.maxHue
-
-    colOverlayB.minHue = _palette2.minHue
-    colOverlayB.maxHue = _palette2.maxHue
-
-    colOverlayA.randomRange = (config.randomRangeMin, config.randomRangeMax)
-    colOverlayB.randomRange = (config.randomRangeMin, config.randomRangeMax)
-
-    colOverlayA.steps = 250
-    colOverlayA.tLimit = 25
-    colOverlayA.tLimitBase = 25
-    colOverlayB.steps = 250
-    colOverlayB.tLimit = 20
-    colOverlayB.tLimitBase = 20
-
     colOverlayA.minSaturation = _palette1.minSaturation
     colOverlayA.maxSaturation = _palette1.maxSaturation
     colOverlayA.minValue = _palette1.minValue 
     colOverlayA.maxValue = _palette1.maxValue
+    colOverlayA.randomRange = (config.randomRangeMin, config.randomRangeMax)
+    # colOverlayA.steps = 225 + round(125 * random.random())
+    colOverlayA.tLimit = 2 + round(15 * random.random())
+    colOverlayA.tLimitBase = 2 + round(25 * random.random())
+    colOverlayA.colorTransitionSetup()
 
+
+    _palette2 = config.palettes[_index][1]
+    colOverlayB = coloroverlay.ColorOverlay()
+    colOverlayB.minHue = _palette2.minHue
+    colOverlayB.maxHue = _palette2.maxHue
     colOverlayB.minSaturation = _palette2.minSaturation
     colOverlayB.maxSaturation = _palette2.maxSaturation
     colOverlayB.minValue = _palette2.minValue 
     colOverlayB.maxValue = _palette2.maxValue 
-
-    colOverlayA.colorTransitionSetup()
+    colOverlayB.randomRange = (config.randomRangeMin, config.randomRangeMax)
+    # colOverlayB.steps = 225 + round(125 * random.random())
+    colOverlayB.tLimit = 2 + round(15 * random.random())
+    colOverlayB.tLimitBase = 2 + round(25 * random.random())
     colOverlayB.colorTransitionSetup()
+
 
     return (colOverlayA, colOverlayB)
 

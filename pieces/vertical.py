@@ -52,15 +52,15 @@ class Vertical:
 		self.border1 = (
 			self.outer1[2],
 			self.yPos,
-			self.outer1[2] + int(random.uniform(-1, 1) + self.BorderWidth) + 1,
+			max(self.outer1[2],self.outer1[2] + int(random.uniform(-1, 1) + self.BorderWidth) + 1),
 			self.yPos + self.config.h,
 		)
 		self.cntr = (
 			self.border1[2],
 			self.yPos,
-			self.border1[2]
+			max(self.border1[2],self.border1[2]
 			+ int(random.uniform(-self.config.var, +self.config.var) + self.CenterWidth)
-			+ 1,
+			+ 1),
 			self.yPos + self.config.h,
 		)
 		self.border2 = (
@@ -72,7 +72,7 @@ class Vertical:
 		self.outer2 = (
 			self.border2[2],
 			self.yPos,
-			self.boxMax,
+			max(self.border2[2], self.border2[2] + self.boxMax),
 			self.yPos + self.config.h,
 		)
 

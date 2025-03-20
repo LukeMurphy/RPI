@@ -195,8 +195,7 @@ def iterate():
 
 	if config.useFadeThruAnimation == True:
 		if config.f.fadingDone == True:
-
-			_extracted_from_iterate_11(config)
+			_fadeInProcessing(config)
 		config.f.fadeIn()
 		config.render(config.f.blendedImage, 0, 0)
 		config.init += config.initCount
@@ -221,6 +220,7 @@ def iterate():
 		'''
 
 	if random.random() < config.dotVariationChangeProb:
+		
 		config.dotVariation = random.uniform(0,config.dotVariationMax)
 		config.dotGrid.dotVariation = config.dotVariation
 		#print(config.dotVariation)
@@ -228,7 +228,7 @@ def iterate():
 
 
 # TODO Rename this here and in `iterate`
-def _extracted_from_iterate_11(config):
+def _fadeInProcessing(config):
 	config.renderImageFullOld = config.renderImageFull.copy()
 	config.renderImageFull.paste(
 		config.canvasImage,

@@ -37,9 +37,13 @@ def runScript(arg="startup"):
 
 def runChange():
     global appList, appListIndex, appListPrevIndex
+    
     execCmd = f"{appList[appListIndex][0]}"
+    print(execCmd)
     os.system(execCmd)
+
     execCmd = f"{appList[appListPrevIndex][1]}"
+    print(execCmd)
     os.system(execCmd)
 
     appListPrevIndex = appListIndex

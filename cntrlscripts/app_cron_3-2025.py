@@ -1,11 +1,5 @@
 import os
-
-# from os import listdir
-# from os.path import isfile, join, isdir
-# from os import walk
-# import datetime
-# import subprocess
-# import sys
+import random
 import time
 
 # This is probably the file to set as the machine's startup desktop
@@ -14,7 +8,7 @@ path = "/home/daemon104/Documents/RPI/cntrlscripts/"
 appChanger = f"{path}app_changer.sh"
 appListIndex = 1
 
-timeToCheck = 15
+timeToCheck = 90
 
 def runScript(arg="startup"):
     global timeToCheck,appListIndex,appChanger
@@ -23,6 +17,7 @@ def runScript(arg="startup"):
         print(execCmd)
         os.system(execCmd)
         appListIndex = 2 if appListIndex == 1 else 1
+        timeToCheck = random.randint(90, 300)
     except Exception as e:
         print("There was an issue:")
         print(e)

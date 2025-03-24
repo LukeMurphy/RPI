@@ -20,10 +20,8 @@ class Pen:
 
 # ----------------------------------------------------##----------------------------------------------------#
 def filterRemapImage(config):
-    if config.filterRemapping:
         config.useFilters = True
         config.remapImageBlock = False
-
         startX = round(random.uniform(0, config.filterRemapRangeX))
         startY = round(random.uniform(0, config.filterRemapRangeY))
         endX = round(random.uniform(config.filterRemapMinHorzSize, config.filterRemapMaxHorzSize))
@@ -33,7 +31,23 @@ def filterRemapImage(config):
 
 
 def resetSystem(fullReset=False):
-    return True
+    global config
+    _create_image_layers(config)
+    config.totalResetTime = random.randint(69,287)
+
+
+def changeDrawingMode():
+    config.drawingMode = random.randint(1,4)
+    config.startNewLineProb = .005
+    config.changeTimeController.slotRate = random.randint(20,33)
+
+    if config.drawingMode in {2, 3}:
+        config.startNewLineProb = .1
+        config.changeTimeController.slotRate = random.randint(33,63)
+
+
+
+    print(f" => New Drawing Mode: {config.drawingMode}")
 
 
 def changePalettes():
@@ -59,79 +73,145 @@ def startNewLine(_pen):
 
 
 def setPenProperties(pen) :
+        pen.drawingSize = [config.canvasWidth , config.canvasHeight ]
+        pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
         pen._p = 0
         pen.smooth_points = []
-        # pen.lineColor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        pen._w = round(random.uniform(1, 6))
         pen.speed = random.randint(1, 5)
-
         pen.centerVariationXMax = random.randint(10, 100)
         pen.centerVariationYMax = random.randint(0, 0)
-        pen.xOffset = random.randint(-pen.drawingSize[0]/2,pen.drawingSize[0]/2)
-        pen.yOffset = random.randint(-pen.drawingSize[1]/2,pen.drawingSize[1]/2)
-
-        pen.minNumPoints = 8
-        pen.maxNumPoints = 20
-        pen.num_points = 8
-
-        # pen.minRandom = 10.1
-        # pen.maxRandom = 0.2
-        # pen.noiseFactor = .8
 
         # genral size of drawing
-        pen.baseRadiusFactor = random.uniform(1.5,3)
-        pen.rotationAngle = random.uniform(-math.pi/2/4,math.pi/2/4)
-        pen.xRadiusFactorNoiseFactor = 0.0
-        pen.yRadiusFactorNoiseFactor = 10.0
-        
-        # shape of ellipse
-        if random.random() < .6:
-            # tight scratch angry linear
-            pen.yRadiusFactor = random.uniform(0.001,.05)
-            pen.xRadiusFactor = random.uniform(1, 1.3)
-            pen.yRandom = random.randint(-10, 10)
-            pen.xRandom = random.randint(-10, 140)
-            pen._w = 1
-            pen.rotationAngle = random.uniform(-math.pi/2/8,math.pi/2/8)
-            pen.yRadiusFactorNoiseFactor = 10.0
-            pen.mode = 1
-
-        else :
-            # winding scribbles
-            pen.xRadiusFactor = random.uniform(1.0,1.4)
-            pen.yRadiusFactor = random.uniform(.3, .80)
-            pen.xRandom = random.randint(-100, 120)
-            pen.yRandom = random.randint(-10, 10)
-            # pen._w = 1
-            pen.rotationAngle = random.uniform(-math.pi/2/8,math.pi/2/8)
-            pen.baseRadiusFactor = random.uniform(1.5,2)
-            pen.xOffset = random.randint(-pen.drawingSize[0]/5,pen.drawingSize[0]/5)
-            pen.yOffset = random.randint(-pen.drawingSize[1]/3,pen.drawingSize[1]/5)
-            pen.mode = 2
-
-
-        
-
-        pen.turns = round(random.uniform(8, 12))
         pen.drawingSkip = random.uniform(0.0,.01)
+        
+        # shape of scribbles
+        if config.drawingMode == 1 :
+            markType  =  random.randint(1,3) 
+            if markType == 1 :
+                _scratchyLong(pen)
+            elif markType == 2 :
+                _shortMarks(pen)
+            elif markType == 3 :
+                _longOvalSweeps(pen)
+        elif config.drawingMode == 2 :
+            if random.random() < .5 :
+                _scratchyLong(pen)
+            else :
+                _shortMarks(pen)
+        elif config.drawingMode == 3 :
+            _scratchyLong(pen)
+        elif config.drawingMode == 4 :
+            _longOvalSweeps(pen)
 
         setPenColor(pen)
 
 
+def _scratchyLong(pen):
+    # tight scratch angry linear
+    pen.minNumPoints = 4
+    pen.maxNumPoints = 10
+    pen.num_points = random.randint(pen.minNumPoints, pen.maxNumPoints)
+    pen.turns = round(random.uniform(8, 12))
+    pen.minInterpolatedPoints = 80
+    pen.maxInterpolatedPoints = 200
+    
+    pen.baseRadiusFactor = random.uniform(1.8,3)
+    pen.yRadiusFactor = random.uniform(0.001,.05)
+    pen.xRadiusFactor = random.uniform(1.8, 2.5)
+
+    pen.xRadiusFactorNoiseFactor = 10.10
+    pen.yRadiusFactorNoiseFactor = 10.0
+    pen.yRandom = random.randint(-10, 10)
+    pen.xRandom = random.randint(-10, 140)
+    
+    pen.rotationFactor = 12
+    pen.rotationAngle = random.uniform(-math.pi/2/pen.rotationFactor,math.pi/2/pen.rotationFactor)
+    
+    pen.xOffset = random.randint(-100,100)
+    pen.yOffset = random.randint(-100,100)
+    pen._w = 1
+    pen.mode = 1
+
+
+def _shortMarks(pen):
+    pen.minNumPoints = 4
+    pen.maxNumPoints = 10
+    pen.num_points = random.randint(pen.minNumPoints, pen.maxNumPoints)
+    pen.turns = round(random.uniform(3, 4))
+    pen.minInterpolatedPoints = 80
+    pen.maxInterpolatedPoints = 100
+    
+    pen.baseRadiusFactor = random.uniform(1.0,1.1)
+    pen.xRadiusFactor = random.uniform(0.001,.01)
+    pen.yRadiusFactor = random.uniform(.45, .6)
+
+    pen.xRadiusFactorNoiseFactor = 1.1
+    pen.yRadiusFactorNoiseFactor = .0
+    pen.yRandom = random.randint(-50, 50)
+    pen.xRandom = random.randint(-10, 10)
+    
+    pen.rotationFactor = 4
+    pen.rotationAngle = random.uniform(-math.pi/2/pen.rotationFactor,math.pi/2/pen.rotationFactor)
+    
+    pen.xOffset = random.randint(-200,200)
+    pen.yOffset = random.randint(-100,100)
+    pen._w = 1
+    pen.mode = 1
+
+
+def _longOvalSweeps(pen):
+    # winding scribbles
+    pen.num_points = 8
+    pen.turns = random.randint(3,7)
+    pen.minInterpolatedPoints = 190
+    pen.maxInterpolatedPoints = 220
+
+    pen.baseRadiusFactor = 1.8
+    pen.xRadiusFactor = 1.2
+    pen.yRadiusFactor = random.uniform(.80,.2)
+
+    pen.xRadiusFactorNoiseFactor = 1.0
+    pen.yRadiusFactorNoiseFactor = 1.0
+    pen.xRandom = random.randint(-10, 100)
+    pen.yRandom = random.randint(-10, 10)
+
+    pen.rotationFactor = 8
+    pen.rotationAngle = random.uniform(-math.pi/2/pen.rotationFactor,math.pi/2/pen.rotationFactor)
+
+    pen.xOffset = random.randint(-10,10)
+    pen.yOffset = random.randint(-10,10)
+    pen._w = round(random.uniform(1, 6))
+    pen.mode = 2
+
+
+def _canvasCircumscribes(pen) :
+    # For ref -- this makes an oval at center
+    pen.num_points = 6
+    pen.baseRadiusFactor = 1.8
+    pen.xRadiusFactor = 1.2
+    pen.yRadiusFactor = .80
+    pen.rotationAngle = 0
+    pen.xOffset = random.randint(-1,1)
+    pen.yOffset = random.randint(-1,1)
+    pen.xRandom = random.randint(-1, 1)
+    pen.yRandom = random.randint(-1, 1)
+    pen.turns = 5
+    pen.minInterpolatedPoints = 190
+    pen.maxInterpolatedPoints = 220
+
+# ----------------------------------------------------##----------------------------------------------------#
+
 def setPenColor(_pen):
-
-
     _pen.lineColor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 225),200)
 
     if random.random() <  .7 :
-        if random.random() <  .45 :
+        if random.random() <  .2 :
             _pen.lineColor = (random.randint(170, 190), random.randint(170, 190), random.randint(170, 190), 200)
         else :
             _pen.lineColor = (random.randint(0, 10), random.randint(0, 10), random.randint(0, 10),200)
 
     if _pen.mode ==2 and random.random() < .4:
         _pen.lineColor = (random.randint(120, 200), random.randint(0, 10), random.randint(0, 10),200)
-
 
 
 def generateSmoothLinePoints(_pen):
@@ -147,8 +227,8 @@ def generateSmoothLinePoints(_pen):
     points = [_pen.lastPoint]
     points = []
     
-    center_x = width // 2 + _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
-    center_y = height // 2 + _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
+    center_x = width // 2 #+ _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
+    center_y = height // 2 #+ _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
 
     
     for _ in range(_pen.turns):
@@ -176,7 +256,7 @@ def generateSmoothLinePoints(_pen):
     # tck, u = splprep([points[:, 0], points[:, 1]], s=0, k=3, per=1)
 
     # Generate more points along the spline for smoothness
-    _mp = random.randint(100, 200)
+    _mp = random.randint(_pen.minInterpolatedPoints, _pen.maxInterpolatedPoints)
     u_new = np.linspace(0, 1, _mp)
     smooth_points = splev(u_new, tck)
 
@@ -188,7 +268,7 @@ def generateSmoothLinePoints(_pen):
         ptx = pt[0] * np.cos(_pen.rotationAngle) - pt[1] * np.sin(_pen.rotationAngle)
         pty = pt[1] * np.cos(_pen.rotationAngle) + pt[0] * np.sin(_pen.rotationAngle)
         _pen.rotationAngle += _pen.rotationAngle/500
-        smooth_points_r.append((ptx,pty))
+        smooth_points_r.append((ptx + _pen.xOffset,pty + _pen.yOffset))
 
     _pen.smooth_points = smooth_points_r
 
@@ -236,7 +316,7 @@ def drawLine(_pen):
             _pen._w = 1    
 
 
-def _penFunctions():
+def _pen_functions():
     for _pen in config.penArray:
         if random.random() < 0.01:
             setPenColor((_pen))
@@ -250,7 +330,7 @@ def _penFunctions():
 # ----------------------------------------------------##----------------------------------------------------#
 
 
-def _doDrawingGlitch():
+def _do_drawing_glitch():
     glitchIterations = round(random.uniform(1, 10))
     for _ in range(glitchIterations):
         glitchBox(
@@ -262,7 +342,7 @@ def _doDrawingGlitch():
         )
 
 
-def _bgColorsFilling(config):
+def _bg_colors_filling(config):
 
     xPos = math.floor(random.uniform(0, config.canvasWidth))
     yPos = math.floor(random.uniform(0, config.canvasHeight))
@@ -376,7 +456,7 @@ def iterate():
     if config.changeTime > 0:
         config.changeTimeController.checkTime()
         if config.changeTimeController.advance:
-            resetSystem(False)
+            changeDrawingMode()
 
     if config.totalResetTime > 0:
         config.systemController.checkTime()
@@ -394,18 +474,18 @@ def iterate():
             config.bgColor = random.choice(config.bgColorSets)
 
     if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing:
-        _doDrawingGlitch()
-        _bgColorsFilling(config)
+        _do_drawing_glitch()
+        _bg_colors_filling(config)
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
         filterRemapImage(config)
 
     if not config.doingDrawing and random.random() < 0.1:
-        _doDrawingGlitch()
+        _do_drawing_glitch()
 
 
-    _penFunctions()
+    _pen_functions()
 
     renderImage()
 
@@ -420,9 +500,8 @@ def renderImage() :
 
 def main(run=True):
     global config, workConfig
-    _load_background_config(config)
-    _load_rendering_config(config)
-    _createImageLayers(config)
+    _load_background_color_config(config)
+    _create_image_layers(config)
     _load_filter_config(config)
     _load_color_config(config)
     _initialize_system(config)
@@ -430,41 +509,19 @@ def main(run=True):
         runWork()
 
 
-def _load_background_config(config):
+def _load_background_color_config(config):
     """Loads background-related configuration parameters."""
-    bgColorSets = workConfig.get("drawing-field", "bgColorSets").split(",")
+    bgColorSets = workConfig.get("drawingField", "bgColorSets").split(",")
     config.bgColorSets = []
     for bg in bgColorSets:
         bgColor = workConfig.get(bg, "bgColor").split(",")
         bgColors = [int(x) for x in bgColor]
         config.bgColorSets.append(bgColors)
     config.bgColor = config.bgColorSets[0]
-    config.bgColorAlpha = int(workConfig.get("drawing-field", "bgColorAlpha"))
+    config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha"))
 
 
-def _load_rendering_config(config):
-    """Loads rendering-related configuration parameters."""
-    config.fadeRate = float(workConfig.get("drawing-field", "fadeRate"))
-    config.lineAlpha = float(workConfig.get("drawing-field", "lineAlpha"))
-    config.lineWidth = int(workConfig.get("drawing-field", "lineWidth", fallback=2))
-    config.lineColor = list(map(int, workConfig.get("drawing-field", "lineColor", fallback="40,0,0").split(",")))
-    config.cellAlpha = float(workConfig.get("drawing-field", "cellAlpha"))
-    config.fadeRateDelta = float(workConfig.get("drawing-field", "fadeRateDelta"))
-    config.fadeRateNewSystemThreshold = float(workConfig.get("drawing-field", "fadeRateNewSystemThreshold"))
-
-    config.totalResetTime = float(workConfig.get("drawing-field", "totalResetTime", fallback=33))
-    config.changeTime = float(workConfig.get("drawing-field", "changeTime", fallback=10))
-
-    if config.totalResetTime > 0:
-        config.systemController = Director(config)
-        config.systemController.slotRate = config.totalResetTime
-
-    if config.changeTime > 0:
-        config.changeTimeController = Director(config)
-        config.changeTimeController.slotRate = config.changeTime
-
-
-def _createImageLayers(config):
+def _create_image_layers(config):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
@@ -480,88 +537,85 @@ def _createImageLayers(config):
 def _load_filter_config(config):
     """Loads filter-related configuration parameters."""
     config.filterRemapping = workConfig.getboolean("particles", "filterRemapping", fallback=False)
-    config.filterRemappingProb = float(workConfig.get("drawing-field", "filterRemappingProb", fallback=0.0))
-    config.filterRemapMinHorzSize = int(workConfig.get("drawing-field", "filterRemapMinHorzSize", fallback=24))
-    config.filterRemapMinVertSize = int(workConfig.get("drawing-field", "filterRemapMinVertSize", fallback=24))
-    config.filterRemapMaxHorzSize = int(workConfig.get("drawing-field", "filterRemapMaxHorzSize", fallback=24))
-    config.filterRemapMaxVertSize = int(workConfig.get("drawing-field", "filterRemapMaxVertSize", fallback=24))
-    config.filterRemapRangeX = int(workConfig.get("drawing-field", "filterRemapRangeX", fallback=config.canvasWidth))
-    config.filterRemapRangeY = int(workConfig.get("drawing-field", "filterRemapRangeY", fallback=config.canvasHeight))
+    config.filterRemappingProb = float(workConfig.get("drawingField", "filterRemappingProb", fallback=0.0))
+    config.filterRemapMinHorzSize = int(workConfig.get("drawingField", "filterRemapMinHorzSize", fallback=24))
+    config.filterRemapMinVertSize = int(workConfig.get("drawingField", "filterRemapMinVertSize", fallback=24))
+    config.filterRemapMaxHorzSize = int(workConfig.get("drawingField", "filterRemapMaxHorzSize", fallback=24))
+    config.filterRemapMaxVertSize = int(workConfig.get("drawingField", "filterRemapMaxVertSize", fallback=24))
+    config.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=config.canvasWidth))
+    config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.canvasHeight))
 
 
 def _load_color_config(config):
     """Loads color-related configuration parameters."""
-    config.colorSets = []
-    config.colorGroupsList = workConfig.get("drawing-field", "colorGroups", fallback="colorSetA,colorSetB").split(",")
-    config.mixColorSets = workConfig.getboolean("particles", "mixColorSets", fallback=False)
-    config.changeColorSetTime = float(workConfig.get("drawing-field", "changeColorSetTime", fallback=0))
+    config.changeColorSetTime = float(workConfig.get("drawingField", "changeColorSetTime", fallback=0))
 
     if config.changeColorSetTime > 0:
         config.paletteController = Director(config)
         config.paletteController.slotRate = config.changeColorSetTime
 
-    for grp in config.colorGroupsList:
-        rawColorSetAVals = workConfig.get("drawing-field", grp).replace("\n", "").replace(" ", "")
-        colorSetAVals = rawColorSetAVals.split("|")
-        colorSet = []
-        for element in colorSetAVals:
-            if element != "":
-                clr = [int(x) for x in element.split(",")]
-                colorSet.append(clr)
-        config.colorSets.append(colorSet)
-
-    config.colorSetA = config.colorSets[0]
-    config.colorSetB = config.colorSets[1]
-    config.imgx, config.imgy = config.image.size
-
     config.bgBoxColorRange = list(
         map(
             lambda x: float(x),
-            workConfig.get("drawing-field", "bgBoxColorRange").split(","),
+            workConfig.get("drawingField", "bgBoxColorRange").split(","),
         )
     )
     config.bgBoxAlphaRange = tuple(
         map(
             lambda x: int(x),
-            workConfig.get("drawing-field", "bgBoxAlphaRange").split(","),
+            workConfig.get("drawingField", "bgBoxAlphaRange").split(","),
         )
     )
-    config.usebgBox = workConfig.getboolean("drawing-field", "forcebgBox")
-    config.usebgBoxProb = float(workConfig.get("drawing-field", "usebgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("drawing-field", "bgBoxBox").split(",")))
+    config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
+    config.usebgBoxProb = float(workConfig.get("drawingField", "usebgBoxProb"))
+    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("drawingField", "bgBoxBox").split(",")))
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
     config.bgBoxFill = (100, 0, 80, 100)
 
-    config.bgTileSizeWidthMin = float(workConfig.get("drawing-field", "bgTileSizeWidthMin"))
-    config.bgTileSizeWidthMax = float(workConfig.get("drawing-field", "bgTileSizeWidthMax"))
-    config.bgTileSizeHeightMin = float(workConfig.get("drawing-field", "bgTileSizeHeightMin"))
-    config.bgTileSizeHeightMax = float(workConfig.get("drawing-field", "bgTileSizeHeightMax"))
-    # config.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("drawing-field", "bgBoxFill").split(",")))
+    config.bgTileSizeWidthMin = float(workConfig.get("drawingField", "bgTileSizeWidthMin"))
+    config.bgTileSizeWidthMax = float(workConfig.get("drawingField", "bgTileSizeWidthMax"))
+    config.bgTileSizeHeightMin = float(workConfig.get("drawingField", "bgTileSizeHeightMin"))
+    config.bgTileSizeHeightMax = float(workConfig.get("drawingField", "bgTileSizeHeightMax"))
+    # config.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("drawingField", "bgBoxFill").split(",")))
 
-    config.clearbgBoxProb = float(workConfig.get("drawing-field", "clearbgBoxProb"))
-    config.bgGlitchCyclesMin = float(workConfig.get("drawing-field", "bgGlitchCyclesMin"))
-    config.bgGlitchCyclesMax = float(workConfig.get("drawing-field", "bgGlitchCyclesMax"))
-    config.bgGlitchDisplacementHorizontal = float(workConfig.get("drawing-field", "bgGlitchDisplacementHorizontal"))
-    config.bgGlitchDisplacementVertical = float(workConfig.get("drawing-field", "bgGlitchDisplacementVertical"))
+    config.clearbgBoxProb = float(workConfig.get("drawingField", "clearbgBoxProb"))
+    config.bgGlitchCyclesMin = float(workConfig.get("drawingField", "bgGlitchCyclesMin"))
+    config.bgGlitchCyclesMax = float(workConfig.get("drawingField", "bgGlitchCyclesMax"))
+    config.bgGlitchDisplacementHorizontal = float(workConfig.get("drawingField", "bgGlitchDisplacementHorizontal"))
+    config.bgGlitchDisplacementVertical = float(workConfig.get("drawingField", "bgGlitchDisplacementVertical"))
 
 
 def _initialize_system(config):
     """Initializes the system and related parameters."""
-    global PS
-    resetSystem(True)
-    config.slotRate = float(workConfig.get("drawing-field", "slotRate", fallback=0.03))
-    config.redrawSpeed = float(workConfig.get("drawing-field", "redrawSpeed", fallback=0.03))
-    config.startNewLineProb = float(workConfig.get("drawing-field", "startNewLineProb", fallback=0.03))
+    """Loads rendering-related configuration parameters."""
+    config.fadeRate = float(workConfig.get("drawingField", "fadeRate"))
+    config.fadeRateDelta = float(workConfig.get("drawingField", "fadeRateDelta"))
+    config.fadeRateNewSystemThreshold = float(workConfig.get("drawingField", "fadeRateNewSystemThreshold"))
+
+    config.totalResetTime = float(workConfig.get("drawingField", "totalResetTime", fallback=33))
+    config.changeTime = float(workConfig.get("drawingField", "changeTime", fallback=10))
+
+    if config.totalResetTime > 0:
+        config.systemController = Director(config)
+        config.systemController.slotRate = config.totalResetTime
+
+    if config.changeTime > 0:
+        config.changeTimeController = Director(config)
+        config.changeTimeController.slotRate = config.changeTime
+
+    config.slotRate = float(workConfig.get("drawingField", "slotRate", fallback=0.03))
+    config.redrawSpeed = float(workConfig.get("drawingField", "redrawSpeed", fallback=0.03))
+    config.startNewLineProb = float(workConfig.get("drawingField", "startNewLineProb", fallback=0.03))
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
+
     config.doingDrawing = False
     config.penArray = []
+    config.drawingMode = 1
     
     for i in range(1):
         pen = Pen()
-        pen.drawingSize = [240, 300]
-        pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
         pen.number = i
         setPenProperties(pen)
         config.penArray.append(pen)

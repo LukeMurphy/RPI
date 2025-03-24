@@ -17,9 +17,9 @@ appListIndex = 0
 timeToCheck = 15
 
 def runScript(arg="startup"):
-    global timeToCheck,appListIndex
+    global timeToCheck,appListIndex,appChanger
     try:
-        execCmd = f"{appList[appListIndex][0]} {appListIndex}"
+        execCmd = f"{appChanger} {appListIndex}"
         print(execCmd)
         os.system(execCmd)
         appListIndex = 1 if appListIndex == 0 else 0

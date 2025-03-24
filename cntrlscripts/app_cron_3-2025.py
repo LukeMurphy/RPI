@@ -26,28 +26,22 @@ timeToCheck = 15
 def runScript(arg="startup"):
     global timeToCheck
     try:
-        runChange()
+        execCmd = f"{appList[appListIndex][0]}"
+        print(execCmd)
+        os.system(execCmd)
+
+        execCmd = f"{appList[appListPrevIndex][1]}"
+        print(execCmd)
+        os.system(execCmd)
+
+        appListPrevIndex = appListIndex
+        appListIndex = 1 if appListIndex == 0 else 0
     except Exception as e:
         print("There was an issue:")
         print(e)
     # end try
     time.sleep(timeToCheck)
     runScript("cron")
-
-
-def runChange():
-    global appList, appListIndex, appListPrevIndex
-
-    execCmd = f"{appList[appListIndex][0]}"
-    print(execCmd)
-    os.system(execCmd)
-
-    execCmd = f"{appList[appListPrevIndex][1]}"
-    print(execCmd)
-    os.system(execCmd)
-
-    appListPrevIndex = appListIndex
-    appListIndex = 1 if appListIndex == 0 else 0
 
 
 runScript("startup")

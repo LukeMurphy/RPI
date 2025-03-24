@@ -20,12 +20,12 @@ def runScript(arg="startup"):
     global initPath, timeToCheck
     try:
         # comment:
-        execCmd = initPath + " " + arg
+        execCmd = f"{initPath} {arg}"
         print(execCmd)
         os.system(execCmd)
     except Exception as e:
         print("There was an issue:")
-        print(str(e))
+        print(e)
     # end try
     time.sleep(timeToCheck)
     runScript("cron")

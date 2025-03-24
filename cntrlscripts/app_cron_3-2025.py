@@ -6,7 +6,7 @@ import time
 # if the machine is under remote control
 path = "/home/daemon104/Documents/RPI/cntrlscripts/"
 appChanger = f"{path}app_changer.sh"
-appListIndex = 1
+appListIndex = 2
 
 timeToCheck = 90
 

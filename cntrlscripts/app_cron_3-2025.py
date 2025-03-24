@@ -11,11 +11,11 @@ import time
 # This is probably the file to set as the machine's startup desktop
 # if the machine is under remote control
 
-app1 = "/usr/bin/python3 /home/daemon104/Documents/RPI/player.py -cfg prod/p4-6x8-paintings.cfg"
-app1_endcmd = "ps -ef | pgrep -f player.py | xargs kill -9"
+app1 = "start_app1.sh"
+app1_endcmd = "shut_player_down.sh"
 
-app2 = "/home/daemon104/Documents/electron-quick-start-linux-x64/electron-quick-start"
-app2_endcmd = "ps -ef | pgrep -f electron | xargs kill -9"
+app2 = "start_app2.sh"
+app2_endcmd = "shut_electronplayer_down.sh"
 
 appList = [[app1, app1_endcmd],[app2,app2_endcmd]]
 appListIndex = 1

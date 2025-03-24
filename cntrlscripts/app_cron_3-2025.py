@@ -24,7 +24,7 @@ appListPrevIndex = 1
 timeToCheck = 15
 
 def runScript(arg="startup"):
-    global initPath, timeToCheck
+    global timeToCheck
     try:
         runChange()
     except Exception as e:
@@ -36,7 +36,7 @@ def runScript(arg="startup"):
 
 
 def runChange():
-    # comment:
+    global appList, appListIndex, appListPrevIndex
     execCmd = f"{appList[appListIndex][0]}"
     os.system(execCmd)
     execCmd = f"{appList[appListPrevIndex][1]}"

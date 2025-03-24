@@ -12,7 +12,7 @@ import time
 # if the machine is under remote control
 path = "/home/daemon104/Documents/RPI/cntrlscripts/"
 appChanger = f"{path}app_changer.sh"
-appListIndex = 0
+appListIndex = 1
 
 timeToCheck = 15
 
@@ -22,7 +22,7 @@ def runScript(arg="startup"):
         execCmd = f"{appChanger} {appListIndex}"
         print(execCmd)
         os.system(execCmd)
-        appListIndex = 1 if appListIndex == 0 else 0
+        appListIndex = 2 if appListIndex == 1 else 1
     except Exception as e:
         print("There was an issue:")
         print(e)

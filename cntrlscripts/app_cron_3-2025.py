@@ -10,12 +10,12 @@ import time
 
 # This is probably the file to set as the machine's startup desktop
 # if the machine is under remote control
+path = "/home/daemon104/Documents/RPI/cntrlscripts/"
+app1 = f"{path}start_app1.sh"
+app1_endcmd = f"{path}shut_player_down.sh"
 
-app1 = "start_app1.sh"
-app1_endcmd = "shut_player_down.sh"
-
-app2 = "start_app2.sh"
-app2_endcmd = "shut_electronplayer_down.sh"
+app2 = f"{path}start_app2.sh"
+app2_endcmd = f"{path}shut_electronplayer_down.sh"
 
 appList = [[app1, app1_endcmd],[app2,app2_endcmd]]
 appListIndex = 1

@@ -24,15 +24,15 @@ appListPrevIndex = 0
 timeToCheck = 15
 
 def runScript(arg="startup"):
-    global timeToCheck
+    global timeToCheck,appList,appListIndex,appListPrevIndex
     try:
-        execCmd = f"{appList[appListIndex][0]}"
-        print(execCmd)
-        os.system(execCmd)
+        execCmd1 = f"{appList[appListIndex][0]}"
+        print(execCmd1)
+        os.system(execCmd1)
 
-        execCmd = f"{appList[appListPrevIndex][1]}"
-        print(execCmd)
-        os.system(execCmd)
+        execCmd2 = f"{appList[appListPrevIndex][1]}"
+        print(execCmd2)
+        os.system(execCmd2)
 
         appListPrevIndex = appListIndex
         appListIndex = 1 if appListIndex == 0 else 0

@@ -18,8 +18,8 @@ app2 = "/home/daemon104/Documents/electron-quick-start-linux-x64/electron-quick-
 app2_endcmd = "ps -ef | pgrep -f electron | xargs kill -9"
 
 appList = [[app1, app1_endcmd],[app2,app2_endcmd]]
-appListIndex = 0
-appListPrevIndex = 1
+appListIndex = 1
+appListPrevIndex = 0
 
 timeToCheck = 15
 
@@ -37,7 +37,7 @@ def runScript(arg="startup"):
 
 def runChange():
     global appList, appListIndex, appListPrevIndex
-    
+
     execCmd = f"{appList[appListIndex][0]}"
     print(execCmd)
     os.system(execCmd)

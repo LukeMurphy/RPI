@@ -33,7 +33,7 @@ def filterRemapImage(config):
 def resetSystem(fullReset=False):
     global config
     _create_image_layers(config)
-    config.totalResetTime = random.randint(69,287)
+    config.totalResetTime = random.randint(101,287)
 
 
 def changeDrawingMode():
@@ -51,7 +51,11 @@ def changeDrawingMode():
 
 
 def changePalettes():
-    return True
+    config.bgColor = random.choice(config.bgColorSets)
+    # print(f" New bg Color : {config.bgColor}")
+    _create_image_layers(config)
+    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
+    config.changeColorSetTime = random.randint(123,287)
 
 
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
@@ -205,7 +209,7 @@ def setPenColor(_pen):
     _pen.lineColor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 225),200)
 
     if random.random() <  .7 :
-        if random.random() <  .2 :
+        if random.random() <  .1 :
             _pen.lineColor = (random.randint(170, 190), random.randint(170, 190), random.randint(170, 190), 200)
         else :
             _pen.lineColor = (random.randint(0, 10), random.randint(0, 10), random.randint(0, 10),200)
@@ -531,7 +535,9 @@ def _create_image_layers(config):
     config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
+    # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
+    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
+
 
 
 def _load_filter_config(config):

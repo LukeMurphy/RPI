@@ -310,7 +310,7 @@ def _configure_saving(config, workconfig):
 def _load_work_module(config, workconfig):
     """Loads the work module."""
     config.work = workconfig.get("displayconfig", "work")
-    config.rendering = workconfig.get("displayconfig", "rendering")
+    config.rendering = workconfig.get("displayconfig", "rendering", fallback ="hub")
     config.overallResize = workconfig.getboolean("displayconfig", "overallResize", fallback=False)
 
     print(f"{bcolors.WARNING} ** modules.player.py is Loading: {config.work} {bcolors.ENDC}")

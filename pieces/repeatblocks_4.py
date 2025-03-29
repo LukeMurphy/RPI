@@ -422,7 +422,7 @@ def _disturb_section(sectionParams):
 
 
 def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
-    return colorutils.getRandomColorHSVSaturated(
+    return colorutils.getRandomColorHSV(
         palettObjValsRef.minHue,
         palettObjValsRef.maxHue,
         palettObjValsRef.minSaturation,

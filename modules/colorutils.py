@@ -458,7 +458,7 @@ def closestRBYfromRGB(rgb):
     # d = sqrt( x2-x1 ^ 2 ....)
     dMax = 0
     dArray = []
-    for n in range(0, len(wheel)):
+    for n in range(len(wheel)):
         d = round(
             math.sqrt(
                 (r - wheel[n][0]) ** 2 + (g - wheel[n]
@@ -542,36 +542,35 @@ def HSLToRGB(h, s, l, a=255):
     # m = l - (.3 * r1 + .59 * g1 + .11 * b1)
     m = l - c / 2
     rgb = [r1 + m, g1 + m, b1 + m, a]
-    rgbCol = tuple(round(round(i * 255)) for i in rgb)
-    return rgbCol
+    return tuple(round(round(i * 255)) for i in rgb)
 
 
 def subtractiveColors(arg):
     color = (0, 0, 0)
-    if arg == "RED":
-        color = tuple(round(a * brightness) for a in ((255, 2, 2)))
-    if arg == "VERMILLION":
-        color = tuple(round(a * brightness) for a in ((253, 83, 8)))
-    if arg == "ORANGE":
-        color = tuple(round(a * brightness) for a in ((255, 153, 1)))
     if arg == "AMBER":
         color = tuple(round(a * brightness) for a in ((250, 188, 2)))
-    if arg == "YELLOW":
-        color = tuple(round(a * brightness) for a in ((255, 255, 0)))
-    if arg == "CHARTREUSE":
-        color = tuple(round(a * brightness) for a in ((0, 255, 0)))
-    if arg == "GREEN":
-        color = tuple(round(a * brightness) for a in ((0, 125, 0)))
-    if arg == "TEAL":
-        color = tuple(round(a * brightness) for a in ((146, 206, 0)))
-    if arg == "BLUE":
+    elif arg == "BLUE":
         color = tuple(round(a * brightness) for a in ((0, 0, 255)))
-    if arg == "VIOLET":
-        color = tuple(round(a * brightness) for a in ((65, 0, 165)))
-    if arg == "PURPLE":
-        color = tuple(round(a * brightness) for a in ((135, 0, 175)))
-    if arg == "MAGENTA":
+    elif arg == "CHARTREUSE":
+        color = tuple(round(a * brightness) for a in ((0, 255, 0)))
+    elif arg == "GREEN":
+        color = tuple(round(a * brightness) for a in ((0, 125, 0)))
+    elif arg == "MAGENTA":
         color = tuple(round(a * brightness) for a in ((167, 25, 75)))
+    elif arg == "ORANGE":
+        color = tuple(round(a * brightness) for a in ((255, 153, 1)))
+    elif arg == "PURPLE":
+        color = tuple(round(a * brightness) for a in ((135, 0, 175)))
+    elif arg == "RED":
+        color = tuple(round(a * brightness) for a in ((255, 2, 2)))
+    elif arg == "TEAL":
+        color = tuple(round(a * brightness) for a in ((146, 206, 0)))
+    elif arg == "VERMILLION":
+        color = tuple(round(a * brightness) for a in ((253, 83, 8)))
+    elif arg == "VIOLET":
+        color = tuple(round(a * brightness) for a in ((65, 0, 165)))
+    elif arg == "YELLOW":
+        color = tuple(round(a * brightness) for a in ((255, 255, 0)))
     return color
 
 
@@ -591,11 +590,10 @@ def changeColor(rnd=False):
         if r == 255:
             r = 0
             g = 255
-            b = 0
         else:
             g = 0
             r = 255
-            b = 0
+        b = 0
     else:
         r = round(random.SystemRandom().uniform(0, 255) * brightness)
         g = round(random.SystemRandom().uniform(0, 255) * brightness)

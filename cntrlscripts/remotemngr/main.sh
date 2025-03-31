@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "\n*************"
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
 localvalue=$(cat $localConfigNameFile)
 localvalueControl=$(cat $localControlConfigFileName)

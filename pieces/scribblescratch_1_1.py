@@ -680,6 +680,10 @@ def _load_pen_config(config):
         _penHolder.w = int(workConfig.get(_penConfigName, "w", fallback=1))
         _penHolder.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
 
+
+        '''
+        adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y - in general the arithmetic is more nuanced
+        '''
         _penHolder.xTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xTravelRange", fallback="-1,1").split(",")))
         _penHolder.yTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yTravelRange", fallback="-1,1").split(",")))
         _penHolder.xTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xTravelIncrRange", fallback="-1,1").split(",")))

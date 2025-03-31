@@ -12,6 +12,7 @@ from modules import badpixels, colorutils, coloroverlay
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
+
 # ----------------------------------------------------##----------------------------------------------------#
 class Pen:
     def __init__(self):
@@ -20,32 +21,30 @@ class Pen:
 
 # ----------------------------------------------------##----------------------------------------------------#
 def filterRemapImage(config):
-        config.useFilters = True
-        config.remapImageBlock = False
-        startX = round(random.uniform(0, config.filterRemapRangeX))
-        startY = round(random.uniform(0, config.filterRemapRangeY))
-        endX = round(random.uniform(config.filterRemapMinHorzSize, config.filterRemapMaxHorzSize))
-        endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
-        config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-        config.remapImageBlockDestination = [startX, startY]
+    config.useFilters = True
+    config.remapImageBlock = False
+    startX = round(random.uniform(0, config.filterRemapRangeX))
+    startY = round(random.uniform(0, config.filterRemapRangeY))
+    endX = round(random.uniform(config.filterRemapMinHorzSize, config.filterRemapMaxHorzSize))
+    endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
+    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+    config.remapImageBlockDestination = [startX, startY]
 
 
 def resetSystem(fullReset=False):
     global config
     _create_image_layers(config)
-    config.totalResetTime = random.randint(101,287)
+    config.totalResetTime = random.randint(101, 287)
 
 
 def changeDrawingMode():
-    config.drawingMode = random.randint(1,4)
-    config.startNewLineProb = .005
-    config.changeTimeController.slotRate = random.randint(20,33)
+    config.drawingMode = random.randint(1, 4)
+    config.startNewLineProb = 0.005
+    config.changeTimeController.slotRate = random.randint(20, 33)
 
     if config.drawingMode in {2, 3}:
-        config.startNewLineProb = .1
-        config.changeTimeController.slotRate = random.randint(33,63)
-
-
+        config.startNewLineProb = 0.1
+        config.changeTimeController.slotRate = random.randint(33, 63)
 
     print(f" => New Drawing Mode: {config.drawingMode}")
 
@@ -55,10 +54,11 @@ def changePalettes():
     # print(f" New bg Color : {config.bgColor}")
     _create_image_layers(config)
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
-    config.changeColorSetTime = random.randint(123,287)
+    config.changeColorSetTime = random.randint(123, 287)
 
 
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
+
 
 def startNewLine(_pen):
     setPenProperties(_pen)
@@ -76,37 +76,38 @@ def startNewLine(_pen):
     config.draw = ImageDraw.Draw(config.image)
 
 
-def setPenProperties(pen) :
-        pen.drawingSize = [config.canvasWidth , config.canvasHeight ]
-        pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
-        pen._p = 0
-        pen.smooth_points = []
-        pen.speed = random.randint(1, 5)
-        pen.centerVariationXMax = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
-        pen.centerVariationYMax = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
+def setPenProperties(pen):
+    pen.drawingSize = [config.canvasWidth, config.canvasHeight]
+    pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
+    pen._p = 0
+    pen.smooth_points = []
+    pen.speed = random.randint(1, 5)
+    pen.centerVariationXMax = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
+    pen.centerVariationYMax = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
 
-        # genral size of drawing
-        pen.drawingSkip = random.uniform(0.0,.01)
-        
-        # shape of scribbles
-        if config.drawingMode == 1 :
-            markType  =  random.randint(1,3) 
-            if markType == 1 :
-                _penPropsByName("scratchyLong",pen)
-            elif markType == 2 :
-                _penPropsByName("shortMarks",pen)
-            elif markType == 3 :
-                _penPropsByName("longOvalSweeps",pen)
-        elif config.drawingMode == 2 :
-            if random.random() < .5 :
-                _penPropsByName("scratchyLong",pen)
-            else :
-                _penPropsByName("shortMarks",pen)
-        elif config.drawingMode == 3 :
-            _penPropsByName("scratchyLong",pen)
-        elif config.drawingMode == 4 :
-            _penPropsByName("longOvalSweeps",pen)
-        setPenColor(pen)
+    # genral size of drawing
+    pen.drawingSkip = random.uniform(0.0, 0.01)
+
+    # shape of scribbles
+    if config.drawingMode == 1:
+        markType = random.randint(1, 3)
+        if markType == 1:
+            _penPropsByName("scratchyLong", pen)
+        elif markType == 2:
+            _penPropsByName("shortMarks", pen)
+        elif markType == 3:
+            _penPropsByName("longOvalSweeps", pen)
+    elif config.drawingMode == 2:
+        if random.random() < 0.5:
+            _penPropsByName("scratchyLong", pen)
+        else:
+            _penPropsByName("shortMarks", pen)
+    elif config.drawingMode == 3:
+        _penPropsByName("scratchyLong", pen)
+    elif config.drawingMode == 4:
+        _penPropsByName("longOvalSweeps", pen)
+    setPenColor(pen)
+
 
 # TODO Add some specific pen based rules for shapes based on where
 # the center may end up and how much we want the pen to exit the edges
@@ -115,24 +116,24 @@ def setPenProperties(pen) :
 def _penPropsByName(_name, pen):
     _penProps = None
 
-    if len(config.penHolder) == 1 :
+    if len(config.penHolder) == 1:
         _name = config.penHolder[0].name
 
-    for _p in config.penHolder :
+    for _p in config.penHolder:
         print(_p.name)
-        if _p.name == _name :
+        if _p.name == _name:
             _penProps = _p
 
     print(f"Setting the pen instance {_name} ==> ")
     print(f"Setting the pen instance <=== {_penProps.name} ")
-    
+
     pen.minNumPoints = _penProps.minNumPoints
     pen.maxNumPoints = _penProps.maxNumPoints
     pen.num_points = random.randint(pen.minNumPoints, pen.maxNumPoints)
     pen.turns = round(random.uniform(_penProps.turns[0], _penProps.turns[1]))
     pen.minInterpolatedPoints = _penProps.minInterpolatedPoints
     pen.maxInterpolatedPoints = _penProps.maxInterpolatedPoints
-    
+
     pen.baseRadiusFactor = random.uniform(_penProps.baseRadiusFactor[0], _penProps.baseRadiusFactor[1])
     pen.yRadiusFactor = random.uniform(_penProps.yRadiusFactor[0], _penProps.yRadiusFactor[1])
     pen.xRadiusFactor = random.uniform(_penProps.xRadiusFactor[0], _penProps.xRadiusFactor[1])
@@ -141,49 +142,71 @@ def _penPropsByName(_name, pen):
     pen.yRadiusFactorNoiseFactor = _penProps.yRadiusFactorNoiseFactor
     pen.yRandom = random.randint(_penProps.yRandom[0], _penProps.yRandom[1])
     pen.xRandom = random.randint(_penProps.xRandom[0], _penProps.xRandom[1])
-    
+
     pen.rotationFactor = _penProps.rotationFactor
-    pen.rotationAngle = random.uniform(-math.pi/2/pen.rotationFactor,math.pi/2/pen.rotationFactor)
-    
+    pen.rotationAngle = random.uniform(-math.pi / 2 / pen.rotationFactor, math.pi / 2 / pen.rotationFactor)
+
     pen.xOffset = random.randint(_penProps.xOffset[0], _penProps.xOffset[1])
     pen.yOffset = random.randint(_penProps.yOffset[0], _penProps.yOffset[1])
     pen._w = _penProps.w
     pen.mode = _penProps.mode
 
-    if _name == "longOvalSweeps" :
+    if _name == "longOvalSweeps":
         print(f"pen.xOffset {pen.xOffset} {pen.yOffset}")
 
 
-
-
-def _canvasCircumscribes(pen) :
+def _canvasCircumscribes(pen):
     # For ref -- this makes an oval at center
     pen.num_points = 6
     pen.baseRadiusFactor = 1.8
     pen.xRadiusFactor = 1.2
-    pen.yRadiusFactor = .80
+    pen.yRadiusFactor = 0.80
     pen.rotationAngle = 0
-    pen.xOffset = random.randint(-1,1)
-    pen.yOffset = random.randint(-1,1)
+    pen.xOffset = random.randint(-1, 1)
+    pen.yOffset = random.randint(-1, 1)
     pen.xRandom = random.randint(-1, 1)
     pen.yRandom = random.randint(-1, 1)
     pen.turns = 5
     pen.minInterpolatedPoints = 190
     pen.maxInterpolatedPoints = 220
 
+
 # ----------------------------------------------------##----------------------------------------------------#
 
+
+def _getPenColor(cR):
+    return colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
+
+
 def setPenColor(_pen):
-    _pen.lineColor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 225),200)
+    config.penColor_a = _getPenColor(config.penColor_a_range)
+    config.penColor_b = _getPenColor(config.penColor_b_range)
+    config.penColor_c = _getPenColor(config.penColor_c_range)
+    config.penColor_d = _getPenColor(config.penColor_d_range)
 
-    if random.random() <  .7 :
-        if random.random() <  .1 :
-            _pen.lineColor = (random.randint(170, 190), random.randint(170, 190), random.randint(170, 190), 200)
-        else :
-            _pen.lineColor = (random.randint(0, 10), random.randint(0, 10), random.randint(0, 10),200)
+    _pen.lineColor = config.penColor_a
 
-    if _pen.mode ==2 and random.random() < .4:
-        _pen.lineColor = (random.randint(120, 200), random.randint(0, 10), random.randint(0, 10),200)
+    if random.random() < config.color_c_prob:
+        if random.random() < config.color_b_prob:
+            _pen.lineColor = config.penColor_b
+        else:
+            _pen.lineColor = config.penColor_c
+
+    if _pen.mode == 2 and random.random() < config.color_d_prob:
+        _pen.lineColor = config.penColor_d
+
+
+# def setPenColor(_pen):
+#     _pen.lineColor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 225), 200)
+
+#     if random.random() < 0.7:
+#         if random.random() < 0.1:
+#             _pen.lineColor = (random.randint(170, 190), random.randint(170, 190), random.randint(170, 190), 200)
+#         else:
+#             _pen.lineColor = (random.randint(0, 10), random.randint(0, 10), random.randint(0, 10), 200)
+
+#     if _pen.mode == 2 and random.random() < 0.4:
+#         _pen.lineColor = (random.randint(120, 200), random.randint(0, 10), random.randint(0, 10), 200)
 
 
 def generateSmoothLinePoints(_pen):
@@ -198,11 +221,10 @@ def generateSmoothLinePoints(_pen):
     angles = np.linspace(0, 2 * np.pi, num_points, endpoint=False)
     points = [_pen.lastPoint]
     points = []
-    
-    center_x = width // 2 #+ _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
-    center_y = height // 2 #+ _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
 
-    
+    center_x = width // 2  # + _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
+    center_y = height // 2  # + _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
+
     for _ in range(_pen.turns):
         for angle in angles:
             # Add random variation to the radius
@@ -236,11 +258,11 @@ def generateSmoothLinePoints(_pen):
     smooth_points_c = list(zip(smooth_points[0], smooth_points[1]))
 
     smooth_points_r = []
-    for pt in smooth_points_c :
+    for pt in smooth_points_c:
         ptx = pt[0] * np.cos(_pen.rotationAngle) - pt[1] * np.sin(_pen.rotationAngle)
         pty = pt[1] * np.cos(_pen.rotationAngle) + pt[0] * np.sin(_pen.rotationAngle)
-        _pen.rotationAngle += _pen.rotationAngle/500
-        smooth_points_r.append((ptx + _pen.xOffset,pty + _pen.yOffset))
+        _pen.rotationAngle += _pen.rotationAngle / 500
+        smooth_points_r.append((ptx + _pen.xOffset, pty + _pen.yOffset))
 
     _pen.smooth_points = smooth_points_r
 
@@ -272,7 +294,7 @@ def drawLine(_pen):
             _p1 = _pen.smooth_points[_pen._p - 1]
             _p2 = _pen.smooth_points[_pen._p]
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
-            if not _penSkip :
+            if not _penSkip:
                 config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_pen._w)
             _pen._p += 1
             config.doingDrawing = True
@@ -281,11 +303,11 @@ def drawLine(_pen):
             config.doingDrawing = False
 
         if random.random() < 0.2:
-                _pen._w += 1
+            _pen._w += 1
         if random.random() < 0.2 or _pen._w > 7:
-                _pen._w -= 1
-        if _pen._w <= 0 :
-            _pen._w = 1    
+            _pen._w -= 1
+        if _pen._w <= 0:
+            _pen._w = 1
 
 
 def _pen_functions():
@@ -406,7 +428,9 @@ def animationBackGroundFadeIn():
     if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max:
         currentAnimation.bg_alpha += 2
 
+
 # ----------------------------------------------------##----------------------------------------------------#
+
 
 def runWork():
     while True:
@@ -435,7 +459,6 @@ def iterate():
         if config.systemController.advance:
             resetSystem(True)
 
-
     config.fadeRate += config.fadeRateDelta
 
     if config.fadeRate > 255:
@@ -456,19 +479,20 @@ def iterate():
     if not config.doingDrawing and random.random() < 0.1:
         _do_drawing_glitch()
 
-
     _pen_functions()
 
     renderImage()
 
 
-def renderImage() :
+def renderImage():
 
     config.underLayer.paste(config.image, (0, 0), config.image)
     config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
     config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
 
+
 # ----------------------------------------------------##----------------------------------------------------#
+
 
 def main(run=True):
     global config, workConfig
@@ -506,7 +530,6 @@ def _create_image_layers(config):
 
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
-
 
 
 def _load_filter_config(config):
@@ -560,44 +583,74 @@ def _load_color_config(config):
     config.bgGlitchDisplacementHorizontal = float(workConfig.get("drawingField", "bgGlitchDisplacementHorizontal"))
     config.bgGlitchDisplacementVertical = float(workConfig.get("drawingField", "bgGlitchDisplacementVertical"))
 
+    config.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
+    config.color_b_prob = float(workConfig.get("drawingField", "color_d_prob", fallback=0.1))
+    config.color_c_prob = float(workConfig.get("drawingField", "color_d_prob", fallback=0.7))
+    config.color_d_prob = float(workConfig.get("drawingField", "color_d_prob", fallback=0.4))
+
+    config.penColor_a_range = list(
+        map(
+            lambda x: float(x),
+            workConfig.get("drawingField", "penColor_a").split(","),
+        )
+    )
+    config.penColor_b_range = list(
+        map(
+            lambda x: float(x),
+            workConfig.get("drawingField", "penColor_b").split(","),
+        )
+    )
+    config.penColor_c_range = list(
+        map(
+            lambda x: float(x),
+            workConfig.get("drawingField", "penColor_c").split(","),
+        )
+    )
+    config.penColor_d_range = list(
+        map(
+            lambda x: float(x),
+            workConfig.get("drawingField", "penColor_d").split(","),
+        )
+    )
+
 
 def _load_pen_config(config):
-    config.pen_centerVariationXMin = int(workConfig.get("drawingField", "pen_centerVariationXMin", fallback = 0))
-    config.pen_centerVariationXMax = int(workConfig.get("drawingField", "pen_centerVariationXMax", fallback = 0))
-    config.pen_centerVariationYMin = int(workConfig.get("drawingField", "pen_centerVariationYMin", fallback = 0))
-    config.pen_centerVariationYMax = int(workConfig.get("drawingField", "pen_centerVariationYMax", fallback = 0))
+    config.pen_centerVariationXMin = int(workConfig.get("drawingField", "pen_centerVariationXMin", fallback=0))
+    config.pen_centerVariationXMax = int(workConfig.get("drawingField", "pen_centerVariationXMax", fallback=0))
+    config.pen_centerVariationYMin = int(workConfig.get("drawingField", "pen_centerVariationYMin", fallback=0))
+    config.pen_centerVariationYMax = int(workConfig.get("drawingField", "pen_centerVariationYMax", fallback=0))
 
     config.penNames = workConfig.get("drawingField", "penNames").split(",")
     config.penHolder = []
 
-    for _penConfigName in config.penNames :
+    for _penConfigName in config.penNames:
         _penHolder = Pen()
 
         _penHolder.name = _penConfigName
         print(f"Getting the config for the pen {_penConfigName}")
 
-        _penHolder.minNumPoints = int(workConfig.get(_penConfigName, "minNumPoints", fallback = 8))
-        _penHolder.maxNumPoints = int(workConfig.get(_penConfigName, "maxNumPoints", fallback = 8))
-        _penHolder.turns = list(map(lambda x: int(x), workConfig.get(_penConfigName, "turns", fallback = "2,2").split(",")))
+        _penHolder.minNumPoints = int(workConfig.get(_penConfigName, "minNumPoints", fallback=8))
+        _penHolder.maxNumPoints = int(workConfig.get(_penConfigName, "maxNumPoints", fallback=8))
+        _penHolder.turns = list(map(lambda x: int(x), workConfig.get(_penConfigName, "turns", fallback="2,2").split(",")))
 
-        _penHolder.minInterpolatedPoints = int(workConfig.get(_penConfigName, "minInterpolatedPoints", fallback = 200))
-        _penHolder.maxInterpolatedPoints = int(workConfig.get(_penConfigName, "maxInterpolatedPoints", fallback = 200))
+        _penHolder.minInterpolatedPoints = int(workConfig.get(_penConfigName, "minInterpolatedPoints", fallback=200))
+        _penHolder.maxInterpolatedPoints = int(workConfig.get(_penConfigName, "maxInterpolatedPoints", fallback=200))
 
-        _penHolder.baseRadiusFactor = list(map(lambda x: float(x), workConfig.get(_penConfigName, "baseRadiusFactor", fallback = "1.0,1.0").split(",")))
-        _penHolder.xRadiusFactor = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xRadiusFactor", fallback = ".2,.2").split(",")))
-        _penHolder.yRadiusFactor = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yRadiusFactor", fallback = ".2,.2").split(",")))
+        _penHolder.baseRadiusFactor = list(map(lambda x: float(x), workConfig.get(_penConfigName, "baseRadiusFactor", fallback="1.0,1.0").split(",")))
+        _penHolder.xRadiusFactor = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xRadiusFactor", fallback=".2,.2").split(",")))
+        _penHolder.yRadiusFactor = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yRadiusFactor", fallback=".2,.2").split(",")))
 
-        _penHolder.xRadiusFactorNoiseFactor = float(workConfig.get(_penConfigName, "xRadiusFactorNoiseFactor", fallback = 1.0))
-        _penHolder.yRadiusFactorNoiseFactor = float(workConfig.get(_penConfigName, "yRadiusFactorNoiseFactor", fallback = 1.0))
-        _penHolder.xRandom = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xRandom", fallback = "-1,1").split(",")))
-        _penHolder.yRandom = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yRandom", fallback = "-1,1").split(",")))
+        _penHolder.xRadiusFactorNoiseFactor = float(workConfig.get(_penConfigName, "xRadiusFactorNoiseFactor", fallback=1.0))
+        _penHolder.yRadiusFactorNoiseFactor = float(workConfig.get(_penConfigName, "yRadiusFactorNoiseFactor", fallback=1.0))
+        _penHolder.xRandom = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xRandom", fallback="-1,1").split(",")))
+        _penHolder.yRandom = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yRandom", fallback="-1,1").split(",")))
 
-        _penHolder.rotationFactor = float(workConfig.get(_penConfigName, "rotationFactor", fallback = 8.0))
+        _penHolder.rotationFactor = float(workConfig.get(_penConfigName, "rotationFactor", fallback=8.0))
 
-        _penHolder.xOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xOffset", fallback = "-1,1").split(",")))
-        _penHolder.yOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffset", fallback = "-1,1").split(",")))
-        _penHolder.w = int(workConfig.get(_penConfigName, "w", fallback = 1))
-        _penHolder.mode = int(workConfig.get(_penConfigName, "mode", fallback = 1))
+        _penHolder.xOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xOffset", fallback="-1,1").split(",")))
+        _penHolder.yOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffset", fallback="-1,1").split(",")))
+        _penHolder.w = int(workConfig.get(_penConfigName, "w", fallback=1))
+        _penHolder.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
 
         config.penHolder.append(_penHolder)
 
@@ -629,10 +682,9 @@ def _initialize_system(config):
     config.doingDrawing = False
     config.penArray = []
     config.drawingMode = 1
-    
+
     for i in range(1):
         pen = Pen()
         pen.number = i
         setPenProperties(pen)
         config.penArray.append(pen)
-

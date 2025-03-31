@@ -124,8 +124,8 @@ def _penPropsByName(_name, pen):
         if _p.name == _name:
             _penProps = _p
 
-    print(f"Setting the pen instance {_name} ==> ")
-    print(f"Setting the pen instance <=== {_penProps.name} ")
+    # print(f"Setting the pen instance {_name} ==> ")
+    # print(f"Setting the pen instance <=== {_penProps.name} ")
 
     pen.minNumPoints = _penProps.minNumPoints
     pen.maxNumPoints = _penProps.maxNumPoints

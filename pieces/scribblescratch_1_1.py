@@ -312,7 +312,7 @@ def drawLine(_pen):
 
 def _pen_functions():
     for _pen in config.penArray:
-        if random.random() < 0.01:
+        if random.random() < config.changePenColorWhileDrawingProb:
             setPenColor((_pen))
 
         if random.random() < config.startNewLineProb and _pen._p == 0:
@@ -619,6 +619,7 @@ def _load_pen_config(config):
     config.pen_centerVariationXMax = int(workConfig.get("drawingField", "pen_centerVariationXMax", fallback=0))
     config.pen_centerVariationYMin = int(workConfig.get("drawingField", "pen_centerVariationYMin", fallback=0))
     config.pen_centerVariationYMax = int(workConfig.get("drawingField", "pen_centerVariationYMax", fallback=0))
+    config.changePenColorWhileDrawingProb = float(workConfig.get("drawingField", "changePenColorWhileDrawingProb", fallback=0.01))
 
     config.penNames = workConfig.get("drawingField", "penNames").split(",")
     config.penHolder = []

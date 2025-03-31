@@ -33,6 +33,12 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     echo "Remote brightness:" $remotevalueControl
     configToUse=$localvalue
     brightnessConfig=$localvalueControl
+
+    if [ $brightnessConfig = '' ]; then
+        brightnessConfig = 1
+    fi
+
+
     sub="--manifest.cfg"
     if [ $1 = 'startup' ]; then
         runScript=1

@@ -120,7 +120,7 @@ def _penPropsByName(_name, pen):
         _name = config.penHolder[0].name
 
     for _p in config.penHolder:
-        print(_p.name)
+        # print(_p.name)
         if _p.name == _name:
             _penProps = _p
 

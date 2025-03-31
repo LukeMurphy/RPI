@@ -4,7 +4,7 @@ import time
 
 from matplotlib.pylab import rand
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 from scipy.spatial import Voronoi
 from scipy.interpolate import splprep, splev  # For spline interpolation
 from modules.holder_director import Director
@@ -512,9 +512,37 @@ def iterate():
 
 def renderImage():
 
+    # remapImageBlock = True
+    # remapImageBlockSection = (0,128,500,500)
+    # remapImageBlockDestination = [38,128]
+
+
+    # _temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # _tempdraw = ImageDraw.Draw(_temp)
+    # _tempdraw.rectangle((0,0,500,500), fill=(0,0,0,255))
+
+    # _temp2 = config.canvasImage.crop(remapImageBlockSection)
+    # _temp.paste(_temp2, (0,0), _temp2)
+
+    # _temp2 = config.underLayer.crop(remapImageBlockSection)
+    # _temp.paste(_temp2, (0,0), _temp2)
+
+    # _temp2 = config.image.crop(remapImageBlockSection)
+    # _temp.paste(_temp2, (0,0), _temp2)
+
+    # _temp2 = config.canvasImage.crop(remapImageBlockSection)
+    # _temp.paste(_temp2, (0,0), _temp2)
+    
+    
+
+
     config.underLayer.paste(config.image, (0, 0), config.image)
     config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
     config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+
+    # config.canvasImage.paste(_temp, remapImageBlockDestination, _temp)
+    # config.render(_temp, 38, 128, config.canvasWidth, config.canvasHeight)
+
 
 
 # ----------------------------------------------------##----------------------------------------------------#

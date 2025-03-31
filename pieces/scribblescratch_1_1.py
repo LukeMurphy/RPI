@@ -154,9 +154,13 @@ def _penPropsByName(_name, pen):
 
     pen.xTravelRange = _penProps.xTravelRange
     pen.yTravelRange = _penProps.yTravelRange
+    pen.xTravelIncr = _penProps.xTravelIncrRange
+    pen.yTravelIncr = _penProps.yTravelIncrRange
+    pen.xtravelMode = 1 if random.random() < _penProps.xtravelProb else 0
+    pen.ytravelMode = 1 if random.random() < _penProps.ytravelProb else 0
 
-    if _name == "longOvalSweeps":
-        print(f"pen.xOffset {pen.xOffset} {pen.yOffset}")
+    # if _name == "longOvalSweeps":
+    #     print(f"pen.xOffset {pen.xOffset} {pen.yOffset}")
 
 
 def _canvasCircumscribes(pen):
@@ -229,6 +233,12 @@ def generateSmoothLinePoints(_pen):
     center_x = width // 2  # + _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
     center_y = height // 2  # + _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
 
+    _xTravel = random.uniform(_pen.xTravelRange[0],_pen.xTravelRange[1])
+    _yTravel = random.uniform(_pen.yTravelRange[0],_pen.yTravelRange[1])
+
+    _xTravelIncr = random.uniform(_pen.xTravelIncr[0],_pen.xTravelIncr[1])
+    _yTravelIncr = random.uniform(_pen.yTravelIncr[0],_pen.yTravelIncr[1])
+
     for _ in range(_pen.turns):
         for angle in angles:
             # Add random variation to the radius
@@ -243,8 +253,18 @@ def generateSmoothLinePoints(_pen):
                 y += _pen.yRandom
             base_radius += random.uniform(-5, 5)
             points.append([x, y])
-            center_x += random.uniform(_pen.xTravelRange[0],_pen.xTravelRange[1])
-            center_y += random.uniform(_pen.yTravelRange[0],_pen.yTravelRange[1])
+            
+            if _pen.xtravelMode == 1 :
+                center_x += _xTravel
+                _xTravel *= _xTravelIncr
+            else :
+                center_x += random.uniform(_pen.xTravelRange[0],_pen.xTravelRange[1])
+
+            if _pen.ytravelMode == 1 :
+                center_y += _yTravel
+                _yTravel *= _yTravelIncr
+            else :
+                center_y += random.uniform(_pen.yTravelRange[0],_pen.yTravelRange[1])
         _pen.lastPoint = [x, y]
 
     # Close the shape by repeating the first point
@@ -657,11 +677,16 @@ def _load_pen_config(config):
         _penHolder.xOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xOffset", fallback="-1,1").split(",")))
         _penHolder.yOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffset", fallback="-1,1").split(",")))
 
-        _penHolder.xTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xTravelRange", fallback="-1,1").split(",")))
-        _penHolder.yTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yTravelRange", fallback="-1,1").split(",")))
-
         _penHolder.w = int(workConfig.get(_penConfigName, "w", fallback=1))
         _penHolder.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
+
+        _penHolder.xTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xTravelRange", fallback="-1,1").split(",")))
+        _penHolder.yTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yTravelRange", fallback="-1,1").split(",")))
+        _penHolder.xTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xTravelIncrRange", fallback="-1,1").split(",")))
+        _penHolder.yTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yTravelIncrRange", fallback="-1,1").split(",")))
+        _penHolder.xtravelProb = float(workConfig.get(_penConfigName, "xtravelProb", fallback=.1))
+        _penHolder.ytravelProb = float(workConfig.get(_penConfigName, "ytravelProb", fallback=.1))
+
 
         config.penHolder.append(_penHolder)
 

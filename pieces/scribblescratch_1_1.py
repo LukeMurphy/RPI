@@ -148,8 +148,12 @@ def _penPropsByName(_name, pen):
 
     pen.xOffset = random.randint(_penProps.xOffset[0], _penProps.xOffset[1])
     pen.yOffset = random.randint(_penProps.yOffset[0], _penProps.yOffset[1])
+
     pen._w = _penProps.w
     pen.mode = _penProps.mode
+
+    pen.xTravelRange = _penProps.xTravelRange
+    pen.yTravelRange = _penProps.yTravelRange
 
     if _name == "longOvalSweeps":
         print(f"pen.xOffset {pen.xOffset} {pen.yOffset}")
@@ -239,6 +243,8 @@ def generateSmoothLinePoints(_pen):
                 y += _pen.yRandom
             base_radius += random.uniform(-5, 5)
             points.append([x, y])
+            center_x += random.uniform(_pen.xTravelRange[0],_pen.xTravelRange[1])
+            center_y += random.uniform(_pen.yTravelRange[0],_pen.yTravelRange[1])
         _pen.lastPoint = [x, y]
 
     # Close the shape by repeating the first point
@@ -650,6 +656,10 @@ def _load_pen_config(config):
 
         _penHolder.xOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xOffset", fallback="-1,1").split(",")))
         _penHolder.yOffset = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffset", fallback="-1,1").split(",")))
+
+        _penHolder.xTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xTravelRange", fallback="-1,1").split(",")))
+        _penHolder.yTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yTravelRange", fallback="-1,1").split(",")))
+
         _penHolder.w = int(workConfig.get(_penConfigName, "w", fallback=1))
         _penHolder.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
 

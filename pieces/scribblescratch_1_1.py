@@ -159,6 +159,8 @@ def _penPropsByName(_name, pen):
     pen.xtravelMode = 1 if random.random() < _penProps.xtravelProb else 0
     pen.ytravelMode = 1 if random.random() < _penProps.ytravelProb else 0
 
+    pen.radiusChangePerRound = _penProps.radiusChangePerRound
+
     # if _name == "longOvalSweeps":
     #     print(f"pen.xOffset {pen.xOffset} {pen.yOffset}")
 
@@ -252,6 +254,10 @@ def generateSmoothLinePoints(_pen):
             if random.random() < 0.1:
                 y += _pen.yRandom
             base_radius += random.uniform(-5, 5)
+
+
+            base_radius += _pen.radiusChangePerRound
+
             points.append([x, y])
             
             if _pen.xtravelMode == 1 :
@@ -718,7 +724,7 @@ def _load_pen_config(config):
         _penHolder.yTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yTravelIncrRange", fallback="-1,1").split(",")))
         _penHolder.xtravelProb = float(workConfig.get(_penConfigName, "xtravelProb", fallback=.1))
         _penHolder.ytravelProb = float(workConfig.get(_penConfigName, "ytravelProb", fallback=.1))
-
+        _penHolder.radiusChangePerRound = float(workConfig.get(_penConfigName, "radiusChangePerRound", fallback=0))
 
         config.penHolder.append(_penHolder)
 

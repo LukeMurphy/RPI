@@ -51,7 +51,7 @@ def changeDrawingMode():
 
 def changePalettes():
     config.bgColor = random.choice(config.bgColorSets)
-    # print(f" New bg Color : {config.bgColor}")
+    print(f" New bg Color : {config.bgColor}")
     _create_image_layers(config)
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
     config.changeColorSetTime = random.randint(123, 287)
@@ -502,7 +502,7 @@ def iterate():
     if random.random() < config.filterRemappingProb:
         filterRemapImage(config)
 
-    if not config.doingDrawing and random.random() < 0.1:
+    if not config.doingDrawing and random.random() < config.doGlitchProb:
         _do_drawing_glitch()
 
     _pen_functions()
@@ -732,6 +732,7 @@ def _initialize_system(config):
 
     config.totalResetTime = float(workConfig.get("drawingField", "totalResetTime", fallback=33))
     config.changeTime = float(workConfig.get("drawingField", "changeTime", fallback=10))
+    config.doGlitchProb = float(workConfig.get("drawingField", "doGlitchProb", fallback=.1))
 
     if config.totalResetTime > 0:
         config.systemController = Director(config)

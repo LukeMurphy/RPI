@@ -174,6 +174,20 @@ def _configure_ReMapping(config, workconfig):
         print(f"{bcolors.FAIL} ** {e}")
         config.remapImageBlockSection7Rotation = 0
 
+    try:
+        # remapImageBlockShift
+        config.remapImageBlockShift = workconfig.getboolean("displayconfig", "remapImageBlockShift")
+        config.remapImageBlockShiftSection = workconfig.get("displayconfig", "remapImageBlockShiftSection").split(",")
+        config.remapImageBlockShiftSection = tuple(int(i) for i in config.remapImageBlockShiftSection)
+        config.remapImageBlockShiftDestination = workconfig.get("displayconfig", "remapImageBlockShiftDestination").split(",")
+        config.remapImageBlockShiftDestination = tuple(int(i) for i in config.remapImageBlockShiftDestination)
+        config.remapImageBlockShiftStableSection = workconfig.get("displayconfig", "remapImageBlockShiftStableSection").split(",")
+        config.remapImageBlockShiftStableSection = tuple(int(i) for i in config.remapImageBlockShiftStableSection)
+        print(f"============> {config.remapImageBlockShift}")
+    except Exception as e:
+        print(f"{bcolors.FAIL} ** {e}")
+        config.remapImageBlockShift = False
+
 
 def configure(config, workconfig):
     """Configures the player based on the provided configuration."""

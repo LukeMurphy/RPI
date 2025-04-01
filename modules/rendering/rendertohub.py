@@ -320,6 +320,18 @@ def _reMapBlock(sectionName):
     crop = crop.convert("RGBA")
     config.renderImageFull.paste(crop, _sectionDestination, crop)
 
+def _reMapBlockShift(sectionName):
+    _name = "remapImageBlockShift"
+    _section = config.__getattribute__(f"{_name}Section")
+    _nonsection = config.__getattribute__(f"{_name}StableSection")
+    _sectionDestination = config.__getattribute__(f"{_name}Destination")
+
+    crop = config._imageToRender.crop(_section)
+    noncrop = config._imageToRender.crop(_nonsection)
+    crop = crop.convert("RGBA")
+    config.renderImageFull.paste(noncrop, (0,0), noncrop)
+    config.renderImageFull.paste(crop, _sectionDestination, crop)
+
 def _doReMappingBlocks():
     if config.remapImageBlock:
         _reMapBlock("remapImageBlock")
@@ -341,6 +353,9 @@ def _doReMappingBlocks():
 
     if config.remapImageBlock7:
         _reMapBlock("remapImageBlock7")
+
+    if config.remapImageBlockShift:
+        _reMapBlockShift("remapImageBlockShift")
 
 def _blurringCall():
     if not config.useBlur:
@@ -455,6 +470,9 @@ def render(
     # global memoryUsage
     # global config, debug
 
+    if config.remapImageBlockShift :
+        config._imageToRender = imageToRender.copy()
+
     # Adding this to account for some issues with pasting in RGB on RGBA ...
     if imageToRender.mode == "RGB" :
         imageToRender = imageToRender.convert("RGBA")
@@ -477,7 +495,8 @@ def render(
             # imageToRender = ImageChops.offset(imageToRender, -40, 40)
 
     try:
-        config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
+        if not config.remapImageBlockShift :
+            config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
     except Exception as e:
         print(e)

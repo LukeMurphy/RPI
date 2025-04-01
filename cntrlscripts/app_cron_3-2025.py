@@ -2,6 +2,7 @@ import os
 import random
 import time
 
+
 # This is probably the file to set as the machine's startup desktop
 # if the machine is under remote control
 path = "/home/daemon104/Documents/RPI/cntrlscripts/"
@@ -16,7 +17,8 @@ def runScript(arg="startup"):
         execCmd = f"{appChanger} {appListIndex}"
         print(execCmd)
         os.system(execCmd)
-        appListIndex = 2 if appListIndex == 1 else 1
+        appListIndex = random.randint(1,3)
+        # appListIndex = 2 if appListIndex == 1 else 1
         timeToCheck = random.randint(90, 300)
     except Exception as e:
         print("There was an issue:")

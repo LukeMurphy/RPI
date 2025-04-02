@@ -90,13 +90,15 @@ def setPenProperties(pen):
 
     # shape of scribbles
     if config.drawingMode == 1:
-        markType = random.randint(1, 3)
+        markType = random.randint(1, 4)
         if markType == 1:
             _penPropsByName("scratchyLong", pen)
         elif markType == 2:
             _penPropsByName("shortMarks", pen)
         elif markType == 3:
             _penPropsByName("longOvalSweeps", pen)
+        elif markType == 4:
+            _penPropsByName("spiralGyres", pen)
     elif config.drawingMode == 2:
         if random.random() < 0.5:
             _penPropsByName("scratchyLong", pen)
@@ -106,6 +108,8 @@ def setPenProperties(pen):
         _penPropsByName("scratchyLong", pen)
     elif config.drawingMode == 4:
         _penPropsByName("longOvalSweeps", pen)
+    elif config.drawingMode == 5:
+        _penPropsByName("spiralGyres", pen)
     setPenColor(pen)
 
 

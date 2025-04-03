@@ -54,7 +54,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "-brightnessOverride",
-    type=int,
+    type=float,
     required=False,
     help="brightness param to override the config value (optional)",
 )
@@ -190,8 +190,8 @@ def _parseArgs(config, loadFromArguments):
     # config
     if args.brightnessOverride is not None:
         brightnessOverride = args.brightnessOverride
-        config.brightness = float(float(brightnessOverride) / 100)
-        config.brightnessOverride = float(float(brightnessOverride) / 100)
+        config.brightness = float(brightnessOverride)
+        config.brightnessOverride = float(brightnessOverride)
 
     f = os.path.getmtime(argument)
     config.delta = int((config.startTime - f))

@@ -62,19 +62,24 @@ def timeChecker(sequenceConfig, config):
             pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList)))
             if pieceToPlay == len(sequenceConfig.workList) :
                 pieceToPlay = 0
-
+        print(bcolors.WARNING)
+        print("--------------------------------")
         print(f"Piece Playing is: {pieceToPlay}")
         print(sequenceConfig.workList[pieceToPlay])
+        print("--------------------------------")
 
         sequenceConfig.currentPieceDuration = round(random.SystemRandom().uniform(sequenceConfig.workList[pieceToPlay][1], sequenceConfig.workList[pieceToPlay][2]))
+
 
         # Launch the next player
         # should be able to infer this without explicit specifications in the config
         # commandString = sequenceConfig.commadStringPyth  + " " + sequenceConfig.workListDirectory + sequenceConfig.workList[pieceToPlay][0] + "&"
         scriptsPath = __file__.replace('sequencer.v2.py','')+ "/"
-        commandString = f"python3 {scriptsPath}player.py -cfg {sequenceConfig.workList[pieceToPlay][0]}&"
+        brightnessOverrideString = ""
+        if sequenceConfig.workList[pieceToPlay][3] :
+            brightnessOverrideString = f" -brightnessOverride {sequenceConfig.workList[pieceToPlay][3]}"
+        commandString = f"python3 {scriptsPath}player.py -cfg {sequenceConfig.workList[pieceToPlay][0]}{brightnessOverrideString}"
 
-        print(bcolors.WARNING)
         print("--------------------------------")
         print("Sequencer is calling :\n" + commandString)
         print("--------------------------------")
@@ -102,11 +107,11 @@ def timeChecker(sequenceConfig, config):
             print(f"count play : {sequenceConfig.playCount}")
             print(f"Running player instances are : {len(str(sequenceConfig.currentPID))}")
             print(listOfProcs)
-            print("----")
+            print("--------------------------------")
             listToCheck = listOfProcs[:-2]
             print(listToCheck)
             # print(len(listToCheck))
-            print("----")
+            print("--------------------------------")
 
             if len(listToCheck) == 2:
                 # just kill the first in the list (i.e. the oldest player running)
@@ -117,6 +122,7 @@ def timeChecker(sequenceConfig, config):
                     for p in listToCheck[:-1]:
                         if str(sequenceConfig.currentPID) not in p:
                             len(str(sequenceConfig.currentPID))
+                            print("--------------------------------")
                             print(f"{str(sequenceConfig.currentPID)} : Should be killing {p}")
                             len(str(sequenceConfig.currentPID))
                             subprocess.run([f"kill {p}"], shell=True, check=True)
@@ -202,6 +208,7 @@ def loadConfigFile():
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 def loadSequenceFile():
 
+    print("\n\n\n************************************************\n\n")
     args = loadConfigFile()
 
     if args.cfg != None:
@@ -216,7 +223,6 @@ def loadSequenceFile():
         sequenceConfig.path = args.path
 
 
-        print("-----------------------------------------")
         print ("script: sys.argv[0] is", repr(sys.argv[0]))
         print ("script: __file__ is", repr(__file__))
         print ("script: cwd is", repr(os.getcwd()))
@@ -253,7 +259,7 @@ def loadSequenceFile():
             try:
                 brightnessOverride = float(workconfig.get(w,"brightnessOverride"))
             except Exception as e:
-                print(e)
+                print(f" ==> brightnessOverride not defined {e} ")
                 brightnessOverride = None
 
 
@@ -282,8 +288,6 @@ def _loadSequencer_print_args(arg0, arg1):
     print(bcolors.ENDC)
 
         #sequenceConfig.mainAppWindow.run()
-
-
 
 
 def main():

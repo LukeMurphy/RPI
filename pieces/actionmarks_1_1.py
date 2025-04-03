@@ -210,19 +210,6 @@ def setPenColor(_pen):
         _pen.lineColor = config.penColor_d
 
 
-# def setPenColor(_pen):
-#     _pen.lineColor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 225), 200)
-
-#     if random.random() < 0.7:
-#         if random.random() < 0.1:
-#             _pen.lineColor = (random.randint(170, 190), random.randint(170, 190), random.randint(170, 190), 200)
-#         else:
-#             _pen.lineColor = (random.randint(0, 10), random.randint(0, 10), random.randint(0, 10), 200)
-
-#     if _pen.mode == 2 and random.random() < 0.4:
-#         _pen.lineColor = (random.randint(120, 200), random.randint(0, 10), random.randint(0, 10), 200)
-
-
 def generateSmoothLinePoints(_pen):
 
     width = _pen.drawingSize[0]
@@ -576,7 +563,11 @@ def _load_background_color_config(config):
     config.bgColorSets = []
     for bg in bgColorSets:
         bgColor = workConfig.get(bg, "bgColor").split(",")
-        bgColors = [int(x) for x in bgColor]
+        bgColors = list(
+            map(lambda x : round(config.brightness * int(x)), 
+                bgColor
+                )
+            )
         config.bgColorSets.append(bgColors)
     config.bgColor = config.bgColorSets[0]
     config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha"))

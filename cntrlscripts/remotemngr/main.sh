@@ -82,8 +82,7 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             echo $remotevalue >$controlPath"localvalue.cfg"
             echo $remotevalueControl >$controlPath"localvaluecontrol.cfg"
             configToUse=$remotevalue
-            let result=$remotevalueControl/100
-            brightnessConfig=$result
+            let brightnessConfig=$remotevalueControl/100
             ps -ef | pgrep -f player.py | xargs kill -9
             if [ $configToUse == *"--manifest"* ]; then
                 player="sequence-player.py"

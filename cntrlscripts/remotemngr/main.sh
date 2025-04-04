@@ -65,16 +65,16 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             # echo "50" > $controlPath"localBrightnessValue.cfg"
             echo admin000 | sudo -S shutdown -r now
         fi
-        if [ $remotevalue = 'update' ]; then
+        if [ $workToPlay = 'update' ]; then
             echo "==> RUN UPDATE <=="
             ps -ef | pgrep -f player.py | xargs kill -9
             git -C $path pull
             # echo "x" > $controlPath"localWorkValue.cfg"
             # echo "50" > $controlPath"localBrightnessValue.cfg"
         fi
-        if [ $remotevalue != 'update' ]; then
+        if [ $workToPlay != 'update' ]; then
             echo "==> NOT THE SAME or STARTING UP"
-            echo $remotevalue >$controlPath"localWorkValue.cfg"
+            echo $workToPlay >$controlPath"localWorkValue.cfg"
             echo $workBrightnessControl >$controlPath"localBrightnessValue.cfg"
             configToUse=$remotevalue
             brightnessConfig=$workBrightnessControl

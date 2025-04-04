@@ -79,9 +79,16 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             configToUse=$workToPlay
             brightnessConfig=$workBrightnessControl
             ps -ef | pgrep -f player.py | xargs kill -9
-            if [ $configToUse == *"--manifest"* ]; then
-                player="sequence-player.py"
-            fi
+
+            sub="--manifest.cfg"
+            case "$configToUse" in
+                    *"$sub"*)
+                    player="sequencer.v2.py"
+                    echo "MATCH";;
+                    *)
+                    echo "NO MATCH"
+                    ;;
+            esac
             execString="${path}${player} -mname ${machine} -path ${path} -cfg ${configToUse} -brightnessOverride ${brightnessConfig}"
             runScript=1
         fi

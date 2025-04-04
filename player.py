@@ -188,10 +188,14 @@ def _parseArgs(config, loadFromArguments):
 
     # Optional 4th argument to override the brightness set in the
     # config
+    # code frome web overrides come in as xx/100
     if args.brightnessOverride is not None:
         brightnessOverride = args.brightnessOverride
-        config.brightness = float(brightnessOverride)
-        config.brightnessOverride = float(brightnessOverride)
+        _brightnessOverride = float(brightnessOverride)
+        if _brightnessOverride > 2.0 :
+            _brightnessOverride /= 100
+        config.brightness = _brightnessOverride
+        config.brightnessOverride = _brightnessOverride
 
     f = os.path.getmtime(argument)
     config.delta = int((config.startTime - f))

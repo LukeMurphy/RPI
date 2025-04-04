@@ -64,10 +64,10 @@ def _select_next_piece(sequenceConfig):
 
     work = sequenceConfig.workList[pieceToPlay]
     print(bcolors.WARNING)
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
     print(f"Piece Playing is: {pieceToPlay}")
     print(work)
-    print("--------------------------------")
+    # print("---------------------------------------------------------------------------------------")
 
     sequenceConfig.currentPieceDuration = round(random.uniform(work[1], work[2]))
 
@@ -79,9 +79,9 @@ def _launch_next_player(sequenceConfig):
     brightnessOverrideString = f" -brightnessOverride {work[3]}" if work[3] else ""
     commandString = f"python3 {scriptsPath}player.py -cfg {work[0]}{brightnessOverrideString}"
 
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
     print("Sequencer is calling :\n" + commandString)
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
     print(bcolors.ENDC)
 
     os.system(commandString)
@@ -93,16 +93,16 @@ def _kill_old_players(sequenceConfig):
     try:
         listOfProcs = check_output("ps -ef | pgrep -f -a player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
         print(bcolors.WARNING)
-        print("--------------------------------")
+        print("---------------------------------------------------------------------------------------")
         print("Sequencer is killing off old window(s)")
         print(f"count play : {sequenceConfig.playCount}")
         print(f"Running player instances are : {len(str(sequenceConfig.currentPID))}")
         print(listOfProcs)
-        print("--------------------------------")
+        # print("---------------------------------------------------------------------------------------")
         listToCheck = listOfProcs[:-2]
         print(listToCheck)
         # print(len(listToCheck))
-        print("--------------------------------")
+        print("---------------------------------------------------------------------------------------")
 
         if len(listToCheck) == 2:
             # just kill the first in the list (i.e. the oldest player running)
@@ -113,14 +113,14 @@ def _kill_old_players(sequenceConfig):
                 for p in listToCheck[:-1]:
                     if str(sequenceConfig.currentPID) not in p:
                         len(str(sequenceConfig.currentPID))
-                        print("--------------------------------")
+                        print("---------------------------------------------------------------------------------------")
                         print(f"{str(sequenceConfig.currentPID)} : Should be killing {p}")
                         len(str(sequenceConfig.currentPID))
                         subprocess.run([f"kill {p}"], shell=True, check=True)
             except Exception as e:
                 print(e)
         # comment: 
-        print("--------------------------------")
+        print("---------------------------------------------------------------------------------------")
         print(bcolors.ENDC)
     except Exception as e:
         print(e)
@@ -152,19 +152,19 @@ def loadWorkConfig(work, sequenceConfig):
     argument = f"{config.path}/configs/{work[0]}"
 
     print(bcolors.WARNING)
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
     print(f"Sequencer: first work cfg {work[0]}")
     print(f"Sequencer: loading {argument}")
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
     print(bcolors.ENDC)
     workconfig.read(argument)
     config.fileName = argument
 
 
     sequenceConfig.currentPID = os.getpid()
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
     print(f"Sequence Player PID is: {sequenceConfig.currentPID}")
-    print("--------------------------------")
+    print("---------------------------------------------------------------------------------------")
 
     fakeCallBack(sequenceConfig, config)
 
@@ -198,8 +198,7 @@ def loadConfigFile():
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 def loadSequenceFile():
-
-    print("\n\n\n************************************************\n\n")
+    print(f"{bcolors.WARNING}\n\n\n************************************************\n\n")
     args = loadConfigFile()
 
     if args.cfg != None:
@@ -256,10 +255,9 @@ def loadSequenceFile():
 
             sequenceConfig.workList.append([work,minDuration,maxDuration,brightnessOverride])
 
-        print("--------------------------------")
+        print(f"{bcolors.WARNING}---------------------------------------------------------------------------------------")
         print("WorkList:")
         print(sequenceConfig.workList)
-        print("--------------------------------")
 
 
         sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)
@@ -269,13 +267,14 @@ def loadSequenceFile():
         pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList)-1))
         pieceToPlay = 0
         loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
+        print(f"{bcolors.ENDC}")
 
 
 def _loadSequencer_print_args(arg0, arg1):
-    print(bcolors.OKBLUE)
-    print("--------------------------------")
+    print(bcolors.WARNING)
+    print("---------------------------------------------------------------------------------------")
     print(arg0 + str(arg1))
-    print("--------------------------------")
+    # print("---------------------------------------------------------------------------------------")
     print(bcolors.ENDC)
 
         #sequenceConfig.mainAppWindow.run()

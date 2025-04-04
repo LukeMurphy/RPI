@@ -64,18 +64,19 @@ class Config:
     rotation = 0
 
     def __init__(self):
+        print("\n---------------------------------------------------------------------------------------")
         print("** Config instance init")
   
     def debugSelf(self) :
         allArgs = self.__dict__
-        print("\n----------------\n")
+        print("\n---------------------------------------------------------------------------------------\n")
         for element in allArgs :
             print(element, " : ", allArgs[element])
-        print("\n----------------\n")
+        print("\n---------------------------------------------------------------------------------------\n")
    
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith('__') is False]
         print(method_list)
-        print("\n----------------\n")
+        print("\n---------------------------------------------------------------------------------------\n")
    
         # allFuncs = dir(self)
         # print(allFuncs)

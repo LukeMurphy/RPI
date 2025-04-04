@@ -195,9 +195,9 @@ def _parseArgs(config, loadFromArguments):
     f = os.path.getmtime(argument)
     config.delta = int((config.startTime - f))
     config.deltaWorkFile = int((config.startTime - f))
-    print(bcolors.OKGREEN)
 
-    print("-----------------------------------------")
+
+    print(f"{bcolors.OKGREEN}---------------------------------------------------------------------------------------")
     print ("script: sys.argv[0] is", repr(sys.argv[0]))
     print ("script: __file__ is", repr(__file__))
     print ("script: cwd is", repr(os.getcwd()))
@@ -205,7 +205,7 @@ def _parseArgs(config, loadFromArguments):
     print ("config: path  is", args.path)
     print("-cfg argument: is", argument)
     print("Last Modified Delta: is", config.delta)
-    print(f"-----------------------------------------{bcolors.ENDC}")
+    print(f"---------------------------------------------------------------------------------------{bcolors.ENDC}")
 
 
 

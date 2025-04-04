@@ -4,7 +4,7 @@ echo "\n*************"
 path="${localMachine}Documents/RPI/"
 controlPath="${localMachine}Documents/remotemngr/"
 workFile="local-work.txt"
-brightnessFile="${brightnessFile}"
+brightnessFile="local-brightness.txt"
 
 localWorkValue=$(cat "${localMachine}Documents/remotemngr/${workFile}")
 localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/${brightnessFile}")

@@ -749,6 +749,9 @@ def _initialize_system(config):
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
 
+    if config.brightness < .7 :
+        config.ditherfilterbrightness = .8
+
     config.doingDrawing = False
     config.penArray = []
     config.drawingMode = 1

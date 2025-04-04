@@ -1,27 +1,15 @@
 #!/bin/sh
-configGroup=""
-machine="local"
-
 # MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK
 # sudo visudo
 # user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown
+configGroup=""
+machine="local"
 
-# Where the player and configs all live -- changes based on machine setup
-path="/home/daemon102/Documents/RPI/"
+# local machine
+localMachine="/home/daemon102/"
 
-# Where the control scripts live
-controlPath="/home/daemon102/Documents/remotemngr/"
+# Remote path to check
+piecePath="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/"
 
-# Local file with name of cfg file to check and update
-localConfigNameFile="/home/daemon102/Documents/remotemngr/localvalue.cfg"
-
-# Local file with the brightness override
-localControlConfigFileName="/home/daemon102/Documents/remotemngr/localvaluecontrol.cfg"
-
-# Remote file to check
-pieceFileName="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/local-status.cfg"
-
-# Remote brightness file to check
-brightnessFile="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/local-controlstatus.cfg"
-
-. /home/daemon102/Documents/RPI/cntrlscripts/remotemngr/main.sh
+pathToMain = "${localMachine}Documents/remotemngr/main.sh"
+. $pathToMain

@@ -1,8 +1,8 @@
 #!/bin/sh
 echo "\n*************"
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
-localvalue=$(cat "${localMachine}localvalue.txt")
-localvalueControl=$(cat "${localMachine}local-status.txt")
+localvalue=$(cat "${localMachine}Documents/remotemngr/localvalue.txt")
+localvalueControl=$(cat "${localMachine}Documents/remotemngr/local-status.txt")
 
 # # Local file with name of cfg file to check and update
 # localConfigNameFile="/home/daemon102/Documents/remotemngr/localvalue.txt"

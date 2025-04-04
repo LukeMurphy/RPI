@@ -11,5 +11,5 @@ localMachine="/home/daemon102/"
 # Remote path to check
 piecePath="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/"
 
-pathToMain = "${localMachine}Documents/remotemngr/main.sh"
-. $pathToMain
+pathToMain="${localMachine}Documents/RPI/cntrlscripts/remotemngr/main.sh"
+. "${pathToMain}"

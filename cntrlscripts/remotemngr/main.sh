@@ -1,14 +1,17 @@
 #!/bin/sh
 echo "\n*************"
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
-localWorkValue=$(cat "${localMachine}Documents/remotemngr/local-work.txt")
-localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/local-brightness.txt")
-
 path="${localMachine}Documents/RPI/"
+controlPath="${localMachine}Documents/remotemngr/"
+workFile="local-work.txt"
+brightnessFile="${brightnessFile}"
+
+localWorkValue=$(cat "${localMachine}Documents/remotemngr/${workFile}")
+localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/${brightnessFile}")
 
 # set the remote to be a default
-workToPlay=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-work.txt")
-workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-brightness.txt")
+workToPlay=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}${workFile}")
+workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}${brightnessFile}")
 # status=$?
 
 # MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK
@@ -70,8 +73,8 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         fi
         if [ $workToPlay != 'update' ]; then
             echo "==> NOT THE SAME or STARTING UP"
-            echo $workToPlay >$controlPath"local-work.txt"
-            echo $workBrightnessControl >$controlPath"local-brightness.txt"
+            echo $workToPlay >$controlPath"${workFile}"
+            echo $workBrightnessControl >$controlPath"${brightnessFile}"
             configToUse=$workToPlay
             brightnessConfig=$workBrightnessControl
             ps -ef | pgrep -f player.py | xargs kill -9

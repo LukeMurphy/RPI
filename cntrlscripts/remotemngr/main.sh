@@ -76,14 +76,13 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             echo "==> NOT THE SAME or STARTING UP"
             echo $workToPlay >$controlPath"localWorkValue.cfg"
             echo $workBrightnessControl >$controlPath"localBrightnessValue.cfg"
-            configToUse=$remotevalue
+            configToUse=$workToPlay
             brightnessConfig=$workBrightnessControl
             ps -ef | pgrep -f player.py | xargs kill -9
             if [ $configToUse == *"--manifest"* ]; then
                 player="sequence-player.py"
             fi
             execString="${path}${player} -mname ${machine} -path ${path} -cfg ${configToUse} -brightnessOverride ${brightnessConfig}"
-            # config=$remotevalue
             runScript=1
         fi
     fi

@@ -4,6 +4,8 @@ echo "\n*************"
 localWorkValue=$(cat "${localMachine}Documents/remotemngr/local-work.txt")
 localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/local-brightness.txt")
 
+path="${localMachine}Documents/RPI/"
+
 # set the remote to be a default
 workToPlay=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-work.txt")
 workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-brightness.txt")
@@ -51,7 +53,7 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
                 echo "NO MATCH"
                 ;;
         esac
-        execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+        execString="${path}${player} -mname ${machine} -path ${path} -cfg ${configToUse} -brightnessOverride ${brightnessConfig}"
     fi
 
 
@@ -87,7 +89,7 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             if [ $configToUse == *"--manifest"* ]; then
                 player="sequence-player.py"
             fi
-            execString=$path$player" -mname "$machine" -path "$path" -cfg "$configToUse" -brightnessOverride "$brightnessConfig
+            execString="${path}${player} -mname ${machine} -path ${path} -cfg ${configToUse} -brightnessOverride ${brightnessConfig}"
             # config=$remotevalue
             runScript=1
         fi

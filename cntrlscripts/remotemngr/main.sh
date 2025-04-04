@@ -15,24 +15,17 @@ workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) 
 # sudo visudo
 # user_name ALL=(ALL) NOPASSWD: /sbin/poweroff, /sbin/reboot, /sbin/shutdown
 
-echo "\n*************"
-echo $1
-#echo $2
-echo $localConfigNameFile
-echo $localWorkValue
-echo $workToPlay
-echo $controlPath
-echo "*************\n"
-
 runScript=0
 player="player.py"
 # if curl is ok, set the remote value
 
 if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     echo "OK -- CHECKINGs..."
-    echo "local value:" $localWorkValue
+    echo "-----------------------"
+    echo "local work:" $localWorkValue
     echo "Local brightness:" $localBrightnessValue
-    echo "Remote value:" $workToPlay
+    echo "-----------------------"
+    echo "Remote work:" $workToPlay
     echo "Remote brightness:" $workBrightnessControl
     configToUse=$localWorkValue
     brightnessConfig=$localBrightnessValue

@@ -683,7 +683,7 @@ def _load_pen_config(config):
         _penHolder = Pen()
 
         _penHolder.name = _penConfigName
-        print(f"Getting the config for the pen {_penConfigName}")
+        print(f" => Getting the config for the pen {_penConfigName}")
 
         _penHolder.minNumPoints = int(workConfig.get(_penConfigName, "minNumPoints", fallback=8))
         _penHolder.maxNumPoints = int(workConfig.get(_penConfigName, "maxNumPoints", fallback=8))
@@ -748,9 +748,6 @@ def _initialize_system(config):
     config.startNewLineProb = float(workConfig.get("drawingField", "startNewLineProb", fallback=0.03))
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
-
-    if config.brightness < .7 :
-        config.ditherfilterbrightness = .8
 
     config.doingDrawing = False
     config.penArray = []

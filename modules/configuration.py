@@ -28,7 +28,8 @@ class bcolors:
     OKBLUE = "\033[94m"
     OKGREEN = "\033[92m"
     WARNING = "\033[93m"
-    FAIL = "\033[95m"
+    FULLFAIL = "\033[91m"
+    FAIL = "\033[99m"
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
@@ -63,8 +64,7 @@ class Config:
     rotation = 0
 
     def __init__(self):
-        print(f"{bcolors.WARNING}** Config instance init{bcolors.ENDC}")
-        #print("** Config instance init")
+        print("** Config instance init")
   
     def debugSelf(self) :
         allArgs = self.__dict__

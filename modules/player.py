@@ -55,27 +55,25 @@ class TopDirector:
 
 def _configure_ReMapping(config, workconfig):
     """Configures image remapping settings."""
+
+    
+
     try:
-        config.remapImageBlock = workconfig.getboolean("displayconfig", "remapImageBlock")
-        config.remapImageBlockSection = workconfig.get("displayconfig", "remapImageBlockSection").split(",")
-        config.remapImageBlockSection = tuple(int(i) for i in config.remapImageBlockSection)
-        config.remapImageBlockDestination = workconfig.get("displayconfig", "remapImageBlockDestination").split(",")
-        config.remapImageBlockDestination = tuple(int(i) for i in config.remapImageBlockDestination)
-        config.filterRemap = True
+        _initialBlockSectionRemapping(workconfig, config)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock = False
         config.filterRemap = False
     try:
         config.remapImageBlockRotation = float(workconfig.get("displayconfig", "remapImageBlockSectionRotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockRotation = 0
 
     try:
         config.remapImageBlockSectionRotation = float(workconfig.get("displayconfig", "remapImageBlockSectionRotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSectionRotation = 0
 
     try:
@@ -85,13 +83,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination2 = workconfig.get("displayconfig", "remapImageBlockDestination2").split(",")
         config.remapImageBlockDestination2 = tuple(int(i) for i in config.remapImageBlockDestination2)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock2 = False
 
     try:
         config.remapImageBlockSection2Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection2Rotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSection2Rotation = 0
 
     try:
@@ -101,13 +99,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination3 = workconfig.get("displayconfig", "remapImageBlockDestination3").split(",")
         config.remapImageBlockDestination3 = tuple(int(i) for i in config.remapImageBlockDestination3)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock3 = False
 
     try:
         config.remapImageBlockSection3Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection3Rotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSection3Rotation = 0
 
     try:
@@ -117,13 +115,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination4 = workconfig.get("displayconfig", "remapImageBlockDestination4").split(",")
         config.remapImageBlockDestination4 = tuple(int(i) for i in config.remapImageBlockDestination4)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock4 = False
 
     try:
         config.remapImageBlockSection4Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection4Rotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSection4Rotation = 0
 
     try:
@@ -133,13 +131,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination5 = workconfig.get("displayconfig", "remapImageBlockDestination5").split(",")
         config.remapImageBlockDestination5 = tuple(int(i) for i in config.remapImageBlockDestination5)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock5 = False
 
     try:
         config.remapImageBlockSection5Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection5Rotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSection5Rotation = 0
 
     try:
@@ -149,13 +147,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination6 = workconfig.get("displayconfig", "remapImageBlockDestination6").split(",")
         config.remapImageBlockDestination6 = tuple(int(i) for i in config.remapImageBlockDestination6)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock6 = False
 
     try:
         config.remapImageBlockSection6Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection6Rotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSection6Rotation = 0
 
     try:
@@ -165,36 +163,52 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination7 = workconfig.get("displayconfig", "remapImageBlockDestination7").split(",")
         config.remapImageBlockDestination7 = tuple(int(i) for i in config.remapImageBlockDestination7)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlock7 = False
 
     try:
         config.remapImageBlockSection7Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection7Rotation"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockSection7Rotation = 0
 
     try:
-        # remapImageBlockShift
-        config.remapImageBlockShift = workconfig.getboolean("displayconfig", "remapImageBlockShift")
-        config.remapImageBlockShiftSection = workconfig.get("displayconfig", "remapImageBlockShiftSection").split(",")
-        config.remapImageBlockShiftSection = tuple(int(i) for i in config.remapImageBlockShiftSection)
-        config.remapImageBlockShiftDestination = workconfig.get("displayconfig", "remapImageBlockShiftDestination").split(",")
-        config.remapImageBlockShiftDestination = tuple(int(i) for i in config.remapImageBlockShiftDestination)
-        config.remapImageBlockShiftStableSection = workconfig.get("displayconfig", "remapImageBlockShiftStableSection").split(",")
-        config.remapImageBlockShiftStableSection = tuple(int(i) for i in config.remapImageBlockShiftStableSection)
-        print(f"============> {config.remapImageBlockShift}")
+        _specialShiftBlockRemapping(workconfig, config)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         config.remapImageBlockShift = False
 
+
+
+def _specialShiftBlockRemapping(workconfig, config):
+    # remapImageBlockShift
+    config.remapImageBlockShift = workconfig.getboolean("displayconfig", "remapImageBlockShift")
+    config.remapImageBlockShiftSection = workconfig.get("displayconfig", "remapImageBlockShiftSection").split(",")
+    config.remapImageBlockShiftSection = tuple(int(i) for i in config.remapImageBlockShiftSection)
+    config.remapImageBlockShiftDestination = workconfig.get("displayconfig", "remapImageBlockShiftDestination").split(",")
+    config.remapImageBlockShiftDestination = tuple(int(i) for i in config.remapImageBlockShiftDestination)
+    config.remapImageBlockShiftStableSection = workconfig.get("displayconfig", "remapImageBlockShiftStableSection").split(",")
+    config.remapImageBlockShiftStableSection = tuple(int(i) for i in config.remapImageBlockShiftStableSection)
+    print(f"============> {config.remapImageBlockShift}")
+
+
+
+def _initialBlockSectionRemapping(workconfig, config):
+    config.remapImageBlock = workconfig.getboolean("displayconfig", "remapImageBlock")
+    config.remapImageBlockSection = workconfig.get("displayconfig", "remapImageBlockSection").split(",")
+    config.remapImageBlockSection = tuple(int(i) for i in config.remapImageBlockSection)
+    config.remapImageBlockDestination = workconfig.get("displayconfig", "remapImageBlockDestination").split(",")
+    config.remapImageBlockDestination = tuple(int(i) for i in config.remapImageBlockDestination)
+    config.filterRemap = True
+    
+    
 
 def configure(config, workconfig):
     """Configures the player based on the provided configuration."""
     global path, tempImage, threads, thrd
     # gc.enable()
     print(f"{bcolors.WARNING}** Setting PLAYER config values **{bcolors.ENDC}")
-
+    print(f"{bcolors.FAIL}")
     _configure_base(config, workconfig)
     _configure_pixelsort(config, workconfig)
     _configure_ReMapping(config, workconfig)
@@ -207,6 +221,7 @@ def configure(config, workconfig):
     _configure_tiles(config, workconfig)
     _configure_saving(config, workconfig)
     _load_work_module(config, workconfig)
+    print(f"{bcolors.ENDC}")
 
 
 def _configure_base(config, workconfig):
@@ -328,12 +343,11 @@ def _load_work_module(config, workconfig):
     config.overallResize = workconfig.getboolean("displayconfig", "overallResize", fallback=False)
 
     print(f"{bcolors.WARNING} ** modules.player.py is Loading: {config.work} {bcolors.ENDC}")
-    print(f"{bcolors.OKBLUE}")
 
     try:
         work = importlib.import_module(f"pieces.{config.work}")
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        print(f" ** {e}")
         work = importlib.import_module(f"pieces.{config.work}")  # Try again without the pieces prefix
 
     work.config = config

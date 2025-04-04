@@ -36,7 +36,16 @@ _devOnDeckClr = "#ccFF00"
 _screenGridClr = "#eeeeee"
 
 
-
+class bcolors:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[95m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    
 """Summary
 
 Attributes:
@@ -89,12 +98,11 @@ def verify():
 
 
 def execute(configToRun):
-
-    print("--------------------------------------------")
-    print("--------------------------------------------")
+    print(f"{bcolors.WARNING}")
+    print("\n\n---------------------------------------------------------------------------------------")
+    print("full_list.py app window is calling this to run: ")
     print(configToRun.split(configPath)[1])
-    print("--------------------------------------------")
-    print("--------------------------------------------")
+    
     """
     Summary
 	Args:vconfigToRun (TYPE): Description
@@ -107,7 +115,6 @@ def execute(configToRun):
             os.system(commadStringMultiPyth + configToRun.split(configPath)[1] + "&")
         if "--manifest" in configToRun:
             commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/sequencer.v2.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
-
             print(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
             os.system(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
         else:
@@ -116,6 +123,9 @@ def execute(configToRun):
     elif ".app" in configToRun:
         os.system(f"open {commadStringProc}{configToRun.split(configPath)[1]}")
         JavaAppRunning = configToRun.split(configPath)[1]
+    print(f"---------------------------------------------------------------------------------------\n\n\n{bcolors.ENDC}")
+
+    
 
 
 def action():

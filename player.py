@@ -61,10 +61,10 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-print(bcolors.OKBLUE)
-print("--------------------------------")
+print(bcolors.OKGREEN)
+print("---------------------------------------------------------------------------------------")
 print("Inital Player Arguments: \n" + str(args))
-print("--------------------------------")
+print("---------------------------------------------------------------------------------------")
 print(bcolors.ENDC)
 
 
@@ -92,7 +92,7 @@ def loadFromArguments(reloading=False, config=None):
     """
     # global config, workconfig, path, tempImage, threads, thrd
 
-    print(f"{bcolors.OKBLUE}** RELOADING: {str(reloading)}{bcolors.ENDC}")
+    print(f"** RELOADING: {str(reloading)}")
 
     if reloading is False:
         try:
@@ -149,7 +149,7 @@ def _printConfigsLoaded(config):
     # Default Local Path
     config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
     print(
-        f"{bcolors.WARNING}** Loading {config.path}configs/{config.WRKINID}.cfg to run. **{bcolors.ENDC}"
+        f"{bcolors.WARNING}** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n{bcolors.ENDC}"
     )
     workconfig.read(f"{config.path}configs/{config.WRKINID}.cfg")
     print(f"{bcolors.OKGREEN}** ")
@@ -190,12 +190,7 @@ def _parseArgs(config, loadFromArguments):
     # config
     # code frome web overrides come in as xx/100
     if args.brightnessOverride is not None:
-        brightnessOverride = args.brightnessOverride
-        _brightnessOverride = float(brightnessOverride)
-        if _brightnessOverride > 2.0 :
-            _brightnessOverride /= 100
-        config.brightness = _brightnessOverride
-        config.brightnessOverride = _brightnessOverride
+        _brightnessOverrideConfigs(config)
 
     f = os.path.getmtime(argument)
     config.delta = int((config.startTime - f))
@@ -211,6 +206,18 @@ def _parseArgs(config, loadFromArguments):
     print("-cfg argument: is", argument)
     print("Last Modified Delta: is", config.delta)
     print(f"-----------------------------------------{bcolors.ENDC}")
+
+
+
+def _brightnessOverrideConfigs(config):
+    brightnessOverride = args.brightnessOverride
+    _brightnessOverride = float(brightnessOverride)
+    if _brightnessOverride > 2.0 :
+        _brightnessOverride /= 100
+    config.brightness = _brightnessOverride
+    config.brightnessOverride = _brightnessOverride
+    # y = 0.3215x2 + 0.0092x + 0.6742
+    config.ditherfilterbrightness = 0.3215 * config.brightness * config.brightness + .0092 * config.brightness + 0.6742
 
 
 def main():

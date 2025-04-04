@@ -54,15 +54,11 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         if [ $workToPlay = 'Shutdown' ]; then
             echo "==>shutting down <=="
             ps -ef | pgrep -f player.py | xargs kill -9
-            # echo "x" > $controlPath"localWorkValue.cfg"
-            # echo "50" > $controlPath"localBrightnessValue.cfg"
             echo admin000 | sudo -S shutdown -h now
         fi
         if [ $workToPlay = 'Restart' ]; then
             echo "==>restarting <=="
             ps -ef | pgrep -f player.py | xargs kill -9
-            # echo "x" > $controlPath"localWorkValue.cfg"
-            # echo "50" > $controlPath"localBrightnessValue.cfg"
             echo admin000 | sudo -S shutdown -r now
         fi
         if [ $workToPlay = 'update' ]; then
@@ -74,8 +70,8 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         fi
         if [ $workToPlay != 'update' ]; then
             echo "==> NOT THE SAME or STARTING UP"
-            echo $workToPlay >$controlPath"localWorkValue.cfg"
-            echo $workBrightnessControl >$controlPath"localBrightnessValue.cfg"
+            echo $workToPlay >$controlPath"local-work.txt"
+            echo $workBrightnessControl >$controlPath"local-brightness.txt"
             configToUse=$workToPlay
             brightnessConfig=$workBrightnessControl
             ps -ef | pgrep -f player.py | xargs kill -9

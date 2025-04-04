@@ -2,11 +2,11 @@
 echo "\n*************"
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
 localWorkValue=$(cat "${localMachine}Documents/remotemngr/local-work.txt")
-localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/local-status.txt")
+localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/local-brightness.txt")
 
 # set the remote to be a default
 workToPlay=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-work.txt")
-workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-status.txt")
+workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-brightness.txt")
 # status=$?
 
 # MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK

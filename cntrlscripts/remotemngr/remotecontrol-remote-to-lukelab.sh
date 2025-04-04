@@ -9,7 +9,7 @@ machine="local"
 localMachine="/home/daemon102/"
 
 # Remote path to check
-piecePath="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/"
+piecePath="https://lukelab.com/projects/rpi-controls/home/"
 
 pathToMain="${localMachine}Documents/RPI/cntrlscripts/remotemngr/main.sh"
 . "${pathToMain}"

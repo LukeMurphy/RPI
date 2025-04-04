@@ -1,24 +1,12 @@
 #!/bin/sh
 echo "\n*************"
 # Pull the local value -- not totatlly safe if it gets overriden with something wrong or unsafe...
-localvalue=$(cat "${localMachine}Documents/remotemngr/localvalue.txt")
-localvalueControl=$(cat "${localMachine}Documents/remotemngr/local-status.txt")
-
-# # Local file with name of cfg file to check and update
-# localConfigNameFile="/home/daemon102/Documents/remotemngr/localvalue.txt"
-
-# # Local file with the brightness override
-# localControlConfigFileName="/home/daemon102/Documents/remotemngr/localvaluecontrol.txt"
-
-# # Remote file to check
-# pieceFileName="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/local-status.txt"
-
-# # Remote brightness file to check
-# brightnessFile="https://lukelab.com/projects/rpi-controls/p3-informal-abstraction/local-controlstatus.txt"
+localWorkValue=$(cat "${localMachine}Documents/remotemngr/local-work.txt")
+localBrightnessValue=$(cat "${localMachine}Documents/remotemngr/local-status.txt")
 
 # set the remote to be a default
-remotevalue=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}localvalue.txt")
-remotevalueControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-status.txt")
+workToPlay=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-work.txt")
+workBrightnessControl=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}local-status.txt")
 # status=$?
 
 # MUST DO THIS TO LINUX MACHINE FOR SHUTDOWN TO WORK
@@ -29,8 +17,8 @@ echo "\n*************"
 echo $1
 #echo $2
 echo $localConfigNameFile
-echo $localvalue
-echo $remotevalue
+echo $localWorkValue
+echo $workToPlay
 echo $controlPath
 echo "*************\n"
 
@@ -40,12 +28,12 @@ player="player.py"
 
 if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     echo "OK -- CHECKINGs..."
-    echo "local value:" $localvalue
-    echo "Local brightness:" $localvalueControl
-    echo "Remote value:" $remotevalue
-    echo "Remote brightness:" $remotevalueControl
-    configToUse=$localvalue
-    brightnessConfig=$localvalueControl
+    echo "local value:" $localWorkValue
+    echo "Local brightness:" $localBrightnessValue
+    echo "Remote value:" $workToPlay
+    echo "Remote brightness:" $workBrightnessControl
+    configToUse=$localWorkValue
+    brightnessConfig=$localBrightnessValue
 
     if [ $brightnessConfig = '' ]; then
         brightnessConfig = 1
@@ -67,34 +55,34 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     fi
 
 
-    if [ $remotevalue != $localvalue ] || [ $remotevalueControl != $localvalueControl ]; then
-        if [ $remotevalue = 'Shutdown' ]; then
+    if [ $workToPlay != $localWorkValue ] || [ $workBrightnessControl != $localBrightnessValue ]; then
+        if [ $workToPlay = 'Shutdown' ]; then
             echo "==>shutting down <=="
             ps -ef | pgrep -f player.py | xargs kill -9
-            # echo "x" > $controlPath"localvalue.cfg"
-            # echo "50" > $controlPath"localvaluecontrol.cfg"
+            # echo "x" > $controlPath"localWorkValue.cfg"
+            # echo "50" > $controlPath"localBrightnessValue.cfg"
             echo admin000 | sudo -S shutdown -h now
         fi
-        if [ $remotevalue = 'Restart' ]; then
+        if [ $workToPlay = 'Restart' ]; then
             echo "==>restarting <=="
             ps -ef | pgrep -f player.py | xargs kill -9
-            # echo "x" > $controlPath"localvalue.cfg"
-            # echo "50" > $controlPath"localvaluecontrol.cfg"
+            # echo "x" > $controlPath"localWorkValue.cfg"
+            # echo "50" > $controlPath"localBrightnessValue.cfg"
             echo admin000 | sudo -S shutdown -r now
         fi
         if [ $remotevalue = 'update' ]; then
             echo "==> RUN UPDATE <=="
             ps -ef | pgrep -f player.py | xargs kill -9
             git -C $path pull
-            # echo "x" > $controlPath"localvalue.cfg"
-            # echo "50" > $controlPath"localvaluecontrol.cfg"
+            # echo "x" > $controlPath"localWorkValue.cfg"
+            # echo "50" > $controlPath"localBrightnessValue.cfg"
         fi
         if [ $remotevalue != 'update' ]; then
             echo "==> NOT THE SAME or STARTING UP"
-            echo $remotevalue >$controlPath"localvalue.cfg"
-            echo $remotevalueControl >$controlPath"localvaluecontrol.cfg"
+            echo $remotevalue >$controlPath"localWorkValue.cfg"
+            echo $workBrightnessControl >$controlPath"localBrightnessValue.cfg"
             configToUse=$remotevalue
-            brightnessConfig=$remotevalueControl
+            brightnessConfig=$workBrightnessControl
             ps -ef | pgrep -f player.py | xargs kill -9
             if [ $configToUse == *"--manifest"* ]; then
                 player="sequence-player.py"

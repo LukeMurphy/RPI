@@ -50,8 +50,13 @@ def changeDrawingMode():
 
 
 def changePalettes():
-    config.bgColor = random.choice(config.bgColorSets)
-    print(f" New bg Color : {config.bgColor}")
+    if config.usingbgHSVColorSets: 
+        _bgColorVals = random.choice(config.bgHSVColorSets)
+        config.bgColor = colorutils.getRandomColorHSV(*_bgColorVals)
+    else :
+        config.bgColor = random.choice(config.bgColorSets)
+    # print(f" New bg Color : {config.bgColor}")
+    # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     _create_image_layers(config)
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
     config.changeColorSetTime = random.randint(123, 287)
@@ -565,12 +570,32 @@ def main(run=True):
 def _load_background_color_config(config):
     """Loads background-related configuration parameters."""
     bgColorSets = workConfig.get("drawingField", "bgColorSets").split(",")
-    config.bgColorSets = []
-    for bg in bgColorSets:
-        bgColor = workConfig.get(bg, "bgColor").split(",")
-        bgColors = list(map(lambda x: round(config.brightness * int(x)), bgColor))
-        config.bgColorSets.append(bgColors)
-    config.bgColor = config.bgColorSets[0]
+    bgHSVColorSetsVals = workConfig.get("drawingField", "bgHSVColorSets", fallback=None)
+    bgHSVColorSets = []
+    config.bgHSVColorSets = [] 
+    config.usingbgHSVColorSets = False
+
+    if bgHSVColorSetsVals is not None:
+        bgHSVColorSets = bgHSVColorSetsVals.split(",")
+        for bg in bgHSVColorSets:
+            bgColor = workConfig.get(bg, "bgColor").split(",")
+            bgColors = list(map(lambda x: round(float(x)), bgColor))
+            bgColors.extend((0, 0, config.brightness))
+            config.bgHSVColorSets.append(bgColors)
+        config.bgColor = colorutils.getRandomColorHSV(*config.bgHSVColorSets[0])
+        config.usingbgHSVColorSets = True
+    else :
+        config.bgColorSets = []
+        for bg in bgColorSets:
+            bgColor = workConfig.get(bg, "bgColor").split(",")
+            bgColors = list(map(lambda x: round(config.brightness * int(x)), bgColor))
+            config.bgColorSets.append(bgColors)
+            config.bgColor = config.bgColorSets[0]
+
+
+
+    # print(f" New bg Color : {config.bgColor}")
+    # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha"))
 
 
@@ -809,6 +834,7 @@ def _initialize_system(config):
     config.doingDrawing = False
     config.penArray = []
     config.drawingMode = 1
+
 
     for i in range(1):
         pen = Pen()

@@ -91,34 +91,35 @@ sunset = dict(
     ltorange=(221, 144, 82),
     warmwht=(255, 255, 238),
 )
-sky = dict(coolblue=(254, 254, 248), ltblue=(
-    190, 200, 202), grayblue=(182, 186, 182))
+sky = dict(coolblue=(254, 254, 248), ltblue=(190, 200, 202), grayblue=(182, 186, 182))
 # sorted_sunset = {k: (sum(v)/3) for k, v in sunset.iteritems()}
 # sorted_sunset = sorted({k: (sum(v)/3) for k, v in sunset.iteritems()}.items(), key=operator.itemgetter(1))
 
 brightness = 1
 
 
-klimt = ([48, 48, 48],
-         [96, 96, 72],
-         [120, 120, 48],
-         [168, 168, 120],
-         [120, 120, 120],
-         [216, 120, 48],
-         [168, 120, 120],
-         [168, 48, 0],
-         [48, 0, 0],
-         [0, 48, 48],
-         [168, 48, 48],
-         [216, 168, 48],
-         [120, 48, 48],
-         [168, 120, 48],
-         [120, 120, 0],
-         [168, 168, 168],
-         [168, 168, 0],
-         [0, 0, 48],
-         [200, 180, 8],
-         [0, 0, 120])
+klimt = (
+    [48, 48, 48],
+    [96, 96, 72],
+    [120, 120, 48],
+    [168, 168, 120],
+    [120, 120, 120],
+    [216, 120, 48],
+    [168, 120, 120],
+    [168, 48, 0],
+    [48, 0, 0],
+    [0, 48, 48],
+    [168, 48, 48],
+    [216, 168, 48],
+    [120, 48, 48],
+    [168, 120, 48],
+    [120, 120, 0],
+    [168, 168, 168],
+    [168, 168, 0],
+    [0, 0, 48],
+    [200, 180, 8],
+    [0, 0, 120],
+)
 
 testPalette = ([255, 0, 0], [255, 100, 100], [255, 0, 200])
 
@@ -135,36 +136,28 @@ def getNamedPalette(arg, brtns=1, a=255):
 
 
 def getKlimt(brtns=1, a=255):
-    choice = round(
-        random.SystemRandom().uniform(0, len((klimt))-1)
-    )
+    choice = round(random.SystemRandom().uniform(0, len((klimt)) - 1))
 
     c = klimt[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
 
 def getColorWheel(brtns=1, a=255):
-    choice = round(
-        random.SystemRandom().uniform(0, len((wheelBasic))-1)
-    )
+    choice = round(random.SystemRandom().uniform(0, len((wheelBasic)) - 1))
 
     c = wheelBasic[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
 
 def getwheelBasicLowGreen(brtns=1, a=255):
-    choice = round(
-        random.SystemRandom().uniform(0, len((wheelBasicLowGreen))-1)
-    )
+    choice = round(random.SystemRandom().uniform(0, len((wheelBasicLowGreen)) - 1))
 
     c = wheelBasicLowGreen[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
 
 
 def getTest(brtns=1, a=255):
-    choice = round(
-        random.SystemRandom().uniform(0, len((testPalette))-1)
-    )
+    choice = round(random.SystemRandom().uniform(0, len((testPalette)) - 1))
 
     c = testPalette[choice]
     return (round(c[0] * brtns), round(c[1] * brtns), round(c[2] * brtns), a)
@@ -235,9 +228,9 @@ def randomYellowsAlpha(brtns=1, maxTransparency=255, minTransparency=0, sMax=1.0
     if brtns == 1:
         brtns = brightness
 
-    h = (random.SystemRandom().uniform(42, 60))
-    s = (random.SystemRandom().uniform(sMin, sMax))
-    v = .5
+    h = random.SystemRandom().uniform(42, 60)
+    s = random.SystemRandom().uniform(sMin, sMax)
+    v = 0.5
 
     col = HSVToRGB(h, s, v, a=255)
 
@@ -266,6 +259,7 @@ def randomGrayAlpha(brtns=1, maxTransparency=255, minTransparency=0):
     a = round(random.SystemRandom().uniform(minTransparency, maxTransparency))
     return (r, g, b, a)
 
+
 # Yup, same function that should have been called this
 # to start with...    ;(
 
@@ -281,18 +275,7 @@ def getRandomColor(brtns=1):
     return (r, g, b)
 
 
-def getRandomColorHSVSaturated(
-        hMin=0.0,
-        hMax=360.0,
-        sMin=0.0,
-        sMax=1.0,
-        vMin=0.0,
-        vMax=1.0,
-        dropHueMin=0,
-        dropHueMax=0,
-        a=255,
-        brtns=1.0
-):
+def getRandomColorHSVSaturated(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1.0, dropHueMin=0, dropHueMax=0, a=255, brtns=1.0):
 
     # adjust for 360 degrees ranges
     degreeRange = hMax - hMin
@@ -318,10 +301,10 @@ def getRandomColorHSVSaturated(
     # h = random.SystemRandom().uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
     s = random.SystemRandom().uniform(sMin, sMax)
-    
-    if s < .5 :
-        v = random.SystemRandom().uniform(vMin, vMin + .4)
-    else :
+
+    if s < 0.5:
+        v = random.SystemRandom().uniform(vMin, vMin + 0.4)
+    else:
         v = random.SystemRandom().uniform(vMin, vMax)
     # print(vMin, vMax, v)
     # v = math.sqrt(s)
@@ -329,18 +312,8 @@ def getRandomColorHSVSaturated(
     # print(s,v)
     return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
 
-def getRandomColorHSV(
-        hMin=0.0,
-        hMax=360.0,
-        sMin=0.0,
-        sMax=1.0,
-        vMin=0.0,
-        vMax=1.0,
-        dropHueMin=0,
-        dropHueMax=0,
-        a=255,
-        brtns=1.0
-):
+
+def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1.0, dropHueMin=0, dropHueMax=0, a=255, brtns=1.0):
 
     # adjust for 360 degrees ranges
     degreeRange = hMax - hMin
@@ -361,7 +334,6 @@ def getRandomColorHSV(
     if h > 360.0:
         h -= 360.0
 
-
     # h = random.SystemRandom().uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
     s = random.SystemRandom().uniform(sMin, sMax)
@@ -372,18 +344,7 @@ def getRandomColorHSV(
     return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
 
 
-def getRandomColorHSL(
-        hMin=0.0,
-        hMax=360.0,
-        sMin=0.0,
-        sMax=1.0,
-        lMin=0.0,
-        lMax=1.0,
-        dropHueMin=0,
-        dropHueMax=0,
-        a=255,
-        brtns=1.0
-):
+def getRandomColorHSL(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, lMin=0.0, lMax=1.0, dropHueMin=0, dropHueMax=0, a=255, brtns=1.0):
 
     # adjust for 360 degrees ranges
     degreeRange = hMax - hMin
@@ -459,12 +420,7 @@ def closestRBYfromRGB(rgb):
     dMax = 0
     dArray = []
     for n in range(len(wheel)):
-        d = round(
-            math.sqrt(
-                (r - wheel[n][0]) ** 2 + (g - wheel[n]
-                                          [1]) ** 2 + (b - wheel[n][2]) ** 2
-            )
-        )
+        d = round(math.sqrt((r - wheel[n][0]) ** 2 + (g - wheel[n][1]) ** 2 + (b - wheel[n][2]) ** 2))
         dArray.append([n, d])
     dArray = sorted(dArray, key=lambda n: n[1], reverse=False)
     return wheel[dArray[0][0]]
@@ -479,17 +435,17 @@ def rgb_to_hsv(r, g, b):
     v = maxc
     if minc == maxc:
         return 0.0, 0.0, v
-    s = (maxc-minc) / maxc
-    rc = (maxc-r) / (maxc-minc)
-    gc = (maxc-g) / (maxc-minc)
-    bc = (maxc-b) / (maxc-minc)
+    s = (maxc - minc) / maxc
+    rc = (maxc - r) / (maxc - minc)
+    gc = (maxc - g) / (maxc - minc)
+    bc = (maxc - b) / (maxc - minc)
     if r == maxc:
-        h = 0.0+bc-gc
+        h = 0.0 + bc - gc
     elif g == maxc:
-        h = 2.0+rc-bc
+        h = 2.0 + rc - bc
     else:
-        h = 4.0+gc-rc
-    h = (h/6.0) % 1.0
+        h = 4.0 + gc - rc
+    h = (h / 6.0) % 1.0
 
     hue = h * 360
     sat = s * 1
@@ -598,3 +554,45 @@ def changeColor(rnd=False):
         r = round(random.SystemRandom().uniform(0, 255) * brightness)
         g = round(random.SystemRandom().uniform(0, 255) * brightness)
         b = round(random.SystemRandom().uniform(0, 255) * brightness)
+
+
+def brightness(_r, _g, _b):
+    # brightness  =  sqrt( .299 R^2 + .587 G^2 + .114 B^2 )
+    # (0.21 × R) + (0.72 × G) + (0.07 × B)
+    _rVal = 0.299
+    _gVal = 0.547
+    _bVal = 0.114
+
+    _rVal = 0.21
+    _gVal = 0.72
+    _bVal = 0.07
+
+    _brightness1 = math.sqrt(_rVal * (_r * _r) + _gVal * (_g * _g) + _bVal * (_b * _b))
+    _brightness2 = _rVal * (_r) + _gVal * (_g) + _bVal * (_b)
+
+    return [_brightness1, _brightness2]
+
+
+def convertPerceivedBrightness(_r, _g, _b, _brt):
+    # brightness  =  sqrt( .299 R^2 + .587 G^2 + .114 B^2 )
+    # (0.21 × R) + (0.72 × G) + (0.07 × B)
+    _rVal = 0.299
+    _gVal = 0.547
+    _bVal = 0.114
+
+    _rVal = 0.21
+    _gVal = 0.72
+    _bVal = 0.07
+
+    _brightness1 = _rVal * (_r) + _gVal * (_g) + _bVal * (_b)
+    _deltaB = _brt - _brightness1 / 255
+
+    print("\n\n")
+    print(f"the _brightness1 {_brightness1/255}")
+    print(f"the delta {_deltaB*255}")
+
+    _newR = (_r) + _deltaB * (_rVal) * 255
+    _newG = (_g) + _deltaB * (_gVal) * 255
+    _newB = (_b) + _deltaB * (_bVal) * 255
+
+    return [_newR, _newG, _newB]

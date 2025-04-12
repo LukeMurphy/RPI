@@ -4,11 +4,11 @@ import time
 
 from matplotlib.pylab import rand
 import numpy as np
-from PIL import Image, ImageDraw, ImageOps, ImageFilter
-from scipy.spatial import Voronoi
+from PIL import Image, ImageDraw, ImageFilter
+# from scipy.spatial import Voronoi
 from scipy.interpolate import splprep, splev  # For spline interpolation
 from modules.holder_director import Director
-from modules import badpixels, colorutils, coloroverlay
+from modules import colorutils
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
@@ -39,22 +39,18 @@ def resetSystem(fullReset=False):
 
 def changeDrawingMode():
     config.drawingMode = random.randint(1, 4)
-    config.startNewLineProb = 0.005
+    # config.startNewLineProb = 0.005
     config.changeTimeController.slotRate = random.randint(20, 33)
 
     if config.drawingMode in {2, 3}:
-        config.startNewLineProb = 0.1
+        # config.startNewLineProb = 0.1
         config.changeTimeController.slotRate = random.randint(33, 63)
 
     print(f" => New Drawing Mode: {config.drawingMode}")
 
 
 def changePalettes():
-    if config.usingbgHSVColorSets: 
-        _bgColorVals = random.choice(config.bgHSVColorSets)
-        config.bgColor = colorutils.getRandomColorHSV(*_bgColorVals)
-    else :
-        config.bgColor = random.choice(config.bgColorSets)
+    setBGColor()
     # print(f" New bg Color : {config.bgColor}")
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     _create_image_layers(config)
@@ -397,14 +393,10 @@ def _bg_colors_filling(config):
         )
         cR = config.bgBoxColorRange
         # print(cR)
-        bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
-        # print(bgBoxFill)
-        config.bgBoxFill = (
-            round(config.brightness * bgBoxFill[0]),
-            round(config.brightness * bgBoxFill[1]),
-            round(config.brightness * bgBoxFill[2]),
-            round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
+        config.bgBoxFill = colorutils.getRandomColorHSV(
+            cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])), config.brightness
         )
+
 
     config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
@@ -458,10 +450,18 @@ def glitchBox(
 
 
 # ----------------------------------------------------##----------------------------------------------------#
-def animationBackGroundFadeIn():
-    currentAnimation = config.animations[config.currentAnimationIndex]
-    if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max:
-        currentAnimation.bg_alpha += 2
+# def animationBackGroundFadeIn():
+#     currentAnimation = config.animations[config.currentAnimationIndex]
+#     if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max:
+#         currentAnimation.bg_alpha += 2
+
+
+def setBGColor():
+    if config.usingbgHSVColorSets:
+        _choice = random.choice(config.bgHSVColorSets)
+        config.bgColor = colorutils.getRandomColorHSV(*_choice)
+    else:
+        config.bgColor = random.choice(config.bgColorSets)
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -501,7 +501,7 @@ def iterate():
         config.fadeRateDelta = random.uniform(0.1, 2)
 
         if config.fadeRateDelta <= config.fadeRateNewSystemThreshold:
-            config.bgColor = random.choice(config.bgColorSets)
+            setBGColor()
 
     if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing:
         _do_drawing_glitch()
@@ -520,36 +520,12 @@ def iterate():
 
 
 def renderImage():
-
-    # remapImageBlock = True
-    # remapImageBlockSection = (0,128,500,500)
-    # remapImageBlockDestination = [38,128]
-
-    # _temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    # _tempdraw = ImageDraw.Draw(_temp)
-    # _tempdraw.rectangle((0,0,500,500), fill=(0,0,0,255))
-
-    # _temp2 = config.canvasImage.crop(remapImageBlockSection)
-    # _temp.paste(_temp2, (0,0), _temp2)
-
-    # _temp2 = config.underLayer.crop(remapImageBlockSection)
-    # _temp.paste(_temp2, (0,0), _temp2)
-
-    # _temp2 = config.image.crop(remapImageBlockSection)
-    # _temp.paste(_temp2, (0,0), _temp2)
-
-    # _temp2 = config.canvasImage.crop(remapImageBlockSection)
-    # _temp.paste(_temp2, (0,0), _temp2)
-
     config.underLayer.paste(config.image, (0, 0), config.image)
-    if config.useTextureLayer :
+    if config.useTextureLayer:
         config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
     config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
     config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-
-    # config.canvasImage.paste(_temp, remapImageBlockDestination, _temp)
-    # config.render(_temp, 38, 128, config.canvasWidth, config.canvasHeight)
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -571,32 +547,30 @@ def _load_background_color_config(config):
     """Loads background-related configuration parameters."""
     bgColorSets = workConfig.get("drawingField", "bgColorSets").split(",")
     bgHSVColorSetsVals = workConfig.get("drawingField", "bgHSVColorSets", fallback=None)
+    config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha"))
     bgHSVColorSets = []
-    config.bgHSVColorSets = [] 
+    config.bgHSVColorSets = []
     config.usingbgHSVColorSets = False
 
     if bgHSVColorSetsVals is not None:
         bgHSVColorSets = bgHSVColorSetsVals.split(",")
         for bg in bgHSVColorSets:
             bgColor = workConfig.get(bg, "bgColor").split(",")
-            bgColors = list(map(lambda x: round(float(x)), bgColor))
-            bgColors.extend((0, 0, config.brightness))
+            bgColors = list(map(lambda x: float(x), bgColor))
+            bgColors.extend((0, 0, config.bgColorAlpha, config.brightness))
             config.bgHSVColorSets.append(bgColors)
-        config.bgColor = colorutils.getRandomColorHSV(*config.bgHSVColorSets[0])
         config.usingbgHSVColorSets = True
-    else :
+    else:
         config.bgColorSets = []
         for bg in bgColorSets:
             bgColor = workConfig.get(bg, "bgColor").split(",")
             bgColors = list(map(lambda x: round(config.brightness * int(x)), bgColor))
             config.bgColorSets.append(bgColors)
-            config.bgColor = config.bgColorSets[0]
 
-
+    setBGColor()
 
     # print(f" New bg Color : {config.bgColor}")
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
-    config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha"))
 
 
 def _create_image_layers(config):
@@ -612,9 +586,6 @@ def _create_image_layers(config):
     config.textureLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.textureLayerDraw = ImageDraw.Draw(config.textureLayer)
 
-    # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColorAlpha))
-
     createTextureLayer()
 
 
@@ -623,7 +594,7 @@ def createTextureLayer():
     _step = workConfig.getint("drawingField", "texture_step", fallback=7)
     _px = workConfig.getint("drawingField", "texture_px", fallback=2)
     _blockRows = workConfig.getint("drawingField", "texture_blockRows", fallback=8)
-    _blockCols= workConfig.getint("drawingField", "texture_blockCols", fallback=8)
+    _blockCols = workConfig.getint("drawingField", "texture_blockCols", fallback=8)
     _rows = workConfig.getint("drawingField", "texture_rows", fallback=64)
     _cols = workConfig.getint("drawingField", "texture_cols", fallback=32)
     _rate = workConfig.getint("drawingField", "texture_rate", fallback=2)
@@ -631,40 +602,36 @@ def createTextureLayer():
     _clr_r = workConfig.getint("drawingField", "texture_clr_r", fallback=40)
     _clr_g = workConfig.getint("drawingField", "texture_clr_g", fallback=40)
     _clr_b = workConfig.getint("drawingField", "texture_clr_b", fallback=240)
-    _skipProb = workConfig.getfloat("drawingField", "texture_skipProb", fallback=.7)
+    _skipProb = workConfig.getfloat("drawingField", "texture_skipProb", fallback=0.7)
     _blur = workConfig.getint("drawingField", "texture_blur", fallback=1)
-
 
     _xtick = workConfig.getint("drawingField", "texture_xtick", fallback=0)
     _ytick = workConfig.getint("drawingField", "texture_ytick", fallback=0)
 
-    _drawMark = workConfig.getfloat("drawingField", "texture_drawMark", fallback=.9)
+    _drawMark = workConfig.getfloat("drawingField", "texture_drawMark", fallback=0.9)
     _usedots = workConfig.getboolean("drawingField", "texture_usedots", fallback=True)
-
-
-
 
     for _row in range(_blockRows):
         for _col in range(_blockCols):
-            if random.random() > _skipProb :
+            if random.random() > _skipProb:
                 for _r in range(0, _rows, _step):
                     for _c in range(0, _cols, _step):
                         x1 = _c + _col * _cols
                         y1 = _r + _row * _rows
                         x2 = x1 + _px
                         y2 = y1 + _px
-                        _rate = random.uniform(1,3)
+                        _rate = random.uniform(1, 3)
                         _a = 2 + round(_base / _base * _r / ((_rows - _r) * _rate) * _c / ((_cols - _c) * _rate))
 
                         if _base == 255:
                             _a = _base
-                        if random.random() < _drawMark :
-                            if _usedots :
+                        if random.random() < _drawMark:
+                            if _usedots:
                                 config.textureLayerDraw.ellipse((x1, y1, x2, y2), fill=(_clr_r, _clr_g, _clr_b, _a), outline=None)
-                            else :
-                                config.textureLayerDraw.rectangle((x1, y1, x2+_xtick, y2+_ytick), fill=(_clr_r, _clr_g, _clr_b, _a), outline=None)
+                            else:
+                                config.textureLayerDraw.rectangle((x1, y1, x2 + _xtick, y2 + _ytick), fill=(_clr_r, _clr_g, _clr_b, _a), outline=None)
                                 # config.textureLayerDraw.line((x1, y1, x2+_xtick, y2+_ytick), fill=(_clr_r, _clr_g, _clr_b, 255), width=0)
-    if _blur > 0 :
+    if _blur > 0:
         config.textureLayer = config.textureLayer.filter(ImageFilter.GaussianBlur(radius=_blur))
 
 
@@ -702,7 +669,7 @@ def _load_color_config(config):
     )
     config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
     config.usebgBoxProb = float(workConfig.get("drawingField", "usebgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("drawingField", "bgBoxBox").split(",")))
+    # config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("drawingField", "bgBoxBox").split(",")))
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
     config.bgBoxFill = (100, 0, 80, 100)
@@ -802,8 +769,8 @@ def _load_pen_config(config):
         _penHolder.radiusChangePerRound = float(workConfig.get(_penConfigName, "radiusChangePerRound", fallback=0))
 
         config.penHolder.append(_penHolder)
-    
-    print(config.penHolder)
+
+    # print(config.penHolder)
 
 
 def _initialize_system(config):
@@ -835,9 +802,12 @@ def _initialize_system(config):
     config.penArray = []
     config.drawingMode = 1
 
-
     for i in range(1):
         pen = Pen()
         pen.number = i
         setPenProperties(pen)
         config.penArray.append(pen)
+
+    # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
+    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+    startNewLine(config.penArray[0])

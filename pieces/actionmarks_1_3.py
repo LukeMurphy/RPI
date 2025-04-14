@@ -26,6 +26,10 @@ class Mark:
     def __init__(self):
         pass
 
+class Texture:
+    def __init__(self):
+        pass
+
 
 # ----------------------------------------------------##----------------------------------------------------#
 def filterRemapImage(config):
@@ -541,13 +545,47 @@ def renderImageForDeBugging():
 
 def main(run=True):
     global config, workConfig
+    _load_texture_models(config)
     _create_image_layers(config)
     _load_filter_config(config)
-    _load_color_config(config)
+    _load_drawing_palettes(config)
     _load_pen_config(config)
     _initialize_system(config)
     if run:
         runWork()
+
+
+def _load_texture_models(config):
+    config.useTextureLayer = True
+    config.textureSetNames = workConfig.get("drawingField", "textureSets", fallback='texture1').split(',')
+    config.textureSets = []
+    for _t in config.textureSetNames:
+        _tex = _loadTextureValues(_t)
+        config.textureSets.append(_tex)
+
+
+def _loadTextureValues(_tName):
+    tex = Texture()
+    tex.name = _tName
+    tex.useTextureLayer = workConfig.getboolean(_tName, "useTextureLayer", fallback=False)
+    tex.step = workConfig.getint(_tName, "texture_step", fallback=7)
+    tex.px = workConfig.getint(_tName, "texture_px", fallback=2)
+    tex.blockRows = workConfig.getint(_tName, "texture_blockRows", fallback=8)
+    tex.blockCols = workConfig.getint(_tName, "texture_blockCols", fallback=8)
+    tex.rows = workConfig.getint(_tName, "texture_rows", fallback=64)
+    tex.cols = workConfig.getint(_tName, "texture_cols", fallback=32)
+    tex.rate = workConfig.getint(_tName, "texture_rate", fallback=2)
+    tex.base = workConfig.getint(_tName, "texture_base", fallback=125)
+    tex.clr_r = workConfig.getint(_tName, "texture_clr_r", fallback=40)
+    tex.clr_g = workConfig.getint(_tName, "texture_clr_g", fallback=40)
+    tex.clr_b = workConfig.getint(_tName, "texture_clr_b", fallback=240)
+    tex.skipProb = workConfig.getfloat(_tName, "texture_skipProb", fallback=0.7)
+    tex.blur = workConfig.getint(_tName, "texture_blur", fallback=1)
+    tex.xtick = workConfig.getint(_tName, "texture_xtick", fallback=0)
+    tex.ytick = workConfig.getint(_tName, "texture_ytick", fallback=0)
+    tex.drawMark = workConfig.getfloat(_tName, "texture_drawMark", fallback=0.9)
+    tex.usedots = workConfig.getboolean(_tName, "texture_usedots", fallback=True)
+    return tex
 
 
 def _create_image_layers(arg=None):
@@ -570,53 +608,31 @@ def _create_image_layers(arg=None):
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
-    _createTextureLayer()
 
-
-def _createTextureLayer():
-    config.useTextureLayer = workConfig.getboolean("drawingField", "useTextureLayer", fallback=False)
-    _step = workConfig.getint("drawingField", "texture_step", fallback=7)
-    _px = workConfig.getint("drawingField", "texture_px", fallback=2)
-    _blockRows = workConfig.getint("drawingField", "texture_blockRows", fallback=8)
-    _blockCols = workConfig.getint("drawingField", "texture_blockCols", fallback=8)
-    _rows = workConfig.getint("drawingField", "texture_rows", fallback=64)
-    _cols = workConfig.getint("drawingField", "texture_cols", fallback=32)
-    _rate = workConfig.getint("drawingField", "texture_rate", fallback=2)
-    _base = workConfig.getint("drawingField", "texture_base", fallback=125)
-    _clr_r = workConfig.getint("drawingField", "texture_clr_r", fallback=40)
-    _clr_g = workConfig.getint("drawingField", "texture_clr_g", fallback=40)
-    _clr_b = workConfig.getint("drawingField", "texture_clr_b", fallback=240)
-    _skipProb = workConfig.getfloat("drawingField", "texture_skipProb", fallback=0.7)
-    _blur = workConfig.getint("drawingField", "texture_blur", fallback=1)
-
-    _xtick = workConfig.getint("drawingField", "texture_xtick", fallback=0)
-    _ytick = workConfig.getint("drawingField", "texture_ytick", fallback=0)
-
-    _drawMark = workConfig.getfloat("drawingField", "texture_drawMark", fallback=0.9)
-    _usedots = workConfig.getboolean("drawingField", "texture_usedots", fallback=True)
-
-    for _row in range(_blockRows):
-        for _col in range(_blockCols):
-            if random.random() > _skipProb:
-                for _r in range(0, _rows, _step):
-                    for _c in range(0, _cols, _step):
-                        x1 = _c + _col * _cols
-                        y1 = _r + _row * _rows
-                        x2 = x1 + _px
-                        y2 = y1 + _px
+def _createTextureLayer(tex):
+    config.useTextureLayer = tex.useTextureLayer
+    for _row in range(tex.blockRows):
+        for _col in range(tex.blockCols):
+            if random.random() > tex.skipProb:
+                for _r in range(0, tex.rows, tex.step):
+                    for _c in range(0, tex.cols, tex.step):
+                        x1 = _c + _col * tex.cols
+                        y1 = _r + _row * tex.rows
+                        x2 = x1 + tex.px
+                        y2 = y1 + tex.px
                         _rate = random.uniform(1, 3)
-                        _a = 2 + round(_base / _base * _r / ((_rows - _r) * _rate) * _c / ((_cols - _c) * _rate))
+                        _a = 2 + round(tex.base / tex.base * _r / ((tex.rows - _r) * tex.rate) * _c / ((tex.cols - _c) * tex.rate))
 
-                        if _base == 255:
-                            _a = _base
-                        if random.random() < _drawMark:
-                            if _usedots:
-                                config.textureLayerDraw.ellipse((x1, y1, x2, y2), fill=(_clr_r, _clr_g, _clr_b, _a), outline=None)
+                        if tex.base == 255:
+                            _a = tex.base
+                        if random.random() < tex.drawMark:
+                            if tex.usedots:
+                                config.textureLayerDraw.ellipse((x1, y1, x2, y2), fill=(tex.clr_r, tex.clr_g, tex.clr_b, _a), outline=None)
                             else:
-                                config.textureLayerDraw.rectangle((x1, y1, x2 + _xtick, y2 + _ytick), fill=(_clr_r, _clr_g, _clr_b, _a), outline=None)
+                                config.textureLayerDraw.rectangle((x1, y1, x2 + tex.xtick, y2 + tex.ytick), fill=(tex.clr_r, tex.clr_g, tex.clr_b, _a), outline=None)
                                 # config.textureLayerDraw.line((x1, y1, x2+_xtick, y2+_ytick), fill=(_clr_r, _clr_g, _clr_b, 255), width=0)
-    if _blur > 0:
-        config.textureLayer = config.textureLayer.filter(ImageFilter.GaussianBlur(radius=_blur))
+    if tex.blur > 0:
+        config.textureLayer = config.textureLayer.filter(ImageFilter.GaussianBlur(radius=tex.blur))
 
 
 def _load_filter_config(config):
@@ -631,12 +647,10 @@ def _load_filter_config(config):
     config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.canvasHeight))
 
 
-def _load_color_config(config):
+def _load_drawing_palettes(config):
     """Loads color-related configuration parameters."""
 
     config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
-    config.usebgBoxProb = float(workConfig.get("drawingField", "usebgBoxProb"))
-
     config.bgTileSizeWidthMin = float(workConfig.get("drawingField", "bgTileSizeWidthMin"))
     config.bgTileSizeWidthMax = float(workConfig.get("drawingField", "bgTileSizeWidthMax"))
     config.bgTileSizeHeightMin = float(workConfig.get("drawingField", "bgTileSizeHeightMin"))
@@ -685,6 +699,9 @@ def _load_color_config(config):
 
         palette.pens = workConfig.get(_p, "penNames").split(",")
         palette.name = _p
+        palette.textureName = workConfig.get(_p, "texture")
+        palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
+        palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
         config.paletteSets.append(palette)
 
     config.activePalette = random.choice(config.paletteSets)
@@ -782,7 +799,7 @@ def _initialize_system(config):
 
     config.slotRate = float(workConfig.get("drawingField", "slotRate", fallback=0.03))
     config.redrawSpeed = float(workConfig.get("drawingField", "redrawSpeed", fallback=0.03))
-    config.startNewLineProb = float(workConfig.get("drawingField", "startNewLineProb", fallback=0.03))
+    
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
 
@@ -802,6 +819,8 @@ def _initialize_system(config):
 def initDrawings():
     global config
     # print(f"Init drawings {config.activePalette.pens}")
+
+    _createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
     for _ in range(3):
@@ -809,6 +828,8 @@ def initDrawings():
 
     _pen = choosePenMark()
     config.activePalette.activePen = _pen
+    config.startNewLineProb = config.activePalette.startNewLineProb
+    config.usebgBoxProb = config.activePalette.usebgBoxProb
     startNewLine(_pen)
     do_drawing_jitter()
 
@@ -820,4 +841,12 @@ def choosePenMark() :
         if _pen.name == _penName :
             # print(f"we chose {_pen.name}")
             return _pen
+
+def chooseTexture() :
+    _textureName = config.activePalette.textureName
+    for _t in config.textureSets:
+        # print(f"{_pen.name} {config.activePalette.pens}")
+        if _t.name == _textureName :
+            # print(f"we chose {_pen.name}")
+            return _t
         

@@ -80,8 +80,7 @@ def changePalettes():
     config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
     config.underLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
     config.underLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
-    for _ in range(3):
-        bg_colors_filling(config)
+    primeCanvas()
     # print(f" New bg Color : {config.bgColor}")
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     config.changeColorSetTimeToUse = random.randint(config.changeColorSetTime, round(config.changeColorSetTime*config.changeColorSetTimeMaxMultiplier))
@@ -336,6 +335,8 @@ def do_drawing_jitter():
 
 def bg_colors_filling(arg):
     global config
+
+    if not arg : print(f"drawing a bg box {config.blendLevel}")
     config.blendLevelRate = config.blendLevelRateBase
     config.blendLevel = 0.0
 
@@ -355,6 +356,8 @@ def bg_colors_filling(arg):
         )
         config.bgBoxFill = (0, 0, 0, 0)
     else:
+
+       
         config.bgBoxBox = (
             xPos,
             yPos,
@@ -455,14 +458,12 @@ def iterate():
         if config.paletteController.advance:
             changeDrawing(True)
 
-    config.fadeRate += config.fadeRateDelta
+    if random.SystemRandom().random() < config.changeBGColorProb :
+        setBGColor()
 
-    if config.fadeRate > 255:
-        config.fadeRate = 30
-        config.fadeRateDelta = random.uniform(0.1, 2)
+    if random.random() < config.clearCurrentDrawingProb:
+        clearCurrentDrawing()
 
-        if config.fadeRateDelta <= config.fadeRateNewSystemThreshold:
-            setBGColor()
 
     if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing:
         if config.doJitterWhenAddingBG :
@@ -480,7 +481,6 @@ def iterate():
     pen_functions()
 
     renderImage()
-    # renderImageForDeBugging()
 
 
 def renderImage():
@@ -504,43 +504,38 @@ def renderImage():
         config.fadeThruToNewDone = True
         initDrawings()
         
-
-
-    config.canvasImage.paste(_tempImage, (0, 0), _tempImage)
-    config.finalCompositeLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
-    config.finalCompositeLayer.paste(config.canvasImage,(0,0),config.canvasImage)
-    config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
-
-
-def renderImageForDeBugging():
-    config.underLayer.paste(config.image, (0, 0), config.image)
-    if config.useTextureLayer:
-        config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
-
-    _tempImage = ImageChops.blend(config.canvasImage, config.underLayer, config.blendLevel)
-
-    config.blendLevel += config.blendLevelRate
-
-    if config.blendLevel >= 1.0:
-        config.blendLevelRate = 0.0
-        config.blendLevel = 1.0
-
     config.canvasImage.paste(_tempImage, (0, 0), _tempImage)
 
-    config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
-    config.finalCompositeLayerDraw.rectangle((0,550,config.canvasWidth, 550 + config.canvasHeight), fill = (config.bgColor))
+    if not config.debugMode :
+        config.finalCompositeLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
+        config.finalCompositeLayer.paste(config.canvasImage,(0,0),config.canvasImage)
+        config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
+    else :
+        config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
+        config.finalCompositeLayerDraw.rectangle((0,550,config.canvasWidth, 550 + config.canvasHeight), fill = (config.bgColor))
 
-    config.finalCompositeLayer.paste(config.textureLayer,(0,0),config.textureLayer)      
-    config.finalCompositeLayer.paste(config.image,(280,0),config.image)
-    config.finalCompositeLayer.paste(config.underLayer,(0,280),config.underLayer)
+        config.finalCompositeLayer.paste(config.textureLayer,(0,0),config.textureLayer)      
+        config.finalCompositeLayer.paste(config.image,(280,0),config.image)
+        config.finalCompositeLayer.paste(config.underLayer,(0,280),config.underLayer)
+
+        config.finalCompositeLayerDraw.rectangle((280,280,config.canvasWidth  + 280, 280 + config.canvasHeight), fill = (config.bgColor))
+        config.finalCompositeLayer.paste(config.canvasImage,(280,280),config.canvasImage)
+
+        config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
 
 
-    config.finalCompositeLayerDraw.rectangle((280,280,config.canvasWidth  + 280, 280 + config.canvasHeight), fill = (config.bgColor))
-    config.finalCompositeLayer.paste(config.canvasImage,(280,280),config.canvasImage)
 
+def clearCurrentDrawing():
+    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],200))
 
-    config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
-    # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.draw = ImageDraw.Draw(config.image)
+
+    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+    primeCanvas(1)
+    config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],225))
+
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -551,7 +546,7 @@ def main(run=True):
     _load_texture_models(config)
     _create_image_layers(config)
     _load_filter_config(config)
-    _load_drawing_palettes(config)
+    _load_drawing_configs(config)
     _load_pen_config(config)
     _initialize_system(config)
     if run:
@@ -593,14 +588,16 @@ def _loadTextureValues(_tName):
 
 def _create_image_layers(arg=None):
     global config
+
+    print("Setting up all layers")
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
-    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.canvasDraw = ImageDraw.Draw(config.canvasImage)
-
     config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
     config.textureLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.textureLayerDraw = ImageDraw.Draw(config.textureLayer)
@@ -650,7 +647,7 @@ def _load_filter_config(config):
     config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.canvasHeight))
 
 
-def _load_drawing_palettes(config):
+def _load_drawing_configs(config):
     """Loads color-related configuration parameters."""
 
     config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
@@ -705,6 +702,8 @@ def _load_drawing_palettes(config):
         palette.textureName = workConfig.get(_p, "texture")
         palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
         palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
+        palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
+        palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0003"))
         config.paletteSets.append(palette)
 
     config.activePalette = random.choice(config.paletteSets)
@@ -770,13 +769,10 @@ def _load_pen_config(config):
 def _initialize_system(config):
     """Initializes the system and related parameters."""
     """Loads rendering-related configuration parameters."""
-    config.fadeRate = float(workConfig.get("drawingField", "fadeRate"))
-    config.fadeRateDelta = float(workConfig.get("drawingField", "fadeRateDelta"))
-    config.fadeRateNewSystemThreshold = float(workConfig.get("drawingField", "fadeRateNewSystemThreshold"))
-
+    
+    config.changeBGColorProb = float(workConfig.get("drawingField", "changeBGColorProb", fallback=.01))
     config.totalResetTime = (workConfig.getint("drawingField", "totalResetTime", fallback=33))
     config.totalResetTimeMaxMultiplier = float(workConfig.get("drawingField", "totalResetTimeMaxMultiplier", fallback=1.0))
-
     config.changeDrawingModeTime = float(workConfig.get("drawingField", "changeDrawingModeTime", fallback=100.0))
     config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.1))
     config.jitterIterationsMin = (workConfig.getint("drawingField", "jitterIterationsMin", fallback=1))
@@ -787,6 +783,7 @@ def _initialize_system(config):
     config.blendLevelRateBase = float(workConfig.get("drawingField", "blendLevelRateBase", fallback=0.01))
     config.totalRandomPenColorProb = float(workConfig.get("drawingField", "totalRandomPenColorProb", fallback=0.0))
     config.totalRandomBGBoxColorProb = float(workConfig.get("drawingField", "totalRandomBGBoxColorProb", fallback=0.0))
+    config.debugMode = (workConfig.getboolean("drawingField", "debugMode", fallback=False))
 
     config.changeColorSetTime = float(workConfig.get("drawingField", "changeColorSetTime", fallback=0))
     config.changeColorSetTimeMaxMultiplier = float(workConfig.get("drawingField", "changeColorSetTimeMaxMultiplier", fallback=1))
@@ -821,20 +818,26 @@ def _initialize_system(config):
 
 def initDrawings():
     global config
-    # print(f"Init drawings {config.activePalette.pens}")
+    print(f"Init drawings {config.activePalette.pens}")
 
     _createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
-    for _ in range(3):
-        bg_colors_filling(config)
+    primeCanvas()
 
     _pen = choosePenMark()
     config.activePalette.activePen = _pen
     config.startNewLineProb = config.activePalette.startNewLineProb
     config.usebgBoxProb = config.activePalette.usebgBoxProb
+    config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
     startNewLine(_pen)
     do_drawing_jitter()
+
+
+def primeCanvas(_i = 3):
+    global config
+    for _ in range(_i):
+        bg_colors_filling(True)
 
 
 def choosePenMark() :

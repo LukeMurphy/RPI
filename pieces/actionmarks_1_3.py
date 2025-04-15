@@ -26,6 +26,7 @@ class Mark:
     def __init__(self):
         pass
 
+
 class Texture:
     def __init__(self):
         pass
@@ -332,6 +333,7 @@ def do_drawing_jitter():
         )
 
 
+
 def bg_colors_filling(arg):
     global config
     config.blendLevelRate = config.blendLevelRateBase
@@ -379,6 +381,7 @@ def bg_colors_filling(arg):
             config.bgGlitchDisplacementHorizontal,
             config.bgGlitchDisplacementVertical,
         )
+
 
 
 def glitchBox(
@@ -841,6 +844,7 @@ def choosePenMark() :
         if _pen.name == _penName :
             # print(f"we chose {_pen.name}")
             return _pen
+
 
 def chooseTexture() :
     _textureName = config.activePalette.textureName

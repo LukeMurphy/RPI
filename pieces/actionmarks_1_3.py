@@ -576,6 +576,7 @@ def iterate():
     if random.SystemRandom().random() < config.changeBGColorProb :
         setBGColor()
 
+
     if random.random() < config.clearCurrentDrawingProb:
         clearCurrentDrawing()
 
@@ -647,7 +648,7 @@ def clearCurrentDrawing():
 
     config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
-    primeCanvas(1)
+    primeCanvas(2)
     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],225))
 
 
@@ -766,7 +767,7 @@ def _load_drawing_configs(config):
         palette.textureName = workConfig.get(_p, "texture")
         palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
         palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
-        palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0003"))
+        palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0001"))
 
         # when set to 1.0 and startNewLineDelayRange is set
         # then the new line starts as soon as the random delay

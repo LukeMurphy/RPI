@@ -11,26 +11,22 @@ from modules.holder_director import Director
 from modules import colorutils
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
+# ----------------------------------------------------##----------------------------------------------------#
 class Palette:
     def __init__(self):
         pass
 
-# ----------------------------------------------------##----------------------------------------------------#
 class Pen:
     def __init__(self):
         pass
-
 
 class Mark:
     def __init__(self):
         pass
 
-
 class Texture:
     def __init__(self):
         pass
-
 
 # ----------------------------------------------------##----------------------------------------------------#
 def filterRemapImage(config):
@@ -47,7 +43,7 @@ def filterRemapImage(config):
 def changeDrawing(args):
     global config
     print("\nCHANGE DRAWING/PAINTING")
-    _create_image_layers()
+    createImageLayers()
     changePalettes()
     initDrawings()
 
@@ -87,8 +83,8 @@ def changePalettes():
     config.paletteController.slotRate = config.changeColorSetTimeToUse
 
 
-# ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
+# ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 def startNewLine(_pen):
     # print(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
@@ -102,15 +98,16 @@ def startNewLine(_pen):
 
 def setPenProperties(pen):
     # print(f"setting {pen} {pen.name}")
-    _penPropsByName(pen.name, pen)
+    setPenPropsByName(pen.name, pen)
     setPenColor(pen)
 
 
-# TODO Add some specific pen based rules for shapes based on where
-# the center may end up and how much we want the pen to exit the edges
-# or stay close to the edge - i.e. like Jerry, close to the edge but
-# not over the edge
-def _penPropsByName(_name, pen):
+def setPenPropsByName(_name, pen):
+
+    # TODO Add some specific pen based rules for shapes based on where
+    # the center may end up and how much we want the pen to exit the edges
+    # or stay close to the edge - i.e. like Jerry, close to the edge but
+    # not over the edge
     _penProps = None
 
     for _p in config.marksPalette:
@@ -145,8 +142,10 @@ def _penPropsByName(_name, pen):
 
     pen.xOffset = random.randint(_penProps.xOffsetRange[0], _penProps.xOffsetRange[1])
     pen.yOffset = random.randint(_penProps.yOffsetRange[0], _penProps.yOffsetRange[1])
-
+    
     pen._w = _penProps.w
+    pen.maxMarkWidth = _penProps.maxMarkWidth
+    pen.changeMarkWidthProb = _penProps.changeMarkWidthProb
     pen.mode = _penProps.mode
 
     pen.xTravelRange = _penProps.xTravelRange
@@ -174,13 +173,20 @@ def _penPropsByName(_name, pen):
     # print("--")
 
 
-# ----------------------------------------------------##----------------------------------------------------#
-
 def setPenColor(_pen):
     cR = config.activePalette.penColor
     _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
     if random.random() < config.totalRandomBGBoxColorProb :
         _pen.lineColor = colorutils.getRandomColorHSV(0,360,.1,1.0,.1,1.0,0,0, config.penAlpha, config.brightness) 
+
+
+def choosePenMark() :
+    _penName = random.choice(config.activePalette.pens)
+    for _pen in config.marksPalette:
+        # print(f"{_pen.name} {config.activePalette.pens}")
+        if _pen.name == _penName :
+            # print(f"we chose {_pen.name}")
+            return _pen
 
 
 def generateSmoothLinePoints(_pen):
@@ -281,6 +287,37 @@ def generateSmoothLinePoints(_pen):
     return True
 
 
+def pauseDrawing():
+    config.stoppedAndWaitingToDraw = True
+    config.canDraw = False
+    config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0],config.activePalette.startNewLineDelayRange[1])
+    # print(f"paused for {config.drawingController.slotRate}")
+
+def releaseDrawing():
+    # print("released")
+    config.stoppedAndWaitingToDraw = False
+    config.canDraw = True
+
+
+def penLoopActions():
+    if random.random() < config.changePenColorWhileDrawingProb:
+        setPenColor((config.activePalette.activePen))
+
+    if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0 and config.canDraw:
+        _pen = choosePenMark()
+        config.activePalette.activePen = _pen
+        startNewLine(_pen)
+
+    drawLine(config.activePalette.activePen)
+
+    # if not config.doingDrawing and config.canDraw and not config.stoppedAndWaitingToDraw:
+    #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
+    #     print(f"config.canDraw {config.canDraw}")
+    #     pauseDrawing()
+
+    
+
+
 def drawLine(_pen):
     # Draw the shape
     # print(f"pen {_pen.name}")
@@ -297,30 +334,22 @@ def drawLine(_pen):
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
             config.doingDrawing = False
+            pauseDrawing()
 
-        if random.random() < 0.2:
+        if random.random() < _pen.changeMarkWidthProb:
             _pen._w += 1
-        if random.random() < 0.2 or _pen._w > 7:
+
+        if random.random() < _pen.changeMarkWidthProb or _pen._w > _pen.maxMarkWidth:
             _pen._w -= 1
+
         if _pen._w <= 0:
             _pen._w = 1
 
 
-def pen_functions():
-    if random.random() < config.changePenColorWhileDrawingProb:
-        setPenColor((config.activePalette.activePen))
-    if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0:
-        _pen = choosePenMark()
-        config.activePalette.activePen = _pen
-        startNewLine(_pen)
-
-    drawLine(config.activePalette.activePen)
-    
-
 # ----------------------------------------------------##----------------------------------------------------#
 
 
-def do_drawing_jitter():
+def doDrawingJitter():
     jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMin))
     for _ in range(jitterIterations):
         glitchBox(
@@ -332,8 +361,7 @@ def do_drawing_jitter():
         )
 
 
-
-def bg_colors_filling(arg):
+def bgColorBlocksFilling(arg):
     global config
 
     if not arg : print(f"drawing a bg box {config.blendLevel}")
@@ -386,7 +414,6 @@ def bg_colors_filling(arg):
         )
 
 
-
 def glitchBox(
     imageRef,
     apparentWidth,
@@ -433,6 +460,89 @@ def setBGColor():
     # print(f"config.bgColor {config.bgColor}")
 
 
+def primeCanvas(_i = 3):
+    global config
+    for _ in range(_i):
+        bgColorBlocksFilling(True)
+
+
+def chooseTexture() :
+    _textureName = config.activePalette.textureName
+    for _t in config.textureSets:
+        # print(f"{_pen.name} {config.activePalette.pens}")
+        if _t.name == _textureName :
+            # print(f"we chose {_pen.name}")
+            return _t
+        
+# ----------------------------------------------------##----------------------------------------------------#
+
+def createImageLayers(arg=None):
+    global config
+
+    print("Setting up all layers")
+    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.draw = ImageDraw.Draw(config.image)
+
+    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+
+    config.textureLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.textureLayerDraw = ImageDraw.Draw(config.textureLayer)
+
+    config.finalCompositeLayer = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.finalCompositeLayerDraw = ImageDraw.Draw(config.finalCompositeLayer)
+
+    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+
+
+def createTextureLayer(tex):
+    config.useTextureLayer = tex.useTextureLayer
+    for _row in range(tex.blockRows):
+        for _col in range(tex.blockCols):
+            if random.random() > tex.skipProb:
+                for _r in range(0, tex.rows, tex.step):
+                    for _c in range(0, tex.cols, tex.step):
+                        x1 = _c + _col * tex.cols
+                        y1 = _r + _row * tex.rows
+                        x2 = x1 + tex.px
+                        y2 = y1 + tex.px
+                        _rate = random.uniform(1, 3)
+                        _a = 2 + round(tex.base / tex.base * _r / ((tex.rows - _r) * tex.rate) * _c / ((tex.cols - _c) * tex.rate))
+
+                        if tex.base == 255:
+                            _a = tex.base
+                        if random.random() < tex.drawMark:
+                            if tex.usedots:
+                                config.textureLayerDraw.ellipse((x1, y1, x2, y2), fill=(tex.clr_r, tex.clr_g, tex.clr_b, _a), outline=None)
+                            else:
+                                config.textureLayerDraw.rectangle((x1, y1, x2 + tex.xtick, y2 + tex.ytick), fill=(tex.clr_r, tex.clr_g, tex.clr_b, _a), outline=None)
+                                # config.textureLayerDraw.line((x1, y1, x2+_xtick, y2+_ytick), fill=(_clr_r, _clr_g, _clr_b, 255), width=0)
+    if tex.blur > 0:
+        config.textureLayer = config.textureLayer.filter(ImageFilter.GaussianBlur(radius=tex.blur))
+
+
+def initDrawings():
+    global config
+    print(f"Init drawings {config.activePalette.pens}")
+
+    createTextureLayer(chooseTexture())
+    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+
+    primeCanvas()
+
+    _pen = choosePenMark()
+    config.activePalette.activePen = _pen
+    config.startNewLineProb = config.activePalette.startNewLineProb
+    config.usebgBoxProb = config.activePalette.usebgBoxProb
+    config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
+    startNewLine(_pen)
+    doDrawingJitter()
+
+
 # ----------------------------------------------------##----------------------------------------------------#
 
 
@@ -458,6 +568,11 @@ def iterate():
         if config.paletteController.advance:
             changeDrawing(True)
 
+    if config.stoppedAndWaitingToDraw :
+        config.drawingController.checkTime()
+        if config.drawingController.advance:
+            releaseDrawing()  
+
     if random.SystemRandom().random() < config.changeBGColorProb :
         setBGColor()
 
@@ -468,17 +583,17 @@ def iterate():
     if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing:
         if config.doJitterWhenAddingBG :
             # print("doing jitter while adding bg filling")
-            do_drawing_jitter()
-        bg_colors_filling(config)
+            doDrawingJitter()
+        bgColorBlocksFilling(config)
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
         filterRemapImage(config)
 
     if not config.doingDrawing and random.random() < config.doJitterProb:
-        do_drawing_jitter()
+        doDrawingJitter()
 
-    pen_functions()
+    penLoopActions()
 
     renderImage()
 
@@ -524,7 +639,6 @@ def renderImage():
         config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
 
 
-
 def clearCurrentDrawing():
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],200))
 
@@ -537,14 +651,13 @@ def clearCurrentDrawing():
     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],225))
 
 
-
 # ----------------------------------------------------##----------------------------------------------------#
 
 
 def main(run=True):
     global config, workConfig
     _load_texture_models(config)
-    _create_image_layers(config)
+    createImageLayers(config)
     _load_filter_config(config)
     _load_drawing_configs(config)
     _load_pen_config(config)
@@ -558,11 +671,11 @@ def _load_texture_models(config):
     config.textureSetNames = workConfig.get("drawingField", "textureSets", fallback='texture1').split(',')
     config.textureSets = []
     for _t in config.textureSetNames:
-        _tex = _loadTextureValues(_t)
+        _tex = _load_texture_values(_t)
         config.textureSets.append(_tex)
 
 
-def _loadTextureValues(_tName):
+def _load_texture_values(_tName):
     tex = Texture()
     tex.name = _tName
     tex.useTextureLayer = workConfig.getboolean(_tName, "useTextureLayer", fallback=False)
@@ -584,55 +697,6 @@ def _loadTextureValues(_tName):
     tex.drawMark = workConfig.getfloat(_tName, "texture_drawMark", fallback=0.9)
     tex.usedots = workConfig.getboolean(_tName, "texture_usedots", fallback=True)
     return tex
-
-
-def _create_image_layers(arg=None):
-    global config
-
-    print("Setting up all layers")
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.draw = ImageDraw.Draw(config.image)
-
-    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
-
-    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.canvasDraw = ImageDraw.Draw(config.canvasImage)
-
-    config.textureLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.textureLayerDraw = ImageDraw.Draw(config.textureLayer)
-
-    config.finalCompositeLayer = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.finalCompositeLayerDraw = ImageDraw.Draw(config.finalCompositeLayer)
-
-    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-
-
-def _createTextureLayer(tex):
-    config.useTextureLayer = tex.useTextureLayer
-    for _row in range(tex.blockRows):
-        for _col in range(tex.blockCols):
-            if random.random() > tex.skipProb:
-                for _r in range(0, tex.rows, tex.step):
-                    for _c in range(0, tex.cols, tex.step):
-                        x1 = _c + _col * tex.cols
-                        y1 = _r + _row * tex.rows
-                        x2 = x1 + tex.px
-                        y2 = y1 + tex.px
-                        _rate = random.uniform(1, 3)
-                        _a = 2 + round(tex.base / tex.base * _r / ((tex.rows - _r) * tex.rate) * _c / ((tex.cols - _c) * tex.rate))
-
-                        if tex.base == 255:
-                            _a = tex.base
-                        if random.random() < tex.drawMark:
-                            if tex.usedots:
-                                config.textureLayerDraw.ellipse((x1, y1, x2, y2), fill=(tex.clr_r, tex.clr_g, tex.clr_b, _a), outline=None)
-                            else:
-                                config.textureLayerDraw.rectangle((x1, y1, x2 + tex.xtick, y2 + tex.ytick), fill=(tex.clr_r, tex.clr_g, tex.clr_b, _a), outline=None)
-                                # config.textureLayerDraw.line((x1, y1, x2+_xtick, y2+_ytick), fill=(_clr_r, _clr_g, _clr_b, 255), width=0)
-    if tex.blur > 0:
-        config.textureLayer = config.textureLayer.filter(ImageFilter.GaussianBlur(radius=tex.blur))
 
 
 def _load_filter_config(config):
@@ -700,10 +764,20 @@ def _load_drawing_configs(config):
         palette.pens = workConfig.get(_p, "penNames").split(",")
         palette.name = _p
         palette.textureName = workConfig.get(_p, "texture")
-        palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
         palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
         palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
         palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0003"))
+
+        # when set to 1.0 and startNewLineDelayRange is set
+        # then the new line starts as soon as the random delay
+        # ends - since drawing is a major event and changes the
+        # attention of the viewer, controlling when it happens
+        # is probably better left to timing than just cycle-based
+        # probability
+        palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
+        palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
+
+
         config.paletteSets.append(palette)
 
     config.activePalette = random.choice(config.paletteSets)
@@ -749,6 +823,8 @@ def _load_pen_config(config):
         _mark.yOffsetRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffsetRange", fallback="-1,1").split(",")))
 
         _mark.w = int(workConfig.get(_penConfigName, "w", fallback=1))
+        _mark.maxMarkWidth = int(workConfig.get(_penConfigName, "maxMarkWidth", fallback=7))
+        _mark.changeMarkWidthProb = float(workConfig.get(_penConfigName, "changeMarkWidthProb", fallback=".02"))
         _mark.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
 
         """
@@ -757,7 +833,7 @@ def _load_pen_config(config):
         _mark.xTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xTravelRange", fallback="-1,1").split(",")))
         _mark.yTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yTravelRange", fallback="-1,1").split(",")))
         _mark.xTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xTravelIncrRange", fallback="-1,1").split(",")))
-        _mark.yTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yTravelIncrRange", fallback="-1,1").split(",")))
+        _mark.yTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yTravelIncrRange", fallback="-1,1").split(",")))       
         _mark.xtravelProb = float(workConfig.get(_penConfigName, "xtravelProb", fallback=0.1))
         _mark.ytravelProb = float(workConfig.get(_penConfigName, "ytravelProb", fallback=0.1))
         _mark.radiusChangePerRound = float(workConfig.get(_penConfigName, "radiusChangePerRound", fallback=0))
@@ -803,7 +879,14 @@ def _initialize_system(config):
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
 
+    config.drawingController = Director(config)
+    config.drawingController.slotRate = 10
+
+    config.canDraw = True
     config.doingDrawing = False
+    config.stoppedAndWaitingToDraw = False
+
+
     config.penArray = []
     config.drawingMode = 1
 
@@ -815,45 +898,3 @@ def _initialize_system(config):
 
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
 
-
-def initDrawings():
-    global config
-    print(f"Init drawings {config.activePalette.pens}")
-
-    _createTextureLayer(chooseTexture())
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
-
-    primeCanvas()
-
-    _pen = choosePenMark()
-    config.activePalette.activePen = _pen
-    config.startNewLineProb = config.activePalette.startNewLineProb
-    config.usebgBoxProb = config.activePalette.usebgBoxProb
-    config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
-    startNewLine(_pen)
-    do_drawing_jitter()
-
-
-def primeCanvas(_i = 3):
-    global config
-    for _ in range(_i):
-        bg_colors_filling(True)
-
-
-def choosePenMark() :
-    _penName = random.choice(config.activePalette.pens)
-    for _pen in config.marksPalette:
-        # print(f"{_pen.name} {config.activePalette.pens}")
-        if _pen.name == _penName :
-            # print(f"we chose {_pen.name}")
-            return _pen
-
-
-def chooseTexture() :
-    _textureName = config.activePalette.textureName
-    for _t in config.textureSets:
-        # print(f"{_pen.name} {config.activePalette.pens}")
-        if _t.name == _textureName :
-            # print(f"we chose {_pen.name}")
-            return _t
-        

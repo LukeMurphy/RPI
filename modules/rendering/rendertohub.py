@@ -588,7 +588,10 @@ def saveImageToFile():
     print("Saving image to file")
     currentTime = time.time()
     baseName = config.outPutPath + str(currentTime)
-    writeImage(baseName, renderImage=config.renderImageFull)
+    _temp = config.renderImageFull.copy()
+    _img  = _temp.crop((10,10, config.windowWidth,config.windowHeight))
+    _img = _img.convert("RGBA")
+    writeImage(baseName, renderImage=_img)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""

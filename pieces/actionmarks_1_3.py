@@ -147,6 +147,7 @@ def setPenPropsByName(_name, pen):
     pen.maxMarkWidth = _penProps.maxMarkWidth
     pen.changeMarkWidthProb = _penProps.changeMarkWidthProb
     pen.mode = _penProps.mode
+    pen.incrementFactor = _penProps.incrementFactor
 
     pen.xTravelRange = _penProps.xTravelRange
     pen.yTravelRange = _penProps.yTravelRange
@@ -293,6 +294,7 @@ def pauseDrawing():
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0],config.activePalette.startNewLineDelayRange[1])
     # print(f"paused for {config.drawingController.slotRate}")
 
+
 def releaseDrawing():
     # print("released")
     config.stoppedAndWaitingToDraw = False
@@ -315,8 +317,6 @@ def penLoopActions():
     #     print(f"config.canDraw {config.canDraw}")
     #     pauseDrawing()
 
-    
-
 
 def drawLine(_pen):
     # Draw the shape
@@ -337,10 +337,10 @@ def drawLine(_pen):
             pauseDrawing()
 
         if random.random() < _pen.changeMarkWidthProb:
-            _pen._w += 1
+            _pen._w += round(1 * _pen.incrementFactor)
 
         if random.random() < _pen.changeMarkWidthProb or _pen._w > _pen.maxMarkWidth:
-            _pen._w -= 1
+            _pen._w -= round(1 * _pen.incrementFactor)
 
         if _pen._w <= 0:
             _pen._w = 1
@@ -838,6 +838,7 @@ def _load_pen_config(config):
         _mark.xtravelProb = float(workConfig.get(_penConfigName, "xtravelProb", fallback=0.1))
         _mark.ytravelProb = float(workConfig.get(_penConfigName, "ytravelProb", fallback=0.1))
         _mark.radiusChangePerRound = float(workConfig.get(_penConfigName, "radiusChangePerRound", fallback=0))
+        _mark.incrementFactor = float(workConfig.get(_penConfigName, "incrementFactor", fallback=1))
         config.marksPalette.append(_mark)
 
     # print(config.marksPalette)

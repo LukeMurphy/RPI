@@ -160,6 +160,7 @@ def setPenPropsByName(_name, pen):
     pen.radiusChangePerRound = _penProps.radiusChangePerRound
 
     pen.drawingSize = [config.canvasWidth, config.canvasHeight]
+    # pen.drawingSize = [180, 180]
     pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
     pen.centerVariationXMax = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
     pen.centerVariationYMax = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
@@ -208,6 +209,7 @@ def generateSmoothLinePoints(_pen):
 
     center_x = width // 2  # + _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
     center_y = height // 2  # + _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
+
 
     _xTravel = random.uniform(_pen.xTravelRange[0], _pen.xTravelRange[1])
     _yTravel = random.uniform(_pen.yTravelRange[0], _pen.yTravelRange[1])
@@ -261,7 +263,7 @@ def generateSmoothLinePoints(_pen):
 
     # Convert to list of tuples for PIL
     smooth_points_c = list(zip(smooth_points[0], smooth_points[1]))
-
+    # _pen.rotationAngle = 0
     smooth_points_r = []
     for pt in smooth_points_c:
         ptx = pt[0] * np.cos(_pen.rotationAngle) - pt[1] * np.sin(_pen.rotationAngle)

@@ -144,6 +144,7 @@ def setPenPropsByName(_name, pen):
     pen.yOffset = random.randint(_penProps.yOffsetRange[0], _penProps.yOffsetRange[1])
     
     pen._w = _penProps.w
+    pen.minMarkWidth = _penProps.minMarkWidth
     pen.maxMarkWidth = _penProps.maxMarkWidth
     pen.changeMarkWidthProb = _penProps.changeMarkWidthProb
     pen.mode = _penProps.mode
@@ -168,6 +169,8 @@ def setPenPropsByName(_name, pen):
     pen._p = 0
     pen.smooth_points = []
     pen.speed = random.randint(1, 5)
+    pen.attenuating = False
+    pen.enlarging = False
 
     # print(f"setting pen props pen.name {pen.name}")
     # print(f"pen.drawingSkip {pen.drawingSkip}")
@@ -333,24 +336,46 @@ def drawLine(_pen):
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
-            config.doingDrawing = False
-            pauseDrawing()
+            drawLineStopped()
 
         if random.random() < _pen.changeMarkWidthProb:
-            _pen._w += round(1 * _pen.incrementFactor)
+            if not _pen.attenuating and not _pen.enlarging :
+                if random.random() < .5 :
+                    _pen.attenuating = True
+                else :
+                    _pen.enlarging = True
+            elif random.random() < _pen.changeMarkWidthProb * 2:
+                if _pen.attenuating :
+                    _pen.enlarging = True
+                    _pen.attenuating = False
+                else :
+                    _pen.enlarging = False
+                    _pen.attenuating = True
 
-        if random.random() < _pen.changeMarkWidthProb or _pen._w > _pen.maxMarkWidth:
-            _pen._w -= round(1 * _pen.incrementFactor)
 
-        if _pen._w <= 0:
-            _pen._w = 1
+        if _pen._w > _pen.maxMarkWidth:
+            _pen.enlarging = False
 
+        if _pen._w <= _pen.minMarkWidth:
+            _pen.attenuating = False
+            _pen._w = _pen.minMarkWidth
+
+        if _pen.enlarging : _pen._w += round(1 * _pen.incrementFactor)
+        if _pen.attenuating : _pen._w -= round(1 * _pen.incrementFactor)
+
+
+def drawLineStopped():
+    config.doingDrawing = False
+    pauseDrawing()
+    if config.alwaysJitterLineAfterDrawn :  doDrawingJitter()
 
 # ----------------------------------------------------##----------------------------------------------------#
 
 
 def doDrawingJitter():
     jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMin))
+    # print(f"jitterIterations {jitterIterations}")
+    
     for _ in range(jitterIterations):
         glitchBox(
             config.image,
@@ -424,8 +449,8 @@ def glitchBox(
 
     global config
 
-    apparentWidth = config.canvasImage.size[0]
-    apparentHeight = config.canvasImage.size[1]
+    # apparentWidth = config.canvasImage.size[0]
+    # apparentHeight = config.canvasImage.size[1]
 
     dx = round(random.uniform(-imageGlitchDisplacementHorizontal, imageGlitchDisplacementHorizontal))
     dy = round(random.uniform(-imageGlitchDisplacementVertical, imageGlitchDisplacementVertical))
@@ -433,22 +458,22 @@ def glitchBox(
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
     sectionHeight = round(random.uniform(2, apparentHeight - dy))
 
+    # print(f"jitter {sectionWidth} {sectionHeight} {dx} {dx}")
+
     # 95% of the time they dance together as mirrors
     try:
-        if random.SystemRandom().random() < 0.97:
-            cx = dx + sectionWidth
-            cy = dy + sectionHeight
+        cx = dx + sectionWidth
+        cy = dy + sectionHeight
 
-            if cx < 0:
-                cx = 32
-            if cy < 0:
-                cy = 32
-            cp1 = imageRef.crop((0, 0, cx, cy))
-            imageRef.paste(cp1, (round(dx), round(dy)))
+        if cx < 0:
+            cx = 32
+        if cy < 0:
+            cy = 32
+        cp1 = imageRef.crop((0, 0, cx, cy))
+        imageRef.paste(cp1, (round(dx), round(dy)))
         # comment:
     except Exception as e:
-        print(e)
-        print(dx + sectionWidth, dy + sectionHeight)
+        print(f"jitter prom {e} {dx + sectionWidth} , {dy + sectionHeight}")
     # end try
 
 
@@ -824,6 +849,7 @@ def _load_pen_config(config):
         _mark.yOffsetRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffsetRange", fallback="-1,1").split(",")))
 
         _mark.w = int(workConfig.get(_penConfigName, "w", fallback=1))
+        _mark.minMarkWidth = int(workConfig.get(_penConfigName, "minMarkWidth", fallback=2))
         _mark.maxMarkWidth = int(workConfig.get(_penConfigName, "maxMarkWidth", fallback=7))
         _mark.changeMarkWidthProb = float(workConfig.get(_penConfigName, "changeMarkWidthProb", fallback=".02"))
         _mark.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
@@ -857,6 +883,8 @@ def _initialize_system(config):
     config.jitterIterationsMax = (workConfig.getint("drawingField", "jitterIterationsMax", fallback=10))
     config.jitterIterationsHoriz = (workConfig.getint("drawingField", "jitterIterationsHoriz", fallback=2))
     config.jitterIterationsVert = (workConfig.getint("drawingField", "jitterIterationsVert", fallback=2))
+    config.alwaysJitterLineAfterDrawn = (workConfig.getboolean("drawingField", "alwaysJitterLineAfterDrawn", fallback=False))
+    
     config.doJitterWhenAddingBG = (workConfig.getboolean("drawingField", "doJitterWhenAddingBG", fallback=True))
     config.blendLevelRateBase = float(workConfig.get("drawingField", "blendLevelRateBase", fallback=0.01))
     config.totalRandomPenColorProb = float(workConfig.get("drawingField", "totalRandomPenColorProb", fallback=0.0))

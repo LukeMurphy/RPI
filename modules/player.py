@@ -332,6 +332,8 @@ def _configure_saving(config, workconfig):
     if config.saveToFile:
         config.outPutPath = workconfig.get("displayconfig", "outPutPath")
         config.timeToTakeInterval = float(workconfig.get("displayconfig", "timeToTakeInterval"))
+        config.saveFileCropFromLeft = workconfig.getint("displayconfig", "saveFileCropFromLeft", fallback=0)
+        config.saveFileCropFromTop = workconfig.getint("displayconfig", "saveFileCropFromTop", fallback=0)
         config.topDirector = TopDirector(config)
         config.topDirector.slotRate = config.timeToTakeInterval
 

@@ -1,6 +1,7 @@
 import math
 import random
 import time
+import configparser
 
 from matplotlib.pylab import rand
 import numpy as np
@@ -706,24 +707,27 @@ def _load_texture_models(config):
 def _load_texture_values(_tName):
     tex = Texture()
     tex.name = _tName
-    tex.useTextureLayer = workConfig.getboolean(_tName, "useTextureLayer", fallback=False)
-    tex.step = workConfig.getint(_tName, "texture_step", fallback=7)
-    tex.px = workConfig.getint(_tName, "texture_px", fallback=2)
-    tex.blockRows = workConfig.getint(_tName, "texture_blockRows", fallback=8)
-    tex.blockCols = workConfig.getint(_tName, "texture_blockCols", fallback=8)
-    tex.rows = workConfig.getint(_tName, "texture_rows", fallback=64)
-    tex.cols = workConfig.getint(_tName, "texture_cols", fallback=32)
-    tex.rate = workConfig.getint(_tName, "texture_rate", fallback=2)
-    tex.base = workConfig.getint(_tName, "texture_base", fallback=125)
-    tex.clr_r = workConfig.getint(_tName, "texture_clr_r", fallback=40)
-    tex.clr_g = workConfig.getint(_tName, "texture_clr_g", fallback=40)
-    tex.clr_b = workConfig.getint(_tName, "texture_clr_b", fallback=240)
-    tex.skipProb = workConfig.getfloat(_tName, "texture_skipProb", fallback=0.7)
-    tex.blur = workConfig.getint(_tName, "texture_blur", fallback=1)
-    tex.xtick = workConfig.getint(_tName, "texture_xtick", fallback=0)
-    tex.ytick = workConfig.getint(_tName, "texture_ytick", fallback=0)
-    tex.drawMark = workConfig.getfloat(_tName, "texture_drawMark", fallback=0.9)
-    tex.usedots = workConfig.getboolean(_tName, "texture_usedots", fallback=True)
+    textureConfig = configparser.ConfigParser()
+    textureConfig.read(f"configs/asset_configs/textures/{_tName}.cfg")
+    print(f"textureConfig  {textureConfig}")
+    tex.useTextureLayer = textureConfig.getboolean("textureParams", "useTextureLayer", fallback=False)
+    tex.step = textureConfig.getint("textureParams", "texture_step", fallback=7)
+    tex.px = textureConfig.getint("textureParams", "texture_px", fallback=2)
+    tex.blockRows = textureConfig.getint("textureParams", "texture_blockRows", fallback=8)
+    tex.blockCols = textureConfig.getint("textureParams", "texture_blockCols", fallback=8)
+    tex.rows = textureConfig.getint("textureParams", "texture_rows", fallback=64)
+    tex.cols = textureConfig.getint("textureParams", "texture_cols", fallback=32)
+    tex.rate = textureConfig.getint("textureParams", "texture_rate", fallback=2)
+    tex.base = textureConfig.getint("textureParams", "texture_base", fallback=125)
+    tex.clr_r = textureConfig.getint("textureParams", "texture_clr_r", fallback=40)
+    tex.clr_g = textureConfig.getint("textureParams", "texture_clr_g", fallback=40)
+    tex.clr_b = textureConfig.getint("textureParams", "texture_clr_b", fallback=240)
+    tex.skipProb = textureConfig.getfloat("textureParams", "texture_skipProb", fallback=0.7)
+    tex.blur = textureConfig.getint("textureParams", "texture_blur", fallback=1)
+    tex.xtick = textureConfig.getint("textureParams", "texture_xtick", fallback=0)
+    tex.ytick = textureConfig.getint("textureParams", "texture_ytick", fallback=0)
+    tex.drawMark = textureConfig.getfloat("textureParams", "texture_drawMark", fallback=0.9)
+    tex.usedots = textureConfig.getboolean("textureParams", "texture_usedots", fallback=True)
     return tex
 
 
@@ -819,54 +823,58 @@ def _load_pen_config(config):
     config.pen_centerVariationYMin = int(workConfig.get("drawingField", "pen_centerVariationYMin", fallback=0))
     config.pen_centerVariationYMax = int(workConfig.get("drawingField", "pen_centerVariationYMax", fallback=0))
     config.changePenColorWhileDrawingProb = float(workConfig.get("drawingField", "changePenColorWhileDrawingProb", fallback=0.01))
-
     config.penNames = workConfig.get("drawingField", "penNames").split(",")
     # config.marksPalette = {}
     config.marksPalette = []
 
     for _penConfigName in config.penNames:
+
+        markConfig = configparser.ConfigParser()
+        markConfig.read(f"configs/asset_configs/marks/{_penConfigName}.cfg")
+        print(f"markConfig  {markConfig}")
+
         _mark = Mark()
         _mark.name = _penConfigName
         print(f" => Getting the config for the pen {_penConfigName}")
 
-        _mark.minNumPoints = int(workConfig.get(_penConfigName, "minNumPoints", fallback=8))
-        _mark.maxNumPoints = int(workConfig.get(_penConfigName, "maxNumPoints", fallback=8))
-        _mark.turnsRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "turnsRange", fallback="2,2").split(",")))
+        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
+        _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
+        _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
 
-        _mark.minInterpolatedPoints = int(workConfig.get(_penConfigName, "minInterpolatedPoints", fallback=200))
-        _mark.maxInterpolatedPoints = int(workConfig.get(_penConfigName, "maxInterpolatedPoints", fallback=200))
+        _mark.minInterpolatedPoints = int(markConfig.get("markParams", "minInterpolatedPoints", fallback=200))
+        _mark.maxInterpolatedPoints = int(markConfig.get("markParams", "maxInterpolatedPoints", fallback=200))
 
-        _mark.baseRadiusFactorRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "baseRadiusFactorRange", fallback="1.0,1.0").split(",")))
-        _mark.xRadiusFactorRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xRadiusFactorRange", fallback=".2,.2").split(",")))
-        _mark.yRadiusFactorRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yRadiusFactorRange", fallback=".2,.2").split(",")))
+        _mark.baseRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "baseRadiusFactorRange", fallback="1.0,1.0").split(",")))
+        _mark.xRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "xRadiusFactorRange", fallback=".2,.2").split(",")))
+        _mark.yRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "yRadiusFactorRange", fallback=".2,.2").split(",")))
 
-        _mark.xRadiusFactorNoiseFactor = float(workConfig.get(_penConfigName, "xRadiusFactorNoiseFactor", fallback=1.0))
-        _mark.yRadiusFactorNoiseFactor = float(workConfig.get(_penConfigName, "yRadiusFactorNoiseFactor", fallback=1.0))
-        _mark.xRandomRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xRandomRange", fallback="-1,1").split(",")))
-        _mark.yRandomRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yRandomRange", fallback="-1,1").split(",")))
+        _mark.xRadiusFactorNoiseFactor = float(markConfig.get("markParams", "xRadiusFactorNoiseFactor", fallback=1.0))
+        _mark.yRadiusFactorNoiseFactor = float(markConfig.get("markParams", "yRadiusFactorNoiseFactor", fallback=1.0))
+        _mark.xRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "xRandomRange", fallback="-1,1").split(",")))
+        _mark.yRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "yRandomRange", fallback="-1,1").split(",")))
 
-        _mark.rotationFactor = float(workConfig.get(_penConfigName, "rotationFactor", fallback=8.0))
+        _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
 
-        _mark.xOffsetRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xOffsetRange", fallback="-1,1").split(",")))
-        _mark.yOffsetRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yOffsetRange", fallback="-1,1").split(",")))
+        _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange", fallback="-1,1").split(",")))
+        _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange", fallback="-1,1").split(",")))
 
-        _mark.w = int(workConfig.get(_penConfigName, "w", fallback=1))
-        _mark.minMarkWidth = int(workConfig.get(_penConfigName, "minMarkWidth", fallback=2))
-        _mark.maxMarkWidth = int(workConfig.get(_penConfigName, "maxMarkWidth", fallback=7))
-        _mark.changeMarkWidthProb = float(workConfig.get(_penConfigName, "changeMarkWidthProb", fallback=".02"))
-        _mark.mode = int(workConfig.get(_penConfigName, "mode", fallback=1))
+        _mark.w = int(markConfig.get("markParams", "w", fallback=1))
+        _mark.minMarkWidth = int(markConfig.get("markParams", "minMarkWidth", fallback=2))
+        _mark.maxMarkWidth = int(markConfig.get("markParams", "maxMarkWidth", fallback=7))
+        _mark.changeMarkWidthProb = float(markConfig.get("markParams", "changeMarkWidthProb", fallback=".02"))
+        _mark.mode = int(markConfig.get("markParams", "mode", fallback=1))
 
         """
         adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y - in general the arithmetic is more nuanced
         """
-        _mark.xTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "xTravelRange", fallback="-1,1").split(",")))
-        _mark.yTravelRange = list(map(lambda x: int(x), workConfig.get(_penConfigName, "yTravelRange", fallback="-1,1").split(",")))
-        _mark.xTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "xTravelIncrRange", fallback="-1,1").split(",")))
-        _mark.yTravelIncrRange = list(map(lambda x: float(x), workConfig.get(_penConfigName, "yTravelIncrRange", fallback="-1,1").split(",")))       
-        _mark.xtravelProb = float(workConfig.get(_penConfigName, "xtravelProb", fallback=0.1))
-        _mark.ytravelProb = float(workConfig.get(_penConfigName, "ytravelProb", fallback=0.1))
-        _mark.radiusChangePerRound = float(workConfig.get(_penConfigName, "radiusChangePerRound", fallback=0))
-        _mark.incrementFactor = float(workConfig.get(_penConfigName, "incrementFactor", fallback=1))
+        _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
+        _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
+        _mark.xTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "xTravelIncrRange", fallback="-1,1").split(",")))
+        _mark.yTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "yTravelIncrRange", fallback="-1,1").split(",")))       
+        _mark.xtravelProb = float(markConfig.get("markParams", "xtravelProb", fallback=0.1))
+        _mark.ytravelProb = float(markConfig.get("markParams", "ytravelProb", fallback=0.1))
+        _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback=0))
+        _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback=1))
         config.marksPalette.append(_mark)
 
     # print(config.marksPalette)

@@ -88,7 +88,7 @@ def changePalettes():
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 def startNewLine(_pen):
-    # print(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
+    print(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
     setPenProperties(_pen)
     setPenColor(_pen)
     _img = generateSmoothLinePoints(_pen)
@@ -98,7 +98,7 @@ def startNewLine(_pen):
 
 
 def setPenProperties(pen):
-    # print(f"setting {pen} {pen.name}")
+    print(f"setting {pen} {pen.name}")
     setPenPropsByName(pen.name, pen)
     setPenColor(pen)
 
@@ -188,6 +188,7 @@ def setPenColor(_pen):
 
 def choosePenMark() :
     _penName = random.choice(config.activePalette.pens)
+    # print(f"\nLooking for this pen mark: {_penName}\n")
     for _pen in config.marksPalette:
         # print(f"{_pen.name} {config.activePalette.pens}")
         if _pen.name == _penName :
@@ -831,6 +832,9 @@ def _load_pen_config(config):
 
     for _penConfigName in config.penNames:
 
+        _mark = Mark()
+        _mark.name = f"{_penConfigName}"
+
         markConfig = configparser.ConfigParser()
         pathToCfg = f"{_marksPath}configs/asset_configs/marks/{_penConfigName}.cfg"
         markConfig.read(pathToCfg)
@@ -843,8 +847,6 @@ def _load_pen_config(config):
             print(i)
         print(" ---------------------------- ")
 
-        _mark = Mark()
-        _mark.name = _penConfigName
 
         _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
         _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))

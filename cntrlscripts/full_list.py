@@ -225,10 +225,11 @@ def _get_config_files(configPath, filterText):
             fullPath = os.path.join(root, name)
             if name.endswith(".cfg") and not name.endswith(".py") and name != ".DS_Store":
                 res = os.stat(fullPath)
-                if not filterResults:
-                    fullList.append((fullPath, res.st_mtime, name))
-                elif name.find(filterText) > 0 or fullPath.find(filterText) > 0:
-                    fullList.append((fullPath, res.st_mtime, name))
+                if "asset_configs" not in fullPath:
+                    if not filterResults:
+                        fullList.append((fullPath, res.st_mtime, name))
+                    elif name.find(filterText) > 0 or fullPath.find(filterText) > 0:
+                        fullList.append((fullPath, res.st_mtime, name))
     return fullList
 
 

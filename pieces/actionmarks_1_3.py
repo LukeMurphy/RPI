@@ -826,11 +826,13 @@ def _load_pen_config(config):
     config.penNames = workConfig.get("drawingField", "penNames").split(",")
     # config.marksPalette = {}
     config.marksPalette = []
+    _marksPath = config.path
+    if _marksPath[-1] != "/" : _marksPath = f"{config.path}/"
 
     for _penConfigName in config.penNames:
 
         markConfig = configparser.ConfigParser()
-        pathToCfg = f"{config.path}configs/asset_configs/marks/{_penConfigName}.cfg"
+        pathToCfg = f"{_marksPath}configs/asset_configs/marks/{_penConfigName}.cfg"
         markConfig.read(pathToCfg)
 
         print(" ---------------------------- ")

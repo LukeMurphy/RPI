@@ -174,6 +174,10 @@ def setPenPropsByName(_name, pen):
     pen.attenuating = False
     pen.enlarging = False
 
+    pen.linePpoints = _penProps.linePoints
+    pen.lopOff = _penProps.lopOff
+    pen.forceOrientation = _penProps.forceOrientation
+
     # print(f"setting pen props pen.name {pen.name}")
     # print(f"pen.drawingSkip {pen.drawingSkip}")
     # print("--")
@@ -198,6 +202,32 @@ def choosePenMark() :
 
 def generateSmoothLinePoints(_pen):
 
+    if "lineMarks" in _pen.name :
+        # clearCurrentDrawing()
+        _generateLine(_pen)
+    else :
+        _generateCurve(_pen)
+
+
+def _generateLine(_pen):
+    points = []
+    _rangex = _pen.yRandomRange[0]
+    _yD = _pen.maxNumPoints
+    _pts = round(config.canvasHeight / _yD) + 2
+
+    for i in range(_pts):
+        if _pen.forceOrientation == "horizontal":
+            _y  =  (_rangex - (_rangex * 2 * random.random()))
+            _x  = _yD * i
+        else:
+            _x  =  (_rangex - (_rangex * 2 * random.random()))
+            _y  = _yD * i
+        points.append([_x,_y])
+    smoothLine(points, _pen)
+
+
+def _generateCurve(_pen):
+    
     width = _pen.drawingSize[0]
     height = _pen.drawingSize[1]
     num_points = _pen.num_points
@@ -252,6 +282,13 @@ def generateSmoothLinePoints(_pen):
 
     # Close the shape by repeating the first point
     points.append(points[0])
+    smoothLine(points, _pen)
+
+
+def smoothLine(points, _pen):
+    _lopOff = -round(_pen.lopOff)
+
+    print(f"_lopOff {_pen.lopOff} {_lopOff}")
     points = np.array(points)
 
     # Fit a B-spline to the points
@@ -273,7 +310,7 @@ def generateSmoothLinePoints(_pen):
         _pen.rotationAngle += _pen.rotationAngle / 500
         smooth_points_r.append((ptx + _pen.xOffset, pty + _pen.yOffset))
 
-    _pen.smooth_points = smooth_points_r
+    _pen.smooth_points = smooth_points_r[:_lopOff]
 
     # either clockwise or counter
     if random.random() < 0.5:
@@ -887,8 +924,17 @@ def _load_pen_config(config):
         _mark.yTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "yTravelIncrRange", fallback="-1,1").split(",")))       
         _mark.xtravelProb = float(markConfig.get("markParams", "xtravelProb", fallback=0.1))
         _mark.ytravelProb = float(markConfig.get("markParams", "ytravelProb", fallback=0.1))
-        _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback=0))
-        _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback=1))
+        _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback="0"))
+        _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback="1"))
+
+
+        _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
+        _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
+        _mark.forceOrientation = (markConfig.get("markParams", "forceOrientation", fallback="vertical"))
+
+
+
+
         config.marksPalette.append(_mark)
 
     # print(config.marksPalette)

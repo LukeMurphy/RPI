@@ -648,25 +648,28 @@ def renderImage():
     elif not config.fadeThruToNewDone :
         config.fadeThruToNewDone = True
         initDrawings()
-        
+
     config.canvasImage.paste(_tempImage, (0, 0), _tempImage)
 
-    if not config.debugMode :
+    if not config.debugMode:
         config.finalCompositeLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
         config.finalCompositeLayer.paste(config.canvasImage,(0,0),config.canvasImage)
-        config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
-    else :
-        config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
-        config.finalCompositeLayerDraw.rectangle((0,550,config.canvasWidth, 550 + config.canvasHeight), fill = (config.bgColor))
+    else:
+        _layerCompositing(config)
 
-        config.finalCompositeLayer.paste(config.textureLayer,(0,0),config.textureLayer)      
-        config.finalCompositeLayer.paste(config.image,(280,0),config.image)
-        config.finalCompositeLayer.paste(config.underLayer,(0,280),config.underLayer)
+    config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
 
-        config.finalCompositeLayerDraw.rectangle((280,280,config.canvasWidth  + 280, 280 + config.canvasHeight), fill = (config.bgColor))
-        config.finalCompositeLayer.paste(config.canvasImage,(280,280),config.canvasImage)
 
-        config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
+def _layerCompositing(config):
+    config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
+    config.finalCompositeLayerDraw.rectangle((0,550,config.canvasWidth, 550 + config.canvasHeight), fill = (config.bgColor))
+
+    config.finalCompositeLayer.paste(config.textureLayer,(0,0),config.textureLayer)
+    config.finalCompositeLayer.paste(config.image,(280,0),config.image)
+    config.finalCompositeLayer.paste(config.underLayer,(0,280),config.underLayer)
+
+    config.finalCompositeLayerDraw.rectangle((280,280,config.canvasWidth  + 280, 280 + config.canvasHeight), fill = (config.bgColor))
+    config.finalCompositeLayer.paste(config.canvasImage,(280,280),config.canvasImage)
 
 
 def clearCurrentDrawing():

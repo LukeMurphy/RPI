@@ -830,10 +830,11 @@ def _load_pen_config(config):
     for _penConfigName in config.penNames:
 
         markConfig = configparser.ConfigParser()
-        markConfig.read(f"configs/asset_configs/marks/{_penConfigName}.cfg")
+        pathToCfg = f"configs/asset_configs/marks/{_penConfigName}.cfg"
+        markConfig.read(pathToCfg)
 
         print(" ---------------------------- ")
-        print(f" => Getting the config for the pen {_penConfigName}")
+        print(f" => Getting the config for the pen {_penConfigName} {pathToCfg}")
         print(f"markConfig  {markConfig}")
 
         for i in markConfig :
@@ -843,7 +844,7 @@ def _load_pen_config(config):
         _mark = Mark()
         _mark.name = _penConfigName
 
-        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"), fallback=8)
+        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints", fallback=8))
         _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
         _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
 

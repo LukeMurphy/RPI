@@ -159,6 +159,7 @@ def clear():
 def stopAll():
     # print("Tkinter is easy to use!")
     os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+    os.system("ps -ef | pgrep -f sequencer | xargs sudo kill -9;")
 
 
 def sortByDate():

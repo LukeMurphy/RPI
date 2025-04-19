@@ -46,12 +46,19 @@ def timeChecker(sequenceConfig, config):
     sequenceConfig.currentTime = time.time()
 
     # uncomment to debug
-    #print(bcolors.WARNING + "** " + "sequence-player.py checking the time ... " + str(round(sequenceConfig.currentTime - sequenceConfig.startTime)) + " / " + str(sequenceConfig.currentPieceDuration) + ""  + bcolors.ENDC)
+    print(
+        f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
+        + ""
+        + bcolors.ENDC
+    )
 
     if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration:
         _select_next_piece(sequenceConfig)
         _launch_next_player(sequenceConfig)
         _kill_old_players(sequenceConfig)
+
+    time.sleep(1)
+    timeChecker(sequenceConfig, config)
 
 def _select_next_piece(sequenceConfig):
     sequenceConfig.startTime = time.time()
@@ -166,16 +173,14 @@ def loadWorkConfig(work, sequenceConfig):
     print(f"Sequence Player PID is: {sequenceConfig.currentPID}")
     print("---------------------------------------------------------------------------------------")
 
-    fakeCallBack(sequenceConfig, config)
+    callBack(sequenceConfig, config)
 
 
 
-def fakeCallBack(sequenceConfig, config):
-    while True:
-        # checks the time every second - could configure this if really
-        # necessary
-        time.sleep(1)
-        timeChecker(sequenceConfig, config)	
+def callBack(sequenceConfig, config):
+    time.sleep(1)
+    print("foo")
+    timeChecker(sequenceConfig, config)	
 
 
 

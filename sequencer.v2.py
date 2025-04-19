@@ -21,7 +21,7 @@ from PIL import (
     ImageFont,
     ImageOps,
 )
-
+from multiprocessing import Pool
 from modules import configuration, player
 from modules.rendering import appWindow
 from modules.configuration import bcolors
@@ -46,11 +46,11 @@ def timeChecker(sequenceConfig, config):
     sequenceConfig.currentTime = time.time()
 
     # uncomment to debug
-    print(
-        f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
-        + ""
-        + bcolors.ENDC
-    )
+    # print(
+    #     f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
+    #     + ""
+    #     + bcolors.ENDC
+    # )
 
     if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration:
         _select_next_piece(sequenceConfig)
@@ -83,15 +83,23 @@ def _launch_next_player(sequenceConfig):
     pieceToPlay = sequenceConfig.playOrder if sequenceConfig.playInOrder else random.randrange(len(sequenceConfig.workList))
     work = sequenceConfig.workList[pieceToPlay]
 
-    brightnessOverrideString = f" -brightnessOverride {work[3]}" if work[3] else ""
-    commandString = f"python3 {scriptsPath}player.py -cfg {work[0]}{brightnessOverrideString}"
+    brightnessOverrideString = f"{work[3]}" if work[3] else ""
+    commandString = "player.py"
+    arg1 = "-cfg"
+    arg2 = f"{work[0]}"
+    arg4 = brightnessOverrideString
+    # commandString = f"{scriptsPath}player.py"
 
     print("---------------------------------------------------------------------------------------")
     print("Sequencer is calling :\n" + commandString)
     print("---------------------------------------------------------------------------------------")
     print(bcolors.ENDC)
 
-    os.system(commandString)
+    if arg4 != "":
+        arg3 = "-brightnessOverride"
+        subprocess.Popen(['python3',commandString,arg1,arg2,arg3,arg4])
+    else:
+        subprocess.Popen(['python3',commandString,arg1,arg2])
     sequenceConfig.playCount += 1
 
 def _kill_old_players(sequenceConfig):

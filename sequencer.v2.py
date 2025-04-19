@@ -46,19 +46,19 @@ def timeChecker(sequenceConfig, config):
     sequenceConfig.currentTime = time.time()
 
     # uncomment to debug
-    # print(
-    #     f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
-    #     + ""
-    #     + bcolors.ENDC
-    # )
+    print(
+        f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
+        + ""
+        + bcolors.ENDC
+    )
 
     if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration:
         _select_next_piece(sequenceConfig)
         _launch_next_player(sequenceConfig)
         _kill_old_players(sequenceConfig)
 
-    time.sleep(1)
-    timeChecker(sequenceConfig, config)
+
+
 
 def _select_next_piece(sequenceConfig):
     sequenceConfig.startTime = time.time()
@@ -142,8 +142,6 @@ def _kill_old_players(sequenceConfig):
         
         # end try
 
-
-
 def loadWorkConfig(work, sequenceConfig):
 
     workconfig = configparser.ConfigParser()
@@ -183,14 +181,10 @@ def loadWorkConfig(work, sequenceConfig):
 
     callBack(sequenceConfig, config)
 
-
-
 def callBack(sequenceConfig, config):
-    time.sleep(1)
-    print("foo")
-    timeChecker(sequenceConfig, config)	
-
-
+    while True:
+        time.sleep(1)
+        timeChecker(sequenceConfig, config)	
 
 def loadConfigFile():
     parser = argparse.ArgumentParser(description="Process")

@@ -43,7 +43,7 @@ def filterRemapImage(config):
 
 def changeDrawing(args):
     global config
-    print("\nCHANGE DRAWING/PAINTING")
+    # print("\nCHANGE DRAWING/PAINTING")
     createImageLayers()
     changePalettes()
     initDrawings()
@@ -71,7 +71,7 @@ def changeDrawingMode():
 
 def changePalettes():
     config.activePalette = random.choice(config.paletteSets)
-    print(f"New Palette : {config.activePalette.name}")
+    # print(f"New Palette : {config.activePalette.name}")
     setBGColor()
     config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
     config.canvasDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
@@ -88,7 +88,7 @@ def changePalettes():
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 def startNewLine(_pen):
-    print(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
+    # print(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
     setPenProperties(_pen)
     setPenColor(_pen)
     _img = generateSmoothLinePoints(_pen)
@@ -98,7 +98,7 @@ def startNewLine(_pen):
 
 
 def setPenProperties(pen):
-    print(f"setting {pen} {pen.name}")
+    # print(f"setting {pen} {pen.name}")
     setPenPropsByName(pen.name, pen)
     setPenColor(pen)
 
@@ -288,7 +288,7 @@ def _generateCurve(_pen):
 def smoothLine(points, _pen):
     _lopOff = -round(_pen.lopOff)
 
-    print(f"_lopOff {_pen.lopOff} {_lopOff}")
+    # print(f"_lopOff {_pen.lopOff} {_lopOff}")
     points = np.array(points)
 
     # Fit a B-spline to the points
@@ -879,13 +879,13 @@ def _load_pen_config(config):
         pathToCfg = f"{_marksPath}configs/asset_configs/marks/{_penConfigName}.cfg"
         markConfig.read(pathToCfg)
 
-        print(" ---------------------------- ")
-        print(f" => Getting the config for the pen {_penConfigName} {pathToCfg}")
-        print(f"markConfig  {markConfig}")
+        # print(" ---------------------------- ")
+        # print(f" => Getting the config for the pen {_penConfigName} {pathToCfg}")
+        # print(f"markConfig  {markConfig}")
 
-        for i in markConfig :
-            print(i)
-        print(" ---------------------------- ")
+        # for i in markConfig :
+        #     print(i)
+        # print(" ---------------------------- ")
 
 
         _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))

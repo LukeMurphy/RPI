@@ -30,6 +30,23 @@ class Texture:
         pass
 
 # ----------------------------------------------------##----------------------------------------------------#
+
+
+def chaikins_corner_cutting(coords, refinements=5, ratio=.75):
+    coords = np.array(coords)
+
+    for _ in range(refinements):
+        L = coords.repeat(2, axis=0)
+        R = np.empty_like(L)
+        R[0] = L[0]
+        R[2::2] = L[1:-1:2]
+        R[1:-1:2] = L[2::2]
+        R[-1] = L[-1]
+        coords = L * ratio + R * (1.00 - ratio)
+
+    return coords
+
+# ----------------------------------------------------##----------------------------------------------------#
 def filterRemapImage(config):
     config.useFilters = True
     config.remapImageBlock = False
@@ -212,18 +229,29 @@ def generateSmoothLinePoints(_pen):
 def _generateLine(_pen):
     points = []
     _rangex = _pen.yRandomRange[0]
+    _rangey = _pen.yRandomRange[1]
     _yD = _pen.maxNumPoints
     _pts = round(config.canvasHeight / _yD) + 2
-
+    _pen.smooth_points = []
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y  =  (_rangex - (_rangex * 2 * random.random()))
             _x  = _yD * i
         else:
             _x  =  (_rangex - (_rangex * 2 * random.random()))
-            _y  = _yD * i
+            _y  = _yD * i + random.uniform(-_rangey,_rangey)
         points.append([_x,_y])
-    smoothLine(points, _pen)
+        # _pen.smooth_points.append((_x +_pen.xOffset,_y + _pen.yOffset))
+    # smoothLine(points, _pen)
+    _pen.smooth_points = []     
+    ratio = random.uniform(0.6, 0.8)
+    res =  (chaikins_corner_cutting(points,2, ratio).tolist())
+    for pt in res :
+        _pen.smooth_points.append((pt[0]+_pen.xOffset,pt[1]+_pen.yOffset))
+    # either clockwise or counter
+    if random.random() < 0.5:
+        _pen.smooth_points.reverse()
+
 
 
 def _generateCurve(_pen):
@@ -281,8 +309,16 @@ def _generateCurve(_pen):
         _pen.lastPoint = [x, y]
 
     # Close the shape by repeating the first point
-    points.append(points[0])
-    smoothLine(points, _pen)
+    # points.append(points[0])
+    # smoothLine(points, _pen)
+
+    _pen.smooth_points = []     
+    res =  (chaikins_corner_cutting(points,2).tolist())
+    for pt in res :
+        _pen.smooth_points.append((pt[0]+_pen.xOffset,pt[1]+_pen.yOffset))
+    # either clockwise or counter
+    if random.random() < 0.5:
+        _pen.smooth_points.reverse()
 
 
 def smoothLine(points, _pen):

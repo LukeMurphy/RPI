@@ -31,7 +31,7 @@ class Texture:
 
 # ----------------------------------------------------##----------------------------------------------------#
 
-
+# https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
 def chaikins_corner_cutting(coords, refinements=5, ratio=.75):
     coords = np.array(coords)
 
@@ -243,11 +243,12 @@ def _generateLine(_pen):
         points.append([_x,_y])
         # _pen.smooth_points.append((_x +_pen.xOffset,_y + _pen.yOffset))
     # smoothLine(points, _pen)
-    _pen.smooth_points = []     
+    _pen.smooth_points = []
     ratio = random.uniform(0.6, 0.8)
     res =  (chaikins_corner_cutting(points,2, ratio).tolist())
-    for pt in res :
-        _pen.smooth_points.append((pt[0]+_pen.xOffset,pt[1]+_pen.yOffset))
+    _pen.smooth_points.extend(
+        (pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res
+    )
     # either clockwise or counter
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
@@ -312,10 +313,11 @@ def _generateCurve(_pen):
     # points.append(points[0])
     # smoothLine(points, _pen)
 
-    _pen.smooth_points = []     
+    _pen.smooth_points = []
     res =  (chaikins_corner_cutting(points,2).tolist())
-    for pt in res :
-        _pen.smooth_points.append((pt[0]+_pen.xOffset,pt[1]+_pen.yOffset))
+    _pen.smooth_points.extend(
+        (pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res
+    )
     # either clockwise or counter
     if random.random() < 0.5:
         _pen.smooth_points.reverse()

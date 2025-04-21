@@ -46,11 +46,11 @@ def timeChecker(sequenceConfig, config):
     sequenceConfig.currentTime = time.time()
 
     # uncomment to debug
-    print(
-        f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
-        + ""
-        + bcolors.ENDC
-    )
+    # print(
+    #     f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
+    #     + ""
+    #     + bcolors.ENDC
+    # )
 
     if sequenceConfig.currentTime - sequenceConfig.startTime > sequenceConfig.currentPieceDuration:
         _select_next_piece(sequenceConfig)

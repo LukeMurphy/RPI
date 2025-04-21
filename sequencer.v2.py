@@ -30,7 +30,7 @@ import subprocess
 from subprocess import check_output
 
 
-'''
+"""
 This file runs as a daemon to mange the sequence of players
 Mange is right
 I can barely remember how this works
@@ -39,7 +39,7 @@ basically it starts a new player and kills off the previous one over and over ag
 avoid a memory leak by having one player re-load new configs that I had the last time
 not elegant but way more maintainable  ;)
 
-'''
+"""
 
 
 def timeChecker(sequenceConfig, config):
@@ -56,8 +56,6 @@ def timeChecker(sequenceConfig, config):
         _select_next_piece(sequenceConfig)
         _launch_next_player(sequenceConfig)
         _kill_old_players(sequenceConfig)
-
-
 
 
 def _select_next_piece(sequenceConfig):
@@ -78,17 +76,18 @@ def _select_next_piece(sequenceConfig):
 
     sequenceConfig.currentPieceDuration = round(random.uniform(work[1], work[2]))
 
+
 def _launch_next_player(sequenceConfig):
     scriptsPath = f"{os.path.dirname(__file__)}/"
     pieceToPlay = sequenceConfig.playOrder if sequenceConfig.playInOrder else random.randrange(len(sequenceConfig.workList))
     work = sequenceConfig.workList[pieceToPlay]
 
     brightnessOverrideString = f"{work[3]}" if work[3] else ""
-    commandString = "player.py"
+    # commandString = "player.py"
+    commandString = f"{scriptsPath}player.py"
     arg1 = "-cfg"
     arg2 = f"{work[0]}"
     arg4 = brightnessOverrideString
-    # commandString = f"{scriptsPath}player.py"
 
     print("---------------------------------------------------------------------------------------")
     print("Sequencer is calling :\n" + commandString)
@@ -97,10 +96,11 @@ def _launch_next_player(sequenceConfig):
 
     if arg4 != "":
         arg3 = "-brightnessOverride"
-        subprocess.Popen(['python3',commandString,arg1,arg2,arg3,arg4])
+        subprocess.Popen(["python3", commandString, arg1, arg2, arg3, arg4])
     else:
-        subprocess.Popen(['python3',commandString,arg1,arg2])
+        subprocess.Popen(["python3", commandString, arg1, arg2])
     sequenceConfig.playCount += 1
+
 
 def _kill_old_players(sequenceConfig):
     time.sleep(3)
@@ -134,13 +134,15 @@ def _kill_old_players(sequenceConfig):
                         subprocess.run([f"kill {p}"], shell=True, check=True)
             except Exception as e:
                 print(e)
-        # comment: 
+        # comment:
         print("---------------------------------------------------------------------------------------")
         print(bcolors.ENDC)
     except Exception as e:
         print(e)
-        
+
         # end try
+
+
 
 def loadWorkConfig(work, sequenceConfig):
 
@@ -157,7 +159,7 @@ def loadWorkConfig(work, sequenceConfig):
     config.isRunning = True
     # This is so the Player does not create a window
     config.standAlone = False
-    config.callBack = lambda : timeChecker(sequenceConfig, config)
+    config.callBack = lambda: timeChecker(sequenceConfig, config)
 
     config.MID = ""
     config.path = sequenceConfig.path
@@ -173,7 +175,6 @@ def loadWorkConfig(work, sequenceConfig):
     workconfig.read(argument)
     config.fileName = argument
 
-
     sequenceConfig.currentPID = os.getpid()
     print("---------------------------------------------------------------------------------------")
     print(f"Sequence Player PID is: {sequenceConfig.currentPID}")
@@ -181,10 +182,12 @@ def loadWorkConfig(work, sequenceConfig):
 
     callBack(sequenceConfig, config)
 
+
 def callBack(sequenceConfig, config):
     while True:
         time.sleep(1)
-        timeChecker(sequenceConfig, config)	
+        timeChecker(sequenceConfig, config)
+
 
 def loadConfigFile():
     parser = argparse.ArgumentParser(description="Process")
@@ -203,7 +206,10 @@ def loadConfigFile():
     )
     return parser.parse_args()
 
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
 def loadSequenceFile():
     print(f"{bcolors.WARNING}\n\n\n************************************************\n\n")
     args = loadConfigFile()
@@ -219,18 +225,16 @@ def loadSequenceFile():
         sequenceConfig.MID = args.mname
         sequenceConfig.path = args.path
 
-
-        print ("script: sys.argv[0] is", repr(sys.argv[0]))
-        print ("script: __file__ is", repr(__file__))
-        print ("script: cwd is", repr(os.getcwd()))
-        print ("config: path  is", repr(args.path))
+        print("script: sys.argv[0] is", repr(sys.argv[0]))
+        print("script: __file__ is", repr(__file__))
+        print("script: cwd is", repr(os.getcwd()))
+        print("config: path  is", repr(args.path))
 
         # Automating the config path a bit better
-        # assumes that if no -path is specified, it defaults to ./ so 
+        # assumes that if no -path is specified, it defaults to ./ so
         # just to be sure get the abs path
-        if sequenceConfig.path == './' :
-            sequenceConfig.path = __file__.replace('sequencer.v2.py','')+ "/"
-
+        if sequenceConfig.path == "./":
+            sequenceConfig.path = __file__.replace("sequencer.v2.py", "") + "/"
 
         argument = f"{sequenceConfig.path}configs/{args.cfg}"
 
@@ -240,10 +244,10 @@ def loadSequenceFile():
         sequenceConfig.fileName = argument
         sequenceConfig.fileNameRaw = args.cfg
 
-        sequenceConfig.playInOrder = (workconfig.getboolean("displayconfig", "playInOrder"))
-        sequenceConfig.playOrder = 0 
+        sequenceConfig.playInOrder = workconfig.getboolean("displayconfig", "playInOrder")
+        sequenceConfig.playOrder = 0
 
-        sequenceConfig.workListManifest = list(workconfig.get("displayconfig","workList").split(','))
+        sequenceConfig.workListManifest = list(workconfig.get("displayconfig", "workList").split(","))
         sequenceConfig.currentPieceDuration = 1
         sequenceConfig.playCount = 0
 
@@ -254,24 +258,22 @@ def loadSequenceFile():
             minDuration = float(workconfig.get(w, "minDuration"))
             maxDuration = float(workconfig.get(w, "maxDuration"))
             try:
-                brightnessOverride = float(workconfig.get(w,"brightnessOverride"))
+                brightnessOverride = float(workconfig.get(w, "brightnessOverride"))
             except Exception as e:
                 print(f" ==> brightnessOverride not defined {e} ")
                 brightnessOverride = None
 
-
-            sequenceConfig.workList.append([work,minDuration,maxDuration,brightnessOverride])
+            sequenceConfig.workList.append([work, minDuration, maxDuration, brightnessOverride])
 
         print(f"{bcolors.WARNING}---------------------------------------------------------------------------------------")
         print("WorkList:")
         print(sequenceConfig.workList)
 
-
         sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)
         sequenceConfig.mainAppWindow.setUp()
         sequenceConfig.mainAppWindow.createMainCanvas()
 
-        pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList)-1))
+        pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList) - 1))
         pieceToPlay = 0
         loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
         print(f"{bcolors.ENDC}")
@@ -284,14 +286,14 @@ def _loadSequencer_print_args(arg0, arg1):
     # print("---------------------------------------------------------------------------------------")
     print(bcolors.ENDC)
 
-        #sequenceConfig.mainAppWindow.run()
+    # sequenceConfig.mainAppWindow.run()
 
 
 def main():
     global config, threads
 
     loadSequenceFile()
-    
+
     """
     # Threading now handled by renderer - e.g. see modules/rendertohub.py
     thrd = threading.Thread(target=configure)

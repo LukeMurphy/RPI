@@ -29,9 +29,9 @@ _quitClr = "#74144c"
 _stopAllClr = "#9e1b67"
 
 _prodColor = "#e4fff3"
-_devFormsClr = "#58fc00"
-_devClr = "#58fcbd"
-_devFormsClr = "#58fc00"
+_devFormsClr = "#3bdde2"
+_devClr = "#3bdde2"
+_devFormsClr = "#79fcf3"
 _devOnDeckClr = "#ccFF00"
 _screenGridClr = "#eeeeee"
 
@@ -255,8 +255,8 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
     key = list(item.keys())[0]
     ListBoxOfConfigs.itemconfig(END, bg=_prodColor if "prod" in key else "white")
-    ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "dev_forms" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devClr if "dev/" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "forms" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_screenGridClr if "screen_grid" in key else None)
 
@@ -274,10 +274,10 @@ screen_height = root.winfo_screenheight()
 root.geometry(
     "%dx%d+%d+%d"
     % (
-        760,
+        860,
         420,
         # round(screen_height * 0.6),
-        round(screen_width - 800),
+        round(screen_width - 900),
         round(1 * screen_height / 2),
     )
 )
@@ -302,7 +302,7 @@ ListBoxOfConfigs.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=ListBoxOfConfigs.yview)
 
 topBtnPlace = 8
-leftBtnPlace = 630
+leftBtnPlace = 730
 
 # sort by directory is 1 sort all by date is 0
 sortDefault = 1
@@ -371,14 +371,16 @@ sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 # sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
 # -------------------------------- #
-ondeckButton = Button(root, text="On Deck", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("ondeck"))
+ondeckButton = Button(root, text="By Form", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("forms"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
+ondeckButton = Button(root, text="By Anim", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("animations"))
+ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 
 prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda:ondeck("prod"))
-prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
+prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda:ondeck("dev"))
-devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
+devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
 slogan = Button(
@@ -390,11 +392,11 @@ slogan = Button(
     borderless=1,
     command=stopAll,
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
 
 # -------------------------------- #
 quitbutton = Button(root, text="QUIT", width=120, bg=_quitClr, fg="white", borderless=1, command=quit)
-quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
+quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
 
 

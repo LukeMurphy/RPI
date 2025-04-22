@@ -231,11 +231,11 @@ def updateCanvas():
     ############################################################
 
     if config.checkForConfigChanges:
-        _extracted_from_updateCanvas_42(config)
+        relaunchOnChange(config)
 
 
 # TODO Rename this here and in `updateCanvas`
-def _extracted_from_updateCanvas_42(config):
+def relaunchOnChange(config):
     currentTime = time.time()
     f = os.path.getmtime(config.fileName)
     f2 = os.path.getmtime(f"{config.path}pieces/{config.work}.py")

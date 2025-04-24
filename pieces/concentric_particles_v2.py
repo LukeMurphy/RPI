@@ -38,7 +38,7 @@ class ParticleDot:
     def setUp(self, p, n):
         # variation in initial velocity
         direction = 1 if p.directionProb < 0.5 else -1
-        orbit = True if p.orbitProb <= config.orbitProb else False
+        orbit = p.orbitProb <= config.orbitProb
         fx = random.random() * p.fFactor + 1
         fy = random.random() * p.fFactor + 1
         vx = math.cos(p.angle * n) * fx * direction
@@ -111,7 +111,7 @@ class RadialSet:
             self.angleOffsetSpeed = math.pi/290
             innerRadius = 10
 
-        for _ in range(0, self.radials):
+        for _ in range(self.radials):
             ir = innerRadius + random.uniform(-50, 50)
             outr = outerRadius + random.uniform(-50, 50)
             skip = 0 if random.random() < skipRatio else 1
@@ -142,16 +142,18 @@ class ParticleSystem:
         self.xSpeed = random.random()  * config.PSXSpeed
         self.ySpeed = random.random() * config.PSYSpeed
 
-        self.drawRadialPolys = True if random.random() < .5 else False
+        self.drawRadialPolys = random.random() < .5
 
-        radialSet = RadialSet(config, self.wBase)
-        radialSet.makeRadialsSet(120,300)
-        self.radialSets.append(radialSet)
+        radialSet = self._setRadialAttributes(120, 300)
+        radialSet = self._setRadialAttributes(1, 1)
 
-        # the 33s hand
-        radialSet = RadialSet(config, self.wBase)
-        radialSet.makeRadialsSet(1,1)
-        self.radialSets.append(radialSet)
+
+    def _setRadialAttributes(self, arg0, arg1):
+        result = RadialSet(config, self.wBase)
+        result.makeRadialsSet(arg0, arg1)
+        self.radialSets.append(result)
+
+        return result
 
     def setCenter(self):
         # initial center position
@@ -212,12 +214,12 @@ class ParticleSystem:
         self.radialBand = self.maxRadius / 12
 
 
-        for n in range(0, self.p):
+        for n in range(self.p):
             pDot = ParticleDot()
             pDot.setUp(self, n)
             self.particles.append(pDot)
             
-        print(f"bands {self.bands}")
+        # print(f"bands {self.bands}")
 
     def move(self):
 
@@ -226,9 +228,9 @@ class ParticleSystem:
 
         if self.x > config.canvasWidth - round(self.wBase / 4):
             self.xSpeed = 0
-            
 
-        for q in range(0, self.p):
+
+        for q in range(self.p):
             ref = self.particles[q]
 
             if ref.mode == 1:
@@ -248,20 +250,20 @@ class ParticleSystem:
                 if config.horizontalContinuity  :
                     if ref.xPos  > config.imageCanvasWidth :
                         ref.xPos = 0
-                        
+
                     if ref.xPos  < 0 :
                         ref.xPos  = config.imageCanvasWidth   
                 # vertical Continuity
                 if config.verticalContinuity  :
                     if ref.xPos  > config.imageCanvasWidth :
                         ref.xPos = 0
-                        
+
                     if ref.xPos  < 0 :
                         ref.xPos  = config.imageCanvasWidth   
-                        
+
                     if ref.yPos  > config.imageCanvasHeight :
                         ref.yPos = 0
-                        
+
                     if ref.yPos  < 0 :
                         ref.yPos  = config.imageCanvasHeight   
             else:
@@ -276,12 +278,9 @@ class ParticleSystem:
             self.particles[q].clr[1] = self.particles[q].clr[1] - self.decr_g
             self.particles[q].clr[2] = self.particles[q].clr[2] - self.decr_b
 
-            if self.particles[q].clr[0] <= 0:
-                self.particles[q].clr[0] = 0
-            if self.particles[q].clr[1] <= 0:
-                self.particles[q].clr[1] = 0
-            if self.particles[q].clr[2] <= 0:
-                self.particles[q].clr[2] = 0
+            self.particles[q].clr[0] = max(self.particles[q].clr[0], 0)
+            self.particles[q].clr[1] = max(self.particles[q].clr[1], 0)
+            self.particles[q].clr[2] = max(self.particles[q].clr[2], 0)
 
             r = self.particles[q].clr[0]
             g = self.particles[q].clr[1]
@@ -310,25 +309,25 @@ class ParticleSystem:
             # if (q ==0) : print (particles[q]['c'][0])
             xDisplayPos = ref.xPos
             yDisplayPos = ref.yPos
-            
+
             # horizontal Continuity
             if config.horizontalContinuity  :
                 if xDisplayPos  > config.canvasWidth :
                     xDisplayPos = ref.xPos - config.imageCanvasWidth
-                    
+
                 if xDisplayPos  < 0 :
                     xDisplayPos  = config.imageCanvasWidth  - ref.xPos
             # vertical Continuity
             if config.verticalContinuity  :
                 if xDisplayPos  > config.imageCanvasWidth :
                     xDisplayPos = ref.xPos - config.imageCanvasWidth
-                    
+
                 if xDisplayPos  < 0 :
                     xDisplayPos  = config.imageCanvasWidth  - ref.xPos
-                    
+
                 if yDisplayPos  > config.imageCanvasHeight :
                     yDisplayPos = ref.yPos - config.imageCanvasHeight
-                    
+
                 if yDisplayPos  < 0 :
                     yDisplayPos  = config.imageCanvasHeight  - ref.yPos
 
@@ -366,7 +365,7 @@ class ParticleSystem:
                     # config.image.putpixel((round(xDisplayPos), round(yDisplayPos)+1), (r, g, b))
                     # config.image.putpixel((round(xDisplayPos)+1, round(yDisplayPos)+1), (r, g, b))
                 except Exception as e:
-                    print(str(e))
+                    print(e)
 
             """
 			"""
@@ -419,7 +418,7 @@ def drawBands(p):
 
 
     # Draw from the outside-in
-    for i in range(0, p.bands):
+    for i in range(p.bands):
 
         w = wBase - i * wDiff
         x0 = p.x - w / 2
@@ -453,31 +452,26 @@ def drawBands(p):
         bBase += bDiff
         aBase += aDiff
 
-        if rBase < 0 :
-            rBase = 0
-        if gBase < 0 :
-            gBase = 0
-        if bBase < 0 :
-            bBase = 0
-
+        rBase = max(rBase, 0)
+        gBase = max(gBase, 0)
+        bBase = max(bBase, 0)
     i = 0
 
 
-    for rSet in p.radialSets :
+    for rSet in p.radialSets:
 
         rSet.angleOffset += rSet.angleOffsetSpeed
         polyArray = []
         numLines  = len(rSet.radialsArray)
 
-        for n in range(0, numLines):
+        for n in range(numLines):
             a = i * rSet.rads + rSet.angleOffset
             x0 = math.cos(a) * rSet.radialsArray[n][0] + p.x
             y0 = math.sin(a) * rSet.radialsArray[n][0] + p.y
             x1 = math.cos(a) * rSet.radialsArray[n][1] + p.x
             y1 = math.sin(a) * rSet.radialsArray[n][1] + p.y
             i += 1
-            polyArray.append((x0,y0))
-            polyArray.append((x1,y1))
+            polyArray.extend(((x0, y0), (x1, y1)))
             if rSet.radialsArray[n][2] == 0:
                 config.draw.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
                 config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
@@ -616,7 +610,7 @@ def main(run=True):
     config.bgColorSets = []
     for bg in bgColorSets:
         bgColor = (workConfig.get(bg, "bgColor")).split(",")
-        bgColors = list(int(x) for x in bgColor)
+        bgColors = [int(x) for x in bgColor]
         config.bgColorSets.append(bgColors)
 
     # choose the first bg color - generally the dark one
@@ -653,18 +647,18 @@ def main(run=True):
     config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
     config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
     config.orbitProb = float(workConfig.get("particles", "orbitProb"))
-    
-    
+
+
     # set the actual drawing space
     try:
         config.imageCanvasWidth = int(workConfig.get("particles","imageCanvasWidth"))
         config.imageCanvasHeight = int(workConfig.get("particles","imageCanvasHeight"))
-        
+
     except Exception as e:
-        print(str(e))
+        print(e)
         config.imageCanvasWidth = config.canvasWidth
         config.imageCanvasHeight = config.canvasHeight
-    
+
     try:
         # comment: # for some towers the seam between the 
         # start and end needs to become semi-continuous
@@ -675,7 +669,7 @@ def main(run=True):
         config.horizontalContinuity = workConfig.getboolean("particles","horizontalContinuity")
         config.horizontalOverlapFraction = int(workConfig.get("particles","horizontalOverlapFraction"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.horizontalContinuity = False
         config.horizontalOverlapFraction = 1
 
@@ -689,7 +683,7 @@ def main(run=True):
         config.verticalContinuity = workConfig.getboolean("particles","verticalContinuity")
         config.verticalOverlapFraction = int(workConfig.get("particles","verticalOverlapFraction"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.verticalContinuity = False
         config.verticalOverlapFraction = 1
     # end try
@@ -703,7 +697,7 @@ def main(run=True):
         config.PSRadiusMin = float(workConfig.get("particles", "PSRadiusMin"))
         config.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.PSXSpeed = .5
         config.PSYSpeed =  0
         config.PSRadiusFactor1 =  1.5
@@ -719,31 +713,31 @@ def main(run=True):
         config.gRangeMin = int(workConfig.get("particles","gRangeMin"))
         config.bRangeMin = int(workConfig.get("particles","bRangeMin"))
     except Exception as e:
-        print(str(e))
+        print(e)
         config.rRange = 255
         config.gRange = 200
         config.bRange = 255
         config.rRangeMin = 0
         config.gRangeMin = 0
         config.bRangeMin = 0
-        
-        
+
+
     try:
         goldenRingsArray = workConfig.get("particles","goldenRingsArray").split(',')
-        config.goldenRingsArray = list(int(x) for x in goldenRingsArray)
+        config.goldenRingsArray = [int(x) for x in goldenRingsArray]
     except Exception as e:
-        print(str(e))
+        print(e)
         config.goldenRingsArray = [0,24]
 
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
     config.draw = ImageDraw.Draw(config.drawingImage)
-    
+
     config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight * 2))
     config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
-    
-    
+
+
     PS = ParticleSystem(config)
     PS.setCenter()
     PS.setNewAttributes()

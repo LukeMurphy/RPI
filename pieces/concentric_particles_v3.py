@@ -112,7 +112,7 @@ class RadialSet:
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
-        print(f"wBase {self.wBase} innerRadius = {innerRadius}")
+        # print(f"wBase {self.wBase} innerRadius = {innerRadius}")
 
 
 class ParticleSystem:
@@ -287,11 +287,11 @@ class ParticleSystem:
             self.particles.append(pDot)
             
             
-        print("----------------")
-        print(f"PS.useFixedBandColors : {self.useFixedBandColors}")
-        print(f"config.bgColor: {config.bgColor} config.fadeRateDelta:{config.fadeRateDelta}")
-        print(f"PS.bands: {self.bands} PS.wDiff: {self.wDiff}  PS.wBase: {self.wBase}")
-        print("----------------")
+        # print("----------------")
+        # print(f"PS.useFixedBandColors : {self.useFixedBandColors}")
+        # print(f"config.bgColor: {config.bgColor} config.fadeRateDelta:{config.fadeRateDelta}")
+        # print(f"PS.bands: {self.bands} PS.wDiff: {self.wDiff}  PS.wBase: {self.wBase}")
+        # print("----------------")
 
          
     def move(self):

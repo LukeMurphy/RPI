@@ -901,6 +901,7 @@ def _handle_disturbances():
 
 def _handle_filter_remapping():
     """Handles filter remapping if enabled."""
+    #print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
     if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
         _remap_filter(config)
 
@@ -914,6 +915,7 @@ def _remap_filter(config):
     endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
     config.remapImageBlockDestination = [startX, startY]
+
 
 
 def _handle_fading_and_rebuild():
@@ -1068,7 +1070,7 @@ def _loadFilterRemapping():
 
 def _loadFilterRemappingConfigs():
     _load_config_value(config, workConfig, "movingpattern", "filterRemapping", False, bool)
-    _load_config_value(config, workConfig, "movingpattern", "stefilterRemappingProbps", 0, float)
+    _load_config_value(config, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
     _load_config_value(config, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
     _load_config_value(config, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)

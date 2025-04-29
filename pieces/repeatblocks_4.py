@@ -267,6 +267,7 @@ def setUpDisturbanceConfigs(configSet):
 
 
 def setupStableSections():
+    print("New stable sections")
     config.stableSegments = []
     n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
     minWidth = config.stableSectionsMinWidth
@@ -500,7 +501,7 @@ def changeSinglePalette(index=0):
 
 def setPalette(config, index=0):
     paletteObj = config.paletteList[index]
-    print(f"New palette {paletteObj.paletteName}")
+    print(f"Setting a new palette:  {paletteObj.paletteName}")
     config.colOverlay.currentColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.colOverlay.bgColor = setCurrentColor(paletteObj.colOverlay, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.linecolOverlay.currentColor = setCurrentColor(paletteObj.linecolOverlay)
@@ -534,6 +535,17 @@ def setupPalettes():
     setPalette(config, config.currentPaletteIndex)
 
     config.borderPalette = changeSinglePalette(0)
+
+
+def selectNewPalette(_setPalette=True):
+        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
+        if config.currentPaletteIndex == len(config.palettes):
+            config.currentPaletteIndex = 0
+        print(f"Choosing a palette:  {config.palettes[config.currentPaletteIndex]}")
+        # buildPalette(config, newPalette)
+        if _setPalette :
+            setPalette(config, config.currentPaletteIndex)
+
 
 
 # --------------------- PATTERNS     ---------------------
@@ -607,7 +619,7 @@ def _get_temp_palette(config):
     if random.SystemRandom().random() > config.changePaletteWhenChangingPatternProb:
         return config.paletteList[config.currentPaletteIndex]
     if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb:
-        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
+        selectNewPalette(False)
     return changeSinglePalette(config.currentPaletteIndex)
 
 
@@ -627,11 +639,7 @@ def rebuildPatterns(arg=0):
     if c == 1 and config.numRowsRandomize:
         _rowsAndDotsSettings()
     if c == 2 or (random.random() < config.changePaletteWhenRebuildProb):
-        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
-        if config.currentPaletteIndex == len(config.palettes):
-            config.currentPaletteIndex = 0
-        # buildPalette(config, newPalette)
-        setPalette(config, config.currentPaletteIndex)
+        selectNewPalette()
 
     if c >= 3:
         buildPatternSequence(config)
@@ -758,11 +766,10 @@ def setupPatterns():
 def iterate():
     """Performs a single iteration of the animation."""
     global config
+    # _handlePaletteChanges()
     _update_background_color()
     _handle_clip_player()
-
     _draw_and_process_pattern()
-
     _handle_disturbances()
     _handle_filter_remapping()
     _handle_fading_and_rebuild()
@@ -850,6 +857,11 @@ def _update_background_color():
     config.bgColor = tuple(round(a * config.brightness) for a in config.colOverlay.currentColor)
 
 
+def _handlePaletteChanges():
+    if random.random() < .01 :
+        selectNewPalette()
+
+
 def _draw_and_process_pattern():
     """Draws and processes the repeated pattern image."""
     drawRepeatedPatternImage(config, config.patternImage)
@@ -915,7 +927,6 @@ def _remap_filter(config):
     endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
     config.remapImageBlockDestination = [startX, startY]
-
 
 
 def _handle_fading_and_rebuild():
@@ -1012,9 +1023,9 @@ def renderComposite(_img):
     # uncomment for all temp canvas layers to show 
 
     # config.destinationImage.paste(_img, (0, 0), _img)
-    # config.destinationImage.paste(config.patternImage, (280, 0), config.patternImage)
-    # config.destinationImage.paste(config.fader.crossFade, (0, 280), config.fader.crossFade)
-    # config.destinationImage.paste(config.fader.image, (280, 280), config.fader.image)
+    # config.destinationImage.paste(config.patternImage, (340, 0), config.patternImage)
+    # config.destinationImage.paste(config.fader.crossFade, (0, 330), config.fader.crossFade)
+    # config.destinationImage.paste(config.fader.image, (340, 330), config.fader.image)
     # config.render(config.destinationImage, 0, 0)
 
     config.render(_img, config.imgcanvasOffsetX, config.imgcanvasOffsetY, config.canvasWidth, config.canvasHeight)
@@ -1082,7 +1093,7 @@ def _loadFilterRemappingConfigs():
 def _loadPolyOverlaybaseValues():
     try:
         _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
-        print(_polyBaseVals)
+        # print(_polyBaseVals)
         config.polyBase = []
         for _a in _polyBaseVals:
             _ps = list(map(lambda x: int(x), _a.split(",")))
@@ -1114,7 +1125,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         config.polyOverlay.colorTransitionSetup()
         config.polyOverlayChangeProb = float(workConfig.get("movingpattern", "polyOverlayChangeProb", fallback=0.003))
         _loadPolyOverlaybaseValues()
-        print(config.polyBase)
+        # print(config.polyBase)
     except Exception as e:
         print(f" ==> Not using custom polygon overlay {e}")
         config.usePolygonOverlay = False

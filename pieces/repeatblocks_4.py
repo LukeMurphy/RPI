@@ -667,7 +667,6 @@ def resetCrossFader():
     config.fader.initialized = True
     config.debugPause = True
 
-
 def rowsAndDotsSettings():
 
     config.numRows = round(random.uniform(1, 2))
@@ -904,6 +903,7 @@ def handleDisturbances():
 
     if random.random() < config.stableSectionsChangeProb:
         setupStableSections()
+        resetCrossFader()
 
     if config.sectionDisturbance and config.fader.fadingDone:
         disturber()
@@ -1001,11 +1001,12 @@ def renderComposite():
     if config.usePolygonOverlay:
         config.compositeImage = shapeOverLayFunction(config.compositeImage)
 
-    # uncomment for all temp canvas layers to show
-    _w = config.canvasWidth
-    _h = config.canvasHeight
 
     config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
+
+    # # uncomment for all temp canvas layers to show
+    # _w = config.canvasWidth
+    # _h = config.canvasHeight
     # config.destinationImageDraw.rectangle((0,0,_w,_h), fill=None, outline=(0,255,255,200))
     # config.destinationImage.paste(config.patternImage, (1*(_w + 20), 0), config.patternImage)
     # config.destinationImage.paste(config.canvasImage, (2*(_w + 20), 0), config.canvasImage)

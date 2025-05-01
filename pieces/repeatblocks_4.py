@@ -652,7 +652,7 @@ def rebuildPatterns(arg=0):
 
     rebuildSections()
 
-    resetCrossFader()
+    resetCrossFader(False)
 
 def resetCrossFader(_useConfigImage=True):
     # os.system('afplay /System/Library/Sounds/Sosumi.aiff')
@@ -874,7 +874,7 @@ def handlePaletteChanges():
         # print("selectPaletted called from handlePaletteChanges()")
         selectNewPalette(True)
         # rebuildSections()
-        resetCrossFader()
+        resetCrossFader(False)
 
 def drawAndProcessPattern():
     """Draws and processes the repeated pattern image."""

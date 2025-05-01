@@ -4,6 +4,7 @@ import math
 import random
 import time
 import noise
+import os,sys
 from modules.configuration import bcolors
 from modules.movieClip import movieClip
 from modules import colorutils, panelDrawing, pattern_blocks
@@ -654,18 +655,20 @@ def rebuildPatterns(arg=0):
     resetCrossFader()
 
 def resetCrossFader():
+    # os.system('afplay /System/Library/Sounds/Sosumi.aiff')
     # print(f"DOING NOW  {config.faderDoingRefreshCount}")
+    # os.system('say "NOW" &')
     config.repeatDrawingMode = 1
     config.fader.fadingDone = False
     config.doTransition = True
 
-    config.fader.startingImage = config.compositeImage.copy()
+    config.fader.startingImage = config.image.copy()
     config.fader.endImage = config.canvasImage.copy()
     config.fader.crossFadeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
     config.fader.doingRefreshCount = config.faderDoingRefreshCount
     config.fader.initialized = True
-    config.debugPause = True
+    # config.debugPause = True
 
 def rowsAndDotsSettings():
 
@@ -783,6 +786,10 @@ def setupPatterns():
 def iterate():
     """Performs a single iteration of the animation."""
     global config
+
+    if config.debugPause :
+        config.directorController.slotRate = 2.0
+
     handlePaletteChanges()
     updateBackgroundColor()
     handleClipPlayer()

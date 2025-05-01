@@ -654,15 +654,17 @@ def rebuildPatterns(arg=0):
 
     resetCrossFader()
 
-def resetCrossFader():
+def resetCrossFader(_useConfigImage=True):
     # os.system('afplay /System/Library/Sounds/Sosumi.aiff')
     # print(f"DOING NOW  {config.faderDoingRefreshCount}")
     # os.system('say "NOW" &')
     config.repeatDrawingMode = 1
     config.fader.fadingDone = False
     config.doTransition = True
-
-    config.fader.startingImage = config.image.copy()
+    if _useConfigImage :
+        config.fader.startingImage = config.image.copy()
+    else :
+        config.fader.startingImage = config.canvasImage.copy()
     config.fader.endImage = config.canvasImage.copy()
     config.fader.crossFadeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
@@ -910,7 +912,7 @@ def handleDisturbances():
 
     if random.random() < config.stableSectionsChangeProb:
         setupStableSections()
-        resetCrossFader()
+        resetCrossFader(False)
 
     if config.sectionDisturbance and config.fader.fadingDone:
         disturber()

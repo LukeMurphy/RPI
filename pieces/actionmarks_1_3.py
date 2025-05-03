@@ -99,6 +99,7 @@ def changePalettes():
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     config.changeColorSetTimeToUse = random.randint(config.changeColorSetTime, round(config.changeColorSetTime*config.changeColorSetTimeMaxMultiplier))
     config.paletteController.slotRate = config.changeColorSetTimeToUse
+    config.slownessFactor = config.activePalette.slownessFactor
 
 
 
@@ -682,7 +683,7 @@ def iterate():
             print(f" =========>  releaseDrawing() prob: config.drawingController {config.drawingController.slotRate}")
             releaseDrawing()  
 
-    if random.SystemRandom().random() < config.changeBGColorProb :
+    if random.SystemRandom().random() < config.changeBGColorProb/config.slownessFactor :
         print(f" =========>  setBGColor() prob: config.changeBGColorProb {config.changeBGColorProb}")
         setBGColor()
 
@@ -701,11 +702,11 @@ def iterate():
         bgColorBlocksFilling(config)
 
     # dithering movement
-    if random.random() < config.filterRemappingProb:
+    if random.random() < config.filterRemappingProb/config.slownessFactor:
         print(f" =========>  filterRemapImage() prob: config.filterRemappingProb {config.filterRemappingProb}")
         filterRemapImage(config)
 
-    if not config.doingDrawing and random.random() < config.doJitterProb:
+    if not config.doingDrawing and random.random() < config.doJitterProb/config.slownessFactor:
         doDrawingJitter()
         print(f" =========>  doDrawingJitter() prob: config.doJitterProb {config.doJitterProb} config.doingDrawing {config.doingDrawing}")
 
@@ -910,11 +911,13 @@ def _load_drawing_configs(config):
         # probability
         palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
         palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
+        palette.slownessFactor = float(workConfig.get(_p, "slownessFactor", fallback="1.0"))
 
 
         config.paletteSets.append(palette)
 
     config.activePalette = random.choice(config.paletteSets)
+    config.slownessFactor =config.activePalette.slownessFactor
     print(f"New Palette : {config.activePalette.name}")
     setBGColor()
         

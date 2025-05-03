@@ -605,6 +605,8 @@ def createImageLayers(arg=None):
 
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
+    config.textureBlendMode  = tex.blendMode
+    print(f"config.useTextureLayer {config.useTextureLayer}")
     for _row in range(tex.blockRows):
         for _col in range(tex.blockCols):
             if random.random() > tex.skipProb:
@@ -665,38 +667,47 @@ def iterate():
     if config.changeDrawingModeTime > 0:
         config.changeTimeController.checkTime()
         if config.changeTimeController.advance:
+            print(f" =========>  changeDrawingMode()  prob: config.changeDrawingModeTime {config.changeDrawingModeTime}")
             changeDrawingMode()
 
     if config.changeColorSetTime > 0:
         config.paletteController.checkTime()
         if config.paletteController.advance:
+            print(f" =========>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
             changeDrawing(True)
 
     if config.stoppedAndWaitingToDraw :
         config.drawingController.checkTime()
         if config.drawingController.advance:
+            print(f" =========>  releaseDrawing() prob: config.drawingController {config.drawingController.slotRate}")
             releaseDrawing()  
 
     if random.SystemRandom().random() < config.changeBGColorProb :
+        print(f" =========>  setBGColor() prob: config.changeBGColorProb {config.changeBGColorProb}")
         setBGColor()
 
 
     if random.random() < config.clearCurrentDrawingProb:
+        print(f" =========>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
         clearCurrentDrawing()
 
 
     if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing:
         if config.doJitterWhenAddingBG :
-            # print("doing jitter while adding bg filling")
+            # print(f" =========>  doing jitter while adding bg filling prob:  {}")
+            print(f" =========>  doDrawingJitter() prob: config.usebgBoxProb {config.usebgBoxProb} config.doJitterWhenAddingBG {config.doJitterWhenAddingBG }")
             doDrawingJitter()
+        print(f" =========>  bgColorBlocksFilling() prob: config.usebgBoxProb {config.usebgBoxProb}")
         bgColorBlocksFilling(config)
 
     # dithering movement
     if random.random() < config.filterRemappingProb:
+        print(f" =========>  filterRemapImage() prob: config.filterRemappingProb {config.filterRemappingProb}")
         filterRemapImage(config)
 
     if not config.doingDrawing and random.random() < config.doJitterProb:
         doDrawingJitter()
+        print(f" =========>  doDrawingJitter() prob: config.doJitterProb {config.doJitterProb} config.doingDrawing {config.doingDrawing}")
 
     penLoopActions()
 
@@ -706,8 +717,12 @@ def iterate():
 def renderImage():
     global config
     config.underLayer.paste(config.image, (0, 0), config.image)
-    if config.useTextureLayer:
-        config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+
+
+    # config.textureLayerDraw.rectangle((50,50,100,150), fill=(200,0,200,200))
+    if config.useTextureLayer and config.textureBlendMode is None:
+        # config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+        config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
 
     _tempImage = ImageChops.blend(config.canvasImage, config.underLayer, config.blendLevel)
 
@@ -724,18 +739,25 @@ def renderImage():
         config.fadeThruToNewDone = True
         initDrawings()
 
-    config.canvasImage.paste(_tempImage, (0, 0), _tempImage)
+    config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
+    # config.canvasImage.paste(_tempImage, (0, 0), _tempImage)
 
     if not config.debugMode:
         config.finalCompositeLayerDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill = (config.bgColor))
-        config.finalCompositeLayer.paste(config.canvasImage,(0,0),config.canvasImage)
+        # config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
+        if config.textureBlendMode == "subtract":
+            _tempImage = ImageChops.subtract(config.canvasImage,config.textureLayer)
+            config.finalCompositeLayer.paste(_tempImage,(0,0),_tempImage)
+        else :
+            config.finalCompositeLayer.paste(config.canvasImage,(0,0),config.canvasImage)
+        # config.finalCompositeLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
     else:
-        _layerCompositing(config)
+        layerCompositing(config)
 
     config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
 
 
-def _layerCompositing(config):
+def layerCompositing(config):
     config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
     config.finalCompositeLayerDraw.rectangle((0,550,config.canvasWidth, 550 + config.canvasHeight), fill = (config.bgColor))
 
@@ -769,7 +791,7 @@ def main(run=True):
     _load_filter_config(config)
     _load_drawing_configs(config)
     _load_pen_config(config)
-    _initialize_system(config)
+    _load_and_initialize_system(config)
     if run:
         runWork()
 
@@ -788,25 +810,26 @@ def _load_texture_values(_tName):
     tex.name = _tName
     textureConfig = configparser.ConfigParser()
     textureConfig.read(f"configs/asset_configs/textures/{_tName}.cfg")
-    print(f"textureConfig  {textureConfig}")
-    tex.useTextureLayer = textureConfig.getboolean("textureParams", "useTextureLayer", fallback=False)
-    tex.step = textureConfig.getint("textureParams", "texture_step", fallback=7)
-    tex.px = textureConfig.getint("textureParams", "texture_px", fallback=2)
-    tex.blockRows = textureConfig.getint("textureParams", "texture_blockRows", fallback=8)
-    tex.blockCols = textureConfig.getint("textureParams", "texture_blockCols", fallback=8)
-    tex.rows = textureConfig.getint("textureParams", "texture_rows", fallback=64)
-    tex.cols = textureConfig.getint("textureParams", "texture_cols", fallback=32)
-    tex.rate = textureConfig.getint("textureParams", "texture_rate", fallback=2)
-    tex.base = textureConfig.getint("textureParams", "texture_base", fallback=125)
-    tex.clr_r = textureConfig.getint("textureParams", "texture_clr_r", fallback=40)
-    tex.clr_g = textureConfig.getint("textureParams", "texture_clr_g", fallback=40)
-    tex.clr_b = textureConfig.getint("textureParams", "texture_clr_b", fallback=240)
-    tex.skipProb = textureConfig.getfloat("textureParams", "texture_skipProb", fallback=0.7)
-    tex.blur = textureConfig.getint("textureParams", "texture_blur", fallback=1)
-    tex.xtick = textureConfig.getint("textureParams", "texture_xtick", fallback=0)
-    tex.ytick = textureConfig.getint("textureParams", "texture_ytick", fallback=0)
-    tex.drawMark = textureConfig.getfloat("textureParams", "texture_drawMark", fallback=0.9)
-    tex.usedots = textureConfig.getboolean("textureParams", "texture_usedots", fallback=True)
+    tex.useTextureLayer = textureConfig.getboolean("texture", "useTextureLayer", fallback=False)
+    print(f"{_tName} {tex.useTextureLayer}")
+    tex.step = textureConfig.getint("texture", "texture_step", fallback=7)
+    tex.px = textureConfig.getint("texture", "texture_px", fallback=2)
+    tex.blockRows = textureConfig.getint("texture", "texture_blockRows", fallback=8)
+    tex.blockCols = textureConfig.getint("texture", "texture_blockCols", fallback=8)
+    tex.rows = textureConfig.getint("texture", "texture_rows", fallback=64)
+    tex.cols = textureConfig.getint("texture", "texture_cols", fallback=32)
+    tex.rate = textureConfig.getint("texture", "texture_rate", fallback=2)
+    tex.base = textureConfig.getint("texture", "texture_base", fallback=125)
+    tex.clr_r = textureConfig.getint("texture", "texture_clr_r", fallback=40)
+    tex.clr_g = textureConfig.getint("texture", "texture_clr_g", fallback=40)
+    tex.clr_b = textureConfig.getint("texture", "texture_clr_b", fallback=240)
+    tex.skipProb = textureConfig.getfloat("texture", "texture_skipProb", fallback=0.7)
+    tex.blur = textureConfig.getint("texture", "texture_blur", fallback=1)
+    tex.xtick = textureConfig.getint("texture", "texture_xtick", fallback=0)
+    tex.ytick = textureConfig.getint("texture", "texture_ytick", fallback=0)
+    tex.drawMark = textureConfig.getfloat("texture", "texture_drawMark", fallback=0.9)
+    tex.usedots = textureConfig.getboolean("texture", "texture_usedots", fallback=True)
+    tex.blendMode = textureConfig.get("texture", "blendMode", fallback=None)
     return tex
 
 
@@ -978,7 +1001,7 @@ def _load_pen_config(config):
     # print(config.marksPalette)
 
 
-def _initialize_system(config):
+def _load_and_initialize_system(config):
     """Initializes the system and related parameters."""
     """Loads rendering-related configuration parameters."""
     

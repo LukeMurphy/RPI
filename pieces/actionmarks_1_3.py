@@ -57,7 +57,6 @@ def filterRemapImage(config):
     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
     config.remapImageBlockDestination = [startX, startY]
 
-
 def changeDrawing(args):
     global config
     print("\nCHANGE DRAWING/PAINTING")
@@ -73,7 +72,6 @@ def changeDrawing(args):
     # config.finalCompositeLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
     config.fadeThruToNew = 0
 
-
 def changeDrawingMode():
     config.drawingMode = random.randint(1, 4)
     # config.startNewLineProb = 0.005
@@ -84,7 +82,6 @@ def changeDrawingMode():
         config.changeTimeController.slotRate = random.randint(33, 63)
 
     # print(f" => New Drawing Mode: {config.drawingMode}")
-
 
 def changePalettes():
     config.activePalette = random.choice(config.paletteSets)
@@ -102,7 +99,6 @@ def changePalettes():
     config.slownessFactor = config.activePalette.slownessFactor
 
 
-
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 def startNewLine(_pen):
@@ -114,12 +110,10 @@ def startNewLine(_pen):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
-
 def setPenProperties(pen):
     # print(f"setting {pen} {pen.name}")
     setPenPropsByName(pen.name, pen)
     setPenColor(pen)
-
 
 def setPenPropsByName(_name, pen):
 
@@ -200,13 +194,11 @@ def setPenPropsByName(_name, pen):
     # print(f"pen.drawingSkip {pen.drawingSkip}")
     # print("--")
 
-
 def setPenColor(_pen):
     cR = config.activePalette.penColor
     _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
     if random.random() < config.totalRandomBGBoxColorProb :
         _pen.lineColor = colorutils.getRandomColorHSV(0,360,.1,1.0,.1,1.0,0,0, config.penAlpha, config.brightness) 
-
 
 def choosePenMark() :
     _penName = random.choice(config.activePalette.pens)
@@ -217,7 +209,6 @@ def choosePenMark() :
             # print(f"we chose {_pen.name}")
             return _pen
 
-
 def generateSmoothLinePoints(_pen):
 
     if "lineMarks" in _pen.name :
@@ -225,7 +216,6 @@ def generateSmoothLinePoints(_pen):
         _generateLine(_pen)
     else :
         _generateCurve(_pen)
-
 
 def _generateLine(_pen):
     points = []
@@ -253,8 +243,6 @@ def _generateLine(_pen):
     # either clockwise or counter
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
-
-
 
 def _generateCurve(_pen):
     
@@ -323,7 +311,6 @@ def _generateCurve(_pen):
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
 
-
 def smoothLine(points, _pen):
     _lopOff = -round(_pen.lopOff)
 
@@ -370,19 +357,16 @@ def smoothLine(points, _pen):
     # return image
     return True
 
-
 def pauseDrawing():
     config.stoppedAndWaitingToDraw = True
     config.canDraw = False
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0],config.activePalette.startNewLineDelayRange[1])
     # print(f"paused for {config.drawingController.slotRate}")
 
-
 def releaseDrawing():
     # print("released")
     config.stoppedAndWaitingToDraw = False
     config.canDraw = True
-
 
 def penLoopActions():
     if random.random() < config.changePenColorWhileDrawingProb:
@@ -399,7 +383,6 @@ def penLoopActions():
     #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
     #     print(f"config.canDraw {config.canDraw}")
     #     pauseDrawing()
-
 
 def drawLine(_pen):
     # Draw the shape
@@ -443,7 +426,6 @@ def drawLine(_pen):
         if _pen.enlarging : _pen._w += round(1 * _pen.incrementFactor)
         if _pen.attenuating : _pen._w -= round(1 * _pen.incrementFactor)
 
-
 def drawLineStopped():
     config.doingDrawing = False
     pauseDrawing()
@@ -464,7 +446,6 @@ def doDrawingJitter():
             config.jitterIterationsHoriz,
             config.jitterIterationsVert,
         )
-
 
 def bgColorBlocksFilling(arg):
     global config
@@ -518,7 +499,6 @@ def bgColorBlocksFilling(arg):
             config.bgGlitchDisplacementVertical,
         )
 
-
 def glitchBox(
     imageRef,
     apparentWidth,
@@ -564,12 +544,10 @@ def setBGColor():
     # print(f"config.activePalette.bgColor {config.activePalette.bgColor}")
     # print(f"config.bgColor {config.bgColor}")
 
-
 def primeCanvas(_i = 3):
     global config
     for _ in range(_i):
         bgColorBlocksFilling(True)
-
 
 def chooseTexture() :
     _textureName = config.activePalette.textureName
@@ -603,7 +581,6 @@ def createImageLayers(arg=None):
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
-
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
     config.textureBlendMode  = tex.blendMode
@@ -630,7 +607,6 @@ def createTextureLayer(tex):
                                 # config.textureLayerDraw.line((x1, y1, x2+_xtick, y2+_ytick), fill=(_clr_r, _clr_g, _clr_b, 255), width=0)
     if tex.blur > 0:
         config.textureLayer = config.textureLayer.filter(ImageFilter.GaussianBlur(radius=tex.blur))
-
 
 def initDrawings():
     global config
@@ -660,7 +636,6 @@ def runWork():
             iterate()
 
         time.sleep(config.redrawSpeed)
-
 
 def iterate():
     global config
@@ -714,7 +689,6 @@ def iterate():
 
     renderImage()
 
-
 def renderImage():
     global config
     config.underLayer.paste(config.image, (0, 0), config.image)
@@ -758,7 +732,6 @@ def renderImage():
 
     config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
 
-
 def layerCompositing(config):
     config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
     config.finalCompositeLayerDraw.rectangle((0,550,config.canvasWidth, 550 + config.canvasHeight), fill = (config.bgColor))
@@ -769,7 +742,6 @@ def layerCompositing(config):
 
     config.finalCompositeLayerDraw.rectangle((280,280,config.canvasWidth  + 280, 280 + config.canvasHeight), fill = (config.bgColor))
     config.finalCompositeLayer.paste(config.canvasImage,(280,280),config.canvasImage)
-
 
 def clearCurrentDrawing():
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],200))
@@ -797,7 +769,6 @@ def main(run=True):
     if run:
         runWork()
 
-
 def _load_texture_models(config):
     config.useTextureLayer = True
     config.textureSetNames = workConfig.get("drawingField", "textureSets", fallback='texture1').split(',')
@@ -805,7 +776,6 @@ def _load_texture_models(config):
     for _t in config.textureSetNames:
         _tex = _load_texture_values(_t)
         config.textureSets.append(_tex)
-
 
 def _load_texture_values(_tName):
     tex = Texture()
@@ -834,7 +804,6 @@ def _load_texture_values(_tName):
     tex.blendMode = textureConfig.get("texture", "blendMode", fallback=None)
     return tex
 
-
 def _load_filter_config(config):
     """Loads filter-related configuration parameters."""
     config.filterRemapping = workConfig.getboolean("particles", "filterRemapping", fallback=False)
@@ -845,7 +814,6 @@ def _load_filter_config(config):
     config.filterRemapMaxVertSize = int(workConfig.get("drawingField", "filterRemapMaxVertSize", fallback=24))
     config.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=config.canvasWidth))
     config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.canvasHeight))
-
 
 def _load_drawing_configs(config):
     """Loads color-related configuration parameters."""
@@ -922,36 +890,28 @@ def _load_drawing_configs(config):
     print(f"New Palette : {config.activePalette.name}")
     setBGColor()
         
-
 def _load_pen_config(config):
-    config.pen_centerVariationXMin = int(workConfig.get("drawingField", "pen_centerVariationXMin", fallback=0))
-    config.pen_centerVariationXMax = int(workConfig.get("drawingField", "pen_centerVariationXMax", fallback=0))
-    config.pen_centerVariationYMin = int(workConfig.get("drawingField", "pen_centerVariationYMin", fallback=0))
-    config.pen_centerVariationYMax = int(workConfig.get("drawingField", "pen_centerVariationYMax", fallback=0))
-    config.changePenColorWhileDrawingProb = float(workConfig.get("drawingField", "changePenColorWhileDrawingProb", fallback=0.01))
-    config.penNames = workConfig.get("drawingField", "penNames").split(",")
-    # config.marksPalette = {}
-    config.marksPalette = []
-    _marksPath = config.path
-    if _marksPath[-1] != "/" : _marksPath = f"{config.path}/"
+    """Loads pen / brush related configuration parameters."""
 
-    for _penConfigName in config.penNames:
+    def _load_pen_config_globals(config):
+        config.pen_centerVariationXMin = int(workConfig.get("drawingField", "pen_centerVariationXMin", fallback=0))
+        config.pen_centerVariationXMax = int(workConfig.get("drawingField", "pen_centerVariationXMax", fallback=0))
+        config.pen_centerVariationYMin = int(workConfig.get("drawingField", "pen_centerVariationYMin", fallback=0))
+        config.pen_centerVariationYMax = int(workConfig.get("drawingField", "pen_centerVariationYMax", fallback=0))
+        config.changePenColorWhileDrawingProb = float(workConfig.get("drawingField", "changePenColorWhileDrawingProb", fallback=0.01))
+        config.penNames = workConfig.get("drawingField", "penNames").split(",")
+        config.marksPalette = []
+        _marksPath = config.path
+        if _marksPath[-1] != "/" : _marksPath = f"{config.path}/"
+        return _marksPath
 
+    def _load_single_pen(_marksPath, _penConfigName):
         _mark = Mark()
         _mark.name = f"{_penConfigName}"
 
         markConfig = configparser.ConfigParser()
         pathToCfg = f"{_marksPath}configs/asset_configs/marks/{_penConfigName}.cfg"
         markConfig.read(pathToCfg)
-
-        # print(" ---------------------------- ")
-        # print(f" => Getting the config for the pen {_penConfigName} {pathToCfg}")
-        # print(f"markConfig  {markConfig}")
-
-        # for i in markConfig :
-        #     print(i)
-        # print(" ---------------------------- ")
-
 
         _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
         _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
@@ -980,9 +940,7 @@ def _load_pen_config(config):
         _mark.changeMarkWidthProb = float(markConfig.get("markParams", "changeMarkWidthProb", fallback=".02"))
         _mark.mode = int(markConfig.get("markParams", "mode", fallback=1))
 
-        """
-        adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y - in general the arithmetic is more nuanced
-        """
+        # adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y
         _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
         _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
         _mark.xTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "xTravelIncrRange", fallback="-1,1").split(",")))
@@ -992,18 +950,17 @@ def _load_pen_config(config):
         _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback="0"))
         _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback="1"))
 
-
         _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
         _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
         _mark.forceOrientation = (markConfig.get("markParams", "forceOrientation", fallback="vertical"))
 
+        return _mark
 
-
-
+    _marksPath = _load_pen_config_globals(config)
+    for _penConfigName in config.penNames:
+        _mark = _load_single_pen(_marksPath, _penConfigName)
         config.marksPalette.append(_mark)
-
     # print(config.marksPalette)
-
 
 def _load_and_initialize_system(config):
     """Initializes the system and related parameters."""

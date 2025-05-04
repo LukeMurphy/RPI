@@ -60,7 +60,7 @@ def filterRemapImage(config):
 
 def changeDrawing(args):
     global config
-    # print("\nCHANGE DRAWING/PAINTING")
+    print("\nCHANGE DRAWING/PAINTING")
     createImageLayers()
     changePalettes()
     initDrawings()
@@ -684,7 +684,7 @@ def iterate():
             releaseDrawing()  
 
     if random.SystemRandom().random() < config.changeBGColorProb/config.slownessFactor :
-        print(f" =========>  setBGColor() prob: config.changeBGColorProb {config.changeBGColorProb}")
+        print(f" =========>  setBGColor() prob: config.changeBGColorProb {config.changeBGColorProb/config.slownessFactor}")
         setBGColor()
 
 
@@ -703,12 +703,12 @@ def iterate():
 
     # dithering movement
     if random.random() < config.filterRemappingProb/config.slownessFactor:
-        print(f" =========>  filterRemapImage() prob: config.filterRemappingProb {config.filterRemappingProb}")
+        print(f" =========>  filterRemapImage() prob: config.filterRemappingProb {config.filterRemappingProb/config.slownessFactor}")
         filterRemapImage(config)
 
     if not config.doingDrawing and random.random() < config.doJitterProb/config.slownessFactor:
         doDrawingJitter()
-        print(f" =========>  doDrawingJitter() prob: config.doJitterProb {config.doJitterProb} config.doingDrawing {config.doingDrawing}")
+        print(f" =========>  doDrawingJitter() prob: config.doJitterProb {config.doJitterProb/config.slownessFactor} config.doingDrawing {config.doingDrawing}")
 
     penLoopActions()
 
@@ -734,7 +734,8 @@ def renderImage():
         config.blendLevel = 1.0
 
     if config.fadeThruToNew < 255 :
-        config.fadeThruToNew += 10
+        config.fadeThruToNew += 4
+        # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],config.fadeThruToNew))
     elif not config.fadeThruToNewDone :
         config.fadeThruToNewDone = True

@@ -602,6 +602,37 @@ def concentricBoxes(config, paletteObj=None):
             print(f"Concentric boxes error prob too many {e}")
 
 
+
+def randomizer3(config, paletteObj=None):
+
+    w = config.randomBlockWidth
+    h = config.randomBlockHeight
+
+    clr3 = tuple(int(a) for a in (paletteObj.colOverlay.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.linecolOverlay.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.linecolOverlay2.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+
+    rows = config.blockHeight
+    cols = config.blockWidth
+
+    step = w
+    hStep = h
+
+    if w == 0:
+        step = 1
+    if h == 0:
+        hStep = 1
+
+    for r in range(0, rows, hStep):
+        for c in range(0, cols, step):
+            clr = colorutils.getRandomRGB(config.brightness / 2)
+            if random.random() < config.randomBlockProb:
+                config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
+
+
+
 def decoBoxes(config, paletteObj=None):
 
     clr = tuple(int(a * config.brightness) for a in (config.linecolOverlay2.currentColor))

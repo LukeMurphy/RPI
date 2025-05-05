@@ -563,7 +563,7 @@ def selectNewPalette(_setPalette=True):
 # --------------------- PATTERNS     ---------------------
 
 def buildPatternSequence(config):
-    print("Building new pattern sequence")
+    # print("Building new pattern sequence")
     config.patternSequence = []
     config.usedPatterns = []
 

@@ -29,6 +29,46 @@ class Texture:
     def __init__(self):
         pass
 
+class TransitionStates:
+    rate = .02
+    count  = 0
+    countMax  = 20
+    inTransition = False
+    chunckSize = 140
+
+    def __init__(self, config):
+        self.transitionController = Director(config)
+        self.transitionController.slotRate = self.rate
+
+    def initiateTransition(self):
+        self.inTransition = True
+        self.count = 0
+
+        self.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        self.intermediateImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+        self.destinationImageDraw = ImageDraw.Draw(self.destinationImage)
+        self.destinationImageDraw.rectangle((0,0,50,50), fill = (200,0,0,200))
+
+    def transition(self):
+        self.transitionController.checkTime()
+        if self.transitionController.advance:
+            self.stepThru()
+    
+    def stepThru(self):
+
+        # print(self.count)
+        if self.count < self.countMax :
+            _x = round(random.uniform(-self.chunckSize/2, config.canvasWidth))
+            _y = round(random.uniform(-self.chunckSize/2, config.canvasHeight))
+            _part  = self.sourceImage.crop((_x,_y,_x + self.chunckSize, _y + self.chunckSize))
+            self.intermediateImage.paste(_part,(_x,_y),_part)
+            self.count +=1
+        else :
+            self.inTransition = False
+
+
+
 # ----------------------------------------------------##----------------------------------------------------#
 
 # https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
@@ -71,6 +111,7 @@ def changeDrawing(args):
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
     # config.finalCompositeLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
     config.fadeThruToNew = 0
+    initiateTransition()
 
 def changeDrawingMode():
     config.drawingMode = random.randint(1, 4)
@@ -98,7 +139,10 @@ def changePalettes():
     config.paletteController.slotRate = config.changeColorSetTimeToUse
     config.slownessFactor = config.activePalette.slownessFactor
 
-
+def initiateTransition():
+    # print("\n ITNITATE TRANSITION")
+    config.transitionStateHandler.sourceImage = config.finalCompositeLayer
+    config.transitionStateHandler.initiateTransition()
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 def startNewLine(_pen):
@@ -182,7 +226,9 @@ def setPenPropsByName(_name, pen):
     pen.drawingSkip = random.uniform(0.0, 0.01)
     pen._p = 0
     pen.smooth_points = []
-    pen.speed = random.randint(1, 5)
+    _penSpeedMax = max(1,math.ceil(5/config.slownessFactor + 1))
+    pen.speed = random.randint(1, _penSpeedMax)
+    # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
     pen.attenuating = False
     pen.enlarging = False
 
@@ -581,6 +627,7 @@ def createImageLayers(arg=None):
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
+
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
     config.textureBlendMode  = tex.blendMode
@@ -640,53 +687,65 @@ def runWork():
 def iterate():
     global config
 
-    if config.changeDrawingModeTime > 0:
-        config.changeTimeController.checkTime()
-        if config.changeTimeController.advance:
-            print(f" =========>  changeDrawingMode()  prob: config.changeDrawingModeTime {config.changeDrawingModeTime}")
-            changeDrawingMode()
+    def maybe_change_drawing_mode():
+        if config.changeDrawingModeTime > 0:
+            config.changeTimeController.checkTime()
+            if config.changeTimeController.advance:
+                changeDrawingMode()
 
-    if config.changeColorSetTime > 0:
-        config.paletteController.checkTime()
-        if config.paletteController.advance:
-            print(f" =========>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
-            changeDrawing(True)
+    def maybe_change_color_set():
+        if config.changeColorSetTime > 0 and not config.transitionStateHandler.inTransition:
+            config.paletteController.checkTime()
+            if config.paletteController.advance:
+                print(f" =========>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
+                changeDrawing(True)
 
-    if config.stoppedAndWaitingToDraw :
-        config.drawingController.checkTime()
-        if config.drawingController.advance:
-            print(f" =========>  releaseDrawing() prob: config.drawingController {config.drawingController.slotRate}")
-            releaseDrawing()  
+    def maybe_release_drawing():
+        if config.stoppedAndWaitingToDraw:
+            config.drawingController.checkTime()
+            if config.drawingController.advance:
+                releaseDrawing()
 
-    if random.SystemRandom().random() < config.changeBGColorProb/config.slownessFactor :
-        print(f" =========>  setBGColor() prob: config.changeBGColorProb {config.changeBGColorProb/config.slownessFactor}")
-        setBGColor()
+    def maybe_set_bg_color():
+        if random.SystemRandom().random() < config.changeBGColorProb / config.slownessFactor:
+            setBGColor()
 
+    def maybe_clear_current_drawing():
+        if random.random() < config.clearCurrentDrawingProb and not config.transitionStateHandler.inTransition:
+            print(f" =========>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
+            clearCurrentDrawing()
 
-    if random.random() < config.clearCurrentDrawingProb:
-        print(f" =========>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
-        clearCurrentDrawing()
+    def maybe_bg_color_blocks_filling():
+        if (
+            random.SystemRandom().random() < config.usebgBoxProb
+            and not config.doingDrawing
+            and not config.transitionStateHandler.inTransition
+        ):
+            if config.doJitterWhenAddingBG:
+                doDrawingJitter()
+            bgColorBlocksFilling(config)
 
+    def maybe_filter_remap_image():
+        if random.random() < config.filterRemappingProb / config.slownessFactor:
+            filterRemapImage(config)
 
-    if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing:
-        if config.doJitterWhenAddingBG :
-            # print(f" =========>  doing jitter while adding bg filling prob:  {}")
-            print(f" =========>  doDrawingJitter() prob: config.usebgBoxProb {config.usebgBoxProb} config.doJitterWhenAddingBG {config.doJitterWhenAddingBG }")
+    def maybe_do_drawing_jitter():
+        if (
+            not config.doingDrawing
+            and random.random() < config.doJitterProb / config.slownessFactor
+            and not config.transitionStateHandler.inTransition
+        ):
             doDrawingJitter()
-        print(f" =========>  bgColorBlocksFilling() prob: config.usebgBoxProb {config.usebgBoxProb}")
-        bgColorBlocksFilling(config)
 
-    # dithering movement
-    if random.random() < config.filterRemappingProb/config.slownessFactor:
-        print(f" =========>  filterRemapImage() prob: config.filterRemappingProb {config.filterRemappingProb/config.slownessFactor}")
-        filterRemapImage(config)
-
-    if not config.doingDrawing and random.random() < config.doJitterProb/config.slownessFactor:
-        doDrawingJitter()
-        print(f" =========>  doDrawingJitter() prob: config.doJitterProb {config.doJitterProb/config.slownessFactor} config.doingDrawing {config.doingDrawing}")
-
+    maybe_change_drawing_mode()
+    maybe_change_color_set()
+    maybe_release_drawing()
+    maybe_set_bg_color()
+    maybe_clear_current_drawing()
+    maybe_bg_color_blocks_filling()
+    maybe_filter_remap_image()
+    maybe_do_drawing_jitter()
     penLoopActions()
-
     renderImage()
 
 def renderImage():
@@ -730,7 +789,11 @@ def renderImage():
     else:
         layerCompositing(config)
 
-    config.render(config.finalCompositeLayer, 0, 0, config.finalCompositeLayer, config.finalCompositeLayer)
+    if config.transitionStateHandler.inTransition:
+        config.transitionStateHandler.transition()
+        config.render(config.transitionStateHandler.intermediateImage, 0, 0)
+    else :
+        config.render(config.finalCompositeLayer, 0, 0)
 
 def layerCompositing(config):
     config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
@@ -744,15 +807,21 @@ def layerCompositing(config):
     config.finalCompositeLayer.paste(config.canvasImage,(280,280),config.canvasImage)
 
 def clearCurrentDrawing():
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],200))
+    if not config.transitionStateHandler.inTransition :
+        initiateTransition()
 
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.draw = ImageDraw.Draw(config.image)
+        config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],200))
 
-    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
-    primeCanvas(2)
-    config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],225))
+        config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.draw = ImageDraw.Draw(config.image)
+
+        config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+        primeCanvas(2)
+        config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],225))
+
+
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -1008,7 +1077,6 @@ def _load_and_initialize_system(config):
     config.doingDrawing = False
     config.stoppedAndWaitingToDraw = False
 
-
     config.penArray = []
     config.drawingMode = 1
 
@@ -1017,6 +1085,11 @@ def _load_and_initialize_system(config):
     config.blendLevelRate = .1
     config.fadeThruToNew = 255
     config.fadeThruToNewDone = True
+
+    config.transitionStateHandler = TransitionStates(config)
+    config.transitionStateHandler.sourceImage = config.finalCompositeLayer
+    config.transitionStateHandler.targetImage = config.finalCompositeLayer
+    config.inTransition = False
 
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
 

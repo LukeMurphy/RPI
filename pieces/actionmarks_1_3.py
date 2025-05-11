@@ -71,8 +71,8 @@ class TransitionStates:
 
 # ----------------------------------------------------##----------------------------------------------------#
 
-# https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
 def chaikins_corner_cutting(coords, refinements=5, ratio=.75):
+    # https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
     coords = np.array(coords)
 
     for _ in range(refinements):
@@ -143,6 +143,7 @@ def initiateTransition():
     # print("\n ITNITATE TRANSITION")
     config.transitionStateHandler.sourceImage = config.finalCompositeLayer
     config.transitionStateHandler.initiateTransition()
+
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 def startNewLine(_pen):
@@ -608,7 +609,7 @@ def chooseTexture() :
 def createImageLayers(arg=None):
     global config
 
-    print("Setting up all layers")
+    print("\n===> Setting up all layers")
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
@@ -627,11 +628,10 @@ def createImageLayers(arg=None):
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
-
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
     config.textureBlendMode  = tex.blendMode
-    print(f"config.useTextureLayer {config.useTextureLayer}")
+    print(f"\n===> config.useTextureLayer {config.useTextureLayer}")
     for _row in range(tex.blockRows):
         for _col in range(tex.blockCols):
             if random.random() > tex.skipProb:
@@ -657,7 +657,8 @@ def createTextureLayer(tex):
 
 def initDrawings():
     global config
-    print(f"Init drawings {config.activePalette.pens}")
+    print(f"\n===> Init drawings {config.activePalette.pens}")
+    print(f"===> Using {config.activePalette.name} ")
 
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
@@ -697,7 +698,7 @@ def iterate():
         if config.changeColorSetTime > 0 and not config.transitionStateHandler.inTransition:
             config.paletteController.checkTime()
             if config.paletteController.advance:
-                print(f" =========>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
+                print(f"\n===>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
                 changeDrawing(True)
 
     def maybe_release_drawing():
@@ -712,7 +713,7 @@ def iterate():
 
     def maybe_clear_current_drawing():
         if random.random() < config.clearCurrentDrawingProb and not config.transitionStateHandler.inTransition:
-            print(f" =========>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
+            print(f"\n===>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
             clearCurrentDrawing()
 
     def maybe_bg_color_blocks_filling():
@@ -820,8 +821,6 @@ def clearCurrentDrawing():
 
         primeCanvas(2)
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0],config.bgColor[1],config.bgColor[2],225))
-
-
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -956,7 +955,7 @@ def _load_drawing_configs(config):
 
     config.activePalette = random.choice(config.paletteSets)
     config.slownessFactor =config.activePalette.slownessFactor
-    print(f"New Palette : {config.activePalette.name}")
+    print(f"\n===> New Palette : {config.activePalette.name}")
     setBGColor()
         
 def _load_pen_config(config):

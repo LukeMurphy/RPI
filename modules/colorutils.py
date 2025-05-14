@@ -426,7 +426,7 @@ def closestRBYfromRGB(rgb):
     return wheel[dArray[0][0]]
 
 
-def rgb_to_hsv(r, g, b):
+def rgb_to_hsv(r, g, b, a=255, _round=False):
     r /= 255
     g /= 255
     b /= 255
@@ -450,8 +450,11 @@ def rgb_to_hsv(r, g, b):
     hue = h * 360
     sat = s * 1
     val = v * 1
+    if _round :
+        return (round(hue), round(sat,3), round(val,3), round(a/255,2))
+    else :
+        return (hue, sat, val)
 
-    return (hue, sat, val)
 
 
 def HSVToRGB(h, s, v, a=255):

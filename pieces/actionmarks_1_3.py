@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageChops
 from scipy.interpolate import splprep, splev  # For spline interpolation
 from modules.holder_director import Director
 from modules import colorutils
+from modules.rendering.rendertohub import saveImageToFile
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 # ----------------------------------------------------##----------------------------------------------------#
@@ -751,6 +752,33 @@ def iterate():
 
 def renderImage():
     global config
+
+    def maybe_take_snapshot(img):
+        config.stateReportController.checkTime()
+        path = "/Users/lamshell/Desktop/outputs/"
+        if config.stateReportController.advance:
+            print("Saving image to file")
+            currentTime = time.time()
+            baseName = f"{str(currentTime)}"
+            baseName = baseName.replace(".","")
+            _img = img.convert("RGBA")
+            _temp = Image.new("RGBA", (config.canvasWidth,config.canvasHeight))
+            _tempDraw = ImageDraw.Draw(_temp)
+            _tempDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = (0,0,0,255))
+            _temp.paste(_img)
+            _temp = _temp.convert("RGB")
+            _temp = _temp.rotate(-90)
+            fn = f"{path}{baseName}.png"
+            _temp.save(fn)
+            # fn2 = f"{baseName}-palette.txt"
+            fn2 = "palettes.txt"
+            with open(f"/Users/lamshell/Desktop/outputs/{fn2}", 'a+') as f:
+                _bg = colorutils.rgb_to_hsv(config.bgColor[0],config.bgColor[1],config.bgColor[2],config.bgColor[3],True)
+                _bgf = colorutils.rgb_to_hsv(config.bgBoxFill[0],config.bgBoxFill[1],config.bgBoxFill[2],config.bgBoxFill[3], True)
+                _pc = colorutils.rgb_to_hsv(config.activePalette.activePen.lineColor[0],config.activePalette.activePen.lineColor[1],config.activePalette.activePen.lineColor[2],config.activePalette.activePen.lineColor[3], True)
+
+                f.write(f"\n{baseName} bg:{_bg} {config.bgColor[3]} fill:{_bgf} {config.bgBoxFill[3]} pen:{_pc} {config.activePalette.activePen.lineColor[3]}")
+
     config.underLayer.paste(config.image, (0, 0), config.image)
 
 
@@ -793,8 +821,10 @@ def renderImage():
     if config.transitionStateHandler.inTransition:
         config.transitionStateHandler.transition()
         config.render(config.transitionStateHandler.intermediateImage, 0, 0)
+        # maybe_take_snapshot(config.transitionStateHandler.intermediateImage)
     else :
         config.render(config.finalCompositeLayer, 0, 0)
+        # maybe_take_snapshot(config.finalCompositeLayer)
 
 def layerCompositing(config):
     config.finalCompositeLayerDraw.rectangle((0,0,config.screenWidth,config.screenHeight), fill = (125,125,125))
@@ -1071,6 +1101,9 @@ def _load_and_initialize_system(config):
 
     config.drawingController = Director(config)
     config.drawingController.slotRate = 10
+
+    config.stateReportController = Director(config)
+    config.stateReportController.slotRate = 25
 
     config.canDraw = True
     config.doingDrawing = False

@@ -580,7 +580,7 @@ def iterate():
         _verticalContinuitySetup(config)
 
 
-    for i in range(len(PSArray)) :
+    for i in range(config.numberOfCenters) :
         _PS = PSArray[i]
         drawBands(_PS)
         _PS.move()
@@ -600,7 +600,7 @@ def iterate():
             # renew the particle dots that travel
             # bgChoice = math.floor(random.SystemRandom().uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
-            for i in range(len(PSArray)) :
+            for i in range(config.numberOfCenters) :
                 _PS = PSArray[i]
                 if random.SystemRandom().random() < config.totalResetProb:
                     _PS.useFixedBandColors = random.SystemRandom().random() < config.useFixedBandColorsProb
@@ -837,7 +837,9 @@ def main(run=True):
     config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight * 2))
     config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
 
-    for _ in range(11):
+    config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback = 1)
+
+    for _ in range(config.numberOfCenters):
 
         _PS = ParticleSystem(config)
         _PS.setCenter()

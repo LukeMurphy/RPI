@@ -130,7 +130,7 @@ class ParticleSystem:
         self.yMaxFactor = 4
         self.wDiff = 17
 
-    def setNewAttributes(self):
+    def setNewAttributes(self, _i=0):
         self.radialSets = []
 
         # The rings around the center
@@ -222,12 +222,16 @@ class ParticleSystem:
         self.bandDecriment = round(random.uniform(3, 12))
         self.bandApha = round(random.uniform(140, 190))
 
-    def setCenter(self):
+    def setCenter(self, _i=0):
         # initial center position
         self.x = round(random.SystemRandom().uniform(self.initXRange[0], self.initXRange[1]))
         self.y = round(random.SystemRandom().uniform(self.initYRange[0], self.initYRange[1]))
 
-    def setUp(self):
+        if _i == 0:
+            self.x = round(random.SystemRandom().uniform(0, 128))
+
+
+    def setUp(self, _i=0):
 
         self.directionProb = random.SystemRandom().uniform(0.4, 0.6)
         self.orbitProb = config.orbitProb
@@ -639,9 +643,9 @@ def iterate():
                 _PS = PSArray[i]
                 if random.SystemRandom().random() < config.totalResetProb:
                     _PS.useFixedBandColors = random.SystemRandom().random() < config.useFixedBandColorsProb
-                    _PS.setCenter()
-                    _PS.setNewAttributes()
-                    _PS.setUp()
+                    _PS.setCenter(i)
+                    _PS.setNewAttributes(i)
+                    _PS.setUp(i)
 
     config.image.paste(config.drawingImage, (0, 0), config.drawingImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
@@ -871,12 +875,12 @@ def main(run=True):
 
     config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
 
-    for _ in range(config.numberOfCenters):
+    for i in range(config.numberOfCenters):
 
         _PS = ParticleSystem(config)
-        _PS.setCenter()
-        _PS.setNewAttributes()
-        _PS.setUp()
+        _PS.setCenter(i)
+        _PS.setNewAttributes(i)
+        _PS.setUp(i)
 
         PSArray.append(_PS)
 

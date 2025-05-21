@@ -76,8 +76,8 @@ class RadialSet:
         self.radialSetMaxNum = 300
         self.radialSetInnerRadiusFactor = 3
         self.radialSetInnerRadiusFactorFixedBands = 3
-        self.radialSetInnerRadiusRange = [-100, 50]
-        self.radialSetOuterRadiusRange = [-50, 50]
+        self.radialSetInnerRadiusRange = [0, 0]
+        self.radialSetOuterRadiusRange = [0, 0]
         self.useFixedBandColors = False
 
     def makeRadialsSet(self, minNum=120, maxNum=300):
@@ -171,7 +171,7 @@ class ParticleSystem:
 
         # created transition bands
         self.bandColorsAdjusted = []
-        bandColorSteps = 3
+        bandColorSteps = round(random.uniform(1, 3))
 
         for c in range(len(self.bandColors) - 1):
             color1 = self.bandColors[c]
@@ -199,6 +199,9 @@ class ParticleSystem:
                     color[cx] *= 0.8
 
         self.bands = bandColorSteps * len(self.bandColors)
+
+        self.bandGoldColors = config.bandGoldColors
+
         self.wBase = round(
             random.SystemRandom().uniform(config.PSRadiusMin + config.PSRadiusFixedColorMinInternalRadius, config.PSRadiusMax + config.PSRadiusFixedColorMinInternalRadius)
         )
@@ -214,6 +217,10 @@ class ParticleSystem:
             )
             for _ in range(self.bands)
         )
+
+        self.bandWidth = round(random.uniform(3, 12))
+        self.bandDecriment = round(random.uniform(3, 12))
+        self.bandApha = round(random.uniform(140, 190))
 
     def setCenter(self):
         # initial center position
@@ -383,6 +390,37 @@ def drawBands(p):
 
 
 def drawBandRings(p):
+    _b = p.bandWidth
+    _decriment = p.bandDecriment
+    _startWidth = p.wBase - config.PSRadiusFixedColorMinInternalRadius
+    # _clrs = [(0, 100, 255, 50), (0, 120, 255, 50), (0, 0, 255, 50), (220, 240, 0, 50)]
+    # _clrs = config.bandColors
+    _setsOfRings = 1
+    _alpha = p.bandApha
+
+    if p.useFixedBandColors :
+        _rings = len(p.bandColorsAdjusted)
+        _clrs = p.bandColorsAdjusted
+    else :
+        _rings = len(p.bandGoldColors)
+        _clrs = p.bandGoldColors
+
+
+
+    _ringNum = 0
+    for _ii in range(_setsOfRings):
+        for _i in range(_rings):
+            _xoff = round(p.x - _startWidth / 2 + _decriment * _i / 2) + round(_ii * _decriment * _rings / 2)
+            _yoff = round(p.y - _startWidth / 2 + _decriment * _i / 2) + round(_ii * _decriment * _rings / 2)
+            if ringImage := ringMaker(_startWidth - _decriment * _i, _b, 0, 0, (round(_clrs[_i][0]), round(_clrs[_i][1]), round(_clrs[_i][2]), _alpha)):
+                # config.image.paste(ringImage, (_xoff, _yoff), mask=ringImage)
+                config.drawingImage.paste(ringImage, (_xoff, _yoff), mask=ringImage)
+
+            _ringNum += 1
+        _startWidth -= _decriment * _rings
+
+
+def _drawBandRings(p):
     wBase = p.wBase
     wDiff = round(wBase / p.bands)
 
@@ -416,7 +454,6 @@ def drawBandRings(p):
 
     aBase = 10
     aBase2 = 10
-
 
     for i in range(p.bands):
 
@@ -478,7 +515,7 @@ def drawBandRings(p):
                 a = 50
                 if p.useFixedBandColors and index == 1:
                     config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                    config.draw.ellipse((x0, y0, x1, y1), outline =(rBase, gBase, bBase, a))
+                    config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
                     config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
                 else:
                     config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
@@ -579,12 +616,10 @@ def iterate():
     if config.verticalContinuity:
         _verticalContinuitySetup(config)
 
-
-    for i in range(config.numberOfCenters) :
+    for i in range(config.numberOfCenters):
         _PS = PSArray[i]
         drawBands(_PS)
         _PS.move()
-
 
     config.fadeRate += config.fadeRateDelta
     # if random.SystemRandom().random() < config.totalResetProb:
@@ -600,7 +635,7 @@ def iterate():
             # renew the particle dots that travel
             # bgChoice = math.floor(random.SystemRandom().uniform(0,len(config.bgColorSets)))
             config.bgColor = random.choice(config.bgColorSets)
-            for i in range(config.numberOfCenters) :
+            for i in range(config.numberOfCenters):
                 _PS = PSArray[i]
                 if random.SystemRandom().random() < config.totalResetProb:
                     _PS.useFixedBandColors = random.SystemRandom().random() < config.useFixedBandColorsProb
@@ -608,9 +643,29 @@ def iterate():
                     _PS.setNewAttributes()
                     _PS.setUp()
 
-
     config.image.paste(config.drawingImage, (0, 0), config.drawingImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+
+
+def ringMaker(_ringWidth=200, _bandWidth=8, _xOffSet=0, _yOffSet=0, _fill=(255, 0, 0, 30)):
+    if _ringWidth <= 0:
+        return False
+    _bandWidth = min(_bandWidth, _ringWidth / 2)
+    _innerRingWidth = _ringWidth - _bandWidth
+
+    _im1 = Image.new("RGBA", (_ringWidth, _ringWidth))
+    _im1Draw = ImageDraw.Draw(_im1)
+    _im1Draw.rectangle((0, 0, _ringWidth, _ringWidth), fill=_fill)
+
+    mask = Image.new("L", (_ringWidth, _ringWidth))
+    maskDraw = ImageDraw.Draw(mask)
+    maskDraw.ellipse((0, 0, _ringWidth, _ringWidth), fill=(255))
+    maskDraw.ellipse((_bandWidth + _xOffSet, _bandWidth + _yOffSet, _innerRingWidth, _innerRingWidth), fill=(0))
+
+    ringImage = Image.new("RGBA", (200, 200))
+    ringImage.paste(_im1, (0, 0), mask=mask)
+
+    return ringImage
 
 
 def _verticalContinuitySetup(config):
@@ -762,36 +817,13 @@ def main(run=True):
 
     config.useFixedBandColorsProb = float(workConfig.get("particles", "useFixedBandColorsProb"))
 
-    try:
-        bandColorsRaw = workConfig.get("particles", "bandColors").split("|")
-        config.bandColors = []
-        config.bandColors.extend([int(x) for x in n.split(",")] for n in bandColorsRaw)
-        # comment:
-    except Exception as e:
-        print(e)
-        config.bandColors = [
-            [50, 10, 50],
-            [120, 90, 90],
-            [120, 50, 50],
-            [50, 120, 90],
-            [151, 165, 194],
-            [222, 208, 182],
-            [10, 90, 150],
-            [10, 80, 0],
-            [80, 90, 0],
-            [80, 0, 0],
-            [120, 74, 52],
-            [187, 189, 168],
-            [129, 137, 158],
-            [204, 228, 232],
-            [253, 240, 195],
-            [199, 166, 151],
-            [151, 165, 194],
-            [89, 113, 175],
-            [53, 73, 136],
-            [27, 38, 83],
-            [27, 38, 83],
-        ]
+    bandColorsRaw = workConfig.get("particles", "bandColors").split("|")
+    config.bandColors = []
+    config.bandColors.extend([int(x) for x in n.split(",")] for n in bandColorsRaw)
+
+    bandGoldColorsRaw = workConfig.get("particles", "bandGoldColors").split("|")
+    config.bandGoldColors = []
+    config.bandGoldColors.extend([int(x) for x in n.split(",")] for n in bandGoldColorsRaw)
 
     # only has to happen once, I had it happening every turn
     config.bandColors.reverse()
@@ -837,7 +869,7 @@ def main(run=True):
     config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight * 2))
     config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
 
-    config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback = 1)
+    config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
 
     for _ in range(config.numberOfCenters):
 
@@ -847,7 +879,6 @@ def main(run=True):
         _PS.setUp()
 
         PSArray.append(_PS)
-
 
     # managing speed of animation and framerate
     config.directorController = Director(config)

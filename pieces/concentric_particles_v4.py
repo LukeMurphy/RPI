@@ -280,8 +280,8 @@ class ParticleSystem:
     def move(self):
         """Updates the position of the particle system and its particles."""
         self._update_system_position()
-        # for q in range(self.p):
-        #     self._update_particle(q)
+        for q in range(self.p):
+            self._update_particle(q)
 
     def _update_system_position(self):
         """Updates the position of the particle system."""
@@ -465,8 +465,8 @@ def drawBandRings(p):
             # Should try to interleave the bands so that the fixed color bands integrate better
             # with the prescribed golden ones
 
-            if i < 0:
-                config.draw.ellipse((x0, y0, x1, y1), fill=(255, 0, 0, 20))
+            # if i < 0:
+            #     config.draw.ellipse((x0, y0, x1, y1), fill=(255, 0, 0, 20))
 
             # Golden Rings
             aBase2 = 50
@@ -478,7 +478,7 @@ def drawBandRings(p):
                 a = 50
                 if p.useFixedBandColors and index == 1:
                     config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                    # config.draw.ellipse((x0, y0, x1, y1), outline =(rBase, gBase, bBase, a))
+                    config.draw.ellipse((x0, y0, x1, y1), outline =(rBase, gBase, bBase, a))
                     config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
                 else:
                     config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
@@ -487,7 +487,7 @@ def drawBandRings(p):
                 if i > p.bands - 3 and p.useFixedBandColors:
                     # config.draw.ellipse( (x0, y0, x1, y1), fill=(250,60,525,150) )
                     # config.draw.ellipse( (x0, y0, x1, y1), fill=(20,60,125,150) )
-                    config.draw.ellipse((x0, y0, x1, y1), fill=(6, 46, 104, 25))
+                    config.draw.ellipse((x0, y0, x1, y1), fill=(6, 46, 104, 2))
 
             if not p.useFixedBandColors:
                 rBase += rDiff

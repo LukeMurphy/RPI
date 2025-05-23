@@ -120,6 +120,10 @@ def doColorManagementSetup():
         _p.particle_outlineRange[4] *= config.brightness
         _p.particle_outlineRange[5] *= config.brightness
 
+
+        if len(_p.particle_fillRange) == 8 :
+            _p.particle_fillRange.extend([0,0])
+
         _p.bg_fillRange = list(
             map(
                 lambda x: (float(x)),
@@ -477,8 +481,8 @@ def emitParticle(i=None):
         paletteRef.particle_fillRange[3],
         paletteRef.particle_fillRange[4],
         paletteRef.particle_fillRange[5],
-        0,
-        0,
+        paletteRef.particle_fillRange[8],
+        paletteRef.particle_fillRange[9],
         transparency,
         ps.config.brightness,
     )

@@ -5,6 +5,7 @@ import random
 import sys
 
 from PIL import ImageChops, ImageOps
+from matplotlib.pylab import rand
 
 colorWheel = [
     "RED",
@@ -265,12 +266,9 @@ def randomGrayAlpha(brtns=1, maxTransparency=255, minTransparency=0):
 
 
 def getRandomColor(brtns=1):
-    global brightness
-    if brtns == 1:
-        brtns = brightness
-    r = round((random.SystemRandom().uniform(0, 255)) * brtns)
-    g = round((random.SystemRandom().uniform(0, 255)) * brtns)
-    b = round((random.SystemRandom().uniform(0, 255)) * brtns)
+    r = round(random.SystemRandom().random() * 255.0 * float(brtns))
+    g = round(random.SystemRandom().random() * 255.0 * float(brtns))
+    b = round(random.SystemRandom().random() * 255.0 * float(brtns))
     a = 255
     return (r, g, b)
 
@@ -559,7 +557,7 @@ def changeColor(rnd=False):
         b = round(random.SystemRandom().uniform(0, 255) * brightness)
 
 
-def brightness(_r, _g, _b):
+def brightnessCalculation(_r, _g, _b):
     # brightness  =  sqrt( .299 R^2 + .587 G^2 + .114 B^2 )
     # (0.21 × R) + (0.72 × G) + (0.07 × B)
     _rVal = 0.299

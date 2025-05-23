@@ -409,14 +409,20 @@ def drawBandRings(p):
         _rings = len(p.bandGoldColors)
         _clrs = p.bandGoldColors
 
-
-
     _ringNum = 0
     for _ii in range(_setsOfRings):
         for _i in range(_rings):
             _xoff = round(p.x - _startWidth / 2 + _decriment * _i / 2) + round(_ii * _decriment * _rings / 2)
             _yoff = round(p.y - _startWidth / 2 + _decriment * _i / 2) + round(_ii * _decriment * _rings / 2)
-            if ringImage := ringMaker(_startWidth - _decriment * _i, _b, 0, 0, (round(_clrs[_i][0]), round(_clrs[_i][1]), round(_clrs[_i][2]), _alpha)):
+            _alphaToUse = _alpha
+
+            if not p.useFixedBandColors:
+                if _clrs[_i][0] < 10 :
+                    _alphaToUse = 20
+                else :
+                    _alphaToUse = 150
+
+            if ringImage := ringMaker(_startWidth - _decriment * _i, _b, 0, 0, (round(_clrs[_i][0]), round(_clrs[_i][1]), round(_clrs[_i][2]), _alphaToUse)):
                 # config.image.paste(ringImage, (_xoff, _yoff), mask=ringImage)
                 config.drawingImage.paste(ringImage, (_xoff, _yoff), mask=ringImage)
 

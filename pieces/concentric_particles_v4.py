@@ -230,7 +230,6 @@ class ParticleSystem:
         if _i == 0:
             self.x = round(random.SystemRandom().uniform(0, 128))
 
-
     def setUp(self, _i=0):
 
         self.directionProb = random.SystemRandom().uniform(0.4, 0.6)
@@ -275,7 +274,9 @@ class ParticleSystem:
         # dy = config.canvasHeight - self.y
         self.maxRadius = math.sqrt(config.imageCanvasWidth * config.imageCanvasWidth + config.imageCanvasHeight * config.imageCanvasHeight) * config.PSRadiusFactor1
 
+
         self.radialBand = self.maxRadius / 12
+ 
 
         for n in range(self.p):
             pDot = ParticleDot()
@@ -417,134 +418,13 @@ def drawBandRings(p):
             _alphaToUse = _alpha
 
             if not p.useFixedBandColors:
-                if _clrs[_i][0] < 10 :
-                    _alphaToUse = 20
-                else :
-                    _alphaToUse = 150
-
+                _alphaToUse = 20 if _clrs[_i][0] < 10 else 150
             if ringImage := ringMaker(_startWidth - _decriment * _i, _b, 0, 0, (round(_clrs[_i][0]), round(_clrs[_i][1]), round(_clrs[_i][2]), _alphaToUse)):
                 # config.image.paste(ringImage, (_xoff, _yoff), mask=ringImage)
                 config.drawingImage.paste(ringImage, (_xoff, _yoff), mask=ringImage)
 
             _ringNum += 1
         _startWidth -= _decriment * _rings
-
-
-def _drawBandRings(p):
-    wBase = p.wBase
-    wDiff = round(wBase / p.bands)
-
-    if p.useFixedBandColors:
-        wBase = p.wBase - config.PSRadiusFixedColorMinInternalRadius
-        wDiff = p.wDiff
-        # print(wDiff, p.bands, wBase)
-
-    aBase = 0
-    aDiff = 1
-
-    rBase = config.rBase
-    gBase = config.gBase
-    bBase = config.bBase
-    aBase = config.aBase
-
-    rBase2 = config.rBase2
-    gBase2 = config.gBase2
-    # bBase2 = config.bBase2
-    aBase2 = config.aBase2
-
-    rDiff = config.rDiff
-    gDiff = config.gDiff
-    bDiff = config.bDiff
-
-    # Draw from the outside-in
-    colorBandIndex = 0
-    # goldenBandIndex = 0
-
-    calculatedRingSize = wBase / p.bands
-
-    aBase = 10
-    aBase2 = 10
-
-    for i in range(p.bands):
-
-        if p.useFixedBandColors:
-            wDiff = p.bandWidthsSet[i]
-
-        w = wBase - i * wDiff
-
-        if p.useFixedBandColors or random.SystemRandom().random() < p.bandWVariabilityProb:
-            w = (p.bands - i) * calculatedRingSize
-            w = max(w, config.PSRadiusFixedColorMinInternalRadius)
-
-        if w != 0:
-            x0 = p.x - w / 2
-            y0 = p.y - w / 2
-            x1 = p.x + w / 2
-            y1 = p.y + w / 2
-
-            if x1 < 0 or x1 < x0:
-                x1 = x0
-            if y1 < 0 or y1 < y0:
-                y1 = y0
-
-            a = round(config.fadeRate + aBase) if config.fadeRate > aBase else round(config.fadeRate)
-
-            # OVERRIDE
-            a = 50
-            # config.draw.ellipse((x0, y0, x1, y1), fill=(5, 30, 60, round(a)))
-
-            if p.useFixedBandColors:
-                # index = p.bands - i - 1
-                index = colorBandIndex
-                # index = i
-                rBase = round(p.bandColorsAdjusted[index][0] * config.brightness)
-                gBase = round(p.bandColorsAdjusted[index][1] * config.brightness)
-                bBase = round(p.bandColorsAdjusted[index][2] * config.brightness)
-                aBase = 2
-                colorBandIndex += 1
-
-                if colorBandIndex >= len(p.bandColorsAdjusted):
-                    colorBandIndex = 0
-
-            # if i == 1:
-            #     config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, round(a)))
-
-            # Should try to interleave the bands so that the fixed color bands integrate better
-            # with the prescribed golden ones
-
-            # if i < 0:
-            #     config.draw.ellipse((x0, y0, x1, y1), fill=(255, 0, 0, 20))
-
-            # Golden Rings
-            aBase2 = 50
-            if i in config.goldenRingsArray and not p.useFixedBandColors:
-                config.draw.ellipse((x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2))
-                config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase2, gBase2, bBase, aBase2))
-            else:
-                # OVERRIDE
-                a = 50
-                if p.useFixedBandColors and index == 1:
-                    config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                    config.draw.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
-                    config.drawOverFlow.ellipse((x0, y0, x1, y1), outline=(rBase, gBase, bBase, a))
-                else:
-                    config.draw.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-                    config.drawOverFlow.ellipse((x0, y0, x1, y1), fill=(rBase, gBase, bBase, a))
-
-                if i > p.bands - 3 and p.useFixedBandColors:
-                    # config.draw.ellipse( (x0, y0, x1, y1), fill=(250,60,525,150) )
-                    # config.draw.ellipse( (x0, y0, x1, y1), fill=(20,60,125,150) )
-                    config.draw.ellipse((x0, y0, x1, y1), fill=(6, 46, 104, 2))
-
-            if not p.useFixedBandColors:
-                rBase += rDiff
-                gBase += gDiff
-                bBase += bDiff
-                aBase += aDiff
-
-            rBase = max(rBase, 0)
-            gBase = max(gBase, 0)
-            bBase = max(bBase, 0)
 
 
 def drawRadials(p):

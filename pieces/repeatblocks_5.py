@@ -133,7 +133,7 @@ class Fader:
             self.initialized = False
 
 
-class PatternBlock :
+class PatternBlock:
     def __init__(self):
         self.hasBeenPainted = False
         self.rePainting = False
@@ -589,8 +589,17 @@ def selectNewPalette(_setPalette=True):
     # buildPalette(config, newPalette)
     if _setPalette:
         setPalette(config, config.currentPaletteIndex)
-    
-    rebuildPatterns()
+
+    if random.random() < config.probPatternsRebuildAfterNewPalette:
+        rebuildPatterns()
+    else:
+        for i in range(config.totalSlots):
+            _patternBlock = config.patternSequence[i]
+            _patternBlock.hasBeenPainted = False
+            if random.random() < config.changeEachblockWhenChangingPatternProb :
+                _patternBlock.tempPalette = config.paletteList[config.currentPaletteIndex]
+            config.patternSequence[i] = _patternBlock
+        resetCrossFader()
 
 
 # --------------------- PATTERNS     ---------------------
@@ -602,11 +611,9 @@ def buildPatternSequence(config):
     config.usedPatterns = []
 
     if random.random() < config.blockSizeChangeProb:
-
         if config.blockSizeChangeAlwaysUseMax:
             config.blockWidth = config.blockWidthMax
             config.blockHeight = config.blockWidthMax
-
         else:
             config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
             config.blockHeight = config.blockWidth
@@ -761,10 +768,12 @@ def setupPatterns():
     # new pattern
 
     loadConfigValue(config, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
+    loadConfigValue(config, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changePaletteAnytimeProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
+    loadConfigValue(config, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
@@ -877,11 +886,7 @@ def drawRepeatedPatternImage(config, canvasImage):
         _patternBlock = config.patternSequence[i]
         if config.patternModelVariations:
             applyPatternVariations(config, i)
-
-        # config.patternSequence.append([_pattern, _position, _rotate, _tempPalette, [c, r], _patternBlock])
-        # drawIndividualBlock(config, canvasImage, config.patternSequence[i][4][0], config.patternSequence[i][4][1], i, extraOverlapx, extraOverlapy)
         drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
-
 
     # if config.initPatternBuild :
     #     config.initPatternBuild = False
@@ -944,11 +949,11 @@ def updateBackgroundColor():
 
 
 def handlePaletteChanges():
-    if random.random() < config.changePaletteAnytimeProb:
+    if random.random() < config.changePaletteAnytimeProb and config.fader.fadingDone:
         # print("selectPaletted called from handlePaletteChanges()")
         selectNewPalette(True)
         # rebuildSections()
-        resetCrossFader(False)
+        # resetCrossFader(False)
 
 
 def drawAndProcessPattern():
@@ -987,7 +992,7 @@ def handleDisturbances():
     if random.random() < 0.01:
         config.triangles = False
 
-    if random.random() < config.stableSectionsChangeProb:
+    if random.random() < config.stableSectionsChangeProb and config.fader.fadingDone:
         setupStableSections()
         resetCrossFader(False)
 
@@ -1055,7 +1060,7 @@ def handlePatternRebuild():
 
 def handleSectionDisturbances():
     """Handles random overlay repetition disturbance."""
-    if random.random() < config.redoSectionDisturbance and config.sectionDisturbance:
+    if random.random() < config.redoSectionDisturbance and config.sectionDisturbance  and config.fader.fadingDone:
         config.doSectionDisturbance = True
         rebuildSections()
 
@@ -1245,7 +1250,6 @@ def createImageHolders():
 
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
-
 
 
 def main(run=True):

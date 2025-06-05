@@ -533,6 +533,62 @@ def bars(config, paletteObj=None):
         config.blockDraw.rectangle((0, i * barWidth, config.blockWidth - 1, i * barWidth), outline=(outClr), fill=None)
 
 
+def peaceCross(config, paletteObj=None):
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+
+    # hideos override until I can pair palettes and patterns in a
+    # more flexible way
+    # if paletteObj.paletteName == "galah" :
+    #     clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
+
+    _blockSize = config.blockWidth
+    _mid = [_blockSize / 2, _blockSize / 2]
+    gridSize = math.ceil(_blockSize / 4)
+
+    _clrBase = colorutils.getRandomColorHSV(0, 360, 0.1, .20, 0.5, 0.75, 70, 190, 255)
+    _clrBase = clr4
+    for _rowCount, (_row, _col) in enumerate(itertools.product(range(4), range(4))):
+        _clr = _clrBase
+        _gridSize = gridSize
+        _xOffset = _col * _gridSize
+        _yOffset = _row * _gridSize
+        _h = _gridSize
+        _w = _gridSize
+        if random.random() < config.popRandomColorProb/4:
+            _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.5, 0.5, 70, 190, 255)
+        
+        # 4 squares around cross
+        if _rowCount in [5,7,15,13] :
+            if random.random() < config.popRandomColorProb/2:
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.05, .10, 0.75, 0.95, 70, 190, 255)
+            else :
+                _clr = clr4
+
+        # cross shape
+        if _rowCount in [6,9,10,11,14] :
+            _clr = tuple(round(i * 0.5) for i in clr1)
+            if random.random() < config.popRandomColorProb/4:
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.5, 0.5, 70, 190, 255)
+        _y = _xOffset
+        _x = _yOffset
+
+        # if _rowCount %2 != 0 :
+        #     if random.random() < config.popRandomColorProb :
+        #         _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+        #     else:
+        #         _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+
+        config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clr, outline=None)
+
+        
+
 def fiboSeq(n):
     _seq = []
     _seq.extend(2 * i - 1 for i in range(n, 1, -1))

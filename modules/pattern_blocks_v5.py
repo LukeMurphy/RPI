@@ -17,15 +17,9 @@ def runningSpiral(config, paletteObj=None):
     h = 4
     x = config.xIncrementer
     y = config.yIncrementer
-
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -79,14 +73,9 @@ def balls(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -114,14 +103,10 @@ def balls(config, paletteObj=None):
 
 def circlesPacked(config, paletteObj=None):
     config.circlesPackedSize = 0.1
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
 
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     # config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=clr)
 
@@ -167,17 +152,9 @@ def shingles(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    clr2 = config.bgColor
-
-    if paletteObj is not None:
-        # print(f"paletteObj == {paletteObj.c2.currentColor}")
-        clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
 
@@ -200,17 +177,9 @@ def fishScales(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    clr3 = tuple(int(a * config.brightness) for a in (config.c1.currentColor))
-
-    if paletteObj != None:
-        # print(f"paletteObj == {paletteObj.c2.currentColor}")
-        clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
 
@@ -459,13 +428,10 @@ def _draw_circles(config, xOff, yOff, numLines, steps, outlineClr, fillClr1, fil
 
 
 def compass(config, paletteObj=None):
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
 
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -519,20 +485,44 @@ def compass(config, paletteObj=None):
         config.blockDraw.polygon(isoTriangle, fill=clr, outline=outlineClr)
 
 
-def bars(config, paletteObj=None):
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
+def tripart(config, paletteObj=None):
 
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    if random.random() < config.popRandomColorProb  :
+        # hideos override until I can pair palettes and patterns in a
+        # more flexible way
+        if paletteObj.paletteName == "galah" :
+            clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 60, 170, 255)
+        else :
+            clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    midPt = (config.blockWidth / 2, config.blockWidth / 2)
+
+    poly1 = ((0, 0), (midPt[0], midPt[1]), (0, config.blockHeight), (0, 0))
+    config.blockDraw.polygon(poly1, fill=clr2)
+
+    poly2 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (config.blockWidth, config.blockHeight), (config.blockWidth, 0))
+    config.blockDraw.polygon(poly2, fill=clr3)
+
+    poly3 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (0, 0), (config.blockWidth, 0))
+    config.blockDraw.polygon(poly3, fill=clr4)
+
+
+def bars(config, paletteObj=None):
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
-    count = 0
     barWidth = 4
-    for i in range(0, config.numConcentricBoxes, 2):
+    for count, i in enumerate(range(0, config.numConcentricBoxes, 2)):
 
         if config.altLineColoring == True:
             outClr = clr2
@@ -541,17 +531,110 @@ def bars(config, paletteObj=None):
         else:
             outClr = clr
         config.blockDraw.rectangle((0, i * barWidth, config.blockWidth - 1, i * barWidth), outline=(outClr), fill=None)
-        count += 1
+
+
+def fiboSeq(n):
+    _seq = []
+    _seq.extend(2 * i - 1 for i in range(n, 1, -1))
+    _seq.extend(2 * i - 1 for i in range(1, n + 1))
+    return _seq
+
+
+def logcabin(config, paletteObj=None):
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+
+    # hideos override until I can pair palettes and patterns in a
+    # more flexible way
+    if paletteObj.paletteName == "galah" :
+        clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
+
+    _blockSize = config.blockWidth - 0
+    _mid = [_blockSize / 2, _blockSize / 2]
+    fibo = 7
+    _seq = fiboSeq(fibo)
+    numberOfBars = len(_seq)
+    gridSize = math.ceil(_blockSize / numberOfBars)
+
+    for _rowCount, col in enumerate(_seq):
+        _h = col * gridSize
+        _w = gridSize
+        _y = round(_mid[1] - _h / 2)
+        _x = round((_rowCount) * gridSize)
+        _clr = clr1
+        if _rowCount %2 != 0 :
+            if random.random() < config.popRandomColorProb :
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+            else:
+                _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+
+        _clrReduced = (
+            tuple(round(i * 0.85) for i in _clr)
+            if _rowCount < numberOfBars / 2
+            else tuple(round(i * 1.0) for i in _clr)
+        )
+
+        if col == 1:
+            _clrReduced = (255, 0, 100, 255)
+        config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
+        
+    for _rowCount, row in enumerate(_seq):
+        _w = row * gridSize
+        _x = round(_mid[0] - _w / 2)
+        _y = round((_rowCount) * gridSize)
+        _h = gridSize
+        _clr = clr1
+        if _rowCount %2 != 0 :
+            if random.random() < config.popRandomColorProb  :
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+            else:
+                _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+        _clrReduced = (
+            tuple(round(i * 0.65) for i in _clr)
+            if _rowCount < numberOfBars / 2
+            else tuple(round(i * 1.0) for i in _clr)
+        )
+        if row == 1:
+            _clrReduced = (255, 0, 100, 255)
+        config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
+
+
+def littleCones(config, paletteObj=None):
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+    _mid = [config.blockWidth / 2, config.blockHeight / 2]
+    fibo = 4
+    numberOfBars = fibo + fibo - 1
+    gridSize = math.ceil(config.blockWidth / numberOfBars / 2)
+
+    for row in range(2 * fibo, 0, -1):
+        _w = row * gridSize
+        if row >= fibo:
+            _w = row * gridSize
+        _x = _mid[0] - _w / 2
+        _y = row * gridSize
+        _clr = clr3
+        if row % 2 == 0:
+            _clr = colorutils.getRandomColorHSV(0, 360, 0.5, 0.5, 0.5, 0.5, 0, 0, 255)
+        config.blockDraw.rectangle((_x, _y, _x + _w, _y + gridSize), fill=_clr, outline=None)
 
 
 def coloredBlocks(config, paletteObj=None):
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
 
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr, outline=None)
     # config.blockDraw.rectangle((5, 5, 10, 15), fill=(255,0,0,255), outline=None)
@@ -573,14 +656,9 @@ def coloredBlocks(config, paletteObj=None):
 
 
 def concentricBoxes(config, paletteObj=None):
-
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -633,13 +711,9 @@ def randomizer3(config, paletteObj=None):
 
 def decoBoxes(config, paletteObj=None):
 
-    clr = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -733,7 +807,7 @@ def randomizer2(config, paletteObj=None):
                 config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
 
-def randomizer(config, paletteObj=None):
+def randomizer(config, paletteObj=None):  # sourcery skip: use-itertools-product
 
     w = config.randomBlockWidth
     h = config.randomBlockHeight
@@ -758,12 +832,9 @@ def randomizer(config, paletteObj=None):
                 config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
 
-def diamond(config, paletteObj=None):
-    clr = tuple(int(a * config.brightness) for a in config.c2.currentColor)
-    clr2 = tuple(int(a * config.brightness) for a in config.c1.currentColor)
-    if paletteObj is not None:
-        clr = tuple(int(a) for a in paletteObj.c2.currentColor)
-        clr2 = tuple(int(a) for a in paletteObj.c1.currentColor)
+def diamond(config, paletteObj=None):  # sourcery skip: low-code-quality, use-itertools-product
+    clr = tuple(int(a) for a in paletteObj.c2.currentColor)
+    clr2 = tuple(int(a) for a in paletteObj.c1.currentColor)
 
     x = config.xIncrementer
     y = config.yIncrementer
@@ -783,7 +854,7 @@ def diamond(config, paletteObj=None):
     for rw in range(rows):
         for c in range(rows):
             for i in range(0, blockHeight, step * 2):
-                for r in range(0, row, 1):
+                for r in range(row):
                     x = r + mid - row / 2 + c * blockHeight
                     y = i + config.yIncrementer + rw * blockHeight
 
@@ -807,12 +878,9 @@ def diamond(config, paletteObj=None):
 
 
 def diagonalMove(config, paletteObj=None):
-    clr = (255, 0, 0, 210)
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     w = 4
     h = 4
@@ -839,13 +907,9 @@ def reMove(config, paletteObj=None):
 
     bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[3], 255)
 
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=None)
 
@@ -871,7 +935,7 @@ def reMove(config, paletteObj=None):
                 fill=(clr2),
             )
 
-    config.xIncrementer += 0  # config.xSpeed
+    config.xIncrementer += config.xSpeed
     config.yIncrementer += 0
 
     """
@@ -888,12 +952,9 @@ def wavePattern(config, paletteObj=None):
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
 
@@ -939,18 +1000,15 @@ def wavePattern(config, paletteObj=None):
 
 
 def wavePattern2(config, paletteObj=None):
+    # sourcery skip: use-itertools-product
     w = 4
     h = 4
     x = config.xIncrementer
     y = config.yIncrementer
 
-    clr = tuple(int(a * config.brightness) for a in (config.c2.currentColor))
-    clr2 = tuple(int(a * config.brightness) for a in (config.c3.currentColor))
-
-    if paletteObj != None:
-        clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-        clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-        clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=config.bgColor, outline=config.bgColor)
 

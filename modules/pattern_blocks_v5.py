@@ -553,7 +553,7 @@ def peaceCross(config, paletteObj=None):
     gridSize = math.ceil(_blockSize / 4)
 
     _clrBase = colorutils.getRandomColorHSV(0, 360, 0.1, .20, 0.5, 0.75, 70, 190, 255)
-    _clrBase = clr4
+    # _clrBase = clr4
     for _rowCount, (_row, _col) in enumerate(itertools.product(range(4), range(4))):
         _clr = _clrBase
         _gridSize = gridSize
@@ -566,16 +566,16 @@ def peaceCross(config, paletteObj=None):
         
         # 4 squares around cross
         if _rowCount in [5,7,15,13] :
-            if random.random() < config.popRandomColorProb/2:
+            if random.random() > config.popRandomColorProb/4:
                 _clr = colorutils.getRandomColorHSV(0, 360, 0.05, .10, 0.75, 0.95, 70, 190, 255)
             else :
-                _clr = clr4
+                _clr = tuple(round(i * .75) for i in clr4)
 
         # cross shape
         if _rowCount in [6,9,10,11,14] :
             _clr = tuple(round(i * 0.5) for i in clr1)
-            if random.random() < config.popRandomColorProb/4:
-                _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.5, 0.5, 70, 190, 255)
+            if random.random() < config.popRandomColorProb/8:
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.1, 0.3, 70, 190, 255)
         _y = _xOffset
         _x = _yOffset
 
@@ -586,8 +586,7 @@ def peaceCross(config, paletteObj=None):
         #         _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
 
         config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clr, outline=None)
-
-        
+     
 
 def fiboSeq(n):
     _seq = []

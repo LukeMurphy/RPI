@@ -190,6 +190,64 @@ def shingles(config, paletteObj=None):
             config.blockDraw.rectangle((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + shingleWidth, yPos + boxWidth / 2 - 1), outline=(clr1), fill=clr2)
 
 
+def fishScales3(config, paletteObj=None):
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    # clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    numRows = config.numShingleRows
+    boxWidth = config.blockWidth / numRows
+
+    for r in range(numRows, -1, -1):
+        yPos = -2 + r * boxWidth
+        for i in range(3):
+            config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(clr4), fill=clr1)
+
+        for i in range(2):
+            config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(clr4), fill=clr1)
+
+
+def fishScales2(config, paletteObj=None):
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    # clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    numRows = config.numShingleRows
+    boxWidth = config.blockWidth / numRows
+
+    for r in range(numRows, -1, -1):
+        yPos = -2 + r * boxWidth
+        for i in range(3):
+            config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(clr1), fill=clr2)
+
+        for i in range(2):
+            config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(clr1), fill=clr2)
+
+
 def fishScales(config, paletteObj=None):
     w = 4
     h = 4
@@ -418,6 +476,7 @@ def gothic2(config, paletteObj=None):
     _draw_circles(config, _w - _w / 2, _h, numLines, steps, clr4, clr4, clr4, _w, _h)
     _draw_circles(config, 0, _h - _h / 2, numLines, steps, clr4, clr4, clr4, _w, _h)
     _draw_circles(config, _w, _h - _h / 2, numLines, steps, clr4, clr4, clr4, _w, _h)
+
 
 def gothic1(config, paletteObj=None):
     # clr, clr2, clr3 = _get_colors(config, paletteObj)

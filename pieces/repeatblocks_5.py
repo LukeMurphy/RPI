@@ -478,7 +478,7 @@ def loadAndSetupAllPalettes():
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
 
-    loadConfigValue(config, workConfig, "movingpattern", "popRandomColorProb", .8, float)
+    
     # buildPalette(config, 0)
 
     config.allAvailablePalettesList = []
@@ -671,6 +671,7 @@ def loadAndSetupPatterns():
     loadConfigValue(config, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
+    loadConfigValue(config, workConfig, "movingpattern", "popRandomColorProb", .8, float)
     loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeAlwaysUseMax", False, bool)
 
@@ -756,19 +757,14 @@ def loadAndSetCombinations():
     config.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
     for combinationSetName in  combinationSets :
         comboSet = CombinationSet(combinationSetName)
-        _patterns = workConfig.get(combinationSetName, "patterns").split(",")
-        _palettes = workConfig.get(combinationSetName, "palettes").split(",")
-        _dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").split(",")
-        _dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
-        _borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback = "")
-        _useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
-
-        comboSet.patterns = _patterns
-        comboSet.palettes = _palettes
-        comboSet.dominantPatterns = _dominantPatterns
-        comboSet.dominantPatternProb = _dominantPatternProb
-        comboSet.borderPattern = _borderPattern
-        comboSet.useBorderPattern = _useBorderPattern
+        comboSet.patterns = workConfig.get(combinationSetName, "patterns").split(",")
+        comboSet.palettes = workConfig.get(combinationSetName, "palettes").split(",")
+        comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").split(",")
+        comboSet.dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
+        comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback = "")
+        comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
+        comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=config.altColoringProb))
+        comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=config.popRandomColorProb))
 
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
@@ -794,7 +790,7 @@ def resetPatternBlocks():
 
 
 def buildPatternSequence(config):
-    # print("Building new pattern sequence")
+    print("Building new pattern sequence")
     config.patternSequence = []
     config.usedPatterns = []
 
@@ -816,7 +812,10 @@ def buildPatternSequence(config):
     config.patternBlockRows = round(config.canvasHeight / config.blockHeight)
 
     config.totalSlots = config.patternBlockRows * config.patterbBlockCols
-    config.altLineColoring = random.random() < config.altColoringProb
+    config.altLineColoring = random.random() < config.combinationSets[config.currentCombinationsetIndex].altColoringProb
+    config.popRandomColorProb = random.random() < config.combinationSets[config.currentCombinationsetIndex].popRandomColorProb
+
+    # print(config.altLineColoring)
     config.numConcentricBoxes = round(random.uniform(config.minnumConcentricBoxes, config.maxnumConcentricBoxes))
     generatePatternSequence(config)
     # _print_pattern_sequence(config)
@@ -1037,7 +1036,7 @@ def updateFaderEndpoint():
     config.fader.endImage = config.patternImage.copy()
     # config.fader.endImage = config.canvasImage.copy()
 
-
+# ------------------------------------------------
 def applyPatternVariations(config, _counter):
     """Applies pattern variations based on the pattern sequence."""
     _patternBlock = config.patternSequence[_counter]

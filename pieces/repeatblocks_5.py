@@ -305,7 +305,7 @@ def setUpDisturbanceConfigs(configSet):
 
 
 def setupStableSections():
-    print("New stable sections")
+    # print("New stable sections")
     config.stableSegments = []
     n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
     minWidth = config.stableSectionsMinWidth
@@ -788,7 +788,8 @@ def resetPatternBlocks():
         _patternBlock = config.patternSequence[i]
         _patternBlock.hasBeenPainted = False
         if random.random() < config.changeEachblockWhenChangingPatternProb :
-            _patternBlock.tempPalette = config.allAvailablePalettesList[config.currentPaletteIndex]
+            # _patternBlock.tempPalette = config.allAvailablePalettesList[config.currentPaletteIndex]
+            _patternBlock.tempPalette =getTempPalette(config)
         config.patternSequence[i] = _patternBlock
 
 
@@ -881,7 +882,6 @@ def generatePatternSequence(config):
 
 
 def getTempPalette(config):
-
     if random.SystemRandom().random() > config.changePaletteWhenChangingPatternProb:
         # return config.allAvailablePalettesList[config.currentPaletteIndex]
         return getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
@@ -902,7 +902,7 @@ def _print_pattern_sequence(config):
 
 
 def rebuildPatterns(arg=0):
-    print("rebuildPattern called")
+    # print("rebuildPattern called")
     if config.numRowsRandomize:
         rowsAndDotsSettings()
 
@@ -1218,7 +1218,7 @@ def showDebugCanvases(config):
     _h = config.canvasHeight
 
     patternCoord = (1*(_w + 20), 0)
-    canvasImageCoord = (1*(_w + 20), _h * 2 + 20)
+    canvasImageCoord = (1*(_w + 20), _h * 2 + 40)
     startingImageCoord = (0, _h + 20)
     crossFadeImageCoord = (1 * (_w + 20),  _h + 20)
     endImageCoord = (2 * (_w + 20), _h + 20)

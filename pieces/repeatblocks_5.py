@@ -808,10 +808,15 @@ def buildPatternSequence(config):
     config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
     config.blockDraw = ImageDraw.Draw(config.blockImage)
 
-    config.patterbBlockCols = round(config.canvasWidth / config.blockWidth)
+    config.patternBlockCols = round(config.canvasWidth / config.blockWidth)
     config.patternBlockRows = round(config.canvasHeight / config.blockHeight)
 
-    config.totalSlots = config.patternBlockRows * config.patterbBlockCols
+    # considering making this be an option to fit exactly the width - i.e. choose the number of columns 
+    # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
+    # ragged edges which are a nice trace of the previous state
+    # print(f"config.blockWidth {config.blockWidth} config.patternBlockCols {config.patternBlockCols}")
+
+    config.totalSlots = config.patternBlockRows * config.patternBlockCols
     config.altLineColoring = random.random() < config.combinationSets[config.currentCombinationsetIndex].altColoringProb
     config.popRandomColorProb = random.random() < config.combinationSets[config.currentCombinationsetIndex].popRandomColorProb
 
@@ -846,7 +851,7 @@ def generatePatternSequence(config):
     config.useBorderPattern = config.combinationSets[config.currentCombinationsetIndex].useBorderPattern
     config.borderPattern = config.combinationSets[config.currentCombinationsetIndex].borderPattern
 
-    for c in range(config.patterbBlockCols):
+    for c in range(config.patternBlockCols):
         for r in range(config.patternBlockRows):
             if random.random() < _baseProb:
                 _patternSelected = chooseAPattern()
@@ -856,7 +861,7 @@ def generatePatternSequence(config):
             _position = _iterCount
             _pattern = _patternSelected
 
-            if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patterbBlockCols - 1) or r == (config.patternBlockRows - 1)):
+            if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
                 _pattern = config.borderPattern
 
             _patternBlock = PatternBlock()

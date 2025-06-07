@@ -111,6 +111,45 @@ def balls(config, paletteObj=None):
             )
 
 
+def balls_hili(config, paletteObj=None):
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    numRows = config.numDotRows
+    boxWidth = config.blockWidth
+    density = numRows * 4
+    dotWidth = boxWidth / 2 / numRows - 2
+    outline = None
+
+    for r in range(numRows):
+
+        for i in range(density):
+            yPos = r * (dotWidth * 2) + r * 4
+            config.blockDraw.ellipse(
+                (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth), outline=(outline), fill=clr4
+            )
+
+        for i in range(density):
+            config.blockDraw.ellipse(
+                (i * 2 * boxWidth / density, yPos + 2 * boxWidth / density, i * 2 * boxWidth / density + dotWidth, yPos + 2 * boxWidth / density + dotWidth),
+                outline=(outline),
+                fill=clr4,
+            )
+
+
 def circlesPacked(config, paletteObj=None):
     config.circlesPackedSize = 0.1
 
@@ -190,7 +229,7 @@ def shingles(config, paletteObj=None):
             config.blockDraw.rectangle((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + shingleWidth, yPos + boxWidth / 2 - 1), outline=(clr1), fill=clr2)
 
 
-def fishScales3(config, paletteObj=None):
+def fishScales_hili(config, paletteObj=None):
     w = 4
     h = 4
     x = config.xIncrementer
@@ -596,6 +635,68 @@ def compass(config, paletteObj=None):
         config.blockDraw.polygon(isoTriangle, fill=clr2, outline=outlineClr)
 
 
+def compass_hili(config, paletteObj=None):
+
+
+    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    count = 0
+    barWidth = 4
+    grid = round(config.blockWidth / 16)
+    len1 = 5
+    len2 = 2
+
+    origins = (
+        (0, 0),
+        (config.blockWidth, 0),
+        (round(config.blockWidth / 2), round(config.blockWidth / 2)),
+        (0, config.blockWidth),
+        (config.blockWidth, config.blockWidth),
+    )
+
+    outlineClr = None
+    outlineClr = clr3
+    for i in range(5):
+
+        midx = origins[i][0]
+        midy = origins[i][1]
+
+        isoTriangle = (
+            (midx - grid, midy),
+            (midx, midy - len1 * grid),
+            (midx + grid, midy),
+            (midx, midy + len1 * grid),
+            (midx - grid, midy),
+        )
+        config.blockDraw.polygon(isoTriangle, fill=clr4, outline=outlineClr)
+        isoTriangle = (
+            (midx - grid * len1, midy),
+            (midx, midy - grid),
+            (midx + grid * len1, midy),
+            (midx, midy + grid),
+            (midx - grid * len1, midy),
+        )
+        config.blockDraw.polygon(isoTriangle, fill=clr4, outline=outlineClr)
+        isoTriangle = (
+            (midx - grid * len2, midy - grid * len2),
+            (midx, midy - grid),
+            (midx + grid * len2, midy - grid * len2),
+            (midx + grid, midy),
+            (midx + grid * len2, midy + grid * len2),
+            (midx, midy + grid),
+            (midx - grid * len2, midy + grid * len2),
+            (midx - grid, midy),
+        )
+        config.blockDraw.polygon(isoTriangle, fill=clr4, outline=outlineClr)
+
+
+
 def tripart(config, paletteObj=None):
 
     clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
@@ -780,19 +881,20 @@ def littleCones(config, paletteObj=None):
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
     _mid = [config.blockWidth / 2, config.blockHeight / 2]
-    fibo = 4
+    fibo = 5
     numberOfBars = fibo + fibo - 1
-    gridSize = math.ceil(config.blockWidth / numberOfBars / 2)
+    gridSize = math.ceil(config.blockWidth / numberOfBars / 1)
 
     for row in range(2 * fibo, 0, -1):
         _w = row * gridSize
-        if row >= fibo:
-            _w = row * gridSize
+        # if row >= fibo:
+        #     _w = row * gridSize
         _x = _mid[0] - _w / 2
         _y = row * gridSize
-        _clr = clr3
+        _clr = clr4
         if row % 2 == 0:
-            _clr = colorutils.getRandomColorHSV(0, 360, 0.5, 0.5, 0.5, 0.5, 0, 0, 255)
+            # _clr = colorutils.getRandomColorHSV(0, 360, 0.5, 0.5, 0.5, 0.5, 0, 0, 255)
+            _clr = clr2
         config.blockDraw.rectangle((_x, _y, _x + _w, _y + gridSize), fill=_clr, outline=None)
 
 

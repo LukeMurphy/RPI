@@ -11,6 +11,473 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 
 
+def fishscalepatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+        w = 4
+        h = 4
+        x = config.xIncrementer
+        y = config.yIncrementer
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+        numRows = config.numShingleRows
+        boxWidth = config.blockWidth / numRows
+
+        for r in range(numRows, -1, -1):
+            yPos = -2 + r * boxWidth
+            for i in range(3):
+                config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(patternOutLine), fill=patternFill)
+
+            for i in range(2):
+                config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(patternOutLine), fill=patternFill)
+          
+    return wrapper
+
+@fishscalepatternFunction
+def fishScales3(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@fishscalepatternFunction
+def fishScales2(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@fishscalepatternFunction
+def fishScales(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+# --------------------------------------- #
+
+def gothicPatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+        w = 4
+        h = 4
+        x = config.xIncrementer
+        y = config.yIncrementer
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+        numLines = 1
+        steps = 1
+        _w = config.blockWidth / 2
+        _h = config.blockHeight / 2
+
+        _draw_circles(config, _w - _w / 2, 0, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
+        _draw_circles(config, _w - _w / 2, _h, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
+        _draw_circles(config, 0, _h - _h / 2, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
+        _draw_circles(config, _w, _h - _h / 2, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
+          
+    return wrapper
+ 
+@gothicPatternFunction
+def gothic1(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@gothicPatternFunction
+def gothic2(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+# --------------------------------------- #
+
+def ballsPatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+        w = 4
+        h = 4
+        x = config.xIncrementer
+        y = config.yIncrementer
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+        numRows = config.numDotRows
+        boxWidth = config.blockWidth
+        density = numRows * 4
+        dotWidth = boxWidth / 2 / numRows - 2
+        outline = None
+
+        for r in range(numRows):
+
+            for i in range(density):
+                yPos = r * (dotWidth * 2) + r * 4
+                config.blockDraw.ellipse(
+                    (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth), outline=(outline), fill=patternFill
+                )
+
+            for i in range(density):
+                config.blockDraw.ellipse(
+                    (i * 2 * boxWidth / density, yPos + 2 * boxWidth / density, i * 2 * boxWidth / density + dotWidth, yPos + 2 * boxWidth / density + dotWidth),
+                    outline=(outline),
+                    fill=patternFill,
+                )
+          
+    return wrapper
+ 
+@ballsPatternFunction
+def balls(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@ballsPatternFunction
+def balls_hili(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+# --------------------------------------- #
+
+def compassPatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+        w = 4
+        h = 4
+        x = config.xIncrementer
+        y = config.yIncrementer
+
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+        count = 0
+        barWidth = 4
+        grid = round(config.blockWidth / 16)
+        len1 = 5
+        len2 = 2
+
+        origins = (
+            (0, 0),
+            (config.blockWidth, 0),
+            (round(config.blockWidth / 2), round(config.blockWidth / 2)),
+            (0, config.blockWidth),
+            (config.blockWidth, config.blockWidth),
+        )
+
+        outlineClr = None
+        outlineClr = patternOutLine
+        for i in range(5):
+
+            midx = origins[i][0]
+            midy = origins[i][1]
+
+            isoTriangle = (
+                (midx - grid, midy),
+                (midx, midy - len1 * grid),
+                (midx + grid, midy),
+                (midx, midy + len1 * grid),
+                (midx - grid, midy),
+            )
+            config.blockDraw.polygon(isoTriangle, fill=patternFill, outline=outlineClr)
+            isoTriangle = (
+                (midx - grid * len1, midy),
+                (midx, midy - grid),
+                (midx + grid * len1, midy),
+                (midx, midy + grid),
+                (midx - grid * len1, midy),
+            )
+            config.blockDraw.polygon(isoTriangle, fill=patternFill, outline=outlineClr)
+            isoTriangle = (
+                (midx - grid * len2, midy - grid * len2),
+                (midx, midy - grid),
+                (midx + grid * len2, midy - grid * len2),
+                (midx + grid, midy),
+                (midx + grid * len2, midy + grid * len2),
+                (midx, midy + grid),
+                (midx - grid * len2, midy + grid * len2),
+                (midx - grid, midy),
+            )
+            config.blockDraw.polygon(isoTriangle, fill=patternFill, outline=outlineClr)
+            
+    return wrapper
+ 
+@compassPatternFunction
+def compass(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@compassPatternFunction
+def compass_hili(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+# --------------------------------------- #
+
+def randomizerPatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+        w = 4
+        h = 4
+        x = config.xIncrementer
+        y = config.yIncrementer
+
+        w = config.randomBlockWidth
+        h = config.randomBlockHeight
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+        rows = config.blockHeight
+        cols = config.blockWidth
+
+        step = w
+        hStep = h
+
+        if w == 0:
+            step = 1
+        if h == 0:
+            hStep = 1
+
+        for r in range(0, rows, hStep):
+            for c in range(0, cols, step):
+                clr = colorutils.getRandomRGB(config.brightness / 2)
+                if random.random() < config.randomBlockProb:
+                    config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
+
+    return wrapper
+ 
+@randomizerPatternFunction
+def randomizer(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@randomizerPatternFunction
+def randomizer2(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@randomizerPatternFunction
+def randomizer3(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+# --------------------------------------- #
+
+def wavePatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+        w = 4
+        h = 4
+        x = config.xIncrementer
+        y = config.yIncrementer
+
+        # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+        # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+        # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+        # clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+        # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+        # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+        # clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=bgFill)
+
+        numPoints = round(config.blockWidth)
+        amplitude = config.amplitude
+        yOffset = config.yOffset
+        amplitude2 = config.amplitude2
+        yOffset2 = config.yOffset2
+        steps = config.steps
+        steps2 = config.steps2
+        rads = 2 * 22 / 7 / numPoints
+
+        for i in range(0, numPoints, steps):
+            angle = (i + config.xIncrementer) * rads
+            angle2 = (i + config.xIncrementer + steps) * rads
+            a = (i, math.sin(angle) * amplitude + yOffset)
+            b = (i + steps, math.sin(angle) * amplitude + yOffset)
+            c = (i + steps, math.sin(angle2) * amplitude + yOffset)
+
+            if c[1] < a[1]:
+                b = (i, math.sin(angle2) * amplitude + yOffset)
+            config.blockDraw.polygon((a, b, c, a), fill=patternFill, outline=None)
+
+        phase = round(config.blockWidth / config.phaseFactor)
+        for i in range(0, numPoints, steps2):
+            angle = (i - config.speedFactor * config.xIncrementer + phase) * rads
+            angle2 = (i - config.speedFactor * config.xIncrementer + phase + steps2) * rads
+            a = (i, math.cos(angle) * amplitude2 + yOffset2)
+            b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
+            c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
+
+            if c[1] < a[1]:
+                b = (i, math.cos(angle2) * amplitude2 + yOffset2)
+            config.blockDraw.polygon((a, b, c, a), fill=patternOutLine, outline=None)
+
+        config.xIncrementer += config.xSpeed
+        config.yIncrementer += config.ySpeed
+
+        if config.xIncrementer >= config.blockWidth * 1:
+            config.xIncrementer = -0
+        if config.yIncrementer >= config.blockHeight - 4:
+            config.yIncrementer = 0
+                
+    return wrapper
+ 
+@wavePatternFunction
+def wavePattern(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+# @wavePatternFunction
+# def wavePattern2(config, paletteObj):
+#     # return "B","C","A"
+#     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+#     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+#     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+#     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+#     return config,bgFill,patternFill,patternOutLine,hilight
+
+# --------------------------------------- #
+
+
+def wavePattern2(config, paletteObj=None):
+    # sourcery skip: use-itertools-product
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=clr1)
+
+    numPoints = round(config.blockWidth)
+    amplitude = config.amplitude
+    yOffset = config.yOffset
+    amplitude2 = config.amplitude2
+    yOffset2 = config.yOffset2
+    steps = config.steps
+    steps2 = config.steps2
+    rads = 2 * 22 / 7 / numPoints
+
+    for iy in range(-numPoints, numPoints * 2, steps * 2):
+        for i in range(0, numPoints, steps):
+            angle = (i + config.xIncrementer) * rads
+            angle2 = (i + config.xIncrementer + steps) * rads
+            a = (i, math.sin(angle) * amplitude + yOffset + iy)
+            b = (i + steps, math.sin(angle) * amplitude + yOffset + iy)
+            c = (i + steps, math.sin(angle2) * amplitude + yOffset + iy)
+            c2 = (i + steps, math.sin(angle2) * amplitude + yOffset + iy + 1)
+
+            if c[1] < a[1]:
+                b = (i, math.sin(angle2) * amplitude + yOffset)
+            # config.blockDraw.polygon((a, b, c, a), fill=None, outline=clr)
+            config.blockDraw.line((a, c), fill=clr2)
+            config.blockDraw.line((a, c2), fill=clr2)
+
+    # phase = round(config.blockWidth/config.phaseFactor)
+    # for i in range(0, numPoints, steps2):
+    #     angle = (i - config.speedFactor*config.xIncrementer + phase) * rads
+    #     angle2 = (i - config.speedFactor *
+    #               config.xIncrementer + phase + steps2) * rads
+    #     a = (i, math.cos(angle) * amplitude2 + yOffset2)
+    #     b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
+    #     c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
+
+    #     if c[1] < a[1]:
+    #         b = (i, math.cos(angle2) * amplitude2 + yOffset2)
+    #     config.blockDraw.polygon((a, b, c, a), fill=clr2, outline=None)
+
+    config.xIncrementer += config.xSpeed
+    config.yIncrementer += config.ySpeed
+
+    if config.xIncrementer >= config.blockWidth * 1:
+        config.xIncrementer = -0
+    if config.yIncrementer >= config.blockHeight - 4:
+        config.yIncrementer = 0
+
+
+
 def runningSpiral(config, paletteObj=None):
     # 16px grid box spiral for now
     w = 4
@@ -70,84 +537,6 @@ def runningSpiral(config, paletteObj=None):
         config.blockDraw.line((p1[0], p1[1], p2[0], p2[1]), fill=clr3)
         direction *= -1
         p1[1] = p2[1]
-
-
-def balls(config, paletteObj=None):
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    numRows = config.numDotRows
-    boxWidth = config.blockWidth
-    density = numRows * 4
-    dotWidth = boxWidth / 2 / numRows - 2
-    outline = None
-
-    for r in range(numRows):
-
-        for i in range(density):
-            yPos = r * (dotWidth * 2) + r * 4
-            config.blockDraw.ellipse(
-                (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth), outline=(outline), fill=clr2
-            )
-
-        for i in range(density):
-            config.blockDraw.ellipse(
-                (i * 2 * boxWidth / density, yPos + 2 * boxWidth / density, i * 2 * boxWidth / density + dotWidth, yPos + 2 * boxWidth / density + dotWidth),
-                outline=(outline),
-                fill=clr2,
-            )
-
-
-def balls_hili(config, paletteObj=None):
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    numRows = config.numDotRows
-    boxWidth = config.blockWidth
-    density = numRows * 4
-    dotWidth = boxWidth / 2 / numRows - 2
-    outline = None
-
-    for r in range(numRows):
-
-        for i in range(density):
-            yPos = r * (dotWidth * 2) + r * 4
-            config.blockDraw.ellipse(
-                (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth), outline=(outline), fill=clr4
-            )
-
-        for i in range(density):
-            config.blockDraw.ellipse(
-                (i * 2 * boxWidth / density, yPos + 2 * boxWidth / density, i * 2 * boxWidth / density + dotWidth, yPos + 2 * boxWidth / density + dotWidth),
-                outline=(outline),
-                fill=clr4,
-            )
 
 
 def circlesPacked(config, paletteObj=None):
@@ -227,93 +616,6 @@ def shingles(config, paletteObj=None):
             config.blockDraw.rectangle((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + shingleWidth - boxWidth / 2, yPos + boxWidth - 1), outline=(clr1), fill=clr2)
         for i in range(2):
             config.blockDraw.rectangle((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + shingleWidth, yPos + boxWidth / 2 - 1), outline=(clr1), fill=clr2)
-
-
-def fishScales_hili(config, paletteObj=None):
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    numRows = config.numShingleRows
-    boxWidth = config.blockWidth / numRows
-
-    for r in range(numRows, -1, -1):
-        yPos = -2 + r * boxWidth
-        for i in range(3):
-            config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(clr4), fill=clr1)
-
-        for i in range(2):
-            config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(clr4), fill=clr1)
-
-
-def fishScales2(config, paletteObj=None):
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    numRows = config.numShingleRows
-    boxWidth = config.blockWidth / numRows
-
-    for r in range(numRows, -1, -1):
-        yPos = -2 + r * boxWidth
-        for i in range(3):
-            config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(clr1), fill=clr2)
-
-        for i in range(2):
-            config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(clr1), fill=clr2)
-
-
-def fishScales(config, paletteObj=None):
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
-
-    numRows = config.numShingleRows
-    boxWidth = config.blockWidth / numRows
-
-    for r in range(numRows, -1, -1):
-        yPos = -2 + r * boxWidth
-        for i in range(3):
-            config.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(clr1), fill=clr3)
-
-        for i in range(2):
-            config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(clr1), fill=clr3)
 
 
 def shellScales(config, paletteObj=None):
@@ -496,48 +798,6 @@ def _draw_ellipse(config, x0, y0, x1, y1, lineToUse, clrToUse):
     config.blockDraw.ellipse((x0, y0, x1, y1), outline=lineToUse, fill=clrToUse)
 
 
-def gothic2(config, paletteObj=None):
-    # clr, clr2, clr3 = _get_colors(config, paletteObj)
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
-
-    numLines = 1
-    steps = 1
-    _w = config.blockWidth / 2
-    _h = config.blockHeight / 2
-
-    _draw_circles(config, _w - _w / 2, 0, numLines, steps, clr4, clr4, clr4, _w, _h)
-    _draw_circles(config, _w - _w / 2, _h, numLines, steps, clr4, clr4, clr4, _w, _h)
-    _draw_circles(config, 0, _h - _h / 2, numLines, steps, clr4, clr4, clr4, _w, _h)
-    _draw_circles(config, _w, _h - _h / 2, numLines, steps, clr4, clr4, clr4, _w, _h)
-
-
-def gothic1(config, paletteObj=None):
-    # clr, clr2, clr3 = _get_colors(config, paletteObj)
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    numLines = 1
-    steps = 1
-    _w = config.blockWidth / 2
-    _h = config.blockHeight / 2
-
-    _draw_circles(config, _w - _w / 2, 0, numLines, steps, clr2, clr2, clr2, _w, _h)
-    _draw_circles(config, _w - _w / 2, _h, numLines, steps, clr2, clr2, clr2, _w, _h)
-    _draw_circles(config, 0, _h - _h / 2, numLines, steps, clr2, clr2, clr2, _w, _h)
-    _draw_circles(config, _w, _h - _h / 2, numLines, steps, clr2, clr2, clr2, _w, _h)
-
-
 def circles(config, paletteObj=None):
     # clr, clr2, clr3 = _get_colors(config, paletteObj)
 
@@ -572,129 +832,6 @@ def _draw_circles(config, xOff, yOff, numLines, steps, outlineClr, fillClr1, fil
 
         fillClr = fillClr1 if i % 2 == 0 else fillClr2
         config.blockDraw.ellipse((x1, y1, x2, y2), outline=(outlineClr), fill=fillClr)
-
-
-def compass(config, paletteObj=None):
-
-
-    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    count = 0
-    barWidth = 4
-    grid = round(config.blockWidth / 16)
-    len1 = 5
-    len2 = 2
-
-    origins = (
-        (0, 0),
-        (config.blockWidth, 0),
-        (round(config.blockWidth / 2), round(config.blockWidth / 2)),
-        (0, config.blockWidth),
-        (config.blockWidth, config.blockWidth),
-    )
-
-    outlineClr = None
-    outlineClr = clr3
-    for i in range(5):
-
-        midx = origins[i][0]
-        midy = origins[i][1]
-
-        isoTriangle = (
-            (midx - grid, midy),
-            (midx, midy - len1 * grid),
-            (midx + grid, midy),
-            (midx, midy + len1 * grid),
-            (midx - grid, midy),
-        )
-        config.blockDraw.polygon(isoTriangle, fill=clr2, outline=outlineClr)
-        isoTriangle = (
-            (midx - grid * len1, midy),
-            (midx, midy - grid),
-            (midx + grid * len1, midy),
-            (midx, midy + grid),
-            (midx - grid * len1, midy),
-        )
-        config.blockDraw.polygon(isoTriangle, fill=clr2, outline=outlineClr)
-        isoTriangle = (
-            (midx - grid * len2, midy - grid * len2),
-            (midx, midy - grid),
-            (midx + grid * len2, midy - grid * len2),
-            (midx + grid, midy),
-            (midx + grid * len2, midy + grid * len2),
-            (midx, midy + grid),
-            (midx - grid * len2, midy + grid * len2),
-            (midx - grid, midy),
-        )
-        config.blockDraw.polygon(isoTriangle, fill=clr2, outline=outlineClr)
-
-
-def compass_hili(config, paletteObj=None):
-
-
-    clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    count = 0
-    barWidth = 4
-    grid = round(config.blockWidth / 16)
-    len1 = 5
-    len2 = 2
-
-    origins = (
-        (0, 0),
-        (config.blockWidth, 0),
-        (round(config.blockWidth / 2), round(config.blockWidth / 2)),
-        (0, config.blockWidth),
-        (config.blockWidth, config.blockWidth),
-    )
-
-    outlineClr = None
-    outlineClr = clr3
-    for i in range(5):
-
-        midx = origins[i][0]
-        midy = origins[i][1]
-
-        isoTriangle = (
-            (midx - grid, midy),
-            (midx, midy - len1 * grid),
-            (midx + grid, midy),
-            (midx, midy + len1 * grid),
-            (midx - grid, midy),
-        )
-        config.blockDraw.polygon(isoTriangle, fill=clr4, outline=outlineClr)
-        isoTriangle = (
-            (midx - grid * len1, midy),
-            (midx, midy - grid),
-            (midx + grid * len1, midy),
-            (midx, midy + grid),
-            (midx - grid * len1, midy),
-        )
-        config.blockDraw.polygon(isoTriangle, fill=clr4, outline=outlineClr)
-        isoTriangle = (
-            (midx - grid * len2, midy - grid * len2),
-            (midx, midy - grid),
-            (midx + grid * len2, midy - grid * len2),
-            (midx + grid, midy),
-            (midx + grid * len2, midy + grid * len2),
-            (midx, midy + grid),
-            (midx - grid * len2, midy + grid * len2),
-            (midx - grid, midy),
-        )
-        config.blockDraw.polygon(isoTriangle, fill=clr4, outline=outlineClr)
-
 
 
 def tripart(config, paletteObj=None):
@@ -1064,71 +1201,6 @@ def decoBoxes(config, paletteObj=None):
     config.blockImage.paste(temp, (xOff, yOff), temp)
 
 
-def randomizer2(config, paletteObj=None):
-
-    w = config.randomBlockWidth
-    h = config.randomBlockHeight
-
-    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    rows = config.blockHeight
-    cols = config.blockWidth
-
-    step = w
-    hStep = h
-
-    if w == 0:
-        step = 1
-    if h == 0:
-        hStep = 1
-
-    for r in range(0, rows, hStep):
-        for c in range(0, cols, step):
-            clr = colorutils.getRandomRGB(config.brightness / 2)
-            if random.random() < config.randomBlockProb:
-                # was clr2....
-                config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr1), outline=None)
-
-
-def randomizer(config, paletteObj=None):  # sourcery skip: use-itertools-product
-
-    w = config.randomBlockWidth
-    h = config.randomBlockHeight
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
-
-    rows = config.blockHeight
-    cols = config.blockWidth
-
-    step = w
-    hStep = h
-
-    if w == 0:
-        step = 1
-    if h == 0:
-        hStep = 1
-
-    for r in range(0, rows, hStep):
-        for c in range(0, cols, step):
-            clr = colorutils.getRandomRGB(config.brightness / 2)
-            if random.random() < config.randomBlockProb:
-                config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
-
-
 def diamond(config, paletteObj=None):  # sourcery skip: low-code-quality, use-itertools-product
     # clr = tuple(int(a) for a in paletteObj.c2.currentColor)
     # clr2 = tuple(int(a) for a in paletteObj.c1.currentColor)
@@ -1257,124 +1329,3 @@ def reMove(config, paletteObj=None):
     if config.yIncrementer >= config.blockHeight - 4:
         config.yIncrementer = 0
 
-
-def wavePattern(config, paletteObj=None):
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=clr1)
-
-    numPoints = round(config.blockWidth)
-    amplitude = config.amplitude
-    yOffset = config.yOffset
-    amplitude2 = config.amplitude2
-    yOffset2 = config.yOffset2
-    steps = config.steps
-    steps2 = config.steps2
-    rads = 2 * 22 / 7 / numPoints
-
-    for i in range(0, numPoints, steps):
-        angle = (i + config.xIncrementer) * rads
-        angle2 = (i + config.xIncrementer + steps) * rads
-        a = (i, math.sin(angle) * amplitude + yOffset)
-        b = (i + steps, math.sin(angle) * amplitude + yOffset)
-        c = (i + steps, math.sin(angle2) * amplitude + yOffset)
-
-        if c[1] < a[1]:
-            b = (i, math.sin(angle2) * amplitude + yOffset)
-        config.blockDraw.polygon((a, b, c, a), fill=clr2, outline=None)
-
-    phase = round(config.blockWidth / config.phaseFactor)
-    for i in range(0, numPoints, steps2):
-        angle = (i - config.speedFactor * config.xIncrementer + phase) * rads
-        angle2 = (i - config.speedFactor * config.xIncrementer + phase + steps2) * rads
-        a = (i, math.cos(angle) * amplitude2 + yOffset2)
-        b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
-        c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
-
-        if c[1] < a[1]:
-            b = (i, math.cos(angle2) * amplitude2 + yOffset2)
-        config.blockDraw.polygon((a, b, c, a), fill=clr3, outline=None)
-
-    config.xIncrementer += config.xSpeed
-    config.yIncrementer += config.ySpeed
-
-    if config.xIncrementer >= config.blockWidth * 1:
-        config.xIncrementer = -0
-    if config.yIncrementer >= config.blockHeight - 4:
-        config.yIncrementer = 0
-
-
-def wavePattern2(config, paletteObj=None):
-    # sourcery skip: use-itertools-product
-    w = 4
-    h = 4
-    x = config.xIncrementer
-    y = config.yIncrementer
-
-    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=clr1)
-
-    numPoints = round(config.blockWidth)
-    amplitude = config.amplitude
-    yOffset = config.yOffset
-    amplitude2 = config.amplitude2
-    yOffset2 = config.yOffset2
-    steps = config.steps
-    steps2 = config.steps2
-    rads = 2 * 22 / 7 / numPoints
-
-    for iy in range(-numPoints, numPoints * 2, steps * 2):
-        for i in range(0, numPoints, steps):
-            angle = (i + config.xIncrementer) * rads
-            angle2 = (i + config.xIncrementer + steps) * rads
-            a = (i, math.sin(angle) * amplitude + yOffset + iy)
-            b = (i + steps, math.sin(angle) * amplitude + yOffset + iy)
-            c = (i + steps, math.sin(angle2) * amplitude + yOffset + iy)
-            c2 = (i + steps, math.sin(angle2) * amplitude + yOffset + iy + 1)
-
-            if c[1] < a[1]:
-                b = (i, math.sin(angle2) * amplitude + yOffset)
-            # config.blockDraw.polygon((a, b, c, a), fill=None, outline=clr)
-            config.blockDraw.line((a, c), fill=clr2)
-            config.blockDraw.line((a, c2), fill=clr2)
-
-    # phase = round(config.blockWidth/config.phaseFactor)
-    # for i in range(0, numPoints, steps2):
-    #     angle = (i - config.speedFactor*config.xIncrementer + phase) * rads
-    #     angle2 = (i - config.speedFactor *
-    #               config.xIncrementer + phase + steps2) * rads
-    #     a = (i, math.cos(angle) * amplitude2 + yOffset2)
-    #     b = (i + steps2, math.cos(angle) * amplitude2 + yOffset2)
-    #     c = (i + steps2, math.cos(angle2) * amplitude2 + yOffset2)
-
-    #     if c[1] < a[1]:
-    #         b = (i, math.cos(angle2) * amplitude2 + yOffset2)
-    #     config.blockDraw.polygon((a, b, c, a), fill=clr2, outline=None)
-
-    config.xIncrementer += config.xSpeed
-    config.yIncrementer += config.ySpeed
-
-    if config.xIncrementer >= config.blockWidth * 1:
-        config.xIncrementer = -0
-    if config.yIncrementer >= config.blockHeight - 4:
-        config.yIncrementer = 0

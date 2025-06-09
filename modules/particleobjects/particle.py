@@ -55,6 +55,8 @@ class Particle(object):
     outlineColorRawValues = (0, 0, 0, 0)
     extraOutlineColor = None
 
+    aliasBuffer = 2
+
     # gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
 
     def __init__(self, particleSystemRef):
@@ -147,8 +149,9 @@ class Particle(object):
 
     def createParticleImage(self):
 
+        # adding some buffer around size of particle
         self.image = Image.new(
-            "RGBA", (round(self.objWidth) + 2, round(self.objHeight) + 2)
+            "RGBA", (round(self.objWidth) + 2 * self.aliasBuffer, round(self.objHeight) + 2 * self.aliasBuffer)
         )
         self.draw = ImageDraw.Draw(self.image)
         self.imageDrawn = True
@@ -398,9 +401,13 @@ class Particle(object):
             # This should be optional
             # self.unitBlur += 1
 
-        ### This produces trails
+
+        # self.ps.config.image.paste(imageToPaste, (xPos, yPos), imageToPaste)
+        # ### This produces trails
+
+
         if self.ps.objTrails == True:
-            self.ps.config.image.paste(imageToPaste, (xPos, yPos))
+            self.ps.config.image.paste(imageToPaste, (xPos, yPos, xPos + imageToPaste.size[0], yPos + imageToPaste.size[1]))
         else:
             self.ps.config.image.paste(imageToPaste, (xPos, yPos), imageToPaste)
 
@@ -534,10 +541,18 @@ class Particle(object):
     def drawRectangle(self):
 
         self.draw.rectangle(
-            (0, 0, round(self.objWidth), round(self.objHeight)),
-            fill=self.fillColor,
-            outline=self.outlineColor,
+            (0, 0, round(self.objWidth)+4, round(self.objHeight)),
+            fill=(self.fillColor[0],self.fillColor[1],self.fillColor[2],20),
+            outline=(self.outlineColor[0], self.outlineColor[1], self.outlineColor[2], 20)
         )
+
+
+
+        # self.draw.rectangle(
+        #     (2, 0, round(self.objWidth), round(self.objHeight)),
+        #     fill=self.fillColor,
+        #     outline=None,
+        # )
 
         if self.extraOutlineColor != None:
             self.draw.rectangle(

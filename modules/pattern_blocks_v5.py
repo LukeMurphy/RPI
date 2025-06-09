@@ -477,7 +477,6 @@ def wavePattern2(config, paletteObj=None):
         config.yIncrementer = 0
 
 
-
 def runningSpiral(config, paletteObj=None):
     # 16px grid box spiral for now
     w = 4
@@ -903,7 +902,9 @@ def peaceCross(config, paletteObj=None):
     gridSize = math.ceil(_blockSize / 4)
 
     _clrBase = colorutils.getRandomColorHSV(0, 360, 0.1, .20, 0.5, 0.75, 70, 190, 255)
-    # _clrBase = clr4
+
+    _clrBase = clr4
+    
     for _rowCount, (_row, _col) in enumerate(itertools.product(range(4), range(4))):
         _clr = _clrBase
         _gridSize = gridSize
@@ -911,12 +912,13 @@ def peaceCross(config, paletteObj=None):
         _yOffset = _row * _gridSize
         _h = _gridSize
         _w = _gridSize
-        if random.random() < config.popRandomColorProb/4:
+
+        if random.random() < config.popRandomColorProb/14:
             _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.5, 0.5, 70, 190, 255)
         
         # 4 squares around cross
         if _rowCount in [5,7,15,13] :
-            if random.random() > config.popRandomColorProb/4:
+            if random.random() > config.popRandomColorProb/14:
                 _clr = colorutils.getRandomColorHSV(0, 360, 0.05, .10, 0.75, 0.95, 70, 190, 255)
             else :
                 _clr = tuple(round(i * .75) for i in clr4)
@@ -924,8 +926,9 @@ def peaceCross(config, paletteObj=None):
         # cross shape
         if _rowCount in [6,9,10,11,14] :
             _clr = tuple(round(i * 0.5) for i in clr1)
-            if random.random() < config.popRandomColorProb/8:
+            if random.random() < config.popRandomColorProb/18:
                 _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.1, 0.3, 70, 190, 255)
+        
         _y = _xOffset
         _x = _yOffset
 

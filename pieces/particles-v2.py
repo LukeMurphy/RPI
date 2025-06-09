@@ -551,6 +551,12 @@ class WaveDeformer:
 def linearMotionAction(config, p, ps):
     p.xPosR = int(random.uniform(0, config.canvasWidth))
     p.yPosR = int(random.uniform(0, config.canvasHeight))
+
+    # print(p.yPosR)
+    # p.xPosR = config.canvasWidth / 2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
+    p.yPosR = config.canvasHeight / 2 - ps.centerRangeYMin + round(random.random() * ps.centerRangeYMax) - p.objHeight
+
+    # print(p.yPosR)
     # config.canvasHeight/3 - p.objHeight/4 #
 
     directions = [0, math.pi, math.pi / 2, -math.pi / 2]

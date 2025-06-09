@@ -1,4 +1,5 @@
 # ################################################### #
+from logging import config
 import math
 import random
 import sys
@@ -147,6 +148,7 @@ def setTwoColors(_index = 0):  # sourcery skip: extract-duplicate-method
     # colOverlayA.steps = 225 + round(125 * random.random())
     colOverlayA.tLimit = 2 + round(15 * random.random())
     colOverlayA.tLimitBase = 2 + round(25 * random.random())
+    colOverlayA.brightness = config.brightness
     colOverlayA.colorTransitionSetup()
 
 
@@ -162,6 +164,7 @@ def setTwoColors(_index = 0):  # sourcery skip: extract-duplicate-method
     # colOverlayB.steps = 225 + round(125 * random.random())
     colOverlayB.tLimit = 2 + round(15 * random.random())
     colOverlayB.tLimitBase = 2 + round(25 * random.random())
+    colOverlayB.brightness = config.brightness
     colOverlayB.colorTransitionSetup()
 
 
@@ -206,6 +209,7 @@ def setBackgroundColor(_overlay = None):
         config.bgColor = _overlay
     else :
         config.bgColor = coloroverlay.ColorOverlay()
+        config.bgColor.brightness = config.brightness
         config.bgColor.randomRange = (config.randomRangeMin, config.randomRangeMax)
         config.bgColor.colorTransitionSetup()
 
@@ -220,7 +224,7 @@ def setBackgroundColor(_overlay = None):
 
 def init():
     global config
-    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 255))
+    config.draw.rectangle((0, 0, config.marqueeImageWidth, config.marqueeImageHeight), fill=(0, 0, 0, 255))
 
     pattern = []
     pattern.extend(1 for _ in range(config.baseDashSize))
@@ -228,8 +232,8 @@ def init():
 
     p0 = [config.imageXOffset, config.imageYOffset]
     marqueeWidth = config.marqueeWidth
-    innerWidth = config.screenWidth - marqueeWidth
-    innerHeight = config.screenHeight - marqueeWidth
+    innerWidth = config.marqueeImageWidth - marqueeWidth
+    innerHeight = config.marqueeImageHeight - marqueeWidth
     marqueeWidthPrev = marqueeWidth
 
     step = config.step
@@ -244,8 +248,9 @@ def init():
     # If this is 1 then offsets the gap...
     eveningGap = 2
 
+    
     for i in range(config.marqueeNum):
-        clrs = [colorutils.randomColor(), colorutils.randomColorAlpha(255, 255)]
+        clrs = [colorutils.randomColor(config.brightness), colorutils.randomColorAlpha(255, 255)]
 
         if config.multiColor :
             unitColors = setTwoColors()
@@ -301,8 +306,8 @@ def animate():
     if config.animationController.advance:
         config.bgColor.stepTransition()
         bgColor = tuple(round(c) for c in config.bgColor.currentColor)
-        # config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, 10))
-        config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=bgColor)
+        # config.draw.rectangle((0, 0, config.marqueeImageWidth, config.marqueeImageHeight), fill=(0, 0, 0, 10))
+        config.draw.rectangle((0, 0, config.marqueeImageWidth, config.marqueeImageHeight), fill=bgColor)
         for mq in config.marquees:
             mq.advance()
 
@@ -334,10 +339,10 @@ def redraw():
     #         # animate()
     #         config.displayImage.paste(config.image, (0,0), config.image)
     #         # print("paste\n")
-    #     config.render(temp, 0, 0, config.screenWidth, config.screenHeight)
+    #     config.render(temp, 0, 0, config.marqueeImageWidth, config.marqueeImageHeight)
     # else :
     animate()
-    config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
+    config.render(config.image, 0, 0, config.marqueeImageWidth, config.marqueeImageHeight)
 
 
 def runWork():
@@ -372,9 +377,14 @@ def iterate():
 def main(run=True):
     global config
     global workConfig
-    config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.displayImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.interImage1 = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+
+    config.marqueeImageWidth = int(workConfig.get("marquee", "marqueeImageWidth", fallback=config.screenWidth))
+    config.marqueeImageHeight = int(workConfig.get("marquee", "marqueeImageHeight", fallback = config.screenHeight))
+
+
+    config.image = Image.new("RGBA", (config.marqueeImageWidth, config.marqueeImageHeight))
+    config.displayImage = Image.new("RGBA", (config.marqueeImageWidth, config.marqueeImageHeight))
+    config.interImage1 = Image.new("RGBA", (config.marqueeImageWidth, config.marqueeImageHeight))
     config.interImageState = 0
 
     config.draw = ImageDraw.Draw(config.image)

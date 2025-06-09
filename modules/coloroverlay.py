@@ -34,6 +34,9 @@ class ColorOverlay:
 
     maxBrightness = 1
 
+    brightness = 1.0
+    alpha = 255
+
     minValue = 0.1
     maxValue = 1
 
@@ -79,6 +82,8 @@ class ColorOverlay:
             vMax=self.maxValue,
             dropHueMin=self.dropHueMin,
             dropHueMax=self.dropHueMax,
+            a = self.alpha,
+            brtns=self.brightness
         )
 
         # print(f"New minHue A: {self.minHue}")
@@ -109,6 +114,8 @@ class ColorOverlay:
             vMax=self.maxValue,
             dropHueMin=self.dropHueMin,
             dropHueMax=self.dropHueMax,
+            a = self.alpha,
+            brtns=self.brightness
         )
 
         # """

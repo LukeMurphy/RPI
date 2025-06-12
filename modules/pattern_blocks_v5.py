@@ -412,6 +412,101 @@ def wavePattern(config, paletteObj):
 
 # --------------------------------------- #
 
+def logcabinPatternFunction(func):
+    def wrapper(*args):
+        res = func(*args)
+        config = res[0]
+        bgFill = res[1]
+        patternFill = res[2]
+        patternOutLine = res[3]
+        hilight = res[4]
+
+        # clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+        # clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+        # clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+        # clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+        config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+        _blockSize = config.blockWidth - 0
+        _mid = [_blockSize / 2, _blockSize / 2]
+        fibo = 7
+        _seq = fiboSeq(fibo)
+        numberOfBars = len(_seq)
+        gridSize = math.ceil(_blockSize / numberOfBars)
+
+        for _rowCount, col in enumerate(_seq):
+            _h = col * gridSize
+            _w = gridSize
+            _y = round(_mid[1] - _h / 2)
+            _x = round((_rowCount) * gridSize)
+            _clr = patternFill
+            if _rowCount %2 != 0 :
+                if random.random() < config.popRandomColorProb :
+                    _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+                else:
+                    _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+
+            _clrReduced = (
+                tuple(round(i * 0.85) for i in _clr)
+                if _rowCount < numberOfBars / 2
+                else tuple(round(i * 1.0) for i in _clr)
+            )
+
+            if col == 1:
+                _clrReduced = (255, 0, 100, 255)
+            config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
+            
+        for _rowCount, row in enumerate(_seq):
+            _w = row * gridSize
+            _x = round(_mid[0] - _w / 2)
+            _y = round((_rowCount) * gridSize)
+            _h = gridSize
+            _clr = patternFill
+            if _rowCount %2 != 0 :
+                if random.random() < config.popRandomColorProb  :
+                    _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+                else:
+                    _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+            _clrReduced = (
+                tuple(round(i * 0.65) for i in _clr)
+                if _rowCount < numberOfBars / 2
+                else tuple(round(i * 1.0) for i in _clr)
+            )
+            if row == 1:
+                _clrReduced = (255, 0, 100, 255)
+            config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
+    return wrapper
+
+
+@logcabinPatternFunction
+def logcabin(config, paletteObj) :
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@logcabinPatternFunction
+def logcabinAlt1(config, paletteObj) :
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+@logcabinPatternFunction
+def logcabinAlt2(config, paletteObj) :
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config,bgFill,patternFill,patternOutLine,hilight
+
+
+
+# --------------------------------------- #
+
 
 def wavePattern2(config, paletteObj=None):
     # sourcery skip: use-itertools-product

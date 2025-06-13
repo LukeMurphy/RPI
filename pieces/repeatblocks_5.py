@@ -5,6 +5,7 @@ import random
 import time
 import noise
 import os, sys
+import configparser
 from modules.configuration import bcolors
 from modules.movieClip import movieClip
 from modules import colorutils, panelDrawing, pattern_blocks_v5
@@ -211,6 +212,7 @@ def handleClipPlayer():
 # loads the disturbance configs and calls the disturbance
 # setup functions
 def setupDisturbances():
+
     try:
         config.transformShape = workConfig.getboolean("movingpattern", "transformShape")
         transformTuples = workConfig.get("movingpattern", "transformTuples").split(",")
@@ -261,44 +263,52 @@ def setWaveDistortionParams():
 
 # loads the disturbance configs
 def setUpDisturbanceConfigs(configSet):
-    config.baseSectionSpeed = float(workConfig.get(configSet, "baseSectionSpeed"))
-    config.sectionRotationRange = float(workConfig.get(configSet, "sectionRotationRange"))
 
-    sectionPlacementXRange = workConfig.get(configSet, "sectionPlacementXRange").split(",")
+    config.disturbanceConfigFile = workConfig.get("movingpattern", "disturbancesConfigs")
+    config.disturbanceConfig = configparser.ConfigParser()
+    argument = f"{config.path}/configs/{config.disturbanceConfigFile}"
+    config.disturbanceConfig.read(argument)
+
+
+
+    config.baseSectionSpeed = float(config.disturbanceConfig.get(configSet, "baseSectionSpeed"))
+    config.sectionRotationRange = float(config.disturbanceConfig.get(configSet, "sectionRotationRange"))
+
+    sectionPlacementXRange = config.disturbanceConfig.get(configSet, "sectionPlacementXRange").split(",")
     config.sectionPlacementXRange = tuple(map(lambda x: int(x), sectionPlacementXRange))
 
-    sectionPlacementYRange = workConfig.get(configSet, "sectionPlacementYRange").split(",")
+    sectionPlacementYRange = config.disturbanceConfig.get(configSet, "sectionPlacementYRange").split(",")
     config.sectionPlacementYRange = tuple(map(lambda x: int(x), sectionPlacementYRange))
 
-    sectionWidthRange = workConfig.get(configSet, "sectionWidthRange").split(",")
+    sectionWidthRange = config.disturbanceConfig.get(configSet, "sectionWidthRange").split(",")
     config.sectionWidthRange = tuple(map(lambda x: int(x), sectionWidthRange))
 
-    sectionHeightRange = workConfig.get(configSet, "sectionHeightRange").split(",")
+    sectionHeightRange = config.disturbanceConfig.get(configSet, "sectionHeightRange").split(",")
     config.sectionHeightRange = tuple(map(lambda x: int(x), sectionHeightRange))
 
-    config.numberOfSections = int(workConfig.get(configSet, "numberOfSections"))
-    config.sectionMovementCountMax = int(workConfig.get(configSet, "sectionMovementCountMax"))
+    config.numberOfSections = int(config.disturbanceConfig.get(configSet, "numberOfSections"))
+    config.sectionMovementCountMax = int(config.disturbanceConfig.get(configSet, "sectionMovementCountMax"))
 
-    config.stopProb = float(workConfig.get(configSet, "stopProbMax"))
-    config.sectionSpeedFactorHorizontal = float(workConfig.get(configSet, "sectionSpeedFactorHorizontal"))
-    config.sectionSpeedFactorVertical = float(workConfig.get(configSet, "sectionSpeedFactorVertical"))
-    config.speedDeAcceleration = float(workConfig.get(configSet, "speedDeAcceleration"))
-    config.speedDeAccelerationBase = float(workConfig.get(configSet, "speedDeAcceleration"))
-    config.redoSectionDisturbance = float(workConfig.get(configSet, "redoSectionDisturbance"))
-    config.speedDeAccelerationUpperLimit = float(workConfig.get(configSet, "speedDeAccelerationUpperLimit"))
-    config.rebuildImmediatelyAfterDone = workConfig.getboolean(configSet, "rebuildImmediatelyAfterDone")
+    config.stopProb = float(config.disturbanceConfig.get(configSet, "stopProbMax"))
+    config.sectionSpeedFactorHorizontal = float(config.disturbanceConfig.get(configSet, "sectionSpeedFactorHorizontal"))
+    config.sectionSpeedFactorVertical = float(config.disturbanceConfig.get(configSet, "sectionSpeedFactorVertical"))
+    config.speedDeAcceleration = float(config.disturbanceConfig.get(configSet, "speedDeAcceleration"))
+    config.speedDeAccelerationBase = float(config.disturbanceConfig.get(configSet, "speedDeAcceleration"))
+    config.redoSectionDisturbance = float(config.disturbanceConfig.get(configSet, "redoSectionDisturbance"))
+    config.speedDeAccelerationUpperLimit = float(config.disturbanceConfig.get(configSet, "speedDeAccelerationUpperLimit"))
+    config.rebuildImmediatelyAfterDone = config.disturbanceConfig.getboolean(configSet, "rebuildImmediatelyAfterDone")
 
     try:
         # comment:
-        config.diagonalMovement = workConfig.getboolean(configSet, "diagonalMovement")
+        config.diagonalMovement = config.disturbanceConfig.getboolean(configSet, "diagonalMovement")
     except Exception as e:
         print(e)
         config.diagonalMovement = False
     # end try
 
     try:
-        config.randomDiagonal = workConfig.getboolean(configSet, "randomDiagonal")
-        config.diagonalFixedAngle = float(workConfig.get(configSet, "diagonalFixedAngle"))
+        config.randomDiagonal = config.disturbanceConfig.getboolean(configSet, "randomDiagonal")
+        config.diagonalFixedAngle = float(config.disturbanceConfig.get(configSet, "diagonalFixedAngle"))
     except Exception as e:
         print(e)
         config.randomDiagonal = True
@@ -466,14 +476,19 @@ def disturbSingleSection(sectionParams):
 
 
 
-
-
 # --------------------- PALETTES      ---------------------
 
 def loadAndSetupAllPalettes():
+    global workConfig
     '''initial palatte setups -- needs to run after combinations are established'''
-    config.palettes = workConfig.get("movingpattern", "palettes").split(",")
-    config.paletteConfigs = workConfig.get("movingpattern", "palettes").split(",")
+    config.palettesConfigFile = workConfig.get("movingpattern", "palettesConfigFile")
+
+    config.paletteConfig = configparser.ConfigParser()
+    argument = f"{config.path}/configs/{config.palettesConfigFile}"
+    config.paletteConfig.read(argument)
+
+    config.palettes = config.paletteConfig.get("palettesIncluded", "palettes").split(",")
+    config.paletteConfigs = config.paletteConfig.get("palettesIncluded", "palettes").split(",")
 
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
@@ -497,8 +512,10 @@ def loadAndSetupAllPalettes():
 
 
 def loadPalette(palette):
-    global workConfig
+    global config
     # palette = config.palettes[index]
+
+
 
     print(f"Loading palette {palette}")
     c1 = Holder()
@@ -508,47 +525,47 @@ def loadPalette(palette):
 
     # background
     # tLimitBase = int(workConfig.get(palette, "tLimitBase"))
-    c1.minHue = float(workConfig.get(palette, "c1_minHue"))
-    c1.maxHue = float(workConfig.get(palette, "c1_maxHue"))
-    c1.minSaturation = float(workConfig.get(palette, "c1_minSaturation"))
-    c1.maxSaturation = float(workConfig.get(palette, "c1_maxSaturation"))
-    c1.minValue = float(workConfig.get(palette, "c1_minValue"))
-    c1.maxValue = float(workConfig.get(palette, "c1_maxValue"))
-    c1.dropHueMin = float(workConfig.get(palette, "c1_dropHueMin", fallback = 0))
-    c1.dropHueMax = float(workConfig.get(palette, "c1_dropHueMax", fallback = 0))
+    c1.minHue = float(config.paletteConfig.get(palette, "c1_minHue"))
+    c1.maxHue = float(config.paletteConfig.get(palette, "c1_maxHue"))
+    c1.minSaturation = float(config.paletteConfig.get(palette, "c1_minSaturation"))
+    c1.maxSaturation = float(config.paletteConfig.get(palette, "c1_maxSaturation"))
+    c1.minValue = float(config.paletteConfig.get(palette, "c1_minValue"))
+    c1.maxValue = float(config.paletteConfig.get(palette, "c1_maxValue"))
+    c1.dropHueMin = float(config.paletteConfig.get(palette, "c1_dropHueMin", fallback = 0))
+    c1.dropHueMax = float(config.paletteConfig.get(palette, "c1_dropHueMax", fallback = 0))
     c1.currentColor = setCurrentColor(c1)
 
     # color 1
-    # tLimitBase = int(workConfig.get(palette, "line_tLimitBase"))
-    c2.minHue = float(workConfig.get(palette, "c2_minHue"))
-    c2.maxHue = float(workConfig.get(palette, "c2_maxHue"))
-    c2.minSaturation = float(workConfig.get(palette, "c2_minSaturation"))
-    c2.maxSaturation = float(workConfig.get(palette, "c2_maxSaturation"))
-    c2.minValue = float(workConfig.get(palette, "c2_minValue"))
-    c2.maxValue = float(workConfig.get(palette, "c2_maxValue"))
-    c2.dropHueMin = float(workConfig.get(palette, "c2_dropHueMin", fallback = 0))
-    c2.dropHueMax = float(workConfig.get(palette, "c2_dropHueMax", fallback = 0))
+    # tLimitBase = int(config.paletteConfig.get(palette, "line_tLimitBase"))
+    c2.minHue = float(config.paletteConfig.get(palette, "c2_minHue"))
+    c2.maxHue = float(config.paletteConfig.get(palette, "c2_maxHue"))
+    c2.minSaturation = float(config.paletteConfig.get(palette, "c2_minSaturation"))
+    c2.maxSaturation = float(config.paletteConfig.get(palette, "c2_maxSaturation"))
+    c2.minValue = float(config.paletteConfig.get(palette, "c2_minValue"))
+    c2.maxValue = float(config.paletteConfig.get(palette, "c2_maxValue"))
+    c2.dropHueMin = float(config.paletteConfig.get(palette, "c2_dropHueMin", fallback = 0))
+    c2.dropHueMax = float(config.paletteConfig.get(palette, "c2_dropHueMax", fallback = 0))
     c2.currentColor = setCurrentColor(c2)
     # color 2
-    # tLimitBase = int(workConfig.get(palette, "line2_tLimitBase"))
-    c3.minHue = float(workConfig.get(palette, "c3_minHue"))
-    c3.maxHue = float(workConfig.get(palette, "c3_maxHue"))
-    c3.minSaturation = float(workConfig.get(palette, "c3_minSaturation"))
-    c3.maxSaturation = float(workConfig.get(palette, "c3_maxSaturation"))
-    c3.minValue = float(workConfig.get(palette, "c3_minValue"))
-    c3.maxValue = float(workConfig.get(palette, "c3_maxValue"))
-    c3.dropHueMin = float(workConfig.get(palette, "c3_dropHueMin", fallback = 0))
-    c3.dropHueMax = float(workConfig.get(palette, "c3_dropHueMax", fallback = 0))
+    # tLimitBase = int(config.paletteConfig.get(palette, "line2_tLimitBase"))
+    c3.minHue = float(config.paletteConfig.get(palette, "c3_minHue"))
+    c3.maxHue = float(config.paletteConfig.get(palette, "c3_maxHue"))
+    c3.minSaturation = float(config.paletteConfig.get(palette, "c3_minSaturation"))
+    c3.maxSaturation = float(config.paletteConfig.get(palette, "c3_maxSaturation"))
+    c3.minValue = float(config.paletteConfig.get(palette, "c3_minValue"))
+    c3.maxValue = float(config.paletteConfig.get(palette, "c3_maxValue"))
+    c3.dropHueMin = float(config.paletteConfig.get(palette, "c3_dropHueMin", fallback = 0))
+    c3.dropHueMax = float(config.paletteConfig.get(palette, "c3_dropHueMax", fallback = 0))
     c3.currentColor = setCurrentColor(c3)
 
-    c4.minHue = float(workConfig.get(palette, "c4_minHue", fallback=0))
-    c4.maxHue = float(workConfig.get(palette, "c4_maxHue", fallback=0))
-    c4.minSaturation = float(workConfig.get(palette, "c4_minSaturation", fallback=0))
-    c4.maxSaturation = float(workConfig.get(palette, "c4_maxSaturation", fallback=0))
-    c4.minValue = float(workConfig.get(palette, "c4_minValue", fallback=0))
-    c4.maxValue = float(workConfig.get(palette, "c4_maxValue", fallback=0))
-    c4.dropHueMin = float(workConfig.get(palette, "c4_dropHueMin", fallback = 0))
-    c4.dropHueMax = float(workConfig.get(palette, "c4_dropHueMax", fallback = 0))
+    c4.minHue = float(config.paletteConfig.get(palette, "c4_minHue", fallback=0))
+    c4.maxHue = float(config.paletteConfig.get(palette, "c4_maxHue", fallback=0))
+    c4.minSaturation = float(config.paletteConfig.get(palette, "c4_minSaturation", fallback=0))
+    c4.maxSaturation = float(config.paletteConfig.get(palette, "c4_maxSaturation", fallback=0))
+    c4.minValue = float(config.paletteConfig.get(palette, "c4_minValue", fallback=0))
+    c4.maxValue = float(config.paletteConfig.get(palette, "c4_maxValue", fallback=0))
+    c4.dropHueMin = float(config.paletteConfig.get(palette, "c4_dropHueMin", fallback = 0))
+    c4.dropHueMax = float(config.paletteConfig.get(palette, "c4_dropHueMax", fallback = 0))
     c4.currentColor = setCurrentColor(c4)
 
     _paletteObj = Holder()
@@ -642,15 +659,15 @@ def selectNewPalette(_setPalette=True):
 # --------------------- PATTERNS     ---------------------
 
 def loadAndSetupPatterns():
-    config.patterns = workConfig.get("movingpattern", "patterns").split(",")
-    config.dominantPatterns =  workConfig.get("movingpattern", "dominantPatterns", fallback="").split(",")
-    loadConfigValue(config, workConfig, "movingpattern", "dominantPatternProb", 0, float)
+    # config.patterns = workConfig.get("movingpattern", "patterns").split(",")
+    # config.dominantPatterns =  workConfig.get("movingpattern", "dominantPatterns", fallback="").split(",")
+    # loadConfigValue(config, workConfig, "movingpattern", "dominantPatternProb", 0, float)
 
     loadConfigValue(config, workConfig, "movingpattern", "patternModelVariations", True, bool)
     loadConfigValue(config, workConfig, "movingpattern", "patternModel", None, str)
 
-    patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
-    config.patternSequence = []
+    # patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
+    # config.patternSequence = []
 
     loadConfigValue(config, workConfig, "movingpattern", "patternSequenceMax", 2, int)
     loadConfigValue(config, workConfig, "movingpattern", "patternSequenceMin", 5, int)
@@ -1446,6 +1463,7 @@ def main(run=True):
 
     # ####################### clip player instert ################################
     loadClipPlayerConfigs()
+    
     # ###########################################################################
 
     initializeCrossFader()

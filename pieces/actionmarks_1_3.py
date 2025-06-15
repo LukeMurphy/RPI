@@ -221,8 +221,8 @@ def setPenPropsByName(_name, pen):
     pen.drawingSize = [config.canvasWidth, config.canvasHeight]
     # pen.drawingSize = [180, 180]
     pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
-    pen.centerVariationXMax = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
-    pen.centerVariationYMax = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
+    pen.centerVariationX = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
+    pen.centerVariationY = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
 
     # genral size of drawing
     pen.drawingSkip = random.uniform(0.0, 0.01)
@@ -261,11 +261,12 @@ def generateSmoothLinePoints(_pen):
 
     if "lineMarks" in _pen.name :
         # clearCurrentDrawing()
-        _generateLine(_pen)
+        generateLine(_pen)
     else :
-        _generateCurve(_pen)
+        generateCurve(_pen)
 
-def _generateLine(_pen):
+def generateLine(_pen):
+    print("Making line")
     points = []
     _rangex = _pen.yRandomRange[0]
     _rangey = _pen.yRandomRange[1]
@@ -292,8 +293,8 @@ def _generateLine(_pen):
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
 
-def _generateCurve(_pen):
-    
+def generateCurve(_pen):
+    print("Making curve")
     width = _pen.drawingSize[0]
     height = _pen.drawingSize[1]
     num_points = _pen.num_points
@@ -305,8 +306,10 @@ def _generateCurve(_pen):
     points = [_pen.lastPoint]
     points = []
 
-    center_x = width // 2  # + _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
-    center_y = height // 2  # + _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
+    # center_x = width // 2  # + _pen.xOffset  # + round(centerVariationX - random.random() * centerVariationX * 2)
+    # center_y = height // 2  # + _pen.yOffset  # + round(centerVariationY - random.random() * centerVariationY * 2)
+    center_x = width // 2   + round(_pen.centerVariationX - random.random() * _pen.centerVariationX * 2)
+    center_y = height // 2  + round(_pen.centerVariationY - random.random() * _pen.centerVariationY * 2)
 
 
     _xTravel = random.uniform(_pen.xTravelRange[0], _pen.xTravelRange[1])

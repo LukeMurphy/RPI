@@ -12,6 +12,13 @@ import numpy as np
 
 
 def fishscalepatternFunction(func):
+    """Decorator for fish scale pattern drawing functions.
+    This decorator wraps a function that returns drawing parameters for a fish scale pattern, and performs the drawing using those parameters. It abstracts the common drawing logic for fish scale patterns, allowing the decorated function to focus on color and configuration selection.
+    Args:
+        func: A function that returns a tuple containing (config, bgFill, patternFill, patternOutLine, hilight).
+    Returns:
+        A wrapper function that executes the drawing logic for the fish scale pattern.
+    """
     def wrapper(*args):
         res = func(*args)
         config = res[0]
@@ -41,6 +48,14 @@ def fishscalepatternFunction(func):
 
 @fishscalepatternFunction
 def fishScales3(config, paletteObj):
+    """Generates parameters for a fish scale pattern using the provided palette.
+    Returns the configuration and color values needed to draw a fish scale pattern with the specified palette object.
+    Args:
+        config: The configuration object containing drawing parameters.
+        paletteObj: The palette object providing color values.
+    Returns:
+        A tuple containing (config, bgFill, patternFill, patternOutLine, hilight).
+    """
     # return "A","B","C"
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
     patternFill = tuple(int(a) for a in (paletteObj.c1.currentColor))

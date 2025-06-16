@@ -209,6 +209,9 @@ def setPenPropsByName(_name, pen):
     pen.mode = _penProps.mode
     pen.incrementFactor = _penProps.incrementFactor
 
+    if pen.incrementFactor == 0 :
+        pen._w = random.randint(_penProps.minMarkWidth, _penProps.maxMarkWidth)
+
     pen.xTravelRange = _penProps.xTravelRange
     pen.yTravelRange = _penProps.yTravelRange
     pen.xTravelIncr = _penProps.xTravelIncrRange
@@ -437,7 +440,7 @@ def penLoopActions():
 
 def drawLine(_pen):
     # Draw the shape
-    # print(f"pen {_pen.name}")
+    # print(f"pen {_pen._w}")
     _penSkip = random.random() <= _pen.drawingSkip
     for _ in range(_pen.speed):
         if _pen._p < len(_pen.smooth_points) and _pen._p > 0:
@@ -1032,7 +1035,7 @@ def _load_pen_config(config):
 
         _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
 
-        _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange", fallback="-1,1").split(",")))
+        _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange", fallback=f"{config.pen_centerVariationXMin},{config.pen_centerVariationXMax}").split(",")))
         _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange", fallback="-1,1").split(",")))
 
         _mark.w = int(markConfig.get("markParams", "w", fallback=1))

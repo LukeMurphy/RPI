@@ -486,12 +486,13 @@ def render(
     if config.rotation != 0:
         if config.fullRotation:
             # This rotates the image that is painted i.e. after pasting-in the image sent
-            config.renderImageFull = config.renderImageFull.rotate(
-                -config.rotation, expand=False
-            )
+            config.renderImageFull = config.renderImageFull.rotate(-config.rotation, expand=False)
         else:
             # This rotates the image sent to be rendered
             imageToRender = imageToRender.rotate(-config.rotation, expand=True)
+
+    if config.remapImageBlockShift and config.rotation != 0 :
+        config._imageToRender = config._imageToRender.rotate(-config.rotation, expand=True)
             # imageToRender = ImageChops.offset(imageToRender, -40, 40)
 
     try:

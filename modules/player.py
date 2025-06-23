@@ -172,24 +172,30 @@ def _configure_ReMapping(config, workconfig):
         print(f" ** {e}")
         config.remapImageBlockSection7Rotation = 0
 
-    try:
-        _specialShiftBlockRemapping(workconfig, config)
-    except Exception as e:
-        print(f" ** {e}")
-        config.remapImageBlockShift = False
 
+    _specialShiftBlockRemapping(workconfig, config)
 
 
 def _specialShiftBlockRemapping(workconfig, config):
     # remapImageBlockShift
-    config.remapImageBlockShift = workconfig.getboolean("displayconfig", "remapImageBlockShift")
-    config.remapImageBlockShiftSection = workconfig.get("displayconfig", "remapImageBlockShiftSection").split(",")
-    config.remapImageBlockShiftSection = tuple(int(i) for i in config.remapImageBlockShiftSection)
-    config.remapImageBlockShiftDestination = workconfig.get("displayconfig", "remapImageBlockShiftDestination").split(",")
-    config.remapImageBlockShiftDestination = tuple(int(i) for i in config.remapImageBlockShiftDestination)
-    config.remapImageBlockShiftStableSection = workconfig.get("displayconfig", "remapImageBlockShiftStableSection").split(",")
-    config.remapImageBlockShiftStableSection = tuple(int(i) for i in config.remapImageBlockShiftStableSection)
-    print(f"============> {config.remapImageBlockShift}")
+    for i in range(1,6) :
+        _suff= ""
+        if i > 1:
+            _suff = str(i)
+        _remapImageBlockShift = workconfig.getboolean("displayconfig", f"remapImageBlockShift{_suff}", fallback = False)
+        setattr(config, f"remapImageBlockShift{_suff}", _remapImageBlockShift)
+        print(f"============>remapImageBlockShift{_suff} {_remapImageBlockShift}")
+
+        if _remapImageBlockShift :
+            _remapImageBlockShiftSection = workconfig.get("displayconfig", f"remapImageBlockShiftSection{_suff}", fallback = "").split(",")
+            _remapImageBlockShiftSection = tuple(int(i) for i in _remapImageBlockShiftSection)
+            _remapImageBlockShiftDestination = workconfig.get("displayconfig", f"remapImageBlockShiftDestination{_suff}", fallback = "").split(",")
+            _remapImageBlockShiftDestination = tuple(int(i) for i in _remapImageBlockShiftDestination)
+            _remapImageBlockShiftStableSection = workconfig.get("displayconfig", f"remapImageBlockShiftStableSection{_suff}", fallback = "").split(",")
+            _remapImageBlockShiftStableSection = tuple(int(i) for i in _remapImageBlockShiftStableSection)
+            setattr(config, f"remapImageBlockShift{_suff}Section", _remapImageBlockShiftSection)
+            setattr(config, f"remapImageBlockShift{_suff}Destination", _remapImageBlockShiftDestination)
+            setattr(config, f"remapImageBlockShift{_suff}StableSection", _remapImageBlockShiftStableSection)
 
 
 

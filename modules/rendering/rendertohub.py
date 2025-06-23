@@ -321,7 +321,7 @@ def _reMapBlock(sectionName):
     config.renderImageFull.paste(crop, _sectionDestination, crop)
 
 def _reMapBlockShift(sectionName):
-    _name = "remapImageBlockShift"
+    _name = sectionName
     _section = config.__getattribute__(f"{_name}Section")
     _nonsection = config.__getattribute__(f"{_name}StableSection")
     _sectionDestination = config.__getattribute__(f"{_name}Destination")
@@ -354,8 +354,17 @@ def _doReMappingBlocks():
     if config.remapImageBlock7:
         _reMapBlock("remapImageBlock7")
 
+
     if config.remapImageBlockShift:
         _reMapBlockShift("remapImageBlockShift")
+        if config.remapImageBlockShift2:
+            _reMapBlockShift("remapImageBlockShift2")
+        if config.remapImageBlockShift3:
+            _reMapBlockShift("remapImageBlockShift3")
+        if config.remapImageBlockShift4:
+            _reMapBlockShift("remapImageBlockShift4")
+        if config.remapImageBlockShift5:
+            _reMapBlockShift("remapImageBlockShift5")
 
 def _blurringCall():
     if not config.useBlur:

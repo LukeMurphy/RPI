@@ -3,6 +3,9 @@
 # an empty configuration object
 ################################
 
+from sys import exception
+
+
 screenWidth = 128
 screenHeight = 64
 
@@ -87,3 +90,7 @@ class Config:
     
     def __getattribute__(self, name):
         return super().__getattribute__(name)
+        # try:
+        # except Exception as e:
+        #     print(f" ** {e}")
+        #     return False

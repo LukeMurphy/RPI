@@ -4,7 +4,7 @@ import math
 import random
 import time
 import noise as noise
-from noise import *
+# from noise import *
 import os, sys
 import configparser
 from modules.configuration import bcolors

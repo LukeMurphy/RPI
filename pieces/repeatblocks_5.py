@@ -233,7 +233,7 @@ def setupDisturbances():
     config.disturbanceConfigSets = (workConfig.get("movingpattern", "disturbanceConfigSets")).split(",")
     config.changeDisturbanceSetProb = float(workConfig.get("movingpattern", "changeDisturbanceSetProb"))
     workingDisturbanceSet = config.disturbanceConfigSets[0]
-    config.skipFrames = 1
+    config.skipFrames = 0
     config.skipFramesCount = 0
     setUpDisturbanceConfigs(workingDisturbanceSet)
 
@@ -345,49 +345,51 @@ def rebuildSections():
     baseSpeed = config.baseSectionSpeed
 
     for i in range(config.numberOfSections):
-        section = config.movingSections[i]
-        section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
-        section.sectionPlacement = [
-            round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])),
-            round(random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1])),
-        ]
-        section.sectionPlacementInit = [
-            section.sectionPlacement[0],
-            section.sectionPlacement[1],
-        ]
-        section.sectionSize = [
-            round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])),
-            round(random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1])),
-        ]
-        section.sectionSpeed = [
-            random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorHorizontal,
-            random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorVertical,
-        ]
+        
+        if i < len(config.movingSections):
+            section = config.movingSections[i]
+            section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
+            section.sectionPlacement = [
+                round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])),
+                round(random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1])),
+            ]
+            section.sectionPlacementInit = [
+                section.sectionPlacement[0],
+                section.sectionPlacement[1],
+            ]
+            section.sectionSize = [
+                round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])),
+                round(random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1])),
+            ]
+            section.sectionSpeed = [
+                random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorHorizontal,
+                random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorVertical,
+            ]
 
-        if not config.diagonalMovement:
-            if sectionDisturbanceDirection == 1:
-                section.sectionSpeed = [
-                    random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorHorizontal,
-                    0,
-                ]
-            else:
-                section.sectionSpeed = [
-                    0,
-                    random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorVertical,
-                ]
+            if not config.diagonalMovement:
+                if sectionDisturbanceDirection == 1:
+                    section.sectionSpeed = [
+                        random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorHorizontal,
+                        0,
+                    ]
+                else:
+                    section.sectionSpeed = [
+                        0,
+                        random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorVertical,
+                    ]
 
-        if not config.randomDiagonal and config.diagonalMovement:
-            speed = random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorHorizontal
+            if not config.randomDiagonal and config.diagonalMovement:
+                speed = random.uniform(-baseSpeed, baseSpeed) / config.sectionSpeedFactorHorizontal
 
-            hComponent = math.cos(config.diagonalFixedAngle) * speed
-            vComponent = math.sin(config.diagonalFixedAngle) * speed
-            section.sectionSpeed = [hComponent, vComponent]
+                hComponent = math.cos(config.diagonalFixedAngle) * speed
+                vComponent = math.sin(config.diagonalFixedAngle) * speed
+                section.sectionSpeed = [hComponent, vComponent]
 
-        section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
-        section.actionCount = 0
-        section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
-        section.done = False
-        section.stopProb = random.uniform(0, config.stopProb)
+            section.rotationSpeed = random.uniform(-baseSpeed, baseSpeed)
+            section.actionCount = 0
+            section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
+            section.done = False
+            section.stopProb = random.uniform(0, config.stopProb)
 
     config.drawingPrinted = False
 

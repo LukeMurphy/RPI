@@ -415,7 +415,7 @@ def renderUsingIDAFruitHat(work):
 
 def renderAsAnimationWindow(work):
 
-    from modules.rendering import rendertohub
+    from modules.rendering import render
     import threading
 
     work.config.useFilters = work.workConfig.getboolean("displayconfig", "useFilters")
@@ -486,7 +486,7 @@ def renderAsAnimationWindow(work):
     work.config.image = PIL.Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
     work.config.draw = ImageDraw.Draw(work.config.image)
 
-    renderer = rendertohub
+    renderer = render
     renderer.config = work.config
     renderer.work = work
 

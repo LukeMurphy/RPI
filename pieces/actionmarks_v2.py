@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageChops
 from scipy.interpolate import splprep, splev  # For spline interpolation
 from modules.holder_director import Director
 from modules import colorutils
-from modules.rendering.rendertohub import saveImageToFile
+from modules.rendering.render import saveImageToFile
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 

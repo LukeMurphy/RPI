@@ -295,7 +295,7 @@ def main():
     loadSequenceFile()
 
     """
-    # Threading now handled by renderer - e.g. see modules/rendertohub.py
+    # Threading now handled by renderer - e.g. see modules/render.py
     thrd = threading.Thread(target=configure)
     threads.append(thrd)
     thrd.start()

@@ -3,7 +3,7 @@
 # an empty configuration object
 ################################
 
-from sys import exception
+# from sys import exception
 
 
 screenWidth = 128

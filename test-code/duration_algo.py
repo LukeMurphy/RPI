@@ -99,7 +99,7 @@ events = [Event(start, end, name) for start, end, name in eventsArray]
 
 
 def drawTheEventList():
-    resultImage = Image.new("RGB", (1024,768))
+    resultImage = Image.new("RGB", (600,400))
     resultImageDraw = ImageDraw.Draw(resultImage)
     resultImageDraw.rectangle((0,0,600,400), fill = (225,225,225))
 
@@ -140,6 +140,6 @@ def drawTheEventList():
             resultImageDraw.rectangle((_x1,_y1,_x2,_y2), fill = (0,0,100))
 
         _incrementalDays += dayDiff.days
-    resultImage.save("result.jpg")
+    resultImage.save("result.png")
 
 drawTheEventList()

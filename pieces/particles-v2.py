@@ -69,6 +69,11 @@ def setColorsByPalette():
     config.bgColorOverlay.maxSaturation = paletteRef.bg_fillRange[3]
     config.bgColorOverlay.minValue = paletteRef.bg_fillRange[4]
     config.bgColorOverlay.maxValue = paletteRef.bg_fillRange[5]
+
+    config.bgColorOverlay.dropHueMin = paletteRef.bg_fillRange[6]
+    config.bgColorOverlay.dropHueMax = paletteRef.bg_fillRange[7]
+
+
     config.bgColorOverlay.maxBrightness = paletteRef.bg_maxBrightness
     config.bgColorOverlay.tLimitBase = paletteRef.bg_tLimitBase
     config.bgColorOverlay.randomSteps = True
@@ -111,6 +116,28 @@ def doColorManagementSetup():
         _p.particle_fillRange[4] *= config.brightness
         _p.particle_fillRange[5] *= config.brightness
 
+
+        print(len(_p.particle_fillRange))
+
+        if len(_p.particle_fillRange) == 8 :
+            _p.particle_fillRange.extend([0,0])
+
+        _p.ratioOfFillRanges = float(workConfig.get(_palette, "ratioOfFillRanges", fallback = "1.0"))
+
+        if _p.ratioOfFillRanges != 1.0 :
+            _p.particle_fillRange2 = list(
+                map(
+                    lambda x: (float(x)),
+                    workConfig.get(_palette, "particle_fillRange2").split(","),
+                )
+            )
+            _p.particle_fillRange2[4] *= config.brightness
+            _p.particle_fillRange2[5] *= config.brightness
+
+            if len(_p.particle_fillRange2) == 8 :
+                _p.particle_fillRange2.extend([0,0])
+
+
         _p.particle_outlineRange = list(
             map(
                 lambda x: (float(x)),
@@ -120,9 +147,6 @@ def doColorManagementSetup():
         _p.particle_outlineRange[4] *= config.brightness
         _p.particle_outlineRange[5] *= config.brightness
 
-
-        if len(_p.particle_fillRange) == 8 :
-            _p.particle_fillRange.extend([0,0])
 
         _p.bg_fillRange = list(
             map(
@@ -458,38 +482,45 @@ def emitParticle(i=None):
     if ps.movement == "fire":
         p.direction = random.uniform(0, 180) * math.pi / 180
         if ps.oneDirection:
-            p.direction = 1
+            p.direction = 0
 
     if ps.movement == "travel":
         p.direction = random.uniform(0, 360) * math.pi / 180
         if ps.oneDirection:
-            p.direction = 1
+            p.direction = 0
 
     p.v = random.uniform(ps.speedMin, ps.speedMax)
     p.xWind = config.xWind
 
     p.pixelsGoGray = paletteRef.pixelsGoGray
     p.jumpToGray = paletteRef.jumpToGray
+    _fillRange = paletteRef.particle_fillRange
+    if paletteRef.ratioOfFillRanges != 1.0 :
+            if random.random() > paletteRef.ratioOfFillRanges :
+                _fillRange = paletteRef.particle_fillRange2
 
-    transMin = paletteRef.particle_fillRange[6]
-    transMax = paletteRef.particle_fillRange[7]
+
+    transMin = _fillRange[8]
+    transMax = _fillRange[9]
     transparency = round(random.random() * (transMax - transMin) + transMin)
+
     p.fillColor = colorutils.getRandomColorHSV(
-        paletteRef.particle_fillRange[0],
-        paletteRef.particle_fillRange[1],
-        paletteRef.particle_fillRange[2],
-        paletteRef.particle_fillRange[3],
-        paletteRef.particle_fillRange[4],
-        paletteRef.particle_fillRange[5],
-        paletteRef.particle_fillRange[8],
-        paletteRef.particle_fillRange[9],
+        _fillRange[0],
+        _fillRange[1],
+        _fillRange[2],
+        _fillRange[3],
+        _fillRange[4],
+        _fillRange[5],
+        _fillRange[6],
+        _fillRange[7],
         transparency,
         ps.config.brightness,
     )
 
-    transMin = paletteRef.particle_outlineRange[6]
-    transMax = paletteRef.particle_outlineRange[7]
+    transMin = paletteRef.particle_outlineRange[8]
+    transMax = paletteRef.particle_outlineRange[9]
     transparency = round(random.random() * (transMax - transMin) + transMin)
+
     p.outlineColor = colorutils.getRandomColorHSV(
         paletteRef.particle_outlineRange[0],
         paletteRef.particle_outlineRange[1],
@@ -497,8 +528,8 @@ def emitParticle(i=None):
         paletteRef.particle_outlineRange[3],
         paletteRef.particle_outlineRange[4],
         paletteRef.particle_outlineRange[5],
-        0,
-        0,
+        paletteRef.particle_outlineRange[6],
+        paletteRef.particle_outlineRange[7],
         transparency,
         ps.config.brightness,
     )
@@ -567,6 +598,9 @@ def linearMotionAction(config, p, ps):
         (p.xPosR, config.canvasHeight + p.objHeight),
     ]
     dirVal = round(random.uniform(0, 1))
+
+    if ps.oneDirection :
+        dirVal = 0
 
     if ps.linearMotionAlsoHorizontal:
         dirVal = round(random.uniform(0, 3))

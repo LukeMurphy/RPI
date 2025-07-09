@@ -539,11 +539,10 @@ class Particle(object):
         self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
 
     def drawRectangle(self):
-
         self.draw.rectangle(
             (0, 0, round(self.objWidth)+4, round(self.objHeight)),
-            fill=(self.fillColor[0],self.fillColor[1],self.fillColor[2],20),
-            outline=(self.outlineColor[0], self.outlineColor[1], self.outlineColor[2], 20)
+            fill=(self.fillColor[0],self.fillColor[1],self.fillColor[2],self.fillColor[3]),
+            outline=(self.outlineColor[0], self.outlineColor[1], self.outlineColor[2], self.outlineColor[3])
         )
 
 

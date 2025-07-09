@@ -1,7 +1,7 @@
 # RPI
 
 --
-RPI LED Matrix driving -- the new neon
+RPI LED Matrix driving -- the new neon and video monitors
 
 Works are started with running the player.py 
 
@@ -28,6 +28,7 @@ Set up the environment:
 
 On a Mac
 Python3 with Tkinter, python3-pil, numpy, noise
+matplotlib, scipy
 
 Lubuntu / Linux flavors -
 As of 2022 using Linux Mint for most things
@@ -47,15 +48,18 @@ sudo apt-get install python3-pip
 sudo apt-get install python3-pil.imagetk
 pip3 install numpy
 pip3 install noise
+pip3 install matplotlib
+pip3 install scipy
 
-git clone -b F22 https://github.com/LukeMurphy/RPI.git
+git clone -b MAIN-PRODUCTION https://github.com/LukeMurphy/RPI.git
 
 
 --> to have a piece startup when a machine boots up
+if there is not an ~/.config/autostart directory already:
 mkdir ~/.config/autostart
-nano ~/.config/autostart/startup0.desktop
 
-nano ~/.config/autostart/startup1.desktop
+Make the startup script:
+nano ~/.config/autostart/StartArt.desktop
 ```
 [Desktop Entry]
 Encoding=UTF-8
@@ -67,7 +71,7 @@ Terminal=false
 Type=Application
 Categories=
 X-GNOME-Autostart-enabled=true
-X-GNOME-Autostart-Delay=2
+X-GNOME-Autostart-Delay=1
 ```
 ``` 
 

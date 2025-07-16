@@ -1454,29 +1454,30 @@ def reMove(config, paletteObj=None):
 def grainLines(config, paletteObj=None):
 
     # print(f"grainLines running {grainLines}")
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
 
     if random.random() < config.popRandomColorProb:
         # hideos override until I can pair palettes and patterns in a
         # more flexible way
         if paletteObj.paletteName == "galah":
-            clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 60, 170, 255)
+            hilight = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 60, 170, 255)
         else:
-            clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+            hilight = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
 
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
 
     midPt = (config.blockWidth / 2, config.blockWidth / 2)
 
-    rnd = random.random() + .5
+    rnd = random.random() + .35
 
     _w = 2
     _gradientCount  = 0
     _gradientPeriod = 6
-    for yPt in range(-config.blockHeight,2*config.blockHeight, 2):
+    for yPt in range(-config.blockHeight,2*config.blockHeight, 1):
         _lastX = 0
         _lastY = 0
         for xPt in range(0, config.blockWidth, _w):
@@ -1484,7 +1485,7 @@ def grainLines(config, paletteObj=None):
             _x2 = xPt * _w
             _y1 = _lastY
             _y2 = noise.pnoise2(rnd * _x2/120,rnd * yPt/100) * 100
-            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(clr2[0],clr2[1],clr2[3],round(255 *  (_gradientCount/_gradientPeriod +.25))))
+            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0],patternFill[1],patternFill[2],round(255 *  (_gradientCount/_gradientPeriod +.15))))
             _lastX = _x2
             _lastY = _y2
         _gradientCount += 1

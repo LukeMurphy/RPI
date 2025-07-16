@@ -1473,10 +1473,11 @@ def grainLines(config, paletteObj=None):
     midPt = (config.blockWidth / 2, config.blockWidth / 2)
 
     rnd = random.random() + .35
+    rnd2 = random.random() + .35
 
-    _w = 2
+    _w = round(random.uniform(1,3))
     _gradientCount  = 0
-    _gradientPeriod = 6
+    _gradientPeriod = round(random.uniform(3,8))
     for yPt in range(-config.blockHeight,2*config.blockHeight, 1):
         _lastX = 0
         _lastY = 0
@@ -1484,8 +1485,8 @@ def grainLines(config, paletteObj=None):
             _x1 = _lastX
             _x2 = xPt * _w
             _y1 = _lastY
-            _y2 = noise.pnoise2(rnd * _x2/120,rnd * yPt/100) * 100
-            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0],patternFill[1],patternFill[2],round(255 *  (_gradientCount/_gradientPeriod +.15))))
+            _y2 = noise.pnoise2(rnd * _x2/120,rnd2 * yPt/100) * 100
+            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0],patternFill[1],patternFill[2],round(255 *  (_gradientCount/_gradientPeriod +.45))))
             _lastX = _x2
             _lastY = _y2
         _gradientCount += 1

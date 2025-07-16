@@ -890,6 +890,7 @@ def generatePatternSequence(config):
             _patternBlock.tempPalette = _tempPalette
             _patternBlock.col = c
             _patternBlock.row = r
+            _patternBlock.rePainting = False
             _patternBlock.rePainting = _patternSelected in [
                 "randomizer3",
                 "randomizer2",
@@ -902,6 +903,7 @@ def generatePatternSequence(config):
             # config.lastPosition = _position
             _iterCount += 1
             # print(_pattern)
+            # print(f"_patternBlock.rePainting = {_patternBlock.rePainting}")
 
 
 def getTempPalette(config):
@@ -1010,8 +1012,11 @@ def drawRepeatedPatternImage(config, canvasImage):
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
 
+        # print(f"_patternBlock.rePainting = {_patternBlock.rePainting} {_patternBlock.hasBeenPainted}")
+
         if config.patternModelVariations:
             applyPatternVariations(config, i)
+
 
         if _patternBlock.hasBeenPainted == False :
             drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
@@ -1067,7 +1072,11 @@ def applyPatternVariations(config, _counter):
     config.patternModel = _patternBlock.pattern
     config.rotateAltBlock = _patternBlock.rotate
     func = eval(f"pattern_blocks_v5.{_patternBlock.pattern}")
-    func(config, _patternBlock.tempPalette)
+
+
+
+    if not _patternBlock.hasBeenPainted :
+        func(config, _patternBlock.tempPalette)
 
     # if not _patternBlock.rePainting:
     #     _patternBlock.hasBeenPainted = True

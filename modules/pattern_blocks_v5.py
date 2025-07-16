@@ -9,6 +9,8 @@ from modules.configuration import bcolors
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
+import noise
+from noise import *
 
 
 def fishscalepatternFunction(func):
@@ -19,6 +21,7 @@ def fishscalepatternFunction(func):
     Returns:
         A wrapper function that executes the drawing logic for the fish scale pattern.
     """
+
     def wrapper(*args):
         res = func(*args)
         config = res[0]
@@ -43,8 +46,9 @@ def fishscalepatternFunction(func):
 
             for i in range(2):
                 config.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(patternOutLine), fill=patternFill)
-          
+
     return wrapper
+
 
 @fishscalepatternFunction
 def fishScales3(config, paletteObj):
@@ -61,7 +65,8 @@ def fishScales3(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @fishscalepatternFunction
 def fishScales2(config, paletteObj):
@@ -70,7 +75,8 @@ def fishScales2(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @fishscalepatternFunction
 def fishScales(config, paletteObj):
@@ -79,9 +85,11 @@ def fishScales(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c3.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 # --------------------------------------- #
+
 
 def gothicPatternFunction(func):
     def wrapper(*args):
@@ -107,9 +115,10 @@ def gothicPatternFunction(func):
         _draw_circles(config, _w - _w / 2, _h, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
         _draw_circles(config, 0, _h - _h / 2, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
         _draw_circles(config, _w, _h - _h / 2, numLines, steps, patternFill, patternFill, patternFill, _w, _h)
-          
+
     return wrapper
- 
+
+
 @gothicPatternFunction
 def gothic1(config, paletteObj):
     # return "A","B","C"
@@ -117,7 +126,8 @@ def gothic1(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @gothicPatternFunction
 def gothic2(config, paletteObj):
@@ -126,9 +136,11 @@ def gothic2(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 # --------------------------------------- #
+
 
 def ballsPatternFunction(func):
     def wrapper(*args):
@@ -156,7 +168,9 @@ def ballsPatternFunction(func):
             for i in range(density):
                 yPos = r * (dotWidth * 2) + r * 4
                 config.blockDraw.ellipse(
-                    (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth), outline=(outline), fill=patternFill
+                    (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth),
+                    outline=(outline),
+                    fill=patternFill,
                 )
 
             for i in range(density):
@@ -165,9 +179,10 @@ def ballsPatternFunction(func):
                     outline=(outline),
                     fill=patternFill,
                 )
-          
+
     return wrapper
- 
+
+
 @ballsPatternFunction
 def balls(config, paletteObj):
     # return "A","B","C"
@@ -175,7 +190,8 @@ def balls(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @ballsPatternFunction
 def balls_hili(config, paletteObj):
@@ -184,9 +200,11 @@ def balls_hili(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 # --------------------------------------- #
+
 
 def compassPatternFunction(func):
     def wrapper(*args):
@@ -200,7 +218,6 @@ def compassPatternFunction(func):
         h = 4
         x = config.xIncrementer
         y = config.yIncrementer
-
 
         config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
 
@@ -252,9 +269,10 @@ def compassPatternFunction(func):
                 (midx - grid, midy),
             )
             config.blockDraw.polygon(isoTriangle, fill=patternFill, outline=outlineClr)
-            
+
     return wrapper
- 
+
+
 @compassPatternFunction
 def compass(config, paletteObj):
     # return "A","B","C"
@@ -262,7 +280,8 @@ def compass(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @compassPatternFunction
 def compass_hili(config, paletteObj):
@@ -271,9 +290,11 @@ def compass_hili(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 # --------------------------------------- #
+
 
 def randomizerPatternFunction(func):
     def wrapper(*args):
@@ -311,7 +332,8 @@ def randomizerPatternFunction(func):
                     config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
     return wrapper
- 
+
+
 @randomizerPatternFunction
 def randomizer(config, paletteObj):
     # return "A","B","C"
@@ -319,7 +341,8 @@ def randomizer(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @randomizerPatternFunction
 def randomizer2(config, paletteObj):
@@ -328,7 +351,8 @@ def randomizer2(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @randomizerPatternFunction
 def randomizer3(config, paletteObj):
@@ -337,9 +361,11 @@ def randomizer3(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 # --------------------------------------- #
+
 
 def wavePatternFunction(func):
     def wrapper(*args):
@@ -404,9 +430,10 @@ def wavePatternFunction(func):
             config.xIncrementer = -0
         if config.yIncrementer >= config.blockHeight - 4:
             config.yIncrementer = 0
-                
+
     return wrapper
- 
+
+
 @wavePatternFunction
 def wavePattern(config, paletteObj):
     # return "A","B","C"
@@ -414,7 +441,8 @@ def wavePattern(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 # @wavePatternFunction
 # def wavePattern2(config, paletteObj):
@@ -426,6 +454,7 @@ def wavePattern(config, paletteObj):
 #     return config,bgFill,patternFill,patternOutLine,hilight
 
 # --------------------------------------- #
+
 
 def logcabinPatternFunction(func):
     def wrapper(*args):
@@ -456,68 +485,62 @@ def logcabinPatternFunction(func):
             _y = round(_mid[1] - _h / 2)
             _x = round((_rowCount) * gridSize)
             _clr = patternFill
-            if _rowCount %2 != 0 :
-                if random.random() < config.popRandomColorProb :
+            if _rowCount % 2 != 0:
+                if random.random() < config.popRandomColorProb:
                     _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
                 else:
                     _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
 
-            _clrReduced = (
-                tuple(round(i * 0.85) for i in _clr)
-                if _rowCount < numberOfBars / 2
-                else tuple(round(i * 1.0) for i in _clr)
-            )
+            _clrReduced = tuple(round(i * 0.85) for i in _clr) if _rowCount < numberOfBars / 2 else tuple(round(i * 1.0) for i in _clr)
 
             if col == 1:
                 _clrReduced = (255, 0, 100, 255)
             config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
-            
+
         for _rowCount, row in enumerate(_seq):
             _w = row * gridSize
             _x = round(_mid[0] - _w / 2)
             _y = round((_rowCount) * gridSize)
             _h = gridSize
             _clr = patternFill
-            if _rowCount %2 != 0 :
-                if random.random() < config.popRandomColorProb  :
+            if _rowCount % 2 != 0:
+                if random.random() < config.popRandomColorProb:
                     _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
                 else:
                     _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
-            _clrReduced = (
-                tuple(round(i * 0.65) for i in _clr)
-                if _rowCount < numberOfBars / 2
-                else tuple(round(i * 1.0) for i in _clr)
-            )
+            _clrReduced = tuple(round(i * 0.65) for i in _clr) if _rowCount < numberOfBars / 2 else tuple(round(i * 1.0) for i in _clr)
             if row == 1:
                 _clrReduced = (255, 0, 100, 255)
             config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
+
     return wrapper
 
 
 @logcabinPatternFunction
-def logcabin(config, paletteObj) :
+def logcabin(config, paletteObj):
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @logcabinPatternFunction
-def logcabinAlt1(config, paletteObj) :
+def logcabinAlt1(config, paletteObj):
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
+    return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @logcabinPatternFunction
-def logcabinAlt2(config, paletteObj) :
+def logcabinAlt2(config, paletteObj):
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config,bgFill,patternFill,patternOutLine,hilight
-
+    return config, bgFill, patternFill, patternOutLine, hilight
 
 
 # --------------------------------------- #
@@ -533,7 +556,7 @@ def wavePattern2(config, paletteObj=None):
     # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
     # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
     # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    
+
     clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
     clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
@@ -781,7 +804,6 @@ def _draw_offset_row_of_ellipses(config, yPos, boxWidth, clr, clr3, numLinesHalf
 def ellipses(config, paletteObj=None):
     # clr, clr2, clr3 = _get_colors(config, paletteObj)
 
-
     clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
     clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
@@ -850,7 +872,6 @@ def waveScales(config, paletteObj=None):
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
     clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
 
-
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
 
     numRows = 2
@@ -909,7 +930,6 @@ def _draw_ellipse(config, x0, y0, x1, y1, lineToUse, clrToUse):
 
 def circles(config, paletteObj=None):
     # clr, clr2, clr3 = _get_colors(config, paletteObj)
-
     clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
     clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
@@ -950,12 +970,12 @@ def tripart(config, paletteObj=None):
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
     clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
 
-    if random.random() < config.popRandomColorProb  :
+    if random.random() < config.popRandomColorProb:
         # hideos override until I can pair palettes and patterns in a
         # more flexible way
-        if paletteObj.paletteName == "galah" :
+        if paletteObj.paletteName == "galah":
             clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 60, 170, 255)
-        else :
+        else:
             clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
@@ -999,7 +1019,6 @@ def peaceCross(config, paletteObj=None):
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
     clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
 
-
     # hideos override until I can pair palettes and patterns in a
     # more flexible way
     # if paletteObj.paletteName == "galah" :
@@ -1011,10 +1030,10 @@ def peaceCross(config, paletteObj=None):
     _mid = [_blockSize / 2, _blockSize / 2]
     gridSize = math.ceil(_blockSize / 4)
 
-    _clrBase = colorutils.getRandomColorHSV(0, 360, 0.1, .20, 0.5, 0.75, 70, 190, 255)
+    _clrBase = colorutils.getRandomColorHSV(0, 360, 0.1, 0.20, 0.5, 0.75, 70, 190, 255)
 
     _clrBase = clr4
-    
+
     for _rowCount, (_row, _col) in enumerate(itertools.product(range(4), range(4))):
         _clr = _clrBase
         _gridSize = gridSize
@@ -1023,22 +1042,22 @@ def peaceCross(config, paletteObj=None):
         _h = _gridSize
         _w = _gridSize
 
-        if random.random() < config.popRandomColorProb/14:
-            _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.5, 0.5, 70, 190, 255)
-        
+        if random.random() < config.popRandomColorProb / 14:
+            _clr = colorutils.getRandomColorHSV(0, 360, 0.2, 0.40, 0.5, 0.5, 70, 190, 255)
+
         # 4 squares around cross
-        if _rowCount in [5,7,15,13] :
-            if random.random() > config.popRandomColorProb/14:
-                _clr = colorutils.getRandomColorHSV(0, 360, 0.05, .10, 0.75, 0.95, 70, 190, 255)
-            else :
-                _clr = tuple(round(i * .75) for i in clr4)
+        if _rowCount in [5, 7, 15, 13]:
+            if random.random() > config.popRandomColorProb / 14:
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.05, 0.10, 0.75, 0.95, 70, 190, 255)
+            else:
+                _clr = tuple(round(i * 0.75) for i in clr4)
 
         # cross shape
-        if _rowCount in [6,9,10,11,14] :
+        if _rowCount in [6, 9, 10, 11, 14]:
             _clr = tuple(round(i * 0.5) for i in clr1)
-            if random.random() < config.popRandomColorProb/18:
-                _clr = colorutils.getRandomColorHSV(0, 360, 0.2, .40, 0.1, 0.3, 70, 190, 255)
-        
+            if random.random() < config.popRandomColorProb / 18:
+                _clr = colorutils.getRandomColorHSV(0, 360, 0.2, 0.40, 0.1, 0.3, 70, 190, 255)
+
         _y = _xOffset
         _x = _yOffset
 
@@ -1049,7 +1068,7 @@ def peaceCross(config, paletteObj=None):
         #         _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
 
         config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clr, outline=None)
-     
+
 
 def fiboSeq(n):
     _seq = []
@@ -1065,10 +1084,9 @@ def logcabin(config, paletteObj=None):
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
     clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
 
-
     # hideos override until I can pair palettes and patterns in a
     # more flexible way
-    if paletteObj.paletteName == "galah" :
+    if paletteObj.paletteName == "galah":
         clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr3, outline=None)
@@ -1086,38 +1104,30 @@ def logcabin(config, paletteObj=None):
         _y = round(_mid[1] - _h / 2)
         _x = round((_rowCount) * gridSize)
         _clr = clr1
-        if _rowCount %2 != 0 :
-            if random.random() < config.popRandomColorProb :
+        if _rowCount % 2 != 0:
+            if random.random() < config.popRandomColorProb:
                 _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
             else:
                 _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
 
-        _clrReduced = (
-            tuple(round(i * 0.85) for i in _clr)
-            if _rowCount < numberOfBars / 2
-            else tuple(round(i * 1.0) for i in _clr)
-        )
+        _clrReduced = tuple(round(i * 0.85) for i in _clr) if _rowCount < numberOfBars / 2 else tuple(round(i * 1.0) for i in _clr)
 
         if col == 1:
             _clrReduced = (255, 0, 100, 255)
         config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
-        
+
     for _rowCount, row in enumerate(_seq):
         _w = row * gridSize
         _x = round(_mid[0] - _w / 2)
         _y = round((_rowCount) * gridSize)
         _h = gridSize
         _clr = clr1
-        if _rowCount %2 != 0 :
-            if random.random() < config.popRandomColorProb  :
+        if _rowCount % 2 != 0:
+            if random.random() < config.popRandomColorProb:
                 _clr = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
             else:
                 _clr = colorutils.getRandomColorHSV(320, 340, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
-        _clrReduced = (
-            tuple(round(i * 0.65) for i in _clr)
-            if _rowCount < numberOfBars / 2
-            else tuple(round(i * 1.0) for i in _clr)
-        )
+        _clrReduced = tuple(round(i * 0.65) for i in _clr) if _rowCount < numberOfBars / 2 else tuple(round(i * 1.0) for i in _clr)
         if row == 1:
             _clrReduced = (255, 0, 100, 255)
         config.blockDraw.rectangle((_x, _y, _x + _w, _y + _h), fill=_clrReduced, outline=None)
@@ -1217,8 +1227,6 @@ def randomizer3(config, paletteObj=None):
     clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
     clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
 
@@ -1442,3 +1450,51 @@ def reMove(config, paletteObj=None):
     if config.yIncrementer >= config.blockHeight - 4:
         config.yIncrementer = 0
 
+
+def grainLines(config, paletteObj=None):
+
+    # print(f"grainLines running {grainLines}")
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    if random.random() < config.popRandomColorProb:
+        # hideos override until I can pair palettes and patterns in a
+        # more flexible way
+        if paletteObj.paletteName == "galah":
+            clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 60, 170, 255)
+        else:
+            clr4 = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    midPt = (config.blockWidth / 2, config.blockWidth / 2)
+
+    rnd = random.random() + .5
+
+    _w = 2
+    _gradientCount  = 0
+    _gradientPeriod = 6
+    for yPt in range(-config.blockHeight,2*config.blockHeight, 2):
+        _lastX = 0
+        _lastY = 0
+        for xPt in range(0, config.blockWidth, _w):
+            _x1 = _lastX
+            _x2 = xPt * _w
+            _y1 = _lastY
+            _y2 = noise.pnoise2(rnd * _x2/120,rnd * yPt/100) * 100
+            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(clr2[0],clr2[1],clr2[3],round(255 *  (_gradientCount/_gradientPeriod +.25))))
+            _lastX = _x2
+            _lastY = _y2
+        _gradientCount += 1
+        if _gradientCount > _gradientPeriod :
+            _gradientCount = 0
+    # poly1 = ((0, 0), (midPt[0], midPt[1]), (0, config.blockHeight), (0, 0))
+    # config.blockDraw.polygon(poly1, fill=clr2)
+
+    # poly2 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (config.blockWidth, config.blockHeight), (config.blockWidth, 0))
+    # config.blockDraw.polygon(poly2, fill=clr3)
+
+    # poly3 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (0, 0), (config.blockWidth, 0))
+    # config.blockDraw.polygon(poly3, fill=clr4)

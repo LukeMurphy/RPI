@@ -1492,6 +1492,8 @@ def grainLines(config, paletteObj=None):
         _gradientCount += 1
         if _gradientCount > _gradientPeriod :
             _gradientCount = 0
+            _gradientPeriod = round(random.uniform(3,8))
+            rnd2 = random.random() + .35
     # poly1 = ((0, 0), (midPt[0], midPt[1]), (0, config.blockHeight), (0, 0))
     # config.blockDraw.polygon(poly1, fill=clr2)
 

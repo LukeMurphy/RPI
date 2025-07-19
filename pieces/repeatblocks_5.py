@@ -882,6 +882,7 @@ def generatePatternSequence(config):
 
             if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
                 _pattern = config.borderPattern
+                
 
             _patternBlock = PatternBlock()
             _patternBlock.pattern = _pattern
@@ -891,12 +892,16 @@ def generatePatternSequence(config):
             _patternBlock.col = c
             _patternBlock.row = r
             _patternBlock.rePainting = False
+            _patternBlock.isBorder = False
             _patternBlock.rePainting = _patternSelected in [
                 "randomizer3",
                 "randomizer2",
                 "randomizer",
                 "diamond",
             ]
+
+            if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
+                _patternBlock.isBorder = True
 
             config.patternSequence.append(_patternBlock)
             # config.usedPatterns.append(_pattern)
@@ -1020,7 +1025,7 @@ def drawRepeatedPatternImage(config, canvasImage):
 
         if _patternBlock.hasBeenPainted == False :
             drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
-            if not _patternBlock.rePainting:
+            if not _patternBlock.rePainting or _patternBlock.isBorder :
                 _patternBlock.hasBeenPainted = True
 
     updateFaderEndpoint()

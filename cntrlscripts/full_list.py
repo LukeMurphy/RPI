@@ -275,7 +275,7 @@ root.geometry(
     "%dx%d+%d+%d"
     % (
         860,
-        420,
+        320,
         # round(screen_height * 0.6),
         round(screen_width - 900),
         round(1 * screen_height / 2),

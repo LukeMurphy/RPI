@@ -74,7 +74,8 @@ class Config:
         allArgs = self.__dict__
         print("\n---------------------------------------------------------------------------------------\n")
         for element in allArgs :
-            print(element, " : ", allArgs[element])
+            print(f"{element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
+            print("----------")
         print("\n---------------------------------------------------------------------------------------\n")
    
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith('__') is False]

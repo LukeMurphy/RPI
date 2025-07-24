@@ -1518,7 +1518,7 @@ def main(run=True):
     # """
 
     # prints out everything in the config global
-    # config.debugSelf()
+    config.debugSelf()
 
     if run:
         runWork()

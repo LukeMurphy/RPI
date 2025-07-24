@@ -1517,6 +1517,9 @@ def main(run=True):
     #         config.render(config.renderImageFull, 0, 0)
     # """
 
+    # prints out everything in the config global
+    # config.debugSelf()
+
     if run:
         runWork()
 

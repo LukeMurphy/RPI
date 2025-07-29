@@ -1471,14 +1471,14 @@ def grainLines(config, paletteObj=None):
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
 
     midPt = (config.blockWidth / 2, config.blockWidth / 2)
-    rndFactor = .1
+    rndFactor = .01
     rnd = random.random() + rndFactor
     rnd2 = random.random() + rndFactor
 
     _w = round(random.uniform(1,3))
     _gradientCount  = 0
     _gradientPeriod = round(random.uniform(3,8))
-    _lineGap = int(random.uniform(1,3))
+    _lineGap = int(random.uniform(1,2))
     for yPt in range(-config.blockHeight,2*config.blockHeight, _lineGap):
         _lastX = 0
         _lastY = 0

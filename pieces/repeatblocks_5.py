@@ -793,7 +793,7 @@ def handleChangeCurrentCominationSet():
     if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone:
         config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
         # {config.combinationSets[config.currentCombinationsetIndex]}
-        print(f"Combo changed to  {config.currentCombinationsetIndex} ")
+        print(f"=====> Combo changed to  {config.currentCombinationsetIndex} ")
         selectNewPalette()
         rebuildPatterns()
     

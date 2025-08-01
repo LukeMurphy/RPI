@@ -1306,7 +1306,7 @@ def shapeOverLayFunction(temp1):
         temp1.paste(temp2, (0, 0), temp2)
     else :
         _count = 0
-        _overlayFill = tuple(round(a * config.brightness) for a in config.c1.currentColor)
+        _overlayFill = tuple(round(a * config.brightness) for a in config.c3.currentColor)
         for _r in range(config.rows) :
             for _c in range(config.cols) :
                 _x0 = _c * config.tileSizeWidth

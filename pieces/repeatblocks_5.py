@@ -784,6 +784,7 @@ def loadAndSetCombinations():
         comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
         comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=config.altColoringProb))
         comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=config.popRandomColorProb))
+        comboSet.usePolygonOverlay = workConfig.getboolean(combinationSetName, "usePolygonOverlay", fallback=config.usePolygonOverlay)
 
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
@@ -869,6 +870,7 @@ def generatePatternSequence(config):
     config.initPatternBuild = True
     config.useBorderPattern = config.combinationSets[config.currentCombinationsetIndex].useBorderPattern
     config.borderPattern = config.combinationSets[config.currentCombinationsetIndex].borderPattern
+    config.usePolygonOverlay = config.combinationSets[config.currentCombinationsetIndex].usePolygonOverlay
 
     for c in range(config.patternBlockCols):
         for r in range(config.patternBlockRows):
@@ -1339,11 +1341,13 @@ def loadPolyOverlaybaseValues():
         print(e)
         config.polyBase = []
 
+
 def generateOverlayTiles():
         config.tileOverlayGrid =[0]
         for _v in range(config.rows * config.cols) :
             if random.random() < config.tileOverlayGridProb :
                 config.tileOverlayGrid.append(_v)
+
 
 def setupPolyOverlay():  # sourcery skip: extract-method
     config.usePolygonOverlay = False

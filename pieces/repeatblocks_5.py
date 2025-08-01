@@ -1342,7 +1342,7 @@ def loadPolyOverlaybaseValues():
 def generateOverlayTiles():
         config.tileOverlayGrid =[0]
         for _v in range(config.rows * config.cols) :
-            if random.random() >.8  :
+            if random.random() < config.tileOverlayGridProb :
                 config.tileOverlayGrid.append(_v)
 
 def setupPolyOverlay():  # sourcery skip: extract-method
@@ -1361,6 +1361,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         config.polyOverlay.maxSaturation = float(workConfig.get("movingpattern", "poly_maxSaturation"))
         config.polyOverlay.minValue = float(workConfig.get("movingpattern", "poly_minValue"))
         config.polyOverlay.maxValue = float(workConfig.get("movingpattern", "poly_maxValue"))
+        config.tileOverlayGridProb = float(workConfig.get("movingpattern", "tileOverlayGridProb", fallback=0.0))
         config.poly_alpha = int(workConfig.get("movingpattern", "poly_alpha"))
         config.useOverlayTileGrid = (workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False))
         config.polyOverlay.setStartColor()

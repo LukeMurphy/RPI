@@ -1280,32 +1280,50 @@ def showDebugCanvases(config):
 def shapeOverLayFunction(temp1):
     temp2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp2Draw = ImageDraw.Draw(temp2)
-    # actual shape
-    if random.random() < config.polyOverlayChangeProb:
-        config.polyBase[0][0] += random.uniform(-3, 3)
-        config.polyBase[1][0] += random.uniform(-3, 3)
-        config.polyBase[2][0] += random.uniform(-3, 3)
-        config.polyBase[3][0] += random.uniform(-3, 3)
-        config.polyBase[4][0] += random.uniform(-3, 3)
-    poly = tuple(map(lambda x: (tuple(x)), config.polyBase))
 
-    # outline outside shape
-    # poly = ((11,20),(24,160),(300,160),(300,200),(0,200),(0,0),(300,0),(200,12),(20,20))
-    config.polyOverlay.stepTransition()
-    polyFillaList = [int(a) for a in (config.polyOverlay.currentColor)]
+    if not config.useOverlayTileGrid :
+        config.polyOverlay.stepTransition()
+        polyFillaList = [int(a) for a in (config.polyOverlay.currentColor)]
+        polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], config.poly_alpha)
+        # actual shape
+        if random.random() < config.polyOverlayChangeProb:
+            config.polyBase[0][0] += random.uniform(-3, 3)
+            config.polyBase[1][0] += random.uniform(-3, 3)
+            config.polyBase[2][0] += random.uniform(-3, 3)
+            config.polyBase[3][0] += random.uniform(-3, 3)
+            config.polyBase[4][0] += random.uniform(-3, 3)
+        poly = tuple(map(lambda x: (tuple(x)), config.polyBase))
 
-    polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], config.poly_alpha)
+        # outline outside shape
+        # poly = ((11,20),(24,160),(300,160),(300,200),(0,200),(0,0),(300,0),(200,12),(20,20))
 
-    # polyFilla =  config.linecolOverlay.currentColor
-    # polyFilla =  config.colOverlay.currentColor
-    # polyFilla =  (config.colOverlay.currentColor[1], config.colOverlay.currentColor[0],config.colOverlay.currentColor[3], config.poly_alpha)
-    # polyFilla = (config.colOverlay.currentColor[0], config.colOverlay.currentColor[1], config.colOverlay.currentColor[2], 1)
+        # polyFilla =  config.linecolOverlay.currentColor
+        # polyFilla =  config.colOverlay.currentColor
+        # polyFilla =  (config.colOverlay.currentColor[1], config.colOverlay.currentColor[0],config.colOverlay.currentColor[3], config.poly_alpha)
+        # polyFilla = (config.colOverlay.currentColor[0], config.colOverlay.currentColor[1], config.colOverlay.currentColor[2], 1)
 
-    temp2Draw.polygon(poly, fill=polyFilla)
+        temp2Draw.polygon(poly, fill=polyFilla)
+        temp1.paste(temp2, (0, 0), temp2)
+    else :
+        _count = 0
+        _overlayFill = tuple(round(a * config.brightness) for a in config.c1.currentColor)
+        for _r in range(config.rows) :
+            for _c in range(config.cols) :
+                _x0 = _c * config.tileSizeWidth
+                _y0 = _r * config.tileSizeHeight
+                _x1 = _x0 + config.tileSizeWidth
+                _y1 = _y0 + config.tileSizeHeight
+                if _count in config.tileOverlayGrid :
+                    temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=_overlayFill)
+                # else :
+                #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
+                _count+= 1
 
-    # resImg = ImageChops.soft_light(temp1, temp2)
 
-    temp1.paste(temp2, (0, 0), temp2)
+        temp1 = ImageChops.soft_light(temp1, temp2)
+        if random.random() < config.polyOverlayChangeProb:
+            generateOverlayTiles()
+        # temp1.paste(temp2, (0, 0), temp2)
     return temp1
 
 
@@ -1321,6 +1339,11 @@ def loadPolyOverlaybaseValues():
         print(e)
         config.polyBase = []
 
+def generateOverlayTiles():
+        config.tileOverlayGrid =[0]
+        for _v in range(config.rows * config.cols) :
+            if random.random() >.8  :
+                config.tileOverlayGrid.append(_v)
 
 def setupPolyOverlay():  # sourcery skip: extract-method
     config.usePolygonOverlay = False
@@ -1339,10 +1362,13 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         config.polyOverlay.minValue = float(workConfig.get("movingpattern", "poly_minValue"))
         config.polyOverlay.maxValue = float(workConfig.get("movingpattern", "poly_maxValue"))
         config.poly_alpha = int(workConfig.get("movingpattern", "poly_alpha"))
+        config.useOverlayTileGrid = (workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False))
         config.polyOverlay.setStartColor()
         config.polyOverlay.getNewColor()
         config.polyOverlay.colorTransitionSetup()
         config.polyOverlayChangeProb = float(workConfig.get("movingpattern", "polyOverlayChangeProb", fallback=0.003))
+
+        generateOverlayTiles()
         loadPolyOverlaybaseValues()
         # print(config.polyBase)
     except Exception as e:

@@ -199,7 +199,7 @@ def setPenPropsByName(_name, pen):
     pen.name = _name
     pen.minNumPoints = _penProps.minNumPoints
     pen.maxNumPoints = _penProps.maxNumPoints
-    pen.num_points = round(random.uniform((pen.minNumPoints, pen.maxNumPoints)))
+    pen.num_points = round(random.uniform(pen.minNumPoints, pen.maxNumPoints))
     pen.turns = round(random.uniform(_penProps.turnsRange[0], _penProps.turnsRange[1]))
     pen.minInterpolatedPoints = _penProps.minInterpolatedPoints
     pen.maxInterpolatedPoints = _penProps.maxInterpolatedPoints

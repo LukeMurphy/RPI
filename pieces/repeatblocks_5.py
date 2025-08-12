@@ -141,9 +141,8 @@ class PatternBlock:
 
 
 class CombinationSet:
-    def __init__(self, _name = "default"):
+    def __init__(self, _name="default"):
         self.name = _name
-
 
 
 # --------------------- UTILS       ---------------------
@@ -269,8 +268,6 @@ def setUpDisturbanceConfigs(configSet):
     argument = f"{config.path}/configs/{config.disturbanceConfigFile}"
     config.disturbanceConfig.read(argument)
 
-
-
     config.baseSectionSpeed = float(config.disturbanceConfig.get(configSet, "baseSectionSpeed"))
     config.sectionRotationRange = float(config.disturbanceConfig.get(configSet, "sectionRotationRange"))
 
@@ -345,7 +342,7 @@ def rebuildSections():
     baseSpeed = config.baseSectionSpeed
 
     for i in range(config.numberOfSections):
-        
+
         if i < len(config.movingSections):
             section = config.movingSections[i]
             section.sectionRotation = random.uniform(-config.sectionRotationRange, config.sectionRotationRange)
@@ -394,13 +391,12 @@ def rebuildSections():
     config.drawingPrinted = False
 
 
-
 # performs the disturbances
 def disturber():
     """Applies disturbances to the canvas image based on configuration."""
-    '''This function applies "disturbances" to a canvas image, either by 
+    """This function applies "disturbances" to a canvas image, either by 
     disturbing specific sections or (in commented code) by repeating a pattern image. 
-    It also pastes stable (undisturbed) sections back onto the canvas. Thanks AI!'''
+    It also pastes stable (undisturbed) sections back onto the canvas. Thanks AI!"""
     config.doneCount = 0
 
     if config.doSectionDisturbance:
@@ -411,12 +407,9 @@ def disturber():
             tempCrop = config.patternImage.crop((s[0], s[1], s[2], s[3]))
             config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
-
-
-
     # else:
     #     drawRepeatedPatternImage(config, config.patternImage)
-        # config.canvasImage.paste(config.patternImage, (0, 0), config.patternImage)
+    # config.canvasImage.paste(config.patternImage, (0, 0), config.patternImage)
 
 
 def disturbSections():
@@ -477,12 +470,12 @@ def disturbSingleSection(sectionParams):
         sectionParams.sectionSpeed[1] = 0
 
 
-
 # --------------------- PALETTES      ---------------------
+
 
 def loadAndSetupAllPalettes():
     global workConfig
-    '''initial palatte setups -- needs to run after combinations are established'''
+    """initial palatte setups -- needs to run after combinations are established"""
     config.palettesConfigFile = workConfig.get("movingpattern", "palettesConfigFile")
 
     config.paletteConfig = configparser.ConfigParser()
@@ -495,7 +488,6 @@ def loadAndSetupAllPalettes():
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
 
-    
     # buildPalette(config, 0)
 
     config.allAvailablePalettesList = []
@@ -507,7 +499,6 @@ def loadAndSetupAllPalettes():
     for arg in config.paletteConfigs:
         loadPalette(arg)
 
-
     config.currentPaletteIndex = 0
     setPalette(config, config.currentPaletteIndex)
     # config.borderPalette = changeSinglePalette(config.currentCombinationsetIndex)
@@ -516,8 +507,6 @@ def loadAndSetupAllPalettes():
 def loadPalette(palette):
     global config
     # palette = config.palettes[index]
-
-
 
     print(f"Loading palette {palette}")
     c1 = Holder()
@@ -533,8 +522,8 @@ def loadPalette(palette):
     c1.maxSaturation = float(config.paletteConfig.get(palette, "c1_maxSaturation"))
     c1.minValue = float(config.paletteConfig.get(palette, "c1_minValue"))
     c1.maxValue = float(config.paletteConfig.get(palette, "c1_maxValue"))
-    c1.dropHueMin = float(config.paletteConfig.get(palette, "c1_dropHueMin", fallback = 0))
-    c1.dropHueMax = float(config.paletteConfig.get(palette, "c1_dropHueMax", fallback = 0))
+    c1.dropHueMin = float(config.paletteConfig.get(palette, "c1_dropHueMin", fallback=0))
+    c1.dropHueMax = float(config.paletteConfig.get(palette, "c1_dropHueMax", fallback=0))
     c1.currentColor = setCurrentColor(c1)
 
     # color 1
@@ -545,8 +534,8 @@ def loadPalette(palette):
     c2.maxSaturation = float(config.paletteConfig.get(palette, "c2_maxSaturation"))
     c2.minValue = float(config.paletteConfig.get(palette, "c2_minValue"))
     c2.maxValue = float(config.paletteConfig.get(palette, "c2_maxValue"))
-    c2.dropHueMin = float(config.paletteConfig.get(palette, "c2_dropHueMin", fallback = 0))
-    c2.dropHueMax = float(config.paletteConfig.get(palette, "c2_dropHueMax", fallback = 0))
+    c2.dropHueMin = float(config.paletteConfig.get(palette, "c2_dropHueMin", fallback=0))
+    c2.dropHueMax = float(config.paletteConfig.get(palette, "c2_dropHueMax", fallback=0))
     c2.currentColor = setCurrentColor(c2)
     # color 2
     # tLimitBase = int(config.paletteConfig.get(palette, "line2_tLimitBase"))
@@ -556,8 +545,8 @@ def loadPalette(palette):
     c3.maxSaturation = float(config.paletteConfig.get(palette, "c3_maxSaturation"))
     c3.minValue = float(config.paletteConfig.get(palette, "c3_minValue"))
     c3.maxValue = float(config.paletteConfig.get(palette, "c3_maxValue"))
-    c3.dropHueMin = float(config.paletteConfig.get(palette, "c3_dropHueMin", fallback = 0))
-    c3.dropHueMax = float(config.paletteConfig.get(palette, "c3_dropHueMax", fallback = 0))
+    c3.dropHueMin = float(config.paletteConfig.get(palette, "c3_dropHueMin", fallback=0))
+    c3.dropHueMax = float(config.paletteConfig.get(palette, "c3_dropHueMax", fallback=0))
     c3.currentColor = setCurrentColor(c3)
 
     c4.minHue = float(config.paletteConfig.get(palette, "c4_minHue", fallback=0))
@@ -566,8 +555,8 @@ def loadPalette(palette):
     c4.maxSaturation = float(config.paletteConfig.get(palette, "c4_maxSaturation", fallback=0))
     c4.minValue = float(config.paletteConfig.get(palette, "c4_minValue", fallback=0))
     c4.maxValue = float(config.paletteConfig.get(palette, "c4_maxValue", fallback=0))
-    c4.dropHueMin = float(config.paletteConfig.get(palette, "c4_dropHueMin", fallback = 0))
-    c4.dropHueMax = float(config.paletteConfig.get(palette, "c4_dropHueMax", fallback = 0))
+    c4.dropHueMin = float(config.paletteConfig.get(palette, "c4_dropHueMin", fallback=0))
+    c4.dropHueMax = float(config.paletteConfig.get(palette, "c4_dropHueMax", fallback=0))
     c4.currentColor = setCurrentColor(c4)
 
     _paletteObj = Holder()
@@ -584,9 +573,9 @@ def loadPalette(palette):
 
 def getPaletteObjectByName(_name):
     for _n in config.allAvailablePalettesList:
-        if _n.paletteName == _name :
+        if _n.paletteName == _name:
             return _n
-    
+
 
 def changeSinglePalette(index=0):
     # paletteObj = config.allAvailablePalettesList[index]
@@ -656,9 +645,8 @@ def selectNewPalette(_setPalette=True):
         resetCrossFader()
 
 
-
-
 # --------------------- PATTERNS     ---------------------
+
 
 def loadAndSetupPatterns():
     # config.patterns = workConfig.get("movingpattern", "patterns").split(",")
@@ -690,7 +678,7 @@ def loadAndSetupPatterns():
     loadConfigValue(config, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "popRandomColorProb", .8, float)
+    loadConfigValue(config, workConfig, "movingpattern", "popRandomColorProb", 0.8, float)
     loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeAlwaysUseMax", False, bool)
 
@@ -706,7 +694,6 @@ def loadAndSetupPatterns():
         config.ringsRange = (1, 1)
         config.numScaleRows = config.numShingleRows
 
-    
     loadConfigValue(config, workConfig, "movingpattern", "patternOrientation", 0, float)
     loadConfigValue(config, workConfig, "movingpattern", "numRows", 5, int)
     loadConfigValue(config, workConfig, "movingpattern", "numRowsRandomize", False, bool)
@@ -774,13 +761,13 @@ def loadAndSetCombinations():
     config.combinationSets = []
     combinationSets = workConfig.get("movingpattern", "combinationSets").split(",")
     config.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
-    for combinationSetName in  combinationSets :
+    for combinationSetName in combinationSets:
         comboSet = CombinationSet(combinationSetName)
         comboSet.patterns = workConfig.get(combinationSetName, "patterns").split(",")
         comboSet.palettes = workConfig.get(combinationSetName, "palettes").split(",")
         comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").split(",")
         comboSet.dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
-        comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback = "")
+        comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback="")
         comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
         comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=config.altColoringProb))
         comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=config.popRandomColorProb))
@@ -797,15 +784,15 @@ def handleChangeCurrentCominationSet():
         print(f"=====> Combo changed to  {config.currentCombinationsetIndex} ")
         selectNewPalette()
         rebuildPatterns()
-    
+
 
 def resetPatternBlocks():
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
         _patternBlock.hasBeenPainted = False
-        if random.random() < config.changeEachblockWhenChangingPatternProb :
+        if random.random() < config.changeEachblockWhenChangingPatternProb:
             # _patternBlock.tempPalette = config.allAvailablePalettesList[config.currentPaletteIndex]
-            _patternBlock.tempPalette =getTempPalette(config)
+            _patternBlock.tempPalette = getTempPalette(config)
         config.patternSequence[i] = _patternBlock
 
 
@@ -831,7 +818,7 @@ def buildPatternSequence(config):
     config.patternBlockCols = round(config.canvasWidth / config.blockWidth)
     config.patternBlockRows = round(config.canvasHeight / config.blockHeight)
 
-    # considering making this be an option to fit exactly the width - i.e. choose the number of columns 
+    # considering making this be an option to fit exactly the width - i.e. choose the number of columns
     # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
     # ragged edges which are a nice trace of the previous state
     # print(f"config.blockWidth {config.blockWidth} config.patternBlockCols {config.patternBlockCols}")
@@ -842,6 +829,8 @@ def buildPatternSequence(config):
 
     # print(config.altLineColoring)
     config.numConcentricBoxes = round(random.uniform(config.minnumConcentricBoxes, config.maxnumConcentricBoxes))
+
+    pattern_blocks_v5.floralConfig(config)
     generatePatternSequence(config)
     # _print_pattern_sequence(config)
     config.borderDrawn = False
@@ -884,7 +873,6 @@ def generatePatternSequence(config):
 
             if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
                 _pattern = config.borderPattern
-                
 
             _patternBlock = PatternBlock()
             _patternBlock.pattern = _pattern
@@ -935,6 +923,7 @@ def _print_pattern_sequence(config):
 
 def rebuildPatterns(arg=0):
     # print("rebuildPattern called")
+
     if config.numRowsRandomize:
         rowsAndDotsSettings()
 
@@ -964,8 +953,6 @@ def resetCrossFader(_useConfigImage=True):
         # config.fader.startingImage = config.canvasImage.copy()
         config.fader.startingImage = config.compositeImage.copy()
 
-
-
     config.fader.endImage = config.canvasImage.copy()
     config.fader.crossFadeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
@@ -983,6 +970,7 @@ def rowsAndDotsSettings():
     config.numDotRows = dotRows[round(random.uniform(0, 2))]
     config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
     config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
+    
 
 
 # --------------------- LOOP ACTIONS  ---------------------
@@ -1024,10 +1012,9 @@ def drawRepeatedPatternImage(config, canvasImage):
         if config.patternModelVariations:
             applyPatternVariations(config, i)
 
-
-        if _patternBlock.hasBeenPainted == False :
+        if _patternBlock.hasBeenPainted == False:
             drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
-            if not _patternBlock.rePainting or _patternBlock.isBorder :
+            if not _patternBlock.rePainting or _patternBlock.isBorder:
                 _patternBlock.hasBeenPainted = True
 
     updateFaderEndpoint()
@@ -1072,6 +1059,7 @@ def updateFaderEndpoint():
     config.fader.endImage = config.patternImage.copy()
     # config.fader.endImage = config.canvasImage.copy()
 
+
 # ------------------------------------------------
 def applyPatternVariations(config, _counter):
     """Applies pattern variations based on the pattern sequence."""
@@ -1080,9 +1068,7 @@ def applyPatternVariations(config, _counter):
     config.rotateAltBlock = _patternBlock.rotate
     func = eval(f"pattern_blocks_v5.{_patternBlock.pattern}")
 
-
-
-    if not _patternBlock.hasBeenPainted :
+    if not _patternBlock.hasBeenPainted:
         func(config, _patternBlock.tempPalette)
 
     # if not _patternBlock.rePainting:
@@ -1137,8 +1123,6 @@ def handleDisturbances():
 
     if random.random() < 0.01:
         config.triangles = False
-
-
 
     if config.sectionDisturbance and config.fader.fadingDone:
         disturber()
@@ -1204,7 +1188,7 @@ def handlePatternRebuild():
 
 def handleSectionDisturbances():
     """Handles random overlay repetition disturbance."""
-    if random.random() < config.redoSectionDisturbance and config.sectionDisturbance  and config.fader.fadingDone:
+    if random.random() < config.redoSectionDisturbance and config.sectionDisturbance and config.fader.fadingDone:
         config.doSectionDisturbance = True
         rebuildSections()
 
@@ -1256,21 +1240,20 @@ def showDebugCanvases(config):
     _w = config.canvasWidth
     _h = config.canvasHeight
 
-    patternCoord = (1*(_w + 20), 0)
-    canvasImageCoord = (1*(_w + 20), _h * 2 + 40)
+    patternCoord = (1 * (_w + 20), 0)
+    canvasImageCoord = (1 * (_w + 20), _h * 2 + 40)
     startingImageCoord = (0, _h + 20)
-    crossFadeImageCoord = (1 * (_w + 20),  _h + 20)
+    crossFadeImageCoord = (1 * (_w + 20), _h + 20)
     endImageCoord = (2 * (_w + 20), _h + 20)
 
-
     hilitCor = patternCoord
-    hilit = (hilitCor[0]-1, hilitCor[1]-1, hilitCor[0] + _w +1, hilitCor[1] + _h+1)
-    config.destinationImageDraw.rectangle(hilit, fill=None, outline=(0,255,255,200))
+    hilit = (hilitCor[0] - 1, hilitCor[1] - 1, hilitCor[0] + _w + 1, hilitCor[1] + _h + 1)
+    config.destinationImageDraw.rectangle(hilit, fill=None, outline=(0, 255, 255, 200))
     hilitCor = canvasImageCoord
-    hilit = (hilitCor[0]-1, hilitCor[1]-1, hilitCor[0] + _w +1, hilitCor[1] + _h+1)
-    config.destinationImageDraw.rectangle(hilit, fill=None, outline=(0,255,0,200))
+    hilit = (hilitCor[0] - 1, hilitCor[1] - 1, hilitCor[0] + _w + 1, hilitCor[1] + _h + 1)
+    config.destinationImageDraw.rectangle(hilit, fill=None, outline=(0, 255, 0, 200))
 
-    config.destinationImage.paste(config.patternImage,patternCoord, config.patternImage)
+    config.destinationImage.paste(config.patternImage, patternCoord, config.patternImage)
     config.destinationImage.paste(config.canvasImage, canvasImageCoord, config.canvasImage)
     config.destinationImage.paste(config.fader.startingImage, startingImageCoord, config.fader.startingImage)
     config.destinationImage.paste(config.fader.crossFadeImage, crossFadeImageCoord, config.fader.crossFadeImage)
@@ -1279,11 +1262,12 @@ def showDebugCanvases(config):
 
 # ----------------- OVERLAY ACTIONS  ---------------------
 
+
 def shapeOverLayFunction(temp1):
     temp2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     temp2Draw = ImageDraw.Draw(temp2)
 
-    if not config.useOverlayTileGrid :
+    if not config.useOverlayTileGrid:
         config.polyOverlay.stepTransition()
         polyFillaList = [int(a) for a in (config.polyOverlay.currentColor)]
         polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], config.poly_alpha)
@@ -1306,21 +1290,20 @@ def shapeOverLayFunction(temp1):
 
         temp2Draw.polygon(poly, fill=polyFilla)
         temp1.paste(temp2, (0, 0), temp2)
-    else :
+    else:
         _count = 0
         _overlayFill = tuple(round(a * config.brightness) for a in config.c3.currentColor)
-        for _r in range(config.rows) :
-            for _c in range(config.cols) :
+        for _r in range(config.rows):
+            for _c in range(config.cols):
                 _x0 = _c * config.tileSizeWidth
                 _y0 = _r * config.tileSizeHeight
                 _x1 = _x0 + config.tileSizeWidth
                 _y1 = _y0 + config.tileSizeHeight
-                if _count in config.tileOverlayGrid :
-                    temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=_overlayFill)
+                if _count in config.tileOverlayGrid:
+                    temp2Draw.rectangle((_x0, _y0, _x1, _y1), fill=_overlayFill)
                 # else :
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
-                _count+= 1
-
+                _count += 1
 
         temp1 = ImageChops.soft_light(temp1, temp2)
         if random.random() < config.polyOverlayChangeProb:
@@ -1343,10 +1326,10 @@ def loadPolyOverlaybaseValues():
 
 
 def generateOverlayTiles():
-        config.tileOverlayGrid =[0]
-        for _v in range(config.rows * config.cols) :
-            if random.random() < config.tileOverlayGridProb :
-                config.tileOverlayGrid.append(_v)
+    config.tileOverlayGrid = [0]
+    for _v in range(config.rows * config.cols):
+        if random.random() < config.tileOverlayGridProb:
+            config.tileOverlayGrid.append(_v)
 
 
 def setupPolyOverlay():  # sourcery skip: extract-method
@@ -1367,7 +1350,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         config.polyOverlay.maxValue = float(workConfig.get("movingpattern", "poly_maxValue"))
         config.tileOverlayGridProb = float(workConfig.get("movingpattern", "tileOverlayGridProb", fallback=0.0))
         config.poly_alpha = int(workConfig.get("movingpattern", "poly_alpha"))
-        config.useOverlayTileGrid = (workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False))
+        config.useOverlayTileGrid = workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False)
         config.polyOverlay.setStartColor()
         config.polyOverlay.getNewColor()
         config.polyOverlay.colorTransitionSetup()
@@ -1507,10 +1490,9 @@ def main(run=True):
 
     loadFilterRemapping()
 
-
     # ####################### clip player instert ################################
     loadClipPlayerConfigs()
-    
+
     # ###########################################################################
 
     initializeCrossFader()

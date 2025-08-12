@@ -41,7 +41,7 @@ class bcolors:
 # print(bcolors.WARNING + "Warning: No active frommets remain. Continue?" + bcolors.ENDC)
 
 
-class Config:
+class ArtWorkConfig:
 
     screenWidth = 128
     screenHeight = 64

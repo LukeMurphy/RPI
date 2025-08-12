@@ -5,8 +5,10 @@ import math
 import random
 import time
 import types
+
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils, panelDrawing
+from modules.configuration import ArtWorkConfig
+from modules import badpixels, coloroverlay, colorutils, panelDrawing, configuration
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 import numpy as np
 import noise
@@ -1459,6 +1461,136 @@ def grainLines(config, paletteObj=None):
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
 
+    if random.random() < config.popRandomColorProb:
+        # hideos override until I can pair palettes and patterns in a
+        # more flexible way
+        if paletteObj.paletteName == "galah":
+            hilight = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 60, 170, 255)
+        else:
+            hilight = colorutils.getRandomColorHSV(0, 360, 0.65, 1.0, 0.5, 0.75, 0, 0, 255)
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
+
+    midPt = (config.blockWidth / 2, config.blockWidth / 2)
+    rndFactor = 0.01
+    rnd = random.random() + rndFactor
+    rnd2 = random.random() + rndFactor
+
+    _w = round(random.uniform(1, 3))
+    _gradientCount = 0
+    _gradientPeriod = round(random.uniform(3, 8))
+    _lineGap = int(random.uniform(1, 2))
+    for yPt in range(-config.blockHeight, 2 * config.blockHeight, _lineGap):
+        _lastX = 0
+        _lastY = 0
+        for xPt in range(-32, config.blockWidth, _w):
+            _x1 = _lastX
+            _x2 = xPt * _w
+            _y1 = _lastY
+            _y2 = noise.pnoise2(rnd * _x2 / 120 + 0.2, rnd2 * yPt / 120) * 100
+            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0], patternFill[1], patternFill[2], round(255 * (_gradientCount / _gradientPeriod + 0.45))))
+            _lastX = _x2
+            _lastY = _y2
+        _gradientCount += 1
+        if _gradientCount > _gradientPeriod:
+            _gradientCount = 0
+            _gradientPeriod = round(random.uniform(3, 8))
+            rnd2 = random.random() + rndFactor
+    # poly1 = ((0, 0), (midPt[0], midPt[1]), (0, config.blockHeight), (0, 0))
+    # config.blockDraw.polygon(poly1, fill=clr2)
+
+    # poly2 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (config.blockWidth, config.blockHeight), (config.blockWidth, 0))
+    # config.blockDraw.polygon(poly2, fill=clr3)
+
+    # poly3 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (0, 0), (config.blockWidth, 0))
+    # config.blockDraw.polygon(poly3, fill=clr4)
+
+
+# ----------------------------------------------------##----------------------------------------------------#
+
+
+def chaikins_corner_cutting(coords, refinements=5, ratio=0.75):
+    # https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
+    coords = np.array(coords)
+
+    for _ in range(refinements):
+        L = coords.repeat(2, axis=0)
+        R = np.empty_like(L)
+        R[0] = L[0]
+        R[2::2] = L[1:-1:2]
+        R[1:-1:2] = L[2::2]
+        R[-1] = L[-1]
+        coords = L * ratio + R * (1.00 - ratio)
+
+    return coords
+
+
+def floralConfig(config):
+    config.floral = ArtWorkConfig()
+
+
+    _choice = random.randint(0, 7)
+
+    match _choice:
+
+        case 0:
+            config.floral._petals = 9
+            config.floral._w = config.blockWidth * 0.51
+            config.floral._lobe = config.floral._w * 0.8
+            config.floral._h = config.blockWidth / 8
+
+        case 1:
+            config.floral._petals = 7
+            config.floral._w = config.blockWidth * 0.51
+            config.floral._lobe = config.floral._w * 0.8
+            config.floral._h = config.blockWidth / 8
+
+        case 2:
+            config.floral._petals = 4
+            config.floral._w = config.blockWidth * 0.51
+            config.floral._lobe = config.floral._w * 0.7
+            config.floral._h = config.blockWidth / 4
+
+        case 3:
+            config.floral._petals = 5
+            config.floral._w = config.blockWidth * 0.51
+            config.floral._lobe = config.floral._w * 0.7
+            config.floral._h = config.blockWidth / 4
+
+        case 4:
+            config.floral._petals = 3
+            config.floral._w = config.blockWidth * 0.51
+            config.floral._lobe = config.floral._w * 0.8
+            config.floral._h = config.blockWidth / 4
+
+        case 5:
+            config.floral._petals = 4
+            config.floral._w = config.blockWidth * 0.6
+            config.floral._lobe = config.floral._w * 0.2
+            config.floral._h = config.blockWidth / 4
+
+        case 6:
+            config.floral._petals = 5
+            config.floral._w = config.blockWidth * 0.6
+            config.floral._lobe = config.floral._w * 0.2
+            config.floral._h = config.blockWidth / 4
+
+        case 7:
+            config.floral._lobe = round(random.uniform(4, config.blockWidth * 0.7))
+            config.floral._w = round(random.uniform(config.floral._lobe, config.blockWidth * 0.8))
+            config.floral._h = round(random.uniform(4, config.blockHeight / 8))
+            # config.floral._extension = config.blockWidth / 2
+            config.floral._petals = round(random.uniform(4, 7))
+    # config.floral.debugSelf()
+
+
+def petals(config, paletteObj=None):
+
+    # print(f"grainLines running {grainLines}")
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
 
     if random.random() < config.popRandomColorProb:
         # hideos override until I can pair palettes and patterns in a
@@ -1471,35 +1603,30 @@ def grainLines(config, paletteObj=None):
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
 
     midPt = (config.blockWidth / 2, config.blockWidth / 2)
-    rndFactor = .01
+    rndFactor = 0.01
     rnd = random.random() + rndFactor
     rnd2 = random.random() + rndFactor
 
-    _w = round(random.uniform(1,3))
-    _gradientCount  = 0
-    _gradientPeriod = round(random.uniform(3,8))
-    _lineGap = int(random.uniform(1,2))
-    for yPt in range(-config.blockHeight,2*config.blockHeight, _lineGap):
-        _lastX = 0
-        _lastY = 0
-        for xPt in range(-32, config.blockWidth, _w):
-            _x1 = _lastX
-            _x2 = xPt * _w
-            _y1 = _lastY
-            _y2 = noise.pnoise2(rnd * _x2/120 + .2, rnd2 * yPt/120) * 100
-            config.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0],patternFill[1],patternFill[2],round(255 *  (_gradientCount/_gradientPeriod +.45))))
-            _lastX = _x2
-            _lastY = _y2
-        _gradientCount += 1
-        if _gradientCount > _gradientPeriod :
-            _gradientCount = 0
-            _gradientPeriod = round(random.uniform(3,8))
-            rnd2 = random.random() + rndFactor
-    # poly1 = ((0, 0), (midPt[0], midPt[1]), (0, config.blockHeight), (0, 0))
-    # config.blockDraw.polygon(poly1, fill=clr2)
+    points = []
+    points.append(midPt)
+    points.append((midPt[0] + config.floral._lobe, midPt[1] - config.floral._h))
+    points.append((midPt[0] + config.floral._w, midPt[1]))
+    points.append((midPt[0] + config.floral._lobe, midPt[1] + config.floral._h))
+    points.append(midPt)
+    res = chaikins_corner_cutting(points, 6).tolist()
 
-    # poly2 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (config.blockWidth, config.blockHeight), (config.blockWidth, 0))
-    # config.blockDraw.polygon(poly2, fill=clr3)
+    _pts = tuple(tuple(_e) for _e in res)
 
-    # poly3 = ((config.blockWidth, 0), (midPt[0], midPt[1]), (0, 0), (config.blockWidth, 0))
-    # config.blockDraw.polygon(poly3, fill=clr4)
+    _petalImg = Image.new("RGBA", (config.blockWidth, config.blockHeight))
+    _petalDraw = ImageDraw.Draw(_petalImg)
+    _petalDraw.polygon(_pts, fill=patternFill)
+    _petalDraw.line((midPt[0], midPt[1], midPt[0] + config.floral._w / 2, midPt[1] + 3), fill=bgFill, width=1)
+    _petalDraw.line((midPt[0], midPt[1], midPt[0] + config.floral._w / 2, midPt[1] - 3), fill=bgFill, width=1)
+
+    _angle = 360 / config.floral._petals
+
+    for _p in range(config.floral._petals):
+        config.blockImage.paste(_petalImg.rotate(_angle * _p), (0, 0), _petalImg.rotate(_angle * _p))
+
+    if random.random() < 0.1:
+        floralConfig(config)

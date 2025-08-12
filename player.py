@@ -118,7 +118,7 @@ def _initializeConfiguration(loadFromArguments):
     # print("Arguments passed to player.py:")
     # print(args)
 
-    config = configuration.Config()
+    config = configuration.ArtWorkConfig()
     config.startTime = time.time()
     config.currentTime = time.time()
     config.doingReload = False

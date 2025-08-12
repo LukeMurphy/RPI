@@ -1606,12 +1606,13 @@ def petals(config, paletteObj=None):
     rnd = random.random() + rndFactor
     rnd2 = random.random() + rndFactor
 
-    points = []
-    points.append(midPt)
-    points.append((midPt[0] + config.floral._lobe, midPt[1] - config.floral._h))
-    points.append((midPt[0] + config.floral._w, midPt[1]))
-    points.append((midPt[0] + config.floral._lobe, midPt[1] + config.floral._h))
-    points.append(midPt)
+    points = [
+        midPt,
+        (midPt[0] + config.floral._lobe, midPt[1] - config.floral._h),
+        (midPt[0] + config.floral._w, midPt[1]),
+        (midPt[0] + config.floral._lobe, midPt[1] + config.floral._h),
+        midPt,
+    ]
     res = chaikins_corner_cutting(points, 6).tolist()
 
     _pts = tuple(tuple(_e) for _e in res)
@@ -1628,7 +1629,7 @@ def petals(config, paletteObj=None):
     for _p in range(config.floral._petals):
         _floralImg.paste(_petalImg.rotate(_angle * _p), (0, 0), _petalImg.rotate(_angle * _p))
 
-    _sizeChange = random.uniform(.5,.85)
+    _sizeChange = random.uniform(.25,.85)
     _newSize  = (round(config.blockWidth * _sizeChange), round(config.blockWidth * _sizeChange))
     _floralTemp = _floralImg.resize((_newSize[0],_newSize[1]),1)
     config.blockImage.paste(_floralTemp, (midPt[0], 0), _floralTemp)

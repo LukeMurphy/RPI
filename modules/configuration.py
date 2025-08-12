@@ -66,9 +66,10 @@ class ArtWorkConfig:
 
     rotation = 0
 
-    def __init__(self):
+    def __init__(self, *kwargs):
         print("\n---------------------------------------------------------------------------------------")
-        print("** Config instance init")
+        print(f"** Config instance init {kwargs}")
+        
   
     def debugSelf(self) :
         allArgs = self.__dict__

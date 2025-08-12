@@ -832,6 +832,7 @@ def buildPatternSequence(config):
 
     pattern_blocks_v5.floralConfig(config)
     generatePatternSequence(config)
+
     # _print_pattern_sequence(config)
     config.borderDrawn = False
     config.initPatternBuild = False
@@ -867,7 +868,8 @@ def generatePatternSequence(config):
                 _patternSelected = chooseAPattern()
                 _tempPalette = getTempPalette(config)
 
-            _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls"]) else round(random.uniform(0, 1))
+            # PREVENTS random rotation for certain patterns
+            _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls","petals"]) else round(random.uniform(0, 1))
             _position = _iterCount
             _pattern = _patternSelected
 

@@ -1526,8 +1526,7 @@ def chaikins_corner_cutting(coords, refinements=5, ratio=0.75):
 
 
 def floralConfig(config):
-    config.floral = ArtWorkConfig()
-
+    config.floral = ArtWorkConfig("Florals")
 
     _choice = random.randint(0, 7)
 
@@ -1602,7 +1601,7 @@ def petals(config, paletteObj=None):
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=bgFill, outline=None)
 
-    midPt = (config.blockWidth / 2, config.blockWidth / 2)
+    midPt = (round(config.blockWidth / 2), round(config.blockWidth / 2))
     rndFactor = 0.01
     rnd = random.random() + rndFactor
     rnd2 = random.random() + rndFactor
@@ -1618,6 +1617,7 @@ def petals(config, paletteObj=None):
     _pts = tuple(tuple(_e) for _e in res)
 
     _petalImg = Image.new("RGBA", (config.blockWidth, config.blockHeight))
+    _floralImg = Image.new("RGBA", (config.blockWidth, config.blockHeight))
     _petalDraw = ImageDraw.Draw(_petalImg)
     _petalDraw.polygon(_pts, fill=patternFill)
     _petalDraw.line((midPt[0], midPt[1], midPt[0] + config.floral._w / 2, midPt[1] + 3), fill=bgFill, width=1)
@@ -1626,7 +1626,17 @@ def petals(config, paletteObj=None):
     _angle = 360 / config.floral._petals
 
     for _p in range(config.floral._petals):
-        config.blockImage.paste(_petalImg.rotate(_angle * _p), (0, 0), _petalImg.rotate(_angle * _p))
+        _floralImg.paste(_petalImg.rotate(_angle * _p), (0, 0), _petalImg.rotate(_angle * _p))
 
-    if random.random() < 0.1:
+    _sizeChange = random.uniform(.5,.85)
+    _newSize  = (round(config.blockWidth * _sizeChange), round(config.blockWidth * _sizeChange))
+    _floralTemp = _floralImg.resize((_newSize[0],_newSize[1]),1)
+    config.blockImage.paste(_floralTemp, (midPt[0], 0), _floralTemp)
+    config.blockImage.paste(_floralTemp, (-midPt[0], 0), _floralTemp)
+    config.blockImage.paste(_floralTemp, (0, midPt[1]), _floralTemp)
+    config.blockImage.paste(_floralTemp, (0, -midPt[1]), _floralTemp)
+
+
+
+    if random.random() < 0.01:
         floralConfig(config)

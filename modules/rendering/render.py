@@ -148,7 +148,7 @@ def setUp(config):
     # videoplayer.play()  # play the video
     # config.videoplayer = videoplayer
 
-    root.after(1000, startWork)
+    root.after(100, startWork)
     root.call("wm", "attributes", ".", "-topmost", "1")
     root.mainloop()
 
@@ -176,8 +176,6 @@ def startWork(*args):
 
     # Putting the animation on its own thread
     # Still throws and error when manually closed though...
-    
-    # threading.Thread(target=work.runWork).start()
 
     try:
         t = threading.Thread.__init__(work.runWork())
@@ -215,7 +213,7 @@ def updateCanvas():
         anchor="nw",
         tag="main",
     )
-    # config.cnvs.update()
+    config.cnvs.update()
 
     # update_duration()
 
@@ -225,8 +223,8 @@ def updateCanvas():
     # config.cnvs2.update()
 
     # This *should* be more efficient
-    config.cnvs.update_idletasks()
-    config.root.update()
+    # config.cnvs.update_idletasks()
+    # root.update()
 
     ############################################################
     ######  Check if config file has changed and reload    #####

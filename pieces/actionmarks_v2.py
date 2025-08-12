@@ -210,15 +210,15 @@ def setPenPropsByName(_name, pen):
 
     pen.xRadiusFactorNoiseFactor = _penProps.xRadiusFactorNoiseFactor
     pen.yRadiusFactorNoiseFactor = _penProps.yRadiusFactorNoiseFactor
-    pen.yRandom = random.randint(_penProps.yRandomRange[0], _penProps.yRandomRange[1])
-    pen.xRandom = random.randint(_penProps.xRandomRange[0], _penProps.xRandomRange[1])
+    pen.yRandom = round(random.uniform(_penProps.yRandomRange[0], _penProps.yRandomRange[1]))
+    pen.xRandom = round(random.uniform(_penProps.xRandomRange[0], _penProps.xRandomRange[1]))
 
     pen.rotationFactor = _penProps.rotationFactor
     pen.rotationAngle = random.uniform(-math.pi / 2 / pen.rotationFactor, math.pi / 2 / pen.rotationFactor)
 
     pen.changePenColorWhileDrawingProb = config.activePalette.changePenColorWhileDrawingProb
-    pen.xOffset = random.randint(config.activePalette.xOffsetRange[0], config.activePalette.xOffsetRange[1])
-    pen.yOffset = random.randint(config.activePalette.yOffsetRange[0], config.activePalette.yOffsetRange[1])
+    pen.xOffset = round(random.uniform(config.activePalette.xOffsetRange[0], config.activePalette.xOffsetRange[1]))
+    pen.yOffset = round(random.uniform(config.activePalette.yOffsetRange[0], config.activePalette.yOffsetRange[1]))
 
     pen._w = _penProps.w
     pen.minMarkWidth = _penProps.minMarkWidth

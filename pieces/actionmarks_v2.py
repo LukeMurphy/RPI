@@ -116,7 +116,7 @@ def changeDrawing(args):
     initDrawings()
 
     config.systemController = Director(config)
-    _newTime = random.randint(config.totalResetTime, round(float(config.totalResetTime) * config.totalResetTimeMaxMultiplier))
+    _newTime = round(random.uniform(config.totalResetTime, round(float(config.totalResetTime) * config.totalResetTimeMaxMultiplier)))
     config.systemController.slotRate = _newTime
 
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
@@ -126,13 +126,13 @@ def changeDrawing(args):
 
 
 def changeDrawingMode():
-    config.drawingMode = random.randint(1, 4)
+    config.drawingMode = round(random.uniform(1, 4))
     # config.startNewLineProb = 0.005
-    config.changeTimeController.slotRate = random.randint(20, 33)
+    config.changeTimeController.slotRate = round(random.uniform(20, 33))
 
     if config.drawingMode in {2, 3}:
         # config.startNewLineProb = 0.1
-        config.changeTimeController.slotRate = random.randint(33, 63)
+        config.changeTimeController.slotRate = round(random.uniform(33, 63))
 
     # print(f" => New Drawing Mode: {config.drawingMode}")
 
@@ -148,7 +148,7 @@ def changePalettes():
     primeCanvas()
     # print(f" New bg Color : {config.bgColor}")
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
-    config.changeColorSetTimeToUse = random.randint(config.changeColorSetTime, round(config.changeColorSetTime * config.changeColorSetTimeMaxMultiplier))
+    config.changeColorSetTimeToUse = round(random.uniform(config.changeColorSetTime, round(config.changeColorSetTime * config.changeColorSetTimeMaxMultiplier)))
     config.paletteController.slotRate = config.changeColorSetTimeToUse
     config.slownessFactor = config.activePalette.slownessFactor
 
@@ -199,7 +199,7 @@ def setPenPropsByName(_name, pen):
     pen.name = _name
     pen.minNumPoints = _penProps.minNumPoints
     pen.maxNumPoints = _penProps.maxNumPoints
-    pen.num_points = random.randint(pen.minNumPoints, pen.maxNumPoints)
+    pen.num_points = round(random.uniform((pen.minNumPoints, pen.maxNumPoints)))
     pen.turns = round(random.uniform(_penProps.turnsRange[0], _penProps.turnsRange[1]))
     pen.minInterpolatedPoints = _penProps.minInterpolatedPoints
     pen.maxInterpolatedPoints = _penProps.maxInterpolatedPoints
@@ -228,7 +228,7 @@ def setPenPropsByName(_name, pen):
     pen.incrementFactor = _penProps.incrementFactor
 
     if pen.incrementFactor == 0:
-        pen._w = random.randint(_penProps.minMarkWidth, _penProps.maxMarkWidth)
+        pen._w = round(random.uniform(_penProps.minMarkWidth, _penProps.maxMarkWidth))
 
     pen.xTravelRange = _penProps.xTravelRange
     pen.yTravelRange = _penProps.yTravelRange
@@ -250,7 +250,7 @@ def setPenPropsByName(_name, pen):
     pen._p = 0
     pen.smooth_points = []
     _penSpeedMax = max(1, math.ceil(5 / config.slownessFactor + 1))
-    pen.speed = random.randint(1, _penSpeedMax)
+    pen.speed = round(random.uniform(1, _penSpeedMax))
     # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
     pen.attenuating = False
     pen.enlarging = False
@@ -324,7 +324,7 @@ def generateLine(_pen):
     res = chaikins_corner_cutting(points, 2, ratio).tolist()
 
     # for lines, really need to handle the yOffset more carefully
-    if _pen.name in ["lineMarksVert"] :
+    if _pen.name in ["lineMarksVert"]:
         _pen.yOffset = 0
 
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res)
@@ -412,7 +412,7 @@ def smoothLine(points, _pen):
     # tck, u = splprep([points[:, 0], points[:, 1]], s=0, k=3, per=1)
 
     # Generate more points along the spline for smoothness
-    _mp = random.randint(_pen.minInterpolatedPoints, _pen.maxInterpolatedPoints)
+    _mp = round(random.uniform(_pen.minInterpolatedPoints, _pen.maxInterpolatedPoints))
     u_new = np.linspace(0, 1, _mp)
     smooth_points = splev(u_new, tck)
 
@@ -820,7 +820,7 @@ def renderImage():
         config.stateReportController.checkTime()
         path = "/Users/lamshell/Desktop/outputs/"
         if config.stateReportController.advance:
-            pieceLogger("Saving image to file",2)
+            pieceLogger("Saving image to file", 2)
             currentTime = time.time()
             baseName = f"{str(currentTime)}"
             baseName = baseName.replace(".", "")

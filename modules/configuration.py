@@ -26,6 +26,22 @@ def configuration():
     pass
 
 
+def pieceLogger(args, clr=0, showLine=False):
+    if clr == 3:
+        print(f"{bcolors.OKBLUE}")
+    if clr == 2:
+        print(f"{bcolors.OKGREEN}")
+    if clr == 1:
+        print(f"{bcolors.FULLFAIL}")
+    if clr == 0:
+        print(f"{bcolors.WARNING}")
+    if showLine :
+        print(".......................................................................................\n")
+    print(args, bcolors.ENDC)
+    # print("\n")
+    # print(bcolors.ENDC)
+
+
 class bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
@@ -33,9 +49,9 @@ class bcolors:
     WARNING = "\033[93m"
     FULLFAIL = "\033[91m"
     FAIL = "\033[99m"
-    ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+    ENDC = "\033[0m"
 
 
 # print(bcolors.WARNING + "Warning: No active frommets remain. Continue?" + bcolors.ENDC)
@@ -57,7 +73,6 @@ class ArtWorkConfig:
     brightness = 1
     transWiring = True
 
-
     ## These are used in the filter effect filters.py
     lev = 0
     levdiff = 1
@@ -66,30 +81,29 @@ class ArtWorkConfig:
 
     rotation = 0
 
-    def __init__(self, *kwargs):
-        print("\n---------------------------------------------------------------------------------------")
-        print(f"** Config instance init {kwargs}")
-        
-  
-    def debugSelf(self) :
+    def __init__(self, args=None, _silent=False):
+        if not _silent:
+            print("\n---------------------------------------------------------------------------------------")
+            print(f"** Config instance init {args}")
+
+    def debugSelf(self):
         allArgs = self.__dict__
         print("\n---------------------------------------------------------------------------------------\n")
-        for element in allArgs :
+        for element in allArgs:
             print(f"{element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
             print("----------")
         print("\n---------------------------------------------------------------------------------------\n")
-   
-        method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith('__') is False]
+
+        method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
         print(method_list)
         print("\n---------------------------------------------------------------------------------------\n")
-   
+
         # allFuncs = dir(self)
         # print(allFuncs)
 
-    def spaceBarAction(self) :
+    def spaceBarAction(self):
         print("SPACE BAR PRESSED")
 
-    
     def __getattribute__(self, name):
         return super().__getattribute__(name)
         # try:

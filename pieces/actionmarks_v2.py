@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageChops
 # from scipy.spatial import Voronoi
 from scipy.interpolate import splprep, splev  # For spline interpolation
 from modules.holder_director import Director
+from modules.configuration import pieceLogger
 from modules import colorutils
 from modules.rendering.render import saveImageToFile
 
@@ -109,7 +110,7 @@ def filterRemapImage(config):
 
 def changeDrawing(args):
     global config
-    print("\nCHANGE DRAWING/PAINTING")
+    pieceLogger("CHANGE DRAWING/PAINTING", 2)
     createImageLayers()
     changePalettes()
     initDrawings()
@@ -299,7 +300,7 @@ def generateLine(_pen):
     _pts = round(config.canvasHeight / _yD) + 2
     _pen.smooth_points = []
 
-    print(f"Making line _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
+    pieceLogger(f"Making line _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y = _rangex - (_rangex * 2 * random.random())
@@ -349,7 +350,7 @@ def generateCurve(_pen):
     center_x = 0
     center_y = 0
 
-    print(f"Making curve _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
+    pieceLogger(f"Making curve _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
 
     _xTravel = random.uniform(_pen.xTravelRange[0], _pen.xTravelRange[1])
     _yTravel = random.uniform(_pen.yTravelRange[0], _pen.yTravelRange[1])
@@ -549,7 +550,7 @@ def bgColorBlocksFilling(arg):
     global config
 
     if not arg:
-        print(f"drawing a bg box {config.blendLevel}")
+        pieceLogger(f"drawing a bg box {config.blendLevel}")
     config.blendLevelRate = config.blendLevelRateBase
     config.blendLevel = 0.0
 
@@ -643,7 +644,7 @@ def glitchBox(
         imageRef.paste(cp1, (round(dx), round(dy)))
         # comment:
     except Exception as e:
-        print(f"jitter prom {e} {dx + sectionWidth} , {dy + sectionHeight}")
+        pieceLogger(f"jitter prom {e} {dx + sectionWidth} , {dy + sectionHeight}")
     # end try
 
 
@@ -677,7 +678,7 @@ def chooseTexture():
 def createImageLayers(arg=None):
     global config
 
-    print("\n===> Setting up all layers")
+    pieceLogger("===> Setting up all layers")
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
@@ -700,7 +701,7 @@ def createImageLayers(arg=None):
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
     config.textureBlendMode = tex.blendMode
-    print(f"\n===> config.useTextureLayer {config.useTextureLayer}")
+    pieceLogger(f"===> config.useTextureLayer {config.useTextureLayer}")
     for _row in range(tex.blockRows):
         for _col in range(tex.blockCols):
             if random.random() > tex.skipProb:
@@ -727,8 +728,7 @@ def createTextureLayer(tex):
 
 def initDrawings():
     global config
-    print(f"\n===> Init drawings {config.activePalette.pens}")
-    print(f"===> Using {config.activePalette.name} ")
+    pieceLogger(f"===> Init drawings {config.activePalette.pens} ===> Using {config.activePalette.name}", 2)
 
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
@@ -769,7 +769,7 @@ def iterate():
         if config.changeColorSetTime > 0 and not config.transitionStateHandler.inTransition:
             config.paletteController.checkTime()
             if config.paletteController.advance:
-                print(f"\n===>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
+                pieceLogger(f"===>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
                 changeDrawing(True)
 
     def maybe_release_drawing():
@@ -784,7 +784,7 @@ def iterate():
 
     def maybe_clear_current_drawing():
         if random.random() < config.clearCurrentDrawingProb and not config.transitionStateHandler.inTransition:
-            print(f"\n===>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
+            pieceLogger(f"===>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
             clearCurrentDrawing()
 
     def maybe_bg_color_blocks_filling():
@@ -820,7 +820,7 @@ def renderImage():
         config.stateReportController.checkTime()
         path = "/Users/lamshell/Desktop/outputs/"
         if config.stateReportController.advance:
-            print("Saving image to file")
+            pieceLogger("Saving image to file",2)
             currentTime = time.time()
             baseName = f"{str(currentTime)}"
             baseName = baseName.replace(".", "")
@@ -953,7 +953,7 @@ def _load_texture_values(_tName):
     textureConfig = configparser.ConfigParser()
     textureConfig.read(f"configs/asset_configs/textures/{_tName}.cfg")
     tex.useTextureLayer = textureConfig.getboolean("texture", "useTextureLayer", fallback=False)
-    print(f"{_tName} {tex.useTextureLayer}")
+    pieceLogger(f"{_tName} {tex.useTextureLayer}")
     tex.step = textureConfig.getint("texture", "texture_step", fallback=7)
     tex.px = textureConfig.getint("texture", "texture_px", fallback=2)
     tex.blockRows = textureConfig.getint("texture", "texture_blockRows", fallback=8)
@@ -1073,7 +1073,7 @@ def _load_drawing_configs(config):
 
     config.activePalette = random.choice(config.paletteSets)
     config.slownessFactor = config.activePalette.slownessFactor
-    print(f"\n===> New Palette : {config.activePalette.name}")
+    pieceLogger(f"===> New Palette : {config.activePalette.name}", 2)
     setBGColor()
 
 

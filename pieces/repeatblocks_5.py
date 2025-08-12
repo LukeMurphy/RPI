@@ -7,6 +7,7 @@ import noise
 import os, sys
 import configparser
 from modules.configuration import bcolors
+from modules.configuration import pieceLogger
 from modules.movieClip import movieClip
 from modules import colorutils, panelDrawing, pattern_blocks_v5
 from modules.holder_director import Holder
@@ -74,7 +75,7 @@ class Fader:
         self.crossFadeImage = Image.new("RGBA", (self.width, self.height))
 
     def test(self):
-        print("test")
+        pieceLogger("test")
         # self.blankImage = Image.new("RGBA", (self.width, self.height))
         tDraw1 = ImageDraw.Draw(self.startingImage)
         tDraw1.rectangle((0, 0, 100, 100), fill=(0, 255, 255, 200))
@@ -161,7 +162,7 @@ def transformImage(img):
 
 def writeImage(baseName, renderImage):
     # baseName = "outputquad3/comp2_"
-    print("Saving Image...")
+    pieceLogger("Saving Image...")
     if config.saveImages:
         fn = f"{baseName}.png"
         renderImage.save(fn)
@@ -174,7 +175,7 @@ def loadImageForBase():
 
     i = math.floor(random.random() * len(config.imageSources))
     imagePath = config.imageSources[i]
-    print(imagePath)
+    pieceLogger(imagePath)
     image = Image.open(imagePath)
     image.load()
     config.canvasImage.paste(image, (0, 0))
@@ -193,7 +194,7 @@ def loadClipPlayerConfigs():
         config.clipMain.clipRotate = config.clipRotate
         config.clipMain.setUp(workConfig)
     except Exception as e:
-        print(f"{e} \n")
+        pieceLogger(f"{e} \n")
         config.useClipPlayer = False
 
 
@@ -205,6 +206,8 @@ def handleClipPlayer():
     temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth, config.clipMain.clipHeight))
     temp = temp.rotate(config.clipRotate, expand=True)
     config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
+
+
 
 
 # --------------------- DISTURBANCES  ---------------------
@@ -508,7 +511,7 @@ def loadPalette(palette):
     global config
     # palette = config.palettes[index]
 
-    print(f"Loading palette {palette}")
+    pieceLogger(f"Loading palette {palette}")
     c1 = Holder()
     c2 = Holder()
     c3 = Holder()
@@ -578,19 +581,23 @@ def getPaletteObjectByName(_name):
 
 
 def changeSinglePalette(index=0):
-    # paletteObj = config.allAvailablePalettesList[index]
+    # pieceLogger(f"changeSinglePalette  {index}")
     paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
     _paletteObjLocal = Holder()
     _paletteObjLocal.paletteName = config.combinationSets[config.currentCombinationsetIndex].palettes[index]
     _paletteObjLocal.c1 = copy(paletteObj.c1)
     _paletteObjLocal.c1.currentColor = copy(paletteObj.c1.currentColor)
     _paletteObjLocal.c2 = copy(paletteObj.c2)
-    _paletteObjLocal.c3 = copy(paletteObj.c3)
     _paletteObjLocal.c2.currentColor = copy(paletteObj.c2.currentColor)
+    _paletteObjLocal.c3 = copy(paletteObj.c3)
     _paletteObjLocal.c3.currentColor = copy(paletteObj.c3.currentColor)
+    _paletteObjLocal.c4 = copy(paletteObj.c4)
+    _paletteObjLocal.c4.currentColor = copy(paletteObj.c4.currentColor)
+   
     _paletteObjLocal.c1.currentColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     _paletteObjLocal.c2.currentColor = setCurrentColor(paletteObj.c2)
     _paletteObjLocal.c3.currentColor = setCurrentColor(paletteObj.c3)
+    _paletteObjLocal.c4.currentColor = setCurrentColor(paletteObj.c4)
     return _paletteObjLocal
 
 
@@ -618,12 +625,14 @@ def setPalette(config, index=0):
     config.c3.currentColor = setCurrentColor(paletteObj.c3)
     config.c4.currentColor = setCurrentColor(paletteObj.c4)
 
+
+
     # if zero palette mixing is desired, force the patterns to rebuild
     # this is a bit of an extreme but was having trouble preventing the
     # palette mixing and making unpleasant combinations
 
     # if config.changePaletteWhenChangingPatternProb == 0.0:
-    #     buildPatternSequence(config)
+    # buildPatternSequence(config)
 
 
 def selectNewPalette(_setPalette=True):
@@ -632,17 +641,20 @@ def selectNewPalette(_setPalette=True):
     # if config.currentPaletteIndex == len(config.palettes):
     #     config.currentPaletteIndex = 0
 
-    # print(f"selectNewPalette: Choosing a palette:  {config.palettes[config.currentPaletteIndex]}")
-    print(f"selectNewPalette: Choosing a palette:  {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]}")
-    # buildPalette(config, newPalette)
-    if _setPalette:
-        setPalette(config, config.currentPaletteIndex)
+    pieceLogger(f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]}",2,True)
+    setPalette(config, config.currentPaletteIndex)
 
-    if random.random() < config.probPatternsRebuildAfterNewPalette:
+    if _setPalette:
         rebuildPatterns()
-    else:
         resetPatternBlocks()
-        resetCrossFader()
+        # resetCrossFader()
+
+
+    # if random.random() < config.probPatternsRebuildAfterNewPalette:
+    #     rebuildPatterns()
+    # else:
+    #     resetPatternBlocks()
+    #     resetCrossFader()
 
 
 # --------------------- PATTERNS     ---------------------
@@ -689,7 +701,7 @@ def loadAndSetupPatterns():
         config.stepsRange = tuple(map(lambda x: int(x), stepsRange))
         config.ringsRange = tuple(map(lambda x: int(x), ringsRange))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.stepsRange = (1, 1)
         config.ringsRange = (1, 1)
         config.numScaleRows = config.numShingleRows
@@ -781,24 +793,31 @@ def handleChangeCurrentCominationSet():
     if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone:
         config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
         # {config.combinationSets[config.currentCombinationsetIndex]}
-        print("\n---------------------------------------------------------------------------------------")
-        print(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n")
+        pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n",2,True)
         selectNewPalette()
-        rebuildPatterns()
+        # rebuildPatterns()
 
 
 def resetPatternBlocks():
+
+    tempPalette = changeSinglePalette(config.currentPaletteIndex)
+
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
         _patternBlock.hasBeenPainted = False
-        if random.random() < config.changeEachblockWhenChangingPatternProb:
+        _patternBlock.tempPalette = tempPalette
+
+        if random.random() > config.changeEachblockWhenChangingPatternProb:
             # _patternBlock.tempPalette = config.allAvailablePalettesList[config.currentPaletteIndex]
             _patternBlock.tempPalette = getTempPalette(config)
+        # else :
+        #     _patternBlock.tempPalette = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
+        
         config.patternSequence[i] = _patternBlock
 
 
 def buildPatternSequence(config):
-    print("Building new pattern sequence")
+    pieceLogger("Building new pattern sequence", 0)
     config.patternSequence = []
     config.usedPatterns = []
 
@@ -925,14 +944,14 @@ def _print_pattern_sequence(config):
 
 
 def rebuildPatterns(arg=0):
-    # print("rebuildPattern called")
+    pieceLogger("rebuildPattern called")
 
     if config.numRowsRandomize:
         rowsAndDotsSettings()
 
-    if random.random() < config.changePaletteWhenRebuildProb:
-        print("seledtNewPalette called from: rebuildPatterns()")
-        selectNewPalette()
+    # if random.random() < config.changePaletteWhenRebuildProb:
+    #     pieceLogger("selectNewPalette called from: rebuildPatterns()")
+    #     selectNewPalette()
 
     buildPatternSequence(config)
 
@@ -947,6 +966,8 @@ def resetCrossFader(_useConfigImage=True):
     # os.system('afplay /System/Library/Sounds/Sosumi.aiff')
     # print(f"DOING NOW  {config.faderDoingRefreshCount}")
     # os.system('say "NOW" &')
+
+    pieceLogger(f"resetCrossFader called : {_useConfigImage}")
     config.repeatDrawingMode = 1
     config.fader.fadingDone = False
     config.doTransition = True
@@ -956,8 +977,15 @@ def resetCrossFader(_useConfigImage=True):
         # config.fader.startingImage = config.canvasImage.copy()
         config.fader.startingImage = config.compositeImage.copy()
 
-    config.fader.endImage = config.canvasImage.copy()
-    config.fader.crossFadeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # _tempImg  =  Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # _tempDraw = ImageDraw.Draw(_tempImg)
+    # _tempDraw.rectangle((0,0,500,500), fill = (255,0,0,255))
+    # config.canvasImage.paste(_tempImg, (0,0), _tempImg)
+
+    # NOT WORKING
+
+    # config.fader.endImage = config.canvasImage.copy()
+    # config.fader.crossFadeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
     config.fader.doingRefreshCount = config.faderDoingRefreshCount
     config.fader.initialized = True
@@ -1009,11 +1037,9 @@ def drawRepeatedPatternImage(config, canvasImage):
     extraOverlapy = 0
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
-
-        # print(f"_patternBlock.rePainting = {_patternBlock.rePainting} {_patternBlock.hasBeenPainted}")
-
+        # This sets the block image for each unit
         if config.patternModelVariations:
-            applyPatternVariations(config, i)
+            drawBlockWithPattern(config, i)
 
         if _patternBlock.hasBeenPainted == False:
             drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
@@ -1027,6 +1053,10 @@ def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extr
     """Draws a single block of the pattern."""
 
     _temp = config.blockImage.copy()
+    # _temp = Image.new("RGBA",(config.blockWidth, config.blockHeight))
+    # _tempDraw = ImageDraw.Draw(_temp)
+    # _temp.paste(config.blockImage, (0,0), config.blockImage)
+    # _tempDraw.rectangle((0,0,10,10), fill =(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
     # _temp = _temp.crop((0,0,20,20))
     # disabling for a moment 2023-04-01
     _temp = _temp.rotate(90)
@@ -1064,14 +1094,13 @@ def updateFaderEndpoint():
 
 
 # ------------------------------------------------
-def applyPatternVariations(config, _counter):
+def drawBlockWithPattern(config, _counter):
     """Applies pattern variations based on the pattern sequence."""
     _patternBlock = config.patternSequence[_counter]
     config.patternModel = _patternBlock.pattern
     config.rotateAltBlock = _patternBlock.rotate
-    func = eval(f"pattern_blocks_v5.{_patternBlock.pattern}")
-
     if not _patternBlock.hasBeenPainted:
+        func = eval(f"pattern_blocks_v5.{_patternBlock.pattern}")
         func(config, _patternBlock.tempPalette)
 
     # if not _patternBlock.rePainting:
@@ -1085,7 +1114,7 @@ def updateBackgroundColor():
 
 def handlePaletteChanges():
     if random.random() < config.changePaletteAnytimeProb and config.fader.fadingDone:
-        # print("selectPaletted called from handlePaletteChanges()")
+        print("selectPaletted called from handlePaletteChanges()")
         selectNewPalette(True)
         # rebuildSections()
         # resetCrossFader(False)
@@ -1164,7 +1193,7 @@ def handleFadingAndRebuild():
         config.fader.doingRefreshCount = 0
         if config.doneCount >= config.numberOfSections and config.rebuildImmediatelyAfterDone:
             config.doSectionDisturbance = False
-            print("rebuildPatterns called after fading done")
+            pieceLogger("rebuildPatterns called after fading done")
             rebuildPatterns()
 
     if random.random() < config.resetOverlayProbability and config.usePolygonOverlay:
@@ -1206,8 +1235,10 @@ def handleShingleVariation():
 def drawBackgroundAndPasteImage():
     """Draws the background and pastes the main image."""
     if config.doTransition:
+
         config.fader.fadeIn(config)
         config.compositeImage.paste(config.fader.crossFadeImage, (0, 0), config.fader.crossFadeImage)
+
     elif config.sectionDisturbance:
         config.compositeImage.paste(config.canvasImage, (0, 0), config.canvasImage)
 
@@ -1251,7 +1282,7 @@ def showDebugCanvases(config):
 
     hilitCor = patternCoord
     hilit = (hilitCor[0] - 1, hilitCor[1] - 1, hilitCor[0] + _w + 1, hilitCor[1] + _h + 1)
-    config.destinationImageDraw.rectangle(hilit, fill=None, outline=(0, 255, 255, 200))
+    config.destinationImageDraw.rectangle(hilit, fill=None, outline=(255, 0, 255, 200))
     hilitCor = canvasImageCoord
     hilit = (hilitCor[0] - 1, hilitCor[1] - 1, hilitCor[0] + _w + 1, hilitCor[1] + _h + 1)
     config.destinationImageDraw.rectangle(hilit, fill=None, outline=(0, 255, 0, 200))
@@ -1324,7 +1355,7 @@ def loadPolyOverlaybaseValues():
             _ps = list(map(lambda x: int(x), _a.split(",")))
             config.polyBase.append(_ps)
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.polyBase = []
 
 
@@ -1363,7 +1394,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         loadPolyOverlaybaseValues()
         # print(config.polyBase)
     except Exception as e:
-        print(f" ==> Not using custom polygon overlay {e}")
+        pieceLogger(f" ==> Not using custom polygon overlay {e}")
         config.usePolygonOverlay = False
 
 
@@ -1390,7 +1421,7 @@ def loadFilterRemapping():
     try:
         loadFilterRemappingConfigs()
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.filterRemapping = False
         config.filterRemappingProb = 0.0
         config.filterRemapMinHoriSize = 24
@@ -1425,13 +1456,13 @@ def createImageHolders():
     config.destinationImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.compositeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
-    config.canvasDraw = ImageDraw.Draw(config.canvasImage)
+    config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
     config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
 
 
 def main(run=True):
     global config
-    print("\n main() called")
+    pieceLogger("\n main() called")
 
     config.debugPause = False
 
@@ -1515,7 +1546,7 @@ def main(run=True):
     try:
         config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
     except Exception as e:
-        print(f"{e} <== adjust config to use slotRate!! <===")
+        pieceLogger(f"{e} <== adjust config to use slotRate!! <===")
         config.directorController.slotRate = 0.03
 
     # """
@@ -1543,9 +1574,7 @@ def main(run=True):
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("Running repeatblocks.py")
-    print(bcolors.ENDC)
+    pieceLogger("Running repeatblocks.py",2)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:
@@ -1562,7 +1591,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        print(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}\n")
+        pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
         setattr(obj, option, default)
 
 

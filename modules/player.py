@@ -15,6 +15,7 @@ import threading
 import PIL.Image
 from modules import configuration, panelDrawing
 from modules.configuration import bcolors
+from modules.configuration import pieceLogger
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 """
@@ -61,19 +62,19 @@ def _configure_ReMapping(config, workconfig):
     try:
         _initialBlockSectionRemapping(workconfig, config)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock = False
         config.filterRemap = False
     try:
         config.remapImageBlockRotation = float(workconfig.get("displayconfig", "remapImageBlockSectionRotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockRotation = 0
 
     try:
         config.remapImageBlockSectionRotation = float(workconfig.get("displayconfig", "remapImageBlockSectionRotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSectionRotation = 0
 
     try:
@@ -83,13 +84,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination2 = workconfig.get("displayconfig", "remapImageBlockDestination2").split(",")
         config.remapImageBlockDestination2 = tuple(int(i) for i in config.remapImageBlockDestination2)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock2 = False
 
     try:
         config.remapImageBlockSection2Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection2Rotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSection2Rotation = 0
 
     try:
@@ -99,13 +100,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination3 = workconfig.get("displayconfig", "remapImageBlockDestination3").split(",")
         config.remapImageBlockDestination3 = tuple(int(i) for i in config.remapImageBlockDestination3)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock3 = False
 
     try:
         config.remapImageBlockSection3Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection3Rotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSection3Rotation = 0
 
     try:
@@ -115,13 +116,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination4 = workconfig.get("displayconfig", "remapImageBlockDestination4").split(",")
         config.remapImageBlockDestination4 = tuple(int(i) for i in config.remapImageBlockDestination4)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock4 = False
 
     try:
         config.remapImageBlockSection4Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection4Rotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSection4Rotation = 0
 
     try:
@@ -131,13 +132,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination5 = workconfig.get("displayconfig", "remapImageBlockDestination5").split(",")
         config.remapImageBlockDestination5 = tuple(int(i) for i in config.remapImageBlockDestination5)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock5 = False
 
     try:
         config.remapImageBlockSection5Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection5Rotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSection5Rotation = 0
 
     try:
@@ -147,13 +148,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination6 = workconfig.get("displayconfig", "remapImageBlockDestination6").split(",")
         config.remapImageBlockDestination6 = tuple(int(i) for i in config.remapImageBlockDestination6)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock6 = False
 
     try:
         config.remapImageBlockSection6Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection6Rotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSection6Rotation = 0
 
     try:
@@ -163,13 +164,13 @@ def _configure_ReMapping(config, workconfig):
         config.remapImageBlockDestination7 = workconfig.get("displayconfig", "remapImageBlockDestination7").split(",")
         config.remapImageBlockDestination7 = tuple(int(i) for i in config.remapImageBlockDestination7)
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlock7 = False
 
     try:
         config.remapImageBlockSection7Rotation = float(workconfig.get("displayconfig", "remapImageBlockSection7Rotation"))
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         config.remapImageBlockSection7Rotation = 0
 
 
@@ -184,7 +185,7 @@ def _specialShiftBlockRemapping(workconfig, config):
             _suff = str(i)
         _remapImageBlockShift = workconfig.getboolean("displayconfig", f"remapImageBlockShift{_suff}", fallback = False)
         setattr(config, f"remapImageBlockShift{_suff}", _remapImageBlockShift)
-        print(f"============>remapImageBlockShift{_suff} {_remapImageBlockShift}")
+        pieceLogger(f"**> remapImageBlockShift{_suff} {_remapImageBlockShift}", 3)
 
         if _remapImageBlockShift :
             _remapImageBlockShiftSection = workconfig.get("displayconfig", f"remapImageBlockShiftSection{_suff}", fallback = "").split(",")
@@ -213,8 +214,8 @@ def configure(config, workconfig):
     """Configures the player based on the provided configuration."""
     global path, tempImage, threads, thrd
     # gc.enable()
-    print(f"{bcolors.WARNING}** Setting PLAYER config values **{bcolors.ENDC}")
-    print(f"{bcolors.FAIL}")
+    pieceLogger(".......................................................................................",3)
+    pieceLogger(f"** Setting PLAYER config values **", 3)
     _configure_base(config, workconfig)
     _configure_pixelsort(config, workconfig)
     _configure_ReMapping(config, workconfig)
@@ -227,7 +228,7 @@ def configure(config, workconfig):
     _configure_tiles(config, workconfig)
     _configure_saving(config, workconfig)
     _load_work_module(config, workconfig)
-    print(f"{bcolors.ENDC}")
+    pieceLogger(f"{bcolors.ENDC}")
 
 
 def _configure_base(config, workconfig):
@@ -350,12 +351,13 @@ def _load_work_module(config, workconfig):
     config.rendering = workconfig.get("displayconfig", "rendering", fallback ="hub")
     config.overallResize = workconfig.getboolean("displayconfig", "overallResize", fallback=False)
 
-    print(f"{bcolors.WARNING} ** modules.player.py is Loading: {config.work} {bcolors.ENDC}")
+    pieceLogger(f"\n** modules.player.py is Loading: {config.work}\n", 3)
+    pieceLogger("")
 
     try:
         work = importlib.import_module(f"pieces.{config.work}")
     except Exception as e:
-        print(f" ** {e}")
+        pieceLogger(f" ** {e}", 1)
         work = importlib.import_module(f"pieces.{config.work}")  # Try again without the pieces prefix
 
     work.config = config
@@ -397,7 +399,7 @@ def renderUsingIDAFruitHat(work):
     try:
         work.config.isRPI = work.workConfig.getboolean("displayconfig", "isRPI")
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
         work.config.useFilters = False
         work.config.isRPI = True
 
@@ -428,7 +430,7 @@ def renderAsAnimationWindow(work):
     try:
         work.config.ditherFilterBrightness = float(work.workConfig.get("displayconfig", "ditherFilterBrightness"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
         work.config.ditherFilterBrightness = 1.0
 
     try:
@@ -437,20 +439,20 @@ def renderAsAnimationWindow(work):
     except Exception as e:
         work.config.ditherBlurRadius = 0
         work.config.ditherUnsharpMaskPercent = 30
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
 
     try:
         work.config.isRPI = work.workConfig.getboolean("displayconfig", "isRPI")
     except Exception as e:
         work.config.usePixSort = False
         work.config.isRPI = False
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
 
     try:
         work.config.renderDiagnostics = work.workConfig.getboolean("displayconfig", "renderDiagnostics")
     except Exception as e:
         work.config.renderDiagnostics = False
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
 
     if work.config.isRPI:
         from cntrlscripts import stest
@@ -467,7 +469,7 @@ def renderAsAnimationWindow(work):
         work.config.filterRemapRangeX = int(work.workConfig.get("displayconfig", "filterRemapRangeX"))
         work.config.filterRemapRangeY = int(work.workConfig.get("displayconfig", "filterRemapRangeY"))
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
         work.config.filterRemapping = False
         work.config.filterRemappingProb = 0.0
         work.config.filterRemapminHoriSize = 128
@@ -496,7 +498,7 @@ def renderAsAnimationWindow(work):
         work.config.renderImageFullOverlay = Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
         work.config.renderDrawOver = ImageDraw.Draw(work.config.renderImageFullOverlay)
     except Exception as e:
-        print(f"{bcolors.FAIL} ** {e}")
+        pieceLogger(f"{bcolors.FAIL} ** {e}", 1)
         work.config.useLastOverlay = False
 
     renderer.canvasOffsetX = int(work.workConfig.get("displayconfig", "canvasOffsetX"))
@@ -509,7 +511,7 @@ def renderAsAnimationWindow(work):
     work.config.updateCanvas = renderer.updateCanvas
     work.main(False)
 
-    print(f"** Player setting up: doing reload? {str(work.config.doingReload)}")
+    pieceLogger(f"** Player setting up: doing reload? {str(work.config.doingReload)}", 3)
     if work.config.doingReload == False and work.config.standAlone == True:
         renderer.setUp(work.config)
 

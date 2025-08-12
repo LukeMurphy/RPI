@@ -14,6 +14,7 @@ import sys
 from configs import defaultpiece
 from modules import configuration, player
 from modules.configuration import bcolors
+from modules.configuration import pieceLogger
 
 # from PIL import (
 # 	Image,
@@ -61,11 +62,8 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-print(bcolors.OKGREEN)
-print("---------------------------------------------------------------------------------------")
-print("Inital Player Arguments: \n" + str(args))
-print("---------------------------------------------------------------------------------------")
-print(bcolors.ENDC)
+pieceLogger("Inital Player Arguments: \n" + str(args),3)
+
 
 
 
@@ -92,7 +90,7 @@ def loadFromArguments(reloading=False, config=None):
     """
     # global config, workconfig, path, tempImage, threads, thrd
 
-    print(f"** RELOADING: {str(reloading)}")
+    pieceLogger(f"** RELOADING: {str(reloading)}", 3)
 
     if reloading is False:
         try:
@@ -101,7 +99,7 @@ def loadFromArguments(reloading=False, config=None):
             # print help information and exit:
             print(f"Error:{str(err)}")
     else:
-        print("\n** RELOADING NOW: " + config.fileName)
+        pieceLogger("\n** RELOADING NOW: " + config.fileName, 3)
         workconfig.read(config.fileName)
         player.configure(config, workconfig)
 
@@ -148,11 +146,9 @@ def _printConfigsLoaded(config):
     config.WRKINID = defaultpiece.defaultPieceToRun
     # Default Local Path
     config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
-    print(
-        f"{bcolors.WARNING}** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n{bcolors.ENDC}"
-    )
+    pieceLogger(f"** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n",3)
     workconfig.read(f"{config.path}configs/{config.WRKINID}.cfg")
-    print(f"{bcolors.OKGREEN}** ")
+    print(f"{bcolors.OKBLUE}** ")
     for c in workconfig:
         print(c)
         for a in workconfig[c]:
@@ -197,7 +193,7 @@ def _parseArgs(config, loadFromArguments):
     config.deltaWorkFile = int((config.startTime - f))
 
 
-    print(f"{bcolors.OKGREEN}---------------------------------------------------------------------------------------")
+    print(f"{bcolors.OKBLUE}---------------------------------------------------------------------------------------")
     print ("script: sys.argv[0] is", repr(sys.argv[0]))
     print ("script: __file__ is", repr(__file__))
     print ("script: cwd is", repr(os.getcwd()))

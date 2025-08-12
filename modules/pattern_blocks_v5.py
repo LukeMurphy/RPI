@@ -1526,7 +1526,7 @@ def chaikins_corner_cutting(coords, refinements=5, ratio=0.75):
 
 
 def floralConfig(config):
-    config.floral = ArtWorkConfig("Florals")
+    config.floral = ArtWorkConfig("Florals", True)
 
     _choice = random.randint(0, 7)
 
@@ -1637,7 +1637,7 @@ def petals(config, paletteObj=None):
     config.blockImage.paste(_floralTemp, (0, midPt[1]), _floralTemp)
     config.blockImage.paste(_floralTemp, (0, -midPt[1]), _floralTemp)
 
-
+    # config.blockDraw.rectangle((0,0,10,10), fill=(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
 
     if random.random() < 0.01:
         floralConfig(config)

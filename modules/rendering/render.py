@@ -148,7 +148,7 @@ def setUp(config):
     # videoplayer.play()  # play the video
     # config.videoplayer = videoplayer
 
-    root.after(100, startWork)
+    root.after(1000, startWork)
     root.call("wm", "attributes", ".", "-topmost", "1")
     root.mainloop()
 

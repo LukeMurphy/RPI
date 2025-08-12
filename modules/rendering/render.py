@@ -176,11 +176,12 @@ def startWork(*args):
 
     # Putting the animation on its own thread
     # Still throws and error when manually closed though...
+    
+    # threading.Thread(target=work.runWork).start()
 
     try:
-        # t = threading.Thread.__init__(work.runWork())
-        threading.Thread(target=work.runWork).start()
-        # t.start()
+        t = threading.Thread.__init__(work.runWork())
+        t.start()
     except tk.TclError as details:
         print(details)
         exit()

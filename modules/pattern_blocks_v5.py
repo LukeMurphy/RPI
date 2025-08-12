@@ -1559,7 +1559,7 @@ def floralConfig(config):
         case 4:
             config.floral._petals = 3
             config.floral._w = config.blockWidth * 0.51
-            config.floral._lobe = config.floral._w * 0.8
+            config.floral._lobe = config.floral._w * 0.4
             config.floral._h = config.blockWidth / 4
 
         case 5:

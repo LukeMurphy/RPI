@@ -215,7 +215,7 @@ def updateCanvas():
         anchor="nw",
         tag="main",
     )
-    config.cnvs.update()
+    # config.cnvs.update()
 
     # update_duration()
 
@@ -225,8 +225,8 @@ def updateCanvas():
     # config.cnvs2.update()
 
     # This *should* be more efficient
-    # config.cnvs.update_idletasks()
-    # root.update()
+    config.cnvs.update_idletasks()
+    config.root.update()
 
     ############################################################
     ######  Check if config file has changed and reload    #####

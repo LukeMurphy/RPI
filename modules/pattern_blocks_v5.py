@@ -1586,6 +1586,7 @@ def floralConfig(config):
 def petals(config, paletteObj=None):
 
     # print(f"grainLines running {grainLines}")
+    # print(paletteObj.c1.currentColor)
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))

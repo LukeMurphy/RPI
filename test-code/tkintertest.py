@@ -1,4 +1,5 @@
 # import tkinter
+import threading
 try:
     import tkinter as tk
 except ImportError:
@@ -7,6 +8,7 @@ except ImportError:
 class Timer:
     def __init__(self, parent):
         # variable storing time
+        self.parent = parent
         self.seconds = 0
         # label displaying time
         self.label = tk.Label(parent, text="0 s", font="Arial 30", width=10)
@@ -15,6 +17,7 @@ class Timer:
         self.label.after(1000, self.refresh_label)
 
     def refresh_label(self):
+        
         """ refresh the content of the label every second """
         # increment the time
         self.seconds += 1
@@ -22,6 +25,7 @@ class Timer:
         self.label.configure(text="%i s" % self.seconds)
         # request tkinter to call self.refresh after 1s (the delay is given in ms)
         self.label.after(1000, self.refresh_label)
+        self.parent.update()
 
 if __name__ == "__main__":
     root = tk.Tk()

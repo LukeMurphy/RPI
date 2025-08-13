@@ -302,7 +302,7 @@ def randomizerPatternFunction(func):
     def wrapper(*args):
         res = func(*args)
         config = res[0]
-        bgFill = res[1]
+        bgFill = (res[1][0], res[1][1], res[1][2], 190)
         patternFill = res[2]
         patternOutLine = res[3]
         hilight = res[4]
@@ -1214,40 +1214,6 @@ def concentricBoxes(config, paletteObj=None):
             count += 1
         except Exception as e:
             print(f"Concentric boxes error prob too many {e}")
-
-
-def randomizer3(config, paletteObj=None):
-
-    w = config.randomBlockWidth
-    h = config.randomBlockHeight
-
-    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-
-    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
-    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
-    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
-    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-
-    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr2, outline=None)
-
-    rows = config.blockHeight
-    cols = config.blockWidth
-
-    step = w
-    hStep = h
-
-    if w == 0:
-        step = 1
-    if h == 0:
-        hStep = 1
-
-    for r in range(0, rows, hStep):
-        for c in range(0, cols, step):
-            clr = colorutils.getRandomRGB(config.brightness / 2)
-            if random.random() < config.randomBlockProb:
-                config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr2), outline=None)
 
 
 def decoBoxes(config, paletteObj=None):

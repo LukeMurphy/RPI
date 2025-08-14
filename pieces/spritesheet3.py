@@ -4,6 +4,7 @@ import math
 import random
 import time
 from modules.configuration import bcolors
+from modules.configuration import pieceLogger
 from modules import badpixels, colorutils, coloroverlay, panelDrawing
 from PIL import (
     Image,
@@ -102,10 +103,7 @@ class spriteAnimation:
                     self.frameArray.append(frameSlice)
                     frame += 1
 
-        print("------------  ")
-        print(f"{self.name} prep done")
-        print(f"Number of Frames:{len(self.frameArray)}")
-        print("------------\n")
+        pieceLogger(f"{self.name} prep done. Number of Frames:{len(self.frameArray)}")
         # exit()
 
     # ----------------------------------------------------##----------------------------------------------------#
@@ -157,7 +155,7 @@ def main(run=True):
     global config, workConfig, blocks, simulBlocks, bads
     # gc.enable()
 
-    print("SpriteSheet Player Piece Loaded")
+    pieceLogger("SpriteSheet Player Piece Loaded\n",2,True)
     # config.playSpeed = float(workConfig.get("base-parameters", "playSpeed"))
 
     # managing speed of animation and framerate
@@ -181,11 +179,10 @@ def main(run=True):
             config.pixelSortProbOff = 0
 
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.pixelSortProbOn = 0
         config.pixelSortProbOff = 0
 
-    print(f"{bcolors.OKBLUE}** {bcolors.BOLD}")
 
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
@@ -267,7 +264,7 @@ def main(run=True):
         config.preGlitchNumberMin = int(workConfig.get("base-parameters", "preGlitchNumberMin"))
         config.preGlitchRedo = float(workConfig.get("base-parameters", "preGlitchRedo"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.preGlitchNumberMin = 1
         config.preGlitchNumber = 2
         config.preGlitchRedo = 0.5
@@ -336,14 +333,14 @@ def main(run=True):
             aConfig.pauseOnFirstFrameProb = float(workConfig.get(a, "pauseOnFirstFrameProb"))
             aConfig.pauseOnLastFrameProb = float(workConfig.get(a, "pauseOnLastFrameProb"))
         except Exception as e:
-            print(e)
+            pieceLogger(e,1)
             aConfig.pauseOnFirstFrameProb = 0.0
             aConfig.pauseOnLastFrameProb = 0.0
         try:
             # comment:
             aConfig.reversing = workConfig.getboolean(a, "reversing")
         except Exception as e:
-            print(e)
+            pieceLogger(e,1)
             aConfig.reversing = False
 
         aConfig.glitching = True
@@ -417,7 +414,7 @@ def main(run=True):
     if config.brightness < 1.0:
         delta = config.ditherFilterBrightness - config.brightness
         config.ditherFilterBrightness -= delta / 4
-        print(config.ditherFilterBrightness)
+        pieceLogger(config.ditherFilterBrightness)
 
     if run:
         runWork()
@@ -457,8 +454,8 @@ def glitchBox(
             imageRef.paste(cp1, (round(dx), round(dy)))
         # comment:
     except Exception as e:
-        print(e)
-        print(dx + sectionWidth, dy + sectionHeight)
+        pieceLogger(e,1)
+        pieceLogger(dx + sectionWidth, dy + sectionHeight)
     # end try
 
 
@@ -539,9 +536,7 @@ def filterRemapCall(ovrd=False):
 
 # ----------------------------------------------------##----------------------------------------------------#
 def runWork():
-    print(f"{bcolors.OKGREEN} ** {bcolors.BOLD}")
-    print("Running spritesheet3.py")
-    print(bcolors.ENDC)
+    pieceLogger("Running spritesheet3.py",2,True)
     # gc.enable()
     while config.isRunning:
         config.directorController.checkTime()
@@ -865,7 +860,7 @@ def _animate(anim, currentAnimation, config):
 # ----------------------------------------------------##----------------------------------------------------#
 def callBack():
     global config
-    print("CALLBACK")
+    pieceLogger("CALLBACK")
     return True
 
 

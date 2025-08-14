@@ -27,17 +27,18 @@ def configuration():
 
 
 def pieceLogger(args, clr=0, showLine=False):
+    fstr = None
     if clr == 3:
-        print(f"{bcolors.OKBLUE}")
+        fstr = bcolors.OKBLUE
     if clr == 2:
-        print(f"{bcolors.OKGREEN}")
+        fstr = bcolors.OKGREEN
     if clr == 1:
-        print(f"{bcolors.FULLFAIL}")
+        fstr = bcolors.FULLFAIL
     if clr == 0:
-        print(f"{bcolors.WARNING}")
+        fstr = bcolors.WARNING
     if showLine :
-        print(".......................................................................................\n")
-    print(args, bcolors.ENDC)
+        print(f"\n{fstr}.......................................................................................")
+    print(f"{fstr}{args}{bcolors.ENDC}")
     # print("\n")
     # print(bcolors.ENDC)
 

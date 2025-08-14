@@ -6,6 +6,7 @@ from modules import colorutils
 from PIL import Image, ImageDraw, ImageChops
 
 # from modules.holder_director import Holder
+from modules.configuration import pieceLogger
 from modules.holder_director import Director
 
 
@@ -388,7 +389,7 @@ class ParticleSystem:
                         fill=tuple(self.particles[q].clr + [255]),
                     )
             except Exception as e:
-                print(e)
+                pieceLogger(e,1)
 
         if yDisplayPos > config.imageCanvasHeight or yDisplayPos < 0:
             ref.setUp(self, ref.id)
@@ -665,6 +666,8 @@ def main(run=True):
     global PS2
     global PSArray
 
+    pieceLogger("concentric_particles_v4.py piece loading and running\n",2,True)
+
     PSArray = []
 
     config.minParticles = int(workConfig.get("particles", "minParticles"))
@@ -736,7 +739,7 @@ def main(run=True):
         config.imageCanvasHeight = int(workConfig.get("particles", "imageCanvasHeight"))
 
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.imageCanvasWidth = config.canvasWidth
         config.imageCanvasHeight = config.canvasHeight
 
@@ -814,7 +817,7 @@ def main(run=True):
     try:
         config.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles", "PSRadiusFixedColorMinInternalRadius"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.PSRadiusFixedColorMinInternalRadius = 1
 
     try:
@@ -822,7 +825,7 @@ def main(run=True):
         config.yMaxFactor = float(workConfig.get("particles", "yMaxFactor"))
 
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.xMaxFactor = 4
         config.yMaxFactor = 8
 

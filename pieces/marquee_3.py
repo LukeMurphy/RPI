@@ -7,6 +7,7 @@ import time
 
 from numpy import true_divide
 from modules.configuration import bcolors
+from modules.configuration import pieceLogger
 from modules import coloroverlay, colorutils
 from modules.holder_director import Holder
 from modules.holder_director import Director
@@ -347,9 +348,7 @@ def redraw():
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("Running marquee_2.py")
-    print(bcolors.ENDC)
+    pieceLogger("Running marquee_2.py\n",2,True)
 
     while config.isRunning:
         config.directorController.checkTime()
@@ -378,6 +377,7 @@ def main(run=True):
     global config
     global workConfig
 
+    pieceLogger("marquee_2.py loading and running \n",2,True)
     config.marqueeImageWidth = int(workConfig.get("marquee", "marqueeImageWidth", fallback=config.screenWidth))
     config.marqueeImageHeight = int(workConfig.get("marquee", "marqueeImageHeight", fallback = config.screenHeight))
 
@@ -427,7 +427,7 @@ def main(run=True):
             _psm = _paletteSetNames[i].replace(" ", "")
             _p = loadPalette(_psm)
             _palette.append(_p)
-            print(f" ==> Loaded this palette (grouped in twos): {_p.name}")
+            pieceLogger(f" ==> Loaded this palette (grouped in twos): {_p.name}")
         config.palettes.append(_palette)
 
 

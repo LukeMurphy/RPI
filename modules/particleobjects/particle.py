@@ -8,6 +8,7 @@ import noise
 from noise import *
 
 from modules import colorutils
+# from modules.configuration import pieceLogger
 from PIL import (
     Image,
     ImageChops,

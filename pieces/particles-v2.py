@@ -4,6 +4,7 @@ import random
 
 import time
 from modules.configuration import bcolors
+from modules.configuration import pieceLogger
 from modules import coloroverlay, colorutils, panelDrawing
 from modules.particleobjects.particle import Particle
 from modules.particleobjects.particlesystem import ParticleSystem
@@ -95,7 +96,7 @@ def doColorManagementSetup():
     try:
         ps.objTrails = workConfig.getboolean("particleSystem", "objTrails")
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         ps.objTrails = True
 
     # ------- Palette management introduce 2025-01-27 --------------
@@ -117,7 +118,7 @@ def doColorManagementSetup():
         _p.particle_fillRange[5] *= config.brightness
 
 
-        print(len(_p.particle_fillRange))
+        # pieceLogger(len(_p.particle_fillRange))
 
         if len(_p.particle_fillRange) == 8 :
             _p.particle_fillRange.extend([0,0])
@@ -179,7 +180,7 @@ def doColorManagementSetup():
             _p.pixelsGoGray = workConfig.getboolean(_palette, "pixelsGoGray")
             _p.greyRate = float(workConfig.get(_palette, "greyRate"))
         except Exception as e:
-            print(e)
+            pieceLogger(e,1)
             _p.pixelsGoGray = False
 
         # ok this may seem screwy, but because I made an error a while ago, the jumpToGray
@@ -188,7 +189,7 @@ def doColorManagementSetup():
         try:
             _p.jumpToGray = workConfig.getboolean(_palette, "jumpToGray")
         except Exception as e:
-            print(e)
+            pieceLogger(e,1)
             _p.jumpToGray = True
             if not _p.pixelsGoGray:
                 _p.jumpToGray = False
@@ -196,7 +197,7 @@ def doColorManagementSetup():
         try:
             _p.pixelsGoGrayModel = int(workConfig.get(_palette, "pixelsGoGrayModel"))
         except Exception as e:
-            print(e)
+            pieceLogger(e,1)
             _p.pixelsGoGray = False
 
         config.palettes.append(_p)
@@ -208,8 +209,7 @@ def doColorManagementSetup():
 def main(run=True):
     global config, directionOrder, ps
     global workConfig
-    print("---------------------")
-    print("Particles Loaded")
+    pieceLogger("Particles Loaded\n",2,True)
     colorutils.brightness = config.brightness
     config.canvasImageWidth = config.canvasWidth
     config.canvasImageHeight = config.canvasHeight
@@ -239,7 +239,7 @@ def main(run=True):
     try:
         ps.changechangeCohesionProb = float(workConfig.get("particleSystem", "changechangeCohesionProb"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         ps.changechangeCohesionProb = 0.0005
 
     ps.useFlocking = workConfig.getboolean("particleSystem", "useFlocking")
@@ -276,7 +276,7 @@ def main(run=True):
         config.renderDiagnostics = workConfig.getboolean("particleSystem", "renderDiagnostics")
         config.renderDiagnosticsCall = renderDiagnosticsCall
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.renderDiagnostics = False
 
     # managing speed of animation and framerate
@@ -312,21 +312,21 @@ def main(run=True):
         transformTuples = workConfig.get("particleSystem", "transformTuples").split(",")
         config.transformTuples = tuple(float(i) for i in transformTuples)
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.transformShape = False
 
     try:
         config.torqueDelta = int(workConfig.get("particleSystem", "torqueDelta"))
         config.torqueRate = float(workConfig.get("particleSystem", "torqueRate"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.torqueDelta = 0
         config.torqueRate = 0
 
     try:
         config.xWind = float(workConfig.get("particleSystem", "xWind"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.xWind = 0
 
     ps.movement = workConfig.get("particleSystem", "movement")
@@ -342,7 +342,7 @@ def main(run=True):
         ps.objHeightMin = int(workConfig.get("particleSystem", "objHeightMin"))
         ps.objHeightMax = int(workConfig.get("particleSystem", "objHeightMax"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         ps.objWidthMax = ps.objWidth
         ps.objHeightMax = ps.objHeight
         ps.objWidthMin = ps.objWidth
@@ -352,7 +352,7 @@ def main(run=True):
         ps.rndSizeFactorMin = float(workConfig.get("particleSystem", "rndSizeFactorMin"))
         ps.rndSizeFactorMax = float(workConfig.get("particleSystem", "rndSizeFactorMax"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         ps.rndSizeFactorMin = 0.5
         ps.rndSizeFactorMax = 1.5
 
@@ -361,7 +361,7 @@ def main(run=True):
         config.pixelSortProbChangeMin = float(workConfig.get("displayconfig", "pixelSortProbChangeMin"))
         config.pixelSortProbChangeMax = float(workConfig.get("displayconfig", "pixelSortProbChangeMax"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.pixelSortProbChange = 0
 
     try:
@@ -370,7 +370,7 @@ def main(run=True):
         config.filterRemapminHoriSize = int(workConfig.get("particleSystem", "filterRemapminHoriSize"))
         config.filterRemapminVertSize = int(workConfig.get("particleSystem", "filterRemapminVertSize"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.filterRemapping = False
         config.filterRemappingProb = 0.0
         config.filterRemapminHoriSize = 24
@@ -380,7 +380,7 @@ def main(run=True):
         config.filterRemapminVertMinSize = int(workConfig.get("particleSystem", "filterRemapminVertMinSize"))
         config.filterRemapminHoriMinSize = int(workConfig.get("particleSystem", "filterRemapminHoriMinSize"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.filterRemapminHoriMinSize = 4
         config.filterRemapminVertMinSize = 4
     # end try
@@ -389,7 +389,7 @@ def main(run=True):
         config.filterRemapRangeX = int(workConfig.get("particleSystem", "filterRemapRangeX"))
         config.filterRemapRangeY = int(workConfig.get("particleSystem", "filterRemapRangeY"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
@@ -405,7 +405,7 @@ def main(run=True):
         config.legacyUnsharpMask = workConfig.getboolean("particleSystem", "legacyUnsharpMask")
         config.optionallegacyToggleProb = float(workConfig.get("particleSystem", "optionallegacyToggleProb"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.legacyUnsharpMask = True
         config.optionallegacyToggleProb = 0
 
@@ -416,7 +416,7 @@ def main(run=True):
         config.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
         config.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.useWaveDistortion = False
 
     config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
@@ -431,7 +431,7 @@ def main(run=True):
         config.useOverLayEnhanced = workConfig.getboolean("particleSystem", "useOverLayEnhanced")
         config.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         config.useOverLayEnhanced = False
         config.useOverOnBG = False
 
@@ -714,7 +714,7 @@ def brightnessChanger():
                 config.brightness < config.destinationBrightness and config.brightnessDelta < 0
             ):
                 config.brightnessVariationTransition = False
-                print(config.brightness)
+                pieceLogger(config.brightness)
 
         else:
             if random.random() < config.brightnessVariationProb:
@@ -722,7 +722,7 @@ def brightnessChanger():
                 config.brightnessVariationTransition = True
                 config.destinationBrightness = 0.1
                 config.brightnessDelta = (config.destinationBrightness - config.brightness) / 100
-                print(
+                pieceLogger(
                     "New brightness:",
                     config.brightness,
                     config.destinationBrightness,
@@ -739,9 +739,7 @@ def setUp():
 # -----------------------------------------------------------
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING Particle System pieces/singletons/particles.py")
-    print(bcolors.ENDC)
+    pieceLogger("RUNNING Particle System pieces/singletons/particles.py\n",2,True)
 
     while config.isRunning:
         config.directorController.checkTime()

@@ -140,7 +140,7 @@ def changeDrawingMode():
 
 def changePalettes():
     config.activePalette = random.choice(config.paletteSets)
-    # print(f"New Palette : {config.activePalette.name}")
+    pieceLogger(f"New Palette : {config.activePalette.name}",2,True)
     setBGColor()
     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
@@ -741,7 +741,7 @@ def createTextureLayer(tex):
 
 def initDrawings():
     global config
-    pieceLogger(f"===> Init drawings {config.activePalette.pens} ===> Using {config.activePalette.name}", 2)
+    pieceLogger(f"===> Init drawings: {config.activePalette.name}", 2, True)
 
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
@@ -1086,7 +1086,7 @@ def _load_drawing_configs(config):
 
     config.activePalette = random.choice(config.paletteSets)
     config.slownessFactor = config.activePalette.slownessFactor
-    pieceLogger(f"===> New Palette : {config.activePalette.name}", 2)
+    pieceLogger(f"===> New Palette : {config.activePalette.name}", 2, True)
     setBGColor()
 
 

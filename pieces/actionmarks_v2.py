@@ -2,6 +2,7 @@ import math
 import random
 import time
 import configparser
+from tkinter import NO
 
 from matplotlib.pylab import rand
 import numpy as np
@@ -217,8 +218,17 @@ def setPenPropsByName(_name, pen):
     pen.rotationAngle = random.uniform(-math.pi / 2 / pen.rotationFactor, math.pi / 2 / pen.rotationFactor)
 
     pen.changePenColorWhileDrawingProb = config.activePalette.changePenColorWhileDrawingProb
-    pen.xOffset = round(random.uniform(config.activePalette.xOffsetRange[0], config.activePalette.xOffsetRange[1]))
-    pen.yOffset = round(random.uniform(config.activePalette.yOffsetRange[0], config.activePalette.yOffsetRange[1]))
+
+    if pen.xOffsetRange is not None :
+        pen.xOffset = round(random.uniform(pen.xOffsetRange[0], pen.xOffsetRange[1]))
+    else :
+        pen.xOffset = round(random.uniform(config.activePalette.xOffsetRange[0], config.activePalette.xOffsetRange[1]))
+
+    if pen.yOffsetRange is not None :
+        pen.yOffset = round(random.uniform(pen.yOffsetRange[0], pen.yOffsetRange[1]))
+    else:
+        pen.yOffset = round(random.uniform(config.activePalette.yOffsetRange[0], config.activePalette.yOffsetRange[1]))
+
 
     pen._w = _penProps.w
     pen.minMarkWidth = _penProps.minMarkWidth
@@ -266,9 +276,11 @@ def setPenPropsByName(_name, pen):
 
 def setPenColor(_pen):
     cR = config.activePalette.penColor
-    _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
-    if random.random() < config.totalRandomBGBoxColorProb:
-        _pen.lineColor = colorutils.getRandomColorHSV(0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, config.penAlpha, config.brightness)
+
+    if _pen.forcedPalette is None :
+        _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
+    else :
+        _pen.lineColor = colorutils.getRandomColorHSV(_pen.forcedPalette[0], _pen.forcedPalette[1], _pen.forcedPalette[2], _pen.forcedPalette[3], _pen.forcedPalette[4], _pen.forcedPalette[5], _pen.forcedPalette[6], _pen.forcedPalette[7], config.penAlpha, config.brightness)
 
 
 def choosePenMark():
@@ -350,7 +362,7 @@ def generateCurve(_pen):
     center_x = 0
     center_y = 0
 
-    pieceLogger(f"Making curve _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
+    # pieceLogger(f"Making curve _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
 
     _xTravel = random.uniform(_pen.xTravelRange[0], _pen.xTravelRange[1])
     _yTravel = random.uniform(_pen.yTravelRange[0], _pen.yTravelRange[1])
@@ -653,8 +665,9 @@ def glitchBox(
 
 def setBGColor():
     config.bgColor = colorutils.getRandomColorHSV(*config.activePalette.bgColor)
-    # print(f"config.activePalette.bgColor {config.activePalette.bgColor}")
-    # print(f"config.bgColor {config.bgColor}")
+    pieceLogger(f"New BGColor: \n   config.activePalette.bgColor {config.activePalette.bgColor} \n   config.bgColor {config.bgColor}",1)
+
+
 
 
 def primeCanvas(_i=3):
@@ -1116,6 +1129,14 @@ def _load_pen_config(config):
         # _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange", fallback=f"{config.pen_centerVariationXMin},{config.pen_centerVariationXMax}").split(",")))
         # _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange", fallback=f"{config.pen_centerVariationYMin},{config.pen_centerVariationYMax}").split(",")))
         # _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange", fallback="-1,1").split(",")))
+        _mark.xOffsetRange = markConfig.get("markParams", "xOffsetRange", fallback=None)
+        _mark.yOffsetRange = markConfig.get("markParams", "yOffsetRange", fallback=None)
+
+        if _mark.xOffsetRange is not None :
+            _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange").split(",")))
+
+        if _mark.yOffsetRange is not None :
+            _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange").split(",")))
 
         _mark.w = int(markConfig.get("markParams", "w", fallback=1))
         _mark.minMarkWidth = int(markConfig.get("markParams", "minMarkWidth", fallback=2))
@@ -1136,6 +1157,9 @@ def _load_pen_config(config):
         _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
         _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
         _mark.forceOrientation = markConfig.get("markParams", "forceOrientation", fallback="vertical")
+        _mark.forcedPalette = markConfig.get("markParams", "forcedPalette", fallback=None)
+        if _mark.forcedPalette is not None:
+            _mark.forcedPalette = list(map(lambda x: float(x), markConfig.get("markParams", "forcedPalette", fallback=None).split(",")))
 
         return _mark
 
@@ -1150,7 +1174,7 @@ def _load_and_initialize_system(config):
     """Initializes the system and related parameters."""
     """Loads rendering-related configuration parameters."""
 
-    config.changeBGColorProb = float(workConfig.get("drawingField", "changeBGColorProb", fallback=0.01))
+    config.changeBGColorProb = float(workConfig.get("drawingField", "changeBGColorProb", fallback=0.001))
     config.totalResetTime = workConfig.getint("drawingField", "totalResetTime", fallback=33)
     config.totalResetTimeMaxMultiplier = float(workConfig.get("drawingField", "totalResetTimeMaxMultiplier", fallback=1.0))
     config.changeDrawingModeTime = float(workConfig.get("drawingField", "changeDrawingModeTime", fallback=100.0))

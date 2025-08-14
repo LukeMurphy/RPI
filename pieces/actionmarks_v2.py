@@ -665,7 +665,7 @@ def glitchBox(
 
 def setBGColor():
     config.bgColor = colorutils.getRandomColorHSV(*config.activePalette.bgColor)
-    pieceLogger(f"New BGColor: \n   config.activePalette.bgColor {config.activePalette.bgColor} \n   config.bgColor {config.bgColor}",1)
+    pieceLogger(f"New BGColor: config.activePalette.bgColor {config.activePalette.bgColor} --> config.bgColor {config.bgColor}")
 
 
 

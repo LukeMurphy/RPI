@@ -27,7 +27,9 @@ def configuration():
 
 
 def pieceLogger(args, clr=0, showLine=False):
-    fstr = None
+    fstr = bcolors.YELLOWONBLUE
+    if clr == 4:
+        fstr = bcolors.YELLOWONBLUE
     if clr == 3:
         fstr = bcolors.OKBLUE
     if clr == 2:
@@ -36,6 +38,7 @@ def pieceLogger(args, clr=0, showLine=False):
         fstr = bcolors.FULLFAIL
     if clr == 0:
         fstr = bcolors.WARNING
+
     if showLine :
         print(f"\n{fstr}.......................................................................................")
     print(f"{fstr}{args}{bcolors.ENDC}")
@@ -46,6 +49,16 @@ def pieceLogger(args, clr=0, showLine=False):
 class bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
+    # YELLOWONBLUE = "\033[1;33;4;44m"
+    # 0 norm
+    # 1 bold
+    # 2 dim
+    # 3 italics
+
+    # ;1 bold
+    # ; 4 undeline
+
+    YELLOWONBLUE = "\033[0;94;1;43m"
     OKGREEN = "\033[92m"
     WARNING = "\033[93m"
     FULLFAIL = "\033[91m"

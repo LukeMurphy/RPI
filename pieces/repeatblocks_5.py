@@ -783,7 +783,10 @@ def loadAndSetCombinations():
         comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
         comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=config.altColoringProb))
         comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=config.popRandomColorProb))
+
         comboSet.usePolygonOverlay = workConfig.getboolean(combinationSetName, "usePolygonOverlay", fallback=config.usePolygonOverlay)
+        comboSet.tileOverlayGridProb = float(workConfig.get(combinationSetName, "tileOverlayGridProb", fallback=config.tileOverlayGridProb))
+        comboSet.polyOverlayMode = (workConfig.get(combinationSetName, "polyOverlayMode", fallback=config.polyOverlayMode))
 
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
@@ -881,6 +884,8 @@ def generatePatternSequence(config):
     config.useBorderPattern = config.combinationSets[config.currentCombinationsetIndex].useBorderPattern
     config.borderPattern = config.combinationSets[config.currentCombinationsetIndex].borderPattern
     config.usePolygonOverlay = config.combinationSets[config.currentCombinationsetIndex].usePolygonOverlay
+    config.polyOverlayMode = config.combinationSets[config.currentCombinationsetIndex].polyOverlayMode
+    config.tileOverlayGridProb = config.combinationSets[config.currentCombinationsetIndex].tileOverlayGridProb
 
     for c in range(config.patternBlockCols):
         for r in range(config.patternBlockRows):
@@ -1339,7 +1344,17 @@ def shapeOverLayFunction(temp1):
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
                 _count += 1
 
-        temp1 = ImageChops.soft_light(temp1, temp2)
+
+        match (config.polyOverlayMode):
+            case "overaly" :
+                temp1 = ImageChops.overlay(temp1, temp2)
+            case "subtract_modulo" :
+                temp1 = ImageChops.subtract_modulo(temp1, temp2)
+            case "soft_light" :
+                temp1 = ImageChops.soft_light(temp1, temp2)
+            case "lighter" :
+                temp1 = ImageChops.lighter(temp1, temp2)
+
         if random.random() < config.polyOverlayChangeProb:
             generateOverlayTiles()
         # temp1.paste(temp2, (0, 0), temp2)
@@ -1385,6 +1400,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         config.tileOverlayGridProb = float(workConfig.get("movingpattern", "tileOverlayGridProb", fallback=0.0))
         config.poly_alpha = int(workConfig.get("movingpattern", "poly_alpha"))
         config.useOverlayTileGrid = workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False)
+        config.polyOverlayMode = workConfig.get("movingpattern", "polyOverlayMode", fallback="soft_light")
         config.polyOverlay.setStartColor()
         config.polyOverlay.getNewColor()
         config.polyOverlay.colorTransitionSetup()

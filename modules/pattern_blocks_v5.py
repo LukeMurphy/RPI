@@ -1472,7 +1472,6 @@ def grainLines(config, paletteObj=None):
     # config.blockDraw.polygon(poly3, fill=clr4)
 
 
-
 def colorGrid(config, paletteObj=None):
     # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
     # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
@@ -1487,7 +1486,7 @@ def colorGrid(config, paletteObj=None):
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 
-    _divs = 4
+    _divs = round(random.uniform(1,4))
     _w = round(config.blockWidth/_divs)
     _h = round(config.blockHeight/_divs)
 
@@ -1498,6 +1497,38 @@ def colorGrid(config, paletteObj=None):
                 # rosetone ;)
                 clr = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
             config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=(0,0,0,125), fill=clr)
+
+
+def colorGridTriangles(config, paletteObj=None):
+    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    _divs = round(random.uniform(1,4))
+    _w = round(config.blockWidth/_divs)
+    _h = round(config.blockHeight/_divs)
+
+    for _r in range(_divs) :
+        for _c in range(_divs) :
+            clr1 = colorutils.getRandomColorHSV(0,360,.3,1.0,.3,.90,100,170,255,config.brightness)
+            clr2 = colorutils.getRandomColorHSV(0,360,.3,1.0,.3,.90,100,170,255,config.brightness)
+            if (_c % 2 == 0 or _r % 2 == 0) and random.random() < .5:
+                # rosetone ;)
+                clr1 = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
+                clr2 = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
+            # config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=(0,0,0,125), fill=clr)
+            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h + _h),( _c * _w, _r * _h + _h),(_c * _w, _r * _h)), outline=(0,0,0,125), fill=clr1)
+            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h),( _c * _w + _w, _r * _h + _h),(_c * _w, _r * _h)), outline=(0,0,0,125), fill=clr2)
+
 
 
 

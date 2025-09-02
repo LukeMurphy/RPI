@@ -1496,7 +1496,7 @@ def colorGrid(config, paletteObj=None):
             if (_c % 2 == 0 or _r % 2 == 0) and random.random() < .5:
                 # rosetone ;)
                 clr = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
-            config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=(0,0,0,125), fill=clr)
+            config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=None, fill=clr)
 
 
 def colorGridTriangles(config, paletteObj=None):
@@ -1526,8 +1526,8 @@ def colorGridTriangles(config, paletteObj=None):
                 clr1 = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
                 clr2 = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
             # config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=(0,0,0,125), fill=clr)
-            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h + _h),( _c * _w, _r * _h + _h),(_c * _w, _r * _h)), outline=(0,0,0,125), fill=clr1)
-            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h),( _c * _w + _w, _r * _h + _h),(_c * _w, _r * _h)), outline=(0,0,0,125), fill=clr2)
+            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h + _h),( _c * _w, _r * _h + _h),(_c * _w, _r * _h)), outline=None, fill=clr1)
+            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h),( _c * _w + _w, _r * _h + _h),(_c * _w, _r * _h)), outline=None, fill=clr2)
 
 
 

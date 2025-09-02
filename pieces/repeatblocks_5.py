@@ -788,6 +788,8 @@ def loadAndSetCombinations():
         comboSet.tileOverlayGridProb = float(workConfig.get(combinationSetName, "tileOverlayGridProb", fallback=config.tileOverlayGridProb))
         comboSet.polyOverlayMode = (workConfig.get(combinationSetName, "polyOverlayMode", fallback=config.polyOverlayMode))
 
+        comboSet.patternsInBands = workConfig.getboolean(combinationSetName, "patternsInBands", fallback=False)
+
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
 
@@ -881,51 +883,49 @@ def generatePatternSequence(config):
     _tempPalette = getTempPalette(config)
     _iterCount = 0
     config.initPatternBuild = True
-    config.useBorderPattern = config.combinationSets[config.currentCombinationsetIndex].useBorderPattern
-    config.borderPattern = config.combinationSets[config.currentCombinationsetIndex].borderPattern
-    config.usePolygonOverlay = config.combinationSets[config.currentCombinationsetIndex].usePolygonOverlay
-    config.polyOverlayMode = config.combinationSets[config.currentCombinationsetIndex].polyOverlayMode
-    config.tileOverlayGridProb = config.combinationSets[config.currentCombinationsetIndex].tileOverlayGridProb
+    combo = config.combinationSets[config.currentCombinationsetIndex]
+    config.useBorderPattern = combo.useBorderPattern
+    config.borderPattern = combo.borderPattern
+    config.usePolygonOverlay = combo.usePolygonOverlay
+    config.polyOverlayMode = combo.polyOverlayMode
+    config.tileOverlayGridProb = combo.tileOverlayGridProb
+    config.patternsInBands = combo.patternsInBands
 
-    for c in range(config.patternBlockCols):
+    def add_pattern_block(c, r):
+        nonlocal _patternSelected, _tempPalette, _iterCount
+        if random.random() < _baseProb:
+            _patternSelected = chooseAPattern()
+            _tempPalette = getTempPalette(config)
+        _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else round(random.uniform(0, 1))
+        _position = _iterCount
+        _pattern = _patternSelected
+        if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
+            _pattern = config.borderPattern
+        _patternBlock = PatternBlock()
+        _patternBlock.pattern = _pattern
+        _patternBlock.position = _position
+        _patternBlock.rotate = _rotate
+        _patternBlock.tempPalette = _tempPalette
+        _patternBlock.col = c
+        _patternBlock.row = r
+        _patternBlock.rePainting = _patternSelected in [
+            "randomizer3",
+            "randomizer2",
+            "randomizer",
+            "diamond",
+        ]
+        _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
+        config.patternSequence.append(_patternBlock)
+        _iterCount += 1
+
+    if config.patternsInBands:
         for r in range(config.patternBlockRows):
-            if random.random() < _baseProb:
-                _patternSelected = chooseAPattern()
-                _tempPalette = getTempPalette(config)
-
-            # PREVENTS random rotation for certain patterns
-            _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls","petals"]) else round(random.uniform(0, 1))
-            _position = _iterCount
-            _pattern = _patternSelected
-
-            if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
-                _pattern = config.borderPattern
-
-            _patternBlock = PatternBlock()
-            _patternBlock.pattern = _pattern
-            _patternBlock.position = _position
-            _patternBlock.rotate = _rotate
-            _patternBlock.tempPalette = _tempPalette
-            _patternBlock.col = c
-            _patternBlock.row = r
-            _patternBlock.rePainting = False
-            _patternBlock.isBorder = False
-            _patternBlock.rePainting = _patternSelected in [
-                "randomizer3",
-                "randomizer2",
-                "randomizer",
-                "diamond",
-            ]
-
-            if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
-                _patternBlock.isBorder = True
-
-            config.patternSequence.append(_patternBlock)
-            # config.usedPatterns.append(_pattern)
-            # config.lastPosition = _position
-            _iterCount += 1
-            # print(_pattern)
-            # print(f"_patternBlock.rePainting = {_patternBlock.rePainting}")
+            for c in range(config.patternBlockCols):
+                add_pattern_block(c, r)
+    else:
+        for c in range(config.patternBlockCols):
+            for r in range(config.patternBlockRows):
+                add_pattern_block(c, r)
 
 
 def getTempPalette(config):

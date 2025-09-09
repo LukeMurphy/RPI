@@ -312,7 +312,7 @@ def generateLine(_pen):
     _pts = round(config.canvasHeight / _yD) + 2
     _pen.smooth_points = []
 
-    pieceLogger(f"Making line _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
+    pieceLogger(f"Making line  {_pen.name} _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y = _rangex - (_rangex * 2 * random.random())
@@ -464,25 +464,29 @@ def pauseDrawing():
     config.stoppedAndWaitingToDraw = True
     config.canDraw = False
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0], config.activePalette.startNewLineDelayRange[1])
-    # print(f"paused for {config.drawingController.slotRate}")
+    pieceLogger(f"paused for {config.drawingController.slotRate}")
 
 
 def releaseDrawing():
     # print("released")
     config.stoppedAndWaitingToDraw = False
     config.canDraw = True
+    pieceLogger("Line released")
 
 
 def penLoopActions():
     if random.random() < config.activePalette.changePenColorWhileDrawingProb:
         setPenColor((config.activePalette.activePen))
 
-    if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0 and config.canDraw:
+    # if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0 and config.canDraw:
+    if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0:
         _pen = choosePenMark()
         config.activePalette.activePen = _pen
         startNewLine(_pen)
+        pieceLogger(f"Next line: {config.activePalette.activePen.name}",4)
 
-    drawLine(config.activePalette.activePen)
+    if config.canDraw:
+        drawLine(config.activePalette.activePen)
 
     # if not config.doingDrawing and config.canDraw and not config.stoppedAndWaitingToDraw:
     #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
@@ -492,15 +496,20 @@ def penLoopActions():
 
 def drawLine(_pen):
     # Draw the shape
-    # print(f"pen {_pen._w}")
+    # pieceLogger(f"pen {_pen.name}")
     _penSkip = random.random() <= _pen.drawingSkip
     for _ in range(_pen.speed):
         if _pen._p < len(_pen.smooth_points) and _pen._p > 0:
             _p1 = _pen.smooth_points[_pen._p - 1]
             _p2 = _pen.smooth_points[_pen._p]
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
+            _angle = abs(math.atan(_p2[1] - _p1[1])/(_p2[0] - _p1[0]))
+            _penWidth = _pen._w
+            if _angle > 30 :
+                _penWidth - 1
+            # pieceLogger(_angle)
             if not _penSkip:
-                config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_pen._w)
+                config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
             _pen._p += 1
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
@@ -535,6 +544,7 @@ def drawLine(_pen):
 
 
 def drawLineStopped():
+    pieceLogger("Pen stopped")
     config.doingDrawing = False
     pauseDrawing()
     if config.alwaysJitterLineAfterDrawn:

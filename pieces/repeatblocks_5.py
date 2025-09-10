@@ -517,6 +517,9 @@ def loadPalette(palette):
     c3 = Holder()
     c4 = Holder()
 
+    _noGraysBool = (config.paletteConfig.getboolean(palette, "noGrays", fallback=False))
+    _noGrays = 1.0 if _noGraysBool else 0.0
+
     # background
     # tLimitBase = int(workConfig.get(palette, "tLimitBase"))
     c1.minHue = float(config.paletteConfig.get(palette, "c1_minHue"))
@@ -527,6 +530,7 @@ def loadPalette(palette):
     c1.maxValue = float(config.paletteConfig.get(palette, "c1_maxValue"))
     c1.dropHueMin = float(config.paletteConfig.get(palette, "c1_dropHueMin", fallback=0))
     c1.dropHueMax = float(config.paletteConfig.get(palette, "c1_dropHueMax", fallback=0))
+    c1.noGrays = _noGrays
     c1.currentColor = setCurrentColor(c1)
 
     # color 1
@@ -539,6 +543,7 @@ def loadPalette(palette):
     c2.maxValue = float(config.paletteConfig.get(palette, "c2_maxValue"))
     c2.dropHueMin = float(config.paletteConfig.get(palette, "c2_dropHueMin", fallback=0))
     c2.dropHueMax = float(config.paletteConfig.get(palette, "c2_dropHueMax", fallback=0))
+    c2.noGrays = _noGrays
     c2.currentColor = setCurrentColor(c2)
     # color 2
     # tLimitBase = int(config.paletteConfig.get(palette, "line2_tLimitBase"))
@@ -550,6 +555,7 @@ def loadPalette(palette):
     c3.maxValue = float(config.paletteConfig.get(palette, "c3_maxValue"))
     c3.dropHueMin = float(config.paletteConfig.get(palette, "c3_dropHueMin", fallback=0))
     c3.dropHueMax = float(config.paletteConfig.get(palette, "c3_dropHueMax", fallback=0))
+    c3.noGrays = _noGrays
     c3.currentColor = setCurrentColor(c3)
 
     c4.minHue = float(config.paletteConfig.get(palette, "c4_minHue", fallback=0))
@@ -560,7 +566,9 @@ def loadPalette(palette):
     c4.maxValue = float(config.paletteConfig.get(palette, "c4_maxValue", fallback=0))
     c4.dropHueMin = float(config.paletteConfig.get(palette, "c4_dropHueMin", fallback=0))
     c4.dropHueMax = float(config.paletteConfig.get(palette, "c4_dropHueMax", fallback=0))
+    c4.noGrays = _noGrays
     c4.currentColor = setCurrentColor(c4)
+
 
     _paletteObj = Holder()
     _paletteObj.paletteName = palette
@@ -568,6 +576,7 @@ def loadPalette(palette):
     _paletteObj.c2 = c2
     _paletteObj.c3 = c3
     _paletteObj.c4 = c4
+    _paletteObj.noGrays = _noGrays
 
     # print(f"Palette Loaded: {palette}")
 
@@ -598,6 +607,7 @@ def changeSinglePalette(index=0):
     _paletteObjLocal.c2.currentColor = setCurrentColor(paletteObj.c2)
     _paletteObjLocal.c3.currentColor = setCurrentColor(paletteObj.c3)
     _paletteObjLocal.c4.currentColor = setCurrentColor(paletteObj.c4)
+    _paletteObjLocal.noGrays = paletteObj.noGrays
     return _paletteObjLocal
 
 
@@ -613,6 +623,7 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
         palettObjValsRef.dropHueMax,
         alpha,
         config.brightness,
+        palettObjValsRef.noGrays
     )
 
 

@@ -7,6 +7,8 @@ import sys
 from PIL import ImageChops, ImageOps
 from matplotlib.pylab import rand
 
+from modules.configuration import pieceLogger
+
 colorWheel = [
     "RED",
     "VERMILLION",
@@ -311,7 +313,7 @@ def getRandomColorHSVSaturated(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.
     return (round(rgb[0] * brtns), round(rgb[1] * brtns), round(rgb[2] * brtns), a)
 
 
-def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1.0, dropHueMin=0, dropHueMax=0, a=255, brtns=1.0):
+def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1.0, dropHueMin=0, dropHueMax=0, a=255, brtns=1.0, nograys=0.0):
 
     # adjust for 360 degrees ranges
     degreeRange = hMax - hMin
@@ -321,6 +323,7 @@ def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1
     h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
 
     # an option to exclude a range of colors
+
     if dropHueMax != dropHueMin:
         h = hMin + random.SystemRandom().uniform(0.0, degreeRange)
         if h > 360.0:
@@ -334,8 +337,13 @@ def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1
 
     # h = random.SystemRandom().uniform(hMin,hMax)
     # print(hMin,hMax,degreeRange, h)
-    s = random.SystemRandom().uniform(sMin, sMax)
     v = random.SystemRandom().uniform(vMin, vMax)
+    s = random.SystemRandom().uniform(sMin, sMax)
+
+    if nograys == 1.0 and v > .25 :
+        s = random.SystemRandom().uniform(max(.5,sMin), 1.0)
+        # pieceLogger(f"saturation {s} {vMax} {vMin}",2)
+
     # print("\nNew hue: " + str(round(h)) + " " + str(dropHueMin)+ " " + str(dropHueMax) + " " + str(s) + " " + str(v) )
     # print(vMin, vMax, v)
     rgb = HSVToRGB(h, s, v)

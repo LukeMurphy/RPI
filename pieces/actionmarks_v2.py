@@ -9,7 +9,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageChops
 
 # from scipy.spatial import Voronoi
-from scipy.interpolate import splprep, splev  # For spline interpolation
+from scipy.interpolate import splprep, splev
+from shapely import length  # For spline interpolation
 from modules.holder_director import Director
 from modules.configuration import pieceLogger
 from modules import colorutils
@@ -30,6 +31,8 @@ class Pen:
 
 
 class Mark:
+    lastAngle = 0
+    angleDiffMax = 70
     def __init__(self):
         pass
 
@@ -81,7 +84,7 @@ class TransitionStates:
 # ----------------------------------------------------##----------------------------------------------------#
 
 
-def chaikins_corner_cutting(coords, refinements=5, ratio=0.75):
+def chaikins_corner_cutting(coords, refinements=2, ratio=0.75):
     # https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
     coords = np.array(coords)
 
@@ -98,6 +101,8 @@ def chaikins_corner_cutting(coords, refinements=5, ratio=0.75):
 
 
 # ----------------------------------------------------##----------------------------------------------------#
+
+
 def filterRemapImage(config):
     config.useFilters = True
     config.remapImageBlock = False
@@ -268,6 +273,7 @@ def setPenPropsByName(_name, pen):
     pen.linePpoints = _penProps.linePoints
     pen.lopOff = _penProps.lopOff
     pen.forceOrientation = _penProps.forceOrientation
+    pen.angleDiffMax = _penProps.angleDiffMax
 
     # print(f"setting pen props pen.name {pen.name}")
     # print(f"pen.drawingSkip {pen.drawingSkip}")
@@ -277,10 +283,12 @@ def setPenPropsByName(_name, pen):
 def setPenColor(_pen):
     cR = config.activePalette.penColor
 
+    # pieceLogger(f"{config.activePalette.noPenGrays}")
+
     if _pen.forcedPalette is None :
-        _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
+        _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness, config.activePalette.noPenGrays)
     else :
-        _pen.lineColor = colorutils.getRandomColorHSV(_pen.forcedPalette[0], _pen.forcedPalette[1], _pen.forcedPalette[2], _pen.forcedPalette[3], _pen.forcedPalette[4], _pen.forcedPalette[5], _pen.forcedPalette[6], _pen.forcedPalette[7], config.penAlpha, config.brightness)
+        _pen.lineColor = colorutils.getRandomColorHSV(_pen.forcedPalette[0], _pen.forcedPalette[1], _pen.forcedPalette[2], _pen.forcedPalette[3], _pen.forcedPalette[4], _pen.forcedPalette[5], _pen.forcedPalette[6], _pen.forcedPalette[7], config.penAlpha, config.brightness, config.activePalette.noPenGrays)
 
 
 def choosePenMark():
@@ -300,8 +308,14 @@ def generateSmoothLinePoints(_pen):
         generateLine(_pen)
     else:
         generateCurve(_pen)
+    # pieceLogger("Line properties:")
+    # for _pnt in range(len(_pen.smooth_points)-2) :
+    #     _dy = _pen.smooth_points[_pnt + 1][1] - _pen.smooth_points[_pnt][1]
+    #     _dx = _pen.smooth_points[_pnt + 1][0] - _pen.smooth_points[_pnt][0]
+    #     _ang = abs(math.atan(_dy/_dx) * 360/math.pi)
+    #     pieceLogger(_ang)
 
-
+    
 def generateLine(_pen):
 
     points = []
@@ -464,14 +478,14 @@ def pauseDrawing():
     config.stoppedAndWaitingToDraw = True
     config.canDraw = False
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0], config.activePalette.startNewLineDelayRange[1])
-    pieceLogger(f"paused for {config.drawingController.slotRate}")
+    # pieceLogger(f"paused for {config.drawingController.slotRate}")
 
 
 def releaseDrawing():
     # print("released")
     config.stoppedAndWaitingToDraw = False
     config.canDraw = True
-    pieceLogger("Line released")
+    # pieceLogger("Pen released")
 
 
 def penLoopActions():
@@ -503,13 +517,24 @@ def drawLine(_pen):
             _p1 = _pen.smooth_points[_pen._p - 1]
             _p2 = _pen.smooth_points[_pen._p]
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
-            _angle = abs(math.atan(_p2[1] - _p1[1])/(_p2[0] - _p1[0]))
+            _dy = _p1[1] - _p2[1]
+            _dx = _p1[0] - _p2[0]
+            _angle = abs(math.atan(_dy/_dx) * 360/math.pi)
             _penWidth = _pen._w
-            if _angle > 30 :
-                _penWidth - 1
-            # pieceLogger(_angle)
-            if not _penSkip:
-                config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
+            _lineColor = _pen.lineColor 
+            _angleDiff = abs(_pen.lastAngle - _angle)
+            _markDrawn = False
+            if _angleDiff > _pen.angleDiffMax and not _penSkip:
+            # if not _penSkip:
+            # if _angle < 20 and _angle >1.0:
+                # pieceLogger(_angle)
+                _penWidth = 0
+                _lineColor = (255,0,0,0)
+                _markDrawn = True
+                # pieceLogger(f"{_angleDiff}")
+            config.draw.line((_p1, _p2), fill=_lineColor, width=_penWidth)
+            # if not _markDrawn :
+            _pen.lastAngle = _angle
             _pen._p += 1
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
@@ -544,7 +569,7 @@ def drawLine(_pen):
 
 
 def drawLineStopped():
-    pieceLogger("Pen stopped")
+    # pieceLogger("Pen stopped")
     config.doingDrawing = False
     pauseDrawing()
     if config.alwaysJitterLineAfterDrawn:
@@ -611,7 +636,7 @@ def bgColorBlocksFilling(arg):
             cR[6],
             cR[7],
             round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
-            config.brightness,
+            config.brightness,config.activePalette.nobgGrays
         )
 
         if random.random() < config.totalRandomBGBoxColorProb:
@@ -675,9 +700,7 @@ def glitchBox(
 
 def setBGColor():
     config.bgColor = colorutils.getRandomColorHSV(*config.activePalette.bgColor)
-    pieceLogger(f"New BGColor: config.activePalette.bgColor {config.activePalette.bgColor} --> config.bgColor {config.bgColor}")
-
-
+    # pieceLogger(f"New BGColor: config.activePalette.bgColor {config.activePalette.bgColor} --> config.bgColor {config.bgColor}")
 
 
 def primeCanvas(_i=3):
@@ -1029,6 +1052,9 @@ def _load_drawing_configs(config):
     config.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
     config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha", fallback=2))
 
+    config.noPenGrays = 0.0
+    config.nobgGrays = 0.0
+
     config.paletteSets = []
     paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
 
@@ -1040,7 +1066,8 @@ def _load_drawing_configs(config):
                 workConfig.get(_p, "bgColor").split(","),
             )
         )
-        palette.bgColor.extend([config.bgColorAlpha, config.brightness])
+        palette.nobgGrays = float(workConfig.get(_p, "nobgGrays", fallback=0))
+        palette.bgColor.extend([config.bgColorAlpha, config.brightness, palette.nobgGrays])
         palette.bgBoxColorRange = list(
             map(
                 lambda x: float(x),
@@ -1059,6 +1086,8 @@ def _load_drawing_configs(config):
                 workConfig.get(_p, "penColor").split(","),
             )
         )
+
+        palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
 
         palette.pens = workConfig.get(_p, "penNames").split(",")
         palette.name = _p
@@ -1171,6 +1200,7 @@ def _load_pen_config(config):
         if _mark.forcedPalette is not None:
             _mark.forcedPalette = list(map(lambda x: float(x), markConfig.get("markParams", "forcedPalette", fallback=None).split(",")))
 
+        _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
         return _mark
 
     _marksPath = _load_pen_config_globals(config)

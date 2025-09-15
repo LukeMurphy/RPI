@@ -618,6 +618,8 @@ def bgColorBlocksFilling(arg):
         config.bgBoxFill = (0, 0, 0, 0)
     else:
 
+        xPos = round(random.uniform(-0,config.tileSizeWidth) * .25)
+        yPos = round(random.uniform(-0,config.tileSizeHeight) * .25)
         config.bgBoxBox = (
             xPos,
             yPos,

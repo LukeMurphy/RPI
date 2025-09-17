@@ -169,7 +169,7 @@ def initiateTransition():
 
 
 def startNewLine(_pen):
-    # print(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
+    # pieceLogger(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
     setPenProperties(_pen)
     setPenColor(_pen)
     _img = generateSmoothLinePoints(_pen)
@@ -326,7 +326,7 @@ def generateLine(_pen):
     _pts = round(config.canvasHeight / _yD) + 2
     _pen.smooth_points = []
 
-    pieceLogger(f"Making line  {_pen.name} _pen.xOffset {_pen.xOffset} _pen.yOffset {_pen.yOffset}")
+    pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset})")
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y = _rangex - (_rangex * 2 * random.random())
@@ -497,7 +497,7 @@ def penLoopActions():
         _pen = choosePenMark()
         config.activePalette.activePen = _pen
         startNewLine(_pen)
-        pieceLogger(f"Next line: {config.activePalette.activePen.name}",4)
+        # pieceLogger(f"Next line: {config.activePalette.activePen.name}",4)
 
     if config.canDraw:
         drawLine(config.activePalette.activePen)
@@ -510,7 +510,7 @@ def penLoopActions():
 
 def drawLine(_pen):
     # Draw the shape
-    # pieceLogger(f"pen {_pen.name}")
+    if _pen._p == 1 : pieceLogger(f"Drawing Line with: {_pen.name}",4)
     _penSkip = random.random() <= _pen.drawingSkip
     for _ in range(_pen.speed):
         if _pen._p < len(_pen.smooth_points) and _pen._p > 0:

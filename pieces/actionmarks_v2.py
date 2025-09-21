@@ -261,12 +261,15 @@ def setPenPropsByName(_name, pen):
     # pen.centerVariationY = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
 
     # genral size of drawing
-    pen.drawingSkip = random.uniform(0.0, 0.01)
+    pen.drawingSkipProb = random.uniform(0.0, _penProps.drawingSkip)
+
     pen._p = 0
     pen.smooth_points = []
     _penSpeedMax = max(1, math.ceil(5 / config.slownessFactor + 1))
     pen.speed = round(random.uniform(1, _penSpeedMax))
     # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
+
+    # pen.speed = 1
     pen.attenuating = False
     pen.enlarging = False
 
@@ -275,9 +278,9 @@ def setPenPropsByName(_name, pen):
     pen.forceOrientation = _penProps.forceOrientation
     pen.angleDiffMax = _penProps.angleDiffMax
 
-    # print(f"setting pen props pen.name {pen.name}")
-    # print(f"pen.drawingSkip {pen.drawingSkip}")
-    # print("--")
+    # pieceLogger(f"setting pen props pen.name {pen.name}")
+    # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
+    # pieceLogger("--")
 
 
 def setPenColor(_pen):
@@ -324,7 +327,10 @@ def generateLine(_pen):
 
     _yD = _pen.maxNumPoints
     _pts = round(config.canvasHeight / _yD) + 2
+
     _pen.smooth_points = []
+
+
 
     pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset})")
     for i in range(_pts):
@@ -350,13 +356,15 @@ def generateLine(_pen):
     res = chaikins_corner_cutting(points, 2, ratio).tolist()
 
     # for lines, really need to handle the yOffset more carefully
-    if _pen.name in ["lineMarksVert"]:
+    if _pen.name in ["lineMarksVert","lineMarksVertTest"]:
         _pen.yOffset = 0
 
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res)
     # either clockwise or counter
-    if random.random() < 0.5:
-        _pen.smooth_points.reverse()
+    # if random.random() < 0.5:
+    #     _pen.smooth_points.reverse()
+
+    pieceLogger(f"{_pts} {_yD}")
 
 
 def generateCurve(_pen):
@@ -502,6 +510,7 @@ def penLoopActions():
     if config.canDraw:
         drawLine(config.activePalette.activePen)
 
+
     # if not config.doingDrawing and config.canDraw and not config.stoppedAndWaitingToDraw:
     #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
     #     print(f"config.canDraw {config.canDraw}")
@@ -510,8 +519,11 @@ def penLoopActions():
 
 def drawLine(_pen):
     # Draw the shape
-    if _pen._p == 1 : pieceLogger(f"Drawing Line with: {_pen.name}",4)
-    _penSkip = random.random() <= _pen.drawingSkip
+    if _pen._p == 1 : 
+        pieceLogger(f"Drawing Line with: {_pen.name}",4)
+        # { _pen.drawingSkipProb}
+    _penSkip = random.random() <= _pen.drawingSkipProb
+
     for _ in range(_pen.speed):
         if _pen._p < len(_pen.smooth_points) and _pen._p > 0:
             _p1 = _pen.smooth_points[_pen._p - 1]
@@ -519,23 +531,70 @@ def drawLine(_pen):
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
             _dy = _p1[1] - _p2[1]
             _dx = _p1[0] - _p2[0]
-            _angle = abs(math.atan(_dy/_dx) * 360/math.pi)
+            _angle = (math.atan(_dy/_dx) * 360/math.pi)
+
+            if _angle < 0 :
+                _angle += 360
+
             _penWidth = _pen._w
             _lineColor = _pen.lineColor 
-            _angleDiff = abs(_pen.lastAngle - _angle)
-            _markDrawn = False
-            if _angleDiff > _pen.angleDiffMax and not _penSkip:
-            # if not _penSkip:
-            # if _angle < 20 and _angle >1.0:
-                # pieceLogger(_angle)
-                _penWidth = 0
-                _lineColor = (255,0,0,0)
-                _markDrawn = True
-                # pieceLogger(f"{_angleDiff}")
-            config.draw.line((_p1, _p2), fill=_lineColor, width=_penWidth)
+
+            # old way, very chunky
+            # config.draw.line((_p1, _p2), fill=_lineColor, width=_penWidth)
+
+            _orthoAngle = math.pi - math.atan2(_dy,_dx)
+            _sinOrthoAngle = math.sin(_orthoAngle)
+            _cosOrthoAngle = math.cos(_orthoAngle)
+
+            _orthoD = _penWidth / 2
+
+
+            _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
+            _orthoP1y = round(_orthoD * _cosOrthoAngle + _p1[1])
+
+            _orthoP2x = round(_orthoD * _sinOrthoAngle+ _p2[0])
+            _orthoP2y = round(_orthoD * _cosOrthoAngle + _p2[1])
+
+            _orthoP3x = round(-_orthoD * _sinOrthoAngle + _p2[0])
+            _orthoP3y = round(-_orthoD * _cosOrthoAngle + _p2[1])
+
+            _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
+            _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
+
+
+            _drawdot = False
+            try:
+                if _pen._p > 1 :
+                    _drawdot = True
+
+                    _orthoP1x = _pen.lastOrthoPoint[0]
+                    _orthoP1y = _pen.lastOrthoPoint[1]
+
+                    _orthoP4x = _pen.lastOrthoPoint[2]
+                    _orthoP4y = _pen.lastOrthoPoint[3]
+
+            except Exception as e:
+                print(e)
+
+            _poly = (
+                (_orthoP1x,_orthoP1y),
+                (_orthoP2x,_orthoP2y),
+                (_orthoP3x,_orthoP3y),
+                (_orthoP4x,_orthoP4y),
+                (_orthoP1x,_orthoP1y)
+            )
+
+            if not _penSkip :
+                config.draw.polygon(_poly, fill = _lineColor, outline = None)
+            
+            # config.draw.line((_p1, _p2), fill=(255,0,0,255), width=1)
+
             # if not _markDrawn :
             _pen.lastAngle = _angle
             _pen._p += 1
+            _pen.lastOrthoPoint = [_orthoP2x,_orthoP2y,_orthoP3x,_orthoP3y]
+
+
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
@@ -566,6 +625,9 @@ def drawLine(_pen):
             _pen._w += round(1 * _pen.incrementFactor)
         if _pen.attenuating:
             _pen._w -= round(1 * _pen.incrementFactor)
+
+
+        # time.sleep(.5)
 
 
 def drawLineStopped():
@@ -1203,6 +1265,9 @@ def _load_pen_config(config):
             _mark.forcedPalette = list(map(lambda x: float(x), markConfig.get("markParams", "forcedPalette", fallback=None).split(",")))
 
         _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
+        _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=.01))
+
+
         return _mark
 
     _marksPath = _load_pen_config_globals(config)

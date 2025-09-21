@@ -5,6 +5,7 @@ import configparser
 from tkinter import NO
 
 from matplotlib.pylab import rand
+from matplotlib.pyplot import pie
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageChops
 
@@ -157,6 +158,8 @@ def changePalettes():
     config.changeColorSetTimeToUse = round(random.uniform(config.changeColorSetTime, round(config.changeColorSetTime * config.changeColorSetTimeMaxMultiplier)))
     config.paletteController.slotRate = config.changeColorSetTimeToUse
     config.slownessFactor = config.activePalette.slownessFactor
+
+    config.bgBoxRange = config.activePalette.bgBoxRange
 
 
 def initiateTransition():
@@ -332,7 +335,7 @@ def generateLine(_pen):
 
 
 
-    pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset})")
+    pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset}) pts {_pts} {_yD}")
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y = _rangex - (_rangex * 2 * random.random())
@@ -364,8 +367,7 @@ def generateLine(_pen):
     # if random.random() < 0.5:
     #     _pen.smooth_points.reverse()
 
-    pieceLogger(f"{_pts} {_yD}")
-
+   
 
 def generateCurve(_pen):
     width = _pen.drawingSize[0]
@@ -630,6 +632,61 @@ def drawLine(_pen):
         # time.sleep(.5)
 
 
+
+
+
+def drawLine_older(_pen):
+    # Draw the shape
+    # pieceLogger(f"pen {_pen.name}")
+    _penSkip = random.random() <= _pen.drawingSkip
+    for _ in range(_pen.speed):
+        if _pen._p < len(_pen.smooth_points) and _pen._p > 0:
+            _p1 = _pen.smooth_points[_pen._p - 1]
+            _p2 = _pen.smooth_points[_pen._p]
+            # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
+            _angle = abs(math.atan(_p2[1] - _p1[1])/(_p2[0] - _p1[0]))
+            _penWidth = _pen._w
+            if _angle > 30 :
+                _penWidth - 1
+            # pieceLogger(_angle)
+            if not _penSkip:
+                config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
+            _pen._p += 1
+            config.doingDrawing = True
+        if _pen._p == len(_pen.smooth_points):
+            _pen._p = 0
+            drawLineStopped()
+
+        if random.random() < _pen.changeMarkWidthProb:
+            if not _pen.attenuating and not _pen.enlarging:
+                if random.random() < 0.5:
+                    _pen.attenuating = True
+                else:
+                    _pen.enlarging = True
+            elif random.random() < _pen.changeMarkWidthProb * 2:
+                if _pen.attenuating:
+                    _pen.enlarging = True
+                    _pen.attenuating = False
+                else:
+                    _pen.enlarging = False
+                    _pen.attenuating = True
+
+        if _pen._w > _pen.maxMarkWidth:
+            _pen.enlarging = False
+
+        if _pen._w <= _pen.minMarkWidth:
+            _pen.attenuating = False
+            _pen._w = _pen.minMarkWidth
+
+        if _pen.enlarging:
+            _pen._w += round(1 * _pen.incrementFactor)
+        if _pen.attenuating:
+            _pen._w -= round(1 * _pen.incrementFactor)
+
+
+
+
+
 def drawLineStopped():
     # pieceLogger("Pen stopped")
     config.doingDrawing = False
@@ -663,8 +720,8 @@ def bgColorBlocksFilling(arg):
     config.blendLevelRate = config.blendLevelRateBase
     config.blendLevel = 0.0
 
-    xPos = math.floor(random.uniform(0, config.canvasWidth))
-    yPos = math.floor(random.uniform(0, config.canvasHeight))
+    xPos = math.floor(random.uniform(config.activePalette.bgBoxRange[0],config.activePalette.bgBoxRange[1]))
+    yPos = math.floor(random.uniform(config.activePalette.bgBoxRange[2],config.activePalette.bgBoxRange[3]))
 
     config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
     config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
@@ -680,8 +737,8 @@ def bgColorBlocksFilling(arg):
         config.bgBoxFill = (0, 0, 0, 0)
     else:
 
-        xPos = round(random.uniform(-0,config.tileSizeWidth) * .25)
-        yPos = round(random.uniform(-0,config.tileSizeHeight) * .25)
+        # xPos = round(random.uniform(-0,config.tileSizeWidth) )
+        # yPos = round(random.uniform(-0,config.tileSizeHeight) )
         config.bgBoxBox = (
             xPos,
             yPos,
@@ -1150,6 +1207,18 @@ def _load_drawing_configs(config):
                 workConfig.get(_p, "penColor").split(","),
             )
         )
+        palette.bgBoxRange = list(
+            map(
+                lambda x: int(x),
+                workConfig.get(_p, "bgBoxRange", fallback="0,0,0,0").split(","),
+            )
+        )
+
+    
+
+        if palette.bgBoxRange == [0,0,0,0] :
+            palette.bgBoxRange = [0, config.canvasWidth, 0, config.canvasHeight]
+
 
         palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
 

@@ -12,7 +12,7 @@ import time
 import sys
 
 from configs import defaultpiece
-from modules import configuration, player
+from modules import configuration, player_module
 from modules.configuration import bcolors
 from modules.configuration import pieceLogger
 
@@ -101,7 +101,7 @@ def loadFromArguments(reloading=False, config=None):
     else:
         pieceLogger("\n** RELOADING NOW: " + config.fileName, 3)
         workconfig.read(config.fileName)
-        player.configure(config, workconfig)
+        player_module.configure(config, workconfig)
 
 
 
@@ -136,7 +136,7 @@ def _initializeConfiguration(loadFromArguments):
     # Sets off the piece based on loading the intitail configs #
     # ****************************************** #
 
-    player.configure(config, workconfig)
+    player_module.configure(config, workconfig)
 
 
 def _printConfigsLoaded(config):

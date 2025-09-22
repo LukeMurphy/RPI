@@ -22,7 +22,7 @@ from PIL import (
     ImageOps,
 )
 from multiprocessing import Pool
-from modules import configuration, player
+from modules import configuration, player_module
 from modules.rendering import appWindow
 from modules.configuration import bcolors
 

@@ -519,7 +519,14 @@ def penLoopActions():
     #     pauseDrawing()
 
 
-def drawLine(_pen):
+def drawLine(_pen) :
+    if config.drawLineAsEnvelope:
+        drawLinePolyEnvelope(_pen)
+    else :
+        drawLineSegments(_pen)
+
+
+def drawLinePolyEnvelope(_pen):
     # Draw the shape
     if _pen._p == 1 : 
         pieceLogger(f"Drawing Line with: {_pen.name}",4)
@@ -548,7 +555,7 @@ def drawLine(_pen):
             _sinOrthoAngle = math.sin(_orthoAngle)
             _cosOrthoAngle = math.cos(_orthoAngle)
 
-            _orthoD = _penWidth / 2
+            _orthoD = _penWidth / 2.2
 
 
             _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
@@ -632,10 +639,7 @@ def drawLine(_pen):
         # time.sleep(.5)
 
 
-
-
-
-def drawLine_older(_pen):
+def drawLineSegments(_pen):
     # Draw the shape
     # pieceLogger(f"pen {_pen.name}")
     _penSkip = random.random() <= _pen.drawingSkip
@@ -682,9 +686,6 @@ def drawLine_older(_pen):
             _pen._w += round(1 * _pen.incrementFactor)
         if _pen.attenuating:
             _pen._w -= round(1 * _pen.incrementFactor)
-
-
-
 
 
 def drawLineStopped():
@@ -1175,6 +1176,8 @@ def _load_drawing_configs(config):
 
     config.noPenGrays = 0.0
     config.nobgGrays = 0.0
+
+    config.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=True)
 
     config.paletteSets = []
     paletteSets = workConfig.get("drawingField", "paletteSets").split(",")

@@ -529,7 +529,7 @@ def drawLine(_pen) :
 def drawLinePolyEnvelope(_pen):
     # Draw the shape
     if _pen._p == 1 : 
-        pieceLogger(f"Drawing Line with: {_pen.name}",4)
+        pieceLogger(f"Drawing Line with: {_pen.name}")
         # { _pen.drawingSkipProb}
     _penSkip = random.random() <= _pen.drawingSkipProb
 

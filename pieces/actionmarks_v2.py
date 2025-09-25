@@ -359,7 +359,8 @@ def generateLine(_pen):
     res = chaikins_corner_cutting(points, 2, ratio).tolist()
 
     # for lines, really need to handle the yOffset more carefully
-    if _pen.name in ["lineMarksVert","lineMarksVertTest"]:
+    # This has GOT to be a parameter ......
+    if _pen.name in ["lineMarksVert","lineMarksVertTest","lineMarksVertNarrow"]:
         _pen.yOffset = 0
 
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res)
@@ -367,7 +368,6 @@ def generateLine(_pen):
     # if random.random() < 0.5:
     #     _pen.smooth_points.reverse()
 
-   
 
 def generateCurve(_pen):
     width = _pen.drawingSize[0]
@@ -1177,7 +1177,7 @@ def _load_drawing_configs(config):
     config.noPenGrays = 0.0
     config.nobgGrays = 0.0
 
-    config.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=True)
+    config.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=False)
 
     config.paletteSets = []
     paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
@@ -1256,6 +1256,7 @@ def _load_drawing_configs(config):
         )
 
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
+        palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
 
         config.paletteSets.append(palette)
 

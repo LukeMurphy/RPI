@@ -18,6 +18,7 @@ from PIL import (
     ImageTk,
 )
 
+from modules.configuration import pieceLogger
 from modules.filters import ditherFilter
 from modules.filters import pixelSort
 
@@ -59,6 +60,7 @@ def key_handler(event):
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
+    pieceLogger("** Setting up the window and rendering in render.py",3)
     gc.enable()
 
     config.imageArrayForSaving = []

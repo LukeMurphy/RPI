@@ -160,6 +160,9 @@ def changePalettes():
     config.slownessFactor = config.activePalette.slownessFactor
 
     config.bgBoxRange = config.activePalette.bgBoxRange
+    config.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
+
+    pieceLogger(f"config.drawLineAsEnvelope {config.drawLineAsEnvelope}  {config.activePalette.drawLineAsEnvelope}")
 
 
 def initiateTransition():
@@ -520,7 +523,7 @@ def penLoopActions():
 
 
 def drawLine(_pen) :
-    if config.drawLineAsEnvelope:
+    if config.activePalette.drawLineAsEnvelope:
         drawLinePolyEnvelope(_pen)
     else :
         drawLineSegments(_pen)
@@ -1257,6 +1260,8 @@ def _load_drawing_configs(config):
 
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
+
+        pieceLogger(f"{palette.drawLineAsEnvelope}",4)
 
         config.paletteSets.append(palette)
 

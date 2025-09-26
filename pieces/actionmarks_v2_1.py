@@ -927,6 +927,14 @@ def initDrawings():
     config.usebgBoxProb = config.activePalette.usebgBoxProb
     config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
     config.doJitterProb = config.activePalette.doJitterProb
+    config.bgGlitchCyclesMin = config.activePalette.bgGlitchCyclesMin
+    config.bgGlitchCyclesMax = config.activePalette.bgGlitchCyclesMax
+    config.bgGlitchDisplacementHorizontal = config.activePalette.bgGlitchDisplacementHorizontal
+    config.bgGlitchDisplacementVertical = config.activePalette.bgGlitchDisplacementVertical
+
+
+
+
     startNewLine(_pen)
     doDrawingJitter()
 
@@ -1275,8 +1283,12 @@ def _load_drawing_configs(config):
         palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
         palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
         palette.slownessFactor = float(workConfig.get(_p, "slownessFactor", fallback="1.0"))
-        palette.doJitterProb  = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
 
+        palette.doJitterProb  = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
+        palette.bgGlitchCyclesMin = float(workConfig.get(_p, "bgGlitchCyclesMin", fallback=config.bgGlitchCyclesMin))
+        palette.bgGlitchCyclesMax = float(workConfig.get(_p, "bgGlitchCyclesMax", fallback=config.bgGlitchCyclesMax))
+        palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))
+        palette.bgGlitchDisplacementVertical = float(workConfig.get(_p, "bgGlitchDisplacementVertical", fallback=config.bgGlitchDisplacementVertical))
 
         palette.xOffsetRange = list(
             map(

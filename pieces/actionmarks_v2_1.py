@@ -162,8 +162,10 @@ def changePalettes():
 
     config.bgBoxRange = config.activePalette.bgBoxRange
     config.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
+    config.doJitterProb = config.activePalette.doJitterProb
 
     pieceLogger(f"config.drawLineAsEnvelope {config.drawLineAsEnvelope}  {config.activePalette.drawLineAsEnvelope}")
+    pieceLogger(f"config.doJitterProb {config.doJitterProb} ")
 
 
 def initiateTransition():
@@ -709,16 +711,23 @@ def drawLineStopped():
 
 
 def doDrawingJitter():
-    jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMin))
-    # print(f"jitterIterations {jitterIterations}")
-
+    jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
+    # pieceLogger(f"jitterIterations {jitterIterations} {config.jitterIterationsMax}")
+    # for _ in range(jitterIterations):
+    #     glitchBox(
+    #         config.image,
+    #         config.canvasWidth,
+    #         config.canvasHeight,
+    #         config.jitterIterationsHoriz,
+    #         config.jitterIterationsVert,
+    #     )
     for _ in range(jitterIterations):
         glitchBox(
-            config.image,
+            config.underLayer,
             config.canvasWidth,
             config.canvasHeight,
-            config.jitterIterationsHoriz,
-            config.jitterIterationsVert,
+            config.bgGlitchDisplacementHorizontal,
+            config.bgGlitchDisplacementVertical,
         )
 
 
@@ -917,6 +926,7 @@ def initDrawings():
     config.startNewLineProb = config.activePalette.startNewLineProb
     config.usebgBoxProb = config.activePalette.usebgBoxProb
     config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
+    config.doJitterProb = config.activePalette.doJitterProb
     startNewLine(_pen)
     doDrawingJitter()
 
@@ -966,6 +976,7 @@ def iterate():
 
     def maybe_bg_color_blocks_filling():
         if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing and not config.transitionStateHandler.inTransition:
+            # pieceLogger("Doing bg blocks")
             if config.doJitterWhenAddingBG:
                 doDrawingJitter()
             bgColorBlocksFilling(config)
@@ -976,6 +987,7 @@ def iterate():
 
     def maybe_do_drawing_jitter():
         if not config.doingDrawing and random.random() < config.doJitterProb / config.slownessFactor and not config.transitionStateHandler.inTransition:
+            # pieceLogger("Doing jitter")
             doDrawingJitter()
 
     maybe_change_drawing_mode()
@@ -1179,7 +1191,7 @@ def _load_filter_config(config):
 
 def _load_drawing_configs(config):
     """Loads color-related configuration parameters."""
-
+    config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.1))
     config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
     config.bgTileSizeWidthMin = float(workConfig.get("drawingField", "bgTileSizeWidthMin"))
     config.bgTileSizeWidthMax = float(workConfig.get("drawingField", "bgTileSizeWidthMax"))
@@ -1263,6 +1275,8 @@ def _load_drawing_configs(config):
         palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
         palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
         palette.slownessFactor = float(workConfig.get(_p, "slownessFactor", fallback="1.0"))
+        palette.doJitterProb  = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
+
 
         palette.xOffsetRange = list(
             map(
@@ -1379,13 +1393,10 @@ def _load_and_initialize_system(config):
     """Initializes the system and related parameters."""
     """Loads rendering-related configuration parameters."""
 
-    
-
     config.changeBGColorProb = float(workConfig.get("drawingField", "changeBGColorProb", fallback=0.001))
     config.totalResetTime = workConfig.getint("drawingField", "totalResetTime", fallback=33)
     config.totalResetTimeMaxMultiplier = float(workConfig.get("drawingField", "totalResetTimeMaxMultiplier", fallback=1.0))
     config.changeDrawingModeTime = float(workConfig.get("drawingField", "changeDrawingModeTime", fallback=100.0))
-    config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.1))
     config.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
     config.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
     config.jitterIterationsHoriz = workConfig.getint("drawingField", "jitterIterationsHoriz", fallback=2)

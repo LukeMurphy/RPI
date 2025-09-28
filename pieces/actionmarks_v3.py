@@ -305,10 +305,12 @@ def setPenColor(_pen):
 
     # pieceLogger(f"{config.activePalette.noPenGrays}")
 
+    _penAlpha = round(random.uniform(config.activePalette.penAlphaRange[0],config.activePalette.penAlphaRange[1]))
+
     if _pen.forcedPalette is None :
-        _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], config.penAlpha, config.brightness)
+        _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], _penAlpha, config.brightness)
     else :
-        _pen.lineColor = colorutils.getRandomColorHSV(_pen.forcedPalette[0], _pen.forcedPalette[1], _pen.forcedPalette[2], _pen.forcedPalette[3], _pen.forcedPalette[4], _pen.forcedPalette[5], _pen.forcedPalette[6], _pen.forcedPalette[7], config.penAlpha, config.brightness)
+        _pen.lineColor = colorutils.getRandomColorHSV(_pen.forcedPalette[0], _pen.forcedPalette[1], _pen.forcedPalette[2], _pen.forcedPalette[3], _pen.forcedPalette[4], _pen.forcedPalette[5], _pen.forcedPalette[6], _pen.forcedPalette[7], _penAlpha, config.brightness)
 
 
 def choosePenMark():
@@ -1232,9 +1234,9 @@ def _load_drawing_configs(config):
     config.paletteSets = []
     paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
 
-    for _p in paletteSets:
+    for _pRaw in paletteSets:
         palette = Palette()
-
+        _p = _pRaw.replace("\n", "")
         palette.bgBoxAlphaRange = tuple(
             map(
                 lambda x: int(x),
@@ -1338,15 +1340,29 @@ def _load_drawing_configs(config):
         palette.xOffsetRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(_p, "xOffsetRange").split(","),
+                workConfig.get(
+                    _p, "xOffsetRange", fallback=f"0,{config.canvasWidth}"
+                ).split(","),
             )
         )
         palette.yOffsetRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(_p, "yOffsetRange").split(","),
+                workConfig.get(
+                    _p, "yOffsetRange", fallback=f"0,{config.canvasHeight}"
+                ).split(","),
             )
         )
+        palette.penAlphaRange = list(
+            map(
+                lambda x: float(x),
+                workConfig.get(
+                    _p, "penAlphaRange", fallback=f"{config.penAlpha},{config.penAlpha}"
+                ).split(","),
+            )
+        )
+
+
 
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
@@ -1372,10 +1388,10 @@ def _load_pen_config(config):
 
     def _load_single_pen(_penConfigName):
         _mark = Mark()
-        _mark.name = f"{_penConfigName}"
+        _mark.name = f"{_penConfigName}".replace("\n", "")
 
         markConfig = configparser.ConfigParser()
-        pathToCfg = f"{config.assetPath}marks/{_penConfigName}.cfg"
+        pathToCfg = f"{config.assetPath}marks/{_mark.name}.cfg"
         pieceLogger(f"{pathToCfg}")
         markConfig.read(pathToCfg)
 
@@ -1441,6 +1457,7 @@ def _load_pen_config(config):
         return _mark
 
     _marksPath = _load_pen_config_globals(config)
+
     for _penConfigName in config.penNames:
         _mark = _load_single_pen( _penConfigName)
         config.marksPalette.append(_mark)

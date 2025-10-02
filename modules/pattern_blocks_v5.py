@@ -684,42 +684,42 @@ def circlesPacked(config, paletteObj=None):
     clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
     clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
     clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    # config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=clr)
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 
     numRows = config.numDotRows
-    boxWidth = round(config.blockWidth * config.circlesPackedSize)
-    dotWidth = boxWidth / 2
+    steps = 3
+    var = 8
+    overlap = (config.blockWidth / 4 - var)
+    dotWidth = (config.blockWidth - overlap - var) / 1
     outline = clr2
-    steps = 2
-    yPos = 0
-    numLines = config.blockWidth - 1
-    for i in range(4):
-        xPos = i * dotWidth * 1 - dotWidth / 2
-        for r in range(0, numLines, steps):
-            x0 = r - 1 + xPos
-            y0 = r - 1 + yPos
-            x1 = x0 + (dotWidth - 1) * r
-            y1 = y0 + (dotWidth - 1) * r
+    for _r in range(steps):
+        # xPos = i * dotWidth * 1 - dotWidth / 2
+        for _c in range(steps):
+            x0 = _c * (dotWidth) - dotWidth / 2 - _c * overlap - var
+            y0 = _r * (dotWidth) - dotWidth / 2 - _r * overlap - var
+            x1 = x0 + (dotWidth * 1)
+            y1 = y0 + (dotWidth * 1)
 
-            x1 = max(x1, x0)
-            y1 = max(y1, y0)
+            # x1 = max(x1, x0)
+            # y1 = max(y1, y0)
 
-            config.blockDraw.ellipse((x0, y0, x1, y1), outline=(outline), fill=clr1)
+            config.blockDraw.ellipse((x0, y0, x1, y1), outline=(outline), fill=None)
+            config.blockDraw.ellipse((x0 + 4, y0 + 4, x1 - 4, y1 -4), outline=(outline), fill=None)
 
-    yPos = 2 * dotWidth / 2 * math.sin(2 * math.pi / 6) + 2
+    # yPos = 2 * dotWidth / 2 * math.sin(2 * math.pi / 6) + 2
 
-    for i in range(4):
-        xPos = i * dotWidth * 1
-        for r in range(0, numLines, steps):
-            x0 = r - 1 + xPos
-            y0 = r - 1 + yPos
-            x1 = x0 + (dotWidth - 1) * r
-            y1 = y0 + (dotWidth - 1) * r
+    # for i in range(4):
+    #     xPos = i * dotWidth * 1
+    #     for r in range(0, numLines, steps):
+    #         x0 = r - 1 + xPos
+    #         y0 = r - 1 + yPos
+    #         x1 = x0 + (dotWidth - 1) * r
+    #         y1 = y0 + (dotWidth - 1) * r
 
-            x1 = max(x1, x0)
-            y1 = max(y1, y0)
+    #         x1 = max(x1, x0)
+    #         y1 = max(y1, y0)
 
-            # config.blockDraw.ellipse((x0,y0,x1,y1), outline=(outline), fill=clr1)
+    #         config.blockDraw.ellipse((x0,y0,x1,y1), outline=(outline), fill=clr1)
 
 
 def shingles(config, paletteObj=None):
@@ -1486,17 +1486,17 @@ def colorGrid(config, paletteObj=None):
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 
-    _divs = round(random.uniform(1,4))
-    _w = round(config.blockWidth/_divs)
-    _h = round(config.blockHeight/_divs)
+    _divs = round(random.uniform(1, 4))
+    _w = round(config.blockWidth / _divs)
+    _h = round(config.blockHeight / _divs)
 
-    for _r in range(_divs) :
-        for _c in range(_divs) :
-            clr = colorutils.getRandomColorHSV(0,360,.3,1.0,.3,.90,100,170,255,config.brightness)
-            if (_c % 2 == 0 or _r % 2 == 0) and random.random() < .5:
+    for _r in range(_divs):
+        for _c in range(_divs):
+            clr = colorutils.getRandomColorHSV(0, 360, 0.3, 1.0, 0.3, 0.90, 100, 170, 255, config.brightness)
+            if (_c % 2 == 0 or _r % 2 == 0) and random.random() < 0.5:
                 # rosetone ;)
-                clr = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
-            config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=None, fill=clr)
+                clr = colorutils.getRandomColorHSV(320, 355, 0.3, 1.0, 0.3, 0.90, 100, 170, 255, config.brightness)
+            config.blockDraw.rectangle((_c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=None, fill=clr)
 
 
 def colorGridTriangles(config, paletteObj=None):
@@ -1513,23 +1513,21 @@ def colorGridTriangles(config, paletteObj=None):
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 
-    _divs = round(random.uniform(1,4))
-    _w = round(config.blockWidth/_divs)
-    _h = round(config.blockHeight/_divs)
+    _divs = round(random.uniform(1, 4))
+    _w = round(config.blockWidth / _divs)
+    _h = round(config.blockHeight / _divs)
 
-    for _r in range(_divs) :
-        for _c in range(_divs) :
-            clr1 = colorutils.getRandomColorHSV(0,360,.3,1.0,.3,.90,100,170,255,config.brightness)
-            clr2 = colorutils.getRandomColorHSV(0,360,.3,1.0,.3,.90,100,170,255,config.brightness)
-            if (_c % 2 == 0 or _r % 2 == 0) and random.random() < .5:
+    for _r in range(_divs):
+        for _c in range(_divs):
+            clr1 = colorutils.getRandomColorHSV(0, 360, 0.3, 1.0, 0.3, 0.90, 100, 170, 255, config.brightness)
+            clr2 = colorutils.getRandomColorHSV(0, 360, 0.3, 1.0, 0.3, 0.90, 100, 170, 255, config.brightness)
+            if (_c % 2 == 0 or _r % 2 == 0) and random.random() < 0.5:
                 # rosetone ;)
-                clr1 = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
-                clr2 = colorutils.getRandomColorHSV(320,355,.3,1.0,.3,.90,100,170,255,config.brightness)
+                clr1 = colorutils.getRandomColorHSV(320, 355, 0.3, 1.0, 0.3, 0.90, 100, 170, 255, config.brightness)
+                clr2 = colorutils.getRandomColorHSV(320, 355, 0.3, 1.0, 0.3, 0.90, 100, 170, 255, config.brightness)
             # config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=(0,0,0,125), fill=clr)
-            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h + _h),( _c * _w, _r * _h + _h),(_c * _w, _r * _h)), outline=None, fill=clr1)
-            config.blockDraw.polygon(( (_c * _w, _r * _h),( _c * _w + _w, _r * _h),( _c * _w + _w, _r * _h + _h),(_c * _w, _r * _h)), outline=None, fill=clr2)
-
-
+            config.blockDraw.polygon(((_c * _w, _r * _h), (_c * _w + _w, _r * _h + _h), (_c * _w, _r * _h + _h), (_c * _w, _r * _h)), outline=None, fill=clr1)
+            config.blockDraw.polygon(((_c * _w, _r * _h), (_c * _w + _w, _r * _h), (_c * _w + _w, _r * _h + _h), (_c * _w, _r * _h)), outline=None, fill=clr2)
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -1656,9 +1654,9 @@ def petals(config, paletteObj=None):
     for _p in range(config.floral._petals):
         _floralImg.paste(_petalImg.rotate(_angle * _p), (0, 0), _petalImg.rotate(_angle * _p))
 
-    _sizeChange = random.uniform(.25,.85)
-    _newSize  = (round(config.blockWidth * _sizeChange), round(config.blockWidth * _sizeChange))
-    _floralTemp = _floralImg.resize((_newSize[0],_newSize[1]),1)
+    _sizeChange = random.uniform(0.25, 0.85)
+    _newSize = (round(config.blockWidth * _sizeChange), round(config.blockWidth * _sizeChange))
+    _floralTemp = _floralImg.resize((_newSize[0], _newSize[1]), 1)
     config.blockImage.paste(_floralTemp, (midPt[0], 0), _floralTemp)
     config.blockImage.paste(_floralTemp, (-midPt[0], 0), _floralTemp)
     config.blockImage.paste(_floralTemp, (0, midPt[1]), _floralTemp)

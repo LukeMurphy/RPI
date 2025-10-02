@@ -1076,8 +1076,9 @@ def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extr
     # _temp = _temp.crop((0,0,20,20))
     # disabling for a moment 2023-04-01
     _temp = _temp.rotate(90)
-    if config.patternModel == "circlesPacked":
-        extraOverlapx = round(config.blockWidth / 8)
+    # if config.patternModel == "circlesPacked":
+    #     extraOverlapx = round(config.blockWidth / 8)
+    #     extraOverlapy = round(config.blockWidth / 8)
 
     if config.patternModel in ["waveScales", "shellScales"]:
         _temp = _temp.rotate(-180)

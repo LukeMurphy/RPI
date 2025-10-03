@@ -673,6 +673,72 @@ def runningSpiral(config, paletteObj=None):
         p1[1] = p2[1]
 
 
+def chainLinks(config, paletteObj=None):
+    config.circlesPackedSize = 0.1
+
+    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    numRows = config.numDotRows
+    steps = 3
+    var = 8
+    overlap = config.blockWidth / 4 - var
+    dotWidth = (config.blockWidth - overlap - var) / 1
+    dotWidth = config.blockWidth
+    outline = clr2
+
+    _unitLength = 1 / 16 * config.blockWidth
+    _wd = 3
+    for _c in range(2):
+        x0 = _unitLength * 1 + _c * _unitLength * 8
+        y0 = _unitLength * 2
+        x1 = _unitLength * 5 + _c * _unitLength * 8
+        y1 = _unitLength * 6
+
+        config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=outline, width = _wd)
+        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, 0), fill=outline, width = _wd)
+        config.blockDraw.line((x1, y0 + 2 * _unitLength, x1, 0), fill=outline, width = _wd)
+
+        # 2nd link
+        x0 = _unitLength * 3 + _c * _unitLength * 8
+        y0 = _unitLength * 3
+        x1 = _unitLength * 7 + _c * _unitLength * 8
+        y1 = _unitLength * 7
+
+        config.blockDraw.arc((x0, y0, x1, y1), 180, 250, fill=clr3, width = _wd)
+        config.blockDraw.arc((x0, y0, x1, y1), 290, 0, fill=clr3, width = _wd)
+        # config.blockDraw.arc((x0, y0, x1, y1), 180, 0, fill=clr3, width = _wd)
+        # config.blockDraw.arc((x0, y0, x1, y1), 90, 0, fill=clr3, width = _wd)
+
+
+        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, _unitLength * 12), fill=clr3, width = _wd)
+        config.blockDraw.line((x1, y0 + 2 * _unitLength, x1, _unitLength * 12), fill=clr3, width = _wd)
+
+        x0 = _unitLength * 3 + _c * _unitLength * 8
+        y0 = _unitLength * 3 + _unitLength * 7
+        x1 = _unitLength * 7 + _c * _unitLength * 8
+        y1 = _unitLength * 7 + _unitLength * 7
+
+        config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=clr3, width = _wd)
+
+        x0 = _unitLength * 1 + _c * _unitLength * 8
+        y0 = _unitLength * 2 + _unitLength * 9
+        x1 = _unitLength * 5 + _c * _unitLength * 8
+        y1 = _unitLength * 6 + _unitLength * 9
+
+        config.blockDraw.arc((x0, y0, x1, y1), 180, 0, fill=outline, width = _wd)
+        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, _unitLength * 16), fill=outline, width = _wd)
+        config.blockDraw.line((x1, y0 + 3 * _unitLength, x1, _unitLength * 16), fill=outline, width = _wd)
+
+
+
 def circlesPacked(config, paletteObj=None):
     config.circlesPackedSize = 0.1
 
@@ -689,7 +755,7 @@ def circlesPacked(config, paletteObj=None):
     numRows = config.numDotRows
     steps = 3
     var = 8
-    overlap = (config.blockWidth / 4 - var)
+    overlap = config.blockWidth / 4 - var
     dotWidth = (config.blockWidth - overlap - var) / 1
     outline = clr2
     for _r in range(steps):
@@ -704,7 +770,7 @@ def circlesPacked(config, paletteObj=None):
             # y1 = max(y1, y0)
 
             config.blockDraw.ellipse((x0, y0, x1, y1), outline=(outline), fill=None)
-            config.blockDraw.ellipse((x0 + 4, y0 + 4, x1 - 4, y1 -4), outline=(outline), fill=None)
+            config.blockDraw.ellipse((x0 + 4, y0 + 4, x1 - 4, y1 - 4), outline=(outline), fill=None)
 
     # yPos = 2 * dotWidth / 2 * math.sin(2 * math.pi / 6) + 2
 

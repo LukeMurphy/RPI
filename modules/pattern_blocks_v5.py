@@ -548,6 +548,48 @@ def logcabinAlt2(config, paletteObj):
 # --------------------------------------- #
 
 
+def ropePattern(config, paletteObj=None):
+    # sourcery skip: use-itertools-product
+    w = 4
+    h = 4
+    x = config.xIncrementer
+    y = config.yIncrementer
+
+    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=clr1)
+
+    numPoints = round(config.blockWidth)
+    amplitude = config.blockWidth / 2 - 3
+    # yOffset = config.yOffset
+    yOffset = config.blockWidth / 2
+    steps = config.steps
+    rads = 2 * math.pi / numPoints
+    phase = 2/3 * math.pi
+    for _s in range(3):
+        for i in range(-1, numPoints + 2, 2):
+            angle1 = (i + config.xIncrementer ) * rads + _s * phase
+            angle2 = (i + config.xIncrementer + steps) * rads + _s * phase
+            a = (i, math.sin(angle1) * amplitude + yOffset)
+            c = (i + steps, math.sin(angle2) * amplitude + yOffset)
+            config.blockDraw.line((a, c), fill=clr2, width=6)
+
+    config.xIncrementer += config.xSpeed
+    config.yIncrementer += config.ySpeed
+
+    if config.xIncrementer >= config.blockWidth * 1:
+        config.xIncrementer = -0
+    if config.yIncrementer >= config.blockHeight - 4:
+        config.yIncrementer = 0
+
+
 def wavePattern2(config, paletteObj=None):
     # sourcery skip: use-itertools-product
     w = 4

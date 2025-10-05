@@ -694,49 +694,101 @@ def chainLinks(config, paletteObj=None):
     dotWidth = config.blockWidth
     outline = clr2
 
-    _unitLength = 1 / 16 * config.blockWidth
-    _wd = 3
-    for _c in range(2):
-        x0 = _unitLength * 1 + _c * _unitLength * 8
-        y0 = _unitLength * 2
-        x1 = _unitLength * 5 + _c * _unitLength * 8
-        y1 = _unitLength * 6
+    _unitLength = max(4,1 / 16 * config.blockWidth)
+    _wd = 4
+    for _c in range(4):
 
-        config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=outline, width = _wd)
-        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, 0), fill=outline, width = _wd)
-        config.blockDraw.line((x1, y0 + 2 * _unitLength, x1, 0), fill=outline, width = _wd)
+        _yOff = 0
+        if _c % 2 == 0:
+            _yOff = _unitLength * 2
+        x0 = _unitLength * 0 + _c * _unitLength * 4
+        y0 = _unitLength * -2 + _yOff
+        x1 = _unitLength * 4 + _c * _unitLength * 4
+        y1 = _unitLength * 2 + _yOff
+        config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=outline, width=_wd)
+        config.blockDraw.line((x0 + _wd / 2, y0 + 2 * _unitLength, x0 - _wd / 2, 0 - _wd / 2), fill=outline, width=_wd)
+        config.blockDraw.line((x1 + _wd / 2, y0 + 2 * _unitLength, x1 - _wd / 2, 0 - _wd / 2), fill=outline, width=_wd)
 
-        # 2nd link
-        x0 = _unitLength * 3 + _c * _unitLength * 8
-        y0 = _unitLength * 3
-        x1 = _unitLength * 7 + _c * _unitLength * 8
-        y1 = _unitLength * 7
+        x0 = _unitLength * 0 + _c * _unitLength * 4
+        y0 = _unitLength * 2 + _yOff
+        x1 = _unitLength * 4 + _c * _unitLength * 4
+        y1 = _unitLength * 6 + _yOff
+        config.blockDraw.arc((x0, y0, x1, y1), 180, 0, fill=outline, width=_wd)
+        config.blockDraw.line((x0, y0 + 1 * _unitLength + _wd / 2, x0, y1 + 1 * _unitLength + _wd / 2), fill=outline, width=_wd)
+        config.blockDraw.line((x1 - _wd / 2, y0 + 1 * _unitLength + _wd / 2, x1 - _wd / 2, y1 + 1 * _unitLength + _wd / 2), fill=outline, width=_wd)
 
-        config.blockDraw.arc((x0, y0, x1, y1), 180, 250, fill=clr3, width = _wd)
-        config.blockDraw.arc((x0, y0, x1, y1), 290, 0, fill=clr3, width = _wd)
-        # config.blockDraw.arc((x0, y0, x1, y1), 180, 0, fill=clr3, width = _wd)
-        # config.blockDraw.arc((x0, y0, x1, y1), 90, 0, fill=clr3, width = _wd)
+        config.blockDraw.rectangle((x0 + (x1 - x0) / 2 - _wd / 2 - 1, 
+                                    y0 - _unitLength * 3, 
+                                    x0 + (x1 - x0) / 2 + _wd / 2 + 0, 
+                                    y1 - _unitLength * 1), 
+                                    fill=(outline), outline=(clr1))
+        config.blockDraw.arc((x0 + (x1 - x0) / 2 - _wd / 2 - 0, 
+                              y0 - _wd * 3, 
+                              x0 + (x1 - x0) / 2 + _wd / 2 - 1, 
+                              y0 - _wd), 180, 0, fill=(outline), width=_wd)
+        config.blockDraw.arc((x0 + (x1 - x0) / 2 - _wd / 2 - 0, 
+                              y1  - _wd * 2, 
+                              x0 + (x1 - x0) / 2 + _wd / 2 - 1, 
+                              y1 - _wd), 0, 180, fill=(outline), width=_wd)
 
 
-        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, _unitLength * 12), fill=clr3, width = _wd)
-        config.blockDraw.line((x1, y0 + 2 * _unitLength, x1, _unitLength * 12), fill=clr3, width = _wd)
+        x0 = _unitLength * 0 + _c * _unitLength * 4
+        y0 = _unitLength * 5 + _yOff
+        x1 = _unitLength * 4 + _c * _unitLength * 4
+        y1 = _unitLength * 10 + _yOff
+        config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=outline, width=_wd)
+        # config.blockDraw.line((x1 - _wd/2, y0, x1- _wd/2, y1 - 1*_unitLength), fill=outline, width=_wd)
 
-        x0 = _unitLength * 3 + _c * _unitLength * 8
-        y0 = _unitLength * 3 + _unitLength * 7
-        x1 = _unitLength * 7 + _c * _unitLength * 8
-        y1 = _unitLength * 7 + _unitLength * 7
 
-        config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=clr3, width = _wd)
+        # 3rd link top
+        x0 = _unitLength * 0 + _c * _unitLength * 4
+        y0 = _unitLength * 3 + _unitLength * 7 + _yOff
+        x1 = _unitLength * 4 + _c * _unitLength * 4
+        y1 = _unitLength * 7 + _unitLength * 7 + _yOff
+        config.blockDraw.arc((x0, y0, x1, y1), 180, 0, fill=outline, width=_wd)
+        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, y1 + 3 * _unitLength), fill=outline, width=_wd)
+        config.blockDraw.line((x1 - _wd / 2, y0 + 2 * _unitLength, x1 - _wd / 2, y1 + 3 * _unitLength), fill=outline, width=_wd)
 
-        x0 = _unitLength * 1 + _c * _unitLength * 8
-        y0 = _unitLength * 2 + _unitLength * 9
-        x1 = _unitLength * 5 + _c * _unitLength * 8
-        y1 = _unitLength * 6 + _unitLength * 9
+        config.blockDraw.rectangle((x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2, y1 - _unitLength * 1), fill=(outline), outline=(clr1))
 
-        config.blockDraw.arc((x0, y0, x1, y1), 180, 0, fill=outline, width = _wd)
-        config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, _unitLength * 16), fill=outline, width = _wd)
-        config.blockDraw.line((x1, y0 + 3 * _unitLength, x1, _unitLength * 16), fill=outline, width = _wd)
+        config.blockDraw.arc((x0 + (x1 - x0) / 2 - _wd / 2 - 0, 
+                              y1 + _unitLength  + 1, 
+                              x0 + (x1 - x0) / 2 + _wd / 2 - 1, 
+                              y1 + _unitLength + _wd * 1), 180, 0, fill=(outline), width=_wd)
+        
+        config.blockDraw.arc((x0 + (x1 - x0) / 2 - _wd / 2 - 0, 
+                              _unitLength * 6 + _yOff, 
+                              x0 + (x1 - x0) / 2 + _wd / 2 - 1, 
+                              _unitLength * 6 + _yOff + _wd * 2), 180, 0, fill=(outline), width=_wd)
+        
+        config.blockDraw.arc((x0 + (x1 - x0) / 2 - _wd / 2 - 0, 
+                              _unitLength * 12 + _yOff, 
+                              x0 + (x1 - x0) / 2 + _wd / 2 - 1, 
+                              _unitLength * 12 + _yOff + _wd * 1), 0, 180, fill=(outline), width=_wd)
+        
 
+        # 3rd link shafts
+        # config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, _unitLength * 16), fill=outline, width=_wd)
+        # config.blockDraw.line((x1, y0 + 3 * _unitLength, x1, _unitLength * 16), fill=outline, width=_wd)
+
+        # # 2nd link top
+        # x0 = _unitLength * 3 + _c * _unitLength * 8
+        # y0 = _unitLength * 1
+        # x1 = _unitLength * 7 + _c * _unitLength * 8
+        # y1 = _unitLength * 5
+        # config.blockDraw.arc((x0, y0, x1, y1), 180, 250, fill=clr3, width=_wd + 1)
+        # config.blockDraw.arc((x0, y0, x1, y1), 290, 0, fill=clr3, width=_wd + 1)
+
+        # # 2nd link shafts
+        # config.blockDraw.line((x0 + 2, y0 + 2 * _unitLength, x0 + 2, _unitLength * 10), fill=clr3, width=_wd)
+        # config.blockDraw.line((x1 - 3, y0 + 2 * _unitLength, x1 - 3, _unitLength * 10), fill=clr3, width=_wd)
+
+        # # 2nd link bottom
+        # x0 = _unitLength * 3 + _c * _unitLength * 8
+        # y0 = _unitLength * 3 + _unitLength * 5
+        # x1 = _unitLength * 7 + _c * _unitLength * 8
+        # y1 = _unitLength * 7 + _unitLength * 5
+        # config.blockDraw.arc((x0, y0, x1, y1), 0, 180, fill=clr3, width=_wd)
 
 
 def circlesPacked(config, paletteObj=None):

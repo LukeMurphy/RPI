@@ -485,8 +485,8 @@ def loadAndSetupAllPalettes():
     argument = f"{config.path}/configs/{config.palettesConfigFile}"
     config.paletteConfig.read(argument)
 
-    config.palettes = config.paletteConfig.get("palettesIncluded", "palettes").split(",")
-    config.paletteConfigs = config.paletteConfig.get("palettesIncluded", "palettes").split(",")
+    config.palettes = config.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
+    config.paletteConfigs = config.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
 
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
     config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
@@ -782,13 +782,13 @@ def loadAndSetupPatterns():
 
 def loadAndSetCombinations():
     config.combinationSets = []
-    combinationSets = workConfig.get("movingpattern", "combinationSets").split(",")
+    combinationSets = workConfig.get("movingpattern", "combinationSets").replace("\n","").split(",")
     config.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
     for combinationSetName in combinationSets:
         comboSet = CombinationSet(combinationSetName)
-        comboSet.patterns = workConfig.get(combinationSetName, "patterns").split(",")
-        comboSet.palettes = workConfig.get(combinationSetName, "palettes").split(",")
-        comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").split(",")
+        comboSet.patterns = workConfig.get(combinationSetName, "patterns").replace("\n","").split(",")
+        comboSet.palettes = workConfig.get(combinationSetName, "palettes").replace("\n","").split(",")
+        comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").replace("\n","").split(",")
         comboSet.dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
         comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback="")
         comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
@@ -1076,7 +1076,7 @@ def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extr
     # _temp = _temp.crop((0,0,20,20))
     # disabling for a moment 2023-04-01
 
-    if config.patternModel not in ["ropePattern"]:
+    if config.patternModel not in ["ropePattern","littleCones"]:
         _temp = _temp.rotate(90)
     # if config.patternModel == "circlesPacked":
     #     extraOverlapx = round(config.blockWidth / 8)

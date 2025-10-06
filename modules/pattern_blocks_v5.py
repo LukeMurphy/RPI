@@ -14,6 +14,53 @@ import numpy as np
 import noise
 from noise import *
 
+'''
+Current List 2025-10-6
+fishScales3
+fishScales2
+fishScales
+gothic1
+gothic2
+balls
+balls_hili
+compass
+compass_hili
+randomizer
+randomizer2
+randomizer3
+wavePattern
+logcabin
+logcabinAlt1
+logcabinAlt2
+ropePattern
+wavePattern2
+runningSpiral
+chainLinks
+circlesPacked
+shingles
+shellScales
+ellipses
+waveScales
+circles
+tripart
+bars
+peaceCross
+fiboSeq
+logcabin
+littleCones
+coloredBlocks
+concentricBoxes
+decoBoxes
+diamond
+diagonalMove
+reMove
+grainLines
+colorGrid
+colorGridTriangles
+floralConfig
+petals
+
+'''
 
 def fishscalepatternFunction(func):
     """Decorator for fish scale pattern drawing functions.

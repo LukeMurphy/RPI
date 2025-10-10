@@ -29,6 +29,7 @@ _quitClr = "#74144c"
 _stopAllClr = "#9e1b67"
 
 _prodColor = "#e4fff3"
+_stagingColor = "#f2f219"
 _devFormsClr = "#3bdde2"
 _devClr = "#3bdde2"
 _devFormsClr = "#79fcf3"
@@ -255,6 +256,7 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
     key = list(item.keys())[0]
     ListBoxOfConfigs.itemconfig(END, bg=_prodColor if "prod" in key else "white")
+    ListBoxOfConfigs.itemconfig(END, bg=_stagingColor if "staging/" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devClr if "dev/" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "forms" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)

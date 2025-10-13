@@ -21,7 +21,7 @@ def colorSeparator(imageSection, xOffset, yOffset, config):
             _tempDraw.rectangle((_c+1,_r,_c+2,_r+2), fill = (0,_clr[1],0,255))
             _tempDraw.rectangle((_c+2,_r,_c+3,_r+2), fill = (0,0,_clr[2],255))
     
-    imageSection.paste(_temp)
+    # imageSection.paste(_temp)
     return imageSection
     
 

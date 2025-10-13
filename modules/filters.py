@@ -3,9 +3,27 @@ import random
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageFilter
 
+from modules.configuration import pieceLogger
+
 # lev = 0
 # levdiff = 1
 # unsharpMaskPercent = 100
+
+def colorSeparator(imageSection, xOffset, yOffset, config):
+    _size = imageSection.size
+    _temp = imageSection.copy()
+    _tempDraw = ImageDraw.Draw(_temp)
+    for _r in range(0,_size[1],2):
+        for _c in range(0,_size[0],3):
+            _clr = imageSection.getpixel((_c,_r))
+            # pieceLogger(_clr)
+            _tempDraw.rectangle((_c,_r,_c+1,_r+2), fill = (_clr[0],0,0,255))
+            _tempDraw.rectangle((_c+1,_r,_c+2,_r+2), fill = (0,_clr[1],0,255))
+            _tempDraw.rectangle((_c+2,_r,_c+3,_r+2), fill = (0,0,_clr[2],255))
+    
+    imageSection.paste(_temp)
+    return imageSection
+    
 
 
 def ditherFilter(renderImageFull, xOffset, yOffset, config):

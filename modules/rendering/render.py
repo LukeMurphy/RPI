@@ -21,6 +21,7 @@ from PIL import (
 from modules.configuration import pieceLogger
 from modules.filters import ditherFilter
 from modules.filters import pixelSort
+from modules.filters import colorSeparator
 
 # from tkVideoPlayer import TkinterVideo
 # from Tkinter import *
@@ -274,6 +275,24 @@ def relaunchOnChange(config):
         #     commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -mname studio -cfg "
             # os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
             # os.system(commadStringPyth + config.fileNameRaw + "&")
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+def _applyColorSep(xOffset = 0, yOffset = 0):
+    _colorSep(xOffset, yOffset)
+
+
+def _colorSep(xOffset = 0, yOffset = 0):
+    _tempImage = config.renderImageFull.copy()
+    _tempImage = colorSeparator(_tempImage, xOffset, yOffset, config)
+    _remapImageBlockSection = (0,0,200,200)
+    _remapImageBlockDestination = (0,0)
+    crop = _tempImage.crop(_remapImageBlockSection)
+    crop = crop.convert("RGBA")
+    config.renderImageFull.paste(crop, _remapImageBlockDestination, crop)
+
+
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -532,6 +551,10 @@ def render(
     # config.renderImageFull = enhancer.enhance(.75)
 
     _applyDitherFilter(xOffset, yOffset)
+
+    _applyColorSep(xOffset, yOffset)
+
+
 
     if config.usePixelSort and config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:
         config.renderImageFull = pixelSort(config.renderImageFull, config)

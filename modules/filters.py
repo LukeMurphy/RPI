@@ -9,21 +9,25 @@ from modules.configuration import pieceLogger
 # levdiff = 1
 # unsharpMaskPercent = 100
 
+
 def colorSeparator(imageSection, xOffset, yOffset, config):
     _size = imageSection.size
     _temp = imageSection.copy()
     _tempDraw = ImageDraw.Draw(_temp)
-    for _r in range(0,_size[1],2):
-        for _c in range(0,_size[0],3):
-            _clr = imageSection.getpixel((_c,_r))
+    _rowStep = 3
+    for _r in range(0, _size[1], _rowStep):
+        for _c in range(0, _size[0], 6):
+            _clr = imageSection.getpixel((_c, _r))
             # pieceLogger(_clr)
-            _tempDraw.rectangle((_c,_r,_c+1,_r+2), fill = (_clr[0],0,0,255))
-            _tempDraw.rectangle((_c+1,_r,_c+2,_r+2), fill = (0,_clr[1],0,255))
-            _tempDraw.rectangle((_c+2,_r,_c+3,_r+2), fill = (0,0,_clr[2],255))
-    
-    # imageSection.paste(_temp)
+            _tempDraw.rectangle((_c + 0, _r, _c + 1, _r + _rowStep), fill=(max(50,_clr[0]), 0, 0, 255))
+            _tempDraw.rectangle((_c + 1, _r, _c + 2, _r + _rowStep), fill=(max(50,_clr[0]), 0, 0, 255))
+            _tempDraw.rectangle((_c + 2, _r, _c + 3, _r + _rowStep), fill=(0, max(50,_clr[1]), 0, 255))
+            _tempDraw.rectangle((_c + 3, _r, _c + 4, _r + _rowStep), fill=(0, max(50,_clr[1]), 0, 255))
+            _tempDraw.rectangle((_c + 4, _r, _c + 5, _r + _rowStep), fill=(0, 0, max(50,_clr[2]), 255))
+            _tempDraw.rectangle((_c + 5, _r, _c + 6, _r + _rowStep), fill=(0, 0, max(50,_clr[2]), 255))
+
+    imageSection.paste(_temp)
     return imageSection
-    
 
 
 def ditherFilter(renderImageFull, xOffset, yOffset, config):
@@ -79,14 +83,8 @@ def ditherGlitch(renderImageFull, xOffset, yOffset, config):
     ## config.lev  config.ditherUnsharpMaskPercent etc are set in the default configuration.py file ..
     ## yes that is dirty but I'm in year 2.5 of this ball of mud ;)
 
-    im1 = renderImageFull.filter(
-        ImageFilter.GaussianBlur(radius=config.ditherBlurRadius)
-    )
-    im2 = im1.filter(
-        ImageFilter.UnsharpMask(
-            radius=config.lev, percent=config.ditherUnsharpMaskPercent, threshold=2
-        )
-    )
+    im1 = renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.ditherBlurRadius))
+    im2 = im1.filter(ImageFilter.UnsharpMask(radius=config.lev, percent=config.ditherUnsharpMaskPercent, threshold=2))
 
     #####    Paste to Render
     renderImageFull.paste(im2, (xOffset, yOffset))
@@ -198,34 +196,19 @@ def pixelSort(imageToModify, config):
                     # print(samplePoint,imageToModify.size[0],imageToModify.size[1])
 
                     # Just make sure the sample point is actually within the bounds of the image
-                    if (
-                        samplePoint[0] < imageToModify.size[0]
-                        and samplePoint[1] < imageToModify.size[1]
-                    ):
+                    if samplePoint[0] < imageToModify.size[0] and samplePoint[1] < imageToModify.size[1]:
                         colorSample = imageToModify.getpixel(samplePoint)
 
                         try:
                             # randomize brightness a little
-                            colorSampleColor = tuple(
-                                int(
-                                    round(
-                                        c
-                                        * random.uniform(
-                                            brightnessVarLow, brightnessVarHi
-                                        )
-                                    )
-                                )
-                                for c in colorSample
-                            )
+                            colorSampleColor = tuple(int(round(c * random.uniform(brightnessVarLow, brightnessVarHi))) for c in colorSample)
                         except Exception as e:
                             print(e)
                             print(colorSample)
 
                 # Once in a little while, the color is just random
                 if random.SystemRandom().random() < randomColorProbabilty:
-                    colorSampleColor = colorutils.getRandomRGB(
-                        random.SystemRandom().random()
-                    )
+                    colorSampleColor = colorutils.getRandomRGB(random.SystemRandom().random())
 
                 colorSampleColorAlpha = tuple(int(c) for c in colorSampleColor)
 
@@ -234,10 +217,7 @@ def pixelSort(imageToModify, config):
                 # print(colorSampleColorAlpha)
                 # Variable probability that the line will even draw. Lower probability means more
                 # glitchy lines
-                if (
-                    random.SystemRandom().random() < pixSortprobDraw
-                    and colorSampleColor != (0, 0, 0)
-                ):
+                if random.SystemRandom().random() < pixSortprobDraw and colorSampleColor != (0, 0, 0):
                     if pixSortDirection == "lateral":
                         tempDraw.line(
                             (
@@ -254,10 +234,7 @@ def pixelSort(imageToModify, config):
                                 i + pixSortxStart + pixSortXOffset,
                                 pixSortyStart + pixSortYOffset - varx,
                                 i + pixSortxStart + pixSortXOffset,
-                                pixSortyStart
-                                - varx
-                                + pixSortboxHeight
-                                + pixSortYOffset,
+                                pixSortyStart - varx + pixSortboxHeight + pixSortYOffset,
                             ),
                             fill=colorSampleColorAlpha,
                         )

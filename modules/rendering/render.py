@@ -16,6 +16,7 @@ from PIL import (
     ImageEnhance,
     ImageFilter,
     ImageTk,
+    ImageChops,
 )
 
 from modules.configuration import pieceLogger
@@ -286,11 +287,23 @@ def _applyColorSep(xOffset = 0, yOffset = 0):
 def _colorSep(xOffset = 0, yOffset = 0):
     _tempImage = config.renderImageFull.copy()
     _tempImage = colorSeparator(_tempImage, xOffset, yOffset, config)
-    _remapImageBlockSection = (0,0,200,200)
-    _remapImageBlockDestination = (0,0)
+    _remapImageBlockSection = (100,50,300,200)
+    _remapImageBlockDestination = (100,50)
     crop = _tempImage.crop(_remapImageBlockSection)
     crop = crop.convert("RGBA")
-    config.renderImageFull.paste(crop, _remapImageBlockDestination, crop)
+    _f = crop.filter(ImageFilter.DETAIL)
+    # _f = crop.filter(ImageFilter.SMOOTH)
+    # _f = crop.filter(ImageFilter.SMOOTH_MORE)
+    # _f = crop.filter(ImageFilter.EMBOSS)
+    # _f = crop.filter(ImageFilter.EDGE_ENHANCE)
+
+    # _f = crop.filter(ImageFilter.CONTOUR)
+    
+    # _f = ImageChops.add(crop,_f,2.5,0)
+    # _f = ImageChops.add(crop,_f,2.95,0)
+
+
+    config.renderImageFull.paste(_f, _remapImageBlockDestination, _f)
 
 
 
@@ -552,7 +565,8 @@ def render(
 
     _applyDitherFilter(xOffset, yOffset)
 
-    _applyColorSep(xOffset, yOffset)
+    # color separation filter - not really very interesting on led panels right now
+    # _applyColorSep(xOffset, yOffset)
 
 
 

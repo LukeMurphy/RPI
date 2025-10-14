@@ -563,10 +563,11 @@ def render(
     # enhancer = ImageEnhance.Brightness(config.renderImageFull)
     # config.renderImageFull = enhancer.enhance(.75)
 
-    _applyDitherFilter(xOffset, yOffset)
-
     # color separation filter - not really very interesting on led panels right now
     # _applyColorSep(xOffset, yOffset)
+
+    _applyDitherFilter(xOffset, yOffset)
+
 
 
 

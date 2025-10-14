@@ -14,7 +14,7 @@ def colorSeparator(imageSection, xOffset, yOffset, config):
     _size = imageSection.size
     _temp = imageSection.copy()
     _tempDraw = ImageDraw.Draw(_temp)
-    _rowStep = 3
+    _rowStep = 2
     for _r in range(0, _size[1], _rowStep):
         for _c in range(0, _size[0], 6):
             _clr = imageSection.getpixel((_c, _r))

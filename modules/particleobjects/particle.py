@@ -562,6 +562,7 @@ class Particle(object):
             )
 
     def changeColor(self):
+
         if self.changeColorOnChange == True:
             self.fillColor = colorutils.randomColor(random.random())
             self.outlineColor = colorutils.getRandomRGB()

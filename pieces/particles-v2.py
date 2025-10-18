@@ -775,7 +775,9 @@ def _update_background(config):
 def _update_particles(config, ps):
     if random.random() < config.paletteChangeProb:
         config.paletteIndex = math.floor(random.random() * len(config.palettes))
+        pieceLogger(f"New palette: {config.paletteIndex}")
         setColorsByPalette()
+
 
     for p in ps.unitArray:
         p.update()

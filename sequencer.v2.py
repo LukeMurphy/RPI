@@ -147,7 +147,8 @@ def _kill_old_players(sequenceConfig):
 def loadWorkConfig(work, sequenceConfig):
 
     workconfig = configparser.ConfigParser()
-    config = configuration.Config()
+    # config = configuration.Config()
+    config = configuration.ArtWorkConfig("SEQUENCER PLAYER")
     config.startTime = time.time()
     config.currentTime = time.time()
     config.reloadConfig = False
@@ -219,7 +220,9 @@ def loadSequenceFile():
         workconfig = configparser.ConfigParser()
 
         _loadSequencer_print_args("Inital Sequencer Arguments: \n", args)
-        sequenceConfig = configuration.Config()
+
+        # sequenceConfig = configuration.Config()
+        sequenceConfig = configuration.ArtWorkConfig("SEQUENCER")
         sequenceConfig.startTime = time.time()
         sequenceConfig.currentTime = time.time()
         sequenceConfig.MID = args.mname

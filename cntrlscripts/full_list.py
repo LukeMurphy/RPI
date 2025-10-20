@@ -46,7 +46,8 @@ class bcolors:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
-    
+
+
 """Summary
 
 Attributes:
@@ -103,7 +104,7 @@ def execute(configToRun):
     print("\n\n---------------------------------------------------------------------------------------")
     print("full_list.py app window is calling this to run: ")
     print(configToRun.split(configPath)[1])
-    
+
     """
     Summary
 	Args:vconfigToRun (TYPE): Description
@@ -125,8 +126,6 @@ def execute(configToRun):
         os.system(f"open {commadStringProc}{configToRun.split(configPath)[1]}")
         JavaAppRunning = configToRun.split(configPath)[1]
     print(f"---------------------------------------------------------------------------------------\n\n\n{bcolors.ENDC}")
-
-    
 
 
 def action():
@@ -190,7 +189,6 @@ def ondeck(arg):
     getAllConfigFiles(dateSort=True, subsortDate=True, filterText=arg)
 
 
-
 def returnFirstElement(arg):
     return arg[0]
 
@@ -228,10 +226,15 @@ def _get_config_files(configPath, filterText):
             if name.endswith(".cfg") and not name.endswith(".py") and name != ".DS_Store":
                 res = os.stat(fullPath)
                 if "asset_configs" not in fullPath and "/marks" not in fullPath and "/textures" not in fullPath and "/colors" not in fullPath:
-                    if not filterResults:
+                    if not filterResults and "non_working" not in fullPath:
                         fullList.append((fullPath, res.st_mtime, name))
                     elif name.find(filterText) > 0 or fullPath.find(filterText) > 0:
-                        fullList.append((fullPath, res.st_mtime, name))
+                        if (
+                            filterText == "non_working"
+                            and "non_working" in fullPath
+                            or "non_working" not in fullPath
+                        ):
+                            fullList.append((fullPath, res.st_mtime, name))
     return fullList
 
 
@@ -249,7 +252,6 @@ def _create_action_dict(fullList, dateSort, configPath):
         else:
             actionDict.append({"": ""})
     return actionDict
-
 
 
 def _update_listbox(ListBoxOfConfigs, item):
@@ -373,15 +375,16 @@ sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 # sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
 # -------------------------------- #
-ondeckButton = Button(root, text="By Form", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("forms"))
+ondeckButton = Button(root, text="non-working", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("non_working"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
-ondeckButton = Button(root, text="By Anim", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda:ondeck("animations"))
+
+ondeckButton = Button(root, text="Staging", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("staging"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 
-prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda:ondeck("prod"))
+prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda: ondeck("prod"))
 prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
-devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda:ondeck("dev"))
+devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda: ondeck("dev"))
 devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
 
 # -------------------------------- #
@@ -399,7 +402,6 @@ slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
 # -------------------------------- #
 quitbutton = Button(root, text="QUIT", width=120, bg=_quitClr, fg="white", borderless=1, command=quit)
 quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
-
 
 
 # -------------------------------- #

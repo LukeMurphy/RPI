@@ -32,9 +32,7 @@ class expandingRing:
     def initializeUnits(self):
         self.unitArray = []
         self.radius = 30 + round(random.uniform(10, 100))
-        self.numUnits = 6 + round(
-            random.uniform(config.numUnitsPerRingMin, config.numUnitsPerRingMax)
-        )
+        self.numUnits = 6 + round(random.uniform(config.numUnitsPerRingMin, config.numUnitsPerRingMax))
         self.radians = 2 * math.pi / self.numUnits
 
         for i in range(0, self.numUnits):
@@ -111,12 +109,8 @@ class unit:
         pass
 
     def transition(self):
-        self.fillColor = tuple(
-            round(a * self.config.brightness) for a in self.colOverlay.currentColor
-        )
-        fillColorTemp = tuple(
-            round(a * self.config.brightness) for a in self.colOverlay.currentColor
-        )
+        self.fillColor = tuple(round(a * self.config.brightness) for a in self.colOverlay.currentColor)
+        fillColorTemp = tuple(round(a * self.config.brightness) for a in self.colOverlay.currentColor)
 
     def reDraw(self):
         # self.config.draw.ellipse((self.xPos - self.boxWidth/2, self.yPos -self.boxHeight/2, self.xPos + self.boxWidth/2, self.yPos + self.boxHeight/2), fill=self.colorTuple)
@@ -124,9 +118,7 @@ class unit:
 
         xPos = round(self.length * math.cos(self.angle)) + self.xPos
         yPos = round(self.length * math.sin(self.angle)) + self.yPos
-        self.config.draw.line(
-            [(self.xPos, self.yPos), (xPos, yPos)], fill=self.colorTuple
-        )
+        self.config.draw.line([(self.xPos, self.yPos), (xPos, yPos)], fill=self.colorTuple)
         self.length += self.config.lineRate
 
         if self.length <= 0.0:
@@ -149,9 +141,7 @@ def runWork():
 def iterate():
     global config, expandingRingsRing, lastRate, calibrated, cycleCount
     # config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.draw.rectangle(
-        (0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, config.bgAlpha)
-    )
+    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0, 0, 0, config.bgAlpha))
     for ringGroup in config.ringSets:
         for ring in ringGroup["rings"]:
             ring.expand()
@@ -178,12 +168,8 @@ def main(run=True):
 
     config.redrawSpeed = float(workConfig.get("expandingRings", "redrawSpeed"))
     config.lineRate = float(workConfig.get("expandingRings", "lineRate"))
-    config.numUnitsPerRingMax = int(
-        workConfig.get("expandingRings", "numUnitsPerRingMax")
-    )
-    config.numUnitsPerRingMin = int(
-        workConfig.get("expandingRings", "numUnitsPerRingMin")
-    )
+    config.numUnitsPerRingMax = int(workConfig.get("expandingRings", "numUnitsPerRingMax"))
+    config.numUnitsPerRingMin = int(workConfig.get("expandingRings", "numUnitsPerRingMin"))
     config.bgAlpha = int(workConfig.get("expandingRings", "bgAlpha"))
     ringSets = workConfig.get("expandingRings", "ringSets")
     ringSets = ringSets.split(",")

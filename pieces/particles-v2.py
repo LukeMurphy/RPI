@@ -380,14 +380,6 @@ def main(run=True):
         config.filterRemapMaxHoriSize = 24
         config.filterRemapMaxVertSize = 24
 
-    try:
-        config.filterRemapminVertMinSize = int(workConfig.get("particleSystem", "filterRemapminVertMinSize"))
-        config.filterRemapminHoriMinSize = int(workConfig.get("particleSystem", "filterRemapminHoriMinSize"))
-    except Exception as e:
-        pieceLogger(e,1)
-        config.filterRemapminHoriMinSize = 4
-        config.filterRemapminVertMinSize = 4
-    # end try
 
     try:
         config.filterRemapRangeX = int(workConfig.get("particleSystem", "filterRemapRangeX"))
@@ -865,8 +857,8 @@ def remapDitherFilteredParts(config):
     # new version  more control but may require previous pieces to be re-worked
     startX = round(random.uniform(0, config.filterRemapRangeX))
     startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(config.filterRemapminHoriMinSize, config.filterRemapMaxHoriSize * 2))
-    endY = round(random.uniform(config.filterRemapminVertMinSize, config.filterRemapMaxVertSize * 2))
+    endX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize * 2))
+    endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize * 2))
     config.remapImageBlockSection = [
         startX,
         startY,

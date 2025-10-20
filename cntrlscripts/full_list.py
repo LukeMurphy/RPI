@@ -35,6 +35,7 @@ _devClr = "#3bdde2"
 _devFormsClr = "#79fcf3"
 _devOnDeckClr = "#ccFF00"
 _screenGridClr = "#eeeeee"
+_reference = "#edbeed"
 
 
 class bcolors:
@@ -185,8 +186,8 @@ def openFile():
         os.system(f"open {configSelected[list(configSelected.keys())[0]]}")
 
 
-def ondeck(arg):
-    getAllConfigFiles(dateSort=True, subsortDate=True, filterText=arg)
+def ondeck(arg, _dateSort=True, _subsortDate=True):
+    getAllConfigFiles(dateSort=_dateSort, subsortDate=_subsortDate, filterText=arg)
 
 
 def returnFirstElement(arg):
@@ -225,15 +226,11 @@ def _get_config_files(configPath, filterText):
             fullPath = os.path.join(root, name)
             if name.endswith(".cfg") and not name.endswith(".py") and name != ".DS_Store":
                 res = os.stat(fullPath)
-                if "asset_configs" not in fullPath and "/marks" not in fullPath and "/textures" not in fullPath and "/colors" not in fullPath:
+                if "asset_configs" not in fullPath and "/marks" not in fullPath and "/textures" not in fullPath and "/colors" not in fullPath and "/disturbances" not in fullPath:
                     if not filterResults and "non_working" not in fullPath:
                         fullList.append((fullPath, res.st_mtime, name))
                     elif name.find(filterText) > 0 or fullPath.find(filterText) > 0:
-                        if (
-                            filterText == "non_working"
-                            and "non_working" in fullPath
-                            or "non_working" not in fullPath
-                        ):
+                        if filterText == "non_working" and "non_working" in fullPath or "non_working" not in fullPath:
                             fullList.append((fullPath, res.st_mtime, name))
     return fullList
 
@@ -263,6 +260,7 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "forms" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_screenGridClr if "screen_grid" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_reference if "reference-configs" in key else None)
 
 
 # -------------------------------- #
@@ -363,22 +361,22 @@ sortbutton2 = Button(
 )
 sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 
-# sortbutton3 = Button(
-#     root,
-#     text="Sort by Folder+",
-#     width=120,
-#     bg=_defaultClr,
-#     fg="white",
-#     borderless=1,
-#     command=sortByFolderAndDate,
-# )
-# sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
+sortbutton3 = Button(
+    root,
+    text="Sort by Folder+",
+    width=120,
+    bg=_defaultClr,
+    fg="white",
+    borderless=1,
+    command=sortByFolderAndDate,
+)
+sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
 # -------------------------------- #
 ondeckButton = Button(root, text="non-working", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("non_working"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 
-ondeckButton = Button(root, text="Staging", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("staging"))
+ondeckButton = Button(root, text="Staging", width=120, bg=_stagingColor, fg="#000000", borderless=1, command=lambda: ondeck("staging"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 
 prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda: ondeck("prod"))
@@ -386,6 +384,9 @@ prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda: ondeck("dev"))
 devButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 200)
+
+refButton = Button(root, text="Reference", width=120, bg=_reference, fg="#000000", borderless=1, command=lambda: ondeck("reference", False))
+refButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
 
 # -------------------------------- #
 slogan = Button(
@@ -397,11 +398,11 @@ slogan = Button(
     borderless=1,
     command=stopAll,
 )
-slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
+slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
 # -------------------------------- #
 quitbutton = Button(root, text="QUIT", width=120, bg=_quitClr, fg="white", borderless=1, command=quit)
-quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
+quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 275)
 
 
 # -------------------------------- #

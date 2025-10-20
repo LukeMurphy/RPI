@@ -367,14 +367,18 @@ def main(run=True):
     try:
         config.filterRemapping = workConfig.getboolean("particleSystem", "filterRemapping")
         config.filterRemappingProb = float(workConfig.get("particleSystem", "filterRemappingProb"))
-        config.filterRemapminHoriSize = int(workConfig.get("particleSystem", "filterRemapminHoriSize"))
-        config.filterRemapminVertSize = int(workConfig.get("particleSystem", "filterRemapminVertSize"))
+        config.filterRemapMinHoriSize = int(workConfig.get("particleSystem", "filterRemapMinHoriSize"))
+        config.filterRemapMaxHoriSize = int(workConfig.get("particleSystem", "filterRemapMaxHoriSize"))
+        config.filterRemapMinVertSize = int(workConfig.get("particleSystem", "filterRemapMinVertSize"))
+        config.filterRemapMaxVertSize = int(workConfig.get("particleSystem", "filterRemapMaxVertSize"))
     except Exception as e:
         pieceLogger(e,1)
         config.filterRemapping = False
         config.filterRemappingProb = 0.0
-        config.filterRemapminHoriSize = 24
-        config.filterRemapminVertSize = 24
+        config.filterRemapMinHoriSize = 24
+        config.filterRemapMinVertSize = 24
+        config.filterRemapMaxHoriSize = 24
+        config.filterRemapMaxVertSize = 24
 
     try:
         config.filterRemapminVertMinSize = int(workConfig.get("particleSystem", "filterRemapminVertMinSize"))
@@ -861,8 +865,8 @@ def remapDitherFilteredParts(config):
     # new version  more control but may require previous pieces to be re-worked
     startX = round(random.uniform(0, config.filterRemapRangeX))
     startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(config.filterRemapminHoriMinSize, config.filterRemapminHoriSize * 2))
-    endY = round(random.uniform(config.filterRemapminVertMinSize, config.filterRemapminVertSize * 2))
+    endX = round(random.uniform(config.filterRemapminHoriMinSize, config.filterRemapMaxHoriSize * 2))
+    endY = round(random.uniform(config.filterRemapminVertMinSize, config.filterRemapMaxVertSize * 2))
     config.remapImageBlockSection = [
         startX,
         startY,

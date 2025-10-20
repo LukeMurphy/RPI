@@ -154,7 +154,7 @@ def action2():
 
 
 def clear():
-    T.delete("1.0", "1.20")
+    Txt.delete("1.0", "1.20")
 
 
 def stopAll():
@@ -164,12 +164,12 @@ def stopAll():
 
 
 def sortByDate():
-    filterText = T.get("1.0", "end-1c")
+    filterText = Txt.get("1.0", "end-1c")
     getAllConfigFiles(True, False, filterText)
 
 
 def sortByFolder():
-    filterText = T.get("1.0", "end-1c")
+    filterText = Txt.get("1.0", "end-1c")
     getAllConfigFiles(False, False, filterText)
 
 
@@ -404,8 +404,8 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
 # -------------------------------- #
 # Filter text box
-T = Text(root, height=1, width=32, bg="white", fg="black", bd=False, padx=4, pady=4)
-T.place(bordermode=OUTSIDE, x=2, y=2)
+Txt = Text(root, height=1, width=32, bg="white", fg="black", bd=False, padx=4, pady=4)
+Txt.place(bordermode=OUTSIDE, x=2, y=2)
 clearButton = Button(
     root,
     text="Clear",

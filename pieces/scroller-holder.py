@@ -10,7 +10,7 @@ import sys
 import textwrap
 import time
 from collections import OrderedDict
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import coloroverlay, colorutils, continuous_scroller,  panelDrawing
 
 from modules.faderclass import FaderObj
@@ -244,11 +244,14 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
     hBuffer = config.imageBlockBuffer
     numberOfUnits = int(round(w / (widthImage + hBuffer)))
 
-    for i in range(0, numberOfUnits):
+    # pieceLogger(f"{widthImage}  {heightImage} {config.imageBlockImageLoaded}")
+
+    for i in range(numberOfUnits):
         x = i * (widthImage + hBuffer)
-        y = -5
+        y = config.yOffset
 
         tempImage = config.imageBlockImageLoaded.copy()
+        # tempImage = tempImage.resize((round(widthImage*.9),round(heightImage*.9)))
         tempEnhancer = ImageEnhance.Brightness(tempImage)
         tempImage = tempEnhancer.enhance(config.brightness)
 
@@ -266,7 +269,8 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
         clrBlockDraw.rectangle((0, 0, widthImage, heightImage), fill=clr)
 
         tempImage = ImageChops.multiply(clrBlock, tempImage)
-        imageRef.paste(tempImage, (x, y), tempImage)
+        if random.random() < config.imageDrawProb :
+            imageRef.paste(tempImage, (x, y), tempImage)
 
 
 def remakeScrollBlock(imageRef, direction):
@@ -297,7 +301,7 @@ def makeArrows(drawRef, direction=1):
         fill=config.bgBackGroundColor,
     )
 
-    for c in range(0, cols):
+    for c in range(cols):
         yArrowEnd = yStart  # yStart + arrowLength
         xArrowEnd = xStart + arrowLength
 
@@ -833,6 +837,7 @@ def configureImageScrolling():
     config.imageSpeed = float(workConfig.get("scroller", "imageSpeed"))
     config.imageBlockImage = workConfig.get("scroller", "imageBlockImage")
     config.imageBlockBuffer = int(workConfig.get("scroller", "imageBlockBuffer"))
+    config.imageDrawProb = float(workConfig.get("scroller", "imageDrawProb", fallback=1.0))
     config.imageBlockRemakeProb = float(
         workConfig.get("scroller", "imageBlockRemakeProb")
     )

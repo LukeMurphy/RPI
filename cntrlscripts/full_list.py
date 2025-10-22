@@ -255,7 +255,7 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
     key = list(item.keys())[0]
     ListBoxOfConfigs.itemconfig(END, bg=_prodColor if "prod" in key else "white")
-    ListBoxOfConfigs.itemconfig(END, bg=_stagingColor if "staging/" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_stagingColor if "staging" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devClr if "dev/" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "forms" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)

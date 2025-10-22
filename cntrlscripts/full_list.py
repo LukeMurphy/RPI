@@ -28,14 +28,14 @@ _stopAndRun = "#0277ed"
 _quitClr = "#74144c"
 _stopAllClr = "#9e1b67"
 
-_prodColor = "#e4fff3"
+_prodColor = "#85f3d6"
 _stagingColor = "#f2f219"
 _devFormsClr = "#3bdde2"
-_devClr = "#3bdde2"
+_devClr = "#cef7f8"
 _devFormsClr = "#79fcf3"
 _devOnDeckClr = "#ccFF00"
 _screenGridClr = "#eeeeee"
-_reference = "#edbeed"
+_reference = "#adc4fd"
 
 
 class bcolors:

@@ -10,8 +10,10 @@ import sys
 import textwrap
 import time
 from collections import OrderedDict
+
+from matplotlib.pyplot import pie
 from modules.configuration import bcolors, pieceLogger
-from modules import coloroverlay, colorutils, continuous_scroller,  panelDrawing
+from modules import coloroverlay, colorutils, continuous_scroller, panelDrawing
 
 from modules.faderclass import FaderObj
 from PIL import (
@@ -57,6 +59,7 @@ def glitchBox(img, r1=-10, r2=10, dir="horizontal"):
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+
 
 ## Layer imagery
 def makeDaemonMessages(imageRef, direction=1):
@@ -162,13 +165,9 @@ def makeDaemonMessages(imageRef, direction=1):
     messageString = ""
 
     if config.sansSerif:
-        font = ImageFont.truetype(
-            config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
-        )
+        font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
     else:
-        font = ImageFont.truetype(
-            config.path + "/assets/fonts/freefont/FreeSerifBold.ttf", config.fontSize
-        )
+        font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSerifBold.ttf", config.fontSize)
 
     for i in range(0, 4):
         adj = arrayToUse[1][int(math.floor(random.uniform(0, 7)))]
@@ -179,15 +178,11 @@ def makeDaemonMessages(imageRef, direction=1):
 
     if random.random() < 0.15:
         messageString = ""
-        font = ImageFont.truetype(
-            config.path + "/assets/fonts/freefont/FreeSans.ttf", config.fontSize
-        )
+        font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSans.ttf", config.fontSize)
         for i in range(0, 23):
             xo = "X" if (random.random() < 0.5) else "O"
             messageString = messageString + xo
-            messageString = (
-                messageString + " " if (random.random() < 0.5) else messageString
-            )
+            messageString = messageString + " " if (random.random() < 0.5) else messageString
 
     if config.colorMode == "getRandomRGB":
         clr = colorutils.getRandomRGB(config.brightness)
@@ -203,8 +198,8 @@ def makeDaemonMessages(imageRef, direction=1):
     draw = ImageDraw.Draw(tempImage)
 
     # pixLen = draw.textsize(messageString, font=font)
-    
-    pixLen = [100,10]
+
+    pixLen = [100, 10]
     # For some reason textsize is not getting full height !
     fontHeight = int(pixLen[1] * 1.3)
 
@@ -261,15 +256,13 @@ def makeScrollBlock(imageRef, imageDrawRef, direction):
         # Color overlay on b/w PNG sprite
         # EVERYTHING HAS TO BE PNG  / have ALPHA
         if config.useTransparentImages == True:
-            clr = colorutils.randomColorAlpha(
-                brtns=config.brightness, maxTransparency=200
-            )
+            clr = colorutils.randomColorAlpha(brtns=config.brightness, maxTransparency=200)
         else:
             clr = colorutils.randomColor()
         clrBlockDraw.rectangle((0, 0, widthImage, heightImage), fill=clr)
 
         tempImage = ImageChops.multiply(clrBlock, tempImage)
-        if random.random() < config.imageDrawProb :
+        if random.random() < config.imageDrawProb:
             imageRef.paste(tempImage, (x, y), tempImage)
 
 
@@ -361,24 +354,20 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
     # draw the message to get its size
     if config.sansSerif:
-        font = ImageFont.truetype(
-            config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
-        )
+        font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
     else:
-        font = ImageFont.truetype(
-            config.path + "/assets/fonts/freefont/FreeSerifBold.ttf", config.fontSize
-        )
+        font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSerifBold.ttf", config.fontSize)
 
     tempImage = Image.new("RGBA", (1200, 196))
     draw = ImageDraw.Draw(tempImage)
     # pixLen = draw.textsize(messageString, font=font)
     pixelLength = int(draw.textlength(messageString, font=font))
-    
+
     print(pixelLength)
     # For some reason textsize is not getting full height !
-    pixLen = [pixelLength + 2,config.fontSize]
+    pixLen = [pixelLength + 2, config.fontSize]
     fontHeight = int(pixLen[1] * 1.3)
-    
+
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
     # make a new image with the right size
     scrollImage = Image.new("RGBA", (pixLen[0] + 2, fontHeight))
@@ -414,311 +403,357 @@ def remakeMessage(imageRef, messageString="FooBar", direction=1):
 
 
 def makeBackGround(drawRef, n=1):
-    rows = config.patternRows * 1
-    cols = config.patternCols * 1
+    def _draw_background(drawRef, cols, xDiv, steps):
+        drawRef.rectangle((0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight), fill=config.bgBackGroundColor)
+        rDelta = (config.bgBackGroundEndColor[0] - config.bgBackGroundColor[0]) / steps
+        gDelta = (config.bgBackGroundEndColor[1] - config.bgBackGroundColor[1]) / steps
+        bDelta = (config.bgBackGroundEndColor[2] - config.bgBackGroundColor[2]) / steps
+        xPos = 0
+        transitionCount = 0
+        config.patternLengthTransition = 8
+        lengthDelta = round((xDiv - config.currentPatternLength) / config.patternLengthTransition)
+        patternLength = xDiv
+        for c in range(cols):
+            rCol = config.bgBackGroundColor[0] + rDelta
+            gCol = config.bgBackGroundColor[1] + gDelta
+            bCol = config.bgBackGroundColor[2] + bDelta
+            config.bgBackGroundColor = (rCol, gCol, bCol)
+            fillClr = (
+                (round(config.bgBackGroundEndColor[0] - rDelta * (c + 1))),
+                (round(config.bgBackGroundEndColor[1] - gDelta * (c + 1))),
+                (round(config.bgBackGroundEndColor[2] - bDelta * (c + 1))),
+                200,
+            )
+            w = patternLength
+            outline = None
+            if c < 0:
+                outline = (255, 0, 0, 200)
+            drawRef.rectangle((xPos, 0, xPos + w, config.canvasHeight), fill=fillClr, outline=outline)
+            xPos += w
+            if transitionCount < config.patternLengthTransition - 1:
+                transitionCount += 1
+            else:
+                patternLength = xDiv
+        config.bgBackGroundColor = config.bgBackGroundEndColor
 
-    xDiv = round(
-        (config.displayRows * config.canvasWidth) / cols
-    )  # - config.patternColsOffset
-
-    xDiv = (
-        2 * config.canvasWidth * config.displayCols/ cols 
-    ) 
-
-    yDiv = (
-        config.canvasHeight / rows
-    ) / config.displayRows  # - config.patternRowsOffset
-
-
-    gap = 0
-    steps = cols
-    config.arrowBgBackGroundColor = (0, 0, 0, 20)  # colorutils.getRandomColor()
-    colorChange = False
-
-    # Background setup
-    '''
-    '''
-    drawRef.rectangle(
-        (0, 0, (round(config.displayRows * config.canvasWidth)), config.canvasHeight),
-        fill=config.bgBackGroundColor)
-
-    ## The multiplier is actually a factor of the number of rows
-    ## but, generally so far only using two rows ....
-    rDelta = ((config.bgBackGroundEndColor[0] - config.bgBackGroundColor[0]) / steps)
-    gDelta = ((config.bgBackGroundEndColor[1] - config.bgBackGroundColor[1]) / steps)
-    bDelta = ((config.bgBackGroundEndColor[2] - config.bgBackGroundColor[2]) / steps)
-
-    xPos = 0 
-    transitionCount = 0 
-    config.patternLengthTransition = 8
-    lengthDelta = round((xDiv - config.currentPatternLength ) / config.patternLengthTransition)
-    patternLength = xDiv
-
-    for c in range(0, cols):
-        columnOffset = 0
-
-        rCol = config.bgBackGroundColor[0] + rDelta
-        gCol = config.bgBackGroundColor[1] + gDelta
-        bCol = config.bgBackGroundColor[2] + bDelta
-        config.bgBackGroundColor = (rCol, gCol, bCol)
-
-        ### Because the way the pattern draws the left end is actually the end color
-        ### so need to reverse the color gradient ....
-
-        fillClr = (
-            (round(config.bgBackGroundEndColor[0] - rDelta * (c + 1))),
-            (round(config.bgBackGroundEndColor[1] - gDelta * (c + 1))),
-            (round(config.bgBackGroundEndColor[2] - bDelta * (c + 1))),
-            200,
-        )
-
-        w = patternLength
-
-        outline = None
-        if c < 0 :
-            outline=(255,0,0,200)
-
-        drawRef.rectangle((xPos,0,xPos+w,config.canvasHeight), fill = fillClr, outline=outline)
-        xPos += w
-
-        if transitionCount < config.patternLengthTransition-1 : 
-            #print(config.currentPatternLength,xDiv,lengthDelta)
-            transitionCount += 1
-            #patternLength += lengthDelta
-        else :
-            patternLength = xDiv
-
-
-    config.bgBackGroundColor = config.bgBackGroundEndColor
-
-    # Foreground setup
-
-    rowMultiplier = 1
-    colMultiplier = 1
-
-    if config.pattern == "bricks":
+    def _draw_foreground(drawRef, rows, cols, xDiv, yDiv, steps):
         rowMultiplier = 1
         colMultiplier = 1
-
-    if config.pattern == "regularLines":
-        rowMultiplier = 2
-        colMultiplier = 1
-
-    if config.pattern == "pluses":
-        rowMultiplier = 2
-        colMultiplier = 1
-
-    if config.pattern == "diamonds":
-        rowMultiplier = 2
-        colMultiplier = 2
-
-    
-    ## The multiplier is actually a factor of the number of rows
-    ## but, generally so far only using two rows ....
-    rDelta = ((config.patternEndColor[0] - config.patternColor[0]) / steps)
-    gDelta = ((config.patternEndColor[1] - config.patternColor[1]) / steps)
-    bDelta = ((config.patternEndColor[2] - config.patternColor[2]) / steps)
-
-    xPos = 0
-    xStart = 0
-    yStart = 0
-    transitionCount = 0 
-    config.patternLengthTransition = 8
-    lengthDelta = round((xDiv - config.currentPatternLength ) / config.patternLengthTransition)
+        if config.pattern == "bricks":
+            rowMultiplier = 1
+            colMultiplier = 1
+        elif config.pattern == "diamonds":
+            rowMultiplier = 2
+            colMultiplier = 2
+        elif config.pattern == "harelequin":
+            rowMultiplier = 2
+            colMultiplier = 2
+        elif config.pattern in ["regularLines", "pluses"]:
+            rowMultiplier = 2
+            colMultiplier = 1
 
 
-    for c in range(0, cols+1):
-        
-        columnOffset = 0
+        rDelta = (config.patternEndColor[0] - config.patternColor[0]) / steps
+        gDelta = (config.patternEndColor[1] - config.patternColor[1]) / steps
+        bDelta = (config.patternEndColor[2] - config.patternColor[2]) / steps
 
-        rCol = config.patternColor[0] + rDelta
-        gCol = config.patternColor[1] + gDelta
-        bCol = config.patternColor[2] + bDelta
-        config.patternColor = (rCol, gCol, bCol)
-
-        ### Because the way the pattern draws the left end is actually the end color
-        ### so need to reverse the color gradient ....
-
-        fillClr = (
-            (round(config.patternEndColor[0] - rDelta * (c + 1))),
-            (round(config.patternEndColor[1] - gDelta * (c + 1))),
-            (round(config.patternEndColor[2] - bDelta * (c + 1))),
-            225,
-        )
-        
-        #drawRef.rectangle((0, 0, 0 + 1, config.canvasHeight), fill = None, outline = (255,0,0,255))
-
-        # length transition
-        patternLength = xDiv
-
-        for r in range(0, rows):
-            columnOffset = 0
-            if r == 0 or r == 2 or r == 4 or r == 6:
-                columnOffset = xDiv
-
-            if r / 2 % 2 == 0:
-                columnOffset = xDiv
-
-            if random.random() < config.patternDrawProb or c == 0:
-
-                if config.pattern == "test":
-                    drawRef.rectangle((xPos,5,xPos+4,55), fill = fillClr)
-
-                if random.random() < config.redGreenSwapProb: 
-                    fillClr = (fillClr[1],fillClr[0],fillClr[2])
-
-                if random.random() < config.redBlueSwapProb: 
-                    fillClr = (fillClr[2],fillClr[1],fillClr[0])
-
-                if random.random() < config.greenBlueSwapProb: 
-                    fillClr = (fillClr[0],fillClr[2],fillClr[1])
-
-                if config.pattern == "diamonds":
-                    poly = []
-                    poly.append((xStart, yStart + yDiv))
-                    poly.append((xStart + xDiv, yStart))
-                    poly.append((xStart + xDiv + xDiv, yStart + yDiv))
-                    poly.append((xStart + xDiv, yStart + yDiv + yDiv))
-                    drawRef.polygon(poly, fill=fillClr)
-                    # if(n ==2) : color = (100,200,0,255)
-
-                if config.pattern == "bricks":
-                    length = xDiv
-                    #xPos = xStart + columnOffset
-                    yPos = yStart
-                    drawRef.rectangle(
-                        (xPos+ columnOffset, yPos, xPos+ columnOffset + length, yPos + yDiv),
-                        fill=fillClr,
-                        outline=None,
-                    )
-
-                if config.pattern == "pluses":
-                    length = xDiv
-                    height = xDiv / 2
-
-                    #xPos = xStart + columnOffset
-                    yPos = yStart
-
-                    xPos2 = xPos + round(length / 2 - height / 2)
-                    yPos2 = round(yPos - length / 2 + height / 2)
-
-                    drawRef.rectangle(
-                        (xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv),
-                        fill=fillClr,
-                        outline=None,
-                    )
-                    drawRef.rectangle(
-                        (xPos2, yPos2, xPos2 + height, yPos2 + length),
-                        fill=fillClr,
-                        outline=None,
-                    )
-        
-                if config.pattern == "regularLines":
-                    length = patternLength
-                    #xPos = xStart + columnOffset
-                    yPos = yStart
-                    drawRef.rectangle((xPos+ columnOffset, yPos, xPos + length+ columnOffset, yPos + yDiv), fill = fillClr)
-
-                
-                if config.pattern == "lines":
-                    # if (r%2 > 0):
-                    length = int(round(random.uniform(1, 2 * xDiv)))
-                    offset = int(round(random.uniform(0, 4 * xDiv)))
-
-                    if random.random() < 0.5:
-                        drawRef.rectangle(
-                            (xStart, yStart, xStart + 2 * xDiv, yStart + yDiv),
-                            fill=fillClr,
-                            outline=None,
-                        )
-                    else:
-                        drawRef.rectangle(
-                            (
-                                xStart + offset,
-                                yStart,
-                                xStart + length + offset,
-                                yStart + yDiv,
-                            ),
-                            fill=fillClr,
-                            outline=None,
-                        )
-
-                
-            yStart += rowMultiplier * yDiv
-
-        if transitionCount < config.patternLengthTransition-1 : 
-            #print(config.currentPatternLength,xDiv,lengthDelta)
-            transitionCount += 1
-            #patternLength += lengthDelta
-        else :
-            config.currentPatternLength = xDiv
-
-        
-        if config.pattern == "lines":
-            xStart += colMultiplier * xDiv
-        else:
-            xStart += xDiv * 2
-        xPos += xDiv
+        xPos = 0
+        xStart = 0
         yStart = 0
+        transitionCount = 0
+        config.patternLengthTransition = 8
+        lengthDelta = round((xDiv - config.currentPatternLength) / config.patternLengthTransition)
+
+        harlequin = ((190, 0, 80, 255), (190, 153, 10, 255), (72, 54, 180, 255), (25, 108, 100, 255))
+        harlequinCount = 0
+        gap = 2
+        _c1 = harlequin[0]
+        _c2 = harlequin[1]
+        _c3 = harlequin[2]
+        _c4 = harlequin[3]
+
+        for c in range(cols + 1):
+            _c4 = harlequin[3]
+            rCol = config.patternColor[0] + rDelta
+            gCol = config.patternColor[1] + gDelta
+            bCol = config.patternColor[2] + bDelta
+            config.patternColor = (rCol, gCol, bCol)
+            fillClr = (
+                (round(config.patternEndColor[0] - rDelta * (c + 1))),
+                (round(config.patternEndColor[1] - gDelta * (c + 1))),
+                (round(config.patternEndColor[2] - bDelta * (c + 1))),
+                225,
+            )
+            patternLength = xDiv
+            for r in range(rows):
+                columnOffset = 0
+                rowOffset = xDiv
+                _c4 = harlequin[3]
+
+                if r in [0, 2, 4, 6]:
+                    columnOffset = xDiv
+
+                if r / 2 % 2 == 0:
+                    columnOffset = xDiv
+                    rowOffset = 0
+                    _c4 = random.choice(harlequin)
+
+                if random.random() < config.patternDrawProb or c == 0 or config.pattern == "harelequin":
+                    if config.pattern == "test":
+                        drawRef.rectangle((xPos, 5, xPos + 4, 55), fill=fillClr)
+                    if random.random() < config.redGreenSwapProb:
+                        fillClr = (fillClr[1], fillClr[0], fillClr[2])
+                    if random.random() < config.redBlueSwapProb:
+                        fillClr = (fillClr[2], fillClr[1], fillClr[0])
+                    if random.random() < config.greenBlueSwapProb:
+                        fillClr = (fillClr[0], fillClr[2], fillClr[1])
+                    if config.pattern == "harelequin":
+                        fillClr = harlequin[harlequinCount]
+                        harlequinCount += 1
+                        if harlequinCount >= len(harlequin):
+                            harlequinCount = 0
+
+                        poly = [
+                            (xStart, yStart + gap),
+                            (xStart + xDiv / 2 - gap, yStart + yDiv),
+                            (xStart, yStart + yDiv + yDiv - gap),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c4)
+
+                        poly = [
+                            (xStart + xDiv * 2, yStart + gap),
+                            (xStart + xDiv * 2 * 0.75 + gap, yStart + yDiv),
+                            (xStart + xDiv * 2, yStart + yDiv + yDiv - gap),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c4)
+
+
+                        poly = [
+                            (xStart + xDiv / 2 + gap, yStart + yDiv),
+                            (xStart + xDiv, yStart + gap),
+                            (xStart + xDiv + xDiv / 2 - gap, yStart + yDiv),
+                            (xStart + xDiv, yStart + 2 * yDiv - gap),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c3)
+
+                        poly = [
+                            (xStart + gap, yStart),
+                            (xStart + xDiv / 2, yStart + yDiv - gap),
+                            (xStart + xDiv - gap, yStart),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c1)
+
+                        poly = [
+                            (xStart + gap, yStart + yDiv * 2),
+                            (xStart + xDiv / 2, yStart + yDiv + gap),
+                            (xStart + xDiv - gap, yStart + yDiv * 2),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c1)
+
+                        poly = [
+                            (xStart + xDiv + gap, yStart),
+                            (xStart + xDiv + xDiv / 2, yStart + yDiv - gap),
+                            (xStart + xDiv * 2 - gap, yStart),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c2)
+
+                        poly = [
+                            (xStart + xDiv + gap, yStart + 2 * yDiv),
+                            (xStart + xDiv + xDiv / 2, yStart + yDiv + gap),
+                            (xStart + xDiv * 2 - gap, yStart + 2 * yDiv),
+                        ]
+                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c2)
+
+                    if config.pattern == "diamonds":
+                        poly = [
+                            (xStart, yStart + yDiv),
+                            (xStart + xDiv, yStart),
+                            (xStart + xDiv + xDiv, yStart + yDiv),
+                            (xStart + xDiv, yStart + yDiv + yDiv),
+                        ]
+                        drawRef.polygon(poly, fill=fillClr)
+                    if config.pattern == "bricks":
+                        length = xDiv
+                        yPos = yStart
+                        drawRef.rectangle(
+                            (xPos + columnOffset, yPos, xPos + columnOffset + length, yPos + yDiv),
+                            fill=fillClr,
+                            outline=None,
+                        )
+                    if config.pattern == "pluses":
+                        length = xDiv
+                        height = xDiv / 2
+                        yPos = yStart
+                        xPos2 = xPos + round(length / 2 - height / 2)
+                        yPos2 = round(yPos - length / 2 + height / 2)
+                        drawRef.rectangle(
+                            (xPos + columnOffset, yPos, xPos + length + columnOffset, yPos + yDiv),
+                            fill=fillClr,
+                            outline=None,
+                        )
+                        drawRef.rectangle(
+                            (xPos2, yPos2, xPos2 + height, yPos2 + length),
+                            fill=fillClr,
+                            outline=None,
+                        )
+                    if config.pattern == "regularLines":
+                        length = patternLength
+                        yPos = yStart
+                        drawRef.rectangle((xPos + columnOffset, yPos, xPos + length + columnOffset, yPos + yDiv), fill=fillClr)
+                    if config.pattern == "lines":
+                        length = int(round(random.uniform(1, 2 * xDiv)))
+                        offset = int(round(random.uniform(0, 4 * xDiv)))
+                        if random.random() < 0.5:
+                            drawRef.rectangle(
+                                (xStart, yStart, xStart + 2 * xDiv, yStart + yDiv),
+                                fill=fillClr,
+                                outline=None,
+                            )
+                        else:
+                            drawRef.rectangle(
+                                (
+                                    xStart + offset,
+                                    yStart,
+                                    xStart + length + offset,
+                                    yStart + yDiv,
+                                ),
+                                fill=fillClr,
+                                outline=None,
+                            )
+                yStart += rowMultiplier * yDiv
+                if config.pattern == "harelequin":
+                    xStart += 0
+
+            if transitionCount < config.patternLengthTransition - 1:
+                transitionCount += 1
+            else:
+                config.currentPatternLength = xDiv
+            xStart += colMultiplier * xDiv if config.pattern == "lines" else xDiv * 2
+            xPos += xDiv
+            yStart = 0
+        config.patternColor = config.patternEndColor
+        config.currentPatternLength = xDiv
+
+    rows = config.patternRows * 1
+    cols = config.patternCols * 1
+    xDiv = 2 * config.canvasWidth * config.displayCols / cols
+    yDiv = (config.canvasHeight / rows) / config.displayRows
+    steps = cols
+    config.arrowBgBackGroundColor = (0, 0, 0, 20)
+    colorChange = False
+
+    _draw_background(drawRef, cols, xDiv, steps)
+    _draw_foreground(drawRef, rows, cols, xDiv, yDiv, steps)
+
+    if config.alwaysRandomPattern == True:
+        if random.random() < 0.15:
+            config.patternDrawProb = random.uniform(0.08, 0.8)
+        if random.random() < 0.15:
+            config.patternRows = round(random.uniform(8, config.canvasHeight))
+        if random.random() < 0.15:
+            config.patternCols = round(random.uniform(4, config.canvasWidth))
+        if random.random() < 0.15:
+            if random.random() < 0.5:
+                config.pattern == "lines"
+            else:
+                config.pattern == "pluses"
+    else:
+        config.pattern == config.initialPattern
 
     config.patternColor = config.patternEndColor
-    config.currentPatternLength = xDiv
+    if random.random() < config.backgroundColorChangeProb:
+        config.patternEndColor = colorutils.getRandomColorHSV(
+            config.fg_minHue,
+            config.fg_maxHue,
+            config.fg_minSaturation,
+            config.fg_maxSaturation,
+            config.fg_minValue,
+            config.fg_maxValue,
+            config.fg_dropHueMinValue,
+            config.fg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
+
+    config.bgBackGroundColor = config.bgBackGroundEndColor
+    if random.random() < config.backgroundColorChangeProb:
+        config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
+            config.bg_minHue,
+            config.bg_maxHue,
+            config.bg_minSaturation,
+            config.bg_maxSaturation,
+            config.bg_minValue,
+            config.bg_maxValue,
+            config.bg_dropHueMinValue,
+            config.bg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
 
 
 ## Layer imagery callbacks & regeneration functions
 def remakePatternBlock(imageRef, direction):
-    #print("remakePatternBlock")
+    # print("remakePatternBlock")
     ## Stacking the cards ...
 
-    '''
+    """
     if config.setPatternColor == True :
         config.setPatternEndColor = colorutils.getRandomColorHSV(
-                config.fg_minHue, config.fg_maxHue, 
-                config.fg_minSaturation, config.fg_maxSaturation, 
+                config.fg_minHue, config.fg_maxHue,
+                config.fg_minSaturation, config.fg_maxSaturation,
                 config.fg_minValue, config.fg_maxValue,
                 config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
         config.patternEndColor = config.setPatternEndColor
         config.patternColor = config.setPatternEndColor
-    '''
-    
-    if config.alwaysRandomPattern == True :
-        if random.random() < .15:
+    """
+
+    if config.alwaysRandomPattern == True:
+        if random.random() < 0.15:
             config.patternDrawProb = random.uniform(0.08, 0.8)
 
-        if random.random() < .15:
-            config.patternRows = (round(random.uniform(8, config.canvasHeight)))
+        if random.random() < 0.15:
+            config.patternRows = round(random.uniform(8, config.canvasHeight))
 
-        if random.random() < .15:
-            config.patternCols = (round(random.uniform(4, config.canvasWidth)))
+        if random.random() < 0.15:
+            config.patternCols = round(random.uniform(4, config.canvasWidth))
 
-        if random.random() < .15:
-            if random.random() < .5 :
+        if random.random() < 0.15:
+            if random.random() < 0.5:
                 config.pattern == "lines"
             else:
                 config.pattern == "pluses"
-    else :
-        config.pattern == config.initialPattern 
-
-
-
+    else:
+        config.pattern == config.initialPattern
 
     config.patternColor = config.patternEndColor
-    if random.random() < config.backgroundColorChangeProb :
+    if random.random() < config.backgroundColorChangeProb:
         config.patternEndColor = colorutils.getRandomColorHSV(
-                config.fg_minHue, config.fg_maxHue, 
-                config.fg_minSaturation, config.fg_maxSaturation, 
-                config.fg_minValue, config.fg_maxValue,
-                config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-
+            config.fg_minHue,
+            config.fg_maxHue,
+            config.fg_minSaturation,
+            config.fg_maxSaturation,
+            config.fg_minValue,
+            config.fg_maxValue,
+            config.fg_dropHueMinValue,
+            config.fg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
 
     config.bgBackGroundColor = config.bgBackGroundEndColor
-    if random.random() < config.backgroundColorChangeProb :
+    if random.random() < config.backgroundColorChangeProb:
         config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
-                config.bg_minHue, config.bg_maxHue, 
-                config.bg_minSaturation, config.bg_maxSaturation, 
-                config.bg_minValue, config.bg_maxValue,
-                config.bg_dropHueMinValue, config.bg_dropHueMaxValue,255,config.brightness)
-
+            config.bg_minHue,
+            config.bg_maxHue,
+            config.bg_minSaturation,
+            config.bg_maxSaturation,
+            config.bg_minValue,
+            config.bg_maxValue,
+            config.bg_dropHueMinValue,
+            config.bg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
 
     drawRef = ImageDraw.Draw(imageRef)
     makeBackGround(drawRef, direction)
@@ -736,35 +771,54 @@ def configureBackgroundScrolling():
     config.bgBackGroundColor = workConfig.get("scroller", "bgBackGroundColor").split(",")
     config.bgBackGroundColor = tuple([int(i) for i in config.bgBackGroundColor])
     config.pattern = workConfig.get("scroller", "pattern")
-    config.initialPattern  = workConfig.get("scroller", "pattern")
+    config.initialPattern = workConfig.get("scroller", "pattern")
     config.patternSpeed = float(workConfig.get("scroller", "patternSpeed"))
 
-
-    if config.useHSV :	
+    if config.useHSV:
 
         config.bgBackGroundColor = colorutils.getRandomColorHSV(
-                config.bg_minHue, config.bg_maxHue, 
-                config.bg_minSaturation, config.bg_maxSaturation, 
-                config.bg_minValue, config.bg_maxValue,
-                config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+            config.bg_minHue,
+            config.bg_maxHue,
+            config.bg_minSaturation,
+            config.bg_maxSaturation,
+            config.bg_minValue,
+            config.bg_maxValue,
+            config.bg_dropHueMinValue,
+            config.bg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
 
         config.bgBackGroundEndColor = colorutils.getRandomColorHSV(
-                config.bg_minHue, config.bg_maxHue, 
-                config.bg_minSaturation, config.bg_maxSaturation, 
-                config.bg_minValue, config.bg_maxValue,
-                config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+            config.bg_minHue,
+            config.bg_maxHue,
+            config.bg_minSaturation,
+            config.bg_maxSaturation,
+            config.bg_minValue,
+            config.bg_maxValue,
+            config.bg_dropHueMinValue,
+            config.bg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
 
         config.patternColor = colorutils.getRandomColorHSV(
-                config.fg_minHue, config.fg_maxHue, 
-                config.fg_minSaturation, config.fg_maxSaturation, 
-                config.fg_minValue, config.fg_maxValue,0,0,255,config.brightness)		
+            config.fg_minHue, config.fg_maxHue, config.fg_minSaturation, config.fg_maxSaturation, config.fg_minValue, config.fg_maxValue, 0, 0, 255, config.brightness
+        )
 
         config.patternEndColor = colorutils.getRandomColorHSV(
-                config.fg_minHue, config.fg_maxHue, 
-                config.fg_minSaturation, config.fg_maxSaturation, 
-                config.fg_minValue, config.fg_maxValue,
-                config.fg_dropHueMinValue, config.fg_dropHueMaxValue, 255, config.brightness)
-    else :
+            config.fg_minHue,
+            config.fg_maxHue,
+            config.fg_minSaturation,
+            config.fg_maxSaturation,
+            config.fg_minValue,
+            config.fg_maxValue,
+            config.fg_dropHueMinValue,
+            config.fg_dropHueMaxValue,
+            255,
+            config.brightness,
+        )
+    else:
 
         config.bgBackGroundColor = colorutils.randomColorAlpha(config.brightness)
         config.bgBackGroundEndColor = colorutils.randomColorAlpha(config.brightness)
@@ -775,16 +829,22 @@ def configureBackgroundScrolling():
             config.patternColor = colorutils.randomColorAlpha(config.brightness)
             config.patternEndColor = colorutils.randomColorAlpha(config.brightness)
 
-        if config.setPatternColor == True :
+        if config.setPatternColor == True:
             config.setPatternEndColor = colorutils.getRandomColorHSV(
-                    config.fg_minHue, config.fg_maxHue, 
-                    config.fg_minSaturation, config.fg_maxSaturation, 
-                    config.fg_minValue, config.fg_maxValue,
-                    config.bg_dropHueMinValue, config.bg_dropHueMaxValue, 255, config.brightness)
+                config.fg_minHue,
+                config.fg_maxHue,
+                config.fg_minSaturation,
+                config.fg_maxSaturation,
+                config.fg_minValue,
+                config.fg_maxValue,
+                config.bg_dropHueMinValue,
+                config.bg_dropHueMaxValue,
+                255,
+                config.brightness,
+            )
             config.patternColor = config.setPatternEndColor
             config.patternEndColor = config.setPatternEndColor
 
-        
     config.currentPatternLength = 0
 
     config.scroller4 = continuous_scroller.ScrollObject()
@@ -795,13 +855,12 @@ def configureBackgroundScrolling():
     scrollerRef.setUp()
     direction = 1 if scrollerRef.xSpeed > 0 else -1
     scrollerRef.callBack = {"func": remakePatternBlock, "direction": direction}
-    
 
     try:
         config.maxSpeed = float(workConfig.get("scroller", "maxSpeed"))
     except Exception as e:
         config.maxSpeed = config.patternSpeed
-    
+
     scrollerRef.xMaxSpeed = config.maxSpeed
 
     try:
@@ -816,10 +875,8 @@ def configureBackgroundScrolling():
         config.changeProbReleaseFactor = 1.0
         print(str(e))
 
-
     makeBackGround(scrollerRef.bg1Draw, 1)
     makeBackGround(scrollerRef.bg2Draw, 1)
-
 
     config.t1 = time.time()
     config.t2 = time.time()
@@ -838,9 +895,7 @@ def configureImageScrolling():
     config.imageBlockImage = workConfig.get("scroller", "imageBlockImage")
     config.imageBlockBuffer = int(workConfig.get("scroller", "imageBlockBuffer"))
     config.imageDrawProb = float(workConfig.get("scroller", "imageDrawProb", fallback=1.0))
-    config.imageBlockRemakeProb = float(
-        workConfig.get("scroller", "imageBlockRemakeProb")
-    )
+    config.imageBlockRemakeProb = float(workConfig.get("scroller", "imageBlockRemakeProb"))
 
     arg = config.path + config.imageBlockImage
     config.imageBlockImageLoaded = Image.open(arg, "r")
@@ -895,7 +950,7 @@ def configureMessageScrolling():
     config.scroller2 = continuous_scroller.ScrollObject()
     scrollerRef = config.scroller2
     scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
-    scrollerRef.canvasWidth = int(len(config.msg1) * config.fontSize/2)
+    scrollerRef.canvasWidth = int(len(config.msg1) * config.fontSize / 2)
     scrollerRef.canvasHeight = 200
     scrollerRef.xSpeed = -config.textSpeed
     scrollerRef.setUp()
@@ -908,7 +963,7 @@ def configureMessageScrolling():
     config.scroller3 = continuous_scroller.ScrollObject()
     scrollerRef = config.scroller3
     scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
-    scrollerRef.canvasWidth = int(len(config.msg2) * config.fontSize/2)
+    scrollerRef.canvasWidth = int(len(config.msg2) * config.fontSize / 2)
     scrollerRef.xSpeed = config.textSpeed + 0.25
     scrollerRef.setUp()
     direction = 1 if scrollerRef.xSpeed > 0 else -1
@@ -979,22 +1034,16 @@ def init():
     config.bgBackGroundColor = (0, 0, 0, 0)
     config.arrowBgBackGroundColor = (0, 0, 0, 200)
 
-    config.canvasImage = Image.new(
-        "RGBA", (config.canvasWidth * 10, config.canvasHeight)
-    )
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
     config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 
-    config.imageLayer = Image.new(
-        "RGBA", (config.canvasWidth * 10, config.canvasHeight)
-    )
+    config.imageLayer = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
     config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
 
     config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.workImageDraw = ImageDraw.Draw(config.workImage)
 
-    config.overallBlur = float(
-        workConfig.get("scroller", "overallBlur", vars=0, fallback=0)
-    )
+    config.overallBlur = float(workConfig.get("scroller", "overallBlur", vars=0, fallback=0))
 
     config.flip = False
     config.scrollArray = []
@@ -1007,8 +1056,7 @@ def init():
         config.backgroundColorChangeProb = float(workConfig.get("scroller", "backgroundColorChangeProb"))
     except Exception as e:
         print(str(e))
-        config.backgroundColorChangeProb = .5
-
+        config.backgroundColorChangeProb = 0.5
 
     try:
         config.setPatternColor = workConfig.getboolean("scroller", "setPatternColor")
@@ -1018,29 +1066,22 @@ def init():
         print(str(e))
 
     try:
-        config.altDirectionScrolling = workConfig.getboolean(
-        "scroller", "altDirectionScrolling"
-        )
+        config.altDirectionScrolling = workConfig.getboolean("scroller", "altDirectionScrolling")
     except Exception as e:
         config.altDirectionScrolling = False
         print(str(e))
 
     try:
-        config.alwaysRandomPatternColor = workConfig.getboolean(
-            "scroller", "alwaysRandomPatternColor"
-        )
+        config.alwaysRandomPatternColor = workConfig.getboolean("scroller", "alwaysRandomPatternColor")
     except Exception as e:
         config.alwaysRandomPatternColor = False
         print(str(e))
 
     try:
-        config.alwaysRandomPattern = workConfig.getboolean(
-            "scroller", "alwaysRandomPattern"
-        )
+        config.alwaysRandomPattern = workConfig.getboolean("scroller", "alwaysRandomPattern")
     except Exception as e:
         config.alwaysRandomPattern = False
         print(str(e))
-
 
     try:
         config.redGreenSwapProb = float(workConfig.get("scroller", "redGreenSwapProb"))
@@ -1062,7 +1103,7 @@ def init():
         config.bg_dropHueMinValue = float(workConfig.get("scroller", "bg_dropHueMinValue"))
         config.bg_dropHueMaxValue = float(workConfig.get("scroller", "bg_dropHueMaxValue"))
         config.fg_dropHueMinValue = float(workConfig.get("scroller", "fg_dropHueMinValue"))
-        config.fg_dropHueMaxValue = float(workConfig.get("scroller", "fg_dropHueMaxValue"))		
+        config.fg_dropHueMaxValue = float(workConfig.get("scroller", "fg_dropHueMaxValue"))
     except Exception as e:
         config.bg_dropHueMinValue = 0
         config.bg_dropHueMaxValue = 0
@@ -1080,14 +1121,12 @@ def init():
         config.fg_minValue = float(workConfig.get("scroller", "fg_minValue"))
         config.fg_maxValue = float(workConfig.get("scroller", "fg_maxValue"))
 
-
         config.bg_minHue = int(workConfig.get("scroller", "bg_minHue"))
         config.bg_maxHue = int(workConfig.get("scroller", "bg_maxHue"))
         config.bg_minSaturation = float(workConfig.get("scroller", "bg_minSaturation"))
         config.bg_maxSaturation = float(workConfig.get("scroller", "bg_maxSaturation"))
         config.bg_minValue = float(workConfig.get("scroller", "bg_minValue"))
         config.bg_maxValue = float(workConfig.get("scroller", "bg_maxValue"))
-
 
     except Exception as e:
 
@@ -1101,23 +1140,15 @@ def init():
         config.fg_minValue = 1
         config.fg_maxValue = 1
 
-
         config.bg_minHue = 0
         config.bg_maxHue = 360
         config.bg_minSaturation = 1
         config.bg_maxSaturation = 1
         config.bg_minValue = 1
         config.bg_maxValue = 1
-        
-        
-        
-        
-        
-
 
     if config.useBackground == True:
         configureBackgroundScrolling()
-
 
     try:
         config.useText = workConfig.getboolean("scroller", "useText")
@@ -1145,35 +1176,28 @@ def init():
         print(str(e))
 
     try:
-        config.useUltraSlowSpeed = workConfig.getboolean(
-            "scroller", "useUltraSlowSpeed"
-        )
+        config.useUltraSlowSpeed = workConfig.getboolean("scroller", "useUltraSlowSpeed")
     except Exception as e:
         config.useUltraSlowSpeed = False
         print(str(e))
 
     try:
         config.useImages = workConfig.getboolean("scroller", "useImages")
-        config.useTransparentImages = workConfig.getboolean(
-            "scroller", "useTransparentImages"
-        )
+        config.useTransparentImages = workConfig.getboolean("scroller", "useTransparentImages")
         if config.useImages == True:
             configureImageScrolling()
     except Exception as e:
         print(str(e))
 
     try:
-        config.doingRefreshCount = float(
-            workConfig.get("scroller", "doingRefreshCount")
-        )
+        config.doingRefreshCount = float(workConfig.get("scroller", "doingRefreshCount"))
     except Exception as e:
         config.doingRefreshCount = 50
         print(str(e))
 
-
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
-    ''' 
+    """ 
         ########### Need to add something like this at final render call  as well
             
         ########### RENDERING AS A MOCKUP OR AS REAL ###########
@@ -1184,10 +1208,7 @@ def init():
             #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
             #config.render(config.image, 0, 0)
             config.render(config.renderImageFull, 0, 0)
-    '''
-
-
-
+    """
 
     config.renderImageFull = config.workImage.copy()
     config.f = FaderObj()
@@ -1215,7 +1236,7 @@ def runWork():
     while config.isRunning == True:
         iterate()
         time.sleep(config.redrawSpeed)
-        if config.standAlone == False :
+        if config.standAlone == False:
             config.callBack()
 
 
@@ -1255,11 +1276,7 @@ def processImageForScrolling():
             )
         )
 
-        if (
-            (n % 2 == 0)
-            and (config.displayRows > 1)
-            and config.altDirectionScrolling == True
-        ):
+        if (n % 2 == 0) and (config.displayRows > 1) and config.altDirectionScrolling == True:
             segment = ImageOps.flip(segment)
             segment = ImageOps.mirror(segment)
 
@@ -1267,9 +1284,7 @@ def processImageForScrolling():
 
     if config.useOverLayImage == True:
         if random.random() < config.overlayGlitchRate:
-            glitchBox(
-                config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize
-            )
+            glitchBox(config.loadedImage, -config.overlayGlitchSize, config.overlayGlitchSize)
         if random.random() < config.overlayResetRate:
             config.loadedImage.paste(config.loadedImageCopy)
         config.workImage.paste(
@@ -1279,9 +1294,7 @@ def processImageForScrolling():
         )
 
     if config.overallBlur != 0:
-        config.workImage = config.workImage.filter(
-            ImageFilter.GaussianBlur(radius=config.overallBlur)
-        )
+        config.workImage = config.workImage.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
 
 
 def iterate():
@@ -1292,11 +1305,7 @@ def iterate():
 
     for scrollerObj in config.scrollArray:
         if scrollerObj.typeOfScroller == "bg":
-            if (
-                random.random() < config.changeProb * config.changeProbReleaseFactor
-                and config.deltaTimeDone == True
-                and config.useFadeThruAnimation == True
-            ):
+            if random.random() < config.changeProb * config.changeProbReleaseFactor and config.deltaTimeDone == True and config.useFadeThruAnimation == True:
                 config.useFadeThruAnimation = False
                 scrollerObj.xSpeed = random.uniform(0.6, scrollerObj.xMaxSpeed)
                 config.deltaTimeDone = False
@@ -1335,12 +1344,12 @@ def iterate():
         )
 
         # RENDERING AS A MOCKUP OR AS REAL
-        if config.useDrawingPoints == True :
+        if config.useDrawingPoints == True:
             config.panelDrawing.canvasToUse = config.renderImageFull
             config.panelDrawing.render()
-        else :
-            #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-            #config.render(config.image, 0, 0)
+        else:
+            # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+            # config.render(config.image, 0, 0)
             config.render(config.renderImageFull, 0, 0)
 
 

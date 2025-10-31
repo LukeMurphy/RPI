@@ -556,7 +556,9 @@ def drawLinePolyEnvelope(_pen):
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
             _dy = _p1[1] - _p2[1]
             _dx = _p1[0] - _p2[0]
-            _angle = (math.atan(_dy/_dx) * 360/math.pi)
+            # changed 10-30-2025
+            # _angle = (math.atan(_dy/_dx) * 360/math.pi)
+            _angle = (math.atan2(_dy,_dx) * 360/math.pi)
 
             if _angle < 0 :
                 _angle += 360
@@ -664,7 +666,9 @@ def drawLineSegments(_pen):
             _p1 = _pen.smooth_points[_pen._p - 1]
             _p2 = _pen.smooth_points[_pen._p]
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
-            _angle = abs(math.atan(_p2[1] - _p1[1])/(_p2[0] - _p1[0]))
+            # changed 10-30-2025
+            # _angle = abs(math.atan(_p2[1] - _p1[1])/(_p2[0] - _p1[0]))
+            _angle = math.atan2(_p2[1] - _p1[1],_p2[0] - _p1[0])
             _penWidth = _pen._w
             if _angle > 30 :
                 _penWidth - 1
@@ -1450,9 +1454,7 @@ def _load_pen_config(config):
         _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
         _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=.01))
 
-        _mark.drawLineAsEnvelope = markConfig.get("markParams", "drawLineAsEnvelope", fallback=None)
-        if _mark.drawLineAsEnvelope is not None:
-            _mark.drawLineAsEnvelope = markConfig.get("markParams", "drawLineAsEnvelope", fallback=False)
+        _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=False)
 
         return _mark
 

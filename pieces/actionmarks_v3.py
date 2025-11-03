@@ -165,7 +165,7 @@ def changePalettes():
     config.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
     config.doJitterProb = config.activePalette.doJitterProb
 
-    pieceLogger(f"config.drawLineAsEnvelope {config.drawLineAsEnvelope}  {config.activePalette.drawLineAsEnvelope}")
+    pieceLogger(f"config.drawLineAsEnvelope {config.drawLineAsEnvelope} <== {config.activePalette.drawLineAsEnvelope}")
     pieceLogger(f"config.doJitterProb {config.doJitterProb} ")
 
 
@@ -288,12 +288,12 @@ def setPenPropsByName(_name, pen):
     pen.forceOrientation = _penProps.forceOrientation
     pen.angleDiffMax = _penProps.angleDiffMax
 
-    if _penProps.drawLineAsEnvelope is not None :
-        pen.drawLineAsEnvelope = _penProps.drawLineAsEnvelope
-    else :
-        pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
+    # if _penProps.drawLineAsEnvelope is not None :
+    # pen.drawLineAsEnvelope = _penProps.drawLineAsEnvelope
+    # else :
+    pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
 
-    # pieceLogger(f"setting pen props pen.name {pen.name} {pen.drawLineAsEnvelope}")
+    pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
     # pieceLogger("--")
 
@@ -1371,13 +1371,12 @@ def _load_drawing_configs(config):
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
 
-        pieceLogger(f"Palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
-
+        pieceLogger(f"\n===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
         config.paletteSets.append(palette)
 
     config.activePalette = random.choice(config.paletteSets)
     config.slownessFactor = config.activePalette.slownessFactor
-    pieceLogger(f"===> New Palette : {config.activePalette.name}", 2, True)
+    pieceLogger(f"\n ===> New Palette : {config.activePalette.name} Using enveloped line: {palette.drawLineAsEnvelope}", 2, True)
 
     setBGColor()
 
@@ -1454,7 +1453,7 @@ def _load_pen_config(config):
         _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
         _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=.01))
 
-        _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=False)
+        _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
 
         return _mark
 

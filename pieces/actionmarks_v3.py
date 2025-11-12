@@ -5,7 +5,6 @@ import configparser
 import re
 from tkinter import NO
 
-from django import conf
 from matplotlib.pylab import rand
 from matplotlib.pyplot import pie
 import numpy as np

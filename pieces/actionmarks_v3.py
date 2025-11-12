@@ -5,6 +5,7 @@ import configparser
 import re
 from tkinter import NO
 
+from django import conf
 from matplotlib.pylab import rand
 from matplotlib.pyplot import pie
 import numpy as np
@@ -968,59 +969,68 @@ def runWork():
 def iterate():
     global config
 
-    def maybe_change_drawing_mode():
-        if config.changeDrawingModeTime > 0:
-            config.changeTimeController.checkTime()
-            if config.changeTimeController.advance:
-                changeDrawingMode()
+    if random.random() < config.justHitPauseProb and not config.justHitPause:
+        config.justHitPause = True
+        pieceLogger(f"I am paused {config.justHitPauseProb}")
+    if random.random() < config.releaseFromJustHitPauseProb and  config.justHitPause:
+        config.justHitPause = False
+        pieceLogger("I am un paused")
 
-    def maybe_change_color_set():
-        if config.changeColorSetTime > 0 and not config.transitionStateHandler.inTransition:
-            config.paletteController.checkTime()
-            if config.paletteController.advance:
-                pieceLogger(f"===>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
-                changeDrawing(True)
+    if not config.justHitPause :
 
-    def maybe_release_drawing():
-        if config.stoppedAndWaitingToDraw:
-            config.drawingController.checkTime()
-            if config.drawingController.advance:
-                releaseDrawing()
+        def maybe_change_drawing_mode():
+            if config.changeDrawingModeTime > 0:
+                config.changeTimeController.checkTime()
+                if config.changeTimeController.advance:
+                    changeDrawingMode()
 
-    def maybe_set_bg_color():
-        if random.SystemRandom().random() < config.changeBGColorProb / config.slownessFactor:
-            setBGColor()
+        def maybe_change_color_set():
+            if config.changeColorSetTime > 0 and not config.transitionStateHandler.inTransition:
+                config.paletteController.checkTime()
+                if config.paletteController.advance:
+                    pieceLogger(f"===>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
+                    changeDrawing(True)
 
-    def maybe_clear_current_drawing():
-        if random.random() < config.clearCurrentDrawingProb and not config.transitionStateHandler.inTransition:
-            pieceLogger(f"===>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
-            clearCurrentDrawing()
+        def maybe_release_drawing():
+            if config.stoppedAndWaitingToDraw:
+                config.drawingController.checkTime()
+                if config.drawingController.advance:
+                    releaseDrawing()
 
-    def maybe_bg_color_blocks_filling():
-        if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing and not config.transitionStateHandler.inTransition:
-            # pieceLogger("Doing bg blocks")
-            if config.doJitterWhenAddingBG:
+        def maybe_set_bg_color():
+            if random.SystemRandom().random() < config.changeBGColorProb / config.slownessFactor:
+                setBGColor()
+
+        def maybe_clear_current_drawing():
+            if random.random() < config.clearCurrentDrawingProb and not config.transitionStateHandler.inTransition:
+                pieceLogger(f"===>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
+                clearCurrentDrawing()
+
+        def maybe_bg_color_blocks_filling():
+            if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing and not config.transitionStateHandler.inTransition:
+                # pieceLogger("Doing bg blocks")
+                if config.doJitterWhenAddingBG:
+                    doDrawingJitter()
+                bgColorBlocksFilling(config)
+
+        def maybe_filter_remap_image():
+            if random.random() < config.filterRemappingProb / config.slownessFactor:
+                filterRemapImage(config)
+
+        def maybe_do_drawing_jitter():
+            if not config.doingDrawing and random.random() < config.doJitterProb / config.slownessFactor and not config.transitionStateHandler.inTransition:
+                # pieceLogger("Doing jitter")
                 doDrawingJitter()
-            bgColorBlocksFilling(config)
 
-    def maybe_filter_remap_image():
-        if random.random() < config.filterRemappingProb / config.slownessFactor:
-            filterRemapImage(config)
-
-    def maybe_do_drawing_jitter():
-        if not config.doingDrawing and random.random() < config.doJitterProb / config.slownessFactor and not config.transitionStateHandler.inTransition:
-            # pieceLogger("Doing jitter")
-            doDrawingJitter()
-
-    maybe_change_drawing_mode()
-    maybe_change_color_set()
-    maybe_release_drawing()
-    maybe_set_bg_color()
-    maybe_clear_current_drawing()
-    maybe_bg_color_blocks_filling()
-    maybe_filter_remap_image()
-    maybe_do_drawing_jitter()
-    penLoopActions()
+        maybe_change_drawing_mode()
+        maybe_change_color_set()
+        maybe_release_drawing()
+        maybe_set_bg_color()
+        maybe_clear_current_drawing()
+        maybe_bg_color_blocks_filling()
+        maybe_filter_remap_image()
+        maybe_do_drawing_jitter()
+        penLoopActions()
     renderImage()
 
 
@@ -1487,6 +1497,10 @@ def _load_and_initialize_system(config):
 
     config.changeColorSetTime = float(workConfig.get("drawingField", "changeColorSetTime", fallback=0))
     config.changeColorSetTimeMaxMultiplier = float(workConfig.get("drawingField", "changeColorSetTimeMaxMultiplier", fallback=1))
+
+    config.justHitPauseProb = float(workConfig.get("drawingField", "justHitPauseProb", fallback=0.0))
+    config.releaseFromJustHitPauseProb = float(workConfig.get("drawingField", "releaseFromJustHitPauseProb", fallback=1.0))
+    config.justHitPause = False
 
     if config.changeColorSetTime > 0:
         config.paletteController = Director(config)

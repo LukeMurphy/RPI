@@ -162,8 +162,8 @@ def transformImage(img):
 
 def writeImage(baseName, renderImage):
     # baseName = "outputquad3/comp2_"
-    pieceLogger("Saving Image...")
-    if config.saveImages:
+    if config.saveImages and not config.drawingPoints:
+        pieceLogger("Saving Image...")
         fn = f"{baseName}.png"
         renderImage.save(fn)
 
@@ -1226,7 +1226,8 @@ def saveImageIfDone():
         config.drawingPrinted = True
         currentTime = time.time()
         baseName = config.outPutPath + str(currentTime)
-        writeImage(baseName, renderImage=config.canvasImage)
+        if not config.useDrawingPoints:
+            writeImage(baseName, renderImage=config.canvasImage)
 
 
 def handlePatternRebuild():
@@ -1278,15 +1279,19 @@ def drawBackgroundAndPasteImage():
 
 def renderComposite():
     """FINAL RENDERING CALL"""
-    if config.usePolygonOverlay:
-        config.compositeImage = shapeOverLayFunction(config.compositeImage)
+    if config.useDrawingPoints == True:
+        config.panelDrawing.canvasToUse = config.compositeImage
+        config.panelDrawing.render()
+    else :
+        if config.usePolygonOverlay:
+            config.compositeImage = shapeOverLayFunction(config.compositeImage)
 
-    config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
+        config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
-    # # uncomment for all temp canvas layers to show
-    if config.setupDeBug:
-        showDebugCanvases(config)
-    config.render(config.destinationImage, 0, 0)
+        # # uncomment for all temp canvas layers to show
+        if config.setupDeBug:
+            showDebugCanvases(config)
+        config.render(config.destinationImage, 0, 0)
 
 
 def showDebugCanvases(config):
@@ -1578,6 +1583,10 @@ def main(run=True):
     except Exception as e:
         pieceLogger(f"{e} <== adjust config to use slotRate!! <===")
         config.directorController.slotRate = 0.03
+
+
+    # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+    panelDrawing.mockupBlock(config, workConfig)
 
     # """
     # # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS

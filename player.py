@@ -123,7 +123,7 @@ def _initializeConfiguration(loadFromArguments):
     config.brightnessOverride = None
     config.standAlone = True
     config.isRunning = True
-
+    config.useDrawingPoints = False
     config.reloadConfig = False
     config.checkForConfigChanges = False
     # Load the default work

@@ -18,9 +18,16 @@ from modules.configuration import pieceLogger
 from modules import colorutils
 from modules.rendering.render import saveImageToFile
 
+
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-""""""""""""""" This version uses bundles of marks and textures             """
+"""""" """""" """ This version uses bundles of marks and textures             """
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
+class LineConfigHolder:
+    def __init__(self):
+        pass
+
 
 # ----------------------------------------------------##----------------------------------------------------#
 class Palette:
@@ -36,6 +43,7 @@ class Pen:
 class Mark:
     lastAngle = 0
     angleDiffMax = 70
+
     def __init__(self):
         pass
 
@@ -148,7 +156,7 @@ def changeDrawingMode():
 
 def changePalettes():
     config.activePalette = random.choice(config.paletteSets)
-    pieceLogger(f"New Palette : {config.activePalette.name}",4,True)
+    pieceLogger(f"New Palette : {config.activePalette.name}", 4, True)
     setBGColor()
     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
@@ -234,16 +242,15 @@ def setPenPropsByName(_name, pen):
 
     pen.changePenColorWhileDrawingProb = config.activePalette.changePenColorWhileDrawingProb
 
-    if pen.xOffsetRange is not None :
+    if pen.xOffsetRange is not None:
         pen.xOffset = round(random.uniform(pen.xOffsetRange[0], pen.xOffsetRange[1]))
-    else :
+    else:
         pen.xOffset = round(random.uniform(config.activePalette.xOffsetRange[0], config.activePalette.xOffsetRange[1]))
 
-    if pen.yOffsetRange is not None :
+    if pen.yOffsetRange is not None:
         pen.yOffset = round(random.uniform(pen.yOffsetRange[0], pen.yOffsetRange[1]))
     else:
         pen.yOffset = round(random.uniform(config.activePalette.yOffsetRange[0], config.activePalette.yOffsetRange[1]))
-
 
     pen._w = _penProps.w
     pen.minMarkWidth = _penProps.minMarkWidth
@@ -305,12 +312,23 @@ def setPenColor(_pen):
 
     # pieceLogger(f"{config.activePalette.noPenGrays}")
 
-    _penAlpha = round(random.uniform(config.activePalette.penAlphaRange[0],config.activePalette.penAlphaRange[1]))
+    _penAlpha = round(random.uniform(config.activePalette.penAlphaRange[0], config.activePalette.penAlphaRange[1]))
 
-    if _pen.forcedPalette is None :
+    if _pen.forcedPalette is None:
         _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], _penAlpha, config.brightness)
-    else :
-        _pen.lineColor = colorutils.getRandomColorHSV(_pen.forcedPalette[0], _pen.forcedPalette[1], _pen.forcedPalette[2], _pen.forcedPalette[3], _pen.forcedPalette[4], _pen.forcedPalette[5], _pen.forcedPalette[6], _pen.forcedPalette[7], _penAlpha, config.brightness)
+    else:
+        _pen.lineColor = colorutils.getRandomColorHSV(
+            _pen.forcedPalette[0],
+            _pen.forcedPalette[1],
+            _pen.forcedPalette[2],
+            _pen.forcedPalette[3],
+            _pen.forcedPalette[4],
+            _pen.forcedPalette[5],
+            _pen.forcedPalette[6],
+            _pen.forcedPalette[7],
+            _penAlpha,
+            config.brightness,
+        )
 
 
 def choosePenMark():
@@ -328,7 +346,9 @@ def generateSmoothLinePoints(_pen):
     if "lineMarks" in _pen.name:
         # clearCurrentDrawing()
         generateLine(_pen)
-    else:
+    elif "scribble" in _pen.name:
+        generateScribble(_pen)
+    else :
         generateCurve(_pen)
     # pieceLogger("Line properties:")
     # for _pnt in range(len(_pen.smooth_points)-2) :
@@ -337,7 +357,7 @@ def generateSmoothLinePoints(_pen):
     #     _ang = abs(math.atan(_dy/_dx) * 360/math.pi)
     #     pieceLogger(_ang)
 
-    
+
 def generateLine(_pen):
 
     points = []
@@ -348,8 +368,6 @@ def generateLine(_pen):
     _pts = round(config.canvasHeight / _yD) + 2
 
     _pen.smooth_points = []
-
-
 
     pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset}) pts {_pts} {_yD}")
     for i in range(_pts):
@@ -376,11 +394,25 @@ def generateLine(_pen):
 
     # for lines, really need to handle the yOffset more carefully
     # This has GOT to be a parameter ......
-    if _pen.name in ["lineMarksVert","lineMarksVertTest","lineMarksVertNarrow"]:
+    if _pen.name in ["lineMarksVert", "lineMarksVertTest", "lineMarksVertNarrow"]:
         _pen.yOffset = 0
 
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res)
     # either clockwise or counter
+    # if random.random() < 0.5:
+    #     _pen.smooth_points.reverse()
+
+
+def generateScribble(_pen):
+    num_points = _pen.num_points
+    points = generate_loop_stroke(num_points)
+    _res = get_curve_points(points, True, 10)
+
+    # _pen.xOffset = 200
+    # _pen.yOffset = 200
+    _pen.smooth_points = []
+    _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in _res)
+
     # if random.random() < 0.5:
     #     _pen.smooth_points.reverse()
 
@@ -442,15 +474,170 @@ def generateCurve(_pen):
         _pen.lastPoint = [x, y]
 
     # Close the shape by repeating the first point
-    # points.append(points[0])
+    points.append(points[0])
     # smoothLine(points, _pen)
 
     _pen.smooth_points = []
     res = chaikins_corner_cutting(points, 2).tolist()
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res)
     # either clockwise or counter
+
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
+
+
+def R(a, b, rounded=False):
+    if not rounded :
+        return random.uniform(a, b)
+    else :
+        return round(random.uniform(a, b))
+
+
+def generate_loop_stroke(num_points):
+
+    lineConfig = LineConfigHolder()
+    lineConfig.points = 60
+    lineConfig.loopsMin = 3
+    lineConfig.loopsMax = 12
+
+    lineConfig.minWidth = 4
+    lineConfig.maxWidth = 4
+    lineConfig.lineWidthMin = 4
+    lineConfig.lineWidthMax = 4
+    lineConfig.lineWidthDelta = 1
+    lineConfig.deltaWidthChangeProb = .2
+    lineConfig.xlineNoiseLevel = 0.001 + random.random() / 1
+    lineConfig.ylineNoiseLevel = 0.001 + random.random() / 1
+    lineConfig.noiseX = 10
+    lineConfig.noiseY = 10
+
+    # // line sizing
+    lineConfig.height = 200
+    lineConfig.radiusX = 100
+    lineConfig.radiusY = 130
+    lineConfig.radiusXMin = 10
+    lineConfig.radiusXMax = 100
+    lineConfig.radiusYMin = 100
+    lineConfig.radiusYMax = 200
+    lineConfig.xRadiusDelta = 4
+    lineConfig.yRadiusDelta = 7
+    lineConfig.deltaRadiusXChangeProb = 0.2
+    lineConfig.deltaRadiusYChangeProb = 0.2
+
+    # // line placement and centering
+    lineConfig.xCenter = 0
+    lineConfig.baseY = 0
+    lineConfig.centerXDelta = 20
+    lineConfig.centerYDelta = 2
+    lineConfig.deltaRadiusXCenterChangeProb = 0.4
+    lineConfig.deltaRadiusYCenterChangeProb = 0.2
+
+    lineConfig.loopDirection = -1
+    lineConfig.loops = R(lineConfig.loopsMin, lineConfig.loopsMax, True)
+    lineConfig.points = round(lineConfig.loops * 8)
+
+    if random.random() < .5  :
+        lineConfig.loopDirection = 1
+
+    pts = []
+
+
+    # initial width
+    # w = R(lineConfig.minWidth, lineConfig.maxWidth)
+    # deltaW = R(-lineConfig.lineWidthDelta, lineConfig.lineWidthDelta)
+
+    _radiusX = lineConfig.radiusX
+    _radiusY = lineConfig.radiusY
+    deltaRadiusX = R(-lineConfig.xRadiusDelta, lineConfig.xRadiusDelta)
+    deltaRadiusY = R(-lineConfig.yRadiusDelta, lineConfig.yRadiusDelta)
+
+    deltaRadiusXCenter = R(-lineConfig.centerXDelta, lineConfig.centerXDelta)
+    deltaRadiusYCenter = R(-lineConfig.centerYDelta, lineConfig.centerYDelta)
+
+    points = lineConfig.points
+
+    pieceLogger(f"lineConfig.loops {lineConfig.loops} {lineConfig.noiseX}")
+
+    for i in range(points):
+        t = i / (points - 1)
+        ang = lineConfig.loopDirection * t * math.pi * 2 * lineConfig.loops
+        x = _xCenter + math.sin(ang) * _radiusX + R(-lineConfig.noiseX, lineConfig.noiseX)
+        y = _yCenter - math.cos(ang) * _radiusY - t * lineConfig.height + R(-lineConfig.noiseY, lineConfig.noiseY)
+
+        # smooth width
+        # w += deltaW
+
+        _radiusX += deltaRadiusX
+        _radiusY += deltaRadiusY
+
+        _xCenter += deltaRadiusXCenter
+        _yCenter += deltaRadiusYCenter
+
+        if R(0, 1.0) < lineConfig.deltaRadiusXChangeProb:
+            deltaRadiusX = R(-lineConfig.xRadiusDelta, lineConfig.xRadiusDelta)
+
+        if R(0, 1.0) < lineConfig.deltaRadiusYChangeProb:
+            deltaRadiusY = R(-lineConfig.yRadiusDelta, lineConfig.yRadiusDelta)
+
+        if R(0, 1.0) < lineConfig.deltaRadiusXCenterChangeProb:
+            deltaRadiusXCenter = R(-lineConfig.centerXDelta, lineConfig.centerXDelta)
+
+        if R(0, 1.0) < lineConfig.deltaRadiusYCenterChangeProb:
+            deltaRadiusYCenter = R(-lineConfig.centerYDelta, lineConfig.centerYDelta)
+
+        # if w < 0.1:
+        #     w = 0.1
+
+        # if R(0, 1.0) < lineConfig.deltaWidthChangeProb:
+        #     deltaW = R(-lineConfig.lineWidthDelta, lineConfig.lineWidthDelta)
+
+        # # force down
+        # if w > lineConfig.maxWidth * 0.75:
+        #     deltaW = R(-0.3, -0.1)
+
+        pts.append((x,y))
+
+    # Extra points for smoother Bézier start/end
+    pts.insert(0, pts[0])
+    pts.append(pts[-1])
+    pts.append(pts[-1])
+
+    return pts
+
+
+
+def catmull_rom(p0, p1, p2, p3, t):
+    t2 = t * t
+    t3 = t2 * t
+
+    return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+
+
+def get_curve_points(points, curve_drawn=True, resolution=50):
+    """
+    points: list of dicts like {"x": float, "y": float}
+    """
+    if not curve_drawn or len(points) < 2:
+        return points
+
+    curve_points = []
+    n = len(points)
+
+    for i in range(n - 1):
+        p0 = points[max(0, i - 1)]
+        p1 = points[i]
+        p2 = points[i + 1]
+        p3 = points[min(n - 1, i + 2)]
+
+        for step in range(resolution):
+            t = step / float(resolution)  # 0 <= t < 1
+
+            x = catmull_rom(p0[0], p1[0], p2[0], p3[0], t)
+            y = catmull_rom(p0[1], p1[1], p2[1], p3[1], t)
+
+            curve_points.append((x, y))
+
+    return curve_points
 
 
 def smoothLine(points, _pen):
@@ -528,23 +715,22 @@ def penLoopActions():
     if config.canDraw:
         drawLine(config.activePalette.activePen)
 
-
     # if not config.doingDrawing and config.canDraw and not config.stoppedAndWaitingToDraw:
     #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
     #     print(f"config.canDraw {config.canDraw}")
     #     pauseDrawing()
 
 
-def drawLine(_pen) :
+def drawLine(_pen):
     if _pen.drawLineAsEnvelope:
         drawLinePolyEnvelope(_pen)
-    else :
+    else:
         drawLineSegments(_pen)
 
 
 def drawLinePolyEnvelope(_pen):
     # Draw the shape
-    if _pen._p == 1 : 
+    if _pen._p == 1:
         pieceLogger(f"Drawing Line with: {_pen.name}")
         # { _pen.drawingSkipProb}
     _penSkip = random.random() <= _pen.drawingSkipProb
@@ -558,28 +744,27 @@ def drawLinePolyEnvelope(_pen):
             _dx = _p1[0] - _p2[0]
             # changed 10-30-2025
             # _angle = (math.atan(_dy/_dx) * 360/math.pi)
-            _angle = (math.atan2(_dy,_dx) * 360/math.pi)
+            _angle = math.atan2(_dy, _dx) * 360 / math.pi
 
-            if _angle < 0 :
+            if _angle < 0:
                 _angle += 360
 
             _penWidth = _pen._w
-            _lineColor = _pen.lineColor 
+            _lineColor = _pen.lineColor
 
             # old way, very chunky
             # config.draw.line((_p1, _p2), fill=_lineColor, width=_penWidth)
 
-            _orthoAngle = math.pi - math.atan2(_dy,_dx)
+            _orthoAngle = math.pi - math.atan2(_dy, _dx)
             _sinOrthoAngle = math.sin(_orthoAngle)
             _cosOrthoAngle = math.cos(_orthoAngle)
 
             _orthoD = _penWidth / 2.2
 
-
             _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
             _orthoP1y = round(_orthoD * _cosOrthoAngle + _p1[1])
 
-            _orthoP2x = round(_orthoD * _sinOrthoAngle+ _p2[0])
+            _orthoP2x = round(_orthoD * _sinOrthoAngle + _p2[0])
             _orthoP2y = round(_orthoD * _cosOrthoAngle + _p2[1])
 
             _orthoP3x = round(-_orthoD * _sinOrthoAngle + _p2[0])
@@ -588,10 +773,9 @@ def drawLinePolyEnvelope(_pen):
             _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
             _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
 
-
             _drawdot = False
             try:
-                if _pen._p > 1 :
+                if _pen._p > 1:
                     _drawdot = True
 
                     _orthoP1x = _pen.lastOrthoPoint[0]
@@ -603,24 +787,17 @@ def drawLinePolyEnvelope(_pen):
             except Exception as e:
                 print(e)
 
-            _poly = (
-                (_orthoP1x,_orthoP1y),
-                (_orthoP2x,_orthoP2y),
-                (_orthoP3x,_orthoP3y),
-                (_orthoP4x,_orthoP4y),
-                (_orthoP1x,_orthoP1y)
-            )
+            _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
-            if not _penSkip :
-                config.draw.polygon(_poly, fill = _lineColor, outline = None)
-            
+            if not _penSkip:
+                config.draw.polygon(_poly, fill=_lineColor, outline=None)
+
             # config.draw.line((_p1, _p2), fill=(255,0,0,255), width=1)
 
             # if not _markDrawn :
             _pen.lastAngle = _angle
             _pen._p += 1
-            _pen.lastOrthoPoint = [_orthoP2x,_orthoP2y,_orthoP3x,_orthoP3y]
-
+            _pen.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
 
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
@@ -653,7 +830,6 @@ def drawLinePolyEnvelope(_pen):
         if _pen.attenuating:
             _pen._w -= round(1 * _pen.incrementFactor)
 
-
         # time.sleep(.5)
 
 
@@ -668,9 +844,9 @@ def drawLineSegments(_pen):
             # if abs(_p1[0] - _p2[0])<10 and abs(_p1[1] - _p2[1]) < 30 :
             # changed 10-30-2025
             # _angle = abs(math.atan(_p2[1] - _p1[1])/(_p2[0] - _p1[0]))
-            _angle = math.atan2(_p2[1] - _p1[1],_p2[0] - _p1[0])
+            _angle = math.atan2(_p2[1] - _p1[1], _p2[0] - _p1[0])
             _penWidth = _pen._w
-            if _angle > 30 :
+            if _angle > 30:
                 _penWidth - 1
             # pieceLogger(_angle)
             if not _penSkip:
@@ -748,8 +924,8 @@ def bgColorBlocksFilling(arg):
     config.blendLevelRate = config.blendLevelRateBase
     config.blendLevel = 0.0
 
-    xPos = math.floor(random.uniform(config.activePalette.bgBoxRange[0],config.activePalette.bgBoxRange[1]))
-    yPos = math.floor(random.uniform(config.activePalette.bgBoxRange[2],config.activePalette.bgBoxRange[3]))
+    xPos = math.floor(random.uniform(config.activePalette.bgBoxRange[0], config.activePalette.bgBoxRange[1]))
+    yPos = math.floor(random.uniform(config.activePalette.bgBoxRange[2], config.activePalette.bgBoxRange[3]))
 
     config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
     config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
@@ -787,7 +963,7 @@ def bgColorBlocksFilling(arg):
             cR[6],
             cR[7],
             round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
-            config.brightness
+            config.brightness,
         )
 
         if random.random() < config.totalRandomBGBoxColorProb:
@@ -946,9 +1122,6 @@ def initDrawings():
     config.bgGlitchDisplacementHorizontal = config.activePalette.bgGlitchDisplacementHorizontal
     config.bgGlitchDisplacementVertical = config.activePalette.bgGlitchDisplacementVertical
 
-
-
-
     startNewLine(_pen)
     doDrawingJitter()
 
@@ -971,11 +1144,11 @@ def iterate():
     if random.random() < config.justHitPauseProb and not config.justHitPause:
         config.justHitPause = True
         pieceLogger(f"I am paused {config.justHitPauseProb}")
-    if random.random() < config.releaseFromJustHitPauseProb and  config.justHitPause:
+    if random.random() < config.releaseFromJustHitPauseProb and config.justHitPause:
         config.justHitPause = False
         pieceLogger("I am un paused")
 
-    if not config.justHitPause :
+    if not config.justHitPause:
 
         def maybe_change_drawing_mode():
             if config.changeDrawingModeTime > 0:
@@ -1159,7 +1332,7 @@ def main(run=True):
         runWork()
 
 
-def _setBundlePath(config) :
+def _setBundlePath(config):
     config.drawingBundle = workConfig.get("drawingField", "drawingBundle")
     config.assetPath = config.path
     if config.assetPath[-1] != "/":
@@ -1268,7 +1441,6 @@ def _load_drawing_configs(config):
         # )
         # palette.bgColor.extend([config.bgColorAlpha, config.brightness, palette.nobgGrays])
 
-
         # palette.bgBoxColorRange = list(
         #     map(
         #         lambda x: float(x),
@@ -1284,35 +1456,22 @@ def _load_drawing_configs(config):
         # )
 
         _bgColorSetsRaw = workConfig.get(_p, "bgColorSets")
-        _bgColorSetsRaw = re.sub(r'[\(\)]', '', _bgColorSetsRaw)
+        _bgColorSetsRaw = re.sub(r"[\(\)]", "", _bgColorSetsRaw)
         _bgColorSetsRaw = _bgColorSetsRaw.split("|")
         palette.bgColorSets = []
-        palette.bgColorSets.extend(
-            tuple(map(lambda x: float(x), _set.split(",")))
-            for _set in _bgColorSetsRaw
-        )
-
+        palette.bgColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgColorSetsRaw)
 
         _penColorSetsRaw = workConfig.get(_p, "penColorSets")
-        _penColorSetsRaw = re.sub(r'[\(\)]', '', _penColorSetsRaw)
+        _penColorSetsRaw = re.sub(r"[\(\)]", "", _penColorSetsRaw)
         _penColorSetsRaw = _penColorSetsRaw.split("|")
         palette.penColorSets = []
-        palette.penColorSets.extend(
-            tuple(map(lambda x: float(x), _set.split(",")))
-            for _set in _penColorSetsRaw
-        )
-
+        palette.penColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _penColorSetsRaw)
 
         _bgBoxColorSetsRaw = workConfig.get(_p, "bgBoxColorSets")
-        _bgBoxColorSetsRaw = re.sub(r'[\(\)]', '', _bgBoxColorSetsRaw)
+        _bgBoxColorSetsRaw = re.sub(r"[\(\)]", "", _bgBoxColorSetsRaw)
         _bgBoxColorSetsRaw = _bgBoxColorSetsRaw.split("|")
         palette.bgBoxColorSets = []
-        palette.bgBoxColorSets.extend(
-            tuple(map(lambda x: float(x), _set.split(",")))
-            for _set in _bgBoxColorSetsRaw
-        )
-
-
+        palette.bgBoxColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgBoxColorSetsRaw)
 
         palette.bgBoxRange = list(
             map(
@@ -1321,9 +1480,8 @@ def _load_drawing_configs(config):
             )
         )
 
-        if palette.bgBoxRange == [0,0,0,0] :
+        if palette.bgBoxRange == [0, 0, 0, 0]:
             palette.bgBoxRange = [0, config.canvasWidth, 0, config.canvasHeight]
-
 
         palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
 
@@ -1344,7 +1502,7 @@ def _load_drawing_configs(config):
         palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
         palette.slownessFactor = float(workConfig.get(_p, "slownessFactor", fallback="1.0"))
 
-        palette.doJitterProb  = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
+        palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
         palette.bgGlitchCyclesMin = float(workConfig.get(_p, "bgGlitchCyclesMin", fallback=config.bgGlitchCyclesMin))
         palette.bgGlitchCyclesMax = float(workConfig.get(_p, "bgGlitchCyclesMax", fallback=config.bgGlitchCyclesMax))
         palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))
@@ -1353,29 +1511,21 @@ def _load_drawing_configs(config):
         palette.xOffsetRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(
-                    _p, "xOffsetRange", fallback=f"0,{config.canvasWidth}"
-                ).split(","),
+                workConfig.get(_p, "xOffsetRange", fallback=f"0,{config.canvasWidth}").split(","),
             )
         )
         palette.yOffsetRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(
-                    _p, "yOffsetRange", fallback=f"0,{config.canvasHeight}"
-                ).split(","),
+                workConfig.get(_p, "yOffsetRange", fallback=f"0,{config.canvasHeight}").split(","),
             )
         )
         palette.penAlphaRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(
-                    _p, "penAlphaRange", fallback=f"{config.penAlpha},{config.penAlpha}"
-                ).split(","),
+                workConfig.get(_p, "penAlphaRange", fallback=f"{config.penAlpha},{config.penAlpha}").split(","),
             )
         )
-
-
 
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
@@ -1396,7 +1546,6 @@ def _load_pen_config(config):
     def _load_pen_config_globals(config):
         config.penNames = workConfig.get("drawingField", "penNames").split(",")
         config.marksPalette = []
-
 
     def _load_single_pen(_penConfigName):
         _mark = Mark()
@@ -1430,10 +1579,10 @@ def _load_pen_config(config):
         _mark.xOffsetRange = markConfig.get("markParams", "xOffsetRange", fallback=None)
         _mark.yOffsetRange = markConfig.get("markParams", "yOffsetRange", fallback=None)
 
-        if _mark.xOffsetRange is not None :
+        if _mark.xOffsetRange is not None:
             _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange").split(",")))
 
-        if _mark.yOffsetRange is not None :
+        if _mark.yOffsetRange is not None:
             _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange").split(",")))
 
         _mark.w = int(markConfig.get("markParams", "w", fallback=1))
@@ -1460,7 +1609,7 @@ def _load_pen_config(config):
             _mark.forcedPalette = list(map(lambda x: float(x), markConfig.get("markParams", "forcedPalette", fallback=None).split(",")))
 
         _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
-        _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=.01))
+        _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=0.01))
 
         _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
 
@@ -1469,7 +1618,7 @@ def _load_pen_config(config):
     _marksPath = _load_pen_config_globals(config)
 
     for _penConfigName in config.penNames:
-        _mark = _load_single_pen( _penConfigName)
+        _mark = _load_single_pen(_penConfigName)
         config.marksPalette.append(_mark)
     # print(config.marksPalette)
 

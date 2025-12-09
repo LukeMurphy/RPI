@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smooth Curve Drawer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .instructions {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    canvas {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      cursor: crosshair;
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f093fb;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #e076e0;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+    }
+
+    .btn-danger {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #ee5a52;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .stats {
+      text-align: center;
+      color: #666;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      .instructions {
+        font-size: 12px;
+      }
+
+      button {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Smooth Curve Drawer</h1>
+    <p class="instructions">Click on the canvas to add points, then draw a smooth curve through them</p>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+      <button class="btn-primary" id="drawBtn">Draw Curve</button>
+      <button class="btn-secondary" id="undoBtn">Undo Point</button>
+      <button class="btn-danger" id="clearBtn">Clear All</button>
+    </div>
+
+    <div class="stats">
+      <span id="pointCount">Points: 0</span>
+    </div>
+  </div>
+  <script> let canvasId = "canvas" </script>
+  <script src="curve.js"></script>
+</body>
+</html>

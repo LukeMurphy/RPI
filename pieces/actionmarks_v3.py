@@ -1490,7 +1490,7 @@ def _load_drawing_configs(config):
         palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))
         palette.bgGlitchDisplacementVertical = float(workConfig.get(_p, "bgGlitchDisplacementVertical", fallback=config.bgGlitchDisplacementVertical))
         palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1)) 
-        palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=5)) 
+        palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8)) 
 
         palette.xOffsetRange = list(
             map(

@@ -24,10 +24,6 @@ from modules.rendering.render import saveImageToFile
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
-class LineConfigHolder:
-    def __init__(self):
-        pass
-
 
 # ----------------------------------------------------##----------------------------------------------------#
 class Palette:
@@ -110,6 +106,19 @@ def chaikins_corner_cutting(coords, refinements=2, ratio=0.75):
 
     return coords
 
+
+def catmull_rom(p0, p1, p2, p3, t):
+    t2 = t * t
+    t3 = t2 * t
+
+    return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+
+
+def R(a, b, rounded=False):
+    if not rounded :
+        return random.uniform(a, b)
+    else :
+        return round(random.uniform(a, b))
 
 # ----------------------------------------------------##----------------------------------------------------#
 
@@ -221,27 +230,82 @@ def setPenPropsByName(_name, pen):
     # print(f"Setting the pen instance <=== {_penProps.name} ")
 
     pen.name = _name
-    pen.minNumPoints = _penProps.minNumPoints
-    pen.maxNumPoints = _penProps.maxNumPoints
-    pen.num_points = round(random.uniform(pen.minNumPoints, pen.maxNumPoints))
-    pen.turns = round(random.uniform(_penProps.turnsRange[0], _penProps.turnsRange[1]))
-    pen.minInterpolatedPoints = _penProps.minInterpolatedPoints
-    pen.maxInterpolatedPoints = _penProps.maxInterpolatedPoints
 
-    pen.baseRadiusFactor = random.uniform(_penProps.baseRadiusFactorRange[0], _penProps.baseRadiusFactorRange[1])
-    pen.yRadiusFactor = random.uniform(_penProps.yRadiusFactorRange[0], _penProps.yRadiusFactorRange[1])
-    pen.xRadiusFactor = random.uniform(_penProps.xRadiusFactorRange[0], _penProps.xRadiusFactorRange[1])
+    if "scribble" in pen.name :
+        # pen.points = R(_penProps.minNumPoints, _penProps.maxNumPoints, True)
+        pen.loopsMin = _penProps.loopsMin
+        pen.loopsMax = _penProps.loopsMax
 
-    pen.xRadiusFactorNoiseFactor = _penProps.xRadiusFactorNoiseFactor
-    pen.yRadiusFactorNoiseFactor = _penProps.yRadiusFactorNoiseFactor
-    pen.yRandom = round(random.uniform(_penProps.yRandomRange[0], _penProps.yRandomRange[1]))
-    pen.xRandom = round(random.uniform(_penProps.xRandomRange[0], _penProps.xRandomRange[1]))
+        pen.noiseX = _penProps.noiseX
+        pen.noiseY = _penProps.noiseY
 
-    pen.rotationFactor = _penProps.rotationFactor
-    pen.rotationAngle = random.uniform(-math.pi / 2 / pen.rotationFactor, math.pi / 2 / pen.rotationFactor)
+        # // line sizing
+        pen.height = _penProps.height
+        pen.radiusX = _penProps.radiusX
+        pen.radiusY = _penProps.radiusY
+        pen.radiusXMin = _penProps.radiusXMin
+        pen.radiusXMax = _penProps.radiusXMax
+        pen.radiusYMin = _penProps.radiusYMin
+        pen.radiusYMax = _penProps.radiusYMax
+        pen.xRadiusDelta = _penProps.xRadiusDelta
+        pen.yRadiusDelta = _penProps.yRadiusDelta
+        pen.deltaRadiusXChangeProb = _penProps.deltaRadiusXChangeProb
+        pen.deltaRadiusYChangeProb = _penProps.deltaRadiusYChangeProb
 
-    pen.changePenColorWhileDrawingProb = config.activePalette.changePenColorWhileDrawingProb
+        # // line placement and centering
+        pen.centerXDelta = _penProps.centerXDelta
+        pen.centerYDelta = _penProps.centerYDelta
+        pen.deltaRadiusXCenterChangeProb = _penProps.deltaRadiusXCenterChangeProb
+        pen.deltaRadiusYCenterChangeProb = _penProps.deltaRadiusYCenterChangeProb
+        pen.loops = R(pen.loopsMin, pen.loopsMax, True)
+        pen.points = round(pen.loops * _penProps.pointsPerLoop)
 
+        pen.penSpeedMinVal = _penProps.penSpeedMinVal
+        pen.penSpeedMaxVal = _penProps.penSpeedMaxVal
+
+        pen.speed = round(random.uniform(_penProps.penSpeedMinVal, _penProps.penSpeedMaxVal))
+
+        pen.loopDirection = -1
+        if random.random() < .5  :
+            pen.loopDirection = 1
+    else :   
+        pen.minNumPoints = _penProps.minNumPoints
+        pen.maxNumPoints = _penProps.maxNumPoints
+        pen.num_points = round(random.uniform(pen.minNumPoints, pen.maxNumPoints))     
+        pen.turns = round(random.uniform(_penProps.turnsRange[0], _penProps.turnsRange[1]))
+        pen.minInterpolatedPoints = _penProps.minInterpolatedPoints
+        pen.maxInterpolatedPoints = _penProps.maxInterpolatedPoints
+
+        pen.baseRadiusFactor = random.uniform(_penProps.baseRadiusFactorRange[0], _penProps.baseRadiusFactorRange[1])
+        pen.yRadiusFactor = random.uniform(_penProps.yRadiusFactorRange[0], _penProps.yRadiusFactorRange[1])
+        pen.xRadiusFactor = random.uniform(_penProps.xRadiusFactorRange[0], _penProps.xRadiusFactorRange[1])
+
+        pen.xRadiusFactorNoiseFactor = _penProps.xRadiusFactorNoiseFactor
+        pen.yRadiusFactorNoiseFactor = _penProps.yRadiusFactorNoiseFactor
+        pen.yRandom = round(random.uniform(_penProps.yRandomRange[0], _penProps.yRandomRange[1]))
+        pen.xRandom = round(random.uniform(_penProps.xRandomRange[0], _penProps.xRandomRange[1]))
+
+        pen.rotationFactor = _penProps.rotationFactor
+        pen.rotationAngle = random.uniform(-math.pi / 2 / pen.rotationFactor, math.pi / 2 / pen.rotationFactor)
+
+        pen.changePenColorWhileDrawingProb = config.activePalette.changePenColorWhileDrawingProb
+
+        pen.xTravelRange = _penProps.xTravelRange
+        pen.yTravelRange = _penProps.yTravelRange
+        pen.xTravelIncr = _penProps.xTravelIncrRange
+        pen.yTravelIncr = _penProps.yTravelIncrRange
+        pen.xtravelMode = 1 if random.random() < _penProps.xtravelProb else 0
+        pen.ytravelMode = 1 if random.random() < _penProps.ytravelProb else 0
+
+        pen.radiusChangePerRound = _penProps.radiusChangePerRound
+        pen.linePpoints = _penProps.linePoints
+        pen.lopOff = _penProps.lopOff
+
+        _penSpeedMax = max(1, math.ceil(5 / config.slownessFactor + 1))
+        pen.speed = round(random.uniform(1, _penSpeedMax))
+    # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
+
+    pen.drawingSize = [config.canvasWidth, config.canvasHeight]
     if pen.xOffsetRange is not None:
         pen.xOffset = round(random.uniform(pen.xOffsetRange[0], pen.xOffsetRange[1]))
     else:
@@ -261,17 +325,6 @@ def setPenPropsByName(_name, pen):
 
     if pen.incrementFactor == 0:
         pen._w = round(random.uniform(_penProps.minMarkWidth, _penProps.maxMarkWidth))
-
-    pen.xTravelRange = _penProps.xTravelRange
-    pen.yTravelRange = _penProps.yTravelRange
-    pen.xTravelIncr = _penProps.xTravelIncrRange
-    pen.yTravelIncr = _penProps.yTravelIncrRange
-    pen.xtravelMode = 1 if random.random() < _penProps.xtravelProb else 0
-    pen.ytravelMode = 1 if random.random() < _penProps.ytravelProb else 0
-
-    pen.radiusChangePerRound = _penProps.radiusChangePerRound
-
-    pen.drawingSize = [config.canvasWidth, config.canvasHeight]
     # pen.drawingSize = [180, 180]
     pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
     # pen.centerVariationX = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
@@ -282,16 +335,9 @@ def setPenPropsByName(_name, pen):
 
     pen._p = 0
     pen.smooth_points = []
-    _penSpeedMax = max(1, math.ceil(5 / config.slownessFactor + 1))
-    pen.speed = round(random.uniform(1, _penSpeedMax))
-    # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
-    # pen.speed = 1
     pen.attenuating = False
     pen.enlarging = False
-
-    pen.linePpoints = _penProps.linePoints
-    pen.lopOff = _penProps.lopOff
     pen.forceOrientation = _penProps.forceOrientation
     pen.angleDiffMax = _penProps.angleDiffMax
 
@@ -404,8 +450,7 @@ def generateLine(_pen):
 
 
 def generateScribble(_pen):
-    num_points = _pen.num_points
-    points = generate_loop_stroke(num_points)
+    points = generate_loop_stroke(_pen)
     _res = get_curve_points(points, True, 10)
 
     # _pen.xOffset = 200
@@ -413,8 +458,8 @@ def generateScribble(_pen):
     _pen.smooth_points = []
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in _res)
 
-    # if random.random() < 0.5:
-    #     _pen.smooth_points.reverse()
+    if random.random() < 0.5:
+        _pen.smooth_points.reverse()
 
 
 def generateCurve(_pen):
@@ -486,86 +531,37 @@ def generateCurve(_pen):
         _pen.smooth_points.reverse()
 
 
-def R(a, b, rounded=False):
-    if not rounded :
-        return random.uniform(a, b)
-    else :
-        return round(random.uniform(a, b))
-
-
-def generate_loop_stroke(num_points):
-
-    lineConfig = LineConfigHolder()
-    lineConfig.points = 60
-    lineConfig.loopsMin = 3
-    lineConfig.loopsMax = 12
-
-    lineConfig.minWidth = 4
-    lineConfig.maxWidth = 4
-    lineConfig.lineWidthMin = 4
-    lineConfig.lineWidthMax = 4
-    lineConfig.lineWidthDelta = 1
-    lineConfig.deltaWidthChangeProb = .2
-    lineConfig.xlineNoiseLevel = 0.001 + random.random() / 1
-    lineConfig.ylineNoiseLevel = 0.001 + random.random() / 1
-    lineConfig.noiseX = 10
-    lineConfig.noiseY = 10
-
-    # // line sizing
-    lineConfig.height = 200
-    lineConfig.radiusX = 100
-    lineConfig.radiusY = 130
-    lineConfig.radiusXMin = 10
-    lineConfig.radiusXMax = 100
-    lineConfig.radiusYMin = 100
-    lineConfig.radiusYMax = 200
-    lineConfig.xRadiusDelta = 4
-    lineConfig.yRadiusDelta = 7
-    lineConfig.deltaRadiusXChangeProb = 0.2
-    lineConfig.deltaRadiusYChangeProb = 0.2
-
-    # // line placement and centering
-    lineConfig.xCenter = 0
-    lineConfig.baseY = 0
-    lineConfig.centerXDelta = 20
-    lineConfig.centerYDelta = 2
-    lineConfig.deltaRadiusXCenterChangeProb = 0.4
-    lineConfig.deltaRadiusYCenterChangeProb = 0.2
-
-    lineConfig.loopDirection = -1
-    lineConfig.loops = R(lineConfig.loopsMin, lineConfig.loopsMax, True)
-    lineConfig.points = round(lineConfig.loops * 8)
-
-    if random.random() < .5  :
-        lineConfig.loopDirection = 1
+def generate_loop_stroke(_pen):
 
     pts = []
+    _radiusX = _pen.radiusX
+    _radiusY = _pen.radiusY
+    deltaRadiusX = R(-_pen.xRadiusDelta, _pen.xRadiusDelta)
+    deltaRadiusY = R(-_pen.yRadiusDelta, _pen.yRadiusDelta)
 
+    deltaRadiusXCenter = R(-_pen.centerXDelta, _pen.centerXDelta)
+    deltaRadiusYCenter = R(-_pen.centerYDelta, _pen.centerYDelta)
 
-    # initial width
-    # w = R(lineConfig.minWidth, lineConfig.maxWidth)
-    # deltaW = R(-lineConfig.lineWidthDelta, lineConfig.lineWidthDelta)
+    _xCenter = 0
+    _yCenter = 0
 
-    _radiusX = lineConfig.radiusX
-    _radiusY = lineConfig.radiusY
-    deltaRadiusX = R(-lineConfig.xRadiusDelta, lineConfig.xRadiusDelta)
-    deltaRadiusY = R(-lineConfig.yRadiusDelta, lineConfig.yRadiusDelta)
+    points = _pen.points
 
-    deltaRadiusXCenter = R(-lineConfig.centerXDelta, lineConfig.centerXDelta)
-    deltaRadiusYCenter = R(-lineConfig.centerYDelta, lineConfig.centerYDelta)
-
-    points = lineConfig.points
-
-    pieceLogger(f"lineConfig.loops {lineConfig.loops} {lineConfig.noiseX}")
+    pieceLogger(f"deltaRadiusX {round(deltaRadiusX,4)}")
+    pieceLogger(f"deltaRadiusY {round(deltaRadiusY,4)}")
+    pieceLogger(f"deltaRadiusXCenter {round(deltaRadiusXCenter,4)}")
+    pieceLogger(f"deltaRadiusYCenter {round(deltaRadiusYCenter,4)}")
+    pieceLogger(f"_pen.loops {_pen.loops}")
+    pieceLogger(f"points {points}")
+    pieceLogger(f"_pen.speed {_pen.speed}")
+    # pieceLogger(f"_pen.xOffset {_pen.xOffset}")
+    # _pen.speed = 8
 
     for i in range(points):
         t = i / (points - 1)
-        ang = lineConfig.loopDirection * t * math.pi * 2 * lineConfig.loops
-        x = _xCenter + math.sin(ang) * _radiusX + R(-lineConfig.noiseX, lineConfig.noiseX)
-        y = _yCenter - math.cos(ang) * _radiusY - t * lineConfig.height + R(-lineConfig.noiseY, lineConfig.noiseY)
-
-        # smooth width
-        # w += deltaW
+        ang = _pen.loopDirection * t * math.pi * 2 * _pen.loops
+        x = _xCenter + math.sin(ang) * _radiusX + R(-_pen.noiseX, _pen.noiseX)
+        y = _yCenter - math.cos(ang) * _radiusY - t * _pen.height + R(-_pen.noiseY, _pen.noiseY)
 
         _radiusX += deltaRadiusX
         _radiusY += deltaRadiusY
@@ -573,27 +569,17 @@ def generate_loop_stroke(num_points):
         _xCenter += deltaRadiusXCenter
         _yCenter += deltaRadiusYCenter
 
-        if R(0, 1.0) < lineConfig.deltaRadiusXChangeProb:
-            deltaRadiusX = R(-lineConfig.xRadiusDelta, lineConfig.xRadiusDelta)
+        if R(0, 1.0) < _pen.deltaRadiusXChangeProb:
+            deltaRadiusX = R(-_pen.xRadiusDelta, _pen.xRadiusDelta)
 
-        if R(0, 1.0) < lineConfig.deltaRadiusYChangeProb:
-            deltaRadiusY = R(-lineConfig.yRadiusDelta, lineConfig.yRadiusDelta)
+        if R(0, 1.0) < _pen.deltaRadiusYChangeProb:
+            deltaRadiusY = R(-_pen.yRadiusDelta, _pen.yRadiusDelta)
 
-        if R(0, 1.0) < lineConfig.deltaRadiusXCenterChangeProb:
-            deltaRadiusXCenter = R(-lineConfig.centerXDelta, lineConfig.centerXDelta)
+        if R(0, 1.0) < _pen.deltaRadiusXCenterChangeProb:
+            deltaRadiusXCenter = R(-_pen.centerXDelta, _pen.centerXDelta)
 
-        if R(0, 1.0) < lineConfig.deltaRadiusYCenterChangeProb:
-            deltaRadiusYCenter = R(-lineConfig.centerYDelta, lineConfig.centerYDelta)
-
-        # if w < 0.1:
-        #     w = 0.1
-
-        # if R(0, 1.0) < lineConfig.deltaWidthChangeProb:
-        #     deltaW = R(-lineConfig.lineWidthDelta, lineConfig.lineWidthDelta)
-
-        # # force down
-        # if w > lineConfig.maxWidth * 0.75:
-        #     deltaW = R(-0.3, -0.1)
+        if R(0, 1.0) < _pen.deltaRadiusYCenterChangeProb:
+            deltaRadiusYCenter = R(-_pen.centerYDelta, _pen.centerYDelta)
 
         pts.append((x,y))
 
@@ -605,18 +591,8 @@ def generate_loop_stroke(num_points):
     return pts
 
 
-
-def catmull_rom(p0, p1, p2, p3, t):
-    t2 = t * t
-    t3 = t2 * t
-
-    return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
-
-
 def get_curve_points(points, curve_drawn=True, resolution=50):
-    """
-    points: list of dicts like {"x": float, "y": float}
-    """
+
     if not curve_drawn or len(points) < 2:
         return points
 
@@ -1556,27 +1532,70 @@ def _load_pen_config(config):
         pieceLogger(f"{pathToCfg}")
         markConfig.read(pathToCfg)
 
-        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
-        _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
         _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
 
-        _mark.minInterpolatedPoints = int(markConfig.get("markParams", "minInterpolatedPoints", fallback=200))
-        _mark.maxInterpolatedPoints = int(markConfig.get("markParams", "maxInterpolatedPoints", fallback=200))
+        if "scribble" in _mark.name :
 
-        _mark.baseRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "baseRadiusFactorRange", fallback="1.0,1.0").split(",")))
-        _mark.xRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "xRadiusFactorRange", fallback=".2,.2").split(",")))
-        _mark.yRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "yRadiusFactorRange", fallback=".2,.2").split(",")))
+            _mark.loopsMin = _mark.turnsRange[0]
+            _mark.loopsMax = _mark.turnsRange[1]
 
-        _mark.xRadiusFactorNoiseFactor = float(markConfig.get("markParams", "xRadiusFactorNoiseFactor", fallback=1.0))
-        _mark.yRadiusFactorNoiseFactor = float(markConfig.get("markParams", "yRadiusFactorNoiseFactor", fallback=1.0))
-        _mark.xRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "xRandomRange", fallback="-1,1").split(",")))
-        _mark.yRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "yRandomRange", fallback="-1,1").split(",")))
+            _mark.pointsPerLoop = int(markConfig.get("markParams", "pointsPerLoop")) 
+            _mark.noiseX = float(markConfig.get("markParams", "noiseX")) 
+            _mark.noiseY = float(markConfig.get("markParams", "noiseY")) 
 
-        _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
-        # _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange", fallback=f"{config.pen_centerVariationXMin},{config.pen_centerVariationXMax}").split(",")))
-        # _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange", fallback=f"{config.pen_centerVariationYMin},{config.pen_centerVariationYMax}").split(",")))
-        # _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange", fallback="-1,1").split(",")))
+            _mark.height = float(markConfig.get("markParams", "height")) 
+            _mark.radiusX = float(markConfig.get("markParams", "radiusX")) 
+            _mark.radiusY = float(markConfig.get("markParams", "radiusY")) 
+            _mark.radiusXMin = float(markConfig.get("markParams", "radiusXMin")) 
+            _mark.radiusXMax = float(markConfig.get("markParams", "radiusXMax")) 
+            _mark.radiusYMin = float(markConfig.get("markParams", "radiusYMin")) 
+            _mark.radiusYMax = float(markConfig.get("markParams", "radiusYMax")) 
+            _mark.xRadiusDelta = float(markConfig.get("markParams", "xRadiusDelta")) 
+            _mark.yRadiusDelta = float(markConfig.get("markParams", "yRadiusDelta")) 
+            _mark.deltaRadiusXChangeProb = float(markConfig.get("markParams", "deltaRadiusXChangeProb")) 
+            _mark.deltaRadiusYChangeProb = float(markConfig.get("markParams", "deltaRadiusYChangeProb")) 
+
+            _mark.xCenter = float(markConfig.get("markParams", "xCenter")) 
+            _mark.yCenter = float(markConfig.get("markParams", "yCenter")) 
+            _mark.centerXDelta = float(markConfig.get("markParams", "centerXDelta")) 
+            _mark.centerYDelta = float(markConfig.get("markParams", "centerYDelta")) 
+            _mark.deltaRadiusXCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusXCenterChangeProb")) 
+            _mark.deltaRadiusYCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusYCenterChangeProb")) 
+            
+            _mark.penSpeedMinVal = float(markConfig.get("markParams", "penSpeedMinVal")) 
+            _mark.penSpeedMaxVal = float(markConfig.get("markParams", "penSpeedMaxVal")) 
+        else :
+
+            _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
+            _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
+            _mark.minInterpolatedPoints = int(markConfig.get("markParams", "minInterpolatedPoints", fallback=200))
+            _mark.maxInterpolatedPoints = int(markConfig.get("markParams", "maxInterpolatedPoints", fallback=200))
+
+            _mark.baseRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "baseRadiusFactorRange", fallback="1.0,1.0").split(",")))
+            _mark.xRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "xRadiusFactorRange", fallback=".2,.2").split(",")))
+            _mark.yRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "yRadiusFactorRange", fallback=".2,.2").split(",")))
+
+            _mark.xRadiusFactorNoiseFactor = float(markConfig.get("markParams", "xRadiusFactorNoiseFactor", fallback=1.0))
+            _mark.yRadiusFactorNoiseFactor = float(markConfig.get("markParams", "yRadiusFactorNoiseFactor", fallback=1.0))
+            _mark.xRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "xRandomRange", fallback="-1,1").split(",")))
+            _mark.yRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "yRandomRange", fallback="-1,1").split(",")))
+
+            _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
+           
+            # adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y
+            _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
+            _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
+            _mark.xTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "xTravelIncrRange", fallback="-1,1").split(",")))
+            _mark.yTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "yTravelIncrRange", fallback="-1,1").split(",")))
+            _mark.xtravelProb = float(markConfig.get("markParams", "xtravelProb", fallback=0.1))
+            _mark.ytravelProb = float(markConfig.get("markParams", "ytravelProb", fallback=0.1))
+            _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback="0"))
+
+            _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
+            _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
+
         _mark.xOffsetRange = markConfig.get("markParams", "xOffsetRange", fallback=None)
+        _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback="1"))
         _mark.yOffsetRange = markConfig.get("markParams", "yOffsetRange", fallback=None)
 
         if _mark.xOffsetRange is not None:
@@ -1591,18 +1610,6 @@ def _load_pen_config(config):
         _mark.changeMarkWidthProb = float(markConfig.get("markParams", "changeMarkWidthProb", fallback=".02"))
         _mark.mode = int(markConfig.get("markParams", "mode", fallback=1))
 
-        # adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y
-        _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
-        _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
-        _mark.xTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "xTravelIncrRange", fallback="-1,1").split(",")))
-        _mark.yTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "yTravelIncrRange", fallback="-1,1").split(",")))
-        _mark.xtravelProb = float(markConfig.get("markParams", "xtravelProb", fallback=0.1))
-        _mark.ytravelProb = float(markConfig.get("markParams", "ytravelProb", fallback=0.1))
-        _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback="0"))
-        _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback="1"))
-
-        _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
-        _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
         _mark.forceOrientation = markConfig.get("markParams", "forceOrientation", fallback="vertical")
         _mark.forcedPalette = markConfig.get("markParams", "forcedPalette", fallback=None)
         if _mark.forcedPalette is not None:

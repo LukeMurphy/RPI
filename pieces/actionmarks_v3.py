@@ -224,13 +224,15 @@ def setPenPropsByName(_name, pen):
         if _p.name == _name:
             _penProps = _p
             break
-
-    # print(f"config.drawingMode {config.drawingMode}")
-    # print(f"Asking to set the pen instance {_name} ==> ")
-    # print(f"Setting the pen instance <=== {_penProps.name} ")
-
     pen.name = _name
 
+    '''
+    Added Scribble like marks - the marks that are a sign or signifier for mark
+    making - marks as constrution of the image plane that recall the hand as
+    much as stand in for the hand - since painting has become algorithmic of
+    its own accord - maybe so much exposure to all the art ever made means 
+    the act of marking is more an act of choice of type of mark
+    '''
     if "scribble" in pen.name :
         # pen.points = R(_penProps.minNumPoints, _penProps.maxNumPoints, True)
         pen.loopsMin = _penProps.loopsMin
@@ -260,8 +262,12 @@ def setPenPropsByName(_name, pen):
         pen.loops = R(pen.loopsMin, pen.loopsMax, True)
         pen.points = round(pen.loops * _penProps.pointsPerLoop)
 
-        pen.penSpeedMinVal = _penProps.penSpeedMinVal
-        pen.penSpeedMaxVal = _penProps.penSpeedMaxVal
+        """"
+        # putting pen speed variables in the palette config rather than in the 
+        # pen configuration
+        """
+        pen.penSpeedMinVal = config.activePalette.penSpeedMinVal
+        pen.penSpeedMaxVal = config.activePalette.penSpeedMaxVal
 
         pen.speed = round(random.uniform(_penProps.penSpeedMinVal, _penProps.penSpeedMaxVal))
 
@@ -1483,6 +1489,8 @@ def _load_drawing_configs(config):
         palette.bgGlitchCyclesMax = float(workConfig.get(_p, "bgGlitchCyclesMax", fallback=config.bgGlitchCyclesMax))
         palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))
         palette.bgGlitchDisplacementVertical = float(workConfig.get(_p, "bgGlitchDisplacementVertical", fallback=config.bgGlitchDisplacementVertical))
+        palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1)) 
+        palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=5)) 
 
         palette.xOffsetRange = list(
             map(
@@ -1562,8 +1570,6 @@ def _load_pen_config(config):
             _mark.deltaRadiusXCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusXCenterChangeProb")) 
             _mark.deltaRadiusYCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusYCenterChangeProb")) 
             
-            _mark.penSpeedMinVal = float(markConfig.get("markParams", "penSpeedMinVal")) 
-            _mark.penSpeedMaxVal = float(markConfig.get("markParams", "penSpeedMaxVal")) 
         else :
 
             _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))

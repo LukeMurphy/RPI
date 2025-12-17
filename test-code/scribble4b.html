@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Continuous Looped Scribble</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ddd;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            width: 840px;
+            height: 1072px;
+            background: #e4e4e4;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="c"></canvas>
+
+    <script>
+
+        let isDrawing = false
+
+        // ================================
+        //  DPI + setup
+        // ================================
+        const canvas = document.getElementById("c");
+        const ctx = canvas.getContext("2d");
+        const w = canvas.width / (window.devicePixelRatio || 1);
+        const h = canvas.height / (window.devicePixelRatio || 1);
+        // ================================
+        //  Helpers
+        // ================================
+        const R = (min, max) => min + Math.random() * (max - min);
+
+        // Proper Catmull–Rom to Bézier for smooth continuous curves
+
+        let lastPoint = [0, 0]
+        let pointsCount = 0
+        let pointsCountMax = 0
+        let drawTimer
+        let drawRate = .2
+
+        let lineConfig = {}
+        let clearCanvasProb = 0.0
+
+        // line characteristics
+        let lineWidthMin = 1
+        let lineWidthMax = 20
+        let lineWidthDelta = .3
+        let deltaWidthChangeProb = .2
+        let xlineNoiseLevel = 0.001
+        let ylineNoiseLevel = 0.001
+        let loopsMin = 3.5
+        let loopsMax = 9.5
+
+        // line sizing
+        let lineHeightMin = 0.28
+        let lineHeightMax = 0.38
+        let radiusXMin = 0.08
+        let radiusXMax = 0.42
+        let radiusYMin = 0.22
+        let radiusYMax = 0.30
+        let xRadiusDelta = 5
+        let yRadiusDelta = 5
+        let deltaRadiusXChangeProb = .2
+        let deltaRadiusYChangeProb = .2
+
+        // line placement and centering
+        let xCenterMin = 0.1
+        let xCenterMax = 0.75
+        let baseYMin = 0.1
+        let baseYMax = 0.75
+        let centerXDelta = 5
+        let centerYDelta = 5
+        let deltaRadiusXCenterChangeProb = .2
+        let deltaRadiusYCenterChangeProb = .2
+
+
+
+        function fixDPI() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        fixDPI();
+        window.addEventListener("resize", () => { fixDPI(); draw(); });
+
+
+        function drawSmoothPath(points, color) {
+            ctx.strokeStyle = color;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            ctx.moveTo(points[0].x, points[0].y);
+            lastPoint = [points[0].x, points[0].y]
+            pointsCountMax = points.length - 3
+
+            drawTimer = setInterval(function () {
+
+                let i = pointsCount
+                let p0 = points[i];
+                let p1 = points[i + 1];
+                let p2 = points[i + 2];
+                let p3 = points[i + 3];
+
+                drawPathPart(p0, p1, p2, p3, color)
+
+                pointsCount += 1
+
+                if (pointsCount >= pointsCountMax) {
+                    clearInterval(drawTimer)
+                    isDrawing = false
+                }
+            }, drawRate)
+
+        }
+
+
+        function drawPathPart(p0, p1, p2, p3, color) {
+            ctx.strokeStyle = color;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+
+            // ctx.globalCompositeOperation = "lighter"
+            // if (Math.random() < 0.005 ) {
+            //     ctx.globalCompositeOperation = "source-over"
+            // }
+            ctx.beginPath();
+            ctx.moveTo(lastPoint[0], lastPoint[1]);
+
+            // dynamic width at p1
+            ctx.lineWidth = p1.w;
+
+            let cp1x = p1.x + (p2.x - p0.x) / 6;
+            let cp1y = p1.y + (p2.y - p0.y) / 6;
+            let cp2x = p2.x - (p3.x - p1.x) / 6;
+            let cp2y = p2.y - (p3.y - p1.y) / 6;
+
+            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            ctx.stroke();
+            lastPoint = [p2.x, p2.y]
+
+        }
+
+        // ================================
+        //  Loop generator (continuous stroke)
+        // ================================
+        function generateLoopStroke() {
+            // let {
+            //     xCenter, baseY, radiusX, radiusY,
+            //     loops, height, noiseX, noiseY,
+            //     points, minWidth, maxWidth, loopDirection
+            // } = opts;
+
+            let pts = [];
+            // initial width
+            let w = R(lineConfig.minWidth, lineConfig.maxWidth)
+            let deltaW = R(-lineWidthDelta, lineWidthDelta)
+
+            let _radiusX = lineConfig.radiusX
+            let _radiusY = lineConfig.radiusY
+            let deltaRadiusX = R(-xRadiusDelta, xRadiusDelta)
+            let deltaRadiusY = R(-yRadiusDelta, yRadiusDelta)
+
+            let _xCenter = lineConfig.xCenter
+            let _yCenter = lineConfig.baseY
+            let deltaRadiusXCenter = R(-centerXDelta, centerXDelta)
+            let deltaRadiusYCenter = R(-centerYDelta, centerYDelta)
+
+
+            for (let i = 0; i < lineConfig.points; i++) {
+                let t = i / (lineConfig.points - 1);
+                let ang = lineConfig.loopDirection * t * Math.PI * 2 * lineConfig.loops;
+
+                let x = _xCenter
+                    + Math.sin(ang) * _radiusX
+                    + R(-lineConfig.noiseX, lineConfig.noiseX);
+
+                let y = _yCenter
+                    - Math.cos(ang) * _radiusY
+                    - t * lineConfig.height
+                    + R(-lineConfig.noiseY, lineConfig.noiseY);
+
+                // Smooth width — continuous, no jumps
+                // let speedFactor = (1 - Math.cos(ang)) * 0.5;
+                w += deltaW
+
+                _radiusX += deltaRadiusX
+                _radiusY += deltaRadiusY
+
+                _xCenter += deltaRadiusXCenter
+                _yCenter += deltaRadiusYCenter
+
+                if (R(0, 1.0) < deltaRadiusXChangeProb) {
+                    deltaRadiusX = R(-xRadiusDelta, xRadiusDelta)
+                }
+                if (R(0, 1.0) < deltaRadiusYChangeProb) {
+                    deltaRadiusY = R(-yRadiusDelta, yRadiusDelta)
+                }
+                if (R(0, 1.0) < deltaRadiusXCenterChangeProb) {
+                    deltaRadiusXCenter = R(-centerXDelta, centerXDelta)
+                }
+                if (R(0, 1.0) < deltaRadiusYCenterChangeProb) {
+                    deltaRadiusYCenter = R(-centerYDelta, centerYDelta)
+                }
+
+                if (w < .1) {
+                    w = .1
+                }
+                if (R(0, 1.0) < deltaWidthChangeProb) {
+                    deltaW = R(-lineWidthDelta, lineWidthDelta)
+                }
+                // force down
+                if (w > lineConfig.maxWidth * .75) {
+                    deltaW = R(-.1, -.3)
+                }
+
+                pts.push({ x, y, w });
+            }
+
+            // Add extra points for smoother Bézier start/end
+            pts.unshift(pts[0]);
+            pts.push(pts[pts.length - 1]);
+            pts.push(pts[pts.length - 1]);
+
+            return pts;
+        }
+
+        // ================================
+        //  Main tall looped stroke
+        // ================================
+        function mainStroke() {
+
+            isDrawing = true
+
+            astPoint = [0, 0]
+            pointsCount = 0
+            pointsCountMax = 0
+
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+
+            lineConfig = {
+                xCenter: R(w * xCenterMin, w * xCenterMax),
+                baseY: R(h * baseYMin, h * baseYMax),
+                radiusX: w * R(radiusXMax, radiusXMax),
+                radiusY: h * R(radiusYMin, radiusYMax),
+                loops: R(loopsMin, loopsMax),
+                height: h * R(lineHeightMin, lineHeightMax),
+                noiseX: w * xlineNoiseLevel,
+                noiseY: h * ylineNoiseLevel,
+                points: 320,
+                minWidth: lineWidthMin,
+                maxWidth: lineWidthMax,
+                loopDirection: (R(0, 1) > .5) ? 1 : -1
+            }
+
+
+            lineConfig = {
+                xCenter: R(h * xCenterMax / 4, h * xCenterMax * .95),
+                baseY: R(h * baseYMax / 2, h * baseYMax * 1.3),
+                radiusX: 128,
+                radiusY: 205,
+                loops: R(7, 9),
+                height: 264,
+                noiseX: 0.64,
+                noiseY: 0.872,
+                points: 320,
+                minWidth: 12,
+                maxWidth: 20,
+                loopDirection: (R(0, 1) > .5) ? 1 : -1
+            }
+            // centerXDelta = 2
+            // centerYDelta = 2
+            // xRadiusDelta = 1
+            // yRadiusDelta = 3
+            // deltaRadiusYChangeProb = .3
+            // deltaRadiusYCenterChangeProb = .7
+
+
+            console.log(lineConfig)
+            const pts = generateLoopStroke();
+
+            drawSmoothPath(pts, "#8a0000");
+        }
+
+
+        function clearCanvas() {
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.fillStyle = "#e4e4e4";
+            
+            
+            
+            const hue = Math.floor(R(0, 360));
+            const sat = Math.floor(R(40, 90));
+            const light = Math.floor(R(40, 80));
+            const alpha = R(0.3, 0.9);
+            
+            ctx.fillStyle = `hsla(${hue}, ${sat}%, ${light}%, ${alpha})`;
+            
+            // ctx.fillRect(0,0,200,200)
+            ctx.fillRect(0, 0, w, h);
+            //  ground();
+        }
+
+        // ================================
+        //  Draw everything
+        // ================================
+        function draw() {
+            if (isDrawing === false) {
+                if (R(0, 1.0) <= clearCanvasProb) {
+                    clearCanvas()
+                }
+                mainStroke();
+            }
+        }
+
+        clearCanvas()
+        draw();
+        canvas.addEventListener("click", draw);
+
+
+    </script>
+</body>
+
+</html>

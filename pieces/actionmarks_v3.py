@@ -24,7 +24,6 @@ from modules.rendering.render import saveImageToFile
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
-
 # ----------------------------------------------------##----------------------------------------------------#
 class Palette:
     def __init__(self):
@@ -115,10 +114,11 @@ def catmull_rom(p0, p1, p2, p3, t):
 
 
 def R(a, b, rounded=False):
-    if not rounded :
+    if not rounded:
         return random.uniform(a, b)
-    else :
+    else:
         return round(random.uniform(a, b))
+
 
 # ----------------------------------------------------##----------------------------------------------------#
 
@@ -201,6 +201,7 @@ def startNewLine(_pen):
     setPenColor(_pen)
     _img = generateSmoothLinePoints(_pen)
     _pen._p = 1
+    config.dripsArray = []
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
@@ -226,14 +227,14 @@ def setPenPropsByName(_name, pen):
             break
     pen.name = _name
 
-    '''
+    """
     Added Scribble like marks - the marks that are a sign or signifier for mark
     making - marks as constrution of the image plane that recall the hand as
     much as stand in for the hand - since painting has become algorithmic of
     its own accord - maybe so much exposure to all the art ever made means 
     the act of marking is more an act of choice of type of mark
-    '''
-    if "scribble" in pen.name :
+    """
+    if "scribble" in pen.name:
         # pen.points = R(_penProps.minNumPoints, _penProps.maxNumPoints, True)
         pen.loopsMin = _penProps.loopsMin
         pen.loopsMax = _penProps.loopsMax
@@ -272,12 +273,12 @@ def setPenPropsByName(_name, pen):
         pen.speed = round(random.uniform(_penProps.penSpeedMinVal, _penProps.penSpeedMaxVal))
 
         pen.loopDirection = -1
-        if random.random() < .5  :
+        if random.random() < 0.5:
             pen.loopDirection = 1
-    else :   
+    else:
         pen.minNumPoints = _penProps.minNumPoints
         pen.maxNumPoints = _penProps.maxNumPoints
-        pen.num_points = round(random.uniform(pen.minNumPoints, pen.maxNumPoints))     
+        pen.num_points = round(random.uniform(pen.minNumPoints, pen.maxNumPoints))
         pen.turns = round(random.uniform(_penProps.turnsRange[0], _penProps.turnsRange[1]))
         pen.minInterpolatedPoints = _penProps.minInterpolatedPoints
         pen.maxInterpolatedPoints = _penProps.maxInterpolatedPoints
@@ -400,7 +401,7 @@ def generateSmoothLinePoints(_pen):
         generateLine(_pen)
     elif "scribble" in _pen.name:
         generateScribble(_pen)
-    else :
+    else:
         generateCurve(_pen)
     # pieceLogger("Line properties:")
     # for _pnt in range(len(_pen.smooth_points)-2) :
@@ -587,7 +588,7 @@ def generate_loop_stroke(_pen):
         if R(0, 1.0) < _pen.deltaRadiusYCenterChangeProb:
             deltaRadiusYCenter = R(-_pen.centerYDelta, _pen.centerYDelta)
 
-        pts.append((x,y))
+        pts.append((x, y))
 
     # Extra points for smoother Bézier start/end
     pts.insert(0, pts[0])
@@ -708,6 +709,23 @@ def drawLine(_pen):
         drawLinePolyEnvelope(_pen)
     else:
         drawLineSegments(_pen)
+    drawDrips()
+
+
+def drawDrips():
+    for _d in config.dripsArray:
+        if not _d[4]:
+            _p1 = _d[0]
+            _long = _d[1]
+            _wide = _d[2]
+            _lineColor = _d[3]
+            _speed = _d[5]
+            _step = _d[6]
+            config.draw.rectangle((_p1[0], _p1[1], _p1[0] + _wide, _p1[1] + _step * _long), fill=_lineColor)
+            _step += 1
+            _d[6] = _step
+            if _step > _speed :
+                _d[4] = True
 
 
 def drawLinePolyEnvelope(_pen):
@@ -775,6 +793,14 @@ def drawLinePolyEnvelope(_pen):
                 config.draw.polygon(_poly, fill=_lineColor, outline=None)
 
             # config.draw.line((_p1, _p2), fill=(255,0,0,255), width=1)
+
+            if random.random() < config.activePalette.dripProbablility:
+                _wide = round(random.uniform(0, config.activePalette.dripWidthMax))
+                _speed = round(random.uniform(config.activePalette.dripSpeedMin, config.activePalette.dripSpeedMax))
+                _long = round(random.uniform(2, config.activePalette.dripLengthMax) / _speed)
+                # config.draw.rectangle((_p1[0],_p1[1],_p1[0]+_wide,_p1[1]+_long), fill=_lineColor)
+                _drip = [_p1, _long, _wide, _lineColor, False, _speed, 0]
+                config.dripsArray.append(_drip)
 
             # if not _markDrawn :
             _pen.lastAngle = _angle
@@ -1489,8 +1515,8 @@ def _load_drawing_configs(config):
         palette.bgGlitchCyclesMax = float(workConfig.get(_p, "bgGlitchCyclesMax", fallback=config.bgGlitchCyclesMax))
         palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))
         palette.bgGlitchDisplacementVertical = float(workConfig.get(_p, "bgGlitchDisplacementVertical", fallback=config.bgGlitchDisplacementVertical))
-        palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1)) 
-        palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8)) 
+        palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
+        palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
 
         palette.xOffsetRange = list(
             map(
@@ -1513,6 +1539,12 @@ def _load_drawing_configs(config):
 
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
+
+        palette.dripWidthMax = float(workConfig.get(_p, "dripWidthMax", fallback=0.0))
+        palette.dripLengthMax = float(workConfig.get(_p, "dripLengthMax", fallback=0.0))
+        palette.dripProbablility = float(workConfig.get(_p, "dripProbablility", fallback=0.0))
+        palette.dripSpeedMin = float(workConfig.get(_p, "dripSpeedMin", fallback=0.0))
+        palette.dripSpeedMax = float(workConfig.get(_p, "dripSpeedMax", fallback=0.0))
 
         pieceLogger(f"\n===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
         config.paletteSets.append(palette)
@@ -1542,35 +1574,35 @@ def _load_pen_config(config):
 
         _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
 
-        if "scribble" in _mark.name :
+        if "scribble" in _mark.name:
 
             _mark.loopsMin = _mark.turnsRange[0]
             _mark.loopsMax = _mark.turnsRange[1]
 
-            _mark.pointsPerLoop = int(markConfig.get("markParams", "pointsPerLoop")) 
-            _mark.noiseX = float(markConfig.get("markParams", "noiseX")) 
-            _mark.noiseY = float(markConfig.get("markParams", "noiseY")) 
+            _mark.pointsPerLoop = int(markConfig.get("markParams", "pointsPerLoop"))
+            _mark.noiseX = float(markConfig.get("markParams", "noiseX"))
+            _mark.noiseY = float(markConfig.get("markParams", "noiseY"))
 
-            _mark.height = float(markConfig.get("markParams", "height")) 
-            _mark.radiusX = float(markConfig.get("markParams", "radiusX")) 
-            _mark.radiusY = float(markConfig.get("markParams", "radiusY")) 
-            _mark.radiusXMin = float(markConfig.get("markParams", "radiusXMin")) 
-            _mark.radiusXMax = float(markConfig.get("markParams", "radiusXMax")) 
-            _mark.radiusYMin = float(markConfig.get("markParams", "radiusYMin")) 
-            _mark.radiusYMax = float(markConfig.get("markParams", "radiusYMax")) 
-            _mark.xRadiusDelta = float(markConfig.get("markParams", "xRadiusDelta")) 
-            _mark.yRadiusDelta = float(markConfig.get("markParams", "yRadiusDelta")) 
-            _mark.deltaRadiusXChangeProb = float(markConfig.get("markParams", "deltaRadiusXChangeProb")) 
-            _mark.deltaRadiusYChangeProb = float(markConfig.get("markParams", "deltaRadiusYChangeProb")) 
+            _mark.height = float(markConfig.get("markParams", "height"))
+            _mark.radiusX = float(markConfig.get("markParams", "radiusX"))
+            _mark.radiusY = float(markConfig.get("markParams", "radiusY"))
+            _mark.radiusXMin = float(markConfig.get("markParams", "radiusXMin"))
+            _mark.radiusXMax = float(markConfig.get("markParams", "radiusXMax"))
+            _mark.radiusYMin = float(markConfig.get("markParams", "radiusYMin"))
+            _mark.radiusYMax = float(markConfig.get("markParams", "radiusYMax"))
+            _mark.xRadiusDelta = float(markConfig.get("markParams", "xRadiusDelta"))
+            _mark.yRadiusDelta = float(markConfig.get("markParams", "yRadiusDelta"))
+            _mark.deltaRadiusXChangeProb = float(markConfig.get("markParams", "deltaRadiusXChangeProb"))
+            _mark.deltaRadiusYChangeProb = float(markConfig.get("markParams", "deltaRadiusYChangeProb"))
 
-            _mark.xCenter = float(markConfig.get("markParams", "xCenter")) 
-            _mark.yCenter = float(markConfig.get("markParams", "yCenter")) 
-            _mark.centerXDelta = float(markConfig.get("markParams", "centerXDelta")) 
-            _mark.centerYDelta = float(markConfig.get("markParams", "centerYDelta")) 
-            _mark.deltaRadiusXCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusXCenterChangeProb")) 
-            _mark.deltaRadiusYCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusYCenterChangeProb")) 
-            
-        else :
+            _mark.xCenter = float(markConfig.get("markParams", "xCenter"))
+            _mark.yCenter = float(markConfig.get("markParams", "yCenter"))
+            _mark.centerXDelta = float(markConfig.get("markParams", "centerXDelta"))
+            _mark.centerYDelta = float(markConfig.get("markParams", "centerYDelta"))
+            _mark.deltaRadiusXCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusXCenterChangeProb"))
+            _mark.deltaRadiusYCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusYCenterChangeProb"))
+
+        else:
 
             _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
             _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
@@ -1587,7 +1619,7 @@ def _load_pen_config(config):
             _mark.yRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "yRandomRange", fallback="-1,1").split(",")))
 
             _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
-           
+
             # adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y
             _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
             _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
@@ -1691,6 +1723,7 @@ def _load_and_initialize_system(config):
     config.penArray = []
     config.drawingMode = 1
 
+    config.dripsArray = []
     initDrawings()
     config.blendLevel = 0.0
     config.blendLevelRate = 0.1

@@ -153,13 +153,12 @@ bgClr = ColorObj()
 bgClr.h = random.uniform(0, 1.0)
 bgClr.s = random.uniform(0, 1.0)
 bgClr.v = random.uniform(0.2, 0.50)
+Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
 fgClr.h = random.uniform(0, 1.0)
 fgClr.s = random.uniform(0.2, 1.0)
 fgClr.v = random.uniform(0.2, 0.80)
-
-Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 shp = AbsShape()
@@ -174,7 +173,7 @@ while True:
     # display.circle(x, y, 10)
     # display.rectangle(x, y, 10, 10)
     shp.p1.pointStep()
-    shp.p4.pointStep()
+    shp.p2.pointStep()
     shp.p3.pointStep()
     shp.p4.pointStep()
     bgClr.clrStep()
@@ -191,8 +190,6 @@ while True:
             tuple(shp.p4.pt),
         ]
     )
-    # Update the display
-    i75.update()
 
     if random.random() < 0.002:
         bgClr.newh = random.uniform(0, 1.0)
@@ -209,4 +206,6 @@ while True:
     if random.random() < 0.01:
         shp.update()
 
+    # Update the display
+    i75.update()
     time.sleep(INTERVAL)

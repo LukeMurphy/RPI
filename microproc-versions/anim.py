@@ -47,7 +47,6 @@ class Point:
         self.pt = [self.x, self.y]
 
 
-
 class AbsShape:
     inColorTrans = False
     inShapeTrans = False
@@ -145,6 +144,17 @@ class ColorObj:
             self.dv = 0
 
 
+def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
+    if init:
+        clrRef.h = random.uniform(hmin, hmax)
+        clrRef.s = random.uniform(smin, smax)
+        clrRef.v = random.uniform(vmin, vmax)
+    else:
+        clrRef.newh = random.uniform(hmin, hmax)
+        clrRef.news = random.uniform(smin, smax)
+        clrRef.newv = random.uniform(vmin, vmax)
+
+
 # Time to pause between frames
 INTERVAL = 0.03
 
@@ -166,12 +176,13 @@ animDirs = [
     "mousey",
 ]
 # frames that are allowed to pause
-animCanNotPauseFrames = [[9, 10, 11, 12], [4, 5, 6, 7], [3, 4, 5, 17, 18], [2], [9], [10, 11], [11, 12, 13, 14, 15], []]
+animCanNotPauseFrames = [[9, 10, 11, 12], [4, 5, 6, 7], [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], [2], [9], [10, 11], [11, 12, 13, 14, 15], []]
 animOffsets = [[0, 2], [0, 0], [0, 0], [0, 0], [0, 2], [0, 0], [0, 2], [0, 0]]
 anims = []
 
 for _dir in animDirs:
-    # make a list of files in the gif folder
+    # make a list of files in the gif fo
+    # lder
     _files = os.listdir(_dir)
     _images = []
 
@@ -183,15 +194,11 @@ for _dir in animDirs:
     anims.append([_images, _numImages])
 
 bgClr = ColorObj()
-bgClr.h = random.uniform(45 / 360, 45 / 360)
-bgClr.s = random.uniform(1.0, 1.0)
-bgClr.v = random.uniform(0.35, 0.350)
+changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
-fgClr.h = random.uniform(0, 1.0)
-fgClr.s = random.uniform(0.9, 1.0)
-fgClr.v = random.uniform(0.45, 0.5)
+changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.45, 0.5, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.set_pen(Bg)
@@ -246,7 +253,7 @@ while True:
     shp.p2.pointStep()
     shp.p3.pointStep()
     shp.p4.pointStep()
-    
+
     display.polygon(
         [
             tuple(shp.p1.pt),
@@ -259,21 +266,11 @@ while True:
     p.open_file(img)
     # Decode our PNG file and set the X and Y
     p.decode(animOffsets[activeAnim][0], animOffsets[activeAnim][1])
-    # i75.update()
-
-    # print("Displaying: " + img)
-
-
-    # if random.random() < 0.002:
-    #     fgClr.newh = random.uniform(0, 1.0)
-    #     fgClr.news = random.uniform(0.9, 1.0)
-    #     fgClr.newv = random.uniform(0.4, 0.60)
-    #     fgClr.change()
 
     if random.random() < 0.01:
         shp.update()
 
-    if random.random() < 0.001 and (count  < 1 or count > 12):
+    if random.random() < 0.001 and (count < 1 or count > 12):
         # activeAnim += 1
         # if activeAnim >= len(anims):
         #     activeAnim = 0
@@ -282,18 +279,13 @@ while True:
         incr = 1
         numImages = anims[activeAnim][1]
 
-        bgClr.newh = random.uniform(0.0, 1.0)
-        bgClr.news = random.uniform(0.5, 1.0)
-        bgClr.newv = random.uniform(0.1, 0.350)
+        changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        fgClr.newh = random.uniform(0, 1.0)
-        fgClr.news = random.uniform(0.9, 1.0)
-        fgClr.newv = random.uniform(0.4, 0.60)
+        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.4, 0.6)
         fgClr.change()
 
         shp.update()
-
 
     i75.update()
     time.sleep(INTERVAL)

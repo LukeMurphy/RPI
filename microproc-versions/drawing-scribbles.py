@@ -382,7 +382,7 @@ x = 10
 y = 10
 
 bgClr = ColorObj()
-changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
+changeColor(bgClr, 45 / 360, 65 / 360, .20, .30, 0.15, 0.15, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
@@ -405,38 +405,41 @@ _pen = Pen()
 config = Config()
 
 _pen.name = "scribbleLine1"
-_pen.pointsPerLoop = 5
+_pen.pointsPerLoop = 8
 _pen.loopsMin = 3
-_pen.loopsMax = 7
+_pen.loopsMax = 4
+
 _pen.minMarkWidth = 1
-_pen.maxMarkWidth = 5
-_pen.changeMarkWidthProb = 0.05
+_pen.maxMarkWidth = 4
+_pen.changeMarkWidthProb = 0.02
 _pen.incrementFactor = 1
-_pen.height = 30
-_pen.radiusX = 10
-_pen.radiusY = 10
-_pen.radiusXMin = 10
-_pen.radiusXMax = 20
-_pen.radiusYMin = 10
-_pen.radiusYMax = 20
-_pen.noiseX = 10
-_pen.noiseY = 10
-_pen.xRadiusDelta = 2
-_pen.yRadiusDelta = 2
-_pen.deltaRadiusXChangeProb = 0.2
-_pen.deltaRadiusYChangeProb = 0.2
+
+_pen.height = 10
+_pen.radiusX = 20
+_pen.radiusY = 32
+_pen.radiusXMin = 5
+_pen.radiusXMax = 30
+_pen.radiusYMin = 5
+_pen.radiusYMax = 30
+_pen.noiseX = 5
+_pen.noiseY = 5
+_pen.xRadiusDelta = 1
+_pen.yRadiusDelta = 1
+_pen.deltaRadiusXChangeProb = 0.02
+_pen.deltaRadiusYChangeProb = 0.02
+
 _pen.xCenter = 0
 _pen.yCenter = 0
 _pen.xOffset = 32
 _pen.yOffset = 32
-_pen.centerXDelta = 10
-_pen.centerYDelta = 8
-_pen.deltaRadiusXCenterChangeProb = 0.4
-_pen.deltaRadiusYCenterChangeProb = 0.4
+_pen.centerXDelta = 2
+_pen.centerYDelta = 0
+_pen.deltaRadiusXCenterChangeProb = 0.04
+_pen.deltaRadiusYCenterChangeProb = 0.04
 _pen.loops = R(_pen.loopsMin, _pen.loopsMax, True)
 _pen.points = round(_pen.loops * _pen.pointsPerLoop)
-_pen.penSpeedMinVal = 1
-_pen.penSpeedMaxVal = 1
+_pen.penSpeedMinVal = 2
+_pen.penSpeedMaxVal = 3
 _pen.speed = round(random.uniform(_pen.penSpeedMinVal, _pen.penSpeedMaxVal))
 _pen._p = 1
 _pen._w = 2
@@ -465,7 +468,7 @@ def startNew():
     _pen.enlarging = False
     _pen.attenuating = False
     
-    changeColor(penClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.1, 0.15, True)
+    changeColor(penClr, 0 / 360, 36 / 360, 0.60, 1.0, 0.1, 0.75, True)
     print(penClr.h, penClr.s, penClr.v)
     penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
     display.reset_pen(penG)
@@ -474,34 +477,43 @@ def startNew():
 
 display.set_pen(Bg)
 display.clear()
+
+def drawPanelShape() :
+    global ForeG
+
+    display.reset_pen(ForeG)
+    display.set_pen(ForeG)
+
+    shp.p1.pointStep()
+    shp.p2.pointStep()
+    shp.p3.pointStep()
+    shp.p4.pointStep()
+    bgClr.clrStep()
+    fgClr.clrStep()
+
+    #Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
+    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+
+    display.polygon(
+         [
+             tuple(shp.p1.pt),
+             tuple(shp.p2.pt),
+             tuple(shp.p3.pt),
+             tuple(shp.p4.pt),
+         ]
+    )
+
+drawPanelShape()
+
 while True:
     # display.set_pen(Bg)
     # display.clear()
 
     # Reset the pen so we can reuse it
-    # display.reset_pen(ForeG)
-    # display.set_pen(ForeG)
 
-    # shp.p1.pointStep()
-    # shp.p2.pointStep()
-    # shp.p3.pointStep()
-    # shp.p4.pointStep()
-    #bgClr.clrStep()
-    # fgClr.clrStep()
-
-    #Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
-    # ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
-
-    # display.polygon(
-    #     [
-    #         tuple(shp.p1.pt),
-    #         tuple(shp.p2.pt),
-    #         tuple(shp.p3.pt),
-    #         tuple(shp.p4.pt),
-    #     ]
-    # )
 
     if random.random() < 0.002:
+        drawPanelShape()
         bgClr.newh = random.uniform(0, 1.0)
         bgClr.news = random.uniform(0, 1.0)
         bgClr.newv = random.uniform(0.2, 0.50)

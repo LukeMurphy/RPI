@@ -1,31 +1,46 @@
-""" """
-
 import time
-import os
 import random
 import math
 
-"""
-"""
-import pngdec
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
 # ----------------------------------------------------##----------------------------------------------------#
+INTERVAL = 0.02
+PWIDTH = 64
+PHEIGHT = 64
+NUMSQRS = 19
+
+bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), 
+               (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
+bgBoxColorSets = [(12 / 360, 27 / 360, 0.77, 0.97, 0.35, 0.77, 0, 0), 
+                  (215 / 360, 218 / 360, 0.77, 0.97, 0.35, 0.87, 0, 0), 
+                  (159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0),
+                  (159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), 
+               (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
+penColorSets = [
+    (28 / 360, 30 / 360, 0.5, 0.99, 0.95, 0.99, 0, 0),
+    (18 / 360, 20 / 360, 0.65, 0.650, 0.93, 0.99, 0, 0),
+    (10 / 360, 18 / 360, 0.5, 0.50, 0.95, 0.99, 0, 0),
+    (10 / 360, 18 / 360, 0.25, 0.350, 0.95, 0.99, 0, 0),
+    (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
+]
 
 
-class Palette:
-    def __init__(self):
-        pass
+shapes = []
+
+# Setup for the display
+i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
+display = i75.display
 
 
-class Pen:
+class PenMark:
     def __init__(self):
         pass
 
 
 class Config:
     def __init__(self):
-        pass
+        self.doingDrawing = False
 
 
 class ColorObj:
@@ -47,9 +62,9 @@ class ColorObj:
         self.dv = (self.newv - self.v) / self.speedFactor
 
     def clrStep(self):
-        self.h = self.h + self.dh
-        self.s = self.s + self.ds
-        self.v = self.v + self.dv
+        self.h += self.dh
+        self.s += self.ds
+        self.v += self.dv
 
         if round(self.h * 10) == round(self.newh * 10):
             self.dh = 0
@@ -60,23 +75,16 @@ class ColorObj:
 
 
 class Point:
-
-    x = 0
-    y = 0
-    dx = 0
-    dy = 0
-    newX = 0
-    newY = 0
-    diffX = 0
-    diffY = 0
-    xSpeed = 0
-    ySpeed = 0
-    pt = []
-    speedFactor = 12
-
     def __init__(self, _x, _y):
         self.x = _x
         self.y = _y
+        self.newX = _x
+        self.newY = _y
+        self.dx = 0
+        self.dy = 0
+        self.xSpeed = 0
+        self.ySpeed = 0
+        self.speedFactor = 12
         self.pt = [self.x, self.y]
 
     def change(self):
@@ -112,11 +120,13 @@ class AbsShape:
     initP4 = Point(50, 64)
 
     def __init__(self):
+        pass
+
+    def setup(self):
         self.p1 = self.initP1
         self.p2 = self.initP2
         self.p3 = self.initP3
         self.p4 = self.initP4
-        pass
 
     def update(self):
         if random.random() < 0.25:
@@ -269,8 +279,6 @@ def get_curve_points(points, curve_drawn=True, resolution=50):
 
 
 def drawLinePolyEnvelope(_pen):
-    # Draw the shape
-    # print(f"should be drawing {_pen} {_pen.speed} {_pen.points}")
     for _ in range(_pen.speed):
         if _pen._p < len(_pen.smooth_points) and _pen._p > 0:
             _p1 = _pen.smooth_points[_pen._p - 1]
@@ -302,33 +310,18 @@ def drawLinePolyEnvelope(_pen):
             _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
             _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
 
-            _drawdot = False
-            try:
-                if _pen._p > 1:
-                    _drawdot = True
+            last_ortho_point = getattr(_pen, "lastOrthoPoint", None)
+            if _pen._p > 1 and last_ortho_point:
+                _orthoP1x = last_ortho_point[0]
+                _orthoP1y = last_ortho_point[1]
 
-                    _orthoP1x = _pen.lastOrthoPoint[0]
-                    _orthoP1y = _pen.lastOrthoPoint[1]
-
-                    _orthoP4x = _pen.lastOrthoPoint[2]
-                    _orthoP4y = _pen.lastOrthoPoint[3]
-
-            except Exception as e:
-                print(e)
+                _orthoP4x = last_ortho_point[2]
+                _orthoP4y = last_ortho_point[3]
 
             _poly = [(_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y)]
 
-            drawPolygon(_poly)
+            drawLineEnvelope(_poly)
 
-            # if random.random() < config.activePalette.dripProbablility:
-            #     _wide = round(random.uniform(0, config.activePalette.dripWidthMax))
-            #     _speed = round(random.uniform(config.activePalette.dripSpeedMin, config.activePalette.dripSpeedMax))
-            #     _long = round(random.uniform(2, config.activePalette.dripLengthMax) / _speed)
-            #     # config.draw.rectangle((_p1[0],_p1[1],_p1[0]+_wide,_p1[1]+_long), fill=_lineColor)
-            #     _drip = [_p1, _long, _wide, _lineColor, False, _speed, 0]
-            #     config.dripsArray.append(_drip)
-
-            # if not _markDrawn :
             _pen.lastAngle = _angle
             _pen._p += 1
             _pen.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
@@ -336,8 +329,10 @@ def drawLinePolyEnvelope(_pen):
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
-            print("Drawing stopped.")
-            startNew()
+            # print("Drawing stopped.")
+
+            time.sleep(random.uniform(0, 7))
+            startUpNewLine()
 
         if random.random() < _pen.changeMarkWidthProb:
             if not _pen.attenuating and not _pen.enlarging:
@@ -365,175 +360,185 @@ def drawLinePolyEnvelope(_pen):
         if _pen.attenuating:
             _pen._w -= round(1 * _pen.incrementFactor)
 
-        # time.sleep(.5)
+
+def setShapes():
+    global shapes
+    for _shp in shapes:
+        _wd = random.uniform(4, 43)
+        _rx = random.uniform(0, PWIDTH - _wd)
+        _ry = random.uniform(0, PHEIGHT - _wd)
+        _shp.initP1 = Point(_rx, _ry)
+        _shp.initP2 = Point(_rx, _ry + _wd)
+        _shp.initP3 = Point(_rx + _wd, _ry + _wd)
+        _shp.initP4 = Point(_rx + _wd, _ry)
+        _shp.setup()
 
 
-# Time to pause between frames
-INTERVAL = 0.02
+def drawLineEnvelope(_poly):
+    global penG
+    display.reset_pen(penG)
+    if random.random() < .02 :
+        setColor(penClr, penColorSets)
+    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
+    display.set_pen(penG)
+    display.polygon(_poly)
 
-# Setup for the display
-i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
-display = i75.display
 
-WIDTH = i75.width
-HEIGHT = i75.height
+def startUpNewLine():
+    global penMark
+    penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
+    penMark.points = round(penMark.loops * penMark.pointsPerLoop)
+    penMark.speed = round(random.uniform(penMark.penSpeedMinVal, penMark.penSpeedMaxVal))
+    penMark._p = 1
+    penMark._w = 0.5
+    penMark.lastOrthoPoint = None
+    penMark.enlarging = False
+    penMark.attenuating = False
+    penMark.loopDirection = -1
+    if random.random() < 0.5:
+        penMark.loopDirection = 1
 
-x = 10
-y = 10
+    setColor(penClr, penColorSets)
+    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
+    display.reset_pen(penG)
+
+    generateScribble(penMark)
+
+
+def drawBGPanelBlocks():
+    global shapes
+    for shp in shapes:
+        drawBGPanelBlock(shp)
+
+
+def drawBGPanelBlock(shp):
+    global ForeG
+    display.reset_pen(ForeG)
+    display.set_pen(ForeG)
+    if random.random() < .02 :
+        setColor(fgClr, bgBoxColorSets)
+    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+    shp.p1.pointStep()
+    shp.p3.pointStep()
+    shp.p2.pointStep()
+    shp.p4.pointStep()
+
+    display.polygon(
+        [
+            tuple(shp.p1.pt),
+            tuple(shp.p2.pt),
+            tuple(shp.p3.pt),
+            tuple(shp.p4.pt),
+        ]
+    )
+
+
+def setColor(_clrRef, _clrSetRef):
+    _clrSet = _clrSetRef[round(random.uniform(0, len(_clrSetRef) - 1))]
+    _clrRef.h = random.uniform(_clrSet[0], _clrSet[1])
+    _clrRef.s = random.uniform(_clrSet[2], _clrSet[3])
+    _clrRef.v = random.uniform(_clrSet[5], _clrSet[5])
+
+
+# ----------------------------------------------------##----------------------------------------------------#
+# SETUPS #
 
 bgClr = ColorObj()
-changeColor(bgClr, 45 / 360, 65 / 360, .20, .30, 0.15, 0.15, True)
+setColor(bgClr, bgColorSets)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
-changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.45, 0.5, True)
+setColor(fgClr, bgBoxColorSets)
+fgClr.change()
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 penClr = ColorObj()
-changeColor(penClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.45, 0.5, True)
+setColor(penClr, penColorSets)
 penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
-print(penClr.h, penClr.s, penClr.v)
+
+
+for _ in range(NUMSQRS):
+    _shp = AbsShape()
+    shapes.append(_shp)
+
+setShapes()
+
+penMark = PenMark()
+config = Config()
+
+penMark.name = "scribbleLine1"
+penMark.pointsPerLoop = 8
+penMark.loopsMin = 3
+penMark.loopsMax = 4
+
+penMark.minMarkWidth = 1
+penMark.maxMarkWidth = 5
+penMark.changeMarkWidthProb = 0.03
+penMark.incrementFactor = 1
+
+penMark.height = 10
+penMark.radiusX = 20
+penMark.radiusY = 32
+penMark.radiusXMin = 5
+penMark.radiusXMax = 30
+penMark.radiusYMin = 5
+penMark.radiusYMax = 30
+penMark.noiseX = 5
+penMark.noiseY = 5
+penMark.xRadiusDelta = 1
+penMark.yRadiusDelta = 1
+penMark.deltaRadiusXChangeProb = 0.02
+penMark.deltaRadiusYChangeProb = 0.02
+
+penMark.xCenter = 0
+penMark.yCenter = 0
+penMark.xOffset = 32
+penMark.yOffset = 32
+penMark.centerXDelta = 2
+penMark.centerYDelta = 1
+penMark.deltaRadiusXCenterChangeProb = 0.04
+penMark.deltaRadiusYCenterChangeProb = 0.04
+penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
+penMark.points = round(penMark.loops * penMark.pointsPerLoop)
+penMark.penSpeedMinVal = 2
+penMark.penSpeedMaxVal = 3
+
+
+startUpNewLine()
 
 display.set_pen(ForeG)
 display.set_pen(penG)
 display.set_pen(Bg)
 display.clear()
 
+generateScribble(penMark)
+drawBGPanelBlocks()
 
-shp = AbsShape()
-_pen = Pen()
-config = Config()
-
-_pen.name = "scribbleLine1"
-_pen.pointsPerLoop = 8
-_pen.loopsMin = 3
-_pen.loopsMax = 4
-
-_pen.minMarkWidth = 1
-_pen.maxMarkWidth = 4
-_pen.changeMarkWidthProb = 0.02
-_pen.incrementFactor = 1
-
-_pen.height = 10
-_pen.radiusX = 20
-_pen.radiusY = 32
-_pen.radiusXMin = 5
-_pen.radiusXMax = 30
-_pen.radiusYMin = 5
-_pen.radiusYMax = 30
-_pen.noiseX = 5
-_pen.noiseY = 5
-_pen.xRadiusDelta = 1
-_pen.yRadiusDelta = 1
-_pen.deltaRadiusXChangeProb = 0.02
-_pen.deltaRadiusYChangeProb = 0.02
-
-_pen.xCenter = 0
-_pen.yCenter = 0
-_pen.xOffset = 32
-_pen.yOffset = 32
-_pen.centerXDelta = 2
-_pen.centerYDelta = 0
-_pen.deltaRadiusXCenterChangeProb = 0.04
-_pen.deltaRadiusYCenterChangeProb = 0.04
-_pen.loops = R(_pen.loopsMin, _pen.loopsMax, True)
-_pen.points = round(_pen.loops * _pen.pointsPerLoop)
-_pen.penSpeedMinVal = 2
-_pen.penSpeedMaxVal = 3
-_pen.speed = round(random.uniform(_pen.penSpeedMinVal, _pen.penSpeedMaxVal))
-_pen._p = 1
-_pen._w = 2
-_pen.enlarging = False
-_pen.attenuating = False
-_pen.lineColor = ""
-_pen.loopDirection = -1
-if random.random() < 0.5:
-    _pen.loopDirection = 1
-
-generateScribble(_pen)
-
-def drawPolygon(_poly):
-    global penG
-    display.reset_pen(penG)
-    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
-    display.set_pen(penG)
-    display.polygon(_poly)
-
-def startNew():
-    _pen.loops = R(_pen.loopsMin, _pen.loopsMax, True)
-    _pen.points = round(_pen.loops * _pen.pointsPerLoop)
-    _pen.speed = round(random.uniform(_pen.penSpeedMinVal, _pen.penSpeedMaxVal))
-    _pen._p = 1
-    _pen._w = 2
-    _pen.enlarging = False
-    _pen.attenuating = False
-    
-    changeColor(penClr, 0 / 360, 36 / 360, 0.60, 1.0, 0.1, 0.75, True)
-    print(penClr.h, penClr.s, penClr.v)
-    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
-    display.reset_pen(penG)
-    
-    generateScribble(_pen)
-
-display.set_pen(Bg)
-display.clear()
-
-def drawPanelShape() :
-    global ForeG
-
-    display.reset_pen(ForeG)
-    display.set_pen(ForeG)
-
-    shp.p1.pointStep()
-    shp.p2.pointStep()
-    shp.p3.pointStep()
-    shp.p4.pointStep()
-    bgClr.clrStep()
-    fgClr.clrStep()
-
-    #Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
-    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
-
-    display.polygon(
-         [
-             tuple(shp.p1.pt),
-             tuple(shp.p2.pt),
-             tuple(shp.p3.pt),
-             tuple(shp.p4.pt),
-         ]
-    )
-
-drawPanelShape()
+panelBGBlockCount = 0
 
 while True:
-    # display.set_pen(Bg)
-    # display.clear()
-
-    # Reset the pen so we can reuse it
-
-
-    if random.random() < 0.002:
-        drawPanelShape()
-        bgClr.newh = random.uniform(0, 1.0)
-        bgClr.news = random.uniform(0, 1.0)
-        bgClr.newv = random.uniform(0.2, 0.50)
-        bgClr.change()
-
-    # if random.random() < 0.001:
-    #     fgClr.newh = random.uniform(0, 1.0)
-    #     fgClr.news = random.uniform(0.2, 1.0)
-    #     fgClr.newv = random.uniform(0.2, 0.50)
-    #     fgClr.change()
+    if random.random() < 0.005:
+        setColor(fgClr, bgBoxColorSets)
+        ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+        setShapes()
+        display.reset_pen(ForeG)
+        display.set_pen(ForeG)
+        panelBGBlockCount = 1
+        
+    # this needs refinement b/c the bg can overpaint the line too often
+    if panelBGBlockCount > 0:
+        drawBGPanelBlock(shapes[panelBGBlockCount])
+        panelBGBlockCount += 1
+        if panelBGBlockCount >= NUMSQRS:
+            panelBGBlockCount = 0
 
     display.reset_pen(penG)
     display.set_pen(penG)
-    drawLinePolyEnvelope(_pen)
 
-    if random.random() < 0.01:
-        shp.update()
+    if panelBGBlockCount == 0:
+        drawLinePolyEnvelope(penMark)
 
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
-
 

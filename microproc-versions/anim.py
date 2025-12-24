@@ -176,8 +176,9 @@ animDirs = [
     "mousey",
 ]
 # frames that are allowed to pause
-animCanNotPauseFrames = [[9, 10, 11, 12], [4, 5, 6, 7], [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], [2], [9], [10, 11], [11, 12, 13, 14, 15], []]
+animCanNotPauseFrames = [[9, 10, 11, 12], [4, 5, 6, 7], [4,5,8, 9, 10, 11, 12, 13, 14, 17, 18, 19], [2], [9], [10, 11], [11, 12, 13, 14, 15], []]
 animOffsets = [[0, 2], [0, 0], [0, 0], [0, 0], [0, 2], [0, 0], [0, 2], [0, 0]]
+animPause = [0.01, 0.01, 0.08, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 anims = []
 
 for _dir in animDirs:
@@ -207,13 +208,19 @@ display.clear()
 count = 0
 incr = 1
 pause = False
-activeAnim = 0
+activeAnim = 2
 numImages = anims[activeAnim][1]
 
 shp = AbsShape()
 
 
 while True:
+    if count <= 0:
+        incr = 1
+        count = 0
+            
+    if count >= numImages:
+        count = numImages -1
 
     img = anims[activeAnim][0][count]
 
@@ -222,17 +229,21 @@ while True:
 
         if count >= numImages:
             incr = -1
-            pause = True
+            # pause = True
 
         if count <= 0:
             incr = 1
             pause = True
 
-    if random.random() < 0.00 and count not in animCanNotPauseFrames[activeAnim]:
-        # pause = True
+            
+    if random.random() < animPause[activeAnim]:
+        pause = True
         # sometimes just goes back
         if random.random() < 0.5:
             incr *= -1
+
+    if count in animCanNotPauseFrames[activeAnim]:
+        pause = False
 
     if random.random() < 0.01:
         pause = False
@@ -289,3 +300,4 @@ while True:
 
     i75.update()
     time.sleep(INTERVAL)
+

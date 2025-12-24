@@ -85,19 +85,19 @@ class AbsShape:
             self.p4.newY = self.p4.pt[1]
             self.p4.change()
 
-        if random.random() < 0.15:
+        if random.random() < 0.25:
             self.p1.newX = self.initP1.pt[0]
             self.p1.newY = self.initP1.pt[1]
             self.p1.change()
-        if random.random() < 0.15:
+        if random.random() < 0.25:
             self.p2.newX = self.initP2.pt[0]
             self.p2.newY = self.initP2.pt[1]
             self.p2.change()
-        if random.random() < 0.15:
+        if random.random() < 0.25:
             self.p3.newX = self.initP3.pt[0]
             self.p3.newY = self.initP3.pt[1]
             self.p3.change()
-        if random.random() < 0.15:
+        if random.random() < 0.25:
             self.p4.newX = self.initP4.pt[0]
             self.p4.newY = self.initP4.pt[1]
             self.p4.change()
@@ -176,9 +176,8 @@ animDirs = [
     "mousey",
 ]
 # frames that are allowed to pause
-animCanNotPauseFrames = [[9, 10, 11, 12], [4, 5, 6, 7], [4,5,8, 9, 10, 11, 12, 13, 14, 17, 18, 19], [2], [9], [10, 11], [11, 12, 13, 14, 15], []]
+animCanNotPauseFrames = [[9, 10, 11, 12], [4, 5, 6, 7], [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], [2], [9], [10, 11], [11, 12, 13, 14, 15], []]
 animOffsets = [[0, 2], [0, 0], [0, 0], [0, 0], [0, 2], [0, 0], [0, 2], [0, 0]]
-animPause = [0.01, 0.01, 0.08, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 anims = []
 
 for _dir in animDirs:
@@ -208,19 +207,13 @@ display.clear()
 count = 0
 incr = 1
 pause = False
-activeAnim = 2
+activeAnim = 0
 numImages = anims[activeAnim][1]
 
 shp = AbsShape()
 
 
 while True:
-    if count <= 0:
-        incr = 1
-        count = 0
-            
-    if count >= numImages:
-        count = numImages -1
 
     img = anims[activeAnim][0][count]
 
@@ -229,21 +222,17 @@ while True:
 
         if count >= numImages:
             incr = -1
-            # pause = True
+            pause = True
 
         if count <= 0:
             incr = 1
             pause = True
 
-            
-    if random.random() < animPause[activeAnim]:
-        pause = True
+    if random.random() < 0.00 and count not in animCanNotPauseFrames[activeAnim]:
+        # pause = True
         # sometimes just goes back
         if random.random() < 0.5:
             incr *= -1
-
-    if count in animCanNotPauseFrames[activeAnim]:
-        pause = False
 
     if random.random() < 0.01:
         pause = False
@@ -278,7 +267,7 @@ while True:
     # Decode our PNG file and set the X and Y
     p.decode(animOffsets[activeAnim][0], animOffsets[activeAnim][1])
 
-    if random.random() < 0.01:
+    if random.random() < 0.03:
         shp.update()
 
     if random.random() < 0.001 and (count < 1 or count > 12):

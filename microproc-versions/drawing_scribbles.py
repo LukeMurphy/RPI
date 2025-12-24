@@ -9,13 +9,16 @@ INTERVAL = 0.02
 PWIDTH = 64
 PHEIGHT = 64
 NUMSQRS = 19
+eraseProb = .01
+shapes = []
+brightness = .5
+penBrightness = .8
 
 bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), 
                (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
-bgBoxColorSets = [(12 / 360, 27 / 360, 0.77, 0.97, 0.35, 0.77, 0, 0), 
+bgBoxColorSets = [(5 / 360, 27 / 360, 0.77, 0.97, 0.1, 0.77, 0, 0), 
                   (215 / 360, 218 / 360, 0.77, 0.97, 0.35, 0.87, 0, 0), 
                   (159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0),
-                  (159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), 
                (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
 penColorSets = [
     (28 / 360, 30 / 360, 0.5, 0.99, 0.95, 0.99, 0, 0),
@@ -26,7 +29,6 @@ penColorSets = [
 ]
 
 
-shapes = []
 
 # Setup for the display
 i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
@@ -365,8 +367,8 @@ def setShapes():
     global shapes
     for _shp in shapes:
         _wd = random.uniform(4, 43)
-        _rx = random.uniform(0, PWIDTH - _wd)
-        _ry = random.uniform(0, PHEIGHT - _wd)
+        _rx = random.uniform(0, PWIDTH - _wd/2)
+        _ry = random.uniform(0, PHEIGHT - _wd/2)
         _shp.initP1 = Point(_rx, _ry)
         _shp.initP2 = Point(_rx, _ry + _wd)
         _shp.initP3 = Point(_rx + _wd, _ry + _wd)
@@ -379,7 +381,7 @@ def drawLineEnvelope(_poly):
     display.reset_pen(penG)
     if random.random() < .02 :
         setColor(penClr, penColorSets)
-    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
+    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * brightness)
     display.set_pen(penG)
     display.polygon(_poly)
 
@@ -399,7 +401,7 @@ def startUpNewLine():
         penMark.loopDirection = 1
 
     setColor(penClr, penColorSets)
-    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
+    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * penBrightness)
     display.reset_pen(penG)
 
     generateScribble(penMark)
@@ -417,7 +419,7 @@ def drawBGPanelBlock(shp):
     display.set_pen(ForeG)
     if random.random() < .02 :
         setColor(fgClr, bgBoxColorSets)
-    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v  * brightness)
     shp.p1.pointStep()
     shp.p3.pointStep()
     shp.p2.pointStep()
@@ -517,7 +519,7 @@ drawBGPanelBlocks()
 panelBGBlockCount = 0
 
 while True:
-    if random.random() < 0.005:
+    if random.random() < eraseProb:
         setColor(fgClr, bgBoxColorSets)
         ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
         setShapes()
@@ -541,4 +543,5 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
+
 

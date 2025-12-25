@@ -158,7 +158,7 @@ class Config() :
 
 def start() :
     # img = loadImage("./spritesheets/babyanimalsheet-pensive-left.png")
-    img = loadImage("./spritesheets/obear-turning.png")
+    img = loadImage("./obear-turning-256.png")
     # img = loadImage("./spritesheets/bbear-2.png")
     # img = loadImage("./spritesheets/babyanimalsheet-bbunny-right.png")
     # img = loadImage("./spritesheets/babyanimalsheet-bear-head-left.png")

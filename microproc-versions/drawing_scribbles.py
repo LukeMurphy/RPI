@@ -4,36 +4,6 @@ import math
 
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
-# ----------------------------------------------------##----------------------------------------------------#
-INTERVAL = 0.02
-PWIDTH = 64
-PHEIGHT = 64
-NUMSQRS = 19
-eraseProb = .01
-shapes = []
-brightness = .5
-penBrightness = .8
-
-bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), 
-               (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
-bgBoxColorSets = [(5 / 360, 27 / 360, 0.77, 0.97, 0.1, 0.77, 0, 0), 
-                  (215 / 360, 218 / 360, 0.77, 0.97, 0.35, 0.87, 0, 0), 
-                  (159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0),
-               (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
-penColorSets = [
-    (28 / 360, 30 / 360, 0.5, 0.99, 0.95, 0.99, 0, 0),
-    (18 / 360, 20 / 360, 0.65, 0.650, 0.93, 0.99, 0, 0),
-    (10 / 360, 18 / 360, 0.5, 0.50, 0.95, 0.99, 0, 0),
-    (10 / 360, 18 / 360, 0.25, 0.350, 0.95, 0.99, 0, 0),
-    (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
-]
-
-
-
-# Setup for the display
-i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
-display = i75.display
-
 
 class PenMark:
     def __init__(self):
@@ -367,8 +337,8 @@ def setShapes():
     global shapes
     for _shp in shapes:
         _wd = random.uniform(4, 43)
-        _rx = random.uniform(0, PWIDTH - _wd/2)
-        _ry = random.uniform(0, PHEIGHT - _wd/2)
+        _rx = random.uniform(0, PWIDTH - _wd / 2)
+        _ry = random.uniform(0, PHEIGHT - _wd / 2)
         _shp.initP1 = Point(_rx, _ry)
         _shp.initP2 = Point(_rx, _ry + _wd)
         _shp.initP3 = Point(_rx + _wd, _ry + _wd)
@@ -379,7 +349,7 @@ def setShapes():
 def drawLineEnvelope(_poly):
     global penG
     display.reset_pen(penG)
-    if random.random() < .02 :
+    if random.random() < 0.02:
         setColor(penClr, penColorSets)
     penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * brightness)
     display.set_pen(penG)
@@ -417,9 +387,9 @@ def drawBGPanelBlock(shp):
     global ForeG
     display.reset_pen(ForeG)
     display.set_pen(ForeG)
-    if random.random() < .02 :
+    if random.random() < 0.02:
         setColor(fgClr, bgBoxColorSets)
-    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v  * brightness)
+    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v * brightness)
     shp.p1.pointStep()
     shp.p3.pointStep()
     shp.p2.pointStep()
@@ -437,13 +407,117 @@ def drawBGPanelBlock(shp):
 
 def setColor(_clrRef, _clrSetRef):
     _clrSet = _clrSetRef[round(random.uniform(0, len(_clrSetRef) - 1))]
-    _clrRef.h = random.uniform(_clrSet[0], _clrSet[1])
+    _minh = _clrSet[0]
+    _maxh = _clrSet[1]
+    _h = random.uniform(_minh, _maxh)
+    if _minh > _maxh :
+        _h = random.uniform(_minh, 1.0 - _maxh)
+
+    _clrRef.h = _h
     _clrRef.s = random.uniform(_clrSet[2], _clrSet[3])
     _clrRef.v = random.uniform(_clrSet[5], _clrSet[5])
 
 
 # ----------------------------------------------------##----------------------------------------------------#
+
+INTERVAL = 0.02
+PWIDTH = 64
+PHEIGHT = 64
+NUMSQRS = 19
+eraseProb = 0.01
+brightness = 0.4
+penBrightness = 0.6
+changePaletteProb = .5
+
+bgColorSets = []
+bgBoxColorSets = []
+penColorSets = []
+
+def setPalette(arg = 0) :
+    global bgColorSets, bgBoxColorSets, penColorSets
+
+    if arg == 0 :
+        bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
+        bgBoxColorSets = [
+            (5 / 360, 27 / 360, 0.77, 0.97, 0.1, 0.77, 0, 0),
+            (215 / 360, 218 / 360, 0.77, 0.97, 0.35, 0.87, 0, 0),
+            (159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0),
+            (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0),
+        ]
+        penColorSets = [
+            (28 / 360, 30 / 360, 0.5, 0.99, 0.95, 0.99, 0, 0),
+            (18 / 360, 20 / 360, 0.65, 0.650, 0.93, 0.99, 0, 0),
+            (10 / 360, 18 / 360, 0.5, 0.50, 0.95, 0.99, 0, 0),
+            (10 / 360, 18 / 360, 0.25, 0.350, 0.95, 0.99, 0, 0),
+            (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
+        ]
+    if arg == 1 :
+        bgColorSets = [[40 / 360, 45 / 360, 0.3, 0.40, 0.8, 0.80]]
+        bgBoxColorSets = [
+            [40 / 360, 45 / 360, 0.3, 0.40, 0.8, 0.80],
+            [
+                40 / 360,
+                180 / 360,
+                0.1,
+                0.4,
+                0.5,
+                1.0,
+            ],
+        ]
+        penColorSets = [[350 / 360, 5 / 360, 0.7, 0.99, 0.76, 0.96], [356 / 360, 5 / 360, 0.99, 0.99, 0.56, 0.86]]
+
+setPalette(1)
+penMark = PenMark()
+config = Config()
+
+penMark.name = "scribbleLine1"
+penMark.pointsPerLoop = 8
+penMark.loopsMin = 3
+penMark.loopsMax = 4
+
+penMark.minMarkWidth = 1
+penMark.maxMarkWidth = 5
+penMark.changeMarkWidthProb = 0.03
+penMark.incrementFactor = 1
+
+penMark.height = 10
+penMark.radiusX = 20
+penMark.radiusY = 32
+penMark.radiusXMin = 5
+penMark.radiusXMax = 20
+penMark.radiusYMin = 5
+penMark.radiusYMax = 30
+penMark.noiseX = 5
+penMark.noiseY = 6
+penMark.xRadiusDelta = 1
+penMark.yRadiusDelta = 1
+penMark.deltaRadiusXChangeProb = 0.02
+penMark.deltaRadiusYChangeProb = 0.02
+
+penMark.xCenter = 0
+penMark.yCenter = 0
+penMark.xOffset = 32
+penMark.yOffset = 32
+penMark.centerXDelta = 2
+penMark.centerYDelta = 1
+penMark.deltaRadiusXCenterChangeProb = 0.04
+penMark.deltaRadiusYCenterChangeProb = 0.04
+penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
+penMark.points = round(penMark.loops * penMark.pointsPerLoop)
+penMark.penSpeedMinVal = 2
+penMark.penSpeedMaxVal = 3
+
+
+# ----------------------------------------------------##----------------------------------------------------#
+
+# Setup for the display
+i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
+display = i75.display
+
+# ----------------------------------------------------##----------------------------------------------------#
 # SETUPS #
+
+shapes = []
 
 bgClr = ColorObj()
 setColor(bgClr, bgColorSets)
@@ -464,48 +538,6 @@ for _ in range(NUMSQRS):
     shapes.append(_shp)
 
 setShapes()
-
-penMark = PenMark()
-config = Config()
-
-penMark.name = "scribbleLine1"
-penMark.pointsPerLoop = 8
-penMark.loopsMin = 3
-penMark.loopsMax = 4
-
-penMark.minMarkWidth = 1
-penMark.maxMarkWidth = 5
-penMark.changeMarkWidthProb = 0.03
-penMark.incrementFactor = 1
-
-penMark.height = 10
-penMark.radiusX = 20
-penMark.radiusY = 32
-penMark.radiusXMin = 5
-penMark.radiusXMax = 30
-penMark.radiusYMin = 5
-penMark.radiusYMax = 30
-penMark.noiseX = 5
-penMark.noiseY = 5
-penMark.xRadiusDelta = 1
-penMark.yRadiusDelta = 1
-penMark.deltaRadiusXChangeProb = 0.02
-penMark.deltaRadiusYChangeProb = 0.02
-
-penMark.xCenter = 0
-penMark.yCenter = 0
-penMark.xOffset = 32
-penMark.yOffset = 32
-penMark.centerXDelta = 2
-penMark.centerYDelta = 1
-penMark.deltaRadiusXCenterChangeProb = 0.04
-penMark.deltaRadiusYCenterChangeProb = 0.04
-penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
-penMark.points = round(penMark.loops * penMark.pointsPerLoop)
-penMark.penSpeedMinVal = 2
-penMark.penSpeedMaxVal = 3
-
-
 startUpNewLine()
 
 display.set_pen(ForeG)
@@ -520,13 +552,17 @@ panelBGBlockCount = 0
 
 while True:
     if random.random() < eraseProb:
+        if random.random() < changePaletteProb :
+            arg = 0
+            if random.random() < .5 : arg = 1
+            setPalette(arg)
         setColor(fgClr, bgBoxColorSets)
         ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
         setShapes()
         display.reset_pen(ForeG)
         display.set_pen(ForeG)
         panelBGBlockCount = 1
-        
+
     # this needs refinement b/c the bg can overpaint the line too often
     if panelBGBlockCount > 0:
         drawBGPanelBlock(shapes[panelBGBlockCount])
@@ -543,5 +579,3 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
-
-

@@ -160,8 +160,12 @@ i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 p = pngdec.PNG(display)
 
-# animDirs = ["gif3", "gif2", "gif"]
-# frames that are allowed to pause
+# ---------- SETTINGS ---------------#
+INTERVAL = 0.03
+activeAnim = 2
+changeAnimProb = 0.01
+shapeChangeProb = 0.003
+
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
     {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
@@ -172,6 +176,9 @@ animConfigs = [
     {"dir": "fig-left", "nopauseFrames": [11, 12, 13, 14, 15], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
     {"dir": "mousey", "nopauseFrames": [], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
 ]
+
+
+# ---------- SETTING UP ---------------#
 anims = []
 
 for _dir in animConfigs:
@@ -189,6 +196,7 @@ for _dir in animConfigs:
     _numImages = len(_images) - 1
     anims.append([_images, _numImages])
 
+shp = AbsShape()
 
 bgClr = ColorObj()
 changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
@@ -201,20 +209,13 @@ ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 display.set_pen(Bg)
 display.clear()
 
-# Time to pause between frames
-INTERVAL = 0.03
+pause = False
 count = 0
 incr = 1
-pause = False
-activeAnim = 2
 pauseProb = animConfigs[activeAnim]["pauseProb"]
 unpauseProb = animConfigs[activeAnim]["unpauseProb"]
 unpauseProbInit = animConfigs[activeAnim]["unpauseProb"]
-changeAnimProb = 0.00
-shapeChangeProb = 0.003
-
 numImages = anims[activeAnim][1]
-shp = AbsShape()
 
 
 while True:

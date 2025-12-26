@@ -303,7 +303,7 @@ def drawLinePolyEnvelope(_pen):
             _pen._p = 0
             # print("Drawing stopped.")
 
-            time.sleep(random.uniform(0, 7))
+            time.sleep(random.uniform(0, timeDelayBeforeDrawingAgain))
             startUpNewLine()
 
         if random.random() < _pen.changeMarkWidthProb:
@@ -335,8 +335,27 @@ def drawLinePolyEnvelope(_pen):
 
 def setShapes():
     global shapes
+    _count = 0
+    _dd = 2
+    for _r in range(ROWS):
+        for _c in range(COLS):
+            _shp = shapes[_count]
+            _wd = random.uniform(4, 32)
+            _wd2 = _wd / 2
+            _rx = _c * PWIDTH / COLS + random.uniform(-_wd2, _wd2) - _r * _dd
+            _ry = _r * PHEIGHT / ROWS + random.uniform(-_wd2, _wd2) - _c * _dd
+            _shp.initP1 = Point(_rx, _ry)
+            _shp.initP2 = Point(_rx, _ry + _wd)
+            _shp.initP3 = Point(_rx + _wd, _ry + _wd)
+            _shp.initP4 = Point(_rx + _wd, _ry)
+            _shp.setup()
+            _count += 1
+
+
+def _setShapes():
+    global shapes
     for _shp in shapes:
-        _wd = random.uniform(4, 43)
+        _wd = random.uniform(4, 5)
         _rx = random.uniform(0, PWIDTH - _wd / 2)
         _ry = random.uniform(0, PHEIGHT - _wd / 2)
         _shp.initP1 = Point(_rx, _ry)
@@ -423,13 +442,17 @@ def setColor(_clrRef, _clrSetRef):
 INTERVAL = 0.02
 PWIDTH = 64
 PHEIGHT = 64
-NUMSQRS = 19
+NUMSQRS = 25
+ROWS = 5
+COLS = 5
 eraseProb = 0.005
-brightness = 0.4
+brightness = 0.6
 penBrightness = 0.6
-changePaletteProb = 0.01
-probPanelBlockChangesColor = .01
-probLineChangesColor = .01
+changePaletteProb = 0.5
+probPanelBlockChangesColor = 0.01
+probLineChangesColor = 0.01
+timeDelayBeforeDrawingAgain = 2
+numPalettes = 4
 
 bgColorSets = []
 bgBoxColorSets = []
@@ -464,17 +487,18 @@ def setPalette(arg=0):
         penColorSets = [[350 / 360, 5 / 360, 0.7, 0.99, 0.76, 0.96], [356 / 360, 5 / 360, 0.99, 0.99, 0.56, 0.86]]
 
     if arg == 2:
-        
-        bgColorSets = [[335 / 360, 345 / 360, 0.4, 0.50, 0.8, 0.9]]
-        bgBoxColorSets = [[335 / 360, 345 / 360, 0.4, 0.50, 0.8, 0.9], 
-                          [335 / 360, 350 / 360, 0.9, 1.0, 0.8, 0.9]]
-        penColorSets = [
-            [330 / 360, 355 / 360, .60, 1.0, .10, 1.0],
-            [340 / 360, 40 / 360, 0.9, 1.0, 0.1, 0.950]
-        ]
+
+        bgColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7, 0.9]]
+        bgBoxColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7, 0.9], [335 / 360, 350 / 360, 0.9, 1.0, 0.7, 0.9]]
+        penColorSets = [[330 / 360, 355 / 360, 0.60, 1.0, 0.10, 1.0], [340 / 360, 40 / 360, 0.9, 1.0, 0.1, 0.950]]
+    if arg == 3:
+
+        bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2, 0.9]]
+        bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2, 0.9], [335 / 360, 345 / 360, 0.1, 0.10, 0.2, 0.9]]
+        penColorSets = [[330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0], [330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0]]
 
 
-setPalette(2)
+setPalette(3)
 penMark = PenMark()
 config = Config()
 
@@ -557,11 +581,10 @@ generateScribble(penMark)
 drawBGPanelBlocks()
 
 
-
 while True:
     if random.random() < eraseProb and panelBGBlockCount == 0:
         if random.random() < changePaletteProb:
-            arg = math.floor(random.uniform(0,3))
+            arg = math.floor(random.uniform(0, numPalettes))
             print(f"setting to palette {arg}")
             setPalette(arg)
         setColor(fgClr, bgBoxColorSets)
@@ -587,3 +610,4 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
+

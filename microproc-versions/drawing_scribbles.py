@@ -451,7 +451,7 @@ penBrightness = 0.6
 changePaletteProb = 0.5
 probPanelBlockChangesColor = 0.01
 probLineChangesColor = 0.01
-timeDelayBeforeDrawingAgain = 2
+timeDelayBeforeDrawingAgain = 9
 numPalettes = 4
 
 bgColorSets = []

@@ -347,9 +347,9 @@ def setShapes():
 
 
 def drawLineEnvelope(_poly):
-    global penG
+    global penG, probLineChangesColor
     display.reset_pen(penG)
-    if random.random() < 0.02:
+    if random.random() < probLineChangesColor:
         setColor(penClr, penColorSets)
     penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * brightness)
     display.set_pen(penG)
@@ -384,10 +384,10 @@ def drawBGPanelBlocks():
 
 
 def drawBGPanelBlock(shp):
-    global ForeG
+    global ForeG, probPanelBlockChangesColor
     display.reset_pen(ForeG)
     display.set_pen(ForeG)
-    if random.random() < 0.02:
+    if random.random() < probPanelBlockChangesColor:
         setColor(fgClr, bgBoxColorSets)
     ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v * brightness)
     shp.p1.pointStep()
@@ -410,12 +410,12 @@ def setColor(_clrRef, _clrSetRef):
     _minh = _clrSet[0]
     _maxh = _clrSet[1]
     _h = random.uniform(_minh, _maxh)
-    if _minh > _maxh :
+    if _minh > _maxh:
         _h = random.uniform(_minh, 1.0 - _maxh)
 
     _clrRef.h = _h
     _clrRef.s = random.uniform(_clrSet[2], _clrSet[3])
-    _clrRef.v = random.uniform(_clrSet[5], _clrSet[5])
+    _clrRef.v = random.uniform(_clrSet[4], _clrSet[5])
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -424,19 +424,23 @@ INTERVAL = 0.02
 PWIDTH = 64
 PHEIGHT = 64
 NUMSQRS = 19
-eraseProb = 0.01
+eraseProb = 0.005
 brightness = 0.4
 penBrightness = 0.6
-changePaletteProb = .5
+changePaletteProb = 0.01
+probPanelBlockChangesColor = .01
+probLineChangesColor = .01
 
 bgColorSets = []
 bgBoxColorSets = []
 penColorSets = []
+panelBGBlockCount = 0
 
-def setPalette(arg = 0) :
+
+def setPalette(arg=0):
     global bgColorSets, bgBoxColorSets, penColorSets
-
-    if arg == 0 :
+    print(f"setPalette to {arg}")
+    if arg == 0:
         bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45, 0.7, 0, 0), (159 / 360, 190 / 360, 0.80, 0.92, 0.45, 0.7, 0, 0)]
         bgBoxColorSets = [
             (5 / 360, 27 / 360, 0.77, 0.97, 0.1, 0.77, 0, 0),
@@ -451,22 +455,26 @@ def setPalette(arg = 0) :
             (10 / 360, 18 / 360, 0.25, 0.350, 0.95, 0.99, 0, 0),
             (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
         ]
-    if arg == 1 :
+    if arg == 1:
         bgColorSets = [[40 / 360, 45 / 360, 0.3, 0.40, 0.8, 0.80]]
         bgBoxColorSets = [
             [40 / 360, 45 / 360, 0.3, 0.40, 0.8, 0.80],
-            [
-                40 / 360,
-                180 / 360,
-                0.1,
-                0.4,
-                0.5,
-                1.0,
-            ],
+            [40 / 360, 180 / 360, 0.1, 0.4, 0.5, 1.0],
         ]
         penColorSets = [[350 / 360, 5 / 360, 0.7, 0.99, 0.76, 0.96], [356 / 360, 5 / 360, 0.99, 0.99, 0.56, 0.86]]
 
-setPalette(1)
+    if arg == 2:
+        
+        bgColorSets = [[335 / 360, 345 / 360, 0.4, 0.50, 0.8, 0.9]]
+        bgBoxColorSets = [[335 / 360, 345 / 360, 0.4, 0.50, 0.8, 0.9], 
+                          [335 / 360, 350 / 360, 0.9, 1.0, 0.8, 0.9]]
+        penColorSets = [
+            [330 / 360, 355 / 360, .60, 1.0, .10, 1.0],
+            [340 / 360, 40 / 360, 0.9, 1.0, 0.1, 0.950]
+        ]
+
+
+setPalette(2)
 penMark = PenMark()
 config = Config()
 
@@ -548,13 +556,13 @@ display.clear()
 generateScribble(penMark)
 drawBGPanelBlocks()
 
-panelBGBlockCount = 0
+
 
 while True:
-    if random.random() < eraseProb:
-        if random.random() < changePaletteProb :
-            arg = 0
-            if random.random() < .5 : arg = 1
+    if random.random() < eraseProb and panelBGBlockCount == 0:
+        if random.random() < changePaletteProb:
+            arg = math.floor(random.uniform(0,3))
+            print(f"setting to palette {arg}")
             setPalette(arg)
         setColor(fgClr, bgBoxColorSets)
         ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)

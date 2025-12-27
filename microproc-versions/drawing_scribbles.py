@@ -171,7 +171,9 @@ def setColor(_clrRef, _clrSetRef):
     _clrRef.s = random.uniform(_clrSet[2], _clrSet[3])
     _clrRef.v = random.uniform(_clrSet[4], _clrSet[5])
 
+
 # ----------------------------------------------------##----------------------------------------------------#
+
 
 def catmull_rom(p0, p1, p2, p3, t):
     t2 = t * t
@@ -381,7 +383,9 @@ def startUpNewLine():
     # print(f"line - will be drawing {penMark.linesDrawn + 1} /  {penMark.linesToDraw} line(s)")
     generateScribble(penMark)
 
+
 # ----------------------------------------------------##----------------------------------------------------#
+
 
 def setShapes():
     global shapes
@@ -452,18 +456,18 @@ NUMSQRS = 25
 ROWS = 5
 COLS = 5
 
-brightness = 0.3
-penBrightness = 0.3
-numPalettes = 4
+brightness = 0.9
+penBrightness = 0.9
+numPalettes = 5
 
-probDarkBG = .25
-startNewLineProb = .25
-eraseProb = 0.75
-changePaletteProb = 0.75
+probDarkBG = 0.025
+startNewLineProb = 0.25
+eraseProb = 0.5
+changePaletteProb = 0.5
 probPanelBlockChangesColor = 0.01
-probLineChangesColor = 0.01
-
-linesToDrawMax = 3
+probLineChangesColor = 0.005
+linesToDrawMin = 1
+linesToDrawMax = 4
 timeDelayBeforeDrawingAgain = 5
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -473,20 +477,46 @@ bgBoxColorSets = []
 penColorSets = []
 panelBGBlockCount = 0
 
+penMark = PenMark()
+config = Config()
+
+penMark.name = "scribbleLine1"
+penMark.pointsPerLoop = 9
+penMark.linesDrawn = 0
+
+penMark.changeMarkWidthProb = 0.03
+penMark.incrementFactor = 1
+
+penMark.noiseX = 2
+penMark.noiseY = 4
+penMark.xRadiusDelta = 2
+penMark.yRadiusDelta = 2
+penMark.deltaRadiusXChangeProb = 0.02
+penMark.deltaRadiusYChangeProb = 0.02
+
+penMark.xCenter = 0
+penMark.yCenter = 0
+penMark.xOffset = 32
+penMark.yOffset = 32
+penMark.centerXDelta = 5
+penMark.centerYDelta = 3
+penMark.deltaRadiusXCenterChangeProb = 0.1
+penMark.deltaRadiusYCenterChangeProb = 0.1
 
 def setPalette(arg=0):
-    global bgColorSets, bgBoxColorSets, penColorSets
+    global bgColorSets, bgBoxColorSets, penColorSets, linesToDrawMin, linesToDrawMax, timeDelayBeforeDrawingAgain
     _brt = 1.0
-    if random.random() < probDarkBG : _brt = .05
+    if random.random() < probDarkBG:
+        _brt = 0.05
     print(f"setPalette to {arg} {_brt}")
     if arg == 0:
-        bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45*_brt, 0.7*_brt), 
-                       (159 / 360, 190 / 360, 0.80, 0.92, 0.45*_brt, 0.7*_brt)]
+        # MATISSE 3 NUDES WITH TURTLE
+        bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45 * _brt, 0.7 * _brt), (159 / 360, 190 / 360, 0.80, 0.92, 0.45 * _brt, 0.7 * _brt)]
         bgBoxColorSets = [
-            (5 / 360, 27 / 360, 0.77, 0.97, 0.1*_brt, 0.77*_brt),
-            (215 / 360, 218 / 360, 0.77, 0.97, 0.35*_brt, 0.87*_brt),
-            (159 / 360, 190 / 360, 0.70, 0.92, 0.45*_brt, 0.7*_brt),
-            (159 / 360, 190 / 360, 0.80, 0.92, 0.45*_brt, 0.7*_brt),
+            (5 / 360, 27 / 360, 0.77, 0.97, 0.1 * _brt, 0.77 * _brt),
+            (215 / 360, 218 / 360, 0.77, 0.97, 0.35 * _brt, 0.87 * _brt),
+            (159 / 360, 190 / 360, 0.70, 0.92, 0.45 * _brt, 0.7 * _brt),
+            (159 / 360, 190 / 360, 0.80, 0.92, 0.45 * _brt, 0.7 * _brt),
         ]
         penColorSets = [
             (28 / 360, 30 / 360, 0.5, 0.99, 0.95, 0.99, 0, 0),
@@ -495,75 +525,133 @@ def setPalette(arg=0):
             (10 / 360, 18 / 360, 0.25, 0.350, 0.95, 0.99, 0, 0),
             (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
         ]
+        linesToDrawMin = 1
+        linesToDrawMax = 3
+        timeDelayBeforeDrawingAgain = 7
+        penMark.loopsMin = 1
+        penMark.loopsMax = 3
+        penMark.penSpeedMinVal = 1
+        penMark.penSpeedMaxVal = 2
+        penMark.radiusXMin = 5
+        penMark.radiusXMax = 22
+        penMark.radiusYMin = 5
+        penMark.radiusYMax = 24
+        penMark.height = 10
+        penMark.radiusX = 24
+        penMark.radiusY = 27
+        penMark.minMarkWidth = 1
+        penMark.maxMarkWidth = 5
     if arg == 1:
-        
-        bgColorSets = [[40 / 360, 45 / 360, 0.3, 0.40, 0.8*_brt, 0.80*_brt]]
+        # LAST TWOMBLY
+        bgColorSets = [[40 / 360, 45 / 360, 0.3, 0.40, 0.8 * _brt, 0.80 * _brt]]
         bgBoxColorSets = [
-            [40 / 360, 45 / 360, 0.3, 0.40, 0.8*_brt, 0.80*_brt],
-            [40 / 360, 180 / 360, 0.1, 0.4, 0.5*_brt, 1.0*_brt],
+            [40 / 360, 45 / 360, 0.3, 0.40, 0.8 * _brt, 0.80 * _brt],
+            [40 / 360, 180 / 360, 0.1, 0.4, 0.5 * _brt, 1.0 * _brt],
         ]
-        penColorSets = [[350 / 360, 5 / 360, 0.7, 0.99, 0.76, 0.96], 
-                        [356 / 360, 5 / 360, 0.99, 0.99, 0.56, 0.86]]
-
+        penColorSets = [[350 / 360, 5 / 360, 0.7, 0.99, 0.3, 0.96], 
+                        [356 / 360, 5 / 360, 0.99, 0.99, 0.1, 0.86]]
+        linesToDrawMin = 2
+        linesToDrawMax = 5
+        timeDelayBeforeDrawingAgain = 1
+        penMark.loopsMax = 4
+        penMark.loopsMin = 1
+        penMark.penSpeedMinVal = 1
+        penMark.penSpeedMaxVal = 5
+        penMark.radiusXMin = 5
+        penMark.radiusXMax = 18
+        penMark.radiusYMin = 5
+        penMark.radiusYMax = 18
+        penMark.height = 10
+        penMark.radiusX = 24
+        penMark.radiusY = 26
+        penMark.minMarkWidth = 1
+        penMark.maxMarkWidth = 5
     if arg == 2:
-
-        bgColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7*_brt, 0.9*_brt]]
-        bgBoxColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7*_brt, 0.9*_brt], 
-                          [335 / 360, 350 / 360, 0.9, 1.0, 0.7*_brt, 0.9*_brt]]
+        # PINK ON PINK
+        bgColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7 * _brt, 0.9 * _brt]]
+        bgBoxColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7 * _brt, 0.9 * _brt], 
+                          [335 / 360, 350 / 360, 0.9, 1.0, 0.7 * _brt, 0.9 * _brt]]
         penColorSets = [[330 / 360, 355 / 360, 0.60, 1.0, 0.10, 1.0], 
                         [340 / 360, 40 / 360, 0.9, 1.0, 0.1, 0.950]]
+        linesToDrawMin = 1
+        linesToDrawMax = 3
+        timeDelayBeforeDrawingAgain = 1
+        penMark.loopsMin = 1
+        penMark.loopsMax = 4
+        penMark.penSpeedMinVal = 1
+        penMark.penSpeedMaxVal = 5
+        penMark.radiusXMin = 5
+        penMark.radiusXMax = 18
+        penMark.radiusYMin = 5
+        penMark.radiusYMax = 18
+        penMark.height = 10
+        penMark.radiusX = 24
+        penMark.radiusY = 26
+        penMark.minMarkWidth = .5
+        penMark.maxMarkWidth = 7
     if arg == 3:
-
-        bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2*_brt, 0.9*_brt]]
-        bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2*_brt, 0.9*_brt], 
-                          [335 / 360, 345 / 360, 0.1, 0.10, 0.2*_brt, 0.9*_brt]]
+        # NOIR
+        bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt]]
+        bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt], 
+                          [335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt]]
         penColorSets = [[330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0], 
                         [330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0]]
+        linesToDrawMax = 3
+        linesToDrawMin = 1
+        timeDelayBeforeDrawingAgain = 1
+        penMark.loopsMin = 1
+        penMark.loopsMax = 4
+        penMark.penSpeedMinVal = 1
+        penMark.penSpeedMaxVal = 5
+        penMark.radiusXMin = 5
+        penMark.radiusXMax = 18
+        penMark.radiusYMin = 5
+        penMark.radiusYMax = 18
+        penMark.height = 10
+        penMark.radiusX = 24
+        penMark.radiusY = 26
+        penMark.minMarkWidth = .5
+        penMark.maxMarkWidth = 7
+    if arg == 4:
+        # WHITEBOARDS
+        bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt]]
+        bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt], 
+                          [335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt]]
+        penColorSets = [
+            [90 / 360, 140 / 360, 1.0, 1.0, 0.60, 0.90],
+            [330 / 360, 5 / 360, 1.0, 1.0, 0.60, 0.90],
+            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
+            [170 / 360, 180 / 360, 1.0, 1.0, 0.60, 0.90],
+            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
+            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
+            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
+            [0 / 230, 5 / 360, 0.0, 0.0, 0.0, 0.0030],
+            [0 / 230, 5 / 360, 0.50, 0.60, 0.10, 0.30],
+            [0 / 230, 5 / 360, 0.50, 0.60, 0.0, 0.0030],
+            [0 / 230, 5 / 360, 0.0, 0.0, 0.0, 0.0030],
+        ]
+        linesToDrawMax = 7
+        linesToDrawMin = 3
+        timeDelayBeforeDrawingAgain = 0.1
+        penMark.loopsMin = 2
+        penMark.loopsMax = 4
+        penMark.penSpeedMinVal = 1
+        penMark.penSpeedMaxVal = 5
+        penMark.radiusXMin = 1
+        penMark.radiusXMax = 8
+        penMark.radiusYMin = 5
+        penMark.radiusYMax = 8
+        penMark.height = 10
+        penMark.radiusX = 5
+        penMark.radiusY = 21
+        penMark.minMarkWidth = .5
+        penMark.maxMarkWidth = 3
 
 
-setPalette(3)
-penMark = PenMark()
-config = Config()
-
-penMark.name = "scribbleLine1"
-penMark.pointsPerLoop = 9
-penMark.loopsMin = 1
-penMark.loopsMax = 4
-penMark.linesDrawn = 0
-penMark.linesToDraw = round(random.uniform(1,linesToDrawMax))
-
-penMark.minMarkWidth = 1
-penMark.maxMarkWidth = 5
-penMark.changeMarkWidthProb = 0.03
-penMark.incrementFactor = 1
-
-penMark.height = 10
-penMark.radiusX = 20
-penMark.radiusY = 32
-penMark.radiusXMin = 5
-penMark.radiusXMax = 20
-penMark.radiusYMin = 5
-penMark.radiusYMax = 30
-penMark.noiseX = 2
-penMark.noiseY = 4
-penMark.xRadiusDelta = 1
-penMark.yRadiusDelta = 1
-penMark.deltaRadiusXChangeProb = 0.02
-penMark.deltaRadiusYChangeProb = 0.02
-
-penMark.xCenter = 0
-penMark.yCenter = 0
-penMark.xOffset = 32
-penMark.yOffset = 32
-penMark.centerXDelta = 2
-penMark.centerYDelta = 1
-penMark.deltaRadiusXCenterChangeProb = 0.04
-penMark.deltaRadiusYCenterChangeProb = 0.04
+setPalette(4)
 penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
 penMark.points = round(penMark.loops * penMark.pointsPerLoop)
-penMark.penSpeedMinVal = 2
-penMark.penSpeedMaxVal = 3
-
+penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
 
 # ----------------------------------------------------##----------------------------------------------------#
 
@@ -609,8 +697,9 @@ drawBGPanelBlocks()
 while True:
 
     if penMark.drawingDone and random.random() < startNewLineProb and penMark.linesDrawn < penMark.linesToDraw:
+        # print(penMark.linesDrawn, penMark.linesToDraw)
         startUpNewLine()
-    
+
     if random.random() < eraseProb and panelBGBlockCount == 0 and penMark.linesDrawn >= penMark.linesToDraw:
         if random.random() < changePaletteProb:
             arg = math.floor(random.uniform(0, numPalettes))
@@ -623,7 +712,10 @@ while True:
         display.set_pen(ForeG)
         panelBGBlockCount = 1
         penMark.linesDrawn = 0
-        penMark.linesToDraw = round(random.uniform(1,linesToDrawMax))
+        penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
+        penMark.points = round(penMark.loops * penMark.pointsPerLoop)
+        penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
+        # print( penMark.linesToDraw)
 
     if panelBGBlockCount > 0:
         drawBGPanelBlock(shapes[panelBGBlockCount])
@@ -640,5 +732,4 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
-
 

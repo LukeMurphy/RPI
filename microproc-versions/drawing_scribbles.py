@@ -463,7 +463,7 @@ panelBGBlockCount = 0
 def setPalette(arg=0):
     global bgColorSets, bgBoxColorSets, penColorSets
     _brt = 1.0
-    if random.random() < .5 : _brt = .05
+    if random.random() < .33 : _brt = .05
     print(f"setPalette to {arg} {_brt}")
     if arg == 0:
         bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45*_brt, 0.7*_brt), 
@@ -619,5 +619,3 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
-
-

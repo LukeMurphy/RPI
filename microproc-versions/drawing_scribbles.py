@@ -485,7 +485,7 @@ penMark.pointsPerLoop = 9
 penMark.linesDrawn = 0
 
 penMark.changeMarkWidthProb = 0.03
-penMark.incrementFactor = 1
+penMark.incrementFactor = .7
 
 penMark.noiseX = 2
 penMark.noiseY = 4
@@ -498,8 +498,8 @@ penMark.xCenter = 0
 penMark.yCenter = 0
 penMark.xOffset = 32
 penMark.yOffset = 32
-penMark.centerXDelta = 5
-penMark.centerYDelta = 3
+penMark.centerXDelta = 3
+penMark.centerYDelta = 4
 penMark.deltaRadiusXCenterChangeProb = 0.1
 penMark.deltaRadiusYCenterChangeProb = 0.1
 
@@ -568,11 +568,12 @@ def setPalette(arg=0):
         penMark.maxMarkWidth = 5
     if arg == 2:
         # PINK ON PINK
+        _brt = .1
         bgColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7 * _brt, 0.9 * _brt]]
         bgBoxColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7 * _brt, 0.9 * _brt], 
                           [335 / 360, 350 / 360, 0.9, 1.0, 0.7 * _brt, 0.9 * _brt]]
-        penColorSets = [[330 / 360, 355 / 360, 0.60, 1.0, 0.10, 1.0], 
-                        [340 / 360, 40 / 360, 0.9, 1.0, 0.1, 0.950]]
+        penColorSets = [[330 / 360, 355 / 360, 0.60, 1.0, 0.30, 1.0], 
+                        [340 / 360, 40 / 360, 0.9, 1.0, 0.3, 0.950]]
         linesToDrawMin = 1
         linesToDrawMax = 3
         timeDelayBeforeDrawingAgain = 1
@@ -591,18 +592,19 @@ def setPalette(arg=0):
         penMark.maxMarkWidth = 7
     if arg == 3:
         # NOIR
+        _brt = .1
         bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt]]
         bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt], 
                           [335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt]]
         penColorSets = [[330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0], 
                         [330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0]]
-        linesToDrawMax = 3
+        linesToDrawMax = 5
         linesToDrawMin = 1
-        timeDelayBeforeDrawingAgain = 1
+        timeDelayBeforeDrawingAgain = 5
         penMark.loopsMin = 1
         penMark.loopsMax = 4
         penMark.penSpeedMinVal = 1
-        penMark.penSpeedMaxVal = 5
+        penMark.penSpeedMaxVal = 3
         penMark.radiusXMin = 5
         penMark.radiusXMax = 18
         penMark.radiusYMin = 5
@@ -610,8 +612,8 @@ def setPalette(arg=0):
         penMark.height = 10
         penMark.radiusX = 24
         penMark.radiusY = 26
-        penMark.minMarkWidth = .5
-        penMark.maxMarkWidth = 7
+        penMark.minMarkWidth = .75
+        penMark.maxMarkWidth = 5
     if arg == 4:
         # WHITEBOARDS
         bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt]]
@@ -644,8 +646,8 @@ def setPalette(arg=0):
         penMark.height = 10
         penMark.radiusX = 5
         penMark.radiusY = 21
-        penMark.minMarkWidth = .5
-        penMark.maxMarkWidth = 3
+        penMark.minMarkWidth = .75
+        penMark.maxMarkWidth = 5
 
 
 setPalette(4)

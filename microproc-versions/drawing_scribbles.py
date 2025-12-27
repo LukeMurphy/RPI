@@ -6,6 +6,8 @@ from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
 
 class PenMark:
+    drawingDone = False
+
     def __init__(self):
         pass
 
@@ -139,6 +141,13 @@ class AbsShape:
             self.p4.change()
 
 
+def R(a, b, rounded=False):
+    if not rounded:
+        return random.uniform(a, b)
+    else:
+        return round(random.uniform(a, b))
+
+
 def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
     if init:
         clrRef.h = random.uniform(hmin, hmax)
@@ -150,18 +159,25 @@ def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
         clrRef.newv = random.uniform(vmin, vmax)
 
 
+def setColor(_clrRef, _clrSetRef):
+    _clrSet = _clrSetRef[round(random.uniform(0, len(_clrSetRef) - 1))]
+    _minh = _clrSet[0]
+    _maxh = _clrSet[1]
+    _h = random.uniform(_minh, _maxh)
+    if _minh > _maxh:
+        _h = random.uniform(_minh, 1.0 - _maxh)
+
+    _clrRef.h = _h
+    _clrRef.s = random.uniform(_clrSet[2], _clrSet[3])
+    _clrRef.v = random.uniform(_clrSet[4], _clrSet[5])
+
+# ----------------------------------------------------##----------------------------------------------------#
+
 def catmull_rom(p0, p1, p2, p3, t):
     t2 = t * t
     t3 = t2 * t
 
     return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
-
-
-def R(a, b, rounded=False):
-    if not rounded:
-        return random.uniform(a, b)
-    else:
-        return round(random.uniform(a, b))
 
 
 def generateScribble(_pen):
@@ -302,9 +318,10 @@ def drawLinePolyEnvelope(_pen):
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
             # print("Drawing stopped.")
-
+            penMark.linesDrawn += 1
+            _pen.drawingDone = True
             time.sleep(random.uniform(0, timeDelayBeforeDrawingAgain))
-            startUpNewLine()
+            # startUpNewLine()
 
         if random.random() < _pen.changeMarkWidthProb:
             if not _pen.attenuating and not _pen.enlarging:
@@ -332,6 +349,39 @@ def drawLinePolyEnvelope(_pen):
         if _pen.attenuating:
             _pen._w -= round(1 * _pen.incrementFactor)
 
+
+def drawLineEnvelope(_poly):
+    global penG, probLineChangesColor
+    display.reset_pen(penG)
+    if random.random() < probLineChangesColor:
+        setColor(penClr, penColorSets)
+    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * brightness)
+    display.set_pen(penG)
+    display.polygon(_poly)
+
+
+def startUpNewLine():
+    global penMark
+    penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
+    penMark.points = round(penMark.loops * penMark.pointsPerLoop)
+    penMark.speed = round(random.uniform(penMark.penSpeedMinVal, penMark.penSpeedMaxVal))
+    penMark._p = 1
+    penMark._w = 0.5
+    penMark.lastOrthoPoint = None
+    penMark.enlarging = False
+    penMark.attenuating = False
+    penMark.drawingDone = False
+    penMark.loopDirection = -1
+    if random.random() < 0.5:
+        penMark.loopDirection = 1
+
+    setColor(penClr, penColorSets)
+    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * penBrightness)
+    display.reset_pen(penG)
+    # print(f"line - will be drawing {penMark.linesDrawn + 1} /  {penMark.linesToDraw} line(s)")
+    generateScribble(penMark)
+
+# ----------------------------------------------------##----------------------------------------------------#
 
 def setShapes():
     global shapes
@@ -365,37 +415,6 @@ def _setShapes():
         _shp.setup()
 
 
-def drawLineEnvelope(_poly):
-    global penG, probLineChangesColor
-    display.reset_pen(penG)
-    if random.random() < probLineChangesColor:
-        setColor(penClr, penColorSets)
-    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * brightness)
-    display.set_pen(penG)
-    display.polygon(_poly)
-
-
-def startUpNewLine():
-    global penMark
-    penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
-    penMark.points = round(penMark.loops * penMark.pointsPerLoop)
-    penMark.speed = round(random.uniform(penMark.penSpeedMinVal, penMark.penSpeedMaxVal))
-    penMark._p = 1
-    penMark._w = 0.5
-    penMark.lastOrthoPoint = None
-    penMark.enlarging = False
-    penMark.attenuating = False
-    penMark.loopDirection = -1
-    if random.random() < 0.5:
-        penMark.loopDirection = 1
-
-    setColor(penClr, penColorSets)
-    penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * penBrightness)
-    display.reset_pen(penG)
-
-    generateScribble(penMark)
-
-
 def drawBGPanelBlocks():
     global shapes
     for shp in shapes:
@@ -424,20 +443,7 @@ def drawBGPanelBlock(shp):
     )
 
 
-def setColor(_clrRef, _clrSetRef):
-    _clrSet = _clrSetRef[round(random.uniform(0, len(_clrSetRef) - 1))]
-    _minh = _clrSet[0]
-    _maxh = _clrSet[1]
-    _h = random.uniform(_minh, _maxh)
-    if _minh > _maxh:
-        _h = random.uniform(_minh, 1.0 - _maxh)
-
-    _clrRef.h = _h
-    _clrRef.s = random.uniform(_clrSet[2], _clrSet[3])
-    _clrRef.v = random.uniform(_clrSet[4], _clrSet[5])
-
-
-# ----------------------------------------------------##----------------------------------------------------#
+# -------------------------------------------  -SETTINGS ---------------------------------------------------#
 
 INTERVAL = 0.02
 PWIDTH = 64
@@ -445,14 +451,22 @@ PHEIGHT = 64
 NUMSQRS = 25
 ROWS = 5
 COLS = 5
-eraseProb = 0.005
-brightness = 0.8
-penBrightness = 0.8
-changePaletteProb = 0.5
+
+brightness = 0.3
+penBrightness = 0.3
+numPalettes = 4
+
+probDarkBG = .25
+startNewLineProb = .25
+eraseProb = 0.75
+changePaletteProb = 0.75
 probPanelBlockChangesColor = 0.01
 probLineChangesColor = 0.01
-timeDelayBeforeDrawingAgain = 9
-numPalettes = 4
+
+linesToDrawMax = 3
+timeDelayBeforeDrawingAgain = 5
+
+# ----------------------------------------------------##----------------------------------------------------#
 
 bgColorSets = []
 bgBoxColorSets = []
@@ -463,7 +477,7 @@ panelBGBlockCount = 0
 def setPalette(arg=0):
     global bgColorSets, bgBoxColorSets, penColorSets
     _brt = 1.0
-    if random.random() < .33 : _brt = .05
+    if random.random() < probDarkBG : _brt = .05
     print(f"setPalette to {arg} {_brt}")
     if arg == 0:
         bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45*_brt, 0.7*_brt), 
@@ -512,9 +526,11 @@ penMark = PenMark()
 config = Config()
 
 penMark.name = "scribbleLine1"
-penMark.pointsPerLoop = 8
-penMark.loopsMin = 3
+penMark.pointsPerLoop = 9
+penMark.loopsMin = 1
 penMark.loopsMax = 4
+penMark.linesDrawn = 0
+penMark.linesToDraw = round(random.uniform(1,linesToDrawMax))
 
 penMark.minMarkWidth = 1
 penMark.maxMarkWidth = 5
@@ -528,8 +544,8 @@ penMark.radiusXMin = 5
 penMark.radiusXMax = 20
 penMark.radiusYMin = 5
 penMark.radiusYMax = 30
-penMark.noiseX = 5
-penMark.noiseY = 6
+penMark.noiseX = 2
+penMark.noiseY = 4
 penMark.xRadiusDelta = 1
 penMark.yRadiusDelta = 1
 penMark.deltaRadiusXChangeProb = 0.02
@@ -591,7 +607,11 @@ drawBGPanelBlocks()
 
 
 while True:
-    if random.random() < eraseProb and panelBGBlockCount == 0:
+
+    if penMark.drawingDone and random.random() < startNewLineProb and penMark.linesDrawn < penMark.linesToDraw:
+        startUpNewLine()
+    
+    if random.random() < eraseProb and panelBGBlockCount == 0 and penMark.linesDrawn >= penMark.linesToDraw:
         if random.random() < changePaletteProb:
             arg = math.floor(random.uniform(0, numPalettes))
             print(f"setting to palette {arg}")
@@ -602,8 +622,9 @@ while True:
         display.reset_pen(ForeG)
         display.set_pen(ForeG)
         panelBGBlockCount = 1
+        penMark.linesDrawn = 0
+        penMark.linesToDraw = round(random.uniform(1,linesToDrawMax))
 
-    # this needs refinement b/c the bg can overpaint the line too often
     if panelBGBlockCount > 0:
         drawBGPanelBlock(shapes[panelBGBlockCount])
         panelBGBlockCount += 1
@@ -613,9 +634,11 @@ while True:
     display.reset_pen(penG)
     display.set_pen(penG)
 
-    if panelBGBlockCount == 0:
+    if panelBGBlockCount == 0 and not penMark.drawingDone:
         drawLinePolyEnvelope(penMark)
 
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
+
+

@@ -470,7 +470,7 @@ numPalettes = 5
 probDarkBG = 0.025
 startNewLineProb = 0.25
 eraseProb = 0.5
-changePaletteProb = 0.5
+changePaletteProb = 0.25
 probPanelBlockChangesColor = 0.01
 probLineChangesColor = 0.005
 linesToDrawMin = 1
@@ -515,7 +515,7 @@ def setPalette(arg=0):
     _brt = 1.0
     if random.random() < probDarkBG:
         _brt = 0.05
-    print(f"setPalette to {arg} {_brt}")
+    #print(f"setPalette to {arg} {_brt}")
     if arg == 0:
         # MATISSE 3 NUDES WITH TURTLE
         bgColorSets = [(159 / 360, 190 / 360, 0.70, 0.92, 0.45 * _brt, 0.7 * _brt), (159 / 360, 190 / 360, 0.80, 0.92, 0.45 * _brt, 0.7 * _brt)]
@@ -641,7 +641,6 @@ def setPalette(arg=0):
             [330 / 360, 5 / 360, 1.0, 1.0, 0.60, 0.90],
             [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
             [0 / 230, 5 / 360, 0.50, 0.60, 0.10, 0.30],
-            [0 / 230, 5 / 360, 0.50, 0.60, 0.0, 0.0030],
             [0 / 230, 5 / 360, 0.0, 0.0, 0.0, 0.0030],
         ]
         linesToDrawMax = 7
@@ -724,7 +723,7 @@ while True:
     if random.random() < eraseProb and panelBGBlockCount == 0 and penMark.linesDrawn >= penMark.linesToDraw:
         if random.random() < changePaletteProb:
             arg = math.floor(random.uniform(0, numPalettes))
-            print(f"setting to palette {arg}")
+            #print(f"setting to palette {arg}")
             setPalette(arg)
         setColor(fgClr, bgBoxColorSets)
         ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
@@ -736,6 +735,7 @@ while True:
         penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
         penMark.points = round(penMark.loops * penMark.pointsPerLoop)
         penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
+        if random.random() < .5  : penMark.outline = True
         # print( penMark.linesToDraw)
 
     if panelBGBlockCount > 0:
@@ -753,3 +753,6 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
+
+
+

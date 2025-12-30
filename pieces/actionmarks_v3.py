@@ -353,6 +353,8 @@ def setPenPropsByName(_name, pen):
     # else :
     pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
 
+    pen.strokeOutline = True
+
     pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
     # pieceLogger("--")
@@ -791,6 +793,11 @@ def drawLinePolyEnvelope(_pen):
 
             if not _penSkip:
                 config.draw.polygon(_poly, fill=_lineColor, outline=None)
+
+            if _pen.strokeOutline :
+                config.draw.line(((_orthoP1x, _orthoP1y),(_orthoP2x, _orthoP2y)), fill=(0,0,0,200), width=2)
+                config.draw.line(((_orthoP3x, _orthoP3y),(_orthoP4x, _orthoP4y)), fill=(0,0,0,200), width=2)
+
 
             # config.draw.line((_p1, _p2), fill=(255,0,0,255), width=1)
 

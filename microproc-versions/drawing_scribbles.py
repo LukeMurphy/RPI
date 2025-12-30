@@ -310,7 +310,9 @@ def drawLinePolyEnvelope(_pen):
 
             _poly = [(_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y)]
 
-            drawLineEnvelope(_poly)
+            _ol = False
+            if _penWidth >= .5 and _pen.outline : _ol = True
+            drawLineEnvelope(_poly,_ol)
 
             _pen.lastAngle = _angle
             _pen._p += 1
@@ -352,14 +354,19 @@ def drawLinePolyEnvelope(_pen):
             _pen._w -= round(1 * _pen.incrementFactor)
 
 
-def drawLineEnvelope(_poly):
-    global penG, probLineChangesColor
+def drawLineEnvelope(_poly, ol = False):
+    global penG, probLineChangesColor, OutlineG
     display.reset_pen(penG)
     if random.random() < probLineChangesColor:
         setColor(penClr, penColorSets)
     penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v * brightness)
     display.set_pen(penG)
     display.polygon(_poly)
+
+    if ol:
+        display.set_pen(OutlineG)
+        display.line(_poly[0][0], _poly[0][1], _poly[1][0], _poly[1][1],2)
+        display.line(_poly[2][0], _poly[2][1], _poly[3][0], _poly[3][1],2)
 
 
 def startUpNewLine():
@@ -541,6 +548,7 @@ def setPalette(arg=0):
         penMark.radiusY = 27
         penMark.minMarkWidth = 1
         penMark.maxMarkWidth = 5
+        penMark.outline = False
     if arg == 1:
         # LAST TWOMBLY
         bgColorSets = [[40 / 360, 45 / 360, 0.3, 0.40, 0.8 * _brt, 0.80 * _brt]]
@@ -566,6 +574,7 @@ def setPalette(arg=0):
         penMark.radiusY = 26
         penMark.minMarkWidth = 1
         penMark.maxMarkWidth = 5
+        penMark.outline = False
     if arg == 2:
         # PINK ON PINK
         _brt = .1
@@ -590,6 +599,7 @@ def setPalette(arg=0):
         penMark.radiusY = 26
         penMark.minMarkWidth = .5
         penMark.maxMarkWidth = 7
+        penMark.outline = False
     if arg == 3:
         # NOIR
         _brt = .1
@@ -614,20 +624,22 @@ def setPalette(arg=0):
         penMark.radiusY = 26
         penMark.minMarkWidth = .75
         penMark.maxMarkWidth = 5
+        penMark.outline = True
     if arg == 4:
         # WHITEBOARDS
+        _brt = .5
         bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt]]
         bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt], 
                           [335 / 360, 345 / 360, 0.1, 0.10, 0.72 * _brt, 0.9 * _brt]]
         penColorSets = [
-            [90 / 360, 140 / 360, 1.0, 1.0, 0.60, 0.90],
-            [330 / 360, 5 / 360, 1.0, 1.0, 0.60, 0.90],
-            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
-            [170 / 360, 180 / 360, 1.0, 1.0, 0.60, 0.90],
-            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
-            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
-            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
             [0 / 230, 5 / 360, 0.0, 0.0, 0.0, 0.0030],
+            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
+            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
+            [90 / 360, 140 / 360, 1.0, 1.0, 0.60, 0.90],
+            [170 / 360, 180 / 360, 1.0, 1.0, 0.60, 0.90],
+            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
+            [330 / 360, 5 / 360, 1.0, 1.0, 0.60, 0.90],
+            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
             [0 / 230, 5 / 360, 0.50, 0.60, 0.10, 0.30],
             [0 / 230, 5 / 360, 0.50, 0.60, 0.0, 0.0030],
             [0 / 230, 5 / 360, 0.0, 0.0, 0.0, 0.0030],
@@ -648,6 +660,7 @@ def setPalette(arg=0):
         penMark.radiusY = 21
         penMark.minMarkWidth = .75
         penMark.maxMarkWidth = 5
+        penMark.outline = True
 
 
 setPalette(4)
@@ -678,6 +691,12 @@ ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 penClr = ColorObj()
 setColor(penClr, penColorSets)
 penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
+
+outLineClr = ColorObj()
+outLineClr.h = random.uniform(0, 1.0)
+outLineClr.s = random.uniform(0.2, 1.0)
+outLineClr.v = random.uniform(0.0, 0.01)
+OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
 
 
 for _ in range(NUMSQRS):
@@ -734,4 +753,3 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
-

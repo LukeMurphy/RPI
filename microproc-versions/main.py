@@ -5,4 +5,4 @@ if _c == 0 :
 elif _c == 1 :
     import abstraction
 elif _c == 2 :
-    import anim
+    import animals

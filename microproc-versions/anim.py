@@ -163,20 +163,22 @@ p = pngdec.PNG(display)
 # ---------- SETTINGS ---------------#
 INTERVAL = 0.03
 activeAnim = 2
-changeAnimProb = 0.01
+changeAnimProb = 0.001
 shapeChangeProb = 0.003
 
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
     {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
     {"dir": "obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
-    {"dir": "bbear-left", "nopauseFrames": [2], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "bbunny-rad", "nopauseFrames": [9], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "fig-left", "nopauseFrames": [11, 12, 13, 14, 15], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "mousey", "nopauseFrames": [], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "bbear-left", "nopauseFrames": [2], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbunny-rad", "nopauseFrames": [9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.01, "unpauseProb": 0.02},
+    {"dir": "fig-left", "nopauseFrames": [6,7,8,9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "mousey", "nopauseFrames": [6,7,8], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
 ]
 
+activeAnim = random.randint(0, len(animConfigs)-1)
+activeAnim = 7
 
 # ---------- SETTING UP ---------------#
 anims = []
@@ -203,7 +205,7 @@ changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
-changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.45, 0.5, True)
+changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.65, 0.95, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.set_pen(Bg)
@@ -220,7 +222,6 @@ numImages = anims[activeAnim][1]
 
 while True:
 
-    img = anims[activeAnim][0][count]
 
     if not pause:
         count += incr
@@ -240,7 +241,7 @@ while True:
             # sometimes just goes back
             if random.random() < 0.5:
                 incr *= -1
-            print(f"paused on {count} {incr}")
+            #print(f"paused on {count} {incr}")
 
     if random.random() < unpauseProb:
         pause = False
@@ -271,13 +272,20 @@ while True:
         ]
     )
 
-    
+    if count >= anims[activeAnim][1] :
+        #print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
+        count = len(anims[activeAnim][0]) - 1
+        incr *= -1
+        
+        
+    img = anims[activeAnim][0][count]
     p.open_file(img)
     # Decode our PNG file and set the X and Y
     p.decode(animConfigs[activeAnim]["offsets"][0], animConfigs[activeAnim]['offsets'][1])
 
     if random.random() < shapeChangeProb:
         shp.update()
+        pause = False
 
     if random.random() < changeAnimProb and (count < 1 or count > 12):
         # activeAnim += 1
@@ -294,10 +302,11 @@ while True:
         changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.4, 0.6)
+        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.5, 0.96)
         fgClr.change()
 
         shp.update()
 
     i75.update()
     time.sleep(INTERVAL)
+

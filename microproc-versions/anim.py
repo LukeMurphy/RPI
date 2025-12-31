@@ -25,12 +25,16 @@ class Point:
         self.y = _y
         self.pt = [self.x, self.y]
 
-    def change(self):
+    def change(self, _log=False):
         self.dx = self.newX - self.x
         self.dy = self.newY - self.y
 
         self.xSpeed = self.dx / self.speedFactor
         self.ySpeed = self.dy / self.speedFactor
+
+        if _log :
+            print(f"Changed: {self.newX},{self.newY} - {self.x}, {self.y}")
+
 
     def pointStep(self):
         self.x = round(self.x + self.xSpeed)
@@ -52,16 +56,16 @@ class AbsShape:
     inShapeTrans = False
     dx = 5
     dy = 5
-    initP1 = Point(3, 64)
-    initP2 = Point(3, 2)
-    initP3 = Point(60, 2)
-    initP4 = Point(60, 64)
+    initP1 = (6, 64)
+    initP2 = (3, 1)
+    initP3 = (60, 1)
+    initP4 = (55, 64)
 
     def __init__(self):
-        self.p1 = self.initP1
-        self.p2 = self.initP2
-        self.p3 = self.initP3
-        self.p4 = self.initP4
+        self.p1 = Point(self.initP1[0], self.initP1[1])
+        self.p2 = Point(self.initP2[0], self.initP2[1])
+        self.p3 = Point(self.initP3[0], self.initP3[1])
+        self.p4 = Point(self.initP4[0], self.initP4[1])
         pass
 
     def update(self):
@@ -85,21 +89,21 @@ class AbsShape:
             self.p4.newY = self.p4.pt[1]
             self.p4.change()
 
-        if random.random() < 0.25:
-            self.p1.newX = self.initP1.pt[0]
-            self.p1.newY = self.initP1.pt[1]
+        if random.random() < 0.05:
+            self.p1.newX = self.initP1[0]
+            self.p1.newY = self.initP1[1]
             self.p1.change()
-        if random.random() < 0.25:
-            self.p2.newX = self.initP2.pt[0]
-            self.p2.newY = self.initP2.pt[1]
+        if random.random() < 0.05:
+            self.p2.newX = self.initP2[0]
+            self.p2.newY = self.initP2[1]
             self.p2.change()
-        if random.random() < 0.25:
-            self.p3.newX = self.initP3.pt[0]
-            self.p3.newY = self.initP3.pt[1]
+        if random.random() < 0.05:
+            self.p3.newX = self.initP3[0]
+            self.p3.newY = self.initP3[1]
             self.p3.change()
-        if random.random() < 0.25:
-            self.p4.newX = self.initP4.pt[0]
-            self.p4.newY = self.initP4.pt[1]
+        if random.random() < 0.05:
+            self.p4.newX = self.initP4[0]
+            self.p4.newY = self.initP4[1]
             self.p4.change()
 
 
@@ -163,22 +167,20 @@ p = pngdec.PNG(display)
 # ---------- SETTINGS ---------------#
 INTERVAL = 0.03
 activeAnim = 2
-changeAnimProb = 0.001
-shapeChangeProb = 0.003
+changeAnimProb = 0.01
+shapeChangeProb = 0.005
 
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
     {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
     {"dir": "obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
-    {"dir": "bbear-left", "nopauseFrames": [2], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbunny-rad", "nopauseFrames": [9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.01, "unpauseProb": 0.02},
-    {"dir": "fig-left", "nopauseFrames": [6,7,8,9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "mousey", "nopauseFrames": [6,7,8], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbear-left", "nopauseFrames": [2], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "bbunny-rad", "nopauseFrames": [9], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "fig-left", "nopauseFrames": [11, 12, 13, 14, 15], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "mousey", "nopauseFrames": [], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
 ]
 
-activeAnim = random.randint(0, len(animConfigs)-1)
-activeAnim = 7
 
 # ---------- SETTING UP ---------------#
 anims = []
@@ -205,7 +207,7 @@ changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
-changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.65, 0.95, True)
+changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.45, 0.5, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.set_pen(Bg)
@@ -222,6 +224,7 @@ numImages = anims[activeAnim][1]
 
 while True:
 
+    img = anims[activeAnim][0][count]
 
     if not pause:
         count += incr
@@ -241,7 +244,7 @@ while True:
             # sometimes just goes back
             if random.random() < 0.5:
                 incr *= -1
-            #print(f"paused on {count} {incr}")
+            # print(f"paused on {count} {incr}")
 
     if random.random() < unpauseProb:
         pause = False
@@ -272,20 +275,13 @@ while True:
         ]
     )
 
-    if count >= anims[activeAnim][1] :
-        #print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
-        count = len(anims[activeAnim][0]) - 1
-        incr *= -1
-        
-        
-    img = anims[activeAnim][0][count]
+    
     p.open_file(img)
     # Decode our PNG file and set the X and Y
     p.decode(animConfigs[activeAnim]["offsets"][0], animConfigs[activeAnim]['offsets'][1])
 
     if random.random() < shapeChangeProb:
         shp.update()
-        pause = False
 
     if random.random() < changeAnimProb and (count < 1 or count > 12):
         # activeAnim += 1
@@ -302,11 +298,10 @@ while True:
         changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.5, 0.96)
+        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.4, 0.6)
         fgClr.change()
 
         shp.update()
 
     i75.update()
     time.sleep(INTERVAL)
-

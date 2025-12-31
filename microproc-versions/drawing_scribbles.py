@@ -1,6 +1,8 @@
 import time
 import random
 import math
+import gc
+
 
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
@@ -548,7 +550,7 @@ def setPalette(arg=0):
         penMark.radiusY = 27
         penMark.minMarkWidth = 1
         penMark.maxMarkWidth = 5
-        penMark.outline = False
+        penMark.outlineProb = 0.2
     if arg == 1:
         # LAST TWOMBLY
         bgColorSets = [[40 / 360, 45 / 360, 0.3, 0.40, 0.8 * _brt, 0.80 * _brt]]
@@ -574,7 +576,7 @@ def setPalette(arg=0):
         penMark.radiusY = 26
         penMark.minMarkWidth = 1
         penMark.maxMarkWidth = 5
-        penMark.outline = False
+        penMark.outlineProb = .1
     if arg == 2:
         # PINK ON PINK
         _brt = .1
@@ -599,7 +601,7 @@ def setPalette(arg=0):
         penMark.radiusY = 26
         penMark.minMarkWidth = .5
         penMark.maxMarkWidth = 7
-        penMark.outline = False
+        penMark.outlineProb = .1
     if arg == 3:
         # NOIR
         _brt = .1
@@ -624,7 +626,7 @@ def setPalette(arg=0):
         penMark.radiusY = 26
         penMark.minMarkWidth = .75
         penMark.maxMarkWidth = 5
-        penMark.outline = True
+        penMark.outlineProb = .99
     if arg == 4:
         # WHITEBOARDS
         _brt = .5
@@ -659,13 +661,15 @@ def setPalette(arg=0):
         penMark.radiusY = 21
         penMark.minMarkWidth = .75
         penMark.maxMarkWidth = 5
-        penMark.outline = True
+        penMark.outlineProb = .99
 
 
-setPalette(4)
+setPalette(0)
 penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
 penMark.points = round(penMark.loops * penMark.pointsPerLoop)
 penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
+penMark.outline = False
+if random.random() < penMark.outlineProb  : penMark.outline = True
 
 # ----------------------------------------------------##----------------------------------------------------#
 
@@ -735,7 +739,7 @@ while True:
         penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
         penMark.points = round(penMark.loops * penMark.pointsPerLoop)
         penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
-        if random.random() < .5  : penMark.outline = True
+        if random.random() < penMark.outlineProb  : penMark.outline = True
         # print( penMark.linesToDraw)
 
     if panelBGBlockCount > 0:
@@ -749,10 +753,12 @@ while True:
 
     if panelBGBlockCount == 0 and not penMark.drawingDone:
         drawLinePolyEnvelope(penMark)
+        
+    if gc.mem_free() < 3000 :
+        #print(gc.mem_free())
+        gc.collect()
+        #print(gc.mem_free())
 
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
-
-
-

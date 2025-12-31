@@ -352,8 +352,7 @@ def setPenPropsByName(_name, pen):
     # pen.drawLineAsEnvelope = _penProps.drawLineAsEnvelope
     # else :
     pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
-
-    pen.strokeOutline = True
+    pen.outlineStroke = config.activePalette.outlineStroke
 
     pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
@@ -794,7 +793,7 @@ def drawLinePolyEnvelope(_pen):
             if not _penSkip:
                 config.draw.polygon(_poly, fill=_lineColor, outline=None)
 
-            if _pen.strokeOutline :
+            if _pen.outlineStroke :
                 config.draw.line(((_orthoP1x, _orthoP1y),(_orthoP2x, _orthoP2y)), fill=(0,0,0,200), width=2)
                 config.draw.line(((_orthoP3x, _orthoP3y),(_orthoP4x, _orthoP4y)), fill=(0,0,0,200), width=2)
 
@@ -1546,6 +1545,7 @@ def _load_drawing_configs(config):
 
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
+        palette.outlineStroke = workConfig.getboolean(_p, "outlineStroke", fallback=False)
 
         palette.dripWidthMax = float(workConfig.get(_p, "dripWidthMax", fallback=0.0))
         palette.dripLengthMax = float(workConfig.get(_p, "dripLengthMax", fallback=0.0))

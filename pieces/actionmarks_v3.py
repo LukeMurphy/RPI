@@ -23,7 +23,6 @@ from modules.rendering.render import saveImageToFile
 """""" """""" """ This version uses bundles of marks and textures             """
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-
 # ----------------------------------------------------##----------------------------------------------------#
 class Palette:
     def __init__(self):
@@ -1743,3 +1742,9 @@ def _load_and_initialize_system(config):
     config.inTransition = False
 
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
+
+# ----------------------------------------------------##----------------------------------------------------#
+# uncomment to silence logging 
+
+# def pieceLogger(*kwargs) :
+#     return True

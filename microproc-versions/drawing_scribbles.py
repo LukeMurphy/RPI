@@ -651,7 +651,7 @@ def setPalette(arg=0):
         penMark.loopsMin = 2
         penMark.loopsMax = 4
         penMark.penSpeedMinVal = 1
-        penMark.penSpeedMaxVal = 5
+        penMark.penSpeedMaxVal = 3
         penMark.radiusXMin = 1
         penMark.radiusXMax = 8
         penMark.radiusYMin = 5
@@ -722,9 +722,13 @@ while True:
 
     if penMark.drawingDone and random.random() < startNewLineProb and penMark.linesDrawn < penMark.linesToDraw:
         # print(penMark.linesDrawn, penMark.linesToDraw)
+        if gc.mem_free() < 3000 :
+            gc.collect()
         startUpNewLine()
 
     if random.random() < eraseProb and panelBGBlockCount == 0 and penMark.linesDrawn >= penMark.linesToDraw:
+        if gc.mem_free() < 3000 :
+            gc.collect()
         if random.random() < changePaletteProb:
             arg = math.floor(random.uniform(0, numPalettes))
             #print(f"setting to palette {arg}")
@@ -739,6 +743,7 @@ while True:
         penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
         penMark.points = round(penMark.loops * penMark.pointsPerLoop)
         penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
+        penMark.outline = False
         if random.random() < penMark.outlineProb  : penMark.outline = True
         # print( penMark.linesToDraw)
 
@@ -754,11 +759,6 @@ while True:
     if panelBGBlockCount == 0 and not penMark.drawingDone:
         drawLinePolyEnvelope(penMark)
         
-    if gc.mem_free() < 3000 :
-        #print(gc.mem_free())
-        gc.collect()
-        #print(gc.mem_free())
-
     # Update the display
     i75.update()
     time.sleep(INTERVAL)

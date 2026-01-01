@@ -168,18 +168,18 @@ p = pngdec.PNG(display)
 # ---------- SETTINGS ---------------#
 INTERVAL = 0.03
 activeAnim = 0
-changeAnimProb = 0.01
+changeAnimProb = 0.001
 shapeChangeProb = 0.005
 
 animConfigs = [
-    {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7,8], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
-    {"dir": "bbear-left", "nopauseFrames": [2], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "bbunny-rad", "nopauseFrames": [9], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "fig-left", "nopauseFrames": [11, 12, 13, 14, 15], "offsets": [0, 2], "pauseProb": 0.5, "unpauseProb": 0.02},
-    {"dir": "mousey", "nopauseFrames": [], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.02},
+    {"dir": "bbear-left", "nopauseFrames": [1,2], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbunny-rad", "nopauseFrames": [8,9,10], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "fig-left", "nopauseFrames": [6,7,8,9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "mousey", "nopauseFrames": [3,4,5,6,7], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
 ]
 
 
@@ -313,3 +313,4 @@ while True:
 
     i75.update()
     time.sleep(INTERVAL)
+

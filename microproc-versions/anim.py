@@ -3,6 +3,7 @@ from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 import pngdec
 import os
 import random
+import gc
 
 
 class Point:
@@ -89,19 +90,19 @@ class AbsShape:
             self.p4.newY = self.p4.pt[1]
             self.p4.change()
 
-        if random.random() < 0.05:
+        if random.random() < 0.25:
             self.p1.newX = self.initP1[0]
             self.p1.newY = self.initP1[1]
             self.p1.change()
-        if random.random() < 0.05:
+        if random.random() < 0.25:
             self.p2.newX = self.initP2[0]
             self.p2.newY = self.initP2[1]
             self.p2.change()
-        if random.random() < 0.05:
+        if random.random() < 0.25:
             self.p3.newX = self.initP3[0]
             self.p3.newY = self.initP3[1]
             self.p3.change()
-        if random.random() < 0.05:
+        if random.random() < 0.25:
             self.p4.newX = self.initP4[0]
             self.p4.newY = self.initP4[1]
             self.p4.change()
@@ -166,7 +167,7 @@ p = pngdec.PNG(display)
 
 # ---------- SETTINGS ---------------#
 INTERVAL = 0.03
-activeAnim = 2
+activeAnim = 0
 changeAnimProb = 0.01
 shapeChangeProb = 0.005
 
@@ -207,7 +208,7 @@ changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
-changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.45, 0.5, True)
+changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.65, 0.75, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.set_pen(Bg)
@@ -216,6 +217,7 @@ display.clear()
 pause = False
 count = 0
 incr = 1
+activeAnim = round(random.uniform(0, len(anims) - 1))
 pauseProb = animConfigs[activeAnim]["pauseProb"]
 unpauseProb = animConfigs[activeAnim]["unpauseProb"]
 unpauseProbInit = animConfigs[activeAnim]["unpauseProb"]
@@ -223,8 +225,6 @@ numImages = anims[activeAnim][1]
 
 
 while True:
-
-    img = anims[activeAnim][0][count]
 
     if not pause:
         count += incr
@@ -275,6 +275,11 @@ while True:
         ]
     )
 
+    if count >= anims[activeAnim][1] :
+        #print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
+        count = len(anims[activeAnim][0]) - 1
+        incr *= -1    
+    img = anims[activeAnim][0][count]
     
     p.open_file(img)
     # Decode our PNG file and set the X and Y
@@ -287,6 +292,9 @@ while True:
         # activeAnim += 1
         # if activeAnim >= len(anims):
         #     activeAnim = 0
+        if gc.mem_free() < 3000 :
+            gc.collect()
+        
         activeAnim = round(random.uniform(0, len(anims) - 1))
         count = 0
         incr = 1
@@ -298,7 +306,7 @@ while True:
         changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.4, 0.6)
+        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.6, 0.8)
         fgClr.change()
 
         shp.update()

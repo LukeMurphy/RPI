@@ -266,12 +266,14 @@ while True:
     shp.p3.pointStep()
     shp.p4.pointStep()
 
+    # OverflowError: overflow converting long int to machine word
+
     display.polygon(
         [
-            tuple(shp.p1.pt),
-            tuple(shp.p2.pt),
-            tuple(shp.p3.pt),
-            tuple(shp.p4.pt),
+            (round(shp.p1.pt[0]),round(shp.p1.pt[1])),
+            (round(shp.p2.pt[0]),round(shp.p2.pt[1])),
+            (round(shp.p3.pt[0]),round(shp.p3.pt[1])),
+            (round(shp.p4.pt[0]),round(shp.p4.pt[1])),
         ]
     )
 

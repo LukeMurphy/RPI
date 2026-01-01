@@ -154,6 +154,8 @@ def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
         _hmin = 0 - hmin
     else:
         _hmin = hmin
+        
+    
 
     if init:
         clrRef.h = random.uniform(_hmin, hmax)
@@ -163,10 +165,12 @@ def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
         clrRef.v = random.uniform(vmin, vmax)
     else:
         clrRef.newh = random.uniform(_hmin, hmax)
-        if clrRef.h < 0:
-            clrRef.h += 1.0
+        if clrRef.newh < 0:
+            clrRef.newh += 1.0
         clrRef.news = random.uniform(smin, smax)
         clrRef.newv = random.uniform(vmin, vmax)
+        
+    #print(f"Color change {_hmin} {hmax} ==> {clrRef.newh}")
 
 
 # Setup for the display
@@ -317,10 +321,11 @@ while True:
         changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        changeColor(fgClr, 330 / 360, 260 / 360, 0.90, 1.0, 0.5, 0.60)
+        changeColor(fgClr, 330 / 360, 260 / 360, 0.90, 1.0, 0.5, .60)
         fgClr.change()
 
         shp.update()
 
     i75.update()
     time.sleep(INTERVAL)
+

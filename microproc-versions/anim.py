@@ -33,9 +33,8 @@ class Point:
         self.xSpeed = self.dx / self.speedFactor
         self.ySpeed = self.dy / self.speedFactor
 
-        if _log :
+        if _log:
             print(f"Changed: {self.newX},{self.newY} - {self.x}, {self.y}")
-
 
     def pointStep(self):
         self.x = round(self.x + self.xSpeed)
@@ -150,12 +149,22 @@ class ColorObj:
 
 
 def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
+
+    if hmin > hmax:
+        _hmin = 0 - hmin
+    else:
+        _hmin = hmin
+
     if init:
-        clrRef.h = random.uniform(hmin, hmax)
+        clrRef.h = random.uniform(_hmin, hmax)
+        if clrRef.h < 0:
+            clrRef.h += 1.0
         clrRef.s = random.uniform(smin, smax)
         clrRef.v = random.uniform(vmin, vmax)
     else:
-        clrRef.newh = random.uniform(hmin, hmax)
+        clrRef.newh = random.uniform(_hmin, hmax)
+        if clrRef.h < 0:
+            clrRef.h += 1.0
         clrRef.news = random.uniform(smin, smax)
         clrRef.newv = random.uniform(vmin, vmax)
 
@@ -173,13 +182,13 @@ shapeChangeProb = 0.005
 
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7,8], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7, 8], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
-    {"dir": "bbear-left", "nopauseFrames": [1,2], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbunny-rad", "nopauseFrames": [8,9,10], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbear-left", "nopauseFrames": [1, 2], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbunny-rad", "nopauseFrames": [8, 9, 10], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "fig-left", "nopauseFrames": [6,7,8,9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "mousey", "nopauseFrames": [3,4,5,6,7], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "fig-left", "nopauseFrames": [6, 7, 8, 9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "mousey", "nopauseFrames": [3, 4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
 ]
 
 
@@ -190,7 +199,7 @@ for _dir in animConfigs:
     # make a list of files in the gif fo
     # lder
     # print(_dir)
-    _files = os.listdir(_dir['dir'])
+    _files = os.listdir(_dir["dir"])
     _images = []
 
     for file in _files:
@@ -208,7 +217,7 @@ changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
 fgClr = ColorObj()
-changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.65, 0.75, True)
+changeColor(fgClr, 350 / 360, 260 / 360, 0.90, 1.0, 0.45, 0.65, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.set_pen(Bg)
@@ -270,22 +279,22 @@ while True:
 
     display.polygon(
         [
-            (round(shp.p1.pt[0]),round(shp.p1.pt[1])),
-            (round(shp.p2.pt[0]),round(shp.p2.pt[1])),
-            (round(shp.p3.pt[0]),round(shp.p3.pt[1])),
-            (round(shp.p4.pt[0]),round(shp.p4.pt[1])),
+            (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
+            (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
+            (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
+            (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
         ]
     )
 
-    if count >= anims[activeAnim][1] :
-        #print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
+    if count >= anims[activeAnim][1]:
+        # print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
         count = len(anims[activeAnim][0]) - 1
-        incr *= -1    
+        incr *= -1
     img = anims[activeAnim][0][count]
-    
+
     p.open_file(img)
     # Decode our PNG file and set the X and Y
-    p.decode(animConfigs[activeAnim]["offsets"][0], animConfigs[activeAnim]['offsets'][1])
+    p.decode(animConfigs[activeAnim]["offsets"][0], animConfigs[activeAnim]["offsets"][1])
 
     if random.random() < shapeChangeProb:
         shp.update()
@@ -294,9 +303,9 @@ while True:
         # activeAnim += 1
         # if activeAnim >= len(anims):
         #     activeAnim = 0
-        if gc.mem_free() < 3000 :
+        if gc.mem_free() < 3000:
             gc.collect()
-        
+
         activeAnim = round(random.uniform(0, len(anims) - 1))
         count = 0
         incr = 1
@@ -308,11 +317,10 @@ while True:
         changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        changeColor(fgClr, 0 / 360, 360 / 360, 0.90, 1.0, 0.6, 0.8)
+        changeColor(fgClr, 330 / 360, 260 / 360, 0.90, 1.0, 0.5, 0.60)
         fgClr.change()
 
         shp.update()
 
     i75.update()
     time.sleep(INTERVAL)
-

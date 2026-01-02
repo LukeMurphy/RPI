@@ -22,14 +22,16 @@ class Point:
     ySpeed = 0
     pt = []
     speedFactor = 8
-    xMax = 20
-    yMax = 20
+    xMax = 12
+    yMax = 12
 
     def __init__(self, _x, _y):
         self.x = _x
         self.y = _y
         self.initX = _x
         self.initY = _y
+        self.xMax = XMAXDRIFT
+        self.yMax = YMAXDRIFT
         self.pt = [self.x, self.y]
 
     def change(self, changeY = True):
@@ -69,16 +71,13 @@ class AbsShape:
     inColorTrans = False
     inShapeTrans = False
     # range of changes
-    dx = 10
-    dy = 10
+    dx = 8
+    dy = 8
     initP1 = (6, 64)
     initP2 = (3, 1)
     initP3 = (60, 1)
     initP4 = (55, 64)
     resetProb = 0.25
-    # point drift limits
-    xMax = 12
-    yMax = 12
 
     def __init__(self):
         self.p1 = Point(self.initP1[0], self.initP1[1])
@@ -184,6 +183,8 @@ INTERVAL = 0.03
 activeAnim = 0
 changeAnimProb = 0.001
 shapeChangeProb = 0.005
+XMAXDRIFT = 10
+YMAXDRIFT = 10
 
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},

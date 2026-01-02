@@ -69,16 +69,16 @@ class AbsShape:
     inColorTrans = False
     inShapeTrans = False
     # range of changes
-    dx = 15
-    dy = 15
+    dx = 10
+    dy = 10
     initP1 = (6, 64)
     initP2 = (3, 1)
     initP3 = (60, 1)
     initP4 = (55, 64)
     resetProb = 0.25
     # point drift limits
-    xMax = 20
-    yMax = 20
+    xMax = 12
+    yMax = 12
 
     def __init__(self):
         self.p1 = Point(self.initP1[0], self.initP1[1])
@@ -183,7 +183,7 @@ p = pngdec.PNG(display)
 INTERVAL = 0.03
 activeAnim = 0
 changeAnimProb = 0.001
-shapeChangeProb = 0.05
+shapeChangeProb = 0.005
 
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},

@@ -69,42 +69,42 @@ class AbsShape:
         pass
 
     def update(self):
-        if random.random() < 0.25:
-            self.p1.newX = self.p1.pt[0] + round(random.uniform(-self.dx, self.dx))
-            self.p1.newY = self.p1.pt[1]
-            self.p1.change()
+        rand = random.random
+        uniform = random.uniform
+        dx = self.dx
+        dy = self.dy
+        points = [
+            (self.p1, self.initP1, 0.25, False),
+            (self.p2, self.initP2, 0.96, True),
+            (self.p3, self.initP3, 0.96, True),
+            (self.p4, self.initP4, 0.25, False),
+        ]
 
-        if random.random() < 0.96:
-            self.p2.newX = self.p2.pt[0] + round(random.uniform(-self.dx, self.dx))
-            self.p2.newY = self.p2.pt[1] + round(random.uniform(-self.dy, self.dy))
-            self.p2.change()
+        for point, init, move_prob, move_y in points:
+            if rand() < move_prob:
+                point.newX = point.pt[0] + round(uniform(-dx, dx))
+                if move_y:
+                    point.newY = point.pt[1] + round(uniform(-dy, dy))
+                else:
+                    point.newY = point.pt[1]
+                point.change()
 
-        if random.random() < 0.96:
-            self.p3.newX = self.p3.pt[0] + round(random.uniform(-self.dx, self.dx))
-            self.p3.newY = self.p3.pt[1] + round(random.uniform(-self.dy, self.dy))
-            self.p3.change()
+        max_x = CANVASWIDTH + OVERFLOWPX
+        max_y = CANVASHEIGHT + OVERFLOWPX
+        min_x = -OVERFLOWPX
+        min_y = -OVERFLOWPX
 
-        if random.random() < 0.25:
-            self.p4.newX = self.p4.pt[0] + round(random.uniform(-self.dx, self.dx))
-            self.p4.newY = self.p4.pt[1]
-            self.p4.change()
-
-        if random.random() < 0.25:
-            self.p1.newX = self.initP1[0]
-            self.p1.newY = self.initP1[1]
-            self.p1.change()
-        if random.random() < 0.25:
-            self.p2.newX = self.initP2[0]
-            self.p2.newY = self.initP2[1]
-            self.p2.change()
-        if random.random() < 0.25:
-            self.p3.newX = self.initP3[0]
-            self.p3.newY = self.initP3[1]
-            self.p3.change()
-        if random.random() < 0.25:
-            self.p4.newX = self.initP4[0]
-            self.p4.newY = self.initP4[1]
-            self.p4.change()
+        for point, init, _, _ in points:
+            if (
+                rand() < 0.25
+                or point.newX > max_x
+                or point.newY > max_y
+                or point.newX < min_x
+                or point.newY < min_y
+            ):
+                point.newX = init[0]
+                point.newY = init[1]
+                point.change()
 
 
 class ColorObj:
@@ -154,8 +154,6 @@ def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
         _hmin = 0 - hmin
     else:
         _hmin = hmin
-        
-    
 
     if init:
         clrRef.h = random.uniform(_hmin, hmax)
@@ -169,11 +167,14 @@ def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
             clrRef.newh += 1.0
         clrRef.news = random.uniform(smin, smax)
         clrRef.newv = random.uniform(vmin, vmax)
-        
-    #print(f"Color change {_hmin} {hmax} ==> {clrRef.newh}")
+
+    # print(f"Color change {_hmin} {hmax} ==> {clrRef.newh}")
 
 
 # Setup for the display
+CANVASWIDTH = 64
+CANVASHEIGHT = 64
+OVERFLOWPX = 20
 i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 p = pngdec.PNG(display)
@@ -236,6 +237,10 @@ unpauseProb = animConfigs[activeAnim]["unpauseProb"]
 unpauseProbInit = animConfigs[activeAnim]["unpauseProb"]
 numImages = anims[activeAnim][1]
 
+# marker = False
+# markerCount = 0
+# markerClr = display.create_pen_hsv(0.22, 1.0, 1.0)
+# markerClrOff = display.create_pen_hsv(0.11, 1.0, 0.20)
 
 while True:
 
@@ -280,15 +285,17 @@ while True:
     shp.p4.pointStep()
 
     # OverflowError: overflow converting long int to machine word
-
-    display.polygon(
-        [
-            (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
-            (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
-            (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
-            (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
-        ]
-    )
+    try:
+        display.polygon(
+            [
+                (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
+                (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
+                (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
+                (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
+            ]
+        )
+    except Exception as e:
+        print(e)
 
     if count >= anims[activeAnim][1]:
         # print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
@@ -321,11 +328,22 @@ while True:
         changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.1, 0.35)
         bgClr.change()
 
-        changeColor(fgClr, 330 / 360, 260 / 360, 0.90, 1.0, 0.5, .60)
+        changeColor(fgClr, 330 / 360, 260 / 360, 0.90, 1.0, 0.5, 0.60)
         fgClr.change()
 
         shp.update()
+    # if markerCount > 6:
+    #     if marker:
+    #         display.reset_pen(markerClr)
+    #         display.set_pen(markerClr)
+    #         marker = False
+    #     else:
+    #         # display.reset_pen(markerClrOff)
+    #         # display.set_pen(markerClrOff)
+    #         marker = True
+    #     markerCount = 0
+    # markerCount += 1
+    # display.rectangle(62, 62, 2, 2)
 
     i75.update()
     time.sleep(INTERVAL)
-

@@ -60,6 +60,7 @@ class AbsShape:
     initP2 = (3, 1)
     initP3 = (60, 1)
     initP4 = (55, 64)
+    pointResetProb = 0.25
 
     def __init__(self):
         self.p1 = Point(self.initP1[0], self.initP1[1])
@@ -69,10 +70,6 @@ class AbsShape:
         pass
 
     def update(self):
-        rand = random.random
-        uniform = random.uniform
-        dx = self.dx
-        dy = self.dy
         points = [
             (self.p1, self.initP1, 0.25, False),
             (self.p2, self.initP2, 0.96, True),
@@ -81,26 +78,24 @@ class AbsShape:
         ]
 
         for point, init, move_prob, move_y in points:
-            if rand() < move_prob:
-                point.newX = point.pt[0] + round(uniform(-dx, dx))
+            if random.random() < move_prob:
+                point.newX = point.pt[0] + round(random.uniform(-self.dx, self.dx))
                 if move_y:
-                    point.newY = point.pt[1] + round(uniform(-dy, dy))
+                    point.newY = point.pt[1] + round(random.uniform(-self.dy, self.dy))
                 else:
                     point.newY = point.pt[1]
                 point.change()
 
         max_x = CANVASWIDTH + OVERFLOWPX
         max_y = CANVASHEIGHT + OVERFLOWPX
-        min_x = -OVERFLOWPX
-        min_y = -OVERFLOWPX
 
         for point, init, _, _ in points:
             if (
-                rand() < 0.25
+                random.random() < self.pointResetProb
                 or point.newX > max_x
                 or point.newY > max_y
-                or point.newX < min_x
-                or point.newY < min_y
+                or point.newX < -OVERFLOWPX
+                or point.newY < -OVERFLOWPX
             ):
                 point.newX = init[0]
                 point.newY = init[1]

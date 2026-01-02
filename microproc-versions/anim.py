@@ -14,39 +14,53 @@ class Point:
     dy = 0
     newX = 0
     newY = 0
+    initX = 0
+    initY = 0
     diffX = 0
     diffY = 0
     xSpeed = 0
     ySpeed = 0
     pt = []
     speedFactor = 8
+    xMax = 20
+    yMax = 20
 
     def __init__(self, _x, _y):
         self.x = _x
         self.y = _y
+        self.initX = _x
+        self.initY = _y
         self.pt = [self.x, self.y]
 
-    def change(self, _log=False):
+    def change(self, changeY = True):
+
         self.dx = self.newX - self.x
-        self.dy = self.newY - self.y
+        if changeY :
+            self.dy = self.newY - self.y
 
         self.xSpeed = self.dx / self.speedFactor
-        self.ySpeed = self.dy / self.speedFactor
-
-        if _log:
-            print(f"Changed: {self.newX},{self.newY} - {self.x}, {self.y}")
+        if changeY :
+            self.ySpeed = self.dy / self.speedFactor
 
     def pointStep(self):
-        self.x = round(self.x + self.xSpeed)
-        self.y = round(self.y + self.ySpeed)
+        self.x = self.x + self.xSpeed
+        self.y = self.y + self.ySpeed
 
-        if self.x == self.newX:
+        if round(self.x) == round(self.newX):
             self.dx = 0
             self.xSpeed = 0
 
-        if self.y == self.newY:
+        if round(self.y) == round(self.newY):
             self.dy = 0
             self.ySpeed = 0
+
+        if self.x > self.initX + self.xMax or self.x < self.initX - self.xMax:
+            self.newX = self.initX
+            self.change()
+        
+        if self.y > self.initY + self.yMax or self.y < self.initY - self.yMax:
+            self.newY = self.initY
+            self.change()
 
         self.pt = [self.x, self.y]
 
@@ -54,13 +68,17 @@ class Point:
 class AbsShape:
     inColorTrans = False
     inShapeTrans = False
-    dx = 5
-    dy = 5
+    # range of changes
+    dx = 15
+    dy = 15
     initP1 = (6, 64)
     initP2 = (3, 1)
     initP3 = (60, 1)
     initP4 = (55, 64)
-    pointResetProb = 0.25
+    resetProb = 0.25
+    # point drift limits
+    xMax = 20
+    yMax = 20
 
     def __init__(self):
         self.p1 = Point(self.initP1[0], self.initP1[1])
@@ -70,36 +88,26 @@ class AbsShape:
         pass
 
     def update(self):
-        points = [
-            (self.p1, self.initP1, 0.25, False),
-            (self.p2, self.initP2, 0.96, True),
-            (self.p3, self.initP3, 0.96, True),
-            (self.p4, self.initP4, 0.25, False),
+
+        pts = [
+            (self.p1, 0.25, False, self.initP1),
+            (self.p2, 0.96, True, self.initP2),
+            (self.p3, 0.96, True, self.initP3),
+            (self.p4, 0.25, False, self.initP4),
         ]
 
-        for point, init, move_prob, move_y in points:
-            if random.random() < move_prob:
-                point.newX = point.pt[0] + round(random.uniform(-self.dx, self.dx))
-                if move_y:
-                    point.newY = point.pt[1] + round(random.uniform(-self.dy, self.dy))
-                else:
-                    point.newY = point.pt[1]
-                point.change()
-
-        max_x = CANVASWIDTH + OVERFLOWPX
-        max_y = CANVASHEIGHT + OVERFLOWPX
-
-        for point, init, _, _ in points:
-            if (
-                random.random() < self.pointResetProb
-                or point.newX > max_x
-                or point.newY > max_y
-                or point.newX < -OVERFLOWPX
-                or point.newY < -OVERFLOWPX
-            ):
-                point.newX = init[0]
-                point.newY = init[1]
-                point.change()
+        for pt, prob, changeY, initPt in pts:
+            if random.random() < prob:
+                pt.newX = pt.pt[0] + random.uniform(-self.dx, self.dx)
+                if changeY:
+                    pt.newY = pt.pt[1] + random.uniform(-self.dy, self.dy)
+                pt.change(changeY)
+            if random.random() < self.resetProb:
+                pt.newX = initPt[0]
+                pt.change(False)
+            if random.random() < self.resetProb:
+                pt.newY = initPt[1]
+                pt.change()
 
 
 class ColorObj:
@@ -167,9 +175,6 @@ def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
 
 
 # Setup for the display
-CANVASWIDTH = 64
-CANVASHEIGHT = 64
-OVERFLOWPX = 20
 i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 p = pngdec.PNG(display)
@@ -178,7 +183,7 @@ p = pngdec.PNG(display)
 INTERVAL = 0.03
 activeAnim = 0
 changeAnimProb = 0.001
-shapeChangeProb = 0.005
+shapeChangeProb = 0.05
 
 animConfigs = [
     {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
@@ -232,10 +237,6 @@ unpauseProb = animConfigs[activeAnim]["unpauseProb"]
 unpauseProbInit = animConfigs[activeAnim]["unpauseProb"]
 numImages = anims[activeAnim][1]
 
-# marker = False
-# markerCount = 0
-# markerClr = display.create_pen_hsv(0.22, 1.0, 1.0)
-# markerClrOff = display.create_pen_hsv(0.11, 1.0, 0.20)
 
 while True:
 
@@ -280,17 +281,15 @@ while True:
     shp.p4.pointStep()
 
     # OverflowError: overflow converting long int to machine word
-    try:
-        display.polygon(
-            [
-                (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
-                (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
-                (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
-                (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
-            ]
-        )
-    except Exception as e:
-        print(e)
+
+    display.polygon(
+        [
+            (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
+            (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
+            (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
+            (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
+        ]
+    )
 
     if count >= anims[activeAnim][1]:
         # print(f"Error : {count} {activeAnim} {anims[activeAnim]}")
@@ -327,18 +326,6 @@ while True:
         fgClr.change()
 
         shp.update()
-    # if markerCount > 6:
-    #     if marker:
-    #         display.reset_pen(markerClr)
-    #         display.set_pen(markerClr)
-    #         marker = False
-    #     else:
-    #         # display.reset_pen(markerClrOff)
-    #         # display.set_pen(markerClrOff)
-    #         marker = True
-    #     markerCount = 0
-    # markerCount += 1
-    # display.rectangle(62, 62, 2, 2)
 
     i75.update()
     time.sleep(INTERVAL)

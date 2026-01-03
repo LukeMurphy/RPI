@@ -1,0 +1,251 @@
+import time
+from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
+import os
+import random
+import gc
+
+
+class Point:
+
+    x = 0
+    y = 0
+    dx = 0
+    dy = 0
+    newX = 0
+    newY = 0
+    initX = 0
+    initY = 0
+    diffX = 0
+    diffY = 0
+    xSpeed = 0
+    ySpeed = 0
+    pt = []
+    speedFactor = 8
+    xMax = 6
+    yMax = 6
+
+    def __init__(self, _x, _y):
+        self.x = _x
+        self.y = _y
+        self.initX = _x
+        self.initY = _y
+        self.xMax = XMAXDRIFT
+        self.yMax = YMAXDRIFT
+        self.pt = [self.x, self.y]
+
+    def change(self, changeY = True):
+
+        self.dx = self.newX - self.x
+        if changeY :
+            self.dy = self.newY - self.y
+
+        self.xSpeed = self.dx / self.speedFactor
+        if changeY :
+            self.ySpeed = self.dy / self.speedFactor
+
+    def pointStep(self):
+        self.x = self.x + self.xSpeed
+        self.y = self.y + self.ySpeed
+
+        if round(self.x) == round(self.newX):
+            self.dx = 0
+            self.xSpeed = 0
+
+        if round(self.y) == round(self.newY):
+            self.dy = 0
+            self.ySpeed = 0
+
+        if self.x > self.initX + self.xMax or self.x < self.initX - self.xMax:
+            self.newX = self.initX
+            self.change()
+        
+        if self.y > self.initY + self.yMax or self.y < self.initY - self.yMax:
+            self.newY = self.initY
+            self.change()
+
+        self.pt = [self.x, self.y]
+
+
+class AbsShape:
+    inColorTrans = False
+    inShapeTrans = False
+    # range of changes
+    dx = 2
+    dy = 2
+    initP1 = (2, 62)
+    initP2 = (2, 1)
+    initP3 = (61, 1)
+    initP4 = (61, 62)
+    resetProb = 0.25
+
+    def __init__(self):
+        self.p1 = Point(self.initP1[0], self.initP1[1])
+        self.p2 = Point(self.initP2[0], self.initP2[1])
+        self.p3 = Point(self.initP3[0], self.initP3[1])
+        self.p4 = Point(self.initP4[0], self.initP4[1])
+        pass
+
+    def update(self):
+
+        pts = [
+            (self.p1, 0.96, True, self.initP1),
+            (self.p2, 0.96, True, self.initP2),
+            (self.p3, 0.96, True, self.initP3),
+            (self.p4, 0.96, True, self.initP4),
+        ]
+
+        for pt, prob, changeY, initPt in pts:
+            if random.random() < prob:
+                pt.newX = pt.pt[0] + random.uniform(-self.dx, self.dx)
+                if changeY:
+                    pt.newY = pt.pt[1] + random.uniform(-self.dy, self.dy)
+                pt.change(changeY)
+            if random.random() < self.resetProb:
+                pt.newX = initPt[0]
+                pt.change(False)
+            if random.random() < self.resetProb:
+                pt.newY = initPt[1]
+                pt.change()
+
+
+class ColorObj:
+    def __init__(self):
+        self.h = 0
+        self.s = 0
+        self.v = 0
+        self.dh = 0
+        self.ds = 0
+        self.dv = 0
+        self.newh = 0
+        self.news = 0
+        self.newv = 0
+        self.speedFactor = 40
+
+    def change(self):
+        dh = self.newh - self.h
+
+        if dh >= 0.5:
+            dh *= -1
+
+        self.dh = dh / self.speedFactor
+        self.ds = (self.news - self.s) / self.speedFactor
+        self.dv = (self.newv - self.v) / self.speedFactor
+
+    def clrStep(self):
+        self.h = self.h + self.dh
+        self.s = self.s + self.ds
+        self.v = self.v + self.dv
+
+        if self.h > 1.0:
+            self.h = self.h - 1.0
+        if self.h < 0.0:
+            self.h = 1.0 + self.h
+
+        if round(self.h * 10) == round(self.newh * 10):
+            self.dh = 0
+        if round(self.s * 10) == round(self.news * 10):
+            self.ds = 0
+        if round(self.v * 10) == round(self.newv * 10):
+            self.dv = 0
+
+
+def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
+
+    if hmin > hmax:
+        _hmin = 0 - hmin
+    else:
+        _hmin = hmin
+
+    if init:
+        clrRef.h = random.uniform(_hmin, hmax)
+        if clrRef.h < 0:
+            clrRef.h += 1.0
+        clrRef.s = random.uniform(smin, smax)
+        clrRef.v = random.uniform(vmin, vmax)
+    else:
+        clrRef.newh = random.uniform(_hmin, hmax)
+        if clrRef.newh < 0:
+            clrRef.newh += 1.0
+        clrRef.news = random.uniform(smin, smax)
+        clrRef.newv = random.uniform(vmin, vmax)
+
+    # print(f"Color change {_hmin} {hmax} ==> {clrRef.newh}")
+
+
+# Setup for the display
+i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
+display = i75.display
+
+# ---------- SETTINGS ---------------#
+INTERVAL = 0.03
+activeAnim = 0
+changeAnimProb = 0.001
+shapeChangeProb = 0.5
+XMAXDRIFT = 10
+YMAXDRIFT = 10
+
+shp = AbsShape()
+
+bgClr = ColorObj()
+changeColor(bgClr, 45 / 360, 45 / 360, 1.50, 1.0, 0.35, 1.0, True)
+Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
+
+fgClr = ColorObj()
+changeColor(fgClr, 350 / 360, 260 / 360, 0.90, 1.0, 0.0, 0.0, True)
+ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+
+display.set_pen(Bg)
+display.clear()
+
+while True :
+    # bgClr.clrStep()
+    # Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
+    display.set_pen(Bg)
+    display.clear()
+
+    fgClr.clrStep()
+    ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+    display.reset_pen(ForeG)
+    display.set_pen(ForeG)
+
+    shp.p1.pointStep()
+    shp.p2.pointStep()
+    shp.p3.pointStep()
+    shp.p4.pointStep()
+
+    # OverflowError: overflow converting long int to machine word
+
+    display.polygon(
+        [
+            (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
+            (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
+            (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
+            (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
+        ]
+    )
+
+    if random.random() < shapeChangeProb:
+        shp.update()
+        Bg = display.create_pen_hsv(random.random(), random.uniform(.1,1.0), random.uniform(.1,1.0))
+
+    if random.random() < changeAnimProb:
+        # activeAnim += 1
+        # if activeAnim >= len(anims):
+        #     activeAnim = 0
+        if gc.mem_free() < 3000:
+            gc.collect()
+
+        count = 0
+        incr = 1
+
+        # changeColor(bgClr, 0 / 360, 360 / 360, 0.50, 1.0, 0.5, 1.0)
+        # bgClr.change()
+
+        #changeColor(fgClr, 330 / 360, 260 / 360, 0.90, 1.0, 0.0, 0.0)
+        #fgClr.change()
+
+        shp.update()
+
+    i75.update()
+    time.sleep(INTERVAL)
+

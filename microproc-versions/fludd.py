@@ -40,6 +40,10 @@ CORNERPOINT_D = [0, 64]
 
 POINTDRIFT = 2
 POINTINSET = 2
+POINTDRIFTMIN = 1
+POINTINSETMIN = 1
+POINTDRIFTMAX = 2
+POINTINSETMAX = 2
 
 SQRPT_A_INIT = [CORNERPOINT_A[0] + POINTINSET, CORNERPOINT_A[1] + POINTINSET]
 SQRPT_B_INIT = [CORNERPOINT_B[0] - POINTINSET, POINTINSET]
@@ -50,7 +54,6 @@ SQRPT_A = [4, 4]
 SQRPT_B = [60, 4]
 SQRPT_C = [60, 60]
 SQRPT_D = [4, 60]
-
 
 
 shp1 = [CORNERPOINT_A, CORNERPOINT_B, SQRPT_B, SQRPT_A]
@@ -66,11 +69,11 @@ clr = changeColor(45 / 360, 45 / 360, 1.50, 1.0, 0.0, 0.0)
 bgClr = display.create_pen_hsv(clr[0], clr[1], clr[2])
 
 fgMinHue = 350 / 360
-fgMaxHue = 260 / 360
+fgMaxHue = 0 / 360
 fgMinSat = 0.5
-fgMaxSat = 1.0
-fgMinVal = 0.3
-fgMaxVal = 1.0
+fgMaxSat = 0.5
+fgMinVal = 0.47
+fgMaxVal = 0.47
 
 clr = changeColor(fgMinHue, fgMaxHue, fgMinSat, fgMaxSat, fgMinVal, fgMaxVal)
 fgClr = display.create_pen_hsv(clr[0], clr[1], clr[2])
@@ -107,8 +110,8 @@ while True:
         if gc.mem_free() < 3000:
             gc.collect()
 
-        POINTDRIFT = random.randint(1,4)
-        POINTINSET = random.randint(1,6)
+        POINTDRIFT = random.randint(POINTDRIFTMIN,POINTDRIFTMAX)
+        POINTINSET = random.randint(POINTINSETMIN,POINTINSETMAX)
 
         SQRPT_A_INIT = [CORNERPOINT_A[0] + POINTINSET, CORNERPOINT_A[1] + POINTINSET]
         SQRPT_B_INIT = [CORNERPOINT_B[0] - POINTINSET, POINTINSET]
@@ -117,5 +120,3 @@ while True:
 
     i75.update()
     time.sleep(INTERVAL)
-
-

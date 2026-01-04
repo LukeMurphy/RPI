@@ -76,7 +76,7 @@ class AbsShape:
     initP1 = (6, 64)
     initP2 = (3, 1)
     initP3 = (60, 1)
-    initP4 = (55, 64)
+    initP4 = (57, 64)
     resetProb = 0.25
 
     def __init__(self):
@@ -152,25 +152,33 @@ class ColorObj:
 
 def changeColor(clrRef, hmin, hmax, smin, smax, vmin, vmax, init=False):
 
+    clr  =  rColor( hmin, hmax, smin, smax, vmin, vmax)
+    if init:
+        clrRef.h = clr[0]
+        clrRef.s = clr[1]
+        clrRef.v = clr[2]
+    else:
+        clrRef.newh = clr[0]
+        clrRef.news = clr[1]
+        clrRef.newv = clr[2]
+
+    # print(f"Color change {_hmin} {hmax} ==> {clrRef.newh}")
+
+
+def rColor(hmin, hmax, smin, smax, vmin, vmax):
+
     if hmin > hmax:
         _hmin = 0 - hmin
     else:
         _hmin = hmin
 
-    if init:
-        clrRef.h = random.uniform(_hmin, hmax)
-        if clrRef.h < 0:
-            clrRef.h += 1.0
-        clrRef.s = random.uniform(smin, smax)
-        clrRef.v = random.uniform(vmin, vmax)
-    else:
-        clrRef.newh = random.uniform(_hmin, hmax)
-        if clrRef.newh < 0:
-            clrRef.newh += 1.0
-        clrRef.news = random.uniform(smin, smax)
-        clrRef.newv = random.uniform(vmin, vmax)
+    _h = random.uniform(_hmin, hmax)
+    if _h < 0:
+        _h += 1.0
+    _s = random.uniform(smin, smax)
+    _v = random.uniform(vmin, vmax)
 
-    # print(f"Color change {_hmin} {hmax} ==> {clrRef.newh}")
+    return [_h, _s, _v]
 
 
 # Setup for the display
@@ -182,16 +190,18 @@ p = pngdec.PNG(display)
 INTERVAL = 0.03
 activeAnim = 0
 changeAnimProb = 0.001
-shapeChangeProb = 0.005
-XMAXDRIFT = 10
-YMAXDRIFT = 10
+shapeChangeProb = 0.001
+dx = 6
+dy = 6
+XMAXDRIFT = 4
+YMAXDRIFT = 4
 
 animConfigs = [
-    {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7, 8], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [-1, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7, 8], "offsets": [2, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
-    {"dir": "bbear-left", "nopauseFrames": [1, 2], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbunny-rad", "nopauseFrames": [8, 9, 10], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbear-left", "nopauseFrames": [1, 2], "offsets": [4, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "bbunny-rad", "nopauseFrames": [8, 9, 10], "offsets": [-2, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "fig-left", "nopauseFrames": [6, 7, 8, 9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "mousey", "nopauseFrames": [3, 4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
@@ -217,6 +227,8 @@ for _dir in animConfigs:
     anims.append([_images, _numImages])
 
 shp = AbsShape()
+shp.dx = dx
+shp.dy = dy
 
 bgClr = ColorObj()
 changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.35, True)
@@ -289,6 +301,7 @@ while True:
             (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
             (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
             (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
+            (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
         ]
     )
 
@@ -330,3 +343,4 @@ while True:
 
     i75.update()
     time.sleep(INTERVAL)
+

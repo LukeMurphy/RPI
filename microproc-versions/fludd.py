@@ -35,8 +35,8 @@ shapeChangeProb = 0.5
 
 CORNERPOINT_A = [0, -1]
 CORNERPOINT_B = [64, -1]
-CORNERPOINT_C = [64, 64]
-CORNERPOINT_D = [0, 64]
+CORNERPOINT_C = [64, 63]
+CORNERPOINT_D = [0, 63]
 
 POINTDRIFT = 2
 POINTINSET = 2
@@ -117,7 +117,15 @@ while True:
         SQRPT_B_INIT = [CORNERPOINT_B[0] - POINTINSET, POINTINSET]
         SQRPT_C_INIT = [CORNERPOINT_C[0]- POINTINSET, CORNERPOINT_C[1]- POINTINSET]
         SQRPT_D_INIT = [POINTINSET, CORNERPOINT_D[1] - POINTINSET]
+        
+        if random.random() < .5 :
+            fgMinSat = 0.5
+            fgMaxSat = 0.5
+        else :
+            fgMinSat = 0.0
+            fgMaxSat = 0.05 
 
     i75.update()
     time.sleep(INTERVAL)
+
 

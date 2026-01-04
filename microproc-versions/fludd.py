@@ -33,8 +33,8 @@ activeAnim = 0
 changeAnimProb = 0.005
 shapeChangeProb = 0.5
 
-CORNERPOINT_A = [0, 0]
-CORNERPOINT_B = [64, 0]
+CORNERPOINT_A = [0, -1]
+CORNERPOINT_B = [64, -1]
 CORNERPOINT_C = [64, 64]
 CORNERPOINT_D = [0, 64]
 
@@ -94,7 +94,7 @@ while True:
 
     display.polygon([tuple(CORNERPOINT_A), tuple(CORNERPOINT_B), tuple(SQRPT_B), tuple(SQRPT_A), tuple(CORNERPOINT_A)])
     display.polygon([tuple(CORNERPOINT_B), tuple(CORNERPOINT_C), tuple(SQRPT_C), tuple(SQRPT_B), tuple(CORNERPOINT_B)])
-    display.polygon([tuple(CORNERPOINT_D), tuple(CORNERPOINT_C), tuple(SQRPT_C), tuple(SQRPT_D), tuple(CORNERPOINT_A)])
+    display.polygon([tuple(CORNERPOINT_D), tuple(CORNERPOINT_C), tuple(SQRPT_C), tuple(SQRPT_D), tuple(CORNERPOINT_D)])
     display.polygon([tuple(CORNERPOINT_A), tuple(CORNERPOINT_D), tuple(SQRPT_D), tuple(SQRPT_A), tuple(CORNERPOINT_A)])
 
     clr = changeColor(fgMinHue, fgMaxHue, fgMinSat, fgMaxSat, fgMinVal, fgMaxVal)
@@ -120,3 +120,4 @@ while True:
 
     i75.update()
     time.sleep(INTERVAL)
+

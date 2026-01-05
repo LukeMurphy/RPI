@@ -28,22 +28,24 @@ i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 
 # ---------- SETTINGS ---------------#
-INTERVAL = 0.03
+INTERVAL = 0.05
 activeAnim = 0
-changeAnimProb = 0.005
-shapeChangeProb = 0.5
+changeAnimProb = 0.003
+changeAnimProbBase = 0.003
 
 CORNERPOINT_A = [0, -1]
 CORNERPOINT_B = [64, -1]
 CORNERPOINT_C = [64, 63]
 CORNERPOINT_D = [0, 63]
 
-POINTDRIFT = 2
-POINTINSET = 2
+# drift 
+POINTDRIFT = 1
 POINTDRIFTMIN = 1
-POINTINSETMIN = 1
 POINTDRIFTMAX = 2
-POINTINSETMAX = 2
+# inset from sides
+POINTINSET = 2
+POINTINSETMIN = 1
+POINTINSETMAX = 3
 
 SQRPT_A_INIT = [CORNERPOINT_A[0] + POINTINSET, CORNERPOINT_A[1] + POINTINSET]
 SQRPT_B_INIT = [CORNERPOINT_B[0] - POINTINSET, POINTINSET]
@@ -117,15 +119,34 @@ while True:
         SQRPT_B_INIT = [CORNERPOINT_B[0] - POINTINSET, POINTINSET]
         SQRPT_C_INIT = [CORNERPOINT_C[0]- POINTINSET, CORNERPOINT_C[1]- POINTINSET]
         SQRPT_D_INIT = [POINTINSET, CORNERPOINT_D[1] - POINTINSET]
+
+        clrMode = random.choice([1,2,3])
         
-        if random.random() < .5 :
+        if clrMode ==1 :
+            fgMinHue = 0
+            fgMaxHue = 1.0
             fgMinSat = 0.5
             fgMaxSat = 0.5
-        else :
+            INTERVAL = random.uniform(.02,5.0)
+            fgMinVal = .4
+            fgMaxVal = .7
+        elif clrMode == 2 :
             fgMinSat = 0.0
             fgMaxSat = 0.05 
+            fgMinVal = .4
+            fgMaxVal = .8
+            INTERVAL = random.uniform(.03,.10)
+        elif clrMode == 3 :
+            fgMinHue = 0
+            fgMaxHue = 50/360
+            fgMinSat = 0.60
+            fgMaxSat = 1.0 
+            fgMinVal = .4
+            fgMaxVal = .7
+            INTERVAL = random.uniform(.01,.05)
+
+        changeAnimProb = changeAnimProbBase * INTERVAL / .03
+        print(INTERVAL, changeAnimProb)
 
     i75.update()
     time.sleep(INTERVAL)
-
-

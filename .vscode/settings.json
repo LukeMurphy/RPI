@@ -2,7 +2,9 @@
     "python.createEnvironment.contentButton": "show",
     "python.autoComplete.extraPaths": [
         "/Users/lamshell/Documents/Dev/LEDELI/RPI",
-        "/Users/lamshell/Documents/Dev/LEDELI/RPI/modules/"
+        "/Users/lamshell/Documents/Dev/LEDELI/RPI/modules/",
+        "/Users/lamshell/Documents/Dev/LEDELI/RPI/modules/rendering",
+        "/Users/lamshell/Documents/Dev/LEDELI/RPI/modules/particleobjects"
     ],
     "python.globalModuleInstallation": false
 }

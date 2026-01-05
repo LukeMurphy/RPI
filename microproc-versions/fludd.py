@@ -127,7 +127,7 @@ while True:
             fgMaxHue = 1.0
             fgMinSat = 0.5
             fgMaxSat = 0.5
-            INTERVAL = random.uniform(.02,5.0)
+            INTERVAL = random.uniform(.04,.070)
             fgMinVal = .4
             fgMaxVal = .7
         elif clrMode == 2 :
@@ -135,7 +135,7 @@ while True:
             fgMaxSat = 0.05 
             fgMinVal = .4
             fgMaxVal = .8
-            INTERVAL = random.uniform(.03,.10)
+            INTERVAL = random.uniform(.04,.10)
         elif clrMode == 3 :
             fgMinHue = 0
             fgMaxHue = 50/360
@@ -143,7 +143,7 @@ while True:
             fgMaxSat = 1.0 
             fgMinVal = .4
             fgMaxVal = .7
-            INTERVAL = random.uniform(.01,.05)
+            INTERVAL = random.uniform(.03,.07)
 
         changeAnimProb = changeAnimProbBase * INTERVAL / .03
         print(INTERVAL, changeAnimProb)

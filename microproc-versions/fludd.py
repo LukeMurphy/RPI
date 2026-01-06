@@ -28,9 +28,9 @@ i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 
 # ---------- SETTINGS ---------------#
-INTERVAL = .01
+INTERVAL = .02
 activeAnim = 0
-changeAnimProbBase = 0.0008
+changeAnimProbBase = 0.0004
 changeAnimProb = changeAnimProbBase
 changeColorProbBase = 0.85
 changeColorProb = changeColorProbBase
@@ -80,8 +80,8 @@ shapeArray = [shp1, shp2, shp3, shp4]
 clr = changeColor(45 / 360, 45 / 360, 1.50, 1.0, 0.0, 0.0)
 bgClr = display.create_pen_hsv(clr[0], clr[1], clr[2])
 
-fgMinHue = 350 / 360
-fgMaxHue = 0 / 360
+fgMinHue = 0
+fgMaxHue = 1
 fgMinSat = 0.5
 fgMaxSat = 0.5
 fgMinVal = 0.47
@@ -218,11 +218,11 @@ while True:
             fgClr = display.create_pen_hsv(clr[0], clr[1], clr[2])
             POINTDRIFT = 1
             POINTDRIFTMIN = 1
-            POINTDRIFTMAX = 4
+            POINTDRIFTMAX = 3
             # inset from sides
             POINTINSET = 2
             POINTINSETMIN = 1
-            POINTINSETMAX = 14
+            POINTINSETMAX = 4
             print("Changed to not fire square")
             
 

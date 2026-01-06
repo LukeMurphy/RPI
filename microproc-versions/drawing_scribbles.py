@@ -456,6 +456,13 @@ def drawBGPanelBlock(shp):
     )
 
 
+# ----------------------------------------------------##----------------------------------------------------#
+
+# Setup for the display
+i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
+display = i75.display
+
+
 # -------------------------------------------  -SETTINGS ---------------------------------------------------#
 
 INTERVAL = 0.02
@@ -467,12 +474,12 @@ COLS = 5
 
 brightness = 0.9
 penBrightness = 0.9
-numPalettes = 5
+numPalettes = 6
 
 probDarkBG = 0.025
 startNewLineProb = 0.25
 eraseProb = 0.5
-changePaletteProb = 0.25
+changePaletteProb = 0.925
 probPanelBlockChangesColor = 0.01
 probLineChangesColor = 0.005
 linesToDrawMin = 1
@@ -488,31 +495,37 @@ panelBGBlockCount = 0
 
 penMark = PenMark()
 config = Config()
+outLineClr = ColorObj()
+outLineClr.h = random.uniform(0, 1.0)
+outLineClr.s = random.uniform(0.2, 1.0)
+outLineClr.v = random.uniform(0.01, 0.1)
+OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
 
 penMark.name = "scribbleLine1"
-penMark.pointsPerLoop = 9
-penMark.linesDrawn = 0
-
-penMark.changeMarkWidthProb = 0.03
-penMark.incrementFactor = .7
-
-penMark.noiseX = 2
-penMark.noiseY = 4
-penMark.xRadiusDelta = 2
-penMark.yRadiusDelta = 2
-penMark.deltaRadiusXChangeProb = 0.02
-penMark.deltaRadiusYChangeProb = 0.02
-
-penMark.xCenter = 0
-penMark.yCenter = 0
-penMark.xOffset = 32
-penMark.yOffset = 32
-penMark.centerXDelta = 3
-penMark.centerYDelta = 4
-penMark.deltaRadiusXCenterChangeProb = 0.1
-penMark.deltaRadiusYCenterChangeProb = 0.1
 
 def setPalette(arg=0):
+    penMark.pointsPerLoop = 9
+    penMark.linesDrawn = 0
+
+    penMark.changeMarkWidthProb = 0.03
+    penMark.incrementFactor = .7
+
+    penMark.noiseX = 2
+    penMark.noiseY = 4
+    penMark.xRadiusDelta = 2
+    penMark.yRadiusDelta = 2
+    penMark.deltaRadiusXChangeProb = 0.02
+    penMark.deltaRadiusYChangeProb = 0.02
+
+    penMark.xCenter = 0
+    penMark.yCenter = 0
+    penMark.xOffset = 32
+    penMark.yOffset = 32
+    penMark.centerXDelta = 3
+    penMark.centerYDelta = 4
+    penMark.deltaRadiusXCenterChangeProb = 0.1
+    penMark.deltaRadiusYCenterChangeProb = 0.1
+    
     global bgColorSets, bgBoxColorSets, penColorSets, linesToDrawMin, linesToDrawMax, timeDelayBeforeDrawingAgain
     _brt = 1.0
     if random.random() < probDarkBG:
@@ -662,20 +675,66 @@ def setPalette(arg=0):
         penMark.minMarkWidth = .75
         penMark.maxMarkWidth = 5
         penMark.outlineProb = .99
-
+    if arg == 5:
+        # TEST
+        _brt = .75
+        bgColorSets = [[35 / 360, 45 / 360, 0.1, 0.30, 0.72 * _brt, 0.9 * _brt]]
+        bgBoxColorSets = [[35 / 360, 55 / 360, 0.1, 0.30, 0.72 * _brt, 0.9 * _brt], 
+                          [35 / 360, 55 / 360, 0.1, 0.30, 0.72 * _brt, 0.9 * _brt]]
+        penColorSets = [
+            [0 / 360, 5 / 360, 0.95, 1.0, 0.50, 0.530],
+            [0 / 360, 5 / 360, 0.95, 1.0, 0.50, 0.530],
+            [50 / 360, 60 / 360, 1.0, 1.0, 0.60, 0.90],
+            [50 / 360, 120 / 360, 1.0, 1.0, 0.40, 0.50],
+            [120 / 360, 180 / 360, 1.0, 1.0, 0.20, 0.50],
+            [220 / 360, 230 / 360, 1.0, 1.0, 0.60, 0.90],
+        ]
+        linesToDrawMax = 7
+        linesToDrawMin = 1
+        probLineChangesColor = 0.01
+        timeDelayBeforeDrawingAgain = 10.0
+        penMark.loopsMin = 3
+        penMark.loopsMax = 3
+        penMark.penSpeedMinVal = 3
+        penMark.penSpeedMaxVal = 3
+        penMark.radiusXMin = 4
+        penMark.radiusXMax = 9
+        penMark.radiusYMin = 1
+        penMark.radiusYMax = 1
+        penMark.height = 64
+        penMark.radiusX = 15
+        penMark.radiusY = 0
+        penMark.minMarkWidth = .75
+        penMark.maxMarkWidth = 4
+        penMark.outlineProb = .85
+        
+        penMark.xCenter = 0
+        penMark.yCenter = 0
+        penMark.xOffset = 32
+        penMark.yOffset = 64
+        penMark.centerXDelta = 0.1
+        penMark.centerYDelta = 0
+        penMark.deltaRadiusXCenterChangeProb = 0.01
+        penMark.deltaRadiusYCenterChangeProb = 0.0
+        
+        penMark.noiseX = 1
+        penMark.noiseY = 2.5
+        penMark.xRadiusDelta = 1
+        penMark.yRadiusDelta = 0
+        penMark.deltaRadiusXChangeProb = 0.02
+        penMark.deltaRadiusYChangeProb = 0.0
+    
+        print("reset")
 
 setPalette(0)
+OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
+display.reset_pen(OutlineG)
 penMark.loops = R(penMark.loopsMin, penMark.loopsMax, True)
 penMark.points = round(penMark.loops * penMark.pointsPerLoop)
 penMark.linesToDraw = round(random.uniform(linesToDrawMin, linesToDrawMax))
 penMark.outline = False
 if random.random() < penMark.outlineProb  : penMark.outline = True
 
-# ----------------------------------------------------##----------------------------------------------------#
-
-# Setup for the display
-i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
-display = i75.display
 
 # ----------------------------------------------------##----------------------------------------------------#
 # SETUPS #
@@ -694,13 +753,6 @@ ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 penClr = ColorObj()
 setColor(penClr, penColorSets)
 penG = display.create_pen_hsv(penClr.h, penClr.s, penClr.v)
-
-outLineClr = ColorObj()
-outLineClr.h = random.uniform(0, 1.0)
-outLineClr.s = random.uniform(0.2, 1.0)
-outLineClr.v = random.uniform(0.0, 0.01)
-OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
-
 
 for _ in range(NUMSQRS):
     _shp = AbsShape()
@@ -735,6 +787,11 @@ while True:
             setPalette(arg)
         setColor(fgClr, bgBoxColorSets)
         ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
+        outLineClr.h = random.uniform(210/360, 240/360)
+        outLineClr.s = random.uniform(0.8, 1.0)
+        outLineClr.v = random.uniform(0.01, 0.1)
+        OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
+        display.reset_pen(OutlineG)
         setShapes()
         display.reset_pen(ForeG)
         display.set_pen(ForeG)

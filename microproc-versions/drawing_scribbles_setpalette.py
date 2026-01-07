@@ -184,7 +184,7 @@ def setPalette(arg, penMark):
         penMark.maxMarkWidth = 5
         penMark.outlineProb = 0.99
     if arg == 5:
-        # Gyres, spirals, helix, cords, powerlines
+        # Gyres, spirals, helix, cords, powerlines, Caduceus
         _brt = 0.75
         penMark.bgColorSets = [[35 / 360, 45 / 360, 0.1, 0.30, 0.72 * _brt, 0.9 * _brt]]
         penMark.bgBoxColorSets = [
@@ -236,4 +236,4 @@ def setPalette(arg, penMark):
         penMark.deltaRadiusXChangeProb = 0.02
         penMark.deltaRadiusYChangeProb = 0.0
 
-        print("reset")
+        #print("reset")

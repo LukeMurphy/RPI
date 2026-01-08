@@ -1,5 +1,5 @@
 import random
-_c = random.choice([0,3,4])
+_c = random.choice([0,3,0,4])
 #_c = 4
 if _c == 0 :
     import drawing_scribbles

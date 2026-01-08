@@ -28,12 +28,13 @@ i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 
 # ---------- SETTINGS ---------------#
-INTERVAL = .02
+INTERVAL = .03
 activeAnim = 0
 changeAnimProbBase = 0.0004
-changeAnimProb = changeAnimProbBase
 changeColorProbBase = 0.85
-changeColorProb = changeColorProbBase
+
+changeAnimProb = changeAnimProbBase * INTERVAL / 0.03
+changeColorProb = changeColorProbBase * INTERVAL / 0.03
 
 scaleMode = False
 

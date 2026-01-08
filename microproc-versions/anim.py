@@ -22,8 +22,8 @@ class Point:
     ySpeed = 0
     pt = []
     speedFactor = 8
-    xMax = 12
-    yMax = 12
+    xMax = 6
+    yMax = 6
 
     def __init__(self, _x, _y):
         self.x = _x
@@ -71,12 +71,12 @@ class AbsShape:
     inColorTrans = False
     inShapeTrans = False
     # range of changes
-    dx = 8
-    dy = 8
-    initP1 = (6, 64)
-    initP2 = (3, 1)
-    initP3 = (60, 1)
-    initP4 = (57, 64)
+    dx = 4
+    dy = 4
+    initP1 = (3, 64)
+    initP2 = (2, 1)
+    initP3 = (62, 1)
+    initP4 = (59, 64)
     resetProb = 0.25
 
     def __init__(self):
@@ -197,14 +197,14 @@ XMAXDRIFT = 4
 YMAXDRIFT = 4
 
 animConfigs = [
-    {"dir": "pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [-1, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbear-2", "nopauseFrames": [4, 5, 6, 7, 8], "offsets": [2, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
-    {"dir": "bbear-left", "nopauseFrames": [1, 2], "offsets": [4, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbunny-rad", "nopauseFrames": [8, 9, 10], "offsets": [-2, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "fig-left", "nopauseFrames": [6, 7, 8, 9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
-    {"dir": "mousey", "nopauseFrames": [3, 4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [-1, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/bbear-2", "nopauseFrames": [4, 5, 6, 7, 8], "offsets": [2, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/obear-turning", "nopauseFrames": [4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 18, 19], "offsets": [0, 0], "pauseProb": 0.5, "unpauseProb": 0.01},
+    {"dir": "imagesets/bbear-left", "nopauseFrames": [1, 2], "offsets": [4, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/bbunny-rad", "nopauseFrames": [8, 9, 10], "offsets": [-2, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/bbunny1", "nopauseFrames": [10, 11], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/fig-left", "nopauseFrames": [6, 7, 8, 9], "offsets": [0, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
+    {"dir": "imagesets/mousey", "nopauseFrames": [3, 4, 5, 6, 7], "offsets": [0, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
 ]
 
 
@@ -343,4 +343,5 @@ while True:
 
     i75.update()
     time.sleep(INTERVAL)
+
 

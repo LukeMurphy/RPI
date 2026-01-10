@@ -237,8 +237,14 @@ display = i75.display
 config = Config()
 
 config.interval = 0.03
-changeAnimProb = 0.001
-shapeChangeProb = 0.009
+
+shapeChangeProb = 0.02
+constantInsetRedrawProb = .001
+constantInsetRedrawProbOff = .01
+
+changeAnimProb = 0.002
+drawInsetProb = 0.5
+
 initialInsetFromEdges = 12
 
 shp = AbsShape()
@@ -247,19 +253,20 @@ shp.dy = 3
 shp.xMaxDrift = 4
 shp.yMaxDrift = 4
 shp.pointspeedFactor = 10
+shp.pointchangeProb = .5
+shp.resetProb = 0.05
 shp.inset = 4
 shp.insetMin = 1
 shp.initP1 = (initialInsetFromEdges, 63 - initialInsetFromEdges)
 shp.initP2 = (initialInsetFromEdges, initialInsetFromEdges - 1)
 shp.initP3 = (63 - initialInsetFromEdges, initialInsetFromEdges - 1)
 shp.initP4 = (63 - initialInsetFromEdges, 63 - initialInsetFromEdges)
-shp.resetProb = 0.05
 shp.constantInsetRedraw = False
 shp.drawInset = False
 shp.init()
 
 bgClr = ColorObj()
-bgClr.speedFactor = 20
+bgClr.speedFactor = 40
 changeColor(bgClr, 45 / 360, 45 / 360, 1.0, 1.0, 0.35, 0.65, True)
 Bg = display.create_pen_hsv(bgClr.h, bgClr.s, bgClr.v)
 
@@ -313,9 +320,9 @@ while True:
             ]
         )
 
-        if random.random() < shapeChangeProb:
+        if random.random() < constantInsetRedrawProb:
             shp.constantInsetRedraw = True
-        if random.random() < shapeChangeProb:
+        if random.random() < constantInsetRedrawProbOff:
             shp.constantInsetRedraw = False
 
     if random.random() < shapeChangeProb:
@@ -331,9 +338,8 @@ while True:
         if gc.mem_free() < 3000:
             gc.collect()
         shp.update(True)
-        if shp.drawInset:
-            shp.drawInset = False
-        else:
+        shp.drawInset = False
+        if random.random() < drawInsetProb :
             shp.drawInset = True
 
     i75.update()

@@ -238,11 +238,12 @@ config = Config()
 
 config.interval = 0.03
 
-shapeChangeProb = 0.02
-constantInsetRedrawProb = .001
+shapeChangeProb = 0.002
+colorChangeProb = .001
+constantInsetRedrawProb = .0009
 constantInsetRedrawProbOff = .01
 
-changeAnimProb = 0.002
+changeAnimProb = 0.0009
 drawInsetProb = 0.5
 
 initialInsetFromEdges = 12
@@ -329,9 +330,9 @@ while True:
         print("change")
         shp.update()
 
-        if random.random() < 0.333 and not bgClr.intransition:
-            changeColor(bgClr, 350 / 360, 260 / 360, 0.50, 1.0, 0.4, 0.45)
-            bgClr.change()
+    if random.random() < colorChangeProb and not bgClr.intransition:
+        changeColor(bgClr, 350 / 360, 260 / 360, 0.50, 1.0, 0.4, 0.45)
+        bgClr.change()
 
     if random.random() < changeAnimProb:
         print("reset")
@@ -344,3 +345,4 @@ while True:
 
     i75.update()
     time.sleep(config.interval)
+

@@ -72,11 +72,18 @@ class AbsShape:
     # range of changes
     dx = 2
     dy = 2
-    initP1 = (2, 62)
-    initP2 = (2, 1)
-    initP3 = (61, 1)
-    initP4 = (61, 62)
-    resetProb = 0.25
+    initP1 = (10, 54)
+    initP2 = (10, 10)
+    initP3 = (54, 10)
+    initP4 = (54, 54)
+    # initP1 = (2, 62)
+    # initP2 = (2, 1)
+    # initP3 = (61, 1)
+    # initP4 = (61, 62)
+
+
+
+    resetProb = 0.025
 
     def __init__(self):
         self.p1 = Point(self.initP1[0], self.initP1[1])
@@ -88,24 +95,26 @@ class AbsShape:
     def update(self):
 
         pts = [
-            (self.p1, 0.96, True, self.initP1),
-            (self.p2, 0.96, True, self.initP2),
-            (self.p3, 0.96, True, self.initP3),
-            (self.p4, 0.96, True, self.initP4),
+            (self.p1, 0.096, True, self.initP1),
+            (self.p2, 0.096, True, self.initP2),
+            (self.p3, 0.096, True, self.initP3),
+            (self.p4, 0.096, True, self.initP4),
         ]
 
         for pt, prob, changeY, initPt in pts:
-            if random.random() < prob:
-                pt.newX = pt.pt[0] + random.uniform(-self.dx, self.dx)
-                if changeY:
-                    pt.newY = pt.pt[1] + random.uniform(-self.dy, self.dy)
-                pt.change(changeY)
-            if random.random() < self.resetProb:
-                pt.newX = initPt[0]
-                pt.change(False)
-            if random.random() < self.resetProb:
-                pt.newY = initPt[1]
-                pt.change()
+
+            if pt.xSpeed == 0 and pt.xSpeed == 0 :
+                if random.random() < prob:
+                    pt.newX = pt.pt[0] + random.uniform(-self.dx, self.dx)
+                    if changeY:
+                        pt.newY = pt.pt[1] + random.uniform(-self.dy, self.dy)
+                    pt.change(changeY)
+                if random.random() < self.resetProb:
+                    pt.newX = initPt[0]
+                    pt.change(False)
+                if random.random() < self.resetProb:
+                    pt.newY = initPt[1]
+                    pt.change()
 
 
 class ColorObj:
@@ -180,6 +189,7 @@ display = i75.display
 INTERVAL = 0.03
 activeAnim = 0
 changeAnimProb = 0.001
+colorChangeProb = 0.00001
 shapeChangeProb = 0.5
 XMAXDRIFT = 10
 YMAXDRIFT = 10
@@ -221,11 +231,14 @@ while True :
             (round(shp.p2.pt[0]), round(shp.p2.pt[1])),
             (round(shp.p3.pt[0]), round(shp.p3.pt[1])),
             (round(shp.p4.pt[0]), round(shp.p4.pt[1])),
+            (round(shp.p1.pt[0]), round(shp.p1.pt[1])),
         ]
     )
 
     if random.random() < shapeChangeProb:
         shp.update()
+
+    if random.random() < colorChangeProb:
         Bg = display.create_pen_hsv(random.random(), random.uniform(.1,1.0), random.uniform(.1,1.0))
 
     if random.random() < changeAnimProb:
@@ -248,4 +261,5 @@ while True :
 
     i75.update()
     time.sleep(INTERVAL)
+
 

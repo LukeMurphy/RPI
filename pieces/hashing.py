@@ -1,21 +1,15 @@
-# ################################################### #
-import argparse
 from logging import config
-import math
 import random
 import time
-import types
 import noise
 from noise import *
 from modules.configuration import bcolors
-from modules import badpixels, coloroverlay, colorutils, panelDrawing
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
+from modules import colorutils, panelDrawing
+from PIL import Image, ImageDraw
 
-import numpy as np
+# ################################################### #
 
-lastRate = 0
 colorutils.brightness = 1
-
 
 def R(a, b, rounded=False):
     if not rounded:
@@ -182,9 +176,7 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running noisescroller.py")
     print(bcolors.ENDC)
-
-    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
-
+    
     while config.isRunning == True:
         iterate()
         time.sleep(config.redrawSpeed)

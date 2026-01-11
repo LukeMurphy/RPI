@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw
 
 colorutils.brightness = 1
 
+
 def R(a, b, rounded=False):
     if not rounded:
         return random.uniform(a, b)
@@ -27,21 +28,24 @@ def catmull_rom(p0, p1, p2, p3, t):
 
 def generateRawLine(points=20, horiz=True):
     pts = []
-    pointSpacing = (config.canvasWidth - 1 * config.xOffset) / points
+    if horiz:
+        pointSpacing = (config.canvasWidth - 1 * config.xOffset) / points
+    else:
+        pointSpacing = (config.canvasHeight - 1 * config.yOffset) / points
 
     for i in range(points):
-        x = i * pointSpacing
-        y = R(-config.noiseAmplitude, config.noiseAmplitude)
+        a = i * pointSpacing
+        b = R(-config.noiseAmplitude, config.noiseAmplitude)
         if horiz:
-            pts.append((round(x), round(y)))
+            pts.append((round(a), round(b)))
         else:
-            pts.append((round(y), round(x)))
+            pts.append((round(b), round(a)))
 
     # ensures the last point at the right or bottom closes the box
     if horiz:
-        pts.append([config.canvasWidth - 2 * config.xOffset, y])
+        pts.append([config.canvasWidth - 2 * config.xOffset, b])
     else:
-        pts.append([y, config.canvasWidth - 2 * config.xOffset])
+        pts.append([b, config.canvasHeight - 2 * config.yOffset])
     # Extra points for smoother Bézier start/end
     # pts.insert(0, pts[0])
     return pts
@@ -100,28 +104,28 @@ def hashlines2():
     _lineWidth = 1
 
     # for row in range(0, config.canvasHeight - 2 * config.yOffset + config.rowAndColAdj, config.rowInterval):
-    rowSpacing = (config.canvasHeight - 2 * config.yOffset + config.rowAndColAdj) / config.rowInterval
-    colSpacing = (config.canvasWidth - 2 * config.xOffset + config.rowAndColAdj) / config.colInterval
+    rowSpacing = (config.canvasHeight - 2 * config.yOffset + config.rowAdj) / config.rowInterval
+    colSpacing = (config.canvasWidth - 2 * config.xOffset + config.colAdj) / config.colInterval
 
-    for row in range(config.rowInterval + config.rowAndColAdj):
-        pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + rowSpacing * row)
+    for row in range(config.rowInterval + config.rowAdj):
+        pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + rowSpacing * row, True)
         lastPt = [pts[0][0], pts[0][1]]
         for pt in pts:
-            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1],_fillColor, _lineWidth)
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _fillColor, _lineWidth)
             lastPt = [pt[0], pt[1]]
 
-    for col in range(config.colInterval + config.rowAndColAdj):
+    for col in range(config.colInterval + config.colAdj):
         pts = generateInformalLine(config.pointsPerLine, config.xOffset + colSpacing * col, config.yOffset, False)
         lastPt = [pts[0][0], pts[0][1]]
         for pt in pts:
-            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1],_fillColor, _lineWidth)
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _fillColor, _lineWidth)
             lastPt = [pt[0], pt[1]]
 
     # config.scroll += config.scrollRate
 
 
-def drawTheLine(p1x,p1y,p2x,p2y,_fillColor,_lineWidth):
-    config.draw.line((p1x,p1y,p2x,p2y), fill=_fillColor, width=_lineWidth)
+def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
+    config.draw.line((p1x, p1y, p2x, p2y), fill=_fillColor, width=_lineWidth)
 
 
 def drawTheBG():
@@ -214,7 +218,7 @@ def setLineColor():
 
 def setBGColor():
     _minVal = 0.5
-    _maxVal = 1.0
+    _maxVal = .70
     if config.lightMode:
         _minVal = 0.0
         _maxVal = 0.1
@@ -244,7 +248,8 @@ def main(run=True):
     config.lightMode = True
 
     config.pointsPerLine = int(workConfig.get("noisescroller", "pointsPerLine"))
-    config.rowAndColAdj = int(workConfig.get("noisescroller", "rowAndColAdj"))
+    config.rowAdj = int(workConfig.get("noisescroller", "rowAdj"))
+    config.colAdj = int(workConfig.get("noisescroller", "colAdj"))
 
     config.redrawSpeed = float(workConfig.get("noisescroller", "redrawSpeed"))
     config.noiseAmplitude = float(workConfig.get("noisescroller", "noiseAmplitude"))

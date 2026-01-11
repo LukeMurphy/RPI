@@ -95,10 +95,9 @@ def reDraw():
 
 def hashlines2():
     global config
-    config.draw.rectangle((0, 0, 500, 500), fill=config.bgColor)
-    if random.random() < 1:
-        config.noiseSeed = random.random()
+    drawTheBG()
     _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
+    _lineWidth = 1
 
     # for row in range(0, config.canvasHeight - 2 * config.yOffset + config.rowAndColAdj, config.rowInterval):
     rowSpacing = (config.canvasHeight - 2 * config.yOffset + config.rowAndColAdj) / config.rowInterval
@@ -108,17 +107,25 @@ def hashlines2():
         pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + rowSpacing * row)
         lastPt = [pts[0][0], pts[0][1]]
         for pt in pts:
-            config.draw.line((lastPt[0], lastPt[1], pt[0], pt[1]), fill=_fillColor, width=1)
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1],_fillColor, _lineWidth)
             lastPt = [pt[0], pt[1]]
 
     for col in range(config.colInterval + config.rowAndColAdj):
         pts = generateInformalLine(config.pointsPerLine, config.xOffset + colSpacing * col, config.yOffset, False)
         lastPt = [pts[0][0], pts[0][1]]
         for pt in pts:
-            config.draw.line((lastPt[0], lastPt[1], pt[0], pt[1]), fill=_fillColor, width=1)
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1],_fillColor, _lineWidth)
             lastPt = [pt[0], pt[1]]
 
     # config.scroll += config.scrollRate
+
+
+def drawTheLine(p1x,p1y,p2x,p2y,_fillColor,_lineWidth):
+    config.draw.line((p1x,p1y,p2x,p2y), fill=_fillColor, width=_lineWidth)
+
+
+def drawTheBG():
+    config.draw.rectangle((0, 0, 500, 500), fill=config.bgColor)
 
 
 def hashlines():
@@ -176,7 +183,7 @@ def runWork():
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running noisescroller.py")
     print(bcolors.ENDC)
-    
+
     while config.isRunning == True:
         iterate()
         time.sleep(config.redrawSpeed)

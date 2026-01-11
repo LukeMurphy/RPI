@@ -245,7 +245,7 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
-    config.lightMode = True
+    config.lightMode = workConfig.getboolean("noisescroller", "lightMode", fallback = False)
 
     config.pointsPerLine = int(workConfig.get("noisescroller", "pointsPerLine"))
     config.rowAdj = int(workConfig.get("noisescroller", "rowAdj"))

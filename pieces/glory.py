@@ -432,7 +432,7 @@ def wavey():
 def waves():
 	global config
 	config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill=config.bgColor)
-	octv = 3
+	octv = 8
 	lastx = [0,0,0]
 	lasty = [0,0,0]
 	rowRads = 2*math.pi / config.waveLines

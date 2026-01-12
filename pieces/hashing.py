@@ -87,16 +87,6 @@ def getColor(r, g, b, a):
     return tuple(clr)
 
 
-def reDraw():
-    if config.function == "hashlines":
-        hashlines()
-    if config.function == "hashlines2":
-        hashlines2()
-    if random.random() < config.changeLinesProb:
-        config.lightMode = False if random.random() > config.lightModeProb else True
-        resetLines()
-
-
 def hashlines2():
     global config
     drawTheBG()
@@ -225,6 +215,16 @@ def setBGColor():
     config.bgColor = colorutils.getRandomColorHSV(
         config.bg_minHue, config.bg_maxHue, config.bg_minSaturation, config.bg_maxSaturation, _minVal, _maxVal, 0, 0, config.bg_alpha, config.brightness
     )
+
+
+def reDraw():
+    if config.function == "hashlines":
+        hashlines()
+    if config.function == "hashlines2":
+        hashlines2()
+    if random.random() < config.changeLinesProb:
+        config.lightMode = False if random.random() > config.lightModeProb else True
+        resetLines()
 
 
 def iterate():

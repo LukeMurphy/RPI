@@ -3,11 +3,12 @@ import random
 import time
 import noise
 from noise import *
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing
 from PIL import Image, ImageDraw
 
 # ################################################### #
+# hatching hashing lines
 
 colorutils.brightness = 1
 
@@ -175,7 +176,7 @@ def resetLines():
 def runWork():
     global config
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running noisescroller.py")
+    print("Running hatchingmarks.py")
     print(bcolors.ENDC)
 
     while config.isRunning == True:
@@ -218,12 +219,21 @@ def setBGColor():
 
 
 def reDraw():
+    # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
     if config.function == "hashlines":
         hashlines()
     if config.function == "hashlines2":
         hashlines2()
-    if random.random() < config.changeLinesProb:
+
+    if config.bg_alpha < config.bg_alpha_base :
+        config.bg_alpha += 1
+        config.bgColor = (config.bgColor[0],config.bgColor[1],config.bgColor[2],config.bg_alpha)
+
+    # adding check on bg alpha as index of transition state - don't want another transition
+    # stomping on the one in progress
+    if random.random() < config.changeLinesProb and config.bg_alpha >= config.bg_alpha_base :
         config.lightMode = False if random.random() > config.lightModeProb else True
+        config.bg_alpha = 0
         resetLines()
 
 
@@ -245,45 +255,46 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
-    config.lightMode = workConfig.getboolean("noisescroller", "lightMode", fallback = False)
+    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback = False)
 
-    config.pointsPerLine = int(workConfig.get("noisescroller", "pointsPerLine"))
-    config.rowAdj = int(workConfig.get("noisescroller", "rowAdj"))
-    config.colAdj = int(workConfig.get("noisescroller", "colAdj"))
+    config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
+    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
+    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
 
-    config.redrawSpeed = float(workConfig.get("noisescroller", "redrawSpeed"))
-    config.noiseAmplitude = float(workConfig.get("noisescroller", "noiseAmplitude"))
-    config.curveResolution = int(workConfig.get("noisescroller", "curveResolution", fallback=10))
+    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
+    config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
+    config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
     config.noiseSeed = random.random()
 
-    config.xOffset = int(workConfig.get("noisescroller", "xOffset"))
-    config.yOffset = int(workConfig.get("noisescroller", "yOffset"))
+    config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
+    config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
     config.scroll = 0
-    config.scrollRate = float(workConfig.get("noisescroller", "scrollRate"))
-    config.lightModeProb = float(workConfig.get("noisescroller", "lightModeProb", fallback=1.0))
-    config.changeLinesProb = float(workConfig.get("noisescroller", "changeLinesProb", fallback=0.01))
-    config.rowInterval = int(workConfig.get("noisescroller", "rowInterval"))
-    config.colInterval = int(workConfig.get("noisescroller", "colInterval"))
-    config.function = workConfig.get("noisescroller", "function")
-    config.rowAndColIntervalRange = workConfig.get("noisescroller", "rowAndColIntervalRange", fallback="20,20").split(",")
-    config.noiseAmplitudeRange = workConfig.get("noisescroller", "noiseAmplitudeRange", fallback="1,4").split(",")
+    config.scrollRate = float(workConfig.get("hatchingmarks", "scrollRate"))
+    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    config.rowInterval = int(workConfig.get("hatchingmarks", "rowInterval"))
+    config.colInterval = int(workConfig.get("hatchingmarks", "colInterval"))
+    config.function = workConfig.get("hatchingmarks", "function")
+    config.rowAndColIntervalRange = workConfig.get("hatchingmarks", "rowAndColIntervalRange", fallback="20,20").split(",")
+    config.noiseAmplitudeRange = workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")
 
-    config.line_minHue = float(workConfig.get("noisescroller", "line_minHue"))
-    config.line_maxHue = float(workConfig.get("noisescroller", "line_maxHue"))
-    config.line_maxSaturation = float(workConfig.get("noisescroller", "line_maxSaturation"))
-    config.line_minSaturation = float(workConfig.get("noisescroller", "line_minSaturation"))
-    config.line_maxValue = float(workConfig.get("noisescroller", "line_maxValue"))
-    config.line_minValue = float(workConfig.get("noisescroller", "line_minValue"))
-    config.line_alpha = int(workConfig.get("noisescroller", "line_alpha"))
+    config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
+    config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
+    config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
+    config.line_minSaturation = float(workConfig.get("hatchingmarks", "line_minSaturation"))
+    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
+    config.line_minValue = float(workConfig.get("hatchingmarks", "line_minValue"))
+    config.line_alpha = int(workConfig.get("hatchingmarks", "line_alpha"))
 
-    config.bg_minHue = float(workConfig.get("noisescroller", "bg_minHue"))
-    config.bg_maxHue = float(workConfig.get("noisescroller", "bg_maxHue"))
-    config.bg_maxSaturation = float(workConfig.get("noisescroller", "bg_maxSaturation"))
-    config.bg_minSaturation = float(workConfig.get("noisescroller", "bg_minSaturation"))
-    config.bg_maxValue = float(workConfig.get("noisescroller", "bg_maxValue"))
-    config.bg_minValue = float(workConfig.get("noisescroller", "bg_minValue"))
-    config.bg_alpha = int(workConfig.get("noisescroller", "bg_alpha"))
+    config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
+    config.bg_maxHue = float(workConfig.get("hatchingmarks", "bg_maxHue"))
+    config.bg_maxSaturation = float(workConfig.get("hatchingmarks", "bg_maxSaturation"))
+    config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
+    config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
+    config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
+    config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha"))
+    config.bg_alpha_base = int(workConfig.get("hatchingmarks", "bg_alpha"))
 
     setLineColor()
     setBGColor()

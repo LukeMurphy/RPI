@@ -269,9 +269,9 @@ config.changeLinesProb = 0.003
 config.lightModeProb = 0.1
 config.changeBGProb = 0.003
 
-config.rowAndColIntervalRange = 4, 16
+config.rowAndColIntervalRange = 4, 48
 config.noiseAmplitude = 2
-config.noiseAmplitudeRange = 1.2, 2
+config.noiseAmplitudeRange = 1.05, 3.1
 
 config.line_minHue = 0
 config.line_maxHue = 60

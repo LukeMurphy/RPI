@@ -10,8 +10,6 @@ from PIL import Image, ImageDraw
 # ################################################### #
 # hatching hashing lines
 
-colorutils.brightness = 1
-
 
 def R(a, b, rounded=False):
     if not rounded:
@@ -30,9 +28,9 @@ def catmull_rom(p0, p1, p2, p3, t):
 def generateRawLine(points=20, horiz=True):
     pts = []
     if horiz:
-        pointSpacing = (config.canvasWidth - 1 * config.xOffset) / points
+        pointSpacing = (config.drawingWidth - 1 * config.xOffset) / points
     else:
-        pointSpacing = (config.canvasHeight - 1 * config.yOffset) / points
+        pointSpacing = (config.drawingHeight - 1 * config.yOffset) / points
 
     for i in range(points):
         a = i * pointSpacing
@@ -44,9 +42,9 @@ def generateRawLine(points=20, horiz=True):
 
     # ensures the last point at the right or bottom closes the box
     if horiz:
-        pts.append([config.canvasWidth - 2 * config.xOffset, b])
+        pts.append([config.drawingWidth - 2 * config.xOffset, b])
     else:
-        pts.append([b, config.canvasHeight - 2 * config.yOffset])
+        pts.append([b, config.drawingHeight - 2 * config.yOffset])
     # Extra points for smoother Bézier start/end
     # pts.insert(0, pts[0])
     return pts
@@ -93,26 +91,27 @@ def hashlines2():
     drawTheBG()
     _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
     _lineWidth = 1
-
-    # for row in range(0, config.canvasHeight - 2 * config.yOffset + config.rowAndColAdj, config.rowInterval):
-    rowSpacing = (config.canvasHeight - 2 * config.yOffset + config.rowAdj) / config.rowInterval
-    colSpacing = (config.canvasWidth - 2 * config.xOffset + config.colAdj) / config.colInterval
-
-    for row in range(config.rowInterval + config.rowAdj):
-        pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + rowSpacing * row, True)
-        lastPt = [pts[0][0], pts[0][1]]
-        for pt in pts:
-            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _fillColor, _lineWidth)
+    _ptCount = 0
+    for h_pts in config.h_pts:
+        if random.random() < config.horizLineChange:
+            h_pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + config.rowSpacing * _ptCount, True)
+            config.h_pts[_ptCount] = h_pts
+        lastPt = [h_pts[0][0], h_pts[0][1]]
+        for pt in h_pts:
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _fillColor,_lineWidth)
             lastPt = [pt[0], pt[1]]
+        _ptCount += 1
 
-    for col in range(config.colInterval + config.colAdj):
-        pts = generateInformalLine(config.pointsPerLine, config.xOffset + colSpacing * col, config.yOffset, False)
-        lastPt = [pts[0][0], pts[0][1]]
-        for pt in pts:
-            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _fillColor, _lineWidth)
+    _ptCount = 0
+    for v_pts in config.v_pts:
+        if random.random() < config.vertLineChange:
+            v_pts = generateInformalLine(config.pointsPerLine, config.xOffset + config.colSpacing * _ptCount, config.yOffset, False)
+            config.v_pts[_ptCount] = v_pts
+        lastPt = [v_pts[0][0], v_pts[0][1]]
+        for pt in v_pts:
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1],_fillColor, _lineWidth)
             lastPt = [pt[0], pt[1]]
-
-    # config.scroll += config.scrollRate
+        _ptCount += 1
 
 
 def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
@@ -120,7 +119,7 @@ def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
 
 
 def drawTheBG():
-    config.draw.rectangle((0, 0, 500, 500), fill=config.bgColor)
+    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
 
 def hashlines():
@@ -166,12 +165,33 @@ def hashlines():
 
 
 def resetLines():
-    config.colInterval = random.randint(int(config.rowAndColIntervalRange[0]), int(config.rowAndColIntervalRange[1]))
-    config.rowInterval = random.randint(int(config.rowAndColIntervalRange[0]), int(config.rowAndColIntervalRange[1]))
-    config.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
-    setLineColor()
-    setBGColor()
+    config.colInterval = random.randint(int(config.colIntervalRange[0]), int(config.colIntervalRange[1]))
 
+    # if uniformRatio, the column ratio is used for the rows as well - this means even rectangles across field
+    if config.uniformRatio :
+        config.rowInterval = config.colInterval
+    else :
+        config.rowInterval = random.randint(int(config.rowIntervalRange[0]), int(config.rowIntervalRange[1]))
+
+    config.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
+    config.colSpacing = (config.drawingWidth - 2 * config.xOffset + config.colAdj) / config.colInterval
+    config.rowSpacing = (config.drawingHeight - 2 * config.yOffset + config.rowAdj) / config.rowInterval
+
+    # if squareRatio, the column ratio and spacing is used for the rows as well - this means all squares across field
+    if config.squareRatio :
+        config.rowSpacing = config.colSpacing
+
+    
+    config.h_pts = []
+    for row in range(config.rowInterval + config.rowAdj):
+        h_pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + config.rowSpacing * row, True)
+        config.h_pts.append(h_pts)
+
+    config.v_pts = []
+    for col in range(config.colInterval + config.colAdj):
+        v_pts = generateInformalLine(config.pointsPerLine, config.xOffset + config.colSpacing * col, config.yOffset, False)
+        config.v_pts.append(v_pts)
+    
 
 def runWork():
     global config
@@ -236,6 +256,11 @@ def reDraw():
         config.bg_alpha = 0
         resetLines()
 
+    if random.random() < config.changeBGProb:
+        setBGColor()
+        setLineColor()
+
+
 
 def iterate():
     reDraw()
@@ -255,30 +280,38 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
-    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback = False)
 
     config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
-    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
-    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
+    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback = False)
 
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
+    config.function = workConfig.get("hatchingmarks", "function")
+
     config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
+    config.noiseAmplitudeRange = workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")
     config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
     config.noiseSeed = random.random()
 
     config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
     config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
-    config.scroll = 0
-    config.scrollRate = float(workConfig.get("hatchingmarks", "scrollRate"))
     config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
+    config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
+    config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
+
+    config.scroll = 0
+    config.scrollRate = float(workConfig.get("hatchingmarks", "scrollRate"))
     config.rowInterval = int(workConfig.get("hatchingmarks", "rowInterval"))
     config.colInterval = int(workConfig.get("hatchingmarks", "colInterval"))
-    config.function = workConfig.get("hatchingmarks", "function")
-    config.rowAndColIntervalRange = workConfig.get("hatchingmarks", "rowAndColIntervalRange", fallback="20,20").split(",")
-    config.noiseAmplitudeRange = workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")
-
+    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
+    config.rowIntervalRange = workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")
+    config.colIntervalRange = workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")
+    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
+    config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback = False)
+    config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback = False)
+    
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
     config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
@@ -296,6 +329,10 @@ def main(run=True):
     config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha"))
     config.bg_alpha_base = int(workConfig.get("hatchingmarks", "bg_alpha"))
 
+    config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
+    config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
+
+    resetLines()
     setLineColor()
     setBGColor()
 

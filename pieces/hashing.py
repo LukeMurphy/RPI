@@ -88,7 +88,6 @@ def getColor(r, g, b, a):
 
 def hashlines2():
     global config
-    drawTheBG()
     _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
     _lineWidth = 1
     _ptCount = 0
@@ -119,50 +118,54 @@ def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
 
 
 def drawTheBG():
+    config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
     config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
+    # if config.bg_alpha != config.bg_alpha_base :
+    #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
 
-def hashlines():
-    global config
-    config.draw.rectangle((0, 0, 500, 500), fill=config.bgColor)
-    if random.random() < 1:
-        config.noiseSeed = random.random()
 
-    lastx = [0, 0, 0]
-    lasty = [0, 0, 0]
-    _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
+# def hashlines():
+#     global config
+   
+#     if random.random() < 1:
+#         config.noiseSeed = random.random()
 
-    for col in range(0, config.canvasWidth - 2 * config.xOffset, config.colInterval):
-        lasty = [0, 0, 0]
-        lineWidth = random.choice([0, 1])
+#     lastx = [0, 0, 0]
+#     lasty = [0, 0, 0]
+#     _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
 
-        for row in range(0, config.canvasHeight - 2 * config.yOffset, config.rowInterval):
-            y = row
-            x = round(noise.pnoise2((col + config.scroll), y / (10 * config.noiseSeed) + config.scroll, 2) * config.noiseAmplitude + col)
-            lineWidth = random.choice([0, 1])
+#     for col in range(0, config.canvasWidth - 2 * config.xOffset, config.colInterval):
+#         lasty = [0, 0, 0]
+#         lineWidth = random.choice([0, 1])
 
-            config.draw.line(
-                (lastx[0] + config.xOffset, lasty[0] + config.yOffset, x + config.xOffset, y + config.yOffset),
-                fill=_fillColor,
-                width=lineWidth,
-            )
+#         for row in range(0, config.canvasHeight - 2 * config.yOffset, config.rowInterval):
+#             y = row
+#             x = round(noise.pnoise2((col + config.scroll), y / (10 * config.noiseSeed) + config.scroll, 2) * config.noiseAmplitude + col)
+#             lineWidth = random.choice([0, 1])
 
-            # config.draw.line(
-            #     (col + config.xOffset, row + config.yOffset, config.canvasWidth - 2 * config.xOffset, row + config.yOffset),
-            #     fill=_fillColor,
-            #     width=lineWidth,
-            # )
+#             config.draw.line(
+#                 (lastx[0] + config.xOffset, lasty[0] + config.yOffset, x + config.xOffset, y + config.yOffset),
+#                 fill=_fillColor,
+#                 width=lineWidth,
+#             )
 
-            config.draw.line(
-                (lasty[0] + config.yOffset, lastx[0] + config.xOffset, y + config.yOffset, x + config.xOffset),
-                fill=getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha),
-                width=lineWidth,
-            )
+#             # config.draw.line(
+#             #     (col + config.xOffset, row + config.yOffset, config.canvasWidth - 2 * config.xOffset, row + config.yOffset),
+#             #     fill=_fillColor,
+#             #     width=lineWidth,
+#             # )
 
-            lastx = [x, x, x]
-            lasty = [y, y, y]
-        # octv += 1
-    config.scroll += config.scrollRate
+#             config.draw.line(
+#                 (lasty[0] + config.yOffset, lastx[0] + config.xOffset, y + config.yOffset, x + config.xOffset),
+#                 fill=getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha),
+#                 width=lineWidth,
+#             )
+
+#             lastx = [x, x, x]
+#             lasty = [y, y, y]
+#         # octv += 1
+#     config.scroll += config.scrollRate
 
 
 def setLines():
@@ -198,7 +201,9 @@ def setLines():
         config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
         config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
         config.line_alpha = R(config.line_alpha_range[0], config.line_alpha_range[1], True)
-        config.bg_alpha = R(config.bg_alpha_range[0], config.bg_alpha_range[1], True)
+        config.bg_alpha_base = R(config.bg_alpha_range[0], config.bg_alpha_range[1], True)
+
+    # pieceLogger("New Lines")
 
 
 def runWork():
@@ -234,10 +239,11 @@ def setLineColor():
         _line_alpha,
         config.brightness,
     )
+    # pieceLogger("New Line Color")
 
 
 def setBGColor():
-    _bg_alpha = config.bg_alpha
+    _bg_alpha = round(config.bg_alpha)
     _minVal = 0.5
     _maxVal = 0.70
     if config.lightMode:
@@ -246,26 +252,33 @@ def setBGColor():
     config.bgColor = colorutils.getRandomColorHSV(
         config.bg_minHue, config.bg_maxHue, config.bg_minSaturation, config.bg_maxSaturation, _minVal, _maxVal, 0, 0, _bg_alpha, config.brightness
     )
+    # pieceLogger("New BG")
 
 
 def reDraw():
     # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
+    if config.bg_alpha < config.bg_alpha_base:
+        config.bg_alpha += config.bg_alpha_returnrate
+
+    if config.bg_alpha > config.bg_alpha_base:
+        config.bg_alpha = config.bg_alpha_base
+
+    drawTheBG()
     hashlines2()
 
-    if config.bg_alpha < config.bg_alpha_base:
-        config.bg_alpha += 1
-        config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bg_alpha)
 
     # adding check on bg alpha as index of transition state - don't want another transition
     # stomping on the one in progress
-    if random.random() < config.changeLinesProb and config.bg_alpha >= config.bg_alpha_base:
+
+    if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base :
+        config.bg_alpha = 0
+        setBGColor()
+        setLineColor()
+
+    if random.random() < config.changeLinesProb:
         config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
         setLines()
-
-    if random.random() < config.changeBGProb:
-        setBGColor()
-        setLineColor()
 
 
 def iterate():
@@ -328,6 +341,7 @@ def main(run=True):
     config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
     config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
     config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
+    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
 
     # light lines on background - more like a drawing on a screen
     config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
@@ -338,7 +352,6 @@ def main(run=True):
 
     config.scroll = 0
     config.scrollRate = float(workConfig.get("hatchingmarks", "scrollRate"))
-
 
     config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
     config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]

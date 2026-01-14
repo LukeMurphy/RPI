@@ -152,6 +152,7 @@ def hashlines():
             #     fill=_fillColor,
             #     width=lineWidth,
             # )
+
             config.draw.line(
                 (lasty[0] + config.yOffset, lastx[0] + config.xOffset, y + config.yOffset, x + config.xOffset),
                 fill=getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha),
@@ -285,42 +286,71 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
+    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
 
+    # refinements for setting points per column and row so amplitude of noise can be adjusted to be more even if aspect ratio is more extreme - e.g narrow beam
+    # but also, lower number makes the line more purely rectilinear so can give a greater focus to one directions linearity
     config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
     config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
     config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
-    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
 
-    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
 
+    # the +/- variability of the points
     config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
     config.noiseAmplitudeRange = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")]
+
+    # adjust higher for higer resolution 
     config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
+
+    # not really used - was used in first iteration using Perlin Noise
     config.noiseSeed = random.random()
 
+    # the edge spacing - critical to making the drawing as the edges matter more than the sum of the lines
     config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
     config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
-    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    '''
+    # PROBABILITIES ----------------
+    # generally based on an interval rate of .03, i.e. 3/100's of a second per cycle ~ 33.33 frames/second
+    # so the chance of change is .001 per frame, then the chance per second is ~ 3.33%
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    '''
+
+    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+
     config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
     config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
-    config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
-    config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
+
     config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
     config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
+
+    # probablility background changes 
+    config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
     config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
     config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
 
+    # light lines on background - more like a drawing on a screen
+    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
+    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    
+    # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
+    config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
+
     config.scroll = 0
     config.scrollRate = float(workConfig.get("hatchingmarks", "scrollRate"))
-    config.rowInterval = int(workConfig.get("hatchingmarks", "rowInterval"))
-    config.colInterval = int(workConfig.get("hatchingmarks", "colInterval"))
-    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
+
+
     config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
     config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
+    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
     config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
+    
+    # means the row interval is the same as the column interval - if they are independent then
+    # there can be more extreme column or row spacing, othewise they get the same ratio
     config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
+
+    # forces grid to squares - but is not currently compensated to will get ragged and missing 
+    # grids at edges of drawing
     config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
 
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))

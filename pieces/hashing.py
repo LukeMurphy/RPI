@@ -94,7 +94,7 @@ def hashlines2():
     _ptCount = 0
     for h_pts in config.h_pts:
         if random.random() < config.horizLineChange:
-            h_pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + config.rowSpacing * _ptCount, True)
+            h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * _ptCount, True)
             config.h_pts[_ptCount] = h_pts
         lastPt = [h_pts[0][0], h_pts[0][1]]
         for pt in h_pts:
@@ -105,7 +105,7 @@ def hashlines2():
     _ptCount = 0
     for v_pts in config.v_pts:
         if random.random() < config.vertLineChange:
-            v_pts = generateInformalLine(config.pointsPerLine, config.xOffset + config.colSpacing * _ptCount, config.yOffset, False)
+            v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * _ptCount, config.yOffset, False)
             config.v_pts[_ptCount] = v_pts
         lastPt = [v_pts[0][0], v_pts[0][1]]
         for pt in v_pts:
@@ -249,10 +249,7 @@ def setBGColor():
 
 def reDraw():
     # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
-    if config.function == "hashlines":
-        hashlines()
-    if config.function == "hashlines2":
-        hashlines2()
+    hashlines2()
 
     if config.bg_alpha < config.bg_alpha_base:
         config.bg_alpha += 1
@@ -290,10 +287,11 @@ def main(run=True):
     config.draw = ImageDraw.Draw(config.image)
 
     config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
+    config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
+    config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
     config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
 
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
-    config.function = workConfig.get("hatchingmarks", "function")
 
     config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
     config.noiseAmplitudeRange = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")]

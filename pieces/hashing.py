@@ -271,7 +271,7 @@ def reDraw():
     # stomping on the one in progress
 
     if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base :
-        config.bg_alpha = 0
+        # config.bg_alpha = 0
         setBGColor()
         setLineColor()
 
@@ -372,7 +372,7 @@ def main(run=True):
     config.line_minSaturation = float(workConfig.get("hatchingmarks", "line_minSaturation"))
     config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
     config.line_minValue = float(workConfig.get("hatchingmarks", "line_minValue"))
-    config.line_alpha = int(workConfig.get("hatchingmarks", "line_alpha"))
+    config.line_alpha = int(workConfig.get("hatchingmarks", "line_alpha", fallback="180"))
 
     config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
     config.bg_maxHue = float(workConfig.get("hatchingmarks", "bg_maxHue"))
@@ -380,8 +380,8 @@ def main(run=True):
     config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
     config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
     config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
-    config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha"))
-    config.bg_alpha_base = int(workConfig.get("hatchingmarks", "bg_alpha"))
+    config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha", fallback="40"))
+    config.bg_alpha_base = config.bg_alpha
 
     config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
     config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))

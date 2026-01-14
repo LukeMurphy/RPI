@@ -164,7 +164,7 @@ def hashlines():
     config.scroll += config.scrollRate
 
 
-def resetLines():
+def setLines():
     config.colInterval = random.randint(int(config.colIntervalRange[0]), int(config.colIntervalRange[1]))
 
     # if uniformRatio, the column ratio is used for the rows as well - this means even rectangles across field
@@ -185,6 +185,8 @@ def resetLines():
     for row in range(config.rowInterval + config.rowAdj):
         h_pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + config.rowSpacing * row, True)
         config.h_pts.append(h_pts)
+        # testing a variable arithmetic or log distribution but really that is not the point
+        # config.rowSpacing -= .02
 
     config.v_pts = []
     for col in range(config.colInterval + config.colAdj):
@@ -261,7 +263,7 @@ def reDraw():
     if random.random() < config.changeLinesProb and config.bg_alpha >= config.bg_alpha_base:
         config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
-        resetLines()
+        setLines()
 
     if random.random() < config.changeBGProb:
         setBGColor()
@@ -343,7 +345,7 @@ def main(run=True):
     config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
     config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
 
-    resetLines()
+    setLines()
     setLineColor()
     setBGColor()
 

@@ -212,12 +212,18 @@ def ballsPatternFunction(func):
         dotWidth = boxWidth / 2 / numRows - 2
         outline = None
 
+        if len(res) > 5 :
+            offset = res[5]
+            density = numRows * 2
+        else :
+            offset = boxWidth
+
         for r in range(numRows):
 
             for i in range(density):
                 yPos = r * (dotWidth * 2) + r * 4
                 config.blockDraw.ellipse(
-                    (i * 2 * boxWidth / density - boxWidth / density, yPos, i * 2 * boxWidth / density - boxWidth / density + dotWidth, yPos + dotWidth),
+                    (i * 2 * boxWidth / density - offset / density, yPos, i * 2 * boxWidth / density - offset / density + dotWidth, yPos + dotWidth),
                     outline=(outline),
                     fill=patternFill,
                 )
@@ -240,6 +246,16 @@ def balls(config, paletteObj):
     patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
     return config, bgFill, patternFill, patternOutLine, hilight
+
+@ballsPatternFunction
+def ballsRegularDots(config, paletteObj):
+    # return "A","B","C"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    offset = 0
+    return config, bgFill, patternFill, patternOutLine, hilight, offset
 
 
 @ballsPatternFunction

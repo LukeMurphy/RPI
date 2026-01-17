@@ -800,6 +800,7 @@ def loadAndSetCombinations():
         comboSet.polyOverlayMode = (workConfig.get(combinationSetName, "polyOverlayMode", fallback=config.polyOverlayMode))
 
         comboSet.patternsInBands = workConfig.getboolean(combinationSetName, "patternsInBands", fallback=False)
+        comboSet.altBlockRotation = workConfig.getboolean(combinationSetName, "altBlockRotation", fallback=True)
 
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
@@ -907,7 +908,9 @@ def generatePatternSequence(config):
         if random.random() < _baseProb:
             _patternSelected = chooseAPattern()
             _tempPalette = getTempPalette(config)
-        _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else round(random.uniform(0, 1))
+        _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else random.randint(0, 1)
+        if not combo.altBlockRotation :
+            _rotate = 0
         _position = _iterCount
         _pattern = _patternSelected
         if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):

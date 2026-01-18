@@ -92,7 +92,7 @@ def hashlines2():
     _lineWidth = 1
     _ptCount = 0
     for h_pts in config.h_pts:
-        if random.random() < config.horizLineChange:
+        if random.random() < config.horizLineChange and not config.noChange:
             h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * _ptCount, True)
             config.h_pts[_ptCount] = h_pts
         lastPt = [h_pts[0][0], h_pts[0][1]]
@@ -103,7 +103,7 @@ def hashlines2():
 
     _ptCount = 0
     for v_pts in config.v_pts:
-        if random.random() < config.vertLineChange:
+        if random.random() < config.vertLineChange and not config.noChange:
             v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * _ptCount, config.yOffset, False)
             config.v_pts[_ptCount] = v_pts
         lastPt = [v_pts[0][0], v_pts[0][1]]
@@ -250,7 +250,15 @@ def setBGColor():
         _minVal = 0.0
         _maxVal = 0.1
     config.bgColor = colorutils.getRandomColorHSV(
-        config.bg_minHue, config.bg_maxHue, config.bg_minSaturation, config.bg_maxSaturation, _minVal, _maxVal, 0, 0, _bg_alpha, config.brightness
+        config.bg_minHue, 
+        config.bg_maxHue, 
+        config.bg_minSaturation, 
+        config.bg_maxSaturation, 
+        _minVal, 
+        _maxVal, 
+        config.bg_dropHueMin, 
+        config.bg_dropHueMax, 
+        _bg_alpha, config.brightness
     )
     # pieceLogger("New BG")
 
@@ -270,16 +278,21 @@ def reDraw():
     # adding check on bg alpha as index of transition state - don't want another transition
     # stomping on the one in progress
 
-    if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base :
+    if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
         # config.bg_alpha = 0
         setBGColor()
         setLineColor()
 
-    if random.random() < config.changeLinesProb:
+    if random.random() < config.changeLinesProb and not config.noChange:
         config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
         setLines()
 
+    if random.random() < config.pauseProb: 
+        config.noChange = True
+
+    if random.random() < config.unpauseProb: 
+        config.noChange = False
 
 def iterate():
     reDraw()
@@ -346,6 +359,9 @@ def main(run=True):
     # light lines on background - more like a drawing on a screen
     config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
     config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=.0001))
+    config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=.0001))
+    config.noChange = False
     
     # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
     config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
@@ -380,6 +396,8 @@ def main(run=True):
     config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
     config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
     config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
+    config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback = "0"))
+    config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "bg_dropHueMax", fallback="0"))
     config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha", fallback="40"))
     config.bg_alpha_base = config.bg_alpha
 

@@ -67,7 +67,7 @@ def getCurvePoints(points, resolution=50):
             x = catmull_rom(p0[0], p1[0], p2[0], p3[0], t)
             y = catmull_rom(p0[1], p1[1], p2[1], p3[1], t)
 
-            curve_points.append((x, y))
+            curve_points.append([x, y])
 
     return curve_points
 
@@ -76,7 +76,7 @@ def generateInformalLine(pts=20, xOffset=0, yOffset=0, horiz=True):
     points = generateRawLine(pts, horiz)
     _curvedPoints = getCurvePoints(points, config.curveResolution)
     _smoothPointsForDrawing = []
-    _smoothPointsForDrawing.extend((pt[0] + xOffset, pt[1] + yOffset) for pt in _curvedPoints)
+    _smoothPointsForDrawing.extend([pt[0] + xOffset, pt[1] + yOffset] for pt in _curvedPoints)
     return _smoothPointsForDrawing
 
 
@@ -91,7 +91,12 @@ def hashlines2():
     _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
     _lineWidth = 1
     _ptCount = 0
-    for h_pts in config.h_pts:
+
+    # print(config.h_pts[0][0])
+    # print(" ")
+
+    for h_pts_n in range(0, len(config.h_pts) - 1):
+        h_pts = config.h_pts[h_pts_n]
         if random.random() < config.horizLineChange and not config.noChange:
             h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * _ptCount, True)
             config.h_pts[_ptCount] = h_pts
@@ -101,8 +106,23 @@ def hashlines2():
             lastPt = [pt[0], pt[1]]
         _ptCount += 1
 
+        if config.horizontalMovement:
+            if random.random() < config.horizontalMovementProb:
+                if h_pts_n % 2 == 0:
+                    _lstpt = h_pts[0][1]
+                    for pt in range(0, len(h_pts) - 1):
+                        h_pts[pt][1] = h_pts[pt + 1][1]
+                    h_pts[pt + 1][1] = _lstpt
+                else:
+                    _lstpt = h_pts[len(h_pts) - 1][1]
+                    for pt in range(len(h_pts) - 1, 0, -1):
+                        h_pts[pt][1] = h_pts[pt - 1][1]
+                    h_pts[pt - 1][1] = _lstpt
+
     _ptCount = 0
-    for v_pts in config.v_pts:
+    # for v_pts in config.v_pts:
+    for v_pts_n in range(0, len(config.v_pts) - 1):
+        v_pts = config.v_pts[v_pts_n]
         if random.random() < config.vertLineChange and not config.noChange:
             v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * _ptCount, config.yOffset, False)
             config.v_pts[_ptCount] = v_pts
@@ -111,6 +131,19 @@ def hashlines2():
             drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _fillColor, _lineWidth)
             lastPt = [pt[0], pt[1]]
         _ptCount += 1
+
+        if config.verticalMovement:
+            if random.random() < config.verticalMovementProb:
+                if v_pts_n % 2 == 0:
+                    _lstpt = v_pts[0][0]
+                    for pt in range(0, len(v_pts) - 1):
+                        v_pts[pt][0] = v_pts[pt + 1][0]
+                    v_pts[pt + 1][0] = _lstpt
+                else:
+                    _lstpt = v_pts[len(v_pts) - 1][0]
+                    for pt in range(len(v_pts) - 1, 0, -1):
+                        v_pts[pt][0] = v_pts[pt - 1][0]
+                    v_pts[pt - 1][0] = _lstpt
 
 
 def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
@@ -127,7 +160,7 @@ def drawTheBG():
 
 # def hashlines():
 #     global config
-   
+
 #     if random.random() < 1:
 #         config.noiseSeed = random.random()
 
@@ -250,15 +283,16 @@ def setBGColor():
         _minVal = 0.0
         _maxVal = 0.1
     config.bgColor = colorutils.getRandomColorHSV(
-        config.bg_minHue, 
-        config.bg_maxHue, 
-        config.bg_minSaturation, 
-        config.bg_maxSaturation, 
-        _minVal, 
-        _maxVal, 
-        config.bg_dropHueMin, 
-        config.bg_dropHueMax, 
-        _bg_alpha, config.brightness
+        config.bg_minHue,
+        config.bg_maxHue,
+        config.bg_minSaturation,
+        config.bg_maxSaturation,
+        _minVal,
+        _maxVal,
+        config.bg_dropHueMin,
+        config.bg_dropHueMax,
+        _bg_alpha,
+        config.brightness,
     )
     # pieceLogger("New BG")
 
@@ -274,7 +308,6 @@ def reDraw():
     drawTheBG()
     hashlines2()
 
-
     # adding check on bg alpha as index of transition state - don't want another transition
     # stomping on the one in progress
 
@@ -288,11 +321,12 @@ def reDraw():
         config.bg_alpha = 0
         setLines()
 
-    if random.random() < config.pauseProb: 
+    if random.random() < config.pauseProb:
         config.noChange = True
 
-    if random.random() < config.unpauseProb: 
+    if random.random() < config.unpauseProb:
         config.noChange = False
+
 
 def iterate():
     reDraw()
@@ -320,12 +354,11 @@ def main(run=True):
     config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
     config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
 
-
     # the +/- variability of the points
     config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
     config.noiseAmplitudeRange = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")]
 
-    # adjust higher for higer resolution 
+    # adjust higher for higer resolution
     config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
 
     # not really used - was used in first iteration using Perlin Noise
@@ -335,12 +368,12 @@ def main(run=True):
     config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
     config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
-    '''
+    """
     # PROBABILITIES ----------------
     # generally based on an interval rate of .03, i.e. 3/100's of a second per cycle ~ 33.33 frames/second
     # so the chance of change is .001 per frame, then the chance per second is ~ 3.33%
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
-    '''
+    """
 
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
 
@@ -350,7 +383,7 @@ def main(run=True):
     config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
     config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
 
-    # probablility background changes 
+    # probablility background changes
     config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
     config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
     config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
@@ -359,10 +392,10 @@ def main(run=True):
     # light lines on background - more like a drawing on a screen
     config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
     config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
-    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=.0001))
-    config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=.0001))
+    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
+    config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
     config.noChange = False
-    
+
     # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
     config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
 
@@ -373,12 +406,12 @@ def main(run=True):
     config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
     config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
     config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
-    
+
     # means the row interval is the same as the column interval - if they are independent then
     # there can be more extreme column or row spacing, othewise they get the same ratio
     config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
 
-    # forces grid to squares - but is not currently compensated to will get ragged and missing 
+    # forces grid to squares - but is not currently compensated to will get ragged and missing
     # grids at edges of drawing
     config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
 
@@ -396,13 +429,20 @@ def main(run=True):
     config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
     config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
     config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
-    config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback = "0"))
+    config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback="0"))
     config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "bg_dropHueMax", fallback="0"))
     config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha", fallback="40"))
     config.bg_alpha_base = config.bg_alpha
 
     config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
     config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
+
+    config.verticalMovement = workConfig.getboolean("hatchingmarks", "verticalMovement", fallback=False)
+    config.horizontalMovement = workConfig.getboolean("hatchingmarks", "horizontalMovement", fallback=False)
+    config.horizontalMovementProb = float(workConfig.get("hatchingmarks", "horizontalMovementProb", fallback="0.25"))
+    config.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
+
+    config.rebuildingVerticals = False
 
     setLines()
     setLineColor()

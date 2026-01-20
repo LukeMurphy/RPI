@@ -28,21 +28,24 @@ def catmull_rom(p0, p1, p2, p3, t):
 def generateRawLine(points=20, horiz=True):
     pts = []
     if horiz:
-        pointSpacing = (config.drawingWidth - 1 * config.xOffset) / points
+        pointSpacing = (config.drawingWidth - 2 * config.xOffset) / points
     else:
-        pointSpacing = (config.drawingHeight - 1 * config.yOffset) / points
+        pointSpacing = (config.drawingHeight - 2 * config.yOffset) / points
 
-    for i in range(points):
+    # pieceLogger(f"drawingWidth: {config.drawingWidth }  real drawingWidth: {config.drawingWidth - 2 * config.xOffset} xOffset:{config.xOffset} points: {points}  pointSpacing:{pointSpacing}")
+
+    for i in range(points + 0):
         a = i * pointSpacing
-        b = R(-config.noiseAmplitude, config.noiseAmplitude)
         if horiz:
+            b = R(-config.noiseAmplitudeRow, config.noiseAmplitudeRow)
             pts.append((round(a), round(b)))
         else:
+            b = R(-config.noiseAmplitudeCol, config.noiseAmplitudeCol)
             pts.append((round(b), round(a)))
 
     # ensures the last point at the right or bottom closes the box
     if horiz:
-        pts.append([config.drawingWidth - 2 * config.xOffset, b])
+        pts.append([config.drawingWidth - 2.0 * config.xOffset, b])
     else:
         pts.append([b, config.drawingHeight - 2 * config.yOffset])
     # Extra points for smoother Bézier start/end
@@ -94,8 +97,8 @@ def hashlines2():
 
     # print(config.h_pts[0][0])
     # print(" ")
-
-    for h_pts_n in range(0, len(config.h_pts) - 1):
+    # pieceLogger(f" len(config.h_pts) :{len(config.h_pts)}")
+    for h_pts_n in range(0, len(config.h_pts) - 0):
         h_pts = config.h_pts[h_pts_n]
         if random.random() < config.horizLineChange and not config.noChange:
             h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * _ptCount, True)
@@ -121,7 +124,7 @@ def hashlines2():
 
     _ptCount = 0
     # for v_pts in config.v_pts:
-    for v_pts_n in range(0, len(config.v_pts) - 1):
+    for v_pts_n in range(0, len(config.v_pts) - 0):
         v_pts = config.v_pts[v_pts_n]
         if random.random() < config.vertLineChange and not config.noChange:
             v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * _ptCount, config.yOffset, False)
@@ -158,49 +161,6 @@ def drawTheBG():
     #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
 
 
-# def hashlines():
-#     global config
-
-#     if random.random() < 1:
-#         config.noiseSeed = random.random()
-
-#     lastx = [0, 0, 0]
-#     lasty = [0, 0, 0]
-#     _fillColor = getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha)
-
-#     for col in range(0, config.canvasWidth - 2 * config.xOffset, config.colInterval):
-#         lasty = [0, 0, 0]
-#         lineWidth = random.choice([0, 1])
-
-#         for row in range(0, config.canvasHeight - 2 * config.yOffset, config.rowInterval):
-#             y = row
-#             x = round(noise.pnoise2((col + config.scroll), y / (10 * config.noiseSeed) + config.scroll, 2) * config.noiseAmplitude + col)
-#             lineWidth = random.choice([0, 1])
-
-#             config.draw.line(
-#                 (lastx[0] + config.xOffset, lasty[0] + config.yOffset, x + config.xOffset, y + config.yOffset),
-#                 fill=_fillColor,
-#                 width=lineWidth,
-#             )
-
-#             # config.draw.line(
-#             #     (col + config.xOffset, row + config.yOffset, config.canvasWidth - 2 * config.xOffset, row + config.yOffset),
-#             #     fill=_fillColor,
-#             #     width=lineWidth,
-#             # )
-
-#             config.draw.line(
-#                 (lasty[0] + config.yOffset, lastx[0] + config.xOffset, y + config.yOffset, x + config.xOffset),
-#                 fill=getColor(config.lineColor[0], config.lineColor[1], config.lineColor[2], config.line_alpha),
-#                 width=lineWidth,
-#             )
-
-#             lastx = [x, x, x]
-#             lasty = [y, y, y]
-#         # octv += 1
-#     config.scroll += config.scrollRate
-
-
 def setLines():
     config.colInterval = random.randint(int(config.colIntervalRange[0]), int(config.colIntervalRange[1]))
 
@@ -210,9 +170,19 @@ def setLines():
     else:
         config.rowInterval = random.randint(int(config.rowIntervalRange[0]), int(config.rowIntervalRange[1]))
 
-    config.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
-    config.colSpacing = (config.drawingWidth - 2 * config.xOffset + config.colAdj) / config.colInterval
-    config.rowSpacing = (config.drawingHeight - 2 * config.yOffset + config.rowAdj) / config.rowInterval
+    # config.colSpacing = (config.drawingWidth - 0 * config.xOffset + config.colAdj) / config.colInterval
+    # config.rowSpacing = (config.drawingHeight - 0 * config.yOffset + config.rowAdj) / config.rowInterval
+    config.colSpacing = (config.drawingWidth - 2 * config.xOffset) / config.colInterval
+    config.rowSpacing = (config.drawingHeight - 2 * config.yOffset) / config.rowInterval
+
+    # pieceLogger(f"colInterval: {config.colInterval} colSpacing:{config.colSpacing}")
+    # pieceLogger(f"rowInterval: {config.rowInterval} rowSpacing:{config.rowSpacing}")
+
+    # pieceLogger("--")
+
+    # config.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
+    config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
+    config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
 
     # if squareRatio, the column ratio and spacing is used for the rows as well - this means all squares across field
     if config.squareRatio:
@@ -220,14 +190,14 @@ def setLines():
 
     config.h_pts = []
     for row in range(config.rowInterval + config.rowAdj):
-        h_pts = generateInformalLine(config.pointsPerLine, config.xOffset, config.yOffset + config.rowSpacing * row, True)
+        h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * row, True)
         config.h_pts.append(h_pts)
         # testing a variable arithmetic or log distribution but really that is not the point
         # config.rowSpacing -= .02
 
     config.v_pts = []
     for col in range(config.colInterval + config.colAdj):
-        v_pts = generateInformalLine(config.pointsPerLine, config.xOffset + config.colSpacing * col, config.yOffset, False)
+        v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * col, config.yOffset, False)
         config.v_pts.append(v_pts)
 
     if not config.useSingleMode:
@@ -357,6 +327,12 @@ def main(run=True):
     # the +/- variability of the points
     config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
     config.noiseAmplitudeRange = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")]
+    config.noiseAmplitudeRangeRow = [
+        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
+    ]
+    config.noiseAmplitudeRangeCol = [
+        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
+    ]
 
     # adjust higher for higer resolution
     config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))

@@ -147,6 +147,22 @@ def main(run=True):
         print(str(e))
         config.imageGlitchDisplacement = 15
 
+    try:
+        config.rotateImage = float(workConfig.get("images", "rotateImage"))
+        config.doRotateImg = (workConfig.getboolean("images", "doRotateImg"))
+    except Exception as e:
+        config.doRotateImg = False
+        config.rotateImage = 0
+
+    try:
+        config.doResizeImg = (workConfig.getboolean("images", "doResizeImg"))
+        config.resizeImageWidth = int(workConfig.get("images", "resizeImageWidth"))
+        config.resizeImageHeight = int(workConfig.get("images", "resizeImageHeight"))
+    except Exception as e:
+        config.doResizeImg = False
+        config.resizeImageWidth = 0
+        config.resizeImageHeight = 0
+
     # Generate image holders
     config.workImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.workImageDraw = ImageDraw.Draw(config.workImage)
@@ -447,6 +463,12 @@ def performChanges():
 
     enhancer = ImageEnhance.Brightness(config.imgLoader.image.convert("RGBA"))
     im_output = enhancer.enhance(config.brightness)
+
+    if config.doResizeImg :
+        im_output = im_output.resize((512,128))
+    if config.doRotateImg :
+        im_output = im_output.rotate(180)
+
     
     
     if config.useBackGround == True :

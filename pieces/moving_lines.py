@@ -30,14 +30,16 @@ class FlameLine:
 
 
     def reconfigure(self) :
-        self.flameSpeed = random.randint(8, 20)
-        self.baseWidth = random.uniform(40,200)
+        self.flameSpeed = random.randint(config.flameSpeedRange[0],config.flameSpeedRange[1])
+        self.baseWidth = random.uniform(config.baseWidthRange[0],config.baseWidthRange[1])
         self.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
-        self.drawingHeight = round(random.uniform(160, 300))
+        self.drawingHeight = round(random.uniform(config.drawingHeightRange[0],config.drawingHeightRange[1]))
         self.xOffset = round(config.xOffset + config.canvasWidth/2 + random.uniform(-config.distributionRange, config.distributionRange))
         self.yOffset = round(config.canvasHeight - self.drawingHeight - config.yOffset)
         self.points = random.randint(5, config.pointsPerLine)
-        self.ratioFactor = random.uniform(100, 400)
+        self.points = 14
+        self.ratioFactor = random.uniform(config.ratioFactorRange[0],config.ratioFactorRange[1])
+        self.resolution = config.curveResolution
 
         self.generateInformalLine()
 
@@ -67,7 +69,7 @@ class FlameLine:
 
         for i in range(self.points):
             a = i * pointSpacing
-            b = R(-self.noiseAmplitude, self.noiseAmplitude)
+            b = R(-self.noiseAmplitude, self.noiseAmplitude) #* i/self.points
             self.rawPts.append((round(b + self.xOffset), round(a + self.yOffset)))
 
         # ensures the last point at the right or bottom closes the box
@@ -81,7 +83,7 @@ class FlameLine:
         self.getCurvePoints()
         self.smoothPointsForDrawing = []
         self.smoothPointsForDrawing.extend([pt[0] + self.xOffset, pt[1] + self.yOffset] for pt in self.curvedPoints)
-        pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
+        # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
 
 
 # -------- Util Functions   -------------- #
@@ -171,21 +173,20 @@ def changeLine() :
 
 def flameLines():
     global config
-    _ptCount = 0
+
     for flameLineUnitIndex in range(0, len(config.flameLineUnits)):
         lineUnit = config.flameLineUnits[flameLineUnitIndex]
         lineUnit.lastOrthoPoint = []
         pointsToDraw = lineUnit.curvedPoints
         lastPt = [pointsToDraw[0][0], pointsToDraw[0][1]]
-        _ptCounter = 0
 
         lineUnit.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0,0,0,5))
 
+        _ptCounter = 0
         for pt in pointsToDraw:
             drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _ptCounter, lineUnit)
             lastPt = [pt[0], pt[1]]
             _ptCounter += 1
-        _ptCount += 1
 
         for _ in range(lineUnit.flameSpeed):
             _lstpt = pointsToDraw[0][0]
@@ -207,12 +208,33 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
     if _angle < 0:
         _angle += 360
 
-    # _ratio = p2y / config.canvasHeight
-    _ratio = _n / _lineUnit.points / _lineUnit.ratioFactor
-    _penWidth = _lineUnit.baseWidth * _ratio
+    _totalPts = len(_lineUnit.curvedPoints) 
+    _ratio1 = _n /_totalPts
+    _ratio1a = _ratio1 / _lineUnit.ratioFactor
+    _ratio2 = (_totalPts - _n) /_totalPts 
+    _ratio2a = _ratio2 / _lineUnit.ratioFactor
+
+    _t = (_n / math.pi ) / 70 
+    _ratio = math.sin(_t + math.pi/5) * math.pow(math.sin(_t),0) * _ratio1a
+
+    _penWidth = _lineUnit.baseWidth * _ratio * _ratio1a
+    
     _alphaBase = 2
 
-    fillClr = [round(190 * (_ratio * 3)), round(100 * _ratio), 0, round(_alphaBase * _ratio)]
+    _r  = round(190 * (_ratio * 3))
+    _g = round(100 * _ratio)
+    _b = round(20  * (_totalPts - _n) /_totalPts)
+    _a = round(_alphaBase * _ratio)
+
+    fillClr = [_r, _g, _b, _a]
+
+    # _alphaBase = 100
+    # _r  = round(190 * (_ratio * 3))
+    # _g = round(100 * _ratio2)
+    # _b = round(220  * _ratio)
+    # _a = round(_alphaBase * _ratio)
+
+    # outlineClr = [_r, _g, _b, _a]
 
     _orthoAngle = math.pi - math.atan2(_dy, _dx)
     _sinOrthoAngle = math.sin(_orthoAngle)
@@ -353,17 +375,21 @@ def main(run=True):
     config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
     config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
     config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
-    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
+
+
+    config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
+    config.flameSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "flameSpeedRange", fallback="1,20").split(",")]
+    config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
+    config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
+
+
+
+
 
     config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
     config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
     config.noChange = False
 
-    # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
-    config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
-
-    config.scroll = 0
-    config.scrollRate = float(workConfig.get("hatchingmarks", "scrollRate"))
 
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))

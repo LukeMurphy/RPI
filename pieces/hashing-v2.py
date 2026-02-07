@@ -69,6 +69,8 @@ class InformalLine:
         for i in range(self.points):
             a = i * pointSpacing
             b = R(-self.noiseAmplitude, self.noiseAmplitude)
+            if random.random() < config.tangleProb and i !=0 and i != self.points-1 and abs(b) > self.noiseAmplitude *.75:
+                a -= random.uniform(config.backTrackRange[0],config.backTrackRange[1])
             self.rawPts.append((round(b + self.xOffset), round(a + self.yOffset)))
 
         # ensures the last point at the right or bottom closes the box
@@ -161,7 +163,7 @@ def setBGColor():
 def setLines():
     pieceLogger(f"New Lines: {config.drawingShape}")
     config.informalLineUnits = []
-
+    
     if config.drawingShape == "grid":
         setGridLines()
     else:
@@ -180,12 +182,16 @@ def setLines():
             round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
             config.brightness,
             )
+
+            if config.singleLineRegularSpacing :
+                informalLine.xOffset = config.xOffset + config.rowSpacing * _u
+
+
             informalLine.generateInformalLine()
             config.informalLineUnits.append(informalLine)
 
 
-def setGridLines():
-    pieceLogger(f"Making Grid: {config.drawingShape} {config.drawingWidth } {config.drawingHeight }")
+def setRegularSpacing():
     config.colInterval = random.randint(int(config.colIntervalRange[0]), int(config.colIntervalRange[1]))
 
     # if uniformRatio, the column ratio is used for the rows as well - this means even rectangles across field
@@ -197,12 +203,17 @@ def setGridLines():
     config.colSpacing = (config.drawingWidth - 2 * config.xOffset) / config.colInterval
     config.rowSpacing = (config.drawingHeight - 2 * config.yOffset) / config.rowInterval
 
-    config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
-    config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
-
     # if squareRatio, the column ratio and spacing is used for the rows as well - this means all squares across field
     if config.squareRatio:
         config.rowSpacing = config.colSpacing
+
+def setGridLines():
+    pieceLogger(f"Making Grid: {config.drawingShape} {config.drawingWidth } {config.drawingHeight }")
+    
+    setRegularSpacing()
+
+    config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
+    config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
 
     # config.h_pts = []
     for row in range(config.rowInterval + config.rowAdj):
@@ -308,7 +319,6 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
 
     if config.drawingShape == "grid" :
         # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-
         if _lineUnit.angle == 90 :
             config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
         else :
@@ -343,8 +353,15 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
 
         _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
-        if config.drawingShape != "grid" :
+
+        if config.renderLinesAsEnvelope :        
             _lineUnit.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
+        else : 
+            if _lineUnit.angle == 90 :
+                _lineUnit.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+            else :
+                _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+        
         # config.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
 
         _lineUnit.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
@@ -425,7 +442,7 @@ def reDraw():
         setLineColor()
 
     if random.random() < config.changeLinesProb and not config.noChange:
-        config.lightMode = False if random.random() > config.lightModeProb else True
+        # config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
         setLines()
 
@@ -434,10 +451,6 @@ def reDraw():
 
     if random.random() < config.unpauseProb:
         config.noChange = False
-
-
-def affine_translate(right=0, down=0):
-    return (1, 0, -right, 0, 1, -down)
 
 
 def iterate():
@@ -454,20 +467,23 @@ def iterate():
         # config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(255,255,255,255))
         if config.drawingShape != "grid" :
             config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+
+            _tempImage = Image.new("RGBA", (config.largestDim,config.largestDim))
             for n in config.informalLineUnits:
                 # n.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 0, 2))
-                # config.image = ImageChops.add(n.canvas, config.image)
-                _temp = n.canvas.rotate(n.angle)
-                # affine = affine_translate(right=0, down=-132)
-                # _temp = _temp.transform(_temp.size, Image.Transform.AFFINE, data=affine)
+                _tempImage = ImageChops.add(n.canvas, _tempImage)
+
+                # _temp = n.canvas.rotate(n.angle)
                 # @todo fix this bs later  .....
-                if n.angle == 90:
-                    config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
-                else:
-                    config.image.paste(_temp, (-_xDiff, -0), _temp)
-                # config.image.paste(n.canvas, (0,0), n.canvas)
-                # config.image.paste(_temp, (0,0), _temp)
-        config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+                # if n.angle == 0:
+                #     config.image.paste(_temp, (-_xDiff, -0), _temp)
+                # else:
+                #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
+            _tempImage = _tempImage.rotate(n.angle)
+            config.image.paste(_tempImage, (0,0), _tempImage)
+            config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+        else: 
+            config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     # Done
 
 
@@ -504,16 +520,34 @@ def main(run=True):
     config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
     # for single lines
+    config.renderLinesAsEnvelope = workConfig.getboolean("hatchingmarks", "renderLinesAsEnvelope", fallback=False)
+    config.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
     config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
     config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
     config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
+    config.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
     config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
     config.verticalMovement = workConfig.getboolean("hatchingmarks", "verticalMovement", fallback=False)
     config.horizontalMovement = workConfig.getboolean("hatchingmarks", "horizontalMovement", fallback=False)
     config.horizontalMovementProb = float(workConfig.get("hatchingmarks", "horizontalMovementProb", fallback="0.25"))
     config.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
     config.singleLinesAngle = float(workConfig.get("hatchingmarks", "singleLinesAngle", fallback="0"))
+    config.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
 
+
+    if config.singleLineRegularSpacing:
+        _hspacing = round(config.canvasWidth/(config.numberOfinformalLines + 2))
+        _vspacing = round(config.canvasHeight/(config.numberOfinformalLines +  2))
+        config.rowIntervalRange = [_vspacing,_vspacing]
+        config.colIntervalRange = [_hspacing,_hspacing]
+
+    # means the row interval is the same as the column interval - if they are independent then
+    # there can be more extreme column or row spacing, othewise they get the same ratio
+    config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
+
+    # forces grid to squares - but is not currently compensated to will get ragged and missing
+    # grids at edges of drawing
+    config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
 
     if config.drawingShape == "grid":
         config.noiseAmplitudeRangeRow = [
@@ -538,13 +572,6 @@ def main(run=True):
         config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
         config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
 
-        # means the row interval is the same as the column interval - if they are independent then
-        # there can be more extreme column or row spacing, othewise they get the same ratio
-        config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
-
-        # forces grid to squares - but is not currently compensated to will get ragged and missing
-        # grids at edges of drawing
-        config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
 
 
     """

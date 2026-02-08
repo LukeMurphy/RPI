@@ -147,8 +147,8 @@ def setBGColor():
         config.bg_maxHue,
         config.bg_minSaturation,
         config.bg_maxSaturation,
-        _minVal,
-        _maxVal,
+        config.bg_minValue,
+        config.bg_maxValue,
         config.bg_dropHueMin,
         config.bg_dropHueMax,
         _bg_alpha,
@@ -167,6 +167,7 @@ def setLines():
     if config.drawingShape == "grid":
         setGridLines()
     else:
+        setRegularSpacing()
         for _u in range(config.numberOfinformalLines):
             informalLine = InformalLine(_u)
             informalLine.angle = config.singleLinesAngle
@@ -519,11 +520,13 @@ def main(run=True):
     config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
     config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
-    # for single lines
+    # for single linesneSpeed
     config.renderLinesAsEnvelope = workConfig.getboolean("hatchingmarks", "renderLinesAsEnvelope", fallback=False)
+    config.drawVertical = workConfig.getboolean("hatchingmarks", "drawVertical", fallback=True)
+    config.drawHorizontal = workConfig.getboolean("hatchingmarks", "drawHorizontal", fallback=True)
     config.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
     config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
-    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "liRange", fallback="1,20").split(",")]
     config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
     config.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
     config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
@@ -603,16 +606,16 @@ def main(run=True):
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
     config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
     config.line_minSaturation = float(workConfig.get("hatchingmarks", "line_minSaturation"))
-    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
     config.line_minValue = float(workConfig.get("hatchingmarks", "line_minValue"))
+    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
     config.line_alpha = int(workConfig.get("hatchingmarks", "line_alpha", fallback="180"))
 
     config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
     config.bg_maxHue = float(workConfig.get("hatchingmarks", "bg_maxHue"))
     config.bg_maxSaturation = float(workConfig.get("hatchingmarks", "bg_maxSaturation"))
     config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
-    config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
     config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
+    config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
     config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback="0"))
     config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "bg_dropHueMax", fallback="0"))
     config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha", fallback="40"))

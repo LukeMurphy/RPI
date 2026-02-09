@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw, ImageChops
 class InformalLine:
 
     points = 1
-    pointPerLine = 1
+    pointPerLine = 3
     resolution = 50
     drawingHeight = 100
     noiseAmplitude = 1.0
@@ -27,22 +27,11 @@ class InformalLine:
         self.unitNumber = unitNumber
         self.canvas = Image.new("RGBA", (config.largestDim, config.largestDim))
         self.draw = ImageDraw.Draw(self.canvas)
-        self.reconfigure()
 
     def reconfigure(self):
-        self.lineSpeed = random.randint(config.lineSpeedRange[0], config.lineSpeedRange[1])
-        self.baseWidth = random.uniform(config.baseWidthRange[0], config.baseWidthRange[1])
-        self.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
-        self.drawingHeight = round(random.uniform(config.drawingHeightRange[0], config.drawingHeightRange[1]))
-        self.xOffset = round(config.xOffset + config.largestDim / 2 + random.uniform(-config.distributionRange, config.distributionRange))
-        self.yOffset = round(config.largestDim - self.drawingHeight - config.yOffset)
-        self.points = random.randint(5, config.pointsPerLine)
-        # self.points = 14
-        self.ratioFactor = random.uniform(config.ratioFactorRange[0], config.ratioFactorRange[1])
-        self.resolution = config.curveResolution
-        self.direction = 1 if random.random() < 0.5 else 0
-
-        # self.generateInformalLine()
+        self.lineSpeed = random.randint(self.lineSpeedRange[0], self.lineSpeedRange[1])
+        self.baseWidth = random.uniform(self.baseWidthRange[0], self.baseWidthRange[1])
+        self.noiseAmplitude = random.uniform(float(self.noiseAmplitudeRange[0]), float(self.noiseAmplitudeRange[1]))
 
     def getCurvePoints(self):
 
@@ -69,8 +58,8 @@ class InformalLine:
         for i in range(self.points):
             a = i * pointSpacing
             b = R(-self.noiseAmplitude, self.noiseAmplitude)
-            if random.random() < config.tangleProb and i !=0 and i != self.points-1 and abs(b) > self.noiseAmplitude *.75:
-                a -= random.uniform(config.backTrackRange[0],config.backTrackRange[1])
+            if random.random() < config.tangleProb and i != 0 and i != self.points - 1 and abs(b) > self.noiseAmplitude * 0.75:
+                a -= random.uniform(config.backTrackRange[0], config.backTrackRange[1])
             self.rawPts.append((round(b + self.xOffset), round(a + self.yOffset)))
 
         # ensures the last point at the right or bottom closes the box
@@ -79,6 +68,12 @@ class InformalLine:
         # pts.insert(0, pts[0])
 
     def generateInformalLine(self):
+
+        self.points = random.randint(3, self.pointPerLine)
+        self.ratioFactor = random.uniform(config.ratioFactorRange[0], config.ratioFactorRange[1])
+        self.resolution = config.curveResolution
+        self.direction = 1 if random.random() < 0.5 else 0
+
         self.generateRawLine()
         self.getCurvePoints()
         self.smoothPointsForDrawing = []
@@ -163,7 +158,7 @@ def setBGColor():
 def setLines():
     pieceLogger(f"New Lines: {config.drawingShape}")
     config.informalLineUnits = []
-    
+
     if config.drawingShape == "grid":
         setGridLines()
     else:
@@ -172,21 +167,28 @@ def setLines():
             informalLine = InformalLine(_u)
             informalLine.angle = config.singleLinesAngle
             informalLine.lineColor = colorutils.getRandomColorHSV(
-            config.line_minHue,
-            config.line_maxHue,
-            config.line_minSaturation,
-            config.line_maxSaturation,
-            config.line_minValue,
-            config.line_maxValue,
-            0,
-            0,
-            round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-            config.brightness,
+                config.line_minHue,
+                config.line_maxHue,
+                config.line_minSaturation,
+                config.line_maxSaturation,
+                config.line_minValue,
+                config.line_maxValue,
+                0,
+                0,
+                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+                config.brightness,
             )
 
-            if config.singleLineRegularSpacing :
+            if config.singleLineRegularSpacing:
                 informalLine.xOffset = config.xOffset + config.rowSpacing * _u
 
+            informalLine.drawingHeight = round(random.uniform(config.drawingHeightRange[0], config.drawingHeightRange[1]))
+            informalLine.xOffset = round(config.xOffset + config.largestDim / 2 + random.uniform(-config.distributionRange, config.distributionRange))
+            informalLine.yOffset = round(config.largestDim - informalLine.drawingHeight - config.yOffset)
+
+            informalLine.lineSpeed = random.randint(config.lineSpeedRange[0], config.lineSpeedRange[1])
+            informalLine.baseWidth = random.uniform(config.baseWidthRange[0], config.baseWidthRange[1])
+            informalLine.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
 
             informalLine.generateInformalLine()
             config.informalLineUnits.append(informalLine)
@@ -208,9 +210,10 @@ def setRegularSpacing():
     if config.squareRatio:
         config.rowSpacing = config.colSpacing
 
+
 def setGridLines():
     pieceLogger(f"Making Grid: {config.drawingShape} {config.drawingWidth } {config.drawingHeight }")
-    
+
     setRegularSpacing()
 
     config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
@@ -225,7 +228,11 @@ def setGridLines():
         informalLine.yOffset = config.yOffset
         informalLine.drawingHeight = config.drawingWidth - 2 * config.xOffset
         informalLine.angle = 90
-        informalLine.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
+        informalLine.pointPerLine = config.pointsPerLineRow
+        informalLine.lineSpeedRange = config.horizLineSpeedRange
+        informalLine.baseWidthRange = config.horizBaseWidthRange
+        informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeRow
+
         informalLine.lineColor = colorutils.getRandomColorHSV(
             config.line_minHue,
             config.line_maxHue,
@@ -237,7 +244,9 @@ def setGridLines():
             0,
             round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
             config.brightness,
-            )
+        )
+
+        informalLine.reconfigure()
         informalLine.generateInformalLine()
         config.informalLineUnits.append(informalLine)
 
@@ -249,7 +258,12 @@ def setGridLines():
         informalLine.xOffset = config.xOffset + config.colSpacing * col
         informalLine.yOffset = config.yOffset
         informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
-        informalLine.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
+
+        informalLine.pointPerLine = config.pointsPerLineCol
+        informalLine.lineSpeedRange = config.vertLineSpeedRange
+        informalLine.baseWidthRange = config.vertBaseWidthRange
+        informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
+
         informalLine.lineColor = colorutils.getRandomColorHSV(
             config.line_minHue,
             config.line_maxHue,
@@ -261,7 +275,8 @@ def setGridLines():
             0,
             round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
             config.brightness,
-            )
+        )
+        informalLine.reconfigure()
         informalLine.generateInformalLine()
         # pieceLogger(f"{informalLine.xOffset}")
         config.informalLineUnits.append(informalLine)
@@ -318,14 +333,14 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
 
     fillClr = _lineUnit.lineColor
 
-    if config.drawingShape == "grid" :
+    if config.drawingShape == "grid":
         # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-        if _lineUnit.angle == 90 :
+        if _lineUnit.angle == 90:
             config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-        else :
+        else:
             config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
 
-    else :
+    else:
 
         _orthoAngle = math.pi - math.atan2(_dy, _dx)
         _sinOrthoAngle = math.sin(_orthoAngle)
@@ -354,15 +369,14 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
 
         _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
-
-        if config.renderLinesAsEnvelope :        
+        if config.renderLinesAsEnvelope:
             _lineUnit.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
-        else : 
-            if _lineUnit.angle == 90 :
+        else:
+            if _lineUnit.angle == 90:
                 _lineUnit.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-            else :
+            else:
                 _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-        
+
         # config.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
 
         _lineUnit.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
@@ -393,9 +407,7 @@ def informalLines():
             lastPt = [pt[0], pt[1]]
             _ptCounter += 1
 
-        if (
-            (lineUnit.angle != 0 and random.random() < config.horizontalMovementProb) or (lineUnit.angle == 0 and random.random() < config.verticalMovementProb)
-        ):
+        if (lineUnit.angle != 0 and random.random() < config.horizontalMovementProb) or (lineUnit.angle == 0 and random.random() < config.verticalMovementProb):
             if lineUnit.direction == 0:
                 for _ in range(lineUnit.lineSpeed):
                     _lstpt = pointsToDraw[0][0]
@@ -466,10 +478,10 @@ def iterate():
         _yDiff = round((config.largestDim - config.canvasHeight) / 1)
 
         # config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(255,255,255,255))
-        if config.drawingShape != "grid" :
+        if config.drawingShape != "grid":
             config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
-            _tempImage = Image.new("RGBA", (config.largestDim,config.largestDim))
+            _tempImage = Image.new("RGBA", (config.largestDim, config.largestDim))
             for n in config.informalLineUnits:
                 # n.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 0, 2))
                 _tempImage = ImageChops.add(n.canvas, _tempImage)
@@ -481,9 +493,9 @@ def iterate():
                 # else:
                 #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
             _tempImage = _tempImage.rotate(n.angle)
-            config.image.paste(_tempImage, (0,0), _tempImage)
+            config.image.paste(_tempImage, (0, 0), _tempImage)
             config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
-        else: 
+        else:
             config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     # Done
 
@@ -526,7 +538,7 @@ def main(run=True):
     config.drawHorizontal = workConfig.getboolean("hatchingmarks", "drawHorizontal", fallback=True)
     config.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
     config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
-    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "liRange", fallback="1,20").split(",")]
+    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
     config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
     config.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
     config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
@@ -537,12 +549,11 @@ def main(run=True):
     config.singleLinesAngle = float(workConfig.get("hatchingmarks", "singleLinesAngle", fallback="0"))
     config.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
 
-
     if config.singleLineRegularSpacing:
-        _hspacing = round(config.canvasWidth/(config.numberOfinformalLines + 2))
-        _vspacing = round(config.canvasHeight/(config.numberOfinformalLines +  2))
-        config.rowIntervalRange = [_vspacing,_vspacing]
-        config.colIntervalRange = [_hspacing,_hspacing]
+        _hspacing = round(config.canvasWidth / (config.numberOfinformalLines + 2))
+        _vspacing = round(config.canvasHeight / (config.numberOfinformalLines + 2))
+        config.rowIntervalRange = [_vspacing, _vspacing]
+        config.colIntervalRange = [_hspacing, _hspacing]
 
     # means the row interval is the same as the column interval - if they are independent then
     # there can be more extreme column or row spacing, othewise they get the same ratio
@@ -552,30 +563,32 @@ def main(run=True):
     # grids at edges of drawing
     config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
 
-    if config.drawingShape == "grid":
-        config.noiseAmplitudeRangeRow = [
-            float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
-        ]
-        config.noiseAmplitudeRangeCol = [
-            float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
-        ]
+    config.noiseAmplitudeRangeRow = [
+        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
+    ]
+    config.noiseAmplitudeRangeCol = [
+        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
+    ]
 
-        config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
-        config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
+    config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
+    config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
 
-        config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
-        config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
+    config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
+    config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
 
-        config.vertlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
-        config.horzlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    config.vertlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    config.horzlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
 
-        config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
-        config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
+    config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
+    config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
 
-        config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj"))
-        config.colAdj = int(workConfig.get("hatchingmarks", "colAdj"))
+    config.horizLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "horizLineSpeedRange", fallback="1,20").split(",")]
+    config.vertLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineSpeedRange", fallback="1,20").split(",")]
+    config.vertBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertBaseWidthRange", fallback="18,180").split(",")]
+    config.horizBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "horizBaseWidthRange", fallback="18,180").split(",")]
 
-
+    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
+    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
 
     """
     # PROBABILITIES ----------------

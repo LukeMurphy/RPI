@@ -9,6 +9,7 @@ import drawing_scribbles_setpalette
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
 
+
 def R(a, b, rounded=False):
     if not rounded:
         return random.uniform(a, b)
@@ -331,6 +332,20 @@ i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 
 
+def checkTime():
+    hour  = time.localtime()[3]
+    minute = time.localtime()[4]
+    keepOn = False
+    if hour >= 8 and hour <= 23 :
+        keepOn = True
+        
+    return keepOn
+        
+
+    
+BLANKSCREEN = display.create_pen_hsv(0,0,0)
+
+
 # -------------------------------------------  -SETTINGS ---------------------------------------------------#
 
 INTERVAL = 0.02
@@ -467,6 +482,15 @@ while True:
     if panelBGBlockCount == 0 and not penMark.drawingDone:
         drawLinePolyEnvelope(penMark)
 
+    # _on  = checkTime()
+    
+    # if not _on:
+    #     display.clear()
+    #     display.reset_pen(BLANKSCREEN)
+    #     display.set_pen(BLANKSCREEN)
+    #     display.clear()
+
+        
     # Update the display
     i75.update()
     time.sleep(INTERVAL)

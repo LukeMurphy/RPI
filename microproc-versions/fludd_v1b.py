@@ -234,6 +234,20 @@ def rColor(hmin, hmax, smin, smax, vmin, vmax):
 i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 
+
+def checkTime():
+    hour  = time.localtime()[3]
+    minute = time.localtime()[4]
+    keepOn = False
+    if hour >= 8 and hour <= 23 :
+        keepOn = True
+        
+    return keepOn
+        
+
+BLANKSCREEN = display.create_pen_hsv(0,0,0)
+
+
 config = Config()
 
 config.interval = 0.03
@@ -276,6 +290,7 @@ changeColor(fgClr, 350 / 360, 260 / 360, 0.90, 1.0, 0.0, 0.0, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.clear()
+
 
 pause = False
 
@@ -342,6 +357,13 @@ while True:
         shp.drawInset = False
         if random.random() < drawInsetProb :
             shp.drawInset = True
+            
+    # _on  = checkTime()
+    # if not _on:
+    #     display.clear()
+    #     display.reset_pen(BLANKSCREEN)
+    #     display.set_pen(BLANKSCREEN)
+    #     display.clear()
 
     i75.update()
     time.sleep(config.interval)

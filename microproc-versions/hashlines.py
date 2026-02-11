@@ -248,6 +248,20 @@ display = i75.display
 
 config = Config()
 
+def checkTime():
+    hour  = time.localtime()[3]
+    minute = time.localtime()[4]
+    keepOn = False
+    if hour >= 8 and hour <= 23 :
+        keepOn = True
+        
+    return keepOn
+        
+
+    
+BLANKSCREEN = display.create_pen_hsv(0,0,0)
+
+
 # ---------------------------------#
 # Framerate
 config.interval = 0.03
@@ -334,7 +348,14 @@ while True:
         resetLines()
         if not config.bgClr.intransition : setBGColor()
         if not config.fgClr.intransition : setLineColor()
-
+        
+    # _on  = checkTime()
+    # if not _on:
+    #     display.clear()
+    #     display.reset_pen(BLANKSCREEN)
+    #     display.set_pen(BLANKSCREEN)
+    #     display.clear()
+        
     i75.update()
     time.sleep(config.interval)
 

@@ -186,6 +186,20 @@ i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 p = pngdec.PNG(display)
 
+
+def checkTime():
+    hour  = time.localtime()[3]
+    minute = time.localtime()[4]
+    keepOn = False
+    if hour >= 8 and hour <= 23 :
+        keepOn = True
+        
+    return keepOn
+        
+BLANKSCREEN = display.create_pen_hsv(0,0,0)
+
+
+
 # ---------- SETTINGS ---------------#
 INTERVAL = 0.03
 activeAnim = 0
@@ -340,6 +354,14 @@ while True:
         fgClr.change()
 
         shp.update()
+        
+    # _on  = checkTime()
+    
+    # if not _on:
+    #     display.clear()
+    #     display.reset_pen(BLANKSCREEN)
+    #     display.set_pen(BLANKSCREEN)
+    #     display.clear()
 
     i75.update()
     time.sleep(INTERVAL)

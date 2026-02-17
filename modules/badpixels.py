@@ -16,6 +16,7 @@ probabilityOfBlockBlanks = 0.9
 
 sizeTarget = [160, 48]
 
+blankColor = (0, 0, 0)
 
 def setBlanks():
 	return None
@@ -43,12 +44,15 @@ def setBlanksOnImage():
 					blankPixels.append((x + i, y + ii))
 
 
-def setBlanksOnScreen():
+def setBlanksOnScreen(_config=None):
 	# print("Setting Blanks")
 	global config, blankPixels, numberOfDeadPixels, probabilityOfBlockBlanks
 	global colsRange, rowsRange, sizeTarget
 	blankPixels = []
 	count = 0
+
+	if _config :
+		config = _config
 
 	# scatter horizontally
 	for n in range(0, numberOfDeadPixels):
@@ -75,15 +79,13 @@ def drawBlanks(target=None, direct=True):
 	count = 0
 	blankNum = len(blankPixels)
 
-
 	try:
-		pass
-
+		# pass
 		for n in range(0, blankNum):
 			if direct:
 				config.matrix.SetPixel(blankPixels[n][0], blankPixels[n][1], 0, 0, 0)
 			else:
 				if blankPixels[n][0] < sizeTarget[0] and blankPixels[n][1] < sizeTarget[1]:
-					target.putpixel((blankPixels[n][0], blankPixels[n][1]), (0, 0, 0))
+					target.putpixel((blankPixels[n][0], blankPixels[n][1]), blankColor)
 	except Exception as e:
 		print(str(e))

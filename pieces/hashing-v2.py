@@ -4,7 +4,7 @@ import time
 import math
 from noise import *
 from modules.configuration import bcolors, pieceLogger
-from modules import colorutils, panelDrawing
+from modules import colorutils, panelDrawing, badpixels
 from PIL import Image, ImageDraw, ImageChops
 
 # ################################################### #
@@ -149,6 +149,12 @@ def setBGColor():
         _bg_alpha,
         config.brightness,
     )
+
+    if random.random() <  .5 :
+        badpixels.blankColor = config.bgColor
+    else :
+        badpixels.blankColor = (0,0,0,255)
+
     # pieceLogger("New BG")
 
 
@@ -465,9 +471,13 @@ def reDraw():
     if random.random() < config.unpauseProb:
         config.noChange = False
 
-
 def iterate():
     reDraw()
+
+ 
+    if random.random() <  config.resetBlanksProb :
+        badpixels.setBlanksOnScreen(config)
+    
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:
@@ -494,9 +504,13 @@ def iterate():
                 #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
             _tempImage = _tempImage.rotate(n.angle)
             config.image.paste(_tempImage, (0, 0), _tempImage)
+            badpixels.drawBlanks(config.image, False)
             config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
         else:
+            badpixels.drawBlanks(config.image, False)
             config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+
+        
     # Done
 
 
@@ -644,6 +658,14 @@ def main(run=True):
     setLines()
     setLineColor()
     setBGColor()
+
+    config.resetBlanksProb = .001
+    badpixels.colsRange = (32, 256)
+    badpixels.rowsRange = (32, 256)
+    badpixels.numberOfDeadPixels = 2
+    badpixels.sizeTarget = [config.canvasWidth, config.canvasHeight]
+    badpixels.probabilityOfBlockBlanks = .0
+    badpixels.setBlanksOnScreen(config)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

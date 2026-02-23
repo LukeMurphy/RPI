@@ -151,6 +151,7 @@ def changeDrawing(args):
 
 
 def changeDrawingMode():
+
     config.drawingMode = round(random.uniform(1, 4))
     # config.startNewLineProb = 0.005
     config.changeTimeController.slotRate = round(random.uniform(20, 33))
@@ -159,6 +160,7 @@ def changeDrawingMode():
         # config.startNewLineProb = 0.1
         config.changeTimeController.slotRate = round(random.uniform(33, 63))
 
+    pieceLogger(f"changing drawingmode {config.drawingMode}")
     # print(f" => New Drawing Mode: {config.drawingMode}")
 
 
@@ -1430,6 +1432,10 @@ def _load_drawing_configs(config):
 
     config.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=False)
 
+    config.globalLineDelayFactor = float(workConfig.get("drawingField", "globalLineDelayFactor", fallback="1.0"))
+    config.globalusebgBoxProbDelayFactor = float(workConfig.get("drawingField", "globalusebgBoxProbDelayFactor", fallback="1.0"))
+    config.globaldoJitterProbDelayfactor = float(workConfig.get("drawingField", "globaldoJitterProbDelayfactor", fallback="1.0"))
+
     config.paletteSets = []
     paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
 
@@ -1501,7 +1507,7 @@ def _load_drawing_configs(config):
         palette.pens = workConfig.get(_p, "penNames").split(",")
         palette.name = _p
         palette.textureName = workConfig.get(_p, "texture")
-        palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
+        palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))/ config.globalusebgBoxProbDelayFactor
         palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
         palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0001"))
 
@@ -1511,11 +1517,11 @@ def _load_drawing_configs(config):
         # attention of the viewer, controlling when it happens
         # is probably better left to timing than just cycle-based
         # probability
-        palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
-        palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
+        palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))/config.globalLineDelayFactor
         palette.slownessFactor = float(workConfig.get(_p, "slownessFactor", fallback="1.0"))
+        palette.startNewLineDelayRange = list(map(lambda x: float(x) * palette.slownessFactor, workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
 
-        palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
+        palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))/config.globaldoJitterProbDelayfactor
         palette.bgGlitchCyclesMin = float(workConfig.get(_p, "bgGlitchCyclesMin", fallback=config.bgGlitchCyclesMin))
         palette.bgGlitchCyclesMax = float(workConfig.get(_p, "bgGlitchCyclesMax", fallback=config.bgGlitchCyclesMax))
         palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))

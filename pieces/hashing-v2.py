@@ -471,6 +471,7 @@ def reDraw():
     if random.random() < config.unpauseProb:
         config.noChange = False
 
+
 def iterate():
     reDraw()
 
@@ -659,12 +660,12 @@ def main(run=True):
     setLineColor()
     setBGColor()
 
-    config.resetBlanksProb = .001
-    badpixels.colsRange = (32, 256)
-    badpixels.rowsRange = (32, 256)
-    badpixels.numberOfDeadPixels = 2
-    badpixels.sizeTarget = [config.canvasWidth, config.canvasHeight]
+    config.resetBlanksProb =  config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
+    badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
     badpixels.probabilityOfBlockBlanks = .0
+    badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
+    badpixels.colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
+    badpixels.rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
     badpixels.setBlanksOnScreen(config)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS

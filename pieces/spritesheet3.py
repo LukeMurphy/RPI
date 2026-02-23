@@ -165,8 +165,23 @@ def main(run=True):
 
     config.filterRemapping = workConfig.getboolean("base-parameters", "filterRemapping")
     config.filterRemappingProb = float(workConfig.get("base-parameters", "filterRemappingProb"))
+
+
+
+    # changed to allow min size of the filter dither
     config.filterRemapminHoriSize = int(workConfig.get("base-parameters", "filterRemapminHoriSize"))
     config.filterRemapminVertSize = int(workConfig.get("base-parameters", "filterRemapminVertSize"))
+
+    try:
+        config.filterRemapmaxHoriSize = int(workConfig.get("base-parameters", "filterRemapmaxHoriSize"))
+        config.filterRemapmaxVertSize = int(workConfig.get("base-parameters", "filterRemapmaxVertSize"))
+    except Exception as e:
+        pieceLogger(e,1)
+        config.filterRemapmaxHoriSize = config.filterRemapminHoriSize
+        config.filterRemapmaxVertSize = config.filterRemapminVertSize
+        config.filterRemapminHori = 8
+        config.filterRemapminVertSize = 8
+
     config.filterRemapRangeX = int(workConfig.get("base-parameters", "filterRemapRangeX"))
     config.filterRemapRangeY = int(workConfig.get("base-parameters", "filterRemapRangeY"))
 
@@ -269,6 +284,14 @@ def main(run=True):
         config.preGlitchNumber = 2
         config.preGlitchRedo = 0.5
 
+
+
+    config.changeAnimProb = float(workConfig.get("base-parameters", "changeAnimProb", fallback=".001"))
+    config.pauseProb = float(workConfig.get("base-parameters", "pauseProb", fallback=".001"))
+    config.unPauseProb = float(workConfig.get("base-parameters", "unPauseProb", fallback=".001"))
+    config.freezeGlitchProb = float(workConfig.get("base-parameters", "freezeGlitchProb", fallback=".001"))
+    config.unFreezeGlitchProb = float(workConfig.get("base-parameters", "unFreezeGlitchProb", fallback=".001"))
+    config.backgroundColorChangeProb = float(workConfig.get("base-parameters", "backgroundColorChangeProb", fallback=".001"))
     # ----------------------------------------------------------------------------
 
     for a in config.animationNames:
@@ -322,12 +345,13 @@ def main(run=True):
         aConfig.bg_alpha = int(workConfig.get(a, "bg_alpha"))
         aConfig.bg_alpha_max = int(workConfig.get(a, "bg_alpha"))
 
-        aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb"))
-        aConfig.changeAnimProb = float(workConfig.get(a, "changeAnimProb"))
-        aConfig.pauseProb = float(workConfig.get(a, "pauseProb"))
-        aConfig.unPauseProb = float(workConfig.get(a, "unPauseProb"))
-        aConfig.freezeGlitchProb = float(workConfig.get(a, "freezeGlitchProb"))
-        aConfig.unFreezeGlitchProb = float(workConfig.get(a, "unFreezeGlitchProb"))
+        aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb", fallback=config.backgroundColorChangeProb))
+
+        aConfig.changeAnimProb = float(workConfig.get(a, "changeAnimProb", fallback=config.changeAnimProb))
+        aConfig.pauseProb = float(workConfig.get(a, "pauseProb", fallback=config.pauseProb))
+        aConfig.unPauseProb = float(workConfig.get(a, "unPauseProb", fallback=config.unPauseProb))
+        aConfig.freezeGlitchProb = float(workConfig.get(a, "freezeGlitchProb", fallback=config.freezeGlitchProb))
+        aConfig.unFreezeGlitchProb = float(workConfig.get(a, "unFreezeGlitchProb", fallback=config.unFreezeGlitchProb))
         try:
             # comment:
             aConfig.pauseOnFirstFrameProb = float(workConfig.get(a, "pauseOnFirstFrameProb"))
@@ -521,8 +545,8 @@ def filterRemapCall(ovrd=False):
     # new version  more control but may require previous pieces to be re-worked
     startX = round(random.uniform(0, config.filterRemapRangeX))
     startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(8, config.filterRemapminHoriSize))
-    endY = round(random.uniform(8, config.filterRemapminVertSize))
+    endX = round(random.uniform(config.filterRemapminHoriSize, config.filterRemapmaxHoriSize))
+    endY = round(random.uniform(config.filterRemapminVertSize, config.filterRemapmaxVertSize))
 
     if ovrd:
         startX = 0
@@ -583,9 +607,14 @@ def iterate(n=0):
     # if it really changes anything though
 
     composite = config.canvasImage
+    # if not config.allPause : pieceLogger(f"{config.usebgBoxProb} : {config.allPause}")
 
     if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox and not config.allPause:
         _bgColorsFilling(config)
+
+    # if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox:
+    #     _bgColorsFilling(config)
+
     if random.SystemRandom().random() < config.clearbgBoxProb:
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
@@ -650,11 +679,11 @@ def _drawNextFrames(currentAnimation, config):
         config.currentAnimationIndex += 1
         if config.currentAnimationIndex >= len(config.animations):
             config.currentAnimationIndex = 0
-        # print("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
+        pieceLogger("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
     else:
         choice = math.floor(random.uniform(0, len(config.animations)))
         config.currentAnimationIndex = choice
-        # print("Next Animation : " + str(config.animations[choice].name))
+        pieceLogger("Next Animation : " + str(config.animations[choice].name))
 
     config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
     currentAnimation = config.animations[config.currentAnimationIndex]
@@ -748,7 +777,6 @@ def _bgColorsFilling(config):
             config.bgGlitchDisplacementHorizontal,
             config.bgGlitchDisplacementVertical,
         )
-
 
 
 def _moireOverLay(currentAnimation, config, bgColor):

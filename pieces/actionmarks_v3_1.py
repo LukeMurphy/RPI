@@ -1115,7 +1115,8 @@ def createImageLayers(arg=None):
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
     config.textureBlendMode = tex.blendMode
-    pieceLogger(f"===> config.useTextureLayer {config.useTextureLayer}")
+    config.textureOption = random.choice([0,1,2])
+    pieceLogger(f"===> config.useTextureLayer {config.useTextureLayer} texture option {config.textureOption}")
     for _row in range(tex.blockRows):
         for _col in range(tex.blockCols):
             if random.random() > tex.skipProb:
@@ -1298,14 +1299,17 @@ def renderImage():
         # to paramterize - it's a bit like a scumble as the texture affects
         # the bg and the line and can be distorted 
 
-        ''' this means the topmost layer gets the texture - most visible version'''
-        config.lineLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+        if config.textureOption == 0 :
+            ''' this means the topmost layer gets the texture - most visible version'''
+            config.lineLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-        ''' this means only the underlayer gets the texture - not so great ''' 
-        # config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+        if config.textureOption == 1 :
+            ''' # the composite gets it -- more subtle''' 
+            config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-        ''' # the composite gets it -- more subtle''' 
-        # config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
+        if config.textureOption == 2 :
+            ''' this means only the underlayer gets the texture - not so great ''' 
+            config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
     ''' deprecated -------->''' 
     # handling transition between drawings

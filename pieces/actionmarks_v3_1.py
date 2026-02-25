@@ -1144,14 +1144,6 @@ def createTextureLayer(tex):
 def initDrawings():
     global config
     pieceLogger(f"===> Init drawings: {config.activePalette.name}", 4, True)
-    # config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    # config.underLayerDraw = ImageDraw.Draw(config.underLayer)
-
-    # config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    # config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
-
-    # config.lineLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    # config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
     
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)

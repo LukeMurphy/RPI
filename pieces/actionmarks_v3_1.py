@@ -720,7 +720,8 @@ def drawDrips():
             _lineColor = _d[3]
             _speed = _d[5]
             _step = _d[6]
-            config.draw.rectangle((_p1[0], _p1[1], _p1[0] + _wide, _p1[1] + _step * _long), fill=_lineColor)
+            config.lineLayerDraw.rectangle((_p1[0], _p1[1], _p1[0] + _wide, _p1[1] + _step * _long), fill=_lineColor)
+            # config.draw.rectangle((_p1[0], _p1[1], _p1[0] + _wide, _p1[1] + _step * _long), fill=_lineColor)
             _step += 1
             _d[6] = _step
             if _step > _speed:

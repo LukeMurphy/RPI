@@ -23,7 +23,9 @@ from modules.rendering.render import saveImageToFile
 """""" """""" """ This version uses bundles of marks and textures             """
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-# ----------------------------------------------------##----------------------------------------------------#
+
+# ----------------------------------------------------#
+
 class Palette:
     def __init__(self):
         pass
@@ -84,6 +86,7 @@ class TransitionStates:
             self.count += 1
         else:
             self.inTransition = False
+            
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -186,13 +189,12 @@ def changePalettes():
 
 
 def initiateTransition():
-    # print("\n ITNITATE TRANSITION")
+    pieceLogger("\n ITNITATE TRANSITION",3)
     config.transitionStateHandler.sourceImage = config.finalCompositeLayer
     config.transitionStateHandler.initiateTransition()
 
 
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
-
 
 def startNewLine(_pen):
     # pieceLogger(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
@@ -201,8 +203,10 @@ def startNewLine(_pen):
     _img = generateSmoothLinePoints(_pen)
     _pen._p = 1
     config.dripsArray = []
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.draw = ImageDraw.Draw(config.image)
+
+    # LINE LAYER IS NOW config.lineLayer
+    # config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # config.draw = ImageDraw.Draw(config.image)
 
 
 def setPenProperties(pen):
@@ -353,7 +357,7 @@ def setPenPropsByName(_name, pen):
     pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
     pen.outlineStroke = config.activePalette.outlineStroke
 
-    pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
+    #pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
     # pieceLogger("--")
 
@@ -422,7 +426,7 @@ def generateLine(_pen):
 
     _pen.smooth_points = []
 
-    pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset}) pts {_pts} {_yD}")
+    # pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset}) pts {_pts} {_yD}")
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y = _rangex - (_rangex * 2 * random.random())
@@ -678,16 +682,16 @@ def pauseDrawing():
 
 
 def releaseDrawing():
-    # print("released")
     config.stoppedAndWaitingToDraw = False
     config.canDraw = True
-    # pieceLogger("Pen released")
+    pieceLogger("Pen released",2)
 
 
 def penLoopActions():
     if random.random() < config.activePalette.changePenColorWhileDrawingProb:
         setPenColor((config.activePalette.activePen))
 
+    # chooses a new pen - however, does not necessarily use it just yet
     # if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0 and config.canDraw:
     if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0:
         _pen = choosePenMark()
@@ -697,11 +701,6 @@ def penLoopActions():
 
     if config.canDraw:
         drawLine(config.activePalette.activePen)
-
-    # if not config.doingDrawing and config.canDraw and not config.stoppedAndWaitingToDraw:
-    #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
-    #     print(f"config.canDraw {config.canDraw}")
-    #     pauseDrawing()
 
 
 def drawLine(_pen):
@@ -724,7 +723,7 @@ def drawDrips():
             config.draw.rectangle((_p1[0], _p1[1], _p1[0] + _wide, _p1[1] + _step * _long), fill=_lineColor)
             _step += 1
             _d[6] = _step
-            if _step > _speed :
+            if _step > _speed:
                 _d[4] = True
 
 
@@ -790,12 +789,14 @@ def drawLinePolyEnvelope(_pen):
             _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
             if not _penSkip:
-                config.draw.polygon(_poly, fill=_lineColor, outline=None)
+                # config.draw.polygon(_poly, fill=_lineColor, outline=None)
+                config.lineLayerDraw.polygon(_poly, fill=_lineColor, outline=None)
 
-            if _pen.outlineStroke :
-                config.draw.line(((_orthoP1x, _orthoP1y),(_orthoP2x, _orthoP2y)), fill=(0,0,0,200), width=2)
-                config.draw.line(((_orthoP3x, _orthoP3y),(_orthoP4x, _orthoP4y)), fill=(0,0,0,200), width=2)
-
+            if _pen.outlineStroke:
+                config.lineLayerDraw.line(((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y)), fill=(0, 0, 0, 200), width=2)
+                config.lineLayerDraw.line(((_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y)), fill=(0, 0, 0, 200), width=2)
+                # config.draw.line(((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y)), fill=(0, 0, 0, 200), width=2)
+                # config.draw.line(((_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y)), fill=(0, 0, 0, 200), width=2)
 
             # config.draw.line((_p1, _p2), fill=(255,0,0,255), width=1)
 
@@ -863,7 +864,8 @@ def drawLineSegments(_pen):
                 _penWidth - 1
             # pieceLogger(_angle)
             if not _penSkip:
-                config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
+                config.lineLayerDraw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
+                # config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
             _pen._p += 1
             config.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
@@ -904,21 +906,13 @@ def drawLineStopped():
     if config.alwaysJitterLineAfterDrawn:
         doDrawingJitter()
 
-
-# ----------------------------------------------------##----------------------------------------------------#
-
+# ----------------------------------------------------
 
 def doDrawingJitter():
     jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-    # pieceLogger(f"jitterIterations {jitterIterations} {config.jitterIterationsMax}")
-    # for _ in range(jitterIterations):
-    #     glitchBox(
-    #         config.image,
-    #         config.canvasWidth,
-    #         config.canvasHeight,
-    #         config.jitterIterationsHoriz,
-    #         config.jitterIterationsVert,
-    #     )
+    pieceLogger(f"jitterIterations {jitterIterations} {config.jitterIterationsMax}")
+
+    ''' The underLayer has both the blocks as well as the lines and the texture ''' 
     for _ in range(jitterIterations):
         glitchBox(
             config.underLayer,
@@ -929,19 +923,40 @@ def doDrawingJitter():
         )
 
 
+
 def bgColorBlocksFilling(arg):
     global config
 
-    if not arg:
-        pieceLogger(f"drawing a bg box {config.blendLevel}")
-    config.blendLevelRate = config.blendLevelRateBase
-    config.blendLevel = 0.0
+    pieceLogger(f"Drawing the background blocks addingTo: {arg}")
+    # if not arg:
+    #     pieceLogger(f"drawing a bg box {config.blendLevel}")
 
     xPos = math.floor(random.uniform(config.activePalette.bgBoxRange[0], config.activePalette.bgBoxRange[1]))
     yPos = math.floor(random.uniform(config.activePalette.bgBoxRange[2], config.activePalette.bgBoxRange[3]))
 
     config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
     config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
+
+    if arg and not config.addingTo :
+        config.blendLevelRate = config.blendLevelRateBase
+        config.blendLevel = 0.0
+        config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
+        config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
+
+        _drawLayer = config.blockLayer
+        _drawTo = config.blockLayerDraw
+
+        config.addingTo = True
+        config.justHitPause = True
+
+    else :
+        _drawLayer = config.underLayer
+        _drawTo = config.underLayerDraw
+
+    # _drawLayer = config.blockLayer
+    # _drawTo = config.blockLayerDraw
 
     if random.SystemRandom().random() < config.clearbgBoxProb:
         xPos = yPos = 0
@@ -984,12 +999,12 @@ def bgColorBlocksFilling(arg):
                 0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])), config.brightness
             )
 
-    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+    _drawTo.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
     glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
     for _ in range(glitchIterations):
         glitchBox(
-            config.underLayer,
+            _drawLayer,
             config.canvasWidth,
             config.canvasHeight,
             config.bgGlitchDisplacementHorizontal,
@@ -1035,7 +1050,7 @@ def glitchBox(
     # end try
 
 
-# ----------------------------------------------------##----------------------------------------------------#
+# ----------------------------------------------------#
 
 
 def setBGColor():
@@ -1049,7 +1064,7 @@ def setBGColor():
 def primeCanvas(_i=3):
     global config
     for _ in range(_i):
-        bgColorBlocksFilling(True)
+        bgColorBlocksFilling(False)
 
 
 def chooseTexture():
@@ -1061,15 +1076,17 @@ def chooseTexture():
             return _t
 
 
-# ----------------------------------------------------##----------------------------------------------------#
-
+# ----------------------------------------------------#
 
 def createImageLayers(arg=None):
     global config
-
     pieceLogger("===> Setting up all layers")
+    
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
+
+    config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
     config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
@@ -1091,6 +1108,8 @@ def createImageLayers(arg=None):
 
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+
+    config.addingTo = False
 
 
 def createTextureLayer(tex):
@@ -1124,7 +1143,15 @@ def createTextureLayer(tex):
 def initDrawings():
     global config
     pieceLogger(f"===> Init drawings: {config.activePalette.name}", 4, True)
+    # config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
+    # config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
+
+    # config.lineLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
+    
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
@@ -1162,10 +1189,10 @@ def iterate():
 
     if random.random() < config.justHitPauseProb and not config.justHitPause:
         config.justHitPause = True
-        pieceLogger(f"I am paused {config.justHitPauseProb}")
+        pieceLogger(f"I am paused {config.justHitPauseProb}",1)
     if random.random() < config.releaseFromJustHitPauseProb and config.justHitPause:
         config.justHitPause = False
-        pieceLogger("I am un paused")
+        pieceLogger("I am un paused",2)
 
     if not config.justHitPause:
 
@@ -1202,7 +1229,7 @@ def iterate():
                 # pieceLogger("Doing bg blocks")
                 if config.doJitterWhenAddingBG:
                     doDrawingJitter()
-                bgColorBlocksFilling(config)
+                bgColorBlocksFilling(True)
 
         def maybe_filter_remap_image():
             if random.random() < config.filterRemappingProb / config.slownessFactor:
@@ -1260,68 +1287,92 @@ def renderImage():
 
                 f.write(f"\n{baseName} bg:{_bg} {config.bgColor[3]} fill:{_bgf} {config.bgBoxFill[3]} pen:{_pc} {config.activePalette.activePen.lineColor[3]}")
 
-    config.underLayer.paste(config.image, (0, 0), config.image)
-
-    # config.textureLayerDraw.rectangle((50,50,100,150), fill=(200,0,200,200))
-    if config.useTextureLayer and config.textureBlendMode is None:
-        # config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
-        config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
-
-    _tempImage = ImageChops.blend(config.canvasImage, config.underLayer, config.blendLevel)
-
-    config.blendLevel += config.blendLevelRate
-
-    if config.blendLevel >= 1.0:
-        config.blendLevelRate = 0.0
-        config.blendLevel = 1.0
-
-    if config.fadeThruToNew < 255:
-        config.fadeThruToNew += 4
-        # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
-        config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
-    elif not config.fadeThruToNewDone:
-        config.fadeThruToNewDone = True
-        initDrawings()
-
+    config.underLayer.paste(config.lineLayer, (0, 0), config.lineLayer)
     config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
-    # config.canvasImage.paste(_tempImage, (0, 0), _tempImage)
+
+    ''' TEXTURE APPEARANCE'''
+    if config.useTextureLayer and config.textureBlendMode is None:
+        # config.textureLayerDraw.rectangle((50,50,150,150), fill=(255,255,0,200))
+
+        # some subtleties here  -- can be any of these and might be something
+        # to paramterize - it's a bit like a scumble as the texture affects
+        # the bg and the line and can be distorted 
+
+        ''' this means the topmost layer gets the texture - most visible version'''
+        config.lineLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+
+        ''' this means only the underlayer gets the texture - not so great ''' 
+        # config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+
+        ''' # the composite gets it -- more subtle''' 
+        # config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
+
+    ''' deprecated -------->''' 
+    # handling transition between drawings
+    # if config.fadeThruToNew < 255:
+    #     config.fadeThruToNew += 4
+    #     # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
+    #     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
+        
+    # elif not config.fadeThruToNewDone:
+    #     config.fadeThruToNewDone = True
+    #     initDrawings()
+    ''' <-------- '''
+    # when new layer is added, blend into existing canvas
+    if config.addingTo:
+        _tempImage = ImageChops.blend(config.blankLayer, config.blockLayer, config.blendLevel)
+        config.blendLevel += config.blendLevelRate
+        if config.blendLevel >= 1.0:
+            config.blendLevelRate = 0.0
+            config.blendLevel = 1.0
+            config.addingTo = False
+            config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
+            # pieceLogger("POOF",4)
+            config.justHitPause = False
+        else:
+            config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
+
 
     if not config.debugMode:
         config.finalCompositeLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
-        # config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
         if config.textureBlendMode == "subtract":
             _tempImage = ImageChops.subtract(config.canvasImage, config.textureLayer)
             config.finalCompositeLayer.paste(_tempImage, (0, 0), _tempImage)
         else:
             config.finalCompositeLayer.paste(config.canvasImage, (0, 0), config.canvasImage)
-        # config.finalCompositeLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
-    else:
-        layerCompositing(config)
+    
+    
+    ''' FOR DEBUGGING '''        
+    # else:
+    #     layerCompositing(config)
 
     if config.transitionStateHandler.inTransition:
         config.transitionStateHandler.transition()
         config.render(config.transitionStateHandler.intermediateImage, 0, 0)
         # maybe_take_snapshot(config.transitionStateHandler.intermediateImage)
     else:
+        # pieceLogger("FINAL COMP RENDER",2)
         config.render(config.finalCompositeLayer, 0, 0)
         # maybe_take_snapshot(config.finalCompositeLayer)
 
+''' FOR DEBUGGING ''' 
+# def layerCompositing(config):
+#     config.finalCompositeLayerDraw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(125, 125, 125))
+#     config.finalCompositeLayerDraw.rectangle((0, 550, config.canvasWidth, 550 + config.canvasHeight), fill=(config.bgColor))
 
-def layerCompositing(config):
-    config.finalCompositeLayerDraw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(125, 125, 125))
-    config.finalCompositeLayerDraw.rectangle((0, 550, config.canvasWidth, 550 + config.canvasHeight), fill=(config.bgColor))
+#     config.finalCompositeLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
+#     config.finalCompositeLayer.paste(config.image, (280, 0), config.image)
+#     config.finalCompositeLayer.paste(config.underLayer, (0, 280), config.underLayer)
 
-    config.finalCompositeLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
-    config.finalCompositeLayer.paste(config.image, (280, 0), config.image)
-    config.finalCompositeLayer.paste(config.underLayer, (0, 280), config.underLayer)
-
-    config.finalCompositeLayerDraw.rectangle((280, 280, config.canvasWidth + 280, 280 + config.canvasHeight), fill=(config.bgColor))
-    config.finalCompositeLayer.paste(config.canvasImage, (280, 280), config.canvasImage)
+#     config.finalCompositeLayerDraw.rectangle((280, 280, config.canvasWidth + 280, 280 + config.canvasHeight), fill=(config.bgColor))
+#     config.finalCompositeLayer.paste(config.canvasImage, (280, 280), config.canvasImage)
 
 
 def clearCurrentDrawing():
     if not config.transitionStateHandler.inTransition:
         initiateTransition()
+
+        pieceLogger("Clearing", 2)
 
         config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 200))
 
@@ -1330,6 +1381,19 @@ def clearCurrentDrawing():
 
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+
+        config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
+
+        config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+        config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
+
+        config.lineLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
 
         primeCanvas(2)
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 225))
@@ -1737,8 +1801,10 @@ def _load_and_initialize_system(config):
 
     config.dripsArray = []
     initDrawings()
+    
     config.blendLevel = 0.0
-    config.blendLevelRate = 0.1
+    config.blendLevelRate = config.blendLevelRateBase
+
     config.fadeThruToNew = 255
     config.fadeThruToNewDone = True
 
@@ -1749,8 +1815,9 @@ def _load_and_initialize_system(config):
 
     # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
 
+
 # ----------------------------------------------------##----------------------------------------------------#
-# uncomment to silence logging 
+# uncomment to silence logging
 
 # def pieceLogger(*kwargs) :
 #     return True

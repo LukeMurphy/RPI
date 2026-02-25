@@ -558,13 +558,13 @@ def generate_loop_stroke(_pen):
 
     points = _pen.points
 
-    pieceLogger(f"deltaRadiusX {round(deltaRadiusX,4)}")
-    pieceLogger(f"deltaRadiusY {round(deltaRadiusY,4)}")
-    pieceLogger(f"deltaRadiusXCenter {round(deltaRadiusXCenter,4)}")
-    pieceLogger(f"deltaRadiusYCenter {round(deltaRadiusYCenter,4)}")
-    pieceLogger(f"_pen.loops {_pen.loops}")
-    pieceLogger(f"points {points}")
-    pieceLogger(f"_pen.speed {_pen.speed}")
+    # pieceLogger(f"deltaRadiusX {round(deltaRadiusX,4)}")
+    # pieceLogger(f"deltaRadiusY {round(deltaRadiusY,4)}")
+    # pieceLogger(f"deltaRadiusXCenter {round(deltaRadiusXCenter,4)}")
+    # pieceLogger(f"deltaRadiusYCenter {round(deltaRadiusYCenter,4)}")
+    # pieceLogger(f"_pen.loops {_pen.loops}")
+    # pieceLogger(f"points {points}")
+    # pieceLogger(f"_pen.speed {_pen.speed}")
     # pieceLogger(f"_pen.xOffset {_pen.xOffset}")
     # _pen.speed = 8
 

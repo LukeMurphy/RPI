@@ -923,7 +923,6 @@ def doDrawingJitter():
         )
 
 
-
 def bgColorBlocksFilling(arg):
     global config
 
@@ -950,6 +949,8 @@ def bgColorBlocksFilling(arg):
 
         config.addingTo = True
         config.justHitPause = True
+        # adding bit to prevent trying to draw a line when painting  a backgound chunk
+        config.canDraw = False
 
     else :
         _drawLayer = config.underLayer
@@ -1325,6 +1326,7 @@ def renderImage():
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
             # pieceLogger("POOF",4)
             config.justHitPause = False
+            config.canDraw = True
         else:
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
 

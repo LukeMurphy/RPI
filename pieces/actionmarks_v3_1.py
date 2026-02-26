@@ -26,6 +26,7 @@ from modules.rendering.render import saveImageToFile
 
 # ----------------------------------------------------#
 
+
 class Palette:
     def __init__(self):
         pass
@@ -86,7 +87,6 @@ class TransitionStates:
             self.count += 1
         else:
             self.inTransition = False
-            
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -178,7 +178,6 @@ def changePalettes():
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     config.changeColorSetTimeToUse = round(random.uniform(config.changeColorSetTime, round(config.changeColorSetTime * config.changeColorSetTimeMaxMultiplier)))
     config.paletteController.slotRate = config.changeColorSetTimeToUse
-    config.slownessFactor = config.activePalette.slownessFactor
 
     config.bgBoxRange = config.activePalette.bgBoxRange
     config.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
@@ -189,12 +188,13 @@ def changePalettes():
 
 
 def initiateTransition():
-    pieceLogger("\n ITNITATE TRANSITION",3)
+    pieceLogger("\n ITNITATE TRANSITION", 3)
     config.transitionStateHandler.sourceImage = config.finalCompositeLayer
     config.transitionStateHandler.initiateTransition()
 
 
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
+
 
 def startNewLine(_pen):
     # pieceLogger(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
@@ -311,7 +311,7 @@ def setPenPropsByName(_name, pen):
         pen.linePpoints = _penProps.linePoints
         pen.lopOff = _penProps.lopOff
 
-        _penSpeedMax = max(1, math.ceil(5 / config.slownessFactor + 1))
+        _penSpeedMax = max(1, math.ceil(5 + 1))
         pen.speed = round(random.uniform(1, _penSpeedMax))
     # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
@@ -357,7 +357,7 @@ def setPenPropsByName(_name, pen):
     pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
     pen.outlineStroke = config.activePalette.outlineStroke
 
-    #pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
+    # pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
     # pieceLogger("--")
 
@@ -678,13 +678,13 @@ def pauseDrawing():
     config.stoppedAndWaitingToDraw = True
     config.canDraw = False
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0], config.activePalette.startNewLineDelayRange[1])
-    pieceLogger(f"paused for {config.drawingController.slotRate} {config.activePalette.startNewLineDelayRange[0]}/{config.activePalette.startNewLineDelayRange[1]}",2)
+    pieceLogger(f"paused for {config.drawingController.slotRate} {config.activePalette.startNewLineDelayRange[0]}/{config.activePalette.startNewLineDelayRange[1]}", 1)
 
 
 def releaseDrawing():
     config.stoppedAndWaitingToDraw = False
     config.canDraw = True
-    pieceLogger("Pen released",2)
+    pieceLogger("Pen released", 2)
 
 
 def penLoopActions():
@@ -904,23 +904,26 @@ def drawLineStopped():
     # pieceLogger("Pen stopped")
     config.doingDrawing = False
     pauseDrawing()
-    if config.alwaysJitterLineAfterDrawn:
+    if random.random() < config.doJitterWhenAddingBGUseProb :
+        pieceLogger("Doing jitter after LINE has been drawn")
         doDrawingJitter()
+
 
 # ----------------------------------------------------
 
+
 def doDrawingJitter():
     jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-    pieceLogger(f"jitterIterations {jitterIterations} {config.jitterIterationsMax}")
+    pieceLogger(f"jitterIterations {jitterIterations}/{config.jitterIterationsMax}",3)
 
-    ''' The underLayer has both the blocks as well as the lines and the texture ''' 
+    """ The underLayer has both the blocks as well as the lines and the texture """
     for _ in range(jitterIterations):
         glitchBox(
             config.underLayer,
             config.canvasWidth,
             config.canvasHeight,
-            config.bgGlitchDisplacementHorizontal,
-            config.bgGlitchDisplacementVertical,
+            config.jitterDisplacementHorizontal,
+            config.jitterDisplacementVertical,
         )
 
 
@@ -937,7 +940,7 @@ def bgColorBlocksFilling(arg):
     config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
     config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
 
-    if arg and not config.addingTo :
+    if arg or config.addingTo:
         config.blendLevelRate = config.blendLevelRateBase
         config.blendLevel = 0.0
         config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -953,7 +956,7 @@ def bgColorBlocksFilling(arg):
         # adding bit to prevent trying to draw a line when painting  a backgound chunk
         # config.canDraw = False
 
-    else :
+    else:
         _drawLayer = config.underLayer
         _drawTo = config.underLayerDraw
 
@@ -962,56 +965,35 @@ def bgColorBlocksFilling(arg):
 
     if random.SystemRandom().random() < config.clearbgBoxProb:
         xPos = yPos = 0
-        config.bgBoxBox = (
-            xPos,
-            yPos,
-            xPos + config.canvasWidth,
-            yPos + config.canvasHeight,
-        )
+        config.bgBoxBox = (xPos,yPos,xPos + config.canvasWidth,yPos + config.canvasHeight,)
         config.bgBoxFill = (0, 0, 0, 0)
     else:
-
-        # xPos = round(random.uniform(-0,config.tileSizeWidth) )
-        # yPos = round(random.uniform(-0,config.tileSizeHeight) )
-        config.bgBoxBox = (
-            xPos,
-            yPos,
-            xPos + config.tileSizeWidth,
-            yPos + config.tileSizeHeight,
-        )
+        config.bgBoxBox = (xPos,yPos,xPos + config.tileSizeWidth,yPos + config.tileSizeHeight,)
 
         cR = random.choice(config.activePalette.bgBoxColorSets)
         # cR = config.activePalette.bgBoxColorRange
         # print(cR)
-        config.bgBoxFill = colorutils.getRandomColorHSV(
-            cR[0],
-            cR[1],
-            cR[2],
-            cR[3],
-            cR[4],
-            cR[5],
-            cR[6],
-            cR[7],
+        config.bgBoxFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7],
             round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
-            config.brightness,
-        )
+            config.brightness,)
 
         if random.random() < config.totalRandomBGBoxColorProb:
             config.bgBoxFill = colorutils.getRandomColorHSV(
-                0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])), config.brightness
-            )
+                0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, 
+                round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])), config.brightness)
 
     _drawTo.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
-    glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
-    for _ in range(glitchIterations):
+    jitteriterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
+    for _ in range(jitteriterations):
         glitchBox(
             _drawLayer,
             config.canvasWidth,
             config.canvasHeight,
-            config.bgGlitchDisplacementHorizontal,
-            config.bgGlitchDisplacementVertical,
+            config.jitterDisplacementHorizontal,
+            config.jitterDisplacementVertical,
         )
+        
 
 
 def glitchBox(
@@ -1080,10 +1062,11 @@ def chooseTexture():
 
 # ----------------------------------------------------#
 
+
 def createImageLayers(arg=None):
     global config
     pieceLogger("===> Setting up all layers")
-    
+
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
 
@@ -1117,7 +1100,7 @@ def createImageLayers(arg=None):
 def createTextureLayer(tex):
     config.useTextureLayer = tex.useTextureLayer
     config.textureBlendMode = tex.blendMode
-    config.textureOption = random.choice([0,1,2])
+    config.textureOption = random.choice([0, 1, 2])
     pieceLogger(f"===> config.useTextureLayer {config.useTextureLayer} texture option {config.textureOption}")
     for _row in range(tex.blockRows):
         for _col in range(tex.blockCols):
@@ -1146,7 +1129,7 @@ def createTextureLayer(tex):
 def initDrawings():
     global config
     pieceLogger(f"===> Init drawings: {config.activePalette.name}", 4, True)
-    
+
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
 
@@ -1157,14 +1140,20 @@ def initDrawings():
     config.startNewLineProb = config.activePalette.startNewLineProb
     config.usebgBoxProb = config.activePalette.usebgBoxProb
     config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
+
     config.doJitterProb = config.activePalette.doJitterProb
-    config.bgGlitchCyclesMin = config.activePalette.bgGlitchCyclesMin
-    config.bgGlitchCyclesMax = config.activePalette.bgGlitchCyclesMax
-    config.bgGlitchDisplacementHorizontal = config.activePalette.bgGlitchDisplacementHorizontal
-    config.bgGlitchDisplacementVertical = config.activePalette.bgGlitchDisplacementVertical
+    config.doJitterAfterLineUseProb = config.activePalette.doJitterAfterLineUseProb
+    config.doJitterWhenAddingBGUseProb = config.activePalette.doJitterWhenAddingBGUseProb
+    config.jitterIterationsMin = config.activePalette.jitterIterationsMin
+    config.jitterIterationsMax = config.activePalette.jitterIterationsMax
+    config.jitterIterationsMaxAfterDraw = config.activePalette.jitterIterationsMaxAfterDraw
+    config.jitterDisplacementHorizontal = config.activePalette.jitterDisplacementHorizontal
+    config.jitterDisplacementVertical = config.activePalette.jitterDisplacementVertical
 
     startNewLine(_pen)
-    doDrawingJitter()
+
+    # pieceLogger("Jitter trigger after inti drawing")
+    # doDrawingJitter()
 
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -1184,10 +1173,11 @@ def iterate():
 
     if random.random() < config.justHitPauseProb and not config.justHitPause:
         config.justHitPause = True
-        pieceLogger(f"I am paused {config.justHitPauseProb}",1)
+        pieceLogger(f"I am paused {config.justHitPauseProb}", 1)
+
     if random.random() < config.releaseFromJustHitPauseProb and config.justHitPause:
         config.justHitPause = False
-        pieceLogger("I am un paused",2)
+        pieceLogger("I am un paused", 2)
 
     if not config.justHitPause:
 
@@ -1211,7 +1201,7 @@ def iterate():
                     releaseDrawing()
 
         def maybe_set_bg_color():
-            if random.SystemRandom().random() < config.changeBGColorProb / config.slownessFactor:
+            if random.SystemRandom().random() < config.changeBGColorProb:
                 setBGColor()
 
         def maybe_clear_current_drawing():
@@ -1221,18 +1211,18 @@ def iterate():
 
         def maybe_bg_color_blocks_filling():
             if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing and not config.transitionStateHandler.inTransition:
-                # pieceLogger("Doing bg blocks")
-                if config.doJitterWhenAddingBG:
-                    doDrawingJitter()
                 bgColorBlocksFilling(True)
+                if random.random() < config.doJitterWhenAddingBGUseProb:
+                    pieceLogger("Calling jitter after BG blocks are drawn")
+                    doDrawingJitter()
 
         def maybe_filter_remap_image():
-            if random.random() < config.filterRemappingProb / config.slownessFactor:
+            if random.random() < config.filterRemappingProb:
                 filterRemapImage(config)
 
         def maybe_do_drawing_jitter():
-            if not config.doingDrawing and random.random() < config.doJitterProb / config.slownessFactor and not config.transitionStateHandler.inTransition:
-                # pieceLogger("Doing jitter")
+            if not config.doingDrawing and random.random() < config.doJitterProb and not config.transitionStateHandler.inTransition:
+                pieceLogger("Doing jitter")
                 doDrawingJitter()
 
         maybe_change_drawing_mode()
@@ -1285,37 +1275,37 @@ def renderImage():
     config.underLayer.paste(config.lineLayer, (0, 0), config.lineLayer)
     config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
 
-    ''' TEXTURE APPEARANCE'''
+    """ TEXTURE APPEARANCE"""
     if config.useTextureLayer and config.textureBlendMode is None:
         # config.textureLayerDraw.rectangle((50,50,150,150), fill=(255,255,0,200))
 
         # some subtleties here  -- can be any of these and might be something
         # to paramterize - it's a bit like a scumble as the texture affects
-        # the bg and the line and can be distorted 
+        # the bg and the line and can be distorted
 
-        if config.textureOption == 0 :
-            ''' this means the topmost layer gets the texture - most visible version'''
+        if config.textureOption == 0:
+            """this means the topmost layer gets the texture - most visible version"""
             config.lineLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-        if config.textureOption == 1 :
-            ''' # the composite gets it -- more subtle''' 
+        if config.textureOption == 1:
+            """# the composite gets it -- more subtle"""
             config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-        if config.textureOption == 2 :
-            ''' this means only the underlayer gets the texture - not so great ''' 
+        if config.textureOption == 2:
+            """this means only the underlayer gets the texture - not so great"""
             config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-    ''' deprecated -------->''' 
+    """ deprecated -------->"""
     # handling transition between drawings
     # if config.fadeThruToNew < 255:
     #     config.fadeThruToNew += 4
     #     # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
     #     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
-        
+
     # elif not config.fadeThruToNewDone:
     #     config.fadeThruToNewDone = True
     #     initDrawings()
-    ''' <-------- '''
+    """ <-------- """
     # when new layer is added, blend into existing canvas
     if config.addingTo:
         _tempImage = ImageChops.blend(config.blankLayer, config.blockLayer, config.blendLevel)
@@ -1331,7 +1321,6 @@ def renderImage():
         else:
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
 
-
     if not config.debugMode:
         config.finalCompositeLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
         if config.textureBlendMode == "subtract":
@@ -1339,9 +1328,8 @@ def renderImage():
             config.finalCompositeLayer.paste(_tempImage, (0, 0), _tempImage)
         else:
             config.finalCompositeLayer.paste(config.canvasImage, (0, 0), config.canvasImage)
-    
-    
-    ''' FOR DEBUGGING '''        
+
+    """ FOR DEBUGGING """
     # else:
     #     layerCompositing(config)
 
@@ -1354,7 +1342,8 @@ def renderImage():
         config.render(config.finalCompositeLayer, 0, 0)
         # maybe_take_snapshot(config.finalCompositeLayer)
 
-''' FOR DEBUGGING ''' 
+
+""" FOR DEBUGGING """
 # def layerCompositing(config):
 #     config.finalCompositeLayerDraw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(125, 125, 125))
 #     config.finalCompositeLayerDraw.rectangle((0, 550, config.canvasWidth, 550 + config.canvasHeight), fill=(config.bgColor))
@@ -1380,7 +1369,6 @@ def clearCurrentDrawing():
 
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
-
 
         config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
@@ -1477,7 +1465,6 @@ def _load_filter_config(config):
 
 def _load_drawing_configs(config):
     """Loads color-related configuration parameters."""
-    config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.1))
     config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
     config.bgTileSizeWidthMin = float(workConfig.get("drawingField", "bgTileSizeWidthMin"))
     config.bgTileSizeWidthMax = float(workConfig.get("drawingField", "bgTileSizeWidthMax"))
@@ -1486,10 +1473,17 @@ def _load_drawing_configs(config):
     # config.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("drawingField", "bgBoxFill").split(",")))
 
     config.clearbgBoxProb = float(workConfig.get("drawingField", "clearbgBoxProb"))
-    config.bgGlitchCyclesMin = float(workConfig.get("drawingField", "bgGlitchCyclesMin"))
-    config.bgGlitchCyclesMax = float(workConfig.get("drawingField", "bgGlitchCyclesMax"))
-    config.bgGlitchDisplacementHorizontal = float(workConfig.get("drawingField", "bgGlitchDisplacementHorizontal"))
-    config.bgGlitchDisplacementVertical = float(workConfig.get("drawingField", "bgGlitchDisplacementVertical"))
+
+    # jitter and roughing
+    config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.0))
+    config.doJitterAfterLineUseProb = float(workConfig.get("drawingField", "doJitterAfterLineUseProb", fallback=1.0))
+    config.doJitterWhenAddingBGUseProb = float(workConfig.get("drawingField", "doJitterWhenAddingBGUseProb", fallback=1.0))
+    config.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
+    config.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
+    config.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
+    config.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal"))
+    config.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical"))
+
 
     config.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
     config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha", fallback=2))
@@ -1511,31 +1505,6 @@ def _load_drawing_configs(config):
                 workConfig.get(_p, "bgBoxAlphaRange").split(","),
             )
         )
-
-        # config.bgColorAlpha
-
-        # palette.nobgGrays = float(workConfig.get(_p, "nobgGrays", fallback=0))
-        # palette.bgColor = list(
-        #     map(
-        #         lambda x: float(x),
-        #         workConfig.get(_p, "bgColor").split(","),
-        #     )
-        # )
-        # palette.bgColor.extend([config.bgColorAlpha, config.brightness, palette.nobgGrays])
-
-        # palette.bgBoxColorRange = list(
-        #     map(
-        #         lambda x: float(x),
-        #         workConfig.get(_p, "bgBoxColorRange").split(","),
-        #     )
-        # )
-
-        # palette.penColor = tuple(
-        #     map(
-        #         lambda x: float(x),
-        #         workConfig.get(_p, "penColor").split(","),
-        #     )
-        # )
 
         _bgColorSetsRaw = workConfig.get(_p, "bgColorSets")
         _bgColorSetsRaw = re.sub(r"[\(\)]", "", _bgColorSetsRaw)
@@ -1582,13 +1551,17 @@ def _load_drawing_configs(config):
         # probability
         palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
         palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
-        palette.slownessFactor = float(workConfig.get(_p, "slownessFactor", fallback="1.0"))
 
+        # jitter and roughing palette overrides
         palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
-        palette.bgGlitchCyclesMin = float(workConfig.get(_p, "bgGlitchCyclesMin", fallback=config.bgGlitchCyclesMin))
-        palette.bgGlitchCyclesMax = float(workConfig.get(_p, "bgGlitchCyclesMax", fallback=config.bgGlitchCyclesMax))
-        palette.bgGlitchDisplacementHorizontal = float(workConfig.get(_p, "bgGlitchDisplacementHorizontal", fallback=config.bgGlitchDisplacementHorizontal))
-        palette.bgGlitchDisplacementVertical = float(workConfig.get(_p, "bgGlitchDisplacementVertical", fallback=config.bgGlitchDisplacementVertical))
+        palette.doJitterAfterLineUseProb = float(workConfig.get(_p, "doJitterAfterLineUseProb", fallback=config.doJitterAfterLineUseProb))
+        palette.doJitterWhenAddingBGUseProb = float(workConfig.get(_p, "doJitterWhenAddingBGUseProb", fallback=config.doJitterWhenAddingBGUseProb))
+        palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=config.jitterIterationsMin)
+        palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMax)
+        palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMaxAfterDraw)
+        palette.jitterDisplacementHorizontal = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=config.jitterDisplacementHorizontal))
+        palette.jitterDisplacementVertical = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=config.jitterDisplacementVertical))
+
         palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
         palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
 
@@ -1625,7 +1598,6 @@ def _load_drawing_configs(config):
         config.paletteSets.append(palette)
 
     config.activePalette = random.choice(config.paletteSets)
-    config.slownessFactor = config.activePalette.slownessFactor
     pieceLogger(f"\n ===> New Palette : {config.activePalette.name} Using enveloped line: {palette.drawLineAsEnvelope}", 2, True)
 
     setBGColor()
@@ -1751,13 +1723,7 @@ def _load_and_initialize_system(config):
     config.totalResetTime = workConfig.getint("drawingField", "totalResetTime", fallback=33)
     config.totalResetTimeMaxMultiplier = float(workConfig.get("drawingField", "totalResetTimeMaxMultiplier", fallback=1.0))
     config.changeDrawingModeTime = float(workConfig.get("drawingField", "changeDrawingModeTime", fallback=100.0))
-    config.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
-    config.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
-    config.jitterIterationsHoriz = workConfig.getint("drawingField", "jitterIterationsHoriz", fallback=2)
-    config.jitterIterationsVert = workConfig.getint("drawingField", "jitterIterationsVert", fallback=2)
-    config.alwaysJitterLineAfterDrawn = workConfig.getboolean("drawingField", "alwaysJitterLineAfterDrawn", fallback=False)
 
-    config.doJitterWhenAddingBG = workConfig.getboolean("drawingField", "doJitterWhenAddingBG", fallback=True)
     config.blendLevelRateBase = float(workConfig.get("drawingField", "blendLevelRateBase", fallback=0.01))
     config.totalRandomPenColorProb = float(workConfig.get("drawingField", "totalRandomPenColorProb", fallback=0.0))
     config.totalRandomBGBoxColorProb = float(workConfig.get("drawingField", "totalRandomBGBoxColorProb", fallback=0.0))
@@ -1800,7 +1766,7 @@ def _load_and_initialize_system(config):
 
     config.dripsArray = []
     initDrawings()
-    
+
     config.blendLevel = 0.0
     config.blendLevelRate = config.blendLevelRateBase
 

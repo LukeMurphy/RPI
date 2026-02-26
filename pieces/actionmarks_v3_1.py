@@ -678,7 +678,7 @@ def pauseDrawing():
     config.stoppedAndWaitingToDraw = True
     config.canDraw = False
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0], config.activePalette.startNewLineDelayRange[1])
-    # pieceLogger(f"paused for {config.drawingController.slotRate}")
+    pieceLogger(f"paused for {config.drawingController.slotRate} {config.activePalette.startNewLineDelayRange[0]}/{config.activePalette.startNewLineDelayRange[1]}",2)
 
 
 def releaseDrawing():
@@ -699,7 +699,7 @@ def penLoopActions():
         startNewLine(_pen)
         # pieceLogger(f"Next line: {config.activePalette.activePen.name}",4)
 
-    if config.canDraw:
+    if config.canDraw and not config.addingTo:
         drawLine(config.activePalette.activePen)
 
 
@@ -951,7 +951,7 @@ def bgColorBlocksFilling(arg):
         config.addingTo = True
         config.justHitPause = True
         # adding bit to prevent trying to draw a line when painting  a backgound chunk
-        config.canDraw = False
+        # config.canDraw = False
 
     else :
         _drawLayer = config.underLayer
@@ -1327,7 +1327,7 @@ def renderImage():
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
             # pieceLogger("POOF",4)
             config.justHitPause = False
-            config.canDraw = True
+            # config.canDraw = True
         else:
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
 

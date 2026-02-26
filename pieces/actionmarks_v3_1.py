@@ -356,6 +356,7 @@ def setPenPropsByName(_name, pen):
     # else :
     pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
     pen.outlineStroke = config.activePalette.outlineStroke
+    pen.outlineStrokeColor = config.activePalette.outlineStrokeColor
 
     # pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
@@ -794,8 +795,8 @@ def drawLinePolyEnvelope(_pen):
                 config.lineLayerDraw.polygon(_poly, fill=_lineColor, outline=None)
 
             if _pen.outlineStroke:
-                config.lineLayerDraw.line(((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y)), fill=(0, 0, 0, 200), width=2)
-                config.lineLayerDraw.line(((_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y)), fill=(0, 0, 0, 200), width=2)
+                config.lineLayerDraw.line(((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y)), fill=_pen.outlineStrokeColor, width=2)
+                config.lineLayerDraw.line(((_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y)), fill=_pen.outlineStrokeColor, width=2)
                 # config.draw.line(((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y)), fill=(0, 0, 0, 200), width=2)
                 # config.draw.line(((_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y)), fill=(0, 0, 0, 200), width=2)
 
@@ -904,7 +905,7 @@ def drawLineStopped():
     # pieceLogger("Pen stopped")
     config.doingDrawing = False
     pauseDrawing()
-    if random.random() < config.doJitterWhenAddingBGUseProb :
+    if random.random() < config.doJitterWhenAddingBGUseProb:
         pieceLogger("Doing jitter after LINE has been drawn")
         doDrawingJitter()
 
@@ -914,7 +915,7 @@ def drawLineStopped():
 
 def doDrawingJitter():
     jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-    pieceLogger(f"jitterIterations {jitterIterations}/{config.jitterIterationsMax}",3)
+    pieceLogger(f"jitterIterations {jitterIterations}/{config.jitterIterationsMax}", 3)
 
     """ The underLayer has both the blocks as well as the lines and the texture """
     for _ in range(jitterIterations):
@@ -965,22 +966,41 @@ def bgColorBlocksFilling(arg):
 
     if random.SystemRandom().random() < config.clearbgBoxProb:
         xPos = yPos = 0
-        config.bgBoxBox = (xPos,yPos,xPos + config.canvasWidth,yPos + config.canvasHeight,)
+        config.bgBoxBox = (
+            xPos,
+            yPos,
+            xPos + config.canvasWidth,
+            yPos + config.canvasHeight,
+        )
         config.bgBoxFill = (0, 0, 0, 0)
     else:
-        config.bgBoxBox = (xPos,yPos,xPos + config.tileSizeWidth,yPos + config.tileSizeHeight,)
+        config.bgBoxBox = (
+            xPos,
+            yPos,
+            xPos + config.tileSizeWidth,
+            yPos + config.tileSizeHeight,
+        )
 
         cR = random.choice(config.activePalette.bgBoxColorSets)
         # cR = config.activePalette.bgBoxColorRange
         # print(cR)
-        config.bgBoxFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7],
+        config.bgBoxFill = colorutils.getRandomColorHSV(
+            cR[0],
+            cR[1],
+            cR[2],
+            cR[3],
+            cR[4],
+            cR[5],
+            cR[6],
+            cR[7],
             round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
-            config.brightness,)
+            config.brightness,
+        )
 
         if random.random() < config.totalRandomBGBoxColorProb:
             config.bgBoxFill = colorutils.getRandomColorHSV(
-                0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, 
-                round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])), config.brightness)
+                0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])), config.brightness
+            )
 
     _drawTo.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
@@ -993,7 +1013,6 @@ def bgColorBlocksFilling(arg):
             config.jitterDisplacementHorizontal,
             config.jitterDisplacementVertical,
         )
-        
 
 
 def glitchBox(
@@ -1484,7 +1503,6 @@ def _load_drawing_configs(config):
     config.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal"))
     config.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical"))
 
-
     config.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
     config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha", fallback=2))
 
@@ -1587,6 +1605,7 @@ def _load_drawing_configs(config):
         palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
         palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
         palette.outlineStroke = workConfig.getboolean(_p, "outlineStroke", fallback=False)
+        palette.outlineStrokeColor = tuple(map(lambda x: int(x), workConfig.get(_p, "outlineStrokeColor", fallback="0,0,0,200").split(",")))
 
         palette.dripWidthMax = float(workConfig.get(_p, "dripWidthMax", fallback=0.0))
         palette.dripLengthMax = float(workConfig.get(_p, "dripLengthMax", fallback=0.0))

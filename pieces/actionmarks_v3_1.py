@@ -940,20 +940,19 @@ def progressiveJitter():
         config.jitterIterations -= 1
         if config.jitterIterations <= 0 :
             config.doingJitter = False
+            pieceLogger(f"==> Progressive jitter ended", 3)
             # config.directorController.slotRate *= .25
 
 
-
 def doDrawingJitter():
-    if not config.doingJitter :
+    if not config.doingJitter and config.jitterIterations == 0:
         config.jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-        pieceLogger(f"jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
 
-        if random.random() < .5:
+        if random.random() < config.doProgressiveJitterProb:
             config.doingJitter = True
-            pieceLogger("Progressive jitter starting")
+            pieceLogger(f"==> Progressive jitters tarting: jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
         else :
-            pieceLogger("Single bulk jitter starting")
+            pieceLogger(f"==> Single bulk jitter: jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
             """ The underLayer has both the blocks as well as the lines and the texture """
             for _ in range(config.jitterIterations):
                 glitchBox(
@@ -963,9 +962,6 @@ def doDrawingJitter():
                     config.jitterDisplacementHorizontal,
                     config.jitterDisplacementVertical,
                 )
-
-
-
 
 
 def bgColorBlocksFilling(arg):
@@ -1045,14 +1041,14 @@ def bgColorBlocksFilling(arg):
     _drawTo.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
     # always roughen the blocks being drawn
-    jitteriterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
+    jitteriterations = round(random.uniform(config.jitterIterationsMin_roughing, config.jitterIterationsMax_roughing))
     for _ in range(jitteriterations):
         glitchBox(
             _drawLayer,
             config.canvasWidth,
             config.canvasHeight,
-            config.jitterDisplacementHorizontal,
-            config.jitterDisplacementVertical,
+            config.jitterDisplacementHorizontal_roughing,
+            config.jitterDisplacementVertical_roughing,
         )
 
 
@@ -1193,6 +1189,7 @@ def initDrawings():
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
     config.linesDrawnCount = 0
+    config.jitterIterations = 0
     primeCanvas()
 
     _pen = choosePenMark()
@@ -1203,13 +1200,18 @@ def initDrawings():
 
     config.doJitterProb = config.activePalette.doJitterProb
     config.doJitterAfterLineUseProb = config.activePalette.doJitterAfterLineUseProb
+    config.doProgressiveJitterProb = config.activePalette.doProgressiveJitterProb
     config.doJitterWhenAddingBGUseProb = config.activePalette.doJitterWhenAddingBGUseProb
     config.doJitterEventPerCyleProb = config.activePalette.doJitterEventPerCyleProb
+    config.jitterIterationsMaxAfterDraw = config.activePalette.jitterIterationsMaxAfterDraw
     config.jitterIterationsMin = config.activePalette.jitterIterationsMin
     config.jitterIterationsMax = config.activePalette.jitterIterationsMax
-    config.jitterIterationsMaxAfterDraw = config.activePalette.jitterIterationsMaxAfterDraw
     config.jitterDisplacementHorizontal = config.activePalette.jitterDisplacementHorizontal
     config.jitterDisplacementVertical = config.activePalette.jitterDisplacementVertical
+    config.jitterIterationsMin_roughing = config.activePalette.jitterIterationsMin_roughing
+    config.jitterIterationsMax_roughing = config.activePalette.jitterIterationsMax_roughing
+    config.jitterDisplacementHorizontal_roughing = config.activePalette.jitterDisplacementHorizontal_roughing
+    config.jitterDisplacementVertical_roughing = config.activePalette.jitterDisplacementVertical_roughing
 
     startNewLine(_pen)
 
@@ -1346,6 +1348,7 @@ def renderImage():
         # some subtleties here  -- can be any of these and might be something
         # to paramterize - it's a bit like a scumble as the texture affects
         # the bg and the line and can be distorted
+
 
         if config.textureOption == 0:
             """this means the topmost layer gets the texture - most visible version"""
@@ -1541,13 +1544,19 @@ def _load_drawing_configs(config):
     # jitter and roughing
     config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.0))
     config.doJitterAfterLineUseProb = float(workConfig.get("drawingField", "doJitterAfterLineUseProb", fallback=1.0))
+    config.doProgressiveJitterProb = float(workConfig.get("drawingField", "doProgressiveJitterProb", fallback=.50))
     config.doJitterWhenAddingBGUseProb = float(workConfig.get("drawingField", "doJitterWhenAddingBGUseProb", fallback=1.0))
     config.doJitterEventPerCyleProb = float(workConfig.get("drawingField", "doJitterEventPerCyleProb", fallback=1.0))
+    config.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
     config.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
     config.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
-    config.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
     config.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal"))
     config.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical"))
+    config.jitterIterationsMin_roughing = workConfig.getint("drawingField", "jitterIterationsMin_roughing", fallback=1)
+    config.jitterIterationsMax_roughing = workConfig.getint("drawingField", "jitterIterationsMax_roughing", fallback=10)
+    config.jitterDisplacementHorizontal_roughing = float(workConfig.get("drawingField", "jitterDisplacementHorizontal_roughing"))
+    config.jitterDisplacementVertical_roughing = float(workConfig.get("drawingField", "jitterDisplacementVertical_roughing"))
+    config.jitterIterations = 0
 
     config.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
     config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha", fallback=2))
@@ -1621,11 +1630,16 @@ def _load_drawing_configs(config):
         palette.doJitterAfterLineUseProb = float(workConfig.get(_p, "doJitterAfterLineUseProb", fallback=config.doJitterAfterLineUseProb))
         palette.doJitterWhenAddingBGUseProb = float(workConfig.get(_p, "doJitterWhenAddingBGUseProb", fallback=config.doJitterWhenAddingBGUseProb))
         palette.doJitterEventPerCyleProb = float(workConfig.get(_p, "doJitterEventPerCyleProb", fallback=config.doJitterEventPerCyleProb))
+        palette.doProgressiveJitterProb = float(workConfig.get(_p, "doProgressiveJitterProb", fallback=config.doProgressiveJitterProb))
+        palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMaxAfterDraw)
         palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=config.jitterIterationsMin)
         palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMax)
-        palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMaxAfterDraw)
         palette.jitterDisplacementHorizontal = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=config.jitterDisplacementHorizontal))
         palette.jitterDisplacementVertical = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=config.jitterDisplacementVertical))
+        palette.jitterIterationsMin_roughing = workConfig.getint(_p, "jitterIterationsMin", fallback=config.jitterIterationsMin_roughing)
+        palette.jitterIterationsMax_roughing = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMax_roughing)
+        palette.jitterDisplacementHorizontal_roughing = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=config.jitterDisplacementHorizontal_roughing))
+        palette.jitterDisplacementVertical_roughing = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=config.jitterDisplacementVertical_roughing))
 
         palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
         palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
@@ -1828,6 +1842,7 @@ def _load_and_initialize_system(config):
     config.doingJitter = False
     config.stoppedAndWaitingToDraw = False
     config.linesDrawnCount = 0
+    config.jitterIterations = 0
 
     config.penArray = []
     config.drawingMode = 1

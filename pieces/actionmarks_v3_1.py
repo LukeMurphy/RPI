@@ -919,7 +919,9 @@ def drawLineStopped():
     config.linesDrawnCount += 1
     if config.linesDrawnCount > 1 : pauseDrawing()
     if random.random() < config.doJitterWhenAddingBGUseProb:
-        pieceLogger("Doing jitter after LINE has been drawn")
+        pieceLogger(f"Doing jitter after LINE has been drawn")
+        config.doingJitter = False
+        config.jitterIterations = 0
         doDrawingJitter()
 
 

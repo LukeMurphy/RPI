@@ -1281,17 +1281,18 @@ def iterate():
             if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing and not config.transitionStateHandler.inTransition:
                 bgColorBlocksFilling(True)
                 if random.random() < config.doJitterWhenAddingBGUseProb:
-                    pieceLogger("Calling jitter after BG blocks are drawn")
+                    pieceLogger("Calling for jitter after BG blocks are drawn")
                     doDrawingJitter()
 
+        def maybe_do_drawing_jitter():
+            if not config.doingDrawing and random.random() < config.doJitterProb and not config.transitionStateHandler.inTransition:
+                pieceLogger("Calling for jitter")
+                doDrawingJitter()
+                
         def maybe_filter_remap_image():
             if random.random() < config.filterRemappingProb:
                 filterRemapImage(config)
 
-        def maybe_do_drawing_jitter():
-            if not config.doingDrawing and random.random() < config.doJitterProb and not config.transitionStateHandler.inTransition:
-                pieceLogger("Doing jitter")
-                doDrawingJitter()
 
         maybe_change_drawing_mode()
         maybe_change_color_set()

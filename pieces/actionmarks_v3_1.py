@@ -136,6 +136,7 @@ def filterRemapImage(config):
     config.remapImageBlockDestination = [startX, startY]
 
 
+
 def changeDrawing(args):
     global config
     pieceLogger("CHANGE DRAWING/PAINTING", 2)
@@ -311,8 +312,20 @@ def setPenPropsByName(_name, pen):
         pen.linePpoints = _penProps.linePoints
         pen.lopOff = _penProps.lopOff
 
-        _penSpeedMax = max(1, math.ceil(5 + 1))
-        pen.speed = round(random.uniform(1, _penSpeedMax))
+        # _penSpeedMax = max(1, math.ceil(pen.penSpeedMaxVal))
+        # pen.speed = round(random.uniform(1, _penSpeedMax))
+        """"
+        # putting pen speed variables in the palette config rather than in the 
+        # pen configuration
+        """
+        pen.penSpeedMinVal = config.activePalette.penSpeedMinVal
+        pen.penSpeedMaxVal = config.activePalette.penSpeedMaxVal
+
+        pen.speed = round(random.uniform(_penProps.penSpeedMinVal, _penProps.penSpeedMaxVal))
+
+        pen.loopDirection = -1
+        if random.random() < 0.5:
+            pen.loopDirection = 1
     # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
     pen.drawingSize = [config.canvasWidth, config.canvasHeight]
@@ -912,13 +925,11 @@ def drawLineStopped():
 
 # ----------------------------------------------------
 
-
-def doDrawingJitter():
-    jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-    pieceLogger(f"jitterIterations {jitterIterations}/{config.jitterIterationsMax}", 3)
-
+def progressiveJitter():
     """ The underLayer has both the blocks as well as the lines and the texture """
-    for _ in range(jitterIterations):
+
+    if random.random() < config.doJitterEventPerCyleProb :
+        pieceLogger(f"Jitter {config.jitterIterations}")
         glitchBox(
             config.underLayer,
             config.canvasWidth,
@@ -926,6 +937,31 @@ def doDrawingJitter():
             config.jitterDisplacementHorizontal,
             config.jitterDisplacementVertical,
         )
+        config.jitterIterations -= 1
+        if config.jitterIterations <= 0 :
+            config.doingJitter = False
+            # config.directorController.slotRate *= .25
+
+
+
+def doDrawingJitter():
+    config.jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
+    pieceLogger(f"jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
+    config.doingJitter = True
+    # config.directorController.slotRate *= 4
+
+
+
+
+    # """ The underLayer has both the blocks as well as the lines and the texture """
+    # for _ in range(jitterIterations):
+    #     glitchBox(
+    #         config.underLayer,
+    #         config.canvasWidth,
+    #         config.canvasHeight,
+    #         config.jitterDisplacementHorizontal,
+    #         config.jitterDisplacementVertical,
+    #     )
 
 
 def bgColorBlocksFilling(arg):
@@ -1004,6 +1040,7 @@ def bgColorBlocksFilling(arg):
 
     _drawTo.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
+    # always roughen the blocks being drawn
     jitteriterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
     for _ in range(jitteriterations):
         glitchBox(
@@ -1163,6 +1200,7 @@ def initDrawings():
     config.doJitterProb = config.activePalette.doJitterProb
     config.doJitterAfterLineUseProb = config.activePalette.doJitterAfterLineUseProb
     config.doJitterWhenAddingBGUseProb = config.activePalette.doJitterWhenAddingBGUseProb
+    config.doJitterEventPerCyleProb = config.activePalette.doJitterEventPerCyleProb
     config.jitterIterationsMin = config.activePalette.jitterIterationsMin
     config.jitterIterationsMax = config.activePalette.jitterIterationsMax
     config.jitterIterationsMaxAfterDraw = config.activePalette.jitterIterationsMaxAfterDraw
@@ -1197,6 +1235,9 @@ def iterate():
     if random.random() < config.releaseFromJustHitPauseProb and config.justHitPause:
         config.justHitPause = False
         pieceLogger("I am un paused", 2)
+
+    if config.doingJitter :
+        progressiveJitter()
 
     if not config.justHitPause:
 
@@ -1497,6 +1538,7 @@ def _load_drawing_configs(config):
     config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.0))
     config.doJitterAfterLineUseProb = float(workConfig.get("drawingField", "doJitterAfterLineUseProb", fallback=1.0))
     config.doJitterWhenAddingBGUseProb = float(workConfig.get("drawingField", "doJitterWhenAddingBGUseProb", fallback=1.0))
+    config.doJitterEventPerCyleProb = float(workConfig.get("drawingField", "doJitterEventPerCyleProb", fallback=1.0))
     config.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
     config.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
     config.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
@@ -1574,6 +1616,7 @@ def _load_drawing_configs(config):
         palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
         palette.doJitterAfterLineUseProb = float(workConfig.get(_p, "doJitterAfterLineUseProb", fallback=config.doJitterAfterLineUseProb))
         palette.doJitterWhenAddingBGUseProb = float(workConfig.get(_p, "doJitterWhenAddingBGUseProb", fallback=config.doJitterWhenAddingBGUseProb))
+        palette.doJitterEventPerCyleProb = float(workConfig.get(_p, "doJitterEventPerCyleProb", fallback=config.doJitterEventPerCyleProb))
         palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=config.jitterIterationsMin)
         palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMax)
         palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMaxAfterDraw)
@@ -1778,6 +1821,7 @@ def _load_and_initialize_system(config):
 
     config.canDraw = True
     config.doingDrawing = False
+    config.doingJitter = False
     config.stoppedAndWaitingToDraw = False
 
     config.penArray = []

@@ -62,7 +62,7 @@ def key_handler(event):
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
-    pieceLogger("** Setting up the window and rendering in render.py",3)
+    pieceLogger("** Setting up the window and rendering in render.py", 3)
     gc.enable()
 
     config.imageArrayForSaving = []
@@ -73,7 +73,7 @@ def setUp(config):
         config.path = "./"
         windowOffset = [1900, 20]
         windowOffset = [2560, 24]
-            # windowOffset = [4,45]
+        # windowOffset = [4,45]
     else:
         windowOffset = [-1, 13]
     windowOffset = [config.windowXOffset, config.windowYOffset]
@@ -116,9 +116,7 @@ def setUp(config):
         cursor="none",
     )
     config.cnvs = cnvs
-    config.cnvs.create_rectangle(
-        0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black"
-    )
+    config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
     # config.cnvs.pack()
     config.cnvs.place(
         bordermode="outside",
@@ -137,9 +135,7 @@ def setUp(config):
 
     # tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
     tempImage = ImageTk.PhotoImage(config.renderImageFull)
-    config.cnvs._image_id = config.cnvs.create_image(
-        canvasOffsetX, canvasOffsetY, image=tempImage, anchor="nw", tag="mainer"
-    )
+    config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor="nw", tag="mainer")
 
     # config.cnvs.update()
     # config.cnvs.update_idletasks()
@@ -253,13 +249,7 @@ def relaunchOnChange(config):
             # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
             if config.doFullReloadOnChange:
-                os.system(
-                    config.path
-                    + "/cntrlscripts/restart_player_dev.sh"
-                    + " "
-                    + config.initialArgs
-                    + "&"
-                )
+                os.system(config.path + "/cntrlscripts/restart_player_dev.sh" + " " + config.initialArgs + "&")
 
             # commadStringPyth = ""
             # os.system(commadStringPyth + config.initialArgs + "&")
@@ -274,21 +264,22 @@ def relaunchOnChange(config):
 
         # if config.delta2 <= 1:
         #     commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -mname studio -cfg "
-            # os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
-            # os.system(commadStringPyth + config.fileNameRaw + "&")
+        # os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
+        # os.system(commadStringPyth + config.fileNameRaw + "&")
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
-def _applyColorSep(xOffset = 0, yOffset = 0):
+
+def _applyColorSep(xOffset=0, yOffset=0):
     _colorSep(xOffset, yOffset)
 
 
-def _colorSep(xOffset = 0, yOffset = 0):
+def _colorSep(xOffset=0, yOffset=0):
     _tempImage = config.renderImageFull.copy()
     _tempImage = colorSeparator(_tempImage, xOffset, yOffset, config)
-    _remapImageBlockSection = (100,50,300,200)
-    _remapImageBlockDestination = (100,50)
+    _remapImageBlockSection = (100, 50, 300, 200)
+    _remapImageBlockDestination = (100, 50)
     crop = _tempImage.crop(_remapImageBlockSection)
     crop = crop.convert("RGBA")
     _f = crop.filter(ImageFilter.DETAIL)
@@ -298,26 +289,23 @@ def _colorSep(xOffset = 0, yOffset = 0):
     # _f = crop.filter(ImageFilter.EDGE_ENHANCE)
 
     # _f = crop.filter(ImageFilter.CONTOUR)
-    
+
     # _f = ImageChops.add(crop,_f,2.5,0)
     # _f = ImageChops.add(crop,_f,2.95,0)
-
 
     config.renderImageFull.paste(_f, _remapImageBlockDestination, _f)
 
 
-
-
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
 def _applyDitherFilter(xOffset, yOffset):
     if not config.useFilters:
         return
     if config.filterRemap:
         _ditherReMapPrep(xOffset, yOffset)
     else:
-        config.renderImageFull = ditherFilter(
-            config.renderImageFull, xOffset, yOffset, config
-        )
+        config.renderImageFull = ditherFilter(config.renderImageFull, xOffset, yOffset, config)
 
 
 def _ditherReMapPrep(xOffset, yOffset):
@@ -326,17 +314,17 @@ def _ditherReMapPrep(xOffset, yOffset):
     crop = config.tempImage.crop(config.remapImageBlockSection)
     crop = crop.convert("RGBA")
     if config.ditherFilterBrightness != 1.0:
-        crop = ImageEnhance.Brightness(crop).enhance(
-            config.ditherFilterBrightness
-        )
+        crop = ImageEnhance.Brightness(crop).enhance(config.ditherFilterBrightness)
     config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
+
 
 # remapImageBlock = False
 # remapImageBlockSection = 0,0,320,32
 # remapImageBlockDestination = 0,0
 # remapImageBlockSectionRotation = 0
 
-# remapImageBlock2 = True  
+
+# remapImageBlock2 = True
 # remapImageBlockSection2 = 320,0, 640,32
 # remapImageBlockDestination2 = 0,32
 # remapImageBlockSection2Rotation = 0
@@ -354,6 +342,7 @@ def _reMapBlock(sectionName):
     crop = crop.convert("RGBA")
     config.renderImageFull.paste(crop, _sectionDestination, crop)
 
+
 def _reMapBlockShift(sectionName):
     _name = sectionName
     _section = config.__getattribute__(f"{_name}Section")
@@ -363,8 +352,9 @@ def _reMapBlockShift(sectionName):
     crop = config._imageToRender.crop(_section)
     noncrop = config._imageToRender.crop(_nonsection)
     crop = crop.convert("RGBA")
-    config.renderImageFull.paste(noncrop, (0,0), noncrop)
+    config.renderImageFull.paste(noncrop, (0, 0), noncrop)
     config.renderImageFull.paste(crop, _sectionDestination, crop)
+
 
 def _doReMappingBlocks():
     if config.remapImageBlock:
@@ -388,7 +378,6 @@ def _doReMappingBlocks():
     if config.remapImageBlock7:
         _reMapBlock("remapImageBlock7")
 
-
     if config.remapImageBlockShift:
         _reMapBlockShift("remapImageBlockShift")
         if config.remapImageBlockShift2:
@@ -399,6 +388,7 @@ def _doReMappingBlocks():
             _reMapBlockShift("remapImageBlockShift4")
         if config.remapImageBlockShift5:
             _reMapBlockShift("remapImageBlockShift5")
+
 
 def _blurringCall():
     if not config.useBlur:
@@ -417,22 +407,18 @@ def _blurringCall():
     config._render_crop = config._render_crop.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
     config.renderImageFull.paste(config._render_crop, config._render_destination, config._render_crop)
 
+
 def _lastOverLay():
     try:
         if config.useLastOverlay:
-            config.renderDrawOver.rectangle(
-                config.lastOverlayBox, fill=config.lastOverlayFill, outline=None
-            )
+            config.renderDrawOver.rectangle(config.lastOverlayBox, fill=config.lastOverlayFill, outline=None)
             # config.renderDrawOver.rectangle(config.lastOverlayBox, fill=(255,0,0,255), outline=None)
             if config.lastOverlayBlur > 0:
-                config.renderImageFullOverlay = config.renderImageFullOverlay.filter(
-                    ImageFilter.GaussianBlur(radius=config.lastOverlayBlur)
-                )
-            config.renderImageFull.paste(
-                config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay
-            )
+                config.renderImageFullOverlay = config.renderImageFullOverlay.filter(ImageFilter.GaussianBlur(radius=config.lastOverlayBlur))
+            config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
     except Exception as e:
         print(e)
+
 
 def _overallResize():
     if not config.overallResize:
@@ -451,6 +437,7 @@ def _overallResize():
     iTemp = iTemp.filter(ImageFilter.SHARPEN)
     iTemp = iTemp.filter(ImageFilter.SHARPEN)
     config.renderImageFull.paste(iTemp, (0, 0))
+
 
 def _saveToFileCall():
     if config.outputMode == "gif":
@@ -495,10 +482,12 @@ def _forceBlueGreenSwap(imageToRender):
     imageToRender = Image.fromarray(data2)
     return imageToRender
 
+
 def _renderDiagnostics():
     if not config.renderDiagnostics:
         return
     config.renderDiagnosticsCall()
+
 
 def render(
     imageToRender,
@@ -513,13 +502,13 @@ def render(
     # global memoryUsage
     # global config, debug
 
-    if config.remapImageBlockShift :
+    if config.remapImageBlockShift:
         config._imageToRender = imageToRender.copy()
 
     # Adding this to account for some issues with pasting in RGB on RGBA ...
-    if imageToRender.mode == "RGB" :
+    if imageToRender.mode == "RGB":
         imageToRender = imageToRender.convert("RGBA")
-        
+
     # Render to canvas
     # This needs to be optomized !!!!!!
 
@@ -534,12 +523,12 @@ def render(
             # This rotates the image sent to be rendered
             imageToRender = imageToRender.rotate(-config.rotation, expand=True)
 
-    if config.remapImageBlockShift and config.rotation != 0 :
+    if config.remapImageBlockShift and config.rotation != 0:
         config._imageToRender = config._imageToRender.rotate(-config.rotation, expand=True)
-            # imageToRender = ImageChops.offset(imageToRender, -40, 40)
+        # imageToRender = ImageChops.offset(imageToRender, -40, 40)
 
     try:
-        if not config.remapImageBlockShift :
+        if not config.remapImageBlockShift:
             config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
     except Exception as e:
@@ -566,10 +555,7 @@ def render(
     # color separation filter - not really very interesting on led panels right now
     # _applyColorSep(xOffset, yOffset)
 
-    _applyDitherFilter(xOffset, yOffset)
-
-
-
+    # _applyDitherFilter(xOffset, yOffset)
 
     if config.usePixelSort and config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:
         config.renderImageFull = pixelSort(config.renderImageFull, config)
@@ -583,6 +569,11 @@ def render(
 
     # ---- Remap sections of image to accommodate odd panels ---- #
     _doReMappingBlocks()
+
+    # moving the dithering to after the remapping on account of the shift 
+    # settings pasting over the dithered renderImageFull 02-27-2026
+    _applyDitherFilter(xOffset, yOffset)
+
     # ---- Overall image blurring  ---- #
     _blurringCall()
     _renderDiagnostics()
@@ -639,7 +630,7 @@ def saveImageToFile():
     currentTime = time.time()
     baseName = config.outPutPath + str(currentTime)
     _temp = config.renderImageFull.copy()
-    _img  = _temp.crop((config.saveFileCropFromLeft,config.saveFileCropFromTop, config.windowWidth,config.windowHeight))
+    _img = _temp.crop((config.saveFileCropFromLeft, config.saveFileCropFromTop, config.windowWidth, config.windowHeight))
     _img = _img.convert("RGBA")
     writeImage(baseName, renderImage=_img)
 

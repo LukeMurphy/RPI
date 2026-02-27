@@ -692,7 +692,7 @@ def pauseDrawing():
     config.stoppedAndWaitingToDraw = True
     config.canDraw = False
     config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0], config.activePalette.startNewLineDelayRange[1])
-    pieceLogger(f"paused for {config.drawingController.slotRate} {config.activePalette.startNewLineDelayRange[0]}/{config.activePalette.startNewLineDelayRange[1]}", 1)
+    pieceLogger(f"Line Drawing paused for {config.drawingController.slotRate} {config.activePalette.startNewLineDelayRange[0]}/{config.activePalette.startNewLineDelayRange[1]} \n lines drawn: {config.linesDrawnCount}", 1)
 
 
 def releaseDrawing():
@@ -748,7 +748,6 @@ def drawLinePolyEnvelope(_pen):
         pieceLogger(f"Drawing Line with: {_pen.name}")
         # { _pen.drawingSkipProb}
     _penSkip = random.random() <= _pen.drawingSkipProb
-
     for _ in range(_pen.speed):
         if _pen._p < len(_pen.smooth_points) and _pen._p > 0:
             _p1 = _pen.smooth_points[_pen._p - 1]
@@ -917,7 +916,8 @@ def drawLineSegments(_pen):
 def drawLineStopped():
     # pieceLogger("Pen stopped")
     config.doingDrawing = False
-    pauseDrawing()
+    config.linesDrawnCount += 1
+    if config.linesDrawnCount > 1 : pauseDrawing()
     if random.random() < config.doJitterWhenAddingBGUseProb:
         pieceLogger("Doing jitter after LINE has been drawn")
         doDrawingJitter()
@@ -929,7 +929,7 @@ def progressiveJitter():
     """ The underLayer has both the blocks as well as the lines and the texture """
 
     if random.random() < config.doJitterEventPerCyleProb :
-        pieceLogger(f"Jitter {config.jitterIterations}")
+        # pieceLogger(f"Jitter {config.jitterIterations}")
         glitchBox(
             config.underLayer,
             config.canvasWidth,
@@ -945,23 +945,27 @@ def progressiveJitter():
 
 
 def doDrawingJitter():
-    config.jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-    pieceLogger(f"jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
-    config.doingJitter = True
-    # config.directorController.slotRate *= 4
+    if not config.doingJitter :
+        config.jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
+        pieceLogger(f"jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
+
+        if random.random() < .5:
+            config.doingJitter = True
+            pieceLogger("Progressive jitter starting")
+        else :
+            pieceLogger("Single bulk jitter starting")
+            """ The underLayer has both the blocks as well as the lines and the texture """
+            for _ in range(config.jitterIterations):
+                glitchBox(
+                    config.underLayer,
+                    config.canvasWidth,
+                    config.canvasHeight,
+                    config.jitterDisplacementHorizontal,
+                    config.jitterDisplacementVertical,
+                )
 
 
 
-
-    # """ The underLayer has both the blocks as well as the lines and the texture """
-    # for _ in range(jitterIterations):
-    #     glitchBox(
-    #         config.underLayer,
-    #         config.canvasWidth,
-    #         config.canvasHeight,
-    #         config.jitterDisplacementHorizontal,
-    #         config.jitterDisplacementVertical,
-    #     )
 
 
 def bgColorBlocksFilling(arg):
@@ -1188,7 +1192,7 @@ def initDrawings():
 
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
-
+    config.linesDrawnCount = 0
     primeCanvas()
 
     _pen = choosePenMark()
@@ -1444,7 +1448,7 @@ def clearCurrentDrawing():
 
         primeCanvas(2)
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 225))
-
+        config.linesDrawnCount = 0
 
 # ----------------------------------------------------##----------------------------------------------------#
 
@@ -1823,6 +1827,7 @@ def _load_and_initialize_system(config):
     config.doingDrawing = False
     config.doingJitter = False
     config.stoppedAndWaitingToDraw = False
+    config.linesDrawnCount = 0
 
     config.penArray = []
     config.drawingMode = 1

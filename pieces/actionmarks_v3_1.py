@@ -1428,6 +1428,8 @@ def clearCurrentDrawing():
         initiateTransition()
 
         pieceLogger("Clearing", 2)
+        config.linesDrawnCount = 0
+        config.jitterIterations = 0
 
         config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 200))
 

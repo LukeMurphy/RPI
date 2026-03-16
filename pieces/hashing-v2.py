@@ -150,10 +150,11 @@ def setBGColor():
         config.brightness,
     )
 
-    if random.random() <  .5 :
+    if random.random() <=  config.blankColorAsColorProb :
         badpixels.blankColor = config.bgColor
     else :
         badpixels.blankColor = (0,0,0,255)
+
 
     # pieceLogger("New BG")
 
@@ -225,67 +226,78 @@ def setGridLines():
     config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
     config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
 
-    # config.h_pts = []
-    for row in range(config.rowInterval + config.rowAdj):
-        informalLine = InformalLine(row)
-        # h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * row, True)
-        # config.h_pts.append(h_pts)
-        informalLine.xOffset = config.xOffset + config.rowSpacing * row
-        informalLine.yOffset = config.yOffset
-        informalLine.drawingHeight = config.drawingWidth - 2 * config.xOffset
-        informalLine.angle = 90
-        informalLine.pointPerLine = config.pointsPerLineRow
-        informalLine.lineSpeedRange = config.horizLineSpeedRange
-        informalLine.baseWidthRange = config.horizBaseWidthRange
-        informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeRow
 
-        informalLine.lineColor = colorutils.getRandomColorHSV(
-            config.line_minHue,
-            config.line_maxHue,
-            config.line_minSaturation,
-            config.line_maxSaturation,
-            config.line_minValue,
-            config.line_maxValue,
-            0,
-            0,
-            round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-            config.brightness,
-        )
+    def add_col_lines():
+        # config.v_pts = []
+        for col in range(config.colInterval + config.colAdj):
+            # v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * col, config.yOffset, False)
+            # config.v_pts.append(v_pts)
+            informalLine = InformalLine(col)
+            informalLine.xOffset = config.xOffset + config.colSpacing * col
+            informalLine.yOffset = config.yOffset
+            informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
 
-        informalLine.reconfigure()
-        informalLine.generateInformalLine()
-        config.informalLineUnits.append(informalLine)
+            informalLine.pointPerLine = config.pointsPerLineCol
+            informalLine.lineSpeedRange = config.vertLineSpeedRange
+            informalLine.baseWidthRange = config.vertBaseWidthRange
+            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
 
-    # config.v_pts = []
-    for col in range(config.colInterval + config.colAdj):
-        # v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * col, config.yOffset, False)
-        # config.v_pts.append(v_pts)
-        informalLine = InformalLine(col)
-        informalLine.xOffset = config.xOffset + config.colSpacing * col
-        informalLine.yOffset = config.yOffset
-        informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
+            informalLine.lineColor = colorutils.getRandomColorHSV(
+                config.line_minHue,
+                config.line_maxHue,
+                config.line_minSaturation,
+                config.line_maxSaturation,
+                config.line_minValue,
+                config.line_maxValue,
+                0,
+                0,
+                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+                config.brightness,
+            )
+            informalLine.reconfigure()
+            informalLine.generateInformalLine()
+            # pieceLogger(f"{informalLine.xOffset}")
+            config.informalLineUnits.append(informalLine)
 
-        informalLine.pointPerLine = config.pointsPerLineCol
-        informalLine.lineSpeedRange = config.vertLineSpeedRange
-        informalLine.baseWidthRange = config.vertBaseWidthRange
-        informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
+    def add_row_lines():
+        # config.h_pts = []
+        for row in range(config.rowInterval + config.rowAdj):
+            informalLine = InformalLine(row)
+            # h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * row, True)
+            # config.h_pts.append(h_pts)
+            informalLine.xOffset = config.xOffset + config.rowSpacing * row
+            informalLine.yOffset = config.yOffset
+            informalLine.drawingHeight = config.drawingWidth - 2 * config.xOffset
+            informalLine.angle = 90
+            informalLine.pointPerLine = config.pointsPerLineRow
+            informalLine.lineSpeedRange = config.horizLineSpeedRange
+            informalLine.baseWidthRange = config.horizBaseWidthRange
+            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeRow
 
-        informalLine.lineColor = colorutils.getRandomColorHSV(
-            config.line_minHue,
-            config.line_maxHue,
-            config.line_minSaturation,
-            config.line_maxSaturation,
-            config.line_minValue,
-            config.line_maxValue,
-            0,
-            0,
-            round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-            config.brightness,
-        )
-        informalLine.reconfigure()
-        informalLine.generateInformalLine()
-        # pieceLogger(f"{informalLine.xOffset}")
-        config.informalLineUnits.append(informalLine)
+            informalLine.lineColor = colorutils.getRandomColorHSV(
+                config.line_minHue,
+                config.line_maxHue,
+                config.line_minSaturation,
+                config.line_maxSaturation,
+                config.line_minValue,
+                config.line_maxValue,
+                0,
+                0,
+                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+                config.brightness,
+            )
+
+            informalLine.reconfigure()
+            informalLine.generateInformalLine()
+            config.informalLineUnits.append(informalLine)
+
+    if config.colFirst:
+        add_col_lines()
+        add_row_lines()
+    else:
+        add_row_lines()
+        add_col_lines()
+
 
     config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
     config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
@@ -584,6 +596,7 @@ def main(run=True):
     config.noiseAmplitudeRangeCol = [
         float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
     ]
+    config.colFirst = workConfig.getboolean("hatchingmarks", "colFirst", fallback=False)
 
     config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
     config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
@@ -656,16 +669,19 @@ def main(run=True):
 
     config.rebuildingVerticals = False
 
-    setLines()
-    setLineColor()
-    setBGColor()
-
     config.resetBlanksProb =  config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
+    config.blankColorAsColorProb = float(workConfig.get("hatchingmarks", "blankColorAsColorProb", fallback="0.5"))
+
     badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
     badpixels.probabilityOfBlockBlanks = .0
     badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
     badpixels.colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
     badpixels.rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
+
+    setLines()
+    setLineColor()
+    setBGColor()
+
     badpixels.setBlanksOnScreen(config)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS

@@ -208,8 +208,6 @@ def handleClipPlayer():
     config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
 
 
-
-
 # --------------------- DISTURBANCES  ---------------------
 # loads the disturbance configs and calls the disturbance
 # setup functions
@@ -517,7 +515,7 @@ def loadPalette(palette):
     c3 = Holder()
     c4 = Holder()
 
-    _noGraysBool = (config.paletteConfig.getboolean(palette, "noGrays", fallback=False))
+    _noGraysBool = config.paletteConfig.getboolean(palette, "noGrays", fallback=False)
     _noGrays = 1.0 if _noGraysBool else 0.0
 
     # background
@@ -569,7 +567,6 @@ def loadPalette(palette):
     c4.noGrays = _noGrays
     c4.currentColor = setCurrentColor(c4)
 
-
     _paletteObj = Holder()
     _paletteObj.paletteName = palette
     _paletteObj.c1 = c1
@@ -602,7 +599,7 @@ def changeSinglePalette(index=0):
     _paletteObjLocal.c3.currentColor = copy(paletteObj.c3.currentColor)
     _paletteObjLocal.c4 = copy(paletteObj.c4)
     _paletteObjLocal.c4.currentColor = copy(paletteObj.c4.currentColor)
-   
+
     _paletteObjLocal.c1.currentColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     _paletteObjLocal.c2.currentColor = setCurrentColor(paletteObj.c2)
     _paletteObjLocal.c3.currentColor = setCurrentColor(paletteObj.c3)
@@ -623,7 +620,7 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
         palettObjValsRef.dropHueMax,
         alpha,
         config.brightness,
-        palettObjValsRef.noGrays
+        palettObjValsRef.noGrays,
     )
 
 
@@ -635,8 +632,6 @@ def setPalette(config, index=0):
     config.c2.currentColor = setCurrentColor(paletteObj.c2)
     config.c3.currentColor = setCurrentColor(paletteObj.c3)
     config.c4.currentColor = setCurrentColor(paletteObj.c4)
-
-
 
     # if zero palette mixing is desired, force the patterns to rebuild
     # this is a bit of an extreme but was having trouble preventing the
@@ -652,14 +647,13 @@ def selectNewPalette(_setPalette=True):
     # if config.currentPaletteIndex == len(config.palettes):
     #     config.currentPaletteIndex = 0
 
-    pieceLogger(f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]}",2,True)
+    pieceLogger(f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]}", 2, True)
     setPalette(config, config.currentPaletteIndex)
 
     if _setPalette:
         rebuildPatterns()
         resetPatternBlocks()
         # resetCrossFader()
-
 
     # if random.random() < config.probPatternsRebuildAfterNewPalette:
     #     rebuildPatterns()
@@ -712,7 +706,7 @@ def loadAndSetupPatterns():
         config.stepsRange = tuple(map(lambda x: int(x), stepsRange))
         config.ringsRange = tuple(map(lambda x: int(x), ringsRange))
     except Exception as e:
-        pieceLogger(e,1)
+        pieceLogger(e, 1)
         config.stepsRange = (1, 1)
         config.ringsRange = (1, 1)
         config.numScaleRows = config.numShingleRows
@@ -782,13 +776,13 @@ def loadAndSetupPatterns():
 
 def loadAndSetCombinations():
     config.combinationSets = []
-    combinationSets = workConfig.get("movingpattern", "combinationSets").replace("\n","").split(",")
+    combinationSets = workConfig.get("movingpattern", "combinationSets").replace("\n", "").split(",")
     config.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
     for combinationSetName in combinationSets:
         comboSet = CombinationSet(combinationSetName)
-        comboSet.patterns = workConfig.get(combinationSetName, "patterns").replace("\n","").split(",")
-        comboSet.palettes = workConfig.get(combinationSetName, "palettes").replace("\n","").split(",")
-        comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").replace("\n","").split(",")
+        comboSet.patterns = workConfig.get(combinationSetName, "patterns").replace("\n", "").split(",")
+        comboSet.palettes = workConfig.get(combinationSetName, "palettes").replace("\n", "").split(",")
+        comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").replace("\n", "").split(",")
         comboSet.dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
         comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback="")
         comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
@@ -797,7 +791,7 @@ def loadAndSetCombinations():
 
         comboSet.usePolygonOverlay = workConfig.getboolean(combinationSetName, "usePolygonOverlay", fallback=config.usePolygonOverlay)
         comboSet.tileOverlayGridProb = float(workConfig.get(combinationSetName, "tileOverlayGridProb", fallback=config.tileOverlayGridProb))
-        comboSet.polyOverlayMode = (workConfig.get(combinationSetName, "polyOverlayMode", fallback=config.polyOverlayMode))
+        comboSet.polyOverlayMode = workConfig.get(combinationSetName, "polyOverlayMode", fallback=config.polyOverlayMode)
 
         comboSet.patternsInBands = workConfig.getboolean(combinationSetName, "patternsInBands", fallback=False)
         comboSet.altBlockRotation = workConfig.getboolean(combinationSetName, "altBlockRotation", fallback=True)
@@ -810,7 +804,7 @@ def handleChangeCurrentCominationSet():
     if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone:
         config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
         # {config.combinationSets[config.currentCombinationsetIndex]}
-        pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n",2,True)
+        pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
         selectNewPalette()
         # rebuildPatterns()
 
@@ -829,7 +823,7 @@ def resetPatternBlocks():
             _patternBlock.tempPalette = getTempPalette(config)
         # else :
         #     _patternBlock.tempPalette = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
-        
+
         config.patternSequence[i] = _patternBlock
 
 
@@ -909,7 +903,7 @@ def generatePatternSequence(config):
             _patternSelected = chooseAPattern()
             _tempPalette = getTempPalette(config)
         _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else random.randint(0, 1)
-        if not combo.altBlockRotation :
+        if not combo.altBlockRotation:
             _rotate = 0
         _position = _iterCount
         _pattern = _patternSelected
@@ -1020,7 +1014,6 @@ def rowsAndDotsSettings():
     config.numDotRows = dotRows[round(random.uniform(0, 2))]
     config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
     config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
-    
 
 
 # --------------------- LOOP ACTIONS  ---------------------
@@ -1079,7 +1072,7 @@ def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extr
     # _temp = _temp.crop((0,0,20,20))
     # disabling for a moment 2023-04-01
 
-    if config.patternModel not in ["ropePattern","littleCones"]:
+    if config.patternModel not in ["ropePattern", "littleCones"]:
         _temp = _temp.rotate(90)
     # if config.patternModel == "circlesPacked":
     #     extraOverlapx = round(config.blockWidth / 8)
@@ -1285,11 +1278,22 @@ def renderComposite():
     if config.useDrawingPoints == True:
         config.panelDrawing.canvasToUse = config.compositeImage
         config.panelDrawing.render()
-    else :
+    else:
         if config.usePolygonOverlay:
             config.compositeImage = shapeOverLayFunction(config.compositeImage)
 
-        config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
+        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
+        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.canvasWidth), round(config.imageYPOS)), config.compositeImage)
+        
+        config.imageXPOS += config.XPOSSpeed
+        # config.imageYPOS += config.YPOSSpeed
+
+        if config.imageXPOS >= config.canvasWidth:
+            config.imageXPOS = 0
+
+        if config.imageYPOS >= config.canvasHeight:
+            config.imageYPOS = 0
+        # config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
         # # uncomment for all temp canvas layers to show
         if config.setupDeBug:
@@ -1366,15 +1370,14 @@ def shapeOverLayFunction(temp1):
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
                 _count += 1
 
-
         match (config.polyOverlayMode):
-            case "overaly" :
+            case "overaly":
                 temp1 = ImageChops.overlay(temp1, temp2)
-            case "subtract_modulo" :
+            case "subtract_modulo":
                 temp1 = ImageChops.subtract_modulo(temp1, temp2)
-            case "soft_light" :
+            case "soft_light":
                 temp1 = ImageChops.soft_light(temp1, temp2)
-            case "lighter" :
+            case "lighter":
                 temp1 = ImageChops.lighter(temp1, temp2)
 
         if random.random() < config.polyOverlayChangeProb:
@@ -1581,12 +1584,16 @@ def main(run=True):
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
 
+    config.imageXPOS = 0
+    config.imageYPOS = 0
+    config.XPOSSpeed = float(workConfig.get("movingpattern", "XPOSSpeed", fallback="0.0"))
+    config.YPOSSpeed = float(workConfig.get("movingpattern", "YPOSSpeed", fallback="0.0"))
+
     try:
         config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
     except Exception as e:
         pieceLogger(f"{e} <== adjust config to use slotRate!! <===")
         config.directorController.slotRate = 0.03
-
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -1616,7 +1623,7 @@ def main(run=True):
 
 def runWork():
     global config
-    pieceLogger("Running repeatblocks.py",2)
+    pieceLogger("Running repeatblocks.py", 2)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:

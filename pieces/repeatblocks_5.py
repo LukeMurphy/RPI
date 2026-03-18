@@ -1,4 +1,5 @@
 # ################################################### #
+from ast import Try
 import itertools
 import math
 import random
@@ -6,6 +7,8 @@ import time
 import noise
 import os, sys
 import configparser
+
+from shapely import length
 from modules.configuration import bcolors
 from modules.configuration import pieceLogger
 from modules.movieClip import movieClip
@@ -670,6 +673,10 @@ def loadAndSetupPatterns():
     # config.dominantPatterns =  workConfig.get("movingpattern", "dominantPatterns", fallback="").split(",")
     # loadConfigValue(config, workConfig, "movingpattern", "dominantPatternProb", 0, float)
 
+    config.patternSequence = []
+    config.settingUpPattern = True
+    config.rebuildIndividualSlotProb = .1
+
     loadConfigValue(config, workConfig, "movingpattern", "patternModelVariations", True, bool)
     loadConfigValue(config, workConfig, "movingpattern", "patternModel", None, str)
 
@@ -828,33 +835,39 @@ def resetPatternBlocks():
 
 
 def buildPatternSequence(config):
-    pieceLogger("Building new pattern sequence", 0)
-    config.patternSequence = []
-    config.usedPatterns = []
+    pieceLogger("Building new pattern sequence : buildPatternSequence called", 0)
+    # config.patternSequence = []
+    # config.usedPatterns = []
+    
 
-    if random.random() < config.blockSizeChangeProb:
-        if config.blockSizeChangeAlwaysUseMax:
-            config.blockWidth = config.blockWidthMax
-            config.blockHeight = config.blockWidthMax
+    # during a partial rebuild, maybe don't change too much
+    # in terms of the block size
+    if config.settingUpPattern :
+        if random.random() < config.blockSizeChangeProb:
+            if config.blockSizeChangeAlwaysUseMax:
+                config.blockWidth = config.blockWidthMax
+                config.blockHeight = config.blockWidthMax
+            else:
+                config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
+                config.blockHeight = config.blockWidth
         else:
-            config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
-            config.blockHeight = config.blockWidth
-    else:
-        config.blockWidth = config.blockWidthMin
-        config.blockHeight = config.blockWidthMin
+            config.blockWidth = config.blockWidthMin
+            config.blockHeight = config.blockWidthMin
 
-    config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
-    config.blockDraw = ImageDraw.Draw(config.blockImage)
+        config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
+        config.blockDraw = ImageDraw.Draw(config.blockImage)
 
-    config.patternBlockCols = round(config.canvasWidth / config.blockWidth)
-    config.patternBlockRows = round(config.canvasHeight / config.blockHeight)
+        config.patternBlockCols = round(config.canvasWidth / config.blockWidth)
+        config.patternBlockRows = round(config.canvasHeight / config.blockHeight)
 
-    # considering making this be an option to fit exactly the width - i.e. choose the number of columns
-    # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
-    # ragged edges which are a nice trace of the previous state
-    # print(f"config.blockWidth {config.blockWidth} config.patternBlockCols {config.patternBlockCols}")
+        # considering making this be an option to fit exactly the width - i.e. choose the number of columns
+        # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
+        # ragged edges which are a nice trace of the previous state
+        # print(f"config.blockWidth {config.blockWidth} config.patternBlockCols {config.patternBlockCols}")
 
-    config.totalSlots = config.patternBlockRows * config.patternBlockCols
+        config.totalSlots = config.patternBlockRows * config.patternBlockCols
+
+
     config.altLineColoring = random.random() < config.combinationSets[config.currentCombinationsetIndex].altColoringProb
     config.popRandomColorProb = random.random() < config.combinationSets[config.currentCombinationsetIndex].popRandomColorProb
 
@@ -884,6 +897,11 @@ def chooseAPattern():
 # there are n number of slots, just fill each one and change randomly etc
 # as they all get filled up
 def generatePatternSequence(config):
+
+    # config.patternSequence = []
+    config.usedPatterns = []
+
+
     _baseProb = config.patternChangeWhenBuilding * config.totalSlots / 100
     _patternSelected = chooseAPattern()
     _tempPalette = getTempPalette(config)
@@ -923,7 +941,17 @@ def generatePatternSequence(config):
             "diamond",
         ]
         _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
-        config.patternSequence.append(_patternBlock)
+        
+        try:
+            if config.settingUpPattern :
+                config.patternSequence.append(_patternBlock)
+            elif random.random() < config.rebuildIndividualSlotProb:
+                config.patternSequence[round(random.uniform(0,len(config.patternSequence)-1))] = _patternBlock
+            # comment: 
+        except Exception as e:
+            print(e)
+        # end try
+
         _iterCount += 1
 
     if config.patternsInBands:
@@ -1047,6 +1075,7 @@ def drawRepeatedPatternImage(config, canvasImage):
     _counter = 0
     extraOverlapx = 0
     extraOverlapy = 0
+    # for i in range(len(config.patternSequence)):
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
         # This sets the block image for each unit
@@ -1231,6 +1260,17 @@ def handlePatternRebuild():
     if random.random() < config.rebuildPatternProbability and config.fader.fadingDone:
         # config.doSectionDisturbance = False
         # print("\nrebuildPatterns called after fading done 2")
+
+
+        if random.random() < .1 :
+            pieceLogger("\nRebuiding full")
+            config.rebuildIndividualSlotProb = 1.0
+            config.settingUpPattern = True
+            config.patternSequence = []
+        else :
+            pieceLogger("\nRebuiding parts")
+            config.settingUpPattern = False
+            config.rebuildIndividualSlotProb = .1
         rebuildPatterns()
 
 
@@ -1273,6 +1313,11 @@ def drawBackgroundAndPasteImage():
             config.waveDeformXPos = 0
 
 
+def blendStep() :
+        f0 = config.scrollBlendFrame0
+        f1 = config.scrollBlendFrame1
+
+
 def renderComposite():
     """FINAL RENDERING CALL"""
     if config.useDrawingPoints == True:
@@ -1282,9 +1327,29 @@ def renderComposite():
         if config.usePolygonOverlay:
             config.compositeImage = shapeOverLayFunction(config.compositeImage)
 
+        # x0 = round(math.floor(config.imageXPOS))
+        # frac = config.imageXPOS - x0
+        # y = round(config.imageYPOS)
+
+        # # Blend between integer pixel positions x0 and x0+1 for smooth sub-pixel scrolling.
+        # # Reuse pre-allocated buffers to avoid per-frame allocation and GC pauses.
+        # _bg = (0, 0, 0, 255)
+        # f0 = config.scrollBlendFrame0
+        # f1 = config.scrollBlendFrame1
+
+        # f0.paste(_bg, (0, 0, f0.width, f0.height))
+        # f0.paste(config.compositeImage, (x0, y), config.compositeImage)
+        # f0.paste(config.compositeImage, (x0 - config.canvasWidth, y), config.compositeImage)
+
+        # f1.paste(_bg, (0, 0, f1.width, f1.height))
+        # f1.paste(config.compositeImage, (x0 + 1, y), config.compositeImage)
+        # f1.paste(config.compositeImage, (x0 + 1 - config.canvasWidth, y), config.compositeImage)
+
+        # config.destinationImage.paste(Image.blend(f0, f1, frac), (0, 0))
+        # original method - only good for whole number jumps
         config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
         config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.canvasWidth), round(config.imageYPOS)), config.compositeImage)
-        
+
         config.imageXPOS += config.XPOSSpeed
         # config.imageYPOS += config.YPOSSpeed
 
@@ -1293,11 +1358,11 @@ def renderComposite():
 
         if config.imageYPOS >= config.canvasHeight:
             config.imageYPOS = 0
-        # config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
         # # uncomment for all temp canvas layers to show
         if config.setupDeBug:
             showDebugCanvases(config)
+            
         config.render(config.destinationImage, 0, 0)
 
 
@@ -1496,6 +1561,13 @@ def createImageHolders():
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.destinationImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.compositeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+    # For scrolling the entire piece
+    config.scrollBlendFrame0 = Image.new("RGBA", (config.screenWidth, config.screenHeight), (0, 0, 0, 255))
+    config.scrollBlendFrame1 = Image.new("RGBA", (config.screenWidth, config.screenHeight), (0, 0, 0, 255))
+
+    config.blendSteps = 5
+    config.blendStep = 0
 
     config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
     config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)

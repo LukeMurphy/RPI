@@ -192,6 +192,8 @@ def loadAndSetupAllPalettes():
 
     config.paletteConfig = configparser.ConfigParser()
     argument = f"{config.path}/configs/{config.palettesConfigFile}"
+
+    pieceLogger(f"loadAndSetupAllPalettes: loading from {argument}")
     config.paletteConfig.read(argument)
 
     config.palettes = config.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")

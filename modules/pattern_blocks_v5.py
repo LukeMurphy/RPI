@@ -1438,8 +1438,9 @@ def concentricBoxes(config, paletteObj=None):
             outClr = clr2
 
         try:
-            config.blockDraw.rectangle((i - 1, i - 1, config.blockWidth - 1 * i, config.blockHeight - 1 * i), outline=(outClr), fill=None)
-            count += 1
+            if config.blockWidth - 1 * i >= i - 1 :
+                config.blockDraw.rectangle((i - 1, i - 1, config.blockWidth - 1 * i, config.blockHeight - 1 * i), outline=(outClr), fill=None)
+                count += 1
         except Exception as e:
             print(f"Concentric boxes error prob too many {e}")
 

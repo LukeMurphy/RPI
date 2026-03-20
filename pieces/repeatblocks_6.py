@@ -339,7 +339,7 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
 
 def setPalette(config, index=0):
     paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
-    # print(f"Setting a new palette:  {paletteObj.paletteName}")
+    print(f"Setting a new palette:  {paletteObj.paletteName}")
     config.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.c1.currentColor = setCurrentColor(paletteObj.c1)
     config.c2.currentColor = setCurrentColor(paletteObj.c2)

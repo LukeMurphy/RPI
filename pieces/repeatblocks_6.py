@@ -211,7 +211,8 @@ def loadAndSetupAllPalettes():
     config.c4 = Holder()
 
     for arg in config.paletteConfigs:
-        loadPalette(arg)
+        if arg != "" :
+            loadPalette(arg)
 
     config.currentPaletteIndex = 0
     setPalette(config, config.currentPaletteIndex)
@@ -360,7 +361,7 @@ def selectNewPalette(_setPalette=True):
     # if config.currentPaletteIndex == len(config.palettes):
     #     config.currentPaletteIndex = 0
 
-    pieceLogger(f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]}", 2, True)
+    pieceLogger(f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}", 2, True)
     setPalette(config, config.currentPaletteIndex)
 
     if _setPalette:

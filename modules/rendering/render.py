@@ -237,12 +237,26 @@ def updateCanvas():
 # TODO Rename this here and in `updateCanvas`
 def relaunchOnChange(config):
     currentTime = time.time()
-    f = os.path.getmtime(config.fileName)
-    f2 = os.path.getmtime(f"{config.path}pieces/{config.work}.py")
-    config.delta = currentTime - f
-    config.delta2 = currentTime - f2
+    configurationDirectory = os.path.dirname(config.fileName)
 
-    if config.delta <= 1 or config.delta2 <= 1:
+    files = [f for f in os.listdir(f"{configurationDirectory}") 
+             if os.path.isfile(os.path.join(f"{configurationDirectory}", f))
+             ]
+
+    # f = os.path.getmtime(config.fileName)
+    f2 = os.path.getmtime(f"{config.path}pieces/{config.work}.py")
+
+    fileHasChanged  = False
+    for f in files :
+        fModTime = os.path.getmtime(f"{configurationDirectory}/{f}")
+        _delta = currentTime - fModTime
+        if _delta <=1 : fileHasChanged = True
+
+    config.delta = currentTime - f2
+    # config.delta2 = currentTime - f2
+
+    # if config.delta <= 1 or config.delta2 <= 1:
+    if config.delta <= 1 or fileHasChanged:
         if not config.reloadConfig:
             print(f"** LAST MODIFIED DELTA: {str(config.delta)} **")
             print(f"** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
@@ -250,10 +264,8 @@ def relaunchOnChange(config):
 
             if config.doFullReloadOnChange:
                 os.system(config.path + "/cntrlscripts/restart_player_dev.sh" + " " + config.initialArgs + "&")
-
             # commadStringPyth = ""
             # os.system(commadStringPyth + config.initialArgs + "&")
-
             else:
                 config.doingReload = True
                 # NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
@@ -570,7 +582,7 @@ def render(
     # ---- Remap sections of image to accommodate odd panels ---- #
     _doReMappingBlocks()
 
-    # moving the dithering to after the remapping on account of the shift 
+    # moving the dithering to after the remapping on account of the shift
     # settings pasting over the dithered renderImageFull 02-27-2026
     _applyDitherFilter(xOffset, yOffset)
 

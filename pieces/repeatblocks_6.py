@@ -656,6 +656,7 @@ def generatePatternSequence(config):
         _patternBlock.col = c
         _patternBlock.row = r
         _patternBlock.rePainting = _patternSelected in [
+            "randomizer4",
             "randomizer3",
             "randomizer2",
             "randomizer",

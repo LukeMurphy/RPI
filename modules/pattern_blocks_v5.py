@@ -14,7 +14,7 @@ import numpy as np
 import noise
 from noise import *
 
-'''
+"""
 Current List 2025-10-6
 fishScales3
 fishScales2
@@ -60,7 +60,8 @@ colorGridTriangles
 floralConfig
 petals
 
-'''
+"""
+
 
 def fishscalepatternFunction(func):
     """Decorator for fish scale pattern drawing functions.
@@ -212,10 +213,10 @@ def ballsPatternFunction(func):
         dotWidth = boxWidth / 2 / numRows - 2
         outline = None
 
-        if len(res) > 5 :
+        if len(res) > 5:
             offset = res[5]
             density = numRows * 2
-        else :
+        else:
             offset = boxWidth
 
         for r in range(numRows):
@@ -246,6 +247,7 @@ def balls(config, paletteObj):
     patternOutLine = tuple(int(a) for a in (paletteObj.c4.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
     return config, bgFill, patternFill, patternOutLine, hilight
+
 
 @ballsPatternFunction
 def ballsRegularDots(config, paletteObj):
@@ -369,6 +371,9 @@ def randomizerPatternFunction(func):
         patternFill = res[2]
         patternOutLine = res[3]
         hilight = res[4]
+        randomix = res[5]
+        paletteRef = res[6]
+
         w = 4
         h = 4
         x = config.xIncrementer
@@ -393,6 +398,8 @@ def randomizerPatternFunction(func):
         for r in range(0, rows, hStep):
             for c in range(0, cols, step):
                 clr = colorutils.getRandomRGB(config.brightness / 2)
+                if randomix == 1:
+                    clr = colorutils.getRandomColorHSV(paletteRef.minHue, paletteRef.maxHue, paletteRef.minSaturation, paletteRef.maxSaturation, paletteRef.minValue, paletteRef.maxValue)
                 if random.random() < config.randomBlockProb:
                     config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
@@ -406,7 +413,7 @@ def randomizer(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c2.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c3.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config, bgFill, patternFill, patternOutLine, hilight
+    return config, bgFill, patternFill, patternOutLine, hilight, 0, None
 
 
 @randomizerPatternFunction
@@ -416,7 +423,7 @@ def randomizer2(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config, bgFill, patternFill, patternOutLine, hilight
+    return config, bgFill, patternFill, patternOutLine, hilight, 0, None
 
 
 @randomizerPatternFunction
@@ -426,7 +433,17 @@ def randomizer3(config, paletteObj):
     patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
     patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
     hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
-    return config, bgFill, patternFill, patternOutLine, hilight
+    return config, bgFill, patternFill, patternOutLine, hilight, 0, None
+
+
+@randomizerPatternFunction
+def randomizer4(config, paletteObj):
+    # return "B","C","A"
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    patternFill = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    patternOutLine = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    hilight = tuple(int(a) for a in (paletteObj.c4.currentColor))
+    return config, bgFill, patternFill, patternOutLine, hilight, 1, paletteObj.c4
 
 
 # --------------------------------------- #
@@ -635,10 +652,10 @@ def ropePattern(config, paletteObj=None):
     yOffset = config.blockWidth / 2
     steps = config.steps
     rads = 2 * math.pi / numPoints
-    phase = 2/3 * math.pi
+    phase = 2 / 3 * math.pi
     for _s in range(3):
         for i in range(-1, numPoints + 2, 2):
-            angle1 = (i + config.xIncrementer ) * rads + _s * phase
+            angle1 = (i + config.xIncrementer) * rads + _s * phase
             angle2 = (i + config.xIncrementer + steps) * rads + _s * phase
             a = (i, math.sin(angle1) * amplitude + yOffset)
             c = (i + steps, math.sin(angle2) * amplitude + yOffset)
@@ -1438,7 +1455,7 @@ def concentricBoxes(config, paletteObj=None):
             outClr = clr2
 
         try:
-            if config.blockWidth - 1 * i >= i - 1 :
+            if config.blockWidth - 1 * i >= i - 1:
                 config.blockDraw.rectangle((i - 1, i - 1, config.blockWidth - 1 * i, config.blockHeight - 1 * i), outline=(outClr), fill=None)
                 count += 1
         except Exception as e:

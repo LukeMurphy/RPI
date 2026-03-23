@@ -6,7 +6,7 @@ import time
 import os, sys
 import configparser
 
-from shapely import length
+# from shapely import length
 from modules.configuration import bcolors
 from modules.configuration import pieceLogger
 from modules.movieClip import movieClip
@@ -30,6 +30,7 @@ from copy import copy, deepcopy
 
 
 # --------------------- CLASSES     ---------------------
+
 
 class Fader:
 
@@ -211,7 +212,7 @@ def loadAndSetupAllPalettes():
     config.c4 = Holder()
 
     for arg in config.paletteConfigs:
-        if arg != "" :
+        if arg != "":
             loadPalette(arg)
 
     config.currentPaletteIndex = 0
@@ -361,7 +362,11 @@ def selectNewPalette(_setPalette=True):
     # if config.currentPaletteIndex == len(config.palettes):
     #     config.currentPaletteIndex = 0
 
-    pieceLogger(f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}", 2, True)
+    pieceLogger(
+        f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}",
+        2,
+        True,
+    )
     setPalette(config, config.currentPaletteIndex)
 
     if _setPalette:
@@ -524,21 +529,33 @@ def loadAndSetCombinations():
         comboSet.patternsInBands = workConfig.getboolean(combinationSetName, "patternsInBands", fallback=False)
         comboSet.altBlockRotation = workConfig.getboolean(combinationSetName, "altBlockRotation", fallback=True)
 
+        comboSet.combinationSetsMinTime = float(workConfig.get(combinationSetName, "combinationSetsMinTime", fallback=30))
+        comboSet.combinationSetsMaxTime = float(workConfig.get(combinationSetName, "combinationSetsMaxTime", fallback=60))
+
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
+    config.comboSetDirector = Director(config)
+    config.comboSetDirector.slotRate = config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
 
 
 def handleChangeCurrentCominationSet():
+    pieceLogger("Checking combo set",3)
     disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
-    if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone:
+    if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone :
         config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
         # {config.combinationSets[config.currentCombinationsetIndex]}
         pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
+
+        # turning off to test
+        # config.settingUpPattern = True
+        # selectNewPalette()
+
+        # changing so the transition between a new combo set happens in chunks rather than
+        # waves
+
         # config.patternSequence = []
-        config.settingUpPattern = True
         # config.rebuildIndividualSlotProb = .1
-        selectNewPalette()
-        # rebuildPatterns()
+        rebuildPatterns()
 
 
 def resetPatternBlocks():
@@ -581,8 +598,8 @@ def buildPatternSequence(config):
         config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
         config.blockDraw = ImageDraw.Draw(config.blockImage)
 
-        config.patternBlockCols = round(config.canvasWidth / config.blockWidth)
-        config.patternBlockRows = round(config.canvasHeight / config.blockHeight)
+        config.patternBlockCols = round(config.pictureWidth / config.blockWidth)
+        config.patternBlockRows = round(config.pictureHeight / config.blockHeight)
 
         # considering making this be an option to fit exactly the width - i.e. choose the number of columns
         # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
@@ -728,11 +745,8 @@ def rebuildPatterns(arg=0):
     #     selectNewPalette()
 
     buildPatternSequence(config)
-
     disturbance.setupStableSections()
-
     disturbance.rebuildSections()
-
     resetCrossFader(False)
 
 
@@ -752,7 +766,7 @@ def resetCrossFader(_useConfigImage=True):
         # config.fader.startingImage = config.canvasImage.copy()
         config.fader.startingImage = config.compositeImage.copy()
 
-    # _tempImg  =  Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # _tempImg  =  Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     # _tempDraw = ImageDraw.Draw(_tempImg)
     # _tempDraw.rectangle((0,0,500,500), fill = (255,0,0,255))
     # config.canvasImage.paste(_tempImg, (0,0), _tempImg)
@@ -760,7 +774,7 @@ def resetCrossFader(_useConfigImage=True):
     # NOT WORKING
 
     # config.fader.endImage = config.canvasImage.copy()
-    # config.fader.crossFadeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # config.fader.crossFadeImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
 
     config.fader.doingRefreshCount = config.faderDoingRefreshCount
     config.fader.initialized = True
@@ -787,7 +801,9 @@ def iterate():
 
     if config.debugPause:
         config.directorController.slotRate = 2.0
-    handleChangeCurrentCominationSet()
+    config.comboSetDirector.checkTime()
+    if config.comboSetDirector.advance:
+        handleChangeCurrentCominationSet()
     handlePaletteChanges()
     updateBackgroundColor()
     handleClipPlayer()
@@ -980,7 +996,6 @@ def handlePatternRebuild():
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger("\nhandlePatternRebuild(): Rebuiding parts")
             if random.random() < config.chanceRebuildPatternChoosesRandom:
                 config.slotsToChange = []
             else:
@@ -998,6 +1013,9 @@ def handlePatternRebuild():
                 # pieceLogger(f"handlePatternRebuild:  {config.slotsToChange}")
 
             config.settingUpPattern = False
+        pieceLogger("\nhandlePatternRebuild(): Rebuiding parts")
+        pieceLogger(f"handlePatternRebuild(): config.settingUpPattern {config.settingUpPattern}")
+        pieceLogger(f"handlePatternRebuild(): config.slotsToChange {config.slotsToChange}")
         rebuildPatterns()
 
 
@@ -1022,18 +1040,18 @@ def drawBackgroundAndPasteImage():
         config.compositeImage = config.compositeImage.rotate(config.canvasRotation, 3, True)
         config.compositeImage = ImageEnhance.Contrast(config.compositeImage).enhance(1.20)
 
-    if config.useWaveDistortion:
-        config.compositeImage = ImageOps.deform(config.compositeImage, disturbance.WaveDeformer())
-        config.waveDeformXPos += config.waveDeformXPosRate
-        if config.waveDeformXPos > config.screenWidth:
-            config.waveDeformXPos = 0
+    # if config.useWaveDistortion:
+    #     config.compositeImage = ImageOps.deform(config.compositeImage, disturbance.WaveDeformer())
+    #     config.waveDeformXPos += config.waveDeformXPosRate
+    #     if config.waveDeformXPos > config.screenWidth:
+    #         config.waveDeformXPos = 0
 
 
 # def blendStep():
 #     f0 = config.scrollBlendFrame0
 #     f1 = config.scrollBlendFrame1
 #     # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
-#     # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.canvasWidth), round(config.imageYPOS)), config.compositeImage)
+#     # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 
 #     if config.blendStep == 0:
 #         # f0.paste(config.compositeImage,(0,0), config.compositeImage)
@@ -1041,22 +1059,22 @@ def drawBackgroundAndPasteImage():
 
 #     if config.blendStep >= config.blendSteps:
 #         f0.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
-#         f0.paste(config.compositeImage, (round(config.imageXPOS - config.canvasWidth), round(config.imageYPOS)), config.compositeImage)
+#         f0.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 #         config.blendStep = 0
 #         config.imageXPOS += config.XPOSSpeed
-#         if config.imageXPOS >= config.canvasWidth:
+#         if config.imageXPOS >= config.pictureWidth:
 #             config.imageXPOS = 0
 
 #         f1.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
-#         f1.paste(config.compositeImage, (round(config.imageXPOS - config.canvasWidth), round(config.imageYPOS)), config.compositeImage)
+#         f1.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 #         # config.destinationImage.paste(f1, (0, 0))
 #     else:
 #         config.blendStep += 1
-#         tempImag = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+#         tempImag = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
 #         tempImag.paste(Image.blend(f0, f1, config.blendStep / 5), (0, 0))
 #         config.render(tempImag, 0, 0)
 #         # config.imageYPOS += config.YPOSSpeed
-#         # if config.imageYPOS >= config.canvasHeight:
+#         # if config.imageYPOS >= config.pictureHeight:
 #         #     config.imageYPOS = 0
 
 
@@ -1081,36 +1099,45 @@ def renderComposite():
 
         # f0.paste(_bg, (0, 0, f0.width, f0.height))
         # f0.paste(config.compositeImage, (x0, y), config.compositeImage)
-        # f0.paste(config.compositeImage, (x0 - config.canvasWidth, y), config.compositeImage)
+        # f0.paste(config.compositeImage, (x0 - config.pictureWidth, y), config.compositeImage)
 
         # f1.paste(_bg, (0, 0, f1.width, f1.height))
         # f1.paste(config.compositeImage, (x0 + 1, y), config.compositeImage)
-        # f1.paste(config.compositeImage, (x0 + 1 - config.canvasWidth, y), config.compositeImage)
+        # f1.paste(config.compositeImage, (x0 + 1 - config.pictureWidth, y), config.compositeImage)
 
         # config.destinationImage.paste(Image.blend(f0, f1, frac), (0, 0))
         # original method - only good for whole number jumps
         config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
-        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.canvasWidth), round(config.imageYPOS)), config.compositeImage)
+        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 
         config.imageXPOS += config.XPOSSpeed
         # config.imageYPOS += config.YPOSSpeed
 
-        if config.imageXPOS >= config.canvasWidth:
+        if config.imageXPOS >= config.pictureWidth:
             config.imageXPOS = 0
 
-        if config.imageYPOS >= config.canvasHeight:
+        if config.imageYPOS >= config.pictureHeight:
             config.imageYPOS = 0
 
         # # uncomment for all temp canvas layers to show
         if config.setupDeBug:
             showDebugCanvases(config)
 
+        # this used to occur on the composite layer but was getting jumps when
+        # new blocks were added so compromising with wave distortions applied to final 
+        # image  - smoother and slower
+        if config.useWaveDistortion:
+            config.destinationImage = ImageOps.deform(config.destinationImage, disturbance.WaveDeformer())
+            config.waveDeformXPos += config.waveDeformXPosRate
+            if config.waveDeformXPos > config.screenWidth:
+                config.waveDeformXPos = 0
+
         config.render(config.destinationImage, 0, 0)
 
 
 def showDebugCanvases(config):
-    _w = config.canvasWidth
-    _h = config.canvasHeight
+    _w = config.pictureWidth
+    _h = config.pictureHeight
 
     patternCoord = (1 * (_w + 20), 0)
     canvasImageCoord = (1 * (_w + 20), _h * 2 + 40)
@@ -1136,7 +1163,7 @@ def showDebugCanvases(config):
 
 
 def shapeOverLayFunction(temp1):
-    temp2 = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    temp2 = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     temp2Draw = ImageDraw.Draw(temp2)
 
     if not config.useOverlayTileGrid:
@@ -1254,12 +1281,12 @@ def initializeCrossFader():
     config.doTransition = True
     config.doneCount = 0
     config.fader = Fader()
-    config.fader.height = config.canvasHeight
-    config.fader.width = config.canvasWidth
+    config.fader.height = config.pictureHeight
+    config.fader.width = config.pictureWidth
     config.fader.xPos = 0
     config.fader.yPos = 0
     config.fader.setUp()
-    config.fader.startingImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.fader.startingImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.fader.endImage = config.canvasImage
     config.fader.destinationImage = config.image
     loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCount", 5, int)
@@ -1276,8 +1303,8 @@ def loadFilterRemapping():
         config.filterRemapMinVertSize = 24
         config.filterRemapMaxHoriSize = 24
         config.filterRemapMaxVertSize = 24
-        config.filterRemapRangeX = config.canvasWidth
-        config.filterRemapRangeY = config.canvasHeight
+        config.filterRemapRangeX = config.pictureWidth
+        config.filterRemapRangeY = config.pictureHeight
 
 
 def loadFilterRemappingConfigs():
@@ -1298,11 +1325,11 @@ def createImageHolders():
     # disturbanceImage will get the disturbance / glitching
     # image will be the final output
 
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.patternImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.patternImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.canvasImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.destinationImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
-    config.compositeImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.compositeImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
 
     # For scrolling the entire piece
     config.scrollBlendFrame0 = Image.new("RGBA", (config.screenWidth, config.screenHeight), (0, 0, 0, 255))
@@ -1335,6 +1362,9 @@ def main(run=True):
     loadConfigValue(config, workConfig, "movingpattern", "canvasRotation", 0.00, float)
     loadConfigValue(config, workConfig, "movingpattern", "imgcanvasOffsetX", 0, int)
     loadConfigValue(config, workConfig, "movingpattern", "imgcanvasOffsetY", 0, int)
+
+    loadConfigValue(config, workConfig, "movingpattern", "pictureWidth", config.canvasWidth, int)
+    loadConfigValue(config, workConfig, "movingpattern", "pictureHeight", config.canvasHeight, int)
 
     config.repeatProb = 0.99
 
@@ -1378,15 +1408,10 @@ def main(run=True):
     loadConfigValue(config, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
 
     loadFilterRemapping()
-
     # ####################### clip player instert ################################
     loadClipPlayerConfigs()
-
     # ###########################################################################
-
     initializeCrossFader()
-
-    # ###########################################################################
     setupPolyOverlay()
     loadAndSetupPatterns()
     loadAndSetupAllPalettes()
@@ -1423,7 +1448,7 @@ def main(run=True):
     #         config.panelDrawing.canvasToUse = config.renderImageFull
     #         config.panelDrawing.render()
     #     else :
-    #         #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+    #         #config.render(config.canvasImage, 0, 0, config.pictureWidth, config.pictureHeight)
     #         #config.render(config.image, 0, 0)
     #         config.render(config.renderImageFull, 0, 0)
     # """

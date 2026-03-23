@@ -663,6 +663,9 @@ def generatePatternSequence(config):
     config.tileOverlayGridProb = combo.tileOverlayGridProb
     config.patternsInBands = combo.patternsInBands
 
+
+    pieceLogger(f"generatePatternSequence: using palette {_tempPalette.paletteName}")
+
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount
         if random.random() < _baseProb:
@@ -692,7 +695,6 @@ def generatePatternSequence(config):
         _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
 
         try:
-
             if config.settingUpPattern:
                 config.patternSequence.append(_patternBlock)
             else:
@@ -706,11 +708,8 @@ def generatePatternSequence(config):
                     # consecuetive? otherwise just makes the whole thing more patchy?
                     # pieceLogger(f"add_pattern_block: change this slot {_slot}/ {len(config.patternSequence)}")
                     config.patternSequence[_slot] = _patternBlock
-
-            # comment:
         except Exception as e:
             print(e)
-        # end try
 
         _iterCount += 1
 
@@ -728,9 +727,11 @@ def getTempPalette(config):
     if random.SystemRandom().random() > config.changePaletteWhenChangingPatternProb:
         # return config.allAvailablePalettesList[config.currentPaletteIndex]
         return getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
+    
     if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb:
         # print("seledtNewPalette called from: getTempPalette()")
         selectNewPalette(False)
+        
     return changeSinglePalette(config.currentPaletteIndex)
 
 
@@ -764,8 +765,7 @@ def resetCrossFader(_useConfigImage=True):
     # os.system('afplay /System/Library/Sounds/Sosumi.aiff')
     # print(f"DOING NOW  {config.faderDoingRefreshCount}")
     # os.system('say "NOW" &')
-
-    pieceLogger(f"resetCrossFader called : {_useConfigImage}")
+    # pieceLogger(f"resetCrossFader called : {_useConfigImage}")
     config.repeatDrawingMode = 1
     config.fader.fadingDone = False
     config.doTransition = True
@@ -1006,6 +1006,7 @@ def handlePatternRebuild():
             # selectNewPalette(True)
             # selectNewPalette()
         else:
+            pieceLogger("\nhandlePatternRebuild(): Rebuiding parts")
             if random.random() < config.chanceRebuildPatternChoosesRandom:
                 config.slotsToChange = []
             else:
@@ -1023,9 +1024,8 @@ def handlePatternRebuild():
                 # pieceLogger(f"handlePatternRebuild:  {config.slotsToChange}")
 
             config.settingUpPattern = False
-        pieceLogger("\nhandlePatternRebuild(): Rebuiding parts")
-        pieceLogger(f"handlePatternRebuild(): config.settingUpPattern {config.settingUpPattern}")
-        pieceLogger(f"handlePatternRebuild(): config.slotsToChange {config.slotsToChange}")
+        pieceLogger(f"handlePatternRebuild(): config.settingUpPattern {config.settingUpPattern} | color palette : {config.palettes[config.currentPaletteIndex]}")
+        # pieceLogger(f"handlePatternRebuild(): config.slotsToChange {config.slotsToChange}")
         rebuildPatterns()
 
 

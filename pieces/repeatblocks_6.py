@@ -532,8 +532,11 @@ def loadAndSetCombinations():
         comboSet.combinationSetsMinTime = float(workConfig.get(combinationSetName, "combinationSetsMinTime", fallback=30))
         comboSet.combinationSetsMaxTime = float(workConfig.get(combinationSetName, "combinationSetsMaxTime", fallback=60))
 
+        comboSet.maxNumberOfRandomizers = int(workConfig.get(combinationSetName, "maxNumberOfRandomizers", fallback=3))
+
         config.combinationSets.append(comboSet)
     config.currentCombinationsetIndex = 0
+    config.numberOfRandomizersUsed = 0
     config.comboSetDirector = Director(config)
     config.comboSetDirector.slotRate = config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
 
@@ -545,6 +548,7 @@ def handleChangeCurrentCominationSet():
         config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
         # {config.combinationSets[config.currentCombinationsetIndex]}
         pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
+        config.numberOfRandomizersUsed = 0
 
         # turning off to test
         # config.settingUpPattern = True
@@ -630,6 +634,12 @@ def chooseAPattern():
     _patternSelected = _patterns[math.floor(random.uniform(0, len(_patterns)))]
     if random.random() < _dominantPatternProb:
         _patternSelected = _dominantPatterns[math.floor(random.uniform(0, len(_dominantPatterns)))]
+
+    if "randomizer" in _patternSelected :
+        if config.numberOfRandomizersUsed < config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers : 
+            config.numberOfRandomizersUsed +=1
+        else :
+            chooseAPattern()
     return _patternSelected
 
 

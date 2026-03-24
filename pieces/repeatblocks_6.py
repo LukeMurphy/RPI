@@ -215,7 +215,8 @@ def loadAndSetupAllPalettes():
         if arg != "":
             loadPalette(arg)
 
-    config.currentPaletteIndex = 0
+    # config.currentPaletteIndex = 0
+    config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
     setPalette(config, config.currentPaletteIndex)
     # config.borderPalette = changeSinglePalette(config.currentCombinationsetIndex)
 
@@ -357,10 +358,8 @@ def setPalette(config, index=0):
 
 
 def selectNewPalette(_setPalette=True):
-    # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.palettes)))
+    
     config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-    # if config.currentPaletteIndex == len(config.palettes):
-    #     config.currentPaletteIndex = 0
 
     pieceLogger(
         f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}",
@@ -535,7 +534,8 @@ def loadAndSetCombinations():
         comboSet.maxNumberOfRandomizers = int(workConfig.get(combinationSetName, "maxNumberOfRandomizers", fallback=3))
 
         config.combinationSets.append(comboSet)
-    config.currentCombinationsetIndex = 0
+    # config.currentCombinationsetIndex = 0
+    config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
     config.numberOfRandomizersUsed = 0
     config.comboSetDirector = Director(config)
     config.comboSetDirector.slotRate = config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
@@ -549,6 +549,8 @@ def handleChangeCurrentCominationSet():
         # {config.combinationSets[config.currentCombinationsetIndex]}
         pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
         config.numberOfRandomizersUsed = 0
+        # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed 
+        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
 
         # turning off to test
         # config.settingUpPattern = True
@@ -572,10 +574,7 @@ def resetPatternBlocks():
         _patternBlock.tempPalette = tempPalette
 
         if random.random() > config.changeEachblockWhenChangingPatternProb:
-            # _patternBlock.tempPalette = config.allAvailablePalettesList[config.currentPaletteIndex]
             _patternBlock.tempPalette = getTempPalette(config)
-        # else :
-        #     _patternBlock.tempPalette = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
 
         config.patternSequence[i] = _patternBlock
 
@@ -724,12 +723,15 @@ def generatePatternSequence(config):
 
 
 def getTempPalette(config):
+
     if random.SystemRandom().random() > config.changePaletteWhenChangingPatternProb:
-        # return config.allAvailablePalettesList[config.currentPaletteIndex]
+
+
         return getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
+
     
     if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb:
-        # print("seledtNewPalette called from: getTempPalette()")
+
         selectNewPalette(False)
         
     return changeSinglePalette(config.currentPaletteIndex)

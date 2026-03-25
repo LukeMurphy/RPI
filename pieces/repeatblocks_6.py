@@ -568,6 +568,8 @@ def resetPatternBlocks():
 
     tempPalette = changeSinglePalette(config.currentPaletteIndex)
 
+    # pieceLogger(f"config.totalSlots {config.totalSlots}", 4, True)
+
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
         _patternBlock.hasBeenPainted = False
@@ -610,6 +612,7 @@ def buildPatternSequence(config):
         # print(f"config.blockWidth {config.blockWidth} config.patternBlockCols {config.patternBlockCols}")
 
         config.totalSlots = config.patternBlockRows * config.patternBlockCols
+        # pieceLogger(f"config.totalSlots {config.totalSlots}", 4, True)
 
     config.altLineColoring = random.random() < config.combinationSets[config.currentCombinationsetIndex].altColoringProb
     config.popRandomColorProb = random.random() < config.combinationSets[config.currentCombinationsetIndex].popRandomColorProb

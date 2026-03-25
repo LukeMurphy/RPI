@@ -42,6 +42,8 @@ def pieceLogger(args, clr=0, showLine=False):
     if showLine :
         print(f"\n{fstr}.......................................................................................{bcolors.ENDC}")
     print(f"{fstr}{args}          {bcolors.ENDC}")
+    if showLine :
+        print(f"{fstr}.......................................................................................{bcolors.ENDC}")
     # print("\n")
     # print(bcolors.ENDC)
 

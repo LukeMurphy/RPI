@@ -628,7 +628,7 @@ def buildPatternSequence(config):
     config.initPatternBuild = False
 
 
-def chooseAPattern():
+def chooseAPattern(limitRandomizers = False):
     _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
@@ -637,11 +637,17 @@ def chooseAPattern():
     if random.random() < _dominantPatternProb:
         _patternSelected = _dominantPatterns[math.floor(random.uniform(0, len(_dominantPatterns)))]
 
+    # need to limit randomizers 
     if "randomizer" in _patternSelected :
-        if config.numberOfRandomizersUsed < config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers : 
-            config.numberOfRandomizersUsed +=1
+        if limitRandomizers :
+            chooseAPattern(True)
         else :
-            chooseAPattern()
+            if config.numberOfRandomizersUsed < config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers : 
+                config.numberOfRandomizersUsed +=1
+            else :
+                chooseAPattern()
+
+
     return _patternSelected
 
 
@@ -673,6 +679,14 @@ def generatePatternSequence(config):
         if random.random() < _baseProb:
             _patternSelected = chooseAPattern()
             _tempPalette = getTempPalette(config)
+        if "randomizer"  in _patternSelected:
+            if config.numberOfRandomizersUsed >= config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers:
+                pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {config.numberOfRandomizersUsed}")
+                _patternSelected = chooseAPattern(True)
+                _tempPalette = getTempPalette(config)
+            else :
+                config.numberOfRandomizersUsed += 1
+
         _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else random.randint(0, 1)
         if not combo.altBlockRotation:
             _rotate = 0
@@ -808,7 +822,6 @@ def rowsAndDotsSettings():
 
 
 # --------------------- LOOP ACTIONS  ---------------------
-
 
 def iterate():
     """Performs a single iteration of the animation."""

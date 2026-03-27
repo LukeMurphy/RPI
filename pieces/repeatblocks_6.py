@@ -582,7 +582,7 @@ def resetPatternBlocks():
 
 
 def buildPatternSequence(config):
-    pieceLogger("Building new pattern sequence : buildPatternSequence called", 0)
+    pieceLogger("buildPatternSequence(config) called", 0)
     # config.patternSequence = []
     # config.usedPatterns = []
 
@@ -674,7 +674,7 @@ def generatePatternSequence(config):
     config.patternsInBands = combo.patternsInBands
 
 
-    pieceLogger(f"generatePatternSequence: using palette {_tempPalette.paletteName}")
+    pieceLogger(f"generatePatternSequence(config) called: {config.combinationSets[config.currentCombinationsetIndex].name} using _tempPalette: {_tempPalette.paletteName}")
 
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount

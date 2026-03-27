@@ -632,22 +632,23 @@ def chooseAPattern(limitRandomizers = False):
     _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
-
     _patternSelected = _patterns[math.floor(random.uniform(0, len(_patterns)))]
+
     if random.random() < _dominantPatternProb:
         _patternSelected = _dominantPatterns[math.floor(random.uniform(0, len(_dominantPatterns)))]
 
     # need to limit randomizers 
     if "randomizer" in _patternSelected :
         if limitRandomizers :
-            chooseAPattern(True)
+            # chooseAPattern(True)
+            _patternSelected = config.lastPatternSelected
         else :
             if config.numberOfRandomizersUsed < config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers : 
                 config.numberOfRandomizersUsed +=1
             else :
                 chooseAPattern()
 
-
+    
     return _patternSelected
 
 
@@ -660,6 +661,7 @@ def generatePatternSequence(config):
     config.usedPatterns = []
     _baseProb = config.patternChangeWhenBuilding * config.totalSlots / 100
     _patternSelected = chooseAPattern()
+    config.lastPatternSelected = _patternSelected
     _tempPalette = getTempPalette(config)
     _iterCount = 0
     config.initPatternBuild = True
@@ -824,7 +826,7 @@ def rowsAndDotsSettings():
 # --------------------- LOOP ACTIONS  ---------------------
 
 def iterate():
-    """Performs a single iteration of the animation."""
+    '''Performs a single iteration of the animation.'''
     global config
 
     if config.debugPause:

@@ -683,7 +683,7 @@ def generatePatternSequence(config):
             _tempPalette = getTempPalette(config)
         if "randomizer"  in _patternSelected:
             if config.numberOfRandomizersUsed >= config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers:
-                pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {config.numberOfRandomizersUsed}")
+                # pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {config.numberOfRandomizersUsed}")
                 _patternSelected = chooseAPattern(True)
                 _tempPalette = getTempPalette(config)
             else :
@@ -1020,13 +1020,13 @@ def handlePatternRebuild():
 
         # selectNewPalette(False)
         if random.random() < config.rebuildAllSlotsProb:
-            pieceLogger("\nhandlePatternRebuild(): Rebuiding full")
+            pieceLogger(f"\nhandlePatternRebuild(): Rebuiding full : {config.combinationSets[config.currentCombinationsetIndex].name}")
             config.settingUpPattern = True
             config.patternSequence = []
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger("\nhandlePatternRebuild(): Rebuiding parts")
+            pieceLogger(f"\nhandlePatternRebuild(): Rebuiding parts: {config.combinationSets[config.currentCombinationsetIndex].name}")
             if random.random() < config.chanceRebuildPatternChoosesRandom:
                 config.slotsToChange = []
             else:

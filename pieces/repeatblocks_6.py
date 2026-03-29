@@ -1044,7 +1044,10 @@ def handlePatternRebuild():
                 # pieceLogger(f"handlePatternRebuild:  {config.slotsToChange}")
 
             config.settingUpPattern = False
-        pieceLogger(f"handlePatternRebuild(): config.settingUpPattern {config.settingUpPattern} | color palette : {config.palettes[config.currentPaletteIndex]}")
+        try :
+            pieceLogger(f"handlePatternRebuild(): config.settingUpPattern {config.settingUpPattern} | color palette : {config.palettes[config.currentPaletteIndex]}")
+        except Exception as e :
+            pieceLogger(e)
         # pieceLogger(f"handlePatternRebuild(): config.slotsToChange {config.slotsToChange}")
         rebuildPatterns()
 

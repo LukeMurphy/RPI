@@ -359,7 +359,10 @@ def setPalette(config, index=0):
 
 def selectNewPalette(_setPalette=True):
     
-    config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+    # rather than favoring a normal distribution, use a list - getting tired of trying to game the randomness by ordering the list of palettes etc
+    # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+    _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+    config.currentPaletteIndex = random.choice(_listOfIndecies)
 
     pieceLogger(
         f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}",
@@ -545,12 +548,22 @@ def handleChangeCurrentCominationSet():
     pieceLogger("Checking combo set",3)
     disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
     if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone :
-        config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
+
+
+        # rather than favoring a normal distribution, use a list - getting tired of trying to game the randomness by ordering the list of palettes etc
+        # config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
+
+        _listOfIndecies = list(range(len(config.combinationSets)))
+        config.currentPalecurrentCombinationsetIndextteIndex = random.choice(_listOfIndecies)
+
         # {config.combinationSets[config.currentCombinationsetIndex]}
         pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
         config.numberOfRandomizersUsed = 0
+
         # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed 
-        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+        # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+        _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+        config.currentPaletteIndex = random.choice(_listOfIndecies)
 
         # turning off to test
         # config.settingUpPattern = True
@@ -632,7 +645,11 @@ def chooseAPattern(limitRandomizers = False):
     _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
-    _patternSelected = _patterns[math.floor(random.uniform(0, len(_patterns)))]
+
+    # due to normal distribution this kind of favors the things in the middle of the list
+    # should really convert to a random choice operation rather than just numerical random
+    # _patternSelected = _patterns[math.floor(random.uniform(0, len(_patterns)))]
+    _patternSelected = random.choice(_patterns)
 
     if random.random() < _dominantPatternProb:
         _patternSelected = _dominantPatterns[math.floor(random.uniform(0, len(_dominantPatterns)))]

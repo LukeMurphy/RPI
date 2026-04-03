@@ -149,10 +149,10 @@ def setupStableSections():
     minWidth = config.stableSectionsMinWidth
     minHeight = config.stableSectionsMinHeight
     for _ in range(n):
-        xPos = round(random.uniform(0, config.canvasWidth))
-        xPos2 = round(random.uniform(xPos + minWidth, config.canvasWidth))
-        yPos = round(random.uniform(0, config.canvasHeight))
-        yPos2 = round(random.uniform(yPos + minHeight, config.canvasHeight))
+        xPos = round(random.uniform(0, config.pictureWidth))
+        xPos2 = round(random.uniform(xPos + minWidth, config.pictureWidth))
+        yPos = round(random.uniform(0, config.pictureHeight))
+        yPos2 = round(random.uniform(yPos + minHeight, config.pictureHeight))
         config.stableSegments.append([xPos, yPos, xPos2, yPos2])
 
 

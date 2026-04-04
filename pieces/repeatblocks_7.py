@@ -52,6 +52,12 @@ class Fader:
         self.initialized = False
 
         self.fadeInMode = 1
+        self.numParallelBlocks = 1
+        self.activeFades = []
+        self.activeDissolves = []
+        self.pendingLargeBlocks = []
+        self.pendingFadeBlockIndices = []
+        self.crossFadePatches = []
 
     def makeSections(self, initalX, sectionWidth, initalY, sectionHeight, x_sections, y_sections, variations=False):
         baseSectionWidth = math.ceil(sectionWidth / (x_sections))
@@ -97,6 +103,7 @@ class Fader:
         self.fadeInMode = config.faderMode
 
         self.fadeThroughIncrement = config.fadeThroughIncrement
+        self.numParallelBlocks = getattr(config, 'faderParallelBlocks', 1)
 
         self.largeBlocks = self.makeSections(0, config.pictureWidth, 0, config.pictureHeight, config.faderLargeBlockXSections, config.faderLargeBlockYSections, True)
         random.shuffle(self.largeBlocks)
@@ -121,6 +128,8 @@ class Fader:
             self.fadingInSection = self.fadeBlocks[self.blocksChanged]
             self.totalSubSectionsToChange = len(self.fadingInSection)
             self.subsectionsChanged = 0
+            self.pendingFadeBlockIndices = list(range(len(self.largeBlocks)))
+            self.activeDissolves = []
         else:
             self.blocksChanged = 0
             self.totalBlocksToChange = len(self.largeBlocks)
@@ -128,6 +137,8 @@ class Fader:
             self.fadingInSection = self.largeBlocks[self.blocksChanged]
             self.totalSubSectionsToChange = len(self.fadingInSection)
             self.subsectionsChanged = 0
+            self.pendingLargeBlocks = list(self.largeBlocks)
+            self.activeFades = []
 
     def test(self):
         pieceLogger("test")
@@ -157,124 +168,114 @@ class Fader:
             self.crossFadeIn()
 
     def dissolveIn(self):
-        if self.totalBlocksToChange >= 0 and not self.fadingDone:
-
-            if self.initialized:
-                self.initialized = False
-
-            if self.testing:
-                self.testing = False
-
-
-            # pieceLogger(f"{self.blocksChanged} {self.subsectionsChanged} < {self.totalSubSectionsToChange} ")
-
-            if self.subsectionsChanged < self.totalSubSectionsToChange:
-                self.x = self.fadingInSection[self.subsectionsChanged][0]
-                _w = self.fadingInSection[self.subsectionsChanged][1]
-
-                self.y = self.fadingInSection[self.subsectionsChanged][2]
-                _h = self.fadingInSection[self.subsectionsChanged][3]
-
-                self.crossFadeImage = self.endImage.crop((self.x, self.y, max(self.x + _w, self.x), max(self.y + _h, self.y)))
-                self.subsectionsChanged += 1
-            else:
-                if self.blocksChanged < self.totalBlocksToChange - 1:
-                    self.blocksChanged += 1
-                    self.fadingInSection = self.fadeBlocks[self.blocksChanged]
-                   
-                    self.totalSubSectionsToChange = len(self.fadingInSection)
-                    self.subsectionsChanged = 0
-                    # pieceLogger(f"{self.blocksChanged} // {self.totalBlocksToChange} {self.fadingInSection}")
-
-                else:
-                    self.fadingDone = True
-                    self.blocksChanged = 0
-                    config.doTransition = False
-                    pieceLogger("\n ======> FADING DONE")
-                    config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
-
-        else:
-            self.fadingDone = True
+        if self.fadingDone:
             self.initialized = False
+            return
+
+        if self.initialized:
+            self.initialized = False
+        if self.testing:
+            self.testing = False
+
+        # Seed active dissolves up to numParallelBlocks
+        while len(self.activeDissolves) < self.numParallelBlocks and self.pendingFadeBlockIndices:
+            _index = self.pendingFadeBlockIndices.pop(0)
+            self.activeDissolves.append({'fadeBlock': self.fadeBlocks[_index], 'subsectionIndex': 0})
+
+        if not self.activeDissolves:
+            self.fadingDone = True
+            self.blocksChanged = 0
+            config.doTransition = False
+            pieceLogger("\n ======> FADING DONE")
+            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+            return
+
+        self.crossFadePatches = []
+        dissolvesDone = []
+
+        for dissolve in self.activeDissolves:
+            _fadeBlock = dissolve['fadeBlock']
+            _subsectionIndex = dissolve['subsectionIndex']
+            if _subsectionIndex < len(_fadeBlock):
+                self.x = _fadeBlock[_subsectionIndex][0]
+                _w = _fadeBlock[_subsectionIndex][1]
+                self.y = _fadeBlock[_subsectionIndex][2]
+                _h = _fadeBlock[_subsectionIndex][3]
+                patch = self.endImage.crop((self.x, self.y, max(self.x + _w, self.x), max(self.y + _h, self.y)))
+                self.crossFadePatches.append((patch, self.x, self.y))
+                self.crossFadeImage = patch
+                dissolve['subsectionIndex'] += 1
+            else:
+                dissolvesDone.append(dissolve)
+                self.blocksChanged += 1
+
+        for d in dissolvesDone:
+            self.activeDissolves.remove(d)
+
+        if not self.activeDissolves and not self.pendingFadeBlockIndices:
+            self.fadingDone = True
+            self.blocksChanged = 0
+            config.doTransition = False
+            pieceLogger("\n ======> FADING DONE")
+            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+
 
     def crossFadeIn(self):
-        if self.totalBlocksToChange >= 0 and not self.fadingDone:
+        if self.fadingDone:
+            return
 
-            if self.initialized:
-                self.initialized = False
+        if self.initialized:
+            self.initialized = False
+        if self.testing:
+            self.testing = False
 
-            if self.testing:
-                self.testing = False
+        # Seed active fades up to numParallelBlocks
+        while len(self.activeFades) < self.numParallelBlocks and self.pendingLargeBlocks:
+            section = self.pendingLargeBlocks.pop(0)
+            self.activeFades.append({'section': section, 'amount': 0.0})
 
-            if self.blocksChanged < self.totalBlocksToChange - 1:
-                self.x = self.fadingInSection[0]
-                _w = self.fadingInSection[1]
-                self.y = self.fadingInSection[2]
-                _h = self.fadingInSection[3]
+        if not self.activeFades:
+            self.fadingDone = True
+            self.blocksChanged = 0
+            self.fadeThroughAmount = 0
+            config.doTransition = False
+            pieceLogger("\n ======> FADING DONE")
+            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+            return
 
-                _tempEnd = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
-                _tempStart = self.startingImage.crop((self.x, self.y, self.x + _w, self.y + _h))
-                # self.crossFadeImage = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
+        self.crossFadePatches = []
+        fadesDone = []
 
-                self.crossFadeImage = Image.blend(
-                    _tempStart,
-                    _tempEnd,
-                    self.fadeThroughAmount,
-                )
+        for fade in self.activeFades:
+            s = fade['section']
+            self.x = s[0]
+            _w = s[1]
+            self.y = s[2]
+            _h = s[3]
+            amt = min(fade['amount'], 1.0)
 
-                if self.fadeThroughAmount >= 0.99:
-                    self.blocksChanged += 1
-                    self.fadingInSection = self.largeBlocks[self.blocksChanged]
-                    self.fadeThroughAmount = 0
-                else:
-                    self.fadeThroughAmount += self.fadeThroughIncrement
+            _tempEnd = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
+            _tempStart = self.startingImage.crop((self.x, self.y, self.x + _w, self.y + _h))
+            blended = Image.blend(_tempStart, _tempEnd, amt)
+            self.crossFadePatches.append((blended, self.x, self.y))
+            self.crossFadeImage = blended
 
-            else:
-                self.fadingDone = True
-                self.blocksChanged = 0
-                self.fadeThroughAmount = 0
-                config.doTransition = False
-                pieceLogger("\n ======> FADING DONE")
-                config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
-
-    def _fadeIn(self, config):
-        if self.totalBlocksToChange >= 0 and not self.fadingDone:
-
-            if self.initialized:
-                # print(self.fadingDone, self.blocksChanged)
-                self.initialized = False
-
-            if self.testing:
-                self.testing = False
-
-            if self.blocksChanged <= self.totalBlocksToChange:
-
-                if self.fadeThruBlack:
-                    self.blankImage = Image.new("RGBA", (self.width, self.height))
-                    self.blankImageDraw = ImageDraw.Draw(self.blankImage)
-                    self.blankImageDraw.rectangle((0, 0, self.width, self.height), fill=(0, 0, 0, 255))
-
-                percent = self.blocksChanged / self.totalBlocksToChange
-                self.crossFadeImage = Image.blend(
-                    self.startingImage,
-                    self.endImage,
-                    percent,
-                )
-
-                # self.test()
-                self.destinationImage.paste(self.crossFadeImage, (self.xPos, self.yPos), self.crossFadeImage)
+            if fade['amount'] >= 1.0:
+                fadesDone.append(fade)
                 self.blocksChanged += 1
             else:
-                # self.destinationImage.paste(self.startingImage, (self.xPos, self.yPos), self.startingImage)
-                self.fadingDone = True
-                self.blocksChanged = 0
-                # self.blankImage = self.startingImage.copy()
-                self.testing = True
-                config.doTransition = False
-                # print("\n ======> FADING DONE")
-        else:
+                fade['amount'] += self.fadeThroughIncrement
+
+        for fade in fadesDone:
+            self.activeFades.remove(fade)
+
+        if not self.activeFades and not self.pendingLargeBlocks:
             self.fadingDone = True
-            self.initialized = False
+            self.blocksChanged = 0
+            self.fadeThroughAmount = 0
+            config.doTransition = False
+            pieceLogger("\n ======> FADING DONE")
+            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
 
 
 class PatternBlock:
@@ -540,8 +541,8 @@ def selectNewPalette(_setPalette=True):
 
     if _setPalette:
         rebuildPatterns()
+        resetCrossFader()
         resetPatternBlocks()
-        # resetCrossFader()
 
     # if random.random() < config.probPatternsRebuildAfterNewPalette:
     #     rebuildPatterns()
@@ -728,8 +729,10 @@ def handleChangeCurrentCominationSet():
 
         # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed
         # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-        _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-        config.currentPaletteIndex = random.choice(_listOfIndecies)
+
+        if random.random() < config.changePaletteWhenRebuildProb :
+            _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+            config.currentPaletteIndex = random.choice(_listOfIndecies)
 
         # turning off to test
         # config.settingUpPattern = True
@@ -756,7 +759,7 @@ def resetPatternBlocks():
 
     tempPalette = changeSinglePalette(config.currentPaletteIndex)
 
-    # pieceLogger(f"config.totalSlots {config.totalSlots}", 4, True)
+    pieceLogger(f"resetPatternBlocks() : config.totalSlots {config.totalSlots}", 4, True)
 
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
@@ -791,8 +794,8 @@ def buildPatternSequence(config):
         config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
         config.blockDraw = ImageDraw.Draw(config.blockImage)
 
-        config.patternBlockCols = round(config.pictureWidth / config.blockWidth)
-        config.patternBlockRows = round(config.pictureHeight / config.blockHeight)
+        config.patternBlockCols = math.ceil(config.pictureWidth / config.blockWidth)
+        config.patternBlockRows = math.ceil(config.pictureHeight / config.blockHeight)
 
         # considering making this be an option to fit exactly the width - i.e. choose the number of columns
         # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
@@ -1025,7 +1028,7 @@ def iterate():
     if config.comboSetDirector.advance:
         handleChangeCurrentCominationSet()
 
-    handlePaletteChanges()
+    # handlePaletteChanges()
 
     updateBackgroundColor()
 
@@ -1138,12 +1141,12 @@ def updateBackgroundColor():
     config.bgColor = tuple(round(a * config.brightness) for a in config.c1.currentColor)
 
 
-def handlePaletteChanges():
-    if random.random() < config.changePaletteAnytimeProb and config.fader.fadingDone:
-        print("selectPaletted called from handlePaletteChanges()")
-        selectNewPalette(True)
-        # rebuildSections()
-        # resetCrossFader(False)
+# def handlePaletteChanges():
+#     if random.random() < config.changePaletteAnytimeProb and config.fader.fadingDone:
+#         print("selectPaletted called from handlePaletteChanges()")
+#         selectNewPalette(True)
+#         # rebuildSections()
+#         # resetCrossFader(False)
 
 
 def drawAndProcessPattern():
@@ -1184,6 +1187,7 @@ def remapFilter(config):
     endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
     config.remapImageBlockDestination = [startX, startY]
+    # config.ditherfilterbrightness = .1
 
 
 def handleFadingAndRebuild():
@@ -1260,8 +1264,8 @@ def drawBackgroundAndPasteImage():
 
         for _ in range(config.faderDoingRefreshCountIterations):
             config.fader.fadeIn(config)
-            # config.compositeImage.paste(config.fader.crossFadeImage, (0, 0), config.fader.crossFadeImage)
-            config.compositeImage.paste(config.fader.crossFadeImage, (config.fader.x, config.fader.y), config.fader.crossFadeImage)
+            for (_patch, _px, _py) in config.fader.crossFadePatches:
+                config.compositeImage.paste(_patch, (_px, _py), _patch)
 
     elif config.sectionDisturbance:
         if config.doSectionDisturbance:
@@ -1479,8 +1483,6 @@ def initializeCrossFader():
     config.fader.startingImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.fader.endImage = config.canvasImage
     config.fader.destinationImage = config.image
-    loadConfigValue(config, workConfig, "movingpattern", "faderMode", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCountIterations", 20, int)
     loadConfigValue(config, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
 
     loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
@@ -1489,15 +1491,24 @@ def initializeCrossFader():
     loadConfigValue(config, workConfig, "movingpattern", "faderSmallBlockYSections", 40, int)
     loadConfigValue(config, workConfig, "movingpattern", "sectionDeltaWidth", 0, int)
     loadConfigValue(config, workConfig, "movingpattern", "sectionDeltaHeight", 0, int)
+    loadConfigValue(config, workConfig, "movingpattern", "faderParallelBlocks", 1, int)
+
+    loadConfigValue(config, workConfig, "movingpattern", "faderMode", 0, int)
+    loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCountIterations", 20, int)
+    loadConfigValue(config, workConfig, "movingpattern", "faderDissolveDoingRefreshCountIterations", 100, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCountIterationsStartup", 500, int)
+
     config.initialfaderDoingRefreshCountIterations = config.faderDoingRefreshCountIterations
     config.faderDoingRefreshCountIterations = config.faderDoingRefreshCountIterationsStartup
 
     if config.faderMode == 0:
         # config.faderDoingRefreshCountIterations = 1
         config.initialfaderDoingRefreshCountIterations = 1
+    if config.faderMode == 1 :
+        config.initialfaderDoingRefreshCountIterations = config.faderDissolveDoingRefreshCountIterations
+
     config.fader.setUp(config)
-    pieceLogger(config.faderMode)
+
 
 
 def loadFilterRemapping():

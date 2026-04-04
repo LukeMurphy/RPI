@@ -183,11 +183,7 @@ class Fader:
             self.activeDissolves.append({'fadeBlock': self.fadeBlocks[_index], 'subsectionIndex': 0})
 
         if not self.activeDissolves:
-            self.fadingDone = True
-            self.blocksChanged = 0
-            config.doTransition = False
-            pieceLogger("\n ======> FADING DONE")
-            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+            self.endFades()
             return
 
         self.crossFadePatches = []
@@ -213,15 +209,19 @@ class Fader:
             self.activeDissolves.remove(d)
 
         if not self.activeDissolves and not self.pendingFadeBlockIndices:
+            self.endFades()
+
+    def endFades(self):
             self.fadingDone = True
             self.blocksChanged = 0
+            self.fadeThroughAmount = 0
             config.doTransition = False
             pieceLogger("\n ======> FADING DONE")
             config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
 
-
     def crossFadeIn(self):
         if self.fadingDone:
+            self.endFades()
             return
 
         if self.initialized:
@@ -235,12 +235,7 @@ class Fader:
             self.activeFades.append({'section': section, 'amount': 0.0})
 
         if not self.activeFades:
-            self.fadingDone = True
-            self.blocksChanged = 0
-            self.fadeThroughAmount = 0
-            config.doTransition = False
-            pieceLogger("\n ======> FADING DONE")
-            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+            self.endFades()
             return
 
         self.crossFadePatches = []
@@ -270,12 +265,8 @@ class Fader:
             self.activeFades.remove(fade)
 
         if not self.activeFades and not self.pendingLargeBlocks:
-            self.fadingDone = True
-            self.blocksChanged = 0
-            self.fadeThroughAmount = 0
-            config.doTransition = False
-            pieceLogger("\n ======> FADING DONE")
-            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+            self.endFades()
+
 
 
 class PatternBlock:
@@ -1291,8 +1282,8 @@ def renderComposite():
         if config.usePolygonOverlay:
             config.compositeImage = shapeOverLayFunction(config.compositeImage)
 
-        config.compositeImageDraw = ImageDraw.Draw(config.compositeImage)
-        config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+        # config.compositeImageDraw = ImageDraw.Draw(config.compositeImage)
+        # config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
         # config.compositeImageDraw.rectangle((60,70,128,120), fill = (255,0,0,50))
         # config.patternImageDraw.rectangle((60, 70, 128, 120), fill=(255, 0, 0, 50))
         
@@ -1302,14 +1293,14 @@ def renderComposite():
         # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
         # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 
-        config.imageXPOS += config.XPOSSpeed
-        # config.imageYPOS += config.YPOSSpeed
+        # config.imageXPOS += config.XPOSSpeed
+        # # config.imageYPOS += config.YPOSSpeed
 
-        if config.imageXPOS >= config.pictureWidth:
-            config.imageXPOS = 0
+        # if config.imageXPOS >= config.pictureWidth:
+        #     config.imageXPOS = 0
 
-        if config.imageYPOS >= config.pictureHeight:
-            config.imageYPOS = 0
+        # if config.imageYPOS >= config.pictureHeight:
+        #     config.imageYPOS = 0
 
         # showDebugCanvases(config)
         # # uncomment for all temp canvas layers to show

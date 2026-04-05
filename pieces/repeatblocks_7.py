@@ -92,18 +92,28 @@ class Fader:
         return sections
 
     def setUp(self, config):
+        # self.fadeInMode = config.faderMode
+        self.fadeInMode = 1 if random.random() < config.faderProbDissolve else 0
 
-        pieceLogger("Fader initialized setup")
+        if config.faderInit :
+            config.faderInit = False
+        else :
+            if self.fadeInMode == 0 :
+                config.faderDoingRefreshCountIterations = config.faderFadeDoingRefreshCountIterations
+            if self.fadeInMode == 1:
+                config.faderDoingRefreshCountIterations = config.faderDissolveDoingRefreshCountIterations
+
+        pieceLogger(f"=> Fader initialized setup {self.fadeInMode} {config.faderDoingRefreshCountIterations}")
+
         self.blankImage = Image.new("RGBA", (self.width, self.height))
         self.startingImage = Image.new("RGBA", (self.width, self.height))
         self.endImage = Image.new("RGBA", (self.width, self.height))
         self.crossFadeImage = Image.new("RGBA", (self.width, self.height))
         self.xRange = [0, config.pictureWidth]
         self.yRange = [0, config.pictureHeight]
-        self.fadeInMode = config.faderMode
 
         self.fadeThroughIncrement = config.fadeThroughIncrement
-        self.numParallelBlocks = getattr(config, 'faderParallelBlocks', 1)
+        self.numParallelBlocks = getattr(config, "faderParallelBlocks", 1)
 
         self.largeBlocks = self.makeSections(0, config.pictureWidth, 0, config.pictureHeight, config.faderLargeBlockXSections, config.faderLargeBlockYSections, True)
         random.shuffle(self.largeBlocks)
@@ -123,8 +133,6 @@ class Fader:
             self.blocksChanged = 0
             self.totalBlocksToChange = len(self.largeBlocks)
 
-            # pieceLogger(f"sections total to change : {self.totalBlocksToChange}")
-
             self.fadingInSection = self.fadeBlocks[self.blocksChanged]
             self.totalSubSectionsToChange = len(self.fadingInSection)
             self.subsectionsChanged = 0
@@ -140,26 +148,6 @@ class Fader:
             self.pendingLargeBlocks = list(self.largeBlocks)
             self.activeFades = []
 
-    def test(self):
-        pieceLogger("test")
-        # self.blankImage = Image.new("RGBA", (self.width, self.height))
-        tDraw1 = ImageDraw.Draw(self.startingImage)
-        tDraw1.rectangle((0, 0, 100, 100), fill=(0, 255, 255, 200))
-
-        tDraw2 = ImageDraw.Draw(self.crossFadeImage)
-        tDraw2.rectangle((100, 0, 200, 100), fill=(0, 0, 255, 200))
-
-        tDraw3 = ImageDraw.Draw(self.destinationImage)
-        tDraw3.rectangle((200, 0, 300, 100), fill=(0, 255, 0, 255))
-
-        tDraw4 = ImageDraw.Draw(config.patternImage)
-        tDraw4.rectangle((0, 100, 100, 200), fill=(255, 255, 0, 255))
-
-        tDraw5 = ImageDraw.Draw(config.canvasImage)
-        tDraw5.rectangle((100, 100, 200, 200), fill=(255, 0, 255, 255))
-
-        tDraw6 = ImageDraw.Draw(config.compositeImage)
-        tDraw6.rectangle((0, 200, 0, 300), fill=(255, 250, 255, 255))
 
     def fadeIn(self, config):
         if self.fadeInMode == 1:
@@ -180,7 +168,7 @@ class Fader:
         # Seed active dissolves up to numParallelBlocks
         while len(self.activeDissolves) < self.numParallelBlocks and self.pendingFadeBlockIndices:
             _index = self.pendingFadeBlockIndices.pop(0)
-            self.activeDissolves.append({'fadeBlock': self.fadeBlocks[_index], 'subsectionIndex': 0})
+            self.activeDissolves.append({"fadeBlock": self.fadeBlocks[_index], "subsectionIndex": 0})
 
         if not self.activeDissolves:
             self.endFades()
@@ -190,8 +178,8 @@ class Fader:
         dissolvesDone = []
 
         for dissolve in self.activeDissolves:
-            _fadeBlock = dissolve['fadeBlock']
-            _subsectionIndex = dissolve['subsectionIndex']
+            _fadeBlock = dissolve["fadeBlock"]
+            _subsectionIndex = dissolve["subsectionIndex"]
             if _subsectionIndex < len(_fadeBlock):
                 self.x = _fadeBlock[_subsectionIndex][0]
                 _w = _fadeBlock[_subsectionIndex][1]
@@ -200,7 +188,7 @@ class Fader:
                 patch = self.endImage.crop((self.x, self.y, max(self.x + _w, self.x), max(self.y + _h, self.y)))
                 self.crossFadePatches.append((patch, self.x, self.y))
                 self.crossFadeImage = patch
-                dissolve['subsectionIndex'] += 1
+                dissolve["subsectionIndex"] += 1
             else:
                 dissolvesDone.append(dissolve)
                 self.blocksChanged += 1
@@ -212,12 +200,12 @@ class Fader:
             self.endFades()
 
     def endFades(self):
-            self.fadingDone = True
-            self.blocksChanged = 0
-            self.fadeThroughAmount = 0
-            config.doTransition = False
-            pieceLogger("\n ======> FADING DONE")
-            config.faderDoingRefreshCountIterations = config.initialfaderDoingRefreshCountIterations
+        self.fadingDone = True
+        self.blocksChanged = 0
+        self.fadeThroughAmount = 0
+        config.doTransition = False
+        pieceLogger("=> FADING DONE")
+
 
     def crossFadeIn(self):
         if self.fadingDone:
@@ -232,7 +220,7 @@ class Fader:
         # Seed active fades up to numParallelBlocks
         while len(self.activeFades) < self.numParallelBlocks and self.pendingLargeBlocks:
             section = self.pendingLargeBlocks.pop(0)
-            self.activeFades.append({'section': section, 'amount': 0.0})
+            self.activeFades.append({"section": section, "amount": 0.0})
 
         if not self.activeFades:
             self.endFades()
@@ -242,12 +230,12 @@ class Fader:
         fadesDone = []
 
         for fade in self.activeFades:
-            s = fade['section']
+            s = fade["section"]
             self.x = s[0]
             _w = s[1]
             self.y = s[2]
             _h = s[3]
-            amt = min(fade['amount'], 1.0)
+            amt = min(fade["amount"], 1.0)
 
             _tempEnd = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
             _tempStart = self.startingImage.crop((self.x, self.y, self.x + _w, self.y + _h))
@@ -255,18 +243,17 @@ class Fader:
             self.crossFadePatches.append((blended, self.x, self.y))
             self.crossFadeImage = blended
 
-            if fade['amount'] >= 1.0:
+            if fade["amount"] >= 1.0:
                 fadesDone.append(fade)
                 self.blocksChanged += 1
             else:
-                fade['amount'] += self.fadeThroughIncrement
+                fade["amount"] += self.fadeThroughIncrement
 
         for fade in fadesDone:
             self.activeFades.remove(fade)
 
         if not self.activeFades and not self.pendingLargeBlocks:
             self.endFades()
-
 
 
 class PatternBlock:
@@ -281,6 +268,8 @@ class CombinationSet:
 
 
 # --------------------- UTILS       ---------------------
+
+
 def transformImage(img):
     width, height = img.size
     m = -0.0
@@ -340,6 +329,17 @@ def handleClipPlayer():
     temp = config.clipMain.canvasImage.resize((config.clipMain.clipWidth, config.clipMain.clipHeight))
     temp = temp.rotate(config.clipRotate, expand=True)
     config.image.paste(temp, (config.clipXPos, config.clipYPos), mask=config.clipMain.removalMask)
+
+
+def loadConfigValue(obj, workConfig, section, option, default, type_converter):
+    try:
+        if type_converter == bool:
+            setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
+        else:
+            setattr(obj, option, type_converter(workConfig.get(section, option)))
+    except Exception as e:
+        pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
+        setattr(obj, option, default)
 
 
 # --------------------- PALETTES      ---------------------
@@ -721,7 +721,7 @@ def handleChangeCurrentCominationSet():
         # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed
         # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
 
-        if random.random() < config.changePaletteWhenRebuildProb :
+        if random.random() < config.changePaletteWhenRebuildProb:
             _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
             config.currentPaletteIndex = random.choice(_listOfIndecies)
 
@@ -1063,7 +1063,9 @@ def drawRepeatedPatternImage(config, canvasImage):
             if not _patternBlock.rePainting or _patternBlock.isBorder:
                 _patternBlock.hasBeenPainted = True
 
-    updateFaderEndpoint()
+    # config.patternImage = canvasImage.copy()
+    config.fader.endImage = config.patternImage.copy()
+    # config.fader.endImage = config.canvasImage.copy()
 
 
 def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extraOverlapy):
@@ -1107,13 +1109,6 @@ def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extr
     config.canvasImage.paste(_temp, (_xPos, _yPos), _temp)
 
 
-def updateFaderEndpoint():
-    # config.patternImage = canvasImage.copy()
-    config.fader.endImage = config.patternImage.copy()
-    # config.fader.endImage = config.canvasImage.copy()
-
-
-# ------------------------------------------------
 def drawBlockWithPattern(config, _counter):
     """Applies pattern variations based on the pattern sequence."""
     _patternBlock = config.patternSequence[_counter]
@@ -1169,16 +1164,65 @@ def handleFilterRemapping():
         remapFilter(config)
 
 
+def expandFilterRemap():
+
+    _pos = list(config.remapImageBlockSection)
+    _pos[0] -= 2
+    _pos[2] += 2
+
+    if _pos[0] <= (config.newFilterStartX) :
+        config.filterRemappingProb = config.basefilterRemappingProb
+        config.filterRemapContracting = 1
+        # pieceLogger(_pos)
+        # pieceLogger("Expanidng done")
+    else:
+        config.filterRemappingProb = 1.0
+        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemappingProb = 1.0
+
+
+def contractFilterRemap():
+    _pos = list(config.remapImageBlockSection)
+    _pos[0] += 1
+    _pos[2] -= 1
+
+    if _pos[0] >= _pos[2]:
+        config.filterRemappingProb = config.basefilterRemappingProb
+        config.filterRemapContracting = 0
+        config.remapImageBlockSection = (_pos[2],_pos[1],_pos[2],_pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+    else:
+        # pieceLogger(_pos)
+        config.filterRemappingProb = 1.0
+        config.remapImageBlockSection = tuple(_pos)
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemappingProb = 1.0
+
+
 def remapFilter(config):
     """Remaps the filter block section."""
     config.filterRemap = True
-    startX = round(random.uniform(0, config.filterRemapRangeX))
-    startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
-    endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
-    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-    config.remapImageBlockDestination = [startX, startY]
-    # config.ditherfilterbrightness = .1
+    if config.filterRemappingProb != 1.0 and config.filterRemapContracting == 0:
+        config.filterRemapContracting = 2
+        config.newFilterStartX = round(random.uniform(0, config.filterRemapRangeX))
+        config.newFilterStartY = round(random.uniform(0, config.filterRemapRangeY))
+        config.newFilterEndX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
+        config.newFilterEndY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
+        config.remapImageBlockSection = (config.newFilterStartX + config.newFilterEndX, 
+                                         config.newFilterStartY, 
+                                         config.newFilterStartX + config.newFilterEndX, 
+                                         config.newFilterStartY + config.newFilterEndY)
+        pieceLogger("Resetting to expand")
+        # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
+
+    if config.filterRemapContracting == 1:
+        # pieceLogger("Resetting to contract")
+        contractFilterRemap()
+
+    if config.filterRemapContracting == 2:
+        expandFilterRemap()
 
 
 def handleFadingAndRebuild():
@@ -1255,7 +1299,7 @@ def drawBackgroundAndPasteImage():
 
         for _ in range(config.faderDoingRefreshCountIterations):
             config.fader.fadeIn(config)
-            for (_patch, _px, _py) in config.fader.crossFadePatches:
+            for _patch, _px, _py in config.fader.crossFadePatches:
                 config.compositeImage.paste(_patch, (_px, _py), _patch)
 
     elif config.sectionDisturbance:
@@ -1286,9 +1330,8 @@ def renderComposite():
         # config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
         # config.compositeImageDraw.rectangle((60,70,128,120), fill = (255,0,0,50))
         # config.patternImageDraw.rectangle((60, 70, 128, 120), fill=(255, 0, 0, 50))
-        
-        config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
+        config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
         # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
         # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
@@ -1460,22 +1503,11 @@ def setupPolyOverlay():  # sourcery skip: extract-method
 # ----------------- INITIAL ACTIONS  ---------------------
 
 
-def initializeCrossFader():
+def loadAndInitializeCrossFader():
 
     pieceLogger("Initialize cross fader")
-
-    config.doTransition = True
-    config.doneCount = 0
-    config.fader = Fader()
-    config.fader.height = config.pictureHeight
-    config.fader.width = config.pictureWidth
-    config.fader.xPos = 0
-    config.fader.yPos = 0
-    config.fader.startingImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
-    config.fader.endImage = config.canvasImage
-    config.fader.destinationImage = config.image
     loadConfigValue(config, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
-
+    loadConfigValue(config, workConfig, "movingpattern", "faderProbDissolve", .5, float)
     loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockYSections", 3, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderSmallBlockXSections", 40, int)
@@ -1483,41 +1515,24 @@ def initializeCrossFader():
     loadConfigValue(config, workConfig, "movingpattern", "sectionDeltaWidth", 0, int)
     loadConfigValue(config, workConfig, "movingpattern", "sectionDeltaHeight", 0, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderParallelBlocks", 1, int)
-
-    loadConfigValue(config, workConfig, "movingpattern", "faderMode", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCountIterations", 20, int)
+    loadConfigValue(config, workConfig, "movingpattern", "faderFadeDoingRefreshCountIterations", 20, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderDissolveDoingRefreshCountIterations", 100, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCountIterationsStartup", 500, int)
 
-    config.initialfaderDoingRefreshCountIterations = config.faderDoingRefreshCountIterations
+    config.doTransition = True
+    config.doneCount = 0
+    config.faderInit = True
     config.faderDoingRefreshCountIterations = config.faderDoingRefreshCountIterationsStartup
-
-    if config.faderMode == 0:
-        # config.faderDoingRefreshCountIterations = 1
-        config.initialfaderDoingRefreshCountIterations = 1
-    if config.faderMode == 1 :
-        config.initialfaderDoingRefreshCountIterations = config.faderDissolveDoingRefreshCountIterations
-
+    config.fader = Fader()
+    config.fader.height = config.pictureHeight
+    config.fader.width = config.pictureWidth
+    config.fader.startingImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.fader.endImage = config.canvasImage
+    config.fader.destinationImage = config.image
     config.fader.setUp(config)
 
 
-
 def loadFilterRemapping():
-    try:
-        loadFilterRemappingConfigs()
-    except Exception as e:
-        pieceLogger(e)
-        config.filterRemapping = False
-        config.filterRemappingProb = 0.0
-        config.filterRemapMinHoriSize = 24
-        config.filterRemapMinVertSize = 24
-        config.filterRemapMaxHoriSize = 24
-        config.filterRemapMaxVertSize = 24
-        config.filterRemapRangeX = config.pictureWidth
-        config.filterRemapRangeY = config.pictureHeight
-
-
-def loadFilterRemappingConfigs():
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapping", False, bool)
     loadConfigValue(config, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
@@ -1526,6 +1541,8 @@ def loadFilterRemappingConfigs():
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
+    config.filterRemapContracting = 0
+    config.basefilterRemappingProb = config.filterRemappingProb
 
 
 def createImageHolders():
@@ -1625,7 +1642,7 @@ def main(run=True):
     # ####################### clip player instert ################################
     loadClipPlayerConfigs()
     # ###########################################################################
-    initializeCrossFader()
+    loadAndInitializeCrossFader()
     setupPolyOverlay()
     loadAndSetupPatterns()
     loadAndSetupAllPalettes()
@@ -1685,17 +1702,6 @@ def runWork():
         time.sleep(config.redrawSpeed)
         if not config.standAlone:
             config.callBack()
-
-
-def loadConfigValue(obj, workConfig, section, option, default, type_converter):
-    try:
-        if type_converter == bool:
-            setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
-        else:
-            setattr(obj, option, type_converter(workConfig.get(section, option)))
-    except Exception as e:
-        pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
-        setattr(obj, option, default)
 
 
 ###############################################

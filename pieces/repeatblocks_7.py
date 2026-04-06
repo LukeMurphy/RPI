@@ -155,6 +155,7 @@ class Fader:
         else:
             self.crossFadeIn()
 
+
     def dissolveIn(self):
         if self.fadingDone:
             self.initialized = False
@@ -199,6 +200,7 @@ class Fader:
         if not self.activeDissolves and not self.pendingFadeBlockIndices:
             self.endFades()
 
+
     def endFades(self):
         self.fadingDone = True
         self.blocksChanged = 0
@@ -236,7 +238,13 @@ class Fader:
             self.y = s[2]
             _h = s[3]
             amt = min(fade["amount"], 1.0)
+            if  (self.x + _w) <= self.x :
+                pieceLogger(_w)
+                _w = 0
 
+            if  (self.y + _h)<= self.y :
+                pieceLogger(_h)
+                _h = 0
             _tempEnd = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
             _tempStart = self.startingImage.crop((self.x, self.y, self.x + _w, self.y + _h))
             blended = Image.blend(_tempStart, _tempEnd, amt)
@@ -1156,6 +1164,7 @@ def redrawAndLoadImage(config):
 
     config.repeatDrawingMode = 0
 
+# ---- dither remapping ------------
 
 def handleFilterRemapping():
     """Handles filter remapping if enabled."""
@@ -1167,14 +1176,18 @@ def handleFilterRemapping():
 def expandFilterRemap():
 
     _pos = list(config.remapImageBlockSection)
-    _pos[0] -= 2
+    # pieceLogger(_pos)
+    _pos[0] = max(_pos[0] - 2, config.newFilterStartX)
     _pos[2] += 2
-
+    # _pos[1] -= 2
+    # _pos[3] += 2
+    # or _pos[1] <= (config.newFilterStartY)
     if _pos[0] <= (config.newFilterStartX) :
         config.filterRemappingProb = config.basefilterRemappingProb
+        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
         config.filterRemapContracting = 1
-        # pieceLogger(_pos)
-        # pieceLogger("Expanidng done")
+        pieceLogger(f"Expanidng done {config.newFilterStartX}")
     else:
         config.filterRemappingProb = 1.0
         config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
@@ -1184,15 +1197,18 @@ def expandFilterRemap():
 
 def contractFilterRemap():
     _pos = list(config.remapImageBlockSection)
+    # pieceLogger(_pos)
     _pos[0] += 1
     _pos[2] -= 1
+    _pos[1] += 1
+    _pos[3] -= 1
 
-    if _pos[0] >= _pos[2]:
+    if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
         config.filterRemappingProb = config.basefilterRemappingProb
         config.filterRemapContracting = 0
-        config.remapImageBlockSection = (_pos[2],_pos[1],_pos[2],_pos[3])
+        config.remapImageBlockSection = (_pos[2],_pos[3],_pos[2],_pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+        pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
     else:
         # pieceLogger(_pos)
         config.filterRemappingProb = 1.0
@@ -1224,6 +1240,8 @@ def remapFilter(config):
     if config.filterRemapContracting == 2:
         expandFilterRemap()
 
+
+# ----------------------------------
 
 def handleFadingAndRebuild():
     """Handles image fading and pattern rebuilding."""

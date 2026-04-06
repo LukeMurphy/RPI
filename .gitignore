@@ -18,6 +18,8 @@ out/
 build/
 dist/
 *.spec
+*.sfdx
+/.sfdx
 
 # Playwright
 node_modules/

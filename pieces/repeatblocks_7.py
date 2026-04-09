@@ -1177,8 +1177,8 @@ def expandFilterRemap():
 
     _pos = list(config.remapImageBlockSection)
     # pieceLogger(_pos)
-    _pos[0] = max(_pos[0] - 2, config.newFilterStartX)
-    _pos[2] += 2
+    _pos[0] = max(_pos[0] - config.expandXSpeed, config.newFilterStartX)
+    _pos[2] += config.expandXSpeed
     # _pos[1] -= 2
     # _pos[3] += 2
     # or _pos[1] <= (config.newFilterStartY)
@@ -1198,10 +1198,10 @@ def expandFilterRemap():
 def contractFilterRemap():
     _pos = list(config.remapImageBlockSection)
     # pieceLogger(_pos)
-    _pos[0] += 1
-    _pos[2] -= 1
-    _pos[1] += 1
-    _pos[3] -= 1
+    _pos[0] += config.contractXSpeed
+    _pos[2] -= config.contractXSpeed
+    _pos[1] += config.contractYSpeed
+    _pos[3] -= config.contractYSpeed
 
     if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
         config.filterRemappingProb = config.basefilterRemappingProb
@@ -1559,6 +1559,10 @@ def loadFilterRemapping():
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
     loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "contractXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "movingpattern", "contractYSpeed", 2, int)
+    loadConfigValue(config, workConfig, "movingpattern", "expandXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "movingpattern", "expandYSpeed", 2, int)
     config.filterRemapContracting = 0
     config.basefilterRemappingProb = config.filterRemappingProb
 

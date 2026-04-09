@@ -65,8 +65,8 @@ class TransitionStates:
         self.inTransition = True
         self.count = 0
 
-        self.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-        self.intermediateImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        self.destinationImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        self.intermediateImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
 
         self.destinationImageDraw = ImageDraw.Draw(self.destinationImage)
         self.destinationImageDraw.rectangle((0, 0, 50, 50), fill=(200, 0, 0, 200))
@@ -80,8 +80,8 @@ class TransitionStates:
 
         # print(self.count)
         if self.count < self.countMax:
-            _x = round(random.uniform(-self.chunckSize / 2, config.canvasWidth))
-            _y = round(random.uniform(-self.chunckSize / 2, config.canvasHeight))
+            _x = round(random.uniform(-self.chunckSize / 2, config.pictureWidth))
+            _y = round(random.uniform(-self.chunckSize / 2, config.pictureHeight))
             _part = self.sourceImage.crop((_x, _y, _x + self.chunckSize, _y + self.chunckSize))
             self.intermediateImage.paste(_part, (_x, _y), _part)
             self.count += 1
@@ -148,8 +148,8 @@ def changeDrawing(args):
     _newTime = round(random.uniform(config.totalResetTime, round(float(config.totalResetTime) * config.totalResetTimeMaxMultiplier)))
     config.systemController.slotRate = _newTime
 
-    # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
-    # config.finalCompositeLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+    # config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=config.bgColor)
+    # config.finalCompositeLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=config.bgColor)
     config.fadeThruToNew = 0
     initiateTransition()
 
@@ -170,10 +170,10 @@ def changePalettes():
     config.activePalette = random.choice(config.paletteSets)
     pieceLogger(f"New Palette : {config.activePalette.name}", 4, True)
     setBGColor()
-    config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
-    config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
+    config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
+    config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
+    config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
+    config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
     primeCanvas()
     # print(f" New bg Color : {config.bgColor}")
     # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
@@ -206,7 +206,7 @@ def startNewLine(_pen):
     config.dripsArray = []
 
     # LINE LAYER IS NOW config.lineLayer
-    # config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    # config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     # config.draw = ImageDraw.Draw(config.image)
 
 
@@ -328,7 +328,7 @@ def setPenPropsByName(_name, pen):
             pen.loopDirection = 1
     # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
-    pen.drawingSize = [config.canvasWidth, config.canvasHeight]
+    pen.drawingSize = [config.pictureWidth, config.pictureHeight]
     if pen.xOffsetRange is not None:
         pen.xOffset = round(random.uniform(pen.xOffsetRange[0], pen.xOffsetRange[1]))
     else:
@@ -349,7 +349,7 @@ def setPenPropsByName(_name, pen):
     if pen.incrementFactor == 0:
         pen._w = round(random.uniform(_penProps.minMarkWidth, _penProps.maxMarkWidth))
     # pen.drawingSize = [180, 180]
-    pen.lastPoint = [config.canvasWidth / 2, config.canvasHeight / 2]
+    pen.lastPoint = [config.pictureWidth / 2, config.pictureHeight / 2]
     # pen.centerVariationX = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
     # pen.centerVariationY = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
 
@@ -436,7 +436,7 @@ def generateLine(_pen):
     _rangey = _pen.yRandomRange[1]
 
     _yD = _pen.maxNumPoints
-    _pts = round(config.canvasHeight / _yD) + 2
+    _pts = round(config.pictureHeight / _yD) + 2
 
     _pen.smooth_points = []
 
@@ -934,8 +934,8 @@ def progressiveJitter():
         # pieceLogger(f"Jitter {config.jitterIterations}")
         glitchBox(
             config.underLayer,
-            config.canvasWidth,
-            config.canvasHeight,
+            config.pictureWidth,
+            config.pictureHeight,
             config.jitterDisplacementHorizontal,
             config.jitterDisplacementVertical,
         )
@@ -959,8 +959,8 @@ def doDrawingJitter():
             for _ in range(config.jitterIterations):
                 glitchBox(
                     config.underLayer,
-                    config.canvasWidth,
-                    config.canvasHeight,
+                    config.pictureWidth,
+                    config.pictureHeight,
                     config.jitterDisplacementHorizontal,
                     config.jitterDisplacementVertical,
                 )
@@ -982,9 +982,9 @@ def bgColorBlocksFilling(arg):
     if arg or config.addingTo:
         config.blendLevelRate = config.blendLevelRateBase
         config.blendLevel = 0.0
-        config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blockLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
-        config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blankLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
         _drawLayer = config.blockLayer
@@ -1007,8 +1007,8 @@ def bgColorBlocksFilling(arg):
         config.bgBoxBox = (
             xPos,
             yPos,
-            xPos + config.canvasWidth,
-            yPos + config.canvasHeight,
+            xPos + config.pictureWidth,
+            yPos + config.pictureHeight,
         )
         config.bgBoxFill = (0, 0, 0, 0)
     else:
@@ -1047,8 +1047,8 @@ def bgColorBlocksFilling(arg):
     for _ in range(jitteriterations):
         glitchBox(
             _drawLayer,
-            config.canvasWidth,
-            config.canvasHeight,
+            config.pictureWidth,
+            config.pictureHeight,
             config.jitterDisplacementHorizontal_roughing,
             config.jitterDisplacementVertical_roughing,
         )
@@ -1125,31 +1125,34 @@ def createImageLayers(arg=None):
     global config
     pieceLogger("===> Setting up all layers")
 
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.pictureWidth = int(workConfig.get("drawingField", "pictureWidth", fallback=config.canvasWidth))
+    config.pictureHeight = int(workConfig.get("drawingField", "pictureHeight", fallback=config.canvasHeight))
+
+    config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.draw = ImageDraw.Draw(config.image)
 
-    config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.blankLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
-    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.underLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-    config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.blockLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
 
-    config.lineLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.lineLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
 
-    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.canvasImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
-    config.textureLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.textureLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.textureLayerDraw = ImageDraw.Draw(config.textureLayer)
 
     config.finalCompositeLayer = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.finalCompositeLayerDraw = ImageDraw.Draw(config.finalCompositeLayer)
 
-    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.renderImageFullOverlay = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
     config.addingTo = False
@@ -1189,7 +1192,7 @@ def initDrawings():
     pieceLogger(f"===> Init drawings: {config.activePalette.name}", 4, True)
 
     createTextureLayer(chooseTexture())
-    config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+    config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=config.bgColor)
     config.linesDrawnCount = 0
     config.jitterIterations = 0
     primeCanvas()
@@ -1318,9 +1321,9 @@ def renderImage():
             baseName = f"{str(currentTime)}"
             baseName = baseName.replace(".", "")
             _img = img.convert("RGBA")
-            _temp = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+            _temp = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
             _tempDraw = ImageDraw.Draw(_temp)
-            _tempDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 255))
+            _tempDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(0, 0, 0, 255))
             _temp.paste(_img)
             _temp = _temp.convert("RGB")
             _temp = _temp.rotate(-90)
@@ -1370,7 +1373,7 @@ def renderImage():
     # if config.fadeThruToNew < 255:
     #     config.fadeThruToNew += 4
     #     # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
-    #     config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
+    #     config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
 
     # elif not config.fadeThruToNewDone:
     #     config.fadeThruToNewDone = True
@@ -1392,7 +1395,7 @@ def renderImage():
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
 
     if not config.debugMode:
-        config.finalCompositeLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
+        config.finalCompositeLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
         if config.textureBlendMode == "subtract":
             _tempImage = ImageChops.subtract(config.canvasImage, config.textureLayer)
             config.finalCompositeLayer.paste(_tempImage, (0, 0), _tempImage)
@@ -1416,13 +1419,13 @@ def renderImage():
 """ FOR DEBUGGING """
 # def layerCompositing(config):
 #     config.finalCompositeLayerDraw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(125, 125, 125))
-#     config.finalCompositeLayerDraw.rectangle((0, 550, config.canvasWidth, 550 + config.canvasHeight), fill=(config.bgColor))
+#     config.finalCompositeLayerDraw.rectangle((0, 550, config.pictureWidth, 550 + config.pictureHeight), fill=(config.bgColor))
 
 #     config.finalCompositeLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 #     config.finalCompositeLayer.paste(config.image, (280, 0), config.image)
 #     config.finalCompositeLayer.paste(config.underLayer, (0, 280), config.underLayer)
 
-#     config.finalCompositeLayerDraw.rectangle((280, 280, config.canvasWidth + 280, 280 + config.canvasHeight), fill=(config.bgColor))
+#     config.finalCompositeLayerDraw.rectangle((280, 280, config.pictureWidth + 280, 280 + config.pictureHeight), fill=(config.bgColor))
 #     config.finalCompositeLayer.paste(config.canvasImage, (280, 280), config.canvasImage)
 
 
@@ -1434,28 +1437,28 @@ def clearCurrentDrawing():
         config.linesDrawnCount = 0
         config.jitterIterations = 0
 
-        config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 200))
+        config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 200))
 
-        config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.draw = ImageDraw.Draw(config.image)
 
-        config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.underLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-        config.blankLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blankLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
-        config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.underLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-        config.blockLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.blockLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
 
-        config.lineLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+        config.lineLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
         config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
 
         primeCanvas(2)
-        config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 225))
+        config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 225))
         config.linesDrawnCount = 0
 
 # ----------------------------------------------------##----------------------------------------------------#
@@ -1531,8 +1534,8 @@ def _load_filter_config(config):
     config.filterRemapMinVertSize = int(workConfig.get("drawingField", "filterRemapMinVertSize", fallback=24))
     config.filterRemapMaxHorzSize = int(workConfig.get("drawingField", "filterRemapMaxHorzSize", fallback=24))
     config.filterRemapMaxVertSize = int(workConfig.get("drawingField", "filterRemapMaxVertSize", fallback=24))
-    config.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=config.canvasWidth))
-    config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.canvasHeight))
+    config.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=config.pictureWidth))
+    config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.pictureHeight))
 
 
 def _load_drawing_configs(config):
@@ -1610,7 +1613,7 @@ def _load_drawing_configs(config):
         )
 
         if palette.bgBoxRange == [0, 0, 0, 0]:
-            palette.bgBoxRange = [0, config.canvasWidth, 0, config.canvasHeight]
+            palette.bgBoxRange = [0, config.pictureWidth, 0, config.pictureHeight]
 
         palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
 
@@ -1652,13 +1655,13 @@ def _load_drawing_configs(config):
         palette.xOffsetRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(_p, "xOffsetRange", fallback=f"0,{config.canvasWidth}").split(","),
+                workConfig.get(_p, "xOffsetRange", fallback=f"0,{config.pictureWidth}").split(","),
             )
         )
         palette.yOffsetRange = list(
             map(
                 lambda x: float(x),
-                workConfig.get(_p, "yOffsetRange", fallback=f"0,{config.canvasHeight}").split(","),
+                workConfig.get(_p, "yOffsetRange", fallback=f"0,{config.pictureHeight}").split(","),
             )
         )
         palette.penAlphaRange = list(
@@ -1866,7 +1869,7 @@ def _load_and_initialize_system(config):
     config.transitionStateHandler.targetImage = config.finalCompositeLayer
     config.inTransition = False
 
-    # config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
+    # config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(100, 0, 80, 100))
 
 
 # ----------------------------------------------------##----------------------------------------------------#

@@ -153,6 +153,7 @@ def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
     config.draw.line((p1x, p1y, p2x, p2y), fill=_fillColor, width=_lineWidth)
 
 
+
 def drawTheBG():
     config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
     config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)

@@ -151,12 +151,12 @@ def hashlines2():
 
 def drawTheLine(p1x, p1y, p2x, p2y, _fillColor, _lineWidth):
     config.draw.line((p1x, p1y, p2x, p2y), fill=_fillColor, width=_lineWidth)
-
+    # pass
 
 
 def drawTheBG():
     config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
-    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+    config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
 
     # if config.bg_alpha != config.bg_alpha_base :
     #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
@@ -226,7 +226,7 @@ def runWork():
 def setLineColor():
     _line_alpha = config.line_alpha
     _minVal = 0.0
-    _maxVal = 0.1
+    _maxVal = 0.9
     if config.lightMode:
         _minVal = 0.65
         _maxVal = 1.0
@@ -238,8 +238,8 @@ def setLineColor():
         config.line_maxSaturation,
         _minVal,
         _maxVal,
-        0,
-        0,
+        config.line_minDropHue,
+        config.line_maxDropHue,
         _line_alpha,
         config.brightness,
     )
@@ -291,6 +291,7 @@ def reDraw():
         config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
         setLines()
+        # setLineColor()
 
     if random.random() < config.pauseProb:
         config.noChange = True
@@ -301,7 +302,7 @@ def reDraw():
 
 def iterate():
     reDraw()
-
+    handleFilterRemapping()
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:
         config.panelDrawing.canvasToUse = config.image
@@ -309,6 +310,110 @@ def iterate():
     else:
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     # Done
+
+# ---- dither remapping ------------
+
+def loadFilterRemapping():
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapping", False, bool)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingProb", 0.0, float)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinHoriSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxHoriSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinVertSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxVertSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapRangeY", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapRangeX", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "contractXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "contractYSpeed", 2, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "expandXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "expandYSpeed", 2, int)
+    config.filterRemapContracting = 0
+    config.basefilterRemappingProb = config.filterRemappingProb
+
+
+def handleFilterRemapping():
+    """Handles filter remapping if enabled."""
+    # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
+    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
+        remapFilter(config)
+
+
+def expandFilterRemap():
+
+    _pos = list(config.remapImageBlockSection)
+    # pieceLogger(_pos)
+    _pos[0] = max(_pos[0] - config.expandXSpeed, config.newFilterStartX)
+    _pos[2] += config.expandXSpeed
+    # _pos[1] -= 2
+    # _pos[3] += 2
+    # or _pos[1] <= (config.newFilterStartY)
+    if _pos[0] <= (config.newFilterStartX) :
+        config.filterRemappingProb = config.basefilterRemappingProb
+        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemapContracting = 1
+        pieceLogger(f"Expanidng done {config.newFilterStartX}")
+    else:
+        config.filterRemappingProb = 1.0
+        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemappingProb = 1.0
+
+
+def contractFilterRemap():
+    _pos = list(config.remapImageBlockSection)
+    # pieceLogger(_pos)
+    _pos[0] += config.contractXSpeed
+    _pos[2] -= config.contractXSpeed
+    _pos[1] += config.contractYSpeed
+    _pos[3] -= config.contractYSpeed
+
+    if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
+        config.filterRemappingProb = config.basefilterRemappingProb
+        config.filterRemapContracting = 0
+        config.remapImageBlockSection = (_pos[2],_pos[3],_pos[2],_pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+    else:
+        # pieceLogger(_pos)
+        config.filterRemappingProb = 1.0
+        config.remapImageBlockSection = tuple(_pos)
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemappingProb = 1.0
+
+
+def remapFilter(config):
+    """Remaps the filter block section."""
+    config.filterRemap = True
+    if config.filterRemappingProb != 1.0 and config.filterRemapContracting == 0:
+        config.filterRemapContracting = 2
+        config.newFilterStartX = round(random.uniform(0, config.filterRemapRangeX))
+        config.newFilterStartY = round(random.uniform(0, config.filterRemapRangeY))
+        config.newFilterEndX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
+        config.newFilterEndY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
+        config.remapImageBlockSection = (config.newFilterStartX + config.newFilterEndX, 
+                                         config.newFilterStartY, 
+                                         config.newFilterStartX + config.newFilterEndX, 
+                                         config.newFilterStartY + config.newFilterEndY)
+        pieceLogger("Resetting to expand")
+        # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
+
+    if config.filterRemapContracting == 1:
+        # pieceLogger("Resetting to contract")
+        contractFilterRemap()
+
+    if config.filterRemapContracting == 2:
+        expandFilterRemap()
+
+
+def loadConfigValue(obj, workConfig, section, option, default, type_converter):
+    try:
+        if type_converter == bool:
+            setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
+        else:
+            setattr(obj, option, type_converter(workConfig.get(section, option)))
+    except Exception as e:
+        pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
+        setattr(obj, option, default)
 
 
 def main(run=True):
@@ -394,10 +499,12 @@ def main(run=True):
 
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
-    config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
     config.line_minSaturation = float(workConfig.get("hatchingmarks", "line_minSaturation"))
-    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
+    config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
     config.line_minValue = float(workConfig.get("hatchingmarks", "line_minValue"))
+    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
+    config.line_minDropHue = float(workConfig.get("hatchingmarks", "line_minDropHue",fallback=0))
+    config.line_maxDropHue = float(workConfig.get("hatchingmarks", "line_maxDropHue", fallback=0))
     config.line_alpha = int(workConfig.get("hatchingmarks", "line_alpha", fallback="180"))
 
     config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
@@ -420,7 +527,8 @@ def main(run=True):
     config.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
 
     config.rebuildingVerticals = False
-
+    
+    loadFilterRemapping()
     setLines()
     setLineColor()
     setBGColor()

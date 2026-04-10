@@ -425,7 +425,10 @@ def renderAsAnimationWindow(work):
     work.config.rotationTrailing = work.workConfig.getboolean("displayconfig", "rotationTrailing", fallback=True)
     work.config.fullRotation = work.workConfig.getboolean("displayconfig", "fullRotation", fallback=True)
     work.config.canvasWidth = int(work.workConfig.get("displayconfig", "canvasWidth"))
-    work.config.canvasHeight = int(work.workConfig.get("displayconfig", "canvasHeight"))
+    work.config.canvasHeight = int(work.workConfig.get("displayconfig", "canvasHeight"))    
+    # This is a special override for certain pieces where the dither mapping interacts with the 
+    # remapping of sections of the image
+    work.config.applyDitherBeforeRemapping = False
 
     try:
         work.config.ditherFilterBrightness = float(work.workConfig.get("displayconfig", "ditherFilterBrightness"))
@@ -529,6 +532,7 @@ def renderUsingFFMPEG(work):
     work.config.actualScreenWidth = int(work.workConfig.get("displayconfig", "actualScreenWidth"))
     work.config.canvasWidth = int(work.workConfig.get("displayconfig", "canvasWidth"))
     work.config.canvasHeight = int(work.workConfig.get("displayconfig", "canvasHeight"))
+    
 
     r = rendertofile
     r.config = work.config

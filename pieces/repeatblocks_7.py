@@ -1019,6 +1019,7 @@ def rowsAndDotsSettings():
 def iterate():
     """Performs a single iteration of the animation."""
     global config
+    handleFilterRemapping()
 
     if config.debugPause:
         config.directorController.slotRate = 2.0
@@ -1037,7 +1038,6 @@ def iterate():
 
     disturbance.handleDisturbances()
 
-    handleFilterRemapping()
 
     handleFadingAndRebuild()
 
@@ -1165,6 +1165,23 @@ def redrawAndLoadImage(config):
     config.repeatDrawingMode = 0
 
 # ---- dither remapping ------------
+
+def loadFilterRemapping():
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapping", False, bool)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
+    loadConfigValue(config, workConfig, "movingpattern", "contractXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "movingpattern", "contractYSpeed", 2, int)
+    loadConfigValue(config, workConfig, "movingpattern", "expandXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "movingpattern", "expandYSpeed", 2, int)
+    config.filterRemapContracting = 0
+    config.basefilterRemappingProb = config.filterRemappingProb
+
 
 def handleFilterRemapping():
     """Handles filter remapping if enabled."""
@@ -1376,7 +1393,8 @@ def renderComposite():
             config.waveDeformXPos += config.waveDeformXPosRate
             if config.waveDeformXPos > config.screenWidth:
                 config.waveDeformXPos = 0
-
+        
+        # config.image = config.destinationImage.copy()
         config.render(config.destinationImage, 0, 0)
 
 
@@ -1550,23 +1568,6 @@ def loadAndInitializeCrossFader():
     config.fader.setUp(config)
 
 
-def loadFilterRemapping():
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapping", False, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "contractXSpeed", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "contractYSpeed", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "expandXSpeed", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "expandYSpeed", 2, int)
-    config.filterRemapContracting = 0
-    config.basefilterRemappingProb = config.filterRemappingProb
-
-
 def createImageHolders():
     ########################################################################
     # CREATE THE IMAGE HOLDERS
@@ -1671,6 +1672,8 @@ def main(run=True):
     disturbance.init(config, workConfig)
     disturbance.setupDisturbances()
     buildPatternSequence(config)
+
+    config.applyDitherBeforeRemapping = True
 
     # ###########################################################################
 

@@ -566,8 +566,8 @@ def render(
 
     # color separation filter - not really very interesting on led panels right now
     # _applyColorSep(xOffset, yOffset)
-
-    # _applyDitherFilter(xOffset, yOffset)
+    if config.applyDitherBeforeRemapping:
+        _applyDitherFilter(xOffset, yOffset)
 
     if config.usePixelSort and config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:
         config.renderImageFull = pixelSort(config.renderImageFull, config)
@@ -584,7 +584,8 @@ def render(
 
     # moving the dithering to after the remapping on account of the shift
     # settings pasting over the dithered renderImageFull 02-27-2026
-    _applyDitherFilter(xOffset, yOffset)
+    if not config.applyDitherBeforeRemapping:
+        _applyDitherFilter(xOffset, yOffset)
 
     # ---- Overall image blurring  ---- #
     _blurringCall()

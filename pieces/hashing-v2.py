@@ -402,7 +402,7 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
 
 def drawTheBG():
     config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
-    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+    config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
 
     # if config.bg_alpha != config.bg_alpha_base :
     #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
@@ -497,16 +497,16 @@ def iterate():
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
     else:
-        _xDiff = round((config.largestDim - config.canvasWidth) / 1)
-        _yDiff = round((config.largestDim - config.canvasHeight) / 1)
+        _xDiff = round((config.largestDim - config.drawingWidth) / 1)
+        _yDiff = round((config.largestDim - config.drawingHeight) / 1)
 
-        # config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(255,255,255,255))
+        # config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=(255,255,255,255))
         if config.drawingShape != "grid":
-            config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=config.bgColor)
+            config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
 
             _tempImage = Image.new("RGBA", (config.largestDim, config.largestDim))
             for n in config.informalLineUnits:
-                # n.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 0, 2))
+                # n.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=(100, 0, 0, 2))
                 _tempImage = ImageChops.add(n.canvas, _tempImage)
 
                 # _temp = n.canvas.rotate(n.angle)
@@ -518,10 +518,10 @@ def iterate():
             _tempImage = _tempImage.rotate(n.angle)
             config.image.paste(_tempImage, (0, 0), _tempImage)
             badpixels.drawBlanks(config.image, False)
-            config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+            config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
         else:
             badpixels.drawBlanks(config.image, False)
-            config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
+            config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
 
         
 
@@ -641,6 +641,11 @@ def main(run=True):
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
     config.drawingShape = workConfig.get("hatchingmarks", "drawingShape")
 
+    config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
+    config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
+
+    config.largestDim = max(config.drawingWidth, config.drawingHeight)
+
     # refinements for setting points per column and row so amplitude of noise can be adjusted to be more even if aspect ratio is more extreme - e.g narrow beam
     # but also, lower number makes the line more purely rectilinear so can give a greater focus to one directions linearity
     config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
@@ -682,8 +687,8 @@ def main(run=True):
     config.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
 
     if config.singleLineRegularSpacing:
-        _hspacing = round(config.canvasWidth / (config.numberOfinformalLines + 2))
-        _vspacing = round(config.canvasHeight / (config.numberOfinformalLines + 2))
+        _hspacing = round(config.drawingWidth / (config.numberOfinformalLines + 2))
+        _vspacing = round(config.drawingHeight / (config.numberOfinformalLines + 2))
         config.rowIntervalRange = [_vspacing, _vspacing]
         config.colIntervalRange = [_hspacing, _hspacing]
 
@@ -769,10 +774,7 @@ def main(run=True):
     config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha", fallback="40"))
     config.bg_alpha_base = config.bg_alpha
 
-    config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
-    config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
 
-    config.largestDim = max(config.canvasWidth, config.canvasHeight)
 
     config.rebuildingVerticals = False
 
@@ -780,7 +782,7 @@ def main(run=True):
     config.blankColorAsColorProb = float(workConfig.get("hatchingmarks", "blankColorAsColorProb", fallback="0.5"))
     badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
     badpixels.probabilityOfBlockBlanks = .0
-    badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
+    badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
     badpixels.colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
     badpixels.rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
 

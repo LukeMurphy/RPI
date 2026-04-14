@@ -295,36 +295,35 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
     _p1 = [p1x, p1y]
     _p2 = [p2x, p2y]
 
-    _dy = _p1[1] - _p2[1]
-    _dx = _p1[0] - _p2[0]
+    # _dy = _p1[1] - _p2[1]
+    # _dx = _p1[0] - _p2[0]
 
-    _angle = math.atan2(_dy, _dx) * 360 / math.pi
+    # _angle = math.atan2(_dy, _dx) * 360 / math.pi
 
-    if _angle < 0:
-        _angle += 360
+    # if _angle < 0:
+    #     _angle += 360
 
-    _totalPts = len(_lineUnit.curvedPoints)
-    _ratio1 = _n / _totalPts
-    _ratio1a = _ratio1 / _lineUnit.ratioFactor
-    _ratio2 = (_totalPts - _n) / _totalPts
-    _ratio2a = _ratio2 / _lineUnit.ratioFactor
+    # _totalPts = len(_lineUnit.curvedPoints)
+    # _ratio1 = _n / _totalPts
+    # _ratio1a = _ratio1 / _lineUnit.ratioFactor
+    # _ratio2 = (_totalPts - _n) / _totalPts
+    # _ratio2a = _ratio2 / _lineUnit.ratioFactor
 
-    _t = (_n / math.pi) / 70
-    _ratio = math.sin(_t + math.pi / 5) * math.pow(math.sin(_t), 0) * _ratio1a
+    # _t = (_n / math.pi) / 70
+    # _ratio = math.sin(_t + math.pi / 5) * math.pow(math.sin(_t), 0) * _ratio1a
 
     _ratio = 1.0
     _ratio1a = 1.0
 
     _penWidth = _lineUnit.baseWidth * _ratio * _ratio1a
 
-    _alphaBase = 2
+    # _alphaBase = 2
+    # _r = round(190 * (_ratio * 3))
+    # _g = round(100 * _ratio)
+    # _b = round(20 * (_totalPts - _n) / _totalPts)
+    # _a = round(_alphaBase * _ratio)
 
-    _r = round(190 * (_ratio * 3))
-    _g = round(100 * _ratio)
-    _b = round(20 * (_totalPts - _n) / _totalPts)
-    _a = round(_alphaBase * _ratio)
-
-    fillClr = [_r, _g, _b, _a]
+    # fillClr = [_r, _g, _b, _a]
 
     fillClr = _lineUnit.lineColor
 
@@ -417,6 +416,8 @@ def informalLines():
                     pointsToDraw[pt + 1][0] = _lstpt
 
 
+# ---- looping and redrawing --------
+
 def runWork():
     global config
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
@@ -448,7 +449,7 @@ def reDraw():
     if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
         config.bg_alpha = 0
         config.lightMode = False if random.random() > config.lightModeProb else True
-        pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
+        # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
         setBGColor()
         # setLines()
 
@@ -456,7 +457,7 @@ def reDraw():
             informalLine = config.informalLineUnits[_u]
             informalLine.lineColor = setLineColor()
 
-            pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
+            # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
 
 
     if random.random() < config.changeLinesProb and not config.noChange:
@@ -464,7 +465,7 @@ def reDraw():
         config.bg_alpha = 0
         setBGColor()
         setLines()
-        pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
+        # pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
 
     if random.random() < config.pauseProb:
         config.noChange = True
@@ -513,7 +514,6 @@ def iterate():
             config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
 
         
-
 # ---- dither remapping ------------
 
 def loadFilterRemapping():
@@ -607,6 +607,7 @@ def remapFilter(config):
     if config.filterRemapContracting == 2:
         expandFilterRemap()
 
+# ---- initialize  -----------------
 
 def loadConfigValue(obj, workConfig, section, option, default, type_converter):
     try:
@@ -638,11 +639,6 @@ def main(run=True):
     config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
     config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
     config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
-
-    # the +/- variability of the points
-    config.noiseAmplitude = float(workConfig.get("hatchingmarks", "noiseAmplitude"))
-    config.noiseAmplitudeRange = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRange", fallback="1,4").split(",")]
-    config.distributionRange = float(workConfig.get("hatchingmarks", "distributionRange"))
 
     # adjust higher for higer resolution
     config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
@@ -686,12 +682,13 @@ def main(run=True):
     # forces grid to squares - but is not currently compensated to will get ragged and missing
     # grids at edges of drawing
     config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
-
+    
+    # the +/- variability of the points
     config.noiseAmplitudeRangeRow = [
-        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
+        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback="1,1").split(",")
     ]
     config.noiseAmplitudeRangeCol = [
-        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback=workConfig.get("hatchingmarks", "noiseAmplitude")).split(",")
+        float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback="1,1").split(",")
     ]
     config.colFirst = workConfig.getboolean("hatchingmarks", "colFirst", fallback=False)
 

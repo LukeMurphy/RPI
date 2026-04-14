@@ -25,6 +25,7 @@ class InformalLine:
 
     def __init__(self, unitNumber):
         self.unitNumber = unitNumber
+        self.lineColor = None
         self.canvas = Image.new("RGBA", (config.largestDim, config.largestDim))
         self.draw = ImageDraw.Draw(self.canvas)
 
@@ -107,33 +108,42 @@ def getColor(r, g, b, a):
 # -------- Line Attribute Function --------- #
 
 
-def setLineColor():
-    _line_alpha = config.line_alpha
-    # _minVal = 0.0
-    # _maxVal = 0.1
-    if config.lightMode:
-        _minVal = 0.65
-        _maxVal = 1.0
 
-    config.lineColor = colorutils.getRandomColorHSV(
-        config.line_minHue,
-        config.line_maxHue,
-        config.line_minSaturation,
-        config.line_maxSaturation,
-        config.line_minValue,
-        config.line_maxValue,
-        config.line_minDropHue,
-        config.line_maxDropHue,
-        _line_alpha,
-        config.brightness,
-    )
+def setLineColor():
+    if not config.lightMode:
+        return colorutils.getRandomColorHSV(
+            config.line_minHue,
+            config.line_maxHue,
+            config.line_minSaturation,
+            config.line_maxSaturation,
+            config.line_minValue,
+            config.line_maxValue,
+            config.line_minDropHue,
+            config.line_maxDropHue,
+            round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+            config.brightness,
+        ) 
+    else :
+        return colorutils.getRandomColorHSV(
+            config.line_light_minHue,
+            config.line_light_maxHue,
+            config.line_light_minSaturation,
+            config.line_light_maxSaturation,
+            config.line_light_minValue,
+            config.line_light_maxValue,
+            config.line_light_minDropHue,
+            config.line_light_maxDropHue,
+            round(random.uniform(config.line_light_alpha_range[0], config.line_light_alpha_range[1])),
+            config.brightness,
+        ) 
+
     # pieceLogger(f"New Line Color {config.lineColor}")
 
 
 def setBGColor():
-    _bg_alpha = round(config.bg_alpha)
-    _minVal = 0.5
-    _maxVal = 0.70
+    _bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1])),
+    _minVal = config.bg_minValue
+    _maxVal = config.bg_maxValue
     if config.lightMode:
         _minVal = 0.0
         _maxVal = 0.1
@@ -142,8 +152,8 @@ def setBGColor():
         config.bg_maxHue,
         config.bg_minSaturation,
         config.bg_maxSaturation,
-        config.bg_minValue,
-        config.bg_maxValue,
+        _minVal,
+        _maxVal,
         config.bg_dropHueMin,
         config.bg_dropHueMax,
         _bg_alpha,
@@ -173,18 +183,8 @@ def setLines():
         for _u in range(config.numberOfinformalLines):
             informalLine = InformalLine(_u)
             informalLine.angle = config.singleLinesAngle
-            informalLine.lineColor = colorutils.getRandomColorHSV(
-                config.line_minHue,
-                config.line_maxHue,
-                config.line_minSaturation,
-                config.line_maxSaturation,
-                config.line_minValue,
-                config.line_maxValue,
-                0,
-                0,
-                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-                config.brightness,
-            )
+
+            informalLine.lineColor = setLineColor()
 
             if config.singleLineRegularSpacing:
                 informalLine.xOffset = config.xOffset + config.rowSpacing * _u
@@ -241,22 +241,12 @@ def setGridLines():
             informalLine.lineSpeedRange = config.vertLineSpeedRange
             informalLine.baseWidthRange = config.vertBaseWidthRange
             informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
+            # _bg_alpha = round(config.bg_alpha)
 
-            informalLine.lineColor = colorutils.getRandomColorHSV(
-                config.line_minHue,
-                config.line_maxHue,
-                config.line_minSaturation,
-                config.line_maxSaturation,
-                config.line_minValue,
-                config.line_maxValue,
-                config.line_minDropHue,
-                config.line_maxDropHue,
-                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-                config.brightness,
-            )
+            informalLine.lineColor = setLineColor()
             informalLine.reconfigure()
             informalLine.generateInformalLine()
-            # pieceLogger(f"{informalLine.xOffset}")
+            # pieceLogger(f"{informalLine.lineColor}")
             config.informalLineUnits.append(informalLine)
 
     def add_row_lines():
@@ -273,20 +263,7 @@ def setGridLines():
             informalLine.lineSpeedRange = config.horizLineSpeedRange
             informalLine.baseWidthRange = config.horizBaseWidthRange
             informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeRow
-
-            informalLine.lineColor = colorutils.getRandomColorHSV(
-                config.line_minHue,
-                config.line_maxHue,
-                config.line_minSaturation,
-                config.line_maxSaturation,
-                config.line_minValue,
-                config.line_maxValue,
-                config.line_minDropHue,
-                config.line_maxDropHue,
-                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-                config.brightness,
-            )
-
+            informalLine.lineColor = setLineColor()
             informalLine.reconfigure()
             informalLine.generateInformalLine()
             config.informalLineUnits.append(informalLine)
@@ -467,15 +444,27 @@ def reDraw():
     # adding check on bg alpha as index of transition state - don't want another transition
     # stomping on the one in progress
 
+    # if random.random() < config.changeBGProb and not config.noChange:
     if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
-        # config.bg_alpha = 0
+        config.bg_alpha = 0
+        config.lightMode = False if random.random() > config.lightModeProb else True
+        pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
         setBGColor()
-        setLineColor()
+        # setLines()
+
+        for _u in range(config.numberOfinformalLines):
+            informalLine = config.informalLineUnits[_u]
+            informalLine.lineColor = setLineColor()
+
+            pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
+
 
     if random.random() < config.changeLinesProb and not config.noChange:
-        # config.lightMode = False if random.random() > config.lightModeProb else True
+        config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
+        setBGColor()
         setLines()
+        pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
 
     if random.random() < config.pauseProb:
         config.noChange = True
@@ -565,7 +554,7 @@ def expandFilterRemap():
         config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
         config.filterRemapContracting = 1
-        pieceLogger(f"Expanidng done {config.newFilterStartX}")
+        # pieceLogger(f"Expanidng done {config.newFilterStartX}")
     else:
         config.filterRemappingProb = 1.0
         config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
@@ -586,7 +575,7 @@ def contractFilterRemap():
         config.filterRemapContracting = 0
         config.remapImageBlockSection = (_pos[2],_pos[3],_pos[2],_pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
     else:
         # pieceLogger(_pos)
         config.filterRemappingProb = 1.0
@@ -608,7 +597,7 @@ def remapFilter(config):
                                          config.newFilterStartY, 
                                          config.newFilterStartX + config.newFilterEndX, 
                                          config.newFilterStartY + config.newFilterEndY)
-        pieceLogger("Resetting to expand")
+        # pieceLogger("Resetting to expand")
         # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
 
     if config.filterRemapContracting == 1:
@@ -628,8 +617,6 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
     except Exception as e:
         pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
         setattr(obj, option, default)
-
-
 
 
 def main(run=True):
@@ -736,22 +723,19 @@ def main(run=True):
     """
 
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
-
     # probablility background changes
     config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
-    config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
-    config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
-    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
-
-    # light lines on background - more like a drawing on a screen
-    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
-    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
     config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
     config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
     config.noChange = False
 
     # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
     config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
+
+    # light lines on background - more like a drawing on a screen
+    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
+    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
 
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
@@ -761,7 +745,17 @@ def main(run=True):
     config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
     config.line_minDropHue = float(workConfig.get("hatchingmarks", "line_minDropHue",fallback=0))
     config.line_maxDropHue = float(workConfig.get("hatchingmarks", "line_maxDropHue", fallback=0))
-    config.line_alpha = int(workConfig.get("hatchingmarks", "line_alpha", fallback="180"))
+    config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
+
+    config.line_light_minHue = float(workConfig.get("hatchingmarks", "line_light_minHue"))
+    config.line_light_maxHue = float(workConfig.get("hatchingmarks", "line_light_maxHue"))
+    config.line_light_maxSaturation = float(workConfig.get("hatchingmarks", "line_light_maxSaturation"))
+    config.line_light_minSaturation = float(workConfig.get("hatchingmarks", "line_light_minSaturation"))
+    config.line_light_minValue = float(workConfig.get("hatchingmarks", "line_light_minValue"))
+    config.line_light_maxValue = float(workConfig.get("hatchingmarks", "line_light_maxValue"))
+    config.line_light_minDropHue = float(workConfig.get("hatchingmarks", "line_light_minDropHue",fallback=0))
+    config.line_light_maxDropHue = float(workConfig.get("hatchingmarks", "line_light_maxDropHue", fallback=0))
+    config.line_light_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_light_alpha_range", fallback="150,190").split(",")]
 
     config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
     config.bg_maxHue = float(workConfig.get("hatchingmarks", "bg_maxHue"))
@@ -771,10 +765,9 @@ def main(run=True):
     config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
     config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback="0"))
     config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "bg_dropHueMax", fallback="0"))
-    config.bg_alpha = int(workConfig.get("hatchingmarks", "bg_alpha", fallback="40"))
-    config.bg_alpha_base = config.bg_alpha
-
-
+    config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
+    config.bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
+    config.bg_alpha_base = 20
 
     config.rebuildingVerticals = False
 
@@ -789,7 +782,7 @@ def main(run=True):
 
     loadFilterRemapping()
     setLines()
-    setLineColor()
+    config.lineColor = setLineColor()
     setBGColor()
 
     badpixels.setBlanksOnScreen(config)

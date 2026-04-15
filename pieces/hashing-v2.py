@@ -141,7 +141,19 @@ def setLineColor():
 
 
 def setBGColor():
-    _bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1])),
+    _bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
+
+    if len(config.bgSets) > 0 :
+        bgSet = random.choice(config.bgSets)
+        config.bg_minHue = bgSet[0]
+        config.bg_maxHue = bgSet[1]
+        config.bg_minSaturation = bgSet[2]
+        config.bg_maxSaturation = bgSet[3]
+        config.bg_minValue = bgSet[4]
+        config.bg_maxValue = bgSet[5]
+        config.bg_dropHueMin = 0
+        config.bg_dropHueMax = 0
+
     _minVal = config.bg_minValue
     _maxVal = config.bg_maxValue
     if config.lightMode:
@@ -765,6 +777,12 @@ def main(run=True):
     config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
     config.bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
     config.bg_alpha_base = 20
+
+    bgSets = workConfig.get("hatchingmarks", "bgSets", fallback="").split("|")
+    if len(bgSets) > 0 :
+        config.bgSets = []
+        for bg in bgSets :
+            config.bgSets.append(list(float(x) for x in bg.split(',')))
 
     config.rebuildingVerticals = False
 

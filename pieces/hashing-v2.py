@@ -779,8 +779,9 @@ def main(run=True):
     config.bg_alpha_base = 20
 
     bgSets = workConfig.get("hatchingmarks", "bgSets", fallback="").split("|")
-    if len(bgSets) > 0 :
-        config.bgSets = []
+    config.bgSets = []
+
+    if len(bgSets[0]) > 0 :
         for bg in bgSets :
             config.bgSets.append(list(float(x) for x in bg.split(',')))
 

@@ -521,9 +521,27 @@ def iterate():
             config.image.paste(_tempImage, (0, 0), _tempImage)
             badpixels.drawBlanks(config.image, False)
             config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
+
         else:
-            badpixels.drawBlanks(config.image, False)
-            config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
+            # badpixels.drawBlanks(config.image, False)
+
+
+
+
+            config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
+            config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
+
+            config.imageXPOS += config.imageXPOSSpeed
+            # config.imageYPOS += config.YPOSSpeed
+
+            if config.imageXPOS >= config.drawingWidth:
+                config.imageXPOS = 0
+
+            # if config.imageYPOS >= config.pictureHeight:
+                # config.imageYPOS = 0
+            # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
+            badpixels.drawBlanks(config.destinationImage, False)
+            config.render(config.destinationImage, 0, 0)
 
         
 # ---- dither remapping ------------
@@ -635,8 +653,13 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
 def main(run=True):
     global config
     global workConfig
+
+    config.imageXPOS = 0
+    config.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
+    config.imageYPOS = 0
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
     config.drawingShape = workConfig.get("hatchingmarks", "drawingShape")

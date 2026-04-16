@@ -525,13 +525,11 @@ def iterate():
         else:
             # badpixels.drawBlanks(config.image, False)
 
-
-
-
             config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
             config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
 
-            config.imageXPOS += config.imageXPOSSpeed
+            if not config.lightMode :
+                config.imageXPOS += config.imageXPOSSpeed
             # config.imageYPOS += config.YPOSSpeed
 
             if config.imageXPOS >= config.drawingWidth:
@@ -549,6 +547,7 @@ def iterate():
 def loadFilterRemapping():
     loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapping", False, bool)
     loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingProb", 0.0, float)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingReappearProb", 0.10, float)
     loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinHoriSize", 1, int)
     loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxHoriSize", 1, int)
     loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinVertSize", 1, int)
@@ -559,6 +558,8 @@ def loadFilterRemapping():
     loadConfigValue(config, workConfig, "hatchingmarks", "contractYSpeed", 2, int)
     loadConfigValue(config, workConfig, "hatchingmarks", "expandXSpeed", 2, int)
     loadConfigValue(config, workConfig, "hatchingmarks", "expandYSpeed", 2, int)
+
+    config.filterRemappingChangeProb = config.filterRemappingProb
     config.filterRemapContracting = 0
     config.basefilterRemappingProb = config.filterRemappingProb
 
@@ -566,7 +567,7 @@ def loadFilterRemapping():
 def handleFilterRemapping():
     """Handles filter remapping if enabled."""
     # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
-    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
+    if random.random() < config.filterRemappingChangeProb and (config.useFilters and config.filterRemapping):
         remapFilter(config)
 
 
@@ -585,11 +586,11 @@ def expandFilterRemap():
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
         config.filterRemapContracting = 1
         # pieceLogger(f"Expanidng done {config.newFilterStartX}")
+        config.filterRemappingChangeProb = config.filterRemappingProb
     else:
-        config.filterRemappingProb = 1.0
         config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemappingProb = 1.0
+        config.filterRemappingChangeProb = 1.0
 
 
 def contractFilterRemap():
@@ -606,12 +607,12 @@ def contractFilterRemap():
         config.remapImageBlockSection = (_pos[2],_pos[3],_pos[2],_pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
         # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+        config.filterRemappingChangeProb = config.filterRemappingReappearProb
     else:
         # pieceLogger(_pos)
-        config.filterRemappingProb = 1.0
         config.remapImageBlockSection = tuple(_pos)
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemappingProb = 1.0
+        config.filterRemappingChangeProb = 1.0
 
 
 def remapFilter(config):

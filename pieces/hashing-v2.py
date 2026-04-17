@@ -174,8 +174,10 @@ def setBGColor():
 
     if random.random() <=  config.blankColorAsColorProb :
         badpixels.blankColor = config.bgColor
+        config.blankColor = config.bgColor
     else :
         badpixels.blankColor = (0,0,0,255)
+        config.blankColor = (0,0,0,255)
 
 
     # pieceLogger("New BG")
@@ -428,6 +430,40 @@ def informalLines():
                     pointsToDraw[pt + 1][0] = _lstpt
 
 
+def resetPolyBlanks():
+    config.blanks_list = []
+
+    config.blanks_numberOfDeadPixels 
+    config.blanks_sizeTarget
+    config.blanks_colsRange 
+    config.blanks_rowsRange
+
+    for _ in range(config.blanks_numberOfDeadPixels) :
+        width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
+        height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
+        width2 = width1 + random.randint(-config.blankPolyVariation,config.blankPolyVariation)
+        height2 = height1 + random.randint(-config.blankPolyVariation,config.blankPolyVariation)
+
+        x0 = random.randint(0, config.blanks_sizeTarget[0])
+        y0 = random.randint(0, config.blanks_sizeTarget[1])
+        x1 = x0 + width1
+        y1 = y0 + random.randint(-config.blankPolyVariation,config.blankPolyVariation)
+        x2 = x1 + random.randint(-config.blankPolyVariation,config.blankPolyVariation)
+        y2 = y1 + height1
+        x3 = x2 - width2
+        y3 = y2 + random.randint(-config.blankPolyVariation,config.blankPolyVariation)
+
+
+        _poly=((x0,y0),(x1,y1),(x2,y2),(x3,y3),(x0,y0))
+
+        config.blanks_list.append(_poly)
+
+
+def drawPolyBlanks(_drawRef):
+    for p in range(config.blanks_numberOfDeadPixels) :
+        _poly = config.blanks_list[p]
+        _drawRef.polygon(_poly, fill=config.blankColor)
+
 # ---- looping and redrawing --------
 
 def runWork():
@@ -491,7 +527,8 @@ def iterate():
     handleFilterRemapping()
  
     if random.random() <  config.resetBlanksProb :
-        badpixels.setBlanksOnScreen(config)
+        # badpixels.setBlanksOnScreen(config)
+        resetPolyBlanks()
     
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
@@ -519,7 +556,8 @@ def iterate():
                 #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
             _tempImage = _tempImage.rotate(n.angle)
             config.image.paste(_tempImage, (0, 0), _tempImage)
-            badpixels.drawBlanks(config.image, False)
+            # badpixels.drawBlanks(config.image, False)
+            drawPolyBlanks(config.imageDraw)
             config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
 
         else:
@@ -538,7 +576,8 @@ def iterate():
             # if config.imageYPOS >= config.pictureHeight:
                 # config.imageYPOS = 0
             # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
-            badpixels.drawBlanks(config.destinationImage, False)
+            drawPolyBlanks(config.destinationImageDraw)
+            # badpixels.drawBlanks(config.destinationImage, False)
             config.render(config.destinationImage, 0, 0)
 
         
@@ -659,8 +698,13 @@ def main(run=True):
     config.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
     config.imageYPOS = 0
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.imageDraw = ImageDraw.Draw(config.image)
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
     config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+
+
     config.draw = ImageDraw.Draw(config.image)
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
     config.drawingShape = workConfig.get("hatchingmarks", "drawingShape")
@@ -813,6 +857,15 @@ def main(run=True):
 
     config.resetBlanksProb =  config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
     config.blankColorAsColorProb = float(workConfig.get("hatchingmarks", "blankColorAsColorProb", fallback="0.5"))
+    config.blanks_numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
+    config.blanks_probabilityOfBlockBlanks = .0
+    config.blanks_sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
+    config.blanks_colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
+    config.blanks_rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
+    config.blankPolyVariation = int(workConfig.get("hatchingmarks", "blankPolyVariation", fallback="10"))
+
+    resetPolyBlanks()
+
     badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
     badpixels.probabilityOfBlockBlanks = .0
     badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]

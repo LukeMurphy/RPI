@@ -432,12 +432,8 @@ def informalLines():
 
 def resetPolyBlanks():
     config.blanks_list = []
-
-    config.blanks_numberOfDeadPixels 
-    config.blanks_sizeTarget
-    config.blanks_colsRange 
-    config.blanks_rowsRange
-
+    config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
+    
     for _ in range(config.blanks_numberOfDeadPixels) :
         width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
         height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
@@ -857,7 +853,7 @@ def main(run=True):
 
     config.resetBlanksProb =  config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
     config.blankColorAsColorProb = float(workConfig.get("hatchingmarks", "blankColorAsColorProb", fallback="0.5"))
-    config.blanks_numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
+    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
     config.blanks_probabilityOfBlockBlanks = .0
     config.blanks_sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
     config.blanks_colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]

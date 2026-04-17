@@ -110,7 +110,7 @@ def getColor(r, g, b, a):
 
 
 def setLineColor():
-    if not config.lightMode:
+    if not config.lightMode and not config.lightLinesOnGround:
         return colorutils.getRandomColorHSV(
             config.line_minHue,
             config.line_maxHue,
@@ -178,6 +178,11 @@ def setBGColor():
     else :
         badpixels.blankColor = (0,0,0,255)
         config.blankColor = (0,0,0,255)
+
+    if random.random() < config.lightLinesOnGroundProb :
+        config.lightLinesOnGround = True
+    else :
+        config.lightLinesOnGround = False
 
 
     # pieceLogger("New BG")
@@ -433,7 +438,7 @@ def informalLines():
 def resetPolyBlanks():
     config.blanks_list = []
     config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
-    
+
     for _ in range(config.blanks_numberOfDeadPixels) :
         width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
         height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
@@ -809,7 +814,8 @@ def main(run=True):
     config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
     config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
     config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
-
+    config.lightLinesOnGroundProb = float(workConfig.get("hatchingmarks", "lightLinesOnGroundProb", fallback=.0))
+    config.lightLinesOnGround = False
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
     config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))

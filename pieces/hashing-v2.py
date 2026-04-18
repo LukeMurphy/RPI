@@ -109,19 +109,33 @@ def getColor(r, g, b, a):
 
 
 def setLineColor():
-    if not config.lightMode and not config.lightLinesOnGround:
-        return colorutils.getRandomColorHSV(
-            config.line_minHue,
-            config.line_maxHue,
-            config.line_minSaturation,
-            config.line_maxSaturation,
-            config.line_minValue,
-            config.line_maxValue,
-            config.line_minDropHue,
-            config.line_maxDropHue,
-            round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
-            config.brightness,
-        )
+    if not config.lightMode:
+        if config.lightLinesOnGround :
+            return colorutils.getRandomColorHSV(
+                config.line_mid_minHue,
+                config.line_mid_maxHue,
+                config.line_mid_minSaturation,
+                config.line_mid_maxSaturation,
+                config.line_mid_minValue,
+                config.line_mid_maxValue,
+                config.line_mid_minDropHue,
+                config.line_mid_maxDropHue,
+                round(random.uniform(config.line_mid_alpha_range[0], config.line_mid_alpha_range[1])),
+                config.brightness,
+            )
+        else :
+            return colorutils.getRandomColorHSV(
+                config.line_minHue,
+                config.line_maxHue,
+                config.line_minSaturation,
+                config.line_maxSaturation,
+                config.line_minValue,
+                config.line_maxValue,
+                config.line_minDropHue,
+                config.line_maxDropHue,
+                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+                config.brightness,
+            )
     else:
         return colorutils.getRandomColorHSV(
             config.line_light_minHue,
@@ -848,7 +862,10 @@ def main(run=True):
     config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
     config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
     config.lightLinesOnGroundProb = float(workConfig.get("hatchingmarks", "lightLinesOnGroundProb", fallback=0.0))
-    config.lightLinesOnGround = False
+    config.lightLinesOnGround = workConfig.getboolean("hatchingmarks", "lightLinesOnGround", fallback=False)
+
+    # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
+
     config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
     config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
     config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
@@ -858,6 +875,16 @@ def main(run=True):
     config.line_minDropHue = float(workConfig.get("hatchingmarks", "line_minDropHue", fallback=0))
     config.line_maxDropHue = float(workConfig.get("hatchingmarks", "line_maxDropHue", fallback=0))
     config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
+
+    config.line_mid_minHue = float(workConfig.get("hatchingmarks", "line_mid_minHue", fallback=config.line_minHue))
+    config.line_mid_maxHue = float(workConfig.get("hatchingmarks", "line_mid_maxHue", fallback=config.line_maxHue))
+    config.line_mid_minSaturation = float(workConfig.get("hatchingmarks", "line_mid_minSaturation", fallback=config.line_minSaturation))
+    config.line_mid_maxSaturation = float(workConfig.get("hatchingmarks", "line_mid_maxSaturation", fallback=config.line_maxSaturation))
+    config.line_mid_minValue = float(workConfig.get("hatchingmarks", "line_mid_minValue", fallback=config.line_minValue))
+    config.line_mid_maxValue = float(workConfig.get("hatchingmarks", "line_mid_maxValue", fallback=config.line_maxValue))
+    config.line_mid_minDropHue = float(workConfig.get("hatchingmarks", "line_mid_minDropHue", fallback=0))
+    config.line_mid_maxDropHue = float(workConfig.get("hatchingmarks", "line_mid_maxDropHue", fallback=0))
+    config.line_mid_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_mid_alpha_range", fallback="150,190").split(",")]
 
     config.line_light_minHue = float(workConfig.get("hatchingmarks", "line_light_minHue"))
     config.line_light_maxHue = float(workConfig.get("hatchingmarks", "line_light_maxHue"))

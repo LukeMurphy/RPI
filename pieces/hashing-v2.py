@@ -621,7 +621,9 @@ def drawPanelVariations(targetImageRef):
         x1 = x0 + config.panelWidth
         y1 = y0 + config.panelHeight
         config.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=config.bgColor)
+    
     tempImage = ImageChops.blend(targetImageRef, config.overlayImage, config.panelOverlayAmount)
+    # tempImage = ImageChops.add(targetImageRef, config.overlayImage, 10)
     targetImageRef.paste(tempImage, (0, 0), tempImage)
 
 

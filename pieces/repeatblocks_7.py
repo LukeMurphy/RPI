@@ -239,11 +239,11 @@ class Fader:
             _h = s[3]
             amt = min(fade["amount"], 1.0)
             if  (self.x + _w) <= self.x :
-                pieceLogger(_w)
+                # pieceLogger(_w)
                 _w = 0
 
             if  (self.y + _h)<= self.y :
-                pieceLogger(_h)
+                # pieceLogger(_h)
                 _h = 0
             _tempEnd = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
             _tempStart = self.startingImage.crop((self.x, self.y, self.x + _w, self.y + _h))

@@ -110,7 +110,7 @@ def getColor(r, g, b, a):
 
 def setLineColor():
     if not config.lightMode:
-        if config.lightLinesOnGround :
+        if config.lightLinesOnGround:
             return colorutils.getRandomColorHSV(
                 config.line_mid_minHue,
                 config.line_mid_maxHue,
@@ -123,7 +123,7 @@ def setLineColor():
                 round(random.uniform(config.line_mid_alpha_range[0], config.line_mid_alpha_range[1])),
                 config.brightness,
             )
-        else :
+        else:
             return colorutils.getRandomColorHSV(
                 config.line_minHue,
                 config.line_maxHue,
@@ -588,10 +588,12 @@ def iterate():
 
             # if config.imageYPOS >= config.pictureHeight:
             # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
-            drawPanelVariations(config.destinationImage)
+            if config.usingPanelOverlays:
+                drawPanelVariations(config.destinationImage)
             drawPolyBlanks(config.destinationImageDraw)
             # badpixels.drawBlanks(config.destinationImage, False)
             config.render(config.destinationImage, 0, 0)
+
 
 # ----- panel based overlays ---------
 # adding panel modulation to mimic physical panel differences
@@ -599,7 +601,7 @@ def setPanelOverlays():
     global config
     panelOverLayList = []
     config.panelOverLayList = []
-    config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0,0,0,0))
+    config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 0))
 
     _totalPanels = config.panelRows * config.panelColumns
     _numPanels = random.randint(config.panelOverlayRange[0], min(_totalPanels, config.panelOverlayRange[1]))
@@ -623,7 +625,7 @@ def drawPanelVariations(targetImageRef):
         x1 = x0 + config.panelWidth
         y1 = y0 + config.panelHeight
         config.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=config.bgColor)
-    
+
     # tempImage = ImageChops.blend(targetImageRef, config.overlayImage, config.panelOverlayAmount)
     tempImage = ImageChops.add(targetImageRef, config.overlayImage, round(100 * config.panelOverlayAmount))
     targetImageRef.paste(tempImage, (0, 0), tempImage)
@@ -945,7 +947,12 @@ def main(run=True):
     config.panelOverlayRange = [int(x) for x in workConfig.get("hatchingmarks", "panelOverlayRange", fallback="1,30").split(",")]
     config.panelOverlayChangeProb = float(workConfig.get("hatchingmarks", "panelOverlayChangeProb", fallback=".0003"))
     config.panelOverlayAmount = float(workConfig.get("hatchingmarks", "panelOverlayAmount", fallback=".1"))
-    setPanelOverlays()
+    config.usingPanelOverlays = True
+    if config.panelColumns == 0 or config.panelRows == 0:
+        config.usingPanelOverlays = False
+
+    if config.usingPanelOverlays:
+        setPanelOverlays()
 
     loadFilterRemapping()
     setLines()

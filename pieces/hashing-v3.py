@@ -1,0 +1,1225 @@
+from logging import config
+import random
+import time
+import math
+from noise import *
+from modules.configuration import bcolors, pieceLogger
+from modules import colorutils, panelDrawing, badpixels
+from PIL import Image, ImageDraw, ImageChops
+
+# ################################################### #
+# hatching hashing lines
+
+
+class InformalLine:
+
+    points = 1
+    pointPerLine = 3
+    resolution = 50
+    drawingHeight = 100
+    noiseAmplitude = 1.0
+    xOffset = 100
+    yOffset = 0
+    angle = 0
+    direction = 0
+
+    def __init__(self, unitNumber):
+        self.unitNumber = unitNumber
+        self.lineColor = None
+        self.canvas = Image.new("RGBA", (config.largestDim, config.largestDim))
+        self.draw = ImageDraw.Draw(self.canvas)
+
+    def reconfigure(self):
+        self.lineSpeed = random.randint(self.lineSpeedRange[0], self.lineSpeedRange[1])
+        self.baseWidth = random.uniform(self.baseWidthRange[0], self.baseWidthRange[1])
+        self.noiseAmplitude = random.uniform(float(self.noiseAmplitudeRange[0]), float(self.noiseAmplitudeRange[1]))
+
+    def getCurvePoints(self):
+
+        self.curvedPoints = []
+
+        for i in range(self.points):
+            p0 = self.rawPts[max(0, i - 1)]
+            p1 = self.rawPts[i]
+            p2 = self.rawPts[i + 1]
+            p3 = self.rawPts[min(self.points - 1, i + 2)]
+
+            for step in range(self.resolution):
+                t = step / float(self.resolution)  # 0 <= t < 1
+
+                x = catmull_rom(p0[0], p1[0], p2[0], p3[0], t)
+                y = catmull_rom(p0[1], p1[1], p2[1], p3[1], t)
+
+                self.curvedPoints.append([x, y])
+
+    def generateRawLine(self):
+        self.rawPts = []
+        pointSpacing = self.drawingHeight / self.points
+
+        for i in range(self.points):
+            a = i * pointSpacing
+            b = R(-self.noiseAmplitude, self.noiseAmplitude)
+            if random.random() < config.tangleProb and i != 0 and i != self.points - 1 and abs(b) > self.noiseAmplitude * 0.75:
+                a -= random.uniform(config.backTrackRange[0], config.backTrackRange[1])
+            self.rawPts.append((round(b + self.xOffset), round(a + self.yOffset)))
+
+        # ensures the last point at the right or bottom closes the box
+        self.rawPts.append([b + self.xOffset, self.drawingHeight + self.yOffset])
+        # Extra points for smoother Bézier start/end
+        # pts.insert(0, pts[0])
+
+    def generateInformalLine(self):
+
+        self.points = random.randint(3, self.pointPerLine)
+        self.ratioFactor = random.uniform(config.ratioFactorRange[0], config.ratioFactorRange[1])
+        self.resolution = config.curveResolution
+        self.direction = 1 if random.random() < 0.5 else 0
+
+        self.generateRawLine()
+        self.getCurvePoints()
+        self.smoothPointsForDrawing = []
+        self.smoothPointsForDrawing.extend([pt[0] + self.xOffset, pt[1] + self.yOffset] for pt in self.curvedPoints)
+        # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
+
+
+# -------- Util Functions   -------------- #
+
+
+def R(a, b, rounded=False):
+    if not rounded:
+        return random.uniform(a, b)
+    else:
+        return round(random.uniform(a, b))
+
+
+def catmull_rom(p0, p1, p2, p3, t):
+    t2 = t * t
+    t3 = t2 * t
+
+    return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+
+
+def getColor(r, g, b, a):
+    clr = list(round(i * config.brightness) for i in [r, g, b])
+    clr.append(a)
+    return tuple(clr)
+
+
+
+
+# ----------------------------------------------------##----------------------------------------------------#
+def glitchBox(
+    imageRef,
+    apparentWidth,
+    apparentHeight,
+    imageGlitchDisplacementHorizontal,
+    imageGlitchDisplacementVertical,
+):
+
+    global config
+
+    apparentWidth = config.canvasImage.size[0]
+    apparentHeight = config.canvasImage.size[1]
+
+    dx = round(random.uniform(-imageGlitchDisplacementHorizontal, imageGlitchDisplacementHorizontal))
+    dy = round(random.uniform(-imageGlitchDisplacementVertical, imageGlitchDisplacementVertical))
+
+    sectionWidth = round(random.uniform(2, apparentWidth - dx))
+    sectionHeight = round(random.uniform(2, apparentHeight - dy))
+
+    # 95% of the time they dance together as mirrors
+    try:
+        if random.SystemRandom().random() < 0.97:
+            cx = dx + sectionWidth
+            cy = dy + sectionHeight
+
+            if cx < 0:
+                cx = 32
+            if cy < 0:
+                cy = 32
+            cp1 = imageRef.crop((0, 0, cx, cy))
+            imageRef.paste(cp1, (round(dx), round(dy)))
+        # comment:
+    except Exception as e:
+        pieceLogger(e,1)
+        pieceLogger(dx + sectionWidth, dy + sectionHeight)
+    # end try
+
+
+
+def _bgColorsFilling(config):
+    # config.usebgBox = False if config.usebgBox   else True
+    # print("bgBox")
+    # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
+    # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
+
+    xPos = math.floor(random.uniform(0, config.canvasWidth))
+    yPos = math.floor(random.uniform(0, config.canvasHeight))
+
+    config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
+    config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
+
+    if random.SystemRandom().random() < config.clearbgBoxProb:
+        xPos = yPos = 0
+        config.bgBoxBox = (
+            xPos,
+            yPos,
+            xPos + config.canvasWidth,
+            yPos + config.canvasHeight,
+        )
+        config.bgBoxFill = (0, 0, 0, 0)
+    else:
+        config.bgBoxBox = (
+            xPos,
+            yPos,
+            xPos + config.tileSizeWidth,
+            yPos + config.tileSizeHeight,
+        )
+        cR = config.bgBoxColorRange
+        # print(cR)
+        bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
+        # print(bgBoxFill)
+        config.bgBoxFill = (
+            round(config.brightness * bgBoxFill[0]),
+            round(config.brightness * bgBoxFill[1]),
+            round(config.brightness * bgBoxFill[2]),
+            round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
+        )
+
+    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+
+    glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
+    for _ in range(glitchIterations):
+        glitchBox(
+            config.underLayer,
+            config.canvasWidth,
+            config.canvasHeight,
+            config.bgGlitchDisplacementHorizontal,
+            config.bgGlitchDisplacementVertical,
+        )
+
+
+def _moireOverLay(currentAnimation, config, bgColor):
+    """Applies moire pattern and animates the current animation."""
+    _draw_background(currentAnimation, config, bgColor)
+    _draw_moire_pattern(currentAnimation, config)
+    _paste_animation_frame(currentAnimation)
+
+    if not config.allPause:
+        _animate(currentAnimation.anim, currentAnimation, config)
+
+    currentAnimation.anim.pause = config.allPause
+
+    if random.SystemRandom().random() < currentAnimation.changeAnimProb:
+        reConfigAnimationCell(currentAnimation.anim, currentAnimation)
+
+
+def _draw_background(currentAnimation, config, bgColor):
+    """Draws the background color on the animation image."""
+    bgColor = (
+        round(config.brightness * bgColor[0]),
+        round(config.brightness * bgColor[1]),
+        round(config.brightness * bgColor[2]),
+        currentAnimation.bg_alpha,
+    )
+    currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
+
+    if config.usebgBox:
+        currentAnimation.animationImage.paste(config.underLayer, (0, 0), config.underLayer)
+
+
+def _draw_moire_pattern(currentAnimation, config):
+    """Draws the moire pattern if enabled."""
+    if not config.drawMoire:
+        return
+
+    c1 = (round(config.brightness * 150), round(config.brightness * 50), 0, 150)
+    if config.setMoireColor:
+        c1 = config.moireColor
+        if random.SystemRandom().random() < config.moireColorAltProb:
+            c1 = config.moireColorAlt
+
+    for ii in range(2):
+        xc = ii * config.moireXDistance + config.moireXPos
+        yc = ii * config.moireYDistance + config.moireYPos
+        for i in range(1200):
+            w = 3 * config.canvasWidth - i * 6
+            if w > 1:
+                x0 = xc - w / 2
+                y0 = yc - w / 2
+                x1 = xc + w / 2
+                y1 = yc + w / 2
+
+                x1 = max(x0 + 1, x1)
+                y1 = max(y0 + 1, y1)
+
+                currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
+
+
+
+
+# -------- Line Attribute Function --------- #
+
+
+def setLineColor():
+    if not config.lightMode:
+        if config.lightLinesOnGround:
+            return colorutils.getRandomColorHSV(
+                config.line_mid_minHue,
+                config.line_mid_maxHue,
+                config.line_mid_minSaturation,
+                config.line_mid_maxSaturation,
+                config.line_mid_minValue,
+                config.line_mid_maxValue,
+                config.line_mid_minDropHue,
+                config.line_mid_maxDropHue,
+                round(random.uniform(config.line_mid_alpha_range[0], config.line_mid_alpha_range[1])),
+                config.brightness,
+            )
+        else:
+            return colorutils.getRandomColorHSV(
+                config.line_minHue,
+                config.line_maxHue,
+                config.line_minSaturation,
+                config.line_maxSaturation,
+                config.line_minValue,
+                config.line_maxValue,
+                config.line_minDropHue,
+                config.line_maxDropHue,
+                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+                config.brightness,
+            )
+    else:
+        return colorutils.getRandomColorHSV(
+            config.line_light_minHue,
+            config.line_light_maxHue,
+            config.line_light_minSaturation,
+            config.line_light_maxSaturation,
+            config.line_light_minValue,
+            config.line_light_maxValue,
+            config.line_light_minDropHue,
+            config.line_light_maxDropHue,
+            round(random.uniform(config.line_light_alpha_range[0], config.line_light_alpha_range[1])),
+            config.brightness,
+        )
+
+    # pieceLogger(f"New Line Color {config.lineColor}")
+
+
+def setBGColor():
+    _bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
+
+    if len(config.bgSets) > 0:
+        bgSet = random.choice(config.bgSets)
+        config.bg_minHue = bgSet[0]
+        config.bg_maxHue = bgSet[1]
+        config.bg_minSaturation = bgSet[2]
+        config.bg_maxSaturation = bgSet[3]
+        config.bg_minValue = bgSet[4]
+        config.bg_maxValue = bgSet[5]
+        config.bg_dropHueMin = 0
+        config.bg_dropHueMax = 0
+
+    _minVal = config.bg_minValue
+    _maxVal = config.bg_maxValue
+    if config.lightMode:
+        _minVal = 0.0
+        _maxVal = 0.1
+    config.bgColor = colorutils.getRandomColorHSV(
+        config.bg_minHue,
+        config.bg_maxHue,
+        config.bg_minSaturation,
+        config.bg_maxSaturation,
+        _minVal,
+        _maxVal,
+        config.bg_dropHueMin,
+        config.bg_dropHueMax,
+        _bg_alpha,
+        config.brightness,
+    )
+
+    if random.random() <= config.blankColorAsColorProb:
+        badpixels.blankColor = config.bgColor
+        config.blankColor = config.bgColor
+    else:
+        badpixels.blankColor = (0, 0, 0, 255)
+        # setting the alpha to a lower number so that when
+        # the blank changes, it comes in over a second or two
+        config.blankColor = (0, 0, 0, 10)
+
+    if random.random() < config.lightLinesOnGroundProb:
+        config.lightLinesOnGround = True
+    else:
+        config.lightLinesOnGround = False
+
+    # pieceLogger("New BG")
+
+
+# -------- Line Functions    -------------- #
+
+
+def setLines():
+    pieceLogger(f"New Lines: {config.drawingShape}")
+    config.informalLineUnits = []
+
+    if config.drawingShape == "grid":
+        setGridLines()
+    else:
+        setRegularSpacing()
+        for _u in range(config.numberOfinformalLines):
+            informalLine = InformalLine(_u)
+            informalLine.angle = config.singleLinesAngle
+
+            informalLine.lineColor = setLineColor()
+
+            if config.singleLineRegularSpacing:
+                informalLine.xOffset = config.xOffset + config.rowSpacing * _u
+
+            informalLine.drawingHeight = round(random.uniform(config.drawingHeightRange[0], config.drawingHeightRange[1]))
+            informalLine.xOffset = round(config.xOffset + config.largestDim / 2 + random.uniform(-config.distributionRange, config.distributionRange))
+            informalLine.yOffset = round(config.largestDim - informalLine.drawingHeight - config.yOffset)
+
+            informalLine.lineSpeed = random.randint(config.lineSpeedRange[0], config.lineSpeedRange[1])
+            informalLine.baseWidth = random.uniform(config.baseWidthRange[0], config.baseWidthRange[1])
+            informalLine.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
+
+            informalLine.generateInformalLine()
+            config.informalLineUnits.append(informalLine)
+
+
+def setRegularSpacing():
+    config.colInterval = random.randint(int(config.colIntervalRange[0]), int(config.colIntervalRange[1]))
+
+    # if uniformRatio, the column ratio is used for the rows as well - this means even rectangles across field
+    if config.uniformRatio:
+        config.rowInterval = config.colInterval
+    else:
+        config.rowInterval = random.randint(int(config.rowIntervalRange[0]), int(config.rowIntervalRange[1]))
+
+    config.colSpacing = (config.drawingWidth - 2 * config.xOffset) / config.colInterval
+    config.rowSpacing = (config.drawingHeight - 2 * config.yOffset) / config.rowInterval
+
+    # if squareRatio, the column ratio and spacing is used for the rows as well - this means all squares across field
+    if config.squareRatio:
+        config.rowSpacing = config.colSpacing
+
+
+def setGridLines():
+    pieceLogger(f"Making Grid: {config.drawingShape} {config.drawingWidth } {config.drawingHeight }")
+
+    setRegularSpacing()
+
+    config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
+    config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
+
+    def add_col_lines():
+        # config.v_pts = []
+        for col in range(config.colInterval + config.colAdj):
+            # v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * col, config.yOffset, False)
+            # config.v_pts.append(v_pts)
+            informalLine = InformalLine(col)
+            informalLine.xOffset = config.xOffset + config.colSpacing * col
+            informalLine.yOffset = config.yOffset
+            informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
+
+            informalLine.pointPerLine = config.pointsPerLineCol
+            informalLine.lineSpeedRange = config.vertLineSpeedRange
+            informalLine.baseWidthRange = config.vertBaseWidthRange
+            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
+            # _bg_alpha = round(config.bg_alpha)
+
+            informalLine.lineColor = setLineColor()
+            informalLine.reconfigure()
+            informalLine.generateInformalLine()
+            # pieceLogger(f"{informalLine.lineColor}")
+            config.informalLineUnits.append(informalLine)
+
+    def add_row_lines():
+        # config.h_pts = []
+        for row in range(config.rowInterval + config.rowAdj):
+            informalLine = InformalLine(row)
+            # h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * row, True)
+            # config.h_pts.append(h_pts)
+            informalLine.xOffset = config.xOffset + config.rowSpacing * row
+            informalLine.yOffset = config.yOffset
+            informalLine.drawingHeight = config.drawingWidth - 2 * config.xOffset
+            informalLine.angle = 90
+            informalLine.pointPerLine = config.pointsPerLineRow
+            informalLine.lineSpeedRange = config.horizLineSpeedRange
+            informalLine.baseWidthRange = config.horizBaseWidthRange
+            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeRow
+            informalLine.lineColor = setLineColor()
+            informalLine.reconfigure()
+            informalLine.generateInformalLine()
+            config.informalLineUnits.append(informalLine)
+
+    if config.colFirst:
+        add_col_lines()
+        add_row_lines()
+    else:
+        add_row_lines()
+        add_col_lines()
+
+    config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
+    config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
+    config.line_alpha = R(config.line_alpha_range[0], config.line_alpha_range[1], True)
+    config.bg_alpha_base = R(config.bg_alpha_range[0], config.bg_alpha_range[1], True)
+
+    config.numberOfinformalLines = len(config.informalLineUnits)
+    # pieceLogger(f"New Lines {config.numberOfinformalLines}")
+
+
+def changeLine():
+    _changeLine = random.randint(0, len(config.informalLineUnits) - 1)
+    config.informalLineUnits[_changeLine].reconfigure()
+
+
+def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
+
+    _p1 = [p1x, p1y]
+    _p2 = [p2x, p2y]
+
+    # _dy = _p1[1] - _p2[1]
+    # _dx = _p1[0] - _p2[0]
+
+    # _angle = math.atan2(_dy, _dx) * 360 / math.pi
+
+    # if _angle < 0:
+    #     _angle += 360
+
+    # _totalPts = len(_lineUnit.curvedPoints)
+    # _ratio1 = _n / _totalPts
+    # _ratio1a = _ratio1 / _lineUnit.ratioFactor
+    # _ratio2 = (_totalPts - _n) / _totalPts
+    # _ratio2a = _ratio2 / _lineUnit.ratioFactor
+
+    # _t = (_n / math.pi) / 70
+    # _ratio = math.sin(_t + math.pi / 5) * math.pow(math.sin(_t), 0) * _ratio1a
+
+    _ratio = 1.0
+    _ratio1a = 1.0
+
+    _penWidth = _lineUnit.baseWidth * _ratio * _ratio1a
+
+    # _alphaBase = 2
+    # _r = round(190 * (_ratio * 3))
+    # _g = round(100 * _ratio)
+    # _b = round(20 * (_totalPts - _n) / _totalPts)
+    # _a = round(_alphaBase * _ratio)
+
+    # fillClr = [_r, _g, _b, _a]
+
+    fillClr = _lineUnit.lineColor
+
+    if config.drawingShape == "grid":
+        # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+        if _lineUnit.angle == 90:
+            config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+        else:
+            config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+
+    else:
+
+        _orthoAngle = math.pi - math.atan2(_dy, _dx)
+        _sinOrthoAngle = math.sin(_orthoAngle)
+        _cosOrthoAngle = math.cos(_orthoAngle)
+
+        _orthoD = _penWidth
+
+        _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
+        _orthoP1y = round(_orthoD * _cosOrthoAngle + _p1[1])
+
+        _orthoP2x = round(_orthoD * _sinOrthoAngle + _p2[0])
+        _orthoP2y = round(_orthoD * _cosOrthoAngle + _p2[1])
+
+        _orthoP3x = round(-_orthoD * _sinOrthoAngle + _p2[0])
+        _orthoP3y = round(-_orthoD * _cosOrthoAngle + _p2[1])
+
+        _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
+        _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
+
+        if _n > 1:
+            _orthoP1x = _lineUnit.lastOrthoPoint[0]
+            _orthoP1y = _lineUnit.lastOrthoPoint[1]
+
+            _orthoP4x = _lineUnit.lastOrthoPoint[2]
+            _orthoP4y = _lineUnit.lastOrthoPoint[3]
+
+        _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
+
+        if config.renderLinesAsEnvelope:
+            _lineUnit.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
+        else:
+            if _lineUnit.angle == 90:
+                _lineUnit.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+            else:
+                _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+
+        # config.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
+
+        _lineUnit.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
+
+
+def drawTheBG():
+    config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
+    config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
+
+    # if config.bg_alpha != config.bg_alpha_base :
+    #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
+
+
+def informalLines():
+    global config
+
+    for informalLineUnitIndex in range(0, len(config.informalLineUnits)):
+        lineUnit = config.informalLineUnits[informalLineUnitIndex]
+        lineUnit.lastOrthoPoint = []
+        pointsToDraw = lineUnit.curvedPoints
+        lastPt = [pointsToDraw[0][0], pointsToDraw[0][1]]
+
+        lineUnit.draw.rectangle((0, 0, config.largestDim, config.largestDim), fill=(0, 0, 0, 0))
+
+        _ptCounter = 0
+        for pt in pointsToDraw:
+            drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _ptCounter, lineUnit)
+            lastPt = [pt[0], pt[1]]
+            _ptCounter += 1
+
+        if (lineUnit.angle != 0 and random.random() < config.horizontalMovementProb) or (lineUnit.angle == 0 and random.random() < config.verticalMovementProb):
+            if lineUnit.direction == 0:
+                for _ in range(lineUnit.lineSpeed):
+                    _lstpt = pointsToDraw[0][0]
+                    for pt in range(0, len(pointsToDraw) - 1):
+                        pointsToDraw[pt][0] = pointsToDraw[pt + 1][0]
+                    pointsToDraw[pt + 1][0] = _lstpt
+            else:
+                for _ in range(lineUnit.lineSpeed):
+                    _lstpt = pointsToDraw[len(pointsToDraw) - 1][0]
+                    for pt in range(len(pointsToDraw) - 1, 0, -1):
+                        pointsToDraw[pt][0] = pointsToDraw[pt - 1][0]
+                    pointsToDraw[pt + 1][0] = _lstpt
+
+
+def resetPolyBlanks():
+    config.blanks_list = []
+    config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
+
+    for _ in range(config.blanks_numberOfDeadPixels):
+        width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
+        height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
+        width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+
+        x0 = random.randint(0, config.blanks_sizeTarget[0])
+        y0 = random.randint(0, config.blanks_sizeTarget[1])
+        x1 = x0 + width1
+        y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        y2 = y1 + height1
+        x3 = x2 - width2
+        y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+
+        _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
+
+        config.blanks_list.append(_poly)
+
+
+def drawPolyBlanks(_drawRef):
+    for p in range(config.blanks_numberOfDeadPixels):
+        _poly = config.blanks_list[p]
+        _drawRef.polygon(_poly, fill=config.blankColor)
+
+
+# ---- looping and redrawing --------
+
+
+def runWork():
+    global config
+    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    print("Running hatchingmarks.py")
+    print(bcolors.ENDC)
+
+    while config.isRunning == True:
+        iterate()
+        time.sleep(config.redrawSpeed)
+        if config.standAlone == False:
+            config.callBack()
+
+
+def reDraw():
+    # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
+    if config.bg_alpha < config.bg_alpha_base:
+        config.bg_alpha += config.bg_alpha_returnrate
+
+    if config.bg_alpha > config.bg_alpha_base:
+        config.bg_alpha = config.bg_alpha_base
+
+    drawTheBG()
+    informalLines()
+
+    # adding check on bg alpha as index of transition state - don't want another transition
+    # stomping on the one in progress
+
+    # if random.random() < config.changeBGProb and not config.noChange:
+    if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
+        config.bg_alpha = 0
+        config.lightMode = False if random.random() > config.lightModeProb else True
+        # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
+        setBGColor()
+        # setLines()
+
+        for _u in range(config.numberOfinformalLines):
+            informalLine = config.informalLineUnits[_u]
+            informalLine.lineColor = setLineColor()
+
+            # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
+
+    if random.random() < config.changeLinesProb and not config.noChange:
+        config.lightMode = False if random.random() > config.lightModeProb else True
+        config.bg_alpha = 0
+        setBGColor()
+        setLines()
+        # pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
+
+    if random.random() < config.pauseProb:
+        config.noChange = True
+
+    if random.random() < config.unpauseProb:
+        config.noChange = False
+
+
+def iterate():
+
+    if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox:
+        _bgColorsFilling(config)
+
+    reDraw()
+    handleFilterRemapping()
+
+    if random.random() < config.resetBlanksProb:
+        # badpixels.setBlanksOnScreen(config)
+        resetPolyBlanks()
+
+    if random.random() < config.panelOverlayChangeProb:
+        setPanelOverlays()
+
+    ########### RENDERING AS A MOCKUP OR AS REAL ###########
+    if config.useDrawingPoints == True:
+        config.panelDrawing.canvasToUse = config.image
+        config.panelDrawing.render()
+    else:
+        # _xDiff = round((config.largestDim - config.drawingWidth) / 1)
+        # _yDiff = round((config.largestDim - config.drawingHeight) / 1)
+
+        # config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=(255,255,255,255))
+        if config.drawingShape != "grid":
+            config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
+
+            _tempImage = Image.new("RGBA", (config.largestDim, config.largestDim))
+            for n in config.informalLineUnits:
+                # n.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=(100, 0, 0, 2))
+                _tempImage = ImageChops.add(n.canvas, _tempImage)
+
+                # _temp = n.canvas.rotate(n.angle)
+                # @todo fix this bs later  .....
+                # if n.angle == 0:
+                #     config.image.paste(_temp, (-_xDiff, -0), _temp)
+                # else:
+                #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
+            _tempImage = _tempImage.rotate(n.angle)
+            
+            config.image.paste(_tempImage, (0, 0), _tempImage)
+            # badpixels.drawBlanks(config.image, False)
+            drawPolyBlanks(config.imageDraw)
+            config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
+        else:
+            # badpixels.drawBlanks(config.image, False)
+            config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
+            config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
+            config.destinationImage.paste(config.underLayer, (0,0) ,config.underLayer)
+            if not config.lightMode:
+                config.imageXPOS += config.imageXPOSSpeed
+            # config.imageYPOS += config.YPOSSpeed
+
+            if config.imageXPOS >= config.drawingWidth:
+                config.imageXPOS = 0
+
+            # if config.imageYPOS >= config.pictureHeight:
+            # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
+            if config.usingPanelOverlays:
+                drawPanelVariations(config.destinationImage)
+            drawPolyBlanks(config.destinationImageDraw)
+            # badpixels.drawBlanks(config.destinationImage, False)
+            config.render(config.destinationImage, 0, 0)
+
+
+# ----- panel based overlays ---------
+# adding panel modulation to mimic physical panel differences
+def setPanelOverlays():
+    global config
+    if not config.usingPanelOverlays :
+        return
+    
+    panelOverLayList = []
+    config.panelOverLayList = []
+    config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 0))
+
+    _totalPanels = config.panelRows * config.panelColumns
+    _numPanels = random.randint(config.panelOverlayRange[0], min(_totalPanels, config.panelOverlayRange[1]))
+
+    # create an array of panel spots then joggle it
+    for c in range(0, config.panelColumns):
+        for r in range(0, config.panelRows):
+            panelOverLayList.append([c, r])
+
+    random.shuffle(panelOverLayList)
+
+    for i in range(_numPanels):
+        config.panelOverLayList.append(panelOverLayList[i])
+
+
+def drawPanelVariations(targetImageRef):
+    global config
+    for p in config.panelOverLayList:
+        x0 = p[0] * config.panelWidth
+        y0 = p[1] * config.panelHeight
+        x1 = x0 + config.panelWidth
+        y1 = y0 + config.panelHeight
+        config.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=config.bgColor)
+
+    # tempImage = ImageChops.blend(targetImageRef, config.overlayImage, config.panelOverlayAmount)
+    tempImage = ImageChops.add(targetImageRef, config.overlayImage, round(100 * config.panelOverlayAmount))
+    targetImageRef.paste(tempImage, (0, 0), tempImage)
+
+
+# ---- dither remapping ------------
+
+
+def loadFilterRemapping():
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapping", False, bool)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingProb", 0.0, float)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingReappearProb", 0.10, float)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinHoriSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxHoriSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinVertSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxVertSize", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapRangeY", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapRangeX", 1, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "contractXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "contractYSpeed", 2, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "expandXSpeed", 2, int)
+    loadConfigValue(config, workConfig, "hatchingmarks", "expandYSpeed", 2, int)
+
+    config.filterRemappingChangeProb = config.filterRemappingProb
+    config.filterRemapContracting = 0
+    config.basefilterRemappingProb = config.filterRemappingProb
+
+
+def handleFilterRemapping():
+    """Handles filter remapping if enabled."""
+    # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
+    if random.random() < config.filterRemappingChangeProb and (config.useFilters and config.filterRemapping):
+        remapFilter(config)
+
+
+def expandFilterRemap():
+
+    _pos = list(config.remapImageBlockSection)
+    # pieceLogger(_pos)
+    _pos[0] = max(_pos[0] - config.expandXSpeed, config.newFilterStartX)
+    _pos[2] += config.expandXSpeed
+    # _pos[1] -= 2
+    # _pos[3] += 2
+    # or _pos[1] <= (config.newFilterStartY)
+    if _pos[0] <= (config.newFilterStartX):
+        config.filterRemappingProb = config.basefilterRemappingProb
+        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemapContracting = 1
+        # pieceLogger(f"Expanidng done {config.newFilterStartX}")
+        config.filterRemappingChangeProb = config.filterRemappingProb
+    else:
+        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemappingChangeProb = 1.0
+
+
+def contractFilterRemap():
+    _pos = list(config.remapImageBlockSection)
+    # pieceLogger(_pos)
+    _pos[0] += config.contractXSpeed
+    _pos[2] -= config.contractXSpeed
+    _pos[1] += config.contractYSpeed
+    _pos[3] -= config.contractYSpeed
+
+    if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
+        config.filterRemappingProb = config.basefilterRemappingProb
+        config.filterRemapContracting = 0
+        config.remapImageBlockSection = (_pos[2], _pos[3], _pos[2], _pos[3])
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+        config.filterRemappingChangeProb = config.filterRemappingReappearProb
+    else:
+        # pieceLogger(_pos)
+        config.remapImageBlockSection = tuple(_pos)
+        config.remapImageBlockDestination = [_pos[0], _pos[1]]
+        config.filterRemappingChangeProb = 1.0
+
+
+def remapFilter(config):
+    """Remaps the filter block section."""
+    config.filterRemap = True
+    if config.filterRemappingProb != 1.0 and config.filterRemapContracting == 0:
+        config.filterRemapContracting = 2
+        config.newFilterStartX = round(random.uniform(0, config.filterRemapRangeX))
+        config.newFilterStartY = round(random.uniform(0, config.filterRemapRangeY))
+        config.newFilterEndX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
+        config.newFilterEndY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
+        config.remapImageBlockSection = (
+            config.newFilterStartX + config.newFilterEndX,
+            config.newFilterStartY,
+            config.newFilterStartX + config.newFilterEndX,
+            config.newFilterStartY + config.newFilterEndY,
+        )
+        # pieceLogger("Resetting to expand")
+        # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
+
+    if config.filterRemapContracting == 1:
+        # pieceLogger("Resetting to contract")
+        contractFilterRemap()
+
+    if config.filterRemapContracting == 2:
+        expandFilterRemap()
+
+
+# ---- initialize  -----------------
+
+
+def loadConfigValue(obj, workConfig, section, option, default, type_converter):
+    try:
+        if type_converter == bool:
+            setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
+        else:
+            setattr(obj, option, type_converter(workConfig.get(section, option)))
+    except Exception as e:
+        pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
+        setattr(obj, option, default)
+
+
+def loadBackgroundConfigs() :
+
+    config.drawMoire = workConfig.getboolean("bgparameters", "drawMoire")
+    config.drawMoireProb = float(workConfig.get("bgparameters", "drawMoireProb"))
+    config.drawMoireProbOff = float(workConfig.get("bgparameters", "drawMoireProbOff"))
+
+    config.moireXPos = int(workConfig.get("bgparameters", "moireXPos"))
+    config.moireYPos = int(workConfig.get("bgparameters", "moireYPos"))
+    config.moireXDistance = int(workConfig.get("bgparameters", "moireXDistance"))
+    config.moireYDistance = int(workConfig.get("bgparameters", "moireYDistance"))
+    config.setMoireColor = workConfig.getboolean("bgparameters", "setMoireColor")
+    config.moireColorAltProb = float(workConfig.get("bgparameters", "moireColorAltProb"))
+    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("bgparameters", "moireColor").split(",")))
+    config.moireColorAlt = tuple(
+        map(
+            lambda x: int(x),
+            workConfig.get("bgparameters", "moireColorAlt").split(","),
+        )
+    )
+
+
+    config.bgBoxColorRange = list(
+        map(
+            lambda x: float(x),
+            workConfig.get("bgparameters", "bgBoxColorRange").split(","),
+        )
+    )
+    config.bgBoxAlphaRange = tuple(
+        map(
+            lambda x: int(x),
+            workConfig.get("bgparameters", "bgBoxAlphaRange").split(","),
+        )
+    )
+    config.usebgBox = workConfig.getboolean("bgparameters", "forcebgBox")
+    config.usebgBoxProb = float(workConfig.get("bgparameters", "usebgBoxProb"))
+    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("bgparameters", "bgBoxBox").split(",")))
+    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+    config.bgBoxFill = (100, 0, 80, 100)
+
+    config.bgTileSizeWidthMin = float(workConfig.get("bgparameters", "bgTileSizeWidthMin"))
+    config.bgTileSizeWidthMax = float(workConfig.get("bgparameters", "bgTileSizeWidthMax"))
+    config.bgTileSizeHeightMin = float(workConfig.get("bgparameters", "bgTileSizeHeightMin"))
+    config.bgTileSizeHeightMax = float(workConfig.get("bgparameters", "bgTileSizeHeightMax"))
+
+    config.clearbgBoxProb = float(workConfig.get("bgparameters", "clearbgBoxProb"))
+    config.bgGlitchCyclesMin = float(workConfig.get("bgparameters", "bgGlitchCyclesMin"))
+    config.bgGlitchCyclesMax = float(workConfig.get("bgparameters", "bgGlitchCyclesMax"))
+    config.bgGlitchDisplacementHorizontal = float(workConfig.get("bgparameters", "bgGlitchDisplacementHorizontal"))
+    config.bgGlitchDisplacementVertical = float(workConfig.get("bgparameters", "bgGlitchDisplacementVertical"))
+
+    config.pauseProb = float(workConfig.get("bgparameters", "pauseProb", fallback=".001"))
+    config.unPauseProb = float(workConfig.get("bgparameters", "unPauseProb", fallback=".001"))
+    config.freezeGlitchProb = float(workConfig.get("bgparameters", "freezeGlitchProb", fallback=".001"))
+    config.unFreezeGlitchProb = float(workConfig.get("bgparameters", "unFreezeGlitchProb", fallback=".001"))
+    config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=".001"))
+
+    config.bg_minHue = int(workConfig.get("bgparameters", "bg_minHue"))
+    config.bg_maxHue = int(workConfig.get("bgparameters", "bg_maxHue"))
+    config.bg_minSaturation = float(workConfig.get("bgparameters", "bg_minSaturation"))
+    config.bg_maxSaturation = float(workConfig.get("bgparameters", "bg_maxSaturation"))
+    config.bg_minValue = float(workConfig.get("bgparameters", "bg_minValue"))
+    config.bg_maxValue = float(workConfig.get("bgparameters", "bg_maxValue"))
+    config.bg_dropHueMinValue = float(workConfig.get("bgparameters", "bg_dropHueMinValue"))
+    config.bg_dropHueMaxValue = float(workConfig.get("bgparameters", "bg_dropHueMaxValue"))
+    config.bg_alpha = int(workConfig.get("bgparameters", "bg_alpha"))
+    config.bg_alpha_max = int(workConfig.get("bgparameters", "bg_alpha"))
+
+    config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=config.backgroundColorChangeProb))
+
+    config.pauseProb = float(workConfig.get("bgparameters", "pauseProb", fallback=config.pauseProb))
+    config.unPauseProb = float(workConfig.get("bgparameters", "unPauseProb", fallback=config.unPauseProb))
+    config.freezeGlitchProb = float(workConfig.get("bgparameters", "freezeGlitchProb", fallback=config.freezeGlitchProb))
+    config.unFreezeGlitchProb = float(workConfig.get("bgparameters", "unFreezeGlitchProb", fallback=config.unFreezeGlitchProb))
+
+
+def main(run=True):
+    global config
+    global workConfig
+
+    config.imageXPOS = 0
+    config.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
+    config.imageYPOS = 0
+    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.imageDraw = ImageDraw.Draw(config.image)
+    config.draw = ImageDraw.Draw(config.image)
+
+    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+    config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+
+    config.overlayImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.overlayImageDraw = ImageDraw.Draw(config.overlayImage)
+
+    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
+    config.drawingShape = workConfig.get("hatchingmarks", "drawingShape")
+
+    config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
+    config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
+
+    config.largestDim = max(config.drawingWidth, config.drawingHeight)
+
+
+
+
+    # refinements for setting points per column and row so amplitude of noise can be adjusted to be more even if aspect ratio is more extreme - e.g narrow beam
+    # but also, lower number makes the line more purely rectilinear so can give a greater focus to one directions linearity
+    config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
+    config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
+    config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
+
+    # adjust higher for higer resolution
+    config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
+
+    # not really used - was used in first iteration using Perlin Noise
+    config.noiseSeed = random.random()
+
+    # if the shape is not single-lines, will be determined by rows and columns
+    config.numberOfinformalLines = int(workConfig.get("hatchingmarks", "numberOfinformalLines", fallback="3"))
+    # the edge spacing - critical to making the drawing as the edges matter more than the sum of the lines
+    config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
+    config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
+
+    # for single linesneSpeed
+    config.renderLinesAsEnvelope = workConfig.getboolean("hatchingmarks", "renderLinesAsEnvelope", fallback=False)
+    config.drawVertical = workConfig.getboolean("hatchingmarks", "drawVertical", fallback=True)
+    config.drawHorizontal = workConfig.getboolean("hatchingmarks", "drawHorizontal", fallback=True)
+    config.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
+    config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
+    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
+    config.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
+    config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
+    config.verticalMovement = workConfig.getboolean("hatchingmarks", "verticalMovement", fallback=False)
+    config.horizontalMovement = workConfig.getboolean("hatchingmarks", "horizontalMovement", fallback=False)
+    config.horizontalMovementProb = float(workConfig.get("hatchingmarks", "horizontalMovementProb", fallback="0.25"))
+    config.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
+    config.singleLinesAngle = float(workConfig.get("hatchingmarks", "singleLinesAngle", fallback="0"))
+    config.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
+
+    if config.singleLineRegularSpacing:
+        _hspacing = round(config.drawingWidth / (config.numberOfinformalLines + 2))
+        _vspacing = round(config.drawingHeight / (config.numberOfinformalLines + 2))
+        config.rowIntervalRange = [_vspacing, _vspacing]
+        config.colIntervalRange = [_hspacing, _hspacing]
+
+    # means the row interval is the same as the column interval - if they are independent then
+    # there can be more extreme column or row spacing, othewise they get the same ratio
+    config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
+
+    # forces grid to squares - but is not currently compensated to will get ragged and missing
+    # grids at edges of drawing
+    config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
+
+    # the +/- variability of the points
+    config.noiseAmplitudeRangeRow = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback="1,1").split(",")]
+    config.noiseAmplitudeRangeCol = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback="1,1").split(",")]
+    config.colFirst = workConfig.getboolean("hatchingmarks", "colFirst", fallback=False)
+
+    config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
+    config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
+
+    config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
+    config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
+
+    config.vertlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    config.horzlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+
+    config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
+    config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
+
+    config.horizLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "horizLineSpeedRange", fallback="1,20").split(",")]
+    config.vertLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineSpeedRange", fallback="1,20").split(",")]
+    config.vertBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertBaseWidthRange", fallback="18,180").split(",")]
+    config.horizBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "horizBaseWidthRange", fallback="18,180").split(",")]
+
+    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
+    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
+
+    """
+    # PROBABILITIES ----------------
+    # generally based on an interval rate of .03, i.e. 3/100's of a second per cycle ~ 33.33 frames/second
+    # so the chance of change is .001 per frame, then the chance per second is ~ 3.33%
+    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    """
+
+    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    # probablility background changes
+    config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
+    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
+    config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
+    config.noChange = False
+
+    # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
+    config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
+
+    # light lines on background - more like a drawing on a screen
+    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
+    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
+    config.lightLinesOnGroundProb = float(workConfig.get("hatchingmarks", "lightLinesOnGroundProb", fallback=0.0))
+    config.lightLinesOnGround = workConfig.getboolean("hatchingmarks", "lightLinesOnGround", fallback=False)
+
+    # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
+
+    config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
+    config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
+    config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
+    config.line_minSaturation = float(workConfig.get("hatchingmarks", "line_minSaturation"))
+    config.line_minValue = float(workConfig.get("hatchingmarks", "line_minValue"))
+    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
+    config.line_minDropHue = float(workConfig.get("hatchingmarks", "line_minDropHue", fallback=0))
+    config.line_maxDropHue = float(workConfig.get("hatchingmarks", "line_maxDropHue", fallback=0))
+    config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
+
+    config.line_mid_minHue = float(workConfig.get("hatchingmarks", "line_mid_minHue", fallback=config.line_minHue))
+    config.line_mid_maxHue = float(workConfig.get("hatchingmarks", "line_mid_maxHue", fallback=config.line_maxHue))
+    config.line_mid_minSaturation = float(workConfig.get("hatchingmarks", "line_mid_minSaturation", fallback=config.line_minSaturation))
+    config.line_mid_maxSaturation = float(workConfig.get("hatchingmarks", "line_mid_maxSaturation", fallback=config.line_maxSaturation))
+    config.line_mid_minValue = float(workConfig.get("hatchingmarks", "line_mid_minValue", fallback=config.line_minValue))
+    config.line_mid_maxValue = float(workConfig.get("hatchingmarks", "line_mid_maxValue", fallback=config.line_maxValue))
+    config.line_mid_minDropHue = float(workConfig.get("hatchingmarks", "line_mid_minDropHue", fallback=0))
+    config.line_mid_maxDropHue = float(workConfig.get("hatchingmarks", "line_mid_maxDropHue", fallback=0))
+    config.line_mid_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_mid_alpha_range", fallback="150,190").split(",")]
+
+    config.line_light_minHue = float(workConfig.get("hatchingmarks", "line_light_minHue"))
+    config.line_light_maxHue = float(workConfig.get("hatchingmarks", "line_light_maxHue"))
+    config.line_light_maxSaturation = float(workConfig.get("hatchingmarks", "line_light_maxSaturation"))
+    config.line_light_minSaturation = float(workConfig.get("hatchingmarks", "line_light_minSaturation"))
+    config.line_light_minValue = float(workConfig.get("hatchingmarks", "line_light_minValue"))
+    config.line_light_maxValue = float(workConfig.get("hatchingmarks", "line_light_maxValue"))
+    config.line_light_minDropHue = float(workConfig.get("hatchingmarks", "line_light_minDropHue", fallback=0))
+    config.line_light_maxDropHue = float(workConfig.get("hatchingmarks", "line_light_maxDropHue", fallback=0))
+    config.line_light_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_light_alpha_range", fallback="150,190").split(",")]
+
+    config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
+    config.bg_maxHue = float(workConfig.get("hatchingmarks", "bg_maxHue"))
+    config.bg_maxSaturation = float(workConfig.get("hatchingmarks", "bg_maxSaturation"))
+    config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
+    config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
+    config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
+    config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback="0"))
+    config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "bg_dropHueMax", fallback="0"))
+    config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
+    config.bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
+    config.bg_alpha_base = 20
+
+    bgSets = workConfig.get("hatchingmarks", "bgSets", fallback="").split("|")
+    config.bgSets = []
+
+    if len(bgSets[0]) > 0:
+        for bg in bgSets:
+            config.bgSets.append(list(float(x) for x in bg.split(",")))
+
+    config.rebuildingVerticals = False
+
+    config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
+    config.blankColorAsColorProb = float(workConfig.get("hatchingmarks", "blankColorAsColorProb", fallback="0.5"))
+    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
+    config.blanks_probabilityOfBlockBlanks = 0.0
+    config.blanks_sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
+    config.blanks_colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
+    config.blanks_rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
+    config.blankPolyVariation = int(workConfig.get("hatchingmarks", "blankPolyVariation", fallback="10"))
+
+    resetPolyBlanks()
+
+    badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
+    badpixels.probabilityOfBlockBlanks = 0.0
+    badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
+    badpixels.colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
+    badpixels.rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
+
+    config.panelWidth = int(workConfig.get("hatchingmarks", "panelWidth", fallback="64"))
+    config.panelHeight = int(workConfig.get("hatchingmarks", "panelHeight", fallback="32"))
+    config.panelColumns = int(workConfig.get("hatchingmarks", "panelColumns", fallback="10"))
+    config.panelRows = int(workConfig.get("hatchingmarks", "panelRows", fallback="10"))
+    config.panelOverlayRange = [int(x) for x in workConfig.get("hatchingmarks", "panelOverlayRange", fallback="1,30").split(",")]
+    config.panelOverlayChangeProb = float(workConfig.get("hatchingmarks", "panelOverlayChangeProb", fallback=".0003"))
+    config.panelOverlayAmount = float(workConfig.get("hatchingmarks", "panelOverlayAmount", fallback=".1"))
+    config.usingPanelOverlays = True
+    if config.panelColumns == 0 or config.panelRows == 0:
+        config.usingPanelOverlays = False
+
+    if config.usingPanelOverlays:
+        setPanelOverlays()
+
+
+    loadBackgroundConfigs()
+    
+
+    loadFilterRemapping()
+    setLines()
+    config.lineColor = setLineColor()
+    setBGColor()
+
+    badpixels.setBlanksOnScreen(config)
+
+    ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
+    panelDrawing.mockupBlock(config, workConfig)
+    #### Need to add something like this at final render call  as well
+    """ 
+        ########### RENDERING AS A MOCKUP OR AS REAL ###########
+        if config.useDrawingPoints == True :
+            config.panelDrawing.canvasToUse = config.renderImageFull
+            config.panelDrawing.render()
+        else :
+            #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
+            #config.render(config.image, 0, 0)
+            config.render(config.renderImageFull, 0, 0)
+    """
+    if run:
+        runWork()

@@ -146,6 +146,17 @@ def glitchBox(
     # end try
 
 
+def clearbgBox():
+    xPos = yPos = 0
+    config.bgBoxBox = (
+        xPos,
+        yPos,
+        xPos + config.canvasWidth,
+        yPos + config.canvasHeight,
+    )
+    config.bgBoxFill = (0, 0, 0, 0)
+    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+
 
 def _bgColorsFilling(config):
     # config.usebgBox = False if config.usebgBox   else True
@@ -159,32 +170,22 @@ def _bgColorsFilling(config):
     config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
     config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
 
-    if random.SystemRandom().random() < config.clearbgBoxProb:
-        xPos = yPos = 0
-        config.bgBoxBox = (
-            xPos,
-            yPos,
-            xPos + config.canvasWidth,
-            yPos + config.canvasHeight,
-        )
-        config.bgBoxFill = (0, 0, 0, 0)
-    else:
-        config.bgBoxBox = (
-            xPos,
-            yPos,
-            xPos + config.tileSizeWidth,
-            yPos + config.tileSizeHeight,
-        )
-        cR = config.bgBoxColorRange
-        # print(cR)
-        bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
-        # print(bgBoxFill)
-        config.bgBoxFill = (
-            round(config.brightness * bgBoxFill[0]),
-            round(config.brightness * bgBoxFill[1]),
-            round(config.brightness * bgBoxFill[2]),
-            round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
-        )
+    config.bgBoxBox = (
+        xPos,
+        yPos,
+        xPos + config.tileSizeWidth,
+        yPos + config.tileSizeHeight,
+    )
+    cR = config.bgBoxColorRange
+    # print(cR)
+    bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
+    # print(bgBoxFill)
+    config.bgBoxFill = (
+        round(config.brightness * bgBoxFill[0]),
+        round(config.brightness * bgBoxFill[1]),
+        round(config.brightness * bgBoxFill[2]),
+        round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
+    )
 
     config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
 
@@ -703,6 +704,10 @@ def iterate():
     if random.random() < config.panelOverlayChangeProb:
         setPanelOverlays()
 
+    
+    if random.SystemRandom().random() < config.clearbgBoxProb:
+        clearbgBox()
+
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:
         config.panelDrawing.canvasToUse = config.image
@@ -974,7 +979,6 @@ def loadBackgroundConfigs() :
     config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=config.backgroundColorChangeProb))
 
 
-
 def main(run=True):
     global config
     global workConfig
@@ -1183,16 +1187,16 @@ def main(run=True):
     if config.usingPanelOverlays:
         setPanelOverlays()
 
-
     loadBackgroundConfigs()
-    
-
     loadFilterRemapping()
     setLines()
     config.lineColor = setLineColor()
     setBGColor()
 
     badpixels.setBlanksOnScreen(config)
+
+    for _ in range(30) :
+        _bgColorsFilling(config)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

@@ -958,9 +958,6 @@ def loadBackgroundConfigs() :
     config.bgGlitchDisplacementVertical = float(workConfig.get("bgparameters", "bgGlitchDisplacementVertical"))
 
     config.pauseProb = float(workConfig.get("bgparameters", "pauseProb", fallback=".001"))
-    config.unPauseProb = float(workConfig.get("bgparameters", "unPauseProb", fallback=".001"))
-    config.freezeGlitchProb = float(workConfig.get("bgparameters", "freezeGlitchProb", fallback=".001"))
-    config.unFreezeGlitchProb = float(workConfig.get("bgparameters", "unFreezeGlitchProb", fallback=".001"))
     config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=".001"))
 
     config.bg_minHue = int(workConfig.get("bgparameters", "bg_minHue"))
@@ -976,10 +973,6 @@ def loadBackgroundConfigs() :
 
     config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=config.backgroundColorChangeProb))
 
-    config.pauseProb = float(workConfig.get("bgparameters", "pauseProb", fallback=config.pauseProb))
-    config.unPauseProb = float(workConfig.get("bgparameters", "unPauseProb", fallback=config.unPauseProb))
-    config.freezeGlitchProb = float(workConfig.get("bgparameters", "freezeGlitchProb", fallback=config.freezeGlitchProb))
-    config.unFreezeGlitchProb = float(workConfig.get("bgparameters", "unFreezeGlitchProb", fallback=config.unFreezeGlitchProb))
 
 
 def main(run=True):
@@ -1088,13 +1081,6 @@ def main(run=True):
 
     config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
     config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
-
-    """
-    # PROBABILITIES ----------------
-    # generally based on an interval rate of .03, i.e. 3/100's of a second per cycle ~ 33.33 frames/second
-    # so the chance of change is .001 per frame, then the chance per second is ~ 3.33%
-    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
-    """
 
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
     # probablility background changes

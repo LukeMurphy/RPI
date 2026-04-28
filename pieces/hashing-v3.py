@@ -105,8 +105,6 @@ def getColor(r, g, b, a):
     return tuple(clr)
 
 
-
-
 # ----------------------------------------------------##----------------------------------------------------#
 def glitchBox(
     imageRef,
@@ -141,7 +139,7 @@ def glitchBox(
             imageRef.paste(cp1, (round(dx), round(dy)))
         # comment:
     except Exception as e:
-        pieceLogger(e,1)
+        pieceLogger(e, 1)
         pieceLogger(dx + sectionWidth, dy + sectionHeight)
     # end try
 
@@ -156,6 +154,7 @@ def clearbgBox():
     )
     config.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+    config.bgBoxColorRange = config.bgBoxColorRanges[random.choice([0,len(config.bgBoxColorRanges)-1])]
 
 
 def _bgColorsFilling(config):
@@ -257,8 +256,6 @@ def _draw_moire_pattern(currentAnimation, config):
                 currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
 
 
-
-
 # -------- Line Attribute Function --------- #
 
 
@@ -352,6 +349,8 @@ def setBGColor():
         config.lightLinesOnGround = True
     else:
         config.lightLinesOnGround = False
+
+    config.bgBoxColorRange = config.bgBoxColorRanges[random.choice([0,len(config.bgBoxColorRanges)-1])]
 
     # pieceLogger("New BG")
 
@@ -704,7 +703,6 @@ def iterate():
     if random.random() < config.panelOverlayChangeProb:
         setPanelOverlays()
 
-    
     if random.SystemRandom().random() < config.clearbgBoxProb:
         clearbgBox()
 
@@ -732,7 +730,7 @@ def iterate():
                 # else:
                 #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
             _tempImage = _tempImage.rotate(n.angle)
-            
+
             config.image.paste(_tempImage, (0, 0), _tempImage)
             # badpixels.drawBlanks(config.image, False)
             drawPolyBlanks(config.imageDraw)
@@ -741,7 +739,7 @@ def iterate():
             # badpixels.drawBlanks(config.image, False)
             config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
             config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
-            config.destinationImage.paste(config.underLayer, (0,0) ,config.underLayer)
+            config.destinationImage.paste(config.underLayer, (0, 0), config.underLayer)
             if not config.lightMode:
                 config.imageXPOS += config.imageXPOSSpeed
             # config.imageYPOS += config.YPOSSpeed
@@ -762,9 +760,9 @@ def iterate():
 # adding panel modulation to mimic physical panel differences
 def setPanelOverlays():
     global config
-    if not config.usingPanelOverlays :
+    if not config.usingPanelOverlays:
         return
-    
+
     panelOverLayList = []
     config.panelOverLayList = []
     config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 0))
@@ -911,7 +909,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         setattr(obj, option, default)
 
 
-def loadBackgroundConfigs() :
+def loadBackgroundConfigs():
 
     config.drawMoire = workConfig.getboolean("bgparameters", "drawMoire")
     config.drawMoireProb = float(workConfig.get("bgparameters", "drawMoireProb"))
@@ -930,14 +928,12 @@ def loadBackgroundConfigs() :
             workConfig.get("bgparameters", "moireColorAlt").split(","),
         )
     )
-
-
-    config.bgBoxColorRange = list(
-        map(
-            lambda x: float(x),
-            workConfig.get("bgparameters", "bgBoxColorRange").split(","),
-        )
-    )
+    config.bgBoxColorRanges = []
+    bgBoxColorRanges = workConfig.get("bgparameters", "bgBoxColorRanges").split("|")
+    for _bgelement in bgBoxColorRanges:
+        bgRange = list(map(lambda x: float(x),_bgelement.split(","),))
+        config.bgBoxColorRanges.append(bgRange)
+    config.bgBoxColorRange = config.bgBoxColorRanges[0]
     config.bgBoxAlphaRange = tuple(
         map(
             lambda x: int(x),
@@ -965,18 +961,7 @@ def loadBackgroundConfigs() :
     config.pauseProb = float(workConfig.get("bgparameters", "pauseProb", fallback=".001"))
     config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=".001"))
 
-    config.bg_minHue = int(workConfig.get("bgparameters", "bg_minHue"))
-    config.bg_maxHue = int(workConfig.get("bgparameters", "bg_maxHue"))
-    config.bg_minSaturation = float(workConfig.get("bgparameters", "bg_minSaturation"))
-    config.bg_maxSaturation = float(workConfig.get("bgparameters", "bg_maxSaturation"))
-    config.bg_minValue = float(workConfig.get("bgparameters", "bg_minValue"))
-    config.bg_maxValue = float(workConfig.get("bgparameters", "bg_maxValue"))
-    config.bg_dropHueMinValue = float(workConfig.get("bgparameters", "bg_dropHueMinValue"))
-    config.bg_dropHueMaxValue = float(workConfig.get("bgparameters", "bg_dropHueMaxValue"))
-    config.bg_alpha = int(workConfig.get("bgparameters", "bg_alpha"))
-    config.bg_alpha_max = int(workConfig.get("bgparameters", "bg_alpha"))
-
-    config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=config.backgroundColorChangeProb))
+    config.initialRunsOfBgBlocks = int(workConfig.get("bgparameters", "initialRunsOfBgBlocks", fallback=0))
 
 
 def main(run=True):
@@ -1008,9 +993,6 @@ def main(run=True):
     config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
 
     config.largestDim = max(config.drawingWidth, config.drawingHeight)
-
-
-
 
     # refinements for setting points per column and row so amplitude of noise can be adjusted to be more even if aspect ratio is more extreme - e.g narrow beam
     # but also, lower number makes the line more purely rectilinear so can give a greater focus to one directions linearity
@@ -1195,7 +1177,7 @@ def main(run=True):
 
     badpixels.setBlanksOnScreen(config)
 
-    for _ in range(30) :
+    for _ in range(config.initialRunsOfBgBlocks):
         _bgColorsFilling(config)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS

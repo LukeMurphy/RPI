@@ -154,7 +154,7 @@ def clearbgBox():
     )
     config.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
-    config.bgBoxColorRange = config.bgBoxColorRanges[random.choice([0,len(config.bgBoxColorRanges)-1])]
+    config.bgBoxColorRange = random.choice(config.bgBoxColorRanges)
 
 
 def _bgColorsFilling(config):
@@ -350,7 +350,7 @@ def setBGColor():
     else:
         config.lightLinesOnGround = False
 
-    config.bgBoxColorRange = config.bgBoxColorRanges[random.choice([0,len(config.bgBoxColorRanges)-1])]
+    config.bgBoxColorRange = random.choice(config.bgBoxColorRanges)
 
     # pieceLogger("New BG")
 
@@ -933,7 +933,7 @@ def loadBackgroundConfigs():
     for _bgelement in bgBoxColorRanges:
         bgRange = list(map(lambda x: float(x),_bgelement.split(","),))
         config.bgBoxColorRanges.append(bgRange)
-    config.bgBoxColorRange = config.bgBoxColorRanges[0]
+    config.bgBoxColorRange = random.choice(config.bgBoxColorRanges)
     config.bgBoxAlphaRange = tuple(
         map(
             lambda x: int(x),

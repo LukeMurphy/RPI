@@ -7,6 +7,8 @@ from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing, badpixels
 from PIL import Image, ImageDraw, ImageChops
 
+from pieces.screen import Holder
+
 # ################################################### #
 # hatching hashing lines
 
@@ -154,11 +156,11 @@ def clearbgBox():
     )
     config.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
-    config.bgBoxColorRange = random.choice(config.bgBoxColorRanges)
+    config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
 
 
 def _bgColorsFilling(config):
-    # config.usebgBox = False if config.usebgBox   else True
+    # config.useBgBox = False if config.useBgBox   else True
     # print("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
     # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
@@ -183,7 +185,7 @@ def _bgColorsFilling(config):
         round(config.brightness * bgBoxFill[0]),
         round(config.brightness * bgBoxFill[1]),
         round(config.brightness * bgBoxFill[2]),
-        round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
+        round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
     )
 
     config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
@@ -224,7 +226,7 @@ def _draw_background(currentAnimation, config, bgColor):
     )
     currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
 
-    if config.usebgBox:
+    if config.useBgBox:
         currentAnimation.animationImage.paste(config.underLayer, (0, 0), config.underLayer)
 
 
@@ -263,41 +265,41 @@ def setLineColor():
     if not config.lightMode:
         if config.lightLinesOnGround:
             return colorutils.getRandomColorHSV(
-                config.line_mid_minHue,
-                config.line_mid_maxHue,
-                config.line_mid_minSaturation,
-                config.line_mid_maxSaturation,
-                config.line_mid_minValue,
-                config.line_mid_maxValue,
-                config.line_mid_minDropHue,
-                config.line_mid_maxDropHue,
-                round(random.uniform(config.line_mid_alpha_range[0], config.line_mid_alpha_range[1])),
+                config.activePalette.line_mid_minHue,
+                config.activePalette.line_mid_maxHue,
+                config.activePalette.line_mid_minSaturation,
+                config.activePalette.line_mid_maxSaturation,
+                config.activePalette.line_mid_minValue,
+                config.activePalette.line_mid_maxValue,
+                config.activePalette.line_mid_minDropHue,
+                config.activePalette.line_mid_maxDropHue,
+                round(random.uniform(config.activePalette.line_mid_alpha_range[0], config.activePalette.line_mid_alpha_range[1])),
                 config.brightness,
             )
         else:
             return colorutils.getRandomColorHSV(
-                config.line_minHue,
-                config.line_maxHue,
-                config.line_minSaturation,
-                config.line_maxSaturation,
-                config.line_minValue,
-                config.line_maxValue,
-                config.line_minDropHue,
-                config.line_maxDropHue,
-                round(random.uniform(config.line_alpha_range[0], config.line_alpha_range[1])),
+                config.activePalette.line_minHue,
+                config.activePalette.line_maxHue,
+                config.activePalette.line_minSaturation,
+                config.activePalette.line_maxSaturation,
+                config.activePalette.line_minValue,
+                config.activePalette.line_maxValue,
+                config.activePalette.line_minDropHue,
+                config.activePalette.line_maxDropHue,
+                round(random.uniform(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1])),
                 config.brightness,
             )
     else:
         return colorutils.getRandomColorHSV(
-            config.line_light_minHue,
-            config.line_light_maxHue,
-            config.line_light_minSaturation,
-            config.line_light_maxSaturation,
-            config.line_light_minValue,
-            config.line_light_maxValue,
-            config.line_light_minDropHue,
-            config.line_light_maxDropHue,
-            round(random.uniform(config.line_light_alpha_range[0], config.line_light_alpha_range[1])),
+            config.activePalette.line_light_minHue,
+            config.activePalette.line_light_maxHue,
+            config.activePalette.line_light_minSaturation,
+            config.activePalette.line_light_maxSaturation,
+            config.activePalette.line_light_minValue,
+            config.activePalette.line_light_maxValue,
+            config.activePalette.line_light_minDropHue,
+            config.activePalette.line_light_maxDropHue,
+            round(random.uniform(config.activePalette.line_light_alpha_range[0], config.activePalette.line_light_alpha_range[1])),
             config.brightness,
         )
 
@@ -305,18 +307,19 @@ def setLineColor():
 
 
 def setBGColor():
-    _bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
 
-    if len(config.bgSets) > 0:
-        bgSet = random.choice(config.bgSets)
-        config.bg_minHue = bgSet[0]
-        config.bg_maxHue = bgSet[1]
-        config.bg_minSaturation = bgSet[2]
-        config.bg_maxSaturation = bgSet[3]
-        config.bg_minValue = bgSet[4]
-        config.bg_maxValue = bgSet[5]
-        config.bg_dropHueMin = 0
-        config.bg_dropHueMax = 0
+    config.activePalette = random.choice(config.paletteSets)
+    pieceLogger(f"NEW palette: {config.activePalette}")
+
+    config.bg_alpha = round(random.uniform(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1]))
+    config.bg_minHue = config.activePalette.bg_minHue
+    config.bg_maxHue = config.activePalette.bg_maxHue
+    config.bg_minSaturation = config.activePalette.bg_minSaturation
+    config.bg_maxSaturation = config.activePalette.bg_maxSaturation
+    config.bg_minValue = config.activePalette.bg_minValue
+    config.bg_maxValue = config.activePalette.bg_maxValue
+    config.bg_dropHueMin = config.activePalette.bg_dropHueMin
+    config.bg_dropHueMax = config.activePalette.bg_dropHueMax
 
     _minVal = config.bg_minValue
     _maxVal = config.bg_maxValue
@@ -332,7 +335,7 @@ def setBGColor():
         _maxVal,
         config.bg_dropHueMin,
         config.bg_dropHueMax,
-        _bg_alpha,
+        config.bg_alpha,
         config.brightness,
     )
 
@@ -350,7 +353,7 @@ def setBGColor():
     else:
         config.lightLinesOnGround = False
 
-    config.bgBoxColorRange = random.choice(config.bgBoxColorRanges)
+    config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
 
     # pieceLogger("New BG")
 
@@ -462,8 +465,8 @@ def setGridLines():
 
     config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
     config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
-    config.line_alpha = R(config.line_alpha_range[0], config.line_alpha_range[1], True)
-    config.bg_alpha_base = R(config.bg_alpha_range[0], config.bg_alpha_range[1], True)
+    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
+    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
 
     config.numberOfinformalLines = len(config.informalLineUnits)
     # pieceLogger(f"New Lines {config.numberOfinformalLines}")
@@ -690,7 +693,7 @@ def reDraw():
 
 def iterate():
 
-    if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox:
+    if random.SystemRandom().random() < config.useBgBoxProb and config.useBgBox:
         _bgColorsFilling(config)
 
     reDraw()
@@ -909,59 +912,71 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         setattr(obj, option, default)
 
 
-def loadBackgroundConfigs():
+def loadColorConfigs():
 
-    config.drawMoire = workConfig.getboolean("bgparameters", "drawMoire")
-    config.drawMoireProb = float(workConfig.get("bgparameters", "drawMoireProb"))
-    config.drawMoireProbOff = float(workConfig.get("bgparameters", "drawMoireProbOff"))
+    config.paletteSets = []
+    paletteList = workConfig.get("hatchingmarks", "paletteSets").split(',')
 
-    config.moireXPos = int(workConfig.get("bgparameters", "moireXPos"))
-    config.moireYPos = int(workConfig.get("bgparameters", "moireYPos"))
-    config.moireXDistance = int(workConfig.get("bgparameters", "moireXDistance"))
-    config.moireYDistance = int(workConfig.get("bgparameters", "moireYDistance"))
-    config.setMoireColor = workConfig.getboolean("bgparameters", "setMoireColor")
-    config.moireColorAltProb = float(workConfig.get("bgparameters", "moireColorAltProb"))
-    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("bgparameters", "moireColor").split(",")))
-    config.moireColorAlt = tuple(
-        map(
-            lambda x: int(x),
-            workConfig.get("bgparameters", "moireColorAlt").split(","),
+    for p in paletteList:
+        palette = Holder(config)
+
+        palette.line_minHue = float(workConfig.get(p, "line_minHue"))
+        palette.line_maxHue = float(workConfig.get(p, "line_maxHue"))
+        palette.line_maxSaturation = float(workConfig.get(p, "line_maxSaturation"))
+        palette.line_minSaturation = float(workConfig.get(p, "line_minSaturation"))
+        palette.line_minValue = float(workConfig.get(p, "line_minValue"))
+        palette.line_maxValue = float(workConfig.get(p, "line_maxValue"))
+        palette.line_minDropHue = float(workConfig.get(p, "line_minDropHue", fallback=0))
+        palette.line_maxDropHue = float(workConfig.get(p, "line_maxDropHue", fallback=0))
+        palette.line_alpha_range = [int(x) for x in workConfig.get(p, "line_alpha_range", fallback="18,180").split(",")]
+
+        palette.line_mid_minHue = float(workConfig.get(p, "line_mid_minHue", fallback=palette.line_minHue))
+        palette.line_mid_maxHue = float(workConfig.get(p, "line_mid_maxHue", fallback=palette.line_maxHue))
+        palette.line_mid_minSaturation = float(workConfig.get(p, "line_mid_minSaturation", fallback=palette.line_minSaturation))
+        palette.line_mid_maxSaturation = float(workConfig.get(p, "line_mid_maxSaturation", fallback=palette.line_maxSaturation))
+        palette.line_mid_minValue = float(workConfig.get(p, "line_mid_minValue", fallback=palette.line_minValue))
+        palette.line_mid_maxValue = float(workConfig.get(p, "line_mid_maxValue", fallback=palette.line_maxValue))
+        palette.line_mid_minDropHue = float(workConfig.get(p, "line_mid_minDropHue", fallback=0))
+        palette.line_mid_maxDropHue = float(workConfig.get(p, "line_mid_maxDropHue", fallback=0))
+        palette.line_mid_alpha_range = [int(x) for x in workConfig.get(p, "line_mid_alpha_range", fallback="150,190").split(",")]
+
+        palette.line_light_minHue = float(workConfig.get(p, "line_light_minHue"))
+        palette.line_light_maxHue = float(workConfig.get(p, "line_light_maxHue"))
+        palette.line_light_maxSaturation = float(workConfig.get(p, "line_light_maxSaturation"))
+        palette.line_light_minSaturation = float(workConfig.get(p, "line_light_minSaturation"))
+        palette.line_light_minValue = float(workConfig.get(p, "line_light_minValue"))
+        palette.line_light_maxValue = float(workConfig.get(p, "line_light_maxValue"))
+        palette.line_light_minDropHue = float(workConfig.get(p, "line_light_minDropHue", fallback=0))
+        palette.line_light_maxDropHue = float(workConfig.get(p, "line_light_maxDropHue", fallback=0))
+        palette.line_light_alpha_range = [int(x) for x in workConfig.get(p, "line_light_alpha_range", fallback="150,190").split(",")]
+
+        palette.bg_minHue = float(workConfig.get(p, "bg_minHue"))
+        palette.bg_maxHue = float(workConfig.get(p, "bg_maxHue"))
+        palette.bg_maxSaturation = float(workConfig.get(p, "bg_maxSaturation"))
+        palette.bg_minSaturation = float(workConfig.get(p, "bg_minSaturation"))
+        palette.bg_minValue = float(workConfig.get(p, "bg_minValue"))
+        palette.bg_maxValue = float(workConfig.get(p, "bg_maxValue"))
+        palette.bg_dropHueMin = float(workConfig.get(p, "bg_dropHueMin", fallback="0"))
+        palette.bg_dropHueMax = float(workConfig.get(p, "bg_dropHueMax", fallback="0"))
+        palette.bg_alpha_range = [int(x) for x in workConfig.get(p, "bg_alpha_range", fallback="10,40").split(",")]
+        palette.bg_alpha = round(random.uniform(palette.bg_alpha_range[0], palette.bg_alpha_range[1]))
+        palette.bg_alpha_base = 20
+    
+        palette.bgBoxColorRanges = []
+        bgBoxColorRanges = workConfig.get(p, "bgBoxColorRanges").split("|")
+        for _bgelement in bgBoxColorRanges:
+            bgRange = list(map(lambda x: float(x),_bgelement.split(","),))
+            palette.bgBoxColorRanges.append(bgRange)
+        palette.bgBoxColorRange = random.choice(palette.bgBoxColorRanges)
+        palette.bgBoxAlphaRange = tuple(
+            map(
+                lambda x: int(x),
+                workConfig.get(p, "bgBoxAlphaRange").split(","),
+            )
         )
-    )
-    config.bgBoxColorRanges = []
-    bgBoxColorRanges = workConfig.get("bgparameters", "bgBoxColorRanges").split("|")
-    for _bgelement in bgBoxColorRanges:
-        bgRange = list(map(lambda x: float(x),_bgelement.split(","),))
-        config.bgBoxColorRanges.append(bgRange)
-    config.bgBoxColorRange = random.choice(config.bgBoxColorRanges)
-    config.bgBoxAlphaRange = tuple(
-        map(
-            lambda x: int(x),
-            workConfig.get("bgparameters", "bgBoxAlphaRange").split(","),
-        )
-    )
-    config.usebgBox = workConfig.getboolean("bgparameters", "forcebgBox")
-    config.usebgBoxProb = float(workConfig.get("bgparameters", "usebgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("bgparameters", "bgBoxBox").split(",")))
-    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-    config.bgBoxFill = (100, 0, 80, 100)
-
-    config.bgTileSizeWidthMin = float(workConfig.get("bgparameters", "bgTileSizeWidthMin"))
-    config.bgTileSizeWidthMax = float(workConfig.get("bgparameters", "bgTileSizeWidthMax"))
-    config.bgTileSizeHeightMin = float(workConfig.get("bgparameters", "bgTileSizeHeightMin"))
-    config.bgTileSizeHeightMax = float(workConfig.get("bgparameters", "bgTileSizeHeightMax"))
-
-    config.clearbgBoxProb = float(workConfig.get("bgparameters", "clearbgBoxProb"))
-    config.bgGlitchCyclesMin = float(workConfig.get("bgparameters", "bgGlitchCyclesMin"))
-    config.bgGlitchCyclesMax = float(workConfig.get("bgparameters", "bgGlitchCyclesMax"))
-    config.bgGlitchDisplacementHorizontal = float(workConfig.get("bgparameters", "bgGlitchDisplacementHorizontal"))
-    config.bgGlitchDisplacementVertical = float(workConfig.get("bgparameters", "bgGlitchDisplacementVertical"))
-
-    config.pauseProb = float(workConfig.get("bgparameters", "pauseProb", fallback=".001"))
-    config.backgroundColorChangeProb = float(workConfig.get("bgparameters", "backgroundColorChangeProb", fallback=".001"))
-
-    config.initialRunsOfBgBlocks = int(workConfig.get("bgparameters", "initialRunsOfBgBlocks", fallback=0))
+        config.paletteSets.append(palette)
+    
+    config.activePalette = random.choice(config.paletteSets)
 
 
 def main(run=True):
@@ -1086,56 +1101,6 @@ def main(run=True):
     config.lightLinesOnGround = workConfig.getboolean("hatchingmarks", "lightLinesOnGround", fallback=False)
 
     # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
-
-    config.line_minHue = float(workConfig.get("hatchingmarks", "line_minHue"))
-    config.line_maxHue = float(workConfig.get("hatchingmarks", "line_maxHue"))
-    config.line_maxSaturation = float(workConfig.get("hatchingmarks", "line_maxSaturation"))
-    config.line_minSaturation = float(workConfig.get("hatchingmarks", "line_minSaturation"))
-    config.line_minValue = float(workConfig.get("hatchingmarks", "line_minValue"))
-    config.line_maxValue = float(workConfig.get("hatchingmarks", "line_maxValue"))
-    config.line_minDropHue = float(workConfig.get("hatchingmarks", "line_minDropHue", fallback=0))
-    config.line_maxDropHue = float(workConfig.get("hatchingmarks", "line_maxDropHue", fallback=0))
-    config.line_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_alpha_range", fallback="18,180").split(",")]
-
-    config.line_mid_minHue = float(workConfig.get("hatchingmarks", "line_mid_minHue", fallback=config.line_minHue))
-    config.line_mid_maxHue = float(workConfig.get("hatchingmarks", "line_mid_maxHue", fallback=config.line_maxHue))
-    config.line_mid_minSaturation = float(workConfig.get("hatchingmarks", "line_mid_minSaturation", fallback=config.line_minSaturation))
-    config.line_mid_maxSaturation = float(workConfig.get("hatchingmarks", "line_mid_maxSaturation", fallback=config.line_maxSaturation))
-    config.line_mid_minValue = float(workConfig.get("hatchingmarks", "line_mid_minValue", fallback=config.line_minValue))
-    config.line_mid_maxValue = float(workConfig.get("hatchingmarks", "line_mid_maxValue", fallback=config.line_maxValue))
-    config.line_mid_minDropHue = float(workConfig.get("hatchingmarks", "line_mid_minDropHue", fallback=0))
-    config.line_mid_maxDropHue = float(workConfig.get("hatchingmarks", "line_mid_maxDropHue", fallback=0))
-    config.line_mid_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_mid_alpha_range", fallback="150,190").split(",")]
-
-    config.line_light_minHue = float(workConfig.get("hatchingmarks", "line_light_minHue"))
-    config.line_light_maxHue = float(workConfig.get("hatchingmarks", "line_light_maxHue"))
-    config.line_light_maxSaturation = float(workConfig.get("hatchingmarks", "line_light_maxSaturation"))
-    config.line_light_minSaturation = float(workConfig.get("hatchingmarks", "line_light_minSaturation"))
-    config.line_light_minValue = float(workConfig.get("hatchingmarks", "line_light_minValue"))
-    config.line_light_maxValue = float(workConfig.get("hatchingmarks", "line_light_maxValue"))
-    config.line_light_minDropHue = float(workConfig.get("hatchingmarks", "line_light_minDropHue", fallback=0))
-    config.line_light_maxDropHue = float(workConfig.get("hatchingmarks", "line_light_maxDropHue", fallback=0))
-    config.line_light_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "line_light_alpha_range", fallback="150,190").split(",")]
-
-    config.bg_minHue = float(workConfig.get("hatchingmarks", "bg_minHue"))
-    config.bg_maxHue = float(workConfig.get("hatchingmarks", "bg_maxHue"))
-    config.bg_maxSaturation = float(workConfig.get("hatchingmarks", "bg_maxSaturation"))
-    config.bg_minSaturation = float(workConfig.get("hatchingmarks", "bg_minSaturation"))
-    config.bg_minValue = float(workConfig.get("hatchingmarks", "bg_minValue"))
-    config.bg_maxValue = float(workConfig.get("hatchingmarks", "bg_maxValue"))
-    config.bg_dropHueMin = float(workConfig.get("hatchingmarks", "bg_dropHueMin", fallback="0"))
-    config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "bg_dropHueMax", fallback="0"))
-    config.bg_alpha_range = [int(x) for x in workConfig.get("hatchingmarks", "bg_alpha_range", fallback="10,40").split(",")]
-    config.bg_alpha = round(random.uniform(config.bg_alpha_range[0], config.bg_alpha_range[1]))
-    config.bg_alpha_base = 20
-
-    bgSets = workConfig.get("hatchingmarks", "bgSets", fallback="").split("|")
-    config.bgSets = []
-
-    if len(bgSets[0]) > 0:
-        for bg in bgSets:
-            config.bgSets.append(list(float(x) for x in bg.split(",")))
-
     config.rebuildingVerticals = False
 
     config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
@@ -1146,8 +1111,6 @@ def main(run=True):
     config.blanks_colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
     config.blanks_rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
     config.blankPolyVariation = int(workConfig.get("hatchingmarks", "blankPolyVariation", fallback="10"))
-
-    resetPolyBlanks()
 
     badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
     badpixels.probabilityOfBlockBlanks = 0.0
@@ -1166,19 +1129,62 @@ def main(run=True):
     if config.panelColumns == 0 or config.panelRows == 0:
         config.usingPanelOverlays = False
 
+    config.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
+    config.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
+    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "bgBoxBox").split(",")))
+    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
+    config.bgBoxFill = (100, 0, 80, 100)
+
+    config.bgTileSizeWidthMin = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMin"))
+    config.bgTileSizeWidthMax = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMax"))
+    config.bgTileSizeHeightMin = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMin"))
+    config.bgTileSizeHeightMax = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMax"))
+
+    config.clearbgBoxProb = float(workConfig.get("hatchingmarks", "clearbgBoxProb"))
+    config.bgGlitchCyclesMin = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMin"))
+    config.bgGlitchCyclesMax = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMax"))
+    config.bgGlitchDisplacementHorizontal = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementHorizontal"))
+    config.bgGlitchDisplacementVertical = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementVertical"))
+    
+    config.drawMoire = workConfig.getboolean("hatchingmarks", "drawMoire")
+    config.drawMoireProb = float(workConfig.get("hatchingmarks", "drawMoireProb"))
+    config.drawMoireProbOff = float(workConfig.get("hatchingmarks", "drawMoireProbOff"))
+
+    config.moireXPos = int(workConfig.get("hatchingmarks", "moireXPos"))
+    config.moireYPos = int(workConfig.get("hatchingmarks", "moireYPos"))
+    config.moireXDistance = int(workConfig.get("hatchingmarks", "moireXDistance"))
+    config.moireYDistance = int(workConfig.get("hatchingmarks", "moireYDistance"))
+    config.setMoireColor = workConfig.getboolean("hatchingmarks", "setMoireColor")
+    config.moireColorAltProb = float(workConfig.get("hatchingmarks", "moireColorAltProb"))
+    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "moireColor").split(",")))
+    config.moireColorAlt = tuple(
+        map(
+            lambda x: int(x),
+            workConfig.get("hatchingmarks", "moireColorAlt").split(","),
+        )
+    )
+
+    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=".001"))
+    config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
+
+    config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
+
+
+    loadColorConfigs()
+    loadFilterRemapping()
+    resetPolyBlanks()
     if config.usingPanelOverlays:
         setPanelOverlays()
-
-    loadBackgroundConfigs()
-    loadFilterRemapping()
     setLines()
     config.lineColor = setLineColor()
     setBGColor()
 
     badpixels.setBlanksOnScreen(config)
 
-    for _ in range(config.initialRunsOfBgBlocks):
-        _bgColorsFilling(config)
+    if config.useBgBox:
+        for _ in range(config.initialRunsOfBgBlocks):
+            _bgColorsFilling(config)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

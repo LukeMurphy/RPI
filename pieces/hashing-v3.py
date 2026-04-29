@@ -321,6 +321,8 @@ def setBGColor():
     config.bg_dropHueMin = config.activePalette.bg_dropHueMin
     config.bg_dropHueMax = config.activePalette.bg_dropHueMax
 
+    config.lineColorIsBgColor =config.activePalette.lineColorIsBgColor
+
     _minVal = config.bg_minValue
     _maxVal = config.bg_maxValue
     if config.lightMode:
@@ -513,7 +515,8 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
     # fillClr = [_r, _g, _b, _a]
 
     fillClr = _lineUnit.lineColor
-
+    if config.lineColorIsBgColor :
+        fillClr = config.bgColor
     if config.drawingShape == "grid":
         # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
         if _lineUnit.angle == 90:
@@ -522,7 +525,8 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
             config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
 
     else:
-
+        _dy = _p1[1] - _p2[1]
+        _dx = _p1[0] - _p2[0]
         _orthoAngle = math.pi - math.atan2(_dy, _dx)
         _sinOrthoAngle = math.sin(_orthoAngle)
         _cosOrthoAngle = math.cos(_orthoAngle)
@@ -961,6 +965,8 @@ def loadColorConfigs():
         palette.bg_alpha_range = [int(x) for x in workConfig.get(p, "bg_alpha_range", fallback="10,40").split(",")]
         palette.bg_alpha = round(random.uniform(palette.bg_alpha_range[0], palette.bg_alpha_range[1]))
         palette.bg_alpha_base = 20
+
+        palette.lineColorIsBgColor = workConfig.getboolean(p, "lineColorIsBgColor", fallback=False)
     
         palette.bgBoxColorRanges = []
         bgBoxColorRanges = workConfig.get(p, "bgBoxColorRanges").split("|")

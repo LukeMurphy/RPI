@@ -309,7 +309,7 @@ def setLineColor():
 def setBGColor():
 
     config.activePalette = random.choice(config.paletteSets)
-    pieceLogger(f"NEW palette: {config.activePalette}")
+    pieceLogger(f"NEW palette: {config.activePalette.name}")
 
     config.bg_alpha = round(random.uniform(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1]))
     config.bg_minHue = config.activePalette.bg_minHue
@@ -857,9 +857,9 @@ def expandFilterRemap():
 def contractFilterRemap():
     _pos = list(config.remapImageBlockSection)
     # pieceLogger(_pos)
-    _pos[0] += config.contractXSpeed
-    _pos[2] -= config.contractXSpeed
-    _pos[1] += config.contractYSpeed
+    # _pos[0] += config.contractXSpeed
+    # _pos[2] -= config.contractXSpeed
+    # _pos[1] += config.contractYSpeed
     _pos[3] -= config.contractYSpeed
 
     if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
@@ -924,6 +924,7 @@ def loadColorConfigs():
     for p in paletteList:
         palette = Holder(config)
 
+        palette.name = p
         palette.line_minHue = float(workConfig.get(p, "line_minHue"))
         palette.line_maxHue = float(workConfig.get(p, "line_maxHue"))
         palette.line_maxSaturation = float(workConfig.get(p, "line_maxSaturation"))

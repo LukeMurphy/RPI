@@ -1215,9 +1215,9 @@ def expandFilterRemap():
 def contractFilterRemap():
     _pos = list(config.remapImageBlockSection)
     # pieceLogger(_pos)
-    _pos[0] += config.contractXSpeed
-    _pos[2] -= config.contractXSpeed
-    _pos[1] += config.contractYSpeed
+    # _pos[0] += config.contractXSpeed
+    # _pos[2] -= config.contractXSpeed
+    # _pos[1] += config.contractYSpeed
     _pos[3] -= config.contractYSpeed
 
     if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
@@ -1368,17 +1368,17 @@ def renderComposite():
 
         config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
-        # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
-        # config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
+        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
+        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 
-        # config.imageXPOS += config.XPOSSpeed
-        # # config.imageYPOS += config.YPOSSpeed
+        config.imageXPOS += config.XPOSSpeed
+        # config.imageYPOS += config.YPOSSpeed
 
-        # if config.imageXPOS >= config.pictureWidth:
-        #     config.imageXPOS = 0
+        if config.imageXPOS >= config.pictureWidth:
+            config.imageXPOS = 0
 
-        # if config.imageYPOS >= config.pictureHeight:
-        #     config.imageYPOS = 0
+        if config.imageYPOS >= config.pictureHeight:
+            config.imageYPOS = 0
 
         # showDebugCanvases(config)
         # # uncomment for all temp canvas layers to show

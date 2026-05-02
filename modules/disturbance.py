@@ -7,7 +7,7 @@ import noise
 from PIL import Image, ImageFilter
 
 from modules.holder_director import Holder
-
+from modules.configuration import pieceLogger
 config = None
 workConfig = None
 
@@ -212,6 +212,7 @@ def disturbSections():
     """Disturbs individual sections of the canvas image."""
     if config.skipFramesCount >= config.skipFrames:
         config.skipFramesCount = 0
+        # pieceLogger(f"Disturber {config.numberOfSections}")
 
         for i in range(config.numberOfSections):
             sectionParams = config.movingSections[i]
@@ -271,7 +272,8 @@ def handleSectionDisturbances():
     """Handles random overlay repetition disturbance."""
     if random.random() < config.redoSectionDisturbance and config.sectionDisturbance and config.fader.fadingDone:
         config.doSectionDisturbance = True
-        config.canvasImage.paste(config.patternImage, (0, 0), config.patternImage)
+        # this causes a jump!!!!
+        # config.canvasImage.paste(config.patternImage, (0, 0), config.patternImage)
         rebuildSections()
 
 

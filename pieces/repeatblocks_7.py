@@ -1366,8 +1366,8 @@ def renderComposite():
         # config.compositeImageDraw.rectangle((60,70,128,120), fill = (255,0,0,50))
         # config.patternImageDraw.rectangle((60, 70, 128, 120), fill=(255, 0, 0, 50))
 
-        config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
-
+        # config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
+        
         config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
         config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
 

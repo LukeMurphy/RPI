@@ -1368,8 +1368,26 @@ def renderComposite():
 
         # config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
         
-        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS), round(config.imageYPOS)), config.compositeImage)
-        config.destinationImage.paste(config.compositeImage, (round(config.imageXPOS - config.pictureWidth), round(config.imageYPOS)), config.compositeImage)
+        _xp = int(config.imageXPOS)
+        _frac = config.imageXPOS - _xp
+        _yp = int(config.imageYPOS)
+
+        if getattr(config, 'useSubPixelSmoothing', False):
+            _BG = config.bgColor
+            _w, _h = config.scrollBlendFrame0.width, config.scrollBlendFrame0.height
+            config.scrollBlendFrame0.paste(_BG, (0, 0, _w, _h))
+            config.scrollBlendFrame0.paste(config.compositeImage, (_xp, _yp), config.compositeImage)
+            config.scrollBlendFrame0.paste(config.compositeImage, (_xp - config.pictureWidth, _yp), config.compositeImage)
+            if _frac > 0.05:
+                config.scrollBlendFrame1.paste(_BG, (0, 0, _w, _h))
+                config.scrollBlendFrame1.paste(config.compositeImage, (_xp + 1, _yp), config.compositeImage)
+                config.scrollBlendFrame1.paste(config.compositeImage, (_xp + 1 - config.pictureWidth, _yp), config.compositeImage)
+                config.destinationImage.paste(Image.blend(config.scrollBlendFrame0, config.scrollBlendFrame1, _frac), (0, 0))
+            else:
+                config.destinationImage.paste(config.scrollBlendFrame0, (0, 0))
+        else:
+            config.destinationImage.paste(config.compositeImage, (_xp, _yp), config.compositeImage)
+            config.destinationImage.paste(config.compositeImage, (_xp - config.pictureWidth, _yp), config.compositeImage)
 
         config.imageXPOS += config.XPOSSpeed
         # config.imageYPOS += config.YPOSSpeed
@@ -1684,6 +1702,7 @@ def main(run=True):
     config.imageYPOS = 0
     config.XPOSSpeed = float(workConfig.get("movingpattern", "XPOSSpeed", fallback="0.0"))
     config.YPOSSpeed = float(workConfig.get("movingpattern", "YPOSSpeed", fallback="0.0"))
+    loadConfigValue(config, workConfig, "movingpattern", "useSubPixelSmoothing", False, bool)
 
     try:
         config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
@@ -1720,10 +1739,15 @@ def main(run=True):
 def runWork():
     global config
     pieceLogger("Running repeatblocks.py", 2)
+    _subSteps = getattr(config, 'smoothingSteps', 0)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:
             iterate()
+        else:
+            renderComposite()
+        for _ in range(_subSteps):
+            renderComposite()
         time.sleep(config.redrawSpeed)
         if not config.standAlone:
             config.callBack()

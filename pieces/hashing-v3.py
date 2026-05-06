@@ -1173,7 +1173,7 @@ def main(run=True):
     )
 
     config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=".001"))
-    config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
+    # config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
 
     config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
 

@@ -24,6 +24,7 @@ class InformalLine:
     yOffset = 0
     angle = 0
     direction = 0
+    isColumn = 1
 
     def __init__(self, unitNumber):
         self.unitNumber = unitNumber
@@ -321,7 +322,7 @@ def setBGColor():
     config.bg_dropHueMin = config.activePalette.bg_dropHueMin
     config.bg_dropHueMax = config.activePalette.bg_dropHueMax
 
-    config.lineColorIsBgColor =config.activePalette.lineColorIsBgColor
+    config.lineColorIsBgColor = config.activePalette.lineColorIsBgColor
 
     _minVal = config.bg_minValue
     _maxVal = config.bg_maxValue
@@ -364,32 +365,9 @@ def setBGColor():
 
 
 def setLines():
-    pieceLogger(f"New Lines: {config.drawingShape}")
+    pieceLogger(f"New Lines:")
     config.informalLineUnits = []
-
-    if config.drawingShape == "grid":
-        setGridLines()
-    else:
-        setRegularSpacing()
-        for _u in range(config.numberOfinformalLines):
-            informalLine = InformalLine(_u)
-            informalLine.angle = config.singleLinesAngle
-
-            informalLine.lineColor = setLineColor()
-
-            if config.singleLineRegularSpacing:
-                informalLine.xOffset = config.xOffset + config.rowSpacing * _u
-
-            informalLine.drawingHeight = round(random.uniform(config.drawingHeightRange[0], config.drawingHeightRange[1]))
-            informalLine.xOffset = round(config.xOffset + config.largestDim / 2 + random.uniform(-config.distributionRange, config.distributionRange))
-            informalLine.yOffset = round(config.largestDim - informalLine.drawingHeight - config.yOffset)
-
-            informalLine.lineSpeed = random.randint(config.lineSpeedRange[0], config.lineSpeedRange[1])
-            informalLine.baseWidth = random.uniform(config.baseWidthRange[0], config.baseWidthRange[1])
-            informalLine.noiseAmplitude = random.uniform(float(config.noiseAmplitudeRange[0]), float(config.noiseAmplitudeRange[1]))
-
-            informalLine.generateInformalLine()
-            config.informalLineUnits.append(informalLine)
+    setGridLines()
 
 
 def setRegularSpacing():
@@ -410,7 +388,7 @@ def setRegularSpacing():
 
 
 def setGridLines():
-    pieceLogger(f"Making Grid: {config.drawingShape} {config.drawingWidth } {config.drawingHeight }")
+    pieceLogger(f"Making Grid:  {config.drawingWidth } {config.drawingHeight }")
 
     setRegularSpacing()
 
@@ -436,6 +414,7 @@ def setGridLines():
             informalLine.lineColor = setLineColor()
             informalLine.reconfigure()
             informalLine.generateInformalLine()
+            informalLine.isColumn = 1
             # pieceLogger(f"{informalLine.lineColor}")
             config.informalLineUnits.append(informalLine)
 
@@ -456,6 +435,7 @@ def setGridLines():
             informalLine.lineColor = setLineColor()
             informalLine.reconfigure()
             informalLine.generateInformalLine()
+            informalLine.isColumn = 0
             config.informalLineUnits.append(informalLine)
 
     if config.colFirst:
@@ -515,56 +495,14 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
     # fillClr = [_r, _g, _b, _a]
 
     fillClr = _lineUnit.lineColor
-    if config.lineColorIsBgColor :
+    if config.lineColorIsBgColor:
         fillClr = config.bgColor
-    if config.drawingShape == "grid":
-        # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-        if _lineUnit.angle == 90:
-            config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-        else:
-            config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
 
+    # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+    if _lineUnit.angle == 90:
+        config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
     else:
-        _dy = _p1[1] - _p2[1]
-        _dx = _p1[0] - _p2[0]
-        _orthoAngle = math.pi - math.atan2(_dy, _dx)
-        _sinOrthoAngle = math.sin(_orthoAngle)
-        _cosOrthoAngle = math.cos(_orthoAngle)
-
-        _orthoD = _penWidth
-
-        _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
-        _orthoP1y = round(_orthoD * _cosOrthoAngle + _p1[1])
-
-        _orthoP2x = round(_orthoD * _sinOrthoAngle + _p2[0])
-        _orthoP2y = round(_orthoD * _cosOrthoAngle + _p2[1])
-
-        _orthoP3x = round(-_orthoD * _sinOrthoAngle + _p2[0])
-        _orthoP3y = round(-_orthoD * _cosOrthoAngle + _p2[1])
-
-        _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
-        _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
-
-        if _n > 1:
-            _orthoP1x = _lineUnit.lastOrthoPoint[0]
-            _orthoP1y = _lineUnit.lastOrthoPoint[1]
-
-            _orthoP4x = _lineUnit.lastOrthoPoint[2]
-            _orthoP4y = _lineUnit.lastOrthoPoint[3]
-
-        _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
-
-        if config.renderLinesAsEnvelope:
-            _lineUnit.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
-        else:
-            if _lineUnit.angle == 90:
-                _lineUnit.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-            else:
-                _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
-
-        # config.draw.polygon(_poly, fill=tuple(fillClr), outline=None)
-
-        _lineUnit.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
+        config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
 
 
 def drawTheBG():
@@ -664,6 +602,8 @@ def reDraw():
     drawTheBG()
     informalLines()
 
+
+
     # adding check on bg alpha as index of transition state - don't want another transition
     # stomping on the one in progress
 
@@ -694,6 +634,52 @@ def reDraw():
     if random.random() < config.unpauseProb:
         config.noChange = False
 
+    # config.draw.rectangle((160, 280, 240, 360), fill=(100, 0, 0, 100))
+    # config.draw.rectangle((160, 280, 240, 360), fill=config.bgColor)
+
+    # for informalLineUnitIndex in range(0, len(config.informalLineUnits)):
+    #     lineUnit = config.informalLineUnits[informalLineUnitIndex]
+    #     lineUnit.lastOrthoPoint = []
+    #     pointsToDraw = lineUnit.curvedPoints
+    #     lastPt = [pointsToDraw[0][0], pointsToDraw[0][1]]
+    #     if lineUnit.isColumn == 1 and pointsToDraw[0][0] >= 160 :
+    #         x0 = pointsToDraw[0][0] - 80
+    #         x1 = pointsToDraw[0][0] - 80
+    #         y0 = 360 - 80
+    #         y1 = 360 + 0
+    #         config.draw.rectangle((x0, y0, x1, y1), fill=(0, 0, 0, 100))
+    #     if lineUnit.isColumn == 1 and pointsToDraw[0][0] >= 0 and pointsToDraw[0][0] < 80 :
+    #         x0 = 0 + 160
+    #         x1 = 80 + 160
+    #         y0 = 80 - pointsToDraw[0][0] + 280
+    #         y1 = 80 - pointsToDraw[0][0] + 280
+    #         config.draw.rectangle((x0, y0, x1, y1), fill=(0, 0, 0, 100))
+
+    # for informalLineUnitIndex in range(0, len(config.informalLineUnits)):
+    #     lineUnit = config.informalLineUnits[informalLineUnitIndex]
+    #     lineUnit.lastOrthoPoint = []
+    #     pointsToDraw = lineUnit.curvedPoints
+    #     lastPt = [pointsToDraw[0][0], pointsToDraw[0][1]]
+    #     if lineUnit.isColumn == 1 and pointsToDraw[0][0] >= 240:
+    #         x0 = pointsToDraw[0][0] - 80
+    #         x1 = pointsToDraw[0][0] - 80
+    #         y0 = 360 - 80
+    #         y1 = 360 + 0
+    #         # config.draw.rectangle((x0, y0, x1, y1), fill=(0, 255, 0, 100))
+
+    #     if lineUnit.isColumn == 1 and pointsToDraw[0][0] >= 0:
+    #         x0 = pointsToDraw[0][0] - 0
+    #         x1 = pointsToDraw[0][0] - 0
+    #         y0 = 360 - 80
+    #         y1 = 360 + 0
+    #         config.draw.rectangle((x0, y0, x1, y1), fill=(0, 0, 250, 100))
+        # if lineUnit.isColumn == 1 and pointsToDraw[0][0] >= 0 and pointsToDraw[0][0] < 80 :
+        #     x0 = 0 + 160
+        #     x1 = 80 + 160
+        #     y0 = 80 - pointsToDraw[0][0] + 280
+        #     y1 = 80 - pointsToDraw[0][0] + 280
+        #     # config.draw.rectangle((x0, y0, x1, y1), fill=(0, 0, 0, 100))
+
 
 def iterate():
 
@@ -701,6 +687,7 @@ def iterate():
         _bgColorsFilling(config)
 
     reDraw()
+
     handleFilterRemapping()
 
     if random.random() < config.resetBlanksProb:
@@ -717,50 +704,25 @@ def iterate():
     if config.useDrawingPoints == True:
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
-    else:
-        # _xDiff = round((config.largestDim - config.drawingWidth) / 1)
-        # _yDiff = round((config.largestDim - config.drawingHeight) / 1)
 
-        # config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=(255,255,255,255))
-        if config.drawingShape != "grid":
-            config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
+    # badpixels.drawBlanks(config.image, False)
+    config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
+    config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
+    config.destinationImage.paste(config.underLayer, (0, 0), config.underLayer)
+    if not config.lightMode:
+        config.imageXPOS += config.imageXPOSSpeed
+    # config.imageYPOS += config.YPOSSpeed
 
-            _tempImage = Image.new("RGBA", (config.largestDim, config.largestDim))
-            for n in config.informalLineUnits:
-                # n.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=(100, 0, 0, 2))
-                _tempImage = ImageChops.add(n.canvas, _tempImage)
+    if config.imageXPOS >= config.drawingWidth:
+        config.imageXPOS = 0
 
-                # _temp = n.canvas.rotate(n.angle)
-                # @todo fix this bs later  .....
-                # if n.angle == 0:
-                #     config.image.paste(_temp, (-_xDiff, -0), _temp)
-                # else:
-                #     config.image.paste(_temp, (-_xDiff, -_yDiff), _temp)
-            _tempImage = _tempImage.rotate(n.angle)
-
-            config.image.paste(_tempImage, (0, 0), _tempImage)
-            # badpixels.drawBlanks(config.image, False)
-            drawPolyBlanks(config.imageDraw)
-            config.render(config.image, 0, 0, config.drawingWidth, config.drawingHeight)
-        else:
-            # badpixels.drawBlanks(config.image, False)
-            config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
-            config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
-            config.destinationImage.paste(config.underLayer, (0, 0), config.underLayer)
-            if not config.lightMode:
-                config.imageXPOS += config.imageXPOSSpeed
-            # config.imageYPOS += config.YPOSSpeed
-
-            if config.imageXPOS >= config.drawingWidth:
-                config.imageXPOS = 0
-
-            # if config.imageYPOS >= config.pictureHeight:
-            # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
-            if config.usingPanelOverlays:
-                drawPanelVariations(config.destinationImage)
-            drawPolyBlanks(config.destinationImageDraw)
-            # badpixels.drawBlanks(config.destinationImage, False)
-            config.render(config.destinationImage, 0, 0)
+    # if config.imageYPOS >= config.pictureHeight:
+    # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
+    if config.usingPanelOverlays:
+        drawPanelVariations(config.destinationImage)
+    drawPolyBlanks(config.destinationImageDraw)
+    # badpixels.drawBlanks(config.destinationImage, False)
+    config.render(config.destinationImage, 0, 0)
 
 
 # ----- panel based overlays ---------
@@ -919,7 +881,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
 def loadColorConfigs():
 
     config.paletteSets = []
-    paletteList = workConfig.get("hatchingmarks", "paletteSets").split(',')
+    paletteList = workConfig.get("hatchingmarks", "paletteSets").split(",")
 
     for p in paletteList:
         palette = Holder(config)
@@ -968,11 +930,16 @@ def loadColorConfigs():
         palette.bg_alpha_base = 20
 
         palette.lineColorIsBgColor = workConfig.getboolean(p, "lineColorIsBgColor", fallback=False)
-    
+
         palette.bgBoxColorRanges = []
         bgBoxColorRanges = workConfig.get(p, "bgBoxColorRanges").split("|")
         for _bgelement in bgBoxColorRanges:
-            bgRange = list(map(lambda x: float(x),_bgelement.split(","),))
+            bgRange = list(
+                map(
+                    lambda x: float(x),
+                    _bgelement.split(","),
+                )
+            )
             palette.bgBoxColorRanges.append(bgRange)
         palette.bgBoxColorRange = random.choice(palette.bgBoxColorRanges)
         palette.bgBoxAlphaRange = tuple(
@@ -982,7 +949,7 @@ def loadColorConfigs():
             )
         )
         config.paletteSets.append(palette)
-    
+
     config.activePalette = random.choice(config.paletteSets)
 
 
@@ -1009,7 +976,6 @@ def main(run=True):
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed"))
-    config.drawingShape = workConfig.get("hatchingmarks", "drawingShape")
 
     config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
     config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
@@ -1153,7 +1119,7 @@ def main(run=True):
     config.bgGlitchCyclesMax = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMax"))
     config.bgGlitchDisplacementHorizontal = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementHorizontal"))
     config.bgGlitchDisplacementVertical = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementVertical"))
-    
+
     config.drawMoire = workConfig.getboolean("hatchingmarks", "drawMoire")
     config.drawMoireProb = float(workConfig.get("hatchingmarks", "drawMoireProb"))
     config.drawMoireProbOff = float(workConfig.get("hatchingmarks", "drawMoireProbOff"))
@@ -1176,7 +1142,6 @@ def main(run=True):
     # config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
 
     config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
-
 
     loadColorConfigs()
     loadFilterRemapping()

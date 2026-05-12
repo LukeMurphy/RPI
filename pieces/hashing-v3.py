@@ -349,7 +349,7 @@ def setBGColor():
         badpixels.blankColor = (0, 0, 0, 255)
         # setting the alpha to a lower number so that when
         # the blank changes, it comes in over a second or two
-        config.blankColor = (0, 0, 0, 10)
+        config.blankColor = (0, 0, 0, 15)
 
     if random.random() < config.lightLinesOnGroundProb:
         config.lightLinesOnGround = True

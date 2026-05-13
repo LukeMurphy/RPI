@@ -361,13 +361,16 @@ def initializeParameters():
     for _ in range(config.num_cells):
         _setCellAttributes()
 
+def randomBetween(a,b) :
+    b = a + random.random() * b
+    return a
 
 # TODO Rename this here and in `initializeParameters`
 def _setCellAttributes():
-    config.nx.append(random.randrange(-config.xRange / 4, 1.25 * config.xRange))
-    config.ny.append(random.randrange(-config.yRange / 4, 1.25 * config.yRange))
-    config.nvx.append(random.randrange(-2, 2))
-    config.nvy.append(random.randrange(-2, 2))
+    config.nx.append(randomBetween(-config.xRange / 4, 1.25 * config.xRange))
+    config.ny.append(randomBetween(-config.yRange / 4, 1.25 * config.yRange))
+    config.nvx.append(randomBetween(-2, 2))
+    config.nvy.append(randomBetween(-2, 2))
     config.nr.append(50)
     config.ng.append(50)
     config.nb.append(50)

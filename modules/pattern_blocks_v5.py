@@ -60,6 +60,8 @@ colorGridTriangles
 floralConfig
 petals
 
+addint TVPaletteTest
+
 """
 
 
@@ -399,7 +401,9 @@ def randomizerPatternFunction(func):
             for c in range(0, cols, step):
                 clr = colorutils.getRandomRGB(config.brightness / 2)
                 if randomix == 1:
-                    clr = colorutils.getRandomColorHSV(paletteRef.minHue, paletteRef.maxHue, paletteRef.minSaturation, paletteRef.maxSaturation, paletteRef.minValue, paletteRef.maxValue)
+                    clr = colorutils.getRandomColorHSV(
+                        paletteRef.minHue, paletteRef.maxHue, paletteRef.minSaturation, paletteRef.maxSaturation, paletteRef.minValue, paletteRef.maxValue
+                    )
                 if random.random() < config.randomBlockProb:
                     config.blockDraw.rectangle((c, r, w + c, h + r), fill=(clr), outline=None)
 
@@ -1774,6 +1778,100 @@ def colorGridTriangles(config, paletteObj=None):
             # config.blockDraw.rectangle(( _c * _w, _r * _h, _c * _w + _w, _r * _h + _h), outline=(0,0,0,125), fill=clr)
             config.blockDraw.polygon(((_c * _w, _r * _h), (_c * _w + _w, _r * _h + _h), (_c * _w, _r * _h + _h), (_c * _w, _r * _h)), outline=None, fill=clr1)
             config.blockDraw.polygon(((_c * _w, _r * _h), (_c * _w + _w, _r * _h), (_c * _w + _w, _r * _h + _h), (_c * _w, _r * _h)), outline=None, fill=clr2)
+
+
+def TVTestPattern(config, paletteObj=None):
+    # clr3 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    # clr = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    # clr2 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+
+    config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
+
+    tileSizeWidth = round(config.blockWidth / 7)
+    tileSizeHeight = round(config.blockHeight / 3)
+    bottomY = 2 * round(tileSizeHeight + tileSizeHeight / 6) - 1
+    bottomH = 2 * round(tileSizeHeight / 3)
+
+    # Top 2/3: 7 primary/secondary SMPTE bars at 75%
+    for col, hsv in enumerate(
+        [
+            (0, 0, 0.75),
+            (60, 1.0, 0.75),
+            (180, 1.0, 0.75),
+            (120, 1.0, 0.75),
+            (300, 1.0, 0.75),
+            (0, 1.0, 0.75),
+            (220, 1.0, 0.75),
+        ]
+    ):
+        xPos = col * tileSizeWidth
+        config.blockDraw.rectangle(
+            (xPos, 0, xPos + tileSizeWidth, 2 * tileSizeHeight),
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
+        )
+
+    # Middle strip: reversed colors interleaved with near-black
+    for col, hsv in enumerate(
+        [
+            (220, 1.0, 0.75),
+            (0, 0, 0.07),
+            (300, 1.0, 0.75),
+            (0, 0, 0.07),
+            (180, 1.0, 0.75),
+            (0, 0, 0.07),
+            (0, 0, 0.75),
+        ]
+    ):
+        xPos = col * tileSizeWidth
+        config.blockDraw.rectangle(
+            (xPos, 2 * tileSizeHeight, xPos + tileSizeWidth - 1, 2 * tileSizeHeight + round(tileSizeHeight / 3) - 1),
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
+        )
+
+    # Bottom-left: I, White, Q tiles across left half
+    leftTileWidth = round(config.blockWidth / 2 / 3)
+    for col, hsv in enumerate([(214, 1.0, 0.3), (0, 0, 1.0), (268, 1.0, 0.42)]):
+        xPos = col * leftTileWidth
+        config.blockDraw.rectangle(
+            (xPos, bottomY, xPos + leftTileWidth, bottomY + bottomH),
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
+        )
+
+    # Bottom-center: near-black from midpoint to 5th column
+    config.blockDraw.rectangle(
+        (round(config.blockWidth / 2), bottomY, round(5 * tileSizeWidth) - 1, bottomY + bottomH),
+        fill=colorutils.HSVToRGB(0, 0, 0.07),
+        outline=None,
+    )
+
+    # Bottom-right: 6 near-black gradient tiles
+    smallTileWidth = tileSizeWidth / 3
+    for col, hsv in enumerate(
+        [
+            (0, 0, 0.0),
+            (0, 0, 0.04),
+            (0, 0, 0.07),
+            (0, 0, 0.11),
+            (0, 0, 0.07),
+            (0, 0, 0.07),
+        ]
+    ):
+        xPos = round(5 * tileSizeWidth) + int(smallTileWidth * col)
+        config.blockDraw.rectangle(
+            (xPos, bottomY, xPos + int(smallTileWidth), bottomY + bottomH),
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
+        )
 
 
 # ----------------------------------------------------##----------------------------------------------------#

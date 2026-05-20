@@ -136,10 +136,10 @@ def displayTest():
             config.draw.rectangle((xp + d, yp, xp + w + d, yp + h), fill=colorBlock, outline=colorBlock)
             xp += w
 
-        xp=0
+        xp = 0
         for item_ in rgbWheel:
-            colorBlock = tuple(map(lambda x: int(int(x) * config.brightness * .75), item_))
-            config.draw.rectangle((xp + d, yp + h/2, xp + w + d, yp + h), fill=colorBlock, outline=colorBlock)
+            colorBlock = tuple(map(lambda x: int(int(x) * config.brightness * 0.75), item_))
+            config.draw.rectangle((xp + d, yp + h / 2, xp + w + d, yp + h), fill=colorBlock, outline=colorBlock)
             xp += w
 
         yp += h + 0
@@ -249,6 +249,88 @@ def showGrid():
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
+def drawTVPalette():
+    config.draw.rectangle(
+        (0, 0, config.screenWidth, config.screenHeight),
+        fill=config.bgColor,
+        outline=(0, 0, 0),
+    )
+    config.canvasDraw.rectangle(
+        (0, 0, config.canvasWidth - 1, config.canvasHeight - 1),
+        fill=config.bgColor,
+        outline=config.outlineColor,
+    )
+    config.canvasDraw.rectangle(
+        (1, 1, config.canvasWidth - 2, config.canvasHeight - 2),
+        fill=config.bgColor,
+        outline=(0, 0, int(255 * config.brightness)),
+    )
+
+    tileSizeWidth = round(config.canvasWidth / 7)
+    tileSizeHeight = round(config.canvasHeight / 3)
+    bottomY = 2 * round(tileSizeHeight + tileSizeHeight / 6) - 1
+    bottomH = 2 * round(tileSizeHeight / 3)
+
+    # Top 2/3: 7 primary/secondary SMPTE bars at 75%
+    for col, hsv in enumerate([
+        (0, 0, 0.75), (60, 1.0, 0.75), (180, 1.0, 0.75), (120, 1.0, 0.75),
+        (300, 1.0, 0.75), (0, 1.0, 0.75), (220, 1.0, 0.75),
+    ]):
+        xPos = col * tileSizeWidth
+        config.canvasDraw.rectangle(
+            (xPos, 0, xPos + tileSizeWidth, 2 * tileSizeHeight),
+            fill=colorutils.HSVToRGB(*hsv), outline=None,
+        )
+
+    # Middle strip: reversed colors interleaved with near-black
+    for col, hsv in enumerate([
+        (220, 1.0, 0.75), (0, 0, 0.07), (300, 1.0, 0.75), (0, 0, 0.07),
+        (180, 1.0, 0.75), (0, 0, 0.07), (0, 0, 0.75),
+    ]):
+        xPos = col * tileSizeWidth
+        config.canvasDraw.rectangle(
+            (xPos, 2 * tileSizeHeight, xPos + tileSizeWidth - 1, 2 * tileSizeHeight + round(tileSizeHeight / 3) - 1),
+            fill=colorutils.HSVToRGB(*hsv), outline=None,
+        )
+
+    # Bottom-left: I, White, Q tiles across left half
+    leftTileWidth = round(config.canvasWidth / 2 / 3)
+    for col, hsv in enumerate([(214, 1.0, 0.3), (0, 0, 1.0), (268, 1.0, 0.42)]):
+        xPos = col * leftTileWidth
+        config.canvasDraw.rectangle(
+            (xPos, bottomY, xPos + leftTileWidth, bottomY + bottomH),
+            fill=colorutils.HSVToRGB(*hsv), outline=None,
+        )
+
+    # Bottom-center: near-black from midpoint to 5th column
+    config.canvasDraw.rectangle(
+        (round(config.canvasWidth / 2), bottomY, round(5 * tileSizeWidth) - 1, bottomY + bottomH),
+        fill=colorutils.HSVToRGB(0, 0, 0.07), outline=None,
+    )
+
+    # Bottom-right: 6 near-black gradient tiles
+    smallTileWidth = tileSizeWidth / 3
+    for col, hsv in enumerate([
+        (0, 0, 0.0), (0, 0, 0.04), (0, 0, 0.07),
+        (0, 0, 0.11), (0, 0, 0.07), (0, 0, 0.07),
+    ]):
+        xPos = round(5 * tileSizeWidth) + int(smallTileWidth * col)
+        config.canvasDraw.rectangle(
+            (xPos, bottomY, xPos + int(smallTileWidth), bottomY + bottomH),
+            fill=colorutils.HSVToRGB(*hsv), outline=None,
+        )
+
+    config.image.paste(
+        config.canvasImage,
+        (config.imageXOffset, config.imageYOffset),
+        config.canvasImage,
+    )
+    config.render(config.image, 0, 0)
+
+
+"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+
+
 def drawPalette():
     global config
 
@@ -271,7 +353,7 @@ def drawPalette():
     # print(config.imageXOffset)
     config.rows = 2
     config.cols = 16
-    config.tileSizeWidth = 16
+    config.tileSizeWidth = config.tileSizeWidth
     hues = 360 / config.cols
     vals = 1 / config.rows
     sat = 1  # / config.rows
@@ -400,6 +482,12 @@ def main(run=True):
         print(e)
         config.colorPalette = False
 
+    try:
+        config.TVPalette = workConfig.getboolean("diag", "TVPalette")
+    except Exception as e:
+        print(e)
+        config.TVPalette = False
+
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -503,7 +591,9 @@ def iterate():
         config.screenPositionX = config.cnvs.winfo_rootx()
         config.screenPositionY = config.cnvs.winfo_rooty() - 22
 
-    if config.colorPalette == True:
+    if config.TVPalette == True:
+        drawTVPalette()
+    elif config.colorPalette == True:
         drawPalette()
     elif config.showGrid == True:
         showGrid()

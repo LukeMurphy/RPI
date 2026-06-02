@@ -3,18 +3,9 @@
     "configurations": [
         {
             "name": "MicroPython (Emulator)",
-            "type": "debugpy",
+            "type": "micropython-emulator",
             "request": "launch",
-            "program": "/Users/lamshell/.vscode/extensions/benpaddlejones.pico-bridge-2.0.2/emulator/mock/runner.py",
-            "args": [
-                "${file}"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false,
-            "env": {
-                "MICROPYTHON_MOCK": "1",
-                "MOCK_BOARD": "raspberry-pi-pico"
-            }
+            "program": "${file}"
         },
         {
             "name": "Python: Current File",

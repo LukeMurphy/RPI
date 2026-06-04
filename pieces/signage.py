@@ -4,7 +4,7 @@ import math
 import random
 import textwrap
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
@@ -587,6 +587,7 @@ def main(run=True):
         config.steps = 200
 
 
+    pieceLogger("===============")
     try:
         palettesToUse = (workConfig.get("signage", "palettesToUse")).split(',')
         config.paletteChangeProb = float(workConfig.get("signage", "paletteChangeProb"))
@@ -599,6 +600,9 @@ def main(run=True):
         
         config.paletteDropHueMin = int(workConfig.get("signage", "dropHueMin"))
         config.paletteDropHueMax = int(workConfig.get("signage", "dropHueMax"))
+        pieceLogger(config.palettes)
+
+
     except Exception as e:
         print(str(e))
         palettesToUse = ['base']
@@ -613,7 +617,7 @@ def main(run=True):
         config.paletteDropHueMin = 0
         config.paletteDropHueMax = 0
 
-
+    pieceLogger("===============")
     config.colOverlay.steps = config.steps
 
     try:

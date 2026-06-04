@@ -245,7 +245,8 @@ def _create_action_dict(fullList, dateSort, configPath):
             if currentDir != lastDir and not dateSort:
                 actionDict.append({"": ""})
                 lastDir = currentDir
-            actionDict.append({f"{tsTxt}\t\t{currentDir} \t\t\t\t \t\t\t\t{f[2]}": f[0]})
+            actionDict.append({f"{tsTxt}\t{f[2]}\t\t [{currentDir}]": f[0]})
+            # actionDict.append({f"{tsTxt}\t\t{currentDir} \t\t\t\t \t\t\t\t{f[2]}": f[0]})
         else:
             actionDict.append({"": ""})
     return actionDict
@@ -276,10 +277,10 @@ screen_height = root.winfo_screenheight()
 root.geometry(
     "%dx%d+%d+%d"
     % (
-        860,
+        960,
         320,
         # round(screen_height * 0.6),
-        round(screen_width - 900),
+        round(screen_width - 970),
         round(1 * screen_height / 2),
     )
 )
@@ -289,11 +290,11 @@ root.config(bg="white")
 
 # -------------------------------- #
 # Setup the main listBox widget
-ListBoxOfConfigs = Listbox(root, width=90, height=42, bg="white", foreground="black", bd=False)
+ListBoxOfConfigs = Listbox(root, width=110, height=42, bg="white", foreground="black", bd=False)
 
-for item in actionDict1:
-    ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
-    ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
+# for item in actionDict1:
+    # ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
+    # ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
 
 ListBoxOfConfigs.place(bordermode=OUTSIDE, x=2, y=14)
 
@@ -304,7 +305,7 @@ ListBoxOfConfigs.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=ListBoxOfConfigs.yview)
 
 topBtnPlace = 8
-leftBtnPlace = 730
+leftBtnPlace = 830
 
 # sort by directory is 1 sort all by date is 0
 sortDefault = 1

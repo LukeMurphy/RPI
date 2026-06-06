@@ -51,9 +51,8 @@ class ScrollMessage:
         """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
         # draw the message to get its size
         if config.sansSerif:
-            font = ImageFont.truetype(
-                config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
-            )
+            # font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
+            font = ImageFont.truetype(config.path + "/assets/fonts/freefont/RobotoCondensed-Bold.ttf", config.fontSize)
         else:
             font = ImageFont.truetype(
                 config.path + "/assets/fonts/freefont/FreeSerifBold.ttf",
@@ -114,7 +113,7 @@ class XOx:
     # scroll speed and steps per cycle
     scrollSpeed = 0.004
     steps = 1.5
-    lineThickness = 2
+    lineThickness = 4
     bufferSpacing = 40
     xsWidth = 54
     maxNumXOs = 12
@@ -209,8 +208,8 @@ class XOx:
                     round(self.OColor[1] * config.brightness),
                     round(self.OColor[2] * config.brightness),
                 )
-                draw.ellipse((startX, startY, endX, endY), outline=clr)
-                draw.ellipse((startX + 1, startY + 1, endX - 1, endY - 1), outline=clr)
+                draw.ellipse((startX, startY, endX, endY), outline=clr, width=4)
+                draw.ellipse((startX + 1, startY + 1, endX - 1, endY - 1), outline=clr, width=4)
             else:
                 clr = (
                     round(self.ArrowColor[0] * config.brightness),

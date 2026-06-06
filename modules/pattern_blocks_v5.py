@@ -6,7 +6,7 @@ import random
 import time
 import types
 
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules.configuration import ArtWorkConfig
 from modules import badpixels, coloroverlay, colorutils, panelDrawing, configuration
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
@@ -1792,6 +1792,9 @@ def TVTestPattern(config, paletteObj=None):
 
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
 
+    _alpha = int(random.uniform(200,250))
+    pieceLogger(_alpha)
+
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 
     tileSizeWidth = round(config.blockWidth / 7)
@@ -1814,7 +1817,7 @@ def TVTestPattern(config, paletteObj=None):
         xPos = col * tileSizeWidth
         config.blockDraw.rectangle(
             (xPos, 0, xPos + tileSizeWidth, 2 * tileSizeHeight),
-            fill=colorutils.HSVToRGB(*hsv),
+            fill=colorutils.HSVToRGB(*hsv, _alpha, config.brightness),
             outline=None,
         )
 
@@ -1833,7 +1836,7 @@ def TVTestPattern(config, paletteObj=None):
         xPos = col * tileSizeWidth
         config.blockDraw.rectangle(
             (xPos, 2 * tileSizeHeight, xPos + tileSizeWidth - 1, 2 * tileSizeHeight + round(tileSizeHeight / 3) - 1),
-            fill=colorutils.HSVToRGB(*hsv),
+            fill=colorutils.HSVToRGB(*hsv, _alpha, config.brightness),
             outline=None,
         )
 
@@ -1843,14 +1846,14 @@ def TVTestPattern(config, paletteObj=None):
         xPos = col * leftTileWidth
         config.blockDraw.rectangle(
             (xPos, bottomY, xPos + leftTileWidth, bottomY + bottomH),
-            fill=colorutils.HSVToRGB(*hsv),
+            fill=colorutils.HSVToRGB(*hsv, _alpha, config.brightness),
             outline=None,
         )
 
     # Bottom-center: near-black from midpoint to 5th column
     config.blockDraw.rectangle(
         (round(config.blockWidth / 2), bottomY, round(5 * tileSizeWidth) - 1, bottomY + bottomH),
-        fill=colorutils.HSVToRGB(0, 0, 0.07),
+        fill=colorutils.HSVToRGB(0, 0, 0.07, _alpha, config.brightness),
         outline=None,
     )
 
@@ -1869,7 +1872,7 @@ def TVTestPattern(config, paletteObj=None):
         xPos = round(5 * tileSizeWidth) + int(smallTileWidth * col)
         config.blockDraw.rectangle(
             (xPos, bottomY, xPos + int(smallTileWidth), bottomY + bottomH),
-            fill=colorutils.HSVToRGB(*hsv),
+            fill=colorutils.HSVToRGB(*hsv, _alpha, config.brightness),
             outline=None,
         )
 

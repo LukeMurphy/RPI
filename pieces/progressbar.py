@@ -144,7 +144,7 @@ def drawBar():
     config.draw.rectangle((0, config.yPos1, 1, config.yPos2), fill=(0, 0, 0))
 
     # draw flat box progress bar - default
-    config.draw.rectangle((config.xPos1, config.yPos1, config.xPos2, config.yPos2), fill=(config.barColor[0], config.barColor[1], config.barColor[2]))
+    config.draw.rectangle((config.xPos1, config.yPos1, max(config.xPos1,config.xPos2), max(config.yPos2,config.yPos1)), fill=(config.barColor[0], config.barColor[1], config.barColor[2]))
 
     lines = config.canvasHeight
     if config.gradientLevel == 1:

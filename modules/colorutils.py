@@ -340,8 +340,8 @@ def getRandomColorHSV(hMin=0.0, hMax=360.0, sMin=0.0, sMax=1.0, vMin=0.0, vMax=1
     v = random.SystemRandom().uniform(vMin, vMax)
     s = random.SystemRandom().uniform(sMin, sMax)
 
-    if nograys == 1.0 and v > .25 :
-        s = random.SystemRandom().uniform(max(.5,sMin), 1.0)
+    if nograys == 1.0 and v > 0.25:
+        s = random.SystemRandom().uniform(max(0.5, sMin), 1.0)
         # pieceLogger(f"saturation {s} {vMax} {vMin}",2)
 
     # print("\nNew hue: " + str(round(h)) + " " + str(dropHueMin)+ " " + str(dropHueMax) + " " + str(s) + " " + str(v) )
@@ -456,35 +456,34 @@ def rgb_to_hsv(r, g, b, a=255, _round=False):
     hue = h * 360
     sat = s * 1
     val = v * 1
-    if _round :
-        return (round(hue), round(sat,3), round(val,3), round(a/255,2))
-    else :
+    if _round:
+        return (round(hue), round(sat, 3), round(val, 3), round(a / 255, 2))
+    else:
         return (hue, sat, val)
 
 
-
-def HSVToRGB(h, s, v, a=255):
+def HSVToRGB(h, s, v, a=255, brightness=1.0):
     c = v * s
     huex = h / 60.0
     x = c * (1 - abs(huex % 2 - 1))
     r1 = g1 = b1 = 0
     if huex <= 1 and huex >= 0:
-        (r1, g1, b1) = (c, x, 0)
+        r1, g1, b1 = (c, x, 0)
     if huex <= 2 and huex >= 1:
-        (r1, g1, b1) = (x, c, 0)
+        r1, g1, b1 = (x, c, 0)
     if huex <= 3 and huex >= 2:
-        (r1, g1, b1) = (0, c, x)
+        r1, g1, b1 = (0, c, x)
     if huex <= 4 and huex >= 3:
-        (r1, g1, b1) = (0, x, c)
+        r1, g1, b1 = (0, x, c)
     if huex <= 5 and huex >= 4:
-        (r1, g1, b1) = (x, 0, c)
+        r1, g1, b1 = (x, 0, c)
     if huex <= 6 and huex >= 5:
-        (r1, g1, b1) = (c, 0, x)
+        r1, g1, b1 = (c, 0, x)
     m = v - c
     rgb = [r1 + m, g1 + m, b1 + m, a]
 
-    rgbCol = tuple(abs(round(i * 255)) for i in rgb)
-    return (rgbCol[0], rgbCol[1], rgbCol[2], a)
+    rgbCol = tuple(abs(round(i * 255 * brightness)) for i in rgb)
+    return (int(rgbCol[0]), int(rgbCol[1]), int(rgbCol[2]), a)
 
 
 def HSLToRGB(h, s, l, a=255):

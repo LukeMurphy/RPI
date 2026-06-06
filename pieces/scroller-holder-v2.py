@@ -1,19 +1,14 @@
 #!/usr/bin/python
 # import modules
 # ################################################### #
-import datetime
-import getopt
 import math
-import os
 import random
-import sys
-import textwrap
 import time
 from collections import OrderedDict
 
 from matplotlib.pyplot import pie
-from modules.configuration import bcolors, pieceLogger
-from modules import coloroverlay, colorutils, continuous_scroller, panelDrawing
+from modules.configuration import  pieceLogger
+from modules import colorutils, continuous_scroller, panelDrawing
 
 from modules.faderclass import FaderObj
 from PIL import (
@@ -24,7 +19,6 @@ from PIL import (
     ImageFilter,
     ImageFont,
     ImageOps,
-    ImagePalette,
 )
 
 global config
@@ -379,8 +373,8 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
     # Draw the text with "borders"
     indent = int(0.01 * config.tileSize[0])
     for i in range(0, config.shadowSize):
-        draw.text((indent + -i, -i), messageString, (0, 0, 0,180), font=font)
-        draw.text((indent + i, i), messageString, (0, 0, 0,180), font=font)
+        draw.text((indent + -i, -i), messageString, (0, 0, 0, 180), font=font)
+        draw.text((indent + i, i), messageString, (0, 0, 0, 180), font=font)
 
     print("makeMesage called:" + messageString)
     draw.text((2, 0), messageString, clr, font=font)
@@ -450,7 +444,6 @@ def makeBackGround(drawRef, n=1):
             rowMultiplier = 2
             colMultiplier = 1
 
-
         rDelta = (config.patternEndColor[0] - config.patternColor[0]) / steps
         gDelta = (config.patternEndColor[1] - config.patternColor[1]) / steps
         bDelta = (config.patternEndColor[2] - config.patternColor[2]) / steps
@@ -464,10 +457,10 @@ def makeBackGround(drawRef, n=1):
 
         harlequinCount = 0
         gap = 2
-        _c1 = tuple(config.harlequinColors [0])
-        _c2 = tuple(config.harlequinColors [1])
-        _c3 = tuple(config.harlequinColors [2])
-        _c4 = tuple(config.harlequinColors [3])
+        _c1 = tuple(config.harlequinColors[0])
+        _c2 = tuple(config.harlequinColors[1])
+        _c3 = tuple(config.harlequinColors[2])
+        _c4 = tuple(config.harlequinColors[3])
 
         pieceLogger(_c4)
 
@@ -518,15 +511,16 @@ def makeBackGround(drawRef, n=1):
                             (xStart + xDiv / 2 - gap, yStart + yDiv),
                             (xStart, yStart + yDiv + yDiv - gap),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c4)
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c4)
 
                         poly = [
                             (xStart + xDiv * 2, yStart + gap),
                             (xStart + xDiv * 2 * 0.75 + gap, yStart + yDiv),
                             (xStart + xDiv * 2, yStart + yDiv + yDiv - gap),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c4)
-
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c4)
 
                         poly = [
                             (xStart + xDiv / 2 + gap, yStart + yDiv),
@@ -534,35 +528,40 @@ def makeBackGround(drawRef, n=1):
                             (xStart + xDiv + xDiv / 2 - gap, yStart + yDiv),
                             (xStart + xDiv, yStart + 2 * yDiv - gap),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c3)
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c3)
 
                         poly = [
                             (xStart + gap, yStart),
                             (xStart + xDiv / 2, yStart + yDiv - gap),
                             (xStart + xDiv - gap, yStart),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c1)
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c1)
 
                         poly = [
                             (xStart + gap, yStart + yDiv * 2),
                             (xStart + xDiv / 2, yStart + yDiv + gap),
                             (xStart + xDiv - gap, yStart + yDiv * 2),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c1)
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c1)
 
                         poly = [
                             (xStart + xDiv + gap, yStart),
                             (xStart + xDiv + xDiv / 2, yStart + yDiv - gap),
                             (xStart + xDiv * 2 - gap, yStart),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c2)
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c2)
 
                         poly = [
                             (xStart + xDiv + gap, yStart + 2 * yDiv),
                             (xStart + xDiv + xDiv / 2, yStart + yDiv + gap),
                             (xStart + xDiv * 2 - gap, yStart + 2 * yDiv),
                         ]
-                        if random.random() < config.patternDrawProb: drawRef.polygon(poly, fill=_c2)
+                        if random.random() < config.patternDrawProb:
+                            drawRef.polygon(poly, fill=_c2)
 
                     if config.pattern == "diamonds":
                         poly = [
@@ -867,13 +866,13 @@ def configureBackgroundScrolling():
         config.changeProb = float(workConfig.get("scroller", "changeProb"))
     except Exception as e:
         config.changeProb = 0.0
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.changeProbReleaseFactor = float(workConfig.get("scroller", "changeProbReleaseFactor"))
     except Exception as e:
         config.changeProbReleaseFactor = 1.0
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     makeBackGround(scrollerRef.bg1Draw, 1)
     makeBackGround(scrollerRef.bg2Draw, 1)
@@ -945,34 +944,36 @@ def configureMessageScrolling():
     config.textVOffest = int(workConfig.get("scroller", "textVOffest"))
     config.shadowSize = int(workConfig.get("scroller", "shadowSize"))
     config.textSpeed = float(workConfig.get("scroller", "textSpeed"))
+    config.textSpeed2 = float(workConfig.get("scroller", "textSpeed2", fallback = config.textSpeed))
     config.msg1 = workConfig.get("scroller", "msg1")
     config.msg2 = workConfig.get("scroller", "msg2")
     config.msg3 = workConfig.get("scroller", "msg3")
 
-    config.scroller2 = continuous_scroller.ScrollObject()
-    scrollerRef = config.scroller2
-    scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
-    scrollerRef.canvasWidth = int(len(config.msg1) * config.fontSize / 2)
-    scrollerRef.canvasHeight = 200
-    scrollerRef.xSpeed = -config.textSpeed
-    scrollerRef.setUp()
-    direction = 1 if scrollerRef.xSpeed > 0 else -1
-    makeMessage(scrollerRef.bg1, config.msg1, direction)
-    makeMessage(scrollerRef.bg2, config.msg1, direction)
-    scrollerRef.callBack = {"func": remakeMessage, "direction": direction}
-    config.scrollArray.append(scrollerRef)
+    def _makeTextLayer(scrollerRef, txtMsg, dir=1, delta=0.25, textSlide=0, speed=config.textSpeed):
+        scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
+        scrollerRef.canvasWidth = int(len(txtMsg) * config.fontSize / 2)
+        scrollerRef.xSpeed = dir * speed + delta
+        scrollerRef.setUp()
+        scrollerRef.typeOfScroller = "text"
+        scrollerRef.textSlide = textSlide
+        direction = 1 if scrollerRef.xSpeed > 0 else -1
+        makeMessage(scrollerRef.bg1, txtMsg, direction)
+        makeMessage(scrollerRef.bg2, txtMsg, direction)
+        scrollerRef.callBack = {"func": remakeMessage, "direction": direction}
+        config.scrollArray.append(scrollerRef)
+        pieceLogger(f"-----------\n {scrollerRef.typeOfScroller} \n----------")
 
-    config.scroller3 = continuous_scroller.ScrollObject()
-    scrollerRef = config.scroller3
-    scrollerRef.canvasWidth = int(config.displayCols * config.canvasWidth)
-    scrollerRef.canvasWidth = int(len(config.msg2) * config.fontSize / 2)
-    scrollerRef.xSpeed = config.textSpeed + 0.25
-    scrollerRef.setUp()
-    direction = 1 if scrollerRef.xSpeed > 0 else -1
-    makeMessage(scrollerRef.bg1, config.msg2, direction)
-    makeMessage(scrollerRef.bg2, config.msg2, direction)
-    scrollerRef.callBack = {"func": remakeMessage, "direction": direction}
-    config.scrollArray.append(scrollerRef)
+    config.textLayer_1 = continuous_scroller.ScrollObject()
+    _makeTextLayer(config.textLayer_1, config.msg1, 1, 0.25, 1)
+
+    config.textLayer_2 = continuous_scroller.ScrollObject()
+    _makeTextLayer(config.textLayer_2, config.msg2, -1, 0.0, 0, config.textSpeed2)
+
+    config.textLayer_3 = continuous_scroller.ScrollObject()
+    # _makeTextLayer(config.textLayer_3, config.msg1, 1, 0.25, 1)
+
+    config.textLayer_4 = continuous_scroller.ScrollObject()
+    # _makeTextLayer(config.textLayer_4, config.msg2, -1, 0.0, 1)
 
 
 def configureAltTextScrolling():
@@ -1017,7 +1018,7 @@ def configureImageOverlay():
 def init():
     global config
     global workConfig
-    print("SINGLETON SCROLLER HOLDER INIT")
+    pieceLogger("SINGLETON SCROLLER HOLDER INIT")
 
     config.redrawSpeed = float(workConfig.get("scroller", "redrawSpeed"))
 
@@ -1039,6 +1040,9 @@ def init():
     config.canvasImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
     config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 
+    config.textImage = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
+    config.textImageDraw = ImageDraw.Draw(config.textImage)
+
     config.imageLayer = Image.new("RGBA", (config.canvasWidth * 10, config.canvasHeight))
     config.imageLayerDraw = ImageDraw.Draw(config.canvasImage)
 
@@ -1057,7 +1061,7 @@ def init():
     try:
         config.backgroundColorChangeProb = float(workConfig.get("scroller", "backgroundColorChangeProb"))
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
         config.backgroundColorChangeProb = 0.5
 
     try:
@@ -1065,40 +1069,40 @@ def init():
         config.setPatternEndColor = list(map(lambda x: int(x), workConfig.get("scroller", "setPatternEndColor").split(",")))
     except Exception as e:
         config.setPatternColor = False
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.altDirectionScrolling = workConfig.getboolean("scroller", "altDirectionScrolling")
     except Exception as e:
         config.altDirectionScrolling = False
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.alwaysRandomPatternColor = workConfig.getboolean("scroller", "alwaysRandomPatternColor")
     except Exception as e:
         config.alwaysRandomPatternColor = False
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.alwaysRandomPattern = workConfig.getboolean("scroller", "alwaysRandomPattern")
     except Exception as e:
         config.alwaysRandomPattern = False
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.redGreenSwapProb = float(workConfig.get("scroller", "redGreenSwapProb"))
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
         config.redGreenSwapProb = 0
     try:
         config.redBlueSwapProb = float(workConfig.get("scroller", "redBlueSwapProb"))
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
         config.redBlueSwapProb = 0
     try:
         config.greenBlueSwapProb = float(workConfig.get("scroller", "greenBlueSwapProb"))
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
         config.greenBlueSwapProb = 0
 
     try:
@@ -1111,7 +1115,7 @@ def init():
         config.bg_dropHueMaxValue = 0
         config.fg_dropHueMinValue = 0
         config.fg_dropHueMaxValue = 0
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.useHSV = True
@@ -1132,7 +1136,7 @@ def init():
 
     except Exception as e:
 
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
         config.useHSV = False
 
         config.fg_minHue = 0
@@ -1151,7 +1155,7 @@ def init():
 
     try:
         _harlequinColorsRaw = (workConfig.get("scroller", "harlequinColorsRaw")).split("|")
-        config.harlequinColors =[]
+        config.harlequinColors = []
         for _set in _harlequinColorsRaw:
             _setVals = _set.split(",")
             _cSet = []
@@ -1160,12 +1164,9 @@ def init():
 
         pieceLogger(f"config.harelquinColors ==> {config.harlequinColors}")
 
-
     except Exception as e:
         config.harlequinColors = ((190, 0, 40, 55), (210, 153, 10, 55), (42, 24, 180, 55), (25, 108, 30, 55))
-        pieceLogger(f"Config not found: {e}",1)
-
-
+        pieceLogger(f"Config not found: {e}", 1)
 
     if config.useBackground == True:
         configureBackgroundScrolling()
@@ -1178,7 +1179,7 @@ def init():
         if config.useAltText == True:
             configureAltTextScrolling()
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.useOverLayImage = workConfig.getboolean("scroller", "useOverLayImage")
@@ -1186,20 +1187,20 @@ def init():
             configureImageOverlay()
     except Exception as e:
         config.useOverLayImage = False
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.useArrows = workConfig.getboolean("scroller", "useArrows")
         if config.useArrows == True:
             configureArrowScrolling()
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.useUltraSlowSpeed = workConfig.getboolean("scroller", "useUltraSlowSpeed")
     except Exception as e:
         config.useUltraSlowSpeed = False
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.useImages = workConfig.getboolean("scroller", "useImages")
@@ -1207,17 +1208,13 @@ def init():
         if config.useImages == True:
             configureImageScrolling()
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
 
     try:
         config.doingRefreshCount = float(workConfig.get("scroller", "doingRefreshCount"))
     except Exception as e:
         config.doingRefreshCount = 50
-        pieceLogger(f"Config not found: {e}",1)
-
-
-
-
+        pieceLogger(f"Config not found: {e}", 1)
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -1248,14 +1245,13 @@ def init():
     try:
         config.useFadeThruAnimation = workConfig.getboolean("scroller", "useFadeThruAnimation")
     except Exception as e:
-        pieceLogger(f"Config not found: {e}",1)
+        pieceLogger(f"Config not found: {e}", 1)
         config.useFadeThruAnimation = True
+
 
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("RUNNING Scroller Holder scroller-holder.py")
-    print(bcolors.ENDC)
+    pieceLogger("RUNNING Scroller Holder scroller-holder-v2.py", 2)
     while config.isRunning == True:
         iterate()
         time.sleep(config.redrawSpeed)
@@ -1286,11 +1282,24 @@ def processImageForScrolling():
     ## Run through each of the objects being scrolled - text, image, background etc
     for scrollerObj in config.scrollArray:
         scrollerObj.scroll()
-        config.canvasImage.paste(scrollerObj.canvas, (0, 0), scrollerObj.canvas)
+
+        if scrollerObj.typeOfScroller != "foo":
+            config.canvasImage.paste(scrollerObj.canvas, (0, 0), scrollerObj.canvas)
+        else:
+            config.textImage.paste(scrollerObj.canvas, (0, scrollerObj.textSlide *  config.bandHeight), scrollerObj.canvas)
+
 
     # Chop up the scrollImage into "rows"
     for n in range(0, config.displayRows):
         segment = config.canvasImage.crop(
+            (
+                n * config.canvasWidth,
+                0,
+                config.canvasWidth + n * config.canvasWidth,
+                config.bandHeight,
+            )
+        )
+        textsegment = config.textImage.crop(
             (
                 n * config.canvasWidth,
                 0,
@@ -1308,9 +1317,13 @@ def processImageForScrolling():
             # _temp = ImageOps.mirror(_temp)
             # segment.paste(_temp,(0,0),_temp)
 
-
-
+        # segment = ImageChops.add_modulo(segment, textsegment)
+        # segment = ImageChops.composite(segment, textsegment, textsegment)
+        # segment = ImageChops.overlay( textsegment, segment)
         config.workImage.paste(segment, (0, n * config.bandHeight))
+        # config.workImage.paste(textsegment, (0, n * config.bandHeight))
+
+
 
     if config.useOverLayImage == True:
         if random.random() < config.overlayGlitchRate:

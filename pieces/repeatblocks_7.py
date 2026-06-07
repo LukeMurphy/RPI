@@ -1264,28 +1264,29 @@ def remapFilter(config):
 
 
 def resetPolyBlanks():
-    config.blanks_list = []
-    config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
-    config.blankColor = (0, 0, 0, 15)
+    if config.blanks_maxNumberOfDeadPixels > 0 :
+        config.blanks_list = []
+        config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
+        config.blankColor = (0, 0, 0, 15)
 
-    for _ in range(config.blanks_numberOfDeadPixels):
-        width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
-        height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
-        width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-        height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        for _ in range(config.blanks_numberOfDeadPixels):
+            width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
+            height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
+            width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+            height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
 
-        x0 = random.randint(0, config.blanks_sizeTarget[0])
-        y0 = random.randint(0, config.blanks_sizeTarget[1])
-        x1 = x0 + width1
-        y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-        x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-        y2 = y1 + height1
-        x3 = x2 - width2
-        y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+            x0 = random.randint(0, config.blanks_sizeTarget[0])
+            y0 = random.randint(0, config.blanks_sizeTarget[1])
+            x1 = x0 + width1
+            y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+            x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+            y2 = y1 + height1
+            x3 = x2 - width2
+            y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
 
-        _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
+            _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
 
-        config.blanks_list.append(_poly)
+            config.blanks_list.append(_poly)
 
 
 def drawPolyBlanks(_drawRef):
@@ -1752,9 +1753,9 @@ def main(run=True):
 
     # ###########################################################################
 
-    config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("movingpattern", "resetBlanksProb", fallback="0.001"))
-    config.blankColorAsColorProb = float(workConfig.get("movingpattern", "blankColorAsColorProb", fallback="0.5"))
-    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("movingpattern", "numberOfDeadPixels", fallback="1"))
+    config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("movingpattern", "resetBlanksProb", fallback="0.00"))
+    config.blankColorAsColorProb = float(workConfig.get("movingpattern", "blankColorAsColorProb", fallback="0.0"))
+    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("movingpattern", "numberOfDeadPixels", fallback="0"))
     config.blanks_probabilityOfBlockBlanks = 0.0
     config.blanks_sizeTarget = [int(x) for x in workConfig.get("movingpattern", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
     config.blanks_colsRange = [int(x) for x in workConfig.get("movingpattern", "colsRange", fallback="32,256").split(",")]

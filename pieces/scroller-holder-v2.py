@@ -358,7 +358,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
     # pixLen = draw.textsize(messageString, font=font)
     pixelLength = int(draw.textlength(messageString, font=font))
 
-    # print(pixelLength)
+    # pieceLogger(pixelLength)
     # For some reason textsize is not getting full height !
     pixLen = [pixelLength + 2, config.fontSize]
     fontHeight = int(pixLen[1] * 1.3)
@@ -376,7 +376,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
         draw.text((indent + -i, -i), messageString, (0, 0, 0, 180), font=font)
         draw.text((indent + i, i), messageString, (0, 0, 0, 180), font=font)
 
-    pieceLogger(f("makeMesage called: {messageString}"))
+    pieceLogger(f"makeMesage called: {messageString}")
     draw.text((2, 0), messageString, clr, font=font)
 
     refDraw = ImageDraw.Draw(imageRef)

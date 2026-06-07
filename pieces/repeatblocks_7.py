@@ -715,6 +715,8 @@ def loadAndSetCombinations():
     config.comboSetDirector = Director(config)
     config.comboSetDirector.slotRate = config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
 
+    pieceLogger(f"wait time : {config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime}")
+
 
 def handleChangeCurrentCominationSet():
     pieceLogger("Checking combo set", 3)

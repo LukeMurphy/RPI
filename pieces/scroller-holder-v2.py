@@ -462,7 +462,7 @@ def makeBackGround(drawRef, n=1):
         _c3 = tuple(config.harlequinColors[2])
         _c4 = tuple(config.harlequinColors[3])
 
-        pieceLogger(_c4)
+        # pieceLogger(_c4)
 
         for c in range(cols + 1):
             _c4 = tuple(config.harlequinColors[3])

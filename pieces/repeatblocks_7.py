@@ -1263,6 +1263,38 @@ def remapFilter(config):
         expandFilterRemap()
 
 
+def resetPolyBlanks():
+    config.blanks_list = []
+    config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
+    config.blankColor = (0, 0, 0, 15)
+
+    for _ in range(config.blanks_numberOfDeadPixels):
+        width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
+        height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
+        width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+
+        x0 = random.randint(0, config.blanks_sizeTarget[0])
+        y0 = random.randint(0, config.blanks_sizeTarget[1])
+        x1 = x0 + width1
+        y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+        y2 = y1 + height1
+        x3 = x2 - width2
+        y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+
+        _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
+
+        config.blanks_list.append(_poly)
+
+
+def drawPolyBlanks(_drawRef):
+    for p in range(config.blanks_numberOfDeadPixels):
+        _poly = config.blanks_list[p]
+        _drawRef.polygon(_poly, fill=config.blankColor)
+
+
+
 # ----------------------------------
 
 def handleFadingAndRebuild():
@@ -1417,6 +1449,15 @@ def renderComposite():
             if config.waveDeformXPos > config.screenWidth:
                 config.waveDeformXPos = 0
         
+
+        if random.random() < config.resetBlanksProb:
+            # badpixels.setBlanksOnScreen(config)
+            resetPolyBlanks()
+
+        if config.blanks_maxNumberOfDeadPixels > 0 :
+            config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+            drawPolyBlanks(config.destinationImageDraw)
+
         # config.image = config.destinationImage.copy()
         config.render(config.destinationImage, 0, 0)
 
@@ -1599,13 +1640,19 @@ def createImageHolders():
     # image will be the final output
 
     config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    
     config.patternImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.patternImageDraw = ImageDraw.Draw(config.patternImage)
+    
     config.canvasImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
+    
     config.nextStateImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.nextStateImageDraw = ImageDraw.Draw(config.nextStateImage)
 
     config.destinationImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
+    config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+
     config.compositeImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
 
     # For scrolling the entire piece
@@ -1615,8 +1662,6 @@ def createImageHolders():
     config.blendSteps = 5
     config.blendStep = 0
 
-    config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
-    config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
 
 
 def main(run=True):
@@ -1685,20 +1730,38 @@ def main(run=True):
     loadConfigValue(config, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
 
     loadFilterRemapping()
+
     # ####################### clip player instert ################################
     loadClipPlayerConfigs()
     # ###########################################################################
+
     loadAndInitializeCrossFader()
+
     setupPolyOverlay()
+
     loadAndSetupPatterns()
+
     loadAndSetupAllPalettes()
+
     disturbance.init(config, workConfig)
     disturbance.setupDisturbances()
+
     buildPatternSequence(config)
 
     config.applyDitherBeforeRemapping = True
 
     # ###########################################################################
+
+    config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("movingpattern", "resetBlanksProb", fallback="0.001"))
+    config.blankColorAsColorProb = float(workConfig.get("movingpattern", "blankColorAsColorProb", fallback="0.5"))
+    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("movingpattern", "numberOfDeadPixels", fallback="1"))
+    config.blanks_probabilityOfBlockBlanks = 0.0
+    config.blanks_sizeTarget = [int(x) for x in workConfig.get("movingpattern", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
+    config.blanks_colsRange = [int(x) for x in workConfig.get("movingpattern", "colsRange", fallback="32,256").split(",")]
+    config.blanks_rowsRange = [int(x) for x in workConfig.get("movingpattern", "rowsRange", fallback="32,256").split(",")]
+    config.blankPolyVariation = int(workConfig.get("movingpattern", "blankPolyVariation", fallback="10"))
+    resetPolyBlanks()
+
 
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))

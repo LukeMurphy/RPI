@@ -29,6 +29,12 @@ class Director:
         self.config = config
         self.tT = time.time()
 
+    def reset(self):
+        self.advance = False
+        self.tT = time.time()
+        print(f"New rate: {self.slotRate}")
+
+
     def checkTime(self):
         if (time.time() - self.tT) >= self.slotRate:
             self.tT = time.time()

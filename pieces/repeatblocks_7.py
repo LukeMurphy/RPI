@@ -25,6 +25,8 @@ from copy import copy, deepcopy
 
 # major refactoring along with pattern_blocks.py 2025-02-19
 
+# more refactoring including slow scrolling and timing controls
+
 
 ###############################################
 
@@ -713,9 +715,8 @@ def loadAndSetCombinations():
     config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
     config.numberOfRandomizersUsed = 0
     config.comboSetDirector = Director(config)
-    config.comboSetDirector.slotRate = config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
-
-    pieceLogger(f"wait time : {config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime}")
+    config.comboSetDirector.slotRate = int(random.uniform(config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime,config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime))
+    pieceLogger(f"Initial wait time : {config.comboSetDirector.slotRate}")
 
 
 def handleChangeCurrentCominationSet():
@@ -749,6 +750,10 @@ def handleChangeCurrentCominationSet():
 
         # config.patternSequence = []
         # config.rebuildIndividualSlotProb = .1
+
+
+        config.comboSetDirector.slotRate = int(random.uniform(config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime,config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime))
+        config.comboSetDirector.reset()
 
         config.settingUpPattern = True
         config.rebuildPatternProbability = 1.0
@@ -1330,7 +1335,7 @@ def saveImageIfDone():
 def handlePatternRebuild():
     """Handles rebuilding the pattern based on probability."""
     disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
-    if random.random() < config.rebuildPatternProbability and config.fader.fadingDone and disturbancesDone:
+    if config.fader.fadingDone and disturbancesDone:
         # config.doSectionDisturbance = False
         # print("\nrebuildPatterns called after fading done 2")
 

@@ -1282,21 +1282,28 @@ def resetPolyBlanks():
         config.blankColor = (0, 0, 0, 15)
 
         for _ in range(config.blanks_numberOfDeadPixels):
-            width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
-            height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
+            width1 = random.randint(config.blankMinWidth, config.blankMaxWidth)
+            height1 = random.randint(config.blankMinHeight, config.blankMaxHeight)
             width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
             height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
 
             x0 = random.randint(0, config.blanks_sizeTarget[0])
             y0 = random.randint(0, config.blanks_sizeTarget[1])
+
             x1 = x0 + width1
             y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
+
             x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
             y2 = y1 + height1
+
             x3 = x2 - width2
             y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
 
             _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
+
+            # pieceLogger(_poly)
+
+            # _poly = ((210, 204), (330, 203), (328, 328), (210, 330), (210, 204))  
 
             config.blanks_list.append(_poly)
 
@@ -1769,12 +1776,16 @@ def main(run=True):
     config.blankColorAsColorProb = float(workConfig.get("movingpattern", "blankColorAsColorProb", fallback="0.0"))
     config.blanks_maxNumberOfDeadPixels = int(workConfig.get("movingpattern", "numberOfDeadPixels", fallback="0"))
     config.blanks_probabilityOfBlockBlanks = 0.0
+    config.blankMinWidth = int(workConfig.get("movingpattern", "blankMinWidth", fallback="0"))
+    config.blankMaxWidth = int(workConfig.get("movingpattern", "blankMaxWidth", fallback="0"))
+    config.blankMinHeight = int(workConfig.get("movingpattern", "blankMinHeight", fallback="0"))
+    config.blankMaxHeight = int(workConfig.get("movingpattern", "blankMaxHeight", fallback="0"))
+
     config.blanks_sizeTarget = [int(x) for x in workConfig.get("movingpattern", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
-    config.blanks_colsRange = [int(x) for x in workConfig.get("movingpattern", "colsRange", fallback="32,256").split(",")]
-    config.blanks_rowsRange = [int(x) for x in workConfig.get("movingpattern", "rowsRange", fallback="32,256").split(",")]
+    # config.blanks_colsRange = [int(x) for x in workConfig.get("movingpattern", "colsRange", fallback="32,256").split(",")]
+    # config.blanks_rowsRange = [int(x) for x in workConfig.get("movingpattern", "rowsRange", fallback="32,256").split(",")]
     config.blankPolyVariation = int(workConfig.get("movingpattern", "blankPolyVariation", fallback="10"))
     resetPolyBlanks()
-
 
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))

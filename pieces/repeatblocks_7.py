@@ -728,7 +728,9 @@ def handleChangeCurrentCominationSet():
         # config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
 
         _listOfIndecies = list(range(len(config.combinationSets)))
-        config.currentPalecurrentCombinationsetIndextteIndex = random.choice(_listOfIndecies)
+
+        pieceLogger(f"_listOfIndecies =   {_listOfIndecies}")
+        config.currentCombinationsetIndex = random.choice(_listOfIndecies)
 
         # {config.combinationSets[config.currentCombinationsetIndex]}
         pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
@@ -1216,7 +1218,7 @@ def expandFilterRemap():
         config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
         config.filterRemapContracting = 1
-        pieceLogger(f"Expanidng done {config.newFilterStartX}")
+        # pieceLogger(f"Expanidng done {config.newFilterStartX}")
     else:
         config.filterRemappingProb = 1.0
         config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
@@ -1259,7 +1261,7 @@ def remapFilter(config):
                                          config.newFilterStartY, 
                                          config.newFilterStartX + config.newFilterEndX, 
                                          config.newFilterStartY + config.newFilterEndY)
-        pieceLogger("Resetting to expand")
+        # pieceLogger("Resetting to expand")
         # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
 
     if config.filterRemapContracting == 1:

@@ -720,7 +720,7 @@ def loadAndSetCombinations():
 
 
 def handleChangeCurrentCominationSet():
-    pieceLogger("Checking combo set", 3)
+    pieceLogger("\nChecking combo set", 2)
     disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
     if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone:
 
@@ -729,8 +729,11 @@ def handleChangeCurrentCominationSet():
 
         _listOfIndecies = list(range(len(config.combinationSets)))
 
-        # pieceLogger(f"_listOfIndecies =   {_listOfIndecies}")
+        pieceLogger(f"_listOfIndecies =   {_listOfIndecies}")
         config.currentCombinationsetIndex = random.choice(_listOfIndecies)
+
+        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+        setPalette(config, config.currentPaletteIndex)
 
         # {config.combinationSets[config.currentCombinationsetIndex]}
         pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
@@ -1239,7 +1242,7 @@ def contractFilterRemap():
         config.filterRemapContracting = 0
         config.remapImageBlockSection = (_pos[2],_pos[3],_pos[2],_pos[3])
         config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
+        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
     else:
         # pieceLogger(_pos)
         config.filterRemappingProb = 1.0

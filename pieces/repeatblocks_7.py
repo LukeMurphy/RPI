@@ -729,7 +729,7 @@ def handleChangeCurrentCominationSet():
 
         _listOfIndecies = list(range(len(config.combinationSets)))
 
-        pieceLogger(f"_listOfIndecies =   {_listOfIndecies}")
+        # pieceLogger(f"_listOfIndecies =   {_listOfIndecies}")
         config.currentCombinationsetIndex = random.choice(_listOfIndecies)
 
         # {config.combinationSets[config.currentCombinationsetIndex]}

@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.holder_director import Holder
 from modules.holder_director import Director
 
-
 """
 config.percentage will be the global config variable for display of progress
 
@@ -20,12 +19,13 @@ def reDraw():
     """""" """""" """""" """ BOX AND BAR """ """""" """""" """""" """""" """"""
     drawBar()
 
-    """""" """""" """""" """ SPINNER """ """""" """""" """""" """""" """"""
-    if config.paused == True or config.percentage <= 1:
-        drawSpinner()
 
     """""" """""" """""" """ TEXT MESSAGE """ """""" """""" """""" """"""
     drawMessageText()
+
+    """""" """""" """""" """ SPINNER """ """""" """""" """""" """""" """"""
+    if config.paused == True or config.percentage <= 1:
+        drawSpinner()
 
 
 def drawMessageText():
@@ -40,7 +40,8 @@ def drawMessageText():
         config.messageString = config.altStringMessage
 
     # Draw the message percentage
-    indent = 4
+    indent = config.indent
+    yindent = config.yindent
     scrollImage = Image.new("RGBA", (config.pixLen[0] + 2 * indent, config.fontHeight + 2 * indent))
     txtdraw = ImageDraw.Draw(scrollImage)
     messageString = config.messageString
@@ -57,11 +58,11 @@ def drawMessageText():
         txtdraw.text((indent + i, -i), messageString, shadowColor, font=font)
         txtdraw.text((indent + i, 0), messageString, shadowColor, font=font)
         txtdraw.text((indent + i, +i), messageString, shadowColor, font=font)
-    txtdraw.text((indent, 0), messageString, config.messageClr, font=font)
+    txtdraw.text((indent, yindent), messageString, config.messageClr, font=font)
 
     # Draw a box around message display
     # numXPos = int(xPos2 - 40)
-    config.draw.text((0,0),text=messageString, font=font)
+    config.draw.text((indent, yindent), text=messageString, font=font)
     config.pixLen = [1200, 100]
     if messageString != config.altStringMessage:
         numXPos = config.boxMax - config.pixLen[0] - 8
@@ -82,6 +83,8 @@ def drawSpinner():
     if config.spinnerAngle > 2 * math.pi:
         config.spinnerAngle = 0
     config.cwidth = (config.spinnerRadius - config.spinnerInnerRadius) + 4
+
+    config.spinnerCenter = [int(config.canvasWidth - 4 * config.spinnerRadius),int(config.boxHeight/2 )]
 
     for n in range(0, 0):
         r = config.spinnerRadius - n + 2
@@ -104,7 +107,8 @@ def drawSpinner():
         b = float(s) / float(config.spinnerAngleSteps)
         fillColor = (round(b * 250), round(b * 200), 0, 200)
         # if (b <=.01) : fillColor = barColor
-        config.draw.line((sX0, sY0, sX, sY), fill=fillColor)
+        if s % config.spinnerMarkSteps == 0 :
+            config.draw.line((sX0, sY0, sX, sY), fill=fillColor, width=config.spinnerLineWidth)
 
 
 def drawBar():
@@ -119,6 +123,7 @@ def drawBar():
     rVd = round(config.barColor[0] * 0.1)
     gVd = round(config.barColor[1] * 0.1)
     bVd = round(config.barColor[2] * 0.1)
+
     config.draw.rectangle(
         (
             config.xPos - 1,
@@ -144,9 +149,11 @@ def drawBar():
     config.draw.rectangle((0, config.yPos1, 1, config.yPos2), fill=(0, 0, 0))
 
     # draw flat box progress bar - default
-    config.draw.rectangle((config.xPos1, config.yPos1, max(config.xPos1,config.xPos2), max(config.yPos2,config.yPos1)), fill=(config.barColor[0], config.barColor[1], config.barColor[2]))
+    # config.draw.rectangle(
+    #     (config.xPos1, config.yPos1, max(config.xPos1, config.xPos2), max(config.yPos2, config.yPos1)), fill=(config.barColor[0], config.barColor[1], config.barColor[2])
+    # )
 
-    lines = config.canvasHeight
+    lines = config.boxHeight
     if config.gradientLevel == 1:
         arc = math.pi / lines * 1
     else:
@@ -457,6 +464,8 @@ def main(run=True):
     config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.draw = ImageDraw.Draw(config.image)
     config.fontSize = int(workConfig.get("progressbar", "fontSize"))
+    config.indent = int(workConfig.get("progressbar", "indent", fallback=0))
+    config.yindent = int(workConfig.get("progressbar", "yindent", fallback=0))
     config.vOffset = int(workConfig.get("progressbar", "vOffset"))
     config.steps = int(workConfig.get("progressbar", "steps"))
     config.redrawRate = float(workConfig.get("progressbar", "redrawRate"))
@@ -471,27 +480,37 @@ def main(run=True):
     config.useHorizontalColorGradient = workConfig.getboolean("progressbar", "useHorizontalColorGradient")
     config.boxMax = config.screenWidth - 2
     config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
-    config.boxHeight = config.canvasHeight - 3
+    # config.boxHeight = config.canvasHeight - 3
+    config.boxHeight = int(workConfig.get("progressbar", "progressbarHeight", fallback=(config.canvasHeight - 3)))
     config.pausePoint = round(random.random() * 100)
     config.cyclicalArc = 4 * math.pi / config.boxMax
     config.cyclicalBrightnessPhase = 0
-    config.spinnerCenter = [config.boxMax - 54, config.canvasHeight / 2 + 1]
 
-    config.pauseProbability = float(workConfig.get("progressbar", "pauseProbability")) / 100
-    config.goBackwardsProb = float(workConfig.get("progressbar", "goBackwardsProb")) / 100
-    config.changeRateProbability = float(workConfig.get("progressbar", "changeRateProbability")) / 100
-    config.goPastProb = float(workConfig.get("progressbar", "goPastProb")) / 100
+
+
+    config.pauseProbability = float(workConfig.get("progressbar", "pauseProbability")) 
+    config.goBackwardsProb = float(workConfig.get("progressbar", "goBackwardsProb")) 
+    config.changeRateProbability = float(workConfig.get("progressbar", "changeRateProbability")) 
+    config.goPastProb = float(workConfig.get("progressbar", "goPastProb")) 
 
     # chance that a message shows instead of %
-    config.messageOverrideProbability = float(workConfig.get("progressbar", "messageOverrideProbability")) / 100
+    config.messageOverrideProbability = float(workConfig.get("progressbar", "messageOverrideProbability")) 
     # chance different message is shown, when shown
-    config.overrideMessagProb = float(workConfig.get("progressbar", "overrideMessagProb")) / 100
-    config.noBarProb = float(workConfig.get("progressbar", "noBarProb")) / 100
-    config.noDoneProb = float(workConfig.get("progressbar", "noDoneProb")) / 100
+    config.overrideMessagProb = float(workConfig.get("progressbar", "overrideMessagProb")) 
+    config.noBarProb = float(workConfig.get("progressbar", "noBarProb")) 
+    config.noDoneProb = float(workConfig.get("progressbar", "noDoneProb")) 
 
+
+    config.spinnerAngleSteps = int(workConfig.get("progressbar", "spinnerAngleSteps", fallback=16))
+    config.spinnerRadius = int(workConfig.get("progressbar", "spinnerRadius", fallback=12))
+    config.spinnerInnerRadius = int(workConfig.get("progressbar", "spinnerInnerRadius", fallback=8))
+    config.spinnerLineWidth = int(workConfig.get("progressbar", "spinnerLineWidth", fallback=1))
+    config.spinnerMarkSteps = int(workConfig.get("progressbar", "spinnerMarkSteps", fallback=2))
+
+    config.spinnerCenter = [config.boxMax - 54, config.boxHeight / 2 + 1]
     try:
         config.filterRemapping = workConfig.getboolean("progressbar", "filterRemapping")
-        config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb")) / 100
+        config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb")) 
         config.filterRemapminHoriSize = int(workConfig.get("progressbar", "filterRemapminHoriSize"))
         config.filterRemapminVertSize = int(workConfig.get("progressbar", "filterRemapminVertSize"))
     except Exception as e:
@@ -542,9 +561,6 @@ def init():
     config.shadowColor = (0, 0, 0)
 
     config.spinnerAngle = 0
-    config.spinnerAngleSteps = 16
-    config.spinnerRadius = 9
-    config.spinnerInnerRadius = 7
 
     config.altStringMessage = "PLEASE WAIT"
     colorutils.brightness = 1

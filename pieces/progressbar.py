@@ -14,6 +14,33 @@ config.percentage will be the global config variable for display of progress
 """
 
 
+class Holder:
+    def __init__(self, config):
+        self.config = config
+
+
+# ----------------------------------------------------##----------------------------------------------------#
+class Director:
+    """docstring for Director"""
+
+    animaRate = 0.5
+
+    def __init__(self, config):
+        super(Director, self).__init__()
+        self.config = config
+        self.tT = time.time()
+
+    def checkTime(self):
+        if (time.time() - self.tT) >= self.animaRate:
+            self.tT = time.time()
+            self.advance = True
+        else:
+            self.advance = False
+
+    def next(self):
+        self.checkTime()
+
+
 def reDraw():
 
     """""" """""" """""" """ BOX AND BAR """ """""" """""" """""" """""" """"""
@@ -32,36 +59,40 @@ def drawMessageText():
 
     # Set the message to be the % completed
     config.displayPercentage = int(math.floor(config.percentage))
+    pre = ""
+    if config.displayPercentage > 0 and config.displayPercentage <= 9:
+        pre = ""
     if config.messageOverrideActive != True and config.firstRun != True:
-        config.messageString = str(config.displayPercentage) + "%"
+        config.messageString = f"{pre}{config.displayPercentage}%"
 
     if config.messageOverrideActive == True:
-        config.messageString = config.altStringMessage
+        config.messageString = f"{pre}{config.displayPercentage}% {config.altStringMessage}"
 
     # Draw the message percentage
     indent = config.indent
     yindent = config.yindent
     scrollImage = Image.new("RGBA", (config.pixLen[0] + 2 * indent, config.fontHeight + 2 * indent))
     txtdraw = ImageDraw.Draw(scrollImage)
+    txtdraw = config.draw
     messageString = config.messageString
     font = config.font
     shadowColor = config.shadowColor
 
     for i in range(1, config.shadowSize):
-        txtdraw.text((indent - i, -i), messageString, shadowColor, font=font)
-        txtdraw.text((indent - i, 0), messageString, shadowColor, font=font)
-        txtdraw.text((indent - i, +i), messageString, shadowColor, font=font)
-        txtdraw.text((indent + 0, -i), messageString, shadowColor, font=font)
-        txtdraw.text((indent + 0, 0), messageString, shadowColor, font=font)
-        txtdraw.text((indent + 0, +i), messageString, shadowColor, font=font)
-        txtdraw.text((indent + i, -i), messageString, shadowColor, font=font)
-        txtdraw.text((indent + i, 0), messageString, shadowColor, font=font)
-        txtdraw.text((indent + i, +i), messageString, shadowColor, font=font)
-    txtdraw.text((indent, yindent), messageString, config.messageClr, font=font)
+        txtdraw.text((indent - i, yindent - i), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent - i, yindent), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent - i, yindent + i), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent + 0, yindent - i), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent + 0, yindent), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent + 0, yindent + i), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent + i, yindent - i), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent + i, yindent), text=messageString, fill=shadowColor, font=font)
+        txtdraw.text((indent + i, yindent + i), text=messageString, fill=shadowColor, font=font)
 
     # Draw a box around message display
     # numXPos = int(xPos2 - 40)
-    config.draw.text((indent, yindent), text=messageString, font=font)
+    config.draw.text((indent, yindent), fill=config.messageClr, text=messageString, font=font)
+
     config.pixLen = [1200, 100]
     if messageString != config.altStringMessage:
         numXPos = config.boxMax - config.pixLen[0] - 8
@@ -203,71 +234,119 @@ def drawBar():
 
 
 #####################################################
+def changeAltMessage():
+    msgIndex = random.choice(config.messageStrings)
+    config.altStringMessage = msgIndex
 
 
 def decisions():
     global config
 
-    # pieceLogger(f"{config.target}")
+    # if random.random() > 0.94:
+    #     config.messageOverrideActive = False
 
-    if config.percentage >= config.target and config.firstRun != True and config.completed != True and config.goPast != True:
-        config.t2 = time.time()
-        timeToComplete = config.t2 - config.t1
-        # config.percentageIncrement = (0.1 + 5 * random.random()) * config.calibratedCycleRate
-        config.completed = True
-        # config.messageOverrideActive = False
-        if config.debug:
-            pieceLogger("Completed progress as far as ")
+    if config.percentage <= 1:
+        config.messageClr = (255, 0, 0, 100)
+
+    if config.percentage > 2:
+        config.messageClr = config.messageClrBase
+
+    if config.percentage >= config.target:
+        config.messageClr = (255, 10, 0, 100)
+
+    if config.percentage >= config.pausePoint:
+        config.messageClr = (255, 100, 0, 100)
+
+    if random.random() < config.noBarProb * config.processorFactor:
+        config.drawBarFill = False
+        pieceLogger("No bar fill called")
+
+    if config.percentage >= config.target and not config.completed and not config.goPast and not config.hasGoneBack:
+        # config.completed = True
+        pieceLogger(f"Completed progress as far as {config.target} completed: {config.completed}")
+        config.percentageIncrement *= -2
+        config.hasGoneBack = True
+        config.messageOverrideActive = True
+        config.negativePercentageDone = 0
         startPause(random.uniform(2, 7))
 
-    if config.goPast == True and config.percentage > 150:
-        if random.random() < 0.01:
-            config.completed = True
-            if config.debug:
+    if config.goPast:
+        if config.percentage > 150:
+            if random.random() < 0.01:
+                config.completed = True
                 pieceLogger("Completed beyond ")
 
-    if config.goPast == True and config.percentage < 100 and config.percentage > 50:
-        if random.random() < 0.1:
-            changeRate(3, 8)
-        # startPause(random.uniform(1,12))
+        if config.percentage < 100 and config.percentage > 50:
+            if random.random() < 0.1:
+                changeRate()
 
-    # pieceLogger(f"{config.pausePoint}")
-    if config.paused == False and config.firstRun == False and config.percentage >= config.pausePoint:
+    # to catch the negative
+    if config.percentage <= config.negativePercentageDone and config.percentageIncrement < 0:
+        config.complete = True
+        pieceLogger("Completed")
+        config.messageOverrideActive = True
+        startPause(random.uniform(2, 7))
+        done()
 
+    # to catch the overage
+    if config.percentage > 107 and config.percentageIncrement > 0:
+        config.complete = True
+        pieceLogger("Completed")
+        config.messageOverrideActive = True
+        startPause(random.uniform(2, 7))
+        done()
 
-        if random.random() < (config.pauseProbability * config.calibratedCycleRate) and config.firstRun == False :
+    if not config.paused and config.percentage >= config.pausePoint:
+
+        if random.random() < (config.pauseProbability * config.calibratedCycleRate):
+            pieceLogger("pause called")
             startPause(random.uniform(2, 7))
-            config.messageOverrideActive = True
+            if random.random() > 0.5:
+                config.messageOverrideActive = True
+            else:
+                config.messageOverrideActive = False
 
-        if random.random() < config.changeRateProbability * config.calibratedCycleRate or config.percentage < 0:
+        # config.messageOverrideActive = True
+        # config.completed = True
+
+        if random.random() < config.changeRateProbability * config.calibratedCycleRate:
+            # sometimes even the messaging breaks..
+            # if(random.random() > .1) : config.messageOverrideActive = False
+            # generally crawls out....
+            pieceLogger("Slow rate")
+            changeRate(0.01, 0.03)
+
+        if random.random() < config.changeRateProbability * config.calibratedCycleRate:
             if config.percentage < 0:
-                if config.debug:
-                    pieceLogger("pause on back")
+                pieceLogger("pause on back")
+                if config.percentage <= config.negativePercentageDone:
+                    done()
                 changeRate()
                 startPause(random.uniform(2, 7))
             else:
                 changeRate()
-            # don't need to multiply the prob by the calibrated cycle rate as it "inherits" probablity
-            # from above
-            if random.random() < config.goBackwardsProb and config.hasGoneBack == False:
-                # config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
-                if config.debug:
-                    pieceLogger("Going back")
-                changeRate()
-                config.percentageIncrement *= -1
-                config.hasGoneBack = True
+
+        if random.random() < config.goBackwardsProb * config.calibratedCycleRate and not config.hasGoneBack:
+            # config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
+            pieceLogger("Going back")
+            changeRate()
+            config.percentageIncrement *= -1
+            config.hasGoneBack = True
+            if random.random() > 0.5:
                 config.messageOverrideActive = True
+            else:
+                config.messageOverrideActive = False
 
         if random.random() < config.noDoneProb * config.calibratedCycleRate:
-            if config.debug:
-                pieceLogger("Done Early")
-            config.altStringMessage = "RESTARTING"
-            config.completed = True
+            pieceLogger("Done Early")
+            config.altStringMessage = "PAUSING"
+            config.completed = False
+            config.percentageIncrement *= -1
+            config.hasGoneBack = True
             startPause(random.uniform(2, 7))
 
-        elif config.completed == True:
-            if config.debug:
-                pieceLogger("Completed")
+        elif config.completed:
+            pieceLogger("Completed")
             done()
 
 
@@ -276,36 +355,18 @@ def checkPause():
         config.pauseTime2 = time.time()
         tD = config.pauseTime2 - config.pauseTime1
 
-        if random.random() > 0.01:
-            config.messageOverrideActive = True
-        else:
-            config.messageOverrideActive = False
-
-        config.messageOverrideActive = True
-
-        # if(config.completed and random.random() < 0) :
-        #     config.messageOverrideActive = False
-
         if tD >= config.timeToPause:
-            if config.completed == True:
-                done()
-            else:
-                config.paused = False
-                config.hasPaused = True
-                # sometimes even the mesaging breaks..
-                # if(random.random() > .1) : config.messageOverrideActive = False
-                # generally crawls out....
-                changeRate(0.01, 0.03)
+            config.paused = False
+            config.hasPaused = True
+            config.messageOverrideActive = False
+            changeAltMessage()
 
 
 def startPause(timeToPause):
-    if (config.pauseCount < config.pauses and config.paused == False) or (config.completed == True):
-        if config.debug and config.completed == True:
-            pieceLogger(f"pausing... for: {timeToPause} {config.pauseCount} - out of -- {config.pauses}")
-        if config.completed != True:
+    if (config.pauseCount < config.pauses and not config.paused) or (config.completed):
+        if config.completed:
             config.pauseCount += 1
-            if config.debug:
-                pieceLogger(f"pausing... for: {timeToPause} {config.pauseCount} - out of -- {config.pauses}")
+            pieceLogger(f"pausing... for: {timeToPause} {config.pauseCount} - out of -- {config.pauses}")
         config.paused = True
         config.timeToPause = timeToPause
         config.pauseTime1 = time.time()
@@ -326,73 +387,77 @@ def changeRate(a=0, b=0):
     if a == b == 0:
         a = config.rateMin
         b = config.rateMax
-    config.percentageIncrement = max(.01, (random.uniform(a,b)) * config.calibratedCycleRate)
-    if config.debug:
-        pieceLogger(f"RATE changed from: {temp}  to: {config.percentageIncrement} {config.target} using {config.calibratedCycleRate}", 5)
+
+    config.percentageIncrement = max(0.01, (random.uniform(a, b)) * config.processorFactor)
+    pieceLogger(f"RATE changed from: {temp}  to: {config.percentageIncrement} {config.target}", 5)
 
 
 def advanceBar():
     global config
-    if config.paused != True:
+    if not config.paused:
         config.percentage += config.percentageIncrement
-        # make sure the % progress shows back up
-        if random.random() > 0.94:
-            config.messageOverrideActive = False
 
-    if config.percentage <= 1:
-        config.messageClr = (255, 0, 0)
 
-    if config.percentage > 2:
-        config.messageClr = config.messageClrBase
+def done():
+    global config
+    pieceLogger("Done called.\n")
+    config.messageOverrideActive = False
+    config.altStringMessage = "PLEASE WAIT"
+    if random.random() < config.overrideMessagProb:
+        changeAltMessage()
 
-    if config.percentage >= config.target:
-        config.messageClr = (255, 100, 0)
+    # if random.random() < 0.1:
+    #     config.altStringMessage = "PLEASE WAIT - RECALCULATING."
 
-    if random.random() < config.noBarProb * config.calibratedCycleRate:
-        config.drawBarFill = False
+    # if random.random() < 0.1:
+    #     config.altStringMessage = "COMPLETE"
+
+    # if random.random() < 0.1:
+    #     config.altStringMessage = "COMPLETED."
+
+    # if random.random() < config.overrideMessagProb:
+    #     config.altStringMessage = "RESTARTING." if (random.random() > 0.5) else "UPDATING."
+
+    pieceLogger(f"altStringMessage set to: {config.altStringMessage}", 2)
+
+    config.percentage = 0
+    # config.barColorStart = config.barColor = colorutils.getRandomRGB(1)
+    # config.barColorStart = config.barColor = colorutils.randomColor(config.brightness)
+    config.barColorStart = config.barColor = colorutils.getRandomColorHSV(0, 360, 0.5, 1.0, 0.5, 1.0)
+    config.hasPaused = False
+    config.paused == False
+    config.pauseCount = 0
+    config.boxWidth = 1
+    config.completed = False
+    config.drawBarFill = True
+
+    config.goBack = True if (random.random() < config.goBackwardsProb) else False
+    config.goPast = True if (random.random() < config.goPastProb) else False
+    config.hasGoneBack = False
+    if config.goPast:
+        config.goBack = False
+
+    config.negativePercentageDone = random.uniform(5, -100)
+    config.target = random.uniform(89, 99)
+    config.pausePoint = 20 + round(random.random() * 79)
+
+    pieceLogger(
+        f"config.pausePoint = {config.pausePoint} target = {config.target}",
+    )
+
+    changeRate()
 
 
 #####################################################
 
 
-def calibration():
-    """
-    Basic calibration  -- test the speed to try and run 10 percentage points / second with
-    the set delay time per cycle. Find the actual time to complete and set the "processor"
-    factor - i.e. if there were no delays running each cycle then it would be 1. If it's slow
-    it will be > 1.
-
-    """
-    global config
-    config.percentage += config.percentageIncrement
-    config.cycleCount += 1
-    if config.percentage >= 100:
-        config.t2 = time.time()
-        timeToComplete = config.t2 - config.t1
-        ##########
-        timeItShouldHaveTaken = 100 / config.calibrationTest
-        config.processorFactor = timeToComplete / timeItShouldHaveTaken
-        config.calibratedCycleRate = config.redrawRate * config.processorFactor
-
-        config.percentageIncrement = config.calibrationTest / 10 * config.calibratedCycleRate
-        if config.debug:
-            pieceLogger(f"\n=====>  {timeToComplete} {timeItShouldHaveTaken} {config.cycleCount} Processor factor:{config.processorFactor}\n")
-        config.cycleCount = 0
-        config.t1 = time.time()
-        config.t2 = time.time()
-        config.percentage = 0
-        config.firstRun = False
-        done()
-
-        # if(config.debug ) : pieceLogger(config.overrideMessagProb * config.calibratedCycleRate)
-        # exit()
-
-
 def runWork():
     global config
     while True:
-        iterate()
-        time.sleep(config.redrawRate)
+        time.sleep(config.cycleDelay)
+        config.director.checkTime()
+        if config.director.advance:
+            iterate()
 
 
 def iterate():
@@ -402,12 +467,10 @@ def iterate():
         calibration()
     else:
         doSomething()
-
-    # Are we waiting?
-    checkPause()
-
-    # Do we go on, do we make changes?
-    decisions()
+        # Are we waiting?
+        checkPause()
+        # Do we go on, do we make changes?
+        decisions()
 
     # Display bar, spinner, message or %
     reDraw()
@@ -442,7 +505,7 @@ def main(run=True):
     config.yindent = int(workConfig.get("progressbar", "yindent", fallback=0))
     config.vOffset = int(workConfig.get("progressbar", "vOffset"))
     config.steps = int(workConfig.get("progressbar", "steps"))
-    config.redrawRate = float(workConfig.get("progressbar", "redrawRate"))
+
     config.rateMin = float(workConfig.get("progressbar", "rateMin"))
     config.rateMax = float(workConfig.get("progressbar", "rateMax"))
 
@@ -499,17 +562,55 @@ def main(run=True):
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
+    config.outlineColor = (1, 1, 1)
+    config.barColorEnd = (200, 200, 0)
+    config.barColorStart = (0, 200, 200)
+    config.barColor = (10, 10, 100)
+    config.barColorBase = (200, 0, 0)
+    config.holderColor = (0, 0, 0)
+    config.messageClr = (255, 255, 255, 100)
+    config.messageClrBase = (255, 255, 255, 100)
+    config.shadowColor = (0, 0, 0, 100)
+
+    config.spinnerAngle = 0
+    config.messageStrings = [
+        "PLEASE WAIT",
+        "PLEASE WAIT",
+        "RECALCULATING.",
+        "COMPLETE",
+        "COMPLETED.",
+        "RESTARTING",
+        "PAUSED",
+        "UDATING",
+        "LOAD WARNING",
+        "ERROR 49",
+    ]
+    config.altStringMessage = "PLEASE WAIT"
+    colorutils.brightness = 1
+    config.gradientLevel = 1
+
+    config.xPos = 1
+    config.yPos = 1
+    config.percentage = 0
+    config.pauses = 3
+
+    config.cycleDelay = float(workConfig.get("progressbar", "cycleDelay", fallback=0.01))
+    config.animaRate = float(workConfig.get("progressbar", "animaRate", fallback=0.02))
+    config.director = Director(config)
+    config.director.animaRate = config.animaRate
+
     init()
 
     config.processorFactor = 1
+    config.calibrationCyclesPerSecond = 1 / config.animaRate
 
     if config.firstRun:
-        config.percentageIncrement = config.calibrationTest * config.redrawRate * config.processorFactor
+        config.percentageIncrement = 1.0
         config.cycleCount = 0
         config.t1 = time.time()
         config.t2 = time.time()
-        if config.debug:
-            pieceLogger("=====>  ", config.percentageIncrement)
+
+        pieceLogger(f"=====>   {config.percentageIncrement} config.calibrationCyclesPerSecond : {config.calibrationCyclesPerSecond }")
         config.messageString = "CALIBRATING"
 
     if run:
@@ -518,36 +619,8 @@ def main(run=True):
 
 def init():
     global config
-    if config.debug:
-        pieceLogger("init Progress Bar")
+    pieceLogger("init Progress Bar")
 
-    config.outlineColor = (1, 1, 1)
-    config.barColorEnd = (200, 200, 0)
-    config.barColorStart = (0, 200, 200)
-    config.barColor = (10, 10, 100)
-    config.barColorBase = (200, 0, 0)
-    config.holderColor = (0, 0, 0)
-    config.messageClr = (200, 0, 0)
-    config.messageClrBase = (51, 196, 127)
-    config.shadowColor = (0, 0, 0)
-
-    config.spinnerAngle = 0
-
-    config.altStringMessage = "PLEASE WAIT"
-    colorutils.brightness = 1
-    config.gradientLevel = 1
-
-    config.xPos = 1
-    config.yPos = 1
-    config.status = 0
-
-    config.percentage = 0
-    config.target = 99
-
-    config.minSleep = 10
-    config.maxSleep = 12
-
-    config.pauses = 3
     config.pauseCount = 0
     config.firstRun = True
     config.completed = False
@@ -561,8 +634,7 @@ def init():
     config.messageOverride = True
     config.messageOverrideActive = False
     config.lastPause = False
-
-    config.calibrationTest = 50
+    config.negativePercentageDone = -3
 
     if config.sansSerif:
         config.font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
@@ -581,51 +653,41 @@ def init():
     config.txtdraw = ImageDraw.Draw(scrollImage)
 
 
-def done():
+"""
+Basic calibration  -- test the speed to try and run 20 percentage points / 2 seconds with
+the set delay time per cycle. Find the actual time to complete and set the "processor"
+factor - i.e. if there were no delays running each cycle then it would be 1. If it's slow
+it will be > 1.
+
+"""
+
+
+def calibration():
     global config
+    config.percentage += config.percentageIncrement
+    config.cycleCount += 1
+    # pieceLogger(f"{config.percentage} {config.calibrationCyclesPerSecond} {config.cycleDelay * config.calibrationCyclesPerSecond}")
+    if config.percentage >= 100:
+        config.t2 = time.time()
+        timeToComplete = config.t2 - config.t1
+        timeItShouldHaveTaken = (100 / config.percentageIncrement) * config.animaRate
+        config.processorFactor = timeToComplete / timeItShouldHaveTaken
+        config.calibratedCycleRate = config.cycleDelay * config.processorFactor
 
-    if config.debug:
-        pieceLogger("Done called.\n")
-    config.messageOverrideActive = False
-    config.altStringMessage = "PLEASE WAIT"
+        # config.calibratedCycleRate = 1.0
+        # config.percentageIncrement = config.calibrationCyclesPerSecond / 10 * config.calibratedCycleRate
 
-    if random.random() < 0.1:
-        config.altStringMessage = "PLEASE WAIT - RECALCULATING."
+        pieceLogger(f"\n=====>  timeToComplete:{timeToComplete} timeItShouldHaveTaken:{timeItShouldHaveTaken}")
+        pieceLogger(f"=====>  cycleCount:{config.cycleCount} Processor factor:{config.processorFactor}\n")
+        config.cycleCount = 0
+        config.t1 = time.time()
+        config.t2 = time.time()
+        config.percentage = 0
+        config.firstRun = False
+        done()
 
-    if random.random() < 0.1:
-        config.altStringMessage = "COMPLETE"
-
-    if random.random() < 0.1:
-        config.altStringMessage = "COMPLETED."
-
-    if random.random() < config.overrideMessagProb:
-        config.altStringMessage = "RESTARTING." if (random.random() > 0.5) else "UPDATING."
-
-    if config.debug:
-        pieceLogger(f"altStringMessage set to: {config.altStringMessage}",2)
-
-    config.percentage = 0
-    # config.barColorStart = config.barColor = colorutils.getRandomRGB(1)
-    config.barColorStart = config.barColor = colorutils.randomColor(config.brightness)
-    config.barColorStart = config.barColor = colorutils.getRandomColorHSV(0, 360, 0.5, 1.0, 0.5, 1.0)
-    config.hasPaused = False
-    config.paused == False
-    config.pauseCount = 0
-    config.boxWidth = 1
-    config.completed = False
-    config.drawBarFill = True
-    config.target = random.uniform(89, 99)
-
-    config.goBack = True if (random.random() < config.goBackwardsProb) else False
-    config.goPast = True if (random.random() < config.goPastProb) else False
-    config.hasGoneBack = False
-    if config.goPast:
-        config.goBack = False
-    config.pausePoint = 20 + round(random.random() * 79)
-
-    pieceLogger(f"config.pausePoint = {config.pausePoint}",)
-
-    changeRate()
+        # if(config.debug ) : pieceLogger(config.overrideMessagProb * config.calibratedCycleRate)
+        # exit()
 
 
 def callBack():

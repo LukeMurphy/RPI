@@ -2,7 +2,7 @@ import math
 import random
 import threading
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.holder_director import Holder
@@ -18,7 +18,6 @@ def reDraw():
 
     """""" """""" """""" """ BOX AND BAR """ """""" """""" """""" """""" """"""
     drawBar()
-
 
     """""" """""" """""" """ TEXT MESSAGE """ """""" """""" """""" """"""
     drawMessageText()
@@ -84,7 +83,7 @@ def drawSpinner():
         config.spinnerAngle = 0
     config.cwidth = (config.spinnerRadius - config.spinnerInnerRadius) + 4
 
-    config.spinnerCenter = [int(config.canvasWidth - 4 * config.spinnerRadius),int(config.boxHeight/2 )]
+    config.spinnerCenter = [int(config.canvasWidth - 4 * config.spinnerRadius), int(config.boxHeight / 2)]
 
     for n in range(0, 0):
         r = config.spinnerRadius - n + 2
@@ -107,7 +106,7 @@ def drawSpinner():
         b = float(s) / float(config.spinnerAngleSteps)
         fillColor = (round(b * 250), round(b * 200), 0, 200)
         # if (b <=.01) : fillColor = barColor
-        if s % config.spinnerMarkSteps == 0 :
+        if s % config.spinnerMarkSteps == 0:
             config.draw.line((sX0, sY0, sX, sY), fill=fillColor, width=config.spinnerLineWidth)
 
 
@@ -170,7 +169,7 @@ def drawBar():
             gVd = round(config.barColor[1] * b)
             bVd = round(config.barColor[2] * b)
             barColorDisplay = (rVd, gVd, bVd)
-            config.draw.rectangle((config.xPos1, yPos, config.xPos2, yPos), fill=(barColorDisplay))
+            config.draw.rectangle((config.xPos1, yPos, max(config.xPos2, config.xPos1), yPos), fill=(barColorDisplay))
 
     elif config.useHorizontalColorGradient:
         # Draw horizontal color gradient bar
@@ -209,6 +208,8 @@ def drawBar():
 def decisions():
     global config
 
+    # pieceLogger(f"{config.target}")
+
     if config.percentage >= config.target and config.firstRun != True and config.completed != True and config.goPast != True:
         config.t2 = time.time()
         timeToComplete = config.t2 - config.t1
@@ -216,35 +217,34 @@ def decisions():
         config.completed = True
         # config.messageOverrideActive = False
         if config.debug:
-            print("Completed progress as far as ")
-        startPause(random.uniform(1, 12))
+            pieceLogger("Completed progress as far as ")
+        startPause(random.uniform(2, 7))
 
     if config.goPast == True and config.percentage > 150:
         if random.random() < 0.01:
             config.completed = True
             if config.debug:
-                print("Completed beyond ")
+                pieceLogger("Completed beyond ")
 
     if config.goPast == True and config.percentage < 100 and config.percentage > 50:
         if random.random() < 0.1:
             changeRate(3, 8)
         # startPause(random.uniform(1,12))
 
-    if config.paused == False and config.firstRun == False:
+    # pieceLogger(f"{config.pausePoint}")
+    if config.paused == False and config.firstRun == False and config.percentage >= config.pausePoint:
 
-        if random.random() < (config.pauseProbability * config.calibratedCycleRate) and config.firstRun == False and config.percentage >= config.pausePoint:
-            startPause(random.uniform(1.0, 5.0))
+
+        if random.random() < (config.pauseProbability * config.calibratedCycleRate) and config.firstRun == False :
+            startPause(random.uniform(2, 7))
             config.messageOverrideActive = True
 
         if random.random() < config.changeRateProbability * config.calibratedCycleRate or config.percentage < 0:
-            if config.debug:
-                print("Changing rate...")
-
             if config.percentage < 0:
                 if config.debug:
-                    print("pause on back")
+                    pieceLogger("pause on back")
                 changeRate()
-                startPause(random.uniform(2.0, 8.0))
+                startPause(random.uniform(2, 7))
             else:
                 changeRate()
             # don't need to multiply the prob by the calibrated cycle rate as it "inherits" probablity
@@ -252,7 +252,7 @@ def decisions():
             if random.random() < config.goBackwardsProb and config.hasGoneBack == False:
                 # config.percentageIncrement = -(1 + 2 * random.random()) * config.calibratedCycleRate
                 if config.debug:
-                    print("Going back")
+                    pieceLogger("Going back")
                 changeRate()
                 config.percentageIncrement *= -1
                 config.hasGoneBack = True
@@ -260,14 +260,14 @@ def decisions():
 
         if random.random() < config.noDoneProb * config.calibratedCycleRate:
             if config.debug:
-                print("Done Early")
+                pieceLogger("Done Early")
             config.altStringMessage = "RESTARTING"
             config.completed = True
-            startPause(random.uniform(5.0, 5.0))
+            startPause(random.uniform(2, 7))
 
         elif config.completed == True:
             if config.debug:
-                print("Completed")
+                pieceLogger("Completed")
             done()
 
 
@@ -301,23 +301,11 @@ def checkPause():
 def startPause(timeToPause):
     if (config.pauseCount < config.pauses and config.paused == False) or (config.completed == True):
         if config.debug and config.completed == True:
-            print(
-                "pausing... for:",
-                timeToPause,
-                config.pauseCount,
-                "- out of -- ",
-                config.pauses,
-            )
+            pieceLogger(f"pausing... for: {timeToPause} {config.pauseCount} - out of -- {config.pauses}")
         if config.completed != True:
             config.pauseCount += 1
             if config.debug:
-                print(
-                    "pausing... for:",
-                    timeToPause,
-                    config.pauseCount,
-                    "- out of -- ",
-                    config.pauses,
-                )
+                pieceLogger(f"pausing... for: {timeToPause} {config.pauseCount} - out of -- {config.pauses}")
         config.paused = True
         config.timeToPause = timeToPause
         config.pauseTime1 = time.time()
@@ -338,15 +326,9 @@ def changeRate(a=0, b=0):
     if a == b == 0:
         a = config.rateMin
         b = config.rateMax
-    config.percentageIncrement = (a + b * random.random()) * config.calibratedCycleRate
+    config.percentageIncrement = max(.01, (random.uniform(a,b)) * config.calibratedCycleRate)
     if config.debug:
-        print(
-            "RATE changed from: ",
-            temp,
-            " to: ",
-            config.percentageIncrement,
-            config.target,
-        )
+        pieceLogger(f"RATE changed from: {temp}  to: {config.percentageIncrement} {config.target} using {config.calibratedCycleRate}", 5)
 
 
 def advanceBar():
@@ -394,15 +376,7 @@ def calibration():
 
         config.percentageIncrement = config.calibrationTest / 10 * config.calibratedCycleRate
         if config.debug:
-            print(
-                "\n=====>  ",
-                timeToComplete,
-                timeItShouldHaveTaken,
-                config.cycleCount,
-                "Processor factor:",
-                config.processorFactor,
-                "\n",
-            )
+            pieceLogger(f"\n=====>  {timeToComplete} {timeItShouldHaveTaken} {config.cycleCount} Processor factor:{config.processorFactor}\n")
         config.cycleCount = 0
         config.t1 = time.time()
         config.t2 = time.time()
@@ -410,7 +384,7 @@ def calibration():
         config.firstRun = False
         done()
 
-        # if(config.debug ) : print(config.overrideMessagProb * config.calibratedCycleRate)
+        # if(config.debug ) : pieceLogger(config.overrideMessagProb * config.calibratedCycleRate)
         # exit()
 
 
@@ -447,7 +421,7 @@ def iterate():
             endY = round(random.uniform(8, config.filterRemapminVertSize))
             config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
             config.remapImageBlockDestination = [startX, startY]
-            # print("swapping" + str(config.remapImageBlockSection))
+            # pieceLogger("swapping" + str(config.remapImageBlockSection))
 
     # Do the final rendering of the composited image
     config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -482,24 +456,21 @@ def main(run=True):
     config.boxMaxAlt = config.boxMax + int(random.uniform(10, 30) * config.screenWidth)
     # config.boxHeight = config.canvasHeight - 3
     config.boxHeight = int(workConfig.get("progressbar", "progressbarHeight", fallback=(config.canvasHeight - 3)))
-    config.pausePoint = round(random.random() * 100)
+    config.pausePoint = round(random.random() * 99)
     config.cyclicalArc = 4 * math.pi / config.boxMax
     config.cyclicalBrightnessPhase = 0
 
-
-
-    config.pauseProbability = float(workConfig.get("progressbar", "pauseProbability")) 
-    config.goBackwardsProb = float(workConfig.get("progressbar", "goBackwardsProb")) 
-    config.changeRateProbability = float(workConfig.get("progressbar", "changeRateProbability")) 
-    config.goPastProb = float(workConfig.get("progressbar", "goPastProb")) 
+    config.pauseProbability = float(workConfig.get("progressbar", "pauseProbability"))
+    config.goBackwardsProb = float(workConfig.get("progressbar", "goBackwardsProb"))
+    config.changeRateProbability = float(workConfig.get("progressbar", "changeRateProbability"))
+    config.goPastProb = float(workConfig.get("progressbar", "goPastProb"))
 
     # chance that a message shows instead of %
-    config.messageOverrideProbability = float(workConfig.get("progressbar", "messageOverrideProbability")) 
+    config.messageOverrideProbability = float(workConfig.get("progressbar", "messageOverrideProbability"))
     # chance different message is shown, when shown
-    config.overrideMessagProb = float(workConfig.get("progressbar", "overrideMessagProb")) 
-    config.noBarProb = float(workConfig.get("progressbar", "noBarProb")) 
-    config.noDoneProb = float(workConfig.get("progressbar", "noDoneProb")) 
-
+    config.overrideMessagProb = float(workConfig.get("progressbar", "overrideMessagProb"))
+    config.noBarProb = float(workConfig.get("progressbar", "noBarProb"))
+    config.noDoneProb = float(workConfig.get("progressbar", "noDoneProb"))
 
     config.spinnerAngleSteps = int(workConfig.get("progressbar", "spinnerAngleSteps", fallback=16))
     config.spinnerRadius = int(workConfig.get("progressbar", "spinnerRadius", fallback=12))
@@ -510,11 +481,11 @@ def main(run=True):
     config.spinnerCenter = [config.boxMax - 54, config.boxHeight / 2 + 1]
     try:
         config.filterRemapping = workConfig.getboolean("progressbar", "filterRemapping")
-        config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb")) 
+        config.filterRemappingProb = float(workConfig.get("progressbar", "filterRemappingProb"))
         config.filterRemapminHoriSize = int(workConfig.get("progressbar", "filterRemapminHoriSize"))
         config.filterRemapminVertSize = int(workConfig.get("progressbar", "filterRemapminVertSize"))
     except Exception as e:
-        print(str(e))
+        pieceLogger(str(e))
         config.filterRemapping = False
         config.filterRemappingProb = 0.0
         config.filterRemapminHoriSize = 24
@@ -524,7 +495,7 @@ def main(run=True):
         config.filterRemapRangeX = int(workConfig.get("progressbar", "filterRemapRangeX"))
         config.filterRemapRangeY = int(workConfig.get("progressbar", "filterRemapRangeY"))
     except Exception as e:
-        print(str(e))
+        pieceLogger(str(e))
         config.filterRemapRangeX = config.canvasWidth
         config.filterRemapRangeY = config.canvasHeight
 
@@ -538,7 +509,7 @@ def main(run=True):
         config.t1 = time.time()
         config.t2 = time.time()
         if config.debug:
-            print("=====>  ", config.percentageIncrement)
+            pieceLogger("=====>  ", config.percentageIncrement)
         config.messageString = "CALIBRATING"
 
     if run:
@@ -548,7 +519,7 @@ def main(run=True):
 def init():
     global config
     if config.debug:
-        print("init Progress Bar")
+        pieceLogger("init Progress Bar")
 
     config.outlineColor = (1, 1, 1)
     config.barColorEnd = (200, 200, 0)
@@ -614,17 +585,24 @@ def done():
     global config
 
     if config.debug:
-        print("Done called.\n")
+        pieceLogger("Done called.\n")
     config.messageOverrideActive = False
     config.altStringMessage = "PLEASE WAIT"
+
     if random.random() < 0.1:
-        config.altStringMessage = "PLEASE WAIT - RECALCULATING"
+        config.altStringMessage = "PLEASE WAIT - RECALCULATING."
+
+    if random.random() < 0.1:
+        config.altStringMessage = "COMPLETE"
+
+    if random.random() < 0.1:
+        config.altStringMessage = "COMPLETED."
 
     if random.random() < config.overrideMessagProb:
-        config.altStringMessage = "RESTARTING..." if (random.random() > 0.5) else "UPDATING"
+        config.altStringMessage = "RESTARTING." if (random.random() > 0.5) else "UPDATING."
 
     if config.debug:
-        print(config.altStringMessage)
+        pieceLogger(f"altStringMessage set to: {config.altStringMessage}",2)
 
     config.percentage = 0
     # config.barColorStart = config.barColor = colorutils.getRandomRGB(1)
@@ -636,14 +614,17 @@ def done():
     config.boxWidth = 1
     config.completed = False
     config.drawBarFill = True
-    config.target = random.uniform(85, 99)
+    config.target = random.uniform(89, 99)
 
     config.goBack = True if (random.random() < config.goBackwardsProb) else False
     config.goPast = True if (random.random() < config.goPastProb) else False
     config.hasGoneBack = False
     if config.goPast:
         config.goBack = False
-    config.pausePoint = 20 + round(random.random() * 80)
+    config.pausePoint = 20 + round(random.random() * 79)
+
+    pieceLogger(f"config.pausePoint = {config.pausePoint}",)
+
     changeRate()
 
 

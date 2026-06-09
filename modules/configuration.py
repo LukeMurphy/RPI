@@ -28,6 +28,8 @@ def configuration():
 
 def pieceLogger(args, clr=0, showLine=False):
     fstr = bcolors.YELLOWONBLUE
+    if clr == 5:
+        fstr = bcolors.BASIC
     if clr == 4:
         fstr = bcolors.YELLOWONBLUE
     if clr == 3:
@@ -61,6 +63,7 @@ class bcolors:
     # ; 4 undeline
 
     YELLOWONBLUE = "\033[0;94;1;43m"
+    BASIC = "\033[90m"
     OKGREEN = "\033[92m"
     WARNING = "\033[93m"
     FULLFAIL = "\033[91m"

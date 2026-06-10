@@ -887,9 +887,15 @@ def chainLinks(config, paletteObj=None):
         config.blockDraw.line((x0, y0 + 2 * _unitLength, x0, y1 + 3 * _unitLength), fill=outline, width=_wd)
         config.blockDraw.line((x1 - _wd / 2, y0 + 2 * _unitLength, x1 - _wd / 2, y1 + 3 * _unitLength), fill=outline, width=_wd)
 
-        config.blockDraw.rounded_rectangle(
-            (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2, y1 - _unitLength * 1), radius=4, corners=None, fill=(outline), outline=(clr1)
-        )
+        try:
+            config.blockDraw.rounded_rectangle(
+                (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2, y1 - _unitLength * 1), radius=4, corners=None, fill=(outline), outline=(clr1)
+            )
+        except Exception as e:
+            pieceLogger(e)
+            config.blockDraw.rectangle(
+                (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2, y1 - _unitLength * 1), fill=(outline), outline=(clr1)
+            )
 
         # config.blockDraw.arc((x0 + (x1 - x0) / 2 - _wd / 2 - 0,
         #                       y1 + _unitLength  + 1,

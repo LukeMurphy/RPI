@@ -1914,52 +1914,52 @@ def floralConfig(config):
     config.floral = ArtWorkConfig("Florals", True)
 
     _choice = random.randint(0, 7)
+    # removing python 3.10 match code for now
+    # match _choice:
 
-    match _choice:
-
-        case 0:
+    if _choice == 0:
             config.floral._petals = 9
             config.floral._w = config.blockWidth * 0.51
             config.floral._lobe = config.floral._w * 0.8
             config.floral._h = config.blockWidth / 8
 
-        case 1:
+    if _choice == 1:
             config.floral._petals = 7
             config.floral._w = config.blockWidth * 0.51
             config.floral._lobe = config.floral._w * 0.8
             config.floral._h = config.blockWidth / 8
 
-        case 2:
+    if _choice == 2:
             config.floral._petals = 4
             config.floral._w = config.blockWidth * 0.51
             config.floral._lobe = config.floral._w * 0.7
             config.floral._h = config.blockWidth / 4
 
-        case 3:
+    if _choice == 3:
             config.floral._petals = 5
             config.floral._w = config.blockWidth * 0.51
             config.floral._lobe = config.floral._w * 0.7
             config.floral._h = config.blockWidth / 4
 
-        case 4:
+    if _choice == 4:
             config.floral._petals = 3
             config.floral._w = config.blockWidth * 0.51
             config.floral._lobe = config.floral._w * 0.4
             config.floral._h = config.blockWidth / 4
 
-        case 5:
+    if _choice == 5:
             config.floral._petals = 4
             config.floral._w = config.blockWidth * 0.6
             config.floral._lobe = config.floral._w * 0.2
             config.floral._h = config.blockWidth / 4
 
-        case 6:
+    if _choice == 6:
             config.floral._petals = 5
             config.floral._w = config.blockWidth * 0.6
             config.floral._lobe = config.floral._w * 0.2
             config.floral._h = config.blockWidth / 4
 
-        case 7:
+    if _choice == 7:
             config.floral._lobe = round(random.uniform(4, config.blockWidth * 0.7))
             config.floral._w = round(random.uniform(config.floral._lobe, config.blockWidth * 0.8))
             config.floral._h = round(random.uniform(4, config.blockHeight / 8))

@@ -1551,7 +1551,7 @@ def shapeOverLayFunction(temp1):
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
                 _count += 1
 
-        match (config.polyOverlayMode):
+        match config.polyOverlayMode:
             case "overaly":
                 temp1 = ImageChops.overlay(temp1, temp2)
             case "subtract_modulo":

@@ -1551,15 +1551,25 @@ def shapeOverLayFunction(temp1):
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
                 _count += 1
 
-        match config.polyOverlayMode:
-            case "overaly":
-                temp1 = ImageChops.overlay(temp1, temp2)
-            case "subtract_modulo":
-                temp1 = ImageChops.subtract_modulo(temp1, temp2)
-            case "soft_light":
-                temp1 = ImageChops.soft_light(temp1, temp2)
-            case "lighter":
-                temp1 = ImageChops.lighter(temp1, temp2)
+        # removing python 3.10 specific match for the moment ..
+        # match config.polyOverlayMode:
+        #     case "overaly":
+        #         temp1 = ImageChops.overlay(temp1, temp2)
+        #     case "subtract_modulo":
+        #         temp1 = ImageChops.subtract_modulo(temp1, temp2)
+        #     case "soft_light":
+        #         temp1 = ImageChops.soft_light(temp1, temp2)
+        #     case "lighter":
+        #         temp1 = ImageChops.lighter(temp1, temp2)
+
+        if config.polyOverlayMode == "overaly":
+            temp1 = ImageChops.overlay(temp1, temp2)
+        if config.polyOverlayMode == "subtract_modulo":
+            temp1 = ImageChops.subtract_modulo(temp1, temp2)
+        if config.polyOverlayMode == "soft_light":
+            temp1 = ImageChops.soft_light(temp1, temp2)
+        if config.polyOverlayMode == "lighter":
+            temp1 = ImageChops.lighter(temp1, temp2)
 
         if random.random() < config.polyOverlayChangeProb:
             generateOverlayTiles()

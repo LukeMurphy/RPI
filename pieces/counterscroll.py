@@ -52,7 +52,7 @@ class ScrollMessage:
         # draw the message to get its size
         if config.sansSerif:
             # font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
-            font = ImageFont.truetype(config.path + "/assets/fonts/freefont/RobotoCondensed-Bold.ttf", config.fontSize)
+            font = ImageFont.truetype(config.path + "/assets/fonts/roboto/RobotoCondensed-Bold.ttf", config.fontSize)
         else:
             font = ImageFont.truetype(
                 config.path + "/assets/fonts/freefont/FreeSerifBold.ttf",

@@ -235,8 +235,9 @@ def drawBar():
 
 #####################################################
 def changeAltMessage():
-    msgIndex = random.choice(config.messageStrings)
-    config.altStringMessage = msgIndex
+    if random.random() < config.overrideMessagProb:
+        msgIndex = random.choice(config.messageStrings)
+        config.altStringMessage = msgIndex
 
 
 def decisions():
@@ -403,8 +404,7 @@ def done():
     pieceLogger("Done called.\n")
     config.messageOverrideActive = False
     config.altStringMessage = "PLEASE WAIT"
-    if random.random() < config.overrideMessagProb:
-        changeAltMessage()
+    changeAltMessage()
 
     # if random.random() < 0.1:
     #     config.altStringMessage = "PLEASE WAIT - RECALCULATING."
@@ -580,6 +580,7 @@ def main(run=True):
         "COMPLETE",
         "COMPLETED.",
         "RESTARTING",
+        "RELOADING",
         "PAUSED",
         "UDATING",
         "LOAD WARNING",

@@ -16,8 +16,8 @@ def setPalette(arg, penMark):
 
     penMark.xCenter = 0
     penMark.yCenter = 0
-    penMark.xOffset = 240
-    penMark.yOffset = 240
+    penMark.xOffset = 120
+    penMark.yOffset = 132
     penMark.centerXDelta = 3
     penMark.centerYDelta = 4
     penMark.deltaRadiusXCenterChangeProb = 0.1
@@ -46,21 +46,21 @@ def setPalette(arg, penMark):
             (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
         ]
         penMark.linesToDrawMin = 1
-        penMark.linesToDrawMax = 3
+        penMark.linesToDrawMax = 5
         penMark.timeDelayBeforeDrawingAgain = 7
         penMark.loopsMin = 1
-        penMark.loopsMax = 3
+        penMark.loopsMax = 5
         penMark.penSpeedMinVal = 1
-        penMark.penSpeedMaxVal = 2
-        penMark.radiusXMin = 5
-        penMark.radiusXMax = 220
-        penMark.radiusYMin = 5
-        penMark.radiusYMax = 240
+        penMark.penSpeedMaxVal = 9
+        penMark.radiusXMin = 15
+        penMark.radiusXMax = 82
+        penMark.radiusYMin = 15
+        penMark.radiusYMax = 84
         penMark.height = 10
-        penMark.radiusX = 240
-        penMark.radiusY = 270
+        penMark.radiusX = 124
+        penMark.radiusY = 127
         penMark.minMarkWidth = 1
-        penMark.maxMarkWidth = 5
+        penMark.maxMarkWidth = 15
         penMark.outlineProb = 0.2
     if arg == 1:
         # LAST TWOMBLY
@@ -78,12 +78,12 @@ def setPalette(arg, penMark):
         penMark.penSpeedMinVal = 1
         penMark.penSpeedMaxVal = 5
         penMark.radiusXMin = 5
-        penMark.radiusXMax = 18
+        penMark.radiusXMax = 180
         penMark.radiusYMin = 5
-        penMark.radiusYMax = 18
+        penMark.radiusYMax = 180
         penMark.height = 10
-        penMark.radiusX = 24
-        penMark.radiusY = 26
+        penMark.radiusX = 240
+        penMark.radiusY = 260
         penMark.minMarkWidth = 1
         penMark.maxMarkWidth = 5
         penMark.outlineProb = 0.1
@@ -97,8 +97,8 @@ def setPalette(arg, penMark):
 
         penMark.xCenter = 0
         penMark.yCenter = 0
-        penMark.xOffset = 32
-        penMark.yOffset = 48
+        penMark.xOffset = 320
+        penMark.yOffset = 480
         penMark.centerXDelta = 3
         penMark.centerYDelta = 4
         penMark.deltaRadiusXCenterChangeProb = 0.1
@@ -209,12 +209,12 @@ def setPalette(arg, penMark):
         penMark.loopsMax = 3
         penMark.penSpeedMinVal = 3
         penMark.penSpeedMaxVal = 3
-        penMark.radiusXMin = 4
-        penMark.radiusXMax = 9
-        penMark.radiusYMin = 1
-        penMark.radiusYMax = 1
+        penMark.radiusXMin = 40
+        penMark.radiusXMax = 90
+        penMark.radiusYMin = 10
+        penMark.radiusYMax = 10
         penMark.height = 64
-        penMark.radiusX = 15
+        penMark.radiusX = 150
         penMark.radiusY = 0
         penMark.minMarkWidth = 0.75
         penMark.maxMarkWidth = 4

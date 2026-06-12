@@ -437,7 +437,7 @@ def done():
     if config.goPast:
         config.goBack = False
 
-    config.negativePercentageDone = random.uniform(5, -100)
+    config.negativePercentageDone = random.uniform(5, -99)
     config.target = random.uniform(89, 99)
     config.pausePoint = 20 + round(random.random() * 79)
 

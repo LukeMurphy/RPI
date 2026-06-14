@@ -8,7 +8,8 @@ from collections import OrderedDict
 
 from matplotlib.pyplot import pie
 from modules.configuration import pieceLogger
-from modules import colorutils, continuous_scroller, panelDrawing, blanks_and_dither_rempping
+from modules import colorutils, continuous_scroller, panelDrawing
+from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 
 from modules.faderclass import FaderObj
 from PIL import (
@@ -21,7 +22,7 @@ from PIL import (
     ImageOps,
 )
 
-global config
+global config, overlayControls
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 ## Image manipulations
@@ -1023,6 +1024,7 @@ def configureImageOverlay():
 def init():
     global config
     global workConfig
+    global overlayControls
     pieceLogger("SINGLETON SCROLLER HOLDER INIT")
 
     config.redrawSpeed = float(workConfig.get("scroller", "redrawSpeed"))
@@ -1253,9 +1255,10 @@ def init():
         pieceLogger(f"Config not found: {e}", 1)
         config.useFadeThruAnimation = True
 
-    blanks_and_dither_rempping.loadFilterRemapping(config, workConfig, "scroller")
-    blanks_and_dither_rempping.loadOverlayConfigs(config, workConfig, "scroller")
-    blanks_and_dither_rempping.loadBlankConfigs(config, workConfig, "scroller", config.workImageDraw)
+    overlayControls = BlanksAndDitherRemapping(workConfig, "scroller", config.workImageDraw)
+    # blanks_and_dither_rempping.loadFilterRemapping(config, workConfig, "scroller")
+    # blanks_and_dither_rempping.loadOverlayConfigs(config, workConfig, "scroller")
+    # blanks_and_dither_rempping.loadBlankConfigs(config, workConfig, "scroller", config.workImageDraw)
 
 
 def runWork():
@@ -1288,6 +1291,7 @@ def checkTime(scrollerObj):
 
 
 def processImageForScrolling():
+    global overlayControls
     ## Run through each of the objects being scrolled - text, image, background etc
     for scrollerObj in config.scrollArray:
         scrollerObj.scroll()
@@ -1331,7 +1335,7 @@ def processImageForScrolling():
         config.workImage.paste(segment, (0, n * config.bandHeight))
         # config.workImage.paste(textsegment, (0, n * config.bandHeight))
 
-        blanks_and_dither_rempping.handleOverlayActions(config)
+        overlayControls.handleOverlayActions()
 
     if config.useOverLayImage == True:
         if random.random() < config.overlayGlitchRate:

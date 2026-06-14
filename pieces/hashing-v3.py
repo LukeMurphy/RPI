@@ -4,7 +4,7 @@ import time
 import math
 from noise import *
 from modules.configuration import bcolors, pieceLogger
-from modules import colorutils, panelDrawing, badpixels
+from modules import colorutils, panelDrawing, badpixels, blanks-and-dither-rempping
 from PIL import Image, ImageDraw, ImageChops
 
 from pieces.screen import Holder

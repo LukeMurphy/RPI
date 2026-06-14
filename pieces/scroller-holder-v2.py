@@ -7,8 +7,8 @@ import time
 from collections import OrderedDict
 
 from matplotlib.pyplot import pie
-from modules.configuration import  pieceLogger
-from modules import colorutils, continuous_scroller, panelDrawing
+from modules.configuration import pieceLogger
+from modules import colorutils, continuous_scroller, panelDrawing, blanks_and_dither_rempping
 
 from modules.faderclass import FaderObj
 from PIL import (
@@ -944,7 +944,7 @@ def configureMessageScrolling():
     config.textVOffest = int(workConfig.get("scroller", "textVOffest"))
     config.shadowSize = int(workConfig.get("scroller", "shadowSize"))
     config.textSpeed = float(workConfig.get("scroller", "textSpeed"))
-    config.textSpeed2 = float(workConfig.get("scroller", "textSpeed2", fallback = config.textSpeed))
+    config.textSpeed2 = float(workConfig.get("scroller", "textSpeed2", fallback=config.textSpeed))
     config.msg1 = workConfig.get("scroller", "msg1")
     config.msg2 = workConfig.get("scroller", "msg2")
     config.msg3 = workConfig.get("scroller", "msg3")
@@ -1013,6 +1013,11 @@ def configureImageOverlay():
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+
+# ---------------------------------#
+
+
+# ---------------------------------#
 
 
 def init():
@@ -1248,6 +1253,10 @@ def init():
         pieceLogger(f"Config not found: {e}", 1)
         config.useFadeThruAnimation = True
 
+    blanks_and_dither_rempping.loadFilterRemapping(config, workConfig, "scroller")
+    blanks_and_dither_rempping.loadOverlayConfigs(config, workConfig, "scroller")
+    blanks_and_dither_rempping.loadBlankConfigs(config, workConfig, "scroller", config.workImageDraw)
+
 
 def runWork():
     global config
@@ -1286,8 +1295,7 @@ def processImageForScrolling():
         if scrollerObj.typeOfScroller != "foo":
             config.canvasImage.paste(scrollerObj.canvas, (0, 0), scrollerObj.canvas)
         else:
-            config.textImage.paste(scrollerObj.canvas, (0, scrollerObj.textSlide *  config.bandHeight), scrollerObj.canvas)
-
+            config.textImage.paste(scrollerObj.canvas, (0, scrollerObj.textSlide * config.bandHeight), scrollerObj.canvas)
 
     # Chop up the scrollImage into "rows"
     for n in range(0, config.displayRows):
@@ -1323,7 +1331,7 @@ def processImageForScrolling():
         config.workImage.paste(segment, (0, n * config.bandHeight))
         # config.workImage.paste(textsegment, (0, n * config.bandHeight))
 
-
+        blanks_and_dither_rempping.handleOverlayActions(config)
 
     if config.useOverLayImage == True:
         if random.random() < config.overlayGlitchRate:

@@ -1255,7 +1255,7 @@ def init():
         pieceLogger(f"Config not found: {e}", 1)
         config.useFadeThruAnimation = True
 
-    overlayControls = BlanksAndDitherRemapping(workConfig, "scroller", config.workImageDraw)
+    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "scroller", config.workImageDraw)
     # blanks_and_dither_rempping.loadFilterRemapping(config, workConfig, "scroller")
     # blanks_and_dither_rempping.loadOverlayConfigs(config, workConfig, "scroller")
     # blanks_and_dither_rempping.loadBlankConfigs(config, workConfig, "scroller", config.workImageDraw)

@@ -3,8 +3,8 @@ from modules.configuration import bcolors, pieceLogger
 
 
 class BlanksAndDitherRemapping:
-    def __init__(self, workConfig, configSectionName, destinationImageDraw):
-        self._load_filter_remapping(workConfig, configSectionName)
+    def __init__(self, configRef, workConfig, configSectionName, destinationImageDraw):
+        self._load_filter_remapping(configRef, workConfig, configSectionName)
         self._load_blank_configs(workConfig, configSectionName, destinationImageDraw)
         self._load_overlay_configs(workConfig, configSectionName)
 
@@ -20,7 +20,8 @@ class BlanksAndDitherRemapping:
 
     # ---- dither remapping ------------
 
-    def _load_filter_remapping(self, workConfig, configSectionName):
+    def _load_filter_remapping(self, configRef, workConfig, configSectionName):
+        self.configRef = configRef
         self._load_config_value(workConfig, configSectionName, "filterRemapping", False, bool)
         self._load_config_value(workConfig, configSectionName, "filterRemappingProb", 0.0, float)
         self._load_config_value(workConfig, configSectionName, "filterRemappingReappearProb", 0.10, float)
@@ -41,33 +42,35 @@ class BlanksAndDitherRemapping:
         self.use_filters = self.filterRemapping
 
     def _expand_filter_remap(self):
-        _pos = list(self.remapImageBlockSection)
+        _pos = list(self.configRef.remapImageBlockSection)
         _pos[0] = max(_pos[0] - self.expandXSpeed, self.newFilterStartX)
         _pos[2] += self.expandXSpeed
+
         if _pos[0] <= self.newFilterStartX:
             self.filterRemappingProb = self.basefilterRemappingProb
-            self.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
-            self.remapImageBlockDestination = [_pos[0], _pos[1]]
+            self.configRef.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+            self.configRef.remapImageBlockDestination = [_pos[0], _pos[1]]
             self.filterRemapContracting = 1
             self.filterRemappingChangeProb = self.filterRemappingProb
         else:
-            self.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
-            self.remapImageBlockDestination = [_pos[0], _pos[1]]
+            self.configRef.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
+            self.configRef.remapImageBlockDestination = [_pos[0], _pos[1]]
             self.filterRemappingChangeProb = 1.0
 
     def _contract_filter_remap(self):
-        _pos = list(self.remapImageBlockSection)
+        _pos = list(self.configRef.remapImageBlockSection)
         _pos[3] -= self.contractYSpeed
+
 
         if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
             self.filterRemappingProb = self.basefilterRemappingProb
             self.filterRemapContracting = 0
-            self.remapImageBlockSection = (_pos[2], _pos[3], _pos[2], _pos[3])
-            self.remapImageBlockDestination = [_pos[0], _pos[1]]
+            self.configRef.remapImageBlockSection = (_pos[2], _pos[3], _pos[2], _pos[3])
+            self.configRef.remapImageBlockDestination = [_pos[0], _pos[1]]
             self.filterRemappingChangeProb = self.filterRemappingReappearProb
         else:
-            self.remapImageBlockSection = tuple(_pos)
-            self.remapImageBlockDestination = [_pos[0], _pos[1]]
+            self.configRef.remapImageBlockSection = tuple(_pos)
+            self.configRef.remapImageBlockDestination = [_pos[0], _pos[1]]
             self.filterRemappingChangeProb = 1.0
 
     def remap_filter(self):
@@ -79,12 +82,13 @@ class BlanksAndDitherRemapping:
             self.newFilterStartY = round(random.uniform(0, self.filterRemapRangeY))
             self.newFilterEndX = round(random.uniform(self.filterRemapMinHoriSize, self.filterRemapMaxHoriSize))
             self.newFilterEndY = round(random.uniform(self.filterRemapMinVertSize, self.filterRemapMaxVertSize))
-            self.remapImageBlockSection = (
+            self.configRef.remapImageBlockSection = (
                 self.newFilterStartX + self.newFilterEndX,
                 self.newFilterStartY,
                 self.newFilterStartX + self.newFilterEndX,
                 self.newFilterStartY + self.newFilterEndY,
             )
+
 
         if self.filterRemapContracting == 1:
             self._contract_filter_remap()

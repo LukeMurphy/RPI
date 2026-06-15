@@ -177,24 +177,50 @@ def main(run=True):
     config.modeChangeProb = 0.01
 
     config.ringSets = []
+    config.randomRingSets = workConfig.get("expandingRings", "randomRingSets", fallback = False)
+    config.numberOfRandomRingSets = int(workConfig.get("expandingRings", "numberOfRandomRingSets", fallback = 0))
 
-    for ringGroup in ringSets:
-        ringSetParams = {}
-        rings = []
-        numberOfRings = int(workConfig.get(ringGroup, "numberOfRings"))
-        ringSetParams["numberOfRings"] = numberOfRings
-        center = workConfig.get(ringGroup, "center")
-        ringSetParams["center"] = tuple(int(p) for p in center.split(","))
-        ringSetParams["rings"] = rings
-        ringSetParams["mode"] = 3
+    if config.randomRingSets:
+        for ringGroup in range(0,config.numberOfRandomRingSets):
+            ringSetParams = {}
+            rings = []
+            numberOfRings = int(random.uniform(12,33))
+            ringSetParams["numberOfRings"] = numberOfRings
+            ringSetParams["center"] = (
+                int(random.uniform(0, config.canvasWidth)), 
+                int(random.uniform(0, config.canvasHeight))
+                )
+            ringSetParams["rings"] = rings
+            ringSetParams["mode"] = 3
 
-        for n in range(0, numberOfRings):
-            er = expandingRing(config)
-            er.mode = ringSetParams["mode"]
-            if n > 2:
-                er.expanding = True
-            er.center = ringSetParams["center"]
-            er.initializeUnits()
-            rings.append(er)
+            for n in range(0, numberOfRings):
+                er = expandingRing(config)
+                er.mode = ringSetParams["mode"]
+                if n > 2:
+                    er.expanding = True
+                er.center = ringSetParams["center"]
+                er.initializeUnits()
+                rings.append(er)
 
-        config.ringSets.append(ringSetParams)
+            config.ringSets.append(ringSetParams)
+    else :
+        for ringGroup in ringSets:
+            ringSetParams = {}
+            rings = []
+            numberOfRings = int(workConfig.get(ringGroup, "numberOfRings"))
+            ringSetParams["numberOfRings"] = numberOfRings
+            center = workConfig.get(ringGroup, "center")
+            ringSetParams["center"] = tuple(int(p) for p in center.split(","))
+            ringSetParams["rings"] = rings
+            ringSetParams["mode"] = 3
+
+            for n in range(0, numberOfRings):
+                er = expandingRing(config)
+                er.mode = ringSetParams["mode"]
+                if n > 2:
+                    er.expanding = True
+                er.center = ringSetParams["center"]
+                er.initializeUnits()
+                rings.append(er)
+
+            config.ringSets.append(ringSetParams)

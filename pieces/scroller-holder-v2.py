@@ -20,6 +20,7 @@ from PIL import (
     ImageFilter,
     ImageFont,
     ImageOps,
+    ImageChops
 )
 
 global config, overlayControls
@@ -346,6 +347,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
     if config.colorMode == "getRandomColorWheel":
         clr = colorutils.getRandomColorWheel(config.brightness)
 
+
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
     # draw the message to get its size
     if config.sansSerif:
@@ -382,6 +384,7 @@ def makeMessage(imageRef, messageString="FooBar", direction=1):
 
     refDraw = ImageDraw.Draw(imageRef)
     # refDraw.rectangle((0, 0, pixLen[0] + 2, fontHeight), fill=None)
+    
     imageRef.paste(scrollImage, (0, config.textVOffest), scrollImage)
 
 
@@ -755,6 +758,7 @@ def remakePatternBlock(imageRef, direction):
             config.brightness,
         )
 
+    overlayControls.altColor = config.bgBackGroundEndColor
     drawRef = ImageDraw.Draw(imageRef)
     makeBackGround(drawRef, direction)
 
@@ -1256,9 +1260,7 @@ def init():
         config.useFadeThruAnimation = True
 
     overlayControls = BlanksAndDitherRemapping(config,  workConfig, "scroller", config.workImageDraw)
-    # blanks_and_dither_rempping.loadFilterRemapping(config, workConfig, "scroller")
-    # blanks_and_dither_rempping.loadOverlayConfigs(config, workConfig, "scroller")
-    # blanks_and_dither_rempping.loadBlankConfigs(config, workConfig, "scroller", config.workImageDraw)
+    
 
 
 def runWork():
@@ -1353,11 +1355,11 @@ def processImageForScrolling():
 
 
 def iterate():
-    global config
+    global config, overlayControls
 
     # config.workImageDraw.rectangle((0,0,config.canvasWidth,config.canvasHeight), fill  = (0,0,0))
     # config.canvasImageDraw.rectangle((0,0,config.canvasWidth*10,config.canvasHeight), fill  = (0,0,0,20))
-
+    
     for scrollerObj in config.scrollArray:
         if scrollerObj.typeOfScroller == "bg":
             if random.random() < config.changeProb * config.changeProbReleaseFactor and config.deltaTimeDone == True and config.useFadeThruAnimation == True:

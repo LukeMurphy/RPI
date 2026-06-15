@@ -4,7 +4,8 @@ import time
 import math
 from noise import *
 from modules.configuration import bcolors, pieceLogger
-from modules import colorutils, panelDrawing, badpixels, blanks-and-dither-rempping
+from modules import colorutils, panelDrawing, badpixels
+from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 from PIL import Image, ImageDraw, ImageChops
 
 from pieces.screen import Holder
@@ -342,14 +343,14 @@ def setBGColor():
         config.brightness,
     )
 
-    if random.random() <= config.blankColorAsColorProb:
-        badpixels.blankColor = config.bgColor
-        config.blankColor = config.bgColor
-    else:
-        badpixels.blankColor = (0, 0, 0, 255)
-        # setting the alpha to a lower number so that when
-        # the blank changes, it comes in over a second or two
-        config.blankColor = (0, 0, 0, 15)
+    # if random.random() <= config.blankColorAsColorProb:
+    #     badpixels.blankColor = config.bgColor
+    #     config.blankColor = config.bgColor
+    # else:
+    #     badpixels.blankColor = (0, 0, 0, 255)
+    #     # setting the alpha to a lower number so that when
+    #     # the blank changes, it comes in over a second or two
+    #     config.blankColor = (0, 0, 0, 15)
 
     if random.random() < config.lightLinesOnGroundProb:
         config.lightLinesOnGround = True
@@ -545,36 +546,6 @@ def informalLines():
                     pointsToDraw[pt + 1][0] = _lstpt
 
 
-def resetPolyBlanks():
-    config.blanks_list = []
-    config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
-
-    for _ in range(config.blanks_numberOfDeadPixels):
-        width1 = random.randint(config.blanks_colsRange[0], config.blanks_colsRange[1])
-        height1 = random.randint(config.blanks_rowsRange[0], config.blanks_rowsRange[1])
-        width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-        height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-
-        x0 = random.randint(0, config.blanks_sizeTarget[0])
-        y0 = random.randint(0, config.blanks_sizeTarget[1])
-        x1 = x0 + width1
-        y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-        x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-        y2 = y1 + height1
-        x3 = x2 - width2
-        y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-
-        _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
-
-        config.blanks_list.append(_poly)
-
-
-def drawPolyBlanks(_drawRef):
-    for p in range(config.blanks_numberOfDeadPixels):
-        _poly = config.blanks_list[p]
-        _drawRef.polygon(_poly, fill=config.blankColor)
-
-
 # ---- looping and redrawing --------
 
 
@@ -682,20 +653,11 @@ def reDraw():
 
 
 def iterate():
-
+    global config, overlayControls
     if random.SystemRandom().random() < config.useBgBoxProb and config.useBgBox:
         _bgColorsFilling(config)
 
     reDraw()
-
-    handleFilterRemapping()
-
-    if random.random() < config.resetBlanksProb:
-        # badpixels.setBlanksOnScreen(config)
-        resetPolyBlanks()
-
-    if random.random() < config.panelOverlayChangeProb:
-        setPanelOverlays()
 
     if random.SystemRandom().random() < config.clearbgBoxProb:
         clearbgBox()
@@ -718,150 +680,51 @@ def iterate():
 
     # if config.imageYPOS >= config.pictureHeight:
     # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
-    if config.usingPanelOverlays:
-        drawPanelVariations(config.destinationImage)
-    drawPolyBlanks(config.destinationImageDraw)
-    # badpixels.drawBlanks(config.destinationImage, False)
+    # if config.usingPanelOverlays:
+    #     drawPanelVariations(config.destinationImage)
+    overlayControls.targetImageRef = config.destinationImage
+    overlayControls.overlayImageRef = config.overlayImage
+    overlayControls.handleOverlayActions()
     config.render(config.destinationImage, 0, 0)
 
 
-# ----- panel based overlays ---------
-# adding panel modulation to mimic physical panel differences
-def setPanelOverlays():
-    global config
-    if not config.usingPanelOverlays:
-        return
+# # ----- panel based overlays ---------
+# # adding panel modulation to mimic physical panel differences
+# def setPanelOverlays():
+#     global config
+#     if not config.usingPanelOverlays:
+#         return
 
-    panelOverLayList = []
-    config.panelOverLayList = []
-    config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 0))
+#     panelOverLayList = []
+#     config.panelOverLayList = []
+#     config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 0))
 
-    _totalPanels = config.panelRows * config.panelColumns
-    _numPanels = random.randint(config.panelOverlayRange[0], min(_totalPanels, config.panelOverlayRange[1]))
+#     _totalPanels = config.panelRows * config.panelColumns
+#     _numPanels = random.randint(config.panelOverlayRange[0], min(_totalPanels, config.panelOverlayRange[1]))
 
-    # create an array of panel spots then joggle it
-    for c in range(0, config.panelColumns):
-        for r in range(0, config.panelRows):
-            panelOverLayList.append([c, r])
+#     # create an array of panel spots then joggle it
+#     for c in range(0, config.panelColumns):
+#         for r in range(0, config.panelRows):
+#             panelOverLayList.append([c, r])
 
-    random.shuffle(panelOverLayList)
+#     random.shuffle(panelOverLayList)
 
-    for i in range(_numPanels):
-        config.panelOverLayList.append(panelOverLayList[i])
-
-
-def drawPanelVariations(targetImageRef):
-    global config
-    for p in config.panelOverLayList:
-        x0 = p[0] * config.panelWidth
-        y0 = p[1] * config.panelHeight
-        x1 = x0 + config.panelWidth
-        y1 = y0 + config.panelHeight
-        config.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=config.bgColor)
-
-    # tempImage = ImageChops.blend(targetImageRef, config.overlayImage, config.panelOverlayAmount)
-    tempImage = ImageChops.add(targetImageRef, config.overlayImage, round(100 * config.panelOverlayAmount))
-    targetImageRef.paste(tempImage, (0, 0), tempImage)
+#     for i in range(_numPanels):
+#         config.panelOverLayList.append(panelOverLayList[i])
 
 
-# ---- dither remapping ------------
+# def drawPanelVariations(targetImageRef):
+#     global config
+#     for p in config.panelOverLayList:
+#         x0 = p[0] * config.panelWidth
+#         y0 = p[1] * config.panelHeight
+#         x1 = x0 + config.panelWidth
+#         y1 = y0 + config.panelHeight
+#         config.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=config.bgColor)
 
-
-def loadFilterRemapping():
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapping", False, bool)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingProb", 0.0, float)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemappingReappearProb", 0.10, float)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinHoriSize", 1, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxHoriSize", 1, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMinVertSize", 1, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapMaxVertSize", 1, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapRangeY", 1, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "filterRemapRangeX", 1, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "contractXSpeed", 2, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "contractYSpeed", 2, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "expandXSpeed", 2, int)
-    loadConfigValue(config, workConfig, "hatchingmarks", "expandYSpeed", 2, int)
-
-    config.filterRemappingChangeProb = config.filterRemappingProb
-    config.filterRemapContracting = 0
-    config.basefilterRemappingProb = config.filterRemappingProb
-
-
-def handleFilterRemapping():
-    """Handles filter remapping if enabled."""
-    # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
-    if random.random() < config.filterRemappingChangeProb and (config.useFilters and config.filterRemapping):
-        remapFilter(config)
-
-
-def expandFilterRemap():
-
-    _pos = list(config.remapImageBlockSection)
-    # pieceLogger(_pos)
-    _pos[0] = max(_pos[0] - config.expandXSpeed, config.newFilterStartX)
-    _pos[2] += config.expandXSpeed
-    # _pos[1] -= 2
-    # _pos[3] += 2
-    # or _pos[1] <= (config.newFilterStartY)
-    if _pos[0] <= (config.newFilterStartX):
-        config.filterRemappingProb = config.basefilterRemappingProb
-        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemapContracting = 1
-        # pieceLogger(f"Expanidng done {config.newFilterStartX}")
-        config.filterRemappingChangeProb = config.filterRemappingProb
-    else:
-        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemappingChangeProb = 1.0
-
-
-def contractFilterRemap():
-    _pos = list(config.remapImageBlockSection)
-    # pieceLogger(_pos)
-    # _pos[0] += config.contractXSpeed
-    # _pos[2] -= config.contractXSpeed
-    # _pos[1] += config.contractYSpeed
-    _pos[3] -= config.contractYSpeed
-
-    if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
-        config.filterRemappingProb = config.basefilterRemappingProb
-        config.filterRemapContracting = 0
-        config.remapImageBlockSection = (_pos[2], _pos[3], _pos[2], _pos[3])
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
-        config.filterRemappingChangeProb = config.filterRemappingReappearProb
-    else:
-        # pieceLogger(_pos)
-        config.remapImageBlockSection = tuple(_pos)
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemappingChangeProb = 1.0
-
-
-def remapFilter(config):
-    """Remaps the filter block section."""
-    config.filterRemap = True
-    if config.filterRemappingProb != 1.0 and config.filterRemapContracting == 0:
-        config.filterRemapContracting = 2
-        config.newFilterStartX = round(random.uniform(0, config.filterRemapRangeX))
-        config.newFilterStartY = round(random.uniform(0, config.filterRemapRangeY))
-        config.newFilterEndX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
-        config.newFilterEndY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
-        config.remapImageBlockSection = (
-            config.newFilterStartX + config.newFilterEndX,
-            config.newFilterStartY,
-            config.newFilterStartX + config.newFilterEndX,
-            config.newFilterStartY + config.newFilterEndY,
-        )
-        # pieceLogger("Resetting to expand")
-        # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
-
-    if config.filterRemapContracting == 1:
-        # pieceLogger("Resetting to contract")
-        contractFilterRemap()
-
-    if config.filterRemapContracting == 2:
-        expandFilterRemap()
+#     # tempImage = ImageChops.blend(targetImageRef, config.overlayImage, config.panelOverlayAmount)
+#     tempImage = ImageChops.add(targetImageRef, config.overlayImage, round(100 * config.panelOverlayAmount))
+#     targetImageRef.paste(tempImage, (0, 0), tempImage)
 
 
 # ---- initialize  -----------------
@@ -956,6 +819,7 @@ def loadColorConfigs():
 def main(run=True):
     global config
     global workConfig
+    global overlayControls
 
     config.imageXPOS = 0
     config.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
@@ -1076,31 +940,6 @@ def main(run=True):
     # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
     config.rebuildingVerticals = False
 
-    config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("hatchingmarks", "resetBlanksProb", fallback="0.001"))
-    config.blankColorAsColorProb = float(workConfig.get("hatchingmarks", "blankColorAsColorProb", fallback="0.5"))
-    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
-    config.blanks_probabilityOfBlockBlanks = 0.0
-    config.blanks_sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
-    config.blanks_colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
-    config.blanks_rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
-    config.blankPolyVariation = int(workConfig.get("hatchingmarks", "blankPolyVariation", fallback="10"))
-
-    badpixels.numberOfDeadPixels = int(workConfig.get("hatchingmarks", "numberOfDeadPixels", fallback="1"))
-    badpixels.probabilityOfBlockBlanks = 0.0
-    badpixels.sizeTarget = [int(x) for x in workConfig.get("hatchingmarks", "sizeTarget", fallback=f"{config.drawingWidth},{config.drawingHeight}").split(",")]
-    badpixels.colsRange = [int(x) for x in workConfig.get("hatchingmarks", "colsRange", fallback="32,256").split(",")]
-    badpixels.rowsRange = [int(x) for x in workConfig.get("hatchingmarks", "rowsRange", fallback="32,256").split(",")]
-
-    config.panelWidth = int(workConfig.get("hatchingmarks", "panelWidth", fallback="64"))
-    config.panelHeight = int(workConfig.get("hatchingmarks", "panelHeight", fallback="32"))
-    config.panelColumns = int(workConfig.get("hatchingmarks", "panelColumns", fallback="10"))
-    config.panelRows = int(workConfig.get("hatchingmarks", "panelRows", fallback="10"))
-    config.panelOverlayRange = [int(x) for x in workConfig.get("hatchingmarks", "panelOverlayRange", fallback="1,30").split(",")]
-    config.panelOverlayChangeProb = float(workConfig.get("hatchingmarks", "panelOverlayChangeProb", fallback=".0003"))
-    config.panelOverlayAmount = float(workConfig.get("hatchingmarks", "panelOverlayAmount", fallback=".1"))
-    config.usingPanelOverlays = True
-    if config.panelColumns == 0 or config.panelRows == 0:
-        config.usingPanelOverlays = False
 
     config.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
     config.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
@@ -1144,20 +983,27 @@ def main(run=True):
     config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
 
     loadColorConfigs()
-    loadFilterRemapping()
-    resetPolyBlanks()
-    if config.usingPanelOverlays:
-        setPanelOverlays()
+    # loadFilterRemapping()
+    # resetPolyBlanks()
+    # if config.usingPanelOverlays:
+    #     setPanelOverlays()
     setLines()
     config.lineColor = setLineColor()
     setBGColor()
 
-    badpixels.setBlanksOnScreen(config)
+    # badpixels.setBlanksOnScreen(config)
+
 
     if config.useBgBox:
         for _ in range(config.initialRunsOfBgBlocks):
             _bgColorsFilling(config)
 
+    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "hatchingmarks", config.destinationImageDraw)
+    overlayControls.targetImageRef = config.destinationImage
+    overlayControls.overlayImage = config.overlayImage
+    overlayControls.overlayImageDraw = config.overlayImageDraw
+    overlayControls.setPanelOverlays()
+    
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
     #### Need to add something like this at final render call  as well

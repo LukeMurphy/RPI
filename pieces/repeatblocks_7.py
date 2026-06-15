@@ -1,4 +1,4 @@
-# ################################################### #
+# ------------------------------------------##### #
 from ast import Try
 import math
 import random
@@ -9,6 +9,7 @@ import configparser
 # from shapely import length
 from modules.configuration import bcolors
 from modules.configuration import pieceLogger
+from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 from modules.movieClip import movieClip
 from modules import colorutils, panelDrawing, pattern_blocks_v5, disturbance
 from modules.holder_director import Holder
@@ -28,7 +29,7 @@ from copy import copy, deepcopy
 # more refactoring including slow scrolling and timing controls
 
 
-###############################################
+# ------------------------------------------#
 
 
 # --------------------- CLASSES     ---------------------
@@ -1036,7 +1037,7 @@ def rowsAndDotsSettings():
 def iterate():
     """Performs a single iteration of the animation."""
     global config
-    handleFilterRemapping()
+    
 
     if config.debugPause:
         config.directorController.slotRate = 2.0
@@ -1180,139 +1181,6 @@ def redrawAndLoadImage(config):
         drawRepeatedPatternImage(config, config.canvasImage)
 
     config.repeatDrawingMode = 0
-
-# ---- dither remapping ------------
-
-def loadFilterRemapping():
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapping", False, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "contractXSpeed", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "contractYSpeed", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "expandXSpeed", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "expandYSpeed", 2, int)
-    config.filterRemapContracting = 0
-    config.basefilterRemappingProb = config.filterRemappingProb
-
-
-def handleFilterRemapping():
-    """Handles filter remapping if enabled."""
-    # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
-    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
-        remapFilter(config)
-
-
-def expandFilterRemap():
-
-    _pos = list(config.remapImageBlockSection)
-    # pieceLogger(_pos)
-    _pos[0] = max(_pos[0] - config.expandXSpeed, config.newFilterStartX)
-    _pos[2] += config.expandXSpeed
-    # _pos[1] -= 2
-    # _pos[3] += 2
-    # or _pos[1] <= (config.newFilterStartY)
-    if _pos[0] <= (config.newFilterStartX) :
-        config.filterRemappingProb = config.basefilterRemappingProb
-        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemapContracting = 1
-        # pieceLogger(f"Expanidng done {config.newFilterStartX}")
-    else:
-        config.filterRemappingProb = 1.0
-        config.remapImageBlockSection = (_pos[0], _pos[1], _pos[2], _pos[3])
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemappingProb = 1.0
-
-
-def contractFilterRemap():
-    _pos = list(config.remapImageBlockSection)
-    # pieceLogger(_pos)
-    # _pos[0] += config.contractXSpeed
-    # _pos[2] -= config.contractXSpeed
-    # _pos[1] += config.contractYSpeed
-    _pos[3] -= config.contractYSpeed
-
-    if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
-        config.filterRemappingProb = config.basefilterRemappingProb
-        config.filterRemapContracting = 0
-        config.remapImageBlockSection = (_pos[2],_pos[3],_pos[2],_pos[3])
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        # pieceLogger(f"contracting done {_pos} {config.filterRemapContracting} {config.filterRemappingProb}")
-    else:
-        # pieceLogger(_pos)
-        config.filterRemappingProb = 1.0
-        config.remapImageBlockSection = tuple(_pos)
-        config.remapImageBlockDestination = [_pos[0], _pos[1]]
-        config.filterRemappingProb = 1.0
-
-
-def remapFilter(config):
-    """Remaps the filter block section."""
-    config.filterRemap = True
-    if config.filterRemappingProb != 1.0 and config.filterRemapContracting == 0:
-        config.filterRemapContracting = 2
-        config.newFilterStartX = round(random.uniform(0, config.filterRemapRangeX))
-        config.newFilterStartY = round(random.uniform(0, config.filterRemapRangeY))
-        config.newFilterEndX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize))
-        config.newFilterEndY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
-        config.remapImageBlockSection = (config.newFilterStartX + config.newFilterEndX, 
-                                         config.newFilterStartY, 
-                                         config.newFilterStartX + config.newFilterEndX, 
-                                         config.newFilterStartY + config.newFilterEndY)
-        # pieceLogger("Resetting to expand")
-        # pieceLogger(f"{config.newFilterStartX} {config.newFilterStartY} {config.newFilterEndX + config.newFilterStartX} {config.newFilterEndY}")
-
-    if config.filterRemapContracting == 1:
-        # pieceLogger("Resetting to contract")
-        contractFilterRemap()
-
-    if config.filterRemapContracting == 2:
-        expandFilterRemap()
-
-
-def resetPolyBlanks():
-    if config.blanks_maxNumberOfDeadPixels > 0 :
-        config.blanks_list = []
-        config.blanks_numberOfDeadPixels = random.randint(1, config.blanks_maxNumberOfDeadPixels)
-        config.blankColor = (0, 0, 0, 15)
-
-        for _ in range(config.blanks_numberOfDeadPixels):
-            width1 = random.randint(config.blankMinWidth, config.blankMaxWidth)
-            height1 = random.randint(config.blankMinHeight, config.blankMaxHeight)
-            width2 = width1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-            height2 = height1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-
-            x0 = random.randint(0, config.blanks_sizeTarget[0])
-            y0 = random.randint(0, config.blanks_sizeTarget[1])
-
-            x1 = x0 + width1
-            y1 = y0 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-
-            x2 = x1 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-            y2 = y1 + height1
-
-            x3 = x2 - width2
-            y3 = y2 + random.randint(-config.blankPolyVariation, config.blankPolyVariation)
-
-            _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
-
-            # pieceLogger(_poly)
-
-            # _poly = ((210, 204), (330, 203), (328, 328), (210, 330), (210, 204))  
-
-            config.blanks_list.append(_poly)
-
-
-def drawPolyBlanks(_drawRef):
-    for p in range(config.blanks_numberOfDeadPixels):
-        _poly = config.blanks_list[p]
-        _drawRef.polygon(_poly, fill=config.blankColor)
-
 
 
 # ----------------------------------
@@ -1469,14 +1337,14 @@ def renderComposite():
             if config.waveDeformXPos > config.screenWidth:
                 config.waveDeformXPos = 0
         
-
-        if random.random() < config.resetBlanksProb:
-            # badpixels.setBlanksOnScreen(config)
-            resetPolyBlanks()
-
-        if config.blanks_maxNumberOfDeadPixels > 0 :
+        # Run every cycle:
+        global overlayControls
+        if overlayControls.usingPanelOverlays :
+            overlayControls.targetImageRef = config.destinationImage
+        if overlayControls.useBlanks :
             config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
-            drawPolyBlanks(config.destinationImageDraw)
+            overlayControls.destinationImageDraw = config.destinationImageDraw
+        overlayControls.handleOverlayActions()
 
         # config.image = config.destinationImage.copy()
         config.render(config.destinationImage, 0, 0)
@@ -1663,7 +1531,6 @@ def loadAndInitializeCrossFader():
 
 
 def createImageHolders():
-    ########################################################################
     # CREATE THE IMAGE HOLDERS
     # canvasImage will get the drawing
     # disturbanceImage will get the disturbance / glitching
@@ -1691,7 +1558,6 @@ def createImageHolders():
 
     config.blendSteps = 5
     config.blendStep = 0
-
 
 
 def main(run=True):
@@ -1730,9 +1596,9 @@ def main(run=True):
     loadConfigValue(config, workConfig, "movingpattern", "loadAnImageProb", 0.0, float)
     config.imageSources = workConfig.get("movingpattern", "imageSources").split(",")
 
-    ########################################################################
+    #---------------------------------------------------------------###
     createImageHolders()
-    ########################################################################
+    #---------------------------------------------------------------###
 
     loadConfigValue(config, workConfig, "movingpattern", "useBlurSection", False, bool)
     loadConfigValue(config, workConfig, "movingpattern", "blurSectionWidth", 0, int)
@@ -1759,11 +1625,8 @@ def main(run=True):
 
     loadConfigValue(config, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
 
-    loadFilterRemapping()
-
-    # ####################### clip player instert ################################
+    # --------------------- clip player instert ---------------------#########
     loadClipPlayerConfigs()
-    # ###########################################################################
 
     loadAndInitializeCrossFader()
 
@@ -1780,22 +1643,7 @@ def main(run=True):
 
     config.applyDitherBeforeRemapping = True
 
-    # ###########################################################################
-
-    config.resetBlanksProb = config.bg_dropHueMax = float(workConfig.get("movingpattern", "resetBlanksProb", fallback="0.00"))
-    config.blankColorAsColorProb = float(workConfig.get("movingpattern", "blankColorAsColorProb", fallback="0.0"))
-    config.blanks_maxNumberOfDeadPixels = int(workConfig.get("movingpattern", "numberOfDeadPixels", fallback="0"))
-    config.blanks_probabilityOfBlockBlanks = 0.0
-    config.blankMinWidth = int(workConfig.get("movingpattern", "blankMinWidth", fallback="0"))
-    config.blankMaxWidth = int(workConfig.get("movingpattern", "blankMaxWidth", fallback="0"))
-    config.blankMinHeight = int(workConfig.get("movingpattern", "blankMinHeight", fallback="0"))
-    config.blankMaxHeight = int(workConfig.get("movingpattern", "blankMaxHeight", fallback="0"))
-
-    config.blanks_sizeTarget = [int(x) for x in workConfig.get("movingpattern", "sizeTarget", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")]
-    # config.blanks_colsRange = [int(x) for x in workConfig.get("movingpattern", "colsRange", fallback="32,256").split(",")]
-    # config.blanks_rowsRange = [int(x) for x in workConfig.get("movingpattern", "rowsRange", fallback="32,256").split(",")]
-    config.blankPolyVariation = int(workConfig.get("movingpattern", "blankPolyVariation", fallback="10"))
-    resetPolyBlanks()
+    # ---------------------------------------------------------------######
 
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
@@ -1811,6 +1659,23 @@ def main(run=True):
     except Exception as e:
         pieceLogger(f"{e} <== adjust config to use slotRate!! <===")
         config.directorController.slotRate = 0.03
+
+
+    # initiate
+    global overlayControls
+    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "movingpattern")
+
+    # For blanks
+    overlayControls.altColor = (0,0,0,15)
+    overlayControls.targetImageRef = config.destinationImage
+    overlayControls.destinationImageDraw = config.destinationImageDraw
+
+
+    # for overlay blocks
+    overlayControls.overlayImage = config.destinationImage
+    overlayControls.overlayImageDraw = config.destinationImageDraw
+    overlayControls.setPanelOverlays()
+
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -1854,5 +1719,3 @@ def runWork():
         if not config.standAlone:
             config.callBack()
 
-
-###############################################

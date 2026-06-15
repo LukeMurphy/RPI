@@ -998,8 +998,11 @@ def main(run=True):
         for _ in range(config.initialRunsOfBgBlocks):
             _bgColorsFilling(config)
 
-    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "hatchingmarks", config.destinationImageDraw)
+    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "hatchingmarks")
+    # for blanks
+    overlayControls.destinationImageDraw = config.destinationImageDraw
     overlayControls.targetImageRef = config.destinationImage
+    # for overlay
     overlayControls.overlayImage = config.overlayImage
     overlayControls.overlayImageDraw = config.overlayImageDraw
     overlayControls.setPanelOverlays()

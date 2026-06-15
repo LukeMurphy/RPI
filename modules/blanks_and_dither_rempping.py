@@ -1,20 +1,113 @@
 import random
+import string
+from tokenize import Floatnumber, String
+from xmlrpc.client import Boolean
+
+from sympy import Integer
 from modules.configuration import bcolors, pieceLogger
 from PIL import Image, ImageDraw, ImageChops
 
-class BlanksAndDitherRemapping:
-    altColor = (0,0,0,15)
+"""
+global overlayControls
+# initiate
+overlayControls = BlanksAndDitherRemapping(config,  workConfig, "[PIECE SECTION NAME]")
 
-    def __init__(self, configRef, workConfig, configSectionName, destinationImageDraw):
+# For blanks
+overlayControls.altColor = config.bgBackGroundEndColor
+overlayControls.targetImageRef = config.destinationImage
+overlayControls.destinationImageDraw = config.destinationImageDraw
+
+# for overlay blocks
+overlayControls.overlayImage = config.overlayImage
+overlayControls.overlayImageDraw = config.overlayImageDraw
+overlayControls.setPanelOverlays()
+
+# Run every cycle:
+global overlayControls
+if overlayControls.usingPanelOverlays :
+    overlayControls.targetImageRef = config.destinationImage
+if overlayControls.useBlanks :
+    config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+    overlayControls.destinationImageDraw = config.destinationImageDraw
+overlayControls.handleOverlayActions()
+
+
+
+#-------------------------------------------------------
+#----- for blanks_and_dither_remapping module ----------
+#-------------------------------------------------------
+
+#-------------------------------------------------------
+#----- for blanks_and_dither_remapping module ----------
+#-------------------------------------------------------
+
+#---------------------  blanks blocks ------------------
+useBlanks = True
+resetBlanksProb = .0005
+numberOfDeadPixels = 3
+blankColorAsColorProb = .0
+sizeTarget = 200,240
+colsRange = 64,128
+rowsRange = 32,128
+blankPolyVariation = 2
+
+#--------------------- filterRemapping  ------------------
+filterRemapping = True
+filterRemappingProb = .0001
+filterRemapMinHoriSize = 32
+filterRemapMinVertSize = 32
+filterRemapMaxHoriSize = 200
+filterRemapMaxVertSize = 200
+filterRemapRangeX = 200
+filterRemapRangeY = 200
+
+contractXSpeed = 20
+contractYSpeed = 20
+expandXSpeed = 20
+expandYSpeed = 20
+
+#----- adding panel modulation to mimic physical panel differences
+usingPanelOverlays = True
+panelColumns = 5
+panelRows = 4
+panelWidth = 64
+panelHeight = 64
+panelOverlayRange = 5,10
+panelOverlayChangeProb = .0001
+panelOverlayAmount = .11
+
+
+
+"""
+
+
+class BlanksAndDitherRemapping:
+    altColor = (0, 0, 0, 15)
+    useBlanks = False
+    filterRemapping = False
+    usingPanelOverlays = False
+
+    
+
+    def __init__(self, configRef, workConfig, configSectionName):
         self.configRef = configRef
         self._load_filter_remapping(workConfig, configSectionName)
-        self._load_blank_configs(workConfig, configSectionName, destinationImageDraw)
+        self._load_blank_configs(workConfig, configSectionName)
         self._load_overlay_configs(workConfig, configSectionName)
 
+
     def _load_config_value(self, workConfig, section, option, default, type_converter):
+
+        pieceLogger(section)
+        pieceLogger(option)
+        pieceLogger(default)
+        pieceLogger(type_converter)
+
         try:
             if type_converter == bool:
                 setattr(self, option, type_converter(workConfig.getboolean(section, option)))
+            elif type_converter == str:
+                setattr(self, workConfig.get(section, option, default))
             else:
                 setattr(self, option, type_converter(workConfig.get(section, option)))
         except Exception as e:
@@ -43,6 +136,7 @@ class BlanksAndDitherRemapping:
         self.basefilterRemappingProb = self.filterRemappingProb
         self.use_filters = self.filterRemapping
 
+
     def _expand_filter_remap(self):
         _pos = list(self.configRef.remapImageBlockSection)
         _pos[0] = max(_pos[0] - self.expandXSpeed, self.newFilterStartX)
@@ -59,10 +153,10 @@ class BlanksAndDitherRemapping:
             self.configRef.remapImageBlockDestination = [_pos[0], _pos[1]]
             self.filterRemappingChangeProb = 1.0
 
+
     def _contract_filter_remap(self):
         _pos = list(self.configRef.remapImageBlockSection)
         _pos[3] -= self.contractYSpeed
-
 
         if _pos[0] >= _pos[2] or _pos[1] >= _pos[3]:
             self.filterRemappingProb = self.basefilterRemappingProb
@@ -74,6 +168,7 @@ class BlanksAndDitherRemapping:
             self.configRef.remapImageBlockSection = tuple(_pos)
             self.configRef.remapImageBlockDestination = [_pos[0], _pos[1]]
             self.filterRemappingChangeProb = 1.0
+
 
     def remap_filter(self):
         """Remaps the filter block section."""
@@ -91,7 +186,6 @@ class BlanksAndDitherRemapping:
                 self.newFilterStartY + self.newFilterEndY,
             )
 
-
         if self.filterRemapContracting == 1:
             self._contract_filter_remap()
 
@@ -104,9 +198,9 @@ class BlanksAndDitherRemapping:
         self.blanks_list = []
         self.blanks_numberOfDeadPixels = random.randint(1, self.blanks_maxNumberOfDeadPixels)
 
-        if random.random() < self.blankColorAsColorProb :
+        if random.random() < self.blankColorAsColorProb:
             self.blankColor = self.altColor
-        else :
+        else:
             self.blankColor = self.blankColorBase
 
         for _ in range(self.blanks_numberOfDeadPixels):
@@ -126,14 +220,16 @@ class BlanksAndDitherRemapping:
             _poly = ((x0, y0), (x1, y1), (x2, y2), (x3, y3), (x0, y0))
             self.blanks_list.append(_poly)
 
+
     def draw_poly_blanks(self, draw_ref=None):
         _draw = draw_ref or self.destinationImageDraw
-        
+
         for p in range(self.blanks_numberOfDeadPixels):
             _poly = self.blanks_list[p]
             _draw.polygon(_poly, fill=self.blankColor)
 
-    def _load_blank_configs(self, workConfig, configSectionName, destinationImageDraw):
+
+    def _load_blank_configs(self, workConfig, configSectionName):
         self.useBlanks = workConfig.getboolean(configSectionName, "useBlanks", fallback=True)
         self.resetBlanksProb = float(workConfig.get(configSectionName, "resetBlanksProb", fallback="0.001"))
         self.blankColorAsColorProb = float(workConfig.get(configSectionName, "blankColorAsColorProb", fallback="0.5"))
@@ -143,30 +239,32 @@ class BlanksAndDitherRemapping:
         self.blanks_colsRange = [int(x) for x in workConfig.get(configSectionName, "colsRange", fallback="32,256").split(",")]
         self.blanks_rowsRange = [int(x) for x in workConfig.get(configSectionName, "rowsRange", fallback="32,256").split(",")]
         self.blankPolyVariation = int(workConfig.get(configSectionName, "blankPolyVariation", fallback="10"))
-        self.destinationImageDraw = destinationImageDraw
+        # self.destinationImageDraw = destinationImageDraw
         self.blankColorBase = (0, 0, 0, 15)
         self.blankColor = (0, 0, 0, 15)
         self.reset_poly_blanks()
 
     # ----- panel based overlays ---------
-    
+
     # adding panel modulation to mimic physical panel differences
     def _load_overlay_configs(self, workConfig, configSectionName):
-        self.usingPanelOverlays = workConfig.getboolean(configSectionName, "usingPanelOverlays", fallback=False)
-        self.panelWidth = int(workConfig.get(configSectionName, "panelWidth", fallback="64"))
-        self.panelHeight = int(workConfig.get(configSectionName, "panelHeight", fallback="32"))
-        self.panelColumns = int(workConfig.get(configSectionName, "panelColumns", fallback="10"))
-        self.panelRows = int(workConfig.get(configSectionName, "panelRows", fallback="10"))
-        self.panelOverlayRange = [int(x) for x in workConfig.get(configSectionName, "panelOverlayRange", fallback="1,30").split(",")]
-        self.panelOverlayChangeProb = float(workConfig.get(configSectionName, "panelOverlayChangeProb", fallback=".0003"))
-        self.panelOverlayAmount = float(workConfig.get(configSectionName, "panelOverlayAmount", fallback=".1"))
-        self.usingPanelOverlays = self.panelColumns != 0 and self.panelRows != 0
-        # self.setPanelOverlays()
+        self._load_config_value(workConfig, configSectionName, "usingPanelOverlays", False, bool)
+        self._load_config_value(workConfig, configSectionName, "panelWidth", 64, int)
+        self._load_config_value(workConfig, configSectionName, "panelHeight", 32, int)
+        self._load_config_value(workConfig, configSectionName, "panelColumns", 10, int)
+        self._load_config_value(workConfig, configSectionName, "panelRows", 10, int)
+        self._load_config_value(workConfig, configSectionName, "panelOverlayChangeProb", 0.0003, float)
+        self._load_config_value(workConfig, configSectionName, "panelOverlayAmount", 0.1, float)
+        self._load_config_value(workConfig, configSectionName, "panelOverlayRange", "1,30", str)
+
+        pieceLogger(self.panelOverlayRange)
+        self.panelOverlayRange = [int(x) for x in self.panelOverlayRange.split(",")]
+
 
     def setPanelOverlays(self):
         if not self.usingPanelOverlays:
             return
-        
+
         self.panelOverLayList = []
         self.fullpanelOverLayList = []
         self.overlayImageDraw.rectangle((0, 0, self.configRef.canvasWidth, self.configRef.canvasHeight), fill=(0, 0, 0, 0))
@@ -174,7 +272,6 @@ class BlanksAndDitherRemapping:
         _totalPanels = self.panelRows * self.panelColumns
         _numPanels = random.randint(self.panelOverlayRange[0], min(_totalPanels, self.panelOverlayRange[1]))
 
-        _numPanels = 2
 
         # create an array of panel spots then joggle it
         for c in range(0, self.panelColumns):
@@ -191,13 +288,17 @@ class BlanksAndDitherRemapping:
 
         pieceLogger(f"{self.panelOverLayList}   {_numPanels}")
 
+
     def drawPanelVariations(self):
+        if not self.usingPanelOverlays:
+            return
+
         for p in self.panelOverLayList:
             x0 = p[0] * self.panelWidth
             y0 = p[1] * self.panelHeight
             x1 = x0 + self.panelWidth
             y1 = y0 + self.panelHeight
-            self.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=(255,0,0,200))
+            self.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=(255, 0, 0, 200))
 
         tempImage = ImageChops.add(self.targetImageRef, self.overlayImage, round(100 * self.panelOverlayAmount))
         self.targetImageRef.paste(tempImage, (0, 0), tempImage)
@@ -206,16 +307,26 @@ class BlanksAndDitherRemapping:
 
     def handleOverlayActions(self):
         """Handles filter remapping if enabled."""
+
+        # pieceLogger("---------")
+        # pieceLogger(f"self.filterRemappingChangeProb: {self.filterRemappingChangeProb} self.use_filters: {self.use_filters} self.filterRemapping:{self.filterRemapping}")
+        # pieceLogger("---------")
+        # pieceLogger(f"self.resetBlanksProb: {self.resetBlanksProb} self.useBlanks: {self.useBlanks} ")
+        # pieceLogger("---------")
+        # pieceLogger(f"self.panelOverlayChangeProb: {self.panelOverlayChangeProb} self.usingPanelOverlays: {self.usingPanelOverlays} ")
+        # pieceLogger("---------")
+
+
         if random.random() < self.filterRemappingChangeProb and (self.use_filters and self.filterRemapping):
             self.remap_filter()
 
         if random.random() < self.resetBlanksProb and self.useBlanks:
             self.reset_poly_blanks()
 
-        if self.useBlanks :
+        if self.useBlanks:
             self.draw_poly_blanks()
 
-        if random.random() < self.panelOverlayChangeProb:
+        if random.random() < self.panelOverlayChangeProb and self.usingPanelOverlays:
             self.setPanelOverlays()
 
         if self.usingPanelOverlays:

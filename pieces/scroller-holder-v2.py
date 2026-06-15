@@ -25,7 +25,6 @@ from PIL import (
 
 global config, overlayControls
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 ## Image manipulations
 
 
@@ -52,9 +51,6 @@ def glitchBox(img, r1=-10, r2=10, dir="horizontal"):
             cp1 = img.crop((dx, 0, dx + sectionWidth, sectionHeight))
 
         img.paste(cp1, (int(0 + dx), int(0 + dy)))
-
-
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
 ## Layer imagery
@@ -393,9 +389,6 @@ def remakeMessage(imageRef, messageString="FooBar", direction=1):
     # config.textVOffest = round(random.uniform(-12, -30))
     config.colorMode = "randomColor" if random.random() < 0.5 else "getRandomRGB"
     # makeMessage(imageRef=imageRef, messageString=messageString, direction=direction)
-
-
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 
 def makeBackGround(drawRef, n=1):
@@ -890,9 +883,6 @@ def configureBackgroundScrolling():
     config.scrollArray.append(scrollerRef)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-
-
 def configureImageScrolling():
     global workConfig
     config.imageSpeed = float(workConfig.get("scroller", "imageSpeed"))
@@ -1017,10 +1007,7 @@ def configureImageOverlay():
     config.loadedImageCopy = config.loadedImage.copy()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-
 # ---------------------------------#
-
 
 # ---------------------------------#
 
@@ -1259,9 +1246,15 @@ def init():
         pieceLogger(f"Config not found: {e}", 1)
         config.useFadeThruAnimation = True
 
-    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "scroller", config.workImageDraw)
+    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "scroller")
+    # for blanks
+    overlayControls.destinationImageDraw = config.workImageDraw
+    overlayControls.targetImageRef = config.workImage
+    # for overlay
+    # overlayControls.overlayImage = config.overlayImage
+    # overlayControls.overlayImageDraw = config.overlayImageDraw
+    # overlayControls.setPanelOverlays()
     
-
 
 def runWork():
     global config
@@ -1326,10 +1319,7 @@ def processImageForScrolling():
             segment = ImageOps.flip(segment)
             # segment = ImageOps.mirror(segment)
             segment = segment.rotate(180)
-            # _temp = segment.copy()
-            # _temp.rotate(180)
-            # _temp = ImageOps.mirror(_temp)
-            # segment.paste(_temp,(0,0),_temp)
+
 
         # segment = ImageChops.add_modulo(segment, textsegment)
         # segment = ImageChops.composite(segment, textsegment, textsegment)

@@ -91,40 +91,22 @@ class BlanksAndDitherRemapping:
         self._load_overlay_configs(workConfig, configSectionName)
 
 
-    def _load_config_value(self, workConfig, section, option, default, type_converter):
-
-        pieceLogger(section)
-        pieceLogger(option)
-        pieceLogger(default)
-        pieceLogger(type_converter)
-
-        try:
-            if type_converter == bool:
-                setattr(self, option, type_converter(workConfig.getboolean(section, option)))
-            elif type_converter == str:
-                setattr(self, workConfig.get(section, option, default))
-            else:
-                setattr(self, option, type_converter(workConfig.get(section, option)))
-        except Exception as e:
-            pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
-            setattr(self, option, default)
-
     # ---- dither remapping ------------
 
     def _load_filter_remapping(self, workConfig, configSectionName):
-        self._load_config_value(workConfig, configSectionName, "filterRemapping", False, bool)
-        self._load_config_value(workConfig, configSectionName, "filterRemappingProb", 0.0, float)
-        self._load_config_value(workConfig, configSectionName, "filterRemappingReappearProb", 0.10, float)
-        self._load_config_value(workConfig, configSectionName, "filterRemapMinHoriSize", 1, int)
-        self._load_config_value(workConfig, configSectionName, "filterRemapMaxHoriSize", 1, int)
-        self._load_config_value(workConfig, configSectionName, "filterRemapMinVertSize", 1, int)
-        self._load_config_value(workConfig, configSectionName, "filterRemapMaxVertSize", 1, int)
-        self._load_config_value(workConfig, configSectionName, "filterRemapRangeY", 1, int)
-        self._load_config_value(workConfig, configSectionName, "filterRemapRangeX", 1, int)
-        self._load_config_value(workConfig, configSectionName, "contractXSpeed", 1, int)
-        self._load_config_value(workConfig, configSectionName, "contractYSpeed", 1, int)
-        self._load_config_value(workConfig, configSectionName, "expandXSpeed", 1, int)
-        self._load_config_value(workConfig, configSectionName, "expandYSpeed", 1, int)
+        self.filterRemapping = workConfig.getboolean(configSectionName, "useBlanks", fallback=False)
+        self.filterRemappingProb = float(workConfig.get(configSectionName, "filterRemappingProb", fallback=0.0))
+        self.filterRemappingReappearProb = float(workConfig.get(configSectionName, "filterRemappingReappearProb", fallback=0.10))
+        self.filterRemapMinHoriSize = int(workConfig.get(configSectionName, "filterRemapMinHoriSize", fallback=1))
+        self.filterRemapMaxHoriSize = int(workConfig.get(configSectionName, "filterRemapMaxHoriSize", fallback=1))
+        self.filterRemapMinVertSize = int(workConfig.get(configSectionName, "filterRemapMinVertSize", fallback=1))
+        self.filterRemapMaxVertSize = int(workConfig.get(configSectionName, "filterRemapMaxVertSize", fallback=1))
+        self.filterRemapRangeY = int(workConfig.get(configSectionName, "filterRemapRangeY", fallback=1))
+        self.filterRemapRangeX = int(workConfig.get(configSectionName, "filterRemapRangeX", fallback=1))
+        self.contractXSpeed = int(workConfig.get(configSectionName, "contractXSpeed", fallback=1))
+        self.contractYSpeed = int(workConfig.get(configSectionName, "contractYSpeed", fallback=1))
+        self.expandXSpeed = int(workConfig.get(configSectionName, "expandXSpeed", fallback=1))
+        self.expandYSpeed = int(workConfig.get(configSectionName, "expandYSpeed", fallback=1))
 
         self.filterRemappingChangeProb = self.filterRemappingProb
         self.filterRemapContracting = 0
@@ -243,16 +225,14 @@ class BlanksAndDitherRemapping:
 
     # adding panel modulation to mimic physical panel differences
     def _load_overlay_configs(self, workConfig, configSectionName):
-        self._load_config_value(workConfig, configSectionName, "usingPanelOverlays", False, bool)
-        self._load_config_value(workConfig, configSectionName, "panelWidth", 64, int)
-        self._load_config_value(workConfig, configSectionName, "panelHeight", 32, int)
-        self._load_config_value(workConfig, configSectionName, "panelColumns", 10, int)
-        self._load_config_value(workConfig, configSectionName, "panelRows", 10, int)
-        self._load_config_value(workConfig, configSectionName, "panelOverlayChangeProb", 0.0003, float)
-        self._load_config_value(workConfig, configSectionName, "panelOverlayAmount", 0.1, float)
-        self._load_config_value(workConfig, configSectionName, "panelOverlayRange", "1,30", str)
-
-        pieceLogger(self.panelOverlayRange)
+        self.usingPanelOverlays = workConfig.getboolean(configSectionName, "usingPanelOverlays", fallback=False)
+        self.panelWidth = int(workConfig.get(configSectionName, "panelWidth", fallback=64))
+        self.panelHeight = int(workConfig.get(configSectionName, "panelHeight", fallback=32))
+        self.panelColumns = int(workConfig.get(configSectionName, "panelColumns", fallback=10))
+        self.panelRows = int(workConfig.get(configSectionName, "panelRows", fallback=10))
+        self.panelOverlayChangeProb = float(workConfig.get(configSectionName, "panelOverlayChangeProb", fallback=0.0003))
+        self.panelOverlayAmount = float(workConfig.get(configSectionName, "panelOverlayAmount", fallback=0.1) )
+        self.panelOverlayRange = workConfig.get(configSectionName, "panelOverlayRange", fallback="1,30")
         self.panelOverlayRange = [int(x) for x in self.panelOverlayRange.split(",")]
 
 

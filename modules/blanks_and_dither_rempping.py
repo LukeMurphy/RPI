@@ -3,21 +3,25 @@ from modules.configuration import bcolors, pieceLogger
 from PIL import Image, ImageDraw, ImageChops
 
 """
-global overlayControls
 # initiate
+#-------------------------------------------------------
+global overlayControls
 overlayControls = BlanksAndDitherRemapping(config,  workConfig, "[PIECE SECTION NAME]")
 
 # For blanks
+#-------------------------------------------------------
 overlayControls.altColor = config.bgBackGroundEndColor
 overlayControls.targetImageRef = config.destinationImage
 overlayControls.destinationImageDraw = config.destinationImageDraw
 
 # for overlay blocks
+#-------------------------------------------------------
 overlayControls.overlayImage = config.overlayImage
 overlayControls.overlayImageDraw = config.overlayImageDraw
 overlayControls.setPanelOverlays()
 
 # Run every cycle:
+#-------------------------------------------------------
 global overlayControls
 if overlayControls.usingPanelOverlays :
     overlayControls.targetImageRef = config.destinationImage
@@ -30,12 +34,6 @@ overlayControls.handleOverlayActions()
 
 #-------------------------------------------------------
 #----- for blanks_and_dither_remapping module ----------
-#-------------------------------------------------------
-
-#-------------------------------------------------------
-#----- for blanks_and_dither_remapping module ----------
-#-------------------------------------------------------
-
 #---------------------  blanks blocks ------------------
 useBlanks = True
 resetBlanksProb = .0005
@@ -70,6 +68,7 @@ panelHeight = 64
 panelOverlayRange = 5,10
 panelOverlayChangeProb = .0001
 panelOverlayAmount = .11
+#-------------------------------------------------------
 
 
 

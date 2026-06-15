@@ -1,9 +1,4 @@
 import random
-import string
-from tokenize import Floatnumber, String
-from xmlrpc.client import Boolean
-
-from sympy import Integer
 from modules.configuration import bcolors, pieceLogger
 from PIL import Image, ImageDraw, ImageChops
 

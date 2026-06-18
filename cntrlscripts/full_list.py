@@ -29,7 +29,7 @@ _quitClr = "#74144c"
 _stopAllClr = "#9e1b67"
 
 _prodColor = "#85f3d6"
-_stagingColor = "#f2f219"
+_stagingColor = "#fafad3"
 _devFormsClr = "#3bdde2"
 _devClr = "#cef7f8"
 _devFormsClr = "#79fcf3"

@@ -206,7 +206,7 @@ class BlanksAndDitherRemapping:
 
 
     def _load_blank_configs(self, workConfig, configSectionName):
-        self.useBlanks = workConfig.getboolean(configSectionName, "useBlanks", fallback=True)
+        self.useBlanks = workConfig.getboolean(configSectionName, "useBlanks", fallback=False)
         self.resetBlanksProb = float(workConfig.get(configSectionName, "resetBlanksProb", fallback="0.001"))
         self.blankColorAsColorProb = float(workConfig.get(configSectionName, "blankColorAsColorProb", fallback="0.5"))
         self.blanks_maxNumberOfDeadPixels = int(workConfig.get(configSectionName, "numberOfDeadPixels", fallback="1"))

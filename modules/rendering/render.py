@@ -400,6 +400,8 @@ def _doReMappingBlocks():
             _reMapBlockShift("remapImageBlockShift4")
         if config.remapImageBlockShift5:
             _reMapBlockShift("remapImageBlockShift5")
+        if config.remapImageBlockShift6:
+            _reMapBlockShift("remapImageBlockShift6")
 
 
 def _blurringCall():

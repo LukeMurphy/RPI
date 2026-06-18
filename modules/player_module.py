@@ -179,7 +179,7 @@ def _configure_ReMapping(config, workconfig):
 
 def _specialShiftBlockRemapping(workconfig, config):
     # remapImageBlockShift
-    for i in range(1,6) :
+    for i in range(1,7) :
         _suff= ""
         if i > 1:
             _suff = str(i)

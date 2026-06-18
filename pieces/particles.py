@@ -3,7 +3,7 @@ import math
 import random
 
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import coloroverlay, colorutils, panelDrawing
 from modules.particleobjects.particle import Particle
 from modules.particleobjects.particlesystem import ParticleSystem
@@ -178,6 +178,8 @@ def main(run=True):
     except Exception as e:
         print(e)
         ps.meanderFactor = 1.0
+
+    pieceLogger(ps.meanderFactor)
 
     try:
         ps.meanderFactor2 = float(workConfig.get("particleSystem", "meanderFactor2"))
@@ -572,7 +574,7 @@ def main(run=True):
 
     setUp()
 
-    config.debugSelf()
+    # config.debugSelf()
 
     if run:
         runWork()

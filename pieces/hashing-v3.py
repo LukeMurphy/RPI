@@ -13,6 +13,10 @@ from pieces.screen import Holder
 # ################################################### #
 # hatching hashing lines
 
+class Pen:
+    def __init__(self):
+        pass
+
 
 class InformalLine:
 
@@ -26,6 +30,10 @@ class InformalLine:
     angle = 0
     direction = 0
     isColumn = 1
+    name = ""
+
+    attenuating = False
+    enlarging = False
 
     def __init__(self, unitNumber):
         self.unitNumber = unitNumber
@@ -201,63 +209,6 @@ def _bgColorsFilling(config):
             config.bgGlitchDisplacementHorizontal,
             config.bgGlitchDisplacementVertical,
         )
-
-
-def _moireOverLay(currentAnimation, config, bgColor):
-    """Applies moire pattern and animates the current animation."""
-    _draw_background(currentAnimation, config, bgColor)
-    _draw_moire_pattern(currentAnimation, config)
-    _paste_animation_frame(currentAnimation)
-
-    if not config.allPause:
-        _animate(currentAnimation.anim, currentAnimation, config)
-
-    currentAnimation.anim.pause = config.allPause
-
-    if random.SystemRandom().random() < currentAnimation.changeAnimProb:
-        reConfigAnimationCell(currentAnimation.anim, currentAnimation)
-
-
-def _draw_background(currentAnimation, config, bgColor):
-    """Draws the background color on the animation image."""
-    bgColor = (
-        round(config.brightness * bgColor[0]),
-        round(config.brightness * bgColor[1]),
-        round(config.brightness * bgColor[2]),
-        currentAnimation.bg_alpha,
-    )
-    currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
-
-    if config.useBgBox:
-        currentAnimation.animationImage.paste(config.underLayer, (0, 0), config.underLayer)
-
-
-def _draw_moire_pattern(currentAnimation, config):
-    """Draws the moire pattern if enabled."""
-    if not config.drawMoire:
-        return
-
-    c1 = (round(config.brightness * 150), round(config.brightness * 50), 0, 150)
-    if config.setMoireColor:
-        c1 = config.moireColor
-        if random.SystemRandom().random() < config.moireColorAltProb:
-            c1 = config.moireColorAlt
-
-    for ii in range(2):
-        xc = ii * config.moireXDistance + config.moireXPos
-        yc = ii * config.moireYDistance + config.moireYPos
-        for i in range(1200):
-            w = 3 * config.canvasWidth - i * 6
-            if w > 1:
-                x0 = xc - w / 2
-                y0 = yc - w / 2
-                x1 = xc + w / 2
-                y1 = yc + w / 2
-
-                x1 = max(x0 + 1, x1)
-                y1 = max(y0 + 1, y1)
-
-                currentAnimation.animationImageDraw.ellipse((x0, y0, x1, y1), fill=None, outline=c1)
 
 
 # -------- Line Attribute Function --------- #
@@ -465,45 +416,116 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
     _p1 = [p1x, p1y]
     _p2 = [p2x, p2y]
 
-    # _dy = _p1[1] - _p2[1]
-    # _dx = _p1[0] - _p2[0]
-
-    # _angle = math.atan2(_dy, _dx) * 360 / math.pi
-
-    # if _angle < 0:
-    #     _angle += 360
-
-    # _totalPts = len(_lineUnit.curvedPoints)
-    # _ratio1 = _n / _totalPts
-    # _ratio1a = _ratio1 / _lineUnit.ratioFactor
-    # _ratio2 = (_totalPts - _n) / _totalPts
-    # _ratio2a = _ratio2 / _lineUnit.ratioFactor
-
-    # _t = (_n / math.pi) / 70
-    # _ratio = math.sin(_t + math.pi / 5) * math.pow(math.sin(_t), 0) * _ratio1a
-
     _ratio = 1.0
     _ratio1a = 1.0
 
     _penWidth = _lineUnit.baseWidth * _ratio * _ratio1a
 
-    # _alphaBase = 2
-    # _r = round(190 * (_ratio * 3))
-    # _g = round(100 * _ratio)
-    # _b = round(20 * (_totalPts - _n) / _totalPts)
-    # _a = round(_alphaBase * _ratio)
-
-    # fillClr = [_r, _g, _b, _a]
-
     fillClr = _lineUnit.lineColor
     if config.lineColorIsBgColor:
         fillClr = config.bgColor
 
-    # _lineUnit.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
     if _lineUnit.angle == 90:
         config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
     else:
         config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(_lineUnit.baseWidth))
+
+
+def drawLinePolyEnvelope(_lineUnit):
+    # Draw the shape
+    if _lineUnit._p == 1:
+        pieceLogger(f"Drawing Line with: {_lineUnit.name}")
+
+    if _lineUnit._p < len(_lineUnit.smooth_points) and _lineUnit._p > 0:
+        _p1 = _lineUnit.smooth_points[_lineUnit._p - 1]
+        _p2 = _lineUnit.smooth_points[_lineUnit._p]
+        _base = math.pi
+        if _lineUnit.angle == 90:
+            _p1[0] = _lineUnit.smooth_points[_lineUnit._p - 1][1]
+            _p1[1] = _lineUnit.smooth_points[_lineUnit._p - 1][0]
+            _p2[0] = _lineUnit.smooth_points[_lineUnit._p][1]
+            _p2[1] = _lineUnit.smooth_points[_lineUnit._p][0]
+            _base = 0
+
+        _dy = _p1[1] - _p2[1]
+        _dx = _p1[0] - _p2[0]
+        
+        _orthoAngle = _base - math.atan2(_dy, _dx)
+
+        _angle = math.atan2(_dy, _dx) * 360 / math.pi
+
+        if _angle < 0:
+            _angle += 360
+
+        _lineUnitWidth = _lineUnit._w
+        _lineColor = _lineUnit.lineColor
+
+        _sinOrthoAngle = math.sin(_orthoAngle)
+        _cosOrthoAngle = math.cos(_orthoAngle)
+
+        _orthoD = _lineUnitWidth / 2.2
+
+        _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
+        _orthoP1y = round(_orthoD * _cosOrthoAngle + _p1[1])
+
+        _orthoP2x = round(_orthoD * _sinOrthoAngle + _p2[0])
+        _orthoP2y = round(_orthoD * _cosOrthoAngle + _p2[1])
+
+        _orthoP3x = round(-_orthoD * _sinOrthoAngle + _p2[0])
+        _orthoP3y = round(-_orthoD * _cosOrthoAngle + _p2[1])
+
+        _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
+        _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
+
+        try:
+            if _lineUnit._p > 1:
+
+                _orthoP1x = _lineUnit.lastOrthoPoint[0]
+                _orthoP1y = _lineUnit.lastOrthoPoint[1]
+
+                _orthoP4x = _lineUnit.lastOrthoPoint[2]
+                _orthoP4y = _lineUnit.lastOrthoPoint[3]
+
+        except Exception as e:
+            print(e)
+
+        _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
+
+        config.draw.polygon(_poly, fill=_lineColor, outline=None)
+
+        _lineUnit.lastAngle = _angle
+        _lineUnit._p += 1
+        _lineUnit.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
+
+        if _lineUnit._p == len(_lineUnit.smooth_points):
+            _lineUnit._p = 0
+
+        if random.random() < _lineUnit.changeMarkWidthProb:
+            if not _lineUnit.attenuating and not _lineUnit.enlarging:
+                if random.random() < 0.5:
+                    _lineUnit.attenuating = True
+                else:
+                    _lineUnit.enlarging = True
+            elif random.random() < _lineUnit.changeMarkWidthProb * 2:
+                if _lineUnit.attenuating:
+                    _lineUnit.enlarging = True
+                    _lineUnit.attenuating = False
+                else:
+                    _lineUnit.enlarging = False
+                    _lineUnit.attenuating = True
+
+        if _lineUnit._w > _lineUnit.maxMarkWidth:
+            _lineUnit.enlarging = False
+
+        if _lineUnit._w <= _lineUnit.minMarkWidth:
+            _lineUnit.attenuating = False
+            _lineUnit._w = _lineUnit.minMarkWidth
+
+        if _lineUnit.enlarging:
+            _lineUnit._w += round(1 * _lineUnit.incrementFactor)
+        if _lineUnit.attenuating:
+            _lineUnit._w -= round(1 * _lineUnit.incrementFactor)
+
 
 
 def drawTheBG():
@@ -529,6 +551,18 @@ def informalLines():
         for pt in pointsToDraw:
             drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _ptCounter, lineUnit)
             lastPt = [pt[0], pt[1]]
+            _ptCounter += 1
+
+        _ptCounter = 0
+        lineUnit.smooth_points = pointsToDraw
+        lineUnit._w = 1
+        lineUnit.maxMarkWidth = 8
+        lineUnit.minMarkWidth = 1
+        lineUnit.changeMarkWidthProb = .3
+        lineUnit.incrementFactor = .710
+        for pt in pointsToDraw:
+            lineUnit._p = _ptCounter
+            # drawLinePolyEnvelope(lineUnit)
             _ptCounter += 1
 
         if (lineUnit.angle != 0 and random.random() < config.horizontalMovementProb) or (lineUnit.angle == 0 and random.random() < config.verticalMovementProb):

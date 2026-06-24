@@ -131,12 +131,15 @@ def drawSpinner():
 
     for s in range(0, config.spinnerAngleSteps):
         angle = s * 2 * math.pi / config.spinnerAngleSteps + config.spinnerAngle
-        sX0 = config.spinnerInnerRadius * math.sin(angle) + config.spinnerCenter[0]
-        sX = config.spinnerRadius * math.sin(angle) + config.spinnerCenter[0]
-        sY0 = config.spinnerInnerRadius * math.cos(angle) + config.spinnerCenter[1]
-        sY = config.spinnerRadius * math.cos(angle) + config.spinnerCenter[1]
         b = float(s) / float(config.spinnerAngleSteps + 2)
-        fillColor = (round(1 * 250), round(1 * 200), 0, round(b * 250))
+
+        sX0 = config.spinnerInnerRadius  * math.sin(angle) + config.spinnerCenter[0]
+        sY0 = config.spinnerInnerRadius  * math.cos(angle) + config.spinnerCenter[1]
+        
+        sX = (config.spinnerRadius +  b/2 * 4) * math.sin(angle) + config.spinnerCenter[0]
+        sY = (config.spinnerRadius +  b/2 * 4) * math.cos(angle) + config.spinnerCenter[1]
+        
+        fillColor = (round(1 * 250 * config.brightness), round(1 * 200 * config.brightness), 0, round(b * 250))
         # if (b <=.01) : fillColor = barColor
         if s % config.spinnerMarkSteps == 0:
             config.draw.line((sX0, sY0, sX, sY), fill=fillColor, width=config.spinnerLineWidth)
@@ -151,9 +154,14 @@ def drawBar():
 
     # draw box container
 
+    # flip the red and green for effect
     gVd = round(config.barColor[0] * 0.41)
     rVd = round(config.barColor[1] * 0.41)
     bVd = round(config.barColor[2] * 0.41)
+
+    rVd = round(30 * config.brightness)
+    gVd = 0
+    bVd = round(80 * config.brightness)
 
     config.draw.rectangle(
         (
@@ -171,7 +179,7 @@ def drawBar():
         config.draw.line(
             (l - config.slidingOffset, -5, l - 40 - config.slidingOffset, config.boxHeight + 5),
             width=3,
-            fill=(round(config.barColor[0] * 0.7), round(config.barColor[1] * 0.7), round(config.barColor[2] * 0.7), 10),
+            fill=(round(config.barColor[0] * 0.7 * config.brightness), round(config.barColor[1] * 0.7 * config.brightness), round(config.barColor[2] * 0.7 * config.brightness), 10),
         )
 
     config.slidingOffset += 1
@@ -260,16 +268,16 @@ def decisions():
     #     config.messageOverrideActive = False
 
     if config.percentage <= 1:
-        config.messageClr = (255, 0, 0, 100)
+        config.messageClr = (round(255 * config.brightness), 0, 0, 100)
 
     if config.percentage > 2:
         config.messageClr = config.messageClrBase
 
     if config.percentage >= config.target:
-        config.messageClr = (255, 10, 0, 100)
+        config.messageClr = (round(255 * config.brightness), round(10 * config.brightness), 0, 100)
 
     if config.percentage >= config.pausePoint:
-        config.messageClr = (255, 100, 0, 100)
+        config.messageClr = (round(255 * config.brightness), round(100 * config.brightness), 0, 100)
 
     if random.random() < config.noBarProb * config.processorFactor:
         config.drawBarFill = False
@@ -585,13 +593,13 @@ def main(run=True):
         config.filterRemapRangeY = config.canvasHeight
 
     config.outlineColor = (1, 1, 1)
-    config.barColorEnd = (200, 200, 0)
-    config.barColorStart = (0, 200, 200)
-    config.barColor = (10, 10, 100)
-    config.barColorBase = (200, 0, 0)
+    config.barColorEnd = (round(200 * config.brightness), round(200 * config.brightness), 0)
+    config.barColorStart = (0, round(200 * config.brightness), round(200 * config.brightness))
+    config.barColor = (10, 10, round(100 * config.brightness))
+    config.barColorBase = (round(200 * config.brightness), 0, 0)
     config.holderColor = (0, 0, 0)
-    config.messageClr = (255, 255, 255, 100)
-    config.messageClrBase = (255, 255, 255, 100)
+    config.messageClr = (round(255 * config.brightness), round(255 * config.brightness), round(255 * config.brightness), 100)
+    config.messageClrBase = (round(255 * config.brightness), round(255 * config.brightness), round(255 * config.brightness), 100)
     config.shadowColor = (0, 0, 0, 100)
 
     config.spinnerAngle = 0

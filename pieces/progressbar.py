@@ -125,8 +125,9 @@ def drawSpinner():
                 config.spinnerCenter[0] + r,
                 config.spinnerCenter[1] + r,
             ),
-            outline=(10, 10, 10, 40),
+            outline=None,
         )
+        # outline=(10, 10, 10, 40),
 
     for s in range(0, config.spinnerAngleSteps):
         angle = s * 2 * math.pi / config.spinnerAngleSteps + config.spinnerAngle
@@ -134,8 +135,8 @@ def drawSpinner():
         sX = config.spinnerRadius * math.sin(angle) + config.spinnerCenter[0]
         sY0 = config.spinnerInnerRadius * math.cos(angle) + config.spinnerCenter[1]
         sY = config.spinnerRadius * math.cos(angle) + config.spinnerCenter[1]
-        b = float(s) / float(config.spinnerAngleSteps)
-        fillColor = (round(b * 250), round(b * 200), 0, 200)
+        b = float(s) / float(config.spinnerAngleSteps + 2)
+        fillColor = (round(1 * 250), round(1 * 200), 0, round(b * 250))
         # if (b <=.01) : fillColor = barColor
         if s % config.spinnerMarkSteps == 0:
             config.draw.line((sX0, sY0, sX, sY), fill=fillColor, width=config.spinnerLineWidth)
@@ -150,9 +151,9 @@ def drawBar():
 
     # draw box container
 
-    rVd = round(config.barColor[0] * 0.1)
-    gVd = round(config.barColor[1] * 0.1)
-    bVd = round(config.barColor[2] * 0.1)
+    gVd = round(config.barColor[0] * 0.41)
+    rVd = round(config.barColor[1] * 0.41)
+    bVd = round(config.barColor[2] * 0.41)
 
     config.draw.rectangle(
         (
@@ -164,6 +165,18 @@ def drawBar():
         outline=(config.outlineColor),
         fill=((rVd, gVd, bVd)),
     )
+
+    # draw slanted bg bars
+    for l in range(0, config.boxMax * 2, 8):
+        config.draw.line(
+            (l - config.slidingOffset, -5, l - 40 - config.slidingOffset, config.boxHeight + 5),
+            width=3,
+            fill=(round(config.barColor[0] * 0.7), round(config.barColor[1] * 0.7), round(config.barColor[2] * 0.7), 10),
+        )
+
+    config.slidingOffset += 1
+    if config.slidingOffset > config.boxMax - 40:
+        config.slidingOffset = 0
 
     # draw bar
     config.boxWidthDisplay = config.boxWidth
@@ -192,7 +205,7 @@ def drawBar():
     if config.useVerticalColorGradient:
         # Draw vertical shading gradient
         for n in range(0, lines):
-            yPos = config.yPos1 + n
+            yPos = config.yPos1 + n - 1
             b = math.sin(arc * n) * config.brightness + 0.3
             # b = cyclicalBrightness
             # if b < .75 : b = .75
@@ -475,16 +488,23 @@ def iterate():
     # Display bar, spinner, message or %
     reDraw()
 
-    if random.random() < config.filterRemappingProb:
-        if config.useFilters == True and config.filterRemapping == True:
-            config.filterRemap = True
-            startX = round(random.uniform(0, config.filterRemapRangeX))
-            startY = round(random.uniform(0, config.filterRemapRangeY))
-            endX = round(random.uniform(8, config.filterRemapminHoriSize))
-            endY = round(random.uniform(8, config.filterRemapminVertSize))
-            config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-            config.remapImageBlockDestination = [startX, startY]
-            # pieceLogger("swapping" + str(config.remapImageBlockSection))
+    startX = round(config.xPos2 + 3)
+    startY = round(0)
+    endX = round(config.boxMax)
+    endY = round(config.boxHeight)
+    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+    config.remapImageBlockDestination = [startX, startY]
+
+    # if random.random() < config.filterRemappingProb:
+    #     if config.useFilters == True and config.filterRemapping == True:
+    #         config.filterRemap = True
+    #         startX = round(random.uniform(0, config.filterRemapRangeX))
+    #         startY = round(random.uniform(0, config.filterRemapRangeY))
+    #         endX = round(random.uniform(8, config.filterRemapminHoriSize))
+    #         endY = round(random.uniform(8, config.filterRemapminVertSize))
+    #         config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+    #         config.remapImageBlockDestination = [startX, startY]
+    #         # pieceLogger("swapping" + str(config.remapImageBlockSection))
 
     # Do the final rendering of the composited image
     config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
@@ -497,6 +517,8 @@ def main(run=True):
     global config
     global workConfig
     config.debug = workConfig.getboolean("progressbar", "debug")
+
+    config.slidingOffset = 0
 
     config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.draw = ImageDraw.Draw(config.image)

@@ -610,11 +610,12 @@ def main(run=True):
         "COMPLETE",
         "COMPLETED.",
         "RESTARTING",
-        "RELOADING",
+        "LOADING",
         "PAUSED",
-        "UDATING",
+        "UPDATING",
         "LOAD WARNING",
-        "ERROR 49",
+        "POSSIBLE ERROR",
+        "OF NULL",
     ]
     config.altStringMessage = "PLEASE WAIT"
     colorutils.brightness = 1

@@ -94,7 +94,7 @@ def ditherGlitch(renderImageFull, xOffset, yOffset, config):
     newimage = renderImageFull.convert("P", dither=Image.FLOYDSTEINBERG, colors=nc)
 
     renderImageFull = newimage.convert("RGB")
-    renderImageFull = newimage.copy()
+    # renderImageFull = newimage.copy()  # bug: was returning P-mode, breaking alpha-blend paste next frame
     return renderImageFull
 
 

@@ -3,23 +3,24 @@
 
 """
 p4-3x8-informal/quilt-triangles-b
-
 p4-3x8-informal/quilt
 """
 
 import argparse
 import configparser
-import getopt
 import os
-import random
 import sys
 import threading
 import time
 
-from threading import Timer
-from modules import configuration, workobject
-from modules.configuration import Config, bcolors
+from PIL import Image, ImageTk
+
+from modules import configuration, player_module
+from modules.configuration import bcolors
+from modules.configuration import pieceLogger
+from modules import rendering
 from modules.rendering import appWindow, renderClass
+
 
 # Create a blank dummy object container for now
 # config = type('', (object,), {})()
@@ -46,8 +47,8 @@ def loadFromArguments(masterConfig, reloading=False):
 		# 		the config file to load
 		"""
 		args = sys.argv
-		print("Arguments passed to player.py:")
-		print(args)
+		pieceLogger("Arguments passed to player.py:")
+		pieceLogger(args)
 		"""
 
 		loadTheConfig(masterConfig)
@@ -70,12 +71,12 @@ def loadFromArguments(masterConfig, reloading=False):
 	else:
 		#### TO BE IMPLEMENTED - NEED TO KILL ALL THE THREADS AND THEN
 		#### RELOAD WINDOW ETC
-		print(">> reloading: ")
+		pieceLogger(">> reloading: ")
 
 	for i in range(0, len(masterConfig.workSets)):
 		workDetails = masterConfig.workSets[i]
 
-		print(bcolors.OKBLUE + "\n>> CREATING Player: " + str(i) + bcolors.ENDC)
+		pieceLogger(bcolors.OKBLUE + "\n>> CREATING Player: " + str(i) + bcolors.ENDC)
 		cfgToFetch = masterConfig.workConfigParser.get(workDetails, "cfg")
 		canvasOffsetX = int(
 			masterConfig.workConfigParser.get(workDetails, "canvasOffsetX")
@@ -88,37 +89,42 @@ def loadFromArguments(masterConfig, reloading=False):
 		)
 		workArgument = masterConfig.path + "/configs/" + cfgToFetch  # + ".cfg"
 
-		## This loads the config file for the work as listed in the
-		## mulitplayer manifest
-		workObject = workobject.WorkObject(workArgument, instanceNumber=i)
+		## Load the piece's config file
+		workConfigParser = configparser.ConfigParser()
+		workConfigParser.read(workArgument)
+
+		## Create blank config object for this work
+		workObject = configuration.ArtWorkConfig(workArgument)
 		workObject.workId = i
+		workObject.standAlone = False
+		workObject.doingReload = False
+		workObject.brightnessOverride = None
+		workObject.isRunning = True
+		workObject.reloadConfig = False
+		workObject.checkForConfigChanges = False
+		workObject.useDrawingPoints = False
+		workObject.startTime = time.time()
+		workObject.currentTime = time.time()
 
-		# forcing this to be 0 as things get jittery when doing final
-		# composition
-		workObject.config.rotation = 0
-
-		## sets the render function -- in the multi player situation, this just draws
-		## the final animation to each player's final image - the canvas is not updated
-		## since that is handled by the main app window process thread
-		# This could be done in the WorkObject itself if I pass more stuff there ...
+		## Set up the per-piece renderer (writes to workObject.renderImageFull,
+		## does NOT touch the Tk canvas — that's handled by startWindowUpdater)
 		workObject.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
-		workObject.renderer.config = workObject.config
+		workObject.renderer.config = workObject
 		workObject.renderer.setUp()
 
 		try:
-			randomChange =	masterConfig.workConfigParser.getboolean(workDetails, "randomChange")
+			randomChange = masterConfig.workConfigParser.getboolean(workDetails, "randomChange")
 		except Exception as e:
-			print(str(e))
+			pieceLogger(str(e))
 			randomChange = True
 
 		workObject.renderer.config.randomChange = randomChange
 
-
-		if randomChange == False :
+		if randomChange == False:
 			workObject.renderer.config.canvasOffsetX = canvasOffsetX
 			workObject.renderer.config.canvasOffsetY = canvasOffsetY
 			workObject.renderer.config.canvasRotation = canvasRotation
-		else :
+		else:
 			workObject.renderer.config.canvasOffsetX = 0
 			workObject.renderer.config.canvasOffsetY = 0
 			workObject.renderer.config.canvasRotation = 0
@@ -127,104 +133,101 @@ def loadFromArguments(masterConfig, reloading=False):
 		workObject.renderer.config.canvasOffsetY_init = canvasOffsetY
 		workObject.renderer.config.canvasRotation_init = canvasRotation
 
-		workObject.config.render = workObject.renderer.render
+		## Force a fresh module import for each slot so two slots using the same piece
+		## type get independent module globals (config, workConfig, particle arrays, etc.)
+		workName = workConfigParser.get("displayconfig", "work")
+		moduleKey = f"pieces.{workName}"
+		if moduleKey in sys.modules:
+			del sys.modules[moduleKey]
+
+		## Configure and initialize the piece module (calls main(run=False) internally)
+		## standAlone=False prevents renderAsAnimationWindow from opening its own Tk window
+		player_module.configure(workObject, workConfigParser)
+
+		## Override render to use CanvasElement (writes to renderImageFull only)
+		## rather than the standalone render.py which would try to update a Tk canvas
+		workObject.render = workObject.renderer.render
+
+		## Double-buffer: after each complete render (post-ditherFilter), snapshot
+		## renderImageFull into renderImageFull_ready. The compositor reads the ready
+		## copy so it never sees a mid-render or pre-filter frame.
+		workObject.renderImageFull_ready = workObject.renderImageFull.copy()
+		_orig_render = workObject.render
+		def _make_snapshotting_render(orig, work):
+			def _render(imageToRender, xOffset, yOffset, *args, **kwargs):
+				orig(imageToRender, xOffset, yOffset, *args, **kwargs)
+				work.renderImageFull_ready = work.renderImageFull.copy()
+			return _render
+		workObject.render = _make_snapshotting_render(_orig_render, workObject)
+		workObject.updateCanvas = lambda: None
+		workObject.drawBeforeConversion = lambda: None
+		workObject.callBack = lambda: None
 
 		workWindow.players.append(workObject)
 
-		# print(bcolors.FAIL + ">> PlayerObject loading the work: " + str(player.work.config.__dict__) + bcolors.ENDC)
-
-		# For now, only running two work threads at a time .....
 		startWorkThread(workObject, i)
 
-	print(">> ")
-	startWindowThread(workWindow)
+	pieceLogger(">> ")
+
+	## Resize the root window to match the manifest's screenWidth/screenHeight
+	buff = 4
+	workWindow.root.geometry(
+		f"{masterConfig.screenWidth + buff}x{masterConfig.screenHeight + buff}"
+		f"+{masterConfig.windowXOffset}+{masterConfig.windowYOffset}"
+	)
+
+	startWindowUpdater(workWindow)
 	workWindow.run()
 
 
 def runWork(work):
-	print(">> runWork")
-	work.runWork()
+	pieceLogger(f">> runWork starting for work {work.workId}")
+	work.workRefForSequencer.runWork()
 
 
-def runWindow(workWindow):
-	print(">> runWindow -- overall renderer")
-	while True:
-		workWindow.renderer.updateTheCanvas(workWindow.players)
-		time.sleep(workWindow.masterConfig.repaintDelay)
-
-		############################################################
-		######  Check if config file has changed and reload    #####
-		############################################################
-
-		if workWindow.masterConfig.checkForConfigChanges == True:
-			workWindow.masterConfig.currentTime = time.time()
-			f = os.path.getmtime(workWindow.masterConfig.windowConfig)
-			workWindow.masterConfig.delta = workWindow.masterConfig.currentTime - f
-
-			if workWindow.masterConfig.delta <= 1:
-				if workWindow.masterConfig.reloadConfig == False:
-					print("LAST MODIFIED DELTA: ", workWindow.masterConfig.delta)
-					workWindow.doingReload = True
-					configure(workWindow.masterConfig)
-					loadFromArguments(masterConfig, True)
-				workWindow.masterConfig.reloadConfig = True
-			else:
-				workWindow.masterConfig.reloadConfig = False
-
-		for work in workWindow.players:
-
-			#if random.random() <.1 :
-				#work.renderer.config.canvasOffsetX = canvasOffsetX
-				#work.renderer.config.canvasOffsetY = canvasOffsetY
-				#work.renderer.config.canvasRotation = random.uniform(-work.config.canvasRotation,work.config.canvasRotation)
-
-			if work.config.checkForConfigChanges == True:
-				work.currentTime = time.time()
-				f = os.path.getmtime(work.workConfigFile)
-				work.delta = work.currentTime - f
-
-				if work.delta <= 1:
-					if work.reloadConfig == False:
-						print("LAST MODIFIED DELTA: ", work.delta)
-						work.doingReload = True
-
-						work.workConfig.read(work.workConfigFile)
-						work.configure()
-						# work.config.loadFromArguments(True)
-					work.reloadConfig = True
-				else:
-					work.reloadConfig = False
+def startWindowUpdater(workWindow):
+	"""Schedules canvas compositing on the Tk main thread via root.after."""
+	mc = workWindow.masterConfig
 
 
-def startWindowThread(workWindow):
-	print("\n>> startWindowThread 0 WORKWINDOW THREAD STARTING")
-	t0 = threading.Thread.__init__(runWindow(workWindow))
-	masterConfig.threads.append(t0)
-	t0.start()
-	# thrd = threading.Thread(target=proc0, kwargs=dict(workWindow=workWindow))
-	# thrd.start()
-	# thrd.join()
+	# Create the canvas image once; itemconfig updates it in-place to avoid the
+	# blank gap that delete+create_image would cause between frames.
+	_blank = Image.new("RGBA", (mc.screenWidth, mc.screenHeight), (0, 0, 0, 255))
+	_initial_tk = ImageTk.PhotoImage(_blank)
+	workWindow.renderer.cnvs._image_tk = _initial_tk
+	_image_id = workWindow.renderer.cnvs.create_image(0, 0, image=_initial_tk, anchor="nw")
+
+	def updateLoop():
+		try:
+			composite = Image.new("RGBA", (mc.screenWidth, mc.screenHeight), (100, 0, 0, 255))
+			for work in workWindow.players:
+				try:
+					# Read the ready buffer — always a complete post-filter frame
+					src = work.renderImageFull_ready.copy().convert("RGBA")
+					if work.canvasRotation != 0:
+						src = src.rotate(-work.canvasRotation, expand=True)
+					composite.paste(src, (work.canvasOffsetX + 3, work.canvasOffsetY +3), src)
+				except Exception:
+					pass
+
+			img_tk = ImageTk.PhotoImage(composite)
+			workWindow.renderer.cnvs._image_tk = img_tk
+			workWindow.renderer.cnvs.itemconfig(_image_id, image=img_tk)
+
+		except Exception as e:
+			pieceLogger(f">> updateLoop error: {e}", 1)
+		delay_ms = max(1, int(mc.repaintDelay * 1000))
+		workWindow.root.after(delay_ms, updateLoop)
+	workWindow.root.after(100, updateLoop)
 
 
 def startWorkThread(work, i):
-	print(">> startWorkThread THREAD STARTING " + str(i))
-
-	work.config.running = True
-	#work.testFCU(work.config)
+	pieceLogger(">> startWorkThread THREAD STARTING " + str(i))
+	work.running = True
 	thrd = threading.Thread(target=runWork, kwargs=dict(work=work))
+	thrd.daemon = True
 	masterConfig.threads.append(thrd)
 	thrd.start()
-	# thrd.join()
-
-	t  = Timer(3.0, unLoadWork, [masterConfig,thrd,work])
-	t.start()
-
-
-def unLoadWork(masterConfig,thrd,work):
-	print("-----> Ending Thread" + str(work))
-
-	work.config.running = False
-	#work.endRunning(work.config)
 
 	
 
@@ -257,7 +260,7 @@ def loadTheConfig(masterConfig):
 	)
 	args = parser.parse_args()
 
-	print(">>  Config Arguments --> " + str(args) + " **")
+	pieceLogger(">>  Config Arguments --> " + str(args) + " **")
 
 	"""
 		config.MID = args[1]
@@ -287,13 +290,14 @@ def loadTheConfig(masterConfig):
 
 	f = os.path.getmtime(masterConfig.windowConfig)
 	masterConfig.delta = int((masterConfig.startTime - f))
-	print(">> LAST MODIFIED DELTA: " + str(masterConfig.delta))
+	pieceLogger(">> LAST MODIFIED DELTA: " + str(masterConfig.delta))
 
 	configure(masterConfig)
 
 
 def configure(masterConfig):
-	print(">>  Multiplayer running loadTheConfig **")
+	pieceLogger(">>  Multiplayer running loadTheConfig **")
+	
 	masterConfig.workConfigParser = configparser.ConfigParser()
 	masterConfig.workConfigParser.read(masterConfig.windowConfig)
 
@@ -327,13 +331,13 @@ def configure(masterConfig):
 			masterConfig.workConfigParser.get("worksList", "repaintDelay")
 		)
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		masterConfig.repaintDelay = 0.01
 	
 	try:
 		masterConfig.useFilters = masterConfig.workConfigParser.getboolean("worksList", "useFilters")
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		masterConfig.useFilters = False
 
 	
@@ -357,14 +361,14 @@ def configure(masterConfig):
 			masterConfig.blurYOffset + masterConfig.blurSectionHeight,
 		)
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		masterConfig.useBlur = False
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-print(">>  Multiplayer running loadFromArguments **")
+pieceLogger(">>  Multiplayer running loadFromArguments **")
 
-masterConfig = configuration.Config()
+masterConfig = configuration.ArtWorkConfig()
 masterConfig.path = "."
 masterConfig.checkForConfigChanges = True
 masterConfig.threads = []

@@ -834,6 +834,7 @@ def main(run=True):
     particleColorRangeVals = workConfig.get("particles", "particleColorRange").split(",")
     config.particleColorRange = [float(i) for i in particleColorRangeVals]
     config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
+    config.slotRate = float(workConfig.get("particles", "slotRate", fallback=.03))
 
     for i in range(config.numberOfCenters):
 
@@ -846,7 +847,7 @@ def main(run=True):
 
     # managing speed of animation and framerate
     config.directorController = Director(config)
-    config.directorController.slotRate = 0.03
+    config.directorController.slotRate = config.slotRate
 
     if run:
         runWork()

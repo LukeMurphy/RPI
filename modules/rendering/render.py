@@ -54,7 +54,7 @@ def update_duration():
 
 def key_handler(event):
     global config
-    # print(event.char, event.keysym, event.keycode)
+    # pieceLogger(event.char, event.keysym, event.keycode)
     if event.keycode == 822083616:
         config.spaceBarAction()
         saveImageToFile()
@@ -81,6 +81,7 @@ def setUp(config):
     # after rotation
     # if(config.rotation == 90) : canvasOffsetY = -25
 
+    pieceLogger(buff)
     root = tk.Tk()
     w = config.windowWidth + buff
     h = config.windowHeight + buff
@@ -99,7 +100,7 @@ def setUp(config):
         root.geometry("%dx%d+%d+%d" % (w, h, x, y))
     except Exception as e:
         root.geometry("%dx%d+%d+%d" % (w, h, x, y))
-        print(e)
+        pieceLogger(e)
 
     # root.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -181,7 +182,7 @@ def startWork(*args):
         t = threading.Thread.__init__(work.runWork())
         t.start()
     except tk.TclError as details:
-        print(details)
+        pieceLogger(details)
         exit()
 
     # work.runWork()
@@ -198,7 +199,7 @@ def updateCanvas():
     # draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
     counter += 1
     if counter > 1000:
-        # print(gc.get_count())
+        # pieceLogger(gc.get_count())
         # I don't know if this really really helps
         gc.collect()
         counter = 0
@@ -258,8 +259,8 @@ def relaunchOnChange(config):
     # if config.delta <= 1 or config.delta2 <= 1:
     if config.delta <= 1 or fileHasChanged:
         if not config.reloadConfig:
-            print(f"** LAST MODIFIED DELTA: {str(config.delta)} **")
-            print(f"** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
+            pieceLogger(f"** LAST MODIFIED DELTA: {str(config.delta)} **")
+            pieceLogger(f"** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
             # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
             if config.doFullReloadOnChange:
@@ -431,7 +432,7 @@ def _lastOverLay():
                 config.renderImageFullOverlay = config.renderImageFullOverlay.filter(ImageFilter.GaussianBlur(radius=config.lastOverlayBlur))
             config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
     except Exception as e:
-        print(e)
+        pieceLogger(e)
 
 
 def _overallResize():
@@ -489,7 +490,7 @@ def _forceBlueGreenSwap(imageToRender):
     try:
         im_rgb = data[:, :, [0, 2, 1, 3]]
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         im_rgb = data[:, :, [0, 2, 1]]
 
     data2 = numpy.array(im_rgb)
@@ -546,7 +547,7 @@ def render(
             config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
     # config.drawBeforeConversion()
@@ -602,7 +603,7 @@ def render(
     # mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
     # if mem > memoryUsage and debug :
     #     memoryUsage = mem
-    #     print 'Memory usage: %s (mb)' % str(memoryUsage)
+    #     pieceLogger 'Memory usage: %s (mb)' % str(memoryUsage)
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -641,7 +642,7 @@ def drawBeforeConversion():
 
 
 def saveImageToFile():
-    print("Saving image to file")
+    pieceLogger("Saving image to file")
     currentTime = time.time()
     baseName = config.outPutPath + str(currentTime)
     _temp = config.renderImageFull.copy()

@@ -1,21 +1,11 @@
 #!/usr/bin/python
 # import modules
 import configparser
-import datetime
-import getopt
 import importlib
-import math
-import os
 import random
-import sys
-import textwrap
-import threading
 import time
 
-import PIL.Image
 from modules import configuration
-from modules.configuration import Config, bcolors
-from modules.rendering import renderClass
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 
@@ -27,7 +17,7 @@ class WorkObject:
 		self.workConfig = configparser.ConfigParser()
 		self.workConfig.read(workArgument)
 		self.workConfigFile = workArgument
-		print(bcolors.WARNING + ">> FETCHING: " + " " + workArgument + bcolors.ENDC)
+		print(">> FETCHING: " + " " + workArgument )
 
 		self.configure()
 

@@ -12,19 +12,20 @@ from PIL import (
 	ImageTk,
 )
 
-from modules.configuration import Config, bcolors
+from modules.configuration import *
 from modules.filters import *
+from modules.configuration import pieceLogger
 
 # from Tkinter import *
 # import tkMessageBox
-# import PIL.Image
-# import PIL.ImageTk
+# import Image
+# import ImageTk
 # import gc, os
 
 
 class CanvasElement:
 	def __init__(self, root, config):
-		print(">> CanvasElement Initialized ** ")
+		pieceLogger(">> CanvasElement Initialized ** ")
 		self.root = root
 		self.config = config
 		self.buff = 8
@@ -32,20 +33,20 @@ class CanvasElement:
 		self.threadsList = []
 
 	def setUp(self):
-		self.config.renderImage = PIL.Image.new(
+		self.config.renderImage = Image.new(
 			"RGBA", (self.config.screenWidth * self.config.rows, 32)
 		)
-		self.config.renderImageFull = PIL.Image.new(
+		self.config.renderImageFull = Image.new(
 			"RGBA", (self.config.screenWidth, self.config.screenHeight)
 		)
-		self.config.image = PIL.Image.new(
+		self.config.image = Image.new(
 			"RGBA", (self.config.screenWidth, self.config.screenHeight)
 		)
 		self.config.draw = ImageDraw.Draw(self.config.image)
 		self.config.renderDraw = ImageDraw.Draw(self.config.renderImageFull)
 		self.config.canvasOffsetX = 0
 		self.config.canvasOffsetY = 0
-		print(
+		pieceLogger(
 			bcolors.FAIL
 			+ ">> CanvasElement setting up renderImageFull: "
 			+ str(self.config.renderImageFull)
@@ -53,7 +54,7 @@ class CanvasElement:
 		)
 
 	def setUpCanvas(self, root):
-		print(">> CanvasElement setting up canvas ** ")
+		pieceLogger(">> CanvasElement setting up canvas ** ")
 		self.config.torqueAngle = 0
 		self.cnvs = tk.Canvas(
 			root,
@@ -83,7 +84,7 @@ class CanvasElement:
 		### Putting the animation on its own thread
 		### Still throws and error when manually closed though...
 
-		print(
+		pieceLogger(
 			">>>>>>>>>>>>Starting" + str(self) + str(self.instanceNumber),
 			"Cnvs --->",
 			self.cnvs,
@@ -97,7 +98,7 @@ class CanvasElement:
 			# self.t.join()
 			# self.threadsList.append(t)
 		except tk.TclError as details:
-			print(details)
+			pieceLogger(details)
 			pass
 			exit()
 
@@ -117,7 +118,7 @@ class CanvasElement:
 		overlayBottom=False,
 		updateCanvasCall=True,
 	):
-		# print("Instance Number Render: " + str(self.config.instanceNumber), self.cnvs)
+		# pieceLogger("Instance Number Render: " + str(self.config.instanceNumber), self.cnvs)
 		pass
 
 	def render(
@@ -135,8 +136,8 @@ class CanvasElement:
 		# Render to canvas
 		# This needs to be optomized !!!!!!
 
-		# print(imageToRender, self.cnvs)
-		# print("Instance Number Render: " + str(self.config.instanceNumber))
+		# pieceLogger(imageToRender, self.cnvs)
+		# pieceLogger("Instance Number Render: " + str(self.config.instanceNumber))
 
 		self.imageToRender = imageToRender
 
@@ -301,7 +302,7 @@ class CanvasElement:
 					crop, self.config.remapImageBlockDestination7, crop
 				)
 		except Exception as e:
-			print(str(e))
+			pieceLogger(str(e))
 			self.config.remapImageBlock7 = False
 			
 
@@ -328,81 +329,84 @@ class CanvasElement:
 		xOff = 0
 		self.config.renderImageFull = self.config.renderImageFull.convert("RGBA")
 		for work in players:
-			temp = work.config.renderImageFull.copy()
+			temp = work.renderImageFull.copy()
+			# temp = work.renderImageFull.copy()
 			temp = temp.convert("RGBA")
 			temp2 = temp.copy()
-			if work.config.canvasRotation != 0:
-				temp2 = temp.rotate(-work.config.canvasRotation, expand=True)
+			# if work.canvasRotation != 0:
+			if work.canvasRotation != 0:
+				temp2 = temp.rotate(-work.canvasRotation, expand=True)
+				# temp2 = temp.rotate(-work.canvasRotation, expand=True)
 
 			"""
-			if work.config.useFilters == True:
+			if work.useFilters == True:
 
-				if work.config.filterRemap == True:
-					work.config.tempImage = work.config.renderImageFull.copy()
-					work.config.tempImage = ditherFilter(
-						work.config.tempImage, 0, 0, work.config.tempImage
+				if work.filterRemap == True:
+					work.tempImage = work.renderImageFull.copy()
+					work.tempImage = ditherFilter(
+						work.tempImage, 0, 0, work.tempImage
 					)
-					crop = work.config.tempImage.crop(
-						work.config.remapImageBlockSection
+					crop = work.tempImage.crop(
+						work.remapImageBlockSection
 					)
 					crop = crop.convert("RGBA")
-					work.config.renderImageFull.paste(
-						crop, work.config.remapImageBlockDestination, crop
+					work.renderImageFull.paste(
+						crop, work.remapImageBlockDestination, crop
 					)
 				else:
-					work.config.renderImageFull = ditherFilter(
-						work.config.renderImageFull, 0, 0, work.config
+					work.renderImageFull = ditherFilter(
+						work.renderImageFull, 0, 0, work.config
 					)
 			"""
 
-			if (
-				work.config.usePixelSort == True
-				and work.config.pixelSortRotatesWithImage == True
-			):
-				if random.random() < work.config.pixelSortAppearanceProb:
-					work.config.renderImageFull = pixelSort(
-						work.config.renderImageFull, work.config
-					)
+			# if (
+			# 	work.usePixelSort == True
+			# 	and work.pixelSortRotatesWithImage == True
+			# ):
+			# 	if random.random() < work.pixelSortAppearanceProb:
+			# 		work.renderImageFull = pixelSort(
+			# 			work.renderImageFull, work.config
+			# 		)
 
-			# ---- Pixel Sort Type Effect ---- #
-			if (
-				work.config.usePixelSort
-				and work.config.pixelSortRotatesWithImage == False
-			):
-				if random.random() < work.config.pixelSortAppearanceProb:
-					work.config.renderImageFull = pixelSort(
-						work.config.renderImageFull, work.config
-					)
+			# # ---- Pixel Sort Type Effect ---- #
+			# if (
+			# 	work.usePixelSort
+			# 	and work.pixelSortRotatesWithImage == False
+			# ):
+			# 	if random.random() < work.pixelSortAppearanceProb:
+			# 		work.renderImageFull = pixelSort(
+			# 			work.renderImageFull, work.config
+			# 		)
 
 			'''
-			if work.config.useBlur == True:
-				temp = work.config.renderImageFull.copy()
+			if work.useBlur == True:
+				temp = work.renderImageFull.copy()
 				temp3 = temp.filter(
-					ImageFilter.GaussianBlur(radius=work.config.sectionBlurRadius)
+					ImageFilter.GaussianBlur(radius=work.sectionBlurRadius)
 				)
 				temp3 = temp3.convert("RGBA")
-				crop = temp3.crop(work.config.blurSection)
-				crop = crop.rotate(-work.config.canvasRotation, expand=True)
-				destination = (work.config.blurXOffset, work.config.blurYOffset)
+				crop = temp3.crop(work.blurSection)
+				crop = crop.rotate(-work.canvasRotation, expand=True)
+				destination = (work.blurXOffset, work.blurYOffset)
 				self.config.renderImageFull.paste(
-					temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2
+					temp2, (work.canvasOffsetX, work.canvasOffsetY), temp2
 				)
 				self.config.renderImageFull.paste(
 					crop,
 					(
-						work.config.canvasOffsetX + work.config.blurXOffset,
-						work.config.canvasOffsetY + work.config.blurYOffset,
+						work.canvasOffsetX + work.blurXOffset,
+						work.canvasOffsetY + work.blurYOffset,
 					),
 					crop,
 				)
 			else:
 				self.config.renderImageFull.paste(
-					temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2
+					temp2, (work.canvasOffsetX, work.canvasOffsetY), temp2
 				)
 			'''
 
 			self.config.renderImageFull.paste(
-				temp2, (work.config.canvasOffsetX, work.config.canvasOffsetY), temp2)
+				temp2, (work.canvasOffsetX, work.canvasOffsetY), temp2)
 
 		
 		if self.config.useFilters == True :
@@ -423,15 +427,17 @@ class CanvasElement:
 			self.config.renderImageFull.paste(crop, destination, crop)
 
 		# UPDATES THE MAIN CANVAS -- there is only one even in the multiplayer setup
-		self.cnvs.delete("main1")
-		self.cnvs._image_tk = PIL.ImageTk.PhotoImage(self.config.renderImageFull)
-		self.cnvs._image_id = self.cnvs.create_image(
-			self.config.canvasOffsetX,
-			self.config.canvasOffsetY,
-			image=self.cnvs._image_tk,
-			anchor="nw",
-			tag="main1",
-		)
+		self.cnvs._image_tk = ImageTk.PhotoImage(self.config.renderImageFull)
+		if hasattr(self.cnvs, '_image_id') and self.cnvs._image_id:
+			self.cnvs.itemconfig(self.cnvs._image_id, image=self.cnvs._image_tk)
+		else:
+			self.cnvs._image_id = self.cnvs.create_image(
+				self.config.canvasOffsetX,
+				self.config.canvasOffsetY,
+				image=self.cnvs._image_tk,
+				anchor="nw",
+				tag="main1",
+			)
 		self.cnvs.update()
 
 	def remappingFunctionTemp(self):

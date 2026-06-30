@@ -571,6 +571,79 @@ def createLayers():
 
 # -------------------------------------------------------- #
 # -------------------------------------------------------- #
+# -------------------------------------------------------- #
+
+def callBack(arg="ok"):
+    pieceLogger(f"\n>>> output from callBack fcu {arg} <<<")
+    config.bgColor = (200,0,0,100)
+
+from multiprocessing.managers import BaseManager
+
+class mngrPieceManager(BaseManager):
+    pass
+
+def mngrInitiateListeners(config):
+    config.usingManagerComms = True
+    config.noWindowChrome = True    
+    try:
+        mngrPieceManager.register('sharedlist', exposed=['get_all', 'append', 'clear'])
+        mngrPieceManager.register('shareddict', exposed=['get_all', 'set', 'get', 'clear'])
+        mngrPieceManager.register('sharedData', exposed=['publicAction'])
+
+        config.m = mngrPieceManager(address=('127.0.0.1', 50000), authkey=b'secret')
+        config.m.connect()
+        config.sharedlist = config.m.sharedlist()
+        config.shareddict = config.m.shareddict()
+        config.sharedData = config.m.sharedData()
+        # comment: 
+    except Exception as e:
+        pieceLogger(e,1)
+        config.usingManagerComms = False
+        # config.noWindowChrome = True
+
+def mngrChangeBG():
+        global config
+        # config.sharedData.publicAction()
+        if config.usingManagerComms :
+            pieceLogger(f"pieceID {config.pieceId}")
+            try:
+                config.shareddict.set("p1Change", False)
+                config.shareddict.set("p2Change", False)
+                config.shareddict.set("p3Change", False)
+                config.shareddict.set("p4Change", False)
+
+                if config.pieceId == 1 : 
+                    config.shareddict.set("p1Change", True)
+                if config.pieceId == 2 : 
+                    config.shareddict.set("p2Change", True)
+                if config.pieceId == 3 : 
+                    config.shareddict.set("p3Change", True)
+                if config.pieceId == 4 : 
+                    config.shareddict.set("p4Change", True)
+                config.shareddict.set("bg", "rnd")
+            except Exception as e:
+                pieceLogger(e,1)
+
+def mngrCheckList():
+
+    if config.usingManagerComms :
+        _ref  = config.pieceId
+        result = config.sharedlist.get_all()
+        state = config.shareddict.get_all()
+
+        if "bg" in state and f"p{_ref}Change" in state :
+            if state["bg"] == "red" and state[f"p{_ref}Change"] == False:
+                config.bgColor = (200, 0, 0, 100)
+                config.shareddict.set(f"p{_ref}Change",True)
+
+            if state["bg"] == "rnd" and state[f"p{_ref}Change"] == False:
+                config.bgColor = colorutils.getRandomColor()
+                config.shareddict.set(f"p{_ref}Change",True)
+
+
+        # if random.random() < .001 :
+        #     mngrChangeBG()
+
 
 def runWork():
     global redrawSpeed
@@ -580,6 +653,7 @@ def runWork():
     while True:
         config.directorController.checkTime()
         if config.directorController.advance:
+            mngrCheckList()
             iterate()
         time.sleep(redrawSpeed)
 
@@ -637,6 +711,8 @@ def iterate():
 
 
     if random.SystemRandom().random() < config.totalResetProb:
+        pieceLogger(f"Changing a center")
+        mngrChangeBG()
         changeACenter(config, PSArray)
     # if config.backgroundAlpha > 255:
     #     config.backgroundAlpha = 30
@@ -853,9 +929,13 @@ def main(run=True):
 
         PSArray.append(_PS)
 
+    mngrInitiateListeners(config)
+
+
     # managing speed of animation and framerate
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
+
 
     if run:
         runWork()

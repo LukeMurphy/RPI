@@ -14,6 +14,7 @@ import threading
 import time
 
 from PIL import Image, ImageTk
+from matplotlib.pyplot import pie
 
 from modules import configuration, player_module
 from modules.configuration import bcolors
@@ -34,30 +35,31 @@ from modules.rendering import appWindow, renderClass
 #
 #
 ##########################################################################
+def callbacker(arg):
+	pieceLogger(arg)
 
 
+###
+"""
+# Expects 3 arguments:
+# 		name-of-machine
+#       the local path
+# 		the config file to load
+args = sys.argv
+pieceLogger("Arguments passed to player.py:")
+pieceLogger(args)
+"""
 def loadFromArguments(masterConfig, reloading=False):
 
 	if reloading == False:
-
-		###
-		# Expects 3 arguments:
-		# 		name-of-machine
-		#       the local path
-		# 		the config file to load
-		"""
-		args = sys.argv
-		pieceLogger("Arguments passed to player.py:")
-		pieceLogger(args)
-		"""
-
+		# loads the manifest of pieces and their locations in the window
 		loadTheConfig(masterConfig)
 
 		# Set up the app window
 		workWindow = appWindow.AppWindow(masterConfig)
 		workWindow.setUp()
 
-		# set up the common rendder -- i.e. everything renders here
+		# set up the common renderer -- i.e. everything renders here
 		# but really there should be more than one renderImageFull ....
 		workWindow.renderer = renderClass.CanvasElement(workWindow.root, masterConfig)
 		workWindow.renderer.masterConfig = masterConfig
@@ -65,7 +67,6 @@ def loadFromArguments(masterConfig, reloading=False):
 		workWindow.renderer.delay = 1
 		workWindow.renderer.setUpCanvas(workWindow.root)
 		workWindow.renderer.setUp()
-
 		workWindow.players = []
 
 	else:
@@ -76,7 +77,7 @@ def loadFromArguments(masterConfig, reloading=False):
 	for i in range(0, len(masterConfig.workSets)):
 		workDetails = masterConfig.workSets[i]
 
-		pieceLogger(bcolors.OKBLUE + "\n>> CREATING Player: " + str(i) + bcolors.ENDC)
+		pieceLogger("\n>> CREATING Player: " + str(i),3)
 		cfgToFetch = masterConfig.workConfigParser.get(workDetails, "cfg")
 		canvasOffsetX = int(
 			masterConfig.workConfigParser.get(workDetails, "canvasOffsetX")
@@ -158,10 +159,18 @@ def loadFromArguments(masterConfig, reloading=False):
 				orig(imageToRender, xOffset, yOffset, *args, **kwargs)
 				work.renderImageFull_ready = work.renderImageFull.copy()
 			return _render
+		
+
 		workObject.render = _make_snapshotting_render(_orig_render, workObject)
 		workObject.updateCanvas = lambda: None
 		workObject.drawBeforeConversion = lambda: None
-		workObject.callBack = lambda: None
+		try:
+			workObject.callBack = player_module.work.callBack
+			# comment: 
+		except Exception as e:
+			pieceLogger(e)
+			workObject.callBack = lambda: None
+		# end try
 
 		workWindow.players.append(workObject)
 
@@ -182,13 +191,14 @@ def loadFromArguments(masterConfig, reloading=False):
 
 def runWork(work):
 	pieceLogger(f">> runWork starting for work {work.workId}")
+	# note all the pieces need to have a runWork() function ....
 	work.workRefForSequencer.runWork()
 
 
 def startWindowUpdater(workWindow):
 	"""Schedules canvas compositing on the Tk main thread via root.after."""
 	mc = workWindow.masterConfig
-
+	mc.sendMessage = False
 
 	# Create the canvas image once; itemconfig updates it in-place to avoid the
 	# blank gap that delete+create_image would cause between frames.
@@ -198,9 +208,13 @@ def startWindowUpdater(workWindow):
 	_image_id = workWindow.renderer.cnvs.create_image(0, 0, image=_initial_tk, anchor="nw")
 
 	def updateLoop():
+
 		try:
-			composite = Image.new("RGBA", (mc.screenWidth, mc.screenHeight), (100, 0, 0, 255))
+			composite = Image.new("RGBA", (mc.screenWidth, mc.screenHeight), (0, 0, 0, 255))
 			for work in workWindow.players:
+				if work.workId == 0 and mc.sendMessage :
+					mc.sendMessage = False
+					work.callBack(f"FROM {work.workId}")
 				try:
 					# Read the ready buffer — always a complete post-filter frame
 					src = work.renderImageFull_ready.copy().convert("RGBA")
@@ -229,23 +243,18 @@ def startWorkThread(work, i):
 	masterConfig.threads.append(thrd)
 	thrd.start()
 
-	
+##########################################################################
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
+"""
+example:
+python player.py -cfg p4-6x5/stroop2
+python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
+"""
 
 def loadTheConfig(masterConfig):
-	"""
-		example:
-		python player.py -cfg p4-6x5/stroop2
-		python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
-		"""
-
 	parser = argparse.ArgumentParser(description="Process")
-	parser.add_argument(
-		"-mname", type=str, default="local", help="machine name (optional)"
-	)
+	parser.add_argument("-mname", type=str, default="local", help="machine name (optional)")
 	parser.add_argument("-path", type=str, default="./", help="directory (optional)")
 	parser.add_argument(
 		"-cfg",
@@ -262,11 +271,11 @@ def loadTheConfig(masterConfig):
 
 	pieceLogger(">>  Config Arguments --> " + str(args) + " **")
 
-	"""
-		config.MID = args[1]
-		config.path = args[2]
-		argument = args[3]
-		"""
+	# """
+	# config.MID = args[1]
+	# config.path = args[2]
+	# argument = args[3]
+	# """
 
 	masterConfig.MID = args.mname
 	masterConfig.path = args.path
@@ -301,6 +310,7 @@ def configure(masterConfig):
 	masterConfig.workConfigParser = configparser.ConfigParser()
 	masterConfig.workConfigParser.read(masterConfig.windowConfig)
 
+	# Get the list of pieces and where the configs for each one is located
 	masterConfig.workSets = list(
 		map(
 			lambda x: x,
@@ -365,7 +375,7 @@ def configure(masterConfig):
 		masterConfig.useBlur = False
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+##########################################################################
 pieceLogger(">>  Multiplayer running loadFromArguments **")
 
 masterConfig = configuration.ArtWorkConfig()

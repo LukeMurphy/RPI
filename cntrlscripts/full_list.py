@@ -1,12 +1,14 @@
 import os
-
-# from os import listdir
-# from os.path import isfile, join, isdir
-# from os import walk
+import subprocess
+import json
+import select
 import datetime
+import sys
+import threading
+import time
+from multiprocessing import Manager
 
-# import subprocess
-# import sys
+
 import tkinter as tk
 from tkinter import Listbox
 from tkinter import Scrollbar
@@ -21,6 +23,8 @@ from tkinter import font
 # import tkmacosx
 from tkmacosx import Button
 
+# Tracks running piece processes: config_path -> subprocess.Popen
+running_procs = {}
 
 _defaultClr = "#5d7982"
 _defaultClr = "#029eed"
@@ -100,32 +104,197 @@ def verify():
     return (process, configSelected)
 
 
-def execute(configToRun):
-    print(f"{bcolors.WARNING}")
-    print("\n\n---------------------------------------------------------------------------------------")
-    print("full_list.py app window is calling this to run: ")
-    print(configToRun.split(configPath)[1])
+'''
+# --------------------------------------------------------------------- #
+from multiprocessing.managers import BaseManager
 
-    """
-    Summary
-	Args:vconfigToRun (TYPE): Description
-	"""
+class _SharedList:
+    def __init__(self):
+        self._data = []
+
+    def get_all(self):
+        # print(f"[server] get_all id(self)={id(self)} data={self._data}", flush=False)
+        return list(self._data)
+    
+    def append(self, item):
+        self._data.append(item)
+        print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
+
+    def setListValue(self, item):
+        self._data.append(item)
+        print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
+
+    def clear(self):
+        self._data.clear()
+
+class _SharedDict:
+    def __init__(self):
+        self._data = {}
+
+    def get_all(self):
+        return dict(self._data)
+
+    def set(self, key, value):
+        print(f"..[server] setting {key} {value}")
+        self._data[key] = value
+
+    def get(self, key, default=None):
+        return self._data.get(key, default)
+
+    def clear(self):
+        self._data.clear()
+
+_shared_state = _SharedList()
+_shared_dict = _SharedDict()
+
+def _shared_dict_factory():
+    return _shared_dict
+
+def _shared_list_factory():
+    return _shared_state
+
+class localManager(BaseManager):
+    pass
+
+localManager.register('sharedlist', callable=_shared_list_factory, exposed=['get_all', 'append', 'clear','setListValue'])
+localManager.register('shareddict', callable=_shared_dict_factory, exposed=['get_all', 'set', 'get', 'clear'])
+
+manager = localManager(address=('127.0.0.1', 50000), authkey=b'secret')
+_manager_server = manager.get_server()
+
+threading.Thread(target=_manager_server.serve_forever, daemon=True).start()
+manager.connect()
+
+_sharedlist = manager.sharedlist()
+_sharedlist.append("SERVER_INIT")
+
+_shareddict = manager.shareddict()
+
+_shareddict.set("bg", "")
+_shareddict.set("cmd", "")
+_shareddict.set("p1Change", False)
+_shareddict.set("p2Change", False)
+_shareddict.set("p3Change", False)
+_shareddict.set("p4Change", False)
+
+# --------------------------------------------------------------------- #
+
+def send_to_piece(msg: dict):
+    if not running_procs:
+        log_message("[no running pieces]")
+        return
+    for cfg, proc in list(running_procs.items()):
+        if proc.poll() is None:
+            proc.stdin.write(json.dumps(msg) + "\n")
+            proc.stdin.flush()
+            label = cfg.split(configPath)[1] if configPath in cfg else cfg
+            log_message(f"[sent to {label}] {msg}")
+
+
+# def poll_pieces():
+#     # print("polling...")
+#     # print(running_procs.items())
+#     for cfg, proc in list(running_procs.items()):
+#         # log_message(proc.stdout)
+#         if proc.poll() is not None:
+#             log_message(f"[stopped] {cfg.split(configPath)[1]}")
+#             del running_procs[cfg]
+#             continue
+#         ready, _, _ = select.select([proc.stdout], [], [], 0)
+#         if ready:
+#             line = proc.stdout.readline()
+#             if line:
+#                 log_message(f"[piece] {line.rstrip()}")
+    # root.after(100, poll_pieces)
+
+
+
+
+def send_typed_message():
+    raw = MsgEntry.get().strip()
+    # if not raw:
+    #     return
+    # try:
+    #     msg = json.loads(raw)
+    # except json.JSONDecodeError:
+    #     msg = {"cmd": raw}
+    # send_to_piece(msg)
+    # MsgEntry.delete(0, END)
+
+    # _sharedlist.append(raw)
+    # print(f"[sent] {raw} → list now: {_sharedlist.get_all()}", flush=True)
+
+    if raw in ["red","rnd"] :
+        _shareddict.set("bg", raw)
+    if raw in ["reset"] :
+        _shareddict.set("p1Change", False)
+        _shareddict.set("p2Change", False)
+        _shareddict.set("p3Change", False)
+        _shareddict.set("p4Change", False)
+        _shareddict.set("bg", "")
+
+# --------------------------------------------------------------------- #
+'''
+def log_message(text):
+    print(f">> {text}")
+    # MsgLog.config(state="normal")
+    # MsgLog.insert(END, text + "\n")
+    # MsgLog.see(END)
+    # MsgLog.config(state="disabled")
+
+
+def execute(configToRun):
+    log_message(f"{bcolors.WARNING}")
+    log_message("\n\n---------------------------------------------------------------------------------------")
+    log_message("full_list.py app window is calling this to run: ")
+    log_message(configToRun.split(configPath)[1])
+
     global JavaAppRunning
+    base = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
+    cfg_rel = configToRun.split(configPath)[1]
+
     if ".cfg" in configToRun:
         if "multi" in configToRun:
-            print("MULTIPLAYER STARTING >>>\n")
-            commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
-            os.system(commadStringMultiPyth + configToRun.split(configPath)[1] + "&")
-        if "--manifest" in configToRun:
-            commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/sequencer.v2.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
-            print(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
-            os.system(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
+            log_message("MULTIPLAYER STARTING >>>\n")
+            cmd = ["python3", "-u", base + "multiplayer.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
+        elif "--manifest" in configToRun:
+            cmd = ["python3", "-u", base + "sequencer.v2.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
+            log_message(" ".join(cmd))
         else:
-            commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
-            os.system(commadStringPyth + configToRun.split(configPath)[1] + "&")
+            cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
+
+
+        # with Manager() as manager:
+        #     shared_list = manager.list()
+        #     shared_dict = manager.dict()
+
+        # proc = subprocess.Popen(cmd, 
+        #                         stdin=subprocess.PIPE, 
+        #                         stdout=subprocess.PIPE, 
+        #                         stderr=subprocess.STDOUT, 
+        #                         text=True, 
+        #                         bufsize=1)
+
+        proc = subprocess.Popen(cmd, text=True, bufsize=1)
+        running_procs[configToRun] = proc
+        log_message(f"[started] {cfg_rel}")
+
+        # --- old os.system launches ---
+        # if "multi" in configToRun:
+        #     commadStringMultiPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/multiplayer.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
+        #     os.system(commadStringMultiPyth + configToRun.split(configPath)[1] + "&")
+        # if "--manifest" in configToRun:
+        #     commadStringSeqPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/sequencer.v2.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
+        #     print(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
+        #     os.system(commadStringSeqPyth + configToRun.split(configPath)[1] + "&")
+        # else:
+        #     commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -path /Users/lamshell/Documents/Dev/LEDELI/RPI/ -mname studio -cfg "
+        #     os.system(commadStringPyth + configToRun.split(configPath)[1] + "&")
+
     elif ".app" in configToRun:
         os.system(f"open {commadStringProc}{configToRun.split(configPath)[1]}")
         JavaAppRunning = configToRun.split(configPath)[1]
+
     print(f"---------------------------------------------------------------------------------------\n\n\n{bcolors.ENDC}")
 
 
@@ -311,14 +480,7 @@ leftBtnPlace = 830
 sortDefault = 1
 
 # -------------------------------- #
-slogan = Button(
-    root,
-    text="Stop & Run",
-    width=120,
-    bg=_stopAndRun,
-    fg="white",
-    borderless=1,
-    command=action2,
+slogan = Button(root,text="Stop & Run",width=120,bg=_stopAndRun,fg="white",borderless=1,command=action2,
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
@@ -327,49 +489,21 @@ slogan = Button(root, text="Run", width=120, bg=_stopAndRun, fg="white", borderl
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 # -------------------------------- #
-openbutton = Button(
-    root,
-    text="Open",
-    width=120,
-    bg=_defaultClr,
-    fg="white",
-    borderless=1,
-    command=openFile,
+openbutton = Button(root,text="Open",width=120,bg=_defaultClr,fg="white",borderless=1,command=openFile,
 )
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
 # -------------------------------- #
-sortbutton1 = Button(
-    root,
-    text="Sort By Date",
-    width=120,
-    bg=_defaultClr,
-    fg="white",
-    borderless=1,
-    command=sortByDate,
+sortbutton1 = Button(root,text="Sort By Date",width=120,bg=_defaultClr,fg="white",borderless=1,command=sortByDate,
 )
 sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 75)
 
 # -------------------------------- #
-sortbutton2 = Button(
-    root,
-    text="Sort by Folder",
-    width=120,
-    bg=_defaultClr,
-    fg="white",
-    borderless=1,
-    command=sortByFolder,
+sortbutton2 = Button(root,text="Sort by Folder",width=120,bg=_defaultClr,fg="white",borderless=1,command=sortByFolder,
 )
 sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 
-sortbutton3 = Button(
-    root,
-    text="Sort by Folder+",
-    width=120,
-    bg=_defaultClr,
-    fg="white",
-    borderless=1,
-    command=sortByFolderAndDate,
+sortbutton3 = Button(root,text="Sort by Folder+",width=120,bg=_defaultClr,fg="white",borderless=1,command=sortByFolderAndDate,
 )
 sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
@@ -390,14 +524,7 @@ refButton = Button(root, text="Reference", width=120, bg=_reference, fg="#000000
 refButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
 
 # -------------------------------- #
-slogan = Button(
-    root,
-    text="Stop All",
-    width=120,
-    bg=_stopAllClr,
-    fg="white",
-    borderless=1,
-    command=stopAll,
+slogan = Button(root,text="Stop All",width=120,bg=_stopAllClr,fg="white",borderless=1,command=stopAll,
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
@@ -410,21 +537,35 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 275)
 # Filter text box
 Txt = Text(root, height=1, width=32, bg="white", fg="black", bd=False, padx=4, pady=4)
 Txt.place(bordermode=OUTSIDE, x=2, y=2)
-clearButton = Button(
-    root,
-    text="Clear",
-    width=120,
-    bg=_defaultClr,
-    fg="white",
-    borderless=True,
-    command=clear,
+clearButton = Button(root,text="Clear",width=120,bg=_defaultClr,fg="white",borderless=True,command=clear,
 )
 clearButton.place(bordermode=OUTSIDE, x=280, y=2)
 
-
 # -------------------------------- #
+
+
+
+'''
+# -------------------------------- #
+# Message log + send box (below the main list)
+# MsgLog = Text(root, height=5, width=110, bg="#111111", fg="#00ff88", bd=False, padx=4, pady=4, state="disabled")
+# MsgLog.place(bordermode=OUTSIDE, x=2, y=530)
+
+MsgEntry = tk.Entry(root, width=20, bg="#222222", fg="white", bd=False)
+MsgEntry.place(bordermode=OUTSIDE, x=420, y=5)
+MsgEntry.bind("<Return>", lambda _e: send_typed_message())
+
+sendButton = Button(root, text="Send", width=80, bg=_defaultClr, fg="white", borderless=1, command=send_typed_message)
+sendButton.place(bordermode=OUTSIDE, x=600, y=5)
+'''
+
+
+
+
+
 # sort by date = True,
 getAllConfigFiles(True, True)
 
 # -------------------------------- #
+# root.after(200, poll_pieces)
 root.mainloop()

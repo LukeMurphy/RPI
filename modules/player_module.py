@@ -29,6 +29,7 @@ from subprocess import call
 
 global thrd, config
 global imageTop, imageBottom, image, transWiring
+global work
 
 threads = []
 
@@ -346,6 +347,7 @@ def _configure_saving(config, workconfig):
 
 
 def _load_work_module(config, workconfig):
+    global work
     """Loads the work module."""
     config.work = workconfig.get("displayconfig", "work")
     config.rendering = workconfig.get("displayconfig", "rendering", fallback ="hub")

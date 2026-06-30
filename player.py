@@ -126,6 +126,7 @@ def _initializeConfiguration(loadFromArguments):
     config.useDrawingPoints = False
     config.reloadConfig = False
     config.checkForConfigChanges = False
+    config.noWindowChrome = False
     # Load the default work
 
     if args.cfg is not None:
@@ -202,7 +203,6 @@ def _parseArgs(config, loadFromArguments):
     print("-cfg argument: is", argument)
     print("Last Modified Delta: is", config.delta)
     print(f"---------------------------------------------------------------------------------------{bcolors.ENDC}")
-
 
 
 def _brightnessOverrideConfigs(config):

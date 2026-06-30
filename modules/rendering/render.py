@@ -91,7 +91,10 @@ def setUp(config):
     config.screenPositionX = x
     config.screenPositionY = y
 
-    root.overrideredirect(False)
+    root.overrideredirect(config.noWindowChrome)
+    # for less chrome, no titlebar etc
+    # root.overrideredirect(True)
+    
 
     try:
         # screen_width = root.winfo_screenwidth()

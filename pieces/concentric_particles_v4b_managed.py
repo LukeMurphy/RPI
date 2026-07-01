@@ -503,11 +503,11 @@ def changeACenter(config, PSArray):
     _PS.setNewAttributes(i)
     _PS.setUp(i)
 
-
     pieceLogger(f"New center is: {_PS.x} {_PS.y}")
-    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-    config.bgColor = random.choice(config.bgColorSets)
+
+
+    mngrLocalAction(_PS.x,_PS.y)
+
     # config.bgColor = colorutils.getRandomColor()
     # _drawRef: ImageDraw.Draw
     # _drawRef = config.drawingImageDraw
@@ -678,6 +678,30 @@ def mngrAction():
     config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
     config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
     config.bgColor = colorutils.getRandomColor()
+    for i in range(len(PSArray)) :
+        _PS: ParticleSystem
+        _PS = PSArray[i] 
+        _PS.xSpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+        _PS.ySpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+
+
+def mngrLocalAction(_x,_y) :
+    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+    config.bgColor = random.choice(config.bgColorSets)
+
+    for i in range(len(PSArray)) :
+        _PS: ParticleSystem
+        _PS = PSArray[i] 
+        _PS.xSpeed = 0
+        _PS.ySpeed = 0
+
+    # _ref  = config.pieceId
+    # state = config.shareddict.get_all()
+
+    # if "remoteCenter" in state and f"p{_ref}Change" in state :
+    #     state[f"p{_ref}RemoteCenter"] == f"{_x},{_y}"
+
 
 # -------------------------------------------------------- #
 

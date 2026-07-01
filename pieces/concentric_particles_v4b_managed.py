@@ -113,6 +113,27 @@ class RadialSet:
 
 
 class ParticleSystem:
+    config
+    x = 0
+    y = 0
+    particles = []
+    done = False
+    drawRadialPolys = True
+    orientation = 1
+    initXRange = 0
+    initYRange = 0
+    useFixedBandColors = False
+
+    # there is really no need for this to change the bands randomly
+    bandWVariabilityProb = 0.00
+    xMaxFactor = 4
+    yMaxFactor = 4
+    wDiff = 17
+    bandWidth = 1
+    bandDecriment = 1
+    bandAlpha = 0
+
+
     def __init__(self, config):
         self.config = config
         self.x = 0
@@ -301,7 +322,6 @@ class ParticleSystem:
             pDot.setUp(self, n)
             self.particles.append(pDot)
 
-
     def move(self):
         """Updates the position of the particle system and its particles."""
         self._update_system_position()
@@ -476,12 +496,24 @@ def drawRadials(p):
 def changeACenter(config, PSArray):
     # config.backgroundAlpha = round(random.uniform(20,120))
     i = round(random.uniform(0, config.numberOfCenters-1))
-    _PS = PSArray[i]
+    _PS: ParticleSystem
+    _PS = PSArray[i] 
     _PS.useFixedBandColors = random.SystemRandom().random() < config.useFixedBandColorsProb
     _PS.setCenter(i)
     _PS.setNewAttributes(i)
     _PS.setUp(i)
 
+
+    pieceLogger(f"New center is: {_PS.x} {_PS.y}")
+    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+    config.bgColor = random.choice(config.bgColorSets)
+    # config.bgColor = colorutils.getRandomColor()
+    # _drawRef: ImageDraw.Draw
+    # _drawRef = config.drawingImageDraw
+    # config.finalCompositeDraw.rectangle((_PS.x, _PS.y, _PS.x +200, _PS.y +200), fill=(255,0,0,100))
+    # config.imageDraw.rectangle((_PS.x, _PS.y, _PS.x +200, _PS.y +200), fill=(255,0,0,100))
+     
 
     # config.drawingImage.paste(config.particleLayer, (0,0), config.particleLayer)
     # config.image.paste(config.particleLayer, (0, 0), config.particleLayer)
@@ -556,6 +588,7 @@ def _horizontalContinuitySetup(config):
 
 def createLayers():
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    config.imageDraw = ImageDraw.Draw(config.image)
 
     config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
     config.drawingImageDraw = ImageDraw.Draw(config.drawingImage)
@@ -569,13 +602,13 @@ def createLayers():
     config.finalComposite = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
     config.finalCompositeDraw = ImageDraw.Draw(config.finalComposite)
 
-# -------------------------------------------------------- #
-# -------------------------------------------------------- #
-# -------------------------------------------------------- #
 
+# -------------------------------------------------------- #
 def callBack(arg="ok"):
     pieceLogger(f"\n>>> output from callBack fcu {arg} <<<")
-    config.bgColor = (200,0,0,100)
+    # config.bgColor = (200,0,0,100)
+
+# -------------------------------------------------------- #
 
 from multiprocessing.managers import BaseManager
 
@@ -584,7 +617,10 @@ class mngrPieceManager(BaseManager):
 
 def mngrInitiateListeners(config):
     config.usingManagerComms = True
-    config.noWindowChrome = True    
+    config.noWindowChrome = True
+    # managing speed of checking the managed shared dicts
+    config.commsController = Director(config)
+    config.commsController.slotRate = .95
     try:
         mngrPieceManager.register('sharedlist', exposed=['get_all', 'append', 'clear'])
         mngrPieceManager.register('shareddict', exposed=['get_all', 'set', 'get', 'clear'])
@@ -600,7 +636,7 @@ def mngrInitiateListeners(config):
         pieceLogger(e,1)
         config.usingManagerComms = False
         # config.noWindowChrome = True
-
+        
 def mngrChangeBG():
         global config
         # config.sharedData.publicAction()
@@ -625,25 +661,25 @@ def mngrChangeBG():
                 pieceLogger(e,1)
 
 def mngrCheckList():
-
     if config.usingManagerComms :
         _ref  = config.pieceId
         result = config.sharedlist.get_all()
         state = config.shareddict.get_all()
 
         if "bg" in state and f"p{_ref}Change" in state :
-            if state["bg"] == "red" and state[f"p{_ref}Change"] == False:
-                config.bgColor = (200, 0, 0, 100)
-                config.shareddict.set(f"p{_ref}Change",True)
-
             if state["bg"] == "rnd" and state[f"p{_ref}Change"] == False:
-                config.bgColor = colorutils.getRandomColor()
+                mngrAction()
                 config.shareddict.set(f"p{_ref}Change",True)
-
-
         # if random.random() < .001 :
         #     mngrChangeBG()
 
+def mngrAction():
+    # config.bgColor = random.choice(config.bgColorSets)
+    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+    config.bgColor = colorutils.getRandomColor()
+
+# -------------------------------------------------------- #
 
 def runWork():
     global redrawSpeed
@@ -653,8 +689,10 @@ def runWork():
     while True:
         config.directorController.checkTime()
         if config.directorController.advance:
-            mngrCheckList()
             iterate()
+        config.commsController.checkTime()
+        if config.commsController.advance:
+            mngrCheckList()
         time.sleep(redrawSpeed)
 
 
@@ -712,7 +750,9 @@ def iterate():
 
     if random.SystemRandom().random() < config.totalResetProb:
         pieceLogger(f"Changing a center")
+
         mngrChangeBG()
+        
         changeACenter(config, PSArray)
     # if config.backgroundAlpha > 255:
     #     config.backgroundAlpha = 30
@@ -920,16 +960,21 @@ def main(run=True):
     config.slotRate = float(workConfig.get("particles", "slotRate", fallback=.03))
 
     config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
-    for i in range(config.numberOfCenters):
 
+
+    #  ---------------------------------------------- #
+    for i in range(config.numberOfCenters):
         _PS = ParticleSystem(config)
         _PS.setCenter(i)
         _PS.setNewAttributes(i)
         _PS.setUp(i)
-
         PSArray.append(_PS)
-
+    #  ---------------------------------------------- #
+    
+    
+    #  ---------------------------------------------- #
     mngrInitiateListeners(config)
+    #  ---------------------------------------------- #
 
 
     # managing speed of animation and framerate

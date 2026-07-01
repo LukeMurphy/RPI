@@ -141,7 +141,10 @@ def execute(configToRun):
     log_message(configToRun)
 
     base = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
-    cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", configToRun]
+    if "multi" in configToRun :
+        cmd = ["python3", "-u", base + "multiplayer.py", "-path", base, "-mname", "studio", "-cfg", configToRun]
+    else:
+        cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", configToRun]
 
     proc = subprocess.Popen(cmd, text=True, bufsize=1)
     running_procs[configToRun] = proc
@@ -155,11 +158,12 @@ def main():
         "dev/p4-512px-in-parts/mngd_celestials-m-3.cfg",
         "dev/p4-512px-in-parts/mngd_celestials-m-4.cfg"
             ]
-    # for cfg in cfgs :
-    #     execute(cfg)
+    cfgs = ["dev/p4-512px-in-parts/multi-celestials.cfg"]
+    for cfg in cfgs :
+        execute(cfg)
 
     while True:
-        time.sleep(.1)
+        time.sleep(.3)
 
         # if random.random() < .02 :
         #     send_typed_message("rnd")

@@ -657,11 +657,7 @@ def runWork():
         if config.directorController.advance:
             iterate()
 
-        if config.coordinationManager.usingManagerComms:
-            config.coordinationManager.commsController.checkTime()
-            if config.coordinationManager.commsController.advance:
-                config.coordinationManager.checkList()
-
+        config.coordinationManager.checkTime()
         time.sleep(redrawSpeed)
 
 

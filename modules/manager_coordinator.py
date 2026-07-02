@@ -2,6 +2,8 @@
 ------------------------------------------------
 To Operate, this needs this in main() at start of piece
 
+    from modules.manager_coordinator import CoordinationManager
+
     #  ---------------------------------------------- #
     config.coordinationManager = CoordinationManager(config)
     config.coordinationManager.pieceId = config.pieceId
@@ -30,10 +32,7 @@ to let the other pieces know what is going on....
 ------------------------------------------------
 This has to be put in the runWork or looping function to poll the manager state:
 
-        if config.coordinationManager.usingManagerComms:
-            config.coordinationManager.commsController.checkTime()
-            if config.coordinationManager.commsController.advance:
-                config.coordinationManager.checkList()
+    config.coordinationManager.checkTime()
 
 ------------------------------------------------
 '''
@@ -58,6 +57,7 @@ class CoordinationManager:
     def __init__(self, config):
         self.config = config
 
+
     def initiateListeners(self):
         self.usingManagerComms = True
         self.config.noWindowChrome = True
@@ -78,7 +78,8 @@ class CoordinationManager:
             pieceLogger(e,1)
             self.usingManagerComms = False
             self.config.noWindowChrome = False
-            
+
+
     def coordinateChanges(self):
             # self.config.sharedData.publicAction()
             try:
@@ -100,6 +101,7 @@ class CoordinationManager:
             except Exception as e:
                 pieceLogger(e,1)
 
+
     def checkList(self):
         _ref  = self.pieceId
         result = self.sharedlist.get_all()
@@ -114,10 +116,19 @@ class CoordinationManager:
         # if random.random() < .001 :
         #     ChangeBG()
 
+
+    def checkTime(self):
+        if self.usingManagerComms:
+            self.commsController.checkTime()
+            if self.commsController.advance:
+                self.checkList()
+
+
     # override these in the piece handle what happens
     def mngrAction(self):
         pieceLogger("[mngrAction] hello - no override?")
         pass
+
 
     def mngrLocalAction(self):
         pieceLogger("[mngrLocalAction] hello - no override?")

@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw, ImageChops
 # from modules.holder_director import Holder
 from modules.configuration import pieceLogger
 from modules.holder_director import Director
+from modules.manager_coordinator import CoordinationManager
 
 
 class ParticleDot:
@@ -503,10 +504,7 @@ def changeACenter(config, PSArray):
     _PS.setNewAttributes(i)
     _PS.setUp(i)
 
-    pieceLogger(f"New center is: {_PS.x} {_PS.y}")
-
-
-    mngrLocalAction(_PS.x,_PS.y)
+    config.coordinationManager.mngrLocalAction(_PS.x,_PS.y)
 
     # config.bgColor = colorutils.getRandomColor()
     # _drawRef: ImageDraw.Draw
@@ -610,68 +608,6 @@ def callBack(arg="ok"):
 
 # -------------------------------------------------------- #
 
-from multiprocessing.managers import BaseManager
-
-class mngrPieceManager(BaseManager):
-    pass
-
-def mngrInitiateListeners(config):
-    config.usingManagerComms = True
-    config.noWindowChrome = True
-    # managing speed of checking the managed shared dicts
-    config.commsController = Director(config)
-    config.commsController.slotRate = .95
-    try:
-        mngrPieceManager.register('sharedlist', exposed=['get_all', 'append', 'clear'])
-        mngrPieceManager.register('shareddict', exposed=['get_all', 'set', 'get', 'clear'])
-        mngrPieceManager.register('sharedData', exposed=['publicAction'])
-
-        config.m = mngrPieceManager(address=('127.0.0.1', 50000), authkey=b'secret')
-        config.m.connect()
-        config.sharedlist = config.m.sharedlist()
-        config.shareddict = config.m.shareddict()
-        config.sharedData = config.m.sharedData()
-        # comment: 
-    except Exception as e:
-        pieceLogger(e,1)
-        config.usingManagerComms = False
-        # config.noWindowChrome = True
-        
-def mngrChangeBG():
-        global config
-        # config.sharedData.publicAction()
-        if config.usingManagerComms :
-            pieceLogger(f"pieceID {config.pieceId}")
-            try:
-                config.shareddict.set("p1Change", False)
-                config.shareddict.set("p2Change", False)
-                config.shareddict.set("p3Change", False)
-                config.shareddict.set("p4Change", False)
-
-                if config.pieceId == 1 : 
-                    config.shareddict.set("p1Change", True)
-                if config.pieceId == 2 : 
-                    config.shareddict.set("p2Change", True)
-                if config.pieceId == 3 : 
-                    config.shareddict.set("p3Change", True)
-                if config.pieceId == 4 : 
-                    config.shareddict.set("p4Change", True)
-                config.shareddict.set("bg", "rnd")
-            except Exception as e:
-                pieceLogger(e,1)
-
-def mngrCheckList():
-    if config.usingManagerComms :
-        _ref  = config.pieceId
-        result = config.sharedlist.get_all()
-        state = config.shareddict.get_all()
-
-        if "bg" in state and f"p{_ref}Change" in state :
-            if state["bg"] == "rnd" and state[f"p{_ref}Change"] == False:
-                mngrAction()
-                config.shareddict.set(f"p{_ref}Change",True)
-        # if random.random() < .001 :
-        #     mngrChangeBG()
 
 def mngrAction():
     # config.bgColor = random.choice(config.bgColorSets)
@@ -686,21 +622,27 @@ def mngrAction():
 
 
 def mngrLocalAction(_x,_y) :
-    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-    config.bgColor = random.choice(config.bgColorSets)
+    if config.coordinationManager.usingManagerComms :
+        # will set all the other pieces to p[pieceId]Change = False but set this one to True
+        # also sets the stateFlag to the stateFlagChange value eg "bg":"rnd"
+        config.coordinationManager.coordinateChanges()
 
-    for i in range(len(PSArray)) :
-        _PS: ParticleSystem
-        _PS = PSArray[i] 
-        _PS.xSpeed = 0
-        _PS.ySpeed = 0
+        pieceLogger(f"pieceID {config.pieceId} changed: New center is: {_x} {_y}")
+        config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+        config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
+        config.bgColor = random.choice(config.bgColorSets)
 
-    # _ref  = config.pieceId
-    # state = config.shareddict.get_all()
+        for i in range(len(PSArray)) :
+            _PS: ParticleSystem
+            _PS = PSArray[i] 
+            _PS.xSpeed = 0
+            _PS.ySpeed = 0
 
-    # if "remoteCenter" in state and f"p{_ref}Change" in state :
-    #     state[f"p{_ref}RemoteCenter"] == f"{_x},{_y}"
+        # _ref  = config.pieceId
+        # state = config.shareddict.get_all()
+
+        # if "remoteCenter" in state and f"p{_ref}Change" in state :
+        #     state[f"p{_ref}RemoteCenter"] == f"{_x},{_y}"
 
 
 # -------------------------------------------------------- #
@@ -714,9 +656,12 @@ def runWork():
         config.directorController.checkTime()
         if config.directorController.advance:
             iterate()
-        config.commsController.checkTime()
-        if config.commsController.advance:
-            mngrCheckList()
+
+        if config.coordinationManager.usingManagerComms:
+            config.coordinationManager.commsController.checkTime()
+            if config.coordinationManager.commsController.advance:
+                config.coordinationManager.checkList()
+
         time.sleep(redrawSpeed)
 
 
@@ -773,10 +718,6 @@ def iterate():
 
 
     if random.SystemRandom().random() < config.totalResetProb:
-        pieceLogger(f"Changing a center")
-
-        mngrChangeBG()
-        
         changeACenter(config, PSArray)
     # if config.backgroundAlpha > 255:
     #     config.backgroundAlpha = 30
@@ -997,7 +938,12 @@ def main(run=True):
     
     
     #  ---------------------------------------------- #
-    mngrInitiateListeners(config)
+    config.coordinationManager = CoordinationManager(config)
+    config.coordinationManager.pieceId = config.pieceId
+    config.coordinationManager.initiateListeners()
+    # overrides what is called
+    config.coordinationManager.mngrAction = mngrAction
+    config.coordinationManager.mngrLocalAction = mngrLocalAction
     #  ---------------------------------------------- #
 
 

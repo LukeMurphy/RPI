@@ -25,11 +25,11 @@ class _SharedList:
     
     def append(self, item):
         self._data.append(item)
-        print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
+        # print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
 
     def setListValue(self, item):
         self._data.append(item)
-        print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
+        # print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
 
     def clear(self):
         self._data.clear()
@@ -42,7 +42,7 @@ class _SharedDict:
         return dict(self._data)
 
     def set(self, key, value):
-        print(f">> [server] _SharedDict.set() called {key} {value}")
+        # print(f">> [server] _SharedDict.set() called {key} {value}")
         self._data[key] = value
 
     def get(self, key, default=None):
@@ -162,7 +162,7 @@ def main():
         "dev/p4-512px-in-parts/mngd_celestials-m-3.cfg",
         "dev/p4-512px-in-parts/mngd_celestials-m-4.cfg"
             ]
-    cfgs = ["dev/p4-512px-in-parts/multi-celestials.cfg"]
+    # cfgs = ["dev/p4-512px-in-parts/multi-celestials.cfg"]
     for cfg in cfgs :
         execute(cfg)
 

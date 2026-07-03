@@ -5,6 +5,8 @@ import random
 import threading
 import time
 import sys, select, json
+
+from matplotlib import cm
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageChops
 
@@ -608,35 +610,77 @@ def callBack(arg="ok"):
 
 # -------------------------------------------------------- #
 
+def mngrSetupCoordination(config) :
+    _CM = CoordinationManager(config)
+    _CM.pieceId = config.pieceId
+    _CM.initiateListeners()
+    # overrides what is called
+    _CM.mngrAction = mngrAction
+    _CM.mngrLocalAction = mngrLocalAction
+    # _CM.stateFlags = {"lines":"raw"}
+    config.coordinationManager = _CM
 
+# read what has happened new in the shared dict and decide how to respond
 def mngrAction():
-    # config.bgColor = random.choice(config.bgColorSets)
-    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-    config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-    config.bgColor = colorutils.getRandomColor()
-    for i in range(len(PSArray)) :
-        _PS: ParticleSystem
-        _PS = PSArray[i] 
-        _PS.xSpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
-        _PS.ySpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+    _CM: CoordinationManager
+    _CM = config.coordinationManager
 
+    # for k,v in _CM.stateFlags.items() :
+    #     pieceLogger(f"[piece-{config.pieceId}]: {k} = {v}", 2)
 
+    for k,v in _CM.shareddict.get_all().items() :
+        if k == "all" :
+            # pieceLogger(f"[piece-{config.pieceId}]: {k} = {v}", 2)
+            config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(0,0,255,255))
+            config.bgColor = random.choice(config.bgColorSets)
+
+            for i in range(len(PSArray)) :
+                _PS: ParticleSystem
+                _PS = PSArray[i] 
+
+                _PS.xSpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+                _PS.ySpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+                # _PS.xSpeed = 0
+                # _PS.ySpeed = 0
+
+                # _PS.x = int(config.canvasWidth/2)
+                # _PS.y = int(config.canvasHeight/2)
+                _PS.x = int(v[0])
+                _PS.y = int(v[1])
+
+# send signal to common dict that this piece has changed and what has changed
 def mngrLocalAction(_x,_y) :
-    if config.coordinationManager.usingManagerComms :
+    # action when this piece changes - i.e. broadcast to others
+    _CM: CoordinationManager
+    _CM = config.coordinationManager
+    if _CM.usingManagerComms :
+        # ----------------------------------------------------------- #
         # will set all the other pieces to p[pieceId]Change = False but set this one to True
         # also sets the stateFlag to the stateFlagChange value eg "bg":"rnd"
-        config.coordinationManager.coordinateChanges()
+        _CM.coordinateChanges(all=[_x,_y])
+        # ----------------------------------------------------------- #
 
-        pieceLogger(f"pieceID {config.pieceId} changed: New center is: {_x} {_y}")
         config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
         config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))
-        config.bgColor = random.choice(config.bgColorSets)
+        config.bgColor = colorutils.getRandomColor(.5)
+        # config.bgColor = random.choice(config.bgColorSets)
+
+        # pieceLogger(f"pieceID {config.pieceId} changed: New center is: {_x} {_y}")
 
         for i in range(len(PSArray)) :
             _PS: ParticleSystem
             _PS = PSArray[i] 
+
             _PS.xSpeed = 0
             _PS.ySpeed = 0
+            # _PS.xSpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+            # _PS.ySpeed = (.01 + .2 * random.random()) * random.choice([1,-1])
+
+            # _PS.x = int(config.canvasWidth/2)
+            # _PS.y = int(config.canvasHeight/2)
+            _PS.x = _x  
+            _PS.y = _y
+
 
         # _ref  = config.pieceId
         # state = config.shareddict.get_all()
@@ -920,7 +964,6 @@ def main(run=True):
     config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
     config.slotRate = float(workConfig.get("particles", "slotRate", fallback=.03))
 
-    config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
 
 
     #  ---------------------------------------------- #
@@ -934,12 +977,10 @@ def main(run=True):
     
     
     #  ---------------------------------------------- #
-    config.coordinationManager = CoordinationManager(config)
-    config.coordinationManager.pieceId = config.pieceId
-    config.coordinationManager.initiateListeners()
-    # overrides what is called
-    config.coordinationManager.mngrAction = mngrAction
-    config.coordinationManager.mngrLocalAction = mngrLocalAction
+
+    config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
+    mngrSetupCoordination(config)
+
     #  ---------------------------------------------- #
 
 

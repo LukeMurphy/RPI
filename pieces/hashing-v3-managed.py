@@ -7,8 +7,10 @@ from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing, badpixels
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 from PIL import Image, ImageDraw, ImageChops
-from modules.holder_director import Director
 from pieces.screen import Holder
+from modules.holder_director import Director
+from modules.manager_coordinator import CoordinationManager
+
 
 # ################################################### #
 # hatching hashing lines
@@ -91,7 +93,7 @@ class InformalLine:
         self.getCurvePoints()
         self.smoothPointsForDrawing = []
         self.smoothPointsForDrawing.extend([pt[0] + self.xOffset, pt[1] + self.yOffset] for pt in self.curvedPoints)
-        # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
+
 
 
 # -------- Util Functions   -------------- #
@@ -256,13 +258,11 @@ def setLineColor():
             config.brightness,
         )
 
-    # pieceLogger(f"New Line Color {config.lineColor}")
-
 
 def setBGColor():
 
     config.activePalette = random.choice(config.paletteSets)
-    pieceLogger(f"NEW palette: {config.activePalette.name}")
+    pieceLogger(f"NEW palette: {config.activePalette.name}",0,False,f"[pieceId {config.pieceId}]")
 
     config.bg_alpha = round(random.uniform(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1]))
     config.bg_minHue = config.activePalette.bg_minHue
@@ -310,14 +310,11 @@ def setBGColor():
 
     config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
 
-    # pieceLogger("New BG")
-
 
 # -------- Line Functions    -------------- #
 
 
 def setLines():
-    pieceLogger(f"New Lines:")
     config.informalLineUnits = []
     setGridLines()
 
@@ -340,7 +337,6 @@ def setRegularSpacing():
 
 
 def setGridLines():
-    pieceLogger(f"Making Grid:  {config.drawingWidth } {config.drawingHeight }")
 
     setRegularSpacing()
 
@@ -367,7 +363,6 @@ def setGridLines():
             informalLine.reconfigure()
             informalLine.generateInformalLine()
             informalLine.isColumn = 1
-            # pieceLogger(f"{informalLine.lineColor}")
             config.informalLineUnits.append(informalLine)
 
     def add_row_lines():
@@ -403,7 +398,6 @@ def setGridLines():
     config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
 
     config.numberOfinformalLines = len(config.informalLineUnits)
-    # pieceLogger(f"New Lines {config.numberOfinformalLines}")
 
 
 def changeLine():
@@ -434,7 +428,7 @@ def drawTheLine(p1x, p1y, p2x, p2y, _n, _lineUnit):
 def drawLinePolyEnvelope(_lineUnit):
     # Draw the shape
     if _lineUnit._p == 1:
-        pieceLogger(f"Drawing Line with: {_lineUnit.name}")
+        pieceLogger(f"Drawing Line with: {_lineUnit.name}",0,False,f"[pieceId {config.pieceId}]")
 
     if _lineUnit._p < len(_lineUnit.smooth_points) and _lineUnit._p > 0:
         _p1 = _lineUnit.smooth_points[_lineUnit._p - 1]
@@ -487,7 +481,7 @@ def drawLinePolyEnvelope(_lineUnit):
                 _orthoP4y = _lineUnit.lastOrthoPoint[3]
 
         except Exception as e:
-            print(e)
+            print(f"ERROR: {e}")
 
         _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
@@ -527,13 +521,9 @@ def drawLinePolyEnvelope(_lineUnit):
             _lineUnit._w -= round(1 * _lineUnit.incrementFactor)
 
 
-
 def drawTheBG():
     config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
     config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
-
-    # if config.bg_alpha != config.bg_alpha_base :
-    #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
 
 
 def informalLines():
@@ -584,10 +574,8 @@ def informalLines():
 
 
 def runWork():
-    global configk
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running hatchingmarks.py")
-    print(bcolors.ENDC)
+    global config
+    pieceLogger("Running hatchingmarks.py",4,False,f"[pieceId {config.pieceId}]")
 
     while config.isRunning == True:
         config.directorController.checkTime()
@@ -597,10 +585,13 @@ def runWork():
         if config.standAlone == False:
             config.callBack()
 
+        config.coordinationManager.checkTime()
+        
         time.sleep(config.redrawSpeed)
 
+
 def reDraw():
-    # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
+
     if config.bg_alpha < config.bg_alpha_base:
         config.bg_alpha += config.bg_alpha_returnrate
 
@@ -618,8 +609,8 @@ def reDraw():
     # if random.random() < config.changeBGProb and not config.noChange:
     if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
         config.bg_alpha = 0
-        config.lightMode = False if random.random() > config.lightModeProb else True
-        # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
+        # config.lightMode = False if random.random() > config.lightModeProb else True
+
         setBGColor()
         # setLines()
 
@@ -627,14 +618,17 @@ def reDraw():
             informalLine = config.informalLineUnits[_u]
             informalLine.lineColor = setLineColor()
 
-            # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
+
+    # ----------------------------------------------------- # 
 
     if random.random() < config.changeLinesProb and not config.noChange:
-        config.lightMode = False if random.random() > config.lightModeProb else True
-        config.bg_alpha = 0
-        setBGColor()
-        setLines()
-        # pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
+        # config.lightMode = False if random.random() > config.lightModeProb else True
+        # config.bg_alpha = 0
+        # setBGColor()
+        # setLines()
+        config.coordinationManager.mngrLocalAction()
+
+    # ----------------------------------------------------- # 
 
     if random.random() < config.pauseProb:
         config.noChange = True
@@ -763,6 +757,53 @@ def iterate():
 #     tempImage = ImageChops.add(targetImageRef, config.overlayImage, round(100 * config.panelOverlayAmount))
 #     targetImageRef.paste(tempImage, (0, 0), tempImage)
 
+
+# -------------------------------------------------------- #
+def mngrSetupCoordination(config) :
+    _CM = CoordinationManager(config)
+    config.pieceId = int(workConfig.get("hatchingmarks", "pieceId", fallback=0))
+    _CM.pieceId = config.pieceId
+    _CM.initiateListeners()
+    # overrides what is called
+    _CM.mngrAction = mngrAction
+    _CM.mngrLocalAction = mngrLocalAction
+    # _CM.stateFlags = {"lines":"raw"}
+    config.coordinationManager = _CM
+
+def mngrAction():
+    # responds when state has changed
+    _CM: CoordinationManager
+    _CM = config.coordinationManager
+
+    # for k,v in _CM.stateFlags.items() :
+    #     pieceLogger(f"[piece-{config.pieceId}]: {k} = {v}", 2)
+
+    for k,v in _CM.shareddict.get_all().items() :
+        if k == "all" :
+            config.lightMode = v
+            pieceLogger(f"[piece-{config.pieceId}]: {k} = {v}", 2)
+
+    setBGColor()
+    setLines()
+
+def mngrLocalAction() :
+    # action when this piece changes - i.e. broadcast to others
+    _CM: CoordinationManager
+    _CM = config.coordinationManager
+    if _CM.usingManagerComms :
+
+        config.lightMode = False if random.random() > .5 else True
+        pieceLogger(f"[piece-{config.pieceId}] changed: lightMode {config.lightMode}",0)
+        setBGColor()
+        setLines()
+
+        # ----------------------------------------------------------- #
+        # will set all the other pieces to p[pieceId]Change = False but set this one to True
+        # also sets the stateFlag to the stateFlagChange value eg "bg":"rnd"
+        _CM.coordinateChanges(all=config.lightMode)
+        # ----------------------------------------------------------- #
+
+        
 
 # ---- initialize  -----------------
 
@@ -978,7 +1019,7 @@ def main(run=True):
 
     config.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
     config.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "bgBoxBox").split(",")))
+    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "bgBoxBox", fallback=f"{config.canvasWidth},{config.canvasHeight}").split(",")))
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
     config.bgBoxFill = (100, 0, 80, 100)
@@ -1016,6 +1057,19 @@ def main(run=True):
     # config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
 
     config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
+
+
+    #  ---------------------------------------------- #
+    # managing speed of animation and framerate
+    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed", fallback=0.02))
+    config.slotRate = float(workConfig.get("hatchingmarks", "slotRate", fallback=0.03))
+    config.directorController = Director(config)
+    config.directorController.slotRate = config.slotRate
+
+
+    #  ---------------------------------------------- #
+    mngrSetupCoordination(config)
+    #  ---------------------------------------------- # 
 
     loadColorConfigs()
     # loadFilterRemapping()
@@ -1057,12 +1111,6 @@ def main(run=True):
     """
 
 
-
-    # managing speed of animation and framerate
-    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed", fallback=0.02))
-    config.slotRate = float(workConfig.get("hatchingmarks", "slotRate", fallback=0.03))
-    config.directorController = Director(config)
-    config.directorController.slotRate = config.slotRate
 
     if run:
         runWork()

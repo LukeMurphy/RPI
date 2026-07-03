@@ -26,7 +26,7 @@ def configuration():
     pass
 
 
-def pieceLogger(args, clr=0, showLine=False):
+def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
     fstr = bcolors.YELLOWONBLUE
     if clr == 5:
         fstr = bcolors.BASIC
@@ -43,7 +43,7 @@ def pieceLogger(args, clr=0, showLine=False):
 
     if showLine :
         print(f"\n{fstr}.......................................................................................{bcolors.ENDC}")
-    print(f"{fstr}{args}          {bcolors.ENDC}")
+    print(f"{fstr}{prefixTxt}{args}          {bcolors.ENDC}")
     if showLine :
         print(f"{fstr}.......................................................................................{bcolors.ENDC}")
     # print("\n")

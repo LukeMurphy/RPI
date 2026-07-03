@@ -260,7 +260,7 @@ class BlanksAndDitherRemapping:
         for i in range(_numPanels):
             self.panelOverLayList.append(self.fullpanelOverLayList[i])
 
-        pieceLogger(f"{self.panelOverLayList}   {_numPanels}")
+        # pieceLogger(f"{self.panelOverLayList}   {_numPanels}")
 
 
     def drawPanelVariations(self):

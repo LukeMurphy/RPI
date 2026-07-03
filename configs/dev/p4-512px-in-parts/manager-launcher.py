@@ -6,10 +6,7 @@ import random
 from multiprocessing import Manager
 from multiprocessing.managers import BaseManager
 
-# Tracks running piece processes: config_path -> subprocess.Popen
-running_procs = {}
-commadStringProc = ""
-configPath = "/Users/lamshell/Documents/Dev/LEDELI/RPI/configs/"
+
 
 # --------------------------------------------------------------------- #
 class localManager(BaseManager):
@@ -60,11 +57,6 @@ class SharedData:
     def publicAction(self):
         print(f"[server SharedData] called ok: {self.arbVar}")
 
-
-_shared_state = _SharedList()
-_shared_dict = _SharedDict()
-_sharedData = SharedData()
-
 def _shared_dict_factory():
     return _shared_dict
 
@@ -73,6 +65,15 @@ def _shared_list_factory():
 
 def _sharedDatafactory():
     return _sharedData
+
+
+# Tracks running piece processes: config_path -> subprocess.Popen
+running_procs = {}
+commadStringProc = ""
+configPath = "/Users/lamshell/Documents/Dev/LEDELI/RPI/configs/"
+_shared_state = _SharedList()
+_shared_dict = _SharedDict()
+_sharedData = SharedData()
 
 
 localManager.register('sharedlist', callable=_shared_list_factory, exposed=['get_all', 'append', 'clear','setListValue'])
@@ -89,18 +90,11 @@ _sharedlist = manager.sharedlist()
 _sharedlist.append("SERVER_INIT")
 
 _shareddict = manager.shareddict()
-_shareddict.set("bg", "")
-_shareddict.set("cmd", "")
-_shareddict.set("p1RemoteCenter", "0,0")
-_shareddict.set("p2RemoteCenter", "0,0")
-_shareddict.set("p3RemoteCenter", "0,0")
-_shareddict.set("p4RemoteCenter", "0,0")
-_shareddict.set("p1Change", False)
-_shareddict.set("p2Change", False)
-_shareddict.set("p3Change", False)
-_shareddict.set("p4Change", False)
+_shareddict.set("p1-changed", False)
+_shareddict.set("p2-changed", False)
+_shareddict.set("p3-changed", False)
+_shareddict.set("p4-changed", False)
 
-_sharedData.arbVar = "foo"
 
 
 
@@ -162,7 +156,17 @@ def main():
         "dev/p4-512px-in-parts/mngd_celestials-m-3.cfg",
         "dev/p4-512px-in-parts/mngd_celestials-m-4.cfg"
             ]
-    # cfgs = ["dev/p4-512px-in-parts/multi-celestials.cfg"]
+    cfgs = ["dev/p4-512px-in-parts/multi-celestials.cfg"]
+    
+    cfgs = [
+        "dev/p4-512px-in-parts/hashing-marks-v3-m-1.cfg",
+        "dev/p4-512px-in-parts/hashing-marks-v3-m-2.cfg",
+        "dev/p4-512px-in-parts/hashing-marks-v3-m-3.cfg",
+        "dev/p4-512px-in-parts/hashing-marks-v3-m-4.cfg"
+            ]
+    cfgs = ["dev/p4-512px-in-parts/multi-hashing.cfg"]
+
+
     for cfg in cfgs :
         execute(cfg)
 

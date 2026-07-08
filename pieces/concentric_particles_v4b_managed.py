@@ -624,6 +624,7 @@ def mngrSetupCoordination(config) :
 def mngrAction():
     _CM: CoordinationManager
     _CM = config.coordinationManager
+    # _CM.numberOfActivePieces = 4
 
     # for k,v in _CM.stateFlags.items() :
     #     pieceLogger(f"[piece-{config.pieceId}]: {k} = {v}", 2)
@@ -645,8 +646,10 @@ def mngrAction():
 
                 # _PS.x = int(config.canvasWidth/2)
                 # _PS.y = int(config.canvasHeight/2)
-                _PS.x = int(v[0])
-                _PS.y = int(v[1])
+
+                 # received the proportional distances so must adapt
+                _PS.x = int(v[0] * config.canvasWidth)
+                _PS.y = int(v[1] * config.canvasHeight)
 
 # send signal to common dict that this piece has changed and what has changed
 def mngrLocalAction(_x,_y) :
@@ -657,7 +660,9 @@ def mngrLocalAction(_x,_y) :
         # ----------------------------------------------------------- #
         # will set all the other pieces to p[pieceId]Change = False but set this one to True
         # also sets the stateFlag to the stateFlagChange value eg "bg":"rnd"
-        _CM.coordinateChanges(all=[_x,_y])
+
+        # sends the proportional distances so other canvases can adapt
+        _CM.coordinateChanges(all=[round(_x/config.canvasWidth,5),round(_y/config.canvasHeight,5)])
         # ----------------------------------------------------------- #
 
         config.imageDraw.rectangle((0,0, config.canvasWidth, config.canvasHeight), fill=(250,250,255,255))

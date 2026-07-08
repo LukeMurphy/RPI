@@ -74,7 +74,7 @@ class CoordinationManager:
             PieceManager.register('shareddict', exposed=['get_all', 'set', 'get', 'clear'])
             PieceManager.register('sharedData', exposed=['publicAction'])
 
-            self.m = PieceManager(address=('127.0.0.1', 50000), authkey=b'secret')
+            self.m = PieceManager(address=('127.0.0.1', 50000), authkey=b'LEDDELI49')
             self.m.connect()
             self.sharedlist = self.m.sharedlist()
             self.shareddict = self.m.shareddict()

@@ -353,7 +353,7 @@ def setPenPropsByName(_name, pen):
     pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
     pen.outlineStroke = config.activePalette.outlineStroke
 
-    pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
+    # pieceLogger(f"\n[setPenPropsByName] ===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
     # pieceLogger("--")
 
@@ -422,7 +422,7 @@ def generateLine(_pen):
 
     _pen.smooth_points = []
 
-    pieceLogger(f"=========>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset}) pts {_pts} {_yD}")
+    # pieceLogger(f"[generateLine] =======>  Creating line  {_pen.name} ( {_pen.xOffset} , {_pen.yOffset}) pts {_pts} {_yD}")
     for i in range(_pts):
         if _pen.forceOrientation == "horizontal":
             _y = _rangex - (_rangex * 2 * random.random())
@@ -448,7 +448,9 @@ def generateLine(_pen):
     # for lines, really need to handle the yOffset more carefully
     # This has GOT to be a parameter ......
     if _pen.name in ["lineMarksVert", "lineMarksVertTest", "lineMarksVertNarrow"]:
-        _pen.yOffset = 0
+        _pen.yOffset =  int(random.uniform(0,10))
+    if _pen.name in ["lineMarksHoriz"]:
+        _pen.xOffset = int(random.uniform(0,10))
 
     _pen.smooth_points.extend((pt[0] + _pen.xOffset, pt[1] + _pen.yOffset) for pt in res)
     # either clockwise or counter
@@ -910,7 +912,7 @@ def drawLineStopped():
 
 def doDrawingJitter():
     jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
-    # pieceLogger(f"jitterIterations {jitterIterations} {config.jitterIterationsMax}")
+    # pieceLogger(f"[doDrawingJitter] jitterIterations {jitterIterations} {config.jitterIterationsMax}")
     # for _ in range(jitterIterations):
     #     glitchBox(
     #         config.image,

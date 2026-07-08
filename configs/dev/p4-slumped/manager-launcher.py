@@ -92,8 +92,8 @@ _sharedlist.append("SERVER_INIT")
 _shareddict = manager.shareddict()
 _shareddict.set("p1-changed", False)
 _shareddict.set("p2-changed", False)
-_shareddict.set("p3-changed", False)
-_shareddict.set("p4-changed", False)
+# _shareddict.set("p3-changed", False)
+# _shareddict.set("p4-changed", False)
 
 
 # --------------------------------------------------------------------- #
@@ -149,20 +149,10 @@ def execute(configToRun):
 
 def main():
     cfgs = [
-        "dev/p4-512px-in-parts/mngd_celestials-m-1.cfg"
-        ,"dev/p4-512px-in-parts/mngd_celestials-m-2.cfg"
-        ,"dev/p4-512px-in-parts/mngd_celestials-m-3.cfg"
-        ,"dev/p4-512px-in-parts/mngd_celestials-m-4.cfg"
+        "dev/p4-slumped/celestials-512x224.cfg"
+        ,"dev/p4-slumped/celestials-managed.cfg"
             ]
-    # cfgs = ["dev/p4-512px-in-parts/multi-celestials.cfg"]
-    
-    # cfgs = [
-    #     "dev/p4-512px-in-parts/hashing-marks-v3-m-1.cfg",
-    #     "dev/p4-512px-in-parts/hashing-marks-v3-m-2.cfg",
-    #     "dev/p4-512px-in-parts/hashing-marks-v3-m-3.cfg",
-    #     "dev/p4-512px-in-parts/hashing-marks-v3-m-4.cfg"
-    #         ]
-    # cfgs = ["dev/p4-512px-in-parts/multi-hashing.cfg"]
+
 
 
     for cfg in cfgs :

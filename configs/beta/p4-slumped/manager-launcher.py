@@ -149,8 +149,8 @@ def execute(configToRun):
 
 def main():
     cfgs = [
-        "dev/p4-slumped/celestials-512x224.cfg"
-        ,"dev/p4-slumped/celestials-managed.cfg"
+        "beta/p4-slumped/celestials-512x224.cfg"
+        ,"beta/p4-slumped/celestials-managed.cfg"
             ]
 
 

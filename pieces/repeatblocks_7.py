@@ -26,8 +26,6 @@ from copy import copy, deepcopy
 # more refactoring including slow scrolling and timing controls
 
 
-# ------------------------------------------#
-
 
 # --------------------- CLASSES     ---------------------
 
@@ -510,9 +508,10 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
 def setPalette(config, index=0):
     paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
 
-    # pieceLogger(config.currentCombinationsetIndex)
-    # pieceLogger(index)
-    # pieceLogger(paletteObj)
+
+    pieceLogger(config.currentCombinationsetIndex)
+    pieceLogger(index)
+    pieceLogger(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
 
     pieceLogger(f"Setting a new palette:  {paletteObj.paletteName}")
     config.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))

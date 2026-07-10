@@ -613,6 +613,7 @@ def callBack(arg="ok"):
 def mngrSetupCoordination(config) :
     _CM = CoordinationManager(config)
     _CM.pieceId = config.pieceId
+    _CM.numberOfActivePieces = config.numberOfPiecesBeingManaged
     _CM.initiateListeners()
     # overrides what is called
     _CM.mngrAction = mngrAction
@@ -984,6 +985,7 @@ def main(run=True):
     #  ---------------------------------------------- #
 
     config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
+    config.numberOfPiecesBeingManaged = workConfig.getint("particles", "numberOfPiecesBeingManaged", fallback=0)
     mngrSetupCoordination(config)
 
     #  ---------------------------------------------- #

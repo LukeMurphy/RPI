@@ -2,29 +2,57 @@
 ------------------------------------------------
 To Operate, this needs this in main() at start of piece
 
+# -------------------------------------------------------- #
+
     from modules.manager_coordinator import CoordinationManager
 
-    #  ---------------------------------------------- #
-    config.coordinationManager = CoordinationManager(config)
-    config.coordinationManager.pieceId = config.pieceId
-    config.coordinationManager.initiateListeners()
+# -------------------------------------------------------- #
+
+    config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
+    config.numberOfPiecesBeingManaged = workConfig.getint("particles", "numberOfPiecesBeingManaged", fallback=0)
+    mngrSetupCoordination(config)
+
+
+# -------------------------------------------------------- #
+
+def mngrSetupCoordination(config) :
+    _CM = CoordinationManager(config)
+    _CM.pieceId = config.pieceId
+    _CM.numberOfActivePieces = config.numberOfPiecesBeingManaged
+    _CM.initiateListeners()
     # overrides what is called
-    config.coordinationManager.mngrAction = mngrAction
-    config.coordinationManager.mngrLocalAction = mngrLocalAction
-    #  ---------------------------------------------- #
+    _CM.mngrAction = mngrAction
+    _CM.mngrLocalAction = mngrLocalAction
+    # _CM.stateFlags = {"lines":"raw"}
+    config.coordinationManager = _CM
 
 where mngrAction and mngrLocalAction are set to handle the local change and what
 to do with the other pieces
 ------------------------------------------------
 mngrAction is what is called when the manager state has changed and the piece is
 responding to that change
+
+def mngrAction():
+    _CM: CoordinationManager
+    _CM = config.coordinationManager
+    # _CM.numberOfActivePieces = 4
+
+    # for k,v in _CM.stateFlags.items() :
+    #     pieceLogger(f"[piece-{config.pieceId}]: {k} = {v}", 2)
+
+    for k,v in _CM.shareddict.get_all().items() :
+        if k == "all" :
+            [code here .......]
 ------------------------------------------------
 mngrLocalAction is the triggering function and has to call:
 
+# send signal to common dict that this piece has changed and what has changed
+def mngrLocalAction(_x,_y) :
     # action when this piece changes - i.e. broadcast to others
     _CM: CoordinationManager
     _CM = config.coordinationManager
     if _CM.usingManagerComms :
+        # ----------------------------------------------------------- #
         # will set all the other pieces to p[pieceId]Change = False but set this one to True
         # also sets the stateFlag to the stateFlagChange value eg "bg":"rnd"
         config.coordinationManager.coordinateChanges({optional new k/v pair})

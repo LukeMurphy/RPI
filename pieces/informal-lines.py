@@ -13,6 +13,7 @@ from modules.informal_line import InformalLine
 # ################################################### #
 # hatching hashing lines
 
+
 class Pen:
     def __init__(self):
         pass
@@ -35,6 +36,7 @@ def getColor(r, g, b, a):
 
 
 # ------------------------------------------#
+
 
 def glitchBox(
     imageRef,
@@ -273,7 +275,8 @@ def setGridLines():
         # config.v_pts = []
         for col in range(config.colInterval + config.colAdj):
             for row in range(config.rowInterval + config.rowAdj):
-                for i in range(0,2):
+                _runningDelta = 0
+                for i in range(0, 2):
                     informalLine = InformalLine(col, config.largestDim)
                     informalLine.curveResolution = config.curveResolution
                     informalLine.ratioFactorRange = config.ratioFactorRange
@@ -283,15 +286,15 @@ def setGridLines():
                     informalLine.draw = config.draw
 
                     informalLine.baseWidthRange = config.vertBaseWidthRange
-                    informalLine.baseWidthRange = (0,2)
-                    informalLine.xOffset = config.xOffset + config.colSpacing * col 
-                    informalLine.yOffset = config.yOffset + row * informalLine.backTrackRange[1]*2.2
+                    informalLine.baseWidthRange = (0, 2)
+                    informalLine.drawingHeight = config.drawingHeight / config.colInterval + random.uniform(-5, 5)
                     # informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
-                    informalLine.drawingHeight = config.drawingHeight / config.colInterval
-                    informalLine.angle = random.uniform(30,45)
+                    informalLine.xOffset = config.xOffset + col * config.colSpacing + _runningDelta
+                    informalLine.yOffset = config.yOffset + row * config.rowSpacing - informalLine.drawingHeight / 4
+                    informalLine.angle = random.uniform(40, 50)
                     if i == 1:
                         informalLine.angle *= -1
-                        informalLine.xOffset -= informalLine.drawingHeight/2
+                        informalLine.xOffset -= informalLine.drawingHeight / 2 + _runningDelta
                     informalLine.pointPerLine = config.pointsPerLineCol
                     informalLine.lineSpeedRange = config.lineSpeedRange
                     informalLine.lineSpeedRange = config.vertLineSpeedRange
@@ -302,12 +305,13 @@ def setGridLines():
                     # informalLine.bgColor = (0,0,0,100)
 
                     informalLine.lineColor = setLineColor()
-
-                    informalLine.lineColor = (int(random.uniform(20,255)),6,30,10)
+                    if random.random() < 0.05:
+                        informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
                     informalLine.reconfigure()
                     informalLine.generateInformalLine()
                     informalLine.isColumn = 1
                     # pieceLogger(f"{informalLine.lineColor}")
+                    _runningDelta +=  informalLine.drawingHeight
                     config.informalLineUnits.append(informalLine)
 
     def add_row_lines():
@@ -343,7 +347,6 @@ def setGridLines():
     # else:
     #     add_row_lines()
     #     add_col_lines()
-
 
     config.numberOfinformalLines = len(config.informalLineUnits)
     # pieceLogger(f"New Lines {config.numberOfinformalLines}")
@@ -427,11 +430,11 @@ def reDraw():
             informalLine.reconfigure()
             informalLine.generateInformalLine()
 
-    if random.random() < config.changeLinesProb and not config.noChange:
+    if random.random() < config.changeAllLinesProb and not config.noChange:
         # config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
-        # setBGColor()
-        # setLines()
+        setBGColor()
+        setLines()
         # pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
 
     if random.random() < config.pauseProb:
@@ -708,6 +711,7 @@ def main(run=True):
     config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
 
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    config.changeAllLinesProb = float(workConfig.get("hatchingmarks", "changeAllLinesProb", fallback=0.01))
     # probablility background changes
     config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
     config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
@@ -726,7 +730,6 @@ def main(run=True):
 
     # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
     config.rebuildingVerticals = False
-
 
     config.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
     config.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
@@ -780,12 +783,11 @@ def main(run=True):
 
     # badpixels.setBlanksOnScreen(config)
 
-
     if config.useBgBox:
         for _ in range(config.initialRunsOfBgBlocks):
             _bgColorsFilling(config)
 
-    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "hatchingmarks")
+    overlayControls = BlanksAndDitherRemapping(config, workConfig, "hatchingmarks")
     # for blanks
     overlayControls.destinationImageDraw = config.destinationImageDraw
     overlayControls.targetImageRef = config.destinationImage
@@ -793,7 +795,7 @@ def main(run=True):
     overlayControls.overlayImage = config.overlayImage
     overlayControls.overlayImageDraw = config.overlayImageDraw
     overlayControls.setPanelOverlays()
-    
+
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
     #### Need to add something like this at final render call  as well
@@ -807,8 +809,6 @@ def main(run=True):
             #config.render(config.image, 0, 0)
             config.render(config.renderImageFull, 0, 0)
     """
-
-
 
     # managing speed of animation and framerate
     config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed", fallback=0.02))

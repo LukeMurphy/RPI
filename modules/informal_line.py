@@ -104,7 +104,7 @@ class InformalLine:
         # pts.insert(0, pts[0])
 
         # rotate the points 
-        theta = self.randomRange(self.angle, self.angle + 20)* math.pi/180
+        theta = self.angle * math.pi/180
         # theta = (self.angle - 2 * self.angle  * random.random())* math.pi/180
         for pt in rawPts:
             _x = pt[0] * math.cos(theta) - pt[1] * math.sin(theta)
@@ -154,19 +154,28 @@ class InformalLine:
             # self.drawLinePolyEnvelope()
             _ptCounter += 1
 
-        if (self.angle != 0 and random.random() < self.horizontalMovementProb) or (self.angle == 0 and random.random() < self.verticalMovementProb):
-            if self.direction == 0:
-                for _ in range(self.lineSpeed):
-                    _lstpt = pointsToDraw[0][0]
-                    for pt in range(0, len(pointsToDraw) - 1):
-                        pointsToDraw[pt][0] = pointsToDraw[pt + 1][0]
-                    pointsToDraw[pt + 1][0] = _lstpt
-            else:
-                for _ in range(self.lineSpeed):
-                    _lstpt = pointsToDraw[len(pointsToDraw) - 1][0]
-                    for pt in range(len(pointsToDraw) - 1, 0, -1):
-                        pointsToDraw[pt][0] = pointsToDraw[pt - 1][0]
-                    pointsToDraw[pt + 1][0] = _lstpt
+        for _ in range(self.lineSpeed):
+            _lstpt = pointsToDraw[len(pointsToDraw) - 1][0]
+            _lstpt2 = pointsToDraw[len(pointsToDraw) - 1][1]
+            for pt in range(len(pointsToDraw) - 1, 0, -1):
+                pointsToDraw[pt][0] = pointsToDraw[pt - 1][0]
+                pointsToDraw[pt][1] = pointsToDraw[pt - 1][1]
+            pointsToDraw[pt + 1][0] = _lstpt
+            pointsToDraw[pt + 1][1] = _lstpt2
+
+        # if (self.angle != 0 and random.random() < self.horizontalMovementProb) or (self.angle == 0 and random.random() < self.verticalMovementProb):
+        #     if self.direction == 0:
+        #         for _ in range(self.lineSpeed):
+        #             _lstpt = pointsToDraw[0][0]
+        #             for pt in range(0, len(pointsToDraw) - 1):
+        #                 pointsToDraw[pt][0] = pointsToDraw[pt + 1][0]
+        #             pointsToDraw[pt + 1][0] = _lstpt
+        #     else:
+        #         for _ in range(self.lineSpeed):
+        #             _lstpt = pointsToDraw[len(pointsToDraw) - 1][0]
+        #             for pt in range(len(pointsToDraw) - 1, 0, -1):
+        #                 pointsToDraw[pt][0] = pointsToDraw[pt - 1][0]
+        #             pointsToDraw[pt + 1][0] = _lstpt
 
 
     def drawTheLine(self, p1x, p1y, p2x, p2y, _n):

@@ -1,14 +1,14 @@
-from logging import config
 import random
 import time
 import math
 from noise import *
+from PIL import Image, ImageDraw, ImageChops
 from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing, badpixels
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
-from PIL import Image, ImageDraw, ImageChops
 from modules.holder_director import Director
 from pieces.screen import Holder
+from modules.informal_line import InformalLine
 
 # ################################################### #
 # hatching hashing lines
@@ -16,250 +16,6 @@ from pieces.screen import Holder
 class Pen:
     def __init__(self):
         pass
-
-
-class InformalLine:
-
-    points = 1
-    pointPerLine = 3
-    resolution = 50
-    drawingHeight = 100
-    noiseAmplitude = 1.0
-    xOffset = 100
-    yOffset = 0
-    angle = 0
-    direction = 0
-    isColumn = 1
-    name = ""
-
-    attenuating = False
-    enlarging = False
-
-    def __init__(self, _unitNumber, _config=None):
-        self.unitNumber = _unitNumber
-        self.lineColor = None
-        self.canvas = Image.new("RGBA", (config.largestDim, config.largestDim))
-        self.draw = ImageDraw.Draw(self.canvas)
-        self.config = _config
-
-
-    def reconfigure(self):
-        self.lineSpeed = random.randint(self.lineSpeedRange[0], self.lineSpeedRange[1])
-        self.baseWidth = random.uniform(self.baseWidthRange[0], self.baseWidthRange[1])
-        self.noiseAmplitude = random.uniform(float(self.noiseAmplitudeRange[0]), float(self.noiseAmplitudeRange[1]))
-
-
-    def catmull_rom(self, p0, p1, p2, p3, t):
-        t2 = t * t
-        t3 = t2 * t
-        return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
-
-
-    def getCurvePoints(self):
-
-        self.curvedPoints = []
-
-        for i in range(self.points):
-            p0 = self.rawPts[max(0, i - 1)]
-            p1 = self.rawPts[i]
-            p2 = self.rawPts[i + 1]
-            p3 = self.rawPts[min(self.points - 1, i + 2)]
-
-            for step in range(self.resolution):
-                t = step / float(self.resolution)  # 0 <= t < 1
-
-                x = self.catmull_rom(p0[0], p1[0], p2[0], p3[0], t)
-                y = self.catmull_rom(p0[1], p1[1], p2[1], p3[1], t)
-
-                self.curvedPoints.append([x, y])
-
-
-    def generateRawLine(self):
-        self.rawPts = []
-        pointSpacing = self.drawingHeight / self.points
-
-        for i in range(self.points):
-            a = i * pointSpacing
-            b = R(-self.noiseAmplitude, self.noiseAmplitude)
-            if random.random() < config.tangleProb and i != 0 and i != self.points - 1 and abs(b) > self.noiseAmplitude * 0.75:
-                a -= random.uniform(config.backTrackRange[0], config.backTrackRange[1])
-            self.rawPts.append((round(b + self.xOffset), round(a + self.yOffset)))
-
-        # ensures the last point at the right or bottom closes the box
-        self.rawPts.append([b + self.xOffset, self.drawingHeight + self.yOffset])
-        # Extra points for smoother Bézier start/end
-        # pts.insert(0, pts[0])
-
-
-    def generateInformalLine(self):
-
-        self.points = random.randint(3, self.pointPerLine)
-        self.ratioFactor = random.uniform(config.ratioFactorRange[0], config.ratioFactorRange[1])
-        self.resolution = config.curveResolution
-        self.direction = 1 if random.random() < 0.5 else 0
-
-        self.generateRawLine()
-        self.getCurvePoints()
-        self.smoothPointsForDrawing = []
-        self.smoothPointsForDrawing.extend([pt[0] + self.xOffset, pt[1] + self.yOffset] for pt in self.curvedPoints)
-        # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
-
-
-    def makeLinePoints(self):
-
-        self.lastOrthoPoint = []
-        pointsToDraw = self.curvedPoints
-        lastPt = [pointsToDraw[0][0], pointsToDraw[0][1]]
-
-        self.draw.rectangle((0, 0, config.largestDim, config.largestDim), fill=(0, 0, 0, 0))
-
-        _ptCounter = 0
-        for pt in pointsToDraw:
-            self.drawTheLine(lastPt[0], lastPt[1], pt[0], pt[1], _ptCounter)
-            lastPt = [pt[0], pt[1]]
-            _ptCounter += 1
-
-        _ptCounter = 0
-        self.smooth_points = pointsToDraw
-        self._w = 1
-        self.maxMarkWidth = 8
-        self.minMarkWidth = 1
-        self.changeMarkWidthProb = .3
-        self.incrementFactor = .710
-        for pt in pointsToDraw:
-            self._p = _ptCounter
-            # self.drawLinePolyEnvelope()
-            _ptCounter += 1
-
-        if (self.angle != 0 and random.random() < config.horizontalMovementProb) or (self.angle == 0 and random.random() < config.verticalMovementProb):
-            if self.direction == 0:
-                for _ in range(self.lineSpeed):
-                    _lstpt = pointsToDraw[0][0]
-                    for pt in range(0, len(pointsToDraw) - 1):
-                        pointsToDraw[pt][0] = pointsToDraw[pt + 1][0]
-                    pointsToDraw[pt + 1][0] = _lstpt
-            else:
-                for _ in range(self.lineSpeed):
-                    _lstpt = pointsToDraw[len(pointsToDraw) - 1][0]
-                    for pt in range(len(pointsToDraw) - 1, 0, -1):
-                        pointsToDraw[pt][0] = pointsToDraw[pt - 1][0]
-                    pointsToDraw[pt + 1][0] = _lstpt
-
-
-    def drawTheLine(self, p1x, p1y, p2x, p2y, _n):
-
-        _p1 = [p1x, p1y]
-        _p2 = [p2x, p2y]
-
-        _ratio = 1.0
-        _ratio1a = 1.0
-
-        _penWidth = self.baseWidth * _ratio * _ratio1a
-
-        fillClr = self.lineColor
-        if config.lineColorIsBgColor:
-            fillClr = config.bgColor
-
-        if self.angle == 90:
-            config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(self.baseWidth))
-        else:
-            config.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(self.baseWidth))
-
-
-    def drawLinePolyEnvelope(self):
-        # Draw the shape
-        if self._p == 1:
-            pieceLogger(f"Drawing Line with: {self.name}")
-
-        if self._p < len(self.smooth_points) and self._p > 0:
-            _p1 = self.smooth_points[self._p - 1]
-            _p2 = self.smooth_points[self._p]
-            _base = math.pi
-            if self.angle == 90:
-                _p1[0] = self.smooth_points[self._p - 1][1]
-                _p1[1] = self.smooth_points[self._p - 1][0]
-                _p2[0] = self.smooth_points[self._p][1]
-                _p2[1] = self.smooth_points[self._p][0]
-                _base = 0
-
-            _dy = _p1[1] - _p2[1]
-            _dx = _p1[0] - _p2[0]
-            
-            _orthoAngle = _base - math.atan2(_dy, _dx)
-
-            _angle = math.atan2(_dy, _dx) * 360 / math.pi
-
-            if _angle < 0:
-                _angle += 360
-
-            selfWidth = self._w
-            _lineColor = self.lineColor
-
-            _sinOrthoAngle = math.sin(_orthoAngle)
-            _cosOrthoAngle = math.cos(_orthoAngle)
-
-            _orthoD = selfWidth / 2.2
-
-            _orthoP1x = round(_orthoD * _sinOrthoAngle + _p1[0])
-            _orthoP1y = round(_orthoD * _cosOrthoAngle + _p1[1])
-
-            _orthoP2x = round(_orthoD * _sinOrthoAngle + _p2[0])
-            _orthoP2y = round(_orthoD * _cosOrthoAngle + _p2[1])
-
-            _orthoP3x = round(-_orthoD * _sinOrthoAngle + _p2[0])
-            _orthoP3y = round(-_orthoD * _cosOrthoAngle + _p2[1])
-
-            _orthoP4x = round(-_orthoD * _sinOrthoAngle + _p1[0])
-            _orthoP4y = round(-_orthoD * _cosOrthoAngle + _p1[1])
-
-            try:
-                if self._p > 1:
-
-                    _orthoP1x = self.lastOrthoPoint[0]
-                    _orthoP1y = self.lastOrthoPoint[1]
-
-                    _orthoP4x = self.lastOrthoPoint[2]
-                    _orthoP4y = self.lastOrthoPoint[3]
-
-            except Exception as e:
-                print(e)
-
-            _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
-
-            config.draw.polygon(_poly, fill=_lineColor, outline=None)
-
-            self.lastAngle = _angle
-            self._p += 1
-            self.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
-
-            if self._p == len(self.smooth_points):
-                self._p = 0
-
-            if random.random() < self.changeMarkWidthProb:
-                if not self.attenuating and not self.enlarging:
-                    if random.random() < 0.5:
-                        self.attenuating = True
-                    else:
-                        self.enlarging = True
-                elif random.random() < self.changeMarkWidthProb * 2:
-                    if self.attenuating:
-                        self.enlarging = True
-                        self.attenuating = False
-                    else:
-                        self.enlarging = False
-                        self.attenuating = True
-
-            if self._w > self.maxMarkWidth:
-                self.enlarging = False
-
-            if self._w <= self.minMarkWidth:
-                self.attenuating = False
-                self._w = self.minMarkWidth
-
-            if self.enlarging:
-                self._w += round(1 * self.incrementFactor)
-            if self.attenuating:
-                self._w -= round(1 * self.incrementFactor)
 
 
 # -------- Util Functions   -------------- #
@@ -508,36 +264,64 @@ def setGridLines():
 
     config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
     config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
+    config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
+    config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
+    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
+    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
 
     def add_col_lines():
         # config.v_pts = []
         for col in range(config.colInterval + config.colAdj):
-            # v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * col, config.yOffset, False)
-            # config.v_pts.append(v_pts)
-            informalLine = InformalLine(col)
-            informalLine.xOffset = config.xOffset + config.colSpacing * col
-            informalLine.yOffset = config.yOffset
-            informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
+            for row in range(config.rowInterval + config.rowAdj):
+                for i in range(0,2):
+                    informalLine = InformalLine(col, config.largestDim)
+                    informalLine.curveResolution = config.curveResolution
+                    informalLine.ratioFactorRange = config.ratioFactorRange
+                    informalLine.backTrackRange = config.backTrackRange
+                    informalLine.lineColorIsBgColor = False
+                    informalLine.tangleProb = config.tangleProb
+                    informalLine.draw = config.draw
 
-            informalLine.pointPerLine = config.pointsPerLineCol
-            informalLine.lineSpeedRange = config.vertLineSpeedRange
-            informalLine.baseWidthRange = config.vertBaseWidthRange
-            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
-            # _bg_alpha = round(config.bg_alpha)
+                    informalLine.baseWidthRange = config.vertBaseWidthRange
+                    informalLine.baseWidthRange = (0,2)
+                    informalLine.xOffset = config.xOffset + config.colSpacing * col 
+                    informalLine.yOffset = config.yOffset + row * informalLine.backTrackRange[1]*2.2
+                    # informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
+                    informalLine.drawingHeight = config.drawingHeight / config.colInterval
+                    informalLine.angle = random.uniform(30,45)
+                    if i == 1:
+                        informalLine.angle *= -1
+                        informalLine.xOffset -= informalLine.drawingHeight/2
+                    informalLine.pointPerLine = config.pointsPerLineCol
+                    informalLine.lineSpeedRange = config.lineSpeedRange
+                    informalLine.lineSpeedRange = config.vertLineSpeedRange
+                    informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
+                    informalLine.horizontalMovementProb = config.horizontalMovementProb
+                    informalLine.verticalMovementProb = config.verticalMovementProb
+                    # _bg_alpha = round(config.bg_alpha)
+                    # informalLine.bgColor = (0,0,0,100)
 
-            informalLine.lineColor = setLineColor()
-            informalLine.reconfigure()
-            informalLine.generateInformalLine()
-            informalLine.isColumn = 1
-            # pieceLogger(f"{informalLine.lineColor}")
-            config.informalLineUnits.append(informalLine)
+                    informalLine.lineColor = setLineColor()
+
+                    informalLine.lineColor = (int(random.uniform(20,255)),6,30,10)
+                    informalLine.reconfigure()
+                    informalLine.generateInformalLine()
+                    informalLine.isColumn = 1
+                    # pieceLogger(f"{informalLine.lineColor}")
+                    config.informalLineUnits.append(informalLine)
 
     def add_row_lines():
-        # config.h_pts = []
+
         for row in range(config.rowInterval + config.rowAdj):
-            informalLine = InformalLine(row)
-            # h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * row, True)
-            # config.h_pts.append(h_pts)
+            informalLine = InformalLine(row, config.largestDim)
+            informalLine.curveResolution = config.curveResolution
+            informalLine.baseWidthRange = config.baseWidthRange
+            informalLine.ratioFactorRange = config.ratioFactorRange
+            informalLine.backTrackRange = config.backTrackRange
+            informalLine.lineColorIsBgColor = False
+            informalLine.tangleProb = config.tangleProb
+            informalLine.draw = config.draw
+
             informalLine.xOffset = config.xOffset + config.rowSpacing * row
             informalLine.yOffset = config.yOffset
             informalLine.drawingHeight = config.drawingWidth - 2 * config.xOffset
@@ -552,17 +336,15 @@ def setGridLines():
             informalLine.isColumn = 0
             config.informalLineUnits.append(informalLine)
 
-    if config.colFirst:
-        add_col_lines()
-        add_row_lines()
-    else:
-        add_row_lines()
-        add_col_lines()
+    add_col_lines()
+    # add_row_lines()
+    # if config.colFirst:
+    #     add_row_lines()
+    # else:
+    #     add_row_lines()
+    #     add_col_lines()
 
-    config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
-    config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
-    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
-    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
+
     config.numberOfinformalLines = len(config.informalLineUnits)
     # pieceLogger(f"New Lines {config.numberOfinformalLines}")
 
@@ -573,6 +355,8 @@ def changeLine():
 
 
 def drawTheBG():
+
+    config.bg_alpha = 255
     config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
     config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
 
@@ -626,9 +410,9 @@ def reDraw():
     # if random.random() < config.changeBGProb and not config.noChange:
     if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
         config.bg_alpha = 0
-        config.lightMode = False if random.random() > config.lightModeProb else True
+        # config.lightMode = False if random.random() > config.lightModeProb else True
         # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
-        setBGColor()
+        # setBGColor()
         # setLines()
 
         for _u in range(config.numberOfinformalLines):
@@ -637,11 +421,17 @@ def reDraw():
 
             # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
 
+    for _u in range(config.numberOfinformalLines):
+        if random.random() < config.changeLinesProb and not config.noChange:
+            informalLine: InformalLine = config.informalLineUnits[_u]
+            informalLine.reconfigure()
+            informalLine.generateInformalLine()
+
     if random.random() < config.changeLinesProb and not config.noChange:
-        config.lightMode = False if random.random() > config.lightModeProb else True
+        # config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
-        setBGColor()
-        setLines()
+        # setBGColor()
+        # setLines()
         # pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
 
     if random.random() < config.pauseProb:
@@ -789,7 +579,7 @@ def loadColorConfigs():
         palette.bg_dropHueMax = float(workConfig.get(p, "bg_dropHueMax", fallback="0"))
         palette.bg_alpha_range = [int(x) for x in workConfig.get(p, "bg_alpha_range", fallback="10,40").split(",")]
         palette.bg_alpha = round(random.uniform(palette.bg_alpha_range[0], palette.bg_alpha_range[1]))
-        palette.bg_alpha_base = 20
+        palette.bg_alpha_base = 200
 
         palette.lineColorIsBgColor = workConfig.getboolean(p, "lineColorIsBgColor", fallback=False)
 

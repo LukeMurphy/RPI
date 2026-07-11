@@ -1,17 +1,22 @@
 '''
-------------------------------------------------
-To Operate, this needs this in main() at start of piece
-
-# -------------------------------------------------------- #
+------------------------------------------------------------
+Add to head of main piece 
+------------------------------------------------------------
 
     from modules.manager_coordinator import CoordinationManager
+    
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+To Operate, this needs this in main() at start of piece
+------------------------------------------------------------
 
 # -------------------------------------------------------- #
 
     config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
     config.numberOfPiecesBeingManaged = workConfig.getint("particles", "numberOfPiecesBeingManaged", fallback=0)
     mngrSetupCoordination(config)
-
 
 # -------------------------------------------------------- #
 
@@ -26,12 +31,16 @@ def mngrSetupCoordination(config) :
     # _CM.stateFlags = {"lines":"raw"}
     config.coordinationManager = _CM
 
-where mngrAction and mngrLocalAction are set to handle the local change and what
+------------------------------------------------------------
+mngrAction and mngrLocalAction are set to handle the local change and what
 to do with the other pieces
-------------------------------------------------
+------------------------------------------------------------
+
+
+------------------------------------------------------------
 mngrAction is what is called when the manager state has changed and the piece is
 responding to that change
-
+# -------------------------------------------------------- #
 def mngrAction():
     _CM: CoordinationManager
     _CM = config.coordinationManager
@@ -43,9 +52,15 @@ def mngrAction():
     for k,v in _CM.shareddict.get_all().items() :
         if k == "all" :
             [code here .......]
-------------------------------------------------
-mngrLocalAction is the triggering function and has to call:
+# -------------------------------------------------------- #
+------------------------------------------------------------
 
+
+------------------------------------------------------------
+mngrLocalAction is the triggering function and has to call:
+to let the other pieces know what is going on....
+
+# -------------------------------------------------------- #
 # send signal to common dict that this piece has changed and what has changed
 def mngrLocalAction(_x,_y) :
     # action when this piece changes - i.e. broadcast to others
@@ -57,15 +72,16 @@ def mngrLocalAction(_x,_y) :
         # also sets the stateFlag to the stateFlagChange value eg "bg":"rnd"
         config.coordinationManager.coordinateChanges({optional new k/v pair})
         [then do things]
+# -------------------------------------------------------- #
+------------------------------------------------------------
 
 
-to let the other pieces know what is going on....
-------------------------------------------------
+------------------------------------------------------------
 This has to be put in the runWork or looping function to poll the manager state:
 
     config.coordinationManager.checkTime()
 
-------------------------------------------------
+------------------------------------------------------------
 '''
 from logging import config
 from multiprocessing.managers import BaseManager

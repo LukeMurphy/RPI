@@ -270,9 +270,9 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType)
     informalLine.noiseY = random.uniform(config.scribbleNoiseYRange[0], config.scribbleNoiseYRange[1])
 
     informalLine.lineColor = setLineColor()
-    if random.random() < 0.02:
+    if random.random() < config.scribbleAltColorProb:
         informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
-    if random.random() < 0.02:
+    if random.random() < config.scribbleAltColorProb:
         _tVal = int(random.uniform(40, 255))
         informalLine.lineColor = (0, _tVal, _tVal, 60)
     if random.random() < config.scribbleSkipMarksProb:
@@ -304,9 +304,9 @@ def drawSingleMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark):
     informalLine.horizontalMovementProb = config.horizontalMovementProb
     informalLine.verticalMovementProb = config.verticalMovementProb
     informalLine.lineColor = setLineColor()
-    if random.random() < 0.05:
+    if random.random() < config.marksAltColorProb:
         informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
-    if random.random() < 0.05:
+    if random.random() < config.marksAltColorProb:
         _tVal = int(random.uniform(40, 255))
         informalLine.lineColor = (0, _tVal, _tVal, 60)
     informalLine.reconfigure()
@@ -349,9 +349,9 @@ def drawXMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark):
         informalLine.verticalMovementProb = config.verticalMovementProb
         if i == 0 :
             informalLine.lineColor = setLineColor()
-            if random.random() < 0.05:
+            if random.random() < config.marksAltColorProb:
                 informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
-            if random.random() < 0.05:
+            if random.random() < config.marksAltColorProb:
                 _tVal = int(random.uniform(40, 255))
                 informalLine.lineColor = (0, _tVal, _tVal, 60)
             _clr  = informalLine.lineColor 
@@ -499,16 +499,16 @@ def reDraw():
     # stomping on the one in progress
 
     # if random.random() < config.changeBGProb and not config.noChange:
-    if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
-        config.bg_alpha = 0
-        # config.lightMode = False if random.random() > config.lightModeProb else True
-        # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
-        # setBGColor()
-        # setLines()
+    # if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
+    #     config.bg_alpha = 0
+    #     # config.lightMode = False if random.random() > config.lightModeProb else True
+    #     # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
+    #     # setBGColor()
+    #     # setLines()
 
-        for _u in range(config.numberOfinformalLines):
-            informalLine = config.informalLineUnits[_u]
-            informalLine.lineColor = setLineColor()
+    #     for _u in range(config.numberOfinformalLines):
+    #         informalLine = config.informalLineUnits[_u]
+    #         informalLine.lineColor = setLineColor()
 
             # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
 
@@ -835,6 +835,8 @@ def main(run=True):
     config.scribbleRows = int(workConfig.get("hatchingmarks", "scribbleRows", fallback=8))
     config.scribbleCols = int(workConfig.get("hatchingmarks", "scribbleCols", fallback=8))
 
+    config.marksAltColorProb = float(workConfig.get("hatchingmarks", "marksAltColorProb", fallback=0.04))
+    config.scribbleAltColorProb = float(workConfig.get("hatchingmarks", "scribbleAltColorProb", fallback=0.04))
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
     config.changeAllLinesProb = float(workConfig.get("hatchingmarks", "changeAllLinesProb", fallback=0.01))
     # probablility background changes

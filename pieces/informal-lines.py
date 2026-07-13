@@ -465,7 +465,7 @@ def reDraw():
     drawTheBG()
     updateLines()
 
-
+    # in-place refresh of mark
     for _u in range(config.numberOfinformalLines):
         if random.random() < config.changeLinesProb and not config.noChange:
             informalLine: InformalLine = config.informalLineUnits[_u]
@@ -476,6 +476,7 @@ def reDraw():
             if informalLine.lineType == 1:
                 informalLine.generateScribble()
 
+    # all marks changed
     if random.random() < config.changeAllLinesProb and not config.noChange:
         config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0

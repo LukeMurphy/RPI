@@ -92,7 +92,7 @@ def clearbgBox():
 def _bgColorsFilling():
     global config
     # config.useBgBox = False if config.useBgBox   else True
-    print("bgBox")
+    # pieceLogger("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
     # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
 

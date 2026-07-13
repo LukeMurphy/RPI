@@ -3,6 +3,7 @@ import time
 import math
 from noise import *
 from PIL import Image, ImageDraw, ImageChops
+from torch import rand
 from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing, badpixels
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
@@ -240,6 +241,7 @@ def setLines():
     pieceLogger(f"New Lines:")
     config.informalLineUnits = []
     setGridLines()
+    generateScribbles()
 
 
 def setRegularSpacing():
@@ -259,9 +261,49 @@ def setRegularSpacing():
         config.rowSpacing = config.colSpacing
 
 
+def generateScribbles():
+
+    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
+    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
+
+    for _row in range (0,config.scribbleRows):
+        for _col in range (0,config.scribbleCols):
+            _skipMark = False
+
+            informalLine = InformalLine(1, 10)
+            informalLine.lineType = 1
+            informalLine.curveResolution = config.curveResolution
+            informalLine.ratioFactorRange = config.ratioFactorRange
+            informalLine.backTrackRange = config.backTrackRange
+            informalLine.lineColorIsBgColor = False
+            informalLine.tangleProb = config.tangleProb
+            informalLine.draw = config.draw
+            # informalLine.drawingHeight = _drawingHeight
+            informalLine.scribbleHeight = random.uniform(config.scribbleHeightRange[0],config.scribbleHeightRange[1])
+            
+            informalLine.xOffset = config.scribblexOffset  + _col * config.scribbleRadiusXRange[1] * config.scibbleXPacking
+            informalLine.yOffset = config.scribbleyOffset + _row * config.scribbleRadiusYRange[1] * config.scibbleYPacking
+
+            informalLine.radiusX = random.uniform(config.scribbleRadiusXRange[0],config.scribbleRadiusXRange[1])
+            informalLine.radiusY = random.uniform(config.scribbleRadiusYRange[0],config.scribbleRadiusYRange[1])
+            informalLine.baseWidth = int(random.uniform(0,config.scribbleLineBaseWidthRange))
+            # informalLine.pointPerLine = 16
+            # informalLine.pointsPerLoop = 16
+            informalLine.points = config.scribblePoints 
+            informalLine.loops = int(random.uniform(config.scribbleLoopsRange[0],config.scribbleLoopsRange[1]))
+
+            informalLine.noiseX = random.uniform(config.scribbleNoiseXRange[0],config.scribbleNoiseXRange[1])
+            informalLine.noiseY = random.uniform(config.scribbleNoiseYRange[0],config.scribbleNoiseYRange[1])
+            if random.random() < config.scribbleSkipMarksProb :
+                _skipMark = True
+            if not _skipMark :
+                informalLine.generateScribble()
+                config.informalLineUnits.append(informalLine)
+    config.numberOfinformalLines = len(config.informalLineUnits)
+
+
 def setGridLines():
     pieceLogger(f"Making Grid:  {config.drawingWidth } {config.drawingHeight }")
-
     setRegularSpacing()
 
     config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
@@ -273,11 +315,24 @@ def setGridLines():
 
     def add_col_lines():
         # config.v_pts = []
-        for col in range(config.colInterval + config.colAdj):
-            for row in range(config.rowInterval + config.rowAdj):
-                _runningDelta = 0
+        for row in range(config.rowInterval + config.rowAdj):
+            _lastX = 0
+            _lastY = config.yOffset + row * (config.minYSpacing)
+            for col in range(config.colInterval + config.colAdj):
+                _drawingHeight = config.markMinHeight + random.uniform(-config.sizeRange , config.sizeRange)
+                _skipMark = False
+                _altMark = False
+                if random.random() < config.skipMarksProb :
+                    _skipMark = True
+                if random.random() < config.altMarksProb :
+                    _altMark = True
+                    _drawingHeight = config.markMinHeight  + random.uniform(-config.sizeRange , config.sizeRange)
+
+
+                _lastX += config.markMinWidth + config.minXSpacing
+                if col == 0 : _lastX /= 2
                 for i in range(0, 2):
-                    informalLine = InformalLine(col, config.largestDim)
+                    informalLine = InformalLine(col, max(config.markMinWidth, config.markMinHeight))
                     informalLine.curveResolution = config.curveResolution
                     informalLine.ratioFactorRange = config.ratioFactorRange
                     informalLine.backTrackRange = config.backTrackRange
@@ -285,24 +340,26 @@ def setGridLines():
                     informalLine.tangleProb = config.tangleProb
                     informalLine.draw = config.draw
 
-                    informalLine.baseWidthRange = config.vertBaseWidthRange
-                    informalLine.baseWidthRange = (0, 2)
-                    informalLine.drawingHeight = config.drawingHeight / config.colInterval + random.uniform(-5, 5)
-                    # informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
-                    informalLine.xOffset = config.xOffset + col * config.colSpacing + _runningDelta
-                    informalLine.yOffset = config.yOffset + row * config.rowSpacing - informalLine.drawingHeight / 4
-                    informalLine.angle = random.uniform(40, 50)
+                    informalLine.baseWidthRange = config.vertLineWidthRange
+                    informalLine.drawingHeight = _drawingHeight
+                    
+                    informalLine.xOffset = config.xOffset + _lastX
+                    informalLine.yOffset = _lastY - informalLine.drawingHeight/4 * random.random()
+
+                    informalLine.angle = random.uniform(config.angleRange[0], config.angleRange[1])
+                    if _altMark :
+                        informalLine.angle = random.uniform(config.angleAltRange[0], config.angleAltRange[1])
                     if i == 1:
                         informalLine.angle *= -1
-                        informalLine.xOffset -= informalLine.drawingHeight / 2 + _runningDelta
+                        informalLine.xOffset -= informalLine.drawingHeight / 2
+                    
                     informalLine.pointPerLine = config.pointsPerLineCol
                     informalLine.lineSpeedRange = config.lineSpeedRange
                     informalLine.lineSpeedRange = config.vertLineSpeedRange
                     informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
                     informalLine.horizontalMovementProb = config.horizontalMovementProb
                     informalLine.verticalMovementProb = config.verticalMovementProb
-                    # _bg_alpha = round(config.bg_alpha)
-                    # informalLine.bgColor = (0,0,0,100)
+
 
                     informalLine.lineColor = setLineColor()
                     if random.random() < 0.05:
@@ -311,8 +368,13 @@ def setGridLines():
                     informalLine.generateInformalLine()
                     informalLine.isColumn = 1
                     # pieceLogger(f"{informalLine.lineColor}")
-                    _runningDelta +=  informalLine.drawingHeight
-                    config.informalLineUnits.append(informalLine)
+
+                    if not _skipMark:
+                        if _altMark and i == 1 :
+                            pass
+                        else:
+                            config.informalLineUnits.append(informalLine)
+
 
     def add_row_lines():
 
@@ -354,12 +416,14 @@ def setGridLines():
 
 def changeLine():
     _changeLine = random.randint(0, len(config.informalLineUnits) - 1)
-    config.informalLineUnits[_changeLine].reconfigure()
+    _lineUnit : InformalLine = config.informalLineUnits[_changeLine]
+    if _lineUnit.lineType == 0 :
+        _lineUnit.reconfigure()
 
 
 def drawTheBG():
 
-    config.bg_alpha = 255
+    # config.bg_alpha = 255
     config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
     config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
 
@@ -373,7 +437,10 @@ def updateLines():
     for informalLineUnitIndex in range(0, len(config.informalLineUnits)):
         lineUnit: InformalLine
         lineUnit = config.informalLineUnits[informalLineUnitIndex]
-        lineUnit.makeLinePoints()
+        if lineUnit.lineType == 0 :
+            lineUnit.drawLinePoints()
+        if lineUnit.lineType == 1 :
+            lineUnit.drawTheLineComplete()
 
 
 # ---- looping and redrawing --------
@@ -427,8 +494,12 @@ def reDraw():
     for _u in range(config.numberOfinformalLines):
         if random.random() < config.changeLinesProb and not config.noChange:
             informalLine: InformalLine = config.informalLineUnits[_u]
-            informalLine.reconfigure()
-            informalLine.generateInformalLine()
+            if informalLine.lineType == 0 :
+                informalLine.reconfigure()
+                informalLine.generateInformalLine()
+
+            if informalLine.lineType == 1 :
+                informalLine.generateScribble()
 
     if random.random() < config.changeAllLinesProb and not config.noChange:
         # config.lightMode = False if random.random() > config.lightModeProb else True
@@ -582,7 +653,7 @@ def loadColorConfigs():
         palette.bg_dropHueMax = float(workConfig.get(p, "bg_dropHueMax", fallback="0"))
         palette.bg_alpha_range = [int(x) for x in workConfig.get(p, "bg_alpha_range", fallback="10,40").split(",")]
         palette.bg_alpha = round(random.uniform(palette.bg_alpha_range[0], palette.bg_alpha_range[1]))
-        palette.bg_alpha_base = 200
+        palette.bg_alpha_base = 20
 
         palette.lineColorIsBgColor = workConfig.getboolean(p, "lineColorIsBgColor", fallback=False)
 
@@ -704,11 +775,47 @@ def main(run=True):
 
     config.horizLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "horizLineSpeedRange", fallback="1,20").split(",")]
     config.vertLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineSpeedRange", fallback="1,20").split(",")]
-    config.vertBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertBaseWidthRange", fallback="18,180").split(",")]
+    config.vertLineWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineWidthRange", fallback="18,180").split(",")]
     config.horizBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "horizBaseWidthRange", fallback="18,180").split(",")]
 
     config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
     config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
+
+
+
+    config.angleRange = [float(x) for x in workConfig.get("hatchingmarks", "angleRange", fallback="0,0").split(",")]
+    config.angleAltRange = [float(x) for x in workConfig.get("hatchingmarks", "angleAltRange", fallback="-10,10").split(",")]
+    config.sizeRange = float(workConfig.get("hatchingmarks", "sizeRange", fallback=10))
+    config.minXSpacing = float(workConfig.get("hatchingmarks", "minXSpacing", fallback=-3))
+    config.minYSpacing = float(workConfig.get("hatchingmarks", "minYSpacing", fallback=-3))
+    config.skipMarksProb = float(workConfig.get("hatchingmarks", "skipMarksProb", fallback=.25))
+    config.altMarksProb = float(workConfig.get("hatchingmarks", "altMarksProb", fallback=.5))
+    config.markMinHeight = float(workConfig.get("hatchingmarks", "markMinHeight", fallback=24))
+    config.markMinWidth = float(workConfig.get("hatchingmarks", "markMinWidth", fallback=24))
+
+    config.scribblexOffset = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
+    config.scribbleyOffset = int(workConfig.get("hatchingmarks", "scribbleyOffset", fallback=0))
+    config.scibbleXPacking = float(workConfig.get("hatchingmarks", "scibbleXPacking", fallback=0))
+    config.scibbleYPacking = float(workConfig.get("hatchingmarks", "scibbleYPacking", fallback=0))
+
+    config.scribbleSkipMarksProb = float(workConfig.get("hatchingmarks", "scribbleSkipMarksProb", fallback=0))
+    config.scribbleAltMarksProb = float(workConfig.get("hatchingmarks", "scribbleAltMarksProb", fallback=0))
+
+    config.scribbleHeightRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleHeightRange", fallback="4,10").split(",")]
+    config.scribbleLineBaseWidthRange = int(workConfig.get("hatchingmarks", "scribbleLineBaseWidthRange", fallback=1))
+
+    config.scribbleRadiusXRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleRadiusXRange", fallback="4,8").split(",")]
+    config.scribbleRadiusYRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleRadiusYRange", fallback="8,24").split(",")]
+
+    config.scribblePoints = int(workConfig.get("hatchingmarks", "scribblePoints", fallback=8))
+    config.scribbleLoopsRange = [int(x) for x in workConfig.get("hatchingmarks", "scribbleLoopsRange", fallback="2,2").split(",")]
+
+    config.scribbleNoiseXRange = [float(x) for x in workConfig.get("hatchingmarks", "anglscribbleNoiseXRangeeRange", fallback="5,5").split(",")]
+    config.scribbleNoiseYRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleNoiseYRange", fallback="5,5").split(",")]
+
+    config.scribbleRows = int(workConfig.get("hatchingmarks", "scribbleRows", fallback=8))
+    config.scribbleCols = int(workConfig.get("hatchingmarks", "scribbleCols", fallback=8))
+
 
     config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
     config.changeAllLinesProb = float(workConfig.get("hatchingmarks", "changeAllLinesProb", fallback=0.01))

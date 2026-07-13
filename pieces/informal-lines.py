@@ -3,7 +3,6 @@ import time
 import math
 from noise import *
 from PIL import Image, ImageDraw, ImageChops
-from torch import rand
 from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing, badpixels
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping

@@ -4,9 +4,8 @@ import time
 import math
 from matplotlib.pyplot import pie
 import numpy as np
+from modules.configuration import pieceLogger
 
-from modules.configuration import bcolors, pieceLogger
-from pieces.actionmarks_v2 import bgColorBlocksFilling
 
 class InformalLine:
 

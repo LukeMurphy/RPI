@@ -16,18 +16,16 @@ class InformalLine:
     xOffset = 100
     yOffset = 0
 
-
     configxOffset = 0
     configyOffset = 0
     angle = 0
     direction = 0
-    isColumn = 1
     name = ""
 
-    '''
+    """
     lineType = 0 ==> straight lines
     lineType = 1 ==> scribble lines
-    '''
+    """
     lineType = 0
 
     attenuating = False
@@ -39,7 +37,7 @@ class InformalLine:
 
     baseWidthRange = []
     baseWidth = 100
-    
+
     noiseAmplitudeRange = []
     noiseAmplitude = 1.0
 
@@ -53,12 +51,11 @@ class InformalLine:
     horizontalMovementProb = 0.0
     veticalMovementProb = 0.0
 
-    bgColor = (0,0,0,255)
-    lineColor = (0,0,0,255)
-
+    bgColor = (0, 0, 0, 255)
+    lineColor = (0, 0, 0, 255)
 
     # -----  CURVES ----- #
-    turnsRange = [2,2]
+    turnsRange = [2, 2]
     loopsMin = 2
     loopsMax = 2
     loops = 2
@@ -79,22 +76,19 @@ class InformalLine:
     radiusYMax = 50
     xRadiusDelta = 0
     yRadiusDelta = 0
-    deltaRadiusXChangeProb = .0
-    deltaRadiusYChangeProb = .0
+    deltaRadiusXChangeProb = 0.0
+    deltaRadiusYChangeProb = 0.0
 
     xCenter = 100
     yCenter = 100
     centerXDelta = 0
     centerYDelta = 0
-    deltaRadiusXCenterChangeProb = .0
-    deltaRadiusYCenterChangeProb = .0
+    deltaRadiusXCenterChangeProb = 0.0
+    deltaRadiusYCenterChangeProb = 0.0
 
-
-    def __init__(self, _unitNumber, _config=None):
+    def __init__(self, _unitNumber=0, _config=None):
         self.unitNumber = _unitNumber
         self.config = _config
-
-
 
     # --------------- UTILS ------------------------ #
     def randomRange(self, a, b, rounded=False):
@@ -103,14 +97,12 @@ class InformalLine:
         else:
             return round(random.uniform(a, b))
 
-
     def catmull_rom(self, p0, p1, p2, p3, t):
         t2 = t * t
         t3 = t2 * t
         return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
 
-
-    def chaikins_corner_cutting(self,coords, refinements=2, ratio=0.75):
+    def chaikins_corner_cutting(self, coords, refinements=2, ratio=0.75):
         # https://stackoverflow.com/questions/47068504/where-to-find-python-implementation-of-chaikins-corner-cutting-algorithm
         coords = np.array(coords)
 
@@ -126,7 +118,6 @@ class InformalLine:
         return coords
 
     # ---------------------------------------------- #
-
 
     # --------------- curves ----------------------- #
 
@@ -152,7 +143,6 @@ class InformalLine:
 
                 self.curve_points.append((x, y))
 
-
     def generateScribble(self):
         points = self.generate_loop_stroke()
         self.get_curve_points(points, True, 10)
@@ -168,7 +158,6 @@ class InformalLine:
 
         if random.random() < 0.5:
             self.curvedPoints.reverse()
-
 
     def generateCurve(self):
         width = self.drawingSize[0]
@@ -241,7 +230,6 @@ class InformalLine:
             self.smooth_points.reverse()
             self.curvedPoints.reverse()
 
-
     def generate_loop_stroke(self):
 
         pts = []
@@ -255,7 +243,7 @@ class InformalLine:
 
         _xCenter = 0
         _yCenter = 0
-        _initAng = random.uniform(0,math.pi)
+        _initAng = random.uniform(0, math.pi)
 
         points = self.points
 
@@ -302,7 +290,6 @@ class InformalLine:
 
         return pts
 
-    
     def getCurvePoints(self):
         self.curvedPoints = []
 
@@ -339,15 +326,14 @@ class InformalLine:
         # Extra points for smoother Bézier start/end
         # pts.insert(0, pts[0])
 
-        # rotate the points 
-        theta = self.angle * math.pi/180
+        # rotate the points
+        theta = self.angle * math.pi / 180
         # theta = (self.angle - 2 * self.angle  * random.random())* math.pi/180
         for pt in rawPts:
             _x = pt[0] * math.cos(theta) - pt[1] * math.sin(theta)
             _y = pt[0] * math.sin(theta) + pt[1] * math.cos(theta)
-            self.rawPts.append((_x + self.xOffset,_y + self.yOffset))
+            self.rawPts.append((_x + self.xOffset, _y + self.yOffset))
         self.rawPts.append([_x + self.xOffset, _y + self.yOffset])
-
 
     def generateInformalLine(self):
 
@@ -362,7 +348,6 @@ class InformalLine:
         self.smoothPointsForDrawing.extend([pt[0] + self.configxOffset, pt[1] + self.configyOffset] for pt in self.curvedPoints)
         # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
         # pieceLogger(f"[generateInformalLine] {self.curvedPoints}")
-
 
     def drawLinePoints(self):
 
@@ -396,10 +381,7 @@ class InformalLine:
             pointsToDraw[pt + 1][0] = _lstpt
             pointsToDraw[pt + 1][1] = _lstpt2
 
-
-
- # ---------------------------------------------- #
-
+    # ---------------------------------------------- #
 
     def drawTheLineComplete(self):
         pointsToDraw = self.curvedPoints
@@ -409,12 +391,11 @@ class InformalLine:
         _p2 = [pointsToDraw[1][0], pointsToDraw[1][1]]
 
         for pt in pointsToDraw:
-            if _ptCount < len(pointsToDraw)-1:
+            if _ptCount < len(pointsToDraw) - 1:
                 self.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(self.baseWidth))
-                _ptCount +=1
-                _p1 = [pointsToDraw[_ptCount-1][0], pointsToDraw[_ptCount-1][1]]
+                _ptCount += 1
+                _p1 = [pointsToDraw[_ptCount - 1][0], pointsToDraw[_ptCount - 1][1]]
                 _p2 = [pointsToDraw[_ptCount][0], pointsToDraw[_ptCount][1]]
-
 
     def drawTheLine(self, p1x, p1y, p2x, p2y, _n):
 
@@ -431,7 +412,6 @@ class InformalLine:
             fillClr = self.bgColor
 
         self.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(self.baseWidth))
-
 
     def drawLinePolyEnvelope(self):
         # Draw the shape
@@ -451,7 +431,7 @@ class InformalLine:
 
             _dy = _p1[1] - _p2[1]
             _dx = _p1[0] - _p2[0]
-            
+
             _orthoAngle = _base - math.atan2(_dy, _dx)
 
             _angle = math.atan2(_dy, _dx) * 360 / math.pi
@@ -528,14 +508,14 @@ class InformalLine:
             if self.attenuating:
                 self._w -= round(1 * self.incrementFactor)
 
- # ---------------------------------------------- #
+    # ---------------------------------------------- #
     def reconfigure(self):
         self.lineSpeed = random.randint(self.lineSpeedRange[0], self.lineSpeedRange[1])
         self.baseWidth = random.uniform(self.baseWidthRange[0], self.baseWidthRange[1])
         self.noiseAmplitude = random.uniform(float(self.noiseAmplitudeRange[0]), float(self.noiseAmplitudeRange[1]))
 
 
-'''
+"""
  
 _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
 _mark.loopsMin = _mark.turnsRange[0]
@@ -592,4 +572,4 @@ self.centerYDelta = 2
 self.deltaRadiusXCenterChangeProb = .5
 self.deltaRadiusYCenterChangeProb = .5
 
-'''
+"""

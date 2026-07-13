@@ -17,6 +17,10 @@ class InformalLine:
     drawingHeight = 100
     xOffset = 100
     yOffset = 0
+
+
+    configxOffset = 0
+    configyOffset = 0
     angle = 0
     direction = 0
     isColumn = 1
@@ -88,14 +92,10 @@ class InformalLine:
     deltaRadiusYCenterChangeProb = .0
 
 
-    def __init__(self, _unitNumber, _largestDim, _config=None):
+    def __init__(self, _unitNumber, _config=None):
         self.unitNumber = _unitNumber
         self.config = _config
-        self.largestDim = _largestDim
-        # self.lineColor = (0,0,0,255)
-        # self.canvas = Image.new("RGBA", (self.largestDim, self.largestDim))
-        # self.draw = ImageDraw.Draw(self.canvas)
-        # self.draw = self.config.draw
+
 
 
     # --------------- UTILS ------------------------ #
@@ -361,8 +361,9 @@ class InformalLine:
         self.generateRawLine()
         self.getCurvePoints()
         self.smoothPointsForDrawing = []
-        self.smoothPointsForDrawing.extend([pt[0] + self.xOffset, pt[1] + self.yOffset] for pt in self.curvedPoints)
+        self.smoothPointsForDrawing.extend([pt[0] + self.configxOffset, pt[1] + self.configyOffset] for pt in self.curvedPoints)
         # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
+        # pieceLogger(f"[generateInformalLine] {self.curvedPoints}")
 
 
     def drawLinePoints(self):
@@ -416,9 +417,7 @@ class InformalLine:
                 _p1 = [pointsToDraw[_ptCount-1][0], pointsToDraw[_ptCount-1][1]]
                 _p2 = [pointsToDraw[_ptCount][0], pointsToDraw[_ptCount][1]]
 
-
-
-
+    
     def drawTheLine(self, p1x, p1y, p2x, p2y, _n):
 
         _p1 = [p1x, p1y]
@@ -431,7 +430,7 @@ class InformalLine:
 
         fillClr = self.lineColor
         if self.lineColorIsBgColor:
-            fillClr = self.bgColo
+            fillClr = self.bgColor
 
         self.draw.line([_p1[0], _p1[1], _p2[0], _p2[1]], fill=tuple(fillClr), width=round(self.baseWidth))
 

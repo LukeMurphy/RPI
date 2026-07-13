@@ -81,7 +81,7 @@ def setUp(config):
     # after rotation
     # if(config.rotation == 90) : canvasOffsetY = -25
 
-    pieceLogger(buff)
+    # pieceLogger(buff)
     root = tk.Tk()
     w = config.windowWidth + buff
     h = config.windowHeight + buff

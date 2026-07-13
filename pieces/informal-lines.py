@@ -89,9 +89,10 @@ def clearbgBox():
     config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
 
 
-def _bgColorsFilling(config):
+def _bgColorsFilling():
+    global config
     # config.useBgBox = False if config.useBgBox   else True
-    # print("bgBox")
+    print("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
     # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
 
@@ -252,6 +253,8 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType)
     informalLine.lineColorIsBgColor = False
     informalLine.tangleProb = config.tangleProb
     informalLine.draw = config.draw
+    if config.useBgBox:
+        informalLine.draw = config.underLayerDraw
     # informalLine.drawingHeight = _drawingHeight
     informalLine.scribbleHeight = random.uniform(config.scribbleHeightRange[0], config.scribbleHeightRange[1])
 
@@ -495,22 +498,6 @@ def reDraw():
     drawTheBG()
     updateLines()
 
-    # adding check on bg alpha as index of transition state - don't want another transition
-    # stomping on the one in progress
-
-    # if random.random() < config.changeBGProb and not config.noChange:
-    # if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
-    #     config.bg_alpha = 0
-    #     # config.lightMode = False if random.random() > config.lightModeProb else True
-    #     # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
-    #     # setBGColor()
-    #     # setLines()
-
-    #     for _u in range(config.numberOfinformalLines):
-    #         informalLine = config.informalLineUnits[_u]
-    #         informalLine.lineColor = setLineColor()
-
-            # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
 
     for _u in range(config.numberOfinformalLines):
         if random.random() < config.changeLinesProb and not config.noChange:
@@ -539,7 +526,7 @@ def reDraw():
 def iterate():
     global config, overlayControls
     if random.SystemRandom().random() < config.useBgBoxProb and config.useBgBox:
-        _bgColorsFilling(config)
+        _bgColorsFilling()
 
     reDraw()
 
@@ -552,63 +539,10 @@ def iterate():
         config.panelDrawing.render()
 
     # badpixels.drawBlanks(config.image, False)
-    config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
-    config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
+    config.destinationImage.paste(config.image, (0,0), config.image)
     config.destinationImage.paste(config.underLayer, (0, 0), config.underLayer)
-    if not config.lightMode:
-        config.imageXPOS += config.imageXPOSSpeed
-    # config.imageYPOS += config.YPOSSpeed
 
-    if config.imageXPOS >= config.drawingWidth:
-        config.imageXPOS = 0
-
-    # if config.imageYPOS >= config.pictureHeight:
-    # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
-    # if config.usingPanelOverlays:
-    #     drawPanelVariations(config.destinationImage)
-    overlayControls.targetImageRef = config.destinationImage
-    overlayControls.overlayImageRef = config.overlayImage
-    overlayControls.handleOverlayActions()
     config.render(config.destinationImage, 0, 0)
-
-
-# # ----- panel based overlays ---------
-# # adding panel modulation to mimic physical panel differences
-# def setPanelOverlays():
-#     global config
-#     if not config.usingPanelOverlays:
-#         return
-
-#     panelOverLayList = []
-#     config.panelOverLayList = []
-#     config.overlayImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 0))
-
-#     _totalPanels = config.panelRows * config.panelColumns
-#     _numPanels = random.randint(config.panelOverlayRange[0], min(_totalPanels, config.panelOverlayRange[1]))
-
-#     # create an array of panel spots then joggle it
-#     for c in range(0, config.panelColumns):
-#         for r in range(0, config.panelRows):
-#             panelOverLayList.append([c, r])
-
-#     random.shuffle(panelOverLayList)
-
-#     for i in range(_numPanels):
-#         config.panelOverLayList.append(panelOverLayList[i])
-
-
-# def drawPanelVariations(targetImageRef):
-#     global config
-#     for p in config.panelOverLayList:
-#         x0 = p[0] * config.panelWidth
-#         y0 = p[1] * config.panelHeight
-#         x1 = x0 + config.panelWidth
-#         y1 = y0 + config.panelHeight
-#         config.overlayImageDraw.rectangle((x0, y0, x1, y1), fill=config.bgColor)
-
-#     # tempImage = ImageChops.blend(targetImageRef, config.overlayImage, config.panelOverlayAmount)
-#     tempImage = ImageChops.add(targetImageRef, config.overlayImage, round(100 * config.panelOverlayAmount))
-#     targetImageRef.paste(tempImage, (0, 0), tempImage)
 
 
 # ---- initialize  -----------------
@@ -705,9 +639,7 @@ def main(run=True):
     global workConfig
     global overlayControls
 
-    config.imageXPOS = 0
-    config.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
-    config.imageYPOS = 0
+
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.imageDraw = ImageDraw.Draw(config.image)
     config.draw = ImageDraw.Draw(config.image)
@@ -912,16 +844,9 @@ def main(run=True):
 
     if config.useBgBox:
         for _ in range(config.initialRunsOfBgBlocks):
-            _bgColorsFilling(config)
+            _bgColorsFilling()
 
-    overlayControls = BlanksAndDitherRemapping(config, workConfig, "hatchingmarks")
-    # for blanks
-    overlayControls.destinationImageDraw = config.destinationImageDraw
-    overlayControls.targetImageRef = config.destinationImage
-    # for overlay
-    overlayControls.overlayImage = config.overlayImage
-    overlayControls.overlayImageDraw = config.overlayImageDraw
-    overlayControls.setPanelOverlays()
+
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

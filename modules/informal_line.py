@@ -9,6 +9,11 @@ from modules.configuration import pieceLogger
 
 class InformalLine:
 
+    """
+    lineType = 0 ==> straight lines
+    lineType = 1 ==> scribble lines
+    """
+    lineType = 0
     points = 1
     pointPerLine = 3
     resolution = 50
@@ -22,11 +27,6 @@ class InformalLine:
     direction = 0
     name = ""
 
-    """
-    lineType = 0 ==> straight lines
-    lineType = 1 ==> scribble lines
-    """
-    lineType = 0
 
     attenuating = False
     enlarging = False
@@ -247,16 +247,6 @@ class InformalLine:
 
         points = self.points
 
-        # pieceLogger(f"deltaRadiusX {round(deltaRadiusX,4)}")
-        # pieceLogger(f"deltaRadiusY {round(deltaRadiusY,4)}")
-        # pieceLogger(f"deltaRadiusXCenter {round(deltaRadiusXCenter,4)}")
-        # pieceLogger(f"deltaRadiusYCenter {round(deltaRadiusYCenter,4)}")
-        # pieceLogger(f"self.loops {self.loops}")
-        # pieceLogger(f"points {points}")
-        # pieceLogger(f"self.speed {self.speed}")
-        # pieceLogger(f"self.xOffset {self.xOffset}")
-        # self.speed = 8
-
         for i in range(points):
             t = i / (points - 1)
             ang = self.loopDirection * t * math.pi * 2 * self.loops
@@ -338,7 +328,6 @@ class InformalLine:
     def generateInformalLine(self):
 
         self.points = random.randint(3, self.pointPerLine)
-        self.ratioFactor = random.uniform(self.ratioFactorRange[0], self.ratioFactorRange[1])
         self.resolution = self.curveResolution
         self.direction = 1 if random.random() < 0.5 else 0
 
@@ -346,8 +335,7 @@ class InformalLine:
         self.getCurvePoints()
         self.smoothPointsForDrawing = []
         self.smoothPointsForDrawing.extend([pt[0] + self.configxOffset, pt[1] + self.configyOffset] for pt in self.curvedPoints)
-        # pieceLogger(f"Made line {self.xOffset}  {self.yOffset} {self.drawingHeight}")
-        # pieceLogger(f"[generateInformalLine] {self.curvedPoints}")
+
 
     def drawLinePoints(self):
 

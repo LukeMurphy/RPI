@@ -2,10 +2,9 @@ import random
 import time
 import math
 from noise import *
-from PIL import Image, ImageDraw, ImageChops
+from PIL import Image, ImageDraw
 from modules.configuration import bcolors, pieceLogger
-from modules import colorutils, panelDrawing, badpixels
-from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
+from modules import colorutils, panelDrawing
 from modules.holder_director import Director
 from pieces.screen import Holder
 from modules.informal_line import InformalLine
@@ -13,7 +12,7 @@ from modules.informal_line import InformalLine
 
 # -------- Util Functions   -------------- #
 
-def R(a, b, rounded=False):
+def randomRange(a, b, rounded=False):
     if not rounded:
         return random.uniform(a, b)
     else:
@@ -239,10 +238,8 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
     if _markType == "scribble":
         informalLine = InformalLine()
         informalLine.curveResolution = config.curveResolution
-        informalLine.ratioFactorRange = config.ratioFactorRange
         informalLine.backTrackRange = config.backTrackRange
         informalLine.lineColorIsBgColor = False
-        informalLine.tangleProb = config.tangleProb
         informalLine.draw = config.draw
         if config.useBgBox:
             informalLine.draw = config.underLayerDraw
@@ -273,11 +270,10 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
     # -------------------------------------- #
     if _markType == "single":
         informalLine = InformalLine()
+        informalLine.lineType = 0
         informalLine.curveResolution = config.curveResolution
-        informalLine.ratioFactorRange = config.ratioFactorRange
         informalLine.backTrackRange = config.backTrackRange
         informalLine.lineColorIsBgColor = False
-        informalLine.tangleProb = config.tangleProb
         informalLine.draw = config.draw
         informalLine.baseWidthRange = config.vertLineWidthRange
         informalLine.drawingHeight = _drawingHeight
@@ -308,11 +304,10 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
         _clr = None
         for i in range(0, 2):
             informalLine = InformalLine()
+            informalLine.lineType = 0
             informalLine.curveResolution = config.curveResolution
-            informalLine.ratioFactorRange = config.ratioFactorRange
             informalLine.backTrackRange = config.backTrackRange
             informalLine.lineColorIsBgColor = False
-            informalLine.tangleProb = config.tangleProb
             informalLine.draw = config.draw
 
             informalLine.baseWidthRange = config.vertLineWidthRange
@@ -361,8 +356,8 @@ def setLines():
 
 def generateScribbleGrid():
     pieceLogger(f"[generateScribbleGrid] Making scribble marks")     
-    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
-    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
+    config.line_alpha = randomRange(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
+    config.bg_alpha_base = randomRange(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
 
     for _row in range(0, config.scribbleRows):
         for _col in range(0, config.scribbleCols):
@@ -378,14 +373,14 @@ def generateMarksGrid():
     config.rowInterval = random.randint(int(config.rowIntervalRange[0]), int(config.rowIntervalRange[1]))
     config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
     config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
-    config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
-    config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
-    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
-    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
+    config.vertLineChange = randomRange(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
+    config.horizLineChange = randomRange(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
+    config.line_alpha = randomRange(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
+    config.bg_alpha_base = randomRange(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
 
-    for row in range(config.rowInterval):
+    for _row in range(config.rowInterval):
         _lastX = 0
-        _lastY = config.yOffset + row * (config.minYSpacing)
+        _lastY = config.yOffset + _row * (config.minYSpacing)
         for col in range(config.colInterval):
             _drawingHeight = config.markMinHeight + random.uniform(-config.sizeRange, config.sizeRange)
             _skipMark = False
@@ -401,9 +396,9 @@ def generateMarksGrid():
                 _lastX /= 2
 
             if _altMark:
-                generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, "single")
+                generateMark(col, _row, _lastX, _lastY, _drawingHeight, _skipMark, "single")
             else:
-                generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, "x")
+                generateMark(col, _row, _lastX, _lastY, _drawingHeight, _skipMark, "x")
 
     config.numberOfinformalLines = len(config.informalLineUnits)
     # pieceLogger(f"New Lines {config.numberOfinformalLines}")
@@ -424,14 +419,14 @@ def drawTheBG():
 def updateLines():
     global config
 
-    for informalLineUnitIndex in range(0, len(config.informalLineUnits)):
-        lineUnit: InformalLine
-        lineUnit = config.informalLineUnits[informalLineUnitIndex]
-        if lineUnit.lineType == 0:
-            # lineUnit.drawTheLineComplete()
-            lineUnit.drawLinePoints()
-        if lineUnit.lineType == 1:
-            lineUnit.drawTheLineComplete()
+    for _informalLineUnitIndex in range(0, len(config.informalLineUnits)):
+        _lineUnit: InformalLine
+        _lineUnit = config.informalLineUnits[_informalLineUnitIndex]
+        if _lineUnit.lineType == 0:
+            # _lineUnit.drawTheLineComplete()
+            _lineUnit.drawLinePoints()
+        if _lineUnit.lineType == 1:
+            _lineUnit.drawTheLineComplete()
 
 
 # ---- looping and redrawing --------
@@ -440,7 +435,7 @@ def updateLines():
 def runWork():
     global configk
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running hatchingmarks.py")
+    print("Running informalMarksGrid.py")
     print(bcolors.ENDC)
 
     while config.isRunning == True:
@@ -468,13 +463,13 @@ def reDraw():
     # in-place refresh of mark
     for _u in range(config.numberOfinformalLines):
         if random.random() < config.changeLinesProb and not config.noChange:
-            informalLine: InformalLine = config.informalLineUnits[_u]
-            if informalLine.lineType == 0:
-                informalLine.reconfigure()
-                informalLine.generateInformalLine()
+            _informalLine: InformalLine = config.informalLineUnits[_u]
+            if _informalLine.lineType == 0:
+                _informalLine.reconfigure()
+                _informalLine.generateInformalLine()
 
-            if informalLine.lineType == 1:
-                informalLine.generateScribble()
+            if _informalLine.lineType == 1:
+                _informalLine.generateScribble()
 
     # all marks changed
     if random.random() < config.changeAllLinesProb and not config.noChange:
@@ -530,7 +525,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
 def loadColorConfigs():
 
     config.paletteSets = []
-    paletteList = workConfig.get("hatchingmarks", "paletteSets").split(",")
+    paletteList = workConfig.get("informalMarksGrid", "paletteSets").split(",")
 
     for p in paletteList:
         palette = Holder(config)
@@ -623,45 +618,45 @@ def main(run=True):
     config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-    config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
-    config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
+    config.drawingWidth = int(workConfig.get("informalMarksGrid", "drawingWidth", fallback=f"{config.canvasWidth}"))
+    config.drawingHeight = int(workConfig.get("informalMarksGrid", "drawingHeight", fallback=f"{config.canvasHeight}"))
 
     config.largestDim = max(config.drawingWidth, config.drawingHeight)
 
     # refinements for setting points per column and row so amplitude of noise can be adjusted to be more even if aspect ratio is more extreme - e.g narrow beam
     # but also, lower number makes the line more purely rectilinear so can give a greater focus to one directions linearity
-    config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
-    config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
-    config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
+    config.pointsPerLine = int(workConfig.get("informalMarksGrid", "pointsPerLine"))
+    config.pointsPerLineCol = int(workConfig.get("informalMarksGrid", "pointsPerLineCol", fallback=config.pointsPerLine))
+    config.pointsPerLineRow = int(workConfig.get("informalMarksGrid", "pointsPerLineRow", fallback=config.pointsPerLine))
 
     # adjust higher for higer resolution
-    config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
+    config.curveResolution = int(workConfig.get("informalMarksGrid", "curveResolution", fallback=10))
 
     # not really used - was used in first iteration using Perlin Noise
     config.noiseSeed = random.random()
 
     # if the shape is not single-lines, will be determined by rows and columns
-    config.numberOfinformalLines = int(workConfig.get("hatchingmarks", "numberOfinformalLines", fallback="3"))
+    config.numberOfinformalLines = int(workConfig.get("informalMarksGrid", "numberOfinformalLines", fallback="3"))
     # the edge spacing - critical to making the drawing as the edges matter more than the sum of the lines
-    config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
-    config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
+    config.xOffset = int(workConfig.get("informalMarksGrid", "xOffset"))
+    config.yOffset = int(workConfig.get("informalMarksGrid", "yOffset"))
 
     # for single linesneSpeed
-    config.renderLinesAsEnvelope = workConfig.getboolean("hatchingmarks", "renderLinesAsEnvelope", fallback=False)
-    config.drawVertical = workConfig.getboolean("hatchingmarks", "drawVertical", fallback=True)
-    config.drawHorizontal = workConfig.getboolean("hatchingmarks", "drawHorizontal", fallback=True)
-    config.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
-    config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
-    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
-    config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
-    config.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
-    config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
-    config.verticalMovement = workConfig.getboolean("hatchingmarks", "verticalMovement", fallback=False)
-    config.horizontalMovement = workConfig.getboolean("hatchingmarks", "horizontalMovement", fallback=False)
-    config.horizontalMovementProb = float(workConfig.get("hatchingmarks", "horizontalMovementProb", fallback="0.25"))
-    config.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
-    config.singleLinesAngle = float(workConfig.get("hatchingmarks", "singleLinesAngle", fallback="0"))
-    config.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
+    config.renderLinesAsEnvelope = workConfig.getboolean("informalMarksGrid", "renderLinesAsEnvelope", fallback=False)
+    config.drawVertical = workConfig.getboolean("informalMarksGrid", "drawVertical", fallback=True)
+    config.drawHorizontal = workConfig.getboolean("informalMarksGrid", "drawHorizontal", fallback=True)
+    config.singleLineRegularSpacing = workConfig.getboolean("informalMarksGrid", "singleLineRegularSpacing", fallback=False)
+    config.drawingHeightRange = [int(x) for x in workConfig.get("informalMarksGrid", "drawingHeightRange", fallback="18,180").split(",")]
+    config.lineSpeedRange = [int(x) for x in workConfig.get("informalMarksGrid", "lineSpeedRange", fallback="1,20").split(",")]
+    config.baseWidthRange = [int(x) for x in workConfig.get("informalMarksGrid", "baseWidthRange", fallback="18,180").split(",")]
+    config.backTrackRange = [int(x) for x in workConfig.get("informalMarksGrid", "backTrackRange", fallback="0,0").split(",")]
+
+    config.verticalMovement = workConfig.getboolean("informalMarksGrid", "verticalMovement", fallback=False)
+    config.horizontalMovement = workConfig.getboolean("informalMarksGrid", "horizontalMovement", fallback=False)
+    config.horizontalMovementProb = float(workConfig.get("informalMarksGrid", "horizontalMovementProb", fallback="0.25"))
+    config.verticalMovementProb = float(workConfig.get("informalMarksGrid", "verticalMovementProb", fallback="0.25"))
+    config.singleLinesAngle = float(workConfig.get("informalMarksGrid", "singleLinesAngle", fallback="0"))
+    config.tangleProb = float(workConfig.get("informalMarksGrid", "tangleProb", fallback="0"))
 
     if config.singleLineRegularSpacing:
         _hspacing = round(config.drawingWidth / (config.numberOfinformalLines + 2))
@@ -669,146 +664,113 @@ def main(run=True):
         config.rowIntervalRange = [_vspacing, _vspacing]
         config.colIntervalRange = [_hspacing, _hspacing]
 
-    # means the row interval is the same as the column interval - if they are independent then
-    # there can be more extreme column or row spacing, othewise they get the same ratio
-    config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
-
-    # forces grid to squares - but is not currently compensated to will get ragged and missing
-    # grids at edges of drawing
-    config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
-
     # the +/- variability of the points
-    config.noiseAmplitudeRangeRow = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback="1,1").split(",")]
-    config.noiseAmplitudeRangeCol = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback="1,1").split(",")]
-    config.colFirst = workConfig.getboolean("hatchingmarks", "colFirst", fallback=False)
+    config.noiseAmplitudeRangeRow = [float(x) for x in workConfig.get("informalMarksGrid", "noiseAmplitudeRangeRow", fallback="1,1").split(",")]
+    config.noiseAmplitudeRangeCol = [float(x) for x in workConfig.get("informalMarksGrid", "noiseAmplitudeRangeCol", fallback="1,1").split(",")]
+    config.colFirst = workConfig.getboolean("informalMarksGrid", "colFirst", fallback=False)
 
-    config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
-    config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
+    config.vertLineChange = float(workConfig.get("informalMarksGrid", "vertLineChange", fallback=0.01))
+    config.horizLineChange = float(workConfig.get("informalMarksGrid", "horizLineChange", fallback=0.01))
 
-    config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
-    config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
+    config.vertLineChangeRange = [float(x) for x in workConfig.get("informalMarksGrid", "vertLineChangeRange", fallback=".05,.6").split(",")]
+    config.horizLineChangeRange = [float(x) for x in workConfig.get("informalMarksGrid", "horizLineChangeRange", fallback=".05,.6").split(",")]
 
-    config.vertlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
-    config.horzlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    config.vertlineSpeedRange = [int(x) for x in workConfig.get("informalMarksGrid", "lineSpeedRange", fallback="1,20").split(",")]
+    config.horzlineSpeedRange = [int(x) for x in workConfig.get("informalMarksGrid", "lineSpeedRange", fallback="1,20").split(",")]
 
-    config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
-    config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
+    config.rowIntervalRange = [int(x) for x in workConfig.get("informalMarksGrid", "rowIntervalRange", fallback="1,1").split(",")]
+    config.colIntervalRange = [int(x) for x in workConfig.get("informalMarksGrid", "colIntervalRange", fallback="1,1").split(",")]
 
-    config.horizLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "horizLineSpeedRange", fallback="1,20").split(",")]
-    config.vertLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineSpeedRange", fallback="1,20").split(",")]
-    config.vertLineWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineWidthRange", fallback="18,180").split(",")]
-    config.horizBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "horizBaseWidthRange", fallback="18,180").split(",")]
+    config.horizLineSpeedRange = [int(x) for x in workConfig.get("informalMarksGrid", "horizLineSpeedRange", fallback="1,20").split(",")]
+    config.vertLineSpeedRange = [int(x) for x in workConfig.get("informalMarksGrid", "vertLineSpeedRange", fallback="1,20").split(",")]
+    config.vertLineWidthRange = [int(x) for x in workConfig.get("informalMarksGrid", "vertLineWidthRange", fallback="18,180").split(",")]
+    config.horizBaseWidthRange = [int(x) for x in workConfig.get("informalMarksGrid", "horizBaseWidthRange", fallback="18,180").split(",")]
 
-    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
-    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
 
-    config.angleRange = [float(x) for x in workConfig.get("hatchingmarks", "angleRange", fallback="0,0").split(",")]
-    config.angleAltRange = [float(x) for x in workConfig.get("hatchingmarks", "angleAltRange", fallback="-10,10").split(",")]
-    config.sizeRange = float(workConfig.get("hatchingmarks", "sizeRange", fallback=10))
-    config.minXSpacing = float(workConfig.get("hatchingmarks", "minXSpacing", fallback=-3))
-    config.minYSpacing = float(workConfig.get("hatchingmarks", "minYSpacing", fallback=-3))
-    config.skipMarksProb = float(workConfig.get("hatchingmarks", "skipMarksProb", fallback=0.25))
-    config.altMarksProb = float(workConfig.get("hatchingmarks", "altMarksProb", fallback=0.5))
-    config.markMinHeight = float(workConfig.get("hatchingmarks", "markMinHeight", fallback=24))
-    config.markMinWidth = float(workConfig.get("hatchingmarks", "markMinWidth", fallback=24))
+    config.angleRange = [float(x) for x in workConfig.get("informalMarksGrid", "angleRange", fallback="0,0").split(",")]
+    config.angleAltRange = [float(x) for x in workConfig.get("informalMarksGrid", "angleAltRange", fallback="-10,10").split(",")]
+    config.sizeRange = float(workConfig.get("informalMarksGrid", "sizeRange", fallback=10))
+    config.minXSpacing = float(workConfig.get("informalMarksGrid", "minXSpacing", fallback=-3))
+    config.minYSpacing = float(workConfig.get("informalMarksGrid", "minYSpacing", fallback=-3))
+    config.skipMarksProb = float(workConfig.get("informalMarksGrid", "skipMarksProb", fallback=0.25))
+    config.altMarksProb = float(workConfig.get("informalMarksGrid", "altMarksProb", fallback=0.5))
+    config.markMinHeight = float(workConfig.get("informalMarksGrid", "markMinHeight", fallback=24))
+    config.markMinWidth = float(workConfig.get("informalMarksGrid", "markMinWidth", fallback=24))
 
-    config.scribblexOffset = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
-    config.scribbleyOffset = int(workConfig.get("hatchingmarks", "scribbleyOffset", fallback=0))
-    config.scibbleXPacking = float(workConfig.get("hatchingmarks", "scibbleXPacking", fallback=0))
-    config.scibbleYPacking = float(workConfig.get("hatchingmarks", "scibbleYPacking", fallback=0))
+    config.scribblexOffset = int(workConfig.get("informalMarksGrid", "scribblexOffset", fallback=0))
+    config.scribbleyOffset = int(workConfig.get("informalMarksGrid", "scribbleyOffset", fallback=0))
+    config.scibbleXPacking = float(workConfig.get("informalMarksGrid", "scibbleXPacking", fallback=0))
+    config.scibbleYPacking = float(workConfig.get("informalMarksGrid", "scibbleYPacking", fallback=0))
 
-    config.scribbleSkipMarksProb = float(workConfig.get("hatchingmarks", "scribbleSkipMarksProb", fallback=0))
-    config.scribbleAltMarksProb = float(workConfig.get("hatchingmarks", "scribbleAltMarksProb", fallback=0))
+    config.scribbleSkipMarksProb = float(workConfig.get("informalMarksGrid", "scribbleSkipMarksProb", fallback=0))
+    config.scribbleAltMarksProb = float(workConfig.get("informalMarksGrid", "scribbleAltMarksProb", fallback=0))
 
-    config.scribbleHeightRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleHeightRange", fallback="4,10").split(",")]
-    config.scribbleLineBaseWidthRange = int(workConfig.get("hatchingmarks", "scribbleLineBaseWidthRange", fallback=1))
+    config.scribbleHeightRange = [float(x) for x in workConfig.get("informalMarksGrid", "scribbleHeightRange", fallback="4,10").split(",")]
+    config.scribbleLineBaseWidthRange = int(workConfig.get("informalMarksGrid", "scribbleLineBaseWidthRange", fallback=1))
 
-    config.scribbleRadiusXRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleRadiusXRange", fallback="4,8").split(",")]
-    config.scribbleRadiusYRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleRadiusYRange", fallback="8,24").split(",")]
+    config.scribbleRadiusXRange = [float(x) for x in workConfig.get("informalMarksGrid", "scribbleRadiusXRange", fallback="4,8").split(",")]
+    config.scribbleRadiusYRange = [float(x) for x in workConfig.get("informalMarksGrid", "scribbleRadiusYRange", fallback="8,24").split(",")]
 
-    config.scribblePoints = int(workConfig.get("hatchingmarks", "scribblePoints", fallback=8))
-    config.scribbleLoopsRange = [int(x) for x in workConfig.get("hatchingmarks", "scribbleLoopsRange", fallback="2,2").split(",")]
+    config.scribblePoints = int(workConfig.get("informalMarksGrid", "scribblePoints", fallback=8))
+    config.scribbleLoopsRange = [int(x) for x in workConfig.get("informalMarksGrid", "scribbleLoopsRange", fallback="2,2").split(",")]
 
-    config.scribbleNoiseXRange = [float(x) for x in workConfig.get("hatchingmarks", "anglscribbleNoiseXRangeeRange", fallback="5,5").split(",")]
-    config.scribbleNoiseYRange = [float(x) for x in workConfig.get("hatchingmarks", "scribbleNoiseYRange", fallback="5,5").split(",")]
+    config.scribbleNoiseXRange = [float(x) for x in workConfig.get("informalMarksGrid", "anglscribbleNoiseXRangeeRange", fallback="5,5").split(",")]
+    config.scribbleNoiseYRange = [float(x) for x in workConfig.get("informalMarksGrid", "scribbleNoiseYRange", fallback="5,5").split(",")]
 
-    config.scribbleRows = int(workConfig.get("hatchingmarks", "scribbleRows", fallback=8))
-    config.scribbleCols = int(workConfig.get("hatchingmarks", "scribbleCols", fallback=8))
+    config.scribbleRows = int(workConfig.get("informalMarksGrid", "scribbleRows", fallback=8))
+    config.scribbleCols = int(workConfig.get("informalMarksGrid", "scribbleCols", fallback=8))
 
-    config.marksAltColorProb = float(workConfig.get("hatchingmarks", "marksAltColorProb", fallback=0.04))
-    config.scribbleAltColorProb = float(workConfig.get("hatchingmarks", "scribbleAltColorProb", fallback=0.04))
-    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
-    config.changeAllLinesProb = float(workConfig.get("hatchingmarks", "changeAllLinesProb", fallback=0.01))
+    config.marksAltColorProb = float(workConfig.get("informalMarksGrid", "marksAltColorProb", fallback=0.04))
+    config.scribbleAltColorProb = float(workConfig.get("informalMarksGrid", "scribbleAltColorProb", fallback=0.04))
+    config.changeLinesProb = float(workConfig.get("informalMarksGrid", "changeLinesProb", fallback=0.01))
+    config.changeAllLinesProb = float(workConfig.get("informalMarksGrid", "changeAllLinesProb", fallback=0.01))
     # probablility background changes
-    config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
-    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
-    config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
+    config.changeBGProb = float(workConfig.get("informalMarksGrid", "changeBGProb", fallback=0.001))
+    config.pauseProb = float(workConfig.get("informalMarksGrid", "pauseProb", fallback=0.0001))
+    config.unpauseProb = float(workConfig.get("informalMarksGrid", "unpauseProb", fallback=0.0001))
     config.noChange = False
 
     # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
-    config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
+    config.useSingleMode = workConfig.getboolean("informalMarksGrid", "useSingleMode", fallback=True)
 
     # light lines on background - more like a drawing on a screen
-    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
-    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
-    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
-    config.lightLinesOnGroundProb = float(workConfig.get("hatchingmarks", "lightLinesOnGroundProb", fallback=0.0))
-    config.lightLinesOnGround = workConfig.getboolean("hatchingmarks", "lightLinesOnGround", fallback=False)
+    config.lightMode = workConfig.getboolean("informalMarksGrid", "lightMode", fallback=False)
+    config.lightModeProb = float(workConfig.get("informalMarksGrid", "lightModeProb", fallback=1.0))
+    config.bg_alpha_returnrate = float(workConfig.get("informalMarksGrid", "bg_alpha_returnrate", fallback=2.0))
+    config.lightLinesOnGroundProb = float(workConfig.get("informalMarksGrid", "lightLinesOnGroundProb", fallback=0.0))
+    config.lightLinesOnGround = workConfig.getboolean("informalMarksGrid", "lightLinesOnGround", fallback=False)
 
     # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
     config.rebuildingVerticals = False
 
-    config.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
-    config.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "bgBoxBox").split(",")))
+    config.useBgBox = workConfig.getboolean("informalMarksGrid", "forcebgBox")
+    config.useBgBoxProb = float(workConfig.get("informalMarksGrid", "useBgBoxProb"))
+    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("informalMarksGrid", "bgBoxBox").split(",")))
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
     config.bgBoxFill = (100, 0, 80, 100)
 
-    config.bgTileSizeWidthMin = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMin"))
-    config.bgTileSizeWidthMax = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMax"))
-    config.bgTileSizeHeightMin = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMin"))
-    config.bgTileSizeHeightMax = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMax"))
+    config.bgTileSizeWidthMin = float(workConfig.get("informalMarksGrid", "bgTileSizeWidthMin"))
+    config.bgTileSizeWidthMax = float(workConfig.get("informalMarksGrid", "bgTileSizeWidthMax"))
+    config.bgTileSizeHeightMin = float(workConfig.get("informalMarksGrid", "bgTileSizeHeightMin"))
+    config.bgTileSizeHeightMax = float(workConfig.get("informalMarksGrid", "bgTileSizeHeightMax"))
 
-    config.clearbgBoxProb = float(workConfig.get("hatchingmarks", "clearbgBoxProb"))
-    config.bgGlitchCyclesMin = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMin"))
-    config.bgGlitchCyclesMax = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMax"))
-    config.bgGlitchDisplacementHorizontal = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementHorizontal"))
-    config.bgGlitchDisplacementVertical = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementVertical"))
+    config.clearbgBoxProb = float(workConfig.get("informalMarksGrid", "clearbgBoxProb"))
+    config.bgGlitchCyclesMin = float(workConfig.get("informalMarksGrid", "bgGlitchCyclesMin"))
+    config.bgGlitchCyclesMax = float(workConfig.get("informalMarksGrid", "bgGlitchCyclesMax"))
+    config.bgGlitchDisplacementHorizontal = float(workConfig.get("informalMarksGrid", "bgGlitchDisplacementHorizontal"))
+    config.bgGlitchDisplacementVertical = float(workConfig.get("informalMarksGrid", "bgGlitchDisplacementVertical"))
 
-    config.drawMoire = workConfig.getboolean("hatchingmarks", "drawMoire")
-    config.drawMoireProb = float(workConfig.get("hatchingmarks", "drawMoireProb"))
-    config.drawMoireProbOff = float(workConfig.get("hatchingmarks", "drawMoireProbOff"))
+    config.pauseProb = float(workConfig.get("informalMarksGrid", "pauseProb", fallback=".001"))
+    # config.backgroundColorChangeProb = float(workConfig.get("informalMarksGrid", "backgroundColorChangeProb", fallback=".001"))
 
-    config.moireXPos = int(workConfig.get("hatchingmarks", "moireXPos"))
-    config.moireYPos = int(workConfig.get("hatchingmarks", "moireYPos"))
-    config.moireXDistance = int(workConfig.get("hatchingmarks", "moireXDistance"))
-    config.moireYDistance = int(workConfig.get("hatchingmarks", "moireYDistance"))
-    config.setMoireColor = workConfig.getboolean("hatchingmarks", "setMoireColor")
-    config.moireColorAltProb = float(workConfig.get("hatchingmarks", "moireColorAltProb"))
-    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "moireColor").split(",")))
-    config.moireColorAlt = tuple(
-        map(
-            lambda x: int(x),
-            workConfig.get("hatchingmarks", "moireColorAlt").split(","),
-        )
-    )
-
-    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=".001"))
-    # config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
-
-    config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
+    config.initialRunsOfBgBlocks = int(workConfig.get("informalMarksGrid", "initialRunsOfBgBlocks", fallback=0))
 
     loadColorConfigs()
-    # loadFilterRemapping()
-    # resetPolyBlanks()
-    # if config.usingPanelOverlays:
-    #     setPanelOverlays()
     setLines()
+
     config.lineColor = setLineColor()
     setBGColor()
-
-    # badpixels.setBlanksOnScreen(config)
 
     if config.useBgBox:
         for _ in range(config.initialRunsOfBgBlocks):
@@ -831,8 +793,8 @@ def main(run=True):
     """
 
     # managing speed of animation and framerate
-    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed", fallback=0.02))
-    config.slotRate = float(workConfig.get("hatchingmarks", "slotRate", fallback=0.03))
+    config.redrawSpeed = float(workConfig.get("informalMarksGrid", "redrawSpeed", fallback=0.02))
+    config.slotRate = float(workConfig.get("informalMarksGrid", "slotRate", fallback=0.03))
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
 

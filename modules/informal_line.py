@@ -2,7 +2,6 @@ from PIL import Image, ImageDraw, ImageChops
 import random
 import time
 import math
-from matplotlib.pylab import rand
 from matplotlib.pyplot import pie
 import numpy as np
 
@@ -417,7 +416,7 @@ class InformalLine:
                 _p1 = [pointsToDraw[_ptCount-1][0], pointsToDraw[_ptCount-1][1]]
                 _p2 = [pointsToDraw[_ptCount][0], pointsToDraw[_ptCount][1]]
 
-    
+
     def drawTheLine(self, p1x, p1y, p2x, p2y, _n):
 
         _p1 = [p1x, p1y]

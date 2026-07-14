@@ -446,7 +446,7 @@ screen_height = root.winfo_screenheight()
 root.geometry(
     "%dx%d+%d+%d"
     % (
-        960,
+        860,
         320,
         # round(screen_height * 0.6),
         round(screen_width - 970),
@@ -474,7 +474,7 @@ ListBoxOfConfigs.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=ListBoxOfConfigs.yview)
 
 topBtnPlace = 8
-leftBtnPlace = 830
+leftBtnPlace = 725
 
 # sort by directory is 1 sort all by date is 0
 sortDefault = 1

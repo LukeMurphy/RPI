@@ -191,6 +191,7 @@ def setBGColor():
     _maxVal = config.bg_maxValue
     _minSat = config.bg_minSaturation
     _maxSat = config.bg_maxSaturation
+
     if config.lightMode:
         _minVal = 0.2
         _maxVal = 0.5
@@ -210,23 +211,12 @@ def setBGColor():
         config.brightness,
     )
 
-    # if random.random() <= config.blankColorAsColorProb:
-    #     badpixels.blankColor = config.bgColor
-    #     config.blankColor = config.bgColor
-    # else:
-    #     badpixels.blankColor = (0, 0, 0, 255)
-    #     # setting the alpha to a lower number so that when
-    #     # the blank changes, it comes in over a second or two
-    #     config.blankColor = (0, 0, 0, 15)
-
     if random.random() < config.lightLinesOnGroundProb:
         config.lightLinesOnGround = True
     else:
         config.lightLinesOnGround = False
 
     config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
-
-    # pieceLogger("New BG")
 
 
 # -------- Line Functions    -------------- #

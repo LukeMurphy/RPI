@@ -231,7 +231,7 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
         informalLine.backTrackRange = config.backTrackRange
         informalLine.lineColorIsBgColor = False
         informalLine.draw = config.draw
-        if config.useBgBox:
+        if config.useBgBox and config.scribbleOnTop:
             informalLine.draw = config.underLayerDraw
         informalLine.lineType = 1
         informalLine.scribbleHeight = random.uniform(config.scribbleHeightRange[0], config.scribbleHeightRange[1])
@@ -265,6 +265,8 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
         informalLine.backTrackRange = config.backTrackRange
         informalLine.lineColorIsBgColor = False
         informalLine.draw = config.draw
+        if config.useBgBox and config.singlesOnTop:
+            informalLine.draw = config.underLayerDraw
         informalLine.baseWidthRange = config.vertLineWidthRange
         informalLine.drawingHeight = _drawingHeight
         informalLine.xOffset = _lastX + config.xOffset
@@ -299,6 +301,8 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
             informalLine.backTrackRange = config.backTrackRange
             informalLine.lineColorIsBgColor = False
             informalLine.draw = config.draw
+            if config.useBgBox and config.xsOnTop:
+                informalLine.draw = config.underLayerDraw
 
             informalLine.baseWidthRange = config.vertLineWidthRange
             informalLine.drawingHeight = _drawingHeight
@@ -722,6 +726,12 @@ def main(run=True):
 
     # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
     config.useSingleMode = workConfig.getboolean("informalMarksGrid", "useSingleMode", fallback=True)
+
+    config.scribbleOnTop = workConfig.getboolean("informalMarksGrid", "scribbleOnTop", fallback=True)
+    config.singlesOnTop = workConfig.getboolean("informalMarksGrid", "singlesOnTop", fallback=False)
+    config.xsOnTop = workConfig.getboolean("informalMarksGrid", "xsOnTop", fallback=False)
+
+
 
     # light lines on background - more like a drawing on a screen
     config.lightMode = workConfig.getboolean("informalMarksGrid", "lightMode", fallback=False)

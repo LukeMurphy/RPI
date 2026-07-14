@@ -444,6 +444,10 @@ def runWork():
 
 
 def reDraw():
+
+    if random.random() < config.useBgBoxProb and config.useBgBox:
+        bgColorsFilling()
+
     # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
     if config.bg_alpha < config.bg_alpha_base:
         config.bg_alpha += config.bg_alpha_returnrate
@@ -469,6 +473,7 @@ def reDraw():
     if random.random() < config.changeAllLinesProb and not config.noChange:
         config.lightMode = False if random.random() > config.lightModeProb else True
         config.bg_alpha = 0
+        clearbgBox()
         setBGColor()
         setLines()
         pieceLogger(f"[reDraw] change ALL LINES  lightMode:{config.lightMode} {config.bg_alpha}")
@@ -479,16 +484,13 @@ def reDraw():
     if random.random() < config.unpauseProb:
         config.noChange = False
 
+    if random.random() < config.clearbgBoxProb:
+        clearbgBox()
+
 
 def iterate():
     global config, overlayControls
-    if random.SystemRandom().random() < config.useBgBoxProb and config.useBgBox:
-        bgColorsFilling()
-
     reDraw()
-
-    if random.SystemRandom().random() < config.clearbgBoxProb:
-        clearbgBox()
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True:

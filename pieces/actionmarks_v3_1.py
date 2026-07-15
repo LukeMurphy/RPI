@@ -163,7 +163,7 @@ def changeDrawingMode():
         # config.startNewLineProb = 0.1
         config.changeTimeController.slotRate = round(random.uniform(33, 63))
 
-    # print(f" => New Drawing Mode: {config.drawingMode}")
+    print(f" => New Drawing Mode: {config.drawingMode} slotRate{config.changeTimeController.slotRate}")
 
 
 def changePalettes():
@@ -1297,7 +1297,7 @@ def iterate():
                 filterRemapImage(config)
 
 
-        maybe_change_drawing_mode()
+        # maybe_change_drawing_mode()
         maybe_change_color_set()
         maybe_release_drawing()
         maybe_set_bg_color()

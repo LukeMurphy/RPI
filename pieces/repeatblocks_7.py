@@ -204,7 +204,7 @@ class Fader:
         self.blocksChanged = 0
         self.fadeThroughAmount = 0
         config.doTransition = False
-        pieceLogger("=> FADING DONE")
+        # pieceLogger("=> FADING DONE")
 
 
     def crossFadeIn(self):

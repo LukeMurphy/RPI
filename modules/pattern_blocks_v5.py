@@ -1807,7 +1807,7 @@ def TVTestPattern(config, paletteObj=None):
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
 
     _alpha = int(random.uniform(200,250))
-    pieceLogger(_alpha)
+    # pieceLogger(_alpha)
 
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 

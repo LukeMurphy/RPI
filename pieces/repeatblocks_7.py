@@ -101,7 +101,7 @@ class Fader:
             if self.fadeInMode == 1:
                 config.faderDoingRefreshCountIterations = config.faderDissolveDoingRefreshCountIterations
 
-        pieceLogger(f"=> Fader initialized setup {self.fadeInMode} {config.faderDoingRefreshCountIterations}")
+        pieceLogger(f"[Fader.setUp] >> Fader initialized setup {self.fadeInMode} {config.faderDoingRefreshCountIterations}")
 
         self.blankImage = Image.new("RGBA", (self.width, self.height))
         self.startingImage = Image.new("RGBA", (self.width, self.height))
@@ -292,7 +292,7 @@ def transformImage(img):
 def writeImage(baseName, renderImage):
     # baseName = "outputquad3/comp2_"
     if config.saveImages and not config.drawingPoints:
-        pieceLogger("Saving Image...")
+        pieceLogger("[writeImage] >> Saving Image...")
         fn = f"{baseName}.png"
         renderImage.save(fn)
 
@@ -304,7 +304,7 @@ def loadImageForBase():
 
     i = math.floor(random.random() * len(config.imageSources))
     imagePath = config.imageSources[i]
-    pieceLogger(imagePath)
+    pieceLogger(f"[loadImageForBase] >> {imagePath}")
     image = Image.open(imagePath)
     image.load()
     config.canvasImage.paste(image, (0, 0))
@@ -323,7 +323,7 @@ def loadClipPlayerConfigs():
         config.clipMain.clipRotate = config.clipRotate
         config.clipMain.setUp(workConfig)
     except Exception as e:
-        pieceLogger(f"{e} \n")
+        pieceLogger(f"[loadClipPlayerConfigs] >> {e} \n")
         config.useClipPlayer = False
 
 
@@ -344,7 +344,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
+        pieceLogger(f"\n[loadConfigValue] >> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
         setattr(obj, option, default)
 
 
@@ -359,7 +359,7 @@ def loadAndSetupAllPalettes():
     config.paletteConfig = configparser.ConfigParser()
     argument = f"{config.path}/configs/{config.palettesConfigFile}"
 
-    pieceLogger(f"loadAndSetupAllPalettes: loading from {argument}")
+    pieceLogger(f"[loadAndSetupAllPalettes] >> loading from {argument}")
     config.paletteConfig.read(argument)
 
     config.palettes = config.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
@@ -390,7 +390,7 @@ def loadPalette(palette):
     global config
     # palette = config.palettes[index]
 
-    pieceLogger(f"Loading palette {palette}")
+    pieceLogger(f"[loadPalette] >> Loading palette {palette}")
     c1 = Holder()
     c2 = Holder()
     c3 = Holder()
@@ -509,11 +509,8 @@ def setPalette(config, index=0):
     paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
 
 
-    pieceLogger(config.currentCombinationsetIndex)
-    pieceLogger(index)
-    pieceLogger(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
-
-    pieceLogger(f"Setting a new palette:  {paletteObj.paletteName}")
+    pieceLogger(f"\n[setPalette] >> currentCombinationsetIndex: {config.currentCombinationsetIndex} index: {index} config.combinationSets[config.currentCombinationsetIndex].palettes[index]: {config.combinationSets[config.currentCombinationsetIndex].palettes[index]}")
+    pieceLogger(f"[setPalette] >> Setting a new palette:  {paletteObj.paletteName}")
     config.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.c1.currentColor = setCurrentColor(paletteObj.c1)
     config.c2.currentColor = setCurrentColor(paletteObj.c2)
@@ -536,7 +533,7 @@ def selectNewPalette(_setPalette=True):
     config.currentPaletteIndex = random.choice(_listOfIndecies)
 
     pieceLogger(
-        f"selectNewPalette: Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}",
+        f"[selectNewPalette] >> Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}",
         2,
         True,
     )
@@ -565,6 +562,9 @@ def loadAndSetupPatterns():
     config.patternSequence = []
     config.slotsToChange = []
     config.settingUpPattern = True
+    config.lastPatternSelected = ""
+    config.consecutivePatternChoiceCount = 0
+    config.consecutivePatternCount = 0
 
     # when rebuild is called, chance that the full pattern gets rebuilt -
     loadConfigValue(config, workConfig, "movingpattern", "rebuildAllSlotsProb", 0.50, float)
@@ -706,18 +706,20 @@ def loadAndSetCombinations():
         comboSet.combinationSetsMaxTime = float(workConfig.get(combinationSetName, "combinationSetsMaxTime", fallback=60))
 
         comboSet.maxNumberOfRandomizers = int(workConfig.get(combinationSetName, "maxNumberOfRandomizers", fallback=3))
+        comboSet.minNumberOfPatternVariations = int(workConfig.get(combinationSetName, "minNumberOfPatternVariations", fallback=0))
 
         config.combinationSets.append(comboSet)
+
     # config.currentCombinationsetIndex = 0
     config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
     config.numberOfRandomizersUsed = 0
     config.comboSetDirector = Director(config)
     config.comboSetDirector.slotRate = int(random.uniform(config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime,config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime))
-    pieceLogger(f"Initial wait time : {config.comboSetDirector.slotRate}")
+    pieceLogger(f"[loadAndSetCombinations] Initial combo set change wait time (slotRate) : {config.comboSetDirector.slotRate}")
 
 
 def handleChangeCurrentCominationSet():
-    pieceLogger("\nChecking combo set", 2)
+    pieceLogger("\n[handleChangeCurrentCominationSet] >> Checking combo set", 2)
     disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
     if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone:
 
@@ -726,14 +728,14 @@ def handleChangeCurrentCominationSet():
 
         _listOfIndecies = list(range(len(config.combinationSets)))
 
-        pieceLogger(f"_listOfIndecies =   {_listOfIndecies}")
+        pieceLogger(f"[handleChangeCurrentCominationSet] >> _listOfIndecies =   {_listOfIndecies}")
         config.currentCombinationsetIndex = random.choice(_listOfIndecies)
 
         config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
         setPalette(config, config.currentPaletteIndex)
 
         # {config.combinationSets[config.currentCombinationsetIndex]}
-        pieceLogger(f"=====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
+        pieceLogger(f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
         config.numberOfRandomizersUsed = 0
 
         # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed
@@ -786,7 +788,7 @@ def resetPatternBlocks():
 
 
 def buildPatternSequence(config):
-    pieceLogger("buildPatternSequence(config) called", 0)
+    pieceLogger("[buildPatternSequence] >> called", 0)
     # config.patternSequence = []
     # config.usedPatterns = []
 
@@ -832,7 +834,7 @@ def buildPatternSequence(config):
     config.initPatternBuild = False
 
 
-def chooseAPattern(limitRandomizers=False):
+def chooseAPattern(limitRandomizers=False, forceDominant=False):
     _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
@@ -842,7 +844,7 @@ def chooseAPattern(limitRandomizers=False):
     # _patternSelected = _patterns[math.floor(random.uniform(0, len(_patterns)))]
     _patternSelected = random.choice(_patterns)
 
-    if random.random() < _dominantPatternProb:
+    if random.random() < _dominantPatternProb or forceDominant:
         _patternSelected = _dominantPatterns[math.floor(random.uniform(0, len(_dominantPatterns)))]
 
     # need to limit randomizers
@@ -856,6 +858,14 @@ def chooseAPattern(limitRandomizers=False):
             else:
                 chooseAPattern()
 
+    # this catches if the same pattern is selected twice in a sequence
+    if _patternSelected == config.lastPatternSelected:
+        config.consecutivePatternCount += 1
+        # pieceLogger(f"\n\n[chooseAPattern] >> {config.lastPatternSelected} {_patternSelected} {config.consecutivePatternChoiceCount}")
+    
+
+    
+    
     return _patternSelected
 
 
@@ -880,13 +890,28 @@ def generatePatternSequence(config):
     config.tileOverlayGridProb = combo.tileOverlayGridProb
     config.patternsInBands = combo.patternsInBands
 
-    pieceLogger(f"generatePatternSequence(config) called: {config.combinationSets[config.currentCombinationsetIndex].name} using _tempPalette: {_tempPalette.paletteName}")
+    pieceLogger(f"[generatePatternSequence(config)] >> COMBINATION SET: {config.combinationSets[config.currentCombinationsetIndex].name} using colors _tempPalette: {_tempPalette.paletteName}")
 
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount
         if random.random() < _baseProb:
             _patternSelected = chooseAPattern()
             _tempPalette = getTempPalette(config)
+
+        if config.combinationSets[config.currentCombinationsetIndex].minNumberOfPatternVariations > 0 :
+            if _patternSelected != config.lastPatternSelected :
+                config.consecutivePatternChoiceCount += 1
+                config.lastPatternSelected = _patternSelected
+
+            if config.consecutivePatternChoiceCount == 0 and _iterCount > (config.patternBlockRows * config.patternBlockCols - config.combinationSets[config.currentCombinationsetIndex].minNumberOfPatternVariations):
+                if config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb > 0 and config.lastPatternSelected != config.combinationSets[config.currentCombinationsetIndex].dominantPatterns[0]:
+                    _patternSelected = chooseAPattern(False,True)
+                else :
+                    _patternSelected = chooseAPattern()
+
+                _tempPalette = getTempPalette(config)
+                pieceLogger("[generatePatternSequence] >> forcing a change in last few slots")
+                
         if "randomizer" in _patternSelected:
             if config.numberOfRandomizersUsed >= config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers:
                 # pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {config.numberOfRandomizersUsed}")
@@ -971,7 +996,7 @@ def _print_pattern_sequence(config):
 
 
 def rebuildPatterns(arg=0):
-    pieceLogger("rebuildPatterns() called")
+    pieceLogger("[rebuildPatterns] >> called")
 
     if config.numRowsRandomize:
         rowsAndDotsSettings()
@@ -1217,13 +1242,13 @@ def handlePatternRebuild():
 
         # selectNewPalette(False)
         if random.random() < config.rebuildAllSlotsProb:
-            pieceLogger(f"\nhandlePatternRebuild(): Rebuiding full : {config.combinationSets[config.currentCombinationsetIndex].name}")
+            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding full : {config.combinationSets[config.currentCombinationsetIndex].name}")
             config.settingUpPattern = True
             config.patternSequence = []
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger(f"\nhandlePatternRebuild(): Rebuiding parts: {config.combinationSets[config.currentCombinationsetIndex].name}")
+            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding parts: {config.combinationSets[config.currentCombinationsetIndex].name}")
             if random.random() < config.chanceRebuildPatternChoosesRandom:
                 config.slotsToChange = []
             else:
@@ -1242,7 +1267,7 @@ def handlePatternRebuild():
 
             config.settingUpPattern = False
         try:
-            pieceLogger(f"handlePatternRebuild(): config.settingUpPattern {config.settingUpPattern} | color palette : {config.palettes[config.currentPaletteIndex]}")
+            pieceLogger(f"[handlePatternRebuild] >> config.settingUpPattern {config.settingUpPattern} | color palette : {config.palettes[config.currentPaletteIndex]}")
         except Exception as e:
             pieceLogger(e)
         # pieceLogger(f"handlePatternRebuild(): config.slotsToChange {config.slotsToChange}")
@@ -1490,7 +1515,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         loadPolyOverlaybaseValues()
         # print(config.polyBase)
     except Exception as e:
-        pieceLogger(f" ==> Not using custom polygon overlay {e}")
+        pieceLogger(f"[setupPolyOverlay] >> Not using custom polygon overlay {e}")
         config.usePolygonOverlay = False
 
 
@@ -1499,7 +1524,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
 
 def loadAndInitializeCrossFader():
 
-    pieceLogger("Initialize cross fader")
+    pieceLogger("[loadAndInitializeCrossFader] >> Initialize cross fader")
     loadConfigValue(config, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
     loadConfigValue(config, workConfig, "movingpattern", "faderProbDissolve", .5, float)
     loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
@@ -1558,7 +1583,7 @@ def createImageHolders():
 
 def main(run=True):
     global config
-    pieceLogger("\n main() called")
+    pieceLogger("\n[main] >> called")
 
     config.debugPause = False
 
@@ -1701,7 +1726,7 @@ def main(run=True):
 
 def runWork():
     global config
-    pieceLogger("Running repeatblocks.py", 2)
+    pieceLogger("[runWork] >> Running repeatblocks.py", 2)
     _subSteps = getattr(config, 'smoothingSteps', 0)
     while config.isRunning:
         config.directorController.checkTime()
@@ -1715,3 +1740,5 @@ def runWork():
         if not config.standAlone:
             config.callBack()
 
+def _pieceLogger(arg1,arg2=None,arg3=None):
+    return True

@@ -32,7 +32,7 @@ class Director:
     def reset(self):
         self.advance = False
         self.tT = time.time()
-        print(f"New rate: {self.slotRate}")
+        print(f"[holder_director.py: Director.reset] >> New rate: {self.slotRate}")
 
 
     def checkTime(self):

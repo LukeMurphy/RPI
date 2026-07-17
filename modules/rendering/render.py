@@ -62,7 +62,7 @@ def key_handler(event):
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
-    pieceLogger("** Setting up the window and rendering in render.py", 3)
+    pieceLogger("[render.py:setUp] >> ** Setting up the window and rendering\n", 3)
     gc.enable()
 
     config.imageArrayForSaving = []
@@ -262,8 +262,8 @@ def relaunchOnChange(config):
     # if config.delta <= 1 or config.delta2 <= 1:
     if config.delta <= 1 or fileHasChanged:
         if not config.reloadConfig:
-            pieceLogger(f"** LAST MODIFIED DELTA: {str(config.delta)} **")
-            pieceLogger(f"** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
+            pieceLogger(f"[render.py:relaunchOnChange] >> ** LAST MODIFIED DELTA: {str(config.delta)} **")
+            pieceLogger(f"[render.py:relaunchOnChange] >> ** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
             # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
             if config.doFullReloadOnChange:
@@ -435,7 +435,7 @@ def _lastOverLay():
                 config.renderImageFullOverlay = config.renderImageFullOverlay.filter(ImageFilter.GaussianBlur(radius=config.lastOverlayBlur))
             config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(f"[render.py:_lastOverLay] >> {e}")
 
 
 def _overallResize():
@@ -645,7 +645,7 @@ def drawBeforeConversion():
 
 
 def saveImageToFile():
-    pieceLogger("Saving image to file")
+    pieceLogger("[render.py:saveImageToFile] >> Saving image to file")
     currentTime = time.time()
     baseName = config.outPutPath + str(currentTime)
     _temp = config.renderImageFull.copy()

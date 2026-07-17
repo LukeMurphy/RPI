@@ -344,26 +344,26 @@ def mockupBlock(config, workConfig) :
             informalGridRows = int(workConfig.get("mockup", "informalGridRows"))
             informalGridCols = int(workConfig.get("mockup", "informalGridCols"))
         except Exception as e:
-            print(str(e))
+            print(f"[panelDrawing.py: mockupBlock] >> {e}")
             informalGridRows = gridRows
             informalGridCols = gridCols 
         
         try:
             angleJiggle = float(workConfig.get("mockup", "angleJiggle"))
         except Exception as e:
-            print(str(e))
+            print(f"[panelDrawing.py: mockupBlock] >> {e}")
             angleJiggle = 0 
 
         try:
             bgColorVals = workConfig.get("mockup", "bgColor").split(",")
             fillColor = tuple(int(a) for a in bgColorVals)
         except Exception as e:
-            print(str(e))
+            print(f"[panelDrawing.py: mockupBlock] >> {e}")
 
         try:
             lsys = workConfig.getboolean("mockup","lsys")
         except Exception as e:
-            print(str(e))
+            print(f"[panelDrawing.py: mockupBlock] >> {e}")
             lsys = False
 
 
@@ -408,7 +408,7 @@ def mockupBlock(config, workConfig) :
             skipPanels = workConfig.get("mockup", "skipPanels").split(',')
             config.panelDrawing.skipPanels = list(int(a)-1 for a in skipPanels)
         except Exception as e:
-            print(str(e))
+            print(f"[panelDrawing.py: mockupBlock] >> {e}")
 
 
         if programmedPath == "ellipse" :
@@ -427,7 +427,7 @@ def mockupBlock(config, workConfig) :
                 p = drawingPathPoints[i].split(",")
                 config.panelDrawing.drawingPath.append((int(p[0]) + xOffset, int(p[1]) + yOffset, int(p[2]), 1))
     except Exception as e:
-        print(str(e))
+        print(f"[panelDrawing.py: mockupBlock] >> {e}")
         config.useDrawingPoints = False
 
 

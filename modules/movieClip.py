@@ -62,7 +62,7 @@ class movieClip:
     clipRotate = 0
 
     def __init__(self, config):
-        print("\nInitializing clip player")
+        print("\n[movieClip.py: movieClip] >> Initializing clip player")
         self.config = config
         self.directorController = Director()
 
@@ -118,7 +118,7 @@ class movieClip:
 
     def setUp(self, workConfig):
 
-        print("Image Sequence Player Piece Loaded")
+        print("[movieClip.py: setUp] >> Image Sequence Player Piece Loaded")
         config = self.config
 
         self.videoWidth = int(workConfig.get("imageSequencePlayer", "videoWidth"))
@@ -178,7 +178,6 @@ class movieClip:
         self.directorController.slotRate = self.delay
 
         self.overLayMode = 0
-        print(f"{bcolors.OKBLUE}** {bcolors.BOLD}")
 
         self.removalMask = Image.new("RGBA", (self.clipWidth, self.clipHeight))
         removalMaskDraw = ImageDraw.Draw(self.removalMask)
@@ -221,4 +220,4 @@ class movieClip:
             self.imageLayer.paste(imgTemp, (0, 0), imgTemp)
 
         except Exception as e:
-            print(e, clrBlock.mode, self.config.renderImageFull.mode)
+            print(f"[movieClip.py] >> {e} {clrBlock.mode} {self.config.renderImageFull.mode}")

@@ -62,7 +62,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-pieceLogger("Inital Player Arguments: \n" + str(args),3)
+pieceLogger("[player] >> Inital Player Arguments: \n" + str(args),3)
 
 
 
@@ -90,16 +90,16 @@ def loadFromArguments(reloading=False, config=None):
     """
     # global config, workconfig, path, tempImage, threads, thrd
 
-    pieceLogger(f"** RELOADING: {str(reloading)}", 3)
+    pieceLogger(f"[player: loadFromArguments] >> ** RELOADING: {str(reloading)}", 3)
 
     if reloading is False:
         try:
             _initializeConfiguration(loadFromArguments)
         except getopt.GetoptError as err:
             # print help information and exit:
-            print(f"Error:{str(err)}")
+            print(f"[player: loadFromArguments] >> Error:{str(err)}")
     else:
-        pieceLogger("\n** RELOADING NOW: " + config.fileName, 3)
+        pieceLogger("\n[player: loadFromArguments] >>** RELOADING NOW: " + config.fileName, 3)
         workconfig.read(config.fileName)
         player_module.configure(config, workconfig)
 
@@ -147,14 +147,14 @@ def _printConfigsLoaded(config):
     config.WRKINID = defaultpiece.defaultPieceToRun
     # Default Local Path
     config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
-    pieceLogger(f"** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n",3)
+    pieceLogger(f"[player: _printConfigsLoaded] >> ** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n",3)
     workconfig.read(f"{config.path}configs/{config.WRKINID}.cfg")
-    print(f"{bcolors.OKBLUE}** ")
+    print(f"{bcolors.OKBLUE}")
     for c in workconfig:
-        print(c)
+        print(f"[player: _printConfigsLoaded] >> {c}")
         for a in workconfig[c]:
-            print("\t" + str(a) + ":  " + str(workconfig.get(c, a)))
-    print(f"**{bcolors.ENDC}")
+            print(f"[player: _printConfigsLoaded] >> \t {a} : {workconfig.get(c, a)}")
+    print(f"{bcolors.ENDC}")
 
 
 def _parseArgs(config, loadFromArguments):
@@ -194,15 +194,15 @@ def _parseArgs(config, loadFromArguments):
     config.deltaWorkFile = int((config.startTime - f))
 
 
-    print(f"{bcolors.OKBLUE}---------------------------------------------------------------------------------------")
-    print ("script: sys.argv[0] is", repr(sys.argv[0]))
-    print ("script: __file__ is", repr(__file__))
-    print ("script: cwd is", repr(os.getcwd()))
-    print ("config: path  is", repr(args.path))
-    print ("config: path  is", args.path)
-    print("-cfg argument: is", argument)
-    print("Last Modified Delta: is", config.delta)
-    print(f"---------------------------------------------------------------------------------------{bcolors.ENDC}")
+    print(f"[player.py: _parseArgs] >> {bcolors.OKBLUE}---------------------------------------------------------------------------------------")
+    print ("[player.py: _parseArgs] >> script: sys.argv[0] is", repr(sys.argv[0]))
+    print ("[player.py: _parseArgs] >> script: __file__ is", repr(__file__))
+    print ("[player.py: _parseArgs] >> script: cwd is", repr(os.getcwd()))
+    print ("[player.py: _parseArgs] >> config: path  is", repr(args.path))
+    print ("[player.py: _parseArgs] >> config: path  is", args.path)
+    print("[player.py: _parseArgs] >> -cfg argument: is", argument)
+    print("[player.py: _parseArgs] >> Last Modified Delta: is", config.delta)
+    print(f"[player.py: _parseArgs] >> ---------------------------------------------------------------------------------------{bcolors.ENDC}")
 
 
 def _brightnessOverrideConfigs(config):

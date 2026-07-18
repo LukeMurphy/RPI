@@ -824,7 +824,7 @@ def buildPatternSequence(config):
     config.popRandomColorProb = random.random() < config.combinationSets[config.currentCombinationsetIndex].popRandomColorProb
 
     # print(config.altLineColoring)
-    config.numConcentricBoxes = round(random.uniform(config.minnumConcentricBoxes, config.maxnumConcentricBoxes))
+    config.numConcentricBoxes = int(random.uniform(config.minnumConcentricBoxes, config.maxnumConcentricBoxes))
 
     pattern_blocks_v5.floralConfig(config)
     generatePatternSequence(config)

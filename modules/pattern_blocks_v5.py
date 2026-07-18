@@ -1462,8 +1462,11 @@ def concentricBoxes(config, paletteObj=None):
     config.blockDraw.rectangle((0, 0, config.blockWidth, config.blockHeight), fill=clr1, outline=None)
 
     count = 0
+    numConcentricBoxes = config.numConcentricBoxes * 3
 
-    for i in range(0, config.numConcentricBoxes, 2):
+    pieceLogger(f"numConcentricBoxes = {numConcentricBoxes}")
+
+    for i in range(0, numConcentricBoxes, 2):
 
         if config.altLineColoring == True:
             outClr = clr3

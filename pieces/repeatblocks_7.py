@@ -708,6 +708,7 @@ def loadAndSetCombinations():
         comboSet.randomInsertionInitialProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionInitialProbabilitly", fallback=0.0))
         comboSet.randomInsertionProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
         comboSet.randomInsertionBaseProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
+        comboSet.borderLeakProb = float(workConfig.get(combinationSetName, "borderLeakProb", fallback=0.0))
         comboSet.randomInsertionMin = int(workConfig.get(combinationSetName, "randomInsertionMin", fallback="0"))
         comboSet.randomInsertionMax = int(workConfig.get(combinationSetName, "randomInsertionMax", fallback="0"))
         config.randomInsertionCount = 0
@@ -944,16 +945,17 @@ def generatePatternSequence(config):
                 config.numberOfRandomizersUsed += 1
 
 
+        _position = _iterCount
+        _pattern = _patternSelected
+
         _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else random.randint(0, 1)
         if not _combo.altBlockRotation:
             _rotate = 0
 
-        if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
+        if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)) and random.random() > _combo.borderLeakProb:
             _pattern = config.borderPattern
             _isBorder = True
 
-        _position = _iterCount
-        _pattern = _patternSelected
         # else:
         #     pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _pattern: {_pattern} _patternSelected: {_patternSelected}\n")
 
@@ -968,7 +970,7 @@ def generatePatternSequence(config):
         _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
 
 
-        if config.randomInsertionCount < _randomInsertionMax and not _isBorder:
+        if config.randomInsertionCount < _randomInsertionMax and not _patternBlock.isBorder:
             if random.random() < _randomInsertionProb :
                 _patternBlock.pattern = _randomInserts[math.floor(random.uniform(0, len(_randomInserts)))]
                 # pieceLogger(f"[generatePatternSequence][add_pattern_block]===== {config.randomInsertionCount} / {_randomInsertionMax} {_patternSelected} {_randomInsertionProb}")

@@ -972,7 +972,8 @@ def generatePatternSequence(config):
         _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
 
 
-        if config.randomInsertionCount < _randomInsertionMax and not _patternBlock.isBorder:
+        # if config.randomInsertionCount < _randomInsertionMax and not _patternBlock.isBorder:
+        if config.randomInsertionCount < _randomInsertionMax :
             if random.random() < _randomInsertionProb :
                 _patternBlock.pattern = _randomInserts[math.floor(random.uniform(0, len(_randomInserts)))]
                 # pieceLogger(f"[generatePatternSequence][add_pattern_block]===== {config.randomInsertionCount} / {_randomInsertionMax} {_patternSelected} {_randomInsertionProb}")

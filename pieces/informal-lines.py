@@ -1,16 +1,20 @@
+import glob
+from logging import config
 import random
 import time
 import math
 from noise import *
 from PIL import Image, ImageDraw
-from modules.configuration import bcolors, pieceLogger
 from modules import colorutils, panelDrawing
+from modules import pattern_blocks_v5
 from modules.holder_director import Director
-from pieces.screen import Holder
+from modules.configuration import bcolors, pieceLogger
 from modules.informal_line import InformalLine
-
+from pieces import repeatblocks_5
+from pieces.screen import Holder
 
 # -------- Util Functions   -------------- #
+
 
 def randomRange(a, b, rounded=False):
     if not rounded:
@@ -292,7 +296,7 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
             config.informalLineUnits.append(informalLine)
 
     # -------------------------------------- #
-    if _markType == "x" :
+    if _markType == "x":
         _clr = None
         for i in range(0, 2):
             informalLine = InformalLine()
@@ -321,15 +325,15 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
             informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
             informalLine.horizontalMovementProb = config.horizontalMovementProb
             informalLine.verticalMovementProb = config.verticalMovementProb
-            if i == 0 :
+            if i == 0:
                 informalLine.lineColor = setLineColor()
                 if random.random() < config.marksAltColorProb:
                     informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
                 if random.random() < config.marksAltColorProb:
                     _tVal = int(random.uniform(40, 255))
                     informalLine.lineColor = (0, _tVal, _tVal, 60)
-                _clr  = informalLine.lineColor 
-            else :
+                _clr = informalLine.lineColor
+            else:
                 informalLine.lineColor = _clr
 
             if not _skipMark:
@@ -349,7 +353,7 @@ def setLines():
 
 
 def generateScribbleGrid():
-    pieceLogger(f"[generateScribbleGrid] Making scribble marks")     
+    pieceLogger(f"[generateScribbleGrid] Making scribble marks")
     config.line_alpha = randomRange(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
     config.bg_alpha_base = randomRange(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
 
@@ -476,6 +480,7 @@ def reDraw():
         clearbgBox()
         setBGColor()
         setLines()
+        # doFrame()
         pieceLogger(f"[reDraw] change ALL LINES  lightMode:{config.lightMode} {config.bg_alpha}")
 
     if random.random() < config.pauseProb:
@@ -493,18 +498,84 @@ def iterate():
     reDraw()
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
-    if config.useDrawingPoints == True:
-        config.panelDrawing.canvasToUse = config.image
-        config.panelDrawing.render()
+    # if config.useDrawingPoints == True:
+    #     config.panelDrawing.canvasToUse = config.image
+    #     config.panelDrawing.render()
 
-    # badpixels.drawBlanks(config.image, False)
-    config.destinationImage.paste(config.image, (0,0), config.image)
+    config.destinationImage.paste(config.image, (0, 0), config.image)
     config.destinationImage.paste(config.underLayer, (0, 0), config.underLayer)
+    # config.destinationImage.paste(config.frameLayer, (0, 0), config.frameLayer)
 
     config.render(config.destinationImage, 0, 0)
 
 
 # ---- initialize  -----------------
+
+
+# def enFramingSetup():
+#     global config
+#     config.blockWidth = 32
+#     config.blockHeight = 32
+#     config.frameLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+#     config.frameLayerDraw = ImageDraw.Draw(config.frameLayer)
+
+#     config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
+#     config.blockDraw = ImageDraw.Draw(config.blockImage)
+
+#     class AbstractObj:
+#         def __init__(self):
+#             pass
+
+#     paletteObj = AbstractObj()
+#     paletteObj.c1 = AbstractObj()
+#     paletteObj.c2 = AbstractObj()
+#     paletteObj.c3 = AbstractObj()
+#     paletteObj.c4 = AbstractObj()
+
+#     config.popRandomColorProb = 0.0
+
+#     c1 = config.bgColor
+#     paletteObj.c1.currentColor = [c1[0],c1[1],c1[2],200]
+#     paletteObj.c2.currentColor = [0, 255, 0, 255]
+#     paletteObj.c3.currentColor = [0, 0, 255, 255]
+#     paletteObj.c4.currentColor = [200, 120, 0, 255]
+
+#     config.paletteObj = paletteObj
+
+#     doFrame()
+
+
+# def doFrame():
+#     global config
+
+#     if random.random() < .2 :
+#         config.frameLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+#         config.frameLayerDraw = ImageDraw.Draw(config.frameLayer)
+
+#     c1 = config.bgColor
+#     config.paletteObj.c1.currentColor = [c1[0],c1[1],c1[2],200]
+
+#     if random.random() < .5  :
+#         pattern_blocks_v5.floralConfig(config)
+#         pattern_blocks_v5.petals(config, config.paletteObj)
+#     else:
+#         pattern_blocks_v5.TVTestPattern(config, config.paletteObj)
+
+#     _rows = int(config.canvasHeight / config.blockHeight)
+#     _cols = int(config.canvasWidth / config.blockWidth)
+
+#     for c in range(_cols):
+#         _temp = config.blockImage.copy()
+#         if random.random() < 0.2:
+#             _temp = _temp.rotate(90)
+#         if random.random() < 0.9 : config.frameLayer.paste(_temp, (int(c * config.blockWidth), 0), _temp)
+#         if random.random() < 0.9 : config.frameLayer.paste(_temp, (int(c * config.blockWidth), int(config.canvasHeight - config.blockHeight)), _temp)
+#     for r in range(_rows):
+#         _temp = config.blockImage.copy()
+#         if random.random() < 0.2:
+#             _temp = _temp.rotate(90)
+#         if random.random() < 0.9 : config.frameLayer.paste(_temp, (0, int(r * config.blockHeight)), _temp)
+#         if random.random() < 0.9 : config.frameLayer.paste(_temp, (int(config.canvasWidth - config.blockHeight), int(r * config.blockHeight)), _temp)
 
 
 def loadConfigValue(obj, workConfig, section, option, default, type_converter):
@@ -598,7 +669,6 @@ def main(run=True):
     global workConfig
     global overlayControls
 
-
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.imageDraw = ImageDraw.Draw(config.image)
     config.draw = ImageDraw.Draw(config.image)
@@ -682,7 +752,6 @@ def main(run=True):
     config.vertLineWidthRange = [int(x) for x in workConfig.get("informalMarksGrid", "vertLineWidthRange", fallback="18,180").split(",")]
     config.horizBaseWidthRange = [int(x) for x in workConfig.get("informalMarksGrid", "horizBaseWidthRange", fallback="18,180").split(",")]
 
-
     config.angleRange = [float(x) for x in workConfig.get("informalMarksGrid", "angleRange", fallback="0,0").split(",")]
     config.angleAltRange = [float(x) for x in workConfig.get("informalMarksGrid", "angleAltRange", fallback="-10,10").split(",")]
     config.sizeRange = float(workConfig.get("informalMarksGrid", "sizeRange", fallback=10))
@@ -733,8 +802,6 @@ def main(run=True):
     config.singlesOnTop = workConfig.getboolean("informalMarksGrid", "singlesOnTop", fallback=False)
     config.xsOnTop = workConfig.getboolean("informalMarksGrid", "xsOnTop", fallback=False)
 
-
-
     # light lines on background - more like a drawing on a screen
     config.lightMode = workConfig.getboolean("informalMarksGrid", "lightMode", fallback=False)
     config.lightModeProb = float(workConfig.get("informalMarksGrid", "lightModeProb", fallback=1.0))
@@ -767,18 +834,17 @@ def main(run=True):
     # config.backgroundColorChangeProb = float(workConfig.get("informalMarksGrid", "backgroundColorChangeProb", fallback=".001"))
 
     config.initialRunsOfBgBlocks = int(workConfig.get("informalMarksGrid", "initialRunsOfBgBlocks", fallback=0))
-
     loadColorConfigs()
     setLines()
 
     config.lineColor = setLineColor()
     setBGColor()
 
+    # enFramingSetup()
+
     if config.useBgBox:
         for _ in range(config.initialRunsOfBgBlocks):
             bgColorsFilling()
-
-
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

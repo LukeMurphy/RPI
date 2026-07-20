@@ -1464,7 +1464,7 @@ def concentricBoxes(config, paletteObj=None):
     count = 0
     numConcentricBoxes = config.numConcentricBoxes * 3
 
-    pieceLogger(f"numConcentricBoxes = {numConcentricBoxes}")
+    # pieceLogger(f"numConcentricBoxes = {numConcentricBoxes}")
 
     for i in range(0, numConcentricBoxes, 2):
 

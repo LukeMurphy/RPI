@@ -5,7 +5,7 @@ import math
 import random
 import textwrap
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
@@ -177,6 +177,16 @@ def displayTest():
 
 def showGrid():
     # global config
+
+    # if config.root.winfo_x() != None and config.root.winfo_y() != None :
+    _windowLastXPosition = config.root.winfo_x()
+    _windowLastYPosition = config.root.winfo_y()
+
+    if _windowLastXPosition != config.windowLastXPosition or _windowLastYPosition != config.windowLastYPosition :
+        pieceLogger(f"window x,y: {config.root.winfo_x()},{config.root.winfo_y()}")
+        config.windowLastXPosition = config.root.winfo_x()
+        config.windowLastYPosition = config.root.winfo_y()
+
 
     config.draw.rectangle(
         (0, 0, config.canvasWidth, config.canvasHeight),
@@ -573,6 +583,8 @@ def runWork():
     print("RUNNING DIAGNOSTICS diagnostics.py")
     print(bcolors.ENDC)
     # gc.enable()
+    config.windowLastXPosition = 0
+    config.windowLastYPosition = 0
 
     while config.isRunning == True:
         iterate()

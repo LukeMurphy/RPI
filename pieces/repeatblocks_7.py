@@ -26,7 +26,6 @@ from copy import copy, deepcopy
 # more refactoring including slow scrolling and timing controls
 
 
-
 # --------------------- CLASSES     ---------------------
 
 
@@ -93,10 +92,10 @@ class Fader:
         # self.fadeInMode = config.faderMode
         self.fadeInMode = 1 if random.random() < config.faderProbDissolve else 0
 
-        if config.faderInit :
+        if config.faderInit:
             config.faderInit = False
-        else :
-            if self.fadeInMode == 0 :
+        else:
+            if self.fadeInMode == 0:
                 config.faderDoingRefreshCountIterations = config.faderFadeDoingRefreshCountIterations
             if self.fadeInMode == 1:
                 config.faderDoingRefreshCountIterations = config.faderDissolveDoingRefreshCountIterations
@@ -146,13 +145,11 @@ class Fader:
             self.pendingLargeBlocks = list(self.largeBlocks)
             self.activeFades = []
 
-
     def fadeIn(self, config):
         if self.fadeInMode == 1:
             self.dissolveIn()
         else:
             self.crossFadeIn()
-
 
     def dissolveIn(self):
         if self.fadingDone:
@@ -198,14 +195,12 @@ class Fader:
         if not self.activeDissolves and not self.pendingFadeBlockIndices:
             self.endFades()
 
-
     def endFades(self):
         self.fadingDone = True
         self.blocksChanged = 0
         self.fadeThroughAmount = 0
         config.doTransition = False
         # pieceLogger("=> FADING DONE")
-
 
     def crossFadeIn(self):
         if self.fadingDone:
@@ -236,11 +231,11 @@ class Fader:
             self.y = s[2]
             _h = s[3]
             amt = min(fade["amount"], 1.0)
-            if  (self.x + _w) <= self.x :
+            if (self.x + _w) <= self.x:
                 # pieceLogger(_w)
                 _w = 0
 
-            if  (self.y + _h)<= self.y :
+            if (self.y + _h) <= self.y:
                 # pieceLogger(_h)
                 _h = 0
             _tempEnd = self.endImage.crop((self.x, self.y, self.x + _w, self.y + _h))
@@ -508,8 +503,9 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
 def setPalette(config, index=0):
     paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
 
-
-    pieceLogger(f"\n[setPalette] >> currentCombinationsetIndex: {config.currentCombinationsetIndex} index: {index} config.combinationSets[config.currentCombinationsetIndex].palettes[index]: {config.combinationSets[config.currentCombinationsetIndex].palettes[index]}")
+    pieceLogger(
+        f"\n[setPalette] >> currentCombinationsetIndex: {config.currentCombinationsetIndex} index: {index} config.combinationSets[config.currentCombinationsetIndex].palettes[index]: {config.combinationSets[config.currentCombinationsetIndex].palettes[index]}"
+    )
     pieceLogger(f"[setPalette] >> Setting a new palette:  {paletteObj.paletteName}")
     config.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
     config.c1.currentColor = setCurrentColor(paletteObj.c1)
@@ -708,13 +704,27 @@ def loadAndSetCombinations():
         comboSet.maxNumberOfRandomizers = int(workConfig.get(combinationSetName, "maxNumberOfRandomizers", fallback=3))
         comboSet.minNumberOfPatternVariations = int(workConfig.get(combinationSetName, "minNumberOfPatternVariations", fallback=0))
 
+        comboSet.randomInsertions = workConfig.get(combinationSetName, "randomInsertions", fallback="0,0").split(",")
+        comboSet.randomInsertionInitialProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionInitialProbabilitly", fallback=0.0))
+        comboSet.randomInsertionProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
+        comboSet.randomInsertionBaseProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
+        comboSet.randomInsertionMin = int(workConfig.get(combinationSetName, "randomInsertionMin", fallback="0"))
+        comboSet.randomInsertionMax = int(workConfig.get(combinationSetName, "randomInsertionMax", fallback="0"))
+        config.randomInsertionCount = 0
+        if comboSet.randomInsertionMin > 0:
+            comboSet.randomInsertionProbabilitly = comboSet.randomInsertionInitialProbabilitly
+
         config.combinationSets.append(comboSet)
 
     # config.currentCombinationsetIndex = 0
     config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
     config.numberOfRandomizersUsed = 0
     config.comboSetDirector = Director(config)
-    config.comboSetDirector.slotRate = int(random.uniform(config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime,config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime))
+    config.comboSetDirector.slotRate = int(
+        random.uniform(
+            config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime, config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
+        )
+    )
     pieceLogger(f"[loadAndSetCombinations] Initial combo set change wait time (slotRate) : {config.comboSetDirector.slotRate}")
 
 
@@ -735,7 +745,11 @@ def handleChangeCurrentCominationSet():
         setPalette(config, config.currentPaletteIndex)
 
         # {config.combinationSets[config.currentCombinationsetIndex]}
-        pieceLogger(f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n", 2, True)
+        pieceLogger(
+            f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n",
+            2,
+            True,
+        )
         config.numberOfRandomizersUsed = 0
 
         # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed
@@ -755,8 +769,11 @@ def handleChangeCurrentCominationSet():
         # config.patternSequence = []
         # config.rebuildIndividualSlotProb = .1
 
-
-        config.comboSetDirector.slotRate = int(random.uniform(config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime,config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime))
+        config.comboSetDirector.slotRate = int(
+            random.uniform(
+                config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime, config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
+            )
+        )
         config.comboSetDirector.reset()
 
         config.settingUpPattern = True
@@ -838,6 +855,9 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
     _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
+    _randomInserts = config.combinationSets[config.currentCombinationsetIndex].randomInsertions
+    _randomInsertionProb = config.combinationSets[config.currentCombinationsetIndex].randomInsertionProbabilitly
+    _randomInsertionMax = config.combinationSets[config.currentCombinationsetIndex].randomInsertionMax
 
     # due to normal distribution this kind of favors the things in the middle of the list
     # should really convert to a random choice operation rather than just numerical random
@@ -850,7 +870,6 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
     # need to limit randomizers
     if "randomizer" in _patternSelected:
         if limitRandomizers:
-            # chooseAPattern(True)
             _patternSelected = config.lastPatternSelected
         else:
             if config.numberOfRandomizersUsed < config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers:
@@ -861,11 +880,7 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
     # this catches if the same pattern is selected twice in a sequence
     if _patternSelected == config.lastPatternSelected:
         config.consecutivePatternCount += 1
-        # pieceLogger(f"\n\n[chooseAPattern] >> {config.lastPatternSelected} {_patternSelected} {config.consecutivePatternChoiceCount}")
-    
 
-    
-    
     return _patternSelected
 
 
@@ -882,51 +897,66 @@ def generatePatternSequence(config):
     _tempPalette = getTempPalette(config)
     _iterCount = 0
     config.initPatternBuild = True
-    combo = config.combinationSets[config.currentCombinationsetIndex]
-    config.useBorderPattern = combo.useBorderPattern
-    config.borderPattern = combo.borderPattern
-    config.usePolygonOverlay = combo.usePolygonOverlay
-    config.polyOverlayMode = combo.polyOverlayMode
-    config.tileOverlayGridProb = combo.tileOverlayGridProb
-    config.patternsInBands = combo.patternsInBands
+    
 
-    pieceLogger(f"[generatePatternSequence(config)] >> COMBINATION SET: {config.combinationSets[config.currentCombinationsetIndex].name} using colors _tempPalette: {_tempPalette.paletteName}")
+    _combo = config.combinationSets[config.currentCombinationsetIndex]
+    config.useBorderPattern = _combo.useBorderPattern
+    config.borderPattern = _combo.borderPattern
+    config.usePolygonOverlay = _combo.usePolygonOverlay
+    config.polyOverlayMode = _combo.polyOverlayMode
+    config.tileOverlayGridProb = _combo.tileOverlayGridProb
+    config.patternsInBands = _combo.patternsInBands
+
+    _randomInserts = _combo.randomInsertions
+    _randomInsertionProb = _combo.randomInsertionProbabilitly
+    _randomInsertionMax = _combo.randomInsertionMax
+
+    pieceLogger(f"[generatePatternSequence(config)] >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}")
 
     def add_pattern_block(c, r):
-        nonlocal _patternSelected, _tempPalette, _iterCount
+        nonlocal _patternSelected, _tempPalette, _iterCount, _randomInserts, _randomInsertionProb, _randomInsertionMax
+        _isBorder = False
+
         if random.random() < _baseProb:
             _patternSelected = chooseAPattern()
             _tempPalette = getTempPalette(config)
 
-        if config.combinationSets[config.currentCombinationsetIndex].minNumberOfPatternVariations > 0 :
-            if _patternSelected != config.lastPatternSelected :
+        if _combo.minNumberOfPatternVariations > 0:
+            if _patternSelected != config.lastPatternSelected:
                 config.consecutivePatternChoiceCount += 1
                 config.lastPatternSelected = _patternSelected
 
-            if config.consecutivePatternChoiceCount == 0 and _iterCount > (config.patternBlockRows * config.patternBlockCols - config.combinationSets[config.currentCombinationsetIndex].minNumberOfPatternVariations):
-                if config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb > 0 and config.lastPatternSelected != config.combinationSets[config.currentCombinationsetIndex].dominantPatterns[0]:
-                    _patternSelected = chooseAPattern(False,True)
-                else :
+            if config.consecutivePatternChoiceCount == 0 and _iterCount > (config.patternBlockRows * config.patternBlockCols - _combo.minNumberOfPatternVariations):
+                if _combo.dominantPatternProb > 0 and config.lastPatternSelected != _combo.dominantPatterns[0]:
+                    _patternSelected = chooseAPattern(False, True)
+                else:
                     _patternSelected = chooseAPattern()
 
                 _tempPalette = getTempPalette(config)
                 pieceLogger("[generatePatternSequence] >> forcing a change in last few slots")
-                
+
         if "randomizer" in _patternSelected:
-            if config.numberOfRandomizersUsed >= config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers:
+            if config.numberOfRandomizersUsed >= _combo.maxNumberOfRandomizers:
                 # pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {config.numberOfRandomizersUsed}")
                 _patternSelected = chooseAPattern(True)
                 _tempPalette = getTempPalette(config)
             else:
                 config.numberOfRandomizersUsed += 1
 
+
         _rotate = 0 if _patternSelected in (["shingles", "fishScales", "balls", "petals"]) else random.randint(0, 1)
-        if not combo.altBlockRotation:
+        if not _combo.altBlockRotation:
             _rotate = 0
-        _position = _iterCount
-        _pattern = _patternSelected
+
         if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)):
             _pattern = config.borderPattern
+            _isBorder = True
+
+        _position = _iterCount
+        _pattern = _patternSelected
+        # else:
+        #     pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _pattern: {_pattern} _patternSelected: {_patternSelected}\n")
+
         _patternBlock = PatternBlock()
         _patternBlock.pattern = _pattern
         _patternBlock.position = _position
@@ -934,14 +964,18 @@ def generatePatternSequence(config):
         _patternBlock.tempPalette = _tempPalette
         _patternBlock.col = c
         _patternBlock.row = r
-        _patternBlock.rePainting = _patternSelected in [
-            "randomizer4",
-            "randomizer3",
-            "randomizer2",
-            "randomizer",
-            "diamond",
-        ]
+        _patternBlock.rePainting = _patternSelected in ["randomizer4", "randomizer3", "randomizer2", "randomizer", "diamond"]
         _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
+
+
+        if config.randomInsertionCount < _randomInsertionMax and not _isBorder:
+            if random.random() < _randomInsertionProb :
+                _patternBlock.pattern = _randomInserts[math.floor(random.uniform(0, len(_randomInserts)))]
+                # pieceLogger(f"[generatePatternSequence][add_pattern_block]===== {config.randomInsertionCount} / {_randomInsertionMax} {_patternSelected} {_randomInsertionProb}")
+                _randomInsertionProb = _combo.randomInsertionBaseProbabilitly
+                config.randomInsertionCount += 1
+
+
 
         try:
             if config.settingUpPattern:
@@ -958,8 +992,9 @@ def generatePatternSequence(config):
                     # pieceLogger(f"add_pattern_block: change this slot {_slot}/ {len(config.patternSequence)}")
                     config.patternSequence[_slot] = _patternBlock
         except Exception as e:
-            print(e)
+            pieceLogger(f"[generatePatternSequence][add_pattern_block] error {e}", 1)
 
+        # pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _patternBlock.pattern: column:{c} row:{r} config.randomInsertionCount {config.randomInsertionCount}/{_randomInsertionMax} {_iterCount}: {_patternBlock.pattern}")
         _iterCount += 1
 
     if config.patternsInBands:
@@ -1058,7 +1093,6 @@ def rowsAndDotsSettings():
 def iterate():
     """Performs a single iteration of the animation."""
     global config
-    
 
     if config.debugPause:
         config.directorController.slotRate = 2.0
@@ -1076,7 +1110,6 @@ def iterate():
     drawAndProcessPattern()
 
     disturbance.handleDisturbances()
-
 
     handleFadingAndRebuild()
 
@@ -1206,6 +1239,7 @@ def redrawAndLoadImage(config):
 
 # ----------------------------------
 
+
 def handleFadingAndRebuild():
     """Handles image fading and pattern rebuilding."""
     if config.fader.fadingDone:
@@ -1313,12 +1347,12 @@ def renderComposite():
         # config.patternImageDraw.rectangle((60, 70, 128, 120), fill=(255, 0, 0, 50))
 
         # config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
-        
+
         _xp = int(config.imageXPOS)
         _frac = config.imageXPOS - _xp
         _yp = int(config.imageYPOS)
 
-        if getattr(config, 'useSubPixelSmoothing', False):
+        if getattr(config, "useSubPixelSmoothing", False):
             _BG = config.bgColor
             _w, _h = config.scrollBlendFrame0.width, config.scrollBlendFrame0.height
             config.scrollBlendFrame0.paste(_BG, (0, 0, _w, _h))
@@ -1357,12 +1391,12 @@ def renderComposite():
             config.waveDeformXPos += config.waveDeformXPosRate
             if config.waveDeformXPos > config.screenWidth:
                 config.waveDeformXPos = 0
-        
+
         # Run every cycle:
         global overlayControls
-        if overlayControls.usingPanelOverlays :
+        if overlayControls.usingPanelOverlays:
             overlayControls.targetImageRef = config.destinationImage
-        if overlayControls.useBlanks :
+        if overlayControls.useBlanks:
             config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
             overlayControls.destinationImageDraw = config.destinationImageDraw
         overlayControls.handleOverlayActions()
@@ -1526,7 +1560,7 @@ def loadAndInitializeCrossFader():
 
     pieceLogger("[loadAndInitializeCrossFader] >> Initialize cross fader")
     loadConfigValue(config, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
-    loadConfigValue(config, workConfig, "movingpattern", "faderProbDissolve", .5, float)
+    loadConfigValue(config, workConfig, "movingpattern", "faderProbDissolve", 0.5, float)
     loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockYSections", 3, int)
     loadConfigValue(config, workConfig, "movingpattern", "faderSmallBlockXSections", 40, int)
@@ -1558,13 +1592,13 @@ def createImageHolders():
     # image will be the final output
 
     config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
-    
+
     config.patternImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.patternImageDraw = ImageDraw.Draw(config.patternImage)
-    
+
     config.canvasImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
-    
+
     config.nextStateImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
     config.nextStateImageDraw = ImageDraw.Draw(config.nextStateImage)
 
@@ -1617,9 +1651,9 @@ def main(run=True):
     loadConfigValue(config, workConfig, "movingpattern", "loadAnImageProb", 0.0, float)
     config.imageSources = workConfig.get("movingpattern", "imageSources").split(",")
 
-    #---------------------------------------------------------------###
+    # ---------------------------------------------------------------###
     createImageHolders()
-    #---------------------------------------------------------------###
+    # ---------------------------------------------------------------###
 
     loadConfigValue(config, workConfig, "movingpattern", "useBlurSection", False, bool)
     loadConfigValue(config, workConfig, "movingpattern", "blurSectionWidth", 0, int)
@@ -1681,22 +1715,19 @@ def main(run=True):
         pieceLogger(f"{e} <== adjust config to use slotRate!! <===")
         config.directorController.slotRate = 0.03
 
-
     # initiate
     global overlayControls
-    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "movingpattern")
+    overlayControls = BlanksAndDitherRemapping(config, workConfig, "movingpattern")
 
     # For blanks
-    overlayControls.altColor = (0,0,0,15)
+    overlayControls.altColor = (0, 0, 0, 15)
     overlayControls.targetImageRef = config.destinationImage
     overlayControls.destinationImageDraw = config.destinationImageDraw
-
 
     # for overlay blocks
     overlayControls.overlayImage = config.destinationImage
     overlayControls.overlayImageDraw = config.destinationImageDraw
     overlayControls.setPanelOverlays()
-
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -1727,7 +1758,7 @@ def main(run=True):
 def runWork():
     global config
     pieceLogger("[runWork] >> Running repeatblocks.py", 2)
-    _subSteps = getattr(config, 'smoothingSteps', 0)
+    _subSteps = getattr(config, "smoothingSteps", 0)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:
@@ -1740,5 +1771,6 @@ def runWork():
         if not config.standAlone:
             config.callBack()
 
-def _pieceLogger(arg1,arg2=None,arg3=None):
+
+def _pieceLogger(arg1, arg2=None, arg3=None):
     return True

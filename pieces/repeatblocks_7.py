@@ -856,9 +856,7 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
     _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
-    _randomInserts = config.combinationSets[config.currentCombinationsetIndex].randomInsertions
-    _randomInsertionProb = config.combinationSets[config.currentCombinationsetIndex].randomInsertionProbabilitly
-    _randomInsertionMax = config.combinationSets[config.currentCombinationsetIndex].randomInsertionMax
+
 
     # due to normal distribution this kind of favors the things in the middle of the list
     # should really convert to a random choice operation rather than just numerical random
@@ -898,6 +896,8 @@ def generatePatternSequence(config):
     _tempPalette = getTempPalette(config)
     _iterCount = 0
     config.initPatternBuild = True
+    config.randomInsertionCount = 0
+    config.consecutivePatternChoiceCount = 0
     
 
     _combo = config.combinationSets[config.currentCombinationsetIndex]
@@ -907,6 +907,8 @@ def generatePatternSequence(config):
     config.polyOverlayMode = _combo.polyOverlayMode
     config.tileOverlayGridProb = _combo.tileOverlayGridProb
     config.patternsInBands = _combo.patternsInBands
+
+    _combo.randomInsertionProbabilitly = _combo.randomInsertionInitialProbabilitly
 
     _randomInserts = _combo.randomInsertions
     _randomInsertionProb = _combo.randomInsertionProbabilitly

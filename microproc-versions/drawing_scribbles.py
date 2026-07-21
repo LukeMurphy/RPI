@@ -272,7 +272,7 @@ def setShapes():
     for _r in range(ROWS):
         for _c in range(COLS):
             _shp = shapes[_count]
-            _wd = random.uniform(4, 32)
+            _wd = random.uniform(16, 32)
             _wd2 = _wd / 2
             _rx = _c * PWIDTH / COLS + random.uniform(-_wd2, _wd2) - _r * _dd
             _ry = _r * PHEIGHT / ROWS + random.uniform(-_wd2, _wd2) - _c * _dd
@@ -359,8 +359,8 @@ brightness = 0.9
 penBrightness = 0.9
 numPalettes = 6
 
-startNewLineProb = 0.25
-eraseProb = 0.5
+startNewLineProb = 0.02
+eraseProb = 0.005
 changePaletteProb = 0.925
 probPanelBlockChangesColor = 0.01
 probLineChangesColor = 0.005
@@ -380,7 +380,7 @@ OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
 penMark.name = "scribbleLine1"
 penMark.linesToDrawMin = 1
 penMark.linesToDrawMax = 4
-penMark.timeDelayBeforeDrawingAgain = 5
+penMark.timeDelayBeforeDrawingAgain = 8
 penMark.probDarkBG = 0.025
 penMark.bgColorSets = []
 penMark.bgBoxColorSets = []
@@ -494,3 +494,4 @@ while True:
     # Update the display
     i75.update()
     time.sleep(INTERVAL)
+

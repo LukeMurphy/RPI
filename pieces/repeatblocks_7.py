@@ -571,15 +571,10 @@ def loadAndSetupPatterns():
     loadConfigValue(config, workConfig, "movingpattern", "chanceRebuildPatternChoosesRandom", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "rebuildSlotSkipRate", 0.1, float)
     loadConfigValue(config, workConfig, "movingpattern", "rebuildSlotStartSkipRate", 0.1, float)
-
-    loadConfigValue(config, workConfig, "movingpattern", "patternModelVariations", True, bool)
     loadConfigValue(config, workConfig, "movingpattern", "patternModel", None, str)
 
     # patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
     # config.patternSequence = []
-
-    loadConfigValue(config, workConfig, "movingpattern", "patternSequenceMax", 2, int)
-    loadConfigValue(config, workConfig, "movingpattern", "patternSequenceMin", 5, int)
 
     config.rotateAltBlock = 0
 
@@ -591,7 +586,6 @@ def loadAndSetupPatterns():
     loadConfigValue(config, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "changePaletteAnytimeProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
     loadConfigValue(config, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
@@ -730,24 +724,21 @@ def loadAndSetCombinations():
 
 
 def handleChangeCurrentCominationSet():
-    pieceLogger("\n[handleChangeCurrentCominationSet] >> Checking combo set", 2)
-    disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
-    if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone:
 
+    pieceLogger("[handleChangeCurrentCominationSet] >> Checking combo set")
+    disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
+
+    if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone:
         # rather than favoring a normal distribution, use a list - getting tired of trying to game the randomness by ordering the list of palettes etc
         # config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
-
         _listOfIndecies = list(range(len(config.combinationSets)))
-
-        pieceLogger(f"[handleChangeCurrentCominationSet] >> _listOfIndecies =   {_listOfIndecies}")
         config.currentCombinationsetIndex = random.choice(_listOfIndecies)
-
         config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
         setPalette(config, config.currentPaletteIndex)
-
         # {config.combinationSets[config.currentCombinationsetIndex]}
+        # pieceLogger(f"[handleChangeCurrentCominationSet] >> _listOfIndecies =   {_listOfIndecies}")
         pieceLogger(
-            f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})\n",
+            f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})",
             2,
             True,
         )
@@ -786,6 +777,9 @@ def handleChangeCurrentCominationSet():
         handlePatternRebuild()
 
         drawAndProcessPattern()
+
+    else:
+        pieceLogger("\n[handleChangeCurrentCominationSet] >> No change")
 
 
 def resetPatternBlocks():
@@ -857,7 +851,6 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
     _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
     _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
 
-
     # due to normal distribution this kind of favors the things in the middle of the list
     # should really convert to a random choice operation rather than just numerical random
     # _patternSelected = _patterns[math.floor(random.uniform(0, len(_patterns)))]
@@ -898,7 +891,6 @@ def generatePatternSequence(config):
     config.initPatternBuild = True
     config.randomInsertionCount = 0
     config.consecutivePatternChoiceCount = 0
-    
 
     _combo = config.combinationSets[config.currentCombinationsetIndex]
     config.useBorderPattern = _combo.useBorderPattern
@@ -914,7 +906,7 @@ def generatePatternSequence(config):
     _randomInsertionProb = _combo.randomInsertionProbabilitly
     _randomInsertionMax = _combo.randomInsertionMax
 
-    pieceLogger(f"[generatePatternSequence(config)] >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}")
+    pieceLogger(f"[generatePatternSequence(config)] >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}", 2, True)
 
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount, _randomInserts, _randomInsertionProb, _randomInsertionMax
@@ -946,7 +938,6 @@ def generatePatternSequence(config):
             else:
                 config.numberOfRandomizersUsed += 1
 
-
         _position = _iterCount
         _pattern = _patternSelected
 
@@ -971,16 +962,13 @@ def generatePatternSequence(config):
         _patternBlock.rePainting = _patternSelected in ["randomizer4", "randomizer3", "randomizer2", "randomizer", "diamond"]
         _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
 
-
         # if config.randomInsertionCount < _randomInsertionMax and not _patternBlock.isBorder:
-        if config.randomInsertionCount < _randomInsertionMax :
-            if random.random() < _randomInsertionProb :
+        if config.randomInsertionCount < _randomInsertionMax:
+            if random.random() < _randomInsertionProb:
                 _patternBlock.pattern = _randomInserts[math.floor(random.uniform(0, len(_randomInserts)))]
                 # pieceLogger(f"[generatePatternSequence][add_pattern_block]===== {config.randomInsertionCount} / {_randomInsertionMax} {_patternSelected} {_randomInsertionProb}")
                 _randomInsertionProb = _combo.randomInsertionBaseProbabilitly
                 config.randomInsertionCount += 1
-
-
 
         try:
             if config.settingUpPattern:
@@ -1015,11 +1003,9 @@ def generatePatternSequence(config):
 def getTempPalette(config):
 
     if random.SystemRandom().random() > config.changePaletteWhenChangingPatternProb:
-
         return getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
 
     if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb:
-
         selectNewPalette(False)
 
     return changeSinglePalette(config.currentPaletteIndex)
@@ -1106,25 +1092,14 @@ def iterate():
     if config.comboSetDirector.advance:
         handleChangeCurrentCominationSet()
 
-    # handlePaletteChanges()
-
     updateBackgroundColor()
-
     # handleClipPlayer()
-
     drawAndProcessPattern()
-
     disturbance.handleDisturbances()
-
     handleFadingAndRebuild()
-
-    # handlePatternRebuild()
-
     disturbance.handleSectionDisturbances()
     disturbance.handleShingleVariation()
-
     drawBackgroundAndPasteImage()
-
     renderComposite()
 
     if config.saveImages:
@@ -1140,8 +1115,7 @@ def drawRepeatedPatternImage(config, canvasImage):
     for i in range(config.totalSlots):
         _patternBlock = config.patternSequence[i]
         # This sets the block image for each unit
-        if config.patternModelVariations:
-            drawBlockWithPattern(config, i)
+        drawBlockWithPattern(config, i)
 
         if _patternBlock.hasBeenPainted == False:
             drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
@@ -1210,14 +1184,6 @@ def drawBlockWithPattern(config, _counter):
 def updateBackgroundColor():
     """Updates the background color based on current palette."""
     config.bgColor = tuple(round(a * config.brightness) for a in config.c1.currentColor)
-
-
-# def handlePaletteChanges():
-#     if random.random() < config.changePaletteAnytimeProb and config.fader.fadingDone:
-#         print("selectPaletted called from handlePaletteChanges()")
-#         selectNewPalette(True)
-#         # rebuildSections()
-#         # resetCrossFader(False)
 
 
 def drawAndProcessPattern():

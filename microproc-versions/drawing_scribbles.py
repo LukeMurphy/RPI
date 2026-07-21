@@ -195,7 +195,13 @@ def drawLinePolyEnvelope(_pen):
             # print("Drawing stopped.")
             penMark.linesDrawn += 1
             _pen.drawingDone = True
-            time.sleep(random.uniform(0, penMark.timeDelayBeforeDrawingAgain))
+
+            if penMark.linesDrawn >= penMark.linesToDraw :
+                time.sleep(random.uniform(0, penMark.timeDelayBeforeDrawingAgain * 2.0))
+            else :
+                time.sleep(random.uniform(0, penMark.timeDelayBeforeDrawingAgain))
+
+
             # startUpNewLine()
 
         if random.random() < _pen.changeMarkWidthProb:
@@ -380,7 +386,7 @@ OutlineG = display.create_pen_hsv(outLineClr.h, outLineClr.s, outLineClr.v)
 penMark.name = "scribbleLine1"
 penMark.linesToDrawMin = 1
 penMark.linesToDrawMax = 4
-penMark.timeDelayBeforeDrawingAgain = 8
+penMark.timeDelayBeforeDrawingAgain = 11
 penMark.probDarkBG = 0.025
 penMark.bgColorSets = []
 penMark.bgBoxColorSets = []

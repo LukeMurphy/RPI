@@ -44,9 +44,10 @@ def setPalette(arg, penMark):
             (10 / 360, 18 / 360, 0.5, 0.50, 0.95, 0.99, 0, 0),
             (10 / 360, 18 / 360, 0.25, 0.350, 0.95, 0.99, 0, 0),
             (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
+            (10 / 360, 20 / 360, 0.5, 0.750, 0.25, 0.49, 0, 0),
         ]
-        penMark.linesToDrawMin = 1
-        penMark.linesToDrawMax = 3
+        penMark.linesToDrawMin = 3
+        penMark.linesToDrawMax = 6
         penMark.timeDelayBeforeDrawingAgain = 9
         penMark.loopsMin = 1
         penMark.loopsMax = 3
@@ -70,7 +71,7 @@ def setPalette(arg, penMark):
             [40 / 360, 180 / 360, 0.1, 0.4, 0.5 * _brt, 1.0 * _brt],
         ]
         penMark.penColorSets = [[350 / 360, 5 / 360, 0.9, 1.0, 0.1, 0.4], [356 / 360, 5 / 360, 0.99, 1.0, 0.1, 0.4]]
-        penMark.linesToDrawMin = 2
+        penMark.linesToDrawMin = 3
         penMark.linesToDrawMax = 5
         penMark.timeDelayBeforeDrawingAgain = 3
         penMark.loopsMax = 4
@@ -109,8 +110,8 @@ def setPalette(arg, penMark):
         penMark.bgColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7 * _brt, 0.9 * _brt]]
         penMark.bgBoxColorSets = [[335 / 360, 345 / 360, 0.7, 1.0, 0.7 * _brt, 0.9 * _brt], [335 / 360, 350 / 360, 0.9, 1.0, 0.7 * _brt, 0.9 * _brt]]
         penMark.penColorSets = [[330 / 360, 355 / 360, 0.60, 1.0, 0.30, 1.0], [340 / 360, 40 / 360, 0.9, 1.0, 0.3, 0.950]]
-        penMark.linesToDrawMin = 1
-        penMark.linesToDrawMax = 3
+        penMark.linesToDrawMin = 2
+        penMark.linesToDrawMax = 5
         penMark.timeDelayBeforeDrawingAgain = 3
         penMark.loopsMin = 1
         penMark.loopsMax = 4
@@ -132,8 +133,8 @@ def setPalette(arg, penMark):
         penMark.bgColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt]]
         penMark.bgBoxColorSets = [[335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt], [335 / 360, 345 / 360, 0.1, 0.10, 0.2 * _brt, 0.9 * _brt]]
         penMark.penColorSets = [[330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0], [330 / 360, 355 / 360, 0.01, 0.1, 0.10, 1.0]]
-        penMark.linesToDrawMax = 5
         penMark.linesToDrawMin = 1
+        penMark.linesToDrawMax = 5
         penMark.timeDelayBeforeDrawingAgain = 5
         penMark.loopsMin = 1
         penMark.loopsMax = 4
@@ -166,8 +167,8 @@ def setPalette(arg, penMark):
             [0 / 230, 5 / 360, 0.50, 0.60, 0.10, 0.30],
             [0 / 230, 5 / 360, 0.0, 0.0, 0.0, 0.0030],
         ]
-        penMark.linesToDrawMax = 7
         penMark.linesToDrawMin = 3
+        penMark.linesToDrawMax = 7
         penMark.timeDelayBeforeDrawingAgain = 2
         penMark.loopsMin = 2
         penMark.loopsMax = 4

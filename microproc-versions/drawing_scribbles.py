@@ -449,10 +449,14 @@ while True:
     if random.random() < eraseProb and panelBGBlockCount == 0 and penMark.linesDrawn >= penMark.linesToDraw:
         if gc.mem_free() < 3000:
             gc.collect()
+
         if random.random() < changePaletteProb:
             arg = math.floor(random.uniform(0, numPalettes))
             # print(f"setting to palette {arg}")
+            if random.random()<.75 :
+                arg = math.floor(random.uniform(0, numPalettes-1))
             drawing_scribbles_setpalette.setPalette(arg, penMark)
+
         setColor(fgClr, penMark.bgBoxColorSets)
         ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
         outLineClr.h = random.uniform(210 / 360, 240 / 360)

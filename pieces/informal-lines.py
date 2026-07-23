@@ -421,8 +421,8 @@ def updateLines():
         _lineUnit: InformalLine
         _lineUnit = config.informalLineUnits[_informalLineUnitIndex]
         if _lineUnit.lineType == 0:
-            # _lineUnit.drawTheLineComplete()
-            _lineUnit.drawLinePoints()
+            _lineUnit.drawTheLineComplete()
+            # _lineUnit.drawLinePoints()
         if _lineUnit.lineType == 1:
             _lineUnit.drawTheLineComplete()
 

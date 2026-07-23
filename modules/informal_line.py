@@ -391,17 +391,17 @@ class InformalLine:
         _p1 = [pointsToDraw[0][0], pointsToDraw[0][1]]
         _p2 = [pointsToDraw[1][0], pointsToDraw[1][1]]
 
-        _maxX = 0
-        _maxY = 0
-        _minX = 0
-        _minY = 0
+        # _maxX = 0
+        # _maxY = 0
+        # _minX = 0
+        # _minY = 0
 
-        for _row in pointsToDraw:
-            if _row[0] > _maxX : _maxX = _row[0]
-            if _row[1] > _maxY : _maxY = _row[1]
-            if _row[0] < _minX : _minX = _row[0]
-            if _row[1] < _minY : _minY = _row[1]
-        # self.draw.rectangle((_minX, _minY, _maxX, _maxY),fill=None, outline=(0,0,0,100))
+        # for _row in pointsToDraw:
+        #     if _row[0] > _maxX : _maxX = _row[0]
+        #     if _row[1] > _maxY : _maxY = _row[1]
+        #     if _row[0] < _minX : _minX = _row[0]
+        #     if _row[1] < _minY : _minY = _row[1]
+        # self.draw.rectangle((_minX, _minY, _maxX, _maxY),fill=(0,0,0,1), outline=None)
         # self.draw.rectangle((_minX, _minY, _minX + 2, _minY + 2),fill=(255,0,0,100))
 
         for pt in pointsToDraw:

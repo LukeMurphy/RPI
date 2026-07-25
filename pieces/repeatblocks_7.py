@@ -4,7 +4,6 @@ import random
 import time
 import configparser
 
-# from shapely import length
 from modules.configuration import pieceLogger
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 from modules.movieClip import movieClip

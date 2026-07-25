@@ -5,14 +5,12 @@ import configparser
 import re
 from tkinter import NO
 
-from matplotlib.pylab import rand
 from matplotlib.pyplot import pie
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageChops
 
 # from scipy.spatial import Voronoi
 from scipy.interpolate import splprep, splev
-from shapely import length  # For spline interpolation
 from modules.holder_director import Director
 from modules.configuration import pieceLogger
 from modules import colorutils

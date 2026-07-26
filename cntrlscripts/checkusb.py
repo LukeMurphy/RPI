@@ -7,12 +7,12 @@ import time
 # ---------------------------- #
 machineName = "daemon116"
 availablePieces = [
-    "staging/p2.5-informal-384x320/hashing-marks-v3-minimals.cfg",
-    "staging/p2.5-informal-384x320/repeatblocks-v7.cfg",
-    "staging/p2.5-informal-384x320/actionmarks-v3_1_c.cfg"]
+    "prod/p2.5-informal-384x320/hashing-marks-v3-minimals.cfg",
+    "prod/p2.5-informal-384x320/repeatblocks-v7.cfg",
+    "prod/p2.5-informal-384x320/actionmarks-v3_1_c.cfg"]
 
 pieceNames = ["hashing-marks","repeat-blocks","action-marks"]
-timeToCheck = 5
+timeToCheck = 10
 # ---------------------------- #
 base = f"/home/{machineName}/Documents/"
 usbPath = f"/media/{machineName}/CONTROLLER"
@@ -48,8 +48,9 @@ def runScript(arg="startup"):
                 with open(f"{base}startart.sh","w") as file :
                     file.write(f"{launchString}{cfg_rel} &")
                 time.sleep(5)
-                timeToCheck = 60
-            os.system(f"umount {usbPath}")
+                timeToCheck = 15
+            os.system(f"echo admin000 | sudo -S umount {usbPath}")
+            os.system("echo admin000 | sudo -S udisksctl power-off -b /dev/sda1")
             time.sleep(5)
             runScript("cron")
         else :

@@ -34,8 +34,11 @@ class CanvasElement:
 
 	def setUp(self):
 		self.config.renderImage = Image.new(
-			"RGBA", (self.config.screenWidth * self.config.rows, 32)
+			"RGBA", (self.config.screenWidth, self.config.screenHeight)
 		)
+		# self.config.renderImage = Image.new(
+		# 	"RGBA", (self.config.screenWidth * self.config.rows, 32)
+		# )
 		self.config.renderImageFull = Image.new(
 			"RGBA", (self.config.screenWidth, self.config.screenHeight)
 		)

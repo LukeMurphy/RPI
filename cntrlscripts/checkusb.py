@@ -12,7 +12,7 @@ availablePieces = [
     "prod/p2.5-informal-384x320/actionmarks-v3_1_c.cfg"]
 
 pieceNames = ["hashing-marks","repeat-blocks","action-marks"]
-timeToCheck = 10
+timeToCheck = 15
 # ---------------------------- #
 base = f"/home/{machineName}/Documents/"
 usbPath = f"/media/{machineName}/CONTROLLER"
@@ -27,7 +27,11 @@ _playingIndex = -1
 def runScript(arg="startup"):
     global timeToCheck,_playingIndex
     try:
-        res = os.system(f"ls {usbPath}")
+        res = -1
+        if os.path.exists(f"{usbPath}"):
+             res = 0
+        #res = os.system(f"if [ -d {usbPath} ]; then echo 0; fi;")
+        #res = os.system(f"ls {usbPath}")
         refresh = False
         if res == 0 :
             with open(playlistFile) as file:
@@ -48,6 +52,8 @@ def runScript(arg="startup"):
                 with open(f"{base}startart.sh","w") as file :
                     file.write(f"{launchString}{cfg_rel} &")
                 time.sleep(5)
+                # can reset the time to check if you think people will
+                # not want to swap pieces more often in one session
                 timeToCheck = 15
             os.system(f"echo admin000 | sudo -S umount {usbPath}")
             os.system("echo admin000 | sudo -S udisksctl power-off -b /dev/sda1")

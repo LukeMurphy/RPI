@@ -6,11 +6,9 @@ import math
 from noise import *
 from PIL import Image, ImageDraw
 from modules import colorutils, panelDrawing
-from modules import pattern_blocks_v5
 from modules.holder_director import Director
 from modules.configuration import bcolors, pieceLogger
 from modules.informal_line import InformalLine
-from pieces import repeatblocks_5
 from pieces.screen import Holder
 
 # -------- Util Functions   -------------- #

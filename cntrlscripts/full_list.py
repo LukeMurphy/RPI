@@ -363,9 +363,6 @@ def returnFirstElement(arg):
     return arg[0]
 
 
-# Generate list of configs:
-
-
 def returnSecondElement(arg):
     return arg[1]
 
@@ -379,6 +376,8 @@ def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
         fullList.sort(key=returnSecondElement, reverse=True)
     else:
         fullList.sort(key=returnFirstElement, reverse=False)
+
+    # print(fullList)
 
     actionDict1 = _create_action_dict(fullList, dateSort, configPath)
 
@@ -508,13 +507,13 @@ sortbutton3 = Button(root,text="Sort by Folder+",width=120,bg=_defaultClr,fg="wh
 sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
 # -------------------------------- #
-ondeckButton = Button(root, text="studio", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("studio"))
+ondeckButton = Button(root, text="studio", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("base-controlled",False, True))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 
-ondeckButton = Button(root, text="Staging", width=120, bg=_stagingColor, fg="#000000", borderless=1, command=lambda: ondeck("staging"))
+ondeckButton = Button(root, text="Staging", width=120, bg=_stagingColor, fg="#000000", borderless=1, command=lambda: ondeck("staging", False))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 
-prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda: ondeck("prod"))
+prodButton = Button(root, text="Production", width=120, bg=_prodColor, fg="#000000", borderless=1, command=lambda: ondeck("prod", False))
 prodButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 175)
 
 devButton = Button(root, text="Dev", width=120, bg=_devClr, fg="#000000", borderless=1, command=lambda: ondeck("dev"))

@@ -428,7 +428,7 @@ def _update_listbox(ListBoxOfConfigs, item):
     ListBoxOfConfigs.itemconfig(END, bg=_stagingColor if "staging" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devClr if "dev/" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_devFormsClr if "forms" in key else None)
-    ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "dev_ondeck" in key else None)
+    ListBoxOfConfigs.itemconfig(END, bg=_devOnDeckClr if "studio" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_screenGridClr if "screen_grid" in key else None)
     ListBoxOfConfigs.itemconfig(END, bg=_reference if "reference-configs" in key else None)
 
@@ -508,7 +508,7 @@ sortbutton3 = Button(root,text="Sort by Folder+",width=120,bg=_defaultClr,fg="wh
 sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
 # -------------------------------- #
-ondeckButton = Button(root, text="non-working", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("non_working"))
+ondeckButton = Button(root, text="studio", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("studio"))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 
 ondeckButton = Button(root, text="Staging", width=120, bg=_stagingColor, fg="#000000", borderless=1, command=lambda: ondeck("staging"))

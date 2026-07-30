@@ -104,137 +104,6 @@ def verify():
     return (process, configSelected)
 
 
-'''
-# --------------------------------------------------------------------- #
-from multiprocessing.managers import BaseManager
-
-class _SharedList:
-    def __init__(self):
-        self._data = []
-
-    def get_all(self):
-        # print(f"[server] get_all id(self)={id(self)} data={self._data}", flush=False)
-        return list(self._data)
-    
-    def append(self, item):
-        self._data.append(item)
-        print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
-
-    def setListValue(self, item):
-        self._data.append(item)
-        print(f"[server] append id(self)={id(self)} data now={self._data}", flush=True)
-
-    def clear(self):
-        self._data.clear()
-
-class _SharedDict:
-    def __init__(self):
-        self._data = {}
-
-    def get_all(self):
-        return dict(self._data)
-
-    def set(self, key, value):
-        print(f"..[server] setting {key} {value}")
-        self._data[key] = value
-
-    def get(self, key, default=None):
-        return self._data.get(key, default)
-
-    def clear(self):
-        self._data.clear()
-
-_shared_state = _SharedList()
-_shared_dict = _SharedDict()
-
-def _shared_dict_factory():
-    return _shared_dict
-
-def _shared_list_factory():
-    return _shared_state
-
-class localManager(BaseManager):
-    pass
-
-localManager.register('sharedlist', callable=_shared_list_factory, exposed=['get_all', 'append', 'clear','setListValue'])
-localManager.register('shareddict', callable=_shared_dict_factory, exposed=['get_all', 'set', 'get', 'clear'])
-
-manager = localManager(address=('127.0.0.1', 50000), authkey=b'secret')
-_manager_server = manager.get_server()
-
-threading.Thread(target=_manager_server.serve_forever, daemon=True).start()
-manager.connect()
-
-_sharedlist = manager.sharedlist()
-_sharedlist.append("SERVER_INIT")
-
-_shareddict = manager.shareddict()
-
-_shareddict.set("bg", "")
-_shareddict.set("cmd", "")
-_shareddict.set("p1Change", False)
-_shareddict.set("p2Change", False)
-_shareddict.set("p3Change", False)
-_shareddict.set("p4Change", False)
-
-# --------------------------------------------------------------------- #
-
-def send_to_piece(msg: dict):
-    if not running_procs:
-        log_message("[no running pieces]")
-        return
-    for cfg, proc in list(running_procs.items()):
-        if proc.poll() is None:
-            proc.stdin.write(json.dumps(msg) + "\n")
-            proc.stdin.flush()
-            label = cfg.split(configPath)[1] if configPath in cfg else cfg
-            log_message(f"[sent to {label}] {msg}")
-
-
-# def poll_pieces():
-#     # print("polling...")
-#     # print(running_procs.items())
-#     for cfg, proc in list(running_procs.items()):
-#         # log_message(proc.stdout)
-#         if proc.poll() is not None:
-#             log_message(f"[stopped] {cfg.split(configPath)[1]}")
-#             del running_procs[cfg]
-#             continue
-#         ready, _, _ = select.select([proc.stdout], [], [], 0)
-#         if ready:
-#             line = proc.stdout.readline()
-#             if line:
-#                 log_message(f"[piece] {line.rstrip()}")
-    # root.after(100, poll_pieces)
-
-
-
-
-def send_typed_message():
-    raw = MsgEntry.get().strip()
-    # if not raw:
-    #     return
-    # try:
-    #     msg = json.loads(raw)
-    # except json.JSONDecodeError:
-    #     msg = {"cmd": raw}
-    # send_to_piece(msg)
-    # MsgEntry.delete(0, END)
-
-    # _sharedlist.append(raw)
-    # print(f"[sent] {raw} → list now: {_sharedlist.get_all()}", flush=True)
-
-    if raw in ["red","rnd"] :
-        _shareddict.set("bg", raw)
-    if raw in ["reset"] :
-        _shareddict.set("p1Change", False)
-        _shareddict.set("p2Change", False)
-        _shareddict.set("p3Change", False)
-        _shareddict.set("p4Change", False)
-        _shareddict.set("bg", "")
-
-# --------------------------------------------------------------------- #
-'''
 def log_message(text):
     print(f">> {text}")
     # MsgLog.config(state="normal")
@@ -263,16 +132,15 @@ def execute(configToRun):
         else:
             cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
 
-
         # with Manager() as manager:
         #     shared_list = manager.list()
         #     shared_dict = manager.dict()
 
-        # proc = subprocess.Popen(cmd, 
-        #                         stdin=subprocess.PIPE, 
-        #                         stdout=subprocess.PIPE, 
-        #                         stderr=subprocess.STDOUT, 
-        #                         text=True, 
+        # proc = subprocess.Popen(cmd,
+        #                         stdin=subprocess.PIPE,
+        #                         stdout=subprocess.PIPE,
+        #                         stderr=subprocess.STDOUT,
+        #                         text=True,
         #                         bufsize=1)
 
         proc = subprocess.Popen(cmd, text=True, bufsize=1)
@@ -323,7 +191,7 @@ def action2():
 
 
 def clear():
-    Txt.delete("1.0", "1.20")
+    SearchField.delete("1.0", "1.20")
 
 
 def stopAll():
@@ -333,12 +201,12 @@ def stopAll():
 
 
 def sortByDate():
-    filterText = Txt.get("1.0", "end-1c")
+    filterText = SearchField.get("1.0", "end-1c")
     getAllConfigFiles(True, False, filterText)
 
 
 def sortByFolder():
-    filterText = Txt.get("1.0", "end-1c")
+    filterText = SearchField.get("1.0", "end-1c")
     getAllConfigFiles(False, False, filterText)
 
 
@@ -356,6 +224,9 @@ def openFile():
 
 
 def ondeck(arg, _dateSort=True, _subsortDate=True):
+
+    SearchField.delete("1.0", "1.20")
+    SearchField.insert("1.0",arg)
     getAllConfigFiles(dateSort=_dateSort, subsortDate=_subsortDate, filterText=arg)
 
 
@@ -369,6 +240,8 @@ def returnSecondElement(arg):
 
 def getAllConfigFiles(dateSort=False, subsortDate=False, filterText=""):
     global actionDict1, ListBoxOfConfigs, configPath
+
+
 
     fullList = _get_config_files(configPath, filterText)
 
@@ -408,13 +281,13 @@ def _create_action_dict(fullList, dateSort, configPath):
     lastDir = ""
     for f in fullList:
         if f:
-            tsTxt = datetime.datetime.fromtimestamp(f[1]).strftime("%Y-%m-%d [%H:%M]")
+            tsSearchField = datetime.datetime.fromtimestamp(f[1]).strftime("%Y-%m-%d [%H:%M]")
             currentDir = os.path.dirname(f[0].split(configPath)[1]).lstrip("/")
             if currentDir != lastDir and not dateSort:
                 actionDict.append({"": ""})
                 lastDir = currentDir
-            actionDict.append({f"{tsTxt}\t{f[2]}\t\t [{currentDir}]": f[0]})
-            # actionDict.append({f"{tsTxt}\t\t{currentDir} \t\t\t\t \t\t\t\t{f[2]}": f[0]})
+            actionDict.append({f"{tsSearchField}\t{f[2]}\t\t [{currentDir}]": f[0]})
+            # actionDict.append({f"{tsSearchField}\t\t{currentDir} \t\t\t\t \t\t\t\t{f[2]}": f[0]})
         else:
             actionDict.append({"": ""})
     return actionDict
@@ -461,8 +334,8 @@ root.config(bg="white")
 ListBoxOfConfigs = Listbox(root, width=110, height=42, bg="white", foreground="black", bd=False)
 
 # for item in actionDict1:
-    # ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
-    # ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
+# ListBoxOfConfigs.insert(END, f" {list(item.keys())[0]}")
+# ListBoxOfConfigs.itemconfig(END, {"bg": "red"})
 
 ListBoxOfConfigs.place(bordermode=OUTSIDE, x=2, y=14)
 
@@ -479,7 +352,14 @@ leftBtnPlace = 725
 sortDefault = 1
 
 # -------------------------------- #
-slogan = Button(root,text="Stop & Run",width=120,bg=_stopAndRun,fg="white",borderless=1,command=action2,
+slogan = Button(
+    root,
+    text="Stop & Run",
+    width=120,
+    bg=_stopAndRun,
+    fg="white",
+    borderless=1,
+    command=action2,
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace)
 
@@ -488,26 +368,54 @@ slogan = Button(root, text="Run", width=120, bg=_stopAndRun, fg="white", borderl
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 25)
 
 # -------------------------------- #
-openbutton = Button(root,text="Open",width=120,bg=_defaultClr,fg="white",borderless=1,command=openFile,
+openbutton = Button(
+    root,
+    text="Open",
+    width=120,
+    bg=_defaultClr,
+    fg="white",
+    borderless=1,
+    command=openFile,
 )
 openbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 50)
 
 # -------------------------------- #
-sortbutton1 = Button(root,text="Sort By Date",width=120,bg=_defaultClr,fg="white",borderless=1,command=sortByDate,
+sortbutton1 = Button(
+    root,
+    text="Sort By Date",
+    width=120,
+    bg=_defaultClr,
+    fg="white",
+    borderless=1,
+    command=sortByDate,
 )
 sortbutton1.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 75)
 
 # -------------------------------- #
-sortbutton2 = Button(root,text="Sort by Folder",width=120,bg=_defaultClr,fg="white",borderless=1,command=sortByFolder,
+sortbutton2 = Button(
+    root,
+    text="Sort by Folder",
+    width=120,
+    bg=_defaultClr,
+    fg="white",
+    borderless=1,
+    command=sortByFolder,
 )
 sortbutton2.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 100)
 
-sortbutton3 = Button(root,text="Sort by Folder+",width=120,bg=_defaultClr,fg="white",borderless=1,command=sortByFolderAndDate,
+sortbutton3 = Button(
+    root,
+    text="Sort by Folder+",
+    width=120,
+    bg=_defaultClr,
+    fg="white",
+    borderless=1,
+    command=sortByFolderAndDate,
 )
 sortbutton3.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 150)
 # -------------------------------- #
 # -------------------------------- #
-ondeckButton = Button(root, text="studio", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("base-controlled",False, True))
+ondeckButton = Button(root, text="base-controlled", width=120, bg=_devOnDeckClr, fg="#000000", borderless=1, command=lambda: ondeck("base-controlled", False, True))
 ondeckButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 125)
 
 ondeckButton = Button(root, text="Staging", width=120, bg=_stagingColor, fg="#000000", borderless=1, command=lambda: ondeck("staging", False))
@@ -523,7 +431,14 @@ refButton = Button(root, text="Reference", width=120, bg=_reference, fg="#000000
 refButton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 225)
 
 # -------------------------------- #
-slogan = Button(root,text="Stop All",width=120,bg=_stopAllClr,fg="white",borderless=1,command=stopAll,
+slogan = Button(
+    root,
+    text="Stop All",
+    width=120,
+    bg=_stopAllClr,
+    fg="white",
+    borderless=1,
+    command=stopAll,
 )
 slogan.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 250)
 
@@ -534,17 +449,24 @@ quitbutton.place(bordermode=OUTSIDE, x=leftBtnPlace, y=topBtnPlace + 275)
 
 # -------------------------------- #
 # Filter text box
-Txt = Text(root, height=1, width=32, bg="white", fg="black", bd=False, padx=4, pady=4)
-Txt.place(bordermode=OUTSIDE, x=2, y=2)
-clearButton = Button(root,text="Clear",width=120,bg=_defaultClr,fg="white",borderless=True,command=clear,
+SearchField = Text(root, height=1, width=32, bg="white", fg="black", bd=False, padx=4, pady=4)
+SearchField.place(bordermode=OUTSIDE, x=2, y=2)
+
+clearButton = Button(
+    root,
+    text="Clear",
+    width=120,
+    bg=_defaultClr,
+    fg="white",
+    borderless=True,
+    command=clear,
 )
 clearButton.place(bordermode=OUTSIDE, x=280, y=2)
 
 # -------------------------------- #
 
 
-
-'''
+"""
 # -------------------------------- #
 # Message log + send box (below the main list)
 # MsgLog = Text(root, height=5, width=110, bg="#111111", fg="#00ff88", bd=False, padx=4, pady=4, state="disabled")
@@ -556,10 +478,7 @@ MsgEntry.bind("<Return>", lambda _e: send_typed_message())
 
 sendButton = Button(root, text="Send", width=80, bg=_defaultClr, fg="white", borderless=1, command=send_typed_message)
 sendButton.place(bordermode=OUTSIDE, x=600, y=5)
-'''
-
-
-
+"""
 
 
 # sort by date = True,

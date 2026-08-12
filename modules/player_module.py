@@ -1,22 +1,14 @@
 #!/usr/bin/python
-# import modules
-import configparser
-import datetime
-import getopt
+
 import importlib
-import math
-import os
 import random
-import sys
-import textwrap
 import time
 import threading
 
 import PIL.Image
-from modules import configuration, panelDrawing
 from modules.configuration import bcolors
 from modules.configuration import pieceLogger
-from PIL import Image, ImageChops, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 """
 import gc
@@ -57,9 +49,7 @@ class TopDirector:
 
 def _configure_ReMapping(config, workconfig):
     """Configures image remapping settings."""
-
-    
-
+  
     try:
         _initialBlockSectionRemapping(workconfig, config)
     except Exception as e:
@@ -200,7 +190,6 @@ def _specialShiftBlockRemapping(workconfig, config):
             setattr(config, f"remapImageBlockShift{_suff}StableSection", _remapImageBlockShiftStableSection)
 
 
-
 def _initialBlockSectionRemapping(workconfig, config):
     config.remapImageBlock = workconfig.getboolean("displayconfig", "remapImageBlock")
     config.remapImageBlockSection = workconfig.get("displayconfig", "remapImageBlockSection").split(",")
@@ -210,7 +199,6 @@ def _initialBlockSectionRemapping(workconfig, config):
     config.filterRemap = True
     
     
-
 def configure(config, workconfig):
     """Configures the player based on the provided configuration."""
     global path, tempImage, threads, thrd
@@ -261,7 +249,6 @@ def _configure_pixelsort(config, workconfig):
     config.brightnessVarLow = float(workconfig.get("displayconfig", "brightnessVarLow", fallback=0.8))
     config.brightnessVarHi = float(workconfig.get("displayconfig", "brightnessVarHi", fallback=1.0))
     config.pixelSortAppearanceProb = float(workconfig.get("displayconfig", "pixelSortAppearanceProb", fallback=1.0))
-
 
 
 def _configure_image_offsets(config, workconfig):

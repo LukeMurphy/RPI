@@ -1,11 +1,11 @@
+import time
+
 ################################
 # This file exists to create
 # an empty configuration object
 ################################
 
 # from sys import exception
-
-
 screenWidth = 128
 screenHeight = 64
 
@@ -18,9 +18,7 @@ path = "/home/pi"
 useMassager = False
 brightness = 1
 transWiring = True
-
 # global imageTop,imageBottom,image,config,transWiring
-
 
 def configuration():
     pass
@@ -91,6 +89,83 @@ class ArtWorkConfig:
     useMassager = False
     brightness = 1
     transWiring = True
+    isRPI = False
+
+    rotation = 0
+    fullRotation = True
+    rotationTrailing = False
+
+    checkForConfigChanges = True
+    doFullReloadOnChange = True
+
+    tileSizeHeight = 32
+    tileSizeWidth = 64
+    matrixTiles = 48
+    rows = 7
+    cols = 4
+
+    # ---  Also determines the window geometry
+    screenWidth = 256
+    screenHeight = 256
+
+    # ---  preparing for rotation
+    windowWidth = 256
+    windowHeight = 256
+
+    canvasWidth = 256
+    canvasHeight = 256
+
+    canvasOffsetX = 3
+    canvasOffsetY = 3
+
+    # Window Offset
+    windowXOffset = 50
+    windowYOffset = 374
+
+    brightness =  1.0
+    minBrightness = 0
+
+    useFilters = False
+    ditherfilterbrightness = 1.0
+
+    remapImageBlock = False
+    remapImageBlockSection = [0,0,256,256]
+    remapImageBlockDestination = [0,0]
+    remapImageBlockSectionRotation = 0
+
+    remapImageBlock2 = False
+    remapImageBlockSection2 = [0,220,160,256]
+    remapImageBlockDestination2 = [1,220]
+    remapImageBlockSection2Rotation = 1
+
+    remapImageBlock3 = False
+    remapImageBlockSection3 = [224,0,256,384]
+    remapImageBlockDestination3 = [0,0]
+    remapImageBlockSection3Rotation = 0
+
+    remapImageBlock4 = False
+    remapImageBlockSection4 = [224,0,256,384]
+    remapImageBlockDestination4 = [0,0]
+    remapImageBlockSection4Rotation = 0
+
+    remapImageBlock5 = False
+    remapImageBlockSection5 = [224,0,256,384]
+    remapImageBlockDestination5 = [0,0]
+    remapImageBlockSection5Rotation = 0
+
+
+    startTime = time.time()
+    currentTime = time.time()
+    doingReload = False
+    brightnessOverride = None
+    standAlone = True
+    isRunning = True
+    useDrawingPoints = False
+    reloadConfig = False
+    checkForConfigChanges = False
+    noWindowChrome = False
+
+
 
     ## These are used in the filter effect filters.py
     lev = 0

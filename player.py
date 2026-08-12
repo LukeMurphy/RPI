@@ -16,21 +16,9 @@ from modules import configuration, player_module
 from modules.configuration import bcolors
 from modules.configuration import pieceLogger
 
-# from PIL import (
-# 	Image,
-# 	ImageChops,
-# 	ImageDraw,
-# 	ImageEnhance,
-# 	ImageFilter,
-# 	ImageFont,
-# 	ImageOps,
-# )
-
-
 workconfig = configparser.ConfigParser()
 
 """
-
 Command line start of any piece:
 example:
 
@@ -38,8 +26,9 @@ python player.py -cfg p4-6x5/stroop2
 python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
 
 python3 player.py -path ./ -cfg __in_progress/p8_particles_sparkles&
-
 """
+
+##########################################################################
 
 parser = argparse.ArgumentParser(description="Process")
 parser.add_argument("-mname", type=str, default="local", help="machine name (optional)")
@@ -64,26 +53,20 @@ args = parser.parse_args()
 
 pieceLogger("[player] >> Inital Player Arguments: \n" + str(args),3)
 
-
-
-
 # Create a blank dummy object container for now
 # config = type('', (object,), {})()
 
 ##########################################################################
 #
-#
 # -------   Reads configuration files and sets defaults
 # -------   Piece is initiated by command line: e.g.
 # sudo python /Users/lamshell/Documents/Dev/LED-MATRIX-RPI/RPI/player.py studio-mac ./ configs/fludd.cfg &
-#
 #
 ##########################################################################
 
 
 def loadFromArguments(reloading=False, config=None):
-    """Summary
-
+    """
     Args:
         reloading (bool, optional): Description
         config (None, optional): Description
@@ -117,17 +100,6 @@ def _initializeConfiguration(loadFromArguments):
     # print(args)
 
     config = configuration.ArtWorkConfig("BASE PLAYER CONFIGS")
-    config.startTime = time.time()
-    config.currentTime = time.time()
-    config.doingReload = False
-    config.brightnessOverride = None
-    config.standAlone = True
-    config.isRunning = True
-    config.useDrawingPoints = False
-    config.reloadConfig = False
-    config.checkForConfigChanges = False
-    config.noWindowChrome = False
-    # Load the default work
 
     if args.cfg is not None:
         _parseArgs(config, loadFromArguments)

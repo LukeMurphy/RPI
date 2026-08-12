@@ -8,27 +8,27 @@ from PIL import Image, ImageFilter
 
 from modules.holder_director import Holder
 from modules.configuration import pieceLogger
-config = None
-workConfig = None
+_config = None
+_workConfig = None
 
 
 def init(cfg, wCfg):
-    global config, workConfig
-    config = cfg
-    workConfig = wCfg
+    global _config, _workConfig
+    _config = cfg
+    _workConfig = wCfg
 
 
 # --------------------- WAVE DEFORMER CLASS ---------------------
 
 class WaveDeformer:
     def transform(self, x, y):
-        y = y + config.waveAmplitude * math.sin((x + config.waveDeformXPos) / config.wavePeriodMod) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
-        config.waveAmplitude += config.waveAmplitudeSpeed
+        y = y + _config.waveAmplitude * math.sin((x + _config.waveDeformXPos) / _config.wavePeriodMod) * noise.pnoise2(math.sin(x), y / _config.pNoiseMod)
+        _config.waveAmplitude += _config.waveAmplitudeSpeed
 
-        if config.waveAmplitude > config.waveAmplitudeMax:
-            config.waveAmplitudeSpeed *= -1
-        if config.waveAmplitude < config.waveAmplitudeMin:
-            config.waveAmplitudeSpeed *= -1
+        if _config.waveAmplitude > _config.waveAmplitudeMax:
+            _config.waveAmplitudeSpeed *= -1
+        if _config.waveAmplitude < _config.waveAmplitudeMin:
+            _config.waveAmplitudeSpeed *= -1
 
         return x, y
 
@@ -44,10 +44,10 @@ class WaveDeformer:
         self.w, self.h = img.size
 
         target_grid = [
-            (x, y, x + config.wavegridspace, y + config.wavegridspace)
+            (x, y, x + _config.wavegridspace, y + _config.wavegridspace)
             for x, y in itertools.product(
-                range(0, self.w, config.wavegridspace),
-                range(0, self.h, config.wavegridspace),
+                range(0, self.w, _config.wavegridspace),
+                range(0, self.h, _config.wavegridspace),
             )
         ]
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
@@ -59,132 +59,134 @@ class WaveDeformer:
 # loads the disturbance configs and calls the disturbance
 # setup functions
 def setupDisturbances():
+    print(f"Setting up disturbances {_config}")
 
     try:
-        config.transformShape = workConfig.getboolean("movingpattern", "transformShape")
-        transformTuples = workConfig.get("movingpattern", "transformTuples").split(",")
-        config.transformTuples = tuple(float(i) for i in transformTuples)
+        _config.transformShape = _workConfig.getboolean("movingpattern", "transformShape")
+        transformTuples = _workConfig.get("movingpattern", "transformTuples").split(",")
+        _config.transformTuples = tuple(float(i) for i in transformTuples)
     except Exception as e:
-        print(e)
-        config.transformShape = False
+        print(f"Error: setupDisturbance: {e}")
+        _config.transformShape = False
     # end try
 
     try:
         setWaveDistortionParams()
     except Exception as e:
         print(e)
-        config.useWaveDistortion = False
+        _config.useWaveDistortion = False
 
-    config.sectionDisturbance = workConfig.getboolean("movingpattern", "sectionDisturbance")
-    config.doSectionDisturbance = False
-    config.disturbanceConfigSets = (workConfig.get("movingpattern", "disturbanceConfigSets")).split(",")
-    config.changeDisturbanceSetProb = float(workConfig.get("movingpattern", "changeDisturbanceSetProb"))
-    workingDisturbanceSet = config.disturbanceConfigSets[0]
-    config.skipFrames = 0
-    config.skipFramesCount = 0
+    _config.sectionDisturbance = _workConfig.getboolean("movingpattern", "sectionDisturbance")
+    _config.doSectionDisturbance = False
+    _config.disturbanceConfigSets = (_workConfig.get("movingpattern", "disturbanceConfigSets")).split(",")
+    _config.changeDisturbanceSetProb = float(_workConfig.get("movingpattern", "changeDisturbanceSetProb"))
+    workingDisturbanceSet = _config.disturbanceConfigSets[0]
+    _config.skipFrames = 0
+    _config.skipFramesCount = 0
     setUpDisturbanceConfigs(workingDisturbanceSet)
 
-    config.stableSectionsMin = int(workConfig.get("movingpattern", "stableSectionsMin"))
-    config.stableSectionsMax = int(workConfig.get("movingpattern", "stableSectionsMax"))
-    config.stableSectionsMinWidth = int(workConfig.get("movingpattern", "stableSectionsMinWidth"))
-    config.stableSectionsMinHeight = int(workConfig.get("movingpattern", "stableSectionsMinHeight"))
+    _config.stableSectionsMin = int(_workConfig.get("movingpattern", "stableSectionsMin"))
+    _config.stableSectionsMax = int(_workConfig.get("movingpattern", "stableSectionsMax"))
+    _config.stableSectionsMinWidth = int(_workConfig.get("movingpattern", "stableSectionsMinWidth"))
+    _config.stableSectionsMinHeight = int(_workConfig.get("movingpattern", "stableSectionsMinHeight"))
     setupStableSections()
 
-    config.movingSections = []
-    for _ in range(config.numberOfSections):
+    _config.movingSections = []
+    for _ in range(_config.numberOfSections):
         section = Holder()
-        config.movingSections.append(section)
+        _config.movingSections.append(section)
     rebuildSections()
 
 
+
 def setWaveDistortionParams():
-    config.useWaveDistortion = workConfig.getboolean("movingpattern", "useWaveDistortion")
-    config.waveAmplitude = float(workConfig.get("movingpattern", "waveAmplitude"))
-    config.waveAmplitudeMax = float(workConfig.get("movingpattern", "waveAmplitudeMax", fallback=config.waveAmplitude * 2))
-    config.waveAmplitudeMin = float(workConfig.get("movingpattern", "waveAmplitudeMin", fallback=0))
-    config.waveAmplitudeSpeed = float(workConfig.get("movingpattern", "waveAmplitudeSpeed", fallback="0.0"))
-    config.wavePeriodMod = float(workConfig.get("movingpattern", "wavePeriodMod"))
-    config.wavegridspace = int(workConfig.get("movingpattern", "wavegridspace"))
-    config.pNoiseMod = float(workConfig.get("movingpattern", "pNoiseMod"))
-    config.waveDeformXPosRate = float(workConfig.get("movingpattern", "waveDeformXPosRate"))
-    config.waveDeformXPos = 0
+    _config.useWaveDistortion = _workConfig.getboolean("movingpattern", "useWaveDistortion")
+    _config.waveAmplitude = float(_workConfig.get("movingpattern", "waveAmplitude"))
+    _config.waveAmplitudeMax = float(_workConfig.get("movingpattern", "waveAmplitudeMax", fallback=_config.waveAmplitude * 2))
+    _config.waveAmplitudeMin = float(_workConfig.get("movingpattern", "waveAmplitudeMin", fallback=0))
+    _config.waveAmplitudeSpeed = float(_workConfig.get("movingpattern", "waveAmplitudeSpeed", fallback="0.0"))
+    _config.wavePeriodMod = float(_workConfig.get("movingpattern", "wavePeriodMod"))
+    _config.wavegridspace = int(_workConfig.get("movingpattern", "wavegridspace"))
+    _config.pNoiseMod = float(_workConfig.get("movingpattern", "pNoiseMod"))
+    _config.waveDeformXPosRate = float(_workConfig.get("movingpattern", "waveDeformXPosRate"))
+    _config.waveDeformXPos = 0
 
 
 # loads the disturbance configs
 def setUpDisturbanceConfigs(configSet):
 
-    config.disturbanceConfigFile = workConfig.get("movingpattern", "disturbancesConfigs")
-    config.disturbanceConfig = configparser.ConfigParser()
-    argument = f"{config.path}/configs/{config.disturbanceConfigFile}"
-    config.disturbanceConfig.read(argument)
+    _config.disturbanceConfigFile = _workConfig.get("movingpattern", "disturbancesConfigs")
+    _config.disturbanceConfig = configparser.ConfigParser()
+    argument = f"{_config.path}/configs/{_config.disturbanceConfigFile}"
+    _config.disturbanceConfig.read(argument)
 
-    config.baseSectionSpeed = float(config.disturbanceConfig.get(configSet, "baseSectionSpeed"))
+    _config.baseSectionSpeed = float(_config.disturbanceConfig.get(configSet, "baseSectionSpeed"))
 
-    sectionPlacementXRange = config.disturbanceConfig.get(configSet, "sectionPlacementXRange").split(",")
-    config.sectionPlacementXRange = tuple(map(lambda x: int(x), sectionPlacementXRange))
+    sectionPlacementXRange = _config.disturbanceConfig.get(configSet, "sectionPlacementXRange").split(",")
+    _config.sectionPlacementXRange = tuple(map(lambda x: int(x), sectionPlacementXRange))
 
-    sectionPlacementYRange = config.disturbanceConfig.get(configSet, "sectionPlacementYRange").split(",")
-    config.sectionPlacementYRange = tuple(map(lambda x: int(x), sectionPlacementYRange))
+    sectionPlacementYRange = _config.disturbanceConfig.get(configSet, "sectionPlacementYRange").split(",")
+    _config.sectionPlacementYRange = tuple(map(lambda x: int(x), sectionPlacementYRange))
 
-    sectionWidthRange = config.disturbanceConfig.get(configSet, "sectionWidthRange").split(",")
-    config.sectionWidthRange = tuple(map(lambda x: int(x), sectionWidthRange))
+    sectionWidthRange = _config.disturbanceConfig.get(configSet, "sectionWidthRange").split(",")
+    _config.sectionWidthRange = tuple(map(lambda x: int(x), sectionWidthRange))
 
-    sectionHeightRange = config.disturbanceConfig.get(configSet, "sectionHeightRange").split(",")
-    config.sectionHeightRange = tuple(map(lambda x: int(x), sectionHeightRange))
+    sectionHeightRange = _config.disturbanceConfig.get(configSet, "sectionHeightRange").split(",")
+    _config.sectionHeightRange = tuple(map(lambda x: int(x), sectionHeightRange))
 
-    config.numberOfSections = int(config.disturbanceConfig.get(configSet, "numberOfSections"))
-    config.sectionMovementCountMax = int(config.disturbanceConfig.get(configSet, "sectionMovementCountMax"))
+    _config.numberOfSections = int(_config.disturbanceConfig.get(configSet, "numberOfSections"))
+    _config.sectionMovementCountMax = int(_config.disturbanceConfig.get(configSet, "sectionMovementCountMax"))
 
-    config.redoSectionDisturbance = float(config.disturbanceConfig.get(configSet, "redoSectionDisturbance"))
-    config.rebuildImmediatelyAfterDone = config.disturbanceConfig.getboolean(configSet, "rebuildImmediatelyAfterDone")
+    _config.redoSectionDisturbance = float(_config.disturbanceConfig.get(configSet, "redoSectionDisturbance"))
+    _config.rebuildImmediatelyAfterDone = _config.disturbanceConfig.getboolean(configSet, "rebuildImmediatelyAfterDone")
 
-    config.disturbanceScaleX = float(config.disturbanceConfig.get(configSet, "disturbanceScaleX", fallback=5.0))
-    config.disturbanceScaleY = float(config.disturbanceConfig.get(configSet, "disturbanceScaleY", fallback=5.0))
+    _config.disturbanceScaleX = float(_config.disturbanceConfig.get(configSet, "disturbanceScaleX", fallback=5.0))
+    _config.disturbanceScaleY = float(_config.disturbanceConfig.get(configSet, "disturbanceScaleY", fallback=5.0))
 
 
 def setupStableSections():
     # print("New stable sections")
-    config.stableSegments = []
-    n = round(random.uniform(config.stableSectionsMin, config.stableSectionsMax))
-    minWidth = config.stableSectionsMinWidth
-    minHeight = config.stableSectionsMinHeight
+    _config.stableSegments = []
+    n = round(random.uniform(_config.stableSectionsMin, _config.stableSectionsMax))
+    minWidth = _config.stableSectionsMinWidth
+    minHeight = _config.stableSectionsMinHeight
     for _ in range(n):
-        xPos = round(random.uniform(0, config.pictureWidth))
-        xPos2 = round(random.uniform(xPos + minWidth, config.pictureWidth))
-        yPos = round(random.uniform(0, config.pictureHeight))
-        yPos2 = round(random.uniform(yPos + minHeight, config.pictureHeight))
-        config.stableSegments.append([xPos, yPos, xPos2, yPos2])
+        xPos = round(random.uniform(0, _config.pictureWidth))
+        xPos2 = round(random.uniform(xPos + minWidth, _config.pictureWidth))
+        yPos = round(random.uniform(0, _config.pictureHeight))
+        yPos2 = round(random.uniform(yPos + minHeight, _config.pictureHeight))
+        _config.stableSegments.append([xPos, yPos, xPos2, yPos2])
 
 
 # changes what disturbance sections are doing
 def rebuildSections():
-    global config
+    global _config
 
-    if random.random() < config.changeDisturbanceSetProb:
-        setNumber = math.floor(random.uniform(0, len(config.disturbanceConfigSets)))
-        setUpDisturbanceConfigs(config.disturbanceConfigSets[setNumber])
+    if random.random() < _config.changeDisturbanceSetProb:
+        setNumber = math.floor(random.uniform(0, len(_config.disturbanceConfigSets)))
+        setUpDisturbanceConfigs(_config.disturbanceConfigSets[setNumber])
 
-    baseSpeed = config.baseSectionSpeed
+    baseSpeed = _config.baseSectionSpeed
 
-    for i in range(config.numberOfSections):
-        if i < len(config.movingSections):
-            section = config.movingSections[i]
+    for i in range(_config.numberOfSections):
+        if i < len(_config.movingSections):
+            section = _config.movingSections[i]
             section.sectionPlacementInit = [
-                round(random.uniform(config.sectionPlacementXRange[0], config.sectionPlacementXRange[1])),
-                round(random.uniform(config.sectionPlacementYRange[0], config.sectionPlacementYRange[1])),
+                round(random.uniform(_config.sectionPlacementXRange[0], _config.sectionPlacementXRange[1])),
+                round(random.uniform(_config.sectionPlacementYRange[0], _config.sectionPlacementYRange[1])),
             ]
             section.sectionSize = [
-                round(random.uniform(config.sectionWidthRange[0], config.sectionWidthRange[1])),
-                round(random.uniform(config.sectionHeightRange[0], config.sectionHeightRange[1])),
+                round(random.uniform(_config.sectionWidthRange[0], _config.sectionWidthRange[1])),
+                round(random.uniform(_config.sectionHeightRange[0], _config.sectionHeightRange[1])),
             ]
             section.actionCount = 0
-            section.actionCountLimit = round(random.uniform(10, config.sectionMovementCountMax))
+            section.actionCountLimit = round(random.uniform(10, _config.sectionMovementCountMax))
             section.sectionMaxOffset = [
-                random.uniform(-baseSpeed, baseSpeed) * config.disturbanceScaleX,
-                random.uniform(-baseSpeed, baseSpeed) * config.disturbanceScaleY,
+                random.uniform(-baseSpeed, baseSpeed) * _config.disturbanceScaleX,
+                random.uniform(-baseSpeed, baseSpeed) * _config.disturbanceScaleY,
             ]
 
-    config.drawingPrinted = False
+    _config.drawingPrinted = False
 
 
 # performs the disturbances
@@ -193,42 +195,43 @@ def disturber():
     """This function applies "disturbances" to a canvas image, either by
     disturbing specific sections or (in commented code) by repeating a pattern image.
     It also pastes stable (undisturbed) sections back onto the canvas. Thanks AI!"""
-    config.doneCount = 0
+    _config.doneCount = 0
 
-    if config.doSectionDisturbance:
+    if _config.doSectionDisturbance:
         disturbSections()
 
         # Paste stable sections onto the canvas
-        for s in config.stableSegments:
-            tempCrop = config.patternImage.crop((s[0], s[1], s[2], s[3]))
-            config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
+        for s in _config.stableSegments:
+            tempCrop = _config.patternImage.crop((s[0], s[1], s[2], s[3]))
+            # pieceLogger(f"{_config.canvasImage} {_config.config.canvasImage}")
+            _config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
     # else:
-    #     drawRepeatedPatternImage(config, config.patternImage)
-    # config.canvasImage.paste(config.patternImage, (0, 0), config.patternImage)
+    #     drawRepeatedPatternImage(_config, _config.patternImage)
+    # _config.canvasImage.paste(_config.patternImage, (0, 0), _config.patternImage)
 
 
 def disturbSections():
     """Disturbs individual sections of the canvas image."""
-    if config.skipFramesCount >= config.skipFrames:
-        config.skipFramesCount = 0
-        # pieceLogger(f"Disturber {config.numberOfSections}")
+    if _config.skipFramesCount >= _config.skipFrames:
+        _config.skipFramesCount = 0
+        # pieceLogger(f"[disturbance.disturbSections] {_config.numberOfSections}")
 
-        for i in range(config.numberOfSections):
-            sectionParams = config.movingSections[i]
-
+        for i in range(_config.numberOfSections):
+            sectionParams = _config.movingSections[i]
             if sectionParams.actionCount >= sectionParams.actionCountLimit:
-                config.doneCount += 1
+                _config.doneCount += 1
             else:
                 disturbSingleSection(sectionParams)
     else:
-        config.skipFramesCount += 1
+        _config.skipFramesCount += 1
 
 
 def disturbSingleSection(sectionParams):
     xPos = round(sectionParams.sectionPlacementInit[0])
     yPos = round(sectionParams.sectionPlacementInit[1])
-    section = config.canvasImage.crop((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
+
+    section = _config.canvasImage.crop((xPos, yPos, xPos + sectionParams.sectionSize[0], yPos + sectionParams.sectionSize[1]))
 
     t = sectionParams.actionCount / sectionParams.actionCountLimit
     # ease-out: fast start, gradual stop
@@ -237,7 +240,7 @@ def disturbSingleSection(sectionParams):
     dx = sectionParams.sectionMaxOffset[0] * ease
     dy = sectionParams.sectionMaxOffset[1] * ease
 
-    config.canvasImage.paste(section, (round(xPos + dx), round(yPos + dy)), section)
+    _config.canvasImage.paste(section, (round(xPos + dx), round(yPos + dy)), section)
 
     sectionParams.actionCount += 1
 
@@ -246,39 +249,41 @@ def disturbSingleSection(sectionParams):
 
 def handleDisturbances():
     """Handles various image disturbances and effects."""
-    if config.randomizeSpeed:
+    # pieceLogger(_config.ySpeed)
+
+    if _config.randomizeSpeed:
         if random.random() < 0.03:
-            config.ySpeed = config.ySpeedInit
+            _config.ySpeed = _config.ySpeedInit
         if random.random() < 0.1:
-            config.ySpeed = 0
+            _config.ySpeed = 0
 
     if random.random() < 0.0005:
-        config.triangles = True
+        _config.triangles = True
 
     if random.random() < 0.01:
-        config.triangles = False
+        _config.triangles = False
 
-    if config.sectionDisturbance and config.fader.fadingDone:
+    if _config.sectionDisturbance and _config.fader.fadingDone:
         disturber()
 
-    if config.useBlurSection:
-        cp = config.canvasImage.copy()
-        mask_blur = config.mask.filter(ImageFilter.GaussianBlur(config.mask_blur_amt))
-        cp_blur = cp.filter(ImageFilter.GaussianBlur(config.cp_blur_amt))
-        config.canvasImage = Image.composite(cp_blur, config.canvasImage, mask_blur)
+    if _config.useBlurSection:
+        cp = _config.canvasImage.copy()
+        mask_blur = _config.mask.filter(ImageFilter.GaussianBlur(_config.mask_blur_amt))
+        cp_blur = cp.filter(ImageFilter.GaussianBlur(_config.cp_blur_amt))
+        _config.canvasImage = Image.composite(cp_blur, _config.canvasImage, mask_blur)
 
 
 def handleSectionDisturbances():
     """Handles random overlay repetition disturbance."""
-    if random.random() < config.redoSectionDisturbance and config.sectionDisturbance and config.fader.fadingDone:
-        config.doSectionDisturbance = True
+    if random.random() < _config.redoSectionDisturbance and _config.sectionDisturbance and _config.fader.fadingDone:
+        _config.doSectionDisturbance = True
         # this causes a jump!!!!
-        # config.canvasImage.paste(config.patternImage, (0, 0), config.patternImage)
+        # _config.canvasImage.paste(_config.patternImage, (0, 0), _config.patternImage)
         rebuildSections()
 
 
 def handleShingleVariation():
     """Handles shingle variation if enabled."""
-    if config.shingleVariation and random.random() < config.redoSectionDisturbance:
-        config.shingleVariationAmount = round(random.uniform(0, config.shingleVariationRange))
+    if _config.shingleVariation and random.random() < _config.redoSectionDisturbance:
+        _config.shingleVariationAmount = round(random.uniform(0, _config.shingleVariationRange))
         rebuildSections()

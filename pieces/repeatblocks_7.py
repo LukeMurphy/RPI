@@ -12,7 +12,7 @@ from modules.holder_director import Holder
 from modules.holder_director import Director
 from modules.coloroverlay import ColorOverlay
 from PIL import Image, ImageDraw, ImageEnhance, ImageOps, ImageChops
-from copy import copy, deepcopy
+from copy import copy
 
 # This version substitutes the overlay disturbance with a slide-repeating of a section
 
@@ -61,8 +61,8 @@ class Fader:
         # variations = False
 
         if variations:
-            sectionDeltaWidth = config.sectionDeltaWidth
-            sectionDeltaHeight = config.sectionDeltaHeight
+            sectionDeltaWidth = rpO.sectionDeltaWidth
+            sectionDeltaHeight = rpO.sectionDeltaHeight
         else:
             sectionDeltaWidth = 0
             sectionDeltaHeight = 0
@@ -106,12 +106,12 @@ class Fader:
         self.endImage = Image.new("RGBA", (self.width, self.height))
         self.crossFadeImage = Image.new("RGBA", (self.width, self.height))
         self.xRange = [0, config.pictureWidth]
-        self.yRange = [0, config.pictureHeight]
+        self.yRange = [0, rpO.pictureHeight]
 
         self.fadeThroughIncrement = config.fadeThroughIncrement
         self.numParallelBlocks = getattr(config, "faderParallelBlocks", 1)
 
-        self.largeBlocks = self.makeSections(0, config.pictureWidth, 0, config.pictureHeight, config.faderLargeBlockXSections, config.faderLargeBlockYSections, True)
+        self.largeBlocks = self.makeSections(0, rpO.pictureWidth, 0, rpO.pictureHeight, config.faderLargeBlockXSections, config.faderLargeBlockYSections, True)
         random.shuffle(self.largeBlocks)
 
         if self.fadeInMode == 1:
@@ -198,7 +198,7 @@ class Fader:
         self.fadingDone = True
         self.blocksChanged = 0
         self.fadeThroughAmount = 0
-        config.doTransition = False
+        rpO.doTransition = False
         # pieceLogger("=> FADING DONE")
 
     def crossFadeIn(self):
@@ -305,20 +305,20 @@ def loadImageForBase():
 
 
 def loadClipPlayerConfigs():
-    loadConfigValue(config, workConfig, "imageSequencePlayer", "useClipPlayer", False, bool)
-    loadConfigValue(config, workConfig, "imageSequencePlayer", "clipXPos", 1, int)
-    loadConfigValue(config, workConfig, "imageSequencePlayer", "clipYPos", 1, int)
-    loadConfigValue(config, workConfig, "imageSequencePlayer", "clipRotate", 0, float)
-    loadConfigValue(config, workConfig, "imageSequencePlayer", "steps", 1, int)
-    loadConfigValue(config, workConfig, "imageSequencePlayer", "steps", 1, int)
+    loadConfigValue(rpO, workConfig, "imageSequencePlayer", "useClipPlayer", False, bool)
+    loadConfigValue(rpO, workConfig, "imageSequencePlayer", "clipXPos", 1, int)
+    loadConfigValue(rpO, workConfig, "imageSequencePlayer", "clipYPos", 1, int)
+    loadConfigValue(rpO, workConfig, "imageSequencePlayer", "clipRotate", 0, float)
+    loadConfigValue(rpO, workConfig, "imageSequencePlayer", "steps", 1, int)
+
 
     try:
-        config.clipMain = movieClip(config)
-        config.clipMain.clipRotate = config.clipRotate
-        config.clipMain.setUp(workConfig)
+        rpO.clipMain = movieClip(rpO)
+        rpO.clipMain.clipRotate = rpO.clipRotate
+        rpO.clipMain.setUp(workConfig)
     except Exception as e:
         pieceLogger(f"[loadClipPlayerConfigs] >> {e} \n")
-        config.useClipPlayer = False
+        rpO.useClipPlayer = False
 
 
 def handleClipPlayer():
@@ -338,7 +338,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        pieceLogger(f"\n[loadConfigValue] >> Config value not loaded: {option} ==> will be set to {default} \n  {e}", 1)
+        pieceLogger(f"\n[loadConfigValue] >> Config value not loaded:{obj} {workConfig} {section} {option} ==> will be set to {default} \n  {e}", 1)
         setattr(obj, option, default)
 
 
@@ -348,36 +348,36 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
 def loadAndSetupAllPalettes():
     global workConfig
     """initial palatte setups -- needs to run after combinations are established"""
-    config.palettesConfigFile = workConfig.get("movingpattern", "palettesConfigFile")
+    rpO.palettesConfigFile = workConfig.get("movingpattern", "palettesConfigFile")
 
-    config.paletteConfig = configparser.ConfigParser()
-    argument = f"{config.path}/configs/{config.palettesConfigFile}"
+    rpO.paletteConfig = configparser.ConfigParser()
+    argument = f"{rpO.path}/configs/{rpO.palettesConfigFile}"
 
     pieceLogger(f"[loadAndSetupAllPalettes] >> loading from {argument}")
-    config.paletteConfig.read(argument)
+    rpO.paletteConfig.read(argument)
 
-    config.palettes = config.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
-    config.paletteConfigs = config.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
+    rpO.palettes = rpO.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
+    rpO.paletteConfigs = rpO.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
 
     bgColorAlpha = (workConfig.get("movingpattern", "bgColorAlpha")).split(",")
-    config.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
+    rpO.bgColorAlpha = list(map(lambda x: (int(x)), bgColorAlpha))
 
-    # buildPalette(config, 0)
+    # buildPalette(rpO, 0)
 
-    config.allAvailablePalettesList = []
-    config.c1 = Holder()
-    config.c2 = Holder()
-    config.c3 = Holder()
-    config.c4 = Holder()
+    rpO.allAvailablePalettesList = []
+    rpO.c1 = Holder()
+    rpO.c2 = Holder()
+    rpO.c3 = Holder()
+    rpO.c4 = Holder()
 
-    for arg in config.paletteConfigs:
+    for arg in rpO.paletteConfigs:
         if arg != "":
             loadPalette(arg)
 
-    # config.currentPaletteIndex = 0
-    config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-    setPalette(config, config.currentPaletteIndex)
-    # config.borderPalette = changeSinglePalette(config.currentCombinationsetIndex)
+    # rpO.currentPaletteIndex = 0
+    rpO.currentPaletteIndex = math.floor(random.uniform(0, len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
+    setPalette(rpO, rpO.currentPaletteIndex)
+    # config.borderPalette = changeSinglePalette(rpO.currentCombinationsetIndex)
 
 
 def loadPalette(palette):
@@ -390,55 +390,55 @@ def loadPalette(palette):
     c3 = Holder()
     c4 = Holder()
 
-    _noGraysBool = config.paletteConfig.getboolean(palette, "noGrays", fallback=False)
+    _noGraysBool = rpO.paletteConfig.getboolean(palette, "noGrays", fallback=False)
     _noGrays = 1.0 if _noGraysBool else 0.0
 
     # background
     # tLimitBase = int(workConfig.get(palette, "tLimitBase"))
-    c1.minHue = float(config.paletteConfig.get(palette, "c1_minHue"))
-    c1.maxHue = float(config.paletteConfig.get(palette, "c1_maxHue"))
-    c1.minSaturation = float(config.paletteConfig.get(palette, "c1_minSaturation"))
-    c1.maxSaturation = float(config.paletteConfig.get(palette, "c1_maxSaturation"))
-    c1.minValue = float(config.paletteConfig.get(palette, "c1_minValue"))
-    c1.maxValue = float(config.paletteConfig.get(palette, "c1_maxValue"))
-    c1.dropHueMin = float(config.paletteConfig.get(palette, "c1_dropHueMin", fallback=0))
-    c1.dropHueMax = float(config.paletteConfig.get(palette, "c1_dropHueMax", fallback=0))
+    c1.minHue = float(rpO.paletteConfig.get(palette, "c1_minHue"))
+    c1.maxHue = float(rpO.paletteConfig.get(palette, "c1_maxHue"))
+    c1.minSaturation = float(rpO.paletteConfig.get(palette, "c1_minSaturation"))
+    c1.maxSaturation = float(rpO.paletteConfig.get(palette, "c1_maxSaturation"))
+    c1.minValue = float(rpO.paletteConfig.get(palette, "c1_minValue"))
+    c1.maxValue = float(rpO.paletteConfig.get(palette, "c1_maxValue"))
+    c1.dropHueMin = float(rpO.paletteConfig.get(palette, "c1_dropHueMin", fallback=0))
+    c1.dropHueMax = float(rpO.paletteConfig.get(palette, "c1_dropHueMax", fallback=0))
     c1.noGrays = _noGrays
     c1.currentColor = setCurrentColor(c1)
 
     # color 1
-    # tLimitBase = int(config.paletteConfig.get(palette, "line_tLimitBase"))
-    c2.minHue = float(config.paletteConfig.get(palette, "c2_minHue"))
-    c2.maxHue = float(config.paletteConfig.get(palette, "c2_maxHue"))
-    c2.minSaturation = float(config.paletteConfig.get(palette, "c2_minSaturation"))
-    c2.maxSaturation = float(config.paletteConfig.get(palette, "c2_maxSaturation"))
-    c2.minValue = float(config.paletteConfig.get(palette, "c2_minValue"))
-    c2.maxValue = float(config.paletteConfig.get(palette, "c2_maxValue"))
-    c2.dropHueMin = float(config.paletteConfig.get(palette, "c2_dropHueMin", fallback=0))
-    c2.dropHueMax = float(config.paletteConfig.get(palette, "c2_dropHueMax", fallback=0))
+    # tLimitBase = int(rpO.paletteConfig.get(palette, "line_tLimitBase"))
+    c2.minHue = float(rpO.paletteConfig.get(palette, "c2_minHue"))
+    c2.maxHue = float(rpO.paletteConfig.get(palette, "c2_maxHue"))
+    c2.minSaturation = float(rpO.paletteConfig.get(palette, "c2_minSaturation"))
+    c2.maxSaturation = float(rpO.paletteConfig.get(palette, "c2_maxSaturation"))
+    c2.minValue = float(rpO.paletteConfig.get(palette, "c2_minValue"))
+    c2.maxValue = float(rpO.paletteConfig.get(palette, "c2_maxValue"))
+    c2.dropHueMin = float(rpO.paletteConfig.get(palette, "c2_dropHueMin", fallback=0))
+    c2.dropHueMax = float(rpO.paletteConfig.get(palette, "c2_dropHueMax", fallback=0))
     c2.noGrays = _noGrays
     c2.currentColor = setCurrentColor(c2)
     # color 2
-    # tLimitBase = int(config.paletteConfig.get(palette, "line2_tLimitBase"))
-    c3.minHue = float(config.paletteConfig.get(palette, "c3_minHue"))
-    c3.maxHue = float(config.paletteConfig.get(palette, "c3_maxHue"))
-    c3.minSaturation = float(config.paletteConfig.get(palette, "c3_minSaturation"))
-    c3.maxSaturation = float(config.paletteConfig.get(palette, "c3_maxSaturation"))
-    c3.minValue = float(config.paletteConfig.get(palette, "c3_minValue"))
-    c3.maxValue = float(config.paletteConfig.get(palette, "c3_maxValue"))
-    c3.dropHueMin = float(config.paletteConfig.get(palette, "c3_dropHueMin", fallback=0))
-    c3.dropHueMax = float(config.paletteConfig.get(palette, "c3_dropHueMax", fallback=0))
+    # tLimitBase = int(rpO.paletteConfig.get(palette, "line2_tLimitBase"))
+    c3.minHue = float(rpO.paletteConfig.get(palette, "c3_minHue"))
+    c3.maxHue = float(rpO.paletteConfig.get(palette, "c3_maxHue"))
+    c3.minSaturation = float(rpO.paletteConfig.get(palette, "c3_minSaturation"))
+    c3.maxSaturation = float(rpO.paletteConfig.get(palette, "c3_maxSaturation"))
+    c3.minValue = float(rpO.paletteConfig.get(palette, "c3_minValue"))
+    c3.maxValue = float(rpO.paletteConfig.get(palette, "c3_maxValue"))
+    c3.dropHueMin = float(rpO.paletteConfig.get(palette, "c3_dropHueMin", fallback=0))
+    c3.dropHueMax = float(rpO.paletteConfig.get(palette, "c3_dropHueMax", fallback=0))
     c3.noGrays = _noGrays
     c3.currentColor = setCurrentColor(c3)
 
-    c4.minHue = float(config.paletteConfig.get(palette, "c4_minHue", fallback=0))
-    c4.maxHue = float(config.paletteConfig.get(palette, "c4_maxHue", fallback=0))
-    c4.minSaturation = float(config.paletteConfig.get(palette, "c4_minSaturation", fallback=0))
-    c4.maxSaturation = float(config.paletteConfig.get(palette, "c4_maxSaturation", fallback=0))
-    c4.minValue = float(config.paletteConfig.get(palette, "c4_minValue", fallback=0))
-    c4.maxValue = float(config.paletteConfig.get(palette, "c4_maxValue", fallback=0))
-    c4.dropHueMin = float(config.paletteConfig.get(palette, "c4_dropHueMin", fallback=0))
-    c4.dropHueMax = float(config.paletteConfig.get(palette, "c4_dropHueMax", fallback=0))
+    c4.minHue = float(rpO.paletteConfig.get(palette, "c4_minHue", fallback=0))
+    c4.maxHue = float(rpO.paletteConfig.get(palette, "c4_maxHue", fallback=0))
+    c4.minSaturation = float(rpO.paletteConfig.get(palette, "c4_minSaturation", fallback=0))
+    c4.maxSaturation = float(rpO.paletteConfig.get(palette, "c4_maxSaturation", fallback=0))
+    c4.minValue = float(rpO.paletteConfig.get(palette, "c4_minValue", fallback=0))
+    c4.maxValue = float(rpO.paletteConfig.get(palette, "c4_maxValue", fallback=0))
+    c4.dropHueMin = float(rpO.paletteConfig.get(palette, "c4_dropHueMin", fallback=0))
+    c4.dropHueMax = float(rpO.paletteConfig.get(palette, "c4_dropHueMax", fallback=0))
     c4.noGrays = _noGrays
     c4.currentColor = setCurrentColor(c4)
 
@@ -452,20 +452,20 @@ def loadPalette(palette):
 
     # print(f"Palette Loaded: {palette}")
 
-    config.allAvailablePalettesList.append(_paletteObj)
+    rpO.allAvailablePalettesList.append(_paletteObj)
 
 
 def getPaletteObjectByName(_name):
-    for _n in config.allAvailablePalettesList:
+    for _n in rpO.allAvailablePalettesList:
         if _n.paletteName == _name:
             return _n
 
 
 def changeSinglePalette(index=0):
     # pieceLogger(f"changeSinglePalette  {index}")
-    paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
+    paletteObj = getPaletteObjectByName(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index])
     _paletteObjLocal = Holder()
-    _paletteObjLocal.paletteName = config.combinationSets[config.currentCombinationsetIndex].palettes[index]
+    _paletteObjLocal.paletteName = rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]
     _paletteObjLocal.c1 = copy(paletteObj.c1)
     _paletteObjLocal.c1.currentColor = copy(paletteObj.c1.currentColor)
     _paletteObjLocal.c2 = copy(paletteObj.c2)
@@ -500,17 +500,17 @@ def setCurrentColor(palettObjValsRef, dropHueMin=0, dropHueMax=0, alpha=255):
 
 
 def setPalette(config, index=0):
-    paletteObj = getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[index])
+    paletteObj = getPaletteObjectByName(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index])
 
     pieceLogger(
-        f"\n[setPalette] >> currentCombinationsetIndex: {config.currentCombinationsetIndex} index: {index} config.combinationSets[config.currentCombinationsetIndex].palettes[index]: {config.combinationSets[config.currentCombinationsetIndex].palettes[index]}"
+        f"\n[setPalette] >> currentCombinationsetIndex: {rpO.currentCombinationsetIndex} index: {index} rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]}"
     )
     pieceLogger(f"[setPalette] >> Setting a new palette:  {paletteObj.paletteName}")
-    config.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
-    config.c1.currentColor = setCurrentColor(paletteObj.c1)
-    config.c2.currentColor = setCurrentColor(paletteObj.c2)
-    config.c3.currentColor = setCurrentColor(paletteObj.c3)
-    config.c4.currentColor = setCurrentColor(paletteObj.c4)
+    rpO.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(rpO.bgColorAlpha[0], rpO.bgColorAlpha[1])))
+    rpO.c1.currentColor = setCurrentColor(paletteObj.c1)
+    rpO.c2.currentColor = setCurrentColor(paletteObj.c2)
+    rpO.c3.currentColor = setCurrentColor(paletteObj.c3)
+    rpO.c4.currentColor = setCurrentColor(paletteObj.c4)
 
     # if zero palette mixing is desired, force the patterns to rebuild
     # this is a bit of an extreme but was having trouble preventing the
@@ -523,16 +523,16 @@ def setPalette(config, index=0):
 def selectNewPalette(_setPalette=True):
 
     # rather than favoring a normal distribution, use a list - getting tired of trying to game the randomness by ordering the list of palettes etc
-    # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-    _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-    config.currentPaletteIndex = random.choice(_listOfIndecies)
+    # rpO.currentPaletteIndex = math.floor(random.uniform(0, len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
+    _listOfIndecies = list(range(len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
+    rpO.currentPaletteIndex = random.choice(_listOfIndecies)
 
     pieceLogger(
-        f"[selectNewPalette] >> Choosing a palette: {config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex]} in {config.combinationSets[config.currentCombinationsetIndex].name}",
+        f"[selectNewPalette] >> Choosing a palette: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[rpO.currentPaletteIndex]} in {rpO.combinationSets[rpO.currentCombinationsetIndex].name}",
         2,
         True,
     )
-    setPalette(config, config.currentPaletteIndex)
+    setPalette(rpO, rpO.currentPaletteIndex)
 
     if _setPalette:
         rebuildPatterns()
@@ -552,25 +552,25 @@ def selectNewPalette(_setPalette=True):
 def loadAndSetupPatterns():
     # config.patterns = workConfig.get("movingpattern", "patterns").split(",")
     # config.dominantPatterns =  workConfig.get("movingpattern", "dominantPatterns", fallback="").split(",")
-    # loadConfigValue(config, workConfig, "movingpattern", "dominantPatternProb", 0, float)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "dominantPatternProb", 0, float)
 
-    config.patternSequence = []
-    config.slotsToChange = []
-    config.settingUpPattern = True
-    config.lastPatternSelected = ""
-    config.consecutivePatternChoiceCount = 0
-    config.consecutivePatternCount = 0
+    rpO.patternSequence = []
+    rpO.slotsToChange = []
+    rpO.settingUpPattern = True
+    rpO.lastPatternSelected = ""
+    rpO.consecutivePatternChoiceCount = 0
+    rpO.consecutivePatternCount = 0
 
     # when rebuild is called, chance that the full pattern gets rebuilt -
-    loadConfigValue(config, workConfig, "movingpattern", "rebuildAllSlotsProb", 0.50, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "rebuildAllSlotsProb", 0.50, float)
     # when rebuild is called and the full rebuild is not called, individual slots can change
     # at this rate
-    loadConfigValue(config, workConfig, "movingpattern", "rebuildIndividualSlotProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "rebuildIndividualSlotProb", 0.0, float)
     # at this rate
-    loadConfigValue(config, workConfig, "movingpattern", "chanceRebuildPatternChoosesRandom", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "rebuildSlotSkipRate", 0.1, float)
-    loadConfigValue(config, workConfig, "movingpattern", "rebuildSlotStartSkipRate", 0.1, float)
-    loadConfigValue(config, workConfig, "movingpattern", "patternModel", None, str)
+    loadConfigValue(rpO, workConfig, "movingpattern", "chanceRebuildPatternChoosesRandom", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "rebuildSlotSkipRate", 0.1, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "rebuildSlotStartSkipRate", 0.1, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "patternModel", None, str)
 
     # patternSequence = workConfig.get("movingpattern", "patternSequence").split(",")
     # config.patternSequence = []
@@ -582,36 +582,36 @@ def loadAndSetupPatterns():
     # e.g. .2 is 20% chance each new block will change to a
     # new pattern
 
-    loadConfigValue(config, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "altColoringProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "popRandomColorProb", 0.8, float)
-    loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "blockSizeChangeAlwaysUseMax", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "altColoringProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "popRandomColorProb", 0.8, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blockSizeChangeProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blockSizeChangeAlwaysUseMax", False, bool)
 
     try:
         ringsRange = workConfig.get("movingpattern", "ringsRange").split(",")
         stepsRange = workConfig.get("movingpattern", "stepsRange").split(",")
-        config.numScaleRows = int(workConfig.get("movingpattern", "numScaleRows"))
-        config.stepsRange = tuple(map(lambda x: int(x), stepsRange))
-        config.ringsRange = tuple(map(lambda x: int(x), ringsRange))
+        rpO.numScaleRows = int(workConfig.get("movingpattern", "numScaleRows"))
+        rpO.stepsRange = tuple(map(lambda x: int(x), stepsRange))
+        rpO.ringsRange = tuple(map(lambda x: int(x), ringsRange))
     except Exception as e:
         pieceLogger(e, 1)
-        config.stepsRange = (1, 1)
-        config.ringsRange = (1, 1)
-        config.numScaleRows = config.numShingleRows
+        rpO.stepsRange = (1, 1)
+        rpO.ringsRange = (1, 1)
+        rpO.numScaleRows = rpO.numShingleRows
 
-    loadConfigValue(config, workConfig, "movingpattern", "patternOrientation", 0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "numRows", 5, int)
-    loadConfigValue(config, workConfig, "movingpattern", "numRowsRandomize", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "patternOrientation", 0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "numRows", 5, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "numRowsRandomize", False, bool)
 
     # affects patterns to use just lines w/o fills
-    loadConfigValue(config, workConfig, "movingpattern", "linesOnly", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "linesOnly", False, bool)
 
     # try:
     #     config.borderPattern = workConfig.get("movingpattern", "borderPattern")
@@ -622,46 +622,46 @@ def loadAndSetupPatterns():
     #     config.useBorderPattern = False
     # end try
 
-    config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
-    config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
+    rpO.waveScaleRings = round(random.uniform(rpO.ringsRange[0], rpO.ringsRange[1]))
+    rpO.waveScaleSteps = round(random.uniform(rpO.stepsRange[0], rpO.stepsRange[1]))
     # print(config.waveScaleRings, config.waveScaleSteps)
     # end try
 
     # for the randomizer
-    loadConfigValue(config, workConfig, "movingpattern", "usePixelSortRandomize", True, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "randomBlockProb", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "randomBlockWidth", 10, int)
-    loadConfigValue(config, workConfig, "movingpattern", "randomBlockHeight", 10, int)
-    loadConfigValue(config, workConfig, "movingpattern", "decoBoxBandWidth", 10, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "usePixelSortRandomize", True, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "randomBlockProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "randomBlockWidth", 10, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "randomBlockHeight", 10, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "decoBoxBandWidth", 10, int)
 
-    config.diamondUseTriangles = False
-    loadConfigValue(config, workConfig, "movingpattern", "diamondStep", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "minnumConcentricBoxes", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "maxnumConcentricBoxes", 8, int)
-    loadConfigValue(config, workConfig, "movingpattern", "numShingleRows", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "amplitude", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "amplitude2", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "shingleVariation", False, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "shingleVariationRange", 1, int)
-    config.shingleVariationAmount = config.shingleVariationRange
+    rpO.diamondUseTriangles = False
+    loadConfigValue(rpO, workConfig, "movingpattern", "diamondStep", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "minnumConcentricBoxes", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "maxnumConcentricBoxes", 8, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "numShingleRows", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "amplitude", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "amplitude2", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "shingleVariation", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "shingleVariationRange", 1, int)
+    rpO.shingleVariationAmount = rpO.shingleVariationRange
 
-    loadConfigValue(config, workConfig, "movingpattern", "numDotRows", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "speedFactor", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "phaseFactor", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "xSpeed", 0.0, float)
-    loadConfigValue(config, workConfig, "movingpattern", "ySpeed", 0.0, float)
-    config.ySpeedInit = config.ySpeed
+    loadConfigValue(rpO, workConfig, "movingpattern", "numDotRows", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "speedFactor", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "phaseFactor", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "xSpeed", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "ySpeed", 0.0, float)
+    rpO.ySpeedInit = rpO.ySpeed
 
-    loadConfigValue(config, workConfig, "movingpattern", "lineDiff", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "useDoubleLine", False, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "randomizeSpeed", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "lineDiff", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "useDoubleLine", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "randomizeSpeed", False, bool)
 
     # used in pattern_blocks code
-    loadConfigValue(config, workConfig, "movingpattern", "steps", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "steps2", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "steps", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "steps2", 1, int)
 
-    loadConfigValue(config, workConfig, "movingpattern", "xIncrementer", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "yIncrementer", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "xIncrementer", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "yIncrementer", 1, int)
 
     config.altLineColoring = False
     stepsRange = workConfig.get("movingpattern", "stepsRange").split(",")
@@ -670,9 +670,9 @@ def loadAndSetupPatterns():
 
 
 def loadAndSetCombinations():
-    config.combinationSets = []
+    rpO.combinationSets = []
     combinationSets = workConfig.get("movingpattern", "combinationSets").replace("\n", "").split(",")
-    config.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
+    rpO.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
     for combinationSetName in combinationSets:
         comboSet = CombinationSet(combinationSetName)
         comboSet.patterns = workConfig.get(combinationSetName, "patterns").replace("\n", "").split(",")
@@ -681,12 +681,12 @@ def loadAndSetCombinations():
         comboSet.dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
         comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback="")
         comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
-        comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=config.altColoringProb))
-        comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=config.popRandomColorProb))
+        comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=rpO.altColoringProb))
+        comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=rpO.popRandomColorProb))
 
-        comboSet.usePolygonOverlay = workConfig.getboolean(combinationSetName, "usePolygonOverlay", fallback=config.usePolygonOverlay)
-        comboSet.tileOverlayGridProb = float(workConfig.get(combinationSetName, "tileOverlayGridProb", fallback=config.tileOverlayGridProb))
-        comboSet.polyOverlayMode = workConfig.get(combinationSetName, "polyOverlayMode", fallback=config.polyOverlayMode)
+        comboSet.usePolygonOverlay = workConfig.getboolean(combinationSetName, "usePolygonOverlay", fallback=rpO.usePolygonOverlay)
+        comboSet.tileOverlayGridProb = float(workConfig.get(combinationSetName, "tileOverlayGridProb", fallback=rpO.tileOverlayGridProb))
+        comboSet.polyOverlayMode = workConfig.get(combinationSetName, "polyOverlayMode", fallback=rpO.polyOverlayMode)
 
         comboSet.patternsInBands = workConfig.getboolean(combinationSetName, "patternsInBands", fallback=False)
         comboSet.altBlockRotation = workConfig.getboolean(combinationSetName, "altBlockRotation", fallback=True)
@@ -708,50 +708,50 @@ def loadAndSetCombinations():
         if comboSet.randomInsertionMin > 0:
             comboSet.randomInsertionProbabilitly = comboSet.randomInsertionInitialProbabilitly
 
-        config.combinationSets.append(comboSet)
+        rpO.combinationSets.append(comboSet)
 
-    # config.currentCombinationsetIndex = 0
-    config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
-    config.numberOfRandomizersUsed = 0
-    config.comboSetDirector = Director(config)
-    config.comboSetDirector.slotRate = int(
+    # rpO.currentCombinationsetIndex = 0
+    rpO.currentCombinationsetIndex = math.floor(random.uniform(0, len(rpO.combinationSets)))
+    rpO.numberOfRandomizersUsed = 0
+    rpO.comboSetDirector = Director(config)
+    rpO.comboSetDirector.slotRate = int(
         random.uniform(
-            config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime, config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
+            rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime
         )
     )
-    pieceLogger(f"[loadAndSetCombinations] Initial combo set change wait time (slotRate) : {config.comboSetDirector.slotRate}")
+    pieceLogger(f"[loadAndSetCombinations] Initial combo set change wait time (slotRate) : {rpO.comboSetDirector.slotRate}")
 
 
 def handleChangeCurrentCominationSet():
 
     pieceLogger("[handleChangeCurrentCominationSet] >> Checking combo set")
-    disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
+    disturbancesDone = not rpO.doSectionDisturbance or rpO.doneCount >= rpO.numberOfSections
 
-    if random.random() < config.changeCombinationAnytimeProb and config.fader.fadingDone and disturbancesDone:
+    if random.random() < rpO.changeCombinationAnytimeProb and rpO.fader.fadingDone and disturbancesDone:
         # rather than favoring a normal distribution, use a list - getting tired of trying to game the randomness by ordering the list of palettes etc
-        # config.currentCombinationsetIndex = math.floor(random.uniform(0, len(config.combinationSets)))
-        _listOfIndecies = list(range(len(config.combinationSets)))
-        config.currentCombinationsetIndex = random.choice(_listOfIndecies)
-        config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-        setPalette(config, config.currentPaletteIndex)
-        # {config.combinationSets[config.currentCombinationsetIndex]}
+        # rpO.currentCombinationsetIndex = math.floor(random.uniform(0, len(rpO.combinationSets)))
+        _listOfIndecies = list(range(len(rpO.combinationSets)))
+        rpO.currentCombinationsetIndex = random.choice(_listOfIndecies)
+        rpO.currentPaletteIndex = math.floor(random.uniform(0, len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
+        setPalette(rpO, rpO.currentPaletteIndex)
+        # {rpO.combinationSets[rpO.currentCombinationsetIndex]}
         # pieceLogger(f"[handleChangeCurrentCominationSet] >> _listOfIndecies =   {_listOfIndecies}")
         pieceLogger(
-            f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {config.combinationSets[config.currentCombinationsetIndex].name} (index: {config.currentCombinationsetIndex})",
+            f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {rpO.combinationSets[rpO.currentCombinationsetIndex].name} (index: {rpO.currentCombinationsetIndex})",
             2,
             True,
         )
-        config.numberOfRandomizersUsed = 0
+        rpO.numberOfRandomizersUsed = 0
 
         # problem the currentPaletteIndex may exceed the number of palettes if the combinationSet has changed
-        # config.currentPaletteIndex = math.floor(random.uniform(0, len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
+        # rpO.currentPaletteIndex = math.floor(random.uniform(0, len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
 
-        if random.random() < config.changePaletteWhenRebuildProb:
-            _listOfIndecies = list(range(len(config.combinationSets[config.currentCombinationsetIndex].palettes)))
-            config.currentPaletteIndex = random.choice(_listOfIndecies)
+        if random.random() < rpO.changePaletteWhenRebuildProb:
+            _listOfIndecies = list(range(len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
+            rpO.currentPaletteIndex = random.choice(_listOfIndecies)
 
         # turning off to test
-        # config.settingUpPattern = True
+        # rpO.settingUpPattern = True
         # selectNewPalette()
 
         # changing so the transition between a new combo set happens in chunks rather than
@@ -760,17 +760,17 @@ def handleChangeCurrentCominationSet():
         # config.patternSequence = []
         # config.rebuildIndividualSlotProb = .1
 
-        config.comboSetDirector.slotRate = int(
+        rpO.comboSetDirector.slotRate = int(
             random.uniform(
-                config.combinationSets[config.currentCombinationsetIndex].combinationSetsMinTime, config.combinationSets[config.currentCombinationsetIndex].combinationSetsMaxTime
+                rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime
             )
         )
-        config.comboSetDirector.reset()
+        rpO.comboSetDirector.reset()
 
-        config.settingUpPattern = True
-        config.rebuildPatternProbability = 1.0
-        config.rebuildAllSlotsProb = 1.0
-        config.fader.setUp(config)
+        rpO.settingUpPattern = True
+        rpO.rebuildPatternProbability = 1.0
+        rpO.rebuildAllSlotsProb = 1.0
+        rpO.fader.setUp(rpO)
         # rebuildPatterns()
 
         handlePatternRebuild()
@@ -783,72 +783,74 @@ def handleChangeCurrentCominationSet():
 
 def resetPatternBlocks():
 
-    tempPalette = changeSinglePalette(config.currentPaletteIndex)
+    tempPalette = changeSinglePalette(rpO.currentPaletteIndex)
 
     pieceLogger(f"resetPatternBlocks() : config.totalSlots {config.totalSlots}", 4, True)
 
-    for i in range(config.totalSlots):
-        _patternBlock = config.patternSequence[i]
+    for i in range(rpO.totalSlots):
+        _patternBlock = rpO.patternSequence[i]
         _patternBlock.hasBeenPainted = False
         _patternBlock.tempPalette = tempPalette
 
-        if random.random() > config.changeEachblockWhenChangingPatternProb:
-            _patternBlock.tempPalette = getTempPalette(config)
+        if random.random() > rpO.changeEachblockWhenChangingPatternProb:
+            _patternBlock.tempPalette = getTempPalette(rpO)
 
-        config.patternSequence[i] = _patternBlock
+        rpO.patternSequence[i] = _patternBlock
 
 
-def buildPatternSequence(config):
+def buildPatternSequence(_repeatedPatternsObj):
     pieceLogger("[buildPatternSequence] >> called", 0)
-    # config.patternSequence = []
-    # config.usedPatterns = []
+
+    rpO : RepeatedPatterns = _repeatedPatternsObj
+    # rpO.patternSequence = []
+    # rpO.usedPatterns = []
 
     # during a partial rebuild, maybe don't change too much
     # in terms of the block size
-    if config.settingUpPattern:
-        if random.random() < config.blockSizeChangeProb:
-            if config.blockSizeChangeAlwaysUseMax:
-                config.blockWidth = config.blockWidthMax
-                config.blockHeight = config.blockWidthMax
+    if rpO.settingUpPattern:
+        if random.random() < rpO.blockSizeChangeProb:
+            if rpO.blockSizeChangeAlwaysUseMax:
+                rpO.blockWidth = rpO.blockWidthMax
+                rpO.blockHeight = rpO.blockWidthMax
             else:
-                config.blockWidth = round(random.uniform(config.blockWidthMin, config.blockWidthMax))
-                config.blockHeight = config.blockWidth
+                rpO.blockWidth = round(random.uniform(rpO.blockWidthMin, rpO.blockWidthMax))
+                rpO.blockHeight = rpO.blockWidth
         else:
-            config.blockWidth = config.blockWidthMin
-            config.blockHeight = config.blockWidthMin
+            rpO.blockWidth = rpO.blockWidthMin
+            rpO.blockHeight = rpO.blockWidthMin
 
-        config.blockImage = Image.new("RGBA", (config.blockWidth, config.blockHeight))
-        config.blockDraw = ImageDraw.Draw(config.blockImage)
+        rpO.blockImage = Image.new("RGBA", (rpO.blockWidth, rpO.blockHeight))
+        rpO.blockDraw = ImageDraw.Draw(rpO.blockImage)
 
-        config.patternBlockCols = math.ceil(config.pictureWidth / config.blockWidth)
-        config.patternBlockRows = math.ceil(config.pictureHeight / config.blockHeight)
+        rpO.patternBlockCols = math.ceil(rpO.pictureWidth / rpO.blockWidth)
+        rpO.patternBlockRows = math.ceil(rpO.pictureHeight / rpO.blockHeight)
 
         # considering making this be an option to fit exactly the width - i.e. choose the number of columns
         # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
         # ragged edges which are a nice trace of the previous state
-        # print(f"config.blockWidth {config.blockWidth} config.patternBlockCols {config.patternBlockCols}")
+        # print(f"rpO.blockWidth {rpO.blockWidth} rpO.patternBlockCols {rpO.patternBlockCols}")
 
-        config.totalSlots = config.patternBlockRows * config.patternBlockCols
-        # pieceLogger(f"config.totalSlots {config.totalSlots}", 4, True)
+        rpO.totalSlots = rpO.patternBlockRows * rpO.patternBlockCols
+        # pieceLogger(f"rpO.totalSlots {rpO.totalSlots}", 4, True)
 
-    config.altLineColoring = random.random() < config.combinationSets[config.currentCombinationsetIndex].altColoringProb
-    config.popRandomColorProb = random.random() < config.combinationSets[config.currentCombinationsetIndex].popRandomColorProb
+    rpO.altLineColoring = random.random() < rpO.combinationSets[rpO.currentCombinationsetIndex].altColoringProb
+    rpO.popRandomColorProb = random.random() < rpO.combinationSets[rpO.currentCombinationsetIndex].popRandomColorProb
 
-    # print(config.altLineColoring)
-    config.numConcentricBoxes = int(random.uniform(config.minnumConcentricBoxes, config.maxnumConcentricBoxes))
+    # print(rpO.altLineColoring)
+    rpO.numConcentricBoxes = int(random.uniform(rpO.minnumConcentricBoxes, rpO.maxnumConcentricBoxes))
 
-    pattern_blocks_v5.floralConfig(config)
-    generatePatternSequence(config)
+    pattern_blocks_v5.floralConfig(rpO)
+    generatePatternSequence(rpO)
 
-    # _print_pattern_sequence(config)
-    config.borderDrawn = False
-    config.initPatternBuild = False
+    # _print_pattern_sequence(rpO)
+    rpO.borderDrawn = False
+    rpO.initPatternBuild = False
 
 
 def chooseAPattern(limitRandomizers=False, forceDominant=False):
-    _patterns = config.combinationSets[config.currentCombinationsetIndex].patterns
-    _dominantPatterns = config.combinationSets[config.currentCombinationsetIndex].dominantPatterns
-    _dominantPatternProb = config.combinationSets[config.currentCombinationsetIndex].dominantPatternProb
+    _patterns = rpO.combinationSets[rpO.currentCombinationsetIndex].patterns
+    _dominantPatterns = rpO.combinationSets[rpO.currentCombinationsetIndex].dominantPatterns
+    _dominantPatternProb = rpO.combinationSets[rpO.currentCombinationsetIndex].dominantPatternProb
 
     # due to normal distribution this kind of favors the things in the middle of the list
     # should really convert to a random choice operation rather than just numerical random
@@ -861,16 +863,16 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
     # need to limit randomizers
     if "randomizer" in _patternSelected:
         if limitRandomizers:
-            _patternSelected = config.lastPatternSelected
+            _patternSelected = rpO.lastPatternSelected
         else:
-            if config.numberOfRandomizersUsed < config.combinationSets[config.currentCombinationsetIndex].maxNumberOfRandomizers:
-                config.numberOfRandomizersUsed += 1
+            if rpO.numberOfRandomizersUsed < rpO.combinationSets[rpO.currentCombinationsetIndex].maxNumberOfRandomizers:
+                rpO.numberOfRandomizersUsed += 1
             else:
                 chooseAPattern()
 
     # this catches if the same pattern is selected twice in a sequence
-    if _patternSelected == config.lastPatternSelected:
-        config.consecutivePatternCount += 1
+    if _patternSelected == rpO.lastPatternSelected:
+        rpO.consecutivePatternCount += 1
 
     return _patternSelected
 
@@ -878,26 +880,26 @@ def chooseAPattern(limitRandomizers=False, forceDominant=False):
 # this really needs to change to be more readable and predictable ....
 # there are n number of slots, just fill each one and change randomly etc
 # as they all get filled up
-def generatePatternSequence(config):
+def generatePatternSequence(rpO):
 
     # config.patternSequence = []
-    config.usedPatterns = []
-    _baseProb = config.patternChangeWhenBuilding * config.totalSlots / 100
+    rpO.usedPatterns = []
+    _baseProb = rpO.patternChangeWhenBuilding * rpO.totalSlots / 100
     _patternSelected = chooseAPattern()
-    config.lastPatternSelected = _patternSelected
-    _tempPalette = getTempPalette(config)
+    rpO.lastPatternSelected = _patternSelected
+    _tempPalette = getTempPalette(rpO)
     _iterCount = 0
-    config.initPatternBuild = True
-    config.randomInsertionCount = 0
-    config.consecutivePatternChoiceCount = 0
+    rpO.initPatternBuild = True
+    rpO.randomInsertionCount = 0
+    rpO.consecutivePatternChoiceCount = 0
 
-    _combo = config.combinationSets[config.currentCombinationsetIndex]
-    config.useBorderPattern = _combo.useBorderPattern
-    config.borderPattern = _combo.borderPattern
-    config.usePolygonOverlay = _combo.usePolygonOverlay
-    config.polyOverlayMode = _combo.polyOverlayMode
-    config.tileOverlayGridProb = _combo.tileOverlayGridProb
-    config.patternsInBands = _combo.patternsInBands
+    _combo = rpO.combinationSets[rpO.currentCombinationsetIndex]
+    rpO.useBorderPattern = _combo.useBorderPattern
+    rpO.borderPattern = _combo.borderPattern
+    rpO.usePolygonOverlay = _combo.usePolygonOverlay
+    rpO.polyOverlayMode = _combo.polyOverlayMode
+    rpO.tileOverlayGridProb = _combo.tileOverlayGridProb
+    rpO.patternsInBands = _combo.patternsInBands
 
     _combo.randomInsertionProbabilitly = _combo.randomInsertionInitialProbabilitly
 
@@ -913,29 +915,29 @@ def generatePatternSequence(config):
 
         if random.random() < _baseProb:
             _patternSelected = chooseAPattern()
-            _tempPalette = getTempPalette(config)
+            _tempPalette = getTempPalette(rpO)
 
         if _combo.minNumberOfPatternVariations > 0:
-            if _patternSelected != config.lastPatternSelected:
-                config.consecutivePatternChoiceCount += 1
-                config.lastPatternSelected = _patternSelected
+            if _patternSelected != rpO.lastPatternSelected:
+                rpO.consecutivePatternChoiceCount += 1
+                rpO.lastPatternSelected = _patternSelected
 
-            if config.consecutivePatternChoiceCount == 0 and _iterCount > (config.patternBlockRows * config.patternBlockCols - _combo.minNumberOfPatternVariations):
-                if _combo.dominantPatternProb > 0 and config.lastPatternSelected != _combo.dominantPatterns[0]:
+            if rpO.consecutivePatternChoiceCount == 0 and _iterCount > (rpO.patternBlockRows * rpO.patternBlockCols - _combo.minNumberOfPatternVariations):
+                if _combo.dominantPatternProb > 0 and rpO.lastPatternSelected != _combo.dominantPatterns[0]:
                     _patternSelected = chooseAPattern(False, True)
                 else:
                     _patternSelected = chooseAPattern()
 
-                _tempPalette = getTempPalette(config)
+                _tempPalette = getTempPalette(rpO)
                 pieceLogger("[generatePatternSequence] >> forcing a change in last few slots")
 
         if "randomizer" in _patternSelected:
-            if config.numberOfRandomizersUsed >= _combo.maxNumberOfRandomizers:
-                # pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {config.numberOfRandomizersUsed}")
+            if rpO.numberOfRandomizersUsed >= _combo.maxNumberOfRandomizers:
+                # pieceLogger(f"need to limit _patternSelected {_patternSelected} {_iterCount} {rpO.numberOfRandomizersUsed}")
                 _patternSelected = chooseAPattern(True)
-                _tempPalette = getTempPalette(config)
+                _tempPalette = getTempPalette(rpO)
             else:
-                config.numberOfRandomizersUsed += 1
+                rpO.numberOfRandomizersUsed += 1
 
         _position = _iterCount
         _pattern = _patternSelected
@@ -944,8 +946,8 @@ def generatePatternSequence(config):
         if not _combo.altBlockRotation:
             _rotate = 0
 
-        if config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1)) and random.random() > _combo.borderLeakProb:
-            _pattern = config.borderPattern
+        if rpO.useBorderPattern and (c == 0 or r == 0 or c == (rpO.patternBlockCols - 1) or r == (rpO.patternBlockRows - 1)) and random.random() > _combo.borderLeakProb:
+            _pattern = rpO.borderPattern
             _isBorder = True
 
         # else:
@@ -959,55 +961,55 @@ def generatePatternSequence(config):
         _patternBlock.col = c
         _patternBlock.row = r
         _patternBlock.rePainting = _patternSelected in ["randomizer4", "randomizer3", "randomizer2", "randomizer", "diamond"]
-        _patternBlock.isBorder = config.useBorderPattern and (c == 0 or r == 0 or c == (config.patternBlockCols - 1) or r == (config.patternBlockRows - 1))
+        _patternBlock.isBorder = rpO.useBorderPattern and (c == 0 or r == 0 or c == (rpO.patternBlockCols - 1) or r == (rpO.patternBlockRows - 1))
 
         # if config.randomInsertionCount < _randomInsertionMax and not _patternBlock.isBorder:
-        if config.randomInsertionCount < _randomInsertionMax:
+        if rpO.randomInsertionCount < _randomInsertionMax:
             if random.random() < _randomInsertionProb:
                 _patternBlock.pattern = _randomInserts[math.floor(random.uniform(0, len(_randomInserts)))]
-                # pieceLogger(f"[generatePatternSequence][add_pattern_block]===== {config.randomInsertionCount} / {_randomInsertionMax} {_patternSelected} {_randomInsertionProb}")
+                # pieceLogger(f"[generatePatternSequence][add_pattern_block]===== {rpO.randomInsertionCount} / {_randomInsertionMax} {_patternSelected} {_randomInsertionProb}")
                 _randomInsertionProb = _combo.randomInsertionBaseProbabilitly
-                config.randomInsertionCount += 1
+                rpO.randomInsertionCount += 1
 
         try:
-            if config.settingUpPattern:
-                config.patternSequence.append(_patternBlock)
+            if rpO.settingUpPattern:
+                rpO.patternSequence.append(_patternBlock)
             else:
-                if len(config.slotsToChange) > 0:
-                    if _iterCount in config.slotsToChange:
-                        config.patternSequence[_iterCount] = _patternBlock
+                if len(rpO.slotsToChange) > 0:
+                    if _iterCount in rpO.slotsToChange:
+                        rpO.patternSequence[_iterCount] = _patternBlock
                         # pieceLogger(f"_iterCount {_iterCount} {_patternBlock.pattern}")
-                elif random.random() < config.rebuildIndividualSlotProb:
-                    _slot = round(random.uniform(0, len(config.patternSequence) - 1))
+                elif random.random() < rpO.rebuildIndividualSlotProb:
+                    _slot = round(random.uniform(0, len(rpO.patternSequence) - 1))
                     # shouldn't there be a list of slots to change that are somewhat
                     # consecuetive? otherwise just makes the whole thing more patchy?
-                    # pieceLogger(f"add_pattern_block: change this slot {_slot}/ {len(config.patternSequence)}")
-                    config.patternSequence[_slot] = _patternBlock
+                    # pieceLogger(f"add_pattern_block: change this slot {_slot}/ {len(rpO.patternSequence)}")
+                    rpO.patternSequence[_slot] = _patternBlock
         except Exception as e:
             pieceLogger(f"[generatePatternSequence][add_pattern_block] error {e}", 1)
 
-        # pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _patternBlock.pattern: column:{c} row:{r} config.randomInsertionCount {config.randomInsertionCount}/{_randomInsertionMax} {_iterCount}: {_patternBlock.pattern}")
+        # pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _patternBlock.pattern: column:{c} row:{r} rpO.randomInsertionCount {rpO.randomInsertionCount}/{_randomInsertionMax} {_iterCount}: {_patternBlock.pattern}")
         _iterCount += 1
 
-    if config.patternsInBands:
-        for r in range(config.patternBlockRows):
-            for c in range(config.patternBlockCols):
+    if rpO.patternsInBands:
+        for r in range(rpO.patternBlockRows):
+            for c in range(rpO.patternBlockCols):
                 add_pattern_block(c, r)
     else:
-        for c in range(config.patternBlockCols):
-            for r in range(config.patternBlockRows):
+        for c in range(rpO.patternBlockCols):
+            for r in range(rpO.patternBlockRows):
                 add_pattern_block(c, r)
 
 
-def getTempPalette(config):
+def getTempPalette(rpO):
 
-    if random.SystemRandom().random() > config.changePaletteWhenChangingPatternProb:
-        return getPaletteObjectByName(config.combinationSets[config.currentCombinationsetIndex].palettes[config.currentPaletteIndex])
+    if random.SystemRandom().random() > rpO.changePaletteWhenChangingPatternProb:
+        return getPaletteObjectByName(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[rpO.currentPaletteIndex])
 
-    if random.SystemRandom().random() <= config.changeFullPaletteWhenChangingPatternProb:
+    if random.SystemRandom().random() <= rpO.changeFullPaletteWhenChangingPatternProb:
         selectNewPalette(False)
 
-    return changeSinglePalette(config.currentPaletteIndex)
+    return changeSinglePalette(rpO.currentPaletteIndex)
 
 
 def _print_pattern_sequence(config):
@@ -1023,14 +1025,14 @@ def _print_pattern_sequence(config):
 def rebuildPatterns(arg=0):
     pieceLogger("[rebuildPatterns] >> called")
 
-    if config.numRowsRandomize:
+    if rpO.numRowsRandomize:
         rowsAndDotsSettings()
 
     # if random.random() < config.changePaletteWhenRebuildProb:
     #     pieceLogger("selectNewPalette called from: rebuildPatterns()")
     #     selectNewPalette()
 
-    buildPatternSequence(config)
+    buildPatternSequence(rpO)
     disturbance.setupStableSections()
     disturbance.rebuildSections()
     resetCrossFader(False)
@@ -1041,17 +1043,17 @@ def resetCrossFader(_useConfigImage=True):
     # print(f"DOING NOW  {config.faderDoingRefreshCount}")
     # os.system('say "NOW" &')
     # pieceLogger(f"resetCrossFader called : {_useConfigImage}")
-    config.repeatDrawingMode = 1
-    config.fader.fadingDone = False
-    config.doTransition = True
-    config.doSectionDisturbance = False
+    rpO.repeatDrawingMode = 1
+    rpO.fader.fadingDone = False
+    rpO.doTransition = True
+    rpO.doSectionDisturbance = False
     if _useConfigImage:
-        config.fader.startingImage = config.image.copy()
+        rpO.fader.startingImage = config.image.copy()
     else:
         # config.fader.startingImage = config.canvasImage.copy()
-        config.fader.startingImage = config.compositeImage.copy()
+        rpO.fader.startingImage = config.compositeImage.copy()
 
-    # _tempImg  =  Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    # _tempImg  =  Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     # _tempDraw = ImageDraw.Draw(_tempImg)
     # _tempDraw.rectangle((0,0,500,500), fill = (255,0,0,255))
     # config.canvasImage.paste(_tempImg, (0,0), _tempImg)
@@ -1059,49 +1061,67 @@ def resetCrossFader(_useConfigImage=True):
     # NOT WORKING
 
     # config.fader.endImage = config.canvasImage.copy()
-    # config.fader.crossFadeImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    # config.fader.crossFadeImage = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
 
     # config.fader.totalBlocksToChange = config.faderDoingRefreshCount
-    config.fader.initialized = True
+    rpO.fader.initialized = True
     # config.debugPause = True
 
 
 def rowsAndDotsSettings():
 
-    config.numRows = round(random.uniform(1, 2))
-    config.numShingleRows = round(random.uniform(1, 2))
-    config.numScaleRows = round(random.uniform(1, 2))
+    rpO.numRows = round(random.uniform(1, 2))
+    rpO.numShingleRows = round(random.uniform(1, 2))
+    rpO.numScaleRows = round(random.uniform(1, 2))
     dotRows = [1, 2, 4]
-    config.numDotRows = dotRows[round(random.uniform(0, 2))]
-    config.waveScaleRings = round(random.uniform(config.ringsRange[0], config.ringsRange[1]))
-    config.waveScaleSteps = round(random.uniform(config.stepsRange[0], config.stepsRange[1]))
+    rpO.numDotRows = dotRows[round(random.uniform(0, 2))]
+    rpO.waveScaleRings = round(random.uniform(rpO.ringsRange[0], rpO.ringsRange[1]))
+    rpO.waveScaleSteps = round(random.uniform(rpO.stepsRange[0], rpO.stepsRange[1]))
 
 
 # --------------------- LOOP ACTIONS  ---------------------
 
+def handleFilterRemapping():
+    """Handles filter remapping if enabled."""
+    # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
+    if random.random() < rpO.filterRemappingProb and (config.useFilters and rpO.filterRemapping):
+        remapFilter(config)
+
+
+def remapFilter(config):
+    """Remaps the filter block section."""
+    config.filterRemap = True
+    startX = round(random.uniform(0, rpO.filterRemapRangeX))
+    startY = round(random.uniform(0, rpO.filterRemapRangeY))
+    endX = round(random.uniform(rpO.filterRemapMinHoriSize, rpO.filterRemapMaxHoriSize))
+    endY = round(random.uniform(rpO.filterRemapMinVertSize, rpO.filterRemapMaxVertSize))
+    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+    config.remapImageBlockDestination = [startX, startY]
 
 def iterate():
     """Performs a single iteration of the animation."""
     global config
+    global rpO
 
     if config.debugPause:
         config.directorController.slotRate = 2.0
 
-    config.comboSetDirector.checkTime()
-    if config.comboSetDirector.advance:
+    rpO.comboSetDirector.checkTime()
+    if rpO.comboSetDirector.advance:
         handleChangeCurrentCominationSet()
 
     updateBackgroundColor()
     # handleClipPlayer()
     drawAndProcessPattern()
     disturbance.handleDisturbances()
+    handleFilterRemapping()
     handleFadingAndRebuild()
     disturbance.handleSectionDisturbances()
     disturbance.handleShingleVariation()
     drawBackgroundAndPasteImage()
     renderComposite()
 
-    if config.saveImages:
+    if rpO.saveImages:
         saveImageIfDone()
 
 
@@ -1111,57 +1131,57 @@ def drawRepeatedPatternImage(config, canvasImage):
     extraOverlapx = 0
     extraOverlapy = 0
     # for i in range(len(config.patternSequence)):
-    for i in range(config.totalSlots):
-        _patternBlock = config.patternSequence[i]
+    for i in range(rpO.totalSlots):
+        _patternBlock = rpO.patternSequence[i]
         # This sets the block image for each unit
-        drawBlockWithPattern(config, i)
+        drawBlockWithPattern(rpO, i)
 
         if _patternBlock.hasBeenPainted == False:
-            drawIndividualBlock(config, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
+            drawIndividualBlock(rpO, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
             if not _patternBlock.rePainting or _patternBlock.isBorder:
                 _patternBlock.hasBeenPainted = True
 
-    # config.patternImage = canvasImage.copy()
-    config.fader.endImage = config.patternImage.copy()
-    # config.fader.endImage = config.canvasImage.copy()
+    # rpO.patternImage = canvasImage.copy()
+    rpO.fader.endImage = config.patternImage.copy()
+    # rpO.fader.endImage = rpO.canvasImage.copy()
 
 
-def drawIndividualBlock(config, canvasImage, c, r, _counter, extraOverlapx, extraOverlapy):
+def drawIndividualBlock(rpO, canvasImage, c, r, _counter, extraOverlapx, extraOverlapy):
     """Draws a single block of the pattern."""
 
-    _temp = config.blockImage.copy()
-    # _temp = Image.new("RGBA",(config.blockWidth, config.blockHeight))
+    _temp = rpO.blockImage.copy()
+    # _temp = Image.new("RGBA",(rpO.blockWidth, rpO.blockHeight))
     # _tempDraw = ImageDraw.Draw(_temp)
-    # _temp.paste(config.blockImage, (0,0), config.blockImage)
+    # _temp.paste(rpO.blockImage, (0,0), rpO.blockImage)
     # _tempDraw.rectangle((0,0,10,10), fill =(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
     # _temp = _temp.crop((0,0,20,20))
     # disabling for a moment 2023-04-01
 
-    if config.patternModel not in ["ropePattern", "littleCones"]:
+    if rpO.patternModel not in ["ropePattern", "littleCones"]:
         _temp = _temp.rotate(90)
-    # if config.patternModel == "circlesPacked":
-    #     extraOverlapx = round(config.blockWidth / 8)
-    #     extraOverlapy = round(config.blockWidth / 8)
+    # if rpO.patternModel == "circlesPacked":
+    #     extraOverlapx = round(rpO.blockWidth / 8)
+    #     extraOverlapy = round(rpO.blockWidth / 8)
 
-    if config.patternModel in ["waveScales", "shellScales"]:
+    if rpO.patternModel in ["waveScales", "shellScales"]:
         _temp = _temp.rotate(-180)
 
-    if c % 2 != 0 and config.rotateAltBlock == 1:
+    if c % 2 != 0 and rpO.rotateAltBlock == 1:
         _temp = _temp.rotate(-90)
 
     # forces the patterns to align to a certain rotation
     # useful instead of rotation the whole piece etc
-    if config.patternOrientation != 0:
-        _temp = _temp.rotate(config.patternOrientation)
+    if rpO.patternOrientation != 0:
+        _temp = _temp.rotate(rpO.patternOrientation)
 
-    if config.blockRotation != 0:
-        _temp = _temp.rotate(config.blockRotation)
+    if rpO.blockRotation != 0:
+        _temp = _temp.rotate(rpO.blockRotation)
 
     # _tempDraw = ImageDraw.Draw(canvasImage)
     # _tempDrawB = ImageDraw.Draw(_temp)
 
-    _xPos = c * config.blockWidth - c * extraOverlapx
-    _yPos = r * config.blockHeight - r * extraOverlapy
+    _xPos = c * rpO.blockWidth - c * extraOverlapx
+    _yPos = r * rpO.blockHeight - r * extraOverlapy
 
     canvasImage.paste(_temp, (_xPos, _yPos), _temp)
     config.canvasImage.paste(_temp, (_xPos, _yPos), _temp)
@@ -1174,7 +1194,7 @@ def drawBlockWithPattern(config, _counter):
     config.rotateAltBlock = _patternBlock.rotate
     if not _patternBlock.hasBeenPainted:
         func = eval(f"pattern_blocks_v5.{_patternBlock.pattern}")
-        func(config, _patternBlock.tempPalette)
+        func(rpO, _patternBlock.tempPalette)
 
     # if not _patternBlock.rePainting:
     #     _patternBlock.hasBeenPainted = True
@@ -1182,7 +1202,7 @@ def drawBlockWithPattern(config, _counter):
 
 def updateBackgroundColor():
     """Updates the background color based on current palette."""
-    config.bgColor = tuple(round(a * config.brightness) for a in config.c1.currentColor)
+    rpO.bgColor = tuple(round(a * config.brightness) for a in rpO.c1.currentColor)
 
 
 def drawAndProcessPattern():
@@ -1192,7 +1212,7 @@ def drawAndProcessPattern():
     # if config.repeatDrawingMode == 1:
     #     redrawAndLoadImage(config)
 
-    if random.random() < 0.005 and config.usePixelSortRandomize:
+    if random.random() < 0.005 and rpO.usePixelSortRandomize:
         config.usePixelSort = not config.usePixelSort  # Toggle pixel sort
 
 
@@ -1212,17 +1232,17 @@ def redrawAndLoadImage(config):
 
 def handleFadingAndRebuild():
     """Handles image fading and pattern rebuilding."""
-    if config.fader.fadingDone:
+    if rpO.fader.fadingDone:
         # config.fader.fadingDone = False
         # config.fader.startingImage = config.canvasImage
 
-        config.fader.totalBlocksToChange = 0
-        if config.doneCount >= config.numberOfSections and config.rebuildImmediatelyAfterDone:
-            config.doSectionDisturbance = False
+        rpO.fader.totalBlocksToChange = 0
+        if rpO.doneCount >= rpO.numberOfSections and rpO.rebuildImmediatelyAfterDone:
+            rpO.doSectionDisturbance = False
             pieceLogger("rebuildPatterns called after fading done")
             rebuildPatterns()
 
-    if random.random() < config.resetOverlayProbability and config.usePolygonOverlay:
+    if random.random() < rpO.resetOverlayProbability and rpO.usePolygonOverlay:
         loadPolyOverlaybaseValues()
 
 
@@ -1239,66 +1259,66 @@ def saveImageIfDone():
 
 def handlePatternRebuild():
     """Handles rebuilding the pattern based on probability."""
-    disturbancesDone = not config.doSectionDisturbance or config.doneCount >= config.numberOfSections
-    if config.fader.fadingDone and disturbancesDone:
-        # config.doSectionDisturbance = False
+    disturbancesDone = not rpO.doSectionDisturbance or rpO.doneCount >= rpO.numberOfSections
+    if rpO.fader.fadingDone and disturbancesDone:
+        # rpO.doSectionDisturbance = False
         # print("\nrebuildPatterns called after fading done 2")
 
         # selectNewPalette(False)
-        if random.random() < config.rebuildAllSlotsProb:
-            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding full : {config.combinationSets[config.currentCombinationsetIndex].name}")
-            config.settingUpPattern = True
-            config.patternSequence = []
+        if random.random() < rpO.rebuildAllSlotsProb:
+            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding full : {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
+            rpO.settingUpPattern = True
+            rpO.patternSequence = []
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding parts: {config.combinationSets[config.currentCombinationsetIndex].name}")
-            if random.random() < config.chanceRebuildPatternChoosesRandom:
-                config.slotsToChange = []
+            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding parts: {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
+            if random.random() < rpO.chanceRebuildPatternChoosesRandom:
+                rpO.slotsToChange = []
             else:
-                config.slotsToChange = []
+                rpO.slotsToChange = []
                 _skip = True
-                _chanceNotToSkip = config.rebuildSlotSkipRate
-                _chanceToSkip = config.rebuildSlotStartSkipRate
-                for i in range(len(config.patternSequence)):
+                _chanceNotToSkip = rpO.rebuildSlotSkipRate
+                _chanceToSkip = rpO.rebuildSlotStartSkipRate
+                for i in range(len(rpO.patternSequence)):
                     if random.random() < _chanceToSkip:
                         _skip = False
                     if random.random() < _chanceNotToSkip:
                         _skip = True
                     if not _skip:
-                        config.slotsToChange.append(i)
-                # pieceLogger(f"handlePatternRebuild:  {config.slotsToChange}")
+                        rpO.slotsToChange.append(i)
+                # pieceLogger(f"handlePatternRebuild:  {rpO.slotsToChange}")
 
-            config.settingUpPattern = False
+            rpO.settingUpPattern = False
         try:
-            pieceLogger(f"[handlePatternRebuild] >> config.settingUpPattern {config.settingUpPattern} | color palette : {config.palettes[config.currentPaletteIndex]}")
+            pieceLogger(f"[handlePatternRebuild] >> rpO.settingUpPattern {rpO.settingUpPattern} | color palette : {rpO.palettes[rpO.currentPaletteIndex]}")
         except Exception as e:
             pieceLogger(e)
-        # pieceLogger(f"handlePatternRebuild(): config.slotsToChange {config.slotsToChange}")
+        # pieceLogger(f"handlePatternRebuild(): rpO.slotsToChange {rpO.slotsToChange}")
         rebuildPatterns()
 
 
 def drawBackgroundAndPasteImage():
     """Draws the background and pastes the main image."""
-    if config.doTransition:
+    if rpO.doTransition:
 
-        for _ in range(config.faderDoingRefreshCountIterations):
-            config.fader.fadeIn(config)
-            for _patch, _px, _py in config.fader.crossFadePatches:
+        for _ in range(rpO.faderDoingRefreshCountIterations):
+            rpO.fader.fadeIn(config)
+            for _patch, _px, _py in rpO.fader.crossFadePatches:
                 config.compositeImage.paste(_patch, (_px, _py), _patch)
 
-    elif config.sectionDisturbance:
-        if config.doSectionDisturbance:
+    elif rpO.sectionDisturbance:
+        if rpO.doSectionDisturbance:
             config.compositeImage.paste(config.canvasImage, (0, 0), config.canvasImage)
         else:
             config.compositeImage.paste(config.patternImage, (0, 0), config.patternImage)
 
     """Transforms and renders the final image."""
-    if config.transformShape:
+    if rpO.transformShape:
         config.compositeImage = transformImage(config.compositeImage)
 
-    if config.canvasRotation != 0:
-        config.compositeImage = config.compositeImage.rotate(config.canvasRotation, 3, True)
+    if rpO.canvasRotation != 0:
+        config.compositeImage = config.compositeImage.rotate(rpO.canvasRotation, 3, True)
         config.compositeImage = ImageEnhance.Contrast(config.compositeImage).enhance(1.20)
 
 
@@ -1308,8 +1328,8 @@ def renderComposite():
         config.panelDrawing.canvasToUse = config.compositeImage
         config.panelDrawing.render()
     else:
-        if config.usePolygonOverlay:
-            config.compositeImage = shapeOverLayFunction(config.compositeImage)
+        # if rpO.usePolygonOverlay:
+        #     config.compositeImage = shapeOverLayFunction(config.compositeImage)
 
         # config.compositeImageDraw = ImageDraw.Draw(config.compositeImage)
         # config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
@@ -1318,49 +1338,49 @@ def renderComposite():
 
         # config.destinationImage.paste(config.compositeImage, (0, 0), config.compositeImage)
 
-        _xp = int(config.imageXPOS)
-        _frac = config.imageXPOS - _xp
-        _yp = int(config.imageYPOS)
+        _xp = int(rpO.imageXPOS)
+        _frac = rpO.imageXPOS - _xp
+        _yp = int(rpO.imageYPOS)
 
-        if getattr(config, "useSubPixelSmoothing", False):
-            _BG = config.bgColor
+        if getattr(rpO, "useSubPixelSmoothing", False):
+            _BG = rpO.bgColor
             _w, _h = config.scrollBlendFrame0.width, config.scrollBlendFrame0.height
             config.scrollBlendFrame0.paste(_BG, (0, 0, _w, _h))
             config.scrollBlendFrame0.paste(config.compositeImage, (_xp, _yp), config.compositeImage)
-            config.scrollBlendFrame0.paste(config.compositeImage, (_xp - config.pictureWidth, _yp), config.compositeImage)
+            config.scrollBlendFrame0.paste(config.compositeImage, (_xp - rpO.pictureWidth, _yp), config.compositeImage)
             if _frac > 0.05:
                 config.scrollBlendFrame1.paste(_BG, (0, 0, _w, _h))
                 config.scrollBlendFrame1.paste(config.compositeImage, (_xp + 1, _yp), config.compositeImage)
-                config.scrollBlendFrame1.paste(config.compositeImage, (_xp + 1 - config.pictureWidth, _yp), config.compositeImage)
+                config.scrollBlendFrame1.paste(config.compositeImage, (_xp + 1 - rpO.pictureWidth, _yp), config.compositeImage)
                 config.destinationImage.paste(Image.blend(config.scrollBlendFrame0, config.scrollBlendFrame1, _frac), (0, 0))
             else:
                 config.destinationImage.paste(config.scrollBlendFrame0, (0, 0))
         else:
             config.destinationImage.paste(config.compositeImage, (_xp, _yp), config.compositeImage)
-            config.destinationImage.paste(config.compositeImage, (_xp - config.pictureWidth, _yp), config.compositeImage)
+            config.destinationImage.paste(config.compositeImage, (_xp - rpO.pictureWidth, _yp), config.compositeImage)
 
-        config.imageXPOS += config.XPOSSpeed
-        # config.imageYPOS += config.YPOSSpeed
+        rpO.imageXPOS += rpO.XPOSSpeed
+        # rpO.imageYPOS += rpO.YPOSSpeed
 
-        if config.imageXPOS >= config.pictureWidth:
-            config.imageXPOS = 0
+        if rpO.imageXPOS >= rpO.pictureWidth:
+            rpO.imageXPOS = 0
 
-        if config.imageYPOS >= config.pictureHeight:
-            config.imageYPOS = 0
+        if rpO.imageYPOS >= rpO.pictureHeight:
+            rpO.imageYPOS = 0
 
-        # showDebugCanvases(config)
+        # showDebugCanvases(rpO)
         # # uncomment for all temp canvas layers to show
-        if config.setupDeBug:
-            showDebugCanvases(config)
+        if rpO.setupDeBug:
+            showDebugCanvases(rpO)
 
         # this used to occur on the composite layer but was getting jumps when
         # new blocks were added so compromising with wave distortions applied to final
         # image  - smoother and slower
-        if config.useWaveDistortion:
+        if rpO.useWaveDistortion:
             config.destinationImage = ImageOps.deform(config.destinationImage, disturbance.WaveDeformer())
-            config.waveDeformXPos += config.waveDeformXPosRate
-            if config.waveDeformXPos > config.screenWidth:
-                config.waveDeformXPos = 0
+            rpO.waveDeformXPos += rpO.waveDeformXPosRate
+            if rpO.waveDeformXPos > config.screenWidth:
+                rpO.waveDeformXPos = 0
 
         # Run every cycle:
         global overlayControls
@@ -1372,12 +1392,15 @@ def renderComposite():
         overlayControls.handleOverlayActions()
 
         # config.image = config.destinationImage.copy()
+
+        if rpO.usePolygonOverlay:
+            config.destinationImage = shapeOverLayFunction(config.destinationImage)
         config.render(config.destinationImage, 0, 0)
 
 
 def showDebugCanvases(config):
-    _w = config.pictureWidth
-    _h = config.pictureHeight
+    _w = rpO.pictureWidth
+    _h = rpO.pictureHeight
 
     patternCoord = (1 * (_w + 20), 0)
     canvasImageCoord = (1 * (_w + 20), _h * 2 + 40)
@@ -1403,21 +1426,21 @@ def showDebugCanvases(config):
 
 
 def shapeOverLayFunction(temp1):
-    temp2 = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    temp2 = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     temp2Draw = ImageDraw.Draw(temp2)
 
-    if not config.useOverlayTileGrid:
-        config.polyOverlay.stepTransition()
-        polyFillaList = [int(a) for a in (config.polyOverlay.currentColor)]
-        polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], config.poly_alpha)
+    if not rpO.useOverlayTileGrid:
+        rpO.polyOverlay.stepTransition()
+        polyFillaList = [int(a) for a in (rpO.polyOverlay.currentColor)]
+        polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], rpO.poly_alpha)
         # actual shape
-        if random.random() < config.polyOverlayChangeProb:
-            config.polyBase[0][0] += random.uniform(-3, 3)
-            config.polyBase[1][0] += random.uniform(-3, 3)
-            config.polyBase[2][0] += random.uniform(-3, 3)
-            config.polyBase[3][0] += random.uniform(-3, 3)
-            config.polyBase[4][0] += random.uniform(-3, 3)
-        poly = tuple(map(lambda x: (tuple(x)), config.polyBase))
+        if random.random() < rpO.polyOverlayChangeProb:
+            rpO.polyBase[0][0] += random.uniform(-3, 3)
+            rpO.polyBase[1][0] += random.uniform(-3, 3)
+            rpO.polyBase[2][0] += random.uniform(-3, 3)
+            rpO.polyBase[3][0] += random.uniform(-3, 3)
+            rpO.polyBase[4][0] += random.uniform(-3, 3)
+        poly = tuple(map(lambda x: (tuple(x)), rpO.polyBase))
 
         # outline outside shape
         # poly = ((11,20),(24,160),(300,160),(300,200),(0,200),(0,0),(300,0),(200,12),(20,20))
@@ -1431,14 +1454,14 @@ def shapeOverLayFunction(temp1):
         temp1.paste(temp2, (0, 0), temp2)
     else:
         _count = 0
-        _overlayFill = tuple(round(a * config.brightness) for a in config.c3.currentColor)
-        for _r in range(config.rows):
-            for _c in range(config.cols):
-                _x0 = _c * config.tileSizeWidth
-                _y0 = _r * config.tileSizeHeight
-                _x1 = _x0 + config.tileSizeWidth
-                _y1 = _y0 + config.tileSizeHeight
-                if _count in config.tileOverlayGrid:
+        _overlayFill = tuple(round(a * config.brightness) for a in rpO.c3.currentColor)
+        for _r in range(rpO.rows):
+            for _c in range(rpO.cols):
+                _x0 = _c * rpO.tileSizeWidth
+                _y0 = _r * rpO.tileSizeHeight
+                _x1 = _x0 + rpO.tileSizeWidth
+                _y1 = _y0 + rpO.tileSizeHeight
+                if _count in rpO.tileOverlayGrid:
                     temp2Draw.rectangle((_x0, _y0, _x1, _y1), fill=_overlayFill)
                 # else :
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
@@ -1455,13 +1478,13 @@ def shapeOverLayFunction(temp1):
         #     case "lighter":
         #         temp1 = ImageChops.lighter(temp1, temp2)
 
-        if config.polyOverlayMode == "overaly":
+        if rpO.polyOverlayMode == "overaly":
             temp1 = ImageChops.overlay(temp1, temp2)
-        if config.polyOverlayMode == "subtract_modulo":
+        if rpO.polyOverlayMode == "subtract_modulo":
             temp1 = ImageChops.subtract_modulo(temp1, temp2)
-        if config.polyOverlayMode == "soft_light":
+        if rpO.polyOverlayMode == "soft_light":
             temp1 = ImageChops.soft_light(temp1, temp2)
-        if config.polyOverlayMode == "lighter":
+        if rpO.polyOverlayMode == "lighter":
             temp1 = ImageChops.lighter(temp1, temp2)
 
         if random.random() < config.polyOverlayChangeProb:
@@ -1474,53 +1497,54 @@ def loadPolyOverlaybaseValues():
     try:
         _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
         # print(_polyBaseVals)
-        config.polyBase = []
+        rpO.polyBase = []
         for _a in _polyBaseVals:
             _ps = list(map(lambda x: int(x), _a.split(",")))
-            config.polyBase.append(_ps)
+            rpO.polyBase.append(_ps)
     except Exception as e:
         pieceLogger(e)
-        config.polyBase = []
+        rpO.polyBase = []
 
 
 def generateOverlayTiles():
-    config.tileOverlayGrid = [0]
+    rpO.tileOverlayGrid = [0]
     for _v in range(config.rows * config.cols):
-        if random.random() < config.tileOverlayGridProb:
-            config.tileOverlayGrid.append(_v)
+        if random.random() < rpO.tileOverlayGridProb:
+            rpO.tileOverlayGrid.append(_v)
 
 
 def setupPolyOverlay():  # sourcery skip: extract-method
+    rpO.usePolygonOverlay = False
     config.usePolygonOverlay = False
     try:
-        config.polyOverlay = ColorOverlay()
-        config.polyOverlay.randomSteps = True
-        config.polyOverlay.timeTrigger = True
-        config.polyOverlay.tLimitBase = int(workConfig.get("movingpattern", "poly_tLimitBase"))
-        config.polyOverlay.tLimit = int(workConfig.get("movingpattern", "poly_tLimit"))
-        config.polyOverlay.steps = int(workConfig.get("movingpattern", "poly_steps"))
-        config.usePolygonOverlay = workConfig.getboolean("movingpattern", "usePolygonOverlay")
-        config.polyOverlay.minHue = int(workConfig.get("movingpattern", "poly_minHue"))
-        config.polyOverlay.maxHue = int(workConfig.get("movingpattern", "poly_maxHue"))
-        config.polyOverlay.minSaturation = float(workConfig.get("movingpattern", "poly_minSaturation"))
-        config.polyOverlay.maxSaturation = float(workConfig.get("movingpattern", "poly_maxSaturation"))
-        config.polyOverlay.minValue = float(workConfig.get("movingpattern", "poly_minValue"))
-        config.polyOverlay.maxValue = float(workConfig.get("movingpattern", "poly_maxValue"))
-        config.tileOverlayGridProb = float(workConfig.get("movingpattern", "tileOverlayGridProb", fallback=0.0))
-        config.poly_alpha = int(workConfig.get("movingpattern", "poly_alpha"))
-        config.useOverlayTileGrid = workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False)
-        config.polyOverlayMode = workConfig.get("movingpattern", "polyOverlayMode", fallback="soft_light")
-        config.polyOverlay.setStartColor()
-        config.polyOverlay.getNewColor()
-        config.polyOverlay.colorTransitionSetup()
-        config.polyOverlayChangeProb = float(workConfig.get("movingpattern", "polyOverlayChangeProb", fallback=0.003))
+        rpO.polyOverlay = ColorOverlay()
+        rpO.polyOverlay.randomSteps = True
+        rpO.polyOverlay.timeTrigger = True
+        rpO.polyOverlay.tLimitBase = int(workConfig.get("movingpattern", "poly_tLimitBase"))
+        rpO.polyOverlay.tLimit = int(workConfig.get("movingpattern", "poly_tLimit"))
+        rpO.polyOverlay.steps = int(workConfig.get("movingpattern", "poly_steps"))
+        rpO.usePolygonOverlay = workConfig.getboolean("movingpattern", "usePolygonOverlay")
+        rpO.polyOverlay.minHue = int(workConfig.get("movingpattern", "poly_minHue"))
+        rpO.polyOverlay.maxHue = int(workConfig.get("movingpattern", "poly_maxHue"))
+        rpO.polyOverlay.minSaturation = float(workConfig.get("movingpattern", "poly_minSaturation"))
+        rpO.polyOverlay.maxSaturation = float(workConfig.get("movingpattern", "poly_maxSaturation"))
+        rpO.polyOverlay.minValue = float(workConfig.get("movingpattern", "poly_minValue"))
+        rpO.polyOverlay.maxValue = float(workConfig.get("movingpattern", "poly_maxValue"))
+        rpO.tileOverlayGridProb = float(workConfig.get("movingpattern", "tileOverlayGridProb", fallback=0.0))
+        rpO.poly_alpha = int(workConfig.get("movingpattern", "poly_alpha"))
+        rpO.useOverlayTileGrid = workConfig.getboolean("movingpattern", "useOverlayTileGrid", fallback=False)
+        rpO.polyOverlayMode = workConfig.get("movingpattern", "polyOverlayMode", fallback="soft_light")
+        rpO.polyOverlay.setStartColor()
+        rpO.polyOverlay.getNewColor()
+        rpO.polyOverlay.colorTransitionSetup()
+        rpO.polyOverlayChangeProb = float(workConfig.get("movingpattern", "polyOverlayChangeProb", fallback=0.003))
 
         generateOverlayTiles()
         loadPolyOverlaybaseValues()
         # print(config.polyBase)
     except Exception as e:
         pieceLogger(f"[setupPolyOverlay] >> Not using custom polygon overlay {e}")
-        config.usePolygonOverlay = False
+        rpO.usePolygonOverlay = False
 
 
 # ----------------- INITIAL ACTIONS  ---------------------
@@ -1529,30 +1553,30 @@ def setupPolyOverlay():  # sourcery skip: extract-method
 def loadAndInitializeCrossFader():
 
     pieceLogger("[loadAndInitializeCrossFader] >> Initialize cross fader")
-    loadConfigValue(config, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
-    loadConfigValue(config, workConfig, "movingpattern", "faderProbDissolve", 0.5, float)
-    loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderLargeBlockYSections", 3, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderSmallBlockXSections", 40, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderSmallBlockYSections", 40, int)
-    loadConfigValue(config, workConfig, "movingpattern", "sectionDeltaWidth", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "sectionDeltaHeight", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderParallelBlocks", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderFadeDoingRefreshCountIterations", 20, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderDissolveDoingRefreshCountIterations", 100, int)
-    loadConfigValue(config, workConfig, "movingpattern", "faderDoingRefreshCountIterationsStartup", 500, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderProbDissolve", 0.5, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderLargeBlockYSections", 3, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderSmallBlockXSections", 40, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderSmallBlockYSections", 40, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "sectionDeltaWidth", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "sectionDeltaHeight", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderParallelBlocks", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderFadeDoingRefreshCountIterations", 20, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderDissolveDoingRefreshCountIterations", 100, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "faderDoingRefreshCountIterationsStartup", 500, int)
 
-    config.doTransition = True
-    config.doneCount = 0
-    config.faderInit = True
-    config.faderDoingRefreshCountIterations = config.faderDoingRefreshCountIterationsStartup
-    config.fader = Fader()
-    config.fader.height = config.pictureHeight
-    config.fader.width = config.pictureWidth
-    config.fader.startingImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
-    config.fader.endImage = config.canvasImage
-    config.fader.destinationImage = config.image
-    config.fader.setUp(config)
+    rpO.doTransition = True
+    rpO.doneCount = 0
+    rpO.faderInit = True
+    rpO.faderDoingRefreshCountIterations = rpO.faderDoingRefreshCountIterationsStartup
+    rpO.fader = Fader()
+    rpO.fader.height = rpO.pictureHeight
+    rpO.fader.width = rpO.pictureWidth
+    rpO.fader.startingImage = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
+    rpO.fader.endImage = config.canvasImage
+    rpO.fader.destinationImage = config.image
+    rpO.fader.setUp(rpO)
 
 
 def createImageHolders():
@@ -1561,21 +1585,21 @@ def createImageHolders():
     # disturbanceImage will get the disturbance / glitching
     # image will be the final output
 
-    config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.image = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
 
-    config.patternImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.patternImage = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     config.patternImageDraw = ImageDraw.Draw(config.patternImage)
 
-    config.canvasImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.canvasImage = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     config.canvasImageDraw = ImageDraw.Draw(config.canvasImage)
 
-    config.nextStateImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.nextStateImage = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     config.nextStateImageDraw = ImageDraw.Draw(config.nextStateImage)
 
     config.destinationImage = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
 
-    config.compositeImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.compositeImage = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
 
     # For scrolling the entire piece
     config.scrollBlendFrame0 = Image.new("RGBA", (config.screenWidth, config.screenHeight), (0, 0, 0, 255))
@@ -1584,71 +1608,311 @@ def createImageHolders():
     config.blendSteps = 5
     config.blendStep = 0
 
+    rpO.canvasImage = config.canvasImage
+    rpO.patternImage = config.patternImage
+    rpO.nextStateImage = config.nextStateImage
+    rpO.destinationImage = config.destinationImage
+    rpO.compositeImage = config.compositeImage
+
+
+class RepeatedPatterns:
+    path = ""
+    brightness = 1.0
+    setupDeBug = False
+    blockWidthMin = 48
+    blockWidthMax = 64
+    yOffset = 12
+    yOffset2 = 13
+    blockRotation = 0.0
+    canvasRotation = -0.0
+    imgcanvasOffsetX = 0
+    imgcanvasOffsetY = 0
+    pictureWidth = 512
+    pictureHeight = 224
+    repeatProb = 0.99
+    saveImages = False
+    outPutPath = ""
+    drawBGColorEachCycle = True
+    repeatDrawingMode = 1
+    loadAnImageProb = 0.0
+    imageSources = []
+    useBlurSection = False
+    blurSectionWidth = 120
+    blurSectionHeight = 60
+    blurSectionXPos = 220
+    blurSectionYPos = 0
+    mask_blur_amt = 20
+    cp_blur_amt = 3
+    resetOverlayProbability = 0.0
+    useClipPlayer = True
+    clipXPos = 100
+    clipYPos = 100
+    clipRotate = 90.0
+    steps = 2
+    fadeThroughIncrement = 0.005
+    faderProbDissolve = 0.2
+    faderLargeBlockXSections = 10
+    faderLargeBlockYSections = 2
+    faderSmallBlockXSections = 32
+    faderSmallBlockYSections = 64
+    sectionDeltaWidth = 20
+    sectionDeltaHeight = 5
+    faderParallelBlocks = 5
+    faderFadeDoingRefreshCountIterations = 1
+    faderDissolveDoingRefreshCountIterations = 20
+    faderDoingRefreshCountIterationsStartup = 100
+    doTransition = True
+    doneCount = 0
+    faderInit = False
+    faderDoingRefreshCountIterations = 100
+    fader = None
+    usePolygonOverlay = False
+    polyOverlay = None
+    tileOverlayGridProb = 0.5
+    poly_alpha = 255
+    useOverlayTileGrid = True
+    polyOverlayMode = "overlay"
+    polyOverlayChangeProb = 0.001
+    tileOverlayGrid = []
+    polyBase = []
+    patternSequence = []
+    slotsToChange = []
+    settingUpPattern = True
+    lastPatternSelected = ""
+    consecutivePatternChoiceCount = 0
+    consecutivePatternCount = 0
+    rebuildAllSlotsProb = 0.001
+    rebuildIndividualSlotProb = 0.9
+    chanceRebuildPatternChoosesRandom = 0.2
+    rebuildSlotSkipRate = 0.1
+    rebuildSlotStartSkipRate = 0.05
+    patternModel = None
+    rebuildPatternProbability = 0.0004
+    probPatternsRebuildAfterNewPalette = 0.99
+    changePaletteWhenRebuildProb = 0.25
+    patternChangeWhenBuilding = 0.05
+    changeFullPaletteWhenChangingPatternProb = 0.5
+    changeEachblockWhenChangingPatternProb = 0.95
+    changePaletteWhenChangingPatternProb = 0.0
+    altColoringProb = 0.5
+    popRandomColorProb = False
+    blockSizeChangeProb = 0.5
+    blockSizeChangeAlwaysUseMax = False
+    numScaleRows = 4
+    stepsRange = (2, 3)
+    ringsRange = (10, 18)
+    patternOrientation = -90.0
+    numRows = 2
+    numRowsRandomize = False
+    linesOnly = False
+    waveScaleRings = 18
+    waveScaleSteps = 2
+    usePixelSortRandomize = False
+    randomBlockProb = 0.99
+    randomBlockWidth = 0
+    randomBlockHeight = 0
+    decoBoxBandWidth = 3
+    diamondUseTriangles = False
+    diamondStep = 1
+    minnumConcentricBoxes = 2
+    maxnumConcentricBoxes = 16
+    numShingleRows = 2
+    amplitude = 9
+    amplitude2 = 9
+    shingleVariation = True
+    shingleVariationRange = 6
+    shingleVariationAmount = 6
+    numDotRows = 3
+    speedFactor = 1.0
+    phaseFactor = 4.0
+    xSpeed = 0.8
+    ySpeed = 0.1
+    ySpeedInit = 0.1
+    lineDiff = 2
+    useDoubleLine = True
+    randomizeSpeed = True
+    steps2 = 2
+    xIncrementer = 1
+    yIncrementer = 1
+    combinationSets = []
+    changeCombinationAnytimeProb = 0.99
+    currentCombinationsetIndex = 7
+    numberOfRandomizersUsed = 0
+    comboSetDirector = None
+    palettesConfigFile = ""
+    paletteConfig = None
+    palettes = []
+    bgColorAlpha = [100, 250]
+    allAvailablePalettesList = []
+    c1 = None
+    c2 = None
+    c3 = None
+    c4 = None
+    currentPaletteIndex = 0
+    transformShape = False
+    transformTuples = (1.2, 0.0, 1.0, -0.0, 1.0, 0.1, 0.005, 0.0)
+    useWaveDistortion = True
+    waveAmplitude = 20.0
+    waveAmplitudeMax = 40.0
+    waveAmplitudeMin = -20.0
+    waveAmplitudeSpeed = 0.0001
+    wavePeriodMod = 5.0
+    wavegridspace = 30
+    pNoiseMod = 10.0
+    waveDeformXPosRate = 0.001
+    waveDeformXPos = 0
+    sectionDisturbance = True
+    doSectionDisturbance = False
+    disturbanceConfigSets = ["heavy"]
+    changeDisturbanceSetProb = 0.25
+    skipFrames = 0
+    skipFramesCount = 0
+    disturbanceConfigFile = ""
+    disturbanceConfig = None
+    baseSectionSpeed = 0.2
+    sectionPlacementXRange = (-10, 384)
+    sectionPlacementYRange = (-10, 200)
+    sectionWidthRange = (88, 180)
+    sectionHeightRange = (88, 180)
+    numberOfSections = 20
+    sectionMovementCountMax = 100
+    redoSectionDisturbance = 0.01
+    rebuildImmediatelyAfterDone = False
+    disturbanceScaleX = 9.0
+    disturbanceScaleY = 9.0
+    stableSectionsMin = 2
+    stableSectionsMax = 3
+    stableSectionsMinWidth = 20
+    stableSectionsMinHeight = 24
+    stableSegments = []
+    movingSections = []
+    drawingPrinted = False
+    blockWidth = 48
+    blockHeight = 48
+    blockImage = None
+    blockDraw = None
+    patternBlockCols = 11
+    patternBlockRows = 5
+    totalSlots = 55
+    altLineColoring = True
+    numConcentricBoxes = 3
+    floral = None
+    usedPatterns = []
+    initPatternBuild = False
+    randomInsertionCount = 0
+    useBorderPattern = False
+    borderPattern = ""
+    patternsInBands = False
+    borderDrawn = False
+    imageXPOS = 0
+    imageYPOS = 0
+    XPOSSpeed = 0.0
+    YPOSSpeed = 0.0
+    useSubPixelSmoothing = True
+
+
+    filterRemapping = True
+    filterRemappingProb = .0005
+    filterRemapMinHoriSize = 32
+    filterRemapMinVertSize = 32
+    filterRemapMaxHoriSize = 256
+    filterRemapMaxVertSize = 192
+    filterRemapRangeX = 256
+    filterRemapRangeY = 192
+
+    def __init__(self):
+        pass
+
+    def debugSelf(self):
+        allArgs = self.__dict__
+        for element in allArgs:
+            print(f"{element} = {allArgs[element]}")
+
+        method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
+        # print(f"[RepeatedPatterns] {method_list}")
+
 
 def main(run=True):
     global config
+    global rpO
+    rpO = RepeatedPatterns()
     pieceLogger("\n[main] >> called")
 
     config.debugPause = False
 
-    loadConfigValue(config, workConfig, "movingpattern", "setupDeBug", False, bool)
+    rpO.path = config.path
+    rpO.brightness =  config.brightness
+    rpO.config = config
 
-    loadConfigValue(config, workConfig, "movingpattern", "blockWidthMin", 32, int)
-    loadConfigValue(config, workConfig, "movingpattern", "blockWidthMax", 32, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "setupDeBug", False, bool)
 
-    loadConfigValue(config, workConfig, "movingpattern", "yOffset", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "yOffset2", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "", 1, int)
-    loadConfigValue(config, workConfig, "movingpattern", "", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blockWidthMin", 32, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blockWidthMax", 32, int)
 
-    loadConfigValue(config, workConfig, "movingpattern", "blockRotation", 0.00, float)
-    loadConfigValue(config, workConfig, "movingpattern", "canvasRotation", 0.00, float)
-    loadConfigValue(config, workConfig, "movingpattern", "imgcanvasOffsetX", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "imgcanvasOffsetY", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "yOffset", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "yOffset2", 1, int)
 
-    loadConfigValue(config, workConfig, "movingpattern", "pictureWidth", config.canvasWidth, int)
-    loadConfigValue(config, workConfig, "movingpattern", "pictureHeight", config.canvasHeight, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blockRotation", 0.00, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "canvasRotation", 0.00, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "imgcanvasOffsetX", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "imgcanvasOffsetY", 0, int)
 
-    config.repeatProb = 0.99
+    loadConfigValue(rpO, workConfig, "movingpattern", "pictureWidth", config.canvasWidth, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "pictureHeight", config.canvasHeight, int)
+
+    rpO.repeatProb = 0.99
 
     # if/when saving images
     config.drawingPrinted = True
-    loadConfigValue(config, workConfig, "movingpattern", "saveImages", False, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "outPutPath", "", str)
-    loadConfigValue(config, workConfig, "movingpattern", "drawBGColorEachCycle", True, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "saveImages", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "outPutPath", "", str)
+    loadConfigValue(rpO, workConfig, "movingpattern", "drawBGColorEachCycle", True, bool)
 
-    config.repeatDrawingMode = 1
-    loadConfigValue(config, workConfig, "movingpattern", "loadAnImageProb", 0.0, float)
-    config.imageSources = workConfig.get("movingpattern", "imageSources").split(",")
+    rpO.repeatDrawingMode = 1
+    loadConfigValue(rpO, workConfig, "movingpattern", "loadAnImageProb", 0.0, float)
+    rpO.imageSources = workConfig.get("movingpattern", "imageSources").split(",")
 
     # ---------------------------------------------------------------###
     createImageHolders()
     # ---------------------------------------------------------------###
 
-    loadConfigValue(config, workConfig, "movingpattern", "useBlurSection", False, bool)
-    loadConfigValue(config, workConfig, "movingpattern", "blurSectionWidth", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "blurSectionHeight", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "blurSectionXPos", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "blurSectionYPos", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "mask_blur_amt", 0, int)
-    loadConfigValue(config, workConfig, "movingpattern", "cp_blur_amt", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "useBlurSection", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blurSectionWidth", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blurSectionHeight", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blurSectionXPos", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "blurSectionYPos", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "mask_blur_amt", 0, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "cp_blur_amt", 0, int)
 
-    config.mask = Image.new("L", config.canvasImage.size, 0)
-    config.mask_draw = ImageDraw.Draw(config.mask)
+    rpO.mask = Image.new("L", config.canvasImage.size, 0)
+    rpO.mask_draw = ImageDraw.Draw(rpO.mask)
 
-    config.mask_draw.ellipse(
+    rpO.mask_draw.ellipse(
         (
-            config.blurSectionXPos,
-            config.blurSectionYPos,
-            config.blurSectionXPos + config.blurSectionWidth,
-            config.blurSectionYPos + config.blurSectionHeight,
+            rpO.blurSectionXPos,
+            rpO.blurSectionYPos,
+            rpO.blurSectionXPos + rpO.blurSectionWidth,
+            rpO.blurSectionYPos + rpO.blurSectionHeight,
         ),
         fill=255,
     )
-    config.mask_blur_amt = config.mask_blur_amt
-    config.cp_blur_amt = config.cp_blur_amt
+    rpO.mask_blur_amt = rpO.mask_blur_amt
+    rpO.cp_blur_amt = rpO.cp_blur_amt
 
-    loadConfigValue(config, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
+    # ---------------------------------------------------------------###
+
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapping", False, bool)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
+    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
+
+    # ---------------------------------------------------------------###
+
+    loadConfigValue(rpO, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
 
     # --------------------- clip player instert ---------------------#########
     loadClipPlayerConfigs()
@@ -1661,10 +1925,10 @@ def main(run=True):
 
     loadAndSetupAllPalettes()
 
-    disturbance.init(config, workConfig)
+    disturbance.init(rpO, workConfig)
     disturbance.setupDisturbances()
 
-    buildPatternSequence(config)
+    buildPatternSequence(rpO)
 
     config.applyDitherBeforeRemapping = True
 
@@ -1673,11 +1937,11 @@ def main(run=True):
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("movingpattern", "redrawSpeed"))
 
-    config.imageXPOS = 0
-    config.imageYPOS = 0
-    config.XPOSSpeed = float(workConfig.get("movingpattern", "XPOSSpeed", fallback="0.0"))
-    config.YPOSSpeed = float(workConfig.get("movingpattern", "YPOSSpeed", fallback="0.0"))
-    loadConfigValue(config, workConfig, "movingpattern", "useSubPixelSmoothing", False, bool)
+    rpO.imageXPOS = 0
+    rpO.imageYPOS = 0
+    rpO.XPOSSpeed = float(workConfig.get("movingpattern", "XPOSSpeed", fallback="0.0"))
+    rpO.YPOSSpeed = float(workConfig.get("movingpattern", "YPOSSpeed", fallback="0.0"))
+    loadConfigValue(rpO, workConfig, "movingpattern", "useSubPixelSmoothing", False, bool)
 
     try:
         config.directorController.slotRate = float(workConfig.get("movingpattern", "slotRate"))
@@ -1712,12 +1976,12 @@ def main(run=True):
     #         config.panelDrawing.canvasToUse = config.renderImageFull
     #         config.panelDrawing.render()
     #     else :
-    #         #config.render(config.canvasImage, 0, 0, config.pictureWidth, config.pictureHeight)
+    #         #config.render(config.canvasImage, 0, 0, rpO.pictureWidth, rpO.pictureHeight)
     #         #config.render(config.image, 0, 0)
     #         config.render(config.renderImageFull, 0, 0)
     # """
 
-    if config.setupDeBug:
+    if rpO.setupDeBug:
         # prints out everything in the config global
         config.debugSelf()
 
@@ -1729,6 +1993,7 @@ def runWork():
     global config
     pieceLogger("[runWork] >> Running repeatblocks.py", 2)
     _subSteps = getattr(config, "smoothingSteps", 0)
+
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:

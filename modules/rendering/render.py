@@ -334,16 +334,6 @@ def _ditherReMapPrep(xOffset, yOffset):
     config.renderImageFull.paste(crop, config.remapImageBlockDestination, crop)
 
 
-# remapImageBlock = False
-# remapImageBlockSection = 0,0,320,32
-# remapImageBlockDestination = 0,0
-# remapImageBlockSectionRotation = 0
-
-
-# remapImageBlock2 = True
-# remapImageBlockSection2 = 320,0, 640,32
-# remapImageBlockDestination2 = 0,32
-# remapImageBlockSection2Rotation = 0
 def _reMapBlock(sectionName):
     _name = "remapImageBlock"
     _num = sectionName.split(_name)[1]

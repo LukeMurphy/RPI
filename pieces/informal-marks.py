@@ -14,8 +14,6 @@ from pieces.screen import Holder
 # -------- Util Functions   -------------- #
 
 
-
-
 def randomRange(a, b, rounded=False):
     if not rounded:
         return random.uniform(a, b)
@@ -610,20 +608,6 @@ class InformalMarks:
         self.config = config
 
     def setUp(self,workConfig):
-        self.image = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
-        self.imageDraw = ImageDraw.Draw(self.image)
-        self.draw = ImageDraw.Draw(self.image)
-
-        self.canvasImage = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
-
-        self.destinationImage = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
-        self.destinationImageDraw = ImageDraw.Draw(self.destinationImage)
-
-        self.overlayImage = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
-        self.overlayImageDraw = ImageDraw.Draw(self.overlayImage)
-
-        self.underLayer = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
-        self.underLayerDraw = ImageDraw.Draw(self.underLayer)
 
         self.drawingWidth = int(workConfig.get("informalMarksGrid", "drawingWidth", fallback=f"{self.config.canvasWidth}"))
         self.drawingHeight = int(workConfig.get("informalMarksGrid", "drawingHeight", fallback=f"{self.config.canvasHeight}"))
@@ -800,6 +784,10 @@ def main(run=True):
 
     config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+
+
+    informalMarks.draw = config.draw
+    informalMarks.imageDraw = config.imageDraw
 
 
     loadColorConfigs()

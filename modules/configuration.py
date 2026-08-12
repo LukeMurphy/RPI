@@ -20,6 +20,7 @@ brightness = 1
 transWiring = True
 # global imageTop,imageBottom,image,config,transWiring
 
+
 def configuration():
     pass
 
@@ -39,10 +40,10 @@ def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
     if clr == 0:
         fstr = bcolors.WARNING
 
-    if showLine :
+    if showLine:
         print(f"\n{fstr}.......................................................................................{bcolors.ENDC}")
     print(f"{fstr}{prefixTxt}{args}          {bcolors.ENDC}")
-    if showLine :
+    if showLine:
         print(f"{fstr}.......................................................................................{bcolors.ENDC}")
     # print("\n")
     # print(bcolors.ENDC)
@@ -122,36 +123,79 @@ class ArtWorkConfig:
     windowXOffset = 50
     windowYOffset = 374
 
-    brightness =  1.0
+    brightness = 1.0
     minBrightness = 0
 
     useFilters = False
     ditherfilterbrightness = 1.0
 
     remapImageBlock = False
-    remapImageBlockSection = [0,0,256,256]
-    remapImageBlockDestination = [0,0]
+    remapImageBlockSection = [0, 0, 256, 256]
+    remapImageBlockDestination = [0, 0]
     remapImageBlockSectionRotation = 0
 
     remapImageBlock2 = False
-    remapImageBlockSection2 = [0,220,160,256]
-    remapImageBlockDestination2 = [1,220]
+    remapImageBlockSection2 = [0, 0, 256, 256]
+    remapImageBlockDestination2 = [0, 0]
     remapImageBlockSection2Rotation = 1
 
     remapImageBlock3 = False
-    remapImageBlockSection3 = [224,0,256,384]
-    remapImageBlockDestination3 = [0,0]
+    remapImageBlockSection3 = [0, 0, 256, 256]
+    remapImageBlockDestination3 = [0, 0]
     remapImageBlockSection3Rotation = 0
 
     remapImageBlock4 = False
-    remapImageBlockSection4 = [224,0,256,384]
-    remapImageBlockDestination4 = [0,0]
+    remapImageBlockSection4 = [0, 0, 256, 256]
+    remapImageBlockDestination4 = [0, 0]
     remapImageBlockSection4Rotation = 0
 
     remapImageBlock5 = False
-    remapImageBlockSection5 = [224,0,256,384]
-    remapImageBlockDestination5 = [0,0]
+    remapImageBlockSection5 = [0, 0, 256, 256]
+    remapImageBlockDestination5 = [0, 0]
     remapImageBlockSection5Rotation = 0
+
+    remapImageBlock6 = False
+    remapImageBlockSection6 = [0, 0, 256, 256]
+    remapImageBlockDestination6 = [0, 0]
+    remapImageBlockSection6Rotation = 0
+
+    remapImageBlock7 = False
+    remapImageBlockSection7 = [0, 0, 256, 256]
+    remapImageBlockDestination7 = [0, 0]
+    remapImageBlockSection7Rotation = 0
+
+
+    remapImageBlockShift = False
+    remapImageBlockShiftSection = [0, 0, 256, 256]
+    remapImageBlockShiftStableSection = [0,0,0,0]
+    remapImageBlockShiftDestination = [-0,0]
+
+    remapImageBlockShift2 = False
+    remapImageBlockShiftSection2 = [0, 0, 256, 256]
+    remapImageBlockShiftStableSection2 = [0,0,0,0]
+    remapImageBlockShiftDestination2 = [-0,0]
+
+    remapImageBlockShift2 = False
+    remapImageBlockShiftSection3 = [0, 0, 256, 256]
+    remapImageBlockShiftStableSection3 = [0,0,0,0]
+    remapImageBlockShiftDestination3 = [-0,0]
+
+    remapImageBlockShift2 = False
+    remapImageBlockShiftSection3 = [0, 0, 256, 256]
+    remapImageBlockShiftStableSection3 = [0,0,0,0]
+    remapImageBlockShiftDestination3 = [-0,0]
+
+    remapImageBlockShift2 = False
+    remapImageBlockShiftSection4 = [0, 0, 256, 256]
+    remapImageBlockShiftStableSection4 = [0,0,0,0]
+    remapImageBlockShiftDestination4 = [-0,0]
+
+    remapImageBlockShift2 = False
+    remapImageBlockShiftSection5 = [0, 0, 256, 256]
+    remapImageBlockShiftStableSection5 = [0,0,0,0]
+    remapImageBlockShiftDestination5 = [-0,0]
+
+
 
 
     startTime = time.time()
@@ -164,8 +208,6 @@ class ArtWorkConfig:
     reloadConfig = False
     checkForConfigChanges = False
     noWindowChrome = False
-
-
 
     ## These are used in the filter effect filters.py
     lev = 0

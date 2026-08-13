@@ -9,37 +9,38 @@ from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 blocks = []
 XOsBlocks = []
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+
+# ------------------------------------------------------------------- #
 # LEFT means text or icon moves to the left (i.e. comes from the right)
 # RIGHT means text or icon moves to the right (i.e. comes from the left)
 directionOrder = ["LEFT", "RIGHT"]
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
+# ------------------------------------------------------------------- #
 
 class ScrollMessage:
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
 
     # scroll speed and steps per cycle
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
     scrollSpeed = 0.004
     steps = 1
     fontSize = 14
 
-    def __init__(self, messageString, direction, config, clr=""):
+    def __init__(self, messageString, direction, config, scrllrMngr, clr=""):
         # print ("init: " + messageString)
         self.messageString = messageString
         self.direction = direction
 
         self.config = config
+        self.scrllrMngr = scrllrMngr
         if clr == "":
-            if config.colorMode == "getRandomRGB":
+            if scrllrMngr.colorMode == "getRandomRGB":
                 self.clr = colorutils.getRandomRGB()
-            if config.colorMode == "randomColor":
+            if scrllrMngr.colorMode == "randomColor":
                 self.clr = colorutils.randomColor()
-            if config.colorMode == "getRandomColorWheel":
+            if scrllrMngr.colorMode == "getRandomColorWheel":
                 self.clr = colorutils.getRandomColorWheel()
         else:
             self.clr = clr
@@ -48,15 +49,15 @@ class ScrollMessage:
 
         # if(config.colorOverlay == True) : self.clr = (200,200,200)
 
-        """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+        # ------------------------------------------------------------------- #
         # draw the message to get its size
-        if config.sansSerif:
-            # font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize)
-            font = ImageFont.truetype(config.path + "/assets/fonts/roboto/RobotoCondensed-Bold.ttf", config.fontSize)
+        if scrllrMngr.sansSerif:
+            # font = ImageFont.truetype(config.path + "/assets/fonts/freefont/FreeSansBold.ttf", scrllrMngr.fontSize)
+            font = ImageFont.truetype(config.path + "/assets/fonts/roboto/RobotoCondensed-Bold.ttf", scrllrMngr.fontSize)
         else:
             font = ImageFont.truetype(
                 config.path + "/assets/fonts/freefont/FreeSerifBold.ttf",
-                config.fontSize,
+                scrllrMngr.fontSize,
             )
         tempImage = Image.new("RGBA", (1200, 196))
         draw = ImageDraw.Draw(tempImage)
@@ -69,7 +70,7 @@ class ScrollMessage:
         print(self.clr)
         # For some reason textsize is not getting full height !
 
-        """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+        # ------------------------------------------------------------------- #
         # make a new image with the right size
         # self.config.renderImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
         # self.scrollImage = Image.new("RGBA", pixLen)
@@ -78,37 +79,34 @@ class ScrollMessage:
         self.draw = ImageDraw.Draw(self.scrollImage)
         self.iid = self.scrollImage.im.id
 
-        """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+        # ------------------------------------------------------------------- #
         # self.draw.rectangle((0,0,self.pixLen[0]+4, self.pixLen[1]), fill = (0,0,0))
         # Draw the text with "borders"
         indent = int(0.05 * config.tileSize[0])
-        for i in range(1, config.shadowSize):
+        for i in range(1, scrllrMngr.shadowSize):
             self.draw.text((indent + -i, -i), self.messageString, (0, 0, 0), font=font)
             self.draw.text((indent + i, i), self.messageString, (0, 0, 0), font=font)
 
         self.draw.text((2, 0), self.messageString, self.clr, font=font)
 
         self.xPos = 0
-        self.yPos = config.vOffset
+        self.yPos = scrllrMngr.vOffset
 
         # self.end = config.screenWidth * config.displayRows
 
     def scroll(self):
         if self.direction == "LEFT":
-            self.xPos += config.steps
+            self.xPos += scrllrMngr.steps
         else:
-            self.xPos -= config.steps
+            self.xPos -= scrllrMngr.steps
 
         # if(self.xPos > self.end) :
         #     self.xPos = self.start = -self.scrollImage.size[0]
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
-
-
 class XOx:
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
 
     # scroll speed and steps per cycle
     scrollSpeed = 0.004
@@ -122,17 +120,18 @@ class XOx:
     OColor = [255, 0, 0]
     ArrowColor = [255, 2, 0]
 
-    def __init__(self, direction, config, n, rng):
+    def __init__(self, direction, config, n, rng, scrllrMngr):
         # print ("init: " + messageString)
 
         self.direction = direction
         self.config = config
+        self.scrllrMngr = scrllrMngr
         self.clr = (int(255 * config.brightness), 0, 0)
 
-        self.xsWidth = int(0.85 * config.fontSize)
+        self.xsWidth = int(0.85 * scrllrMngr.fontSize)
         self.maxNumXOs = int(self.xsWidth / 2)
 
-        self.xoString = self.makeBlock(config.useArrows)
+        self.xoString = self.makeBlock(scrllrMngr.useArrows)
 
         prv = n - 1
         nxt = n + 1
@@ -159,7 +158,7 @@ class XOx:
             if dash:
                 strg += "-"
             else:
-                if random.random() > self.config.oProb:
+                if random.random() > self.scrllrMngr.oProb:
                     strg += "X"
                 else:
                     strg += "O"
@@ -167,11 +166,11 @@ class XOx:
         self.width = n * (self.xsWidth + 8)
 
         if self.direction == "RIGHT":
-            self.xPos = self.config.screenWidth + self.config.bufferSpacing
+            self.xPos = self.config.screenWidth + self.scrllrMngr.bufferSpacing
             self.end = -self.width
         else:
             self.xPos = 0
-            self.end = self.config.screenWidth * self.config.displayRows
+            self.end = self.config.screenWidth * self.scrllrMngr.displayRows
         self.yPos = 0
 
         return strg
@@ -216,11 +215,11 @@ class XOx:
                     round(self.ArrowColor[1] * config.brightness),
                     round(self.ArrowColor[2] * config.brightness),
                 )
-                y0 = startY + self.xsWidth / 2 + config.arrowOffset
-                yA = self.xsWidth / 4 + config.arrowOffset
+                y0 = startY + self.xsWidth / 2 + scrllrMngr.arrowOffset
+                yA = self.xsWidth / 4 + scrllrMngr.arrowOffset
 
                 if self.direction == "RIGHT":
-                    xA = startX + (yA - config.arrowOffset) * math.tan(math.pi / 4)
+                    xA = startX + (yA - scrllrMngr.arrowOffset) * math.tan(math.pi / 4)
                     # the horizontal
                     draw.line(
                         (startX, y0, endX, y0), fill=clr, width=self.lineThickness
@@ -233,7 +232,7 @@ class XOx:
                         width=self.lineThickness,
                     )
                 else:
-                    xA = endX - (yA - config.arrowOffset) * math.tan(math.pi / 4)
+                    xA = endX - (yA - scrllrMngr.arrowOffset) * math.tan(math.pi / 4)
                     # the horizontal
                     draw.line(
                         (startX, y0, endX, y0), fill=clr, width=self.lineThickness
@@ -254,113 +253,156 @@ class XOx:
             self.xPos += self.steps
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+class ScrollerManager:
+    def __init__(self, config):
+        self.config = config
+
+    def setUp(self, workConfig):
+        global directionOrder
+        config = self.config
+        print("---------------------")
+        print("CounterScroll Loaded")
+        colorutils.brightness = config.brightness
+
+        self.displayRows = int(workConfig.get("scroll", "displayRows"))
+        self.displayCols = int(workConfig.get("scroll", "displayCols"))
+
+        self.canvasImageWidth = int(round(config.canvasWidth * self.displayRows))
+        self.canvasImageHeight = int(round(config.canvasHeight / self.displayRows))
+
+        self.fontSize = int(workConfig.get("scroll", "fontSize"))
+        self.vOffset = int(workConfig.get("scroll", "vOffset"))
+        self.scrollSpeed = float(workConfig.get("scroll", "scrollSpeed"))
+        self.steps = int(workConfig.get("scroll", "steps"))
+        self.shadowSize = int(workConfig.get("scroll", "shadowSize"))
+
+        self.usingEmoties = workConfig.getboolean("scroll", "usingEmoties")
+        self.counterScrollText = workConfig.getboolean("scroll", "counterScrollText")
+        self.useXOs = workConfig.getboolean("scroll", "useXOs")
+        self.useArrows = workConfig.getboolean("scroll", "useArrows")
+        try:
+            self.numberOfDeadPixels = int(workConfig.get("scroll", "numberOfDeadPixels"))
+            self.arrowOffset = int(workConfig.get("scroll", "arrowOffset"))
+            self.overlayX = int(workConfig.get("scroll", "overlayX"))
+            self.overlayY = int(workConfig.get("scroll", "overlayY"))
+            self.overlayWidth = int(workConfig.get("scroll", "overlayWidth"))
+            self.overlayHeight = int(workConfig.get("scroll", "overlayHeight"))
+
+        except Exception as e:
+            print(str(e))
+            self.numberOfDeadPixels = 20
+            self.arrowOffset = 0
+            self.overlayX = 0
+            self.overlayY = 0
+            self.overlayWidth = config.screenWidth
+            self.overlayHeight = config.screenHeight
+
+        self.sansSerif = workConfig.getboolean("scroll", "sansSerif")
+        self.useBlanks = workConfig.getboolean("scroll", "useBlanks")
+        self.useThreeD = workConfig.getboolean("scroll", "useThreeD")
+        self.directionOrder = workConfig.get("scroll", "directionOrder")
+        self.bgColorVals = (workConfig.get("scroll", "bgColor")).split(",")
+        self.bgColor = tuple(map(lambda x: int(x), self.bgColorVals))
+        self.txt1 = " " + (workConfig.get("scroll", "txt1")) + " "
+        self.txt2 = " " + (workConfig.get("scroll", "txt2")) + " "
+        self.txtfile = ""
+        try:
+            self.txtfile = workConfig.get("scroll", "txtfile")
+        except Exception as e:
+            print(str(e))
+
+        self.colorMode = workConfig.get("scroll", "colorMode")
+        self.colorOverlay = workConfig.getboolean("scroll", "colorOverlay")
+
+        try:
+            self.coloroverlayBackgroundOnly = workConfig.getboolean("scroll", "coloroverlayBackgroundOnly")
+        except Exception as e:
+            print(str(e))
+            self.coloroverlayBackgroundOnly = False
+
+        if self.colorOverlay == True:
+
+            self.colorOverlayObjA = coloroverlay.ColorOverlay()
+            self.colorOverlayObjB = coloroverlay.ColorOverlay()
+
+            self.colorOverlayObjA.colorTransitionSetup()
+            self.colorOverlayObjB.colorTransitionSetup()
+
+            self.colorOverlayObjB.minHue = 180
+            self.colorOverlayObjB.maxHue = 180
+            self.colorOverlayObjB.minSaturation = .8
+            self.colorOverlayObjB.maxSaturation = .99
+            self.colorOverlayObjB.minValue = .5
+            self.colorOverlayObjB.maxValue = .5
+            self.colorOverlayObjB.setStartColor()
 
 
-def main(run=True):
-    global config, directionOrder
-    global workConfig
-    print("---------------------")
-    print("CounterScroll Loaded")
-    colorutils.brightness = config.brightness
+            self.colorOverlayObjA.minHue = 0
+            self.colorOverlayObjA.maxHue = 360
+            self.colorOverlayObjA.minSaturation = .8
+            self.colorOverlayObjA.maxSaturation = .99
+            self.colorOverlayObjA.minValue = .5
+            self.colorOverlayObjA.maxValue = .5
+            self.colorOverlayObjA.setStartColor()
 
-    config.displayRows = int(workConfig.get("scroll", "displayRows"))
-    config.displayCols = int(workConfig.get("scroll", "displayCols"))
+            # config.colorA = colorutils.randomColor()
+            # config.colorB = colorutils.randomColor()
+            # config.currentColor = config.colorA
 
-    config.canvasImageWidth = int(round(config.canvasWidth * config.displayRows))
-    config.canvasImageHeight = int(round(config.canvasHeight / config.displayRows))
+            # colorTransitionSetup()
 
-    config.fontSize = int(workConfig.get("scroll", "fontSize"))
-    config.vOffset = int(workConfig.get("scroll", "vOffset"))
-    config.scrollSpeed = float(workConfig.get("scroll", "scrollSpeed"))
-    config.steps = int(workConfig.get("scroll", "steps"))
-    config.shadowSize = int(workConfig.get("scroll", "shadowSize"))
+        createImageLayers(config, self)
 
-    config.usingEmoties = workConfig.getboolean("scroll", "usingEmoties")
-    config.counterScrollText = workConfig.getboolean("scroll", "counterScrollText")
-    config.useXOs = workConfig.getboolean("scroll", "useXOs")
-    config.useArrows = workConfig.getboolean("scroll", "useArrows")
-    try:
-        config.numberOfDeadPixels = int(workConfig.get("scroll", "numberOfDeadPixels"))
-        config.arrowOffset = int(workConfig.get("scroll", "arrowOffset"))
-        config.overlayX = int(workConfig.get("scroll", "overlayX"))
-        config.overlayY = int(workConfig.get("scroll", "overlayY"))
-        config.overlayWidth = int(workConfig.get("scroll", "overlayWidth"))
-        config.overlayHeight = int(workConfig.get("scroll", "overlayHeight"))
+        # ------------------------------------------------------------------- #
+        # config.drawBeforeConversion = callBack
+        self.actualScreenWidth = config.canvasImage.size[0]
 
-    except Exception as e:
-        print(str(e))
-        config.numberOfDeadPixels = 20
-        config.arrowOffset = 0
-        config.overlayX = 0
-        config.overlayY = 0
-        config.overlayWidth = config.screenWidth
-        config.overlayHeight = config.screenHeight
+        if self.useBlanks:
+            badpixels.numberOfDeadPixels = self.numberOfDeadPixels
+            badpixels.sizeTarget = list(config.canvasImageFinal.size)
+            print(badpixels.sizeTarget)
+            badpixels.config = config
+            badpixels.setBlanksOnScreen()
 
-    config.sansSerif = workConfig.getboolean("scroll", "sansSerif")
-    config.useBlanks = workConfig.getboolean("scroll", "useBlanks")
-    config.useThreeD = workConfig.getboolean("scroll", "useThreeD")
-    config.directionOrder = workConfig.get("scroll", "directionOrder")
-    config.bgColorVals = (workConfig.get("scroll", "bgColor")).split(",")
-    config.bgColor = tuple(map(lambda x: int(x), config.bgColorVals))
-    config.txt1 = " " + (workConfig.get("scroll", "txt1")) + " "
-    config.txt2 = " " + (workConfig.get("scroll", "txt2")) + " "
-    config.txtfile = ""
-    try:
-        config.txtfile = workConfig.get("scroll", "txtfile")
-    except Exception as e:
-        print(str(e))
+        if self.directionOrder == "RIGHT-LEFT":
+            directionOrder = ["RIGHT", "LEFT"]
 
-    config.colorMode = workConfig.get("scroll", "colorMode")
-    config.colorOverlay = workConfig.getboolean("scroll", "colorOverlay")
+        if self.txtfile != "":
+            self.textArray = []
+            fh = open("" + self.txtfile, "r")
+            lines = fh.readlines()
+            self.txt1 = "  "
 
-    try:
-        config.coloroverlayBackgroundOnly = workConfig.getboolean("scroll", "coloroverlayBackgroundOnly")
-    except Exception as e:
-        print(str(e))
-        config.coloroverlayBackgroundOnly = False
+            # ------------------------------------------------------------------- #
+            # not really necessary but maybe need some scrubs
 
-    if config.colorOverlay == True:
+            for text in lines:
+                # text = fh.readline()
+                self.textArray.append(text.replace("\n", ""))
+                self.txt1 = self.txt1 + " -- " + text.replace("\n", "")
 
-        config.colorOverlayObjA = coloroverlay.ColorOverlay()
-        config.colorOverlayObjB = coloroverlay.ColorOverlay()
-
-        config.colorOverlayObjA.colorTransitionSetup()
-        config.colorOverlayObjB.colorTransitionSetup()
-
-        config.colorOverlayObjB.minHue = 180
-        config.colorOverlayObjB.maxHue = 180
-        config.colorOverlayObjB.minSaturation = .8
-        config.colorOverlayObjB.maxSaturation = .99
-        config.colorOverlayObjB.minValue = .5
-        config.colorOverlayObjB.maxValue = .5
-        config.colorOverlayObjB.setStartColor()
+            self.txt2 = self.txt1
+            self.breaksArray = [i for i, ltr in enumerate(self.txt1) if ltr == "-"]
 
 
-        config.colorOverlayObjA.minHue = 0
-        config.colorOverlayObjA.maxHue = 360
-        config.colorOverlayObjA.minSaturation = .8
-        config.colorOverlayObjA.maxSaturation = .99
-        config.colorOverlayObjA.minValue = .5
-        config.colorOverlayObjA.maxValue = .5
-        config.colorOverlayObjA.setStartColor()
+        self.oProb = 0.5
 
-        # config.colorA = colorutils.randomColor()
-        # config.colorB = colorutils.randomColor()
-        # config.currentColor = config.colorA
 
-        # colorTransitionSetup()
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+# ------------------------------------------------------------------- #
+
+
+def createImageLayers(config, scrllrMngr):
+    # ------------------------------------------------------------------- #
     # Used to composite XO's and message text
     # config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, int(config.screenHeight / config.displayRows)))
     config.canvasImage = Image.new(
-        "RGBA", (config.canvasImageWidth, config.canvasImageHeight)
+        "RGBA", (scrllrMngr.canvasImageWidth, scrllrMngr.canvasImageHeight)
     )
 
 
-    print(config.canvasImageHeight)
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    print(scrllrMngr.canvasImageHeight)
+    # ------------------------------------------------------------------- #
     # Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
     config.canvasImageFinal = Image.new(
         "RGBA", (config.canvasWidth, config.canvasHeight)
@@ -368,15 +410,11 @@ def main(run=True):
 
     """
     if(abs(config.rotation) == 90) :
-        #config.canvasImageWidth = config.canvasWidth * config.displayRows    
+        #config.canvasImageWidth = config.canvasWidth * config.displayRows
         config.canvasImageFinal = Image.new("RGBA", (config.canvasHeight, config.canvasWidth))
         cw = config.canvasWidth
         ch = config.canvasHeight
     """
-
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-    # config.drawBeforeConversion = callBack
-    config.actualScreenWidth = config.canvasImage.size[0]
 
     imageWrapLength = config.screenWidth * 50
     config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenHeight))
@@ -385,64 +423,42 @@ def main(run=True):
         imageWrapLength = config.screenWidth * 50
         config.warpedImage = Image.new("RGBA", (imageWrapLength, config.screenWidth))
 
-    if config.useBlanks:
-        badpixels.numberOfDeadPixels = config.numberOfDeadPixels
-        badpixels.sizeTarget = list(config.canvasImageFinal.size)
-        print(badpixels.sizeTarget)
-        badpixels.config = config
-        badpixels.setBlanksOnScreen()
 
-    if config.directionOrder == "RIGHT-LEFT":
-        directionOrder = ["RIGHT", "LEFT"]
+def main(run=True):
+    global config, scrllrMngr
+    global workConfig
 
-    if config.txtfile != "":
-        config.textArray = []
-        fh = open("" + config.txtfile, "r")
-        lines = fh.readlines()
-        config.txt1 = "  "
-
-        """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-        # not really necessary but maybe need some scrubs
-
-        for text in lines:
-            # text = fh.readline()
-            config.textArray.append(text.replace("\n", ""))
-            config.txt1 = config.txt1 + " -- " + text.replace("\n", "")
-
-        config.txt2 = config.txt1
-        config.breaksArray = [i for i, ltr in enumerate(config.txt1) if ltr == "-"]
-
-
+    scrllrMngr = ScrollerManager(config)
+    scrllrMngr.setUp(workConfig)
 
     config.directorController = Director(config)
     config.directorController.slotRate = .02
 
-    config.oProb = 0.5
     setUp()
 
     if run:
         runWork()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 
 def makeBlock(n, rng=3, direction="LEFT", strgArg=""):
-    global config
+    global config, scrllrMngr
     strg = strgArg
 
     if strgArg == "":
         # if n in[1,3,5] :
         if n < 3:
-            strg = config.txt1
+            strg = scrllrMngr.txt1
         else:
-            strg = config.txt2
+            strg = scrllrMngr.txt2
 
     clrseq = ((100, 0, 0), (0, 100, 0), (0, 0, 100))
     c = n if n < 3 else n - 3
 
     # block = ScrollMessage(makeText(config.usingEmoties, strg), direction ,config, clrseq[c])
-    block = ScrollMessage(makeText(config.usingEmoties, strg), direction, config)
+    block = ScrollMessage(makeText(scrllrMngr.usingEmoties, strg), direction, config, scrllrMngr)
 
     prv = n - 1
     nxt = n + 1
@@ -466,15 +482,15 @@ def makeBlock(n, rng=3, direction="LEFT", strgArg=""):
     return block
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 
 def makeText(emotis=False, arg=" FEEL BAD "):
-    global config
+    global config, scrllrMngr
     space = "  "
     strg = ""
     if emotis:
-        maxNums = int(config.fontSize / 2)
+        maxNums = int(scrllrMngr.fontSize / 2)
         num = int(random.uniform(3, maxNums))
         for n in range(0, num):
             '''
@@ -492,18 +508,18 @@ def makeText(emotis=False, arg=" FEEL BAD "):
     return strg
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 
 def setUp():
-    global config, XOsBlocks, overlayImage, blocks, usingEmoties, directionOrder
+    global config, XOsBlocks, overlayImage, blocks, usingEmoties, directionOrder, scrllrMngr
 
     # overlayImage = Image.new("RGBA", (config.actualScreenWidth , config.screenHeight))
-    lastWidth = config.canvasImageWidth
+    lastWidth = scrllrMngr.canvasImageWidth
     direction = directionOrder[0]
 
     # Used if there are 2 text statements running against eachother
-    rng = 3 if (config.usingEmoties == True or config.counterScrollText == False) else 6
+    rng = 3 if (scrllrMngr.usingEmoties == True or scrllrMngr.counterScrollText == False) else 6
 
     for n in range(0, rng):
 
@@ -521,7 +537,7 @@ def setUp():
             )  # - lastWidth -config.screenWidth * config.displayRows
         elif block.direction == "LEFT":
             block.start = -block.width - lastWidth
-            block.end = config.screenWidth * config.displayRows
+            block.end = config.screenWidth * scrllrMngr.displayRows
 
         lastWidth += block.width
         block.xPos = block.start
@@ -530,23 +546,23 @@ def setUp():
     # lastWidth = 0
     # direction = directionOrder[1]
 
-    if config.useXOs:
+    if scrllrMngr.useXOs:
         lastWidth = 0
         direction = directionOrder[1]
         for n in range(0, 3):
-            XOs = XOx(direction, config, n, 3)
+            XOs = XOx(direction, config, n, 3, scrllrMngr)
             if XOs.direction == "RIGHT":
-                XOs.xPos = XOs.start = config.canvasImageWidth + lastWidth
+                XOs.xPos = XOs.start = scrllrMngr.canvasImageWidth + lastWidth
             else:
                 XOs.xPos = XOs.start = -lastWidth - XOs.width
             lastWidth += XOs.width + XOs.bufferSpacing
             XOsBlocks.append(XOs)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 def runWork():
-    global config
+    global config, scrllrMngr
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("RUNNING counterscroll.py")
     print(bcolors.ENDC)
@@ -554,16 +570,16 @@ def runWork():
         config.directorController.checkTime()
         if config.directorController.advance == True:
             iterate()
-        time.sleep(config.scrollSpeed)
+        time.sleep(scrllrMngr.scrollSpeed)
         if config.standAlone == False :
             config.callBack()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 
 def iterate():
-    global config, blocks, x, y, XOsBlocks, usingEmoties
+    global config, blocks, x, y, XOsBlocks, usingEmoties, scrllrMngr
 
     # Blank out canvases
     draw = ImageDraw.Draw(config.renderImageFull)
@@ -571,25 +587,25 @@ def iterate():
 
     draw = ImageDraw.Draw(config.canvasImage)
 
-    if config.coloroverlayBackgroundOnly == True :
+    if scrllrMngr.coloroverlayBackgroundOnly == True :
         draw.rectangle(
-            (0, 0, config.canvasImageWidth, config.screenHeight), fill=tuple([int(a) for a in config.colorOverlayObjA.currentColor])
-        )		
+            (0, 0, scrllrMngr.canvasImageWidth, config.screenHeight), fill=tuple([int(a) for a in scrllrMngr.colorOverlayObjA.currentColor])
+        )
     else :
         draw.rectangle(
-            (0, 0, config.canvasImageWidth, config.screenHeight), fill=(config.bgColor)
+            (0, 0, scrllrMngr.canvasImageWidth, config.screenHeight), fill=(scrllrMngr.bgColor)
         )
 
-    displayWidth = config.screenWidth * config.displayRows
+    displayWidth = config.screenWidth * scrllrMngr.displayRows
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
     # Scroll message
 
-    rng = 3 if config.usingEmoties == True or config.counterScrollText == False else 6
+    rng = 3 if scrllrMngr.usingEmoties == True or scrllrMngr.counterScrollText == False else 6
 
     for i in range(0, rng):
 
-        """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+        # ------------------------------------------------------------------- #
         ## This reverses the pasting so the text scrolling from right to left is on top
         ## Right to Left scrolling is the normal for readability ....
         if rng != 3:
@@ -600,12 +616,12 @@ def iterate():
         block = blocks[n]
         block.scroll()
 
-        """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+        # ------------------------------------------------------------------- #
 
         # paste scrollImage into the canvasImage - but eventually chop and flip
 
         config.canvasImage.paste(
-            block.scrollImage, (block.xPos, config.vOffset), block.scrollImage
+            block.scrollImage, (block.xPos, scrllrMngr.vOffset), block.scrollImage
         )
         config.canvasImage.paste(
             block.scrollImage, (0, 0), block.scrollImage
@@ -641,9 +657,9 @@ def iterate():
         #         block.xPos = prevBlockEndPoint + block.bufferSpacing
 
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
 
-    if config.useXOs:
+    if scrllrMngr.useXOs:
         # Add the counter XO's
 
         for n in range(0, 3):
@@ -652,7 +668,7 @@ def iterate():
 
             if XOsBlock.xPos > displayWidth and XOsBlock.direction == "LEFT":
                 if random.random() > 0.5:
-                    XOsBlocks[n].xoString = XOsBlocks[n].makeBlock(config.useArrows)
+                    XOsBlocks[n].xoString = XOsBlocks[n].makeBlock(scrllrMngr.useArrows)
                     XOsBlock.end = displayWidth
 
                 nxtBlockStartPoint = XOsBlocks[XOsBlock.prvBlock].xPos
@@ -669,7 +685,7 @@ def iterate():
                 and XOsBlocks[n].direction == "RIGHT"
             ):
                 if random.random() > 0.5:
-                    XOsBlock.xoString = XOsBlock.makeBlock(config.useArrows)
+                    XOsBlock.xoString = XOsBlock.makeBlock(scrllrMngr.useArrows)
                     XOsBlock.end = -XOsBlock.width
 
                 prevBlockEndPoint = (
@@ -677,16 +693,16 @@ def iterate():
                     + XOsBlocks[XOsBlock.prvBlock].width
                 )
                 if prevBlockEndPoint < displayWidth:
-                    XOsBlock.xPos = config.canvasImageWidth + XOsBlock.width
+                    XOsBlock.xPos = scrllrMngr.canvasImageWidth + XOsBlock.width
                 else:
                     XOsBlock.xPos = prevBlockEndPoint + XOsBlock.bufferSpacing
                 # XOsBlock.xPos = XOsBlock.start = XOsBlocks[XOsBlock.prvBlock].xPos + XOsBlocks[XOsBlock.prvBlock].width + XOsBlock.bufferSpacing
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
 
     # Chop up the scrollImage into "rows"
-    for n in range(0, config.displayRows):
-        segmentHeight = int(config.canvasHeight / config.displayRows)
+    for n in range(0, scrllrMngr.displayRows):
+        segmentHeight = int(config.canvasHeight / scrllrMngr.displayRows)
         segmentWidth = config.canvasWidth
         segment = config.canvasImage.crop(
             (
@@ -698,57 +714,57 @@ def iterate():
         )
 
         # At some point go to modulo for even/odd ... but for now not more than 5 rows
-        if (n == 0 or n == 2 or n == 4) and (config.displayRows > 1):
+        if (n == 0 or n == 2 or n == 4) and (scrllrMngr.displayRows > 1):
             segment = ImageOps.flip(segment)
             segment = ImageOps.mirror(segment)
         config.canvasImageFinal.paste(segment, (0, n * segmentHeight))
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
 
     ### Colorizing filter that transitions from colorA to colorB ###
 
-    if config.colorOverlay == True:
-        config.colorOverlayObjA.stepTransition()
-        config.colorOverlayObjB.stepTransition()
+    if scrllrMngr.colorOverlay == True:
+        scrllrMngr.colorOverlayObjA.stepTransition()
+        scrllrMngr.colorOverlayObjB.stepTransition()
 
         segmentColorizer = Image.new(
-            "RGBA", (config.overlayWidth, config.overlayHeight)
+            "RGBA", (scrllrMngr.overlayWidth, scrllrMngr.overlayHeight)
         )
 
         draw = ImageDraw.Draw(segmentColorizer)
         draw.rectangle(
             (
-                config.overlayX,
-                config.overlayY,
-                config.overlayWidth + config.overlayX,
-                config.overlayHeight + config.overlayY,
+                scrllrMngr.overlayX,
+                scrllrMngr.overlayY,
+                scrllrMngr.overlayWidth + scrllrMngr.overlayX,
+                scrllrMngr.overlayHeight + scrllrMngr.overlayY,
             ),
-            fill=tuple([int(a) for a in config.colorOverlayObjA.currentColor]),
+            fill=tuple([int(a) for a in scrllrMngr.colorOverlayObjA.currentColor]),
         )
         # draw.rectangle((projectedWidth/2,0,projectedWidth,config.screenHeight), fill = tuple( [int(a) for a in config.colorOverlayObjB.currentColor] ))
 
-        if config.coloroverlayBackgroundOnly == False :
+        if scrllrMngr.coloroverlayBackgroundOnly == False :
             temp = ImageChops.multiply(config.canvasImageFinal, segmentColorizer)
             config.canvasImageFinal.paste(temp, (0, 0), temp)
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
 
 
-    if config.useBlanks:
+    if scrllrMngr.useBlanks:
         badpixels.drawBlanks(config.canvasImageFinal, False)
 
-    if random.random() > 0.998 and (config.useBlanks):
+    if random.random() > 0.998 and (scrllrMngr.useBlanks):
         badpixels.setBlanksOnScreen()
 
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
+    # ------------------------------------------------------------------- #
     # Debug geometry for rotation
     # tS = config.canvasImageFinal.size
     # tDraw = ImageDraw.Draw(config.canvasImageFinal)
     # tDraw.rectangle((0,0,tS[0],tS[1]), fill = None, outline=(0,255,0))
 
-    if config.useThreeD:
+    if scrllrMngr.useThreeD:
         ThreeD(config.canvasImageFinal)
         # drw = ImageDraw.Draw(config.warpedImage)
         # drw.rectangle((0,0, config.canvasWidth -4 , config.canvasHeight - 2), fill = None, outline=(222,100,0))
@@ -765,12 +781,12 @@ def iterate():
             False,
         )
 
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    # ------------------------------------------------------------------- #
+    # ------------------------------------------------------------------- #
+    # ------------------------------------------------------------------- #
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 
 def ThreeD(imageToRender):
@@ -829,7 +845,7 @@ def ThreeD(imageToRender):
     # config.render(warpedImage,0,0, config.screenWidth, config.screenHeight)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 class Director:
     """docstring for Director"""
@@ -852,11 +868,11 @@ class Director:
         self.checkTime()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""
 
 def callBack():
     global config, XOs
     return True
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ------------------------------------------------------------------- # ""

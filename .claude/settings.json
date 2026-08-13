@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python3 -m pyflakes pieces/barblocks.py)",
+      "Bash(python3 -m py_compile pieces/barblocks.py)",
+      "Bash(python3 -m py_compile pieces/counterscroll.py)",
+      "Bash(python3 -m pyflakes pieces/counterscroll.py)"
+    ]
+  }
+}

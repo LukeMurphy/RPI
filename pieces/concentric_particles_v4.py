@@ -1,10 +1,6 @@
-import glob
-from logging import config
 import math
 import random
-import threading
 import time
-import sys, select, json
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageChops
 
@@ -20,7 +16,7 @@ class ParticleDot:
     def setUp(self, p, n):
         # variation in initial velocity
         direction = 1 if p.directionProb < 0.5 else -1
-        orbit = p.orbitProb <= config.orbitProb
+        orbit = p.orbitProb <= cpMngr.orbitProb
         fx = random.SystemRandom().random() * p.fFactor + 0
         fy = random.SystemRandom().random() * p.fFactor + 0
         vx = math.cos(p.angle * n) * fx * direction
@@ -34,15 +30,15 @@ class ParticleDot:
 
         radius = p.radialBand * radialBand
 
-        rSpeed = random.SystemRandom().uniform(100, 200) / radius / config.radialSpeedFactor
+        rSpeed = random.SystemRandom().uniform(100, 200) / radius / cpMngr.radialSpeedFactor
 
         xPos = p.x
         yPos = p.y
         angle = p.angle * n
 
         if direction == -1:
-            xPos = round(random.SystemRandom().uniform(0, config.imageCanvasWidth))
-            yPos = round(random.SystemRandom().uniform(0, config.imageCanvasHeight))
+            xPos = round(random.SystemRandom().uniform(0, cpMngr.imageCanvasWidth))
+            yPos = round(random.SystemRandom().uniform(0, cpMngr.imageCanvasHeight))
             angle = math.atan2(yPos - p.y, xPos - p.x)
             vx = math.cos(angle) * fx * direction
             vy = math.sin(angle) * fy * direction
@@ -52,7 +48,7 @@ class ParticleDot:
         self.yPos = yPos
         self.vx = vx
         self.vy = vy
-        pClrRange = config.particleColorRange
+        pClrRange = cpMngr.particleColorRange
         clr = colorutils.getRandomColorHSVSaturated(pClrRange[0], pClrRange[1], pClrRange[2], pClrRange[3], pClrRange[4], pClrRange[5])
         self.clr = [clr[0], clr[1], clr[2]]
         self.done = 0
@@ -86,7 +82,7 @@ class RadialSet:
 
         self.angleOffset = 0.0
 
-        self.angleOffsetSpeed = random.SystemRandom().uniform(-math.pi / 300, math.pi / 300) / config.rotationSpeedFactor
+        self.angleOffsetSpeed = random.SystemRandom().uniform(-math.pi / 300, math.pi / 300) / cpMngr.rotationSpeedFactor
 
         radialSetInnerRadiusFactor = self.radialSetInnerRadiusFactor
         # if self.useFixedBandColors:
@@ -121,9 +117,9 @@ class ParticleSystem:
         self.done = False
         self.drawRadialPolys = True
         self.orientation = 1
-        self.initXRange = [config.initXRangeMin, config.initXRangeMax]
-        self.initYRange = [config.initYRangeMin, config.initYRangeMax]
-        self.useFixedBandColors = random.random() < config.useFixedBandColorsProb
+        self.initXRange = [cpMngr.initXRangeMin, cpMngr.initXRangeMax]
+        self.initYRange = [cpMngr.initYRangeMin, cpMngr.initYRangeMax]
+        self.useFixedBandColors = random.random() < cpMngr.useFixedBandColorsProb
 
         # there is really no need for this to change the bands randomly
         self.bandWVariabilityProb = 0.00
@@ -132,22 +128,22 @@ class ParticleSystem:
         self.wDiff = 17
         # self.bandWidth = 1
         # self.bandDecriment = 1
-        self.bandAlpha = round(random.uniform(config.bandAlphaRange[0], config.bandAlphaRange[1]))
+        self.bandAlpha = round(random.uniform(cpMngr.bandAlphaRange[0], cpMngr.bandAlphaRange[1]))
 
     def setNewAttributes(self, _i=0):
         self.radialSets = []
 
         # The rings around the center
         # if not self.useFixedBandColors:
-        self.bands = round(random.SystemRandom().uniform(config.PSMinBands, config.PSMaxBands))
-        self.wBase = round(random.SystemRandom().uniform(config.PSRadiusMin, config.PSRadiusMax))
-        self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
+        self.bands = round(random.SystemRandom().uniform(cpMngr.PSMinBands, cpMngr.PSMaxBands))
+        self.wBase = round(random.SystemRandom().uniform(cpMngr.PSRadiusMin, cpMngr.PSRadiusMax))
+        self.wDiff = round(random.SystemRandom().uniform(cpMngr.bandWidthMin, cpMngr.bandWidthMax))
 
         # if self.useFixedBandColors:
 
-        self.bandWidth = round(random.uniform(config.bandWidthRange[0], config.bandWidthRange[1]))
-        self.bandDecriment = round(random.uniform(config.bandDecrimentRange[0], config.bandDecrimentRange[1]))
-        self.bandAlpha = round(random.uniform(config.bandAlphaRange[0], config.bandAlphaRange[1]))
+        self.bandWidth = round(random.uniform(cpMngr.bandWidthRange[0], cpMngr.bandWidthRange[1]))
+        self.bandDecriment = round(random.uniform(cpMngr.bandDecrimentRange[0], cpMngr.bandDecrimentRange[1]))
+        self.bandAlpha = round(random.uniform(cpMngr.bandAlphaRange[0], cpMngr.bandAlphaRange[1]))
 
         if self.useFixedBandColors:
             self.setBandColors()
@@ -156,24 +152,24 @@ class ParticleSystem:
 
         self.setBandSizes()
 
-        self.xSpeed = random.SystemRandom().random() * config.PSXSpeed
-        self.ySpeed = random.SystemRandom().random() * config.PSYSpeed
+        self.xSpeed = random.SystemRandom().random() * cpMngr.PSXSpeed
+        self.ySpeed = random.SystemRandom().random() * cpMngr.PSYSpeed
 
-        self.xMaxFactor = config.xMaxFactor
-        self.yMaxFactor = config.yMaxFactor
+        self.xMaxFactor = cpMngr.xMaxFactor
+        self.yMaxFactor = cpMngr.yMaxFactor
 
         self.drawRadialPolys = random.SystemRandom().random() < 0.5
 
         radialSet = RadialSet(config, self.wBase)
-        radialSet.radialSetMinNum = config.radialSetMinNum
-        radialSet.radialSetMaxNum = config.radialSetMaxNum
-        radialSet.radialSetInnerRadiusFactor = config.radialSetInnerRadiusFactor
-        radialSet.radialSetInnerRadiusFactorFixedBands = config.radialSetInnerRadiusFactorFixedBands
-        radialSet.radialSetInnerRadiusRange = config.radialSetInnerRadiusRange
-        radialSet.radialSetOuterRadiusRange = config.radialSetOuterRadiusRange
+        radialSet.radialSetMinNum = cpMngr.radialSetMinNum
+        radialSet.radialSetMaxNum = cpMngr.radialSetMaxNum
+        radialSet.radialSetInnerRadiusFactor = cpMngr.radialSetInnerRadiusFactor
+        radialSet.radialSetInnerRadiusFactorFixedBands = cpMngr.radialSetInnerRadiusFactorFixedBands
+        radialSet.radialSetInnerRadiusRange = cpMngr.radialSetInnerRadiusRange
+        radialSet.radialSetOuterRadiusRange = cpMngr.radialSetOuterRadiusRange
         radialSet.useFixedBandColors = self.useFixedBandColors
 
-        radialSet.makeRadialsSet(config.radialSetMinNum, config.radialSetMaxNum)
+        radialSet.makeRadialsSet(cpMngr.radialSetMinNum, cpMngr.radialSetMaxNum)
         self.radialSets.append(radialSet)
 
         # the 33s hand
@@ -184,30 +180,30 @@ class ParticleSystem:
     def setRings(self):
         self.bandColorsAdjusted = []
         for _ in range(self.bands):
-            if random.random() < config.probGoldBand:
+            if random.random() < cpMngr.probGoldBand:
                 _clr = colorutils.getRandomColorHSV(
-                    config.bandGoldColorsRange[0],
-                    config.bandGoldColorsRange[1],
-                    config.bandGoldColorsRange[2],
-                    config.bandGoldColorsRange[3],
-                    config.bandGoldColorsRange[4],
-                    config.bandGoldColorsRange[5],
+                    cpMngr.bandGoldColorsRange[0],
+                    cpMngr.bandGoldColorsRange[1],
+                    cpMngr.bandGoldColorsRange[2],
+                    cpMngr.bandGoldColorsRange[3],
+                    cpMngr.bandGoldColorsRange[4],
+                    cpMngr.bandGoldColorsRange[5],
                 )
             else:
                 _clr = colorutils.getRandomColorHSV(
-                    config.bandBlueColorsRange[0],
-                    config.bandBlueColorsRange[1],
-                    config.bandBlueColorsRange[2],
-                    config.bandBlueColorsRange[3],
-                    config.bandBlueColorsRange[4],
-                    config.bandBlueColorsRange[5],
+                    cpMngr.bandBlueColorsRange[0],
+                    cpMngr.bandBlueColorsRange[1],
+                    cpMngr.bandBlueColorsRange[2],
+                    cpMngr.bandBlueColorsRange[3],
+                    cpMngr.bandBlueColorsRange[4],
+                    cpMngr.bandBlueColorsRange[5],
                 )
                 # _clr = colorutils.getRandomColorHSV()
 
             self.bandColorsAdjusted.extend([_clr])
 
     def setBandColors(self):
-        self.bandColors = config.bandColors
+        self.bandColors = cpMngr.bandColors
 
         # created transition bands
         self.bandColorsAdjusted = []
@@ -242,16 +238,16 @@ class ParticleSystem:
 
     def setBandSizes(self):
         self.wBase = round(
-            random.SystemRandom().uniform(config.PSRadiusMin + config.PSRadiusFixedColorMinInternalRadius, config.PSRadiusMax + config.PSRadiusFixedColorMinInternalRadius)
+            random.SystemRandom().uniform(cpMngr.PSRadiusMin + cpMngr.PSRadiusFixedColorMinInternalRadius, cpMngr.PSRadiusMax + cpMngr.PSRadiusFixedColorMinInternalRadius)
         )
-        self.wDiff = round(random.SystemRandom().uniform(config.bandWidthMin, config.bandWidthMax))
+        self.wDiff = round(random.SystemRandom().uniform(cpMngr.bandWidthMin, cpMngr.bandWidthMax))
 
         self.bandWidthsSet = []
         self.bandWidthsSet.extend(
             round(
                 random.SystemRandom().uniform(
-                    config.PSFixedColorRadiusDiffMin,
-                    config.PSFixedColorRadiusDiffMax,
+                    cpMngr.PSFixedColorRadiusDiffMin,
+                    cpMngr.PSFixedColorRadiusDiffMax,
                 )
             )
             for _ in range(self.bands)
@@ -268,15 +264,15 @@ class ParticleSystem:
     def setUp(self, _i=0):
 
         self.directionProb = random.SystemRandom().uniform(0.4, 0.6)
-        self.orbitProb = config.orbitProb
+        self.orbitProb = cpMngr.orbitProb
         # Number of sparks
-        self.p = int(5 + (random.SystemRandom().uniform(config.minParticles, config.maxParticles)))
+        self.p = int(5 + (random.SystemRandom().uniform(cpMngr.minParticles, cpMngr.maxParticles)))
         self.angle = 2 * math.pi / self.p
 
-        config.numberDone = round(self.p / 5)
+        cpMngr.numberDone = round(self.p / 5)
 
         # Speed factor
-        self.fFactor = int(random.SystemRandom().uniform(config.speedFactorMin, config.speedFactorMax))
+        self.fFactor = int(random.SystemRandom().uniform(cpMngr.speedFactorMin, cpMngr.speedFactorMax))
 
         self.brightness = self.config.brightness
         self.sparkleBrightness = self.config.brightness
@@ -292,7 +288,7 @@ class ParticleSystem:
         # horizontal deacelleration
         self.deacellerationx = random.SystemRandom().uniform(0.8, 0.95)
 
-        self.maxRadius = math.sqrt(config.imageCanvasWidth * config.imageCanvasWidth + config.imageCanvasHeight * config.imageCanvasHeight) * config.PSRadiusFactor1
+        self.maxRadius = math.sqrt(cpMngr.imageCanvasWidth * cpMngr.imageCanvasWidth + cpMngr.imageCanvasHeight * cpMngr.imageCanvasHeight) * cpMngr.PSRadiusFactor1
 
         self.radialBand = self.maxRadius / 12
 
@@ -332,7 +328,7 @@ class ParticleSystem:
         self._update_particle_color(q)
         self._draw_particle(ref, q)
 
-        if random.SystemRandom().random() < config.particleResetProb:
+        if random.SystemRandom().random() < cpMngr.particleResetProb:
             ref.setUp(self, ref.id)
 
     def _move_particle_linear(self, ref):
@@ -348,11 +344,11 @@ class ParticleSystem:
         if r > ref.radius / 2 and ref.orbit:
             ref.mode = 0
 
-        if config.horizontalContinuity:
-            ref.xPos %= config.imageCanvasWidth
-        if config.verticalContinuity:
-            ref.xPos %= config.imageCanvasWidth
-            ref.yPos %= config.imageCanvasHeight
+        if cpMngr.horizontalContinuity:
+            ref.xPos %= cpMngr.imageCanvasWidth
+        if cpMngr.verticalContinuity:
+            ref.xPos %= cpMngr.imageCanvasWidth
+            ref.yPos %= cpMngr.imageCanvasHeight
 
     def _move_particle_orbit(self, ref):
         """Updates the particle's position based on orbital movement."""
@@ -365,7 +361,7 @@ class ParticleSystem:
         for i in range(3):
             self.particles[q].clr[i] = max(0, self.particles[q].clr[i] - getattr(self, "decr_" + "rgb"[i]))
 
-        if random.SystemRandom().random() < config.sparkleProb:
+        if random.SystemRandom().random() < cpMngr.sparkleProb:
             self.particles[q].clr = [int(220 * self.sparkleBrightness)] * 2 + [int(255 * self.sparkleBrightness)]
 
     def _draw_particle(self, ref, q):
@@ -373,13 +369,13 @@ class ParticleSystem:
         xDisplayPos = ref.xPos
         yDisplayPos = ref.yPos
 
-        if config.horizontalContinuity:
+        if cpMngr.horizontalContinuity:
             xDisplayPos %= config.canvasWidth
-        if config.verticalContinuity:
-            xDisplayPos %= config.imageCanvasWidth
-            yDisplayPos %= config.imageCanvasHeight
+        if cpMngr.verticalContinuity:
+            xDisplayPos %= cpMngr.imageCanvasWidth
+            yDisplayPos %= cpMngr.imageCanvasHeight
 
-        if 0 <= xDisplayPos <= self.config.imageCanvasWidth and 0 <= yDisplayPos <= config.imageCanvasHeight:
+        if 0 <= xDisplayPos <= cpMngr.imageCanvasWidth and 0 <= yDisplayPos <= cpMngr.imageCanvasHeight:
             try:
                 if ref.sizeNum == 2:
                     config.particleDraw.rectangle(
@@ -394,9 +390,152 @@ class ParticleSystem:
             except Exception as e:
                 pieceLogger(e,1)
 
-        if yDisplayPos > config.imageCanvasHeight or yDisplayPos < 0:
+        if yDisplayPos > cpMngr.imageCanvasHeight or yDisplayPos < 0:
             ref.setUp(self, ref.id)
 
+
+class ConcentricParticlesManager:
+    def __init__(self, config):
+        self.config = config
+
+    def setUp(self, workConfig):
+        self.minParticles = int(workConfig.get("particles", "minParticles"))
+        self.maxParticles = int(workConfig.get("particles", "maxParticles"))
+
+        self.speedFactorMin = float(workConfig.get("particles", "speedFactorMin"))
+        self.speedFactorMax = float(workConfig.get("particles", "speedFactorMax"))
+
+        self.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
+        self.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
+        self.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
+        self.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
+
+        bgColorSets = (workConfig.get("particles", "bgColorSets")).split(",")
+        self.bgColorSets = []
+        for bg in bgColorSets:
+            bgColor = (workConfig.get(bg, "bgColor")).split(",")
+            bgColors = [int(x) for x in bgColor]
+            self.bgColorSets.append(bgColors)
+
+        # choose the first bg color - generally the dark one
+        self.bgColor = random.choice(self.bgColorSets)
+
+        self.radialAlpha = int(workConfig.get("particles", "radialAlpha"))
+        self.radialSpeedFactor = float(workConfig.get("particles", "radialSpeedFactor"))
+
+        self.radialRed = int(workConfig.get("particles", "radialRed"))
+        self.radialGreen = int(workConfig.get("particles", "radialGreen"))
+        self.radialBlue = int(workConfig.get("particles", "radialBlue"))
+        self.radial2Red = int(workConfig.get("particles", "radial2Red"))
+        self.radial2Green = int(workConfig.get("particles", "radial2Green"))
+        self.radial2Blue = int(workConfig.get("particles", "radial2Blue"))
+
+        self.radialSetMinNum = int(workConfig.get("particles", "radialSetMinNum"))
+        self.radialSetMaxNum = int(workConfig.get("particles", "radialSetMaxNum"))
+        self.radialSetInnerRadiusFactor = int(workConfig.get("particles", "radialSetInnerRadiusFactor"))
+        self.radialSetInnerRadiusFactorFixedBands = float(workConfig.get("particles", "radialSetInnerRadiusFactorFixedBands"))
+        self.radialSetInnerRadiusRange = [int(x) for x in (workConfig.get("particles", "radialSetInnerRadiusRange").split(","))]
+        self.radialSetOuterRadiusRange = [int(x) for x in (workConfig.get("particles", "radialSetOuterRadiusRange").split(","))]
+        self.rotationSpeedFactor = float(workConfig.get("particles", "rotationSpeedFactor"))
+
+        self.backgroundAlpha = float(workConfig.get("particles", "backgroundAlpha"))
+        self.backgroundAlphaMin = float(workConfig.get("particles", "backgroundAlphaMin"))
+        self.backgroundAlphaMax = float(workConfig.get("particles", "backgroundAlphaMax"))
+        self.backgroundAlphaDelta = float(workConfig.get("particles", "backgroundAlphaDelta"))
+        self.backgroundAlphaDeltaSpeed = float(workConfig.get("particles", "backgroundAlphaDeltaSpeed"))
+        self.sparkleProb = float(workConfig.get("particles", "sparkleProb"))
+        self.backgroundAlphaNewSystemThreshold = float(workConfig.get("particles", "backgroundAlphaNewSystemThreshold"))
+
+        self.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
+        self.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
+        self.orbitProb = float(workConfig.get("particles", "orbitProb"))
+
+        # set the actual drawing space
+        try:
+            self.imageCanvasWidth = int(workConfig.get("particles", "imageCanvasWidth"))
+            self.imageCanvasHeight = int(workConfig.get("particles", "imageCanvasHeight"))
+
+        except Exception as e:
+            pieceLogger(e, 1)
+            self.imageCanvasWidth = self.config.canvasWidth
+            self.imageCanvasHeight = self.config.canvasHeight
+
+        # comment: # for some towers the seam between the
+        # start and end needs to become semi-continuous
+        # so I make the particles appear to move around the piece
+        # and overlap one side with some of the drawing
+        # if every thing was drawn pixel by pixel this would
+        # probably not need to be so complicated
+        self.horizontalContinuity = workConfig.getboolean("particles", "horizontalContinuity")
+        self.horizontalOverlapFraction = int(workConfig.get("particles", "horizontalOverlapFraction"))
+
+        self.verticalContinuity = workConfig.getboolean("particles", "verticalContinuity")
+        self.verticalOverlapFraction = int(workConfig.get("particles", "verticalOverlapFraction"))
+
+        self.PSXSpeed = float(workConfig.get("particles", "PSXSpeed"))
+        self.PSYSpeed = float(workConfig.get("particles", "PSYSpeed"))
+        self.PSRadiusFactor1 = float(workConfig.get("particles", "PSRadiusFactor1"))
+        self.PSRadiusFactor2 = float(workConfig.get("particles", "PSRadiusFactor2"))
+        self.PSRadiusMin = float(workConfig.get("particles", "PSRadiusMin"))
+        self.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
+        self.PSMinBands = int(workConfig.get("particles", "PSMinBands"))
+        self.PSMaxBands = int(workConfig.get("particles", "PSMaxBands"))
+
+        self.bandWidthMin = int(workConfig.get("particles", "bandWidthMin"))
+        self.bandWidthMax = int(workConfig.get("particles", "bandWidthMax"))
+        self.PSFixedColorRadiusDiffMin = int(workConfig.get("particles", "PSFixedColorRadiusDiffMin"))
+        self.PSFixedColorRadiusDiffMax = int(workConfig.get("particles", "PSFixedColorRadiusDiffMax"))
+
+        self.useFixedBandColorsProb = float(workConfig.get("particles", "useFixedBandColorsProb"))
+
+        bandColorsRaw = workConfig.get("particles", "bandColors").split("|")
+        self.bandColors = []
+        self.bandColors.extend([int(x) for x in n.split(",")] for n in bandColorsRaw)
+
+        self.probGoldBand = float(workConfig.get("particles", "probGoldBand"))
+
+        bandGoldColorsRange = workConfig.get("particles", "bandGoldColorsRange").split(",")
+        self.bandGoldColorsRange = []
+        self.bandGoldColorsRange.extend(float(n) for n in bandGoldColorsRange)
+
+        bandBlueColorsRange = workConfig.get("particles", "bandBlueColorsRange").split(",")
+        self.bandBlueColorsRange = []
+        self.bandBlueColorsRange.extend(float(n) for n in bandBlueColorsRange)
+
+        bandWidthRange = workConfig.get("particles", "bandWidthRange").split(",")
+        self.bandWidthRange = []
+        self.bandWidthRange.extend(int(n) for n in bandWidthRange)
+
+        bandDecrimentRange = workConfig.get("particles", "bandDecrimentRange").split(",")
+        self.bandDecrimentRange = []
+        self.bandDecrimentRange.extend(int(n) for n in bandDecrimentRange)
+
+        bandAlphaRange = workConfig.get("particles", "bandAlphaRange").split(",")
+        self.bandAlphaRange = []
+        self.bandAlphaRange.extend(float(n) for n in bandAlphaRange)
+
+        # only has to happen once, I had it happening every turn
+        self.bandColors.reverse()
+
+        try:
+            self.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles", "PSRadiusFixedColorMinInternalRadius"))
+        except Exception as e:
+            pieceLogger(e, 1)
+            self.PSRadiusFixedColorMinInternalRadius = 1
+
+        try:
+            self.xMaxFactor = float(workConfig.get("particles", "xMaxFactor"))
+            self.yMaxFactor = float(workConfig.get("particles", "yMaxFactor"))
+
+        except Exception as e:
+            pieceLogger(e, 1)
+            self.xMaxFactor = 4
+            self.yMaxFactor = 8
+
+        particleColorRangeVals = workConfig.get("particles", "particleColorRange").split(",")
+        self.particleColorRange = [float(i) for i in particleColorRangeVals]
+        self.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
+        self.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
 
 ##########################################################################
 
@@ -410,7 +549,7 @@ def drawBands(p):
 def drawBandRings(p):
     _b = p.bandWidth
     _decriment = p.bandDecriment
-    _startWidth = p.wBase - config.PSRadiusFixedColorMinInternalRadius
+    _startWidth = p.wBase - cpMngr.PSRadiusFixedColorMinInternalRadius
     _setsOfRings = 1
     _alpha = p.bandAlpha
 
@@ -454,30 +593,30 @@ def drawRadials(p):
             i += 1
             polyArray.extend(((x0, y0), (x1, y1)))
             if rSet.radialsArray[n][2] == 0:
-                config.drawingImageDraw.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
-                config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha))
+                config.drawingImageDraw.line((x0, y0, x1, y1), fill=(cpMngr.radialRed, cpMngr.radialGreen, cpMngr.radialBlue, cpMngr.radialAlpha))
+                config.drawOverFlow.line((x0, y0, x1, y1), fill=(cpMngr.radialRed, cpMngr.radialGreen, cpMngr.radialBlue, cpMngr.radialAlpha))
             if numLines == 1:
-                config.drawingImageDraw.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
-                config.drawOverFlow.line((x0, y0, x1, y1), fill=(config.radial2Red, config.radial2Green, config.radial2Blue, config.radialAlpha))
+                config.drawingImageDraw.line((x0, y0, x1, y1), fill=(cpMngr.radial2Red, cpMngr.radial2Green, cpMngr.radial2Blue, cpMngr.radialAlpha))
+                config.drawOverFlow.line((x0, y0, x1, y1), fill=(cpMngr.radial2Red, cpMngr.radial2Green, cpMngr.radial2Blue, cpMngr.radialAlpha))
 
         if rSet.drawRadialPolys:
             config.drawingImageDraw.polygon(
                 polyArray,
-                fill=(config.radialRed, config.radialGreen, config.radialBlue, 10),
-                outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha + 2),
+                fill=(cpMngr.radialRed, cpMngr.radialGreen, cpMngr.radialBlue, 10),
+                outline=(cpMngr.radialRed, cpMngr.radialGreen, cpMngr.radialBlue, cpMngr.radialAlpha + 2),
             )
             config.drawOverFlow.polygon(
                 polyArray,
-                fill=(config.radialRed, config.radialGreen, config.radialBlue, 10),
-                outline=(config.radialRed, config.radialGreen, config.radialBlue, config.radialAlpha + 2),
+                fill=(cpMngr.radialRed, cpMngr.radialGreen, cpMngr.radialBlue, 10),
+                outline=(cpMngr.radialRed, cpMngr.radialGreen, cpMngr.radialBlue, cpMngr.radialAlpha + 2),
             )
 
 
-def changeACenter(config, PSArray):
-    # config.backgroundAlpha = round(random.uniform(20,120))
-    i = round(random.uniform(0, config.numberOfCenters-1))
+def changeACenter(cpMngr, PSArray):
+    # cpMngr.backgroundAlpha = round(random.uniform(20,120))
+    i = round(random.uniform(0, cpMngr.numberOfCenters-1))
     _PS = PSArray[i]
-    _PS.useFixedBandColors = random.SystemRandom().random() < config.useFixedBandColorsProb
+    _PS.useFixedBandColors = random.SystemRandom().random() < cpMngr.useFixedBandColorsProb
     _PS.setCenter(i)
     _PS.setNewAttributes(i)
     _PS.setUp(i)
@@ -524,30 +663,30 @@ def ringMaker(_ringWidth=200, _bandWidth=8, _xOffSet=0, _yOffSet=0, _fill=(255, 
     return ringImage
 
 
-def _verticalContinuitySetup(config):
+def _verticalContinuitySetup(config, cpMngr):
     # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
 
-    yCrop = round(config.imageCanvasHeight)
-    yCrop2 = round(config.imageCanvasHeight - config.imageCanvasHeight / config.verticalOverlapFraction)
+    yCrop = round(cpMngr.imageCanvasHeight)
+    yCrop2 = round(cpMngr.imageCanvasHeight - cpMngr.imageCanvasHeight / cpMngr.verticalOverlapFraction)
     # print(yCrop2)
 
-    # temp = config.imageOverFlow.crop((0,yCrop,config.canvasWidth, yCrop + config.canvasHeight / config.verticalOverlapFraction))
+    # temp = config.imageOverFlow.crop((0,yCrop,config.canvasWidth, yCrop + config.canvasHeight / cpMngr.verticalOverlapFraction))
     # temp2 = config.image.crop((0,yCrop2,config.canvasWidth, config.canvasHeight))
 
-    temp = config.imageOverFlow.crop((0, yCrop, config.imageCanvasWidth, yCrop + config.imageCanvasHeight / config.verticalOverlapFraction))
-    temp2 = config.drawingImage.crop((0, yCrop2, config.imageCanvasWidth, config.imageCanvasHeight))
+    temp = config.imageOverFlow.crop((0, yCrop, cpMngr.imageCanvasWidth, yCrop + cpMngr.imageCanvasHeight / cpMngr.verticalOverlapFraction))
+    temp2 = config.drawingImage.crop((0, yCrop2, cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
 
     temp3 = ImageChops.add(temp, config.drawingImage, scale=1.0, offset=0)
     config.drawingImage.paste(temp3, (0, 0), temp2)
 
 
-def _horizontalContinuitySetup(config):
+def _horizontalContinuitySetup(config, cpMngr):
     # config.image  = ImageChops.add(config.image,config.imageOverFlow, scale = 1.0, offset= 0)
 
-    xCrop = round(config.imageCanvasWidth)
-    xCrop2 = round(config.imageCanvasWidth - config.imageCanvasWidth / config.horizontalOverlapFraction)
-    temp = config.imageOverFlow.crop((xCrop, 0, xCrop + config.imageCanvasWidth / config.horizontalOverlapFraction, config.canvasHeight))
-    temp2 = config.drawingImage.crop((xCrop2, 0, config.imageCanvasWidth, config.imageCanvasHeight))
+    xCrop = round(cpMngr.imageCanvasWidth)
+    xCrop2 = round(cpMngr.imageCanvasWidth - cpMngr.imageCanvasWidth / cpMngr.horizontalOverlapFraction)
+    temp = config.imageOverFlow.crop((xCrop, 0, xCrop + cpMngr.imageCanvasWidth / cpMngr.horizontalOverlapFraction, config.canvasHeight))
+    temp2 = config.drawingImage.crop((xCrop2, 0, cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
     temp3 = ImageChops.add(config.drawingImage, temp, scale=1.0, offset=0)
     config.image.paste(temp3, (0, 0), temp2)
 
@@ -557,16 +696,16 @@ def _horizontalContinuitySetup(config):
 def createLayers():
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
-    config.drawingImage = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
+    config.drawingImage = Image.new("RGBA", (cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
     config.drawingImageDraw = ImageDraw.Draw(config.drawingImage)
 
-    config.particleLayer = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
+    config.particleLayer = Image.new("RGBA", (cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
     config.particleDraw = ImageDraw.Draw(config.particleLayer)
 
     config.imageOverFlow = Image.new("RGBA", (config.canvasWidth * 2, config.canvasHeight * 2))
     config.drawOverFlow = ImageDraw.Draw(config.imageOverFlow)
 
-    config.finalComposite = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
+    config.finalComposite = Image.new("RGBA", (cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
     config.finalCompositeDraw = ImageDraw.Draw(config.finalComposite)
 
 # -------------------------------------------------------- #
@@ -586,72 +725,73 @@ def runWork():
 
 def iterate():
     global config
+    global cpMngr
     global PSArray
 
-    config.vx = 0
+    cpMngr.vx = 0
 
     # Fade out the sparkle
     config.drawingImageDraw.rectangle(
-        (0, 0, config.imageCanvasWidth, config.imageCanvasHeight),
+        (0, 0, cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight),
         fill=(
-            config.bgColor[0],
-            config.bgColor[1],
-            config.bgColor[2],
-            round(config.backgroundAlpha),
+            cpMngr.bgColor[0],
+            cpMngr.bgColor[1],
+            cpMngr.bgColor[2],
+            round(cpMngr.backgroundAlpha),
         ),
     )
     config.drawOverFlow.rectangle(
-        (0, 0, config.imageCanvasWidth, config.imageCanvasHeight),
+        (0, 0, cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight),
         fill=(
-            config.bgColor[0],
-            config.bgColor[1],
-            config.bgColor[2],
-            round(config.backgroundAlpha),
+            cpMngr.bgColor[0],
+            cpMngr.bgColor[1],
+            cpMngr.bgColor[2],
+            round(cpMngr.backgroundAlpha),
         ),
     )
 
     config.drawOverFlow.rectangle((0, 0, 100, 200), fill=(200, 0, 0))
 
-    config.particleLayer = Image.new("RGBA", (config.imageCanvasWidth, config.imageCanvasHeight))
+    config.particleLayer = Image.new("RGBA", (cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
     config.particleDraw = ImageDraw.Draw(config.particleLayer)
     # config.particleDraw.rectangle((0,0,300,300), fill = (0,0,0,255))
 
-    if config.horizontalContinuity:
-        _horizontalContinuitySetup(config)
-    if config.verticalContinuity:
-        _verticalContinuitySetup(config)
+    if cpMngr.horizontalContinuity:
+        _horizontalContinuitySetup(config, cpMngr)
+    if cpMngr.verticalContinuity:
+        _verticalContinuitySetup(config, cpMngr)
 
-    for i in range(config.numberOfCenters):
+    for i in range(cpMngr.numberOfCenters):
         _PS = PSArray[i]
         drawBands(_PS)
         _PS.move()
 
-    config.backgroundAlpha += config.backgroundAlphaDelta
-    # if random.SystemRandom().random() < config.totalResetProb:
+    cpMngr.backgroundAlpha += cpMngr.backgroundAlphaDelta
+    # if random.SystemRandom().random() < cpMngr.totalResetProb:
     #     PS.setUp()
 
-    if config.backgroundAlpha < config.backgroundAlphaMin :
-        config.backgroundAlphaDelta = config.backgroundAlphaDeltaSpeed
-    if config.backgroundAlpha > config.backgroundAlphaMax :
-        config.backgroundAlphaDelta = -config.backgroundAlphaDeltaSpeed
+    if cpMngr.backgroundAlpha < cpMngr.backgroundAlphaMin :
+        cpMngr.backgroundAlphaDelta = cpMngr.backgroundAlphaDeltaSpeed
+    if cpMngr.backgroundAlpha > cpMngr.backgroundAlphaMax :
+        cpMngr.backgroundAlphaDelta = -cpMngr.backgroundAlphaDeltaSpeed
 
 
-    if random.SystemRandom().random() < config.totalResetProb:
-        changeACenter(config, PSArray)
-    # if config.backgroundAlpha > 255:
-    #     config.backgroundAlpha = 30
-    #     config.backgroundAlphaDelta = random.SystemRandom().uniform(0.1, 2)
+    if random.SystemRandom().random() < cpMngr.totalResetProb:
+        changeACenter(cpMngr, PSArray)
+    # if cpMngr.backgroundAlpha > 255:
+    #     cpMngr.backgroundAlpha = 30
+    #     cpMngr.backgroundAlphaDelta = random.SystemRandom().uniform(0.1, 2)
 
-    #     if config.backgroundAlphaDelta <= config.backgroundAlphaNewSystemThreshold:
+    #     if cpMngr.backgroundAlphaDelta <= cpMngr.backgroundAlphaNewSystemThreshold:
     #         # when the system reaches a visible chaotic crescendo that will last a few seconds, remake the system
     #         # behind the chaos and start again - choose a new background, reset the center, set new radial attributes
     #         # renew the particle dots that travel
-    #         # bgChoice = math.floor(random.SystemRandom().uniform(0,len(config.bgColorSets)))
-    #         config.bgColor = random.choice(config.bgColorSets)
-    #         for i in range(config.numberOfCenters):
+    #         # bgChoice = math.floor(random.SystemRandom().uniform(0,len(cpMngr.bgColorSets)))
+    #         cpMngr.bgColor = random.choice(cpMngr.bgColorSets)
+    #         for i in range(cpMngr.numberOfCenters):
     #             _PS = PSArray[i]
-    #             if random.SystemRandom().random() < config.totalResetProb:
-    #                 _PS.useFixedBandColors = random.SystemRandom().random() < config.useFixedBandColorsProb
+    #             if random.SystemRandom().random() < cpMngr.totalResetProb:
+    #                 _PS.useFixedBandColors = random.SystemRandom().random() < cpMngr.useFixedBandColorsProb
     #                 _PS.setCenter(i)
     #                 _PS.setNewAttributes(i)
     #                 _PS.setUp(i)
@@ -672,179 +812,18 @@ def main(run=True):
     global PS
     global PS2
     global PSArray
+    global cpMngr
 
     pieceLogger("concentric_particles_v4.py piece loading and running\n",2,True)
 
     PSArray = []
 
-    config.minParticles = int(workConfig.get("particles", "minParticles"))
-    config.maxParticles = int(workConfig.get("particles", "maxParticles"))
-
-    config.speedFactorMin = float(workConfig.get("particles", "speedFactorMin"))
-    config.speedFactorMax = float(workConfig.get("particles", "speedFactorMax"))
-
-    config.initXRangeMin = int(workConfig.get("particles", "initXRangeMin"))
-    config.initXRangeMax = int(workConfig.get("particles", "initXRangeMax"))
-    config.initYRangeMin = int(workConfig.get("particles", "initYRangeMin"))
-    config.initYRangeMax = int(workConfig.get("particles", "initYRangeMax"))
-
-    bgColorSets = (workConfig.get("particles", "bgColorSets")).split(",")
-    config.bgColorSets = []
-    for bg in bgColorSets:
-        bgColor = (workConfig.get(bg, "bgColor")).split(",")
-        bgColors = [int(x) for x in bgColor]
-        config.bgColorSets.append(bgColors)
-
-    # choose the first bg color - generally the dark one
-    config.bgColor = random.choice(config.bgColorSets)
-    # config.bgColor = config.bgColorSets[1]
-
-    # config.rBase = int(workConfig.get("particles", "rBase"))
-    # config.gBase = int(workConfig.get("particles", "gBase"))
-    # config.bBase = int(workConfig.get("particles", "bBase"))
-    # config.aBase = int(workConfig.get("particles", "aBase"))
-    # config.rBase2 = int(workConfig.get("particles", "rBase2"))
-    # config.gBase2 = int(workConfig.get("particles", "gBase2"))
-    # config.bBase2 = int(workConfig.get("particles", "bBase2"))
-    # config.aBase2 = int(workConfig.get("particles", "aBase2"))
-    # config.rDiff = int(workConfig.get("particles", "rDiff"))
-    # config.gDiff = int(workConfig.get("particles", "gDiff"))
-    # config.bDiff = int(workConfig.get("particles", "bDiff"))
-    config.radialAlpha = int(workConfig.get("particles", "radialAlpha"))
-    config.radialSpeedFactor = float(workConfig.get("particles", "radialSpeedFactor"))
-
-    config.radialRed = int(workConfig.get("particles", "radialRed"))
-    config.radialGreen = int(workConfig.get("particles", "radialGreen"))
-    config.radialBlue = int(workConfig.get("particles", "radialBlue"))
-    config.radial2Red = int(workConfig.get("particles", "radial2Red"))
-    config.radial2Green = int(workConfig.get("particles", "radial2Green"))
-    config.radial2Blue = int(workConfig.get("particles", "radial2Blue"))
-
-    config.radialSetMinNum = int(workConfig.get("particles", "radialSetMinNum"))
-    config.radialSetMaxNum = int(workConfig.get("particles", "radialSetMaxNum"))
-    config.radialSetInnerRadiusFactor = int(workConfig.get("particles", "radialSetInnerRadiusFactor"))
-    config.radialSetInnerRadiusFactorFixedBands = float(workConfig.get("particles", "radialSetInnerRadiusFactorFixedBands"))
-    config.radialSetInnerRadiusRange = [int(x) for x in (workConfig.get("particles", "radialSetInnerRadiusRange").split(","))]
-    config.radialSetOuterRadiusRange = [int(x) for x in (workConfig.get("particles", "radialSetOuterRadiusRange").split(","))]
-    config.rotationSpeedFactor = float(workConfig.get("particles", "rotationSpeedFactor"))
-
-    config.backgroundAlpha = float(workConfig.get("particles", "backgroundAlpha"))
-    config.backgroundAlphaMin = float(workConfig.get("particles", "backgroundAlphaMin"))
-    config.backgroundAlphaMax = float(workConfig.get("particles", "backgroundAlphaMax"))
-    config.backgroundAlphaDelta = float(workConfig.get("particles", "backgroundAlphaDelta"))
-    config.backgroundAlphaDeltaSpeed = float(workConfig.get("particles", "backgroundAlphaDeltaSpeed"))
-    config.sparkleProb = float(workConfig.get("particles", "sparkleProb"))
-    config.backgroundAlphaNewSystemThreshold = float(workConfig.get("particles", "backgroundAlphaNewSystemThreshold"))
-
-    config.particleResetProb = float(workConfig.get("particles", "particleResetProb"))
-    config.totalResetProb = float(workConfig.get("particles", "totalResetProb"))
-    config.orbitProb = float(workConfig.get("particles", "orbitProb"))
-
-    # set the actual drawing space
-    try:
-        config.imageCanvasWidth = int(workConfig.get("particles", "imageCanvasWidth"))
-        config.imageCanvasHeight = int(workConfig.get("particles", "imageCanvasHeight"))
-
-    except Exception as e:
-        pieceLogger(e,1)
-        config.imageCanvasWidth = config.canvasWidth
-        config.imageCanvasHeight = config.canvasHeight
-
-    # comment: # for some towers the seam between the
-    # start and end needs to become semi-continuous
-    # so I make the particles appear to move around the piece
-    # and overlap one side with some of the drawing
-    # if every thing was drawn pixel by pixel this would
-    # probably not need to be so complicated
-    config.horizontalContinuity = workConfig.getboolean("particles", "horizontalContinuity")
-    config.horizontalOverlapFraction = int(workConfig.get("particles", "horizontalOverlapFraction"))
-
-    config.verticalContinuity = workConfig.getboolean("particles", "verticalContinuity")
-    config.verticalOverlapFraction = int(workConfig.get("particles", "verticalOverlapFraction"))
+    cpMngr = ConcentricParticlesManager(config)
+    cpMngr.setUp(workConfig)
 
     createLayers()
 
-    config.PSXSpeed = float(workConfig.get("particles", "PSXSpeed"))
-    config.PSYSpeed = float(workConfig.get("particles", "PSYSpeed"))
-    config.PSRadiusFactor1 = float(workConfig.get("particles", "PSRadiusFactor1"))
-    config.PSRadiusFactor2 = float(workConfig.get("particles", "PSRadiusFactor2"))
-    config.PSRadiusMin = float(workConfig.get("particles", "PSRadiusMin"))
-    config.PSRadiusMax = float(workConfig.get("particles", "PSRadiusMax"))
-    config.PSMinBands = int(workConfig.get("particles", "PSMinBands"))
-    config.PSMaxBands = int(workConfig.get("particles", "PSMaxBands"))
-    # config.PSRadiusFixedColorMin = int(workConfig.get("particles", "PSRadiusFixedColorMin"))
-
-    config.bandWidthMin = int(workConfig.get("particles", "bandWidthMin"))
-    config.bandWidthMax = int(workConfig.get("particles", "bandWidthMax"))
-    config.PSFixedColorRadiusDiffMin = int(workConfig.get("particles", "PSFixedColorRadiusDiffMin"))
-    config.PSFixedColorRadiusDiffMax = int(workConfig.get("particles", "PSFixedColorRadiusDiffMax"))
-
-    # goldenRingsArray = workConfig.get("particles", "goldenRingsArray").split(",")
-    # config.goldenRingsArray = [int(x) for x in goldenRingsArray]
-
-    config.useFixedBandColorsProb = float(workConfig.get("particles", "useFixedBandColorsProb"))
-
-    bandColorsRaw = workConfig.get("particles", "bandColors").split("|")
-    config.bandColors = []
-    config.bandColors.extend([int(x) for x in n.split(",")] for n in bandColorsRaw)
-
-    # bandGoldColorsRaw = workConfig.get("particles", "bandGoldColors").split("|")
-    # config.bandGoldColors = []
-    # config.bandGoldColors.extend([int(x) for x in n.split(",")] for n in bandGoldColorsRaw)
-
-    # bandGoldColorsHSVRaw = workConfig.get("particles", "bandGoldColors").split("|")
-    # config.bandGoldColors = []
-    # config.bandGoldColors.extend([int(x) for x in n.split(",")] for n in bandGoldColorsRaw)
-
-    config.probGoldBand = float(workConfig.get("particles", "probGoldBand"))
-
-    bandGoldColorsRange = workConfig.get("particles", "bandGoldColorsRange").split(",")
-    config.bandGoldColorsRange = []
-    config.bandGoldColorsRange.extend(float(n) for n in bandGoldColorsRange)
-
-    bandBlueColorsRange = workConfig.get("particles", "bandBlueColorsRange").split(",")
-    config.bandBlueColorsRange = []
-    config.bandBlueColorsRange.extend(float(n) for n in bandBlueColorsRange)
-
-    bandWidthRange = workConfig.get("particles", "bandWidthRange").split(",")
-    config.bandWidthRange = []
-    config.bandWidthRange.extend(int(n) for n in bandWidthRange)
-
-    bandDecrimentRange = workConfig.get("particles", "bandDecrimentRange").split(",")
-    config.bandDecrimentRange = []
-    config.bandDecrimentRange.extend(int(n) for n in bandDecrimentRange)
-
-    bandAlphaRange = workConfig.get("particles", "bandAlphaRange").split(",")
-    config.bandAlphaRange = []
-    config.bandAlphaRange.extend(float(n) for n in bandAlphaRange)
-
-    # only has to happen once, I had it happening every turn
-    config.bandColors.reverse()
-
-    try:
-        config.PSRadiusFixedColorMinInternalRadius = int(workConfig.get("particles", "PSRadiusFixedColorMinInternalRadius"))
-    except Exception as e:
-        pieceLogger(e,1)
-        config.PSRadiusFixedColorMinInternalRadius = 1
-
-    try:
-        config.xMaxFactor = float(workConfig.get("particles", "xMaxFactor"))
-        config.yMaxFactor = float(workConfig.get("particles", "yMaxFactor"))
-
-    except Exception as e:
-        pieceLogger(e,1)
-        config.xMaxFactor = 4
-        config.yMaxFactor = 8
-
-
-
-    particleColorRangeVals = workConfig.get("particles", "particleColorRange").split(",")
-    config.particleColorRange = [float(i) for i in particleColorRangeVals]
-    config.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
-    config.slotRate = float(workConfig.get("particles", "slotRate", fallback=.03))
-
-    config.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
-    for i in range(config.numberOfCenters):
+    for i in range(cpMngr.numberOfCenters):
 
         _PS = ParticleSystem(config)
         _PS.setCenter(i)
@@ -854,6 +833,7 @@ def main(run=True):
         PSArray.append(_PS)
 
     # managing speed of animation and framerate
+    config.slotRate = float(workConfig.get("particles", "slotRate", fallback=.03))
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
 

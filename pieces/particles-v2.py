@@ -52,37 +52,43 @@ class PaletteObj:
 
 
 # -----------------------------------------------------------
+class ParticleManager:
+    def __init__(self, config):
+        self.config = config
+
+
+# -----------------------------------------------------------
 def setColorsByPalette():
     #  -----------------------------------------------
-    paletteRef = config.palettes[config.paletteIndex]
-    config.bg_bgTransitions = paletteRef.bg_bgTransitions
-    config.bg_bgTransparency = round(random.random() * (paletteRef.bg_transparencyRange[1] - paletteRef.bg_transparencyRange[0]) + paletteRef.bg_transparencyRange[0])
-    config.bg_maxBrightness = paletteRef.bg_maxBrightness
-    config.bg_tLimitBase = paletteRef.bg_tLimitBase
-    config.overallBlur = paletteRef.overallBlur
+    paletteRef = pMngr.palettes[pMngr.paletteIndex]
+    pMngr.bg_bgTransitions = paletteRef.bg_bgTransitions
+    pMngr.bg_bgTransparency = round(random.random() * (paletteRef.bg_transparencyRange[1] - paletteRef.bg_transparencyRange[0]) + paletteRef.bg_transparencyRange[0])
+    pMngr.bg_maxBrightness = paletteRef.bg_maxBrightness
+    pMngr.bg_tLimitBase = paletteRef.bg_tLimitBase
+    pMngr.overallBlur = paletteRef.overallBlur
     ps.unitBlur = paletteRef.unitBlur
 
-    config.bgColorOverlay = coloroverlay.ColorOverlay()
-    config.bgColorOverlay.randomRange = paletteRef.bg_randomRange
-    config.bgColorOverlay.minHue = paletteRef.bg_fillRange[0]
-    config.bgColorOverlay.maxHue = paletteRef.bg_fillRange[1]
-    config.bgColorOverlay.minSaturation = paletteRef.bg_fillRange[2]
-    config.bgColorOverlay.maxSaturation = paletteRef.bg_fillRange[3]
-    config.bgColorOverlay.minValue = paletteRef.bg_fillRange[4]
-    config.bgColorOverlay.maxValue = paletteRef.bg_fillRange[5]
+    pMngr.bgColorOverlay = coloroverlay.ColorOverlay()
+    pMngr.bgColorOverlay.randomRange = paletteRef.bg_randomRange
+    pMngr.bgColorOverlay.minHue = paletteRef.bg_fillRange[0]
+    pMngr.bgColorOverlay.maxHue = paletteRef.bg_fillRange[1]
+    pMngr.bgColorOverlay.minSaturation = paletteRef.bg_fillRange[2]
+    pMngr.bgColorOverlay.maxSaturation = paletteRef.bg_fillRange[3]
+    pMngr.bgColorOverlay.minValue = paletteRef.bg_fillRange[4]
+    pMngr.bgColorOverlay.maxValue = paletteRef.bg_fillRange[5]
 
-    config.bgColorOverlay.dropHueMin = paletteRef.bg_fillRange[6]
-    config.bgColorOverlay.dropHueMax = paletteRef.bg_fillRange[7]
+    pMngr.bgColorOverlay.dropHueMin = paletteRef.bg_fillRange[6]
+    pMngr.bgColorOverlay.dropHueMax = paletteRef.bg_fillRange[7]
 
 
-    config.bgColorOverlay.maxBrightness = paletteRef.bg_maxBrightness
-    config.bgColorOverlay.tLimitBase = paletteRef.bg_tLimitBase
-    config.bgColorOverlay.randomSteps = True
-    config.bgColorOverlay.timeTrigger = True
+    pMngr.bgColorOverlay.maxBrightness = paletteRef.bg_maxBrightness
+    pMngr.bgColorOverlay.tLimitBase = paletteRef.bg_tLimitBase
+    pMngr.bgColorOverlay.randomSteps = True
+    pMngr.bgColorOverlay.timeTrigger = True
 
-    config.bgColorOverlay.colorTransitionSetup()
-    config.bgColorOverlay.setStartColor()
-    config.bgColorOverlay.getNewColor()
+    pMngr.bgColorOverlay.colorTransitionSetup()
+    pMngr.bgColorOverlay.setStartColor()
+    pMngr.bgColorOverlay.getNewColor()
 
     # print(" ---------------------------------------- ")
     # print(" ------------ new palette --------------- ")
@@ -101,12 +107,12 @@ def doColorManagementSetup():
 
     # ------- Palette management introduce 2025-01-27 --------------
 
-    config.paletteList = workConfig.get("particleSystem", "palettes").split(",")
-    config.paletteChangeProb = float(workConfig.get("particleSystem", "paletteChangeProb"))
-    config.palettes = []
-    config.paletteIndex = 0
+    pMngr.paletteList = workConfig.get("particleSystem", "palettes").split(",")
+    pMngr.paletteChangeProb = float(workConfig.get("particleSystem", "paletteChangeProb"))
+    pMngr.palettes = []
+    pMngr.paletteIndex = 0
 
-    for _palette in config.paletteList:
+    for _palette in pMngr.paletteList:
         _p = PaletteObj()
         _p.particle_fillRange = list(
             map(
@@ -200,29 +206,33 @@ def doColorManagementSetup():
             pieceLogger(e,1)
             _p.pixelsGoGray = False
 
-        config.palettes.append(_p)
+        pMngr.palettes.append(_p)
 
     setColorsByPalette()
 
 
 # -----------------------------------------------------------
 def main(run=True):
-    global config, directionOrder, ps
+    global config, directionOrder, ps, pMngr
     global workConfig
     pieceLogger("Particles Loaded\n",2,True)
     colorutils.brightness = config.brightness
-    config.canvasImageWidth = config.canvasWidth
-    config.canvasImageHeight = config.canvasHeight
-    config.canvasImageWidth -= 4
-    config.canvasImageHeight -= 4
-    config.numUnits = 60
 
-    # config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
-    # config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
-    # config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
-    # config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
+    pMngr = ParticleManager(config)
 
-    config.canvasImage = Image.new("RGBA", (config.canvasImageWidth, config.canvasImageHeight))
+    pMngr.canvasImageWidth = config.canvasWidth
+    pMngr.canvasImageHeight = config.canvasHeight
+    pMngr.canvasImageWidth -= 4
+    pMngr.canvasImageHeight -= 4
+    pMngr.numUnits = 60
+
+
+    # pMngr.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
+    # pMngr.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), pMngr.fontColorVals))
+    # pMngr.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
+    # pMngr.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , pMngr.outlineColorVals))
+
+    config.canvasImage = Image.new("RGBA", (pMngr.canvasImageWidth, pMngr.canvasImageHeight))
 
     ps = ParticleSystem(config)
     ps.unitArray = []
@@ -283,9 +293,9 @@ def main(run=True):
     config.directorController = Director(config)
     config.delay = float(workConfig.get("particleSystem", "delay"))
     config.directorController.slotRate = float(workConfig.get("particleSystem", "slotRate"))
-    config.particleWinkOutXMin = float(workConfig.get("particleSystem", "particleWinkOutXMin"))
-    config.particleWinkOutYMin = float(workConfig.get("particleSystem", "particleWinkOutYMin"))
-    config.restartProb = float(workConfig.get("particleSystem", "restartProb"))
+    pMngr.particleWinkOutXMin = float(workConfig.get("particleSystem", "particleWinkOutXMin"))
+    pMngr.particleWinkOutYMin = float(workConfig.get("particleSystem", "particleWinkOutYMin"))
+    pMngr.restartProb = float(workConfig.get("particleSystem", "restartProb"))
 
     ps.meanderFactor = float(workConfig.get("particleSystem", "meanderFactor"))
     ps.meanderFactor2 = float(workConfig.get("particleSystem", "meanderFactor2"))
@@ -303,31 +313,31 @@ def main(run=True):
     # ps.oneDirection = False
     # ps.reEmitNumber = 2
     # ps.fixedUnitArray = False
-    # config.particleWinkOutXMin = 5
-    # config.particleWinkOutYMin = 5
-    # config.restartProb = 0
+    # pMngr.particleWinkOutXMin = 5
+    # pMngr.particleWinkOutYMin = 5
+    # pMngr.restartProb = 0
 
     try:
-        config.transformShape = workConfig.getboolean("particleSystem", "transformShape")
+        pMngr.transformShape = workConfig.getboolean("particleSystem", "transformShape")
         transformTuples = workConfig.get("particleSystem", "transformTuples").split(",")
-        config.transformTuples = tuple(float(i) for i in transformTuples)
+        pMngr.transformTuples = tuple(float(i) for i in transformTuples)
     except Exception as e:
         pieceLogger(e,1)
-        config.transformShape = False
+        pMngr.transformShape = False
 
     try:
-        config.torqueDelta = int(workConfig.get("particleSystem", "torqueDelta"))
-        config.torqueRate = float(workConfig.get("particleSystem", "torqueRate"))
+        pMngr.torqueDelta = int(workConfig.get("particleSystem", "torqueDelta"))
+        pMngr.torqueRate = float(workConfig.get("particleSystem", "torqueRate"))
     except Exception as e:
         pieceLogger(e,1)
-        config.torqueDelta = 0
-        config.torqueRate = 0
+        pMngr.torqueDelta = 0
+        pMngr.torqueRate = 0
 
     try:
-        config.xWind = float(workConfig.get("particleSystem", "xWind"))
+        pMngr.xWind = float(workConfig.get("particleSystem", "xWind"))
     except Exception as e:
         pieceLogger(e,1)
-        config.xWind = 0
+        pMngr.xWind = 0
 
     ps.movement = workConfig.get("particleSystem", "movement")
     ps.objColor = workConfig.get("particleSystem", "objColor")
@@ -357,37 +367,37 @@ def main(run=True):
         ps.rndSizeFactorMax = 1.5
 
     try:
-        config.pixelSortProbChange = float(workConfig.get("displayconfig", "pixelSortProbChange"))
-        config.pixelSortProbChangeMin = float(workConfig.get("displayconfig", "pixelSortProbChangeMin"))
-        config.pixelSortProbChangeMax = float(workConfig.get("displayconfig", "pixelSortProbChangeMax"))
+        pMngr.pixelSortProbChange = float(workConfig.get("displayconfig", "pixelSortProbChange"))
+        pMngr.pixelSortProbChangeMin = float(workConfig.get("displayconfig", "pixelSortProbChangeMin"))
+        pMngr.pixelSortProbChangeMax = float(workConfig.get("displayconfig", "pixelSortProbChangeMax"))
     except Exception as e:
         pieceLogger(e,1)
-        config.pixelSortProbChange = 0
+        pMngr.pixelSortProbChange = 0
 
     try:
-        config.filterRemapping = workConfig.getboolean("particleSystem", "filterRemapping")
-        config.filterRemappingProb = float(workConfig.get("particleSystem", "filterRemappingProb"))
-        config.filterRemapMinHoriSize = int(workConfig.get("particleSystem", "filterRemapMinHoriSize"))
-        config.filterRemapMaxHoriSize = int(workConfig.get("particleSystem", "filterRemapMaxHoriSize"))
-        config.filterRemapMinVertSize = int(workConfig.get("particleSystem", "filterRemapMinVertSize"))
-        config.filterRemapMaxVertSize = int(workConfig.get("particleSystem", "filterRemapMaxVertSize"))
+        pMngr.filterRemapping = workConfig.getboolean("particleSystem", "filterRemapping")
+        pMngr.filterRemappingProb = float(workConfig.get("particleSystem", "filterRemappingProb"))
+        pMngr.filterRemapMinHoriSize = int(workConfig.get("particleSystem", "filterRemapMinHoriSize"))
+        pMngr.filterRemapMaxHoriSize = int(workConfig.get("particleSystem", "filterRemapMaxHoriSize"))
+        pMngr.filterRemapMinVertSize = int(workConfig.get("particleSystem", "filterRemapMinVertSize"))
+        pMngr.filterRemapMaxVertSize = int(workConfig.get("particleSystem", "filterRemapMaxVertSize"))
     except Exception as e:
         pieceLogger(e,1)
-        config.filterRemapping = False
-        config.filterRemappingProb = 0.0
-        config.filterRemapMinHoriSize = 24
-        config.filterRemapMinVertSize = 24
-        config.filterRemapMaxHoriSize = 24
-        config.filterRemapMaxVertSize = 24
+        pMngr.filterRemapping = False
+        pMngr.filterRemappingProb = 0.0
+        pMngr.filterRemapMinHoriSize = 24
+        pMngr.filterRemapMinVertSize = 24
+        pMngr.filterRemapMaxHoriSize = 24
+        pMngr.filterRemapMaxVertSize = 24
 
 
     try:
-        config.filterRemapRangeX = int(workConfig.get("particleSystem", "filterRemapRangeX"))
-        config.filterRemapRangeY = int(workConfig.get("particleSystem", "filterRemapRangeY"))
+        pMngr.filterRemapRangeX = int(workConfig.get("particleSystem", "filterRemapRangeX"))
+        pMngr.filterRemapRangeY = int(workConfig.get("particleSystem", "filterRemapRangeY"))
     except Exception as e:
         pieceLogger(e,1)
-        config.filterRemapRangeX = config.canvasWidth
-        config.filterRemapRangeY = config.canvasHeight
+        pMngr.filterRemapRangeX = config.canvasWidth
+        pMngr.filterRemapRangeY = config.canvasHeight
 
     # -------------  DO COLOR MANAGEMENT SETUP ---------------#
     """ ----------------------------------------------------  """
@@ -398,38 +408,38 @@ def main(run=True):
     # -------------  DO COLOR MANAGEMENT SETUP ---------------#
 
     try:
-        config.legacyUnsharpMask = workConfig.getboolean("particleSystem", "legacyUnsharpMask")
-        config.optionallegacyToggleProb = float(workConfig.get("particleSystem", "optionallegacyToggleProb"))
+        pMngr.legacyUnsharpMask = workConfig.getboolean("particleSystem", "legacyUnsharpMask")
+        pMngr.optionallegacyToggleProb = float(workConfig.get("particleSystem", "optionallegacyToggleProb"))
     except Exception as e:
         pieceLogger(e,1)
-        config.legacyUnsharpMask = True
-        config.optionallegacyToggleProb = 0
+        pMngr.legacyUnsharpMask = True
+        pMngr.optionallegacyToggleProb = 0
 
     try:
-        config.useWaveDistortion = workConfig.getboolean("particleSystem", "useWaveDistortion")
-        config.waveAmplitude = float(workConfig.get("particleSystem", "waveAmplitude"))
-        config.wavePeriodMod = float(workConfig.get("particleSystem", "wavePeriodMod"))
-        config.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
-        config.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
+        pMngr.useWaveDistortion = workConfig.getboolean("particleSystem", "useWaveDistortion")
+        pMngr.waveAmplitude = float(workConfig.get("particleSystem", "waveAmplitude"))
+        pMngr.wavePeriodMod = float(workConfig.get("particleSystem", "wavePeriodMod"))
+        pMngr.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
+        pMngr.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
     except Exception as e:
         pieceLogger(e,1)
-        config.useWaveDistortion = False
+        pMngr.useWaveDistortion = False
 
-    config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
-    config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(",")
-    config.overlayColor = tuple(map(lambda x: int(int(x) * config.brightness), config.overlayColorVals))
-    config.clrBlkWidth = int(workConfig.get("particleSystem", "clrBlkWidth"))
-    config.clrBlkHeight = int(workConfig.get("particleSystem", "clrBlkHeight"))
-    config.overlayxPos = int(workConfig.get("particleSystem", "overlayxPos"))
-    config.overlayyPos = int(workConfig.get("particleSystem", "overlayyPos"))
+    pMngr.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
+    pMngr.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(",")
+    pMngr.overlayColor = tuple(map(lambda x: int(int(x) * config.brightness), pMngr.overlayColorVals))
+    pMngr.clrBlkWidth = int(workConfig.get("particleSystem", "clrBlkWidth"))
+    pMngr.clrBlkHeight = int(workConfig.get("particleSystem", "clrBlkHeight"))
+    pMngr.overlayxPos = int(workConfig.get("particleSystem", "overlayxPos"))
+    pMngr.overlayyPos = int(workConfig.get("particleSystem", "overlayyPos"))
 
     try:
-        config.useOverLayEnhanced = workConfig.getboolean("particleSystem", "useOverLayEnhanced")
-        config.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
+        pMngr.useOverLayEnhanced = workConfig.getboolean("particleSystem", "useOverLayEnhanced")
+        pMngr.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
     except Exception as e:
         pieceLogger(e,1)
-        config.useOverLayEnhanced = False
-        config.useOverOnBG = False
+        pMngr.useOverLayEnhanced = False
+        pMngr.useOverOnBG = False
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -445,7 +455,7 @@ def main(run=True):
     # 		config.render(config.renderImageFull, 0, 0)
     # """
 
-    config.xPos = 0
+    pMngr.xPos = 0
 
     for _ in range(ps.numUnits):
         emitParticle()
@@ -461,14 +471,14 @@ def main(run=True):
 # -----------------------------------------------------------
 def emitParticle(i=None):
     global config, ps
-    paletteRef = config.palettes[config.paletteIndex]
+    paletteRef = pMngr.palettes[pMngr.paletteIndex]
 
     p = Particle(ps)
     p.objWidth = round(random.uniform(ps.objWidthMin, ps.objWidthMax))
     p.objHeight = round(random.uniform(ps.objHeightMin, ps.objHeightMax))
 
-    p.particleWinkOutXMin = config.particleWinkOutXMin
-    p.particleWinkOutYMin = config.particleWinkOutYMin
+    p.particleWinkOutXMin = pMngr.particleWinkOutXMin
+    p.particleWinkOutYMin = pMngr.particleWinkOutYMin
 
     p.setUpParticle()
 
@@ -486,7 +496,7 @@ def emitParticle(i=None):
             p.direction = 0
 
     p.v = random.uniform(ps.speedMin, ps.speedMax)
-    p.xWind = config.xWind
+    p.xWind = pMngr.xWind
 
     p.pixelsGoGray = paletteRef.pixelsGoGray
     p.jumpToGray = paletteRef.jumpToGray
@@ -531,7 +541,7 @@ def emitParticle(i=None):
     )
 
     if paletteRef.pixelsGoGray:
-        makePixGoGray(config, p)
+        makePixGoGray(pMngr, p)
 
         # p.fillColor = (200,0,0,200)
         # print(p.fillColor)
@@ -548,7 +558,7 @@ def emitParticle(i=None):
 # -----------------------------------------------------------
 class WaveDeformer:
     def transform(self, x, y):
-        y = y + config.waveAmplitude * math.sin((x + config.xPos) / config.wavePeriodMod) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
+        y = y + pMngr.waveAmplitude * math.sin((x + pMngr.xPos) / pMngr.wavePeriodMod) * noise.pnoise2(math.sin(x), y / pMngr.pNoiseMod)
         return x, y
 
     def transform_rectangle(self, x0, y0, x1, y1):
@@ -563,10 +573,10 @@ class WaveDeformer:
         self.w, self.h = img.size
 
         target_grid = [
-            (x, y, x + config.wavegridspace, y + config.wavegridspace)
+            (x, y, x + pMngr.wavegridspace, y + pMngr.wavegridspace)
             for x, y in itertools.product(
-                range(0, self.w, config.wavegridspace),
-                range(0, self.h, config.wavegridspace),
+                range(0, self.w, pMngr.wavegridspace),
+                range(0, self.h, pMngr.wavegridspace),
             )
         ]
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
@@ -607,10 +617,10 @@ def linearMotionAction(config, p, ps):
 
 
 # -----------------------------------------------------------
-def makePixGoGray(config, p):
-    paletteRef = config.palettes[config.paletteIndex]
+def makePixGoGray(pMngr, p):
+    paletteRef = pMngr.palettes[pMngr.paletteIndex]
     p.greyRate = random.uniform(paletteRef.greyRate / 4, paletteRef.greyRate)
-    # p.greyRate = config.greyRate
+    # p.greyRate = pMngr.greyRate
 
     """
 			0.2989, 0.5870, 0.1140
@@ -672,7 +682,7 @@ def transformImage(img):
     new_width = width + int(round(xshift))
 
     img = img.transform((new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC)
-    img = img.transform((new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC)
+    img = img.transform((new_width, height), Image.PERSPECTIVE, pMngr.transformTuples, Image.BICUBIC)
     return img
 
 
@@ -680,14 +690,14 @@ def transformImage(img):
 def colorize():
 
     # Colorize via overlay etc
-    config.clrBlock = Image.new("RGBA", (config.clrBlkWidth, config.clrBlkHeight))
-    clrBlockDraw = ImageDraw.Draw(config.clrBlock)
+    pMngr.clrBlock = Image.new("RGBA", (pMngr.clrBlkWidth, pMngr.clrBlkHeight))
+    clrBlockDraw = ImageDraw.Draw(pMngr.clrBlock)
 
     # Color overlay on b/w PNG sprite
     # clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
-    clrBlockDraw.rectangle((0, 0, config.canvasWidth, config.clrBlkHeight), fill=(0, 0, 0, 255))
+    clrBlockDraw.rectangle((0, 0, config.canvasWidth, pMngr.clrBlkHeight), fill=(0, 0, 0, 255))
 
-    clrBlockDraw.rectangle((0, 0, config.clrBlkWidth, config.clrBlkHeight), fill=config.overlayColor)
+    clrBlockDraw.rectangle((0, 0, pMngr.clrBlkWidth, pMngr.clrBlkHeight), fill=pMngr.overlayColor)
 
     """
 		try :
@@ -750,28 +760,28 @@ def iterate():
     global config, ps
 
     brightnessChanger()
-    _update_background(config)
-    _update_particles(config, ps)
-    _handle_remapping_and_effects(config, ps)
-    _render_image(config)
+    _update_background(config, pMngr)
+    _update_particles(config, ps, pMngr)
+    _handle_remapping_and_effects(config, ps, pMngr)
+    _render_image(config, pMngr)
 
 
-def _update_background(config):
-    if config.bg_bgTransitions:
-        config.bgColorOverlay.stepTransition(alpha=config.bg_bgTransparency)
-        config.bgColor = tuple(round(a) for a in config.bgColorOverlay.currentColor)
+def _update_background(config, pMngr):
+    if pMngr.bg_bgTransitions:
+        pMngr.bgColorOverlay.stepTransition(alpha=pMngr.bg_bgTransparency)
+        pMngr.bgColor = tuple(round(a) for a in pMngr.bgColorOverlay.currentColor)
 
-    config.draw.rectangle((0, 0, config.canvasWidth - 1, config.canvasHeight - 1), fill=config.bgColor, outline=None)
+    config.draw.rectangle((0, 0, config.canvasWidth - 1, config.canvasHeight - 1), fill=pMngr.bgColor, outline=None)
 
-    if config.useOverOnBG:
-        config.clrBlock = config.clrBlock.convert("RGBA")
-        config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
+    if pMngr.useOverOnBG:
+        pMngr.clrBlock = pMngr.clrBlock.convert("RGBA")
+        config.image.paste(pMngr.clrBlock, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock)
 
 
-def _update_particles(config, ps):
-    if random.random() < config.paletteChangeProb:
-        config.paletteIndex = math.floor(random.random() * len(config.palettes))
-        pieceLogger(f"New palette: {config.paletteIndex}")
+def _update_particles(config, ps, pMngr):
+    if random.random() < pMngr.paletteChangeProb:
+        pMngr.paletteIndex = math.floor(random.random() * len(pMngr.palettes))
+        pieceLogger(f"New palette: {pMngr.paletteIndex}")
         setColorsByPalette()
 
 
@@ -784,20 +794,20 @@ def _update_particles(config, ps):
                 emitParticle(i=ps.unitArray.index(p))
             else:
                 ps.unitArray.remove(p)
-                if len(ps.unitArray) < config.numUnits:
+                if len(ps.unitArray) < pMngr.numUnits:
                     for _ in range(ps.reEmitNumber):
                         emitParticle()
 
-    if random.random() < config.restartProb:
+    if random.random() < pMngr.restartProb:
         for p in ps.unitArray:
             p.remove = True
         config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, 200))
         config.renderImageFull.paste(config.image)
 
 
-def _handle_remapping_and_effects(config, ps):
-    if random.random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
-        remapDitherFilteredParts(config)
+def _handle_remapping_and_effects(config, ps, pMngr):
+    if random.random() < pMngr.filterRemappingProb and (config.useFilters and pMngr.filterRemapping):
+        remapDitherFilteredParts(config, pMngr)
 
     if random.random() < ps.changechangeCohesionProb and ps.changeCohesion and ps.movement == "travel":
         if random.random() > 0.5:
@@ -805,60 +815,60 @@ def _handle_remapping_and_effects(config, ps):
         else:
             ps.repelDistance = random.uniform(0, 10)
 
-    if config.overallBlur > 0:
-        config.image = config.image.filter(ImageFilter.GaussianBlur(radius=config.overallBlur))
-        if config.legacyUnsharpMask:
+    if pMngr.overallBlur > 0:
+        config.image = config.image.filter(ImageFilter.GaussianBlur(radius=pMngr.overallBlur))
+        if pMngr.legacyUnsharpMask:
             config.image = config.image.filter(ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1))
         config.draw = ImageDraw.Draw(config.image)
 
-    if config.transformShape:
+    if pMngr.transformShape:
         config.image = transformImage(config.image)
 
-    if config.pixelSortProbChange != 0 and random.random() < config.pixelSortProbChange:
-        config.pixSortprobDraw = random.uniform(config.pixelSortProbChangeMin, config.pixelSortProbChangeMax)
+    if pMngr.pixelSortProbChange != 0 and random.random() < pMngr.pixelSortProbChange:
+        config.pixSortprobDraw = random.uniform(pMngr.pixelSortProbChangeMin, pMngr.pixelSortProbChangeMax)
 
-    if config.torqueRate != 0:
-        rows = round(config.canvasHeight / config.torqueDelta)
+    if pMngr.torqueRate != 0:
+        rows = round(config.canvasHeight / pMngr.torqueDelta)
         for i in range(rows):
-            x_dist = 1 + (i) / config.torqueRate
-            box = (0, i * config.torqueDelta, 448, i * config.torqueDelta + config.torqueDelta)
+            x_dist = 1 + (i) / pMngr.torqueRate
+            box = (0, i * pMngr.torqueDelta, 448, i * pMngr.torqueDelta + pMngr.torqueDelta)
             crop = config.renderImageFull.crop(box).convert("RGBA")
-            config.renderImageFull.paste(crop, (round(x_dist), i * config.torqueDelta), crop)
+            config.renderImageFull.paste(crop, (round(x_dist), i * pMngr.torqueDelta), crop)
 
 
-def _render_image(config):
-    if config.useOverLayEnhanced:
-        temp = config.image.crop((config.overlayxPos, config.overlayyPos, config.clrBlkWidth, config.clrBlkHeight))
+def _render_image(config, pMngr):
+    if pMngr.useOverLayEnhanced:
+        temp = config.image.crop((pMngr.overlayxPos, pMngr.overlayyPos, pMngr.clrBlkWidth, pMngr.clrBlkHeight))
         temp = ImageChops.invert(temp)
-        temp = ImageChops.multiply(temp, config.clrBlock)
-        config.image.paste(temp, (config.overlayxPos, config.overlayyPos), temp)
-    elif config.useOverLay:
-        config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
+        temp = ImageChops.multiply(temp, pMngr.clrBlock)
+        config.image.paste(temp, (pMngr.overlayxPos, pMngr.overlayyPos), temp)
+    elif pMngr.useOverLay:
+        config.image.paste(pMngr.clrBlock, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock)
 
     if config.useDrawingPoints:
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
-    elif not config.useWaveDistortion:
+    elif not pMngr.useWaveDistortion:
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     else:
-        config.xPos += 1
-        config.workImage = ImageOps.deform(config.image, WaveDeformer())
-        config.render(config.workImage, 0, 0)
+        pMngr.xPos += 1
+        pMngr.workImage = ImageOps.deform(config.image, WaveDeformer())
+        config.render(pMngr.workImage, 0, 0)
 
 
 # -----------------------------------------------------------
-def remapDitherFilteredParts(config):
+def remapDitherFilteredParts(config, pMngr):
     config.filterRemap = True
 
-    # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
-    # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
-    # endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
-    # endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+    # startX = round(random.uniform(0,config.canvasWidth - pMngr.filterRemapminHoriSize) )
+    # startY = round(random.uniform(0,config.canvasHeight - pMngr.filterRemapminVertSize) )
+    # endX = round(random.uniform(startX+pMngr.filterRemapminHoriSize,config.canvasWidth) )
+    # endY = round(random.uniform(startY+pMngr.filterRemapminVertSize,config.canvasHeight) )
     # new version  more control but may require previous pieces to be re-worked
-    startX = round(random.uniform(0, config.filterRemapRangeX))
-    startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(config.filterRemapMinHoriSize, config.filterRemapMaxHoriSize * 2))
-    endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize * 2))
+    startX = round(random.uniform(0, pMngr.filterRemapRangeX))
+    startY = round(random.uniform(0, pMngr.filterRemapRangeY))
+    endX = round(random.uniform(pMngr.filterRemapMinHoriSize, pMngr.filterRemapMaxHoriSize * 2))
+    endY = round(random.uniform(pMngr.filterRemapMinVertSize, pMngr.filterRemapMaxVertSize * 2))
     config.remapImageBlockSection = [
         startX,
         startY,
@@ -873,15 +883,15 @@ def renderDiagnosticsCall():
     config.renderImageFullOverlay = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
-    config.lastOverlayBox1 = (0, 0, 192, 128)
-    config.lastOverlayBox2 = (0, 128, 192, 256)
-    config.lastOverlayBox3 = (192, 0, 384, 128)
-    config.lastOverlayBox4 = (192, 128, 384, 256)
+    pMngr.lastOverlayBox1 = (0, 0, 192, 128)
+    pMngr.lastOverlayBox2 = (0, 128, 192, 256)
+    pMngr.lastOverlayBox3 = (192, 0, 384, 128)
+    pMngr.lastOverlayBox4 = (192, 128, 384, 256)
 
-    config.renderDrawOver.rectangle(config.lastOverlayBox1, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
-    config.renderDrawOver.rectangle(config.lastOverlayBox2, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
-    config.renderDrawOver.rectangle(config.lastOverlayBox3, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
-    config.renderDrawOver.rectangle(config.lastOverlayBox4, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
+    config.renderDrawOver.rectangle(pMngr.lastOverlayBox1, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
+    config.renderDrawOver.rectangle(pMngr.lastOverlayBox2, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
+    config.renderDrawOver.rectangle(pMngr.lastOverlayBox3, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
+    config.renderDrawOver.rectangle(pMngr.lastOverlayBox4, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255))
     config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
 
 

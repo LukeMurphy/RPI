@@ -70,15 +70,15 @@ def glitchBox(
 
 def clearbgBox():
     xPos = yPos = 0
-    informalMarks.bgBoxBox = (
+    infrmlMarksMngr.bgBoxBox = (
         xPos,
         yPos,
         xPos + config.canvasWidth,
         yPos + config.canvasHeight,
     )
-    informalMarks.bgBoxFill = (0, 0, 0, 0)
-    config.underLayerDraw.rectangle(informalMarks.bgBoxBox, fill=informalMarks.bgBoxFill)
-    informalMarks.bgBoxColorRange = random.choice(informalMarks.activePalette.bgBoxColorRanges)
+    infrmlMarksMngr.bgBoxFill = (0, 0, 0, 0)
+    config.underLayerDraw.rectangle(infrmlMarksMngr.bgBoxBox, fill=infrmlMarksMngr.bgBoxFill)
+    infrmlMarksMngr.bgBoxColorRange = random.choice(infrmlMarksMngr.activePalette.bgBoxColorRanges)
 
 
 def bgColorsFilling():
@@ -91,36 +91,36 @@ def bgColorsFilling():
     xPos = math.floor(random.uniform(0, config.canvasWidth))
     yPos = math.floor(random.uniform(0, config.canvasHeight))
 
-    informalMarks.tileSizeWidth = round(random.uniform(informalMarks.bgTileSizeWidthMin, informalMarks.bgTileSizeWidthMax))
-    informalMarks.tileSizeHeight = round(random.uniform(informalMarks.bgTileSizeHeightMin, informalMarks.bgTileSizeHeightMax))
+    infrmlMarksMngr.tileSizeWidth = round(random.uniform(infrmlMarksMngr.bgTileSizeWidthMin, infrmlMarksMngr.bgTileSizeWidthMax))
+    infrmlMarksMngr.tileSizeHeight = round(random.uniform(infrmlMarksMngr.bgTileSizeHeightMin, infrmlMarksMngr.bgTileSizeHeightMax))
 
-    informalMarks.bgBoxBox = (
+    infrmlMarksMngr.bgBoxBox = (
         xPos,
         yPos,
-        xPos + informalMarks.tileSizeWidth,
-        yPos + informalMarks.tileSizeHeight,
+        xPos + infrmlMarksMngr.tileSizeWidth,
+        yPos + infrmlMarksMngr.tileSizeHeight,
     )
-    cR = informalMarks.bgBoxColorRange
+    cR = infrmlMarksMngr.bgBoxColorRange
     # print(cR)
     bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
     # print(bgBoxFill)
-    informalMarks.bgBoxFill = (
+    infrmlMarksMngr.bgBoxFill = (
         round(config.brightness * bgBoxFill[0]),
         round(config.brightness * bgBoxFill[1]),
         round(config.brightness * bgBoxFill[2]),
-        round(random.uniform(informalMarks.activePalette.bgBoxAlphaRange[0], informalMarks.activePalette.bgBoxAlphaRange[1])),
+        round(random.uniform(infrmlMarksMngr.activePalette.bgBoxAlphaRange[0], infrmlMarksMngr.activePalette.bgBoxAlphaRange[1])),
     )
 
-    config.underLayerDraw.rectangle(informalMarks.bgBoxBox, fill=informalMarks.bgBoxFill)
+    config.underLayerDraw.rectangle(infrmlMarksMngr.bgBoxBox, fill=infrmlMarksMngr.bgBoxFill)
 
-    glitchIterations = round(random.uniform(informalMarks.bgGlitchCyclesMin, informalMarks.bgGlitchCyclesMax))
+    glitchIterations = round(random.uniform(infrmlMarksMngr.bgGlitchCyclesMin, infrmlMarksMngr.bgGlitchCyclesMax))
     for _ in range(glitchIterations):
         glitchBox(
             config.underLayer,
             config.canvasWidth,
             config.canvasHeight,
-            informalMarks.bgGlitchDisplacementHorizontal,
-            informalMarks.bgGlitchDisplacementVertical,
+            infrmlMarksMngr.bgGlitchDisplacementHorizontal,
+            infrmlMarksMngr.bgGlitchDisplacementVertical,
         )
 
 
@@ -128,44 +128,44 @@ def bgColorsFilling():
 
 
 def setLineColor():
-    if not informalMarks.lightMode:
-        if informalMarks.lightLinesOnGround:
+    if not infrmlMarksMngr.lightMode:
+        if infrmlMarksMngr.lightLinesOnGround:
             return colorutils.getRandomColorHSV(
-                informalMarks.activePalette.line_mid_minHue,
-                informalMarks.activePalette.line_mid_maxHue,
-                informalMarks.activePalette.line_mid_minSaturation,
-                informalMarks.activePalette.line_mid_maxSaturation,
-                informalMarks.activePalette.line_mid_minValue,
-                informalMarks.activePalette.line_mid_maxValue,
-                informalMarks.activePalette.line_mid_minDropHue,
-                informalMarks.activePalette.line_mid_maxDropHue,
-                round(random.uniform(informalMarks.activePalette.line_mid_alpha_range[0], informalMarks.activePalette.line_mid_alpha_range[1])),
+                infrmlMarksMngr.activePalette.line_mid_minHue,
+                infrmlMarksMngr.activePalette.line_mid_maxHue,
+                infrmlMarksMngr.activePalette.line_mid_minSaturation,
+                infrmlMarksMngr.activePalette.line_mid_maxSaturation,
+                infrmlMarksMngr.activePalette.line_mid_minValue,
+                infrmlMarksMngr.activePalette.line_mid_maxValue,
+                infrmlMarksMngr.activePalette.line_mid_minDropHue,
+                infrmlMarksMngr.activePalette.line_mid_maxDropHue,
+                round(random.uniform(infrmlMarksMngr.activePalette.line_mid_alpha_range[0], infrmlMarksMngr.activePalette.line_mid_alpha_range[1])),
                 config.brightness,
             )
         else:
             return colorutils.getRandomColorHSV(
-                informalMarks.activePalette.line_minHue,
-                informalMarks.activePalette.line_maxHue,
-                informalMarks.activePalette.line_minSaturation,
-                informalMarks.activePalette.line_maxSaturation,
-                informalMarks.activePalette.line_minValue,
-                informalMarks.activePalette.line_maxValue,
-                informalMarks.activePalette.line_minDropHue,
-                informalMarks.activePalette.line_maxDropHue,
-                round(random.uniform(informalMarks.activePalette.line_alpha_range[0], informalMarks.activePalette.line_alpha_range[1])),
+                infrmlMarksMngr.activePalette.line_minHue,
+                infrmlMarksMngr.activePalette.line_maxHue,
+                infrmlMarksMngr.activePalette.line_minSaturation,
+                infrmlMarksMngr.activePalette.line_maxSaturation,
+                infrmlMarksMngr.activePalette.line_minValue,
+                infrmlMarksMngr.activePalette.line_maxValue,
+                infrmlMarksMngr.activePalette.line_minDropHue,
+                infrmlMarksMngr.activePalette.line_maxDropHue,
+                round(random.uniform(infrmlMarksMngr.activePalette.line_alpha_range[0], infrmlMarksMngr.activePalette.line_alpha_range[1])),
                 config.brightness,
             )
     else:
         return colorutils.getRandomColorHSV(
-            informalMarks.activePalette.line_light_minHue,
-            informalMarks.activePalette.line_light_maxHue,
-            informalMarks.activePalette.line_light_minSaturation,
-            informalMarks.activePalette.line_light_maxSaturation,
-            informalMarks.activePalette.line_light_minValue,
-            informalMarks.activePalette.line_light_maxValue,
-            informalMarks.activePalette.line_light_minDropHue,
-            informalMarks.activePalette.line_light_maxDropHue,
-            round(random.uniform(informalMarks.activePalette.line_light_alpha_range[0], informalMarks.activePalette.line_light_alpha_range[1])),
+            infrmlMarksMngr.activePalette.line_light_minHue,
+            infrmlMarksMngr.activePalette.line_light_maxHue,
+            infrmlMarksMngr.activePalette.line_light_minSaturation,
+            infrmlMarksMngr.activePalette.line_light_maxSaturation,
+            infrmlMarksMngr.activePalette.line_light_minValue,
+            infrmlMarksMngr.activePalette.line_light_maxValue,
+            infrmlMarksMngr.activePalette.line_light_minDropHue,
+            infrmlMarksMngr.activePalette.line_light_maxDropHue,
+            round(random.uniform(infrmlMarksMngr.activePalette.line_light_alpha_range[0], infrmlMarksMngr.activePalette.line_light_alpha_range[1])),
             config.brightness,
         )
 
@@ -174,51 +174,51 @@ def setLineColor():
 
 def setBGColor():
 
-    informalMarks.activePalette = random.choice(informalMarks.paletteSets)
-    pieceLogger(f"[setBGColor] NEW palette: {informalMarks.activePalette.name}")
+    infrmlMarksMngr.activePalette = random.choice(infrmlMarksMngr.paletteSets)
+    pieceLogger(f"[setBGColor] NEW palette: {infrmlMarksMngr.activePalette.name}")
 
-    informalMarks.bg_alpha = round(random.uniform(informalMarks.activePalette.bg_alpha_range[0], informalMarks.activePalette.bg_alpha_range[1]))
-    informalMarks.bg_minHue = informalMarks.activePalette.bg_minHue
-    informalMarks.bg_maxHue = informalMarks.activePalette.bg_maxHue
-    informalMarks.bg_minSaturation = informalMarks.activePalette.bg_minSaturation
-    informalMarks.bg_maxSaturation = informalMarks.activePalette.bg_maxSaturation
-    informalMarks.bg_minValue = informalMarks.activePalette.bg_minValue
-    informalMarks.bg_maxValue = informalMarks.activePalette.bg_maxValue
-    informalMarks.bg_dropHueMin = informalMarks.activePalette.bg_dropHueMin
-    informalMarks.bg_dropHueMax = informalMarks.activePalette.bg_dropHueMax
+    infrmlMarksMngr.bg_alpha = round(random.uniform(infrmlMarksMngr.activePalette.bg_alpha_range[0], infrmlMarksMngr.activePalette.bg_alpha_range[1]))
+    infrmlMarksMngr.bg_minHue = infrmlMarksMngr.activePalette.bg_minHue
+    infrmlMarksMngr.bg_maxHue = infrmlMarksMngr.activePalette.bg_maxHue
+    infrmlMarksMngr.bg_minSaturation = infrmlMarksMngr.activePalette.bg_minSaturation
+    infrmlMarksMngr.bg_maxSaturation = infrmlMarksMngr.activePalette.bg_maxSaturation
+    infrmlMarksMngr.bg_minValue = infrmlMarksMngr.activePalette.bg_minValue
+    infrmlMarksMngr.bg_maxValue = infrmlMarksMngr.activePalette.bg_maxValue
+    infrmlMarksMngr.bg_dropHueMin = infrmlMarksMngr.activePalette.bg_dropHueMin
+    infrmlMarksMngr.bg_dropHueMax = infrmlMarksMngr.activePalette.bg_dropHueMax
 
-    informalMarks.lineColorIsBgColor = informalMarks.activePalette.lineColorIsBgColor
+    infrmlMarksMngr.lineColorIsBgColor = infrmlMarksMngr.activePalette.lineColorIsBgColor
 
-    _minVal = informalMarks.bg_minValue
-    _maxVal = informalMarks.bg_maxValue
-    _minSat = informalMarks.bg_minSaturation
-    _maxSat = informalMarks.bg_maxSaturation
+    _minVal = infrmlMarksMngr.bg_minValue
+    _maxVal = infrmlMarksMngr.bg_maxValue
+    _minSat = infrmlMarksMngr.bg_minSaturation
+    _maxSat = infrmlMarksMngr.bg_maxSaturation
 
-    if informalMarks.lightMode:
+    if infrmlMarksMngr.lightMode:
         _minVal = 0.2
         _maxVal = 0.5
         _minSat = 0.5
         _maxSat = 0.99
 
-    informalMarks.bgColor = colorutils.getRandomColorHSV(
-        informalMarks.bg_minHue,
-        informalMarks.bg_maxHue,
+    infrmlMarksMngr.bgColor = colorutils.getRandomColorHSV(
+        infrmlMarksMngr.bg_minHue,
+        infrmlMarksMngr.bg_maxHue,
         _minSat,
         _maxSat,
         _minVal,
         _maxVal,
-        informalMarks.bg_dropHueMin,
-        informalMarks.bg_dropHueMax,
-        informalMarks.bg_alpha,
+        infrmlMarksMngr.bg_dropHueMin,
+        infrmlMarksMngr.bg_dropHueMax,
+        infrmlMarksMngr.bg_alpha,
         config.brightness,
     )
 
-    if random.random() < informalMarks.lightLinesOnGroundProb:
-        informalMarks.lightLinesOnGround = True
+    if random.random() < infrmlMarksMngr.lightLinesOnGroundProb:
+        infrmlMarksMngr.lightLinesOnGround = True
     else:
-        informalMarks.lightLinesOnGround = False
+        infrmlMarksMngr.lightLinesOnGround = False
 
-    informalMarks.bgBoxColorRange = random.choice(informalMarks.activePalette.bgBoxColorRanges)
+    infrmlMarksMngr.bgBoxColorRange = random.choice(infrmlMarksMngr.activePalette.bgBoxColorRanges)
 
 
 # -------- Line Functions    -------------- #
@@ -229,69 +229,69 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
     # -------------------------------------- #
     if _markType == "scribble":
         informalLine = InformalLine()
-        informalLine.curveResolution = informalMarks.curveResolution
-        informalLine.backTrackRange = informalMarks.backTrackRange
+        informalLine.curveResolution = infrmlMarksMngr.curveResolution
+        informalLine.backTrackRange = infrmlMarksMngr.backTrackRange
         informalLine.lineColorIsBgColor = False
         informalLine.draw = config.draw
-        if informalMarks.useBgBox and informalMarks.scribbleOnTop:
+        if infrmlMarksMngr.useBgBox and infrmlMarksMngr.scribbleOnTop:
             informalLine.draw = config.underLayerDraw
         informalLine.lineType = 1
-        informalLine.scribbleHeight = random.uniform(informalMarks.scribbleHeightRange[0], informalMarks.scribbleHeightRange[1])
-        informalLine.xOffset = informalMarks.scribblexOffset + col * informalMarks.scribbleRadiusXRange[1] * informalMarks.scibbleXPacking
-        informalLine.yOffset = informalMarks.scribbleyOffset + row * informalMarks.scribbleRadiusYRange[1] * informalMarks.scibbleYPacking
-        informalLine.radiusX = random.uniform(informalMarks.scribbleRadiusXRange[0], informalMarks.scribbleRadiusXRange[1])
-        informalLine.radiusY = random.uniform(informalMarks.scribbleRadiusYRange[0], informalMarks.scribbleRadiusYRange[1])
-        informalLine.baseWidth = int(random.uniform(0, informalMarks.scribbleLineBaseWidthRange))
-        informalLine.points = informalMarks.scribblePoints
-        informalLine.loops = int(random.uniform(informalMarks.scribbleLoopsRange[0], informalMarks.scribbleLoopsRange[1]))
-        informalLine.noiseX = random.uniform(informalMarks.scribbleNoiseXRange[0], informalMarks.scribbleNoiseXRange[1])
-        informalLine.noiseY = random.uniform(informalMarks.scribbleNoiseYRange[0], informalMarks.scribbleNoiseYRange[1])
+        informalLine.scribbleHeight = random.uniform(infrmlMarksMngr.scribbleHeightRange[0], infrmlMarksMngr.scribbleHeightRange[1])
+        informalLine.xOffset = infrmlMarksMngr.scribblexOffset + col * infrmlMarksMngr.scribbleRadiusXRange[1] * infrmlMarksMngr.scibbleXPacking
+        informalLine.yOffset = infrmlMarksMngr.scribbleyOffset + row * infrmlMarksMngr.scribbleRadiusYRange[1] * infrmlMarksMngr.scibbleYPacking
+        informalLine.radiusX = random.uniform(infrmlMarksMngr.scribbleRadiusXRange[0], infrmlMarksMngr.scribbleRadiusXRange[1])
+        informalLine.radiusY = random.uniform(infrmlMarksMngr.scribbleRadiusYRange[0], infrmlMarksMngr.scribbleRadiusYRange[1])
+        informalLine.baseWidth = int(random.uniform(0, infrmlMarksMngr.scribbleLineBaseWidthRange))
+        informalLine.points = infrmlMarksMngr.scribblePoints
+        informalLine.loops = int(random.uniform(infrmlMarksMngr.scribbleLoopsRange[0], infrmlMarksMngr.scribbleLoopsRange[1]))
+        informalLine.noiseX = random.uniform(infrmlMarksMngr.scribbleNoiseXRange[0], infrmlMarksMngr.scribbleNoiseXRange[1])
+        informalLine.noiseY = random.uniform(infrmlMarksMngr.scribbleNoiseYRange[0], infrmlMarksMngr.scribbleNoiseYRange[1])
         informalLine.lineColor = setLineColor()
-        if random.random() < informalMarks.scribbleAltColorProb:
+        if random.random() < infrmlMarksMngr.scribbleAltColorProb:
             informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
-        if random.random() < informalMarks.scribbleAltColorProb:
+        if random.random() < infrmlMarksMngr.scribbleAltColorProb:
             _tVal = int(random.uniform(40, 255))
             informalLine.lineColor = (0, _tVal, _tVal, 60)
-        if random.random() < informalMarks.scribbleSkipMarksProb:
+        if random.random() < infrmlMarksMngr.scribbleSkipMarksProb:
             _skipMark = True
 
         if not _skipMark:
             informalLine.generateScribble()
-            informalMarks.informalLineUnits.append(informalLine)
+            infrmlMarksMngr.informalLineUnits.append(informalLine)
 
     # -------------------------------------- #
     if _markType == "single":
         informalLine = InformalLine()
         informalLine.lineType = 0
-        informalLine.curveResolution = informalMarks.curveResolution
-        informalLine.backTrackRange = informalMarks.backTrackRange
+        informalLine.curveResolution = infrmlMarksMngr.curveResolution
+        informalLine.backTrackRange = infrmlMarksMngr.backTrackRange
         informalLine.lineColorIsBgColor = False
         informalLine.draw = config.draw
-        if informalMarks.useBgBox and informalMarks.singlesOnTop:
+        if infrmlMarksMngr.useBgBox and infrmlMarksMngr.singlesOnTop:
             informalLine.draw = config.underLayerDraw
-        informalLine.baseWidthRange = informalMarks.vertLineWidthRange
+        informalLine.baseWidthRange = infrmlMarksMngr.vertLineWidthRange
         informalLine.drawingHeight = _drawingHeight
-        informalLine.xOffset = _lastX + informalMarks.xOffset
-        # informalLine.xOffset = col * informalMarks.markMinWidth
+        informalLine.xOffset = _lastX + infrmlMarksMngr.xOffset
+        # informalLine.xOffset = col * infrmlMarksMngr.markMinWidth
         informalLine.yOffset = _lastY - informalLine.drawingHeight / 4 * random.random()
-        informalLine.angle = random.uniform(informalMarks.angleAltRange[0], informalMarks.angleAltRange[1])
-        informalLine.pointPerLine = informalMarks.pointsPerLineCol
-        informalLine.lineSpeedRange = informalMarks.lineSpeedRange
-        informalLine.lineSpeedRange = informalMarks.vertLineSpeedRange
-        informalLine.noiseAmplitudeRange = informalMarks.noiseAmplitudeRangeCol
-        informalLine.horizontalMovementProb = informalMarks.horizontalMovementProb
-        informalLine.verticalMovementProb = informalMarks.verticalMovementProb
+        informalLine.angle = random.uniform(infrmlMarksMngr.angleAltRange[0], infrmlMarksMngr.angleAltRange[1])
+        informalLine.pointPerLine = infrmlMarksMngr.pointsPerLineCol
+        informalLine.lineSpeedRange = infrmlMarksMngr.lineSpeedRange
+        informalLine.lineSpeedRange = infrmlMarksMngr.vertLineSpeedRange
+        informalLine.noiseAmplitudeRange = infrmlMarksMngr.noiseAmplitudeRangeCol
+        informalLine.horizontalMovementProb = infrmlMarksMngr.horizontalMovementProb
+        informalLine.verticalMovementProb = infrmlMarksMngr.verticalMovementProb
         informalLine.lineColor = setLineColor()
-        if random.random() < informalMarks.marksAltColorProb:
+        if random.random() < infrmlMarksMngr.marksAltColorProb:
             informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
-        if random.random() < informalMarks.marksAltColorProb:
+        if random.random() < infrmlMarksMngr.marksAltColorProb:
             _tVal = int(random.uniform(40, 255))
             informalLine.lineColor = (0, _tVal, _tVal, 60)
 
         if not _skipMark:
             informalLine.reconfigure()
             informalLine.generateInformalLine()
-            informalMarks.informalLineUnits.append(informalLine)
+            infrmlMarksMngr.informalLineUnits.append(informalLine)
 
     # -------------------------------------- #
     if _markType == "x":
@@ -299,35 +299,35 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
         for i in range(0, 2):
             informalLine = InformalLine()
             informalLine.lineType = 0
-            informalLine.curveResolution = informalMarks.curveResolution
-            informalLine.backTrackRange = informalMarks.backTrackRange
+            informalLine.curveResolution = infrmlMarksMngr.curveResolution
+            informalLine.backTrackRange = infrmlMarksMngr.backTrackRange
             informalLine.lineColorIsBgColor = False
             informalLine.draw = config.draw
-            if informalMarks.useBgBox and informalMarks.xsOnTop:
+            if infrmlMarksMngr.useBgBox and infrmlMarksMngr.xsOnTop:
                 informalLine.draw = config.underLayerDraw
 
-            informalLine.baseWidthRange = informalMarks.vertLineWidthRange
+            informalLine.baseWidthRange = infrmlMarksMngr.vertLineWidthRange
             informalLine.drawingHeight = _drawingHeight
-            informalLine.xOffset = informalMarks.xOffset + _lastX
+            informalLine.xOffset = infrmlMarksMngr.xOffset + _lastX
             informalLine.yOffset = _lastY - informalLine.drawingHeight / 4 * random.random()
-            informalLine.angle = random.uniform(informalMarks.angleRange[0], informalMarks.angleRange[1])
+            informalLine.angle = random.uniform(infrmlMarksMngr.angleRange[0], infrmlMarksMngr.angleRange[1])
             if i == 1:
                 informalLine.angle *= -1
                 if random.random() < 0.5:
-                    informalLine.angle = -random.uniform(informalMarks.angleRange[0], informalMarks.angleRange[1])
+                    informalLine.angle = -random.uniform(infrmlMarksMngr.angleRange[0], infrmlMarksMngr.angleRange[1])
                 informalLine.xOffset -= informalLine.drawingHeight / 2
 
-            informalLine.pointPerLine = informalMarks.pointsPerLineCol
-            informalLine.lineSpeedRange = informalMarks.lineSpeedRange
-            informalLine.lineSpeedRange = informalMarks.vertLineSpeedRange
-            informalLine.noiseAmplitudeRange = informalMarks.noiseAmplitudeRangeCol
-            informalLine.horizontalMovementProb = informalMarks.horizontalMovementProb
-            informalLine.verticalMovementProb = informalMarks.verticalMovementProb
+            informalLine.pointPerLine = infrmlMarksMngr.pointsPerLineCol
+            informalLine.lineSpeedRange = infrmlMarksMngr.lineSpeedRange
+            informalLine.lineSpeedRange = infrmlMarksMngr.vertLineSpeedRange
+            informalLine.noiseAmplitudeRange = infrmlMarksMngr.noiseAmplitudeRangeCol
+            informalLine.horizontalMovementProb = infrmlMarksMngr.horizontalMovementProb
+            informalLine.verticalMovementProb = infrmlMarksMngr.verticalMovementProb
             if i == 0:
                 informalLine.lineColor = setLineColor()
-                if random.random() < informalMarks.marksAltColorProb:
+                if random.random() < infrmlMarksMngr.marksAltColorProb:
                     informalLine.lineColor = (int(random.uniform(40, 255)), 6, 30, 60)
-                if random.random() < informalMarks.marksAltColorProb:
+                if random.random() < infrmlMarksMngr.marksAltColorProb:
                     _tVal = int(random.uniform(40, 255))
                     informalLine.lineColor = (0, _tVal, _tVal, 60)
                 _clr = informalLine.lineColor
@@ -337,7 +337,7 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
             if not _skipMark:
                 informalLine.reconfigure()
                 informalLine.generateInformalLine()
-                informalMarks.informalLineUnits.append(informalLine)
+                infrmlMarksMngr.informalLineUnits.append(informalLine)
 
 
 # -------------------------------------- #
@@ -352,42 +352,42 @@ def setLines():
 
 def generateScribbleGrid():
     pieceLogger(f"[generateScribbleGrid] Making scribble marks")
-    informalMarks.line_alpha = randomRange(informalMarks.activePalette.line_alpha_range[0], informalMarks.activePalette.line_alpha_range[1], True)
-    informalMarks.bg_alpha_base = randomRange(informalMarks.activePalette.bg_alpha_range[0], informalMarks.activePalette.bg_alpha_range[1], True)
+    infrmlMarksMngr.line_alpha = randomRange(infrmlMarksMngr.activePalette.line_alpha_range[0], infrmlMarksMngr.activePalette.line_alpha_range[1], True)
+    infrmlMarksMngr.bg_alpha_base = randomRange(infrmlMarksMngr.activePalette.bg_alpha_range[0], infrmlMarksMngr.activePalette.bg_alpha_range[1], True)
 
-    for _row in range(0, informalMarks.scribbleRows):
-        for _col in range(0, informalMarks.scribbleCols):
+    for _row in range(0, infrmlMarksMngr.scribbleRows):
+        for _col in range(0, infrmlMarksMngr.scribbleCols):
             _skipMark = False
             generateMark(_col, _row, 0, 0, 0, _skipMark, "scribble")
-    informalMarks.numberOfinformalLines = len(informalMarks.informalLineUnits)
+    infrmlMarksMngr.numberOfinformalLines = len(infrmlMarksMngr.informalLineUnits)
 
 
 def generateMarksGrid():
-    pieceLogger(f"[generateMarksGrid] Making Grid:  {informalMarks.drawingWidth } {informalMarks.drawingHeight }")
+    pieceLogger(f"[generateMarksGrid] Making Grid:  {infrmlMarksMngr.drawingWidth } {infrmlMarksMngr.drawingHeight }")
 
-    informalMarks.colInterval = random.randint(int(informalMarks.colIntervalRange[0]), int(informalMarks.colIntervalRange[1]))
-    informalMarks.rowInterval = random.randint(int(informalMarks.rowIntervalRange[0]), int(informalMarks.rowIntervalRange[1]))
-    informalMarks.noiseAmplitudeCol = random.uniform(float(informalMarks.noiseAmplitudeRangeCol[0]), float(informalMarks.noiseAmplitudeRangeCol[1]))
-    informalMarks.noiseAmplitudeRow = random.uniform(float(informalMarks.noiseAmplitudeRangeRow[0]), float(informalMarks.noiseAmplitudeRangeRow[1]))
-    informalMarks.vertLineChange = randomRange(informalMarks.vertLineChangeRange[0], informalMarks.vertLineChangeRange[1])
-    informalMarks.horizLineChange = randomRange(informalMarks.horizLineChangeRange[0], informalMarks.horizLineChangeRange[1])
-    informalMarks.line_alpha = randomRange(informalMarks.activePalette.line_alpha_range[0], informalMarks.activePalette.line_alpha_range[1], True)
-    informalMarks.bg_alpha_base = randomRange(informalMarks.activePalette.bg_alpha_range[0], informalMarks.activePalette.bg_alpha_range[1], True)
+    infrmlMarksMngr.colInterval = random.randint(int(infrmlMarksMngr.colIntervalRange[0]), int(infrmlMarksMngr.colIntervalRange[1]))
+    infrmlMarksMngr.rowInterval = random.randint(int(infrmlMarksMngr.rowIntervalRange[0]), int(infrmlMarksMngr.rowIntervalRange[1]))
+    infrmlMarksMngr.noiseAmplitudeCol = random.uniform(float(infrmlMarksMngr.noiseAmplitudeRangeCol[0]), float(infrmlMarksMngr.noiseAmplitudeRangeCol[1]))
+    infrmlMarksMngr.noiseAmplitudeRow = random.uniform(float(infrmlMarksMngr.noiseAmplitudeRangeRow[0]), float(infrmlMarksMngr.noiseAmplitudeRangeRow[1]))
+    infrmlMarksMngr.vertLineChange = randomRange(infrmlMarksMngr.vertLineChangeRange[0], infrmlMarksMngr.vertLineChangeRange[1])
+    infrmlMarksMngr.horizLineChange = randomRange(infrmlMarksMngr.horizLineChangeRange[0], infrmlMarksMngr.horizLineChangeRange[1])
+    infrmlMarksMngr.line_alpha = randomRange(infrmlMarksMngr.activePalette.line_alpha_range[0], infrmlMarksMngr.activePalette.line_alpha_range[1], True)
+    infrmlMarksMngr.bg_alpha_base = randomRange(infrmlMarksMngr.activePalette.bg_alpha_range[0], infrmlMarksMngr.activePalette.bg_alpha_range[1], True)
 
-    for _row in range(informalMarks.rowInterval):
+    for _row in range(infrmlMarksMngr.rowInterval):
         _lastX = 0
-        _lastY = informalMarks.yOffset + _row * (informalMarks.minYSpacing)
-        for col in range(informalMarks.colInterval):
-            _drawingHeight = informalMarks.markMinHeight + random.uniform(-informalMarks.sizeRange, informalMarks.sizeRange)
+        _lastY = infrmlMarksMngr.yOffset + _row * (infrmlMarksMngr.minYSpacing)
+        for col in range(infrmlMarksMngr.colInterval):
+            _drawingHeight = infrmlMarksMngr.markMinHeight + random.uniform(-infrmlMarksMngr.sizeRange, infrmlMarksMngr.sizeRange)
             _skipMark = False
             _altMark = False
-            if random.random() < informalMarks.skipMarksProb:
+            if random.random() < infrmlMarksMngr.skipMarksProb:
                 _skipMark = True
-            if random.random() < informalMarks.altMarksProb:
+            if random.random() < infrmlMarksMngr.altMarksProb:
                 _altMark = True
-                _drawingHeight = informalMarks.markMinHeight + random.uniform(-informalMarks.sizeRange, informalMarks.sizeRange)
+                _drawingHeight = infrmlMarksMngr.markMinHeight + random.uniform(-infrmlMarksMngr.sizeRange, infrmlMarksMngr.sizeRange)
 
-            _lastX += informalMarks.markMinWidth + informalMarks.minXSpacing
+            _lastX += infrmlMarksMngr.markMinWidth + infrmlMarksMngr.minXSpacing
             if col == 0:
                 _lastX /= 2
 
@@ -396,28 +396,28 @@ def generateMarksGrid():
             else:
                 generateMark(col, _row, _lastX, _lastY, _drawingHeight, _skipMark, "x")
 
-    informalMarks.numberOfinformalLines = len(informalMarks.informalLineUnits)
+    infrmlMarksMngr.numberOfinformalLines = len(infrmlMarksMngr.informalLineUnits)
     # pieceLogger(f"New Lines {config.numberOfinformalLines}")
 
 
 def changeLine():
-    _changeLine = random.randint(0, len(informalMarks.informalLineUnits) - 1)
-    _lineUnit: InformalLine = informalMarks.informalLineUnits[_changeLine]
+    _changeLine = random.randint(0, len(infrmlMarksMngr.informalLineUnits) - 1)
+    _lineUnit: InformalLine = infrmlMarksMngr.informalLineUnits[_changeLine]
     if _lineUnit.lineType == 0:
         _lineUnit.reconfigure()
 
 
 def drawTheBG():
-    informalMarks.bgColor = (informalMarks.bgColor[0], informalMarks.bgColor[1], informalMarks.bgColor[2], round(informalMarks.bg_alpha))
-    informalMarks.draw.rectangle((0, 0, informalMarks.drawingWidth, informalMarks.drawingHeight), fill=informalMarks.bgColor)
+    infrmlMarksMngr.bgColor = (infrmlMarksMngr.bgColor[0], infrmlMarksMngr.bgColor[1], infrmlMarksMngr.bgColor[2], round(infrmlMarksMngr.bg_alpha))
+    infrmlMarksMngr.draw.rectangle((0, 0, infrmlMarksMngr.drawingWidth, infrmlMarksMngr.drawingHeight), fill=infrmlMarksMngr.bgColor)
 
 
 def updateLines():
     global config
 
-    for _informalLineUnitIndex in range(0, len(informalMarks.informalLineUnits)):
+    for _informalLineUnitIndex in range(0, len(infrmlMarksMngr.informalLineUnits)):
         _lineUnit: InformalLine
-        _lineUnit = informalMarks.informalLineUnits[_informalLineUnitIndex]
+        _lineUnit = infrmlMarksMngr.informalLineUnits[_informalLineUnitIndex]
         if _lineUnit.lineType == 0:
             _lineUnit.drawTheLineComplete()
             # _lineUnit.drawLinePoints()
@@ -451,22 +451,22 @@ def runWork():
 
 def reDraw():
 
-    if random.random() < informalMarks.useBgBoxProb and informalMarks.useBgBox:
+    if random.random() < infrmlMarksMngr.useBgBoxProb and infrmlMarksMngr.useBgBox:
         bgColorsFilling()
 
-    if informalMarks.bg_alpha < informalMarks.bg_alpha_base:
-        informalMarks.bg_alpha += informalMarks.bg_alpha_returnrate
+    if infrmlMarksMngr.bg_alpha < infrmlMarksMngr.bg_alpha_base:
+        infrmlMarksMngr.bg_alpha += infrmlMarksMngr.bg_alpha_returnrate
 
-    if informalMarks.bg_alpha > informalMarks.bg_alpha_base:
-        informalMarks.bg_alpha = informalMarks.bg_alpha_base
+    if infrmlMarksMngr.bg_alpha > infrmlMarksMngr.bg_alpha_base:
+        infrmlMarksMngr.bg_alpha = infrmlMarksMngr.bg_alpha_base
 
     drawTheBG()
     updateLines()
 
     # in-place refresh of mark
-    for _u in range(informalMarks.numberOfinformalLines):
-        if random.random() < informalMarks.changeLinesProb and not informalMarks.noChange:
-            _informalLine: InformalLine = informalMarks.informalLineUnits[_u]
+    for _u in range(infrmlMarksMngr.numberOfinformalLines):
+        if random.random() < infrmlMarksMngr.changeLinesProb and not infrmlMarksMngr.noChange:
+            _informalLine: InformalLine = infrmlMarksMngr.informalLineUnits[_u]
             if _informalLine.lineType == 0:
                 _informalLine.reconfigure()
                 _informalLine.generateInformalLine()
@@ -475,22 +475,22 @@ def reDraw():
                 _informalLine.generateScribble()
 
     # all marks changed
-    if random.random() < informalMarks.changeAllLinesProb and not informalMarks.noChange:
-        informalMarks.lightMode = False if random.random() > informalMarks.lightModeProb else True
-        informalMarks.bg_alpha = 0
+    if random.random() < infrmlMarksMngr.changeAllLinesProb and not infrmlMarksMngr.noChange:
+        infrmlMarksMngr.lightMode = False if random.random() > infrmlMarksMngr.lightModeProb else True
+        infrmlMarksMngr.bg_alpha = 0
         clearbgBox()
         setBGColor()
         setLines()
         # doFrame()
-        pieceLogger(f"[reDraw] change ALL LINES  lightMode:{informalMarks.lightMode} {informalMarks.bg_alpha}")
+        pieceLogger(f"[reDraw] change ALL LINES  lightMode:{infrmlMarksMngr.lightMode} {infrmlMarksMngr.bg_alpha}")
 
-    if random.random() < informalMarks.pauseProb:
-        informalMarks.noChange = True
+    if random.random() < infrmlMarksMngr.pauseProb:
+        infrmlMarksMngr.noChange = True
 
-    if random.random() < informalMarks.unpauseProb:
-        informalMarks.noChange = False
+    if random.random() < infrmlMarksMngr.unpauseProb:
+        infrmlMarksMngr.noChange = False
 
-    if random.random() < informalMarks.clearbgBoxProb:
+    if random.random() < infrmlMarksMngr.clearbgBoxProb:
         clearbgBox()
 
 
@@ -593,12 +593,12 @@ def loadColorConfigs():
                 workConfig.get(p, "bgBoxAlphaRange").split(","),
             )
         )
-        informalMarks.paletteSets.append(palette)
+        infrmlMarksMngr.paletteSets.append(palette)
 
-    informalMarks.activePalette = random.choice(informalMarks.paletteSets)
+    infrmlMarksMngr.activePalette = random.choice(infrmlMarksMngr.paletteSets)
 
 
-class InformalMarks:
+class InformalMarksManager:
     config
     paletteSets = []
     informalLineUnits = []
@@ -765,10 +765,10 @@ def main(run=True):
     global config 
     global workConfig
     global overlayControls
-    global informalMarks
+    global infrmlMarksMngr
 
-    informalMarks = InformalMarks(config)
-    informalMarks.setUp(workConfig)
+    infrmlMarksMngr = InformalMarksManager(config)
+    infrmlMarksMngr.setUp(workConfig)
 
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.imageDraw = ImageDraw.Draw(config.image)
@@ -786,20 +786,20 @@ def main(run=True):
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
 
-    informalMarks.draw = config.draw
-    informalMarks.imageDraw = config.imageDraw
+    infrmlMarksMngr.draw = config.draw
+    infrmlMarksMngr.imageDraw = config.imageDraw
 
 
     loadColorConfigs()
     setLines()
 
-    informalMarks.lineColor = setLineColor()
+    infrmlMarksMngr.lineColor = setLineColor()
     setBGColor()
 
     # enFramingSetup()
 
-    if informalMarks.useBgBox:
-        for _ in range(informalMarks.initialRunsOfBgBlocks):
+    if infrmlMarksMngr.useBgBox:
+        for _ in range(infrmlMarksMngr.initialRunsOfBgBlocks):
             bgColorsFilling()
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS

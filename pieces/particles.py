@@ -21,13 +21,330 @@ import noise
 from modules.holder_director import Director
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+class ParticleManager:
+    def __init__(self, config):
+        self.config = config
+
+    def setUp(self, workConfig):
+        self.canvasImageWidth = self.config.canvasWidth
+        self.canvasImageHeight = self.config.canvasHeight
+        self.canvasImageWidth -= 4
+        self.canvasImageHeight -= 4
+        self.numUnits = 60
+
+        """
+		self.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
+		self.fontColor = tuple(map(lambda x: int(int(x)  * self.config.brightness), self.fontColorVals))
+		self.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
+		self.outlineColor = tuple(map(lambda x: int(int(x) * self.config.brightness) , self.outlineColorVals))
+		"""
+
+        self.fontSize = 14
+        self.font = ImageFont.truetype(
+            self.config.path + "/assets/fonts/freefont/FreeSansBold.ttf", self.fontSize
+        )
+
+        self.bgColorVals = (workConfig.get("particleSystem", "bgColor")).split(",")
+        self.bgColor = tuple(
+            map(lambda x: int(int(x) * self.config.brightness), self.bgColorVals)
+        )
+
+        try:
+            self.bgTransitions = workConfig.getboolean("particleSystem", "bgTransitions")
+            self.colOverlayA = coloroverlay.ColorOverlay()
+            self.bgRangeA = int(workConfig.get("particleSystem", "bgRangeA"))
+            self.bgRangeB = int(workConfig.get("particleSystem", "bgRangeB"))
+            self.colOverlayA.randomRange = (self.bgRangeA, self.bgRangeB)
+            # self.colOverlayA.colorA = tuple(int(a*self.config.brightness) for a in (colorutils.getRandomColor()))
+            self.colOverlayA.minHue = int(workConfig.get("particleSystem", "minHue"))
+            self.colOverlayA.maxHue = int(workConfig.get("particleSystem", "maxHue"))
+
+            self.colOverlayA.minValue = float(
+                workConfig.get("particleSystem", "minValue")
+            )
+            self.colOverlayA.maxValue = float(
+                workConfig.get("particleSystem", "maxValue")
+            )
+
+            self.colOverlayA.maxBrightness = float(
+                workConfig.get("particleSystem", "maxBrightness")
+            )
+            self.colOverlayA.bgTransparency = float(
+                workConfig.get("particleSystem", "bgTransparency")
+            )
+            self.colOverlayA.randomSteps = True
+            self.colOverlayA.timeTrigger = True
+            self.colOverlayA.tLimitBase = int(
+                workConfig.get("particleSystem", "tLimitBase")
+            )
+            self.colOverlayA.setStartColor()
+            self.colOverlayA.getNewColor()
+            self.colOverlayA.colorTransitionSetup()
+
+        except Exception as e:
+            print(e)
+            self.bgTransitions = False
+
+        try:
+            self.transformShape = workConfig.getboolean(
+                "particleSystem", "transformShape"
+            )
+            transformTuples = workConfig.get("particleSystem", "transformTuples").split(",")
+            self.transformTuples = tuple([float(i) for i in transformTuples])
+        except Exception as e:
+            print(str(e))
+            self.transformShape = False
+
+        try:
+            self.torqueDelta = int(workConfig.get("particleSystem", "torqueDelta"))
+            self.torqueRate = float(workConfig.get("particleSystem", "torqueRate"))
+        except Exception as e:
+            print(str(e))
+            self.torqueDelta = 0
+            self.torqueRate = 0
+
+        try:
+            self.xWind = float(workConfig.get("particleSystem", "xWind"))
+        except Exception as e:
+            print(str(e))
+            self.xWind = 0
+
+        try:
+            self.particleWinkOutXMin = float(
+                workConfig.get("particleSystem", "particleWinkOutXMin")
+            )
+            self.particleWinkOutYMin = float(
+                workConfig.get("particleSystem", "particleWinkOutYMin")
+            )
+        except Exception as e:
+            print(str(e))
+            self.particleWinkOutXMin = 5
+            self.particleWinkOutYMin = 5
+
+        try:
+            self.pixelSortProbChange = float(
+                workConfig.get("displayconfig", "pixelSortProbChange")
+            )
+            self.pixelSortProbChangeMin = float(
+                workConfig.get("displayconfig", "pixelSortProbChangeMin")
+            )
+            self.pixelSortProbChangeMax = float(
+                workConfig.get("displayconfig", "pixelSortProbChangeMax")
+            )
+        except Exception as e:
+            print(str(e))
+            self.pixelSortProbChange = 0
+
+        try:
+            self.restartProb = float(workConfig.get("particleSystem", "restartProb"))
+        except Exception as e:
+            print(str(e))
+            self.restartProb = 0
+
+        try:
+            self.filterRemapping = workConfig.getboolean(
+                "particleSystem", "filterRemapping"
+            )
+            self.filterRemappingProb = float(
+                workConfig.get("particleSystem", "filterRemappingProb")
+            )
+            self.filterRemapminHoriSize = int(
+                workConfig.get("particleSystem", "filterRemapminHoriSize")
+            )
+            self.filterRemapminVertSize = int(
+                workConfig.get("particleSystem", "filterRemapminVertSize")
+            )
+        except Exception as e:
+            print(str(e))
+            self.filterRemapping = False
+            self.filterRemappingProb = 0.0
+            self.filterRemapminHoriSize = 24
+            self.filterRemapminVertSize = 24
+
+        try:
+            self.filterRemapRangeX = int(
+                workConfig.get("particleSystem", "filterRemapRangeX")
+            )
+            self.filterRemapRangeY = int(
+                workConfig.get("particleSystem", "filterRemapRangeY")
+            )
+        except Exception as e:
+            print(str(e))
+            self.filterRemapRangeX = self.config.canvasWidth
+            self.filterRemapRangeY = self.config.canvasHeight
+
+        """
+		Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
+		Because colors are more interesting against gray, because everything goes gray
+
+		Rate of desaturation is set as greyRate
+
+		Sorry about schitzoid spelling of grey-gray
+
+		"""
+
+        try:
+            self.pixelsGoGray = workConfig.getboolean("particleSystem", "pixelsGoGray")
+            self.greyRate = float(workConfig.get("particleSystem", "greyRate"))
+        except Exception as e:
+            print(str(e))
+            self.pixelsGoGray = False
+
+        # ok this may seem screwy, but because I made an error a while ago, the jumpToGray
+        # effect is actually default ... so if you want gradual turn to gray, it must be set
+        # actively. blurp. ugh.
+        try:
+            self.jumpToGray = workConfig.getboolean("particleSystem", "jumpToGray")
+        except Exception as e:
+            print(str(e))
+            self.jumpToGray = True
+
+        try:
+            self.pixelsGoGrayModel = int(
+                workConfig.get("particleSystem", "pixelsGoGrayModel")
+            )
+        except Exception as e:
+            print(str(e))
+            self.pixelsGoGrayModel = 3
+
+        self.variance = float(workConfig.get("particleSystem", "variance"))
+
+        self.fillColorVals = (workConfig.get("particleSystem", "fillColor")).split(",")
+        self.fillColor = tuple(
+            map(lambda x: int(int(x) * self.config.brightness), self.fillColorVals)
+        )
+
+        self.outlineColorVals = (workConfig.get("particleSystem", "outlineColor")).split(
+            ","
+        )
+        self.outlineColor = tuple(
+            map(lambda x: int(int(x) * self.config.brightness), self.outlineColorVals)
+        )
+
+        try:
+            self.extraOutlineColorVals = (
+                workConfig.get("particleSystem", "extraOutlineColor")
+            ).split(",")
+            self.extraOutlineColor = tuple(
+                map(
+                    lambda x: round(int(x) * self.config.brightness),
+                    self.extraOutlineColorVals,
+                )
+            )
+        except Exception as e:
+            print(str(e))
+            self.extraOutlineColor = None
+
+        try:
+            self.pUseHSV = workConfig.getboolean("particleSystem", "pUseHSV")
+            pFillRange = (workConfig.get("particleSystem", "pFillRange")).split(",")
+            self.pFillRange = tuple(
+                map(lambda x: (float(x) * self.config.brightness), pFillRange)
+            )
+            pOutlineRange = (workConfig.get("particleSystem", "pOutlineRange")).split(",")
+            self.pOutlineRange = tuple(
+                map(lambda x: (float(x) * self.config.brightness), pOutlineRange)
+            )
+        except Exception as e:
+            print(f"error : {str(e)} with pUseHSV")
+            self.pUseHSV = False
+
+        # second color for some particles
+        try:
+            self.useSecondColorProb = float(
+                workConfig.get("particleSystem", "useSecondColorProb")
+            )
+            self.fillColorVals2 = (workConfig.get("particleSystem", "fillColor2")).split(
+                ","
+            )
+            self.fillColor2 = tuple(
+                map(lambda x: int(int(x) * self.config.brightness), self.fillColorVals2)
+            )
+
+            self.outlineColorVals2 = (
+                workConfig.get("particleSystem", "outlineColor2")
+            ).split(",")
+            self.outlineColor2 = tuple(
+                map(lambda x: int(int(x) * self.config.brightness), self.outlineColorVals2)
+            )
+
+            try:
+                self.extraOutlineColorVals2 = (
+                    workConfig.get("particleSystem", "extraOutlineColor2")
+                ).split(",")
+                self.extraOutlineColor2 = tuple(
+                    map(
+                        lambda x: round(int(x) * self.config.brightness),
+                        self.extraOutlineColorVals2,
+                    )
+                )
+            except Exception as e:
+                print(str(e))
+                self.extraOutlineColor2 = None
+        except Exception as e:
+            print(str(e))
+            self.useSecondColorProb = 0
+            self.extraOutlineColor2 = self.extraOutlineColor
+            self.fillColor2 = self.fillColor
+            self.outlineColor2 = self.outlineColor
+            self.extraOutlineColor2 = self.extraOutlineColor
+
+        self.overallBlur = int(workConfig.get("particleSystem", "overallBlur"))
+
+        try:
+            self.legacyUnsharpMask = workConfig.getboolean(
+                "particleSystem", "legacyUnsharpMask"
+            )
+            self.optionallegacyToggleProb = float(
+                workConfig.get("particleSystem", "optionallegacyToggleProb")
+            )
+        except Exception as e:
+            print(str(e))
+            self.legacyUnsharpMask = True
+            self.optionallegacyToggleProb = 0
+
+        try:
+            self.useWaveDistortion = workConfig.getboolean(
+                "particleSystem", "useWaveDistortion"
+            )
+            self.waveAmplitude = float(workConfig.get("particleSystem", "waveAmplitude"))
+            self.wavePeriodMod = float(workConfig.get("particleSystem", "wavePeriodMod"))
+            self.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
+            self.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
+        except Exception as e:
+            print(str(e))
+            self.useWaveDistortion = False
+
+        self.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
+        self.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(
+            ","
+        )
+        self.overlayColor = tuple(
+            map(lambda x: int(int(x) * self.config.brightness), self.overlayColorVals)
+        )
+        self.clrBlkWidth = int(workConfig.get("particleSystem", "clrBlkWidth"))
+        self.clrBlkHeight = int(workConfig.get("particleSystem", "clrBlkHeight"))
+        self.overlayxPos = int(workConfig.get("particleSystem", "overlayxPos"))
+        self.overlayyPos = int(workConfig.get("particleSystem", "overlayyPos"))
+
+        try:
+            self.useOverLayEnhanced = workConfig.getboolean(
+                "particleSystem", "useOverLayEnhanced"
+            )
+            self.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
+        except Exception as e:
+            print(str(e))
+            self.useOverLayEnhanced = False
+            self.useOverOnBG = False
+
+        self.xPos = 0
 
 
 class WaveDeformer:
     def transform(self, x, y):
-        y = y + config.waveAmplitude * math.sin(
-            (x + config.xPos) / config.wavePeriodMod
-        ) * noise.pnoise2(math.sin(x), y / config.pNoiseMod)
+        y = y + pMngr.waveAmplitude * math.sin(
+            (x + pMngr.xPos) / pMngr.wavePeriodMod
+        ) * noise.pnoise2(math.sin(x), y / pMngr.pNoiseMod)
         return x, y
 
     def transform_rectangle(self, x0, y0, x1, y1):
@@ -42,10 +359,10 @@ class WaveDeformer:
         self.w, self.h = img.size
 
         target_grid = [
-            (x, y, x + config.wavegridspace, y + config.wavegridspace)
+            (x, y, x + pMngr.wavegridspace, y + pMngr.wavegridspace)
             for x, y in itertools.product(
-                range(0, self.w, config.wavegridspace),
-                range(0, self.h, config.wavegridspace),
+                range(0, self.w, pMngr.wavegridspace),
+                range(0, self.h, pMngr.wavegridspace),
             )
         ]
         source_grid = [self.transform_rectangle(*rect) for rect in target_grid]
@@ -54,35 +371,18 @@ class WaveDeformer:
 
 
 def main(run=True):
-    global config, directionOrder, ps
+    global config, directionOrder, ps, pMngr
     global workConfig
     print("---------------------")
     print("Particles Loaded")
     colorutils.brightness = config.brightness
-    config.canvasImageWidth = config.canvasWidth
-    config.canvasImageHeight = config.canvasHeight
-    config.canvasImageWidth -= 4
-    config.canvasImageHeight -= 4
-    config.numUnits = 60
 
-    """
-	config.fontColorVals = ((workConfig.get("diag", 'fontColor')).split(','))
-	config.fontColor = tuple(map(lambda x: int(int(x)  * config.brightness), config.fontColorVals))
-	config.outlineColorVals = ((workConfig.get("diag", 'outlineColor')).split(','))
-	config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness) , config.outlineColorVals))
-	"""
-
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
+    pMngr = ParticleManager(config)
+    pMngr.setUp(workConfig)
 
     config.canvasImage = Image.new(
-        "RGBA", (config.canvasImageWidth, config.canvasImageHeight)
+        "RGBA", (pMngr.canvasImageWidth, pMngr.canvasImageHeight)
     )
-    config.fontSize = 14
-    config.font = ImageFont.truetype(
-        config.path + "/assets/fonts/freefont/FreeSansBold.ttf", config.fontSize
-    )
-
-    """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
     ps = ParticleSystem(config)
     ps.unitArray = []
@@ -115,10 +415,6 @@ def main(run=True):
     ps.speedMin = float(workConfig.get("particleSystem", "speedMin"))
     ps.speedMax = float(workConfig.get("particleSystem", "speedMax"))
     ps.numUnits = int(workConfig.get("particleSystem", "numUnits"))
-    config.bgColorVals = (workConfig.get("particleSystem", "bgColor")).split(",")
-    config.bgColor = tuple(
-        map(lambda x: int(int(x) * config.brightness), config.bgColorVals)
-    )
 
     ps.centerRangeXMin = int(workConfig.get("particleSystem", "centerRangeXMin"))
     ps.centerRangeYMin = int(workConfig.get("particleSystem", "centerRangeYMin"))
@@ -200,42 +496,6 @@ def main(run=True):
         ps.objTrails = True
 
     try:
-        config.bgTransitions = workConfig.getboolean("particleSystem", "bgTransitions")
-        config.colOverlayA = coloroverlay.ColorOverlay()
-        config.bgRangeA = int(workConfig.get("particleSystem", "bgRangeA"))
-        config.bgRangeB = int(workConfig.get("particleSystem", "bgRangeB"))
-        config.colOverlayA.randomRange = (config.bgRangeA, config.bgRangeB)
-        # config.colOverlayA.colorA = tuple(int(a*config.brightness) for a in (colorutils.getRandomColor()))
-        config.colOverlayA.minHue = int(workConfig.get("particleSystem", "minHue"))
-        config.colOverlayA.maxHue = int(workConfig.get("particleSystem", "maxHue"))
-
-        config.colOverlayA.minValue = float(
-            workConfig.get("particleSystem", "minValue")
-        )
-        config.colOverlayA.maxValue = float(
-            workConfig.get("particleSystem", "maxValue")
-        )
-
-        config.colOverlayA.maxBrightness = float(
-            workConfig.get("particleSystem", "maxBrightness")
-        )
-        config.colOverlayA.bgTransparency = float(
-            workConfig.get("particleSystem", "bgTransparency")
-        )
-        config.colOverlayA.randomSteps = True
-        config.colOverlayA.timeTrigger = True
-        config.colOverlayA.tLimitBase = int(
-            workConfig.get("particleSystem", "tLimitBase")
-        )
-        config.colOverlayA.setStartColor()
-        config.colOverlayA.getNewColor()
-        config.colOverlayA.colorTransitionSetup()
-
-    except Exception as e:
-        print(e)
-        config.bgTransitions = False
-
-    try:
         ps.linearMotionAlsoHorizontal = workConfig.getboolean(
             "particleSystem", "linearMotionAlsoHorizontal"
         )
@@ -270,134 +530,12 @@ def main(run=True):
         print(str(e))
         ps.transparencyRange = (10, 200)
 
-    try:
-        config.transformShape = workConfig.getboolean(
-            "particleSystem", "transformShape"
-        )
-        transformTuples = workConfig.get("particleSystem", "transformTuples").split(",")
-        config.transformTuples = tuple([float(i) for i in transformTuples])
-    except Exception as e:
-        print(str(e))
-        config.transformShape = False
-
-    try:
-        config.torqueDelta = int(workConfig.get("particleSystem", "torqueDelta"))
-        config.torqueRate = float(workConfig.get("particleSystem", "torqueRate"))
-    except Exception as e:
-        print(str(e))
-        config.torqueDelta = 0
-        config.torqueRate = 0
-
-    try:
-        config.xWind = float(workConfig.get("particleSystem", "xWind"))
-    except Exception as e:
-        print(str(e))
-        config.xWind = 0
-
-    try:
-        config.particleWinkOutXMin = float(
-            workConfig.get("particleSystem", "particleWinkOutXMin")
-        )
-        config.particleWinkOutYMin = float(
-            workConfig.get("particleSystem", "particleWinkOutYMin")
-        )
-    except Exception as e:
-        print(str(e))
-        config.particleWinkOutXMin = 5
-        config.particleWinkOutYMin = 5
-
-    try:
-        config.pixelSortProbChange = float(
-            workConfig.get("displayconfig", "pixelSortProbChange")
-        )
-        config.pixelSortProbChangeMin = float(
-            workConfig.get("displayconfig", "pixelSortProbChangeMin")
-        )
-        config.pixelSortProbChangeMax = float(
-            workConfig.get("displayconfig", "pixelSortProbChangeMax")
-        )
-    except Exception as e:
-        print(str(e))
-        config.pixelSortProbChange = 0
-
-    try:
-        config.restartProb = float(workConfig.get("particleSystem", "restartProb"))
-    except Exception as e:
-        print(str(e))
-        config.restartProb = 0
-
-    try:
-        config.filterRemapping = workConfig.getboolean(
-            "particleSystem", "filterRemapping"
-        )
-        config.filterRemappingProb = float(
-            workConfig.get("particleSystem", "filterRemappingProb")
-        )
-        config.filterRemapminHoriSize = int(
-            workConfig.get("particleSystem", "filterRemapminHoriSize")
-        )
-        config.filterRemapminVertSize = int(
-            workConfig.get("particleSystem", "filterRemapminVertSize")
-        )
-    except Exception as e:
-        print(str(e))
-        config.filterRemapping = False
-        config.filterRemappingProb = 0.0
-        config.filterRemapminHoriSize = 24
-        config.filterRemapminVertSize = 24
-
-    try:
-        config.filterRemapRangeX = int(
-            workConfig.get("particleSystem", "filterRemapRangeX")
-        )
-        config.filterRemapRangeY = int(
-            workConfig.get("particleSystem", "filterRemapRangeY")
-        )
-    except Exception as e:
-        print(str(e))
-        config.filterRemapRangeX = config.canvasWidth
-        config.filterRemapRangeY = config.canvasHeight
-    """
-	Why this? because desaturation transitions are not always expected, because Phil and Sarah suggested it
-	Because colors are more interesting against gray, because everything goes gray
-
-	Rate of desaturation is set as greyRate
-
-	Sorry about schitzoid spelling of grey-gray
-
-	"""
-
-    try:
-        config.pixelsGoGray = workConfig.getboolean("particleSystem", "pixelsGoGray")
-        config.greyRate = float(workConfig.get("particleSystem", "greyRate"))
-    except Exception as e:
-        print(str(e))
-        config.pixelsGoGray = False
-
-    # ok this may seem screwy, but because I made an error a while ago, the jumpToGray
-    # effect is actually default ... so if you want gradual turn to gray, it must be set
-    # actively. blurp. ugh.
-    try:
-        config.jumpToGray = workConfig.getboolean("particleSystem", "jumpToGray")
-    except Exception as e:
-        print(str(e))
-        config.jumpToGray = True
-
-    try:
-        config.pixelsGoGrayModel = int(
-            workConfig.get("particleSystem", "pixelsGoGrayModel")
-        )
-    except Exception as e:
-        print(str(e))
-        config.pixelsGoGrayModel = 3
-
     ps.movement = workConfig.get("particleSystem", "movement")
     ps.objColor = workConfig.get("particleSystem", "objColor")
     ps.objWidth = int(workConfig.get("particleSystem", "objWidth"))
     ps.objHeight = int(workConfig.get("particleSystem", "objHeight"))
     ps.widthRate = float(workConfig.get("particleSystem", "widthRate"))
     ps.heightRate = float(workConfig.get("particleSystem", "heightRate"))
-    config.variance = float(workConfig.get("particleSystem", "variance"))
 
     try:
         ps.objWidthMax = int(workConfig.get("particleSystem", "objWidthMax"))
@@ -424,134 +562,7 @@ def main(run=True):
         ps.rndSizeFactorMin = 0.5
         ps.rndSizeFactorMax = 1.5
 
-    config.fillColorVals = (workConfig.get("particleSystem", "fillColor")).split(",")
-    config.fillColor = tuple(
-        map(lambda x: int(int(x) * config.brightness), config.fillColorVals)
-    )
-
-    config.outlineColorVals = (workConfig.get("particleSystem", "outlineColor")).split(
-        ","
-    )
-    config.outlineColor = tuple(
-        map(lambda x: int(int(x) * config.brightness), config.outlineColorVals)
-    )
-
-    try:
-        config.extraOutlineColorVals = (
-            workConfig.get("particleSystem", "extraOutlineColor")
-        ).split(",")
-        config.extraOutlineColor = tuple(
-            map(
-                lambda x: round(int(x) * config.brightness),
-                config.extraOutlineColorVals,
-            )
-        )
-    except Exception as e:
-        print(str(e))
-        config.extraOutlineColor = None
-
-    try:
-        config.pUseHSV = workConfig.getboolean("particleSystem", "pUseHSV")
-        pFillRange = (workConfig.get("particleSystem", "pFillRange")).split(",")
-        config.pFillRange = tuple(
-            map(lambda x: (float(x) * config.brightness), pFillRange)
-        )
-        pOutlineRange = (workConfig.get("particleSystem", "pOutlineRange")).split(",")
-        config.pOutlineRange = tuple(
-            map(lambda x: (float(x) * config.brightness), pOutlineRange)
-        )
-    except Exception as e:
-        print(f"error : {str(e)} with pUseHSV")
-        config.pUseHSV = False
-
-    # second color for some particles
-    try:
-        config.useSecondColorProb = float(
-            workConfig.get("particleSystem", "useSecondColorProb")
-        )
-        config.fillColorVals2 = (workConfig.get("particleSystem", "fillColor2")).split(
-            ","
-        )
-        config.fillColor2 = tuple(
-            map(lambda x: int(int(x) * config.brightness), config.fillColorVals2)
-        )
-
-        config.outlineColorVals2 = (
-            workConfig.get("particleSystem", "outlineColor2")
-        ).split(",")
-        config.outlineColor2 = tuple(
-            map(lambda x: int(int(x) * config.brightness), config.outlineColorVals2)
-        )
-
-        try:
-            config.extraOutlineColorVals2 = (
-                workConfig.get("particleSystem", "extraOutlineColor2")
-            ).split(",")
-            config.extraOutlineColor2 = tuple(
-                map(
-                    lambda x: round(int(x) * config.brightness),
-                    config.extraOutlineColorVals2,
-                )
-            )
-        except Exception as e:
-            print(str(e))
-            config.extraOutlineColor2 = None
-    except Exception as e:
-        print(str(e))
-        config.useSecondColorProb = 0
-        config.extraOutlineColor2 = config.extraOutlineColor
-        config.fillColor2 = config.fillColor
-        config.outlineColor2 = config.outlineColor
-        config.extraOutlineColor2 = config.extraOutlineColor
-
     ps.unitBlur = int(workConfig.get("particleSystem", "unitBlur"))
-    config.overallBlur = int(workConfig.get("particleSystem", "overallBlur"))
-
-    try:
-        config.legacyUnsharpMask = workConfig.getboolean(
-            "particleSystem", "legacyUnsharpMask"
-        )
-        config.optionallegacyToggleProb = float(
-            workConfig.get("particleSystem", "optionallegacyToggleProb")
-        )
-    except Exception as e:
-        print(str(e))
-        config.legacyUnsharpMask = True
-        config.optionallegacyToggleProb = 0
-
-    try:
-        config.useWaveDistortion = workConfig.getboolean(
-            "particleSystem", "useWaveDistortion"
-        )
-        config.waveAmplitude = float(workConfig.get("particleSystem", "waveAmplitude"))
-        config.wavePeriodMod = float(workConfig.get("particleSystem", "wavePeriodMod"))
-        config.wavegridspace = int(workConfig.get("particleSystem", "wavegridspace"))
-        config.pNoiseMod = float(workConfig.get("particleSystem", "pNoiseMod"))
-    except Exception as e:
-        print(str(e))
-        config.useWaveDistortion = False
-
-    config.useOverLay = workConfig.getboolean("particleSystem", "useOverLay")
-    config.overlayColorVals = (workConfig.get("particleSystem", "overlayColor")).split(
-        ","
-    )
-    config.overlayColor = tuple(
-        map(lambda x: int(int(x) * config.brightness), config.overlayColorVals)
-    )
-    config.clrBlkWidth = int(workConfig.get("particleSystem", "clrBlkWidth"))
-    config.clrBlkHeight = int(workConfig.get("particleSystem", "clrBlkHeight"))
-    config.overlayxPos = int(workConfig.get("particleSystem", "overlayxPos"))
-    config.overlayyPos = int(workConfig.get("particleSystem", "overlayyPos"))
-
-    try:
-        config.useOverLayEnhanced = workConfig.getboolean(
-            "particleSystem", "useOverLayEnhanced"
-        )
-        config.useOverOnBG = workConfig.getboolean("particleSystem", "useOverOnBG")
-    except Exception as e:
-        print(str(e))
-        config.useOverLayEnhanced = False
-        config.useOverOnBG = False
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -566,8 +577,6 @@ def main(run=True):
 			# config.render(config.image, 0, 0)
 			config.render(config.renderImageFull, 0, 0)
 	"""
-
-    config.xPos = 0
 
     for _ in range(ps.numUnits):
         emitParticle()
@@ -589,8 +598,8 @@ def emitParticle(i=None):
     p.objWidth = round(random.uniform(ps.objWidthMin, ps.objWidthMax))
     p.objHeight = round(random.uniform(ps.objHeightMin, ps.objHeightMax))
 
-    p.particleWinkOutXMin = config.particleWinkOutXMin
-    p.particleWinkOutYMin = config.particleWinkOutYMin
+    p.particleWinkOutXMin = pMngr.particleWinkOutXMin
+    p.particleWinkOutYMin = pMngr.particleWinkOutYMin
 
     p.setUpParticle()
 
@@ -621,8 +630,8 @@ def emitParticle(i=None):
 
     """
 	p.direction = random.uniform(
-		math.pi + math.pi / 2 - config.variance,
-		math.pi + math.pi / 2 + config.variance
+		math.pi + math.pi / 2 - pMngr.variance,
+		math.pi + math.pi / 2 + pMngr.variance
 	)
 
 	p.direction = random.uniform(-math.pi,math.pi)
@@ -631,10 +640,10 @@ def emitParticle(i=None):
 	"""
 
     p.v = random.uniform(ps.speedMin, ps.speedMax)
-    p.xWind = config.xWind
+    p.xWind = pMngr.xWind
 
-    p.pixelsGoGray = config.pixelsGoGray
-    p.jumpToGray = config.jumpToGray
+    p.pixelsGoGray = pMngr.pixelsGoGray
+    p.jumpToGray = pMngr.jumpToGray
 
     if ps.objColor == "rnd":
         p.fillColor = colorutils.randomColor(ps.config.brightness)
@@ -652,54 +661,53 @@ def emitParticle(i=None):
 
     else:
 
-        p.fillColor = config.fillColor  # (240,150,0,100)
-        p.outlineColor = config.outlineColor  # (100,0,0,100)
-        p.extraOutlineColor = config.extraOutlineColor
+        p.fillColor = pMngr.fillColor  # (240,150,0,100)
+        p.outlineColor = pMngr.outlineColor  # (100,0,0,100)
+        p.extraOutlineColor = pMngr.extraOutlineColor
 
-        if config.pUseHSV:
+        if pMngr.pUseHSV:
             p.fillColor = colorutils.getRandomColorHSV(
-                config.pFillRange[0],
-                config.pFillRange[1],
-                config.pFillRange[2],
-                config.pFillRange[3],
-                config.pFillRange[4],
-                config.pFillRange[5],
+                pMngr.pFillRange[0],
+                pMngr.pFillRange[1],
+                pMngr.pFillRange[2],
+                pMngr.pFillRange[3],
+                pMngr.pFillRange[4],
+                pMngr.pFillRange[5],
                 0,
                 0,
-                int(config.pFillRange[6]),
+                int(pMngr.pFillRange[6]),
                 ps.config.brightness,
             )
             p.outlineColor = colorutils.getRandomColorHSV(
-                config.pOutlineRange[0],
-                config.pOutlineRange[1],
-                config.pOutlineRange[2],
-                config.pOutlineRange[3],
-                config.pOutlineRange[4],
-                config.pOutlineRange[5],
+                pMngr.pOutlineRange[0],
+                pMngr.pOutlineRange[1],
+                pMngr.pOutlineRange[2],
+                pMngr.pOutlineRange[3],
+                pMngr.pOutlineRange[4],
+                pMngr.pOutlineRange[5],
                 0,
                 0,
-                int(config.pOutlineRange[6]),
+                int(pMngr.pOutlineRange[6]),
                 ps.config.brightness,
             )
 
-        if random.random() < config.useSecondColorProb:
-            p.fillColor = config.fillColor2  # (240,150,0,100)
-            p.outlineColor = config.outlineColor2  # (100,0,0,100)
-            p.extraOutlineColor = config.extraOutlineColor2
+        if random.random() < pMngr.useSecondColorProb:
+            p.fillColor = pMngr.fillColor2  # (240,150,0,100)
+            p.outlineColor = pMngr.outlineColor2  # (100,0,0,100)
+            p.extraOutlineColor = pMngr.extraOutlineColor2
 
-        if config.pixelsGoGray:
-            _extracted_from_emitParticle_94(config, p)
+        if pMngr.pixelsGoGray:
+            _pixelsGoGrayFcu(pMngr, p)
     if ps.movement == "linearMotion":
 
-        _extracted_from_emitParticle_158(config, p, ps)
+        _linearMotion(config, p, ps)
     if i is not None:
         ps.unitArray[i] = p
     else:
         ps.unitArray.append(p)
 
 
-# TODO Rename this here and in `emitParticle`
-def _extracted_from_emitParticle_158(config, p, ps):
+def _linearMotion(config, p, ps):
     p.xPosR = int(random.uniform(0, config.canvasWidth))
     p.yPosR = int(random.uniform(0, config.canvasHeight))
     # config.canvasHeight/3 - p.objHeight/4 #
@@ -721,10 +729,9 @@ def _extracted_from_emitParticle_158(config, p, ps):
     p.yPosR = origins[dirVal][1]
 
 
-# TODO Rename this here and in `emitParticle`
-def _extracted_from_emitParticle_94(config, p):
-    p.greyRate = random.uniform(config.greyRate / 4, config.greyRate)
-    # p.greyRate = config.greyRate
+def _pixelsGoGrayFcu(pMngr, p):
+    p.greyRate = random.uniform(pMngr.greyRate / 4, pMngr.greyRate)
+    # p.greyRate = pMngr.greyRate
 
     """
 			0.2989, 0.5870, 0.1140
@@ -740,12 +747,12 @@ def _extracted_from_emitParticle_94(config, p):
 
 			"""
 
-    if config.pixelsGoGrayModel == 2:
+    if pMngr.pixelsGoGrayModel == 2:
         # Luminosity
         rRatio = 0.21
         gRatio = 0.72
         bRatio = 0.07
-    elif config.pixelsGoGrayModel == 3:
+    elif pMngr.pixelsGoGrayModel == 3:
         # BT.601
         rRatio = 0.2989
         gRatio = 0.5870
@@ -797,7 +804,7 @@ def transformImage(img):
         (new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC
     )
     img = img.transform(
-        (new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
+        (new_width, height), Image.PERSPECTIVE, pMngr.transformTuples, Image.BICUBIC
     )
     return img
 
@@ -808,22 +815,22 @@ def transformImage(img):
 def colorize():
 
     # Colorize via overlay etc
-    config.clrBlock = Image.new("RGBA", (config.clrBlkWidth, config.clrBlkHeight))
-    clrBlockDraw = ImageDraw.Draw(config.clrBlock)
+    pMngr.clrBlock = Image.new("RGBA", (pMngr.clrBlkWidth, pMngr.clrBlkHeight))
+    clrBlockDraw = ImageDraw.Draw(pMngr.clrBlock)
 
     # Color overlay on b/w PNG sprite
     # clrBlockDraw.rectangle((0,0, w, h), fill=(255,255,255))
     clrBlockDraw.rectangle(
-        (0, 0, config.canvasWidth, config.clrBlkHeight), fill=(0, 0, 0, 255)
+        (0, 0, config.canvasWidth, pMngr.clrBlkHeight), fill=(0, 0, 0, 255)
     )
 
     clrBlockDraw.rectangle(
-        (0, 0, config.clrBlkWidth, config.clrBlkHeight), fill=config.overlayColor
+        (0, 0, pMngr.clrBlkWidth, pMngr.clrBlkHeight), fill=pMngr.overlayColor
     )
 
     """
 		try :
-			config.image = ImageChops.multiply(config.clrBlock, config.image)
+			config.image = ImageChops.multiply(pMngr.clrBlock, config.image)
 			# pass
 		except Exception as e:
 			print(e, config.image.mode)
@@ -902,30 +909,30 @@ def iterate():
 
     brightnessChanger()
 
-    if config.bgTransitions:
-        config.colOverlayA.stepTransition(alpha=config.colOverlayA.bgTransparency)
-        config.bgColor = tuple(
-            int(a * config.brightness) for a in config.colOverlayA.currentColor
+    if pMngr.bgTransitions:
+        pMngr.colOverlayA.stepTransition(alpha=pMngr.colOverlayA.bgTransparency)
+        pMngr.bgColor = tuple(
+            int(a * config.brightness) for a in pMngr.colOverlayA.currentColor
         )
 
     # Fade trails or not...
     config.draw.rectangle(
         (0, 0, config.canvasWidth - 1, config.canvasHeight - 1),
-        fill=config.bgColor,
+        fill=pMngr.bgColor,
         outline=None,
     )
 
-    if config.useOverOnBG:
+    if pMngr.useOverOnBG:
         config.image.paste(
-            config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
+            pMngr.clrBlock, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock
         )
 
     """
 	# ORIG PLACEMENT
-	if config.useOverLay :
-		# config.image = ImageChops.multiply(config.clrBlock, config.image)
+	if pMngr.useOverLay :
+		# config.image = ImageChops.multiply(pMngr.clrBlock, config.image)
 		config.image.paste(
-			config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
+			pMngr.clrBlock, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock
 		)
 
 
@@ -943,13 +950,13 @@ def iterate():
             if not ps.fixedUnitArray:
                 ps.unitArray.remove(p)
 
-                if len(ps.unitArray) < config.numUnits + 0:
+                if len(ps.unitArray) < pMngr.numUnits + 0:
                     for _ in range(ps.reEmitNumber):
                         emitParticle()
             else:
                 emitParticle(i=ps.unitArray.index(p))
 
-    if random.random() < config.restartProb:
+    if random.random() < pMngr.restartProb:
         for p in ps.unitArray:
             p.remove = True
         config.draw.rectangle(
@@ -961,13 +968,13 @@ def iterate():
     # to move the dithered sparkle around a bit to
     # disturb the eveness of things ..
 
-    # if random.random() < config.optionallegacyToggleProb:
-    #     config.legacyUnsharpMask = config.legacyUnsharpMask != True
+    # if random.random() < pMngr.optionallegacyToggleProb:
+    #     pMngr.legacyUnsharpMask = pMngr.legacyUnsharpMask != True
 
-    if random.random() < config.filterRemappingProb and (
-        config.useFilters and config.filterRemapping
+    if random.random() < pMngr.filterRemappingProb and (
+        config.useFilters and pMngr.filterRemapping
     ):
-        remapDitherFilteredParts(config)
+        remapDitherFilteredParts(config, pMngr)
     if (
         random.random() < ps.changechangeCohesionProb
         and ps.changeCohesion
@@ -984,102 +991,102 @@ def iterate():
 
         # print(ps.cohesionDistance, ps.repelDistance)
 
-    if config.overallBlur > 0:
+    if pMngr.overallBlur > 0:
         config.image = config.image.filter(
-            ImageFilter.GaussianBlur(radius=config.overallBlur)
+            ImageFilter.GaussianBlur(radius=pMngr.overallBlur)
         )
         # This needs to be reset
-        if config.legacyUnsharpMask:
+        if pMngr.legacyUnsharpMask:
             config.image = config.image.filter(
                 ImageFilter.UnsharpMask(radius=80, percent=250, threshold=1)
             )
         config.draw = ImageDraw.Draw(config.image)
 
-    if config.transformShape:
+    if pMngr.transformShape:
         config.image = transformImage(config.image)
 
-    if config.pixelSortProbChange != 0 and random.random() < config.pixelSortProbChange:
+    if pMngr.pixelSortProbChange != 0 and random.random() < pMngr.pixelSortProbChange:
         config.pixSortprobDraw = random.uniform(
-            config.pixelSortProbChangeMin, config.pixelSortProbChangeMax
+            pMngr.pixelSortProbChangeMin, pMngr.pixelSortProbChangeMax
         )
 
-    if config.torqueRate != 0:
+    if pMngr.torqueRate != 0:
         xDist = 0
-        rows = round(config.canvasHeight / config.torqueDelta)
+        rows = round(config.canvasHeight / pMngr.torqueDelta)
 
         for i in range(rows):
             # counter speed - i.e. faster at top
-            # xDist = 1 + (rows -i)/config.torqueRate
-            xDist = 1 + (i) / config.torqueRate
+            # xDist = 1 + (rows -i)/pMngr.torqueRate
+            xDist = 1 + (i) / pMngr.torqueRate
 
             box = (
                 0,
-                i * config.torqueDelta,
+                i * pMngr.torqueDelta,
                 448,
-                i * config.torqueDelta + config.torqueDelta,
+                i * pMngr.torqueDelta + pMngr.torqueDelta,
             )
             crop = config.renderImageFull.crop(box)
             crop = crop.convert("RGBA")
             config.renderImageFull.paste(
-                crop, (round(xDist), i * config.torqueDelta), crop
+                crop, (round(xDist), i * pMngr.torqueDelta), crop
             )
 
     # print("particles ",config.render, config.instanceNumber)
 
-    if config.useOverLayEnhanced:
-        # config.image = ImageChops.multiply(config.clrBlock, config.image)
+    if pMngr.useOverLayEnhanced:
+        # config.image = ImageChops.multiply(pMngr.clrBlock, config.image)
         # config.image = ImageChops.invert(config.image)
 
-        # config.image.paste(config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock)
+        # config.image.paste(pMngr.clrBlock, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock)
 
-        # temp = ImageChops.lighter(config.clrBlock, config.image)
-        # temp = temp.crop((config.overlayxPos, config.overlayyPos,config.clrBlkWidth,config.clrBlkHeight))
+        # temp = ImageChops.lighter(pMngr.clrBlock, config.image)
+        # temp = temp.crop((pMngr.overlayxPos, pMngr.overlayyPos,pMngr.clrBlkWidth,pMngr.clrBlkHeight))
 
         temp = config.image.crop(
             (
-                config.overlayxPos,
-                config.overlayyPos,
-                config.clrBlkWidth,
-                config.clrBlkHeight,
+                pMngr.overlayxPos,
+                pMngr.overlayyPos,
+                pMngr.clrBlkWidth,
+                pMngr.clrBlkHeight,
             )
         )
         temp = ImageChops.invert(temp)
-        temp = ImageChops.multiply(temp, config.clrBlock)
+        temp = ImageChops.multiply(temp, pMngr.clrBlock)
 
         config.image.paste(
-            temp, (config.overlayxPos, config.overlayyPos), config.clrBlock
+            temp, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock
         )
 
-    elif config.useOverLay:
+    elif pMngr.useOverLay:
         config.image.paste(
-            config.clrBlock, (config.overlayxPos, config.overlayyPos), config.clrBlock
+            pMngr.clrBlock, (pMngr.overlayxPos, pMngr.overlayyPos), pMngr.clrBlock
         )
 
     # RENDERING AS A MOCKUP OR AS REAL
     if config.useDrawingPoints:
         config.panelDrawing.canvasToUse = config.image
         config.panelDrawing.render()
-    elif not config.useWaveDistortion:
+    elif not pMngr.useWaveDistortion:
         config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
     else:
-        config.xPos += 1
-        config.workImage = ImageOps.deform(config.image, WaveDeformer())
-        config.render(config.workImage, 0, 0)
+        pMngr.xPos += 1
+        pMngr.workImage = ImageOps.deform(config.image, WaveDeformer())
+        config.render(pMngr.workImage, 0, 0)
 
 
 # TODO Rename this here and in `iterate`
-def remapDitherFilteredParts(config):
+def remapDitherFilteredParts(config, pMngr):
     config.filterRemap = True
 
-    # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
-    # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
-    # endX = round(random.uniform(startX+config.filterRemapminHoriSize,config.canvasWidth) )
-    # endY = round(random.uniform(startY+config.filterRemapminVertSize,config.canvasHeight) )
+    # startX = round(random.uniform(0,config.canvasWidth - pMngr.filterRemapminHoriSize) )
+    # startY = round(random.uniform(0,config.canvasHeight - pMngr.filterRemapminVertSize) )
+    # endX = round(random.uniform(startX+pMngr.filterRemapminHoriSize,config.canvasWidth) )
+    # endY = round(random.uniform(startY+pMngr.filterRemapminVertSize,config.canvasHeight) )
     # new version  more control but may require previous pieces to be re-worked
-    startX = round(random.uniform(0, config.filterRemapRangeX))
-    startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(4, config.filterRemapminHoriSize))
-    endY = round(random.uniform(4, config.filterRemapminVertSize))
+    startX = round(random.uniform(0, pMngr.filterRemapRangeX))
+    startY = round(random.uniform(0, pMngr.filterRemapRangeY))
+    endX = round(random.uniform(4, pMngr.filterRemapminHoriSize))
+    endY = round(random.uniform(4, pMngr.filterRemapminVertSize))
     config.remapImageBlockSection = [
         startX,
         startY,
@@ -1098,22 +1105,22 @@ def renderDiagnosticsCall():
     )
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
-    config.lastOverlayBox1 = (0, 0, 192, 128)
-    config.lastOverlayBox2 = (0, 128, 192, 256)
-    config.lastOverlayBox3 = (192, 0, 384, 128)
-    config.lastOverlayBox4 = (192, 128, 384, 256)
+    pMngr.lastOverlayBox1 = (0, 0, 192, 128)
+    pMngr.lastOverlayBox2 = (0, 128, 192, 256)
+    pMngr.lastOverlayBox3 = (192, 0, 384, 128)
+    pMngr.lastOverlayBox4 = (192, 128, 384, 256)
 
     config.renderDrawOver.rectangle(
-        config.lastOverlayBox1, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
+        pMngr.lastOverlayBox1, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
     )
     config.renderDrawOver.rectangle(
-        config.lastOverlayBox2, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
+        pMngr.lastOverlayBox2, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
     )
     config.renderDrawOver.rectangle(
-        config.lastOverlayBox3, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
+        pMngr.lastOverlayBox3, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
     )
     config.renderDrawOver.rectangle(
-        config.lastOverlayBox4, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
+        pMngr.lastOverlayBox4, fill=(255, 0, 0, 0), outline=(255, 255, 0, 255)
     )
     config.renderImageFull.paste(
         config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay

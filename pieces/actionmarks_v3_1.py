@@ -23,6 +23,266 @@ from modules.rendering.render import saveImageToFile
 
 
 # ----------------------------------------------------#
+class MarksManager:
+    def __init__(self, config):
+        self.config = config
+
+    def setUp(self, workConfig):
+        # ---- bundle path ----
+        self.drawingBundle = workConfig.get("drawingField", "drawingBundle")
+        self.assetPath = self.config.path
+        if self.assetPath[-1] != "/":
+            self.assetPath = f"{self.config.path}/"
+        self.assetPath = f"{self.assetPath}configs/{self.drawingBundle}"
+        if self.assetPath[-1] != "/":
+            self.assetPath = f"{self.assetPath}/"
+
+        # ---- texture models ----
+        self.useTextureLayer = True
+        self.textureSetNames = workConfig.get("drawingField", "textureSets", fallback="texture1").split(",")
+        self.textureSets = []
+        for _t in self.textureSetNames:
+            _tex = _load_texture_values(_t)
+            self.textureSets.append(_tex)
+
+        # ---- image layers ----
+        self.pictureWidth = int(workConfig.get("drawingField", "pictureWidth", fallback=self.config.canvasWidth))
+        self.pictureHeight = int(workConfig.get("drawingField", "pictureHeight", fallback=self.config.canvasHeight))
+        createImageLayers()
+
+        # ---- filter config ----
+        self.filterRemapping = workConfig.getboolean("particles", "filterRemapping", fallback=False)
+        self.filterRemappingProb = float(workConfig.get("drawingField", "filterRemappingProb", fallback=0.0))
+        self.filterRemapMinHorzSize = int(workConfig.get("drawingField", "filterRemapMinHorzSize", fallback=24))
+        self.filterRemapMinVertSize = int(workConfig.get("drawingField", "filterRemapMinVertSize", fallback=24))
+        self.filterRemapMaxHorzSize = int(workConfig.get("drawingField", "filterRemapMaxHorzSize", fallback=24))
+        self.filterRemapMaxVertSize = int(workConfig.get("drawingField", "filterRemapMaxVertSize", fallback=24))
+        self.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=self.pictureWidth))
+        self.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=self.pictureHeight))
+
+        # ---- drawing / color configs ----
+        self.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
+        self.bgTileSizeWidthMin = float(workConfig.get("drawingField", "bgTileSizeWidthMin"))
+        self.bgTileSizeWidthMax = float(workConfig.get("drawingField", "bgTileSizeWidthMax"))
+        self.bgTileSizeHeightMin = float(workConfig.get("drawingField", "bgTileSizeHeightMin"))
+        self.bgTileSizeHeightMax = float(workConfig.get("drawingField", "bgTileSizeHeightMax"))
+        # self.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("drawingField", "bgBoxFill").split(",")))
+
+        self.clearbgBoxProb = float(workConfig.get("drawingField", "clearbgBoxProb"))
+
+        # jitter and roughing
+        self.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.0))
+        self.doJitterAfterLineUseProb = float(workConfig.get("drawingField", "doJitterAfterLineUseProb", fallback=1.0))
+        self.doProgressiveJitterProb = float(workConfig.get("drawingField", "doProgressiveJitterProb", fallback=.50))
+        self.doJitterWhenAddingBGUseProb = float(workConfig.get("drawingField", "doJitterWhenAddingBGUseProb", fallback=1.0))
+        self.doJitterEventPerCyleProb = float(workConfig.get("drawingField", "doJitterEventPerCyleProb", fallback=1.0))
+        self.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
+        self.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
+        self.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
+        self.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal"))
+        self.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical"))
+        self.jitterIterationsMin_roughing = workConfig.getint("drawingField", "jitterIterationsMin_roughing", fallback=1)
+        self.jitterIterationsMax_roughing = workConfig.getint("drawingField", "jitterIterationsMax_roughing", fallback=10)
+        self.jitterDisplacementHorizontal_roughing = float(workConfig.get("drawingField", "jitterDisplacementHorizontal_roughing"))
+        self.jitterDisplacementVertical_roughing = float(workConfig.get("drawingField", "jitterDisplacementVertical_roughing"))
+        self.jitterIterations = 0
+
+        self.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
+        self.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha", fallback=2))
+
+        self.noPenGrays = 0.0
+        self.nobgGrays = 0.0
+
+        self.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=False)
+
+        self.paletteSets = []
+        paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
+
+        for _pRaw in paletteSets:
+            palette = Palette()
+            _p = _pRaw.replace("\n", "")
+            palette.bgBoxAlphaRange = tuple(
+                map(
+                    lambda x: int(x),
+                    workConfig.get(_p, "bgBoxAlphaRange").split(","),
+                )
+            )
+
+            _bgColorSetsRaw = workConfig.get(_p, "bgColorSets")
+            _bgColorSetsRaw = re.sub(r"[\(\)]", "", _bgColorSetsRaw)
+            _bgColorSetsRaw = _bgColorSetsRaw.split("|")
+            palette.bgColorSets = []
+            palette.bgColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgColorSetsRaw)
+
+            _penColorSetsRaw = workConfig.get(_p, "penColorSets")
+            _penColorSetsRaw = re.sub(r"[\(\)]", "", _penColorSetsRaw)
+            _penColorSetsRaw = _penColorSetsRaw.split("|")
+            palette.penColorSets = []
+            palette.penColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _penColorSetsRaw)
+
+            _bgBoxColorSetsRaw = workConfig.get(_p, "bgBoxColorSets")
+            _bgBoxColorSetsRaw = re.sub(r"[\(\)]", "", _bgBoxColorSetsRaw)
+            _bgBoxColorSetsRaw = _bgBoxColorSetsRaw.split("|")
+            palette.bgBoxColorSets = []
+            palette.bgBoxColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgBoxColorSetsRaw)
+
+            palette.bgBoxRange = list(
+                map(
+                    lambda x: int(x),
+                    workConfig.get(_p, "bgBoxRange", fallback="0,0,0,0").split(","),
+                )
+            )
+
+            if palette.bgBoxRange == [0, 0, 0, 0]:
+                palette.bgBoxRange = [0, self.pictureWidth, 0, self.pictureHeight]
+
+            palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
+
+            palette.pens = workConfig.get(_p, "penNames").split(",")
+            palette.name = _p
+            palette.textureName = workConfig.get(_p, "texture")
+            palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
+            palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
+            palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0001"))
+
+            # when set to 1.0 and startNewLineDelayRange is set
+            # then the new line starts as soon as the random delay
+            # ends - since drawing is a major event and changes the
+            # attention of the viewer, controlling when it happens
+            # is probably better left to timing than just cycle-based
+            # probability
+            palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
+            palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
+
+            # jitter and roughing palette overrides
+            palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=self.doJitterProb))
+            palette.doJitterAfterLineUseProb = float(workConfig.get(_p, "doJitterAfterLineUseProb", fallback=self.doJitterAfterLineUseProb))
+            palette.doJitterWhenAddingBGUseProb = float(workConfig.get(_p, "doJitterWhenAddingBGUseProb", fallback=self.doJitterWhenAddingBGUseProb))
+            palette.doJitterEventPerCyleProb = float(workConfig.get(_p, "doJitterEventPerCyleProb", fallback=self.doJitterEventPerCyleProb))
+            palette.doProgressiveJitterProb = float(workConfig.get(_p, "doProgressiveJitterProb", fallback=self.doProgressiveJitterProb))
+            palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMaxAfterDraw)
+            palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=self.jitterIterationsMin)
+            palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax)
+            palette.jitterDisplacementHorizontal = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal))
+            palette.jitterDisplacementVertical = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical))
+            palette.jitterIterationsMin_roughing = workConfig.getint(_p, "jitterIterationsMin", fallback=self.jitterIterationsMin_roughing)
+            palette.jitterIterationsMax_roughing = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax_roughing)
+            palette.jitterDisplacementHorizontal_roughing = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal_roughing))
+            palette.jitterDisplacementVertical_roughing = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical_roughing))
+
+            palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
+            palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
+
+            palette.xOffsetRange = list(
+                map(
+                    lambda x: float(x),
+                    workConfig.get(_p, "xOffsetRange", fallback=f"0,{self.pictureWidth}").split(","),
+                )
+            )
+            palette.yOffsetRange = list(
+                map(
+                    lambda x: float(x),
+                    workConfig.get(_p, "yOffsetRange", fallback=f"0,{self.pictureHeight}").split(","),
+                )
+            )
+            palette.penAlphaRange = list(
+                map(
+                    lambda x: float(x),
+                    workConfig.get(_p, "penAlphaRange", fallback=f"{self.penAlpha},{self.penAlpha}").split(","),
+                )
+            )
+
+            palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
+            palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=self.drawLineAsEnvelope)
+            palette.outlineStroke = workConfig.getboolean(_p, "outlineStroke", fallback=False)
+            palette.outlineStrokeColor = tuple(map(lambda x: int(x), workConfig.get(_p, "outlineStrokeColor", fallback="0,0,0,200").split(",")))
+
+            palette.dripWidthMax = float(workConfig.get(_p, "dripWidthMax", fallback=0.0))
+            palette.dripLengthMax = float(workConfig.get(_p, "dripLengthMax", fallback=0.0))
+            palette.dripProbablility = float(workConfig.get(_p, "dripProbablility", fallback=0.0))
+            palette.dripSpeedMin = float(workConfig.get(_p, "dripSpeedMin", fallback=0.0))
+            palette.dripSpeedMax = float(workConfig.get(_p, "dripSpeedMax", fallback=0.0))
+
+            pieceLogger(f"\n===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
+            self.paletteSets.append(palette)
+
+        self.activePalette = random.choice(self.paletteSets)
+        pieceLogger(f"\n ===> New Palette : {self.activePalette.name} Using enveloped line: {palette.drawLineAsEnvelope}", 2, True)
+
+        setBGColor()
+
+        # ---- pen config ----
+        self.penNames = workConfig.get("drawingField", "penNames").split(",")
+        self.marksPalette = []
+
+        for _penConfigName in self.penNames:
+            _mark = _load_single_pen(_penConfigName)
+            self.marksPalette.append(_mark)
+
+        # ---- system init ----
+        self.changeBGColorProb = float(workConfig.get("drawingField", "changeBGColorProb", fallback=0.001))
+        self.totalResetTime = workConfig.getint("drawingField", "totalResetTime", fallback=33)
+        self.totalResetTimeMaxMultiplier = float(workConfig.get("drawingField", "totalResetTimeMaxMultiplier", fallback=1.0))
+        self.changeDrawingModeTime = float(workConfig.get("drawingField", "changeDrawingModeTime", fallback=100.0))
+
+        self.blendLevelRateBase = float(workConfig.get("drawingField", "blendLevelRateBase", fallback=0.01))
+        self.totalRandomPenColorProb = float(workConfig.get("drawingField", "totalRandomPenColorProb", fallback=0.0))
+        self.totalRandomBGBoxColorProb = float(workConfig.get("drawingField", "totalRandomBGBoxColorProb", fallback=0.0))
+        self.debugMode = workConfig.getboolean("drawingField", "debugMode", fallback=False)
+
+        self.changeColorSetTime = float(workConfig.get("drawingField", "changeColorSetTime", fallback=0))
+        self.changeColorSetTimeMaxMultiplier = float(workConfig.get("drawingField", "changeColorSetTimeMaxMultiplier", fallback=1))
+
+        self.justHitPauseProb = float(workConfig.get("drawingField", "justHitPauseProb", fallback=0.0))
+        self.releaseFromJustHitPauseProb = float(workConfig.get("drawingField", "releaseFromJustHitPauseProb", fallback=1.0))
+        self.justHitPause = False
+
+        if self.changeColorSetTime > 0:
+            self.paletteController = Director(self.config)
+            self.paletteController.slotRate = self.changeColorSetTime
+            self.changeColorSetTimeToUse = self.changeColorSetTime
+
+        if self.changeDrawingModeTime > 0:
+            self.changeTimeController = Director(self.config)
+            self.changeTimeController.slotRate = self.changeDrawingModeTime
+
+        self.config.slotRate = float(workConfig.get("drawingField", "slotRate", fallback=0.03))
+        self.config.redrawSpeed = float(workConfig.get("drawingField", "redrawSpeed", fallback=0.03))
+
+        self.config.directorController = Director(self.config)
+        self.config.directorController.slotRate = self.config.slotRate
+
+        self.drawingController = Director(self.config)
+        self.drawingController.slotRate = 10
+
+        self.stateReportController = Director(self.config)
+        self.stateReportController.slotRate = 25
+
+        self.canDraw = True
+        self.doingDrawing = False
+        self.doingJitter = False
+        self.stoppedAndWaitingToDraw = False
+        self.linesDrawnCount = 0
+        self.jitterIterations = 0
+
+        self.penArray = []
+        self.drawingMode = 1
+
+        self.dripsArray = []
+        initDrawings()
+
+        self.blendLevel = 0.0
+        self.blendLevelRate = self.blendLevelRateBase
+
+        self.fadeThruToNew = 255
+        self.fadeThruToNewDone = True
+
+        self.transitionStateHandler = TransitionStates(self.config)
+        self.transitionStateHandler.sourceImage = self.config.finalCompositeLayer
+        self.transitionStateHandler.targetImage = self.config.finalCompositeLayer
+        self.inTransition = False
+
+        # self.config.underLayerDraw.rectangle((0, 0, self.pictureWidth, self.pictureHeight), fill=(100, 0, 80, 100))
 
 
 class Palette:
@@ -63,8 +323,8 @@ class TransitionStates:
         self.inTransition = True
         self.count = 0
 
-        self.destinationImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
-        self.intermediateImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        self.destinationImage = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
+        self.intermediateImage = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
 
         self.destinationImageDraw = ImageDraw.Draw(self.destinationImage)
         self.destinationImageDraw.rectangle((0, 0, 50, 50), fill=(200, 0, 0, 200))
@@ -78,8 +338,8 @@ class TransitionStates:
 
         # print(self.count)
         if self.count < self.countMax:
-            _x = round(random.uniform(-self.chunckSize / 2, config.pictureWidth))
-            _y = round(random.uniform(-self.chunckSize / 2, config.pictureHeight))
+            _x = round(random.uniform(-self.chunckSize / 2, mrksMngr.pictureWidth))
+            _y = round(random.uniform(-self.chunckSize / 2, mrksMngr.pictureHeight))
             _part = self.sourceImage.crop((_x, _y, _x + self.chunckSize, _y + self.chunckSize))
             self.intermediateImage.paste(_part, (_x, _y), _part)
             self.count += 1
@@ -126,10 +386,10 @@ def R(a, b, rounded=False):
 def filterRemapImage(config):
     config.useFilters = True
     config.remapImageBlock = False
-    startX = round(random.uniform(0, config.filterRemapRangeX))
-    startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(config.filterRemapMinHorzSize, config.filterRemapMaxHorzSize))
-    endY = round(random.uniform(config.filterRemapMinVertSize, config.filterRemapMaxVertSize))
+    startX = round(random.uniform(0, mrksMngr.filterRemapRangeX))
+    startY = round(random.uniform(0, mrksMngr.filterRemapRangeY))
+    endX = round(random.uniform(mrksMngr.filterRemapMinHorzSize, mrksMngr.filterRemapMaxHorzSize))
+    endY = round(random.uniform(mrksMngr.filterRemapMinVertSize, mrksMngr.filterRemapMaxVertSize))
     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
     config.remapImageBlockDestination = [startX, startY]
 
@@ -142,69 +402,69 @@ def changeDrawing(args):
     changePalettes()
     initDrawings()
 
-    config.systemController = Director(config)
-    _newTime = round(random.uniform(config.totalResetTime, round(float(config.totalResetTime) * config.totalResetTimeMaxMultiplier)))
-    config.systemController.slotRate = _newTime
+    mrksMngr.systemController = Director(config)
+    _newTime = round(random.uniform(mrksMngr.totalResetTime, round(float(mrksMngr.totalResetTime) * mrksMngr.totalResetTimeMaxMultiplier)))
+    mrksMngr.systemController.slotRate = _newTime
 
-    # config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=config.bgColor)
-    # config.finalCompositeLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=config.bgColor)
-    config.fadeThruToNew = 0
+    # config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=mrksMngr.bgColor)
+    # config.finalCompositeLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=mrksMngr.bgColor)
+    mrksMngr.fadeThruToNew = 0
     initiateTransition()
 
 
 def changeDrawingMode():
-    config.drawingMode = round(random.uniform(1, 4))
-    # config.startNewLineProb = 0.005
-    config.changeTimeController.slotRate = round(random.uniform(20, 33))
+    mrksMngr.drawingMode = round(random.uniform(1, 4))
+    # mrksMngr.startNewLineProb = 0.005
+    mrksMngr.changeTimeController.slotRate = round(random.uniform(20, 33))
 
-    if config.drawingMode in {2, 3}:
-        # config.startNewLineProb = 0.1
-        config.changeTimeController.slotRate = round(random.uniform(33, 63))
+    if mrksMngr.drawingMode in {2, 3}:
+        # mrksMngr.startNewLineProb = 0.1
+        mrksMngr.changeTimeController.slotRate = round(random.uniform(33, 63))
 
-    print(f" => New Drawing Mode: {config.drawingMode} slotRate{config.changeTimeController.slotRate}")
+    print(f" => New Drawing Mode: {mrksMngr.drawingMode} slotRate{mrksMngr.changeTimeController.slotRate}")
 
 
 def changePalettes():
-    config.activePalette = random.choice(config.paletteSets)
-    pieceLogger(f"New Palette : {config.activePalette.name}", 4, True)
+    mrksMngr.activePalette = random.choice(mrksMngr.paletteSets)
+    pieceLogger(f"New Palette : {mrksMngr.activePalette.name}", 4, True)
     setBGColor()
-    config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
-    config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
-    config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
-    config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
+    config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
+    config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
+    config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
+    config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
     primeCanvas()
-    # print(f" New bg Color : {config.bgColor}")
-    # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
-    config.changeColorSetTimeToUse = round(random.uniform(config.changeColorSetTime, round(config.changeColorSetTime * config.changeColorSetTimeMaxMultiplier)))
-    config.paletteController.slotRate = config.changeColorSetTimeToUse
+    # print(f" New bg Color : {mrksMngr.bgColor}")
+    # print(f"brightness calculated = {colorutils.brightness(mrksMngr.bgColor[0],mrksMngr.bgColor[1],mrksMngr.bgColor[2])}")
+    mrksMngr.changeColorSetTimeToUse = round(random.uniform(mrksMngr.changeColorSetTime, round(mrksMngr.changeColorSetTime * mrksMngr.changeColorSetTimeMaxMultiplier)))
+    mrksMngr.paletteController.slotRate = mrksMngr.changeColorSetTimeToUse
 
-    config.bgBoxRange = config.activePalette.bgBoxRange
-    config.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
-    config.doJitterProb = config.activePalette.doJitterProb
+    mrksMngr.bgBoxRange = mrksMngr.activePalette.bgBoxRange
+    mrksMngr.drawLineAsEnvelope = mrksMngr.activePalette.drawLineAsEnvelope
+    mrksMngr.doJitterProb = mrksMngr.activePalette.doJitterProb
 
-    pieceLogger(f"config.drawLineAsEnvelope {config.drawLineAsEnvelope} <== {config.activePalette.drawLineAsEnvelope}")
-    pieceLogger(f"config.doJitterProb {config.doJitterProb} ")
+    pieceLogger(f"mrksMngr.drawLineAsEnvelope {mrksMngr.drawLineAsEnvelope} <== {mrksMngr.activePalette.drawLineAsEnvelope}")
+    pieceLogger(f"mrksMngr.doJitterProb {mrksMngr.doJitterProb} ")
 
 
 def initiateTransition():
     pieceLogger("\n ITNITATE TRANSITION", 3)
-    config.transitionStateHandler.sourceImage = config.finalCompositeLayer
-    config.transitionStateHandler.initiateTransition()
+    mrksMngr.transitionStateHandler.sourceImage = config.finalCompositeLayer
+    mrksMngr.transitionStateHandler.initiateTransition()
 
 
 # ------------------------------------------- PEN ACTIONS ---------------------------------------------------#
 
 
 def startNewLine(_pen):
-    # pieceLogger(f"=========>   startNewLine _pen ==> {_pen.name} {config.activePalette.pens}")
+    # pieceLogger(f"=========>   startNewLine _pen ==> {_pen.name} {mrksMngr.activePalette.pens}")
     setPenProperties(_pen)
     setPenColor(_pen)
     _img = generateSmoothLinePoints(_pen)
     _pen._p = 1
-    config.dripsArray = []
+    mrksMngr.dripsArray = []
 
     # LINE LAYER IS NOW config.lineLayer
-    # config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    # config.image = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     # config.draw = ImageDraw.Draw(config.image)
 
 
@@ -222,7 +482,7 @@ def setPenPropsByName(_name, pen):
     # not over the edge
     _penProps = None
 
-    for _p in config.marksPalette:
+    for _p in mrksMngr.marksPalette:
         _penProps = _p
         if _p.name == _name:
             _penProps = _p
@@ -269,8 +529,8 @@ def setPenPropsByName(_name, pen):
         # putting pen speed variables in the palette config rather than in the 
         # pen configuration
         """
-        pen.penSpeedMinVal = config.activePalette.penSpeedMinVal
-        pen.penSpeedMaxVal = config.activePalette.penSpeedMaxVal
+        pen.penSpeedMinVal = mrksMngr.activePalette.penSpeedMinVal
+        pen.penSpeedMaxVal = mrksMngr.activePalette.penSpeedMaxVal
 
         pen.speed = round(random.uniform(_penProps.penSpeedMinVal, _penProps.penSpeedMaxVal))
 
@@ -297,7 +557,7 @@ def setPenPropsByName(_name, pen):
         pen.rotationFactor = _penProps.rotationFactor
         pen.rotationAngle = random.uniform(-math.pi / 2 / pen.rotationFactor, math.pi / 2 / pen.rotationFactor)
 
-        pen.changePenColorWhileDrawingProb = config.activePalette.changePenColorWhileDrawingProb
+        pen.changePenColorWhileDrawingProb = mrksMngr.activePalette.changePenColorWhileDrawingProb
 
         pen.xTravelRange = _penProps.xTravelRange
         pen.yTravelRange = _penProps.yTravelRange
@@ -316,8 +576,8 @@ def setPenPropsByName(_name, pen):
         # putting pen speed variables in the palette config rather than in the 
         # pen configuration
         """
-        pen.penSpeedMinVal = config.activePalette.penSpeedMinVal
-        pen.penSpeedMaxVal = config.activePalette.penSpeedMaxVal
+        pen.penSpeedMinVal = mrksMngr.activePalette.penSpeedMinVal
+        pen.penSpeedMaxVal = mrksMngr.activePalette.penSpeedMaxVal
 
         pen.speed = round(random.uniform(_penProps.penSpeedMinVal, _penProps.penSpeedMaxVal))
 
@@ -326,16 +586,16 @@ def setPenPropsByName(_name, pen):
             pen.loopDirection = 1
     # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
-    pen.drawingSize = [config.pictureWidth, config.pictureHeight]
+    pen.drawingSize = [mrksMngr.pictureWidth, mrksMngr.pictureHeight]
     if pen.xOffsetRange is not None:
         pen.xOffset = round(random.uniform(pen.xOffsetRange[0], pen.xOffsetRange[1]))
     else:
-        pen.xOffset = round(random.uniform(config.activePalette.xOffsetRange[0], config.activePalette.xOffsetRange[1]))
+        pen.xOffset = round(random.uniform(mrksMngr.activePalette.xOffsetRange[0], mrksMngr.activePalette.xOffsetRange[1]))
 
     if pen.yOffsetRange is not None:
         pen.yOffset = round(random.uniform(pen.yOffsetRange[0], pen.yOffsetRange[1]))
     else:
-        pen.yOffset = round(random.uniform(config.activePalette.yOffsetRange[0], config.activePalette.yOffsetRange[1]))
+        pen.yOffset = round(random.uniform(mrksMngr.activePalette.yOffsetRange[0], mrksMngr.activePalette.yOffsetRange[1]))
 
     pen._w = _penProps.w
     pen.minMarkWidth = _penProps.minMarkWidth
@@ -347,9 +607,9 @@ def setPenPropsByName(_name, pen):
     if pen.incrementFactor == 0:
         pen._w = round(random.uniform(_penProps.minMarkWidth, _penProps.maxMarkWidth))
     # pen.drawingSize = [180, 180]
-    pen.lastPoint = [config.pictureWidth / 2, config.pictureHeight / 2]
-    # pen.centerVariationX = random.randint(config.pen_centerVariationXMin, config.pen_centerVariationXMin)
-    # pen.centerVariationY = random.randint(config.pen_centerVariationYMin, config.pen_centerVariationYMax)
+    pen.lastPoint = [mrksMngr.pictureWidth / 2, mrksMngr.pictureHeight / 2]
+    # pen.centerVariationX = random.randint(mrksMngr.pen_centerVariationXMin, mrksMngr.pen_centerVariationXMin)
+    # pen.centerVariationY = random.randint(mrksMngr.pen_centerVariationYMin, mrksMngr.pen_centerVariationYMax)
 
     # genral size of drawing
     pen.drawingSkipProb = random.uniform(0.0, _penProps.drawingSkip)
@@ -365,23 +625,23 @@ def setPenPropsByName(_name, pen):
     # if _penProps.drawLineAsEnvelope is not None :
     # pen.drawLineAsEnvelope = _penProps.drawLineAsEnvelope
     # else :
-    pen.drawLineAsEnvelope = config.activePalette.drawLineAsEnvelope
-    pen.outlineStroke = config.activePalette.outlineStroke
-    pen.outlineStrokeColor = config.activePalette.outlineStrokeColor
+    pen.drawLineAsEnvelope = mrksMngr.activePalette.drawLineAsEnvelope
+    pen.outlineStroke = mrksMngr.activePalette.outlineStroke
+    pen.outlineStrokeColor = mrksMngr.activePalette.outlineStrokeColor
 
-    # pieceLogger(f"\n===> setting pen props pen.name {pen.name} config.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {config.drawLineAsEnvelope}")
+    # pieceLogger(f"\n===> setting pen props pen.name {pen.name} mrksMngr.drawLineAsEnvelope = {pen.drawLineAsEnvelope} <== {mrksMngr.drawLineAsEnvelope}")
     # pieceLogger(f"pen.drawingSkip {pen.drawingSkip}")
     # pieceLogger("--")
 
 
 def setPenColor(_pen):
 
-    cR = random.choice(config.activePalette.penColorSets)
-    # cR = config.activePalette.penColor
+    cR = random.choice(mrksMngr.activePalette.penColorSets)
+    # cR = mrksMngr.activePalette.penColor
 
-    # pieceLogger(f"{config.activePalette.noPenGrays}")
+    # pieceLogger(f"{mrksMngr.activePalette.noPenGrays}")
 
-    _penAlpha = round(random.uniform(config.activePalette.penAlphaRange[0], config.activePalette.penAlphaRange[1]))
+    _penAlpha = round(random.uniform(mrksMngr.activePalette.penAlphaRange[0], mrksMngr.activePalette.penAlphaRange[1]))
 
     if _pen.forcedPalette is None:
         _pen.lineColor = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7], _penAlpha, config.brightness)
@@ -401,10 +661,10 @@ def setPenColor(_pen):
 
 
 def choosePenMark():
-    _penName = random.choice(config.activePalette.pens)
+    _penName = random.choice(mrksMngr.activePalette.pens)
     # print(f"\nLooking for this pen mark: {_penName}\n")
-    for _pen in config.marksPalette:
-        # print(f"{_pen.name} {config.activePalette.pens}")
+    for _pen in mrksMngr.marksPalette:
+        # print(f"{_pen.name} {mrksMngr.activePalette.pens}")
         if _pen.name == _penName:
             # print(f"we chose {_pen.name}")
             return _pen
@@ -434,7 +694,7 @@ def generateLine(_pen):
     _rangey = _pen.yRandomRange[1]
 
     _yD = _pen.maxNumPoints
-    _pts = round(config.pictureHeight / _yD) + 2
+    _pts = round(mrksMngr.pictureHeight / _yD) + 2
 
     _pen.smooth_points = []
 
@@ -687,32 +947,32 @@ def smoothLine(points, _pen):
 
 
 def pauseDrawing():
-    config.stoppedAndWaitingToDraw = True
-    config.canDraw = False
-    config.drawingController.slotRate = random.uniform(config.activePalette.startNewLineDelayRange[0], config.activePalette.startNewLineDelayRange[1])
-    pieceLogger(f"Line Drawing paused for {config.drawingController.slotRate} {config.activePalette.startNewLineDelayRange[0]}/{config.activePalette.startNewLineDelayRange[1]} \n lines drawn: {config.linesDrawnCount}", 1)
+    mrksMngr.stoppedAndWaitingToDraw = True
+    mrksMngr.canDraw = False
+    mrksMngr.drawingController.slotRate = random.uniform(mrksMngr.activePalette.startNewLineDelayRange[0], mrksMngr.activePalette.startNewLineDelayRange[1])
+    pieceLogger(f"Line Drawing paused for {mrksMngr.drawingController.slotRate} {mrksMngr.activePalette.startNewLineDelayRange[0]}/{mrksMngr.activePalette.startNewLineDelayRange[1]} \n lines drawn: {mrksMngr.linesDrawnCount}", 1)
 
 
 def releaseDrawing():
-    config.stoppedAndWaitingToDraw = False
-    config.canDraw = True
+    mrksMngr.stoppedAndWaitingToDraw = False
+    mrksMngr.canDraw = True
     pieceLogger("Pen released", 2)
 
 
 def penLoopActions():
-    if random.random() < config.activePalette.changePenColorWhileDrawingProb:
-        setPenColor((config.activePalette.activePen))
+    if random.random() < mrksMngr.activePalette.changePenColorWhileDrawingProb:
+        setPenColor((mrksMngr.activePalette.activePen))
 
     # chooses a new pen - however, does not necessarily use it just yet
-    # if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0 and config.canDraw:
-    if random.random() < config.startNewLineProb and config.activePalette.activePen._p == 0:
+    # if random.random() < mrksMngr.startNewLineProb and mrksMngr.activePalette.activePen._p == 0 and mrksMngr.canDraw:
+    if random.random() < mrksMngr.startNewLineProb and mrksMngr.activePalette.activePen._p == 0:
         _pen = choosePenMark()
-        config.activePalette.activePen = _pen
+        mrksMngr.activePalette.activePen = _pen
         startNewLine(_pen)
-        # pieceLogger(f"Next line: {config.activePalette.activePen.name}",4)
+        # pieceLogger(f"Next line: {mrksMngr.activePalette.activePen.name}",4)
 
-    if config.canDraw and not config.addingTo:
-        drawLine(config.activePalette.activePen)
+    if mrksMngr.canDraw and not mrksMngr.addingTo:
+        drawLine(mrksMngr.activePalette.activePen)
 
 
 def drawLine(_pen):
@@ -724,7 +984,7 @@ def drawLine(_pen):
 
 
 def drawDrips():
-    for _d in config.dripsArray:
+    for _d in mrksMngr.dripsArray:
         if not _d[4]:
             _p1 = _d[0]
             _long = _d[1]
@@ -812,20 +1072,20 @@ def drawLinePolyEnvelope(_pen):
 
             # config.draw.line((_p1, _p2), fill=(255,0,0,255), width=1)
 
-            if random.random() < config.activePalette.dripProbablility:
-                _wide = round(random.uniform(0, config.activePalette.dripWidthMax))
-                _speed = round(random.uniform(config.activePalette.dripSpeedMin, config.activePalette.dripSpeedMax))
-                _long = round(random.uniform(2, config.activePalette.dripLengthMax) / _speed)
+            if random.random() < mrksMngr.activePalette.dripProbablility:
+                _wide = round(random.uniform(0, mrksMngr.activePalette.dripWidthMax))
+                _speed = round(random.uniform(mrksMngr.activePalette.dripSpeedMin, mrksMngr.activePalette.dripSpeedMax))
+                _long = round(random.uniform(2, mrksMngr.activePalette.dripLengthMax) / _speed)
                 # config.draw.rectangle((_p1[0],_p1[1],_p1[0]+_wide,_p1[1]+_long), fill=_lineColor)
                 _drip = [_p1, _long, _wide, _lineColor, False, _speed, 0]
-                config.dripsArray.append(_drip)
+                mrksMngr.dripsArray.append(_drip)
 
             # if not _markDrawn :
             _pen.lastAngle = _angle
             _pen._p += 1
             _pen.lastOrthoPoint = [_orthoP2x, _orthoP2y, _orthoP3x, _orthoP3y]
 
-            config.doingDrawing = True
+            mrksMngr.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
             drawLineStopped()
@@ -879,7 +1139,7 @@ def drawLineSegments(_pen):
                 config.lineLayerDraw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
                 # config.draw.line((_p1, _p2), fill=_pen.lineColor, width=_penWidth)
             _pen._p += 1
-            config.doingDrawing = True
+            mrksMngr.doingDrawing = True
         if _pen._p == len(_pen.smooth_points):
             _pen._p = 0
             drawLineStopped()
@@ -913,13 +1173,13 @@ def drawLineSegments(_pen):
 
 def drawLineStopped():
     # pieceLogger("Pen stopped")
-    config.doingDrawing = False
-    config.linesDrawnCount += 1
-    if config.linesDrawnCount > 1 : pauseDrawing()
-    if random.random() < config.doJitterWhenAddingBGUseProb:
+    mrksMngr.doingDrawing = False
+    mrksMngr.linesDrawnCount += 1
+    if mrksMngr.linesDrawnCount > 1 : pauseDrawing()
+    if random.random() < mrksMngr.doJitterWhenAddingBGUseProb:
         pieceLogger(f"Doing jitter after LINE has been drawn")
-        config.doingJitter = False
-        config.jitterIterations = 0
+        mrksMngr.doingJitter = False
+        mrksMngr.jitterIterations = 0
         doDrawingJitter()
 
 
@@ -928,39 +1188,39 @@ def drawLineStopped():
 def progressiveJitter():
     """ The underLayer has both the blocks as well as the lines and the texture """
 
-    if random.random() < config.doJitterEventPerCyleProb :
-        # pieceLogger(f"Jitter {config.jitterIterations}")
+    if random.random() < mrksMngr.doJitterEventPerCyleProb :
+        # pieceLogger(f"Jitter {mrksMngr.jitterIterations}")
         glitchBox(
             config.underLayer,
-            config.pictureWidth,
-            config.pictureHeight,
-            config.jitterDisplacementHorizontal,
-            config.jitterDisplacementVertical,
+            mrksMngr.pictureWidth,
+            mrksMngr.pictureHeight,
+            mrksMngr.jitterDisplacementHorizontal,
+            mrksMngr.jitterDisplacementVertical,
         )
-        config.jitterIterations -= 1
-        if config.jitterIterations <= 0 :
-            config.doingJitter = False
+        mrksMngr.jitterIterations -= 1
+        if mrksMngr.jitterIterations <= 0 :
+            mrksMngr.doingJitter = False
             pieceLogger(f"==> Progressive jitter ended", 3)
             # config.directorController.slotRate *= .25
 
 
 def doDrawingJitter():
-    if not config.doingJitter and config.jitterIterations == 0:
-        config.jitterIterations = round(random.uniform(config.jitterIterationsMin, config.jitterIterationsMax))
+    if not mrksMngr.doingJitter and mrksMngr.jitterIterations == 0:
+        mrksMngr.jitterIterations = round(random.uniform(mrksMngr.jitterIterationsMin, mrksMngr.jitterIterationsMax))
 
-        if random.random() < config.doProgressiveJitterProb:
-            config.doingJitter = True
-            pieceLogger(f"==> Progressive jitters tarting: jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
+        if random.random() < mrksMngr.doProgressiveJitterProb:
+            mrksMngr.doingJitter = True
+            pieceLogger(f"==> Progressive jitters tarting: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}", 3)
         else :
-            pieceLogger(f"==> Single bulk jitter: jitterIterations {config.jitterIterations}/{config.jitterIterationsMax}", 3)
+            pieceLogger(f"==> Single bulk jitter: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}", 3)
             """ The underLayer has both the blocks as well as the lines and the texture """
-            for _ in range(config.jitterIterations):
+            for _ in range(mrksMngr.jitterIterations):
                 glitchBox(
                     config.underLayer,
-                    config.pictureWidth,
-                    config.pictureHeight,
-                    config.jitterDisplacementHorizontal,
-                    config.jitterDisplacementVertical,
+                    mrksMngr.pictureWidth,
+                    mrksMngr.pictureHeight,
+                    mrksMngr.jitterDisplacementHorizontal,
+                    mrksMngr.jitterDisplacementVertical,
                 )
 
 
@@ -969,29 +1229,29 @@ def bgColorBlocksFilling(arg):
 
     pieceLogger(f"Drawing the background blocks addingTo: {arg}")
     # if not arg:
-    #     pieceLogger(f"drawing a bg box {config.blendLevel}")
+    #     pieceLogger(f"drawing a bg box {mrksMngr.blendLevel}")
 
-    xPos = math.floor(random.uniform(config.activePalette.bgBoxRange[0], config.activePalette.bgBoxRange[1]))
-    yPos = math.floor(random.uniform(config.activePalette.bgBoxRange[2], config.activePalette.bgBoxRange[3]))
+    xPos = math.floor(random.uniform(mrksMngr.activePalette.bgBoxRange[0], mrksMngr.activePalette.bgBoxRange[1]))
+    yPos = math.floor(random.uniform(mrksMngr.activePalette.bgBoxRange[2], mrksMngr.activePalette.bgBoxRange[3]))
 
-    config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
-    config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
+    config.tileSizeWidth = round(random.uniform(mrksMngr.bgTileSizeWidthMin, mrksMngr.bgTileSizeWidthMax))
+    config.tileSizeHeight = round(random.uniform(mrksMngr.bgTileSizeHeightMin, mrksMngr.bgTileSizeHeightMax))
 
-    if arg or config.addingTo:
-        config.blendLevelRate = config.blendLevelRateBase
-        config.blendLevel = 0.0
-        config.blockLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    if arg or mrksMngr.addingTo:
+        mrksMngr.blendLevelRate = mrksMngr.blendLevelRateBase
+        mrksMngr.blendLevel = 0.0
+        config.blockLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
-        config.blankLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.blankLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
         _drawLayer = config.blockLayer
         _drawTo = config.blockLayerDraw
 
-        config.addingTo = True
-        config.justHitPause = True
+        mrksMngr.addingTo = True
+        mrksMngr.justHitPause = True
         # adding bit to prevent trying to draw a line when painting  a backgound chunk
-        # config.canDraw = False
+        # mrksMngr.canDraw = False
 
     else:
         _drawLayer = config.underLayer
@@ -1000,27 +1260,27 @@ def bgColorBlocksFilling(arg):
     # _drawLayer = config.blockLayer
     # _drawTo = config.blockLayerDraw
 
-    if random.SystemRandom().random() < config.clearbgBoxProb:
+    if random.SystemRandom().random() < mrksMngr.clearbgBoxProb:
         xPos = yPos = 0
-        config.bgBoxBox = (
+        mrksMngr.bgBoxBox = (
             xPos,
             yPos,
-            xPos + config.pictureWidth,
-            yPos + config.pictureHeight,
+            xPos + mrksMngr.pictureWidth,
+            yPos + mrksMngr.pictureHeight,
         )
-        config.bgBoxFill = (0, 0, 0, 0)
+        mrksMngr.bgBoxFill = (0, 0, 0, 0)
     else:
-        config.bgBoxBox = (
+        mrksMngr.bgBoxBox = (
             xPos,
             yPos,
             xPos + config.tileSizeWidth,
             yPos + config.tileSizeHeight,
         )
 
-        cR = random.choice(config.activePalette.bgBoxColorSets)
-        # cR = config.activePalette.bgBoxColorRange
+        cR = random.choice(mrksMngr.activePalette.bgBoxColorSets)
+        # cR = mrksMngr.activePalette.bgBoxColorRange
         # print(cR)
-        config.bgBoxFill = colorutils.getRandomColorHSV(
+        mrksMngr.bgBoxFill = colorutils.getRandomColorHSV(
             cR[0],
             cR[1],
             cR[2],
@@ -1029,26 +1289,26 @@ def bgColorBlocksFilling(arg):
             cR[5],
             cR[6],
             cR[7],
-            round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
+            round(random.uniform(mrksMngr.activePalette.bgBoxAlphaRange[0], mrksMngr.activePalette.bgBoxAlphaRange[1])),
             config.brightness,
         )
 
-        if random.random() < config.totalRandomBGBoxColorProb:
-            config.bgBoxFill = colorutils.getRandomColorHSV(
-                0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])), config.brightness
+        if random.random() < mrksMngr.totalRandomBGBoxColorProb:
+            mrksMngr.bgBoxFill = colorutils.getRandomColorHSV(
+                0, 360, 0.1, 1.0, 0.1, 1.0, 0, 0, round(random.uniform(mrksMngr.activePalette.bgBoxAlphaRange[0], mrksMngr.activePalette.bgBoxAlphaRange[1])), config.brightness
             )
 
-    _drawTo.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+    _drawTo.rectangle(mrksMngr.bgBoxBox, fill=mrksMngr.bgBoxFill)
 
     # always roughen the blocks being drawn
-    jitteriterations = round(random.uniform(config.jitterIterationsMin_roughing, config.jitterIterationsMax_roughing))
+    jitteriterations = round(random.uniform(mrksMngr.jitterIterationsMin_roughing, mrksMngr.jitterIterationsMax_roughing))
     for _ in range(jitteriterations):
         glitchBox(
             _drawLayer,
-            config.pictureWidth,
-            config.pictureHeight,
-            config.jitterDisplacementHorizontal_roughing,
-            config.jitterDisplacementVertical_roughing,
+            mrksMngr.pictureWidth,
+            mrksMngr.pictureHeight,
+            mrksMngr.jitterDisplacementHorizontal_roughing,
+            mrksMngr.jitterDisplacementVertical_roughing,
         )
 
 
@@ -1095,10 +1355,10 @@ def glitchBox(
 
 def setBGColor():
 
-    _bgColorSet = random.choice(config.activePalette.bgColorSets)
-    config.bgColor = colorutils.getRandomColorHSV(*_bgColorSet)
-    # config.bgColor = colorutils.getRandomColorHSV(*config.activePalette.bgColor)
-    # pieceLogger(f"New BGColor: config.activePalette.bgColor {config.activePalette.bgColor} --> config.bgColor {config.bgColor}")
+    _bgColorSet = random.choice(mrksMngr.activePalette.bgColorSets)
+    mrksMngr.bgColor = colorutils.getRandomColorHSV(*_bgColorSet)
+    # mrksMngr.bgColor = colorutils.getRandomColorHSV(*mrksMngr.activePalette.bgColor)
+    # pieceLogger(f"New BGColor: mrksMngr.activePalette.bgColor {mrksMngr.activePalette.bgColor} --> mrksMngr.bgColor {mrksMngr.bgColor}")
 
 
 def primeCanvas(_i=3):
@@ -1108,9 +1368,9 @@ def primeCanvas(_i=3):
 
 
 def chooseTexture():
-    _textureName = config.activePalette.textureName
-    for _t in config.textureSets:
-        # print(f"{_pen.name} {config.activePalette.pens}")
+    _textureName = mrksMngr.activePalette.textureName
+    for _t in mrksMngr.textureSets:
+        # print(f"{_pen.name} {mrksMngr.activePalette.pens}")
         if _t.name == _textureName:
             # print(f"we chose {_pen.name}")
             return _t
@@ -1123,44 +1383,41 @@ def createImageLayers(arg=None):
     global config
     pieceLogger("===> Setting up all layers")
 
-    config.pictureWidth = int(workConfig.get("drawingField", "pictureWidth", fallback=config.canvasWidth))
-    config.pictureHeight = int(workConfig.get("drawingField", "pictureHeight", fallback=config.canvasHeight))
-
-    config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.image = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.draw = ImageDraw.Draw(config.image)
 
-    config.blankLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.blankLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
-    config.underLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.underLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-    config.blockLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.blockLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
 
-    config.lineLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.lineLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
 
-    config.canvasImage = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.canvasImage = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
-    config.textureLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.textureLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.textureLayerDraw = ImageDraw.Draw(config.textureLayer)
 
     config.finalCompositeLayer = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.finalCompositeLayerDraw = ImageDraw.Draw(config.finalCompositeLayer)
 
-    config.renderImageFullOverlay = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+    config.renderImageFullOverlay = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
 
-    config.addingTo = False
+    mrksMngr.addingTo = False
 
 
 def createTextureLayer(tex):
-    config.useTextureLayer = tex.useTextureLayer
-    config.textureBlendMode = tex.blendMode
-    config.textureOption = random.choice([0, 1, 2])
-    pieceLogger(f"===> config.useTextureLayer {config.useTextureLayer} texture option {config.textureOption}")
+    mrksMngr.useTextureLayer = tex.useTextureLayer
+    mrksMngr.textureBlendMode = tex.blendMode
+    mrksMngr.textureOption = random.choice([0, 1, 2])
+    pieceLogger(f"===> mrksMngr.useTextureLayer {mrksMngr.useTextureLayer} texture option {mrksMngr.textureOption}")
     for _row in range(tex.blockRows):
         for _col in range(tex.blockCols):
             if random.random() > tex.skipProb:
@@ -1187,34 +1444,34 @@ def createTextureLayer(tex):
 
 def initDrawings():
     global config
-    pieceLogger(f"===> Init drawings: {config.activePalette.name}", 4, True)
+    pieceLogger(f"===> Init drawings: {mrksMngr.activePalette.name}", 4, True)
 
     createTextureLayer(chooseTexture())
-    config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=config.bgColor)
-    config.linesDrawnCount = 0
-    config.jitterIterations = 0
+    config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=mrksMngr.bgColor)
+    mrksMngr.linesDrawnCount = 0
+    mrksMngr.jitterIterations = 0
     primeCanvas()
 
     _pen = choosePenMark()
-    config.activePalette.activePen = _pen
-    config.startNewLineProb = config.activePalette.startNewLineProb
-    config.usebgBoxProb = config.activePalette.usebgBoxProb
-    config.clearCurrentDrawingProb = config.activePalette.clearCurrentDrawingProb
+    mrksMngr.activePalette.activePen = _pen
+    mrksMngr.startNewLineProb = mrksMngr.activePalette.startNewLineProb
+    mrksMngr.usebgBoxProb = mrksMngr.activePalette.usebgBoxProb
+    mrksMngr.clearCurrentDrawingProb = mrksMngr.activePalette.clearCurrentDrawingProb
 
-    config.doJitterProb = config.activePalette.doJitterProb
-    config.doJitterAfterLineUseProb = config.activePalette.doJitterAfterLineUseProb
-    config.doProgressiveJitterProb = config.activePalette.doProgressiveJitterProb
-    config.doJitterWhenAddingBGUseProb = config.activePalette.doJitterWhenAddingBGUseProb
-    config.doJitterEventPerCyleProb = config.activePalette.doJitterEventPerCyleProb
-    config.jitterIterationsMaxAfterDraw = config.activePalette.jitterIterationsMaxAfterDraw
-    config.jitterIterationsMin = config.activePalette.jitterIterationsMin
-    config.jitterIterationsMax = config.activePalette.jitterIterationsMax
-    config.jitterDisplacementHorizontal = config.activePalette.jitterDisplacementHorizontal
-    config.jitterDisplacementVertical = config.activePalette.jitterDisplacementVertical
-    config.jitterIterationsMin_roughing = config.activePalette.jitterIterationsMin_roughing
-    config.jitterIterationsMax_roughing = config.activePalette.jitterIterationsMax_roughing
-    config.jitterDisplacementHorizontal_roughing = config.activePalette.jitterDisplacementHorizontal_roughing
-    config.jitterDisplacementVertical_roughing = config.activePalette.jitterDisplacementVertical_roughing
+    mrksMngr.doJitterProb = mrksMngr.activePalette.doJitterProb
+    mrksMngr.doJitterAfterLineUseProb = mrksMngr.activePalette.doJitterAfterLineUseProb
+    mrksMngr.doProgressiveJitterProb = mrksMngr.activePalette.doProgressiveJitterProb
+    mrksMngr.doJitterWhenAddingBGUseProb = mrksMngr.activePalette.doJitterWhenAddingBGUseProb
+    mrksMngr.doJitterEventPerCyleProb = mrksMngr.activePalette.doJitterEventPerCyleProb
+    mrksMngr.jitterIterationsMaxAfterDraw = mrksMngr.activePalette.jitterIterationsMaxAfterDraw
+    mrksMngr.jitterIterationsMin = mrksMngr.activePalette.jitterIterationsMin
+    mrksMngr.jitterIterationsMax = mrksMngr.activePalette.jitterIterationsMax
+    mrksMngr.jitterDisplacementHorizontal = mrksMngr.activePalette.jitterDisplacementHorizontal
+    mrksMngr.jitterDisplacementVertical = mrksMngr.activePalette.jitterDisplacementVertical
+    mrksMngr.jitterIterationsMin_roughing = mrksMngr.activePalette.jitterIterationsMin_roughing
+    mrksMngr.jitterIterationsMax_roughing = mrksMngr.activePalette.jitterIterationsMax_roughing
+    mrksMngr.jitterDisplacementHorizontal_roughing = mrksMngr.activePalette.jitterDisplacementHorizontal_roughing
+    mrksMngr.jitterDisplacementVertical_roughing = mrksMngr.activePalette.jitterDisplacementVertical_roughing
 
     startNewLine(_pen)
 
@@ -1237,61 +1494,61 @@ def runWork():
 def iterate():
     global config
 
-    if random.random() < config.justHitPauseProb and not config.justHitPause:
-        config.justHitPause = True
-        pieceLogger(f"I am paused {config.justHitPauseProb}", 1)
+    if random.random() < mrksMngr.justHitPauseProb and not mrksMngr.justHitPause:
+        mrksMngr.justHitPause = True
+        pieceLogger(f"I am paused {mrksMngr.justHitPauseProb}", 1)
 
-    if random.random() < config.releaseFromJustHitPauseProb and config.justHitPause:
-        config.justHitPause = False
+    if random.random() < mrksMngr.releaseFromJustHitPauseProb and mrksMngr.justHitPause:
+        mrksMngr.justHitPause = False
         pieceLogger("I am un paused", 2)
 
-    if config.doingJitter :
+    if mrksMngr.doingJitter :
         progressiveJitter()
 
-    if not config.justHitPause:
+    if not mrksMngr.justHitPause:
 
         def maybe_change_drawing_mode():
-            if config.changeDrawingModeTime > 0:
-                config.changeTimeController.checkTime()
-                if config.changeTimeController.advance:
+            if mrksMngr.changeDrawingModeTime > 0:
+                mrksMngr.changeTimeController.checkTime()
+                if mrksMngr.changeTimeController.advance:
                     changeDrawingMode()
 
         def maybe_change_color_set():
-            if config.changeColorSetTime > 0 and not config.transitionStateHandler.inTransition:
-                config.paletteController.checkTime()
-                if config.paletteController.advance:
-                    pieceLogger(f"===>  changeDrawing(True) prob: config.changeColorSetTime {config.changeColorSetTime}")
+            if mrksMngr.changeColorSetTime > 0 and not mrksMngr.transitionStateHandler.inTransition:
+                mrksMngr.paletteController.checkTime()
+                if mrksMngr.paletteController.advance:
+                    pieceLogger(f"===>  changeDrawing(True) prob: mrksMngr.changeColorSetTime {mrksMngr.changeColorSetTime}")
                     changeDrawing(True)
 
         def maybe_release_drawing():
-            if config.stoppedAndWaitingToDraw:
-                config.drawingController.checkTime()
-                if config.drawingController.advance:
+            if mrksMngr.stoppedAndWaitingToDraw:
+                mrksMngr.drawingController.checkTime()
+                if mrksMngr.drawingController.advance:
                     releaseDrawing()
 
         def maybe_set_bg_color():
-            if random.SystemRandom().random() < config.changeBGColorProb:
+            if random.SystemRandom().random() < mrksMngr.changeBGColorProb:
                 setBGColor()
 
         def maybe_clear_current_drawing():
-            if random.random() < config.clearCurrentDrawingProb and not config.transitionStateHandler.inTransition:
-                pieceLogger(f"===>  clearCurrentDrawing() prob: config.clearCurrentDrawingProb {config.clearCurrentDrawingProb}")
+            if random.random() < mrksMngr.clearCurrentDrawingProb and not mrksMngr.transitionStateHandler.inTransition:
+                pieceLogger(f"===>  clearCurrentDrawing() prob: mrksMngr.clearCurrentDrawingProb {mrksMngr.clearCurrentDrawingProb}")
                 clearCurrentDrawing()
 
         def maybe_bg_color_blocks_filling():
-            if random.SystemRandom().random() < config.usebgBoxProb and not config.doingDrawing and not config.transitionStateHandler.inTransition:
+            if random.SystemRandom().random() < mrksMngr.usebgBoxProb and not mrksMngr.doingDrawing and not mrksMngr.transitionStateHandler.inTransition:
                 bgColorBlocksFilling(True)
-                if random.random() < config.doJitterWhenAddingBGUseProb:
+                if random.random() < mrksMngr.doJitterWhenAddingBGUseProb:
                     pieceLogger("Calling for jitter after BG blocks are drawn")
                     doDrawingJitter()
 
         def maybe_do_drawing_jitter():
-            if not config.doingDrawing and random.random() < config.doJitterProb and not config.transitionStateHandler.inTransition:
+            if not mrksMngr.doingDrawing and random.random() < mrksMngr.doJitterProb and not mrksMngr.transitionStateHandler.inTransition:
                 pieceLogger("Calling for jitter")
                 doDrawingJitter()
                 
         def maybe_filter_remap_image():
-            if random.random() < config.filterRemappingProb:
+            if random.random() < mrksMngr.filterRemappingProb:
                 filterRemapImage(config)
 
 
@@ -1311,17 +1568,17 @@ def renderImage():
     global config
 
     def maybe_take_snapshot(img):
-        config.stateReportController.checkTime()
+        mrksMngr.stateReportController.checkTime()
         path = "/Users/lamshell/Desktop/outputs/"
-        if config.stateReportController.advance:
+        if mrksMngr.stateReportController.advance:
             pieceLogger("Saving image to file", 2)
             currentTime = time.time()
             baseName = f"{str(currentTime)}"
             baseName = baseName.replace(".", "")
             _img = img.convert("RGBA")
-            _temp = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+            _temp = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
             _tempDraw = ImageDraw.Draw(_temp)
-            _tempDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(0, 0, 0, 255))
+            _tempDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(0, 0, 0, 255))
             _temp.paste(_img)
             _temp = _temp.convert("RGB")
             _temp = _temp.rotate(-90)
@@ -1330,23 +1587,23 @@ def renderImage():
             # fn2 = f"{baseName}-palette.txt"
             fn2 = "palettes.txt"
             with open(f"/Users/lamshell/Desktop/outputs/{fn2}", "a+") as f:
-                _bg = colorutils.rgb_to_hsv(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.bgColor[3], True)
-                _bgf = colorutils.rgb_to_hsv(config.bgBoxFill[0], config.bgBoxFill[1], config.bgBoxFill[2], config.bgBoxFill[3], True)
+                _bg = colorutils.rgb_to_hsv(mrksMngr.bgColor[0], mrksMngr.bgColor[1], mrksMngr.bgColor[2], mrksMngr.bgColor[3], True)
+                _bgf = colorutils.rgb_to_hsv(mrksMngr.bgBoxFill[0], mrksMngr.bgBoxFill[1], mrksMngr.bgBoxFill[2], mrksMngr.bgBoxFill[3], True)
                 _pc = colorutils.rgb_to_hsv(
-                    config.activePalette.activePen.lineColor[0],
-                    config.activePalette.activePen.lineColor[1],
-                    config.activePalette.activePen.lineColor[2],
-                    config.activePalette.activePen.lineColor[3],
+                    mrksMngr.activePalette.activePen.lineColor[0],
+                    mrksMngr.activePalette.activePen.lineColor[1],
+                    mrksMngr.activePalette.activePen.lineColor[2],
+                    mrksMngr.activePalette.activePen.lineColor[3],
                     True,
                 )
 
-                f.write(f"\n{baseName} bg:{_bg} {config.bgColor[3]} fill:{_bgf} {config.bgBoxFill[3]} pen:{_pc} {config.activePalette.activePen.lineColor[3]}")
+                f.write(f"\n{baseName} bg:{_bg} {mrksMngr.bgColor[3]} fill:{_bgf} {mrksMngr.bgBoxFill[3]} pen:{_pc} {mrksMngr.activePalette.activePen.lineColor[3]}")
 
     config.underLayer.paste(config.lineLayer, (0, 0), config.lineLayer)
     config.canvasImage.paste(config.underLayer, (0, 0), config.underLayer)
 
     """ TEXTURE APPEARANCE"""
-    if config.useTextureLayer and config.textureBlendMode is None:
+    if mrksMngr.useTextureLayer and mrksMngr.textureBlendMode is None:
         # config.textureLayerDraw.rectangle((50,50,150,150), fill=(255,255,0,200))
 
         # some subtleties here  -- can be any of these and might be something
@@ -1354,47 +1611,47 @@ def renderImage():
         # the bg and the line and can be distorted
 
 
-        if config.textureOption == 0:
+        if mrksMngr.textureOption == 0:
             """this means the topmost layer gets the texture - most visible version"""
             config.lineLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-        if config.textureOption == 1:
+        if mrksMngr.textureOption == 1:
             """# the composite gets it -- more subtle"""
             config.canvasImage.paste(config.textureLayer, (0, 0), config.textureLayer)
 
-        if config.textureOption == 2:
+        if mrksMngr.textureOption == 2:
             """this means only the underlayer gets the texture - not so great"""
             config.underLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 
     """ deprecated -------->"""
     # handling transition between drawings
-    # if config.fadeThruToNew < 255:
-    #     config.fadeThruToNew += 4
-    #     # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
-    #     config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
+    # if mrksMngr.fadeThruToNew < 255:
+    #     mrksMngr.fadeThruToNew += 4
+    #     # print(f"mrksMngr.fadeThruToNew  {mrksMngr.fadeThruToNew }")
+    #     config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor[0], mrksMngr.bgColor[1], mrksMngr.bgColor[2], mrksMngr.fadeThruToNew))
 
-    # elif not config.fadeThruToNewDone:
-    #     config.fadeThruToNewDone = True
+    # elif not mrksMngr.fadeThruToNewDone:
+    #     mrksMngr.fadeThruToNewDone = True
     #     initDrawings()
     """ <-------- """
     # when new layer is added, blend into existing canvas
-    if config.addingTo:
-        _tempImage = ImageChops.blend(config.blankLayer, config.blockLayer, config.blendLevel)
-        config.blendLevel += config.blendLevelRate
-        if config.blendLevel >= 1.0:
-            config.blendLevelRate = 0.0
-            config.blendLevel = 1.0
-            config.addingTo = False
+    if mrksMngr.addingTo:
+        _tempImage = ImageChops.blend(config.blankLayer, config.blockLayer, mrksMngr.blendLevel)
+        mrksMngr.blendLevel += mrksMngr.blendLevelRate
+        if mrksMngr.blendLevel >= 1.0:
+            mrksMngr.blendLevelRate = 0.0
+            mrksMngr.blendLevel = 1.0
+            mrksMngr.addingTo = False
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
             # pieceLogger("POOF",4)
-            config.justHitPause = False
-            # config.canDraw = True
+            mrksMngr.justHitPause = False
+            # mrksMngr.canDraw = True
         else:
             config.lineLayer.paste(_tempImage, (0, 0), _tempImage)
 
-    if not config.debugMode:
-        config.finalCompositeLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor))
-        if config.textureBlendMode == "subtract":
+    if not mrksMngr.debugMode:
+        config.finalCompositeLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
+        if mrksMngr.textureBlendMode == "subtract":
             _tempImage = ImageChops.subtract(config.canvasImage, config.textureLayer)
             config.finalCompositeLayer.paste(_tempImage, (0, 0), _tempImage)
         else:
@@ -1404,10 +1661,10 @@ def renderImage():
     # else:
     #     layerCompositing(config)
 
-    if config.transitionStateHandler.inTransition:
-        config.transitionStateHandler.transition()
-        config.render(config.transitionStateHandler.intermediateImage, 0, 0)
-        # maybe_take_snapshot(config.transitionStateHandler.intermediateImage)
+    if mrksMngr.transitionStateHandler.inTransition:
+        mrksMngr.transitionStateHandler.transition()
+        config.render(mrksMngr.transitionStateHandler.intermediateImage, 0, 0)
+        # maybe_take_snapshot(mrksMngr.transitionStateHandler.intermediateImage)
     else:
         # pieceLogger("FINAL COMP RENDER",2)
         config.render(config.finalCompositeLayer, 0, 0)
@@ -1417,92 +1674,66 @@ def renderImage():
 """ FOR DEBUGGING """
 # def layerCompositing(config):
 #     config.finalCompositeLayerDraw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(125, 125, 125))
-#     config.finalCompositeLayerDraw.rectangle((0, 550, config.pictureWidth, 550 + config.pictureHeight), fill=(config.bgColor))
+#     config.finalCompositeLayerDraw.rectangle((0, 550, mrksMngr.pictureWidth, 550 + mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
 
 #     config.finalCompositeLayer.paste(config.textureLayer, (0, 0), config.textureLayer)
 #     config.finalCompositeLayer.paste(config.image, (280, 0), config.image)
 #     config.finalCompositeLayer.paste(config.underLayer, (0, 280), config.underLayer)
 
-#     config.finalCompositeLayerDraw.rectangle((280, 280, config.pictureWidth + 280, 280 + config.pictureHeight), fill=(config.bgColor))
+#     config.finalCompositeLayerDraw.rectangle((280, 280, mrksMngr.pictureWidth + 280, 280 + mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
 #     config.finalCompositeLayer.paste(config.canvasImage, (280, 280), config.canvasImage)
 
 
 def clearCurrentDrawing():
-    if not config.transitionStateHandler.inTransition:
+    if not mrksMngr.transitionStateHandler.inTransition:
         initiateTransition()
 
         pieceLogger("Clearing", 2)
-        config.linesDrawnCount = 0
-        config.jitterIterations = 0
+        mrksMngr.linesDrawnCount = 0
+        mrksMngr.jitterIterations = 0
 
-        config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 200))
+        config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor[0], mrksMngr.bgColor[1], mrksMngr.bgColor[2], 200))
 
-        config.image = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.image = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.draw = ImageDraw.Draw(config.image)
 
-        config.underLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.underLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-        config.blankLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.blankLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.blankLayerDraw = ImageDraw.Draw(config.blankLayer)
 
-        config.underLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.underLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-        config.blockLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.blockLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.blockLayerDraw = ImageDraw.Draw(config.blockLayer)
 
-        config.lineLayer = Image.new("RGBA", (config.pictureWidth, config.pictureHeight))
+        config.lineLayer = Image.new("RGBA", (mrksMngr.pictureWidth, mrksMngr.pictureHeight))
         config.lineLayerDraw = ImageDraw.Draw(config.lineLayer)
 
         primeCanvas(2)
-        config.canvasDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], 225))
-        config.linesDrawnCount = 0
+        config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor[0], mrksMngr.bgColor[1], mrksMngr.bgColor[2], 225))
+        mrksMngr.linesDrawnCount = 0
 
 # ----------------------------------------------------##----------------------------------------------------#
 
 
 def main(run=True):
-    global config, workConfig
-    _setBundlePath(config)
-    _load_texture_models(config)
-    createImageLayers(config)
-    _load_filter_config(config)
-    _load_drawing_configs(config)
-    _load_pen_config(config)
-    _load_and_initialize_system(config)
+    global config, workConfig, mrksMngr
+    mrksMngr = MarksManager(config)
+    mrksMngr.setUp(workConfig)
     if run:
         runWork()
-
-
-def _setBundlePath(config):
-    config.drawingBundle = workConfig.get("drawingField", "drawingBundle")
-    config.assetPath = config.path
-    if config.assetPath[-1] != "/":
-        config.assetPath = f"{config.path}/"
-    config.assetPath = f"{config.assetPath}configs/{config.drawingBundle}"
-    if config.assetPath[-1] != "/":
-        config.assetPath = f"{config.assetPath}/"
-    # pieceLogger(f"{config.assetPath}",4)
-    return config.assetPath
-
-
-def _load_texture_models(config):
-    config.useTextureLayer = True
-    config.textureSetNames = workConfig.get("drawingField", "textureSets", fallback="texture1").split(",")
-    config.textureSets = []
-    for _t in config.textureSetNames:
-        _tex = _load_texture_values(_t)
-        config.textureSets.append(_tex)
 
 
 def _load_texture_values(_tName):
     tex = Texture()
     tex.name = _tName
     textureConfig = configparser.ConfigParser()
-    textureConfig.read(f"{config.assetPath}/textures/{_tName}.cfg")
+    textureConfig.read(f"{mrksMngr.assetPath}/textures/{_tName}.cfg")
     tex.useTextureLayer = textureConfig.getboolean("texture", "useTextureLayer", fallback=False)
-    pieceLogger(f"{config.assetPath}/textures/{_tName}.cfg {_tName} {tex.useTextureLayer}")
+    pieceLogger(f"{mrksMngr.assetPath}/textures/{_tName}.cfg {_tName} {tex.useTextureLayer}")
     tex.step = textureConfig.getint("texture", "texture_step", fallback=7)
     tex.px = textureConfig.getint("texture", "texture_px", fallback=2)
     tex.blockRows = textureConfig.getint("texture", "texture_blockRows", fallback=8)
@@ -1524,350 +1755,104 @@ def _load_texture_values(_tName):
     return tex
 
 
-def _load_filter_config(config):
-    """Loads filter-related configuration parameters."""
-    config.filterRemapping = workConfig.getboolean("particles", "filterRemapping", fallback=False)
-    config.filterRemappingProb = float(workConfig.get("drawingField", "filterRemappingProb", fallback=0.0))
-    config.filterRemapMinHorzSize = int(workConfig.get("drawingField", "filterRemapMinHorzSize", fallback=24))
-    config.filterRemapMinVertSize = int(workConfig.get("drawingField", "filterRemapMinVertSize", fallback=24))
-    config.filterRemapMaxHorzSize = int(workConfig.get("drawingField", "filterRemapMaxHorzSize", fallback=24))
-    config.filterRemapMaxVertSize = int(workConfig.get("drawingField", "filterRemapMaxVertSize", fallback=24))
-    config.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=config.pictureWidth))
-    config.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=config.pictureHeight))
-
-
-def _load_drawing_configs(config):
-    """Loads color-related configuration parameters."""
-    config.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
-    config.bgTileSizeWidthMin = float(workConfig.get("drawingField", "bgTileSizeWidthMin"))
-    config.bgTileSizeWidthMax = float(workConfig.get("drawingField", "bgTileSizeWidthMax"))
-    config.bgTileSizeHeightMin = float(workConfig.get("drawingField", "bgTileSizeHeightMin"))
-    config.bgTileSizeHeightMax = float(workConfig.get("drawingField", "bgTileSizeHeightMax"))
-    # config.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("drawingField", "bgBoxFill").split(",")))
-
-    config.clearbgBoxProb = float(workConfig.get("drawingField", "clearbgBoxProb"))
-
-    # jitter and roughing
-    config.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.0))
-    config.doJitterAfterLineUseProb = float(workConfig.get("drawingField", "doJitterAfterLineUseProb", fallback=1.0))
-    config.doProgressiveJitterProb = float(workConfig.get("drawingField", "doProgressiveJitterProb", fallback=.50))
-    config.doJitterWhenAddingBGUseProb = float(workConfig.get("drawingField", "doJitterWhenAddingBGUseProb", fallback=1.0))
-    config.doJitterEventPerCyleProb = float(workConfig.get("drawingField", "doJitterEventPerCyleProb", fallback=1.0))
-    config.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
-    config.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
-    config.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
-    config.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal"))
-    config.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical"))
-    config.jitterIterationsMin_roughing = workConfig.getint("drawingField", "jitterIterationsMin_roughing", fallback=1)
-    config.jitterIterationsMax_roughing = workConfig.getint("drawingField", "jitterIterationsMax_roughing", fallback=10)
-    config.jitterDisplacementHorizontal_roughing = float(workConfig.get("drawingField", "jitterDisplacementHorizontal_roughing"))
-    config.jitterDisplacementVertical_roughing = float(workConfig.get("drawingField", "jitterDisplacementVertical_roughing"))
-    config.jitterIterations = 0
-
-    config.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
-    config.bgColorAlpha = int(workConfig.get("drawingField", "bgColorAlpha", fallback=2))
-
-    config.noPenGrays = 0.0
-    config.nobgGrays = 0.0
-
-    config.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=False)
-
-    config.paletteSets = []
-    paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
-
-    for _pRaw in paletteSets:
-        palette = Palette()
-        _p = _pRaw.replace("\n", "")
-        palette.bgBoxAlphaRange = tuple(
-            map(
-                lambda x: int(x),
-                workConfig.get(_p, "bgBoxAlphaRange").split(","),
-            )
-        )
-
-        _bgColorSetsRaw = workConfig.get(_p, "bgColorSets")
-        _bgColorSetsRaw = re.sub(r"[\(\)]", "", _bgColorSetsRaw)
-        _bgColorSetsRaw = _bgColorSetsRaw.split("|")
-        palette.bgColorSets = []
-        palette.bgColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgColorSetsRaw)
-
-        _penColorSetsRaw = workConfig.get(_p, "penColorSets")
-        _penColorSetsRaw = re.sub(r"[\(\)]", "", _penColorSetsRaw)
-        _penColorSetsRaw = _penColorSetsRaw.split("|")
-        palette.penColorSets = []
-        palette.penColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _penColorSetsRaw)
-
-        _bgBoxColorSetsRaw = workConfig.get(_p, "bgBoxColorSets")
-        _bgBoxColorSetsRaw = re.sub(r"[\(\)]", "", _bgBoxColorSetsRaw)
-        _bgBoxColorSetsRaw = _bgBoxColorSetsRaw.split("|")
-        palette.bgBoxColorSets = []
-        palette.bgBoxColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgBoxColorSetsRaw)
-
-        palette.bgBoxRange = list(
-            map(
-                lambda x: int(x),
-                workConfig.get(_p, "bgBoxRange", fallback="0,0,0,0").split(","),
-            )
-        )
-
-        if palette.bgBoxRange == [0, 0, 0, 0]:
-            palette.bgBoxRange = [0, config.pictureWidth, 0, config.pictureHeight]
-
-        palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
-
-        palette.pens = workConfig.get(_p, "penNames").split(",")
-        palette.name = _p
-        palette.textureName = workConfig.get(_p, "texture")
-        palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
-        palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
-        palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0001"))
-
-        # when set to 1.0 and startNewLineDelayRange is set
-        # then the new line starts as soon as the random delay
-        # ends - since drawing is a major event and changes the
-        # attention of the viewer, controlling when it happens
-        # is probably better left to timing than just cycle-based
-        # probability
-        palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
-        palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
-
-        # jitter and roughing palette overrides
-        palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=config.doJitterProb))
-        palette.doJitterAfterLineUseProb = float(workConfig.get(_p, "doJitterAfterLineUseProb", fallback=config.doJitterAfterLineUseProb))
-        palette.doJitterWhenAddingBGUseProb = float(workConfig.get(_p, "doJitterWhenAddingBGUseProb", fallback=config.doJitterWhenAddingBGUseProb))
-        palette.doJitterEventPerCyleProb = float(workConfig.get(_p, "doJitterEventPerCyleProb", fallback=config.doJitterEventPerCyleProb))
-        palette.doProgressiveJitterProb = float(workConfig.get(_p, "doProgressiveJitterProb", fallback=config.doProgressiveJitterProb))
-        palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMaxAfterDraw)
-        palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=config.jitterIterationsMin)
-        palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMax)
-        palette.jitterDisplacementHorizontal = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=config.jitterDisplacementHorizontal))
-        palette.jitterDisplacementVertical = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=config.jitterDisplacementVertical))
-        palette.jitterIterationsMin_roughing = workConfig.getint(_p, "jitterIterationsMin", fallback=config.jitterIterationsMin_roughing)
-        palette.jitterIterationsMax_roughing = workConfig.getint(_p, "jitterIterationsMax", fallback=config.jitterIterationsMax_roughing)
-        palette.jitterDisplacementHorizontal_roughing = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=config.jitterDisplacementHorizontal_roughing))
-        palette.jitterDisplacementVertical_roughing = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=config.jitterDisplacementVertical_roughing))
-
-        palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
-        palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
-
-        palette.xOffsetRange = list(
-            map(
-                lambda x: float(x),
-                workConfig.get(_p, "xOffsetRange", fallback=f"0,{config.pictureWidth}").split(","),
-            )
-        )
-        palette.yOffsetRange = list(
-            map(
-                lambda x: float(x),
-                workConfig.get(_p, "yOffsetRange", fallback=f"0,{config.pictureHeight}").split(","),
-            )
-        )
-        palette.penAlphaRange = list(
-            map(
-                lambda x: float(x),
-                workConfig.get(_p, "penAlphaRange", fallback=f"{config.penAlpha},{config.penAlpha}").split(","),
-            )
-        )
-
-        palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
-        palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
-        palette.outlineStroke = workConfig.getboolean(_p, "outlineStroke", fallback=False)
-        palette.outlineStrokeColor = tuple(map(lambda x: int(x), workConfig.get(_p, "outlineStrokeColor", fallback="0,0,0,200").split(",")))
-
-        palette.dripWidthMax = float(workConfig.get(_p, "dripWidthMax", fallback=0.0))
-        palette.dripLengthMax = float(workConfig.get(_p, "dripLengthMax", fallback=0.0))
-        palette.dripProbablility = float(workConfig.get(_p, "dripProbablility", fallback=0.0))
-        palette.dripSpeedMin = float(workConfig.get(_p, "dripSpeedMin", fallback=0.0))
-        palette.dripSpeedMax = float(workConfig.get(_p, "dripSpeedMax", fallback=0.0))
-
-        pieceLogger(f"\n===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
-        config.paletteSets.append(palette)
-
-    config.activePalette = random.choice(config.paletteSets)
-    pieceLogger(f"\n ===> New Palette : {config.activePalette.name} Using enveloped line: {palette.drawLineAsEnvelope}", 2, True)
-
-    setBGColor()
-
-
-def _load_pen_config(config):
-    """Loads pen / brush related configuration parameters."""
-
-    def _load_pen_config_globals(config):
-        config.penNames = workConfig.get("drawingField", "penNames").split(",")
-        config.marksPalette = []
-
-    def _load_single_pen(_penConfigName):
-        _mark = Mark()
-        _mark.name = f"{_penConfigName}".replace("\n", "")
-
-        markConfig = configparser.ConfigParser()
-        pathToCfg = f"{config.assetPath}marks/{_mark.name}.cfg"
-        pieceLogger(f"{pathToCfg}")
-        markConfig.read(pathToCfg)
-
-        _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
-
-        if "scribble" in _mark.name:
-
-            _mark.loopsMin = _mark.turnsRange[0]
-            _mark.loopsMax = _mark.turnsRange[1]
-
-            _mark.pointsPerLoop = int(markConfig.get("markParams", "pointsPerLoop"))
-            _mark.noiseX = float(markConfig.get("markParams", "noiseX"))
-            _mark.noiseY = float(markConfig.get("markParams", "noiseY"))
-
-            _mark.height = float(markConfig.get("markParams", "height"))
-            _mark.radiusX = float(markConfig.get("markParams", "radiusX"))
-            _mark.radiusY = float(markConfig.get("markParams", "radiusY"))
-            _mark.radiusXMin = float(markConfig.get("markParams", "radiusXMin"))
-            _mark.radiusXMax = float(markConfig.get("markParams", "radiusXMax"))
-            _mark.radiusYMin = float(markConfig.get("markParams", "radiusYMin"))
-            _mark.radiusYMax = float(markConfig.get("markParams", "radiusYMax"))
-            _mark.xRadiusDelta = float(markConfig.get("markParams", "xRadiusDelta"))
-            _mark.yRadiusDelta = float(markConfig.get("markParams", "yRadiusDelta"))
-            _mark.deltaRadiusXChangeProb = float(markConfig.get("markParams", "deltaRadiusXChangeProb"))
-            _mark.deltaRadiusYChangeProb = float(markConfig.get("markParams", "deltaRadiusYChangeProb"))
-
-            _mark.xCenter = float(markConfig.get("markParams", "xCenter"))
-            _mark.yCenter = float(markConfig.get("markParams", "yCenter"))
-            _mark.centerXDelta = float(markConfig.get("markParams", "centerXDelta"))
-            _mark.centerYDelta = float(markConfig.get("markParams", "centerYDelta"))
-            _mark.deltaRadiusXCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusXCenterChangeProb"))
-            _mark.deltaRadiusYCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusYCenterChangeProb"))
-
-        else:
-
-            _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
-            _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
-            _mark.minInterpolatedPoints = int(markConfig.get("markParams", "minInterpolatedPoints", fallback=200))
-            _mark.maxInterpolatedPoints = int(markConfig.get("markParams", "maxInterpolatedPoints", fallback=200))
-
-            _mark.baseRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "baseRadiusFactorRange", fallback="1.0,1.0").split(",")))
-            _mark.xRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "xRadiusFactorRange", fallback=".2,.2").split(",")))
-            _mark.yRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "yRadiusFactorRange", fallback=".2,.2").split(",")))
-
-            _mark.xRadiusFactorNoiseFactor = float(markConfig.get("markParams", "xRadiusFactorNoiseFactor", fallback=1.0))
-            _mark.yRadiusFactorNoiseFactor = float(markConfig.get("markParams", "yRadiusFactorNoiseFactor", fallback=1.0))
-            _mark.xRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "xRandomRange", fallback="-1,1").split(",")))
-            _mark.yRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "yRandomRange", fallback="-1,1").split(",")))
-
-            _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
-
-            # adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y
-            _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
-            _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
-            _mark.xTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "xTravelIncrRange", fallback="-1,1").split(",")))
-            _mark.yTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "yTravelIncrRange", fallback="-1,1").split(",")))
-            _mark.xtravelProb = float(markConfig.get("markParams", "xtravelProb", fallback=0.1))
-            _mark.ytravelProb = float(markConfig.get("markParams", "ytravelProb", fallback=0.1))
-            _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback="0"))
-
-            _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
-            _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
-
-        _mark.xOffsetRange = markConfig.get("markParams", "xOffsetRange", fallback=None)
-        _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback="1"))
-        _mark.yOffsetRange = markConfig.get("markParams", "yOffsetRange", fallback=None)
-
-        if _mark.xOffsetRange is not None:
-            _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange").split(",")))
-
-        if _mark.yOffsetRange is not None:
-            _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange").split(",")))
-
-        _mark.w = int(markConfig.get("markParams", "w", fallback=1))
-        _mark.minMarkWidth = int(markConfig.get("markParams", "minMarkWidth", fallback=2))
-        _mark.maxMarkWidth = int(markConfig.get("markParams", "maxMarkWidth", fallback=7))
-        _mark.changeMarkWidthProb = float(markConfig.get("markParams", "changeMarkWidthProb", fallback=".02"))
-        _mark.mode = int(markConfig.get("markParams", "mode", fallback=1))
-
-        _mark.forceOrientation = markConfig.get("markParams", "forceOrientation", fallback="vertical")
-        _mark.forcedPalette = markConfig.get("markParams", "forcedPalette", fallback=None)
-        if _mark.forcedPalette is not None:
-            _mark.forcedPalette = list(map(lambda x: float(x), markConfig.get("markParams", "forcedPalette", fallback=None).split(",")))
-
-        _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
-        _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=0.01))
-
-        _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=config.drawLineAsEnvelope)
-
-        return _mark
-
-    _marksPath = _load_pen_config_globals(config)
-
-    for _penConfigName in config.penNames:
-        _mark = _load_single_pen(_penConfigName)
-        config.marksPalette.append(_mark)
-    # print(config.marksPalette)
-
-
-def _load_and_initialize_system(config):
-    """Initializes the system and related parameters."""
-    """Loads rendering-related configuration parameters."""
-
-    config.changeBGColorProb = float(workConfig.get("drawingField", "changeBGColorProb", fallback=0.001))
-    config.totalResetTime = workConfig.getint("drawingField", "totalResetTime", fallback=33)
-    config.totalResetTimeMaxMultiplier = float(workConfig.get("drawingField", "totalResetTimeMaxMultiplier", fallback=1.0))
-    config.changeDrawingModeTime = float(workConfig.get("drawingField", "changeDrawingModeTime", fallback=100.0))
-
-    config.blendLevelRateBase = float(workConfig.get("drawingField", "blendLevelRateBase", fallback=0.01))
-    config.totalRandomPenColorProb = float(workConfig.get("drawingField", "totalRandomPenColorProb", fallback=0.0))
-    config.totalRandomBGBoxColorProb = float(workConfig.get("drawingField", "totalRandomBGBoxColorProb", fallback=0.0))
-    config.debugMode = workConfig.getboolean("drawingField", "debugMode", fallback=False)
-
-    config.changeColorSetTime = float(workConfig.get("drawingField", "changeColorSetTime", fallback=0))
-    config.changeColorSetTimeMaxMultiplier = float(workConfig.get("drawingField", "changeColorSetTimeMaxMultiplier", fallback=1))
-
-    config.justHitPauseProb = float(workConfig.get("drawingField", "justHitPauseProb", fallback=0.0))
-    config.releaseFromJustHitPauseProb = float(workConfig.get("drawingField", "releaseFromJustHitPauseProb", fallback=1.0))
-    config.justHitPause = False
-
-    if config.changeColorSetTime > 0:
-        config.paletteController = Director(config)
-        config.paletteController.slotRate = config.changeColorSetTime
-        config.changeColorSetTimeToUse = config.changeColorSetTime
-
-    if config.changeDrawingModeTime > 0:
-        config.changeTimeController = Director(config)
-        config.changeTimeController.slotRate = config.changeDrawingModeTime
-
-    config.slotRate = float(workConfig.get("drawingField", "slotRate", fallback=0.03))
-    config.redrawSpeed = float(workConfig.get("drawingField", "redrawSpeed", fallback=0.03))
-
-    config.directorController = Director(config)
-    config.directorController.slotRate = config.slotRate
-
-    config.drawingController = Director(config)
-    config.drawingController.slotRate = 10
-
-    config.stateReportController = Director(config)
-    config.stateReportController.slotRate = 25
-
-    config.canDraw = True
-    config.doingDrawing = False
-    config.doingJitter = False
-    config.stoppedAndWaitingToDraw = False
-    config.linesDrawnCount = 0
-    config.jitterIterations = 0
-
-    config.penArray = []
-    config.drawingMode = 1
-
-    config.dripsArray = []
-    initDrawings()
-
-    config.blendLevel = 0.0
-    config.blendLevelRate = config.blendLevelRateBase
-
-    config.fadeThruToNew = 255
-    config.fadeThruToNewDone = True
-
-    config.transitionStateHandler = TransitionStates(config)
-    config.transitionStateHandler.sourceImage = config.finalCompositeLayer
-    config.transitionStateHandler.targetImage = config.finalCompositeLayer
-    config.inTransition = False
-
-    # config.underLayerDraw.rectangle((0, 0, config.pictureWidth, config.pictureHeight), fill=(100, 0, 80, 100))
+def _load_single_pen(_penConfigName):
+    _mark = Mark()
+    _mark.name = f"{_penConfigName}".replace("\n", "")
+
+    markConfig = configparser.ConfigParser()
+    pathToCfg = f"{mrksMngr.assetPath}marks/{_mark.name}.cfg"
+    pieceLogger(f"{pathToCfg}")
+    markConfig.read(pathToCfg)
+
+    _mark.turnsRange = list(map(lambda x: int(x), markConfig.get("markParams", "turnsRange", fallback="2,2").split(",")))
+
+    if "scribble" in _mark.name:
+
+        _mark.loopsMin = _mark.turnsRange[0]
+        _mark.loopsMax = _mark.turnsRange[1]
+
+        _mark.pointsPerLoop = int(markConfig.get("markParams", "pointsPerLoop"))
+        _mark.noiseX = float(markConfig.get("markParams", "noiseX"))
+        _mark.noiseY = float(markConfig.get("markParams", "noiseY"))
+
+        _mark.height = float(markConfig.get("markParams", "height"))
+        _mark.radiusX = float(markConfig.get("markParams", "radiusX"))
+        _mark.radiusY = float(markConfig.get("markParams", "radiusY"))
+        _mark.radiusXMin = float(markConfig.get("markParams", "radiusXMin"))
+        _mark.radiusXMax = float(markConfig.get("markParams", "radiusXMax"))
+        _mark.radiusYMin = float(markConfig.get("markParams", "radiusYMin"))
+        _mark.radiusYMax = float(markConfig.get("markParams", "radiusYMax"))
+        _mark.xRadiusDelta = float(markConfig.get("markParams", "xRadiusDelta"))
+        _mark.yRadiusDelta = float(markConfig.get("markParams", "yRadiusDelta"))
+        _mark.deltaRadiusXChangeProb = float(markConfig.get("markParams", "deltaRadiusXChangeProb"))
+        _mark.deltaRadiusYChangeProb = float(markConfig.get("markParams", "deltaRadiusYChangeProb"))
+
+        _mark.xCenter = float(markConfig.get("markParams", "xCenter"))
+        _mark.yCenter = float(markConfig.get("markParams", "yCenter"))
+        _mark.centerXDelta = float(markConfig.get("markParams", "centerXDelta"))
+        _mark.centerYDelta = float(markConfig.get("markParams", "centerYDelta"))
+        _mark.deltaRadiusXCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusXCenterChangeProb"))
+        _mark.deltaRadiusYCenterChangeProb = float(markConfig.get("markParams", "deltaRadiusYCenterChangeProb"))
+
+    else:
+
+        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
+        _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
+        _mark.minInterpolatedPoints = int(markConfig.get("markParams", "minInterpolatedPoints", fallback=200))
+        _mark.maxInterpolatedPoints = int(markConfig.get("markParams", "maxInterpolatedPoints", fallback=200))
+
+        _mark.baseRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "baseRadiusFactorRange", fallback="1.0,1.0").split(",")))
+        _mark.xRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "xRadiusFactorRange", fallback=".2,.2").split(",")))
+        _mark.yRadiusFactorRange = list(map(lambda x: float(x), markConfig.get("markParams", "yRadiusFactorRange", fallback=".2,.2").split(",")))
+
+        _mark.xRadiusFactorNoiseFactor = float(markConfig.get("markParams", "xRadiusFactorNoiseFactor", fallback=1.0))
+        _mark.yRadiusFactorNoiseFactor = float(markConfig.get("markParams", "yRadiusFactorNoiseFactor", fallback=1.0))
+        _mark.xRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "xRandomRange", fallback="-1,1").split(",")))
+        _mark.yRandomRange = list(map(lambda x: int(x), markConfig.get("markParams", "yRandomRange", fallback="-1,1").split(",")))
+
+        _mark.rotationFactor = float(markConfig.get("markParams", "rotationFactor", fallback=8.0))
+
+        # adding parameters to enable geometric progression in x and y in addition to random arithmetic travel in x and y
+        _mark.xTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "xTravelRange", fallback="-1,1").split(",")))
+        _mark.yTravelRange = list(map(lambda x: int(x), markConfig.get("markParams", "yTravelRange", fallback="-1,1").split(",")))
+        _mark.xTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "xTravelIncrRange", fallback="-1,1").split(",")))
+        _mark.yTravelIncrRange = list(map(lambda x: float(x), markConfig.get("markParams", "yTravelIncrRange", fallback="-1,1").split(",")))
+        _mark.xtravelProb = float(markConfig.get("markParams", "xtravelProb", fallback=0.1))
+        _mark.ytravelProb = float(markConfig.get("markParams", "ytravelProb", fallback=0.1))
+        _mark.radiusChangePerRound = float(markConfig.get("markParams", "radiusChangePerRound", fallback="0"))
+
+        _mark.linePoints = float(markConfig.get("markParams", "linePoints", fallback="20"))
+        _mark.lopOff = float(markConfig.get("markParams", "lopOff", fallback="20"))
+
+    _mark.xOffsetRange = markConfig.get("markParams", "xOffsetRange", fallback=None)
+    _mark.incrementFactor = float(markConfig.get("markParams", "incrementFactor", fallback="1"))
+    _mark.yOffsetRange = markConfig.get("markParams", "yOffsetRange", fallback=None)
+
+    if _mark.xOffsetRange is not None:
+        _mark.xOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "xOffsetRange").split(",")))
+
+    if _mark.yOffsetRange is not None:
+        _mark.yOffsetRange = list(map(lambda x: int(x), markConfig.get("markParams", "yOffsetRange").split(",")))
+
+    _mark.w = int(markConfig.get("markParams", "w", fallback=1))
+    _mark.minMarkWidth = int(markConfig.get("markParams", "minMarkWidth", fallback=2))
+    _mark.maxMarkWidth = int(markConfig.get("markParams", "maxMarkWidth", fallback=7))
+    _mark.changeMarkWidthProb = float(markConfig.get("markParams", "changeMarkWidthProb", fallback=".02"))
+    _mark.mode = int(markConfig.get("markParams", "mode", fallback=1))
+
+    _mark.forceOrientation = markConfig.get("markParams", "forceOrientation", fallback="vertical")
+    _mark.forcedPalette = markConfig.get("markParams", "forcedPalette", fallback=None)
+    if _mark.forcedPalette is not None:
+        _mark.forcedPalette = list(map(lambda x: float(x), markConfig.get("markParams", "forcedPalette", fallback=None).split(",")))
+
+    _mark.angleDiffMax = float(markConfig.get("markParams", "angleDiffMax", fallback=180))
+    _mark.drawingSkip = float(markConfig.get("markParams", "drawingSkip", fallback=0.01))
+
+    _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=mrksMngr.drawLineAsEnvelope)
+
+    return _mark
+
+
 
 
 # ----------------------------------------------------##----------------------------------------------------#

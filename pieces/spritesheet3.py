@@ -25,7 +25,249 @@ bads = badpixels
 # the filtering happens to this canvasImage as well
 
 # ----------------------------------------------------##----------------------------------------------------#
+class AnimationManager:
+    def __init__(self, config):
+        self.config = config
 
+    def setUp(self, workConfig):
+        self.filterRemapping = workConfig.getboolean("base-parameters", "filterRemapping")
+        self.filterRemappingProb = float(workConfig.get("base-parameters", "filterRemappingProb"))
+
+        # changed to allow min size of the filter dither
+        self.filterRemapminHoriSize = int(workConfig.get("base-parameters", "filterRemapminHoriSize"))
+        self.filterRemapminVertSize = int(workConfig.get("base-parameters", "filterRemapminVertSize"))
+
+        try:
+            self.filterRemapmaxHoriSize = int(workConfig.get("base-parameters", "filterRemapmaxHoriSize"))
+            self.filterRemapmaxVertSize = int(workConfig.get("base-parameters", "filterRemapmaxVertSize"))
+        except Exception as e:
+            pieceLogger(e,1)
+            self.filterRemapmaxHoriSize = self.filterRemapminHoriSize
+            self.filterRemapmaxVertSize = self.filterRemapminVertSize
+            self.filterRemapminHori = 8
+            self.filterRemapminVertSize = 8
+
+        self.filterRemapRangeX = int(workConfig.get("base-parameters", "filterRemapRangeX"))
+        self.filterRemapRangeY = int(workConfig.get("base-parameters", "filterRemapRangeY"))
+
+        try:
+            if self.config.usePixelSort:
+                self.pixelSortProbOn = float(workConfig.get("base-parameters", "pixelSortProbOn"))
+                self.pixelSortProbOff = float(workConfig.get("base-parameters", "pixelSortProbOff"))
+            else:
+                self.pixelSortProbOn = 0
+                self.pixelSortProbOff = 0
+
+        except Exception as e:
+            pieceLogger(e,1)
+            self.pixelSortProbOn = 0
+            self.pixelSortProbOff = 0
+
+        self.allPause = False
+
+        animationNames = workConfig.get("base-parameters", "animations").split(",")
+        playTimes = workConfig.get("base-parameters", "playTimes").split(",")
+        self.playInOrder = workConfig.getboolean("base-parameters", "playInOrder")
+
+        self.drawMoire = workConfig.getboolean("base-parameters", "drawMoire")
+        self.drawMoireProb = float(workConfig.get("base-parameters", "drawMoireProb"))
+        self.drawMoireProbOff = float(workConfig.get("base-parameters", "drawMoireProbOff"))
+
+        self.moireXPos = int(workConfig.get("base-parameters", "moireXPos"))
+        self.moireYPos = int(workConfig.get("base-parameters", "moireYPos"))
+        self.moireXDistance = int(workConfig.get("base-parameters", "moireXDistance"))
+        self.moireYDistance = int(workConfig.get("base-parameters", "moireYDistance"))
+        self.setMoireColor = workConfig.getboolean("base-parameters", "setMoireColor")
+        self.moireColorAltProb = float(workConfig.get("base-parameters", "moireColorAltProb"))
+        self.moireColor = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColor").split(",")))
+        self.moireColorAlt = tuple(
+            map(
+                lambda x: int(x),
+                workConfig.get("base-parameters", "moireColorAlt").split(","),
+            )
+        )
+
+        self.animationNames = animationNames
+        self.animations = []
+        self.currentAnimationIndex = 0
+        self.animationController = Director(self.config)
+
+        self.bgBoxColorRange = list(
+            map(
+                lambda x: float(x),
+                workConfig.get("base-parameters", "bgBoxColorRange").split(","),
+            )
+        )
+        self.bgBoxAlphaRange = tuple(
+            map(
+                lambda x: int(x),
+                workConfig.get("base-parameters", "bgBoxAlphaRange").split(","),
+            )
+        )
+        self.usebgBox = workConfig.getboolean("base-parameters", "forcebgBox")
+        self.usebgBoxProb = float(workConfig.get("base-parameters", "usebgBoxProb"))
+        self.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxBox").split(",")))
+        self.bgBoxFill = (100, 0, 80, 100)
+
+        self.bgTileSizeWidthMin = float(workConfig.get("base-parameters", "bgTileSizeWidthMin"))
+        self.bgTileSizeWidthMax = float(workConfig.get("base-parameters", "bgTileSizeWidthMax"))
+        self.bgTileSizeHeightMin = float(workConfig.get("base-parameters", "bgTileSizeHeightMin"))
+        self.bgTileSizeHeightMax = float(workConfig.get("base-parameters", "bgTileSizeHeightMax"))
+        # self.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxFill").split(",")))
+
+        self.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
+        self.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
+
+        self.clearbgBoxProb = float(workConfig.get("base-parameters", "clearbgBoxProb"))
+        self.bgGlitchCyclesMin = float(workConfig.get("base-parameters", "bgGlitchCyclesMin"))
+        self.bgGlitchCyclesMax = float(workConfig.get("base-parameters", "bgGlitchCyclesMax"))
+        self.bgGlitchDisplacementHorizontal = float(workConfig.get("base-parameters", "bgGlitchDisplacementHorizontal"))
+        self.bgGlitchDisplacementVertical = float(workConfig.get("base-parameters", "bgGlitchDisplacementVertical"))
+
+        self.playTimes = tuple(map(lambda x: int(x), playTimes))
+        # self.animationController.delay = 1.0
+        self.animationController.slotRate = self.playTimes[0]
+
+        try:
+            self.preGlitchNumber = int(workConfig.get("base-parameters", "preGlitchNumber"))
+            self.preGlitchNumberMin = int(workConfig.get("base-parameters", "preGlitchNumberMin"))
+            self.preGlitchRedo = float(workConfig.get("base-parameters", "preGlitchRedo"))
+        except Exception as e:
+            pieceLogger(e,1)
+            self.preGlitchNumberMin = 1
+            self.preGlitchNumber = 2
+            self.preGlitchRedo = 0.5
+
+        self.changeAnimProb = float(workConfig.get("base-parameters", "changeAnimProb", fallback=".001"))
+        self.pauseProb = float(workConfig.get("base-parameters", "pauseProb", fallback=".001"))
+        self.unPauseProb = float(workConfig.get("base-parameters", "unPauseProb", fallback=".001"))
+        self.freezeGlitchProb = float(workConfig.get("base-parameters", "freezeGlitchProb", fallback=".001"))
+        self.unFreezeGlitchProb = float(workConfig.get("base-parameters", "unFreezeGlitchProb", fallback=".001"))
+        self.backgroundColorChangeProb = float(workConfig.get("base-parameters", "backgroundColorChangeProb", fallback=".001"))
+        # ----------------------------------------------------------------------------
+
+        for a in self.animationNames:
+            aConfig = Holder(self.config)
+            aConfig.name = a
+
+            aConfig.imageToLoad = workConfig.get(a, "i1")
+            aConfig.animationWidth = int(workConfig.get(a, "animationWidth"))
+            aConfig.animationHeight = int(workConfig.get(a, "animationHeight"))
+            aConfig.resizeAnimationToFit = workConfig.getboolean(a, "resizeAnimationToFit")
+            aConfig.animationRotation = float(workConfig.get(a, "animationRotation"))
+            aConfig.animationImage = Image.new("RGBA", (aConfig.animationWidth, aConfig.animationHeight))
+
+            if abs(aConfig.animationRotation) == 90:
+                aConfig.animationImage = Image.new("RGBA", (aConfig.animationHeight, aConfig.animationWidth))
+
+            aConfig.animationImageDraw = ImageDraw.Draw(aConfig.animationImage)
+
+            aConfig.animationArray = []
+            aConfig.spriteSheet1 = loadImage(self.config.path + aConfig.imageToLoad)
+
+            aConfig.randomPlacement = workConfig.getboolean(a, "randomPlacement")
+            aConfig.fixedPosition = workConfig.getboolean(a, "fixedPosition")
+            aConfig.frameWidth = int(workConfig.get(a, "frameWidth"))
+            aConfig.frameHeight = int(workConfig.get(a, "frameHeight"))
+            aConfig.totalFrames = int(workConfig.get(a, "totalFrames"))
+            aConfig.frameCols = int(workConfig.get(a, "frameCols"))
+            aConfig.frameRows = int(workConfig.get(a, "frameRows"))
+            aConfig.sliceWidth = int(workConfig.get(a, "sliceWidth"))
+            aConfig.sliceHeight = int(workConfig.get(a, "sliceHeight"))
+            aConfig.sliceWidthMin = int(workConfig.get(a, "sliceWidthMin"))
+            aConfig.sliceHeightMin = int(workConfig.get(a, "sliceHeightMin"))
+            aConfig.numberOfCells = int(workConfig.get(a, "numberOfCells"))
+            aConfig.animSpeedMin = float(workConfig.get(a, "animSpeedMin"))
+            aConfig.animSpeedMax = float(workConfig.get(a, "animSpeedMax"))
+            aConfig.animationRotationRateRange = float(workConfig.get(a, "animationRotationRateRange"))
+            aConfig.animationRotationJitter = float(workConfig.get(a, "animationRotationJitter"))
+            aConfig.animationXOffset = int(workConfig.get(a, "animationXOffset"))
+            aConfig.animationYOffset = int(workConfig.get(a, "animationYOffset"))
+            aConfig.randomPlacemnetXRange = int(workConfig.get(a, "randomPlacemnetXRange"))
+            aConfig.randomPlacemnetYRange = int(workConfig.get(a, "randomPlacemnetYRange"))
+
+            aConfig.bg_minHue = int(workConfig.get(a, "bg_minHue"))
+            aConfig.bg_maxHue = int(workConfig.get(a, "bg_maxHue"))
+            aConfig.bg_minSaturation = float(workConfig.get(a, "bg_minSaturation"))
+            aConfig.bg_maxSaturation = float(workConfig.get(a, "bg_maxSaturation"))
+            aConfig.bg_minValue = float(workConfig.get(a, "bg_minValue"))
+            aConfig.bg_maxValue = float(workConfig.get(a, "bg_maxValue"))
+            aConfig.bg_dropHueMinValue = float(workConfig.get(a, "bg_dropHueMinValue"))
+            aConfig.bg_dropHueMaxValue = float(workConfig.get(a, "bg_dropHueMaxValue"))
+            aConfig.bg_alpha = int(workConfig.get(a, "bg_alpha"))
+            aConfig.bg_alpha_max = int(workConfig.get(a, "bg_alpha"))
+
+            aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb", fallback=self.backgroundColorChangeProb))
+
+            aConfig.changeAnimProb = float(workConfig.get(a, "changeAnimProb", fallback=self.changeAnimProb))
+            aConfig.pauseProb = float(workConfig.get(a, "pauseProb", fallback=self.pauseProb))
+            aConfig.unPauseProb = float(workConfig.get(a, "unPauseProb", fallback=self.unPauseProb))
+            aConfig.freezeGlitchProb = float(workConfig.get(a, "freezeGlitchProb", fallback=self.freezeGlitchProb))
+            aConfig.unFreezeGlitchProb = float(workConfig.get(a, "unFreezeGlitchProb", fallback=self.unFreezeGlitchProb))
+            try:
+                # comment:
+                aConfig.pauseOnFirstFrameProb = float(workConfig.get(a, "pauseOnFirstFrameProb"))
+                aConfig.pauseOnLastFrameProb = float(workConfig.get(a, "pauseOnLastFrameProb"))
+            except Exception as e:
+                pieceLogger(e,1)
+                aConfig.pauseOnFirstFrameProb = 0.0
+                aConfig.pauseOnLastFrameProb = 0.0
+            try:
+                # comment:
+                aConfig.reversing = workConfig.getboolean(a, "reversing")
+            except Exception as e:
+                pieceLogger(e,1)
+                aConfig.reversing = False
+
+            aConfig.glitching = True
+            aConfig.preDistorted = False
+
+            aConfig.imageGlitchDisplacementHorizontal = int(workConfig.get(a, "imageGlitchDisplacementHorizontal"))
+            aConfig.imageGlitchDisplacementVertical = int(workConfig.get(a, "imageGlitchDisplacementVertical"))
+
+            # Sets up color transitions
+            aConfig.colOverlay = coloroverlay.ColorOverlay()
+            aConfig.colOverlay.randomSteps = True
+            aConfig.colOverlay.timeTrigger = True
+            aConfig.colOverlay.tLimitBase = 5
+            aConfig.colOverlay.steps = 10
+
+            aConfig.colOverlay.maxBrightness = self.config.brightness
+            aConfig.colOverlay.minSaturation = aConfig.bg_minSaturation
+            aConfig.colOverlay.maxSaturation = aConfig.bg_maxSaturation
+            aConfig.colOverlay.minValue = aConfig.bg_minValue
+            aConfig.colOverlay.maxValue = aConfig.bg_maxValue
+            aConfig.colOverlay.minHue = aConfig.bg_minHue
+            aConfig.colOverlay.maxHue = aConfig.bg_maxHue
+            aConfig.colOverlay.dropHueMin = aConfig.bg_dropHueMinValue
+            aConfig.colOverlay.dropHueMax = aConfig.bg_dropHueMaxValue
+
+            aConfig.colOverlay.colorTransitionSetup()
+
+            anim = spriteAnimation(self.config)
+            anim.frameWidth = aConfig.frameWidth
+            anim.frameHeight = aConfig.frameHeight
+            anim.totalFrames = aConfig.totalFrames
+            anim.frameCols = aConfig.frameCols
+            anim.frameRows = aConfig.frameRows
+            anim.animSpeedMin = aConfig.animSpeedMin
+            anim.animSpeedMax = aConfig.animSpeedMax
+            anim.animationWidth = aConfig.animationWidth
+            anim.animationHeight = aConfig.animationHeight
+            anim.resizeAnimationToFit = aConfig.resizeAnimationToFit
+            anim.randomPlacement = aConfig.randomPlacement
+            anim.reversing = aConfig.reversing
+            anim.currentFrame = 0
+            anim.name = aConfig.name
+
+            aConfig.imagePath = f"{self.config.path}/assets/imgs/"
+            aConfig.imageList = [aConfig.imageToLoad]
+
+            self.animations.append(aConfig)
+            reConfigAnimationCell(anim, aConfig)
+            anim.prepSlices()
+            # aConfig.animationArray.append(anim)
+            aConfig.anim = anim
 
 # ----------------------------------------------------##----------------------------------------------------#
 class spriteAnimation:
@@ -152,7 +394,7 @@ def loadImage(spriteSheet):
 
 # ----------------------------------------------------##----------------------------------------------------#
 def main(run=True):
-    global config, workConfig, blocks, simulBlocks, bads
+    global config, workConfig, blocks, simulBlocks, bads, animMngr
     # gc.enable()
 
     pieceLogger("SpriteSheet Player Piece Loaded\n",2,True)
@@ -163,41 +405,8 @@ def main(run=True):
     config.delay = float(workConfig.get("base-parameters", "delay"))
     config.directorController.slotRate = float(workConfig.get("base-parameters", "slotRate"))
 
-    config.filterRemapping = workConfig.getboolean("base-parameters", "filterRemapping")
-    config.filterRemappingProb = float(workConfig.get("base-parameters", "filterRemappingProb"))
-
-
-
-    # changed to allow min size of the filter dither
-    config.filterRemapminHoriSize = int(workConfig.get("base-parameters", "filterRemapminHoriSize"))
-    config.filterRemapminVertSize = int(workConfig.get("base-parameters", "filterRemapminVertSize"))
-
-    try:
-        config.filterRemapmaxHoriSize = int(workConfig.get("base-parameters", "filterRemapmaxHoriSize"))
-        config.filterRemapmaxVertSize = int(workConfig.get("base-parameters", "filterRemapmaxVertSize"))
-    except Exception as e:
-        pieceLogger(e,1)
-        config.filterRemapmaxHoriSize = config.filterRemapminHoriSize
-        config.filterRemapmaxVertSize = config.filterRemapminVertSize
-        config.filterRemapminHori = 8
-        config.filterRemapminVertSize = 8
-
-    config.filterRemapRangeX = int(workConfig.get("base-parameters", "filterRemapRangeX"))
-    config.filterRemapRangeY = int(workConfig.get("base-parameters", "filterRemapRangeY"))
-
-    try:
-        if config.usePixelSort:
-            config.pixelSortProbOn = float(workConfig.get("base-parameters", "pixelSortProbOn"))
-            config.pixelSortProbOff = float(workConfig.get("base-parameters", "pixelSortProbOff"))
-        else:
-            config.pixelSortProbOn = 0
-            config.pixelSortProbOff = 0
-
-    except Exception as e:
-        pieceLogger(e,1)
-        config.pixelSortProbOn = 0
-        config.pixelSortProbOff = 0
-
+    animMngr = AnimationManager(config)
+    animMngr.setUp(workConfig)
 
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
@@ -207,215 +416,8 @@ def main(run=True):
 
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(100, 0, 80, 100))
 
-    config.allPause = False
-
-    animationNames = workConfig.get("base-parameters", "animations").split(",")
-    playTimes = workConfig.get("base-parameters", "playTimes").split(",")
-    config.playInOrder = workConfig.getboolean("base-parameters", "playInOrder")
-
-    config.drawMoire = workConfig.getboolean("base-parameters", "drawMoire")
-    config.drawMoireProb = float(workConfig.get("base-parameters", "drawMoireProb"))
-    config.drawMoireProbOff = float(workConfig.get("base-parameters", "drawMoireProbOff"))
-
-    config.moireXPos = int(workConfig.get("base-parameters", "moireXPos"))
-    config.moireYPos = int(workConfig.get("base-parameters", "moireYPos"))
-    config.moireXDistance = int(workConfig.get("base-parameters", "moireXDistance"))
-    config.moireYDistance = int(workConfig.get("base-parameters", "moireYDistance"))
-    config.setMoireColor = workConfig.getboolean("base-parameters", "setMoireColor")
-    config.moireColorAltProb = float(workConfig.get("base-parameters", "moireColorAltProb"))
-    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "moireColor").split(",")))
-    config.moireColorAlt = tuple(
-        map(
-            lambda x: int(x),
-            workConfig.get("base-parameters", "moireColorAlt").split(","),
-        )
-    )
-
-    config.animationNames = animationNames
-    config.animations = []
-    config.currentAnimationIndex = 0
-    config.animationController = Director(config)
-
-    config.bgBoxColorRange = list(
-        map(
-            lambda x: float(x),
-            workConfig.get("base-parameters", "bgBoxColorRange").split(","),
-        )
-    )
-    config.bgBoxAlphaRange = tuple(
-        map(
-            lambda x: int(x),
-            workConfig.get("base-parameters", "bgBoxAlphaRange").split(","),
-        )
-    )
-    config.usebgBox = workConfig.getboolean("base-parameters", "forcebgBox")
-    config.usebgBoxProb = float(workConfig.get("base-parameters", "usebgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxBox").split(",")))
     config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-    config.bgBoxFill = (100, 0, 80, 100)
-
-    config.bgTileSizeWidthMin = float(workConfig.get("base-parameters", "bgTileSizeWidthMin"))
-    config.bgTileSizeWidthMax = float(workConfig.get("base-parameters", "bgTileSizeWidthMax"))
-    config.bgTileSizeHeightMin = float(workConfig.get("base-parameters", "bgTileSizeHeightMin"))
-    config.bgTileSizeHeightMax = float(workConfig.get("base-parameters", "bgTileSizeHeightMax"))
-    # config.bgBoxFill = tuple(	map(lambda x: int(x), workConfig.get("base-parameters", "bgBoxFill").split(",")))
-
-    config.animationFrameXOffset = int(workConfig.get("base-parameters", "animationFrameXOffset"))
-    config.animationFrameYOffset = int(workConfig.get("base-parameters", "animationFrameYOffset"))
-
-    config.clearbgBoxProb = float(workConfig.get("base-parameters", "clearbgBoxProb"))
-    config.bgGlitchCyclesMin = float(workConfig.get("base-parameters", "bgGlitchCyclesMin"))
-    config.bgGlitchCyclesMax = float(workConfig.get("base-parameters", "bgGlitchCyclesMax"))
-    config.bgGlitchDisplacementHorizontal = float(workConfig.get("base-parameters", "bgGlitchDisplacementHorizontal"))
-    config.bgGlitchDisplacementVertical = float(workConfig.get("base-parameters", "bgGlitchDisplacementVertical"))
-
-    config.playTimes = tuple(map(lambda x: int(x), playTimes))
-    # config.animationController.delay = 1.0
-    config.animationController.slotRate = config.playTimes[0]
-
-    try:
-        config.preGlitchNumber = int(workConfig.get("base-parameters", "preGlitchNumber"))
-        config.preGlitchNumberMin = int(workConfig.get("base-parameters", "preGlitchNumberMin"))
-        config.preGlitchRedo = float(workConfig.get("base-parameters", "preGlitchRedo"))
-    except Exception as e:
-        pieceLogger(e,1)
-        config.preGlitchNumberMin = 1
-        config.preGlitchNumber = 2
-        config.preGlitchRedo = 0.5
-
-
-
-    config.changeAnimProb = float(workConfig.get("base-parameters", "changeAnimProb", fallback=".001"))
-    config.pauseProb = float(workConfig.get("base-parameters", "pauseProb", fallback=".001"))
-    config.unPauseProb = float(workConfig.get("base-parameters", "unPauseProb", fallback=".001"))
-    config.freezeGlitchProb = float(workConfig.get("base-parameters", "freezeGlitchProb", fallback=".001"))
-    config.unFreezeGlitchProb = float(workConfig.get("base-parameters", "unFreezeGlitchProb", fallback=".001"))
-    config.backgroundColorChangeProb = float(workConfig.get("base-parameters", "backgroundColorChangeProb", fallback=".001"))
-    # ----------------------------------------------------------------------------
-
-    for a in config.animationNames:
-        aConfig = Holder(config)
-        aConfig.name = a
-
-        aConfig.imageToLoad = workConfig.get(a, "i1")
-        aConfig.animationWidth = int(workConfig.get(a, "animationWidth"))
-        aConfig.animationHeight = int(workConfig.get(a, "animationHeight"))
-        aConfig.resizeAnimationToFit = workConfig.getboolean(a, "resizeAnimationToFit")
-        aConfig.animationRotation = float(workConfig.get(a, "animationRotation"))
-        aConfig.animationImage = Image.new("RGBA", (aConfig.animationWidth, aConfig.animationHeight))
-
-        if abs(aConfig.animationRotation) == 90:
-            aConfig.animationImage = Image.new("RGBA", (aConfig.animationHeight, aConfig.animationWidth))
-
-        aConfig.animationImageDraw = ImageDraw.Draw(aConfig.animationImage)
-
-        aConfig.animationArray = []
-        aConfig.spriteSheet1 = loadImage(config.path + aConfig.imageToLoad)
-
-        aConfig.randomPlacement = workConfig.getboolean(a, "randomPlacement")
-        aConfig.fixedPosition = workConfig.getboolean(a, "fixedPosition")
-        aConfig.frameWidth = int(workConfig.get(a, "frameWidth"))
-        aConfig.frameHeight = int(workConfig.get(a, "frameHeight"))
-        aConfig.totalFrames = int(workConfig.get(a, "totalFrames"))
-        aConfig.frameCols = int(workConfig.get(a, "frameCols"))
-        aConfig.frameRows = int(workConfig.get(a, "frameRows"))
-        aConfig.sliceWidth = int(workConfig.get(a, "sliceWidth"))
-        aConfig.sliceHeight = int(workConfig.get(a, "sliceHeight"))
-        aConfig.sliceWidthMin = int(workConfig.get(a, "sliceWidthMin"))
-        aConfig.sliceHeightMin = int(workConfig.get(a, "sliceHeightMin"))
-        aConfig.numberOfCells = int(workConfig.get(a, "numberOfCells"))
-        aConfig.animSpeedMin = float(workConfig.get(a, "animSpeedMin"))
-        aConfig.animSpeedMax = float(workConfig.get(a, "animSpeedMax"))
-        aConfig.animationRotationRateRange = float(workConfig.get(a, "animationRotationRateRange"))
-        aConfig.animationRotationJitter = float(workConfig.get(a, "animationRotationJitter"))
-        aConfig.animationXOffset = int(workConfig.get(a, "animationXOffset"))
-        aConfig.animationYOffset = int(workConfig.get(a, "animationYOffset"))
-        aConfig.randomPlacemnetXRange = int(workConfig.get(a, "randomPlacemnetXRange"))
-        aConfig.randomPlacemnetYRange = int(workConfig.get(a, "randomPlacemnetYRange"))
-
-        aConfig.bg_minHue = int(workConfig.get(a, "bg_minHue"))
-        aConfig.bg_maxHue = int(workConfig.get(a, "bg_maxHue"))
-        aConfig.bg_minSaturation = float(workConfig.get(a, "bg_minSaturation"))
-        aConfig.bg_maxSaturation = float(workConfig.get(a, "bg_maxSaturation"))
-        aConfig.bg_minValue = float(workConfig.get(a, "bg_minValue"))
-        aConfig.bg_maxValue = float(workConfig.get(a, "bg_maxValue"))
-        aConfig.bg_dropHueMinValue = float(workConfig.get(a, "bg_dropHueMinValue"))
-        aConfig.bg_dropHueMaxValue = float(workConfig.get(a, "bg_dropHueMaxValue"))
-        aConfig.bg_alpha = int(workConfig.get(a, "bg_alpha"))
-        aConfig.bg_alpha_max = int(workConfig.get(a, "bg_alpha"))
-
-        aConfig.backgroundColorChangeProb = float(workConfig.get(a, "backgroundColorChangeProb", fallback=config.backgroundColorChangeProb))
-
-        aConfig.changeAnimProb = float(workConfig.get(a, "changeAnimProb", fallback=config.changeAnimProb))
-        aConfig.pauseProb = float(workConfig.get(a, "pauseProb", fallback=config.pauseProb))
-        aConfig.unPauseProb = float(workConfig.get(a, "unPauseProb", fallback=config.unPauseProb))
-        aConfig.freezeGlitchProb = float(workConfig.get(a, "freezeGlitchProb", fallback=config.freezeGlitchProb))
-        aConfig.unFreezeGlitchProb = float(workConfig.get(a, "unFreezeGlitchProb", fallback=config.unFreezeGlitchProb))
-        try:
-            # comment:
-            aConfig.pauseOnFirstFrameProb = float(workConfig.get(a, "pauseOnFirstFrameProb"))
-            aConfig.pauseOnLastFrameProb = float(workConfig.get(a, "pauseOnLastFrameProb"))
-        except Exception as e:
-            pieceLogger(e,1)
-            aConfig.pauseOnFirstFrameProb = 0.0
-            aConfig.pauseOnLastFrameProb = 0.0
-        try:
-            # comment:
-            aConfig.reversing = workConfig.getboolean(a, "reversing")
-        except Exception as e:
-            pieceLogger(e,1)
-            aConfig.reversing = False
-
-        aConfig.glitching = True
-        aConfig.preDistorted = False
-
-        aConfig.imageGlitchDisplacementHorizontal = int(workConfig.get(a, "imageGlitchDisplacementHorizontal"))
-        aConfig.imageGlitchDisplacementVertical = int(workConfig.get(a, "imageGlitchDisplacementVertical"))
-
-        # Sets up color transitions
-        aConfig.colOverlay = coloroverlay.ColorOverlay()
-        aConfig.colOverlay.randomSteps = True
-        aConfig.colOverlay.timeTrigger = True
-        aConfig.colOverlay.tLimitBase = 5
-        aConfig.colOverlay.steps = 10
-
-        aConfig.colOverlay.maxBrightness = config.brightness
-        aConfig.colOverlay.minSaturation = aConfig.bg_minSaturation
-        aConfig.colOverlay.maxSaturation = aConfig.bg_maxSaturation
-        aConfig.colOverlay.minValue = aConfig.bg_minValue
-        aConfig.colOverlay.maxValue = aConfig.bg_maxValue
-        aConfig.colOverlay.minHue = aConfig.bg_minHue
-        aConfig.colOverlay.maxHue = aConfig.bg_maxHue
-        aConfig.colOverlay.dropHueMin = aConfig.bg_dropHueMinValue
-        aConfig.colOverlay.dropHueMax = aConfig.bg_dropHueMaxValue
-
-        aConfig.colOverlay.colorTransitionSetup()
-
-        anim = spriteAnimation(config)
-        anim.frameWidth = aConfig.frameWidth
-        anim.frameHeight = aConfig.frameHeight
-        anim.totalFrames = aConfig.totalFrames
-        anim.frameCols = aConfig.frameCols
-        anim.frameRows = aConfig.frameRows
-        anim.animSpeedMin = aConfig.animSpeedMin
-        anim.animSpeedMax = aConfig.animSpeedMax
-        anim.animationWidth = aConfig.animationWidth
-        anim.animationHeight = aConfig.animationHeight
-        anim.resizeAnimationToFit = aConfig.resizeAnimationToFit
-        anim.randomPlacement = aConfig.randomPlacement
-        anim.reversing = aConfig.reversing
-        anim.currentFrame = 0
-        anim.name = aConfig.name
-
-        aConfig.imagePath = f"{config.path}/assets/imgs/"
-        aConfig.imageList = [aConfig.imageToLoad]
-
-        config.animations.append(aConfig)
-        reConfigAnimationCell(anim, aConfig)
-        anim.prepSlices()
-        # aConfig.animationArray.append(anim)
-        aConfig.anim = anim
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -485,7 +487,7 @@ def glitchBox(
 
 # ----------------------------------------------------##----------------------------------------------------#
 def animationBackGroundFadeIn():
-    currentAnimation = config.animations[config.currentAnimationIndex]
+    currentAnimation = animMngr.animations[animMngr.currentAnimationIndex]
     if currentAnimation.bg_alpha <= currentAnimation.bg_alpha_max:
         currentAnimation.bg_alpha += 2
 
@@ -543,10 +545,10 @@ def reConfigAnimationCell(anim, aConfig):
 def filterRemapCall(ovrd=False):
     config.filterRemap = True
     # new version  more control but may require previous pieces to be re-worked
-    startX = round(random.uniform(0, config.filterRemapRangeX))
-    startY = round(random.uniform(0, config.filterRemapRangeY))
-    endX = round(random.uniform(config.filterRemapminHoriSize, config.filterRemapmaxHoriSize))
-    endY = round(random.uniform(config.filterRemapminVertSize, config.filterRemapmaxVertSize))
+    startX = round(random.uniform(0, animMngr.filterRemapRangeX))
+    startY = round(random.uniform(0, animMngr.filterRemapRangeY))
+    endX = round(random.uniform(animMngr.filterRemapminHoriSize, animMngr.filterRemapmaxHoriSize))
+    endY = round(random.uniform(animMngr.filterRemapminVertSize, animMngr.filterRemapmaxVertSize))
 
     if ovrd:
         startX = 0
@@ -573,21 +575,21 @@ def runWork():
 
 # ----------------------------------------------------##----------------------------------------------------#
 def iterate(n=0):
-    global config, blocks
+    global config, blocks, animMngr
     global xPos, yPos
 
-    currentAnimation = config.animations[config.currentAnimationIndex]
+    currentAnimation = animMngr.animations[animMngr.currentAnimationIndex]
     currentAnimation.colOverlay.stepTransition()
     bgColor = currentAnimation.colOverlay.currentColor
 
     config.canvasImage.paste(
         currentAnimation.animationImage,
-        (config.animationFrameXOffset, config.animationFrameYOffset),
+        (animMngr.animationFrameXOffset, animMngr.animationFrameYOffset),
         currentAnimation.animationImage,
     )
     animationBackGroundFadeIn()
 
-    if config.allPause:
+    if animMngr.allPause:
         if currentAnimation.glitching:
             glitchBox(
                 currentAnimation.animationImage,
@@ -607,19 +609,19 @@ def iterate(n=0):
     # if it really changes anything though
 
     composite = config.canvasImage
-    # if not config.allPause : pieceLogger(f"{config.usebgBoxProb} : {config.allPause}")
+    # if not animMngr.allPause : pieceLogger(f"{animMngr.usebgBoxProb} : {animMngr.allPause}")
 
-    if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox and not config.allPause:
+    if random.SystemRandom().random() < animMngr.usebgBoxProb and animMngr.usebgBox and not animMngr.allPause:
         _bgColorsFilling(config)
 
-    # if random.SystemRandom().random() < config.usebgBoxProb and config.usebgBox:
+    # if random.SystemRandom().random() < animMngr.usebgBoxProb and animMngr.usebgBox:
     #     _bgColorsFilling(config)
 
-    if random.SystemRandom().random() < config.clearbgBoxProb:
+    if random.SystemRandom().random() < animMngr.clearbgBoxProb:
         config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
         config.underLayerDraw = ImageDraw.Draw(config.underLayer)
 
-    # if config.usebgBox  :
+    # if animMngr.usebgBox  :
     #     # config.canvasImage.paste(config.underLayer, (0,0), config.underLayer)
     #     composite = ImageChops.screen( config.underLayer, config.canvasImage)
 
@@ -636,57 +638,57 @@ def iterate(n=0):
 
         # ===================== RENDERING ================================
 
-    if random.SystemRandom().random() < config.drawMoireProb:
-        config.drawMoire = True
-    if random.SystemRandom().random() < config.drawMoireProbOff:
-        config.drawMoire = False
+    if random.SystemRandom().random() < animMngr.drawMoireProb:
+        animMngr.drawMoire = True
+    if random.SystemRandom().random() < animMngr.drawMoireProbOff:
+        animMngr.drawMoire = False
 
-    # if random.SystemRandom().random() < config.filterRemappingProb:
+    # if random.SystemRandom().random() < animMngr.filterRemappingProb:
     #     if random.SystemRandom().random() < 0.5:
-    #         not config.filterRemapping
+    #         not animMngr.filterRemapping
     #     else:
-    #         config.filterRemapping
+    #         animMngr.filterRemapping
 
-    if random.SystemRandom().random() < config.filterRemappingProb and (config.useFilters and config.filterRemapping):
+    if random.SystemRandom().random() < animMngr.filterRemappingProb and (config.useFilters and animMngr.filterRemapping):
         filterRemapCall()
 
-    if random.SystemRandom().random() < config.pixelSortProbOn:
+    if random.SystemRandom().random() < animMngr.pixelSortProbOn:
         config.usePixelSort = True
 
-    if random.SystemRandom().random() < config.pixelSortProbOff:
+    if random.SystemRandom().random() < animMngr.pixelSortProbOff:
         config.usePixelSort = False
 
     # if random.SystemRandom().random() < currentAnimation.pauseProb:
-    #     config.allPause = True
+    #     animMngr.allPause = True
 
-    if config.allPause and random.SystemRandom().random() < currentAnimation.unFreezeGlitchProb:
+    if animMngr.allPause and random.SystemRandom().random() < currentAnimation.unFreezeGlitchProb:
         # print("glitching")
         currentAnimation.glitching = True
 
-    if config.allPause and random.SystemRandom().random() < currentAnimation.unPauseProb:
+    if animMngr.allPause and random.SystemRandom().random() < currentAnimation.unPauseProb:
         # print("unpausing")
-        config.allPause = False
+        animMngr.allPause = False
 
-    config.animationController.checkTime()
-    if config.animationController.advance:
-        _drawNextFrames(currentAnimation, config)
+    animMngr.animationController.checkTime()
+    if animMngr.animationController.advance:
+        _drawNextFrames(currentAnimation)
 
 
-def _drawNextFrames(currentAnimation, config):
+def _drawNextFrames(currentAnimation):
     currentAnimation.glitching = False
 
-    if config.playInOrder:
-        config.currentAnimationIndex += 1
-        if config.currentAnimationIndex >= len(config.animations):
-            config.currentAnimationIndex = 0
-        pieceLogger("Next Animation : " + str(config.animations[config.currentAnimationIndex].name))
+    if animMngr.playInOrder:
+        animMngr.currentAnimationIndex += 1
+        if animMngr.currentAnimationIndex >= len(animMngr.animations):
+            animMngr.currentAnimationIndex = 0
+        pieceLogger("Next Animation : " + str(animMngr.animations[animMngr.currentAnimationIndex].name))
     else:
-        choice = math.floor(random.uniform(0, len(config.animations)))
-        config.currentAnimationIndex = choice
-        pieceLogger("Next Animation : " + str(config.animations[choice].name))
+        choice = math.floor(random.uniform(0, len(animMngr.animations)))
+        animMngr.currentAnimationIndex = choice
+        pieceLogger("Next Animation : " + str(animMngr.animations[choice].name))
 
-    config.animationController.slotRate = config.playTimes[config.currentAnimationIndex]
-    currentAnimation = config.animations[config.currentAnimationIndex]
+    animMngr.animationController.slotRate = animMngr.playTimes[animMngr.currentAnimationIndex]
+    currentAnimation = animMngr.animations[animMngr.currentAnimationIndex]
     currentAnimation.preDistorted = False
 
     if currentAnimation.totalFrames == 1:
@@ -697,7 +699,7 @@ def _drawNextFrames(currentAnimation, config):
         tempImageRef = currentAnimation.anim.nextFrameImg()
         # currentAnimation.anim.currentFrame = tempImageRef
         # print("Should be reset")
-        glitchyCycles = random.SystemRandom().randrange(config.preGlitchNumberMin, config.preGlitchNumber)
+        glitchyCycles = random.SystemRandom().randrange(animMngr.preGlitchNumberMin, animMngr.preGlitchNumber)
         # print(glitchyCycles)
         for _ in range(glitchyCycles):
             glitchBox(
@@ -708,7 +710,7 @@ def _drawNextFrames(currentAnimation, config):
                 currentAnimation.imageGlitchDisplacementVertical,
             )
 
-        if random.SystemRandom().random() < config.preGlitchRedo:
+        if random.SystemRandom().random() < animMngr.preGlitchRedo:
             # print("second round")
             for _ in range(glitchyCycles):
                 glitchBox(
@@ -720,15 +722,15 @@ def _drawNextFrames(currentAnimation, config):
                 )
 
     currentAnimation.preDistorted = True
-    # config.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
+    # animMngr.animationController.slotRate = round(random.uniform(currentAnimation.animSpeedMin,currentAnimation.animSpeedMax))
 
     currentAnimation.bg_alpha = 10
-    config.allPause = False
+    animMngr.allPause = False
     currentAnimation.anim.currentFrame = 0
 
 
 def _bgColorsFilling(config):
-    # config.usebgBox = False if config.usebgBox   else True
+    # animMngr.usebgBox = False if animMngr.usebgBox   else True
     # print("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
     # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
@@ -736,46 +738,46 @@ def _bgColorsFilling(config):
     xPos = math.floor(random.uniform(0, config.canvasWidth))
     yPos = math.floor(random.uniform(0, config.canvasHeight))
 
-    config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
-    config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
+    config.tileSizeWidth = round(random.uniform(animMngr.bgTileSizeWidthMin, animMngr.bgTileSizeWidthMax))
+    config.tileSizeHeight = round(random.uniform(animMngr.bgTileSizeHeightMin, animMngr.bgTileSizeHeightMax))
 
-    if random.SystemRandom().random() < config.clearbgBoxProb:
+    if random.SystemRandom().random() < animMngr.clearbgBoxProb:
         xPos = yPos = 0
-        config.bgBoxBox = (
+        animMngr.bgBoxBox = (
             xPos,
             yPos,
             xPos + config.canvasWidth,
             yPos + config.canvasHeight,
         )
-        config.bgBoxFill = (0, 0, 0, 0)
+        animMngr.bgBoxFill = (0, 0, 0, 0)
     else:
-        config.bgBoxBox = (
+        animMngr.bgBoxBox = (
             xPos,
             yPos,
             xPos + config.tileSizeWidth,
             yPos + config.tileSizeHeight,
         )
-        cR = config.bgBoxColorRange
+        cR = animMngr.bgBoxColorRange
         # print(cR)
         bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
         # print(bgBoxFill)
-        config.bgBoxFill = (
+        animMngr.bgBoxFill = (
             round(config.brightness * bgBoxFill[0]),
             round(config.brightness * bgBoxFill[1]),
             round(config.brightness * bgBoxFill[2]),
-            round(random.uniform(config.bgBoxAlphaRange[0], config.bgBoxAlphaRange[1])),
+            round(random.uniform(animMngr.bgBoxAlphaRange[0], animMngr.bgBoxAlphaRange[1])),
         )
 
-    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+    config.underLayerDraw.rectangle(animMngr.bgBoxBox, fill=animMngr.bgBoxFill)
 
-    glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
+    glitchIterations = round(random.uniform(animMngr.bgGlitchCyclesMin, animMngr.bgGlitchCyclesMax))
     for _ in range(glitchIterations):
         glitchBox(
             config.underLayer,
             config.canvasWidth,
             config.canvasHeight,
-            config.bgGlitchDisplacementHorizontal,
-            config.bgGlitchDisplacementVertical,
+            animMngr.bgGlitchDisplacementHorizontal,
+            animMngr.bgGlitchDisplacementVertical,
         )
 
 
@@ -785,10 +787,10 @@ def _moireOverLay(currentAnimation, config, bgColor):
     _draw_moire_pattern(currentAnimation, config)
     _paste_animation_frame(currentAnimation)
 
-    if not config.allPause:
-        _animate(currentAnimation.anim, currentAnimation, config)
+    if not animMngr.allPause:
+        _animate(currentAnimation.anim, currentAnimation)
 
-    currentAnimation.anim.pause = config.allPause
+    currentAnimation.anim.pause = animMngr.allPause
 
     if random.SystemRandom().random() < currentAnimation.changeAnimProb:
         reConfigAnimationCell(currentAnimation.anim, currentAnimation)
@@ -804,24 +806,24 @@ def _draw_background(currentAnimation, config, bgColor):
     )
     currentAnimation.animationImageDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=bgColor)
 
-    if config.usebgBox:
+    if animMngr.usebgBox:
         currentAnimation.animationImage.paste(config.underLayer, (0, 0), config.underLayer)
 
 
 def _draw_moire_pattern(currentAnimation, config):
     """Draws the moire pattern if enabled."""
-    if not config.drawMoire:
+    if not animMngr.drawMoire:
         return
 
     c1 = (round(config.brightness * 150), round(config.brightness * 50), 0, 150)
-    if config.setMoireColor:
-        c1 = config.moireColor
-        if random.SystemRandom().random() < config.moireColorAltProb:
-            c1 = config.moireColorAlt
+    if animMngr.setMoireColor:
+        c1 = animMngr.moireColor
+        if random.SystemRandom().random() < animMngr.moireColorAltProb:
+            c1 = animMngr.moireColorAlt
 
     for ii in range(2):
-        xc = ii * config.moireXDistance + config.moireXPos
-        yc = ii * config.moireYDistance + config.moireYPos
+        xc = ii * animMngr.moireXDistance + animMngr.moireXPos
+        yc = ii * animMngr.moireYDistance + animMngr.moireYPos
         for i in range(1200):
             w = 3 * config.canvasWidth - i * 6
             if w > 1:
@@ -847,7 +849,7 @@ def _paste_animation_frame(currentAnimation):
     )
 
 
-def _animate(anim, currentAnimation, config):
+def _animate(anim, currentAnimation):
     # doing this 3 times because this was how the v.2 version inadvertently did it - my bad - but also to
     # improve the smoothness and the way the animation speed values work - i.e. they affect the speed at
     # at a more granular way
@@ -860,29 +862,29 @@ def _animate(anim, currentAnimation, config):
     if random.SystemRandom().random() < currentAnimation.pauseOnFirstFrameProb and anim.currentFrame == anim.startFrame:
         # print("paused at start")
         anim.pause = True
-        config.allPause = True
+        animMngr.allPause = True
 
     # print(anim.currentFrame,anim.endFrame-1)
     if random.SystemRandom().random() < currentAnimation.pauseOnLastFrameProb and anim.currentFrame == anim.endFrame - 1:
         # print("paused at end")
-        config.allPause = True
+        animMngr.allPause = True
         anim.pause = True
 
-    if (anim.pause or config.allPause) and random.SystemRandom().random() < currentAnimation.unPauseProb:
+    if (anim.pause or animMngr.allPause) and random.SystemRandom().random() < currentAnimation.unPauseProb:
         # print("releasing animation")
         anim.pause = False
-        config.allPause = False
+        animMngr.allPause = False
 
     if random.SystemRandom().random() < currentAnimation.pauseProb:
         # print("pausing at frame:" + str(anim.currentFrame) + " prob: " + str(currentAnimation.pauseProb))
         anim.pause = True
-        config.allPause = True
+        animMngr.allPause = True
         if random.SystemRandom().random() < 0.5:
             anim.direction *= -1
         # config.canvasImage.paste(currentAnimation.animationImage, (0,0), currentAnimation.animationImage)
         # config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
         # currentAnimation.glitching = True
-        # config.allPause = True
+        # animMngr.allPause = True
 
 
 # ----------------------------------------------------##----------------------------------------------------#

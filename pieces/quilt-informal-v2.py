@@ -19,6 +19,118 @@ def setTimeout(fn, ms, *args, **kwargs):
 ## This quilt supercedes the quilt.py module because it accounts for a zero irregularity
 ## as well as the infomal bar construction
 
+class QuiltManager:
+    def __init__(self, config):
+        self.config = config
+
+    def setUp(self, workConfig):
+        self.canvasImageWidth = self.config.screenWidth
+        self.canvasImageHeight = self.config.screenHeight
+        # self.canvasImageWidth -= 4
+        # self.canvasImageHeight -= 4
+
+        self.outlineColorObj = coloroverlay.ColorOverlay()
+        self.outlineColorObj.randomRange = (5.0, 30.0)
+        self.outlineColorObj.colorTransitionSetup()
+
+        self.transitionStepsMin = float(
+            workConfig.get("quilt-informal", "transitionStepsMin")
+        )
+        self.transitionStepsMax = float(
+            workConfig.get("quilt-informal", "transitionStepsMax")
+        )
+
+        self.transformShape = workConfig.getboolean("quilt-informal", "transformShape")
+        transformTuples = workConfig.get("quilt-informal", "transformTuples").split(",")
+        self.transformTuples = tuple(float(i) for i in transformTuples)
+
+        redRange = workConfig.get("quilt-informal", "redRange").split(",")
+        self.redRange = tuple(int(i) for i in redRange)
+
+        try:
+            saturationRangeFactorLeft = workConfig.get(
+                "quilt-informal", "saturationRangeFactorLeft"
+            ).split(",")
+            self.saturationRangeFactorLeft = tuple(
+                float(i) for i in saturationRangeFactorLeft
+            )
+
+            saturationRangeFactorRight = workConfig.get(
+                "quilt-informal", "saturationRangeFactorRight"
+            ).split(",")
+            self.saturationRangeFactorRight = tuple(
+                float(i) for i in saturationRangeFactorRight
+            )
+
+        except Exception as e:
+            print(e)
+            self.saturationRangeFactorLeft = (1, 1)
+            self.saturationRangeFactorRight = (1, 1)
+
+        backgroundColor = workConfig.get("quilt-informal", "backgroundColor").split(",")
+        self.backgroundColor = tuple(int(i) for i in backgroundColor)
+
+        self.numUnits = int(workConfig.get("quilt-informal", "numUnits"))
+        self.hGapSize = int(workConfig.get("quilt-informal", "hGapSize"))
+        self.vGapSize = int(workConfig.get("quilt-informal", "vGapSize"))
+        self.blockSize = int(workConfig.get("quilt-informal", "blockSize"))
+        self.blockLength = float(workConfig.get("quilt-informal", "blockLength"))
+        self.blockHeight = float(workConfig.get("quilt-informal", "blockHeight"))
+        self.blockLengthBase = float(workConfig.get("quilt-informal", "blockLength"))
+        self.blockHeightBase = float(workConfig.get("quilt-informal", "blockHeight"))
+        self.blockRows = int(workConfig.get("quilt-informal", "blockRows"))
+        self.blockCols = int(workConfig.get("quilt-informal", "blockCols"))
+        self.cntrOffsetX = int(workConfig.get("quilt-informal", "cntrOffsetX"))
+        self.cntrOffsetY = int(workConfig.get("quilt-informal", "cntrOffsetY"))
+        self.colorPopProb = float(workConfig.get("quilt-informal", "colorPopProb"))
+        self.brightnessFactorDark = float(
+            workConfig.get("quilt-informal", "brightnessFactorDark")
+        )
+        self.brightnessFactorLight = float(
+            workConfig.get("quilt-informal", "brightnessFactorLight")
+        )
+        self.lines = workConfig.getboolean("quilt-informal", "lines")
+        self.patternPrecision = workConfig.getboolean(
+            "quilt-informal", "patternPrecision"
+        )
+
+        self.polyDistortion = float(workConfig.get("quilt-informal", "polyDistortion"))
+        self.polyDistortionMin = -self.polyDistortion
+        self.polyDistortionMax = self.polyDistortion
+
+        # stacking the decks a bit in favor of vertical lightening strike and regular
+        try:
+            self.opticalPatterns = workConfig.get(
+                "quilt-informal", "opticalPatterns"
+            ).split(",")
+        except Exception as e:
+            print(e)
+            self.opticalPatterns = [
+                "Regular",
+                "Regular",
+                "LighteningStrikeH",
+                "LighteningStrikeH",
+                "Diagonals",
+                "LighteningStrikeH",
+            ]
+
+        # Chance that when the Quilt rebuilds the pattern doubles in size
+        self.sizeFactorChangeProb = float(
+            workConfig.get("quilt-informal", "sizeFactorChangeProb")
+        )
+        self.baseSizeMultiplier = float(
+            workConfig.get("quilt-informal", "baseSizeMultiplier")
+        )
+        self.extraSizeMultiplier = float(
+            workConfig.get("quilt-informal", "extraSizeMultiplier")
+        )
+
+        p = math.floor(random.SystemRandom().uniform(0, len(self.opticalPatterns)))
+        self.opticalPattern = self.opticalPatterns[p]
+
+        self.timeToComplete = int(workConfig.get("quilt-informal", "timeToComplete"))
+
+
 class unit:
 
     timeTrigger = True
@@ -35,8 +147,9 @@ class unit:
     minHue = 0
     maxHue = 360
 
-    def __init__(self, config):
+    def __init__(self, config, qMngr):
         self.config = config
+        self.qMngr = qMngr
         self.xPos = 0
         self.yPos = 0
         self.redraw = False
@@ -44,7 +157,7 @@ class unit:
         self.draw = ImageDraw.Draw(config.image)
 
         ## Like the "stiching" color and affects the overall "tone" of the piece
-        self.outlineColor = config.outlineColorObj.currentColor
+        self.outlineColor = qMngr.outlineColorObj.currentColor
         self.objWidth = 20
 
         self.outlineRange = [(20, 20, 250)]
@@ -52,7 +165,7 @@ class unit:
         self.fillColorMode = "random"
         self.lineColorMode = "red"
         self.changeColor = True
-        self.lines = config.lines
+        self.lines = qMngr.lines
 
     def setUp(self, n=0):
 
@@ -84,8 +197,8 @@ class unit:
         ### Higher numbers means more possible steps so slower
         ### transitions - 1,10 very blinky, 10,200 very slow
         self.colOverlay.randomRange = (
-            self.config.transitionStepsMin,
-            self.config.transitionStepsMax,
+            self.qMngr.transitionStepsMin,
+            self.qMngr.transitionStepsMax,
         )
 
         """
@@ -118,7 +231,7 @@ class unit:
 
     def update(self):
         # self.fillColorMode == "random" or
-        if random.SystemRandom().random() > config.colorPopProb:
+        if random.SystemRandom().random() > qMngr.colorPopProb:
             self.colOverlay.stepTransition()
             self.fillColor = tuple(
                 int(a * self.brightness) for a in self.colOverlay.currentColor
@@ -129,9 +242,9 @@ class unit:
     def renderPolys(self):
 
         if self.fillColorMode == "red":
-            brightnessFactor = self.config.brightnessFactorDark
+            brightnessFactor = self.qMngr.brightnessFactorDark
         else:
-            brightnessFactor = self.config.brightnessFactorLight
+            brightnessFactor = self.qMngr.brightnessFactorLight
 
         self.outlineColor = tuple(
             int(a * self.brightness * brightnessFactor)
@@ -149,9 +262,9 @@ class unit:
     def render(self):
 
         if self.fillColorMode == "red":
-            brightnessFactor = self.config.brightnessFactorDark
+            brightnessFactor = self.qMngr.brightnessFactorDark
         else:
-            brightnessFactor = self.config.brightnessFactorLight
+            brightnessFactor = self.qMngr.brightnessFactorLight
 
         self.outlineColor = tuple(
             int(a * self.brightness * brightnessFactor)
@@ -206,19 +319,19 @@ class unit:
 
 def drawSquareSpiral():
 
-    global config
+    global config, qMngr
 
-    config.t1 = time.time()
-    config.t2 = time.time()
+    qMngr.t1 = time.time()
+    qMngr.t2 = time.time()
 
     setTimeout(resetToAllowDistortion, 3000)
 
-    cntrOffset = [config.cntrOffsetX, config.cntrOffsetY]
+    cntrOffset = [qMngr.cntrOffsetX, qMngr.cntrOffsetY]
 
-    config.unitArray = []
+    qMngr.unitArray = []
 
     ## Alignment perfect setup
-    # if config.patternPrecision :
+    # if qMngr.patternPrecision :
     #     sizeAdjustor = 1
 
     n = 0
@@ -227,7 +340,7 @@ def drawSquareSpiral():
     darkValues = [0.1 * config.brightness, 0.5 * config.brightness]
     lightValues = [0.5 * config.brightness, 1.0 * config.brightness]
 
-    opticalPattern = config.opticalPattern
+    opticalPattern = qMngr.opticalPattern
 
     """
     LIGHTENING PATTERN
@@ -239,9 +352,9 @@ def drawSquareSpiral():
 
     """
 
-    for rows in range(config.blockRows):
+    for rows in range(qMngr.blockRows):
 
-        for cols in range(config.blockCols):
+        for cols in range(qMngr.blockCols):
 
             if opticalPattern == "Diagonals":
                 if cols % 2 > 0 and rows % 2 > 0 or cols % 2 <= 0 and rows % 2 <= 0:
@@ -304,8 +417,8 @@ def drawSquareSpiral():
                 bottomValues = darkValues
                 leftValues = darkValues
 
-            hDelta = config.numUnits * config.blockLength * 2 + config.hGapSize
-            vDelta = config.numUnits * config.blockHeight * 2 + config.vGapSize
+            hDelta = qMngr.numUnits * qMngr.blockLength * 2 + qMngr.hGapSize
+            vDelta = qMngr.numUnits * qMngr.blockHeight * 2 + qMngr.vGapSize
 
             _center = [cols * hDelta + cntrOffset[0], rows * vDelta + cntrOffset[1]]
             outlineColorObj = coloroverlay.ColorOverlay()
@@ -315,13 +428,13 @@ def drawSquareSpiral():
             n += 1
 
             ## Archimedean spiral is  r = a + b * theta
-            turns = config.numUnits + 1
-            _blockLength = config.blockLength
-            _blockHeight = config.blockHeight
+            turns = qMngr.numUnits + 1
+            _blockLength = qMngr.blockLength
+            _blockHeight = qMngr.blockHeight
 
             A = []
             B = []
-            rangeChange = (config.polyDistortionMin, config.polyDistortionMax)
+            rangeChange = (qMngr.polyDistortionMin, qMngr.polyDistortionMax)
 
             for i in range(1, turns):
                 x = (
@@ -366,7 +479,7 @@ def drawSquareSpiral():
 
             B = [(_item[0] - _blockLength*1.25, _item[1]) for _item in A]
 
-            obj = unit(config)
+            obj = unit(config, qMngr)
             obj.fillColorMode = "red"
             obj.changeColor = False
             obj.outlineColorObj = outlineColorObj
@@ -381,7 +494,7 @@ def drawSquareSpiral():
             obj.maxHue = 36
 
             obj.setUp(n)
-            config.unitArray.append(obj)
+            qMngr.unitArray.append(obj)
 
             n = 1
 
@@ -389,70 +502,70 @@ def drawSquareSpiral():
                 with contextlib.suppress(Exception):
                     # LEFT
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/4))
-                    obj = unit(config)
+                    obj = unit(config, qMngr)
                     obj.poly = (B[n + 1], A[n + 1], A[n + 0], B[n + 0])
                     obj.changeColor = False
                     obj.outlineColorObj = outlineColorObj
 
-                    obj.minHue = config.redRange[0]
-                    obj.maxHue = config.redRange[1]
-                    obj.minSaturation = 0.5 * config.saturationRangeFactorLeft[0]
-                    obj.maxSaturation = 1 * config.saturationRangeFactorLeft[1]
+                    obj.minHue = qMngr.redRange[0]
+                    obj.maxHue = qMngr.redRange[1]
+                    obj.minSaturation = 0.5 * qMngr.saturationRangeFactorLeft[0]
+                    obj.maxSaturation = 1 * qMngr.saturationRangeFactorLeft[1]
                     obj.minValue = leftValues[0]
                     obj.maxValue = leftValues[1]
 
                     obj.setUp(n)
-                    config.unitArray.append(obj)
+                    qMngr.unitArray.append(obj)
 
                     # BOTTOM
-                    obj = unit(config)
+                    obj = unit(config, qMngr)
                     obj.poly = (B[n + 0], A[n - 1], B[n + 3], A[n + 4])
                     obj.changeColor = False
                     obj.outlineColorObj = outlineColorObj
 
                     obj.minHue = 0
                     obj.maxHue = 360
-                    obj.minSaturation = 0.8 * config.saturationRangeFactorLeft[0]
-                    obj.maxSaturation = 1 * config.saturationRangeFactorLeft[1]
+                    obj.minSaturation = 0.8 * qMngr.saturationRangeFactorLeft[0]
+                    obj.maxSaturation = 1 * qMngr.saturationRangeFactorLeft[1]
                     obj.minValue = bottomValues[0]
                     obj.maxValue = bottomValues[1]
 
                     obj.setUp(n)
-                    config.unitArray.append(obj)
+                    qMngr.unitArray.append(obj)
                     # draw.polygon(poly, fill=colorutils.randomColor())
 
                     # RIGHT
-                    obj = unit(config)
+                    obj = unit(config, qMngr)
                     obj.poly = (B[n + 2], A[n + 2], A[n + 3], B[n + 3])
                     obj.changeColor = False
                     obj.outlineColorObj = outlineColorObj
 
                     obj.minHue = 0
                     obj.maxHue = 360
-                    obj.minSaturation = 0.7 * config.saturationRangeFactorRight[0]
-                    obj.maxSaturation = 0.9 * config.saturationRangeFactorRight[1]
+                    obj.minSaturation = 0.7 * qMngr.saturationRangeFactorRight[0]
+                    obj.maxSaturation = 0.9 * qMngr.saturationRangeFactorRight[1]
                     obj.minValue = rightValues[0]
                     obj.maxValue = rightValues[1]
 
                     obj.setUp(n)
-                    config.unitArray.append(obj)
+                    qMngr.unitArray.append(obj)
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness * 1.2))
 
                     # TOP
-                    obj = unit(config)
+                    obj = unit(config, qMngr)
                     obj.poly = (B[n + 1], A[n + 5], B[n + 6], A[n + 2])
                     obj.changeColor = False
                     obj.outlineColorObj = outlineColorObj
 
-                    obj.minHue = config.redRange[0]
-                    obj.maxHue = config.redRange[1]
-                    obj.minSaturation = 0.7 * config.saturationRangeFactorRight[0]
-                    obj.maxSaturation = 0.9 * config.saturationRangeFactorRight[1]
+                    obj.minHue = qMngr.redRange[0]
+                    obj.maxHue = qMngr.redRange[1]
+                    obj.minSaturation = 0.7 * qMngr.saturationRangeFactorRight[0]
+                    obj.maxSaturation = 0.9 * qMngr.saturationRangeFactorRight[1]
                     obj.minValue = topValues[0]
                     obj.maxValue = topValues[1]
 
                     obj.setUp(n)
-                    config.unitArray.append(obj)
+                    qMngr.unitArray.append(obj)
                     # draw.polygon(poly, fill=colorutils.randomColor(config.brightness/1.5))
                     n += 4
 
@@ -468,28 +581,28 @@ def restartPiece():
     config.doingSectionDisturbance = False
     config.rebuildingPattern = True
 
-    config.polyDistortionMin = -random.SystemRandom().uniform(
-        1, config.polyDistortion + 1
+    qMngr.polyDistortionMin = -random.SystemRandom().uniform(
+        1, qMngr.polyDistortion + 1
     )
-    config.polyDistortionMax = random.SystemRandom().uniform(
-        1, config.polyDistortion + 1
+    qMngr.polyDistortionMax = random.SystemRandom().uniform(
+        1, qMngr.polyDistortion + 1
     )
 
-    del config.unitArray[:]
+    del qMngr.unitArray[:]
 
-    p = math.floor(random.SystemRandom().uniform(0, len(config.opticalPatterns)))
+    p = math.floor(random.SystemRandom().uniform(0, len(qMngr.opticalPatterns)))
 
-    config.opticalPattern = config.opticalPatterns[p]
+    qMngr.opticalPattern = qMngr.opticalPatterns[p]
 
-    if random.SystemRandom().random() < config.sizeFactorChangeProb:
-        config.sizeFactor = config.extraSizeMultiplier
+    if random.SystemRandom().random() < qMngr.sizeFactorChangeProb:
+        qMngr.sizeFactor = qMngr.extraSizeMultiplier
     else:
-        config.sizeFactor = config.baseSizeMultiplier
+        qMngr.sizeFactor = qMngr.baseSizeMultiplier
 
-    config.blockLength = config.blockLengthBase * config.sizeFactor
-    config.blockHeight = config.blockHeightBase * config.sizeFactor
+    qMngr.blockLength = qMngr.blockLengthBase * qMngr.sizeFactor
+    qMngr.blockHeight = qMngr.blockHeightBase * qMngr.sizeFactor
 
-    print(f"{config.opticalPattern} {str(config.sizeFactor)}")
+    print(f"{qMngr.opticalPattern} {str(qMngr.sizeFactor)}")
 
     drawSquareSpiral()
 
@@ -504,13 +617,13 @@ def transformImage(img):
         (new_width, height), Image.AFFINE, (1, m, 0, 0, 1, 0), Image.BICUBIC
     )
     img = img.transform(
-        (new_width, height), Image.PERSPECTIVE, config.transformTuples, Image.BICUBIC
+        (new_width, height), Image.PERSPECTIVE, qMngr.transformTuples, Image.BICUBIC
     )
     return img
 
 
 def main(run=True):
-    global config, directionOrder, workConfig
+    global config, directionOrder, workConfig, qMngr
     print("---------------------")
     print("QUILT Loaded")
 
@@ -522,119 +635,11 @@ def main(run=True):
 
     config.brightness = float(workConfig.get("displayconfig", "brightness"))
     colorutils.brightness = config.brightness
-    config.canvasImageWidth = config.screenWidth
-    config.canvasImageHeight = config.screenHeight
-    # config.canvasImageWidth -= 4
-    # config.canvasImageHeight -= 4
 
-    config.outlineColorObj = coloroverlay.ColorOverlay()
-    config.outlineColorObj.randomRange = (5.0, 30.0)
-    config.outlineColorObj.colorTransitionSetup()
+    qMngr = QuiltManager(config)
+    qMngr.setUp(workConfig)
 
-    config.transitionStepsMin = float(
-        workConfig.get("quilt-informal", "transitionStepsMin")
-    )
-    config.transitionStepsMax = float(
-        workConfig.get("quilt-informal", "transitionStepsMax")
-    )
-
-    config.transformShape = workConfig.getboolean("quilt-informal", "transformShape")
-    transformTuples = workConfig.get("quilt-informal", "transformTuples").split(",")
-    config.transformTuples = tuple(float(i) for i in transformTuples)
-
-    redRange = workConfig.get("quilt-informal", "redRange").split(",")
-    config.redRange = tuple(int(i) for i in redRange)
-
-    try:
-        saturationRangeFactorLeft = workConfig.get(
-            "quilt-informal", "saturationRangeFactorLeft"
-        ).split(",")
-        config.saturationRangeFactorLeft = tuple(
-            float(i) for i in saturationRangeFactorLeft
-        )
-
-        saturationRangeFactorRight = workConfig.get(
-            "quilt-informal", "saturationRangeFactorRight"
-        ).split(",")
-        config.saturationRangeFactorRight = tuple(
-            float(i) for i in saturationRangeFactorRight
-        )
-
-    except Exception as e:
-        print(e)
-        config.saturationRangeFactorLeft = (1, 1)
-        config.saturationRangeFactorRight = (1, 1)
-
-    backgroundColor = workConfig.get("quilt-informal", "backgroundColor").split(",")
-    config.backgroundColor = tuple(int(i) for i in backgroundColor)
-
-    config.numUnits = int(workConfig.get("quilt-informal", "numUnits"))
-    config.hGapSize = int(workConfig.get("quilt-informal", "hGapSize"))
-    config.vGapSize = int(workConfig.get("quilt-informal", "vGapSize"))
-    config.blockSize = int(workConfig.get("quilt-informal", "blockSize"))
-    config.blockLength = float(workConfig.get("quilt-informal", "blockLength"))
-    config.blockHeight = float(workConfig.get("quilt-informal", "blockHeight"))
-    config.blockLengthBase = float(workConfig.get("quilt-informal", "blockLength"))
-    config.blockHeightBase = float(workConfig.get("quilt-informal", "blockHeight"))
-    config.blockRows = int(workConfig.get("quilt-informal", "blockRows"))
-    config.blockCols = int(workConfig.get("quilt-informal", "blockCols"))
-    config.cntrOffsetX = int(workConfig.get("quilt-informal", "cntrOffsetX"))
-    config.cntrOffsetY = int(workConfig.get("quilt-informal", "cntrOffsetY"))
     config.delay = float(workConfig.get("quilt-informal", "delay"))
-    config.colorPopProb = float(workConfig.get("quilt-informal", "colorPopProb"))
-    config.brightnessFactorDark = float(
-        workConfig.get("quilt-informal", "brightnessFactorDark")
-    )
-    config.brightnessFactorLight = float(
-        workConfig.get("quilt-informal", "brightnessFactorLight")
-    )
-    config.lines = workConfig.getboolean("quilt-informal", "lines")
-    config.patternPrecision = workConfig.getboolean(
-        "quilt-informal", "patternPrecision"
-    )
-
-    config.polyDistortion = float(workConfig.get("quilt-informal", "polyDistortion"))
-    config.polyDistortionMin = -config.polyDistortion
-    config.polyDistortionMax = config.polyDistortion
-
-    # stacking the decks a bit in favor of vertical lightening strike and regular
-    try:
-        config.opticalPatterns = workConfig.get(
-            "quilt-informal", "opticalPatterns"
-        ).split(",")
-    except Exception as e:
-        print(e)
-        config.opticalPatterns = [
-            "Regular",
-            "Regular",
-            "LighteningStrikeH",
-            "LighteningStrikeH",
-            "Diagonals",
-            "LighteningStrikeH",
-        ]
-
-    # Chance that when the Quilt rebuilds the pattern doubles in size
-    config.sizeFactorChangeProb = float(
-        workConfig.get("quilt-informal", "sizeFactorChangeProb")
-    )
-    config.baseSizeMultiplier = float(
-        workConfig.get("quilt-informal", "baseSizeMultiplier")
-    )
-    config.extraSizeMultiplier = float(
-        workConfig.get("quilt-informal", "extraSizeMultiplier")
-    )
-
-    # "LighteningStrikeH"  aka Charlie Brown sweater ...
-
-    # for now, all squares
-    # config.blockLength = config.blockSize
-    # config.blockHeight = config.blockSize
-
-    p = math.floor(random.SystemRandom().uniform(0, len(config.opticalPatterns)))
-    config.opticalPattern = config.opticalPatterns[p]
-
-    config.timeToComplete = int(workConfig.get("quilt-informal", "timeToComplete"))
-    # config.timeToComplete = 60 #round(random.SystemRandom().uniform(30,220))
 
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
@@ -695,12 +700,12 @@ def runWork():
 
 
 def iterate():
-    global config
-    config.outlineColorObj.stepTransition()
+    global config, qMngr
+    qMngr.outlineColorObj.stepTransition()
 
     if not config.doingSectionDisturbance :
-        for i in range(len(config.unitArray)):
-            obj = config.unitArray[i]
+        for i in range(len(qMngr.unitArray)):
+            obj = qMngr.unitArray[i]
             if random.SystemRandom().random() > 0.98:
                 obj.outlineColorObj.stepTransition()
             obj.update()
@@ -711,10 +716,10 @@ def iterate():
     temp = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     tDraw = ImageDraw.Draw(temp)
     tDraw.rectangle(
-        ((0, 0), (config.screenWidth, config.screenHeight)), fill=config.backgroundColor
+        ((0, 0), (config.screenWidth, config.screenHeight)), fill=qMngr.backgroundColor
     )
 
-    if config.transformShape :
+    if qMngr.transformShape :
         temp = transformImage(temp)
 
     if config.sectionDisturbance :
@@ -729,7 +734,7 @@ def iterate():
     config.image.paste(config.canvasImage, (0, 0), config.canvasImage)
     temp1.paste(config.image, (0, 0), config.image)
 
-    if config.transformShape :
+    if qMngr.transformShape :
         temp1 = transformImage(temp1)
 
     if config.useWaveDistortion :
@@ -747,10 +752,10 @@ def iterate():
     )
     # Done
 
-    config.t2 = time.time()
-    delta = config.t2 - config.t1
+    qMngr.t2 = time.time()
+    delta = qMngr.t2 - qMngr.t1
 
-    if delta > config.timeToComplete:
+    if delta > qMngr.timeToComplete:
         if config.sectionDisturbance :
             # these functions are run to restart disturber
             distortions.resetFunction(config)

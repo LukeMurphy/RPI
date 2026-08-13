@@ -27,6 +27,227 @@ from copy import copy
 
 # --------------------- CLASSES     ---------------------
 
+class RepeatedPatterns:
+    path = ""
+    brightness = 1.0
+    setupDeBug = False
+    blockWidthMin = 48
+    blockWidthMax = 64
+    yOffset = 12
+    yOffset2 = 13
+    blockRotation = 0.0
+    canvasRotation = -0.0
+    imgcanvasOffsetX = 0
+    imgcanvasOffsetY = 0
+    pictureWidth = 512
+    pictureHeight = 224
+    repeatProb = 0.99
+    saveImages = False
+    outPutPath = ""
+    drawBGColorEachCycle = True
+    repeatDrawingMode = 1
+    loadAnImageProb = 0.0
+    imageSources = []
+    useBlurSection = False
+    blurSectionWidth = 120
+    blurSectionHeight = 60
+    blurSectionXPos = 220
+    blurSectionYPos = 0
+    mask_blur_amt = 20
+    cp_blur_amt = 3
+    resetOverlayProbability = 0.0
+    useClipPlayer = True
+    clipXPos = 100
+    clipYPos = 100
+    clipRotate = 90.0
+    steps = 2
+    fadeThroughIncrement = 0.005
+    faderProbDissolve = 0.2
+    faderLargeBlockXSections = 10
+    faderLargeBlockYSections = 2
+    faderSmallBlockXSections = 32
+    faderSmallBlockYSections = 64
+    sectionDeltaWidth = 20
+    sectionDeltaHeight = 5
+    faderParallelBlocks = 5
+    faderFadeDoingRefreshCountIterations = 1
+    faderDissolveDoingRefreshCountIterations = 20
+    faderDoingRefreshCountIterationsStartup = 100
+    doTransition = True
+    doneCount = 0
+    faderInit = False
+    faderDoingRefreshCountIterations = 100
+    fader = None
+    usePolygonOverlay = False
+    polyOverlay = None
+    tileOverlayGridProb = 0.5
+    poly_alpha = 255
+    useOverlayTileGrid = True
+    polyOverlayMode = "overlay"
+    polyOverlayChangeProb = 0.001
+    tileOverlayGrid = []
+    polyBase = []
+    patternSequence = []
+    slotsToChange = []
+    settingUpPattern = True
+    lastPatternSelected = ""
+    consecutivePatternChoiceCount = 0
+    consecutivePatternCount = 0
+    rebuildAllSlotsProb = 0.001
+    rebuildIndividualSlotProb = 0.9
+    chanceRebuildPatternChoosesRandom = 0.2
+    rebuildSlotSkipRate = 0.1
+    rebuildSlotStartSkipRate = 0.05
+    patternModel = None
+    rebuildPatternProbability = 0.0004
+    probPatternsRebuildAfterNewPalette = 0.99
+    changePaletteWhenRebuildProb = 0.25
+    patternChangeWhenBuilding = 0.05
+    changeFullPaletteWhenChangingPatternProb = 0.5
+    changeEachblockWhenChangingPatternProb = 0.95
+    changePaletteWhenChangingPatternProb = 0.0
+    altColoringProb = 0.5
+    popRandomColorProb = False
+    blockSizeChangeProb = 0.5
+    blockSizeChangeAlwaysUseMax = False
+    numScaleRows = 4
+    stepsRange = (2, 3)
+    ringsRange = (10, 18)
+    patternOrientation = -90.0
+    numRows = 2
+    numRowsRandomize = False
+    linesOnly = False
+    waveScaleRings = 18
+    waveScaleSteps = 2
+    usePixelSortRandomize = False
+    randomBlockProb = 0.99
+    randomBlockWidth = 0
+    randomBlockHeight = 0
+    decoBoxBandWidth = 3
+    diamondUseTriangles = False
+    diamondStep = 1
+    minnumConcentricBoxes = 2
+    maxnumConcentricBoxes = 16
+    numShingleRows = 2
+    amplitude = 9
+    amplitude2 = 9
+    shingleVariation = True
+    shingleVariationRange = 6
+    shingleVariationAmount = 6
+    numDotRows = 3
+    speedFactor = 1.0
+    phaseFactor = 4.0
+    xSpeed = 0.8
+    ySpeed = 0.1
+    ySpeedInit = 0.1
+    lineDiff = 2
+    useDoubleLine = True
+    randomizeSpeed = True
+    steps2 = 2
+    xIncrementer = 1
+    yIncrementer = 1
+    combinationSets = []
+    changeCombinationAnytimeProb = 0.99
+    currentCombinationsetIndex = 7
+    numberOfRandomizersUsed = 0
+    comboSetDirector = None
+    palettesConfigFile = ""
+    paletteConfig = None
+    palettes = []
+    bgColorAlpha = [100, 250]
+    allAvailablePalettesList = []
+    c1 = None
+    c2 = None
+    c3 = None
+    c4 = None
+    currentPaletteIndex = 0
+    transformShape = False
+    transformTuples = (1.2, 0.0, 1.0, -0.0, 1.0, 0.1, 0.005, 0.0)
+    useWaveDistortion = True
+    waveAmplitude = 20.0
+    waveAmplitudeMax = 40.0
+    waveAmplitudeMin = -20.0
+    waveAmplitudeSpeed = 0.0001
+    wavePeriodMod = 5.0
+    wavegridspace = 30
+    pNoiseMod = 10.0
+    waveDeformXPosRate = 0.001
+    waveDeformXPos = 0
+    sectionDisturbance = True
+    doSectionDisturbance = False
+    disturbanceConfigSets = ["heavy"]
+    changeDisturbanceSetProb = 0.25
+    skipFrames = 0
+    skipFramesCount = 0
+    disturbanceConfigFile = ""
+    disturbanceConfig = None
+    baseSectionSpeed = 0.2
+    sectionPlacementXRange = (-10, 384)
+    sectionPlacementYRange = (-10, 200)
+    sectionWidthRange = (88, 180)
+    sectionHeightRange = (88, 180)
+    numberOfSections = 20
+    sectionMovementCountMax = 100
+    redoSectionDisturbance = 0.01
+    rebuildImmediatelyAfterDone = False
+    disturbanceScaleX = 9.0
+    disturbanceScaleY = 9.0
+    stableSectionsMin = 2
+    stableSectionsMax = 3
+    stableSectionsMinWidth = 20
+    stableSectionsMinHeight = 24
+    stableSegments = []
+    movingSections = []
+    drawingPrinted = False
+    blockWidth = 48
+    blockHeight = 48
+    blockImage = None
+    blockDraw = None
+    patternBlockCols = 11
+    patternBlockRows = 5
+    totalSlots = 55
+    altLineColoring = True
+    numConcentricBoxes = 3
+    floral = None
+    usedPatterns = []
+    initPatternBuild = False
+    randomInsertionCount = 0
+    useBorderPattern = False
+    borderPattern = ""
+    patternsInBands = False
+    borderDrawn = False
+    imageXPOS = 0
+    imageYPOS = 0
+    XPOSSpeed = 0.0
+    YPOSSpeed = 0.0
+    useSubPixelSmoothing = True
+
+
+    filterRemapping = True
+    filterRemappingProb = .0005
+    filterRemapMinHoriSize = 32
+    filterRemapMinVertSize = 32
+    filterRemapMaxHoriSize = 256
+    filterRemapMaxVertSize = 192
+    filterRemapRangeX = 256
+    filterRemapRangeY = 192
+
+    rows = 0
+    cols = 0
+    tileSizeWidth = 0
+    tileSizeHeight = 0
+
+    def __init__(self):
+        pass
+
+    def debugSelf(self):
+        allArgs = self.__dict__
+        for element in allArgs:
+            print(f"{element} = {allArgs[element]}")
+
+        method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
+        # print(f"[RepeatedPatterns] {method_list}")
+
 
 class Fader:
 
@@ -1098,6 +1319,7 @@ def remapFilter(config):
     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
     config.remapImageBlockDestination = [startX, startY]
 
+
 def iterate():
     """Performs a single iteration of the animation."""
     global config
@@ -1386,15 +1608,17 @@ def renderComposite():
         global overlayControls
         if overlayControls.usingPanelOverlays:
             overlayControls.targetImageRef = config.destinationImage
+            
         if overlayControls.useBlanks:
             config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
             overlayControls.destinationImageDraw = config.destinationImageDraw
+
         overlayControls.handleOverlayActions()
 
-        # config.image = config.destinationImage.copy()
-
+        # Special polygon overlay for certain types of framing
         if rpO.usePolygonOverlay:
             config.destinationImage = shapeOverLayFunction(config.destinationImage)
+
         config.render(config.destinationImage, 0, 0)
 
 
@@ -1426,21 +1650,23 @@ def showDebugCanvases(config):
 
 
 def shapeOverLayFunction(temp1):
+    global rpO
+    _rpO : RepeatedPatterns = rpO
     temp2 = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     temp2Draw = ImageDraw.Draw(temp2)
 
-    if not rpO.useOverlayTileGrid:
-        rpO.polyOverlay.stepTransition()
-        polyFillaList = [int(a) for a in (rpO.polyOverlay.currentColor)]
-        polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], rpO.poly_alpha)
+    if not _rpO.useOverlayTileGrid:
+        _rpO.polyOverlay.stepTransition()
+        polyFillaList = [int(a) for a in (_rpO.polyOverlay.currentColor)]
+        polyFilla = (polyFillaList[0], polyFillaList[1], polyFillaList[2], _rpO.poly_alpha)
         # actual shape
-        if random.random() < rpO.polyOverlayChangeProb:
-            rpO.polyBase[0][0] += random.uniform(-3, 3)
-            rpO.polyBase[1][0] += random.uniform(-3, 3)
-            rpO.polyBase[2][0] += random.uniform(-3, 3)
-            rpO.polyBase[3][0] += random.uniform(-3, 3)
-            rpO.polyBase[4][0] += random.uniform(-3, 3)
-        poly = tuple(map(lambda x: (tuple(x)), rpO.polyBase))
+        if random.random() < _rpO.polyOverlayChangeProb:
+            _rpO.polyBase[0][0] += random.uniform(-3, 3)
+            _rpO.polyBase[1][0] += random.uniform(-3, 3)
+            _rpO.polyBase[2][0] += random.uniform(-3, 3)
+            _rpO.polyBase[3][0] += random.uniform(-3, 3)
+            _rpO.polyBase[4][0] += random.uniform(-3, 3)
+        poly = tuple(map(lambda x: (tuple(x)), _rpO.polyBase))
 
         # outline outside shape
         # poly = ((11,20),(24,160),(300,160),(300,200),(0,200),(0,0),(300,0),(200,12),(20,20))
@@ -1454,14 +1680,14 @@ def shapeOverLayFunction(temp1):
         temp1.paste(temp2, (0, 0), temp2)
     else:
         _count = 0
-        _overlayFill = tuple(round(a * config.brightness) for a in rpO.c3.currentColor)
-        for _r in range(rpO.rows):
-            for _c in range(rpO.cols):
-                _x0 = _c * rpO.tileSizeWidth
-                _y0 = _r * rpO.tileSizeHeight
-                _x1 = _x0 + rpO.tileSizeWidth
-                _y1 = _y0 + rpO.tileSizeHeight
-                if _count in rpO.tileOverlayGrid:
+        _overlayFill = tuple(round(a * config.brightness) for a in _rpO.c3.currentColor)
+        for _r in range(_rpO.rows):
+            for _c in range(_rpO.cols):
+                _x0 = _c * _rpO.tileSizeWidth
+                _y0 = _r * _rpO.tileSizeHeight
+                _x1 = _x0 + _rpO.tileSizeWidth
+                _y1 = _y0 + _rpO.tileSizeHeight
+                if _count in _rpO.tileOverlayGrid:
                     temp2Draw.rectangle((_x0, _y0, _x1, _y1), fill=_overlayFill)
                 # else :
                 #     temp2Draw.rectangle((_x0,_y0,_x1,_y1), fill=(200,0,0,0))
@@ -1478,16 +1704,16 @@ def shapeOverLayFunction(temp1):
         #     case "lighter":
         #         temp1 = ImageChops.lighter(temp1, temp2)
 
-        if rpO.polyOverlayMode == "overaly":
+        if _rpO.polyOverlayMode == "overaly":
             temp1 = ImageChops.overlay(temp1, temp2)
-        if rpO.polyOverlayMode == "subtract_modulo":
+        if _rpO.polyOverlayMode == "subtract_modulo":
             temp1 = ImageChops.subtract_modulo(temp1, temp2)
-        if rpO.polyOverlayMode == "soft_light":
+        if _rpO.polyOverlayMode == "soft_light":
             temp1 = ImageChops.soft_light(temp1, temp2)
-        if rpO.polyOverlayMode == "lighter":
+        if _rpO.polyOverlayMode == "lighter":
             temp1 = ImageChops.lighter(temp1, temp2)
 
-        if random.random() < config.polyOverlayChangeProb:
+        if random.random() < _rpO.polyOverlayChangeProb:
             generateOverlayTiles()
         # temp1.paste(temp2, (0, 0), temp2)
     return temp1
@@ -1513,9 +1739,8 @@ def generateOverlayTiles():
             rpO.tileOverlayGrid.append(_v)
 
 
-def setupPolyOverlay():  # sourcery skip: extract-method
+def setupPolyOverlay(): 
     rpO.usePolygonOverlay = False
-    config.usePolygonOverlay = False
     try:
         rpO.polyOverlay = ColorOverlay()
         rpO.polyOverlay.randomSteps = True
@@ -1542,6 +1767,7 @@ def setupPolyOverlay():  # sourcery skip: extract-method
         generateOverlayTiles()
         loadPolyOverlaybaseValues()
         # print(config.polyBase)
+
     except Exception as e:
         pieceLogger(f"[setupPolyOverlay] >> Not using custom polygon overlay {e}")
         rpO.usePolygonOverlay = False
@@ -1615,223 +1841,6 @@ def createImageHolders():
     rpO.compositeImage = config.compositeImage
 
 
-class RepeatedPatterns:
-    path = ""
-    brightness = 1.0
-    setupDeBug = False
-    blockWidthMin = 48
-    blockWidthMax = 64
-    yOffset = 12
-    yOffset2 = 13
-    blockRotation = 0.0
-    canvasRotation = -0.0
-    imgcanvasOffsetX = 0
-    imgcanvasOffsetY = 0
-    pictureWidth = 512
-    pictureHeight = 224
-    repeatProb = 0.99
-    saveImages = False
-    outPutPath = ""
-    drawBGColorEachCycle = True
-    repeatDrawingMode = 1
-    loadAnImageProb = 0.0
-    imageSources = []
-    useBlurSection = False
-    blurSectionWidth = 120
-    blurSectionHeight = 60
-    blurSectionXPos = 220
-    blurSectionYPos = 0
-    mask_blur_amt = 20
-    cp_blur_amt = 3
-    resetOverlayProbability = 0.0
-    useClipPlayer = True
-    clipXPos = 100
-    clipYPos = 100
-    clipRotate = 90.0
-    steps = 2
-    fadeThroughIncrement = 0.005
-    faderProbDissolve = 0.2
-    faderLargeBlockXSections = 10
-    faderLargeBlockYSections = 2
-    faderSmallBlockXSections = 32
-    faderSmallBlockYSections = 64
-    sectionDeltaWidth = 20
-    sectionDeltaHeight = 5
-    faderParallelBlocks = 5
-    faderFadeDoingRefreshCountIterations = 1
-    faderDissolveDoingRefreshCountIterations = 20
-    faderDoingRefreshCountIterationsStartup = 100
-    doTransition = True
-    doneCount = 0
-    faderInit = False
-    faderDoingRefreshCountIterations = 100
-    fader = None
-    usePolygonOverlay = False
-    polyOverlay = None
-    tileOverlayGridProb = 0.5
-    poly_alpha = 255
-    useOverlayTileGrid = True
-    polyOverlayMode = "overlay"
-    polyOverlayChangeProb = 0.001
-    tileOverlayGrid = []
-    polyBase = []
-    patternSequence = []
-    slotsToChange = []
-    settingUpPattern = True
-    lastPatternSelected = ""
-    consecutivePatternChoiceCount = 0
-    consecutivePatternCount = 0
-    rebuildAllSlotsProb = 0.001
-    rebuildIndividualSlotProb = 0.9
-    chanceRebuildPatternChoosesRandom = 0.2
-    rebuildSlotSkipRate = 0.1
-    rebuildSlotStartSkipRate = 0.05
-    patternModel = None
-    rebuildPatternProbability = 0.0004
-    probPatternsRebuildAfterNewPalette = 0.99
-    changePaletteWhenRebuildProb = 0.25
-    patternChangeWhenBuilding = 0.05
-    changeFullPaletteWhenChangingPatternProb = 0.5
-    changeEachblockWhenChangingPatternProb = 0.95
-    changePaletteWhenChangingPatternProb = 0.0
-    altColoringProb = 0.5
-    popRandomColorProb = False
-    blockSizeChangeProb = 0.5
-    blockSizeChangeAlwaysUseMax = False
-    numScaleRows = 4
-    stepsRange = (2, 3)
-    ringsRange = (10, 18)
-    patternOrientation = -90.0
-    numRows = 2
-    numRowsRandomize = False
-    linesOnly = False
-    waveScaleRings = 18
-    waveScaleSteps = 2
-    usePixelSortRandomize = False
-    randomBlockProb = 0.99
-    randomBlockWidth = 0
-    randomBlockHeight = 0
-    decoBoxBandWidth = 3
-    diamondUseTriangles = False
-    diamondStep = 1
-    minnumConcentricBoxes = 2
-    maxnumConcentricBoxes = 16
-    numShingleRows = 2
-    amplitude = 9
-    amplitude2 = 9
-    shingleVariation = True
-    shingleVariationRange = 6
-    shingleVariationAmount = 6
-    numDotRows = 3
-    speedFactor = 1.0
-    phaseFactor = 4.0
-    xSpeed = 0.8
-    ySpeed = 0.1
-    ySpeedInit = 0.1
-    lineDiff = 2
-    useDoubleLine = True
-    randomizeSpeed = True
-    steps2 = 2
-    xIncrementer = 1
-    yIncrementer = 1
-    combinationSets = []
-    changeCombinationAnytimeProb = 0.99
-    currentCombinationsetIndex = 7
-    numberOfRandomizersUsed = 0
-    comboSetDirector = None
-    palettesConfigFile = ""
-    paletteConfig = None
-    palettes = []
-    bgColorAlpha = [100, 250]
-    allAvailablePalettesList = []
-    c1 = None
-    c2 = None
-    c3 = None
-    c4 = None
-    currentPaletteIndex = 0
-    transformShape = False
-    transformTuples = (1.2, 0.0, 1.0, -0.0, 1.0, 0.1, 0.005, 0.0)
-    useWaveDistortion = True
-    waveAmplitude = 20.0
-    waveAmplitudeMax = 40.0
-    waveAmplitudeMin = -20.0
-    waveAmplitudeSpeed = 0.0001
-    wavePeriodMod = 5.0
-    wavegridspace = 30
-    pNoiseMod = 10.0
-    waveDeformXPosRate = 0.001
-    waveDeformXPos = 0
-    sectionDisturbance = True
-    doSectionDisturbance = False
-    disturbanceConfigSets = ["heavy"]
-    changeDisturbanceSetProb = 0.25
-    skipFrames = 0
-    skipFramesCount = 0
-    disturbanceConfigFile = ""
-    disturbanceConfig = None
-    baseSectionSpeed = 0.2
-    sectionPlacementXRange = (-10, 384)
-    sectionPlacementYRange = (-10, 200)
-    sectionWidthRange = (88, 180)
-    sectionHeightRange = (88, 180)
-    numberOfSections = 20
-    sectionMovementCountMax = 100
-    redoSectionDisturbance = 0.01
-    rebuildImmediatelyAfterDone = False
-    disturbanceScaleX = 9.0
-    disturbanceScaleY = 9.0
-    stableSectionsMin = 2
-    stableSectionsMax = 3
-    stableSectionsMinWidth = 20
-    stableSectionsMinHeight = 24
-    stableSegments = []
-    movingSections = []
-    drawingPrinted = False
-    blockWidth = 48
-    blockHeight = 48
-    blockImage = None
-    blockDraw = None
-    patternBlockCols = 11
-    patternBlockRows = 5
-    totalSlots = 55
-    altLineColoring = True
-    numConcentricBoxes = 3
-    floral = None
-    usedPatterns = []
-    initPatternBuild = False
-    randomInsertionCount = 0
-    useBorderPattern = False
-    borderPattern = ""
-    patternsInBands = False
-    borderDrawn = False
-    imageXPOS = 0
-    imageYPOS = 0
-    XPOSSpeed = 0.0
-    YPOSSpeed = 0.0
-    useSubPixelSmoothing = True
-
-
-    filterRemapping = True
-    filterRemappingProb = .0005
-    filterRemapMinHoriSize = 32
-    filterRemapMinVertSize = 32
-    filterRemapMaxHoriSize = 256
-    filterRemapMaxVertSize = 192
-    filterRemapRangeX = 256
-    filterRemapRangeY = 192
-
-    def __init__(self):
-        pass
-
-    def debugSelf(self):
-        allArgs = self.__dict__
-        for element in allArgs:
-            print(f"{element} = {allArgs[element]}")
-
-        method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
-        # print(f"[RepeatedPatterns] {method_list}")
-
-
 def main(run=True):
     global config
     global rpO
@@ -1843,6 +1852,12 @@ def main(run=True):
     rpO.path = config.path
     rpO.brightness =  config.brightness
     rpO.config = config
+    # for the overlay function when doing
+    # strict panels
+    rpO.rows = config.rows
+    rpO.cols = config.cols
+    rpO.tileSizeWidth = config.tileSizeWidth
+    rpO.tileSizeHeight = config.tileSizeHeight
 
     loadConfigValue(rpO, workConfig, "movingpattern", "setupDeBug", False, bool)
 

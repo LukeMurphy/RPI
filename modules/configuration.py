@@ -217,6 +217,23 @@ class ArtWorkConfig:
 
     rotation = 0
 
+    # Common images and drawing
+    image = None
+    imageDraw = None
+    draw = None
+    canvasImage = None
+    destinationImage = None
+    destinationImageDraw = None
+    overlayImage = None
+    overlayImageDraw = None
+    underLayer = None
+    underLayerDraw = None
+
+    redrawSpeed = .03
+    slotRate = .03
+    directorController = None
+
+
     def __init__(self, args=None, _silent=False):
         if not _silent:
             print("\n[configuration.py: ArtWorkConfig] ---------------------------------------------------------------------------------------")

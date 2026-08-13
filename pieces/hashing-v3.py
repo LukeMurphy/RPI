@@ -3,15 +3,135 @@ import random
 import time
 import math
 from noise import *
-from modules.configuration import bcolors, pieceLogger
-from modules import colorutils, panelDrawing, badpixels
+from modules.configuration import ArtWorkConfig, bcolors, pieceLogger
+from modules import colorutils, panelDrawing
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
-from PIL import Image, ImageDraw, ImageChops
+from PIL import Image, ImageDraw
 from modules.holder_director import Director
 from pieces.screen import Holder
 
 # ################################################### #
 # hatching hashing lines
+
+global hashLines
+
+
+class HashingMarksLines :
+
+    # These are all overwritten but useful to have 
+    # for code hinting....
+    drawingWidth = 385
+    drawingHeight = 320
+    imageXPOS = 0
+    imageXPOSSpeed = 0.0
+    imageYPOS = 0
+    largestDim = 385
+    pointsPerLine = 28
+    pointsPerLineCol = 28
+    pointsPerLineRow = 28
+    curveResolution = 10
+    noiseSeed = 0.2754912575422065
+    numberOfinformalLines = 122
+    xOffset = 8
+    yOffset = 8
+    renderLinesAsEnvelope = True
+    drawVertical = True
+    drawHorizontal = True
+    singleLineRegularSpacing = False
+    drawingHeightRange = [18, 180]
+    lineSpeedRange = [1, 20]
+    baseWidthRange = [18, 180]
+    backTrackRange = [1, 10]
+    ratioFactorRange = [18.0, 180.0]
+    verticalMovement = True
+    horizontalMovement = True
+    horizontalMovementProb = 0.002
+    verticalMovementProb = 0.002
+    singleLinesAngle = 0.0
+    tangleProb = 1.0
+    uniformRatio = False
+    squareRatio = False
+    noiseAmplitudeRangeRow = [1.1, 4.0]
+    noiseAmplitudeRangeCol = [1.1, 4.0]
+    colFirst = True
+    vertLineChange = 0.0148
+    horizLineChange = 0.0018
+    vertLineChangeRange = [0.001, 0.02]
+    horizLineChangeRange = [0.001, 0.002]
+    vertlineSpeedRange = [1, 20]
+    horzlineSpeedRange = [1, 20]
+    rowIntervalRange = [20, 80]
+    colIntervalRange = [20, 80]
+    horizLineSpeedRange = [1, 3]
+    vertLineSpeedRange = [1, 3]
+    vertBaseWidthRange = [0, 0]
+    horizBaseWidthRange = [0, 0]
+    rowAdj = 1
+    colAdj = 1
+    changeLinesProb = 0.0004
+    changeBGProb = 0.0003
+    pauseProb = 0.0002
+    unpauseProb = 0.003
+    noChange = False
+    useSingleMode = False
+    lightMode = False
+    lightModeProb = 0.0
+    bg_alpha_returnrate = 0.2
+    lightLinesOnGroundProb = 0.0
+    lightLinesOnGround = False
+    rebuildingVerticals = False
+    useBgBox = False
+    useBgBoxProb = 0.01
+    bgBoxBox = (0, 0, 256, 256)
+    bgBoxFill = (100, 0, 80, 100)
+    bgTileSizeWidthMin = 64.0
+    bgTileSizeWidthMax = 128.0
+    bgTileSizeHeightMin = 64.0
+    bgTileSizeHeightMax = 129.0
+    clearbgBoxProb = 0.0003
+    bgGlitchCyclesMin = 4.0
+    bgGlitchCyclesMax = 30.0
+    bgGlitchDisplacementHorizontal = 10.0
+    bgGlitchDisplacementVertical = 10.0
+
+    initialRunsOfBgBlocks = 30
+    paletteSets = []
+    activePalette = None
+    informalLineUnits = []
+    colInterval = 54
+    rowInterval = 66
+    colSpacing = 6.83
+    rowSpacing = 4.606
+    noiseAmplitudeCol = 2.919
+    noiseAmplitudeRow = 1.557
+
+    line_alpha = 22
+    bg_alpha_base = 39
+    lineColor = (14, 8, 7, 24)
+    bg_alpha = 89
+    bg_minHue = 355.0
+    bg_maxHue = 10.0
+    bg_minSaturation = 0.1
+    bg_maxSaturation = 0.4
+    bg_minValue = 0.9
+    bg_maxValue = 0.9
+    bg_dropHueMin = 0.0
+    bg_dropHueMax = 0.0
+    lineColorIsBgColor = False
+    bgColor = (230, 183, 176, 89)
+    bgBoxColorRange = [345.0, 10.0, 0.5, 1.0, 0.2, 1.0, 0.0, 0.0]
+
+    def __init__(self):
+        pass
+
+    def debugSelf(self):
+        allArgs = self.__dict__
+        for element in allArgs:
+            print(f"{element} = {allArgs[element]}")
+
+        method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
+        # print(f"[RepeatedPatterns] {method_list}")
+
 
 class Pen:
     def __init__(self):
@@ -38,7 +158,7 @@ class InformalLine:
     def __init__(self, _unitNumber, _config=None):
         self.unitNumber = _unitNumber
         self.lineColor = None
-        self.canvas = Image.new("RGBA", (config.largestDim, config.largestDim))
+        self.canvas = Image.new("RGBA", (hashLines.largestDim, hashLines.largestDim))
         self.draw = ImageDraw.Draw(self.canvas)
         self.config = _config
 
@@ -81,8 +201,8 @@ class InformalLine:
         for i in range(self.points):
             a = i * pointSpacing
             b = R(-self.noiseAmplitude, self.noiseAmplitude)
-            if random.random() < config.tangleProb and i != 0 and i != self.points - 1 and abs(b) > self.noiseAmplitude * 0.75:
-                a -= random.uniform(config.backTrackRange[0], config.backTrackRange[1])
+            if random.random() < hashLines.tangleProb and i != 0 and i != self.points - 1 and abs(b) > self.noiseAmplitude * 0.75:
+                a -= random.uniform(hashLines.backTrackRange[0], hashLines.backTrackRange[1])
             self.rawPts.append((round(b + self.xOffset), round(a + self.yOffset)))
 
         # ensures the last point at the right or bottom closes the box
@@ -94,8 +214,8 @@ class InformalLine:
     def generateInformalLine(self):
 
         self.points = random.randint(3, self.pointPerLine)
-        self.ratioFactor = random.uniform(config.ratioFactorRange[0], config.ratioFactorRange[1])
-        self.resolution = config.curveResolution
+        self.ratioFactor = random.uniform(hashLines.ratioFactorRange[0], hashLines.ratioFactorRange[1])
+        self.resolution = hashLines.curveResolution
         self.direction = 1 if random.random() < 0.5 else 0
 
         self.generateRawLine()
@@ -111,7 +231,7 @@ class InformalLine:
         pointsToDraw = self.curvedPoints
         lastPt = [pointsToDraw[0][0], pointsToDraw[0][1]]
 
-        self.draw.rectangle((0, 0, config.largestDim, config.largestDim), fill=(0, 0, 0, 0))
+        self.draw.rectangle((0, 0, hashLines.largestDim, hashLines.largestDim), fill=(0, 0, 0, 0))
 
         _ptCounter = 0
         for pt in pointsToDraw:
@@ -131,7 +251,7 @@ class InformalLine:
             # self.drawLinePolyEnvelope()
             _ptCounter += 1
 
-        if (self.angle != 0 and random.random() < config.horizontalMovementProb) or (self.angle == 0 and random.random() < config.verticalMovementProb):
+        if (self.angle != 0 and random.random() < hashLines.horizontalMovementProb) or (self.angle == 0 and random.random() < hashLines.verticalMovementProb):
             if self.direction == 0:
                 for _ in range(self.lineSpeed):
                     _lstpt = pointsToDraw[0][0]
@@ -157,8 +277,8 @@ class InformalLine:
         _penWidth = self.baseWidth * _ratio * _ratio1a
 
         fillClr = self.lineColor
-        if config.lineColorIsBgColor:
-            fillClr = config.bgColor
+        if hashLines.lineColorIsBgColor:
+            fillClr = hashLines.bgColor
 
         if self.angle == 90:
             config.draw.line([_p1[1], _p1[0], _p2[1], _p2[0]], fill=tuple(fillClr), width=round(self.baseWidth))
@@ -326,12 +446,12 @@ def clearbgBox():
         xPos + config.canvasWidth,
         yPos + config.canvasHeight,
     )
-    config.bgBoxFill = (0, 0, 0, 0)
-    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
-    config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
+    hashLines.bgBoxFill = (0, 0, 0, 0)
+    config.underLayerDraw.rectangle(hashLines.bgBoxBox, fill=hashLines.bgBoxFill)
+    hashLines.bgBoxColorRange = random.choice(hashLines.activePalette.bgBoxColorRanges)
 
 
-def _bgColorsFilling(config):
+def _bgColorsFilling():
     # config.useBgBox = False if config.useBgBox   else True
     # print("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
@@ -340,36 +460,36 @@ def _bgColorsFilling(config):
     xPos = math.floor(random.uniform(0, config.canvasWidth))
     yPos = math.floor(random.uniform(0, config.canvasHeight))
 
-    config.tileSizeWidth = round(random.uniform(config.bgTileSizeWidthMin, config.bgTileSizeWidthMax))
-    config.tileSizeHeight = round(random.uniform(config.bgTileSizeHeightMin, config.bgTileSizeHeightMax))
+    hashLines.tileSizeWidth = round(random.uniform(hashLines.bgTileSizeWidthMin, hashLines.bgTileSizeWidthMax))
+    hashLines.tileSizeHeight = round(random.uniform(hashLines.bgTileSizeHeightMin, hashLines.bgTileSizeHeightMax))
 
-    config.bgBoxBox = (
+    hashLines.bgBoxBox = (
         xPos,
         yPos,
-        xPos + config.tileSizeWidth,
-        yPos + config.tileSizeHeight,
+        xPos + hashLines.tileSizeWidth,
+        yPos + hashLines.tileSizeHeight,
     )
-    cR = config.bgBoxColorRange
+    cR = hashLines.bgBoxColorRange
     # print(cR)
     bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
     # print(bgBoxFill)
-    config.bgBoxFill = (
+    hashLines.bgBoxFill = (
         round(config.brightness * bgBoxFill[0]),
         round(config.brightness * bgBoxFill[1]),
         round(config.brightness * bgBoxFill[2]),
-        round(random.uniform(config.activePalette.bgBoxAlphaRange[0], config.activePalette.bgBoxAlphaRange[1])),
+        round(random.uniform(hashLines.activePalette.bgBoxAlphaRange[0], hashLines.activePalette.bgBoxAlphaRange[1])),
     )
 
-    config.underLayerDraw.rectangle(config.bgBoxBox, fill=config.bgBoxFill)
+    config.underLayerDraw.rectangle(hashLines.bgBoxBox, fill=hashLines.bgBoxFill)
 
-    glitchIterations = round(random.uniform(config.bgGlitchCyclesMin, config.bgGlitchCyclesMax))
+    glitchIterations = round(random.uniform(hashLines.bgGlitchCyclesMin, hashLines.bgGlitchCyclesMax))
     for _ in range(glitchIterations):
         glitchBox(
             config.underLayer,
             config.canvasWidth,
             config.canvasHeight,
-            config.bgGlitchDisplacementHorizontal,
-            config.bgGlitchDisplacementVertical,
+            hashLines.bgGlitchDisplacementHorizontal,
+            hashLines.bgGlitchDisplacementVertical,
         )
 
 
@@ -377,44 +497,44 @@ def _bgColorsFilling(config):
 
 
 def setLineColor():
-    if not config.lightMode:
-        if config.lightLinesOnGround:
+    if not hashLines.lightMode:
+        if hashLines.lightLinesOnGround:
             return colorutils.getRandomColorHSV(
-                config.activePalette.line_mid_minHue,
-                config.activePalette.line_mid_maxHue,
-                config.activePalette.line_mid_minSaturation,
-                config.activePalette.line_mid_maxSaturation,
-                config.activePalette.line_mid_minValue,
-                config.activePalette.line_mid_maxValue,
-                config.activePalette.line_mid_minDropHue,
-                config.activePalette.line_mid_maxDropHue,
-                round(random.uniform(config.activePalette.line_mid_alpha_range[0], config.activePalette.line_mid_alpha_range[1])),
+                hashLines.activePalette.line_mid_minHue,
+                hashLines.activePalette.line_mid_maxHue,
+                hashLines.activePalette.line_mid_minSaturation,
+                hashLines.activePalette.line_mid_maxSaturation,
+                hashLines.activePalette.line_mid_minValue,
+                hashLines.activePalette.line_mid_maxValue,
+                hashLines.activePalette.line_mid_minDropHue,
+                hashLines.activePalette.line_mid_maxDropHue,
+                round(random.uniform(hashLines.activePalette.line_mid_alpha_range[0], hashLines.activePalette.line_mid_alpha_range[1])),
                 config.brightness,
             )
         else:
             return colorutils.getRandomColorHSV(
-                config.activePalette.line_minHue,
-                config.activePalette.line_maxHue,
-                config.activePalette.line_minSaturation,
-                config.activePalette.line_maxSaturation,
-                config.activePalette.line_minValue,
-                config.activePalette.line_maxValue,
-                config.activePalette.line_minDropHue,
-                config.activePalette.line_maxDropHue,
-                round(random.uniform(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1])),
+                hashLines.activePalette.line_minHue,
+                hashLines.activePalette.line_maxHue,
+                hashLines.activePalette.line_minSaturation,
+                hashLines.activePalette.line_maxSaturation,
+                hashLines.activePalette.line_minValue,
+                hashLines.activePalette.line_maxValue,
+                hashLines.activePalette.line_minDropHue,
+                hashLines.activePalette.line_maxDropHue,
+                round(random.uniform(hashLines.activePalette.line_alpha_range[0], hashLines.activePalette.line_alpha_range[1])),
                 config.brightness,
             )
     else:
         return colorutils.getRandomColorHSV(
-            config.activePalette.line_light_minHue,
-            config.activePalette.line_light_maxHue,
-            config.activePalette.line_light_minSaturation,
-            config.activePalette.line_light_maxSaturation,
-            config.activePalette.line_light_minValue,
-            config.activePalette.line_light_maxValue,
-            config.activePalette.line_light_minDropHue,
-            config.activePalette.line_light_maxDropHue,
-            round(random.uniform(config.activePalette.line_light_alpha_range[0], config.activePalette.line_light_alpha_range[1])),
+            hashLines.activePalette.line_light_minHue,
+            hashLines.activePalette.line_light_maxHue,
+            hashLines.activePalette.line_light_minSaturation,
+            hashLines.activePalette.line_light_maxSaturation,
+            hashLines.activePalette.line_light_minValue,
+            hashLines.activePalette.line_light_maxValue,
+            hashLines.activePalette.line_light_minDropHue,
+            hashLines.activePalette.line_light_maxDropHue,
+            round(random.uniform(hashLines.activePalette.line_light_alpha_range[0], hashLines.activePalette.line_light_alpha_range[1])),
             config.brightness,
         )
 
@@ -423,36 +543,36 @@ def setLineColor():
 
 def setBGColor():
 
-    config.activePalette = random.choice(config.paletteSets)
-    pieceLogger(f"NEW palette: {config.activePalette.name}")
+    hashLines.activePalette = random.choice(hashLines.paletteSets)
+    pieceLogger(f"NEW palette: {hashLines.activePalette.name}")
 
-    config.bg_alpha = round(random.uniform(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1]))
-    config.bg_minHue = config.activePalette.bg_minHue
-    config.bg_maxHue = config.activePalette.bg_maxHue
-    config.bg_minSaturation = config.activePalette.bg_minSaturation
-    config.bg_maxSaturation = config.activePalette.bg_maxSaturation
-    config.bg_minValue = config.activePalette.bg_minValue
-    config.bg_maxValue = config.activePalette.bg_maxValue
-    config.bg_dropHueMin = config.activePalette.bg_dropHueMin
-    config.bg_dropHueMax = config.activePalette.bg_dropHueMax
+    hashLines.bg_alpha = round(random.uniform(hashLines.activePalette.bg_alpha_range[0], hashLines.activePalette.bg_alpha_range[1]))
+    hashLines.bg_minHue = hashLines.activePalette.bg_minHue
+    hashLines.bg_maxHue = hashLines.activePalette.bg_maxHue
+    hashLines.bg_minSaturation = hashLines.activePalette.bg_minSaturation
+    hashLines.bg_maxSaturation = hashLines.activePalette.bg_maxSaturation
+    hashLines.bg_minValue = hashLines.activePalette.bg_minValue
+    hashLines.bg_maxValue = hashLines.activePalette.bg_maxValue
+    hashLines.bg_dropHueMin = hashLines.activePalette.bg_dropHueMin
+    hashLines.bg_dropHueMax = hashLines.activePalette.bg_dropHueMax
 
-    config.lineColorIsBgColor = config.activePalette.lineColorIsBgColor
+    hashLines.lineColorIsBgColor = hashLines.activePalette.lineColorIsBgColor
 
-    _minVal = config.bg_minValue
-    _maxVal = config.bg_maxValue
-    if config.lightMode:
+    _minVal = hashLines.bg_minValue
+    _maxVal = hashLines.bg_maxValue
+    if hashLines.lightMode:
         _minVal = 0.0
         _maxVal = 0.1
-    config.bgColor = colorutils.getRandomColorHSV(
-        config.bg_minHue,
-        config.bg_maxHue,
-        config.bg_minSaturation,
-        config.bg_maxSaturation,
+    hashLines.bgColor = colorutils.getRandomColorHSV(
+        hashLines.bg_minHue,
+        hashLines.bg_maxHue,
+        hashLines.bg_minSaturation,
+        hashLines.bg_maxSaturation,
         _minVal,
         _maxVal,
-        config.bg_dropHueMin,
-        config.bg_dropHueMax,
-        config.bg_alpha,
+        hashLines.bg_dropHueMin,
+        hashLines.bg_dropHueMax,
+        hashLines.bg_alpha,
         config.brightness,
     )
 
@@ -465,12 +585,12 @@ def setBGColor():
     #     # the blank changes, it comes in over a second or two
     #     config.blankColor = (0, 0, 0, 15)
 
-    if random.random() < config.lightLinesOnGroundProb:
-        config.lightLinesOnGround = True
+    if random.random() < hashLines.lightLinesOnGroundProb:
+        hashLines.lightLinesOnGround = True
     else:
-        config.lightLinesOnGround = False
+        hashLines.lightLinesOnGround = False
 
-    config.bgBoxColorRange = random.choice(config.activePalette.bgBoxColorRanges)
+    hashLines.bgBoxColorRange = random.choice(hashLines.activePalette.bgBoxColorRanges)
 
     # pieceLogger("New BG")
 
@@ -479,113 +599,114 @@ def setBGColor():
 
 
 def setLines():
+    global hashLines
     pieceLogger(f"New Lines:")
-    config.informalLineUnits = []
-    setGridLines()
+    hashLines.informalLineUnits = []
+    setGridLines(hashLines)
 
 
 def setRegularSpacing():
-    config.colInterval = random.randint(int(config.colIntervalRange[0]), int(config.colIntervalRange[1]))
+    hashLines.colInterval = random.randint(int(hashLines.colIntervalRange[0]), int(hashLines.colIntervalRange[1]))
 
     # if uniformRatio, the column ratio is used for the rows as well - this means even rectangles across field
-    if config.uniformRatio:
-        config.rowInterval = config.colInterval
+    if hashLines.uniformRatio:
+        hashLines.rowInterval = hashLines.colInterval
     else:
-        config.rowInterval = random.randint(int(config.rowIntervalRange[0]), int(config.rowIntervalRange[1]))
+        hashLines.rowInterval = random.randint(int(hashLines.rowIntervalRange[0]), int(hashLines.rowIntervalRange[1]))
 
-    config.colSpacing = (config.drawingWidth - 2 * config.xOffset) / config.colInterval
-    config.rowSpacing = (config.drawingHeight - 2 * config.yOffset) / config.rowInterval
+    hashLines.colSpacing = (hashLines.drawingWidth - 2 * hashLines.xOffset) / hashLines.colInterval
+    hashLines.rowSpacing = (hashLines.drawingHeight - 2 * hashLines.yOffset) / hashLines.rowInterval
 
     # if squareRatio, the column ratio and spacing is used for the rows as well - this means all squares across field
-    if config.squareRatio:
-        config.rowSpacing = config.colSpacing
+    if hashLines.squareRatio:
+        hashLines.rowSpacing = hashLines.colSpacing
 
 
-def setGridLines():
-    pieceLogger(f"Making Grid:  {config.drawingWidth } {config.drawingHeight }")
+def setGridLines(hashLines):
+    pieceLogger(f"Making Grid:  {hashLines.drawingWidth } {hashLines.drawingHeight }")
 
     setRegularSpacing()
 
-    config.noiseAmplitudeCol = random.uniform(float(config.noiseAmplitudeRangeCol[0]), float(config.noiseAmplitudeRangeCol[1]))
-    config.noiseAmplitudeRow = random.uniform(float(config.noiseAmplitudeRangeRow[0]), float(config.noiseAmplitudeRangeRow[1]))
+    hashLines.noiseAmplitudeCol = random.uniform(float(hashLines.noiseAmplitudeRangeCol[0]), float(hashLines.noiseAmplitudeRangeCol[1]))
+    hashLines.noiseAmplitudeRow = random.uniform(float(hashLines.noiseAmplitudeRangeRow[0]), float(hashLines.noiseAmplitudeRangeRow[1]))
 
     def add_col_lines():
         # config.v_pts = []
-        for col in range(config.colInterval + config.colAdj):
-            # v_pts = generateInformalLine(config.pointsPerLineCol, config.xOffset + config.colSpacing * col, config.yOffset, False)
-            # config.v_pts.append(v_pts)
+        for col in range(hashLines.colInterval + hashLines.colAdj):
+            # v_pts = generateInformalLine(hashLines.pointsPerLineCol, hashLines.xOffset + hashLines.colSpacing * col, hashLines.yOffset, False)
+            # hashLines.v_pts.append(v_pts)
             informalLine = InformalLine(col)
-            informalLine.xOffset = config.xOffset + config.colSpacing * col
-            informalLine.yOffset = config.yOffset
-            informalLine.drawingHeight = config.drawingHeight - 2 * config.yOffset
+            informalLine.xOffset = hashLines.xOffset + hashLines.colSpacing * col
+            informalLine.yOffset = hashLines.yOffset
+            informalLine.drawingHeight = hashLines.drawingHeight - 2 * hashLines.yOffset
 
-            informalLine.pointPerLine = config.pointsPerLineCol
-            informalLine.lineSpeedRange = config.vertLineSpeedRange
-            informalLine.baseWidthRange = config.vertBaseWidthRange
-            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeCol
-            # _bg_alpha = round(config.bg_alpha)
+            informalLine.pointPerLine = hashLines.pointsPerLineCol
+            informalLine.lineSpeedRange = hashLines.vertLineSpeedRange
+            informalLine.baseWidthRange = hashLines.vertBaseWidthRange
+            informalLine.noiseAmplitudeRange = hashLines.noiseAmplitudeRangeCol
+            # _bg_alpha = round(hashLines.bg_alpha)
 
             informalLine.lineColor = setLineColor()
             informalLine.reconfigure()
             informalLine.generateInformalLine()
             informalLine.isColumn = 1
             # pieceLogger(f"{informalLine.lineColor}")
-            config.informalLineUnits.append(informalLine)
+            hashLines.informalLineUnits.append(informalLine)
 
     def add_row_lines():
         # config.h_pts = []
-        for row in range(config.rowInterval + config.rowAdj):
+        for row in range(hashLines.rowInterval + hashLines.rowAdj):
             informalLine = InformalLine(row)
-            # h_pts = generateInformalLine(config.pointsPerLineRow, config.xOffset, config.yOffset + config.rowSpacing * row, True)
-            # config.h_pts.append(h_pts)
-            informalLine.xOffset = config.xOffset + config.rowSpacing * row
-            informalLine.yOffset = config.yOffset
-            informalLine.drawingHeight = config.drawingWidth - 2 * config.xOffset
+            # h_pts = generateInformalLine(hashLines.pointsPerLineRow, hashLines.xOffset, hashLines.yOffset + hashLines.rowSpacing * row, True)
+            # hashLines.h_pts.append(h_pts)
+            informalLine.xOffset = hashLines.xOffset + hashLines.rowSpacing * row
+            informalLine.yOffset = hashLines.yOffset
+            informalLine.drawingHeight = hashLines.drawingWidth - 2 * hashLines.xOffset
             informalLine.angle = 90
-            informalLine.pointPerLine = config.pointsPerLineRow
-            informalLine.lineSpeedRange = config.horizLineSpeedRange
-            informalLine.baseWidthRange = config.horizBaseWidthRange
-            informalLine.noiseAmplitudeRange = config.noiseAmplitudeRangeRow
+            informalLine.pointPerLine = hashLines.pointsPerLineRow
+            informalLine.lineSpeedRange = hashLines.horizLineSpeedRange
+            informalLine.baseWidthRange = hashLines.horizBaseWidthRange
+            informalLine.noiseAmplitudeRange = hashLines.noiseAmplitudeRangeRow
             informalLine.lineColor = setLineColor()
             informalLine.reconfigure()
             informalLine.generateInformalLine()
             informalLine.isColumn = 0
-            config.informalLineUnits.append(informalLine)
+            hashLines.informalLineUnits.append(informalLine)
 
-    if config.colFirst:
+    if hashLines.colFirst:
         add_col_lines()
         add_row_lines()
     else:
         add_row_lines()
         add_col_lines()
 
-    config.vertLineChange = R(config.vertLineChangeRange[0], config.vertLineChangeRange[1])
-    config.horizLineChange = R(config.horizLineChangeRange[0], config.horizLineChangeRange[1])
-    config.line_alpha = R(config.activePalette.line_alpha_range[0], config.activePalette.line_alpha_range[1], True)
-    config.bg_alpha_base = R(config.activePalette.bg_alpha_range[0], config.activePalette.bg_alpha_range[1], True)
-    config.numberOfinformalLines = len(config.informalLineUnits)
-    # pieceLogger(f"New Lines {config.numberOfinformalLines}")
+    hashLines.vertLineChange = R(hashLines.vertLineChangeRange[0], hashLines.vertLineChangeRange[1])
+    hashLines.horizLineChange = R(hashLines.horizLineChangeRange[0], hashLines.horizLineChangeRange[1])
+    hashLines.line_alpha = R(hashLines.activePalette.line_alpha_range[0], hashLines.activePalette.line_alpha_range[1], True)
+    hashLines.bg_alpha_base = R(hashLines.activePalette.bg_alpha_range[0], hashLines.activePalette.bg_alpha_range[1], True)
+    hashLines.numberOfinformalLines = len(hashLines.informalLineUnits)
+    # pieceLogger(f"New Lines {hashLines.numberOfinformalLines}")
 
 
 def changeLine():
-    _changeLine = random.randint(0, len(config.informalLineUnits) - 1)
-    config.informalLineUnits[_changeLine].reconfigure()
+    _changeLine = random.randint(0, len(hashLines.informalLineUnits) - 1)
+    hashLines.informalLineUnits[_changeLine].reconfigure()
 
 
 def drawTheBG():
-    config.bgColor = (config.bgColor[0], config.bgColor[1], config.bgColor[2], round(config.bg_alpha))
-    config.draw.rectangle((0, 0, config.drawingWidth, config.drawingHeight), fill=config.bgColor)
+    hashLines.bgColor = (hashLines.bgColor[0], hashLines.bgColor[1], hashLines.bgColor[2], round(hashLines.bg_alpha))
+    config.draw.rectangle((0, 0, hashLines.drawingWidth, hashLines.drawingHeight), fill=hashLines.bgColor)
 
     # if config.bg_alpha != config.bg_alpha_base :
     #     pieceLogger(f"{config.bg_alpha}  /  {config.bg_alpha_base}")
 
 
 def updateLines():
-    global config
+    global hashLines
 
-    for informalLineUnitIndex in range(0, len(config.informalLineUnits)):
+    for informalLineUnitIndex in range(0, len(hashLines.informalLineUnits)):
         lineUnit: InformalLine
-        lineUnit = config.informalLineUnits[informalLineUnitIndex]
+        lineUnit = hashLines.informalLineUnits[informalLineUnitIndex]
         lineUnit.makeLinePoints()
 
 
@@ -593,10 +714,11 @@ def updateLines():
 
 
 def runWork():
-    global configk
+    global config, hashLines
     print(bcolors.OKGREEN + "** " + bcolors.BOLD)
     print("Running hatchingmarks.py")
     print(bcolors.ENDC)
+    # hashLines.debugSelf()
 
     while config.isRunning == True:
         config.directorController.checkTime()
@@ -611,11 +733,11 @@ def runWork():
 
 def reDraw():
     # pieceLogger(f"{config.bg_alpha} {config.bg_alpha_base}")
-    if config.bg_alpha < config.bg_alpha_base:
-        config.bg_alpha += config.bg_alpha_returnrate
+    if hashLines.bg_alpha < hashLines.bg_alpha_base:
+        hashLines.bg_alpha += hashLines.bg_alpha_returnrate
 
-    if config.bg_alpha > config.bg_alpha_base:
-        config.bg_alpha = config.bg_alpha_base
+    if hashLines.bg_alpha > hashLines.bg_alpha_base:
+        hashLines.bg_alpha = hashLines.bg_alpha_base
 
     drawTheBG()
     updateLines()
@@ -624,41 +746,41 @@ def reDraw():
     # stomping on the one in progress
 
     # if random.random() < config.changeBGProb and not config.noChange:
-    if random.random() < config.changeBGProb and config.bg_alpha == config.bg_alpha_base and not config.noChange:
-        config.bg_alpha = 0
-        config.lightMode = False if random.random() > config.lightModeProb else True
-        # pieceLogger(f"change BG {config.lightMode} {config.bg_alpha}")
+    if random.random() < hashLines.changeBGProb and hashLines.bg_alpha == hashLines.bg_alpha_base and not hashLines.noChange:
+        hashLines.bg_alpha = 0
+        hashLines.lightMode = False if random.random() > hashLines.lightModeProb else True
+        # pieceLogger(f"change BG {hashLines.lightMode} {hashLines.bg_alpha}")
         setBGColor()
         # setLines()
 
-        for _u in range(config.numberOfinformalLines):
-            informalLine = config.informalLineUnits[_u]
+        for _u in range(hashLines.numberOfinformalLines):
+            informalLine = hashLines.informalLineUnits[_u]
             informalLine.lineColor = setLineColor()
 
             # pieceLogger(f"line {informalLine.lineColor} <= {config.lightMode}")
 
-    if random.random() < config.changeLinesProb and not config.noChange:
-        config.lightMode = False if random.random() > config.lightModeProb else True
-        config.bg_alpha = 0
+    if random.random() < hashLines.changeLinesProb and not hashLines.noChange:
+        hashLines.lightMode = False if random.random() > hashLines.lightModeProb else True
+        hashLines.bg_alpha = 0
         setBGColor()
         setLines()
         # pieceLogger(f"change LINE {config.lightMode} {config.bg_alpha}")
 
-    if random.random() < config.pauseProb:
-        config.noChange = True
+    if random.random() < hashLines.pauseProb:
+        hashLines.noChange = True
 
-    if random.random() < config.unpauseProb:
-        config.noChange = False
+    if random.random() < hashLines.unpauseProb:
+        hashLines.noChange = False
 
 
 def iterate():
-    global config, overlayControls
-    if random.SystemRandom().random() < config.useBgBoxProb and config.useBgBox:
-        _bgColorsFilling(config)
+    global config, overlayControls, hashLines
+    if random.SystemRandom().random() < hashLines.useBgBoxProb and hashLines.useBgBox:
+        _bgColorsFilling(hashLines)
 
     reDraw()
 
-    if random.SystemRandom().random() < config.clearbgBoxProb:
+    if random.SystemRandom().random() < hashLines.clearbgBoxProb:
         clearbgBox()
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
@@ -667,17 +789,17 @@ def iterate():
         config.panelDrawing.render()
 
     # badpixels.drawBlanks(config.image, False)
-    config.destinationImage.paste(config.image, (round(config.imageXPOS), round(config.imageYPOS)), config.image)
-    config.destinationImage.paste(config.image, (round(config.imageXPOS - config.drawingWidth), round(config.imageYPOS)), config.image)
+    config.destinationImage.paste(config.image, (round(hashLines.imageXPOS), round(hashLines.imageYPOS)), config.image)
+    config.destinationImage.paste(config.image, (round(hashLines.imageXPOS - hashLines.drawingWidth), round(hashLines.imageYPOS)), config.image)
     config.destinationImage.paste(config.underLayer, (0, 0), config.underLayer)
-    if not config.lightMode:
-        config.imageXPOS += config.imageXPOSSpeed
-    # config.imageYPOS += config.YPOSSpeed
+    if not hashLines.lightMode:
+        hashLines.imageXPOS += hashLines.imageXPOSSpeed
+    # hashLines.imageYPOS += hashLines.YPOSSpeed
 
-    if config.imageXPOS >= config.drawingWidth:
-        config.imageXPOS = 0
+    if hashLines.imageXPOS >= hashLines.drawingWidth:
+        hashLines.imageXPOS = 0
 
-    # if config.imageYPOS >= config.pictureHeight:
+    # if hashLines.imageYPOS >= hashLines.pictureHeight:
     # config.render(config.image, round(0, 0, config.drawingWidth, config.drawingHeight)
     # if config.usingPanelOverlays:
     #     drawPanelVariations(config.destinationImage)
@@ -741,12 +863,11 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
 
 
 def loadColorConfigs():
-
-    config.paletteSets = []
+    hashLines.paletteSets = []
     paletteList = workConfig.get("hatchingmarks", "paletteSets").split(",")
 
     for p in paletteList:
-        palette = Holder(config)
+        palette = Holder(hashLines)
 
         palette.name = p
         palette.line_minHue = float(workConfig.get(p, "line_minHue"))
@@ -810,221 +931,211 @@ def loadColorConfigs():
                 workConfig.get(p, "bgBoxAlphaRange").split(","),
             )
         )
-        config.paletteSets.append(palette)
+        hashLines.paletteSets.append(palette)
 
-    config.activePalette = random.choice(config.paletteSets)
+    hashLines.activePalette = random.choice(hashLines.paletteSets)
 
 
 def main(run=True):
-    global config
+    global config 
     global workConfig
     global overlayControls
+    global hashLines
 
-    config.imageXPOS = 0
-    config.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
-    config.imageYPOS = 0
-    config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.imageDraw = ImageDraw.Draw(config.image)
-    config.draw = ImageDraw.Draw(config.image)
+    hashLines = HashingMarksLines()
+    _config : ArtWorkConfig = config
+    
+    # Images and Drawing are set to the main config
+    _config.image = Image.new("RGBA", (_config.canvasWidth, _config.canvasHeight))
+    _config.imageDraw = ImageDraw.Draw(_config.image)
+    _config.draw = ImageDraw.Draw(_config.image)
 
-    config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+    _config.canvasImage = Image.new("RGBA", (_config.canvasWidth, _config.canvasHeight))
 
-    config.destinationImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
+    _config.destinationImage = Image.new("RGBA", (_config.canvasWidth, _config.canvasHeight))
+    _config.destinationImageDraw = ImageDraw.Draw(_config.destinationImage)
 
-    config.overlayImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.overlayImageDraw = ImageDraw.Draw(config.overlayImage)
+    _config.overlayImage = Image.new("RGBA", (_config.canvasWidth, _config.canvasHeight))
+    _config.overlayImageDraw = ImageDraw.Draw(_config.overlayImage)
 
-    config.underLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.underLayerDraw = ImageDraw.Draw(config.underLayer)
+    _config.underLayer = Image.new("RGBA", (_config.canvasWidth, _config.canvasHeight))
+    _config.underLayerDraw = ImageDraw.Draw(_config.underLayer)
 
-    config.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{config.canvasWidth}"))
-    config.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{config.canvasHeight}"))
-
-    config.largestDim = max(config.drawingWidth, config.drawingHeight)
+    hashLines.drawingWidth = int(workConfig.get("hatchingmarks", "drawingWidth", fallback=f"{_config.canvasWidth}"))
+    hashLines.drawingHeight = int(workConfig.get("hatchingmarks", "drawingHeight", fallback=f"{_config.canvasHeight}"))
+    hashLines.imageXPOS = 0
+    hashLines.imageXPOSSpeed = float(workConfig.get("hatchingmarks", "imageXPOSSpeed", fallback=0))
+    hashLines.imageYPOS = 0
+    hashLines.largestDim = max(hashLines.drawingWidth, hashLines.drawingHeight)
 
     # refinements for setting points per column and row so amplitude of noise can be adjusted to be more even if aspect ratio is more extreme - e.g narrow beam
     # but also, lower number makes the line more purely rectilinear so can give a greater focus to one directions linearity
-    config.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
-    config.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=config.pointsPerLine))
-    config.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=config.pointsPerLine))
+    hashLines.pointsPerLine = int(workConfig.get("hatchingmarks", "pointsPerLine"))
+    hashLines.pointsPerLineCol = int(workConfig.get("hatchingmarks", "pointsPerLineCol", fallback=hashLines.pointsPerLine))
+    hashLines.pointsPerLineRow = int(workConfig.get("hatchingmarks", "pointsPerLineRow", fallback=hashLines.pointsPerLine))
 
     # adjust higher for higer resolution
-    config.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
+    hashLines.curveResolution = int(workConfig.get("hatchingmarks", "curveResolution", fallback=10))
 
     # not really used - was used in first iteration using Perlin Noise
-    config.noiseSeed = random.random()
+    hashLines.noiseSeed = random.random()
 
     # if the shape is not single-lines, will be determined by rows and columns
-    config.numberOfinformalLines = int(workConfig.get("hatchingmarks", "numberOfinformalLines", fallback="3"))
+    hashLines.numberOfinformalLines = int(workConfig.get("hatchingmarks", "numberOfinformalLines", fallback="3"))
     # the edge spacing - critical to making the drawing as the edges matter more than the sum of the lines
-    config.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
-    config.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
+    hashLines.xOffset = int(workConfig.get("hatchingmarks", "xOffset"))
+    hashLines.yOffset = int(workConfig.get("hatchingmarks", "yOffset"))
 
     # for single linesneSpeed
-    config.renderLinesAsEnvelope = workConfig.getboolean("hatchingmarks", "renderLinesAsEnvelope", fallback=False)
-    config.drawVertical = workConfig.getboolean("hatchingmarks", "drawVertical", fallback=True)
-    config.drawHorizontal = workConfig.getboolean("hatchingmarks", "drawHorizontal", fallback=True)
-    config.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
-    config.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
-    config.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
-    config.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
-    config.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
-    config.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
-    config.verticalMovement = workConfig.getboolean("hatchingmarks", "verticalMovement", fallback=False)
-    config.horizontalMovement = workConfig.getboolean("hatchingmarks", "horizontalMovement", fallback=False)
-    config.horizontalMovementProb = float(workConfig.get("hatchingmarks", "horizontalMovementProb", fallback="0.25"))
-    config.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
-    config.singleLinesAngle = float(workConfig.get("hatchingmarks", "singleLinesAngle", fallback="0"))
-    config.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
+    hashLines.renderLinesAsEnvelope = workConfig.getboolean("hatchingmarks", "renderLinesAsEnvelope", fallback=False)
+    hashLines.drawVertical = workConfig.getboolean("hatchingmarks", "drawVertical", fallback=True)
+    hashLines.drawHorizontal = workConfig.getboolean("hatchingmarks", "drawHorizontal", fallback=True)
+    hashLines.singleLineRegularSpacing = workConfig.getboolean("hatchingmarks", "singleLineRegularSpacing", fallback=False)
+    hashLines.drawingHeightRange = [int(x) for x in workConfig.get("hatchingmarks", "drawingHeightRange", fallback="18,180").split(",")]
+    hashLines.lineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    hashLines.baseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "baseWidthRange", fallback="18,180").split(",")]
+    hashLines.backTrackRange = [int(x) for x in workConfig.get("hatchingmarks", "backTrackRange", fallback="0,0").split(",")]
+    hashLines.ratioFactorRange = [float(x) for x in workConfig.get("hatchingmarks", "ratioFactorRange", fallback="18,180").split(",")]
+    hashLines.verticalMovement = workConfig.getboolean("hatchingmarks", "verticalMovement", fallback=False)
+    hashLines.horizontalMovement = workConfig.getboolean("hatchingmarks", "horizontalMovement", fallback=False)
+    hashLines.horizontalMovementProb = float(workConfig.get("hatchingmarks", "horizontalMovementProb", fallback="0.25"))
+    hashLines.verticalMovementProb = float(workConfig.get("hatchingmarks", "verticalMovementProb", fallback="0.25"))
+    hashLines.singleLinesAngle = float(workConfig.get("hatchingmarks", "singleLinesAngle", fallback="0"))
+    hashLines.tangleProb = float(workConfig.get("hatchingmarks", "tangleProb", fallback="0"))
 
-    if config.singleLineRegularSpacing:
-        _hspacing = round(config.drawingWidth / (config.numberOfinformalLines + 2))
-        _vspacing = round(config.drawingHeight / (config.numberOfinformalLines + 2))
-        config.rowIntervalRange = [_vspacing, _vspacing]
-        config.colIntervalRange = [_hspacing, _hspacing]
+    if hashLines.singleLineRegularSpacing:
+        _hspacing = round(hashLines.drawingWidth / (hashLines.numberOfinformalLines + 2))
+        _vspacing = round(hashLines.drawingHeight / (hashLines.numberOfinformalLines + 2))
+        hashLines.rowIntervalRange = [_vspacing, _vspacing]
+        hashLines.colIntervalRange = [_hspacing, _hspacing]
 
     # means the row interval is the same as the column interval - if they are independent then
     # there can be more extreme column or row spacing, othewise they get the same ratio
-    config.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
+    hashLines.uniformRatio = workConfig.getboolean("hatchingmarks", "uniformRatio", fallback=False)
 
     # forces grid to squares - but is not currently compensated to will get ragged and missing
     # grids at edges of drawing
-    config.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
+    hashLines.squareRatio = workConfig.getboolean("hatchingmarks", "squareRatio", fallback=False)
 
     # the +/- variability of the points
-    config.noiseAmplitudeRangeRow = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback="1,1").split(",")]
-    config.noiseAmplitudeRangeCol = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback="1,1").split(",")]
-    config.colFirst = workConfig.getboolean("hatchingmarks", "colFirst", fallback=False)
+    hashLines.noiseAmplitudeRangeRow = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeRow", fallback="1,1").split(",")]
+    hashLines.noiseAmplitudeRangeCol = [float(x) for x in workConfig.get("hatchingmarks", "noiseAmplitudeRangeCol", fallback="1,1").split(",")]
+    hashLines.colFirst = workConfig.getboolean("hatchingmarks", "colFirst", fallback=False)
 
-    config.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
-    config.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
+    hashLines.vertLineChange = float(workConfig.get("hatchingmarks", "vertLineChange", fallback=0.01))
+    hashLines.horizLineChange = float(workConfig.get("hatchingmarks", "horizLineChange", fallback=0.01))
 
-    config.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
-    config.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
+    hashLines.vertLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "vertLineChangeRange", fallback=".05,.6").split(",")]
+    hashLines.horizLineChangeRange = [float(x) for x in workConfig.get("hatchingmarks", "horizLineChangeRange", fallback=".05,.6").split(",")]
 
-    config.vertlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
-    config.horzlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    hashLines.vertlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
+    hashLines.horzlineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "lineSpeedRange", fallback="1,20").split(",")]
 
-    config.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
-    config.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
+    hashLines.rowIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "rowIntervalRange", fallback="1,1").split(",")]
+    hashLines.colIntervalRange = [int(x) for x in workConfig.get("hatchingmarks", "colIntervalRange", fallback="1,1").split(",")]
 
-    config.horizLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "horizLineSpeedRange", fallback="1,20").split(",")]
-    config.vertLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineSpeedRange", fallback="1,20").split(",")]
-    config.vertBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertBaseWidthRange", fallback="18,180").split(",")]
-    config.horizBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "horizBaseWidthRange", fallback="18,180").split(",")]
+    hashLines.horizLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "horizLineSpeedRange", fallback="1,20").split(",")]
+    hashLines.vertLineSpeedRange = [int(x) for x in workConfig.get("hatchingmarks", "vertLineSpeedRange", fallback="1,20").split(",")]
+    hashLines.vertBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "vertBaseWidthRange", fallback="18,180").split(",")]
+    hashLines.horizBaseWidthRange = [int(x) for x in workConfig.get("hatchingmarks", "horizBaseWidthRange", fallback="18,180").split(",")]
 
-    config.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
-    config.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
+    hashLines.rowAdj = int(workConfig.get("hatchingmarks", "rowAdj", fallback=0))
+    hashLines.colAdj = int(workConfig.get("hatchingmarks", "colAdj", fallback=0))
 
-    config.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
+    hashLines.changeLinesProb = float(workConfig.get("hatchingmarks", "changeLinesProb", fallback=0.01))
     # probablility background changes
-    config.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
-    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
-    config.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
-    config.noChange = False
+    hashLines.changeBGProb = float(workConfig.get("hatchingmarks", "changeBGProb", fallback=0.001))
+    hashLines.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=0.0001))
+    hashLines.unpauseProb = float(workConfig.get("hatchingmarks", "unpauseProb", fallback=0.0001))
+    hashLines.noChange = False
 
     # overrides the variable background and line alpha changes and fixes at one value the rate at which the vertical and horizontal lines
-    config.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
+    hashLines.useSingleMode = workConfig.getboolean("hatchingmarks", "useSingleMode", fallback=True)
 
     # light lines on background - more like a drawing on a screen
-    config.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
-    config.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
-    config.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
-    config.lightLinesOnGroundProb = float(workConfig.get("hatchingmarks", "lightLinesOnGroundProb", fallback=0.0))
-    config.lightLinesOnGround = workConfig.getboolean("hatchingmarks", "lightLinesOnGround", fallback=False)
+    hashLines.lightMode = workConfig.getboolean("hatchingmarks", "lightMode", fallback=False)
+    hashLines.lightModeProb = float(workConfig.get("hatchingmarks", "lightModeProb", fallback=1.0))
+    hashLines.bg_alpha_returnrate = float(workConfig.get("hatchingmarks", "bg_alpha_returnrate", fallback=2.0))
+    hashLines.lightLinesOnGroundProb = float(workConfig.get("hatchingmarks", "lightLinesOnGroundProb", fallback=0.0))
+    hashLines.lightLinesOnGround = workConfig.getboolean("hatchingmarks", "lightLinesOnGround", fallback=False)
 
     # really there are 3 modes - black/dark lines on lighter ground, mid to light lines on lighter ground, light lines on dark ground
-    config.rebuildingVerticals = False
+    hashLines.rebuildingVerticals = False
 
+    hashLines.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
+    hashLines.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
+    hashLines.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "bgBoxBox").split(",")))
+    _config.renderImageFullOverlay = Image.new("RGBA", (_config.canvasWidth, _config.canvasHeight))
+    _config.renderDrawOver = ImageDraw.Draw(_config.renderImageFullOverlay)
+    hashLines.bgBoxFill = (100, 0, 80, 100)
 
-    config.useBgBox = workConfig.getboolean("hatchingmarks", "forcebgBox")
-    config.useBgBoxProb = float(workConfig.get("hatchingmarks", "useBgBoxProb"))
-    config.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "bgBoxBox").split(",")))
-    config.renderImageFullOverlay = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
-    config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
-    config.bgBoxFill = (100, 0, 80, 100)
+    hashLines.bgTileSizeWidthMin = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMin"))
+    hashLines.bgTileSizeWidthMax = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMax"))
+    hashLines.bgTileSizeHeightMin = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMin"))
+    hashLines.bgTileSizeHeightMax = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMax"))
 
-    config.bgTileSizeWidthMin = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMin"))
-    config.bgTileSizeWidthMax = float(workConfig.get("hatchingmarks", "bgTileSizeWidthMax"))
-    config.bgTileSizeHeightMin = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMin"))
-    config.bgTileSizeHeightMax = float(workConfig.get("hatchingmarks", "bgTileSizeHeightMax"))
+    hashLines.clearbgBoxProb = float(workConfig.get("hatchingmarks", "clearbgBoxProb"))
+    hashLines.bgGlitchCyclesMin = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMin"))
+    hashLines.bgGlitchCyclesMax = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMax"))
+    hashLines.bgGlitchDisplacementHorizontal = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementHorizontal"))
+    hashLines.bgGlitchDisplacementVertical = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementVertical"))
 
-    config.clearbgBoxProb = float(workConfig.get("hatchingmarks", "clearbgBoxProb"))
-    config.bgGlitchCyclesMin = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMin"))
-    config.bgGlitchCyclesMax = float(workConfig.get("hatchingmarks", "bgGlitchCyclesMax"))
-    config.bgGlitchDisplacementHorizontal = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementHorizontal"))
-    config.bgGlitchDisplacementVertical = float(workConfig.get("hatchingmarks", "bgGlitchDisplacementVertical"))
+    hashLines.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=".001"))
+    # hashLines.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
 
-    config.drawMoire = workConfig.getboolean("hatchingmarks", "drawMoire")
-    config.drawMoireProb = float(workConfig.get("hatchingmarks", "drawMoireProb"))
-    config.drawMoireProbOff = float(workConfig.get("hatchingmarks", "drawMoireProbOff"))
-
-    config.moireXPos = int(workConfig.get("hatchingmarks", "moireXPos"))
-    config.moireYPos = int(workConfig.get("hatchingmarks", "moireYPos"))
-    config.moireXDistance = int(workConfig.get("hatchingmarks", "moireXDistance"))
-    config.moireYDistance = int(workConfig.get("hatchingmarks", "moireYDistance"))
-    config.setMoireColor = workConfig.getboolean("hatchingmarks", "setMoireColor")
-    config.moireColorAltProb = float(workConfig.get("hatchingmarks", "moireColorAltProb"))
-    config.moireColor = tuple(map(lambda x: int(x), workConfig.get("hatchingmarks", "moireColor").split(",")))
-    config.moireColorAlt = tuple(
-        map(
-            lambda x: int(x),
-            workConfig.get("hatchingmarks", "moireColorAlt").split(","),
-        )
-    )
-
-    config.pauseProb = float(workConfig.get("hatchingmarks", "pauseProb", fallback=".001"))
-    # config.backgroundColorChangeProb = float(workConfig.get("hatchingmarks", "backgroundColorChangeProb", fallback=".001"))
-
-    config.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
+    hashLines.initialRunsOfBgBlocks = int(workConfig.get("hatchingmarks", "initialRunsOfBgBlocks", fallback=0))
 
     loadColorConfigs()
     # loadFilterRemapping()
     # resetPolyBlanks()
-    # if config.usingPanelOverlays:
+    # if _config.usingPanelOverlays:
     #     setPanelOverlays()
     setLines()
-    config.lineColor = setLineColor()
+    hashLines.lineColor = setLineColor()
     setBGColor()
 
-    # badpixels.setBlanksOnScreen(config)
+    # badpixels.setBlanksOnScreen(_config)
 
 
-    if config.useBgBox:
-        for _ in range(config.initialRunsOfBgBlocks):
-            _bgColorsFilling(config)
+    if hashLines.useBgBox:
+        for _ in range(hashLines.initialRunsOfBgBlocks):
+            _bgColorsFilling(hashLines)
 
-    overlayControls = BlanksAndDitherRemapping(config,  workConfig, "hatchingmarks")
+    # these need to be set for BlanksAndDitherRemapping
+    hashLines.canvasWidth = _config.canvasWidth
+    hashLines.canvasHeight = _config.canvasHeight
+    overlayControls = BlanksAndDitherRemapping(hashLines,  workConfig, "hatchingmarks")
+
     # for blanks
-    overlayControls.destinationImageDraw = config.destinationImageDraw
-    overlayControls.targetImageRef = config.destinationImage
+    overlayControls.destinationImageDraw = _config.destinationImageDraw
+    overlayControls.targetImageRef = _config.destinationImage
+    
     # for overlay
-    overlayControls.overlayImage = config.overlayImage
-    overlayControls.overlayImageDraw = config.overlayImageDraw
+    overlayControls.overlayImage = _config.overlayImage
+    overlayControls.overlayImageDraw = _config.overlayImageDraw
     overlayControls.setPanelOverlays()
     
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
-    panelDrawing.mockupBlock(config, workConfig)
+    panelDrawing.mockupBlock(_config, workConfig)
     #### Need to add something like this at final render call  as well
     """ 
         ########### RENDERING AS A MOCKUP OR AS REAL ###########
-        if config.useDrawingPoints == True :
-            config.panelDrawing.canvasToUse = config.renderImageFull
-            config.panelDrawing.render()
+        if _config.useDrawingPoints == True :
+            _config.panelDrawing.canvasToUse = _config.renderImageFull
+            _config.panelDrawing.render()
         else :
-            #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
-            #config.render(config.image, 0, 0)
-            config.render(config.renderImageFull, 0, 0)
+            #_config.render(_config.canvasImage, 0, 0, _config.canvasWidth, _config.canvasHeight)
+            #_config.render(_config.image, 0, 0)
+            _config.render(_config.renderImageFull, 0, 0)
     """
 
 
-
+    
     # managing speed of animation and framerate
-    config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed", fallback=0.02))
-    config.slotRate = float(workConfig.get("hatchingmarks", "slotRate", fallback=0.03))
-    config.directorController = Director(config)
-    config.directorController.slotRate = config.slotRate
+    _config.redrawSpeed = float(workConfig.get("hatchingmarks", "redrawSpeed", fallback=0.02))
+    _config.slotRate = float(workConfig.get("hatchingmarks", "slotRate", fallback=0.03))
+    _config.directorController = Director(_config)
+    _config.directorController.slotRate = _config.slotRate
 
     if run:
         runWork()

@@ -81,8 +81,6 @@ class BlanksAndDitherRemapping:
     filterRemapping = False
     usingPanelOverlays = False
 
-    
-
     def __init__(self, configRef, workConfig, configSectionName):
         self.configRef = configRef
         self._load_filter_remapping(workConfig, configSectionName)
@@ -276,6 +274,7 @@ class BlanksAndDitherRemapping:
 
         tempImage = ImageChops.add(self.targetImageRef, self.overlayImage, round(100 * self.panelOverlayAmount))
         self.targetImageRef.paste(tempImage, (0, 0), tempImage)
+        # self.targetImageRef.paste(self.overlayImage, (0, 0), self.overlayImage)
 
     # ----- per cycle---------
 

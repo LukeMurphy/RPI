@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageChops
 
 # from scipy.spatial import Voronoi
 from scipy.interpolate import splprep, splev
-from shapely import length  # For spline interpolation
+# from shapely import length  # For spline interpolation
 from modules.holder_director import Director
 from modules.configuration import pieceLogger
 from modules import colorutils

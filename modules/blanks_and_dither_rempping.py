@@ -91,7 +91,8 @@ class BlanksAndDitherRemapping:
     # ---- dither remapping ------------
 
     def _load_filter_remapping(self, workConfig, configSectionName):
-        self.filterRemapping = workConfig.getboolean(configSectionName, "useBlanks", fallback=False)
+        pieceLogger(f"[BlanksAndDithering._load_filter_remapping] - done {self}")
+        self.filterRemapping = workConfig.getboolean(configSectionName, "filterRemapping", fallback=False)
         self.filterRemappingProb = float(workConfig.get(configSectionName, "filterRemappingProb", fallback=0.0))
         self.filterRemappingReappearProb = float(workConfig.get(configSectionName, "filterRemappingReappearProb", fallback=0.10))
         self.filterRemapMinHoriSize = int(workConfig.get(configSectionName, "filterRemapMinHoriSize", fallback=1))

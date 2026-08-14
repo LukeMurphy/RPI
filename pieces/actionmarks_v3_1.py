@@ -15,6 +15,7 @@ from modules.holder_director import Director
 from modules.configuration import pieceLogger
 from modules import colorutils
 from modules.rendering.render import saveImageToFile
+from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -49,16 +50,6 @@ class MarksManager:
         self.pictureWidth = int(workConfig.get("drawingField", "pictureWidth", fallback=self.config.canvasWidth))
         self.pictureHeight = int(workConfig.get("drawingField", "pictureHeight", fallback=self.config.canvasHeight))
         createImageLayers()
-
-        # ---- filter config ----
-        self.filterRemapping = workConfig.getboolean("particles", "filterRemapping", fallback=False)
-        self.filterRemappingProb = float(workConfig.get("drawingField", "filterRemappingProb", fallback=0.0))
-        self.filterRemapMinHorzSize = int(workConfig.get("drawingField", "filterRemapMinHorzSize", fallback=24))
-        self.filterRemapMinVertSize = int(workConfig.get("drawingField", "filterRemapMinVertSize", fallback=24))
-        self.filterRemapMaxHorzSize = int(workConfig.get("drawingField", "filterRemapMaxHorzSize", fallback=24))
-        self.filterRemapMaxVertSize = int(workConfig.get("drawingField", "filterRemapMaxVertSize", fallback=24))
-        self.filterRemapRangeX = int(workConfig.get("drawingField", "filterRemapRangeX", fallback=self.pictureWidth))
-        self.filterRemapRangeY = int(workConfig.get("drawingField", "filterRemapRangeY", fallback=self.pictureHeight))
 
         # ---- drawing / color configs ----
         self.usebgBox = workConfig.getboolean("drawingField", "forcebgBox")
@@ -383,15 +374,15 @@ def R(a, b, rounded=False):
 # ----------------------------------------------------##----------------------------------------------------#
 
 
-def filterRemapImage(config):
-    config.useFilters = True
-    config.remapImageBlock = False
-    startX = round(random.uniform(0, mrksMngr.filterRemapRangeX))
-    startY = round(random.uniform(0, mrksMngr.filterRemapRangeY))
-    endX = round(random.uniform(mrksMngr.filterRemapMinHorzSize, mrksMngr.filterRemapMaxHorzSize))
-    endY = round(random.uniform(mrksMngr.filterRemapMinVertSize, mrksMngr.filterRemapMaxVertSize))
-    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-    config.remapImageBlockDestination = [startX, startY]
+# def filterRemapImage(config):
+#     config.useFilters = True
+#     config.remapImageBlock = False
+#     startX = round(random.uniform(0, mrksMngr.filterRemapRangeX))
+#     startY = round(random.uniform(0, mrksMngr.filterRemapRangeY))
+#     endX = round(random.uniform(mrksMngr.filterRemapMinHorzSize, mrksMngr.filterRemapMaxHorzSize))
+#     endY = round(random.uniform(mrksMngr.filterRemapMinVertSize, mrksMngr.filterRemapMaxVertSize))
+#     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
+#     config.remapImageBlockDestination = [startX, startY]
 
 
 
@@ -1547,9 +1538,7 @@ def iterate():
                 pieceLogger("Calling for jitter")
                 doDrawingJitter()
                 
-        def maybe_filter_remap_image():
-            if random.random() < mrksMngr.filterRemappingProb:
-                filterRemapImage(config)
+
 
 
         # maybe_change_drawing_mode()
@@ -1558,9 +1547,10 @@ def iterate():
         maybe_set_bg_color()
         maybe_clear_current_drawing()
         maybe_bg_color_blocks_filling()
-        maybe_filter_remap_image()
         maybe_do_drawing_jitter()
         penLoopActions()
+
+        overlayControls.handleOverlayActions()
     renderImage()
 
 
@@ -1723,6 +1713,10 @@ def main(run=True):
     global config, workConfig, mrksMngr
     mrksMngr = MarksManager(config)
     mrksMngr.setUp(workConfig)
+
+    # initiate
+    global overlayControls
+    overlayControls = BlanksAndDitherRemapping(config, workConfig, "drawingField")
     if run:
         runWork()
 

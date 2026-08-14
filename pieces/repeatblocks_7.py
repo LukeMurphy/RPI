@@ -1302,23 +1302,6 @@ def rowsAndDotsSettings():
 
 # --------------------- LOOP ACTIONS  ---------------------
 
-def handleFilterRemapping():
-    """Handles filter remapping if enabled."""
-    # print(f"config.useFilters {config.useFilters}  config.filterRemapping {config.filterRemapping} config.filterRemappingProb {config.filterRemappingProb}")
-    if random.random() < rpO.filterRemappingProb and (config.useFilters and rpO.filterRemapping):
-        remapFilter(config)
-
-
-def remapFilter(config):
-    """Remaps the filter block section."""
-    config.filterRemap = True
-    startX = round(random.uniform(0, rpO.filterRemapRangeX))
-    startY = round(random.uniform(0, rpO.filterRemapRangeY))
-    endX = round(random.uniform(rpO.filterRemapMinHoriSize, rpO.filterRemapMaxHoriSize))
-    endY = round(random.uniform(rpO.filterRemapMinVertSize, rpO.filterRemapMaxVertSize))
-    config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-    config.remapImageBlockDestination = [startX, startY]
-
 
 def iterate():
     """Performs a single iteration of the animation."""
@@ -1336,7 +1319,7 @@ def iterate():
     # handleClipPlayer()
     drawAndProcessPattern()
     disturbance.handleDisturbances()
-    handleFilterRemapping()
+    overlayControls.handleOverlayActions()
     handleFadingAndRebuild()
     disturbance.handleSectionDisturbances()
     disturbance.handleShingleVariation()
@@ -1650,7 +1633,6 @@ def showDebugCanvases(config):
 
 
 def shapeOverLayFunction(temp1):
-    global rpO
     _rpO : RepeatedPatterns = rpO
     temp2 = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     temp2Draw = ImageDraw.Draw(temp2)
@@ -1916,14 +1898,14 @@ def main(run=True):
 
     # ---------------------------------------------------------------###
 
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapping", False, bool)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
-    loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapping", False, bool)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
 
     # ---------------------------------------------------------------###
 
@@ -1978,6 +1960,9 @@ def main(run=True):
     overlayControls.overlayImageDraw = config.destinationImageDraw
     overlayControls.setPanelOverlays()
 
+    # for filter remapping
+
+
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)
 
@@ -2005,7 +1990,6 @@ def main(run=True):
 
 
 def runWork():
-    global config
     pieceLogger("[runWork] >> Running repeatblocks.py", 2)
     _subSteps = getattr(config, "smoothingSteps", 0)
 

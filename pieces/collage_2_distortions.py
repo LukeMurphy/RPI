@@ -8,7 +8,7 @@ import types
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.configuration import bcolors
-
+from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 from modules.holder_director import Holder
 from modules.holder_director import Director
 from modules import distortions
@@ -254,17 +254,6 @@ class CollageManager:
         _initialize_overlay_settings(config, self, workConfig)
 
 
-        """Loads filter-related configuration parameters."""
-        self.filterRemapping = workConfig.getboolean("collageShapes", "filterRemapping", fallback=False)
-        self.filterRemappingProb = float(workConfig.get("collageShapes", "filterRemappingProb", fallback=0.0))
-        self.filterRemapMinHorzSize = int(workConfig.get("collageShapes", "filterRemapMinHorzSize", fallback=24))
-        self.filterRemapMinVertSize = int(workConfig.get("collageShapes", "filterRemapMinVertSize", fallback=24))
-        self.filterRemapMaxHorzSize = int(workConfig.get("collageShapes", "filterRemapMaxHorzSize", fallback=24))
-        self.filterRemapMaxVertSize = int(workConfig.get("collageShapes", "filterRemapMaxVertSize", fallback=24))
-        self.filterRemapRangeX = int(workConfig.get("collageShapes", "filterRemapRangeX", fallback=config.canvasWidth))
-        self.filterRemapRangeY = int(workConfig.get("collageShapes", "filterRemapRangeY", fallback=config.canvasHeight))
-
-
 #-----------------------------------------------#
 
 def redraw():
@@ -279,8 +268,8 @@ def redraw():
 
     _handle_pixel_sort(config, clgMngr)
     _handle_bad_pixels(config, clgMngr)
-    _handle_filter_patch(config, clgMngr)
     _handle_last_overlay(config, clgMngr)
+    overlayControls.handleOverlayActions()
 
 
 def _handle_shape_tweening(config, clgMngr, shapes):
@@ -349,12 +338,12 @@ def _handle_bad_pixels(config, clgMngr):
             badpixels.setBlanksOnScreen()
 
 
-def _handle_filter_patch(config, clgMngr):
-    if random.random() < clgMngr.filterPatchProb:
-        _remap_image_block(config, clgMngr)
+# def _handle_filter_patch(config, clgMngr):
+#     if random.random() < clgMngr.filterPatchProb:
+#         _remap_image_block(config, clgMngr)
 
-    if random.random() < clgMngr.filterPatchProb * .50 and clgMngr.filterPatchProb > 0.0:
-        _reset_remap_image_block(config)
+#     if random.random() < clgMngr.filterPatchProb * .50 and clgMngr.filterPatchProb > 0.0:
+#         _reset_remap_image_block(config)
 
 
 def _handle_last_overlay(config, clgMngr):
@@ -362,21 +351,21 @@ def _handle_last_overlay(config, clgMngr):
         _draw_last_overlay(config, clgMngr)
 
 
-def _remap_image_block(config, clgMngr):
-    x1 = round(random.uniform(0, config.canvasWidth - + clgMngr.minFilterPatchWidth))
-    x2 = round(random.uniform(x1 + clgMngr.minFilterPatchWidth, config.canvasWidth + clgMngr.minFilterPatchWidth))
-    y1 = round(random.uniform(0, config.canvasHeight - + clgMngr.minFilterPatchHeight))
-    y2 = round(random.uniform(y1 + clgMngr.minFilterPatchHeight, config.canvasHeight + clgMngr.minFilterPatchHeight))
+# def _remap_image_block(config, clgMngr):
+#     x1 = round(random.uniform(0, config.canvasWidth - + clgMngr.minFilterPatchWidth))
+#     x2 = round(random.uniform(x1 + clgMngr.minFilterPatchWidth, config.canvasWidth + clgMngr.minFilterPatchWidth))
+#     y1 = round(random.uniform(0, config.canvasHeight - + clgMngr.minFilterPatchHeight))
+#     y2 = round(random.uniform(y1 + clgMngr.minFilterPatchHeight, config.canvasHeight + clgMngr.minFilterPatchHeight))
 
-    config.remapImageBlock = True
-    config.remapImageBlockSection = (x1, y1, x2, y2)
-    config.remapImageBlockDestination = (x1, y1)
+#     config.remapImageBlock = True
+#     config.remapImageBlockSection = (x1, y1, x2, y2)
+#     config.remapImageBlockDestination = (x1, y1)
 
 
-def _reset_remap_image_block(config):
-    config.remapImageBlock = True
-    config.remapImageBlockSection = (0, 0, 0, 0)
-    config.remapImageBlockDestination = (0, 0)
+# def _reset_remap_image_block(config):
+#     config.remapImageBlock = True
+#     config.remapImageBlockSection = (0, 0, 0, 0)
+#     config.remapImageBlockDestination = (0, 0)
 
 
 def _draw_last_overlay(config, clgMngr):
@@ -430,33 +419,10 @@ def iterate():
                 clgMngr.shapeGroupDisplayed = newIndex
                 print(f"--> New Set:{str(newIndex)}")
 
-    """
-    ## Paste an alpha of the next image, wait a few ms
-    ## then past a more opaque one again
-    ## softens the transitions just enough
-
-    config.pasteDelay = .02
-
-    mask1 = config.image.point(lambda i: min(i * 1, 50))
-    config.canvasImage.paste(config.image, (0,0), mask1)
-    config.render(config.canvasImage, 0, 0, config.image)
-
-    time.sleep(config.pasteDelay)
-    mask2 = config.image.point(lambda i: min(i * 25, 100))
-    config.canvasImage.paste(config.image, (0,0), mask2)
-    config.render(config.canvasImage, 0, 0, config.image)
-
-    time.sleep(config.pasteDelay)
-    mask3 = config.image.point(lambda i: min(i * 25, 255))
-    config.canvasImage.paste(config.image, (0,0), mask3)
-    config.render(config.canvasImage, 0, 0, config.image)
-    """
 
     if random.random() < clgMngr.blurChangeProb:
         config.sectionBlurRadius = round(random.uniform(1, 3))
 
-    if random.random() < clgMngr.filterRemappingProb and (config.useFilters == True and clgMngr.filterRemapping == True):
-        _newFilterRemapping(config, clgMngr)
     if config.sectionDisturbance == True:
         distortions.iterationFunction(config)
 
@@ -544,6 +510,9 @@ def main(run=True):
 
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
     config.disturbanceImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
+
+    global overlayControls
+    overlayControls = BlanksAndDitherRemapping(config, workConfig, "collageShapes")
 
 
     if run:

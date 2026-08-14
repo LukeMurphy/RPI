@@ -17,7 +17,6 @@ from modules import colorutils
 from modules.rendering.render import saveImageToFile
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 
-
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 """""" """""" """ This version uses bundles of marks and textures             """
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
@@ -64,18 +63,18 @@ class MarksManager:
         # jitter and roughing
         self.doJitterProb = float(workConfig.get("drawingField", "doJitterProb", fallback=0.0))
         self.doJitterAfterLineUseProb = float(workConfig.get("drawingField", "doJitterAfterLineUseProb", fallback=1.0))
-        self.doProgressiveJitterProb = float(workConfig.get("drawingField", "doProgressiveJitterProb", fallback=.50))
+        self.doProgressiveJitterProb = float(workConfig.get("drawingField", "doProgressiveJitterProb", fallback=0.50))
         self.doJitterWhenAddingBGUseProb = float(workConfig.get("drawingField", "doJitterWhenAddingBGUseProb", fallback=1.0))
         self.doJitterEventPerCyleProb = float(workConfig.get("drawingField", "doJitterEventPerCyleProb", fallback=1.0))
         self.jitterIterationsMaxAfterDraw = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
         self.jitterIterationsMin = workConfig.getint("drawingField", "jitterIterationsMin", fallback=1)
         self.jitterIterationsMax = workConfig.getint("drawingField", "jitterIterationsMax", fallback=10)
-        self.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal"))
-        self.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical"))
+        self.jitterDisplacementHorizontal = float(workConfig.get("drawingField", "jitterDisplacementHorizontal", fallback=1))
+        self.jitterDisplacementVertical = float(workConfig.get("drawingField", "jitterDisplacementVertical", fallback=1))
         self.jitterIterationsMin_roughing = workConfig.getint("drawingField", "jitterIterationsMin_roughing", fallback=1)
         self.jitterIterationsMax_roughing = workConfig.getint("drawingField", "jitterIterationsMax_roughing", fallback=10)
-        self.jitterDisplacementHorizontal_roughing = float(workConfig.get("drawingField", "jitterDisplacementHorizontal_roughing"))
-        self.jitterDisplacementVertical_roughing = float(workConfig.get("drawingField", "jitterDisplacementVertical_roughing"))
+        self.jitterDisplacementHorizontal_roughing = float(workConfig.get("drawingField", "jitterDisplacementHorizontal_roughing", fallback=2))
+        self.jitterDisplacementVertical_roughing = float(workConfig.get("drawingField", "jitterDisplacementVertical_roughing", fallback=2))
         self.jitterIterations = 0
 
         self.penAlpha = int(workConfig.get("drawingField", "penAlpha", fallback=200))
@@ -383,7 +382,6 @@ def R(a, b, rounded=False):
 #     endY = round(random.uniform(mrksMngr.filterRemapMinVertSize, mrksMngr.filterRemapMaxVertSize))
 #     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
 #     config.remapImageBlockDestination = [startX, startY]
-
 
 
 def changeDrawing(args):
@@ -941,7 +939,10 @@ def pauseDrawing():
     mrksMngr.stoppedAndWaitingToDraw = True
     mrksMngr.canDraw = False
     mrksMngr.drawingController.slotRate = random.uniform(mrksMngr.activePalette.startNewLineDelayRange[0], mrksMngr.activePalette.startNewLineDelayRange[1])
-    pieceLogger(f"Line Drawing paused for {mrksMngr.drawingController.slotRate} {mrksMngr.activePalette.startNewLineDelayRange[0]}/{mrksMngr.activePalette.startNewLineDelayRange[1]} \n lines drawn: {mrksMngr.linesDrawnCount}", 1)
+    pieceLogger(
+        f"Line Drawing paused for {mrksMngr.drawingController.slotRate} {mrksMngr.activePalette.startNewLineDelayRange[0]}/{mrksMngr.activePalette.startNewLineDelayRange[1]} \n lines drawn: {mrksMngr.linesDrawnCount}",
+        1,
+    )
 
 
 def releaseDrawing():
@@ -1166,7 +1167,8 @@ def drawLineStopped():
     # pieceLogger("Pen stopped")
     mrksMngr.doingDrawing = False
     mrksMngr.linesDrawnCount += 1
-    if mrksMngr.linesDrawnCount > 1 : pauseDrawing()
+    if mrksMngr.linesDrawnCount > 1:
+        pauseDrawing()
     if random.random() < mrksMngr.doJitterWhenAddingBGUseProb:
         pieceLogger(f"Doing jitter after LINE has been drawn")
         mrksMngr.doingJitter = False
@@ -1176,10 +1178,11 @@ def drawLineStopped():
 
 # ----------------------------------------------------
 
-def progressiveJitter():
-    """ The underLayer has both the blocks as well as the lines and the texture """
 
-    if random.random() < mrksMngr.doJitterEventPerCyleProb :
+def progressiveJitter():
+    """The underLayer has both the blocks as well as the lines and the texture"""
+
+    if random.random() < mrksMngr.doJitterEventPerCyleProb:
         # pieceLogger(f"Jitter {mrksMngr.jitterIterations}")
         glitchBox(
             config.underLayer,
@@ -1189,7 +1192,7 @@ def progressiveJitter():
             mrksMngr.jitterDisplacementVertical,
         )
         mrksMngr.jitterIterations -= 1
-        if mrksMngr.jitterIterations <= 0 :
+        if mrksMngr.jitterIterations <= 0:
             mrksMngr.doingJitter = False
             pieceLogger(f"==> Progressive jitter ended", 3)
             # config.directorController.slotRate *= .25
@@ -1202,7 +1205,7 @@ def doDrawingJitter():
         if random.random() < mrksMngr.doProgressiveJitterProb:
             mrksMngr.doingJitter = True
             pieceLogger(f"==> Progressive jitters tarting: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}", 3)
-        else :
+        else:
             pieceLogger(f"==> Single bulk jitter: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}", 3)
             """ The underLayer has both the blocks as well as the lines and the texture """
             for _ in range(mrksMngr.jitterIterations):
@@ -1493,7 +1496,7 @@ def iterate():
         mrksMngr.justHitPause = False
         pieceLogger("I am un paused", 2)
 
-    if mrksMngr.doingJitter :
+    if mrksMngr.doingJitter:
         progressiveJitter()
 
     if not mrksMngr.justHitPause:
@@ -1537,9 +1540,6 @@ def iterate():
             if not mrksMngr.doingDrawing and random.random() < mrksMngr.doJitterProb and not mrksMngr.transitionStateHandler.inTransition:
                 pieceLogger("Calling for jitter")
                 doDrawingJitter()
-                
-
-
 
         # maybe_change_drawing_mode()
         maybe_change_color_set()
@@ -1599,7 +1599,6 @@ def renderImage():
         # some subtleties here  -- can be any of these and might be something
         # to paramterize - it's a bit like a scumble as the texture affects
         # the bg and the line and can be distorted
-
 
         if mrksMngr.textureOption == 0:
             """this means the topmost layer gets the texture - most visible version"""
@@ -1706,6 +1705,7 @@ def clearCurrentDrawing():
         config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor[0], mrksMngr.bgColor[1], mrksMngr.bgColor[2], 225))
         mrksMngr.linesDrawnCount = 0
 
+
 # ----------------------------------------------------##----------------------------------------------------#
 
 
@@ -1790,7 +1790,7 @@ def _load_single_pen(_penConfigName):
 
     else:
 
-        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints"))
+        _mark.minNumPoints = int(markConfig.get("markParams", "minNumPoints", fallback=4))
         _mark.maxNumPoints = int(markConfig.get("markParams", "maxNumPoints", fallback=8))
         _mark.minInterpolatedPoints = int(markConfig.get("markParams", "minInterpolatedPoints", fallback=200))
         _mark.maxInterpolatedPoints = int(markConfig.get("markParams", "maxInterpolatedPoints", fallback=200))
@@ -1845,8 +1845,6 @@ def _load_single_pen(_penConfigName):
     _mark.drawLineAsEnvelope = markConfig.getboolean("markParams", "drawLineAsEnvelope", fallback=mrksMngr.drawLineAsEnvelope)
 
     return _mark
-
-
 
 
 # ----------------------------------------------------##----------------------------------------------------#

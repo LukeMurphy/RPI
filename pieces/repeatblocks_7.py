@@ -696,7 +696,7 @@ def changeSinglePalette(index=0):
     _paletteObjLocal.c4 = copy(paletteObj.c4)
     _paletteObjLocal.c4.currentColor = copy(paletteObj.c4.currentColor)
 
-    _paletteObjLocal.c1.currentColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(config.bgColorAlpha[0], config.bgColorAlpha[1])))
+    _paletteObjLocal.c1.currentColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(rpO.bgColorAlpha[0], rpO.bgColorAlpha[1])))
     _paletteObjLocal.c2.currentColor = setCurrentColor(paletteObj.c2)
     _paletteObjLocal.c3.currentColor = setCurrentColor(paletteObj.c3)
     _paletteObjLocal.c4.currentColor = setCurrentColor(paletteObj.c4)

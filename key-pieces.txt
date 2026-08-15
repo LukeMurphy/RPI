@@ -24,3 +24,43 @@ pieces/particles.py
 pieces/particles-v2.py
 
 pieces/spritesheet3.py
+
+
+daemon93@192.168.1.32   small informal p2.5 64x64 256x192 cron controlled
+
+daemon97@192.168.1.36   corner firepile/spill p4 32x64 
+                        Exec=/usr/bin/python3 /home/daemon97/Documents/RPI/sequencer.v2.py -cfg staging/p4-post-fire-spill/p4-firepile--manifest.cfg
+
+daemon98@192.168.1.37   doodem p5 
+                        Exec=/usr/bin/python3 /home/daemon98/Documents/RPI/player.py -cfg prod/p4-40-80-plank-comp-var.cfg
+                        Exec=/usr/bin/python3 /home/daemon98/Documents/RPI/player.py -cfg studio/p5-doodem/p4-40-80-plank-hashing-lines.cfg
+
+daemon30a@192.168.1.161 p4 40x80 mitered tower cron controlled barblocks / hashing marks grid
+
+daemon70@192.168.1.169  Book of Celestials p4 panels 
+                        /usr/bin/python3 /home/daemon70/Documents/RPI/player.py -path /home/daemon70/Documents/RPI/ -cfg dev/p4-floor-book/celestials.cfg
+
+daemon59@192.168.1.176  home piece: p4 vertical shift cron controlled 
+
+daemon101@192.168.1.192 informal - for Hort auction p2.5 64x64 320x256 informal marks and lines 
+
+daemon92@192.168.1.219  FirePile 3.0 
+                        /usr/bin/python3 /home/daemon92/Documents/RPI/sequencer.v2.py -path /home/daemon92/Documents/RPI/ -cfg prod/p4-firepile-3.0/p4-firepile--manifest.cfg
+
+daemon67@192.168.1.241  p3 64x64 192x256 16px vert shift shift, cron controlled
+
+daemon125@192.168.1.25  Progress Bar, p3 outdoors 64x64, 64x512
+                        /usr/bin/python3 /home/daemon125/Documents/RPI/player.py -path /home/daemon125/Documents/RPI/ -cfg studio/p3-plank/progressbar-pb2b.cfg&
+
+daemon64@192.168.1.215  p2.5 Asym w. 2 slits, 192x192
+                        staging/p2.5-asym-w-slits/p2.5-slit-shift-repeatblocks_7.cfg
+
+daemon40@192.168.1.237  Tower w. Mike B, p3 flat 64x64, 384x256
+                        /usr/bin/python3 /home/daemon40/Documents/RPI/sequencer.v2.py -path /home/daemon40/Documents/RPI/ -cfg studio/p3-askew-tower-w-mike-ballou/p3-askew-tower-with-mike-ballou--manifest.cfg&
+
+daemon120@192.168.1.4   p4 landscape 224x384
+                        /usr/bin/python3 /home/daemon120/Documents/RPI/player.py -path /home/daemon120/Documents/RPI/ -cfg prod/landscaper-actionmarks-bundle-384px/actionmarks-v3_1>
+
+
+
+

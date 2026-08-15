@@ -37,8 +37,6 @@ def glitchBox(
     imageGlitchDisplacementVertical,
 ):
 
-    global config
-
     apparentWidth = config.canvasImage.size[0]
     apparentHeight = config.canvasImage.size[1]
 
@@ -81,7 +79,7 @@ def clearbgBox():
 
 
 def bgColorsFilling():
-    global config
+
     # config.useBgBox = False if config.useBgBox   else True
     # pieceLogger("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
@@ -412,8 +410,6 @@ def drawTheBG():
 
 
 def updateLines():
-    global config
-
     for _informalLineUnitIndex in range(0, len(imMngr.informalLineUnits)):
         _lineUnit: InformalLine
         _lineUnit = imMngr.informalLineUnits[_informalLineUnitIndex]
@@ -428,7 +424,6 @@ def updateLines():
 
 
 def runWork():
-    global config
     _config : ArtWorkConfig
     _config = config
 
@@ -494,7 +489,6 @@ def reDraw():
 
 
 def iterate():
-    global config, overlayControls
     reDraw()
 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########

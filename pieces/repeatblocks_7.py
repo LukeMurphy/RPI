@@ -1339,7 +1339,7 @@ def drawRepeatedPatternImage(config, canvasImage):
     for i in range(rpO.totalSlots):
         _patternBlock = rpO.patternSequence[i]
         # This sets the block image for each unit
-        drawBlockWithPattern(rpO, i)
+        drawBlockWithPattern(i)
 
         if _patternBlock.hasBeenPainted == False:
             drawIndividualBlock(rpO, canvasImage, _patternBlock.col, _patternBlock.row, i, extraOverlapx, extraOverlapy)
@@ -1392,11 +1392,11 @@ def drawIndividualBlock(rpO, canvasImage, c, r, _counter, extraOverlapx, extraOv
     config.canvasImage.paste(_temp, (_xPos, _yPos), _temp)
 
 
-def drawBlockWithPattern(config, _counter):
+def drawBlockWithPattern(_counter):
     """Applies pattern variations based on the pattern sequence."""
-    _patternBlock = config.patternSequence[_counter]
-    config.patternModel = _patternBlock.pattern
-    config.rotateAltBlock = _patternBlock.rotate
+    _patternBlock = rpO.patternSequence[_counter]
+    rpO.patternModel = _patternBlock.pattern
+    rpO.rotateAltBlock = _patternBlock.rotate
     if not _patternBlock.hasBeenPainted:
         func = eval(f"pattern_blocks_v5.{_patternBlock.pattern}")
         func(rpO, _patternBlock.tempPalette)

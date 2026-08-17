@@ -85,7 +85,7 @@ class unit:
             self.objWidth = int(random.uniform(self.objWidthMin, self.objWidthMax))
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def displayTest():
@@ -172,7 +172,7 @@ def displayTest():
     config.render(config.image, 0, 0)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def showGrid():
@@ -182,11 +182,10 @@ def showGrid():
     _windowLastXPosition = config.root.winfo_x()
     _windowLastYPosition = config.root.winfo_y()
 
-    if _windowLastXPosition != config.windowLastXPosition or _windowLastYPosition != config.windowLastYPosition :
+    if _windowLastXPosition != config.windowLastXPosition or _windowLastYPosition != config.windowLastYPosition:
         pieceLogger(f"window x,y: {config.root.winfo_x()},{config.root.winfo_y()}")
         config.windowLastXPosition = config.root.winfo_x()
         config.windowLastYPosition = config.root.winfo_y()
-
 
     config.draw.rectangle(
         (0, 0, config.canvasWidth, config.canvasHeight),
@@ -224,8 +223,8 @@ def showGrid():
                 )
                 displyInfo = f"x:{str(col)}" + "\ny:" + str(row) + ""
                 config.canvasDraw.multiline_text((xPos + 2, yPos - 1), displyInfo, config.fontColor, font=config.font, spacing=0)
-                displyInfo = "\n" + str(col * config.tileSizeWidth) + " " + str(row * config.tileSizeHeight)
-                config.canvasDraw.multiline_text((xPos + 2, yPos - 1 + config.fontSize / 1.0), displyInfo, config.fontColor2, font=config.font, spacing=0)
+                displyInfo = "" + str(col * config.tileSizeWidth) + "\n" + str(row * config.tileSizeHeight)
+                config.canvasDraw.multiline_text((xPos + 2 * config.fontSize, yPos), displyInfo, config.fontColor2, font=config.font, spacing=0)
 
     config.image.paste(
         config.canvasImage,
@@ -256,7 +255,7 @@ def showGrid():
         config.render(config.image, 0, 0)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def drawTVPalette():
@@ -282,25 +281,41 @@ def drawTVPalette():
     bottomH = 2 * round(tileSizeHeight / 3)
 
     # Top 2/3: 7 primary/secondary SMPTE bars at 75%
-    for col, hsv in enumerate([
-        (0, 0, 0.75), (60, 1.0, 0.75), (180, 1.0, 0.75), (120, 1.0, 0.75),
-        (300, 1.0, 0.75), (0, 1.0, 0.75), (220, 1.0, 0.75),
-    ]):
+    for col, hsv in enumerate(
+        [
+            (0, 0, 0.75),
+            (60, 1.0, 0.75),
+            (180, 1.0, 0.75),
+            (120, 1.0, 0.75),
+            (300, 1.0, 0.75),
+            (0, 1.0, 0.75),
+            (220, 1.0, 0.75),
+        ]
+    ):
         xPos = col * tileSizeWidth
         config.canvasDraw.rectangle(
             (xPos, 0, xPos + tileSizeWidth, 2 * tileSizeHeight),
-            fill=colorutils.HSVToRGB(*hsv), outline=None,
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
         )
 
     # Middle strip: reversed colors interleaved with near-black
-    for col, hsv in enumerate([
-        (220, 1.0, 0.75), (0, 0, 0.07), (300, 1.0, 0.75), (0, 0, 0.07),
-        (180, 1.0, 0.75), (0, 0, 0.07), (0, 0, 0.75),
-    ]):
+    for col, hsv in enumerate(
+        [
+            (220, 1.0, 0.75),
+            (0, 0, 0.07),
+            (300, 1.0, 0.75),
+            (0, 0, 0.07),
+            (180, 1.0, 0.75),
+            (0, 0, 0.07),
+            (0, 0, 0.75),
+        ]
+    ):
         xPos = col * tileSizeWidth
         config.canvasDraw.rectangle(
             (xPos, 2 * tileSizeHeight, xPos + tileSizeWidth - 1, 2 * tileSizeHeight + round(tileSizeHeight / 3) - 1),
-            fill=colorutils.HSVToRGB(*hsv), outline=None,
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
         )
 
     # Bottom-left: I, White, Q tiles across left half
@@ -309,25 +324,34 @@ def drawTVPalette():
         xPos = col * leftTileWidth
         config.canvasDraw.rectangle(
             (xPos, bottomY, xPos + leftTileWidth, bottomY + bottomH),
-            fill=colorutils.HSVToRGB(*hsv), outline=None,
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
         )
 
     # Bottom-center: near-black from midpoint to 5th column
     config.canvasDraw.rectangle(
         (round(config.canvasWidth / 2), bottomY, round(5 * tileSizeWidth) - 1, bottomY + bottomH),
-        fill=colorutils.HSVToRGB(0, 0, 0.07), outline=None,
+        fill=colorutils.HSVToRGB(0, 0, 0.07),
+        outline=None,
     )
 
     # Bottom-right: 6 near-black gradient tiles
     smallTileWidth = tileSizeWidth / 3
-    for col, hsv in enumerate([
-        (0, 0, 0.0), (0, 0, 0.04), (0, 0, 0.07),
-        (0, 0, 0.11), (0, 0, 0.07), (0, 0, 0.07),
-    ]):
+    for col, hsv in enumerate(
+        [
+            (0, 0, 0.0),
+            (0, 0, 0.04),
+            (0, 0, 0.07),
+            (0, 0, 0.11),
+            (0, 0, 0.07),
+            (0, 0, 0.07),
+        ]
+    ):
         xPos = round(5 * tileSizeWidth) + int(smallTileWidth * col)
         config.canvasDraw.rectangle(
             (xPos, bottomY, xPos + int(smallTileWidth), bottomY + bottomH),
-            fill=colorutils.HSVToRGB(*hsv), outline=None,
+            fill=colorutils.HSVToRGB(*hsv),
+            outline=None,
         )
 
     config.image.paste(
@@ -338,7 +362,7 @@ def drawTVPalette():
     config.render(config.image, 0, 0)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def drawPalette():
@@ -408,7 +432,7 @@ def drawPalette():
     config.render(config.image, 0, 0)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def main(run=True):
@@ -546,7 +570,7 @@ def main(run=True):
         runWork()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def renderDiagnosticsCall():
@@ -565,7 +589,7 @@ def renderDiagnosticsCall():
     config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def setUp():
@@ -575,7 +599,7 @@ def setUp():
     # config.loadedImage.load()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def runWork():
@@ -593,7 +617,7 @@ def runWork():
             config.callBack()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def iterate():
@@ -613,7 +637,7 @@ def iterate():
         displayTest()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #
 
 
 def callBack():
@@ -621,4 +645,4 @@ def callBack():
     return True
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------- #

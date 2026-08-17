@@ -1,4 +1,6 @@
 import time
+import inspect
+import sys
 
 ################################
 # This file exists to create
@@ -26,6 +28,23 @@ def configuration():
 
 
 def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
+
+    _moduleName = ""
+    _functionName = ""
+    try:
+        _val = sys._getframe(1)
+        _moduleName = inspect.getmodule(_val).__name__
+        _functionName = inspect.currentframe().f_back.f_code.co_name
+        # comment:
+    except Exception as e:
+        print(e)
+    # end try
+
+    # parent_frame_info = inspect.stack()[1]
+    # parent_frame_info2 = inspect.stack()[2]
+    # mod = inspect.getmodule(parent_frame_info.frame)
+    # mod2 = inspect.getmodule(parent_frame_info2.frame)
+
     fstr = bcolors.YELLOWONBLUE
     if clr == 5:
         fstr = bcolors.BASIC
@@ -42,7 +61,7 @@ def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
 
     if showLine:
         print(f"\n{fstr}.......................................................................................{bcolors.ENDC}")
-    print(f"{fstr}{prefixTxt}{args}          {bcolors.ENDC}")
+    print(f"{fstr}{prefixTxt}[{_moduleName}.{_functionName}] {args}          {bcolors.ENDC}")
     if showLine:
         print(f"{fstr}.......................................................................................{bcolors.ENDC}")
     # print("\n")
@@ -164,39 +183,35 @@ class ArtWorkConfig:
     remapImageBlockDestination7 = [0, 0]
     remapImageBlockSection7Rotation = 0
 
-
     remapImageBlockShift = False
     remapImageBlockShiftSection = [0, 0, 256, 256]
-    remapImageBlockShiftStableSection = [0,0,0,0]
-    remapImageBlockShiftDestination = [-0,0]
+    remapImageBlockShiftStableSection = [0, 0, 0, 0]
+    remapImageBlockShiftDestination = [-0, 0]
 
     remapImageBlockShift2 = False
     remapImageBlockShiftSection2 = [0, 0, 256, 256]
-    remapImageBlockShiftStableSection2 = [0,0,0,0]
-    remapImageBlockShiftDestination2 = [-0,0]
+    remapImageBlockShiftStableSection2 = [0, 0, 0, 0]
+    remapImageBlockShiftDestination2 = [-0, 0]
 
     remapImageBlockShift2 = False
     remapImageBlockShiftSection3 = [0, 0, 256, 256]
-    remapImageBlockShiftStableSection3 = [0,0,0,0]
-    remapImageBlockShiftDestination3 = [-0,0]
+    remapImageBlockShiftStableSection3 = [0, 0, 0, 0]
+    remapImageBlockShiftDestination3 = [-0, 0]
 
     remapImageBlockShift2 = False
     remapImageBlockShiftSection3 = [0, 0, 256, 256]
-    remapImageBlockShiftStableSection3 = [0,0,0,0]
-    remapImageBlockShiftDestination3 = [-0,0]
+    remapImageBlockShiftStableSection3 = [0, 0, 0, 0]
+    remapImageBlockShiftDestination3 = [-0, 0]
 
     remapImageBlockShift2 = False
     remapImageBlockShiftSection4 = [0, 0, 256, 256]
-    remapImageBlockShiftStableSection4 = [0,0,0,0]
-    remapImageBlockShiftDestination4 = [-0,0]
+    remapImageBlockShiftStableSection4 = [0, 0, 0, 0]
+    remapImageBlockShiftDestination4 = [-0, 0]
 
     remapImageBlockShift2 = False
     remapImageBlockShiftSection5 = [0, 0, 256, 256]
-    remapImageBlockShiftStableSection5 = [0,0,0,0]
-    remapImageBlockShiftDestination5 = [-0,0]
-
-
-
+    remapImageBlockShiftStableSection5 = [0, 0, 0, 0]
+    remapImageBlockShiftDestination5 = [-0, 0]
 
     startTime = time.time()
     currentTime = time.time()
@@ -229,10 +244,9 @@ class ArtWorkConfig:
     underLayer = None
     underLayerDraw = None
 
-    redrawSpeed = .03
-    slotRate = .03
+    redrawSpeed = 0.03
+    slotRate = 0.03
     directorController = None
-
 
     def __init__(self, args=None, _silent=False):
         if not _silent:

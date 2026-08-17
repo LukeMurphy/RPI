@@ -940,7 +940,7 @@ def pauseDrawing():
     mrksMngr.canDraw = False
     mrksMngr.drawingController.slotRate = random.uniform(mrksMngr.activePalette.startNewLineDelayRange[0], mrksMngr.activePalette.startNewLineDelayRange[1])
     pieceLogger(
-        f"Line Drawing paused for {mrksMngr.drawingController.slotRate} {mrksMngr.activePalette.startNewLineDelayRange[0]}/{mrksMngr.activePalette.startNewLineDelayRange[1]} \n lines drawn: {mrksMngr.linesDrawnCount}",
+        f"Line Drawing paused for {mrksMngr.drawingController.slotRate} {mrksMngr.activePalette.startNewLineDelayRange[0]}/{mrksMngr.activePalette.startNewLineDelayRange[1]} : lines drawn: {mrksMngr.linesDrawnCount}",
         1,
     )
 
@@ -948,7 +948,7 @@ def pauseDrawing():
 def releaseDrawing():
     mrksMngr.stoppedAndWaitingToDraw = False
     mrksMngr.canDraw = True
-    pieceLogger("Pen released", 2)
+    pieceLogger("[releaseDrawing] Pen released", 2)
 
 
 def penLoopActions():

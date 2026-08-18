@@ -28,7 +28,7 @@ from modules.filters import colorSeparator
 # from Tkinter import *
 # import tkMessageBox
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 global root
 global work, config
@@ -41,7 +41,7 @@ canvasOffsetY = 7
 buff = 8
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 
 def update_duration():
@@ -157,7 +157,7 @@ def setUp(config):
     root.mainloop()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 
 def on_closing():
@@ -165,7 +165,7 @@ def on_closing():
     return True
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 
 def writeImage(baseName, renderImage):
@@ -191,7 +191,7 @@ def startWork(*args):
     # work.runWork()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 
 def updateCanvas():
@@ -284,7 +284,7 @@ def relaunchOnChange(config):
         # os.system(commadStringPyth + config.fileNameRaw + "&")
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 
 def _applyColorSep(xOffset=0, yOffset=0):
@@ -312,7 +312,7 @@ def _colorSep(xOffset=0, yOffset=0):
     config.renderImageFull.paste(_f, _remapImageBlockDestination, _f)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 
 
 def _applyDitherFilter(xOffset, yOffset):
@@ -545,12 +545,17 @@ def render(
 
     # config.drawBeforeConversion()
     # config.renderImageFull.paste(config.renderImageFull2)
-
-    config.renderImageFull = config.renderImageFull.convert("RGB")
+    # 2026-08-18 this was clearly a mistake made a long time ago .... but now all the pieces depend on it
+    # it affects how alpha is rendered - making any alpha a progressive add-to even if the base layer or 
+    # alpha is being set each frame -- see the hsl tester ... but helped in certain fading and transition
+    # effects - better smoothing sometimes
+    if config.convertRenderImageFullToRGB :
+        config.renderImageFull = config.renderImageFull.convert("RGB")
     config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
-    # config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40)
 
+
+    # config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40)
     # For planes, only this works - has to do with transparency of repeated pasting of
     # PNG's I think
     # newimage = Image.new('RGBA', config.renderImageFull.size)
@@ -599,7 +604,7 @@ def render(
     #     pieceLogger 'Memory usage: %s (mb)' % str(memoryUsage)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #
 # Might be used at some point
 
 
@@ -644,4 +649,4 @@ def saveImageToFile():
     writeImage(baseName, renderImage=_img)
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
+# ----------------------------------------- #

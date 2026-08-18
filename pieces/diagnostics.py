@@ -1,9 +1,6 @@
-import argparse
 import datetime
 import itertools
-import math
 import random
-import textwrap
 import time
 from modules.configuration import bcolors, pieceLogger
 from modules import badpixels, coloroverlay, colorutils, panelDrawing
@@ -203,7 +200,7 @@ def showGrid():
         outline=(0, 0, int(220 * config.brightness)),
     )
 
-    # print(config.imageXOffset)
+    # pieceLogger(config.imageXOffset)
 
     for row in range(config.rows):
         for col in range(config.cols):
@@ -384,7 +381,7 @@ def drawPalette():
         outline=(0, 0, int(255 * config.brightness)),
     )
 
-    # print(config.imageXOffset)
+    # pieceLogger(config.imageXOffset)
     config.rows = 2
     config.cols = 16
     config.tileSizeWidth = config.tileSizeWidth
@@ -438,8 +435,8 @@ def drawPalette():
 def main(run=True):
     global config, directionOrder
     global workConfig
-    print("** ---------------------")
-    print("** Diag Loaded **")
+    pieceLogger("** ---------------------")
+    pieceLogger("** Diag Loaded **")
 
     colorutils.brightness = config.brightness
     # config.canvasImageWidth = config.screenWidth
@@ -456,7 +453,7 @@ def main(run=True):
     config.bgColorVals = (workConfig.get("diag", "bgColor")).split(",")
     config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness), config.bgColorVals))
     config.useLastOverlay = False
-    print(config.bgColor)
+    pieceLogger(config.bgColor)
 
     config.angle = 0
 
@@ -464,33 +461,33 @@ def main(run=True):
         config.rowsVals = (workConfig.get("diag", "rowsToShow")).split(",")
         config.rowsToShow = tuple(map(lambda x: int(x), config.rowsVals))
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.rowsToShow = 0
 
     try:
         config.fontSize = int(workConfig.get("diag", "fontSize"))
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.fontSize = 14
     try:
         config.imageXOffset = int(workConfig.get("displayconfig", "imageXOffset"))
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.imageXOffset = 0
     try:
         config.showGrid = workConfig.getboolean("diag", "showGrid")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.showGrid = False
     try:
         config.showWhitesGreys = workConfig.getboolean("diag", "showWhitesGreys")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.showWhitesGreys = False
     try:
         fontColor2 = workConfig.get("diag", "fontColor2").split(",")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         fontColor2 = [0, 200, 0]
     config.fontColor2 = tuple(map(lambda x: int(int(x) * config.brightness), fontColor2))
 
@@ -499,7 +496,7 @@ def main(run=True):
         config.showAsOverLay = workConfig.getboolean("diag", "showAsOverLay")
         config.imgPath = workConfig.get("diag", "imgPath")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.useImage = False
         config.showAsOverLay = False
         config.imgPath = ""
@@ -513,13 +510,13 @@ def main(run=True):
     try:
         config.colorPalette = workConfig.getboolean("diag", "colorPalette")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.colorPalette = False
 
     try:
         config.TVPalette = workConfig.getboolean("diag", "TVPalette")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.TVPalette = False
 
     """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
@@ -603,9 +600,9 @@ def setUp():
 
 
 def runWork():
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING DIAGNOSTICS diagnostics.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
+    pieceLogger("RUNNING DIAGNOSTICS diagnostics.py")
+    pieceLogger(bcolors.ENDC)
     # gc.enable()
     config.windowLastXPosition = 0
     config.windowLastYPosition = 0
@@ -623,7 +620,7 @@ def runWork():
 def iterate():
 
     # if config.screenPositionX != config.cnvs.winfo_rootx() or config.screenPositionY != config.cnvs.winfo_rooty() - 22:
-    #     print(config.cnvs.winfo_rootx(), config.cnvs.winfo_rooty() - 22)
+    #     pieceLogger(config.cnvs.winfo_rootx(), config.cnvs.winfo_rooty() - 22)
     #     config.screenPositionX = config.cnvs.winfo_rootx()
     #     config.screenPositionY = config.cnvs.winfo_rooty() - 22
 

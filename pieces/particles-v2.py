@@ -90,10 +90,10 @@ def setColorsByPalette():
     pMngr.bgColorOverlay.setStartColor()
     pMngr.bgColorOverlay.getNewColor()
 
-    # print(" ---------------------------------------- ")
-    # print(" ------------ new palette --------------- ")
-    # print(f" palette {paletteRef.name}\n {paletteRef.bg_fillRange}\n {paletteRef.particle_fillRange}")
-    # print(" ---------------------------------------- ")
+    # pieceLogger(" ---------------------------------------- ")
+    # pieceLogger(" ------------ new palette --------------- ")
+    # pieceLogger(f" palette {paletteRef.name}\n {paletteRef.bg_fillRange}\n {paletteRef.particle_fillRange}")
+    # pieceLogger(" ---------------------------------------- ")
 
 
 # -----------------------------------------------------------
@@ -544,7 +544,7 @@ def emitParticle(i=None):
         makePixGoGray(pMngr, p)
 
         # p.fillColor = (200,0,0,200)
-        # print(p.fillColor)
+        # pieceLogger(p.fillColor)
 
     if ps.movement == "linearMotion":
         linearMotionAction(config, p, ps)
@@ -589,11 +589,11 @@ def linearMotionAction(config, p, ps):
     p.xPosR = int(random.uniform(0, config.canvasWidth))
     p.yPosR = int(random.uniform(0, config.canvasHeight))
 
-    # print(p.yPosR)
+    # pieceLogger(p.yPosR)
     # p.xPosR = config.canvasWidth / 2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
     p.yPosR = config.canvasHeight / 2 - ps.centerRangeYMin + round(random.random() * ps.centerRangeYMax) - p.objHeight
 
-    # print(p.yPosR)
+    # pieceLogger(p.yPosR)
     # config.canvasHeight/3 - p.objHeight/4 #
 
     directions = [0, math.pi, math.pi / 2, -math.pi / 2]
@@ -667,8 +667,8 @@ def makePixGoGray(pMngr, p):
         (p.fillGrey - p.fillColor[2]) / p.greyRate,
     ]
 
-    # print("Fill", p.fillColor)
-    # print("Fill Grey, GreayRate",p.fillGrey, p.fillGreyRate )
+    # pieceLogger("Fill", p.fillColor)
+    # pieceLogger("Fill Grey, GreayRate",p.fillGrey, p.fillGreyRate )
 
     p.fillColorRawValues = tuple(float(i) for i in p.fillColor)
     p.outlineColorRawValues = tuple(float(i) for i in p.outlineColor)
@@ -704,7 +704,7 @@ def colorize():
 			config.image = ImageChops.multiply(config.clrBlock, config.image)
 			# pass
 		except Exception as e:
-			print(e, config.image.mode)
+			pieceLogger(e, config.image.mode)
 			pass
 		"""
 

@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 from modules.configuration import bcolors
 from modules.holder_director import Holder
 from modules.holder_director import Director
+from modules.configuration import pieceLogger
 
 lastRate = 0
 colorutils.brightness = 1
@@ -59,7 +60,7 @@ class Shape:
     steps = 20
 
     def __init__(self, config, clgMngr, i=0):
-        # print ("init Fludd", i)
+        # pieceLogger ("init Fludd", i)
 
         # self.boxMax = config.screenWidth - 1
         # self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
@@ -92,8 +93,8 @@ class Shape:
 
         # This will force the overlay color transition functions to use the
         # configs for HSV
-        # print("\n--- New Colors --- ")
-        # print(self.minHue,self.maxHue)
+        # pieceLogger("\n--- New Colors --- ")
+        # pieceLogger(self.minHue,self.maxHue)
         self.colOverlay.maxBrightness = 1
         self.colOverlay.minHue = self.minHue
         self.colOverlay.maxHue = self.maxHue
@@ -182,7 +183,7 @@ class CollageManager:
             self.delay = float(workConfig.get("collageShapes", "delay"))
             config.directorController.slotRate = float(workConfig.get("collageShapes", "slotRate"))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.delay = .03
             config.directorController.slotRate = .04
 
@@ -199,7 +200,7 @@ class CollageManager:
                 workConfig.get("displayconfig", "useLastOverlayProb")
             )
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             config.useLastOverlay = False
             self.useLastOverlayProb = 0.001
 
@@ -225,7 +226,7 @@ class CollageManager:
                 "collageShapes", "useTransitionCallbacks"
             )
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.useTransitionCallbacks = False
 
         try:
@@ -233,7 +234,7 @@ class CollageManager:
                 "collageShapes", "useTweenTriggers"
             )
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.useTweenTriggers = False
 
         try:
@@ -244,7 +245,7 @@ class CollageManager:
                 )
             )
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.triggers = []
 
         try:
@@ -256,12 +257,12 @@ class CollageManager:
             badpixels.setBlanksOnScreen()
             self.useBadPixels = True
         except Exception as e:
-            print(e)
+            pieceLogger(e)
 
         try:
             self.filterPatchProb = float(workConfig.get("collageShapes", "filterPatchProb"))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.filterPatchProb = 0.0
 
 
@@ -271,7 +272,7 @@ class CollageManager:
             # config.useFilters = True
             # config.usePixelSort = True
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.useVariableFilter = False
 
         try:
@@ -286,12 +287,12 @@ class CollageManager:
                     workConfig.get("collageShapes", "variablePixelProbOff")
                 )
             except Exception as e:
-                print(e)
+                pieceLogger(e)
                 self.variablePixelProbOff = self.variablePixelProb
             # config.useFilters = True
             # config.usePixelSort = True
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.useVariablePixelSort = False
 
 
@@ -304,8 +305,8 @@ class CollageManager:
         except Exception as e:
             self.timeBetweenSetChanges = 60.0
             self.probablilitySetChanges = 1.0
-            print(e)
-            print("Setting times to " + str(self.timeBetweenSetChanges) + " " + str(self.probablilitySetChanges ))
+            pieceLogger(e)
+            pieceLogger("Setting times to " + str(self.timeBetweenSetChanges) + " " + str(self.probablilitySetChanges ))
 
 
         self.shapeSets = list(
@@ -355,7 +356,7 @@ class CollageManager:
                     shape.minValue = float(workConfig.get(shapeDetails, "minValue"))
 
                 except Exception as e:
-                    print(e)
+                    pieceLogger(e)
                     shape.minHue = 0
                     shape.maxHue = 360
                     shape.maxSaturation = 1
@@ -367,7 +368,7 @@ class CollageManager:
                 try:
                     shape.changeBoxProb  = float(workConfig.get(shapeDetails, "changeBoxProb"))
                 except Exception as e:
-                    print(str(e))
+                    pieceLogger(str(e))
                     shape.changeBoxProb  = self.changeBoxProb
 
                 shape.setUp()
@@ -395,13 +396,13 @@ class CollageManager:
                 map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(","))
             )
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
             self.lastOverLayColorRange = (0,10,.5,1.0,.5,.5)
 
         try:
             self.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayAlphaRange").split(",")))
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
             self.lastOverlayAlphaRange = (5,50)
 
         try:
@@ -413,7 +414,7 @@ class CollageManager:
             config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
             config.lastOverlayFill = tuple(	map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(",")))
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
             config.lastOverlayBox = (0, 0, 64, 32)
             config.lastOverlayFill = (0, 0, 0, 0)
             config.useLastOverlay = False
@@ -422,13 +423,13 @@ class CollageManager:
             self.blurChangeProb = float(workConfig.get("collageShapes", "blurChangeProb"))
         except Exception as e:
             self.blurChangeProb = 0.0
-            print(e)
+            pieceLogger(e)
 
         try:
             config.lastOverlayBlur = float(workConfig.get("collageShapes", "lastOverlayBlur"))
         except Exception as e:
             config.lastOverlayBlur = 0.0
-            print(e)
+            pieceLogger(e)
 
 #-----------------------------------------------#
 
@@ -452,7 +453,7 @@ def redraw():
                 pass
             else :
                 shapeElement.setNewBox()
-                #print("new box: " + shapeElement.name)
+                #pieceLogger("new box: " + shapeElement.name)
     """
     shapes = clgMngr.shapeGroups[clgMngr.shapeGroupDisplayed]
 
@@ -483,8 +484,8 @@ def redraw():
             clgMngr.shapeTweening = 0
             if clgMngr.useTweenTriggers == True:
                 colorTransitionDone()
-            # print("Tweening Done")
-            # print("")
+            # pieceLogger("Tweening Done")
+            # pieceLogger("")
 
     if clgMngr.shapeTweening == 0:
         shapeToChange = -1
@@ -494,7 +495,7 @@ def redraw():
             if random.random() < shapeElement.changeBoxProb:
                 shapeToChange = sCount
             sCount += 1
-            #print(shapeToChange)
+            #pieceLogger(shapeToChange)
 
         shapeCount = 0
         for shapeElement in shapes:
@@ -509,7 +510,7 @@ def redraw():
                 and shapeCount == shapeToChange
             ):
                 shapeElement.setNewBox()
-                # print("new box: " + shapeElement.name)
+                # pieceLogger("new box: " + shapeElement.name)
                 clgMngr.shapeTweening = 1
             shapeCount += 1
 
@@ -546,7 +547,7 @@ def redraw():
             badpixels.setBlanksOnScreen()
 
     if random.random() < clgMngr.filterPatchProb:
-        #print("should be remapping")
+        #pieceLogger("should be remapping")
         x1 = round(random.uniform(0,config.canvasWidth))
         x2 = round(random.uniform(x1,config.canvasWidth))
         y1 = round(random.uniform(0,config.canvasHeight))
@@ -558,7 +559,7 @@ def redraw():
 
     # Don't want the patch to always be there - just little interruptions
     if random.random() < clgMngr.filterPatchProb * 1.0 and clgMngr.filterPatchProb > 0.0 :
-        #print("turning off remapping")
+        #pieceLogger("turning off remapping")
         x1 = 0
         x2 = 0
         y1 = 0
@@ -570,23 +571,23 @@ def redraw():
 
     if random.random() < clgMngr.useLastOverlayProb and config.useLastOverlay == True:
         # config.useLastOverlay = False if config.useLastOverlay == True  else True
-        #print("lastOVerlay")
+        #pieceLogger("lastOVerlay")
         xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
         yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
         config.lastOverlayBox = (xPos, yPos, xPos + config.tileSizeWidth, yPos + config.tileSizeHeight)
 
         cR = clgMngr.lastOverLayColorRange
         lastOverlayFill = colorutils.getRandomColorHSV(cR[0],cR[1],cR[2],cR[3],cR[4],cR[5],cR[6],cR[7])
-        #print(lastOverlayFill)
+        #pieceLogger(lastOverlayFill)
         config.lastOverlayFill = (lastOverlayFill[0], lastOverlayFill[1], lastOverlayFill[2], round(random.uniform(clgMngr.lastOverlayAlphaRange[0], clgMngr.lastOverlayAlphaRange[1])))
         #config.lastOverlayFill = (10, 0, 0, round(random.uniform(5, 50)))
 
 
 def runWork():
     global config, clgMngr
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("RUNNING collage.py")
-    print(bcolors.ENDC)
+    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    pieceLogger("RUNNING collage.py")
+    pieceLogger(bcolors.ENDC)
     while config.isRunning == True:
         config.directorController.checkTime()
         if config.directorController.advance == True:
@@ -605,7 +606,7 @@ def iterate():
 
         if (clgMngr.t1 - clgMngr.t2) > clgMngr.timeBetweenSetChanges :
             ## Beeps ... for debugging
-            #print(chr(7))
+            #pieceLogger(chr(7))
             clgMngr.t2 = time.time()
             if random.random() < clgMngr.probablilitySetChanges:
                 newIndex = math.floor(random.uniform(0,len(clgMngr.shapeGroups)))
@@ -614,7 +615,7 @@ def iterate():
                 while newIndex == clgMngr.shapeGroupDisplayed :
                     newIndex = math.floor(random.uniform(0,len(clgMngr.shapeGroups)))
                 clgMngr.shapeGroupDisplayed = newIndex
-                print("--> New Set:" + str(newIndex))
+                pieceLogger("--> New Set:" + str(newIndex))
 
     """
     ## Paste an alpha of the next image, wait a few ms
@@ -646,7 +647,7 @@ def iterate():
     if random.random() < clgMngr.filterRemappingProb:
         if config.useFilters == True and clgMngr.filterRemapping == True:
             config.filterRemap = True
-            #print("Doing remap filter")
+            #pieceLogger("Doing remap filter")
 
             #startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
             #startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
@@ -668,14 +669,14 @@ def iterate():
 
 
 def colorTransitionDone(arg=None):
-    # print("colorTransition   Done ")
+    # pieceLogger("colorTransition   Done ")
     if clgMngr.useTransitionCallbacks == True:
         config.useFilters = False
         config.usePixelSort = True
 
 
 def colorTransitionStarted(arg=None):
-    # print("colorTransition   Started ")
+    # pieceLogger("colorTransition   Started ")
     if clgMngr.useTransitionCallbacks == True:
         config.useFilters = True
         config.usePixelSort = False

@@ -244,6 +244,12 @@ class ArtWorkConfig:
     underLayer = None
     underLayerDraw = None
 
+
+    # Rendering controls
+    renderImageFull = None
+    renderDraw = None
+    convertRenderImageFullToRGB = True
+
     redrawSpeed = 0.03
     slotRate = 0.03
     directorController = None

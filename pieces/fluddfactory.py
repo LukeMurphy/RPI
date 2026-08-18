@@ -2,7 +2,7 @@
 import math
 import random
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
@@ -50,7 +50,7 @@ class Fludd:
     steps = 20
 
     def __init__(self, config, i):
-        # print ("init Fludd", i)
+        # pieceLogger ("init Fludd", i)
 
         # self.boxMax = config.screenWidth - 1
         # self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
@@ -219,8 +219,8 @@ class Fludd:
         self.xDelta = (self.xPos1New - self.xPos1) / self.config.transitionStepsMax
         self.yDelta = (self.yPos1New - self.yPos1) / self.config.transitionStepsMax
 
-        # print (self.symBoxWidth,self.symBoxWidthNew)
-        # print (self.symBoxHeight,self.symBoxHeightNew)
+        # pieceLogger (self.symBoxWidth,self.symBoxWidthNew)
+        # pieceLogger (self.symBoxHeight,self.symBoxHeightNew)
 
     def transitionBox(self):
 
@@ -255,7 +255,7 @@ class Fludd:
             round(fillColorTemp[2] * self.config.blueBoost),
             fillColorTemp[3],
         )
-        # print(fillColorTemp, self.fillColor)
+        # pieceLogger(fillColorTemp, self.fillColor)
 
         # self.fillColor = (100,50,50)
         self.draw.rectangle((0, 0, self.boxMax, self.boxHeight), fill=self.fillColor, outline=None)
@@ -378,8 +378,8 @@ class Fludd:
             self.varianceMode = "independent"
 
         self.borderModel = "plenum" if self.borderModel == "prism" else "prism"
-        print(self.varianceMode)
-        # if(self.config.demoMode != 0) : print(self.varianceMode, self.borderModel)
+        pieceLogger(self.varianceMode)
+        # if(self.config.demoMode != 0) : pieceLogger(self.varianceMode, self.borderModel)
 
     def done(self):
         return True
@@ -414,9 +414,9 @@ def redraw():
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("Running fluddfactory.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
+    pieceLogger("Running fluddfactory.py")
+    pieceLogger(bcolors.ENDC)
     while True:
         iterate()
         time.sleep(config.redrawSpeed)
@@ -436,7 +436,7 @@ def iterate():
                 config.count = 0
                 config.t2 = time.time()
                 config.timeToComplete = config.t2 - config.t1
-                print(config.timeToComplete)
+                pieceLogger(config.timeToComplete)
                 config.t1 = time.time()
                 config.t2 = time.time()
                 for i in range(0, config.numberOfSquares):
@@ -455,8 +455,8 @@ def iterate():
             config.countMax = config.demoMode * config.calibrationCount / config.timeToComplete
             config.calibrated = True
 
-            print("config.timeItShouldHaveTaken, config.timeToComplete, config.countMax")
-            print(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax)
+            pieceLogger("config.timeItShouldHaveTaken, config.timeToComplete, config.countMax")
+            pieceLogger(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax)
 
             config.t1 = time.time()
             config.t2 = time.time()
@@ -495,9 +495,9 @@ def main(run=True):
 
         config.varianceX = int(workConfig.get("fludd", "var"))
         config.varianceY = int(workConfig.get("fludd", "var"))
-        print(e)
+        pieceLogger(e)
 
-    # print(config.boxWidth, config.boxHeight)
+    # pieceLogger(config.boxWidth, config.boxHeight)
 
     squareCount = 0
 

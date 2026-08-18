@@ -3,7 +3,7 @@ import random
 import time
 
 from modules import badpixels, coloroverlay, colorutils
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 blocks = []
@@ -29,7 +29,7 @@ class ScrollMessage:
     fontSize = 14
 
     def __init__(self, messageString, direction, config, scrllrMngr, clr=""):
-        # print ("init: " + messageString)
+        # pieceLogger ("init: " + messageString)
         self.messageString = messageString
         self.direction = direction
 
@@ -63,11 +63,11 @@ class ScrollMessage:
         draw = ImageDraw.Draw(tempImage)
         self.pixLen = draw.textbbox((0,0),self.messageString, font=font)
         self.fontHeight = int(self.pixLen[1] * 2)
-        print("\n\n***************************")
-        print(self.pixLen)
-        print(self.messageString)
-        print(self.fontHeight)
-        print(self.clr)
+        pieceLogger("\n\n***************************")
+        pieceLogger(self.pixLen)
+        pieceLogger(self.messageString)
+        pieceLogger(self.fontHeight)
+        pieceLogger(self.clr)
         # For some reason textsize is not getting full height !
 
         # ------------------------------------------------------------------- #
@@ -121,7 +121,7 @@ class XOx:
     ArrowColor = [255, 2, 0]
 
     def __init__(self, direction, config, n, rng, scrllrMngr):
-        # print ("init: " + messageString)
+        # pieceLogger ("init: " + messageString)
 
         self.direction = direction
         self.config = config
@@ -260,8 +260,8 @@ class ScrollerManager:
     def setUp(self, workConfig):
         global directionOrder
         config = self.config
-        print("---------------------")
-        print("CounterScroll Loaded")
+        pieceLogger("---------------------")
+        pieceLogger("CounterScroll Loaded")
         colorutils.brightness = config.brightness
 
         self.displayRows = int(workConfig.get("scroll", "displayRows"))
@@ -289,7 +289,7 @@ class ScrollerManager:
             self.overlayHeight = int(workConfig.get("scroll", "overlayHeight"))
 
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
             self.numberOfDeadPixels = 20
             self.arrowOffset = 0
             self.overlayX = 0
@@ -309,7 +309,7 @@ class ScrollerManager:
         try:
             self.txtfile = workConfig.get("scroll", "txtfile")
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
 
         self.colorMode = workConfig.get("scroll", "colorMode")
         self.colorOverlay = workConfig.getboolean("scroll", "colorOverlay")
@@ -317,7 +317,7 @@ class ScrollerManager:
         try:
             self.coloroverlayBackgroundOnly = workConfig.getboolean("scroll", "coloroverlayBackgroundOnly")
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
             self.coloroverlayBackgroundOnly = False
 
         if self.colorOverlay == True:
@@ -360,7 +360,7 @@ class ScrollerManager:
         if self.useBlanks:
             badpixels.numberOfDeadPixels = self.numberOfDeadPixels
             badpixels.sizeTarget = list(config.canvasImageFinal.size)
-            print(badpixels.sizeTarget)
+            pieceLogger(badpixels.sizeTarget)
             badpixels.config = config
             badpixels.setBlanksOnScreen()
 
@@ -401,7 +401,7 @@ def createImageLayers(config, scrllrMngr):
     )
 
 
-    print(scrllrMngr.canvasImageHeight)
+    pieceLogger(scrllrMngr.canvasImageHeight)
     # ------------------------------------------------------------------- #
     # Used to be final image sent to renderImageFull after canvasImage has been chopped up and reordered to fit
     config.canvasImageFinal = Image.new(
@@ -478,7 +478,7 @@ def makeBlock(n, rng=3, direction="LEFT", strgArg=""):
     block.width = block.scrollImage.size[0]
     block.bufferSpacing = 8
 
-    # print(n, block.prvBlock, block.nxtBlock, block.width, direction, strg)
+    # pieceLogger(n, block.prvBlock, block.nxtBlock, block.width, direction, strg)
     return block
 
 
@@ -563,9 +563,9 @@ def setUp():
 
 def runWork():
     global config, scrllrMngr
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("RUNNING counterscroll.py")
-    print(bcolors.ENDC)
+    pieceLogger("**", 2)
+    pieceLogger("RUNNING counterscroll.py", 2)
+
     while config.isRunning == True:
         config.directorController.checkTime()
         if config.directorController.advance == True:
@@ -677,7 +677,7 @@ def iterate():
                 else:
                     XOsBlock.xPos = nxtBlockStartPoint - XOsBlock.width
 
-                # print (n,XOsBlock.xPos,XOsBlock.end, XOsBlock.width)
+                # pieceLogger (n,XOsBlock.xPos,XOsBlock.end, XOsBlock.width)
                 # XOsBlocks[n].xPos = XOsBlocks[n].start =  XOsBlocks[XOsBlock.prvBlock].xPos - XOsBlock.width - XOsBlock.bufferSpacing
 
             elif (

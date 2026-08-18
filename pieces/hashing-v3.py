@@ -252,10 +252,10 @@ class HashingMarksLinesManager:
     def debugSelf(self):
         allArgs = self.__dict__
         for element in allArgs:
-            print(f"{element} = {allArgs[element]}")
+            pieceLogger(f"{element} = {allArgs[element]}")
 
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
-        # print(f"[RepeatedPatterns] {method_list}")
+        # pieceLogger(f"[RepeatedPatterns] {method_list}")
 
 
 class Pen:
@@ -459,7 +459,7 @@ class InformalLine:
                     _orthoP4y = self.lastOrthoPoint[3]
 
             except Exception as e:
-                print(e)
+                pieceLogger(e)
 
             _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
@@ -571,7 +571,7 @@ def clearbgBox():
 
 def _bgColorsFilling():
     # config.useBgBox = False if config.useBgBox   else True
-    # print("bgBox")
+    # pieceLogger("bgBox")
     # xPos = config.tileSizeWidth * math.floor(random.uniform(0, config.cols))
     # yPos = config.tileSizeHeight * math.floor(random.uniform(0, config.rows))
 
@@ -588,9 +588,9 @@ def _bgColorsFilling():
         yPos + hmLinesMngr.tileSizeHeight,
     )
     cR = hmLinesMngr.bgBoxColorRange
-    # print(cR)
+    # pieceLogger(cR)
     bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
-    # print(bgBoxFill)
+    # pieceLogger(bgBoxFill)
     hmLinesMngr.bgBoxFill = (
         round(config.brightness * bgBoxFill[0]),
         round(config.brightness * bgBoxFill[1]),
@@ -833,9 +833,9 @@ def updateLines():
 
 def runWork():
     global config, hmLinesMngr
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running hatchingmarks.py")
-    print(bcolors.ENDC)
+    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    pieceLogger("Running hatchingmarks.py")
+    pieceLogger(bcolors.ENDC)
     # hmLinesMngr.debugSelf()
 
     while config.isRunning == True:

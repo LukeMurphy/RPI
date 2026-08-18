@@ -5,7 +5,7 @@ import time
 
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 
 def ScaleRotateTranslate(
 	image, angle, center=None, new_center=None, scale=None, expand=False
@@ -119,7 +119,7 @@ def drawCompositions():
 
 def main(run=True):
 	global config, workConfig
-	print("---------------------")
+	pieceLogger("---------------------")
 
 	config.delay = float(workConfig.get("compositions", "delay"))
 	config.canvasImageWidth = int(workConfig.get("compositions", "canvasImageWidth"))
@@ -141,7 +141,7 @@ def main(run=True):
 	config.minValue = float(workConfig.get("compositions", "minValue"))
 	config.maxValue = float(workConfig.get("compositions", "maxValue"))
 
-	print("Running")
+	pieceLogger("Running")
 
 	config.bgColor = tuple(
 		int(i) for i in (workConfig.get("compositions", "bgColor").split(","))
@@ -215,9 +215,9 @@ def setUp():
 
 def runWork():
 	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-	print("RUNNING Compositions (1) compositions.py")
-	print(bcolors.ENDC)
+	pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	pieceLogger("RUNNING Compositions (1) compositions.py")
+	pieceLogger(bcolors.ENDC)
 	while config.isRunning == True:
 		iterate()
 		time.sleep(config.delay)

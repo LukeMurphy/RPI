@@ -1,12 +1,9 @@
 import random
 import time
 import math
-from collections import OrderedDict
-from modules.configuration import bcolors
-import numpy
+from modules.configuration import bcolors, pieceLogger
 from modules import coloroverlay, colorutils
-from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.holder_director import Holder 
+from PIL import Image, ImageChops, ImageDraw
 from modules.holder_director import Director 
 
 global thrd, config
@@ -27,7 +24,7 @@ class Fader:
         self.crossFade = Image.new("RGBA", (self.width, self.height))
 
     def test(self):
-        print("test")
+        pieceLogger("test")
         # self.blankImage = Image.new("RGBA", (self.width, self.height))
         draw = ImageDraw.Draw(self.crossFade)
         draw.rectangle((0, 0, 100, 100), fill=(0, 0, 255, 255))
@@ -41,7 +38,7 @@ class Fader:
 
             if self.testing == True:
                 self.testing = False
-                # print(self.fadingDone, self.doingRefresh)
+                # pieceLogger(self.fadingDone, self.doingRefresh)
 
             if self.doingRefresh < self.doingRefreshCount:
 
@@ -64,7 +61,7 @@ class Fader:
                 self.doingRefresh = 0
                 self.blankImage = self.image.copy()
                 self.testing = True                
-                # print("Fade done")
+                # pieceLogger("Fade done")
                 # time.sleep(5)
                 
         else :
@@ -249,13 +246,13 @@ class CompositionManager:
         try:
             self.filterPatchProb = float(workConfig.get("compositions", "filterPatchProb"))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.filterPatchProb = 0.0
         try:
             self.filterPatchMinWidth = float(workConfig.get("compositions", "filterPatchMinWidth"))
             self.filterPatchMinHeight = float(workConfig.get("compositions", "filterPatchMinHeight"))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.filterPatchMinWidth = 60
             self.filterPatchMinHeight = 60
 
@@ -265,7 +262,7 @@ class CompositionManager:
             config.directorController.slotRate = float(workConfig.get("compositions", "slotRate"))
             config.directorController.delay = float(workConfig.get("compositions", "redrawSpeed"))
         except Exception as e:
-            print(str(e))
+            pieceLogger(str(e))
             config.directorController.slotRate = .02
             config.directorController.delay = .02
 
@@ -329,9 +326,9 @@ def renderCompositions():
 
 
 def drawCompositions():
-    print("\n**********************")
-    print("Drawing the figure")
-    print("**********************")
+    pieceLogger("\n**********************")
+    pieceLogger("Drawing the figure")
+    pieceLogger("**********************")
 
 
     cmpMngr.pctAlphaNewFigure = 0
@@ -490,7 +487,7 @@ def initCompositions():
     # cmpMngr.fader.yPos = 0
     # cmpMngr.fader.setUp()
 
-    print("Running")
+    pieceLogger("Running")
     drawCompositions()
 
 
@@ -512,7 +509,7 @@ def restartDrawing():
             c.bg_dropHueMin,
             c.bg_dropHueMax
         )
-        # print(cmpMngr.bgColor)
+        # pieceLogger(cmpMngr.bgColor)
         # cmpMngr.bgColor = colorutils.getRandomColorHSV(0,360, .3,.95, .1,.94)
         config.draw.rectangle(
             (0, 0, cmpMngr.imageWidth, cmpMngr.imageHeight), fill=cmpMngr.bgColor
@@ -535,7 +532,7 @@ def drawFigure() :
 
     if delta > cmpMngr.timeToComplete:
 
-        print("Starting a new drawing")
+        pieceLogger("Starting a new drawing")
         cmpMngr.snapShot = config.imageLayer.copy()
         config.workImage.paste(cmpMngr.snapShot, (0, 0), cmpMngr.snapShot)
         config.imageLayer = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
@@ -555,7 +552,7 @@ def drawFigure() :
 def rebuildColorPalette():
     cmpMngr.colorSetInUse  = math.floor(random.uniform(0,len(cmpMngr.colorSets)))
     c = cmpMngr.colorSets[cmpMngr.colorSetInUse]
-    print("Changing color to ", c.name)
+    pieceLogger("Changing color to ", c.name)
     cmpMngr.colOverlayA.minHue = c.bg_minHue
     cmpMngr.colOverlayA.maxHue = c.bg_maxHue
     cmpMngr.colOverlayA.minSaturation = c.bg_minSaturation
@@ -653,7 +650,7 @@ def drawBackGround():
             config.workImage = ImageChops.multiply(config.clrBlock, config.workImage)
 
         except Exception as e:
-            print(e, config.clrBlock.mode, config.renderImageFull.mode)
+            pieceLogger(e, config.clrBlock.mode, config.renderImageFull.mode)
             pass
 
     cmpMngr.bgYpos += cmpMngr.bgYStepSpeed
@@ -721,10 +718,10 @@ def callBack():
 
 def runWork():
     global config
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("RUNNING compositions3.py")
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print(bcolors.ENDC)
+    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    pieceLogger("RUNNING compositions3.py")
+    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    pieceLogger(bcolors.ENDC)
     while config.isRunning == True:
         config.directorController.checkTime()
         if config.directorController.advance == True:
@@ -776,7 +773,7 @@ def iterate():
 
 
     if random.random() < cmpMngr.filterPatchProb:
-        #print("should be remapping")
+        #pieceLogger("should be remapping")
         minWidth = round(random.uniform(cmpMngr.filterPatchMinWidth,config.canvasWidth))
         minHeight = round(random.uniform(cmpMngr.filterPatchMinHeight,config.canvasHeight))
         x1 = round(random.uniform(0,config.canvasWidth))

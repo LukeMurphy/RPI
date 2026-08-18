@@ -2,7 +2,7 @@ import math
 import random
 import threading
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
 
@@ -15,15 +15,23 @@ def reDraw():  # sourcery skip: extract-duplicate-method, use-itertools-product
     maxHue = 60
     minSaturation = 1.0
     maxSaturation = 1.0
-    minValue = 1.0
-    maxValue = 1.0
+    minValue = .50
+    maxValue = .50
 
+    config.draw.rectangle((0, 0, config.screenWidth, config.screenHeight), fill=(0,0,0,255))
+    # config.draw.rectangle((0, 200, config.screenWidth, config.screenHeight), fill=(255,255,255,255))
+    config.draw.rectangle((config.xPos, 150, 100 + config.xPos, 220), fill=(255,255,255,200))
+    config.draw.rectangle((50, 100, 175, 295), fill=(0,0,255,60))
 
+    # if config.xPos < config.screenWidth - 120 :
+    #     config.xPos += 1
+
+    
     for c in range(0, 6, 3):
         for r in range(2):
             if r == 1:
                 clr[0] = colorutils.getRandomColorHSL(0, 0, 1.0, 1.0, 1.0, 1.0, 0, 0, 255, 1.0)
-                clr[1] = colorutils.getRandomColorHSL(0, 0, 1.0, 1.0, .50, .50, 0, 0, 255, 1.0)
+                clr[1] = colorutils.getRandomColorHSL(0, 0, 1.0, 1.0, .50, .50, 0, 0, 10, 1.0)
                 clr[2] = colorutils.getRandomColorHSV(0, 0, 1.0, 1.0, 1.0, 1.0, 0, 0, 255, 1.0)
             if c == 3:
                 clr[0] = colorutils.getRandomColorHSL(60, 60, 1.0, 1.0, 1.0, 1.0, 0, 0, 255, 1.0)
@@ -33,6 +41,8 @@ def reDraw():  # sourcery skip: extract-duplicate-method, use-itertools-product
                 clr[0] = colorutils.getRandomColorHSL(120, 120, 1.0, 1.0, 1.0, 1.0, 0, 0, 255, 1.0)
                 clr[1] = colorutils.getRandomColorHSL(120, 120, 1.0, 1.0, .50, .50, 0, 0, 255, 1.0)
                 clr[2] = colorutils.getRandomColorHSV(minHue, maxHue, minSaturation, maxSaturation, minValue, maxValue, 0, 0, 255, 1.0)
+
+                # pieceLogger(clr)
             for c2 in range(3):
                 _x1 = c * _blkWidth + 8 * c + c2 * _blkWidth + 4 * c2
                 _y1 = r * _blkWidth + 0 * r
@@ -43,9 +53,9 @@ def reDraw():  # sourcery skip: extract-duplicate-method, use-itertools-product
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING dotgrid.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
+    pieceLogger("RUNNING dotgrid.py")
+    pieceLogger(bcolors.ENDC)
 
     while config.isRunning == True:
         iterate()
@@ -67,8 +77,11 @@ def main(run=True):
     global workConfig
     config.debug = workConfig.getboolean("gradients", "debug")
 
+    config.xPos = 0
     config.image = Image.new("RGBA", (config.screenWidth, config.screenHeight))
     config.draw = ImageDraw.Draw(config.image)
+
+    config.convertRenderImageFullToRGB = False
 
     # config.vOffset = int(workConfig.get("gradients", "vOffset"))
     # config.steps = int(workConfig.get("gradients", "steps"))
@@ -108,7 +121,7 @@ def main(run=True):
     # 	config.blockXOffset = tuple(map(lambda x: int(x), workConfig.get("gradients", "blockXOffset").split(",")))
     # 	config.blockYOffset = tuple(map(lambda x: int(x), workConfig.get("gradients", "blockYOffset").split(",")))
     # except Exception as e:
-    # 	print(e)
+    # 	pieceLogger(e)
     # 	config.blockXOffset = (0,0)
     # 	config.blockYOffset = (0,0)
 

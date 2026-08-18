@@ -3,13 +3,11 @@ import argparse
 import math
 import random
 import time
-import types
 
 from modules import badpixels, coloroverlay, colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
-from modules.holder_director import Holder
 from modules.holder_director import Director
 from modules import distortions
 
@@ -61,7 +59,7 @@ class Shape:
     steps = 20
 
     def __init__(self, config, clgMngr, i=0):
-        # print ("init Fludd", i)
+        # pieceLogger ("init Fludd", i)
 
         # self.boxMax = config.screenWidth - 1
         # self.boxMaxAlt = self.boxMax + int(random.uniform(10,30) * config.screenWidth)
@@ -94,8 +92,8 @@ class Shape:
 
         # This will force the overlay color transition functions to use the
         # configs for HSV
-        # print("\n--- New Colors --- ")
-        # print(self.minHue,self.maxHue)
+        # pieceLogger("\n--- New Colors --- ")
+        # pieceLogger(self.minHue,self.maxHue)
         self.colOverlay.maxBrightness = 1
         self.colOverlay.minHue = self.minHue
         self.colOverlay.maxHue = self.maxHue
@@ -181,7 +179,7 @@ class CollageManager:
             testForDistortionSetup = workConfig.get("distortionsConfigs", "sectionDisturbance")
             distortions.distortionsConfigs(config, workConfig)
         except Exception as e:
-            print(f" ==> No distortionsConfigs or sectionDisturbance: {e}")
+            pieceLogger(f" ==> No distortionsConfigs or sectionDisturbance: {e}")
             config.sectionDisturbance = False
             config.useWaveDistortion = False
             config.imgcanvasOffsetX = 0
@@ -222,7 +220,7 @@ class CollageManager:
         try:
             self.variablePixelProbOff = float(workConfig.get("collageShapes", "variablePixelProbOff"))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.variablePixelProbOff = self.variablePixelProb
 
 
@@ -239,15 +237,15 @@ class CollageManager:
             badpixels.setBlanksOnScreen()
             self.useBadPixels = True
         except Exception as e:
-            print(e)
+            pieceLogger(e)
 
         #     config.timeBetweenSetChanges = float(workConfig.get("collageShapes", "timeBetweenSetChanges"))
         #     config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
         # except Exception as e:
         #     config.timeBetweenSetChanges = 60.0
         #     config.probablilitySetChanges = .0
-        #     print(e)
-        #     print(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
+        #     pieceLogger(e)
+        #     pieceLogger(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
 
 
         _initialize_shapes(config, self, workConfig)
@@ -387,9 +385,8 @@ def _draw_last_overlay(config, clgMngr):
 
 def runWork():
     global config, clgMngr
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING collage.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"**", 2)
+    pieceLogger("RUNNING collage.py", 2)
     while config.isRunning == True:
         config.directorController.checkTime()
         if config.directorController.advance == True:
@@ -408,7 +405,7 @@ def iterate():
 
         if (clgMngr.t1 - clgMngr.t2) > clgMngr.timeBetweenSetChanges:
             ## Beeps ... for debugging
-            # print(chr(7))
+            # pieceLogger(chr(7))
             clgMngr.t2 = time.time()
             if random.random() < clgMngr.probablilitySetChanges:
                 newIndex = math.floor(random.uniform(0, len(clgMngr.shapeGroups)))
@@ -417,7 +414,7 @@ def iterate():
                 while newIndex == clgMngr.shapeGroupDisplayed:
                     newIndex = math.floor(random.uniform(0, len(clgMngr.shapeGroups)))
                 clgMngr.shapeGroupDisplayed = newIndex
-                print(f"--> New Set:{str(newIndex)}")
+                pieceLogger(f"--> New Set:{str(newIndex)}")
 
 
     if random.random() < clgMngr.blurChangeProb:
@@ -455,7 +452,7 @@ def _imageReset():
 
 def _newFilterRemapping(config, clgMngr):
     config.filterRemap = True
-    # print("Doing remap filter")
+    # pieceLogger("Doing remap filter")
 
     # startX = round(random.uniform(0,config.canvasWidth - config.filterRemapminHoriSize) )
     # startY = round(random.uniform(0,config.canvasHeight - config.filterRemapminVertSize) )
@@ -476,14 +473,14 @@ def _newFilterRemapping(config, clgMngr):
 
 
 def colorTransitionDone(arg=None):
-    # print("colorTransition   Done ")
+    # pieceLogger("colorTransition   Done ")
     if clgMngr.useTransitionCallbacks == True:
         config.useFilters = False
         config.usePixelSort = True
 
 
 def colorTransitionStarted(arg=None):
-    print("colorTransition   Started ")
+    pieceLogger("colorTransition   Started ")
     if clgMngr.useTransitionCallbacks == True:
         config.useFilters = True
         config.usePixelSort = False
@@ -491,7 +488,7 @@ def colorTransitionStarted(arg=None):
 
 def main(run=True):
     global config, shapeGroups, workConfig, clgMngr
-    print("\n Main Init:")
+    pieceLogger("\n Main Init:")
 
     clgMngr = CollageManager(config)
     clgMngr.setUp(workConfig)
@@ -554,7 +551,7 @@ def _initialize_shapes(config, clgMngr, workConfig):
             try:
                 shape.changeBoxProb = float(workConfig.get(shapeDetails, "changeBoxProb"))
             except Exception as e:
-                print(e)
+                pieceLogger(e)
                 shape.changeBoxProb = clgMngr.changeBoxProb
 
             shape.setUp()
@@ -579,13 +576,13 @@ def _initialize_overlay_settings(config, clgMngr, workConfig):
     try:
         clgMngr.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(",")))
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         clgMngr.lastOverLayColorRange = (0, 10, 0.5, 1.0, 0.5, 0.5)
 
     try:
         clgMngr.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayAlphaRange").split(",")))
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         clgMngr.lastOverlayAlphaRange = (5, 50)
 
     _load_config_value(clgMngr, workConfig, "collageShapes", "forceLastOverlay", False, bool)
@@ -597,7 +594,7 @@ def _initialize_overlay_settings(config, clgMngr, workConfig):
         config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
         config.lastOverlayFill = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(",")))
     except Exception as e:
-        print(e)
+        pieceLogger(e)
         config.lastOverlayBox = (0, 0, 64, 32)
         config.lastOverlayFill = (0, 0, 0, 0)
         config.useLastOverlay = False
@@ -610,5 +607,5 @@ def _load_config_value(obj, workConfig, section, option, default, type_converter
     try:
         setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        print(f"=> Failed to set {section}.{option} {e}")
+        pieceLogger(f"=> Failed to set {section}.{option} {e}")
         setattr(obj, option, default)

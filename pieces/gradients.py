@@ -2,7 +2,7 @@ import math
 import random
 import threading
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
@@ -175,9 +175,9 @@ def reDraw(config):
 
 def runWork():
 	global config
-	print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-	print("Running gradients.py")
-	print(bcolors.ENDC)
+	pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+	pieceLogger("Running gradients.py")
+	pieceLogger(bcolors.ENDC)
 	while True:
 		iterate()
 		time.sleep(config.redrawRate)
@@ -214,7 +214,7 @@ def iterate():
 	if random.random() < config.probDrawChange:
 		config.probDraw = random.uniform(0.001, 0.05)
 		config.probDrawChange = 0.001
-		# print(config.probDraw)
+		# pieceLogger(config.probDraw)
 
 	if random.random() < .01 :
 		config.probDrawEffective = config.probDraw
@@ -248,7 +248,7 @@ def main(run=True):
 		config.drawBarProb = float(workConfig.get("gradients", "drawBarProb"))
 	except Exception as e:
 		config.drawBarProb = float(workConfig.get("gradients", "blackProb"))
-		print(str(e))
+		pieceLogger(str(e))
 
 	config.heightMin = int(workConfig.get("gradients", "heightMin"))
 	config.heightMax = int(workConfig.get("gradients", "heightMax"))
@@ -277,20 +277,20 @@ def main(run=True):
 	try:
 		config.fromBlack = workConfig.getboolean("gradients", "fromBlack")
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		config.fromBlack = False
 
 	try:
 		config.rotateDrawing = float(workConfig.get("gradients", "rotate"))
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		config.rotateDrawing = 0
 
 
 	try:
 		config.colorChange = float(workConfig.get("gradients", "colorChange"))
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		config.colorChange = 0
 
 
@@ -298,7 +298,7 @@ def main(run=True):
 		config.minWidth = int(workConfig.get("gradients", "minWidth"))
 		config.maxWidth = int(workConfig.get("gradients", "maxWidth"))
 	except Exception as e:
-		print(str(e))
+		pieceLogger(str(e))
 		config.minWidth = 4
 		config.maxWidth = 16
 

@@ -105,7 +105,7 @@ class RadialSet:
             skip = 0 if random.SystemRandom().random() < skipRatio else 1
             self.radialsArray.append([ir, outr, skip])
 
-        # print(f"wBase {self.wBase} innerRadius = {innerRadius}")
+        # pieceLogger(f"wBase {self.wBase} innerRadius = {innerRadius}")
 
 
 class ParticleSystem:
@@ -541,7 +541,7 @@ class ConcentricParticlesManager:
 
 
 def drawBands(p):
-    # print("----")
+    # pieceLogger("----")
     drawBandRings(p)
     drawRadials(p)
 
@@ -668,7 +668,7 @@ def _verticalContinuitySetup(config, cpMngr):
 
     yCrop = round(cpMngr.imageCanvasHeight)
     yCrop2 = round(cpMngr.imageCanvasHeight - cpMngr.imageCanvasHeight / cpMngr.verticalOverlapFraction)
-    # print(yCrop2)
+    # pieceLogger(yCrop2)
 
     # temp = config.imageOverFlow.crop((0,yCrop,config.canvasWidth, yCrop + config.canvasHeight / cpMngr.verticalOverlapFraction))
     # temp2 = config.image.crop((0,yCrop2,config.canvasWidth, config.canvasHeight))
@@ -715,7 +715,7 @@ def runWork():
     global redrawSpeed
     global PS
     redrawSpeed = 0.02
-    pieceLogger(".. runWork() called in concentric_particles_v4.py")
+    pieceLogger("concentric_particles_v4.py running", 2)
     while True:
         config.directorController.checkTime()
         if config.directorController.advance:

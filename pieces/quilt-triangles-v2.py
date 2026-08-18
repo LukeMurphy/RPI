@@ -4,12 +4,11 @@ import textwrap
 import time
 import noise
 from noise import *
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import badpixels, coloroverlay, colorutils
 from modules.quilting import createstarpieces, createtrianglepieces
 from modules.quilting.colorset import ColorSet
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-from modules.holder_director import Holder
 from modules.holder_director import Director
 from modules import distortions
 
@@ -43,7 +42,7 @@ class QuiltManager:
             # elements will change
             self.resetSizeProbability = float(workConfig.get("quilt-triangles", "resetSizeProbability"))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.resetTrianglesProb = 0.001
             self.resetSizeProbability = 0.001
 
@@ -69,7 +68,7 @@ class QuiltManager:
             """
 
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.transformShape = False
 
         redRange = workConfig.get("quilt-triangles", "redRange").split(",")
@@ -82,7 +81,7 @@ class QuiltManager:
             self.blockSizeMax = int(workConfig.get("quilt-triangles", "blockSizeMax"))
             self.blockSize = round(random.SystemRandom().uniform(self.blockSizeMin, self.blockSizeMax))
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.blockSize = int(workConfig.get("quilt-triangles", "blockSize"))
 
         try:
@@ -93,7 +92,7 @@ class QuiltManager:
             self.blockCols = self.blockColsMax
             self.blockRows = self.blockRowsMax
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.blockCols = int(workConfig.get("quilt-triangles", "blockCols"))
             self.blockRows = int(workConfig.get("quilt-triangles", "blockRows"))
         # can adjust the quilt image offset
@@ -176,14 +175,14 @@ class QuiltManager:
         try:
             self.usePresets = workConfig.getboolean("quilt-triangles", "usePresets")
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.usePresets = True
 
         try:
             self.rotationRange = float(workConfig.get("quilt-triangles", "rotationRange"))
         except Exception as e:
             self.rotationRange = 0
-            print(e)
+            pieceLogger(e)
 
         try:
             drawBlockCoordsRaw = [
@@ -206,7 +205,7 @@ class QuiltManager:
             self.drawBlock = True
             self.drawBlockShape = lambda: self.canvasImageDraw.polygon(self.drawBlockCoords, fill=self.drawBlockFixedColor)
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.drawBlock = False
             self.drawBlockShape = lambda: True
 
@@ -358,7 +357,7 @@ def setInitialColors(refresh=False):
 
     for i in range(len(config.unitArray)):
         obj = config.unitArray[i]
-        # print("number of colorOverlay objs {}".format(len(obj.triangles)) )
+        # pieceLogger("number of colorOverlay objs {}".format(len(obj.triangles)) )
         for c in range(len(obj.triangles)):
             colOverlay = obj.triangles[c][1]
             # colOverlay.colorB = colorutils.randomColorAlpha(config.brightness * .8,0)
@@ -369,8 +368,8 @@ def setInitialColors(refresh=False):
 
 def main(run=True):
     global config, directionOrder, workConfig, mrksMngr
-    print("---------------------")
-    print("QUILT TRIANGLES or STARS Loaded")
+    pieceLogger("---------------------")
+    pieceLogger("QUILT TRIANGLES or STARS Loaded")
 
     # ------------------------------------------------------------------ #
     # CREATE THE IMAGE HOLDERS
@@ -400,9 +399,8 @@ def main(run=True):
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING quilt-triangles.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"**", 2)
+    pieceLogger("RUNNING quilt-triangles.py", 2)
     while config.isRunning == True:
         iterate()
         time.sleep(config.delay)
@@ -416,7 +414,7 @@ def iterate():
 
     # Need to do a crossfade
     # if mrksMngr.doingRefresh < mrksMngr.doingRefreshCount:
-    #     # print("crossfade...",  mrksMngr.doingRefresh/mrksMngr.doingRefreshCount)
+    #     # pieceLogger("crossfade...",  mrksMngr.doingRefresh/mrksMngr.doingRefreshCount)
     #     if mrksMngr.doingRefresh == 0:
     #         mrksMngr.snapShot = config.canvasImage.copy()
     #     crossFade = Image.blend(

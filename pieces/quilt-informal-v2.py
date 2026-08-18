@@ -5,10 +5,10 @@ import time
 # from noise import *
 from threading import Timer
 from PIL import Image,  ImageDraw, ImageOps
-from modules.configuration import bcolors
 from modules import distortions
 from modules import coloroverlay, colorutils, panelDrawing
 from modules.holder_director import Director
+from modules.configuration import bcolors, pieceLogger
 
 def setTimeout(fn, ms, *args, **kwargs):
     t = Timer(ms / 1000.0, fn, args=args, kwargs=kwargs)
@@ -63,7 +63,7 @@ class QuiltManager:
             )
 
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.saturationRangeFactorLeft = (1, 1)
             self.saturationRangeFactorRight = (1, 1)
 
@@ -104,7 +104,7 @@ class QuiltManager:
                 "quilt-informal", "opticalPatterns"
             ).split(",")
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.opticalPatterns = [
                 "Regular",
                 "Regular",
@@ -572,7 +572,7 @@ def drawSquareSpiral():
 
 def resetToAllowDistortion():
     config.rebuildingPattern = False
-    # print("restartPiece has finished its call")
+    # pieceLogger("restartPiece has finished its call")
 
 
 def restartPiece():
@@ -602,7 +602,7 @@ def restartPiece():
     qMngr.blockLength = qMngr.blockLengthBase * qMngr.sizeFactor
     qMngr.blockHeight = qMngr.blockHeightBase * qMngr.sizeFactor
 
-    print(f"{qMngr.opticalPattern} {str(qMngr.sizeFactor)}")
+    pieceLogger(f"{qMngr.opticalPattern} {str(qMngr.sizeFactor)}")
 
     drawSquareSpiral()
 
@@ -624,8 +624,8 @@ def transformImage(img):
 
 def main(run=True):
     global config, directionOrder, workConfig, qMngr
-    print("---------------------")
-    print("QUILT Loaded")
+    pieceLogger("---------------------")
+    pieceLogger("QUILT Loaded")
 
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("quilt-informal", "redrawSpeed"))
@@ -687,9 +687,8 @@ def main(run=True):
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING quilt-informal.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"**", 2)
+    pieceLogger("RUNNING quilt-informal.py", 2)
     while config.isRunning :
         config.directorController.checkTime()
         if config.directorController.advance :

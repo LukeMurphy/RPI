@@ -1,6 +1,6 @@
 import random
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import coloroverlay, colorutils
 from modules.quilting import (
     createpolypieces,
@@ -110,20 +110,20 @@ class QuiltManager:
             self.rotationRange = float(workConfig.get("quilt-polys", "rotationRange"))
         except Exception as e:
             self.rotationRange = 0
-            print(e)
+            pieceLogger(e)
 
         try:
             self.refreshCount = float(workConfig.get("quilt-polys", "refreshCount"))
         except Exception as e:
             self.refreshCount = 100
-            print(e)
+            pieceLogger(e)
 
         try:
             self.config.randomness = int(workConfig.get("quilt-polys", "randomness"))
             self.randomnessBase = int(workConfig.get("quilt-polys", "randomness"))
         except Exception as e:
             self.config.randomness = 0
-            print(e)
+            pieceLogger(e)
 
         try:
             drawBlockCoordsRaw = [list((i).split(",")) for i in workConfig.get("drawBlock", "drawBlockCoords").split("|")]
@@ -141,7 +141,7 @@ class QuiltManager:
             self.drawBlockShape = lambda: self.config.canvasImageDraw.polygon(self.drawBlockCoords, fill=self.drawBlockFixedColor)
 
         except Exception as e:
-            print(e)
+            pieceLogger(e)
             self.drawBlock = False
             self.drawBlockShape = lambda: True
 
@@ -203,7 +203,7 @@ def restartPiece():
 
     if random.random() < 0.25:
         choice = round(random.SystemRandom().uniform(1, 3))
-        print("Choice {0}".format(choice))
+        pieceLogger("Choice {0}".format(choice))
         if choice == 1:
             # ruby pink bgs
             mrksMngr.c3HueRange = (350, 40)
@@ -270,8 +270,8 @@ def setInitialColors(refresh=False):
 
 def main(run=True):
     global config, directionOrder, workConfig, mrksMngr
-    print("---------------------")
-    print("QUILT Loaded")
+    pieceLogger("---------------------")
+    pieceLogger("QUILT Loaded")
 
     # ------------------------------------------------------------------ #
     # CREATE THE IMAGE HOLDERS
@@ -303,9 +303,8 @@ def main(run=True):
 
 def runWork():
     global config
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("RUNNING quilt-poly-v2.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"**", 2)
+    pieceLogger("RUNNING quilt-poly-v2.py", 2)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:
@@ -321,7 +320,7 @@ def iterate():
 
     # Need to do a crossfade
     # if mrksMngr.doingRefresh < mrksMngr.doingRefreshCount:
-    #     # print("crossfade...",  mrksMngr.doingRefresh/mrksMngr.doingRefreshCount)
+    #     # pieceLogger("crossfade...",  mrksMngr.doingRefresh/mrksMngr.doingRefreshCount)
     #     if mrksMngr.doingRefresh == 0:
     #         mrksMngr.snapShot = config.image.copy()
     #     crossFade = Image.blend(

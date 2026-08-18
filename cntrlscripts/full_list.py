@@ -286,7 +286,10 @@ def _create_action_dict(fullList, dateSort, configPath):
             if currentDir != lastDir and not dateSort:
                 actionDict.append({"": ""})
                 lastDir = currentDir
-            actionDict.append({f"{tsSearchField}\t{f[2]}\t\t [{currentDir}]": f[0]})
+            if dateSort :
+                actionDict.append({f"{tsSearchField}\t{f[2]}\t\t [{currentDir}]": f[0]})
+            else :
+                actionDict.append({f"[{currentDir}] \t {tsSearchField} \t\t {f[2]}": f[0]})
             # actionDict.append({f"{tsSearchField}\t\t{currentDir} \t\t\t\t \t\t\t\t{f[2]}": f[0]})
         else:
             actionDict.append({"": ""})
@@ -319,10 +322,10 @@ root.geometry(
     "%dx%d+%d+%d"
     % (
         860,
-        320,
+        740,
         # round(screen_height * 0.6),
-        round(screen_width - 970),
-        round(1 * screen_height / 2),
+        round(screen_width - 870),
+        round(40),
     )
 )
 def_font = tk.font.nametofont("TkDefaultFont")

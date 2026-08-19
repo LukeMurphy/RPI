@@ -320,7 +320,7 @@ class Fader:
             if self.fadeInMode == 1:
                 config.faderDoingRefreshCountIterations = config.faderDissolveDoingRefreshCountIterations
 
-        pieceLogger(f"[Fader.setUp] >> Fader initialized setup {self.fadeInMode} {config.faderDoingRefreshCountIterations}")
+        pieceLogger(f" >> Fader initialized setup {self.fadeInMode} {config.faderDoingRefreshCountIterations}")
 
         self.blankImage = Image.new("RGBA", (self.width, self.height))
         self.startingImage = Image.new("RGBA", (self.width, self.height))
@@ -507,7 +507,7 @@ def transformImage(img):
 def writeImage(baseName, renderImage):
     # baseName = "outputquad3/comp2_"
     if config.saveImages and not config.drawingPoints:
-        pieceLogger("[writeImage] >> Saving Image...")
+        pieceLogger(" >> Saving Image...")
         fn = f"{baseName}.png"
         renderImage.save(fn)
 
@@ -519,7 +519,7 @@ def loadImageForBase():
 
     i = math.floor(random.random() * len(config.imageSources))
     imagePath = config.imageSources[i]
-    pieceLogger(f"[loadImageForBase] >> {imagePath}")
+    pieceLogger(f" >> {imagePath}")
     image = Image.open(imagePath)
     image.load()
     config.canvasImage.paste(image, (0, 0))
@@ -538,7 +538,7 @@ def loadClipPlayerConfigs():
         rpO.clipMain.clipRotate = rpO.clipRotate
         rpO.clipMain.setUp(workConfig)
     except Exception as e:
-        pieceLogger(f"[loadClipPlayerConfigs] >> {e} \n")
+        pieceLogger(f" >> {e} \n")
         rpO.useClipPlayer = False
 
 
@@ -559,7 +559,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        pieceLogger(f"\n[loadConfigValue] >> Config value not loaded:{obj} {workConfig} {section} {option} ==> will be set to {default} \n  {e}", 1)
+        pieceLogger(f"\n >> Config value not loaded:{obj} {workConfig} {section} {option} ==> will be set to {default} \n  {e}", 1)
         setattr(obj, option, default)
 
 
@@ -574,7 +574,7 @@ def loadAndSetupAllPalettes():
     rpO.paletteConfig = configparser.ConfigParser()
     argument = f"{rpO.path}/configs/{rpO.palettesConfigFile}"
 
-    pieceLogger(f"[loadAndSetupAllPalettes] >> loading from {argument}")
+    pieceLogger(f" >> loading from {argument}")
     rpO.paletteConfig.read(argument)
 
     rpO.palettes = rpO.paletteConfig.get("palettesIncluded", "palettes").replace("\n", "").split(",")
@@ -605,7 +605,7 @@ def loadPalette(palette):
     global config
     # palette = config.palettes[index]
 
-    pieceLogger(f"[loadPalette] >> Loading palette {palette}")
+    pieceLogger(f" >> Loading palette {palette}")
     c1 = Holder()
     c2 = Holder()
     c3 = Holder()
@@ -724,9 +724,9 @@ def setPalette(config, index=0):
     paletteObj = getPaletteObjectByName(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index])
 
     pieceLogger(
-        f"\n[setPalette] >> currentCombinationsetIndex: {rpO.currentCombinationsetIndex} index: {index} rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]}"
+        f"\n >> currentCombinationsetIndex: {rpO.currentCombinationsetIndex} index: {index} rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]}"
     )
-    pieceLogger(f"[setPalette] >> Setting a new palette:  {paletteObj.paletteName}")
+    pieceLogger(f" >> Setting a new palette:  {paletteObj.paletteName}")
     rpO.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(rpO.bgColorAlpha[0], rpO.bgColorAlpha[1])))
     rpO.c1.currentColor = setCurrentColor(paletteObj.c1)
     rpO.c2.currentColor = setCurrentColor(paletteObj.c2)
@@ -749,7 +749,7 @@ def selectNewPalette(_setPalette=True):
     rpO.currentPaletteIndex = random.choice(_listOfIndecies)
 
     pieceLogger(
-        f"[selectNewPalette] >> Choosing a palette: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[rpO.currentPaletteIndex]} in {rpO.combinationSets[rpO.currentCombinationsetIndex].name}",
+        f" >> Choosing a palette: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[rpO.currentPaletteIndex]} in {rpO.combinationSets[rpO.currentCombinationsetIndex].name}",
         2,
         True,
     )
@@ -940,12 +940,12 @@ def loadAndSetCombinations():
             rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime
         )
     )
-    pieceLogger(f"[loadAndSetCombinations] Initial combo set change wait time (slotRate) : {rpO.comboSetDirector.slotRate}")
+    pieceLogger(f" Initial combo set change wait time (slotRate) : {rpO.comboSetDirector.slotRate}")
 
 
 def handleChangeCurrentCominationSet():
 
-    pieceLogger("[handleChangeCurrentCominationSet] >> Checking combo set")
+    pieceLogger(" >> Checking combo set")
     disturbancesDone = not rpO.doSectionDisturbance or rpO.doneCount >= rpO.numberOfSections
 
     if random.random() < rpO.changeCombinationAnytimeProb and rpO.fader.fadingDone and disturbancesDone:
@@ -956,9 +956,9 @@ def handleChangeCurrentCominationSet():
         rpO.currentPaletteIndex = math.floor(random.uniform(0, len(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes)))
         setPalette(rpO, rpO.currentPaletteIndex)
         # {rpO.combinationSets[rpO.currentCombinationsetIndex]}
-        # pieceLogger(f"[handleChangeCurrentCominationSet] >> _listOfIndecies =   {_listOfIndecies}")
+        # pieceLogger(f" >> _listOfIndecies =   {_listOfIndecies}")
         pieceLogger(
-            f"[handleChangeCurrentCominationSet] >> =====> Combo changed to {rpO.combinationSets[rpO.currentCombinationsetIndex].name} (index: {rpO.currentCombinationsetIndex})",
+            f" >> =====> Combo changed to {rpO.combinationSets[rpO.currentCombinationsetIndex].name} (index: {rpO.currentCombinationsetIndex})",
             2,
             True,
         )
@@ -999,14 +999,14 @@ def handleChangeCurrentCominationSet():
         drawAndProcessPattern()
 
     else:
-        pieceLogger("\n[handleChangeCurrentCominationSet] >> No change")
+        pieceLogger("\n >> No change")
 
 
 def resetPatternBlocks():
 
     tempPalette = changeSinglePalette(rpO.currentPaletteIndex)
 
-    pieceLogger(f"resetPatternBlocks() : config.totalSlots {config.totalSlots}", 4, True)
+    pieceLogger(f" >> config.totalSlots {config.totalSlots}", 4, True)
 
     for i in range(rpO.totalSlots):
         _patternBlock = rpO.patternSequence[i]
@@ -1020,7 +1020,7 @@ def resetPatternBlocks():
 
 
 def buildPatternSequence(_repeatedPatternsObj):
-    pieceLogger("[buildPatternSequence] >> called", 0)
+    pieceLogger(" >> called", 0)
 
     rpO : RepeatedPatterns = _repeatedPatternsObj
     # rpO.patternSequence = []
@@ -1128,7 +1128,7 @@ def generatePatternSequence(rpO):
     _randomInsertionProb = _combo.randomInsertionProbabilitly
     _randomInsertionMax = _combo.randomInsertionMax
 
-    pieceLogger(f"[generatePatternSequence(config)] >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}", 2, True)
+    pieceLogger(f" >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}", 2, True)
 
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount, _randomInserts, _randomInsertionProb, _randomInsertionMax
@@ -1150,7 +1150,7 @@ def generatePatternSequence(rpO):
                     _patternSelected = chooseAPattern()
 
                 _tempPalette = getTempPalette(rpO)
-                pieceLogger("[generatePatternSequence] >> forcing a change in last few slots")
+                pieceLogger(" >> forcing a change in last few slots")
 
         if "randomizer" in _patternSelected:
             if rpO.numberOfRandomizersUsed >= _combo.maxNumberOfRandomizers:
@@ -1207,7 +1207,7 @@ def generatePatternSequence(rpO):
                     # pieceLogger(f"add_pattern_block: change this slot {_slot}/ {len(rpO.patternSequence)}")
                     rpO.patternSequence[_slot] = _patternBlock
         except Exception as e:
-            pieceLogger(f"[generatePatternSequence][add_pattern_block] error {e}", 1)
+            pieceLogger(f" error {e}", 1)
 
         # pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _patternBlock.pattern: column:{c} row:{r} rpO.randomInsertionCount {rpO.randomInsertionCount}/{_randomInsertionMax} {_iterCount}: {_patternBlock.pattern}")
         _iterCount += 1
@@ -1244,7 +1244,7 @@ def _print_pattern_sequence(config):
 
 
 def rebuildPatterns(arg=0):
-    pieceLogger("[rebuildPatterns] >> called")
+    pieceLogger(" >> called")
 
     if rpO.numRowsRandomize:
         rowsAndDotsSettings()
@@ -1471,13 +1471,13 @@ def handlePatternRebuild():
 
         # selectNewPalette(False)
         if random.random() < rpO.rebuildAllSlotsProb:
-            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding full : {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
+            pieceLogger(f"\n >> Rebuiding full : {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
             rpO.settingUpPattern = True
             rpO.patternSequence = []
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger(f"\n[handlePatternRebuild] >> Rebuiding parts: {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
+            pieceLogger(f"\n >> Rebuiding parts: {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
             if random.random() < rpO.chanceRebuildPatternChoosesRandom:
                 rpO.slotsToChange = []
             else:
@@ -1496,7 +1496,7 @@ def handlePatternRebuild():
 
             rpO.settingUpPattern = False
         try:
-            pieceLogger(f"[handlePatternRebuild] >> rpO.settingUpPattern {rpO.settingUpPattern} | color palette : {rpO.palettes[rpO.currentPaletteIndex]}")
+            pieceLogger(f" >> rpO.settingUpPattern {rpO.settingUpPattern} | color palette : {rpO.palettes[rpO.currentPaletteIndex]}")
         except Exception as e:
             pieceLogger(e)
         # pieceLogger(f"handlePatternRebuild(): rpO.slotsToChange {rpO.slotsToChange}")
@@ -1751,7 +1751,7 @@ def setupPolyOverlay():
         # print(config.polyBase)
 
     except Exception as e:
-        pieceLogger(f"[setupPolyOverlay] >> Not using custom polygon overlay {e}")
+        pieceLogger(f" >> Not using custom polygon overlay {e}")
         rpO.usePolygonOverlay = False
 
 
@@ -1760,7 +1760,7 @@ def setupPolyOverlay():
 
 def loadAndInitializeCrossFader():
 
-    pieceLogger("[loadAndInitializeCrossFader] >> Initialize cross fader")
+    pieceLogger(" >> Initialize cross fader")
     loadConfigValue(rpO, workConfig, "movingpattern", "fadeThroughIncrement", 0.1, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "faderProbDissolve", 0.5, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "faderLargeBlockXSections", 10, int)
@@ -1990,7 +1990,7 @@ def main(run=True):
 
 
 def runWork():
-    pieceLogger("[runWork] >> Running repeatblocks.py", 2)
+    pieceLogger(" >> Running repeatblocks.py", 2)
     _subSteps = getattr(config, "smoothingSteps", 0)
 
     while config.isRunning:

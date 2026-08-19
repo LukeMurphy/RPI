@@ -21,10 +21,9 @@ from PIL import (
     ImageFont,
     ImageOps,
 )
-from multiprocessing import Pool
-from modules import configuration, player_module
+from modules import configuration
 from modules.rendering import appWindow
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 
 import subprocess
 from subprocess import check_output
@@ -46,8 +45,8 @@ def timeChecker(sequenceConfig, config):
     sequenceConfig.currentTime = time.time()
 
     # uncomment to debug
-    # print(
-    #     f"{bcolors.WARNING}** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
+    # pieceLogger(
+    #     f"** sequence-player.py checking the time ... {str(round(sequenceConfig.currentTime - sequenceConfig.startTime))} / {str(sequenceConfig.currentPieceDuration)}"
     #     + ""
     #     + bcolors.ENDC
     # )
@@ -68,11 +67,10 @@ def _select_next_piece(sequenceConfig):
         pieceToPlay = random.randrange(len(sequenceConfig.workList))
 
     work = sequenceConfig.workList[pieceToPlay]
-    print(bcolors.WARNING)
-    print("---------------------------------------------------------------------------------------")
-    print(f"Piece Playing is: {pieceToPlay}")
-    print(work)
-    # print("---------------------------------------------------------------------------------------")
+    pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger(f"Piece Playing is: {pieceToPlay}")
+    pieceLogger(work)
+    # pieceLogger("---------------------------------------------------------------------------------------")
 
     sequenceConfig.currentPieceDuration = round(random.uniform(work[1], work[2]))
 
@@ -89,10 +87,10 @@ def _launch_next_player(sequenceConfig):
     arg2 = f"{work[0]}"
     arg4 = brightnessOverrideString
 
-    print("---------------------------------------------------------------------------------------")
-    print("Sequencer is calling :\n" + commandString)
-    print("---------------------------------------------------------------------------------------")
-    print(bcolors.ENDC)
+    pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger("Sequencer is calling :\n" + commandString)
+    pieceLogger("---------------------------------------------------------------------------------------")
+
 
     if arg4 != "":
         arg3 = "-brightnessOverride"
@@ -107,17 +105,16 @@ def _kill_old_players(sequenceConfig):
 
     try:
         listOfProcs = check_output("ps -ef | pgrep -f -a player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
-        print(bcolors.WARNING)
-        print("---------------------------------------------------------------------------------------")
-        print("Sequencer is killing off old window(s)")
-        print(f"count play : {sequenceConfig.playCount}")
-        print(f"Running player instances are : {len(str(sequenceConfig.currentPID))}")
-        print(listOfProcs)
-        # print("---------------------------------------------------------------------------------------")
+        pieceLogger("---------------------------------------------------------------------------------------")
+        pieceLogger("Sequencer is killing off old window(s)")
+        pieceLogger(f"count play : {sequenceConfig.playCount}")
+        pieceLogger(f"Running player instances are : {len(str(sequenceConfig.currentPID))}")
+        pieceLogger(listOfProcs)
+        # pieceLogger("---------------------------------------------------------------------------------------")
         listToCheck = listOfProcs[:-2]
-        print(listToCheck)
-        # print(len(listToCheck))
-        print("---------------------------------------------------------------------------------------")
+        pieceLogger(listToCheck)
+        # pieceLogger(len(listToCheck))
+        pieceLogger("---------------------------------------------------------------------------------------")
 
         if len(listToCheck) == 2:
             # just kill the first in the list (i.e. the oldest player running)
@@ -128,17 +125,16 @@ def _kill_old_players(sequenceConfig):
                 for p in listToCheck[:-1]:
                     if str(sequenceConfig.currentPID) not in p:
                         len(str(sequenceConfig.currentPID))
-                        print("---------------------------------------------------------------------------------------")
-                        print(f"{str(sequenceConfig.currentPID)} : Should be killing {p}")
+                        pieceLogger("---------------------------------------------------------------------------------------")
+                        pieceLogger(f"{str(sequenceConfig.currentPID)} : Should be killing {p}")
                         len(str(sequenceConfig.currentPID))
                         subprocess.run([f"kill {p}"], shell=True, check=True)
             except Exception as e:
-                print(e)
+                pieceLogger(e)
         # comment:
-        print("---------------------------------------------------------------------------------------")
-        print(bcolors.ENDC)
+        pieceLogger("---------------------------------------------------------------------------------------")
     except Exception as e:
-        print(e)
+        pieceLogger(e)
 
         # end try
 
@@ -167,19 +163,18 @@ def loadWorkConfig(work, sequenceConfig):
 
     argument = f"{config.path}/configs/{work[0]}"
 
-    print(bcolors.WARNING)
-    print("---------------------------------------------------------------------------------------")
-    print(f"Sequencer: first work cfg {work[0]}")
-    print(f"Sequencer: loading {argument}")
-    print("---------------------------------------------------------------------------------------")
-    print(bcolors.ENDC)
+    pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger(f"Sequencer: first work cfg {work[0]}")
+    pieceLogger(f"Sequencer: loading {argument}")
+    pieceLogger("---------------------------------------------------------------------------------------")
+
     workconfig.read(argument)
     config.fileName = argument
 
     sequenceConfig.currentPID = os.getpid()
-    print("---------------------------------------------------------------------------------------")
-    print(f"Sequence Player PID is: {sequenceConfig.currentPID}")
-    print("---------------------------------------------------------------------------------------")
+    pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger(f"Sequence Player PID is: {sequenceConfig.currentPID}")
+    pieceLogger("---------------------------------------------------------------------------------------")
 
     callBack(sequenceConfig, config)
 
@@ -212,14 +207,14 @@ def loadConfigFile():
 
 
 def loadSequenceFile():
-    print(f"{bcolors.WARNING}\n\n\n************************************************\n\n")
+    pieceLogger(f"\n\n\n************************************************\n\n")
     args = loadConfigFile()
 
     if args.cfg != None:
 
         workconfig = configparser.ConfigParser()
 
-        _loadSequencer_print_args("Inital Sequencer Arguments: \n", args)
+        _loadSequencer_pieceLogger_args("Inital Sequencer Arguments: \n", args)
 
         # sequenceConfig = configuration.Config()
         sequenceConfig = configuration.ArtWorkConfig("SEQUENCER")
@@ -228,10 +223,10 @@ def loadSequenceFile():
         sequenceConfig.MID = args.mname
         sequenceConfig.path = args.path
 
-        print("script: sys.argv[0] is", repr(sys.argv[0]))
-        print("script: __file__ is", repr(__file__))
-        print("script: cwd is", repr(os.getcwd()))
-        print("config: path  is", repr(args.path))
+        pieceLogger("script: sys.argv[0] is", repr(sys.argv[0]))
+        pieceLogger("script: __file__ is", repr(__file__))
+        pieceLogger("script: cwd is", repr(os.getcwd()))
+        pieceLogger("config: path  is", repr(args.path))
 
         # Automating the config path a bit better
         # assumes that if no -path is specified, it defaults to ./ so
@@ -241,7 +236,7 @@ def loadSequenceFile():
 
         argument = f"{sequenceConfig.path}configs/{args.cfg}"
 
-        _loadSequencer_print_args("-cfg sequencer argument: \n", argument)
+        _loadSequencer_pieceLogger_args("-cfg sequencer argument: \n", argument)
         workconfig.read(argument)
 
         sequenceConfig.fileName = argument
@@ -263,14 +258,14 @@ def loadSequenceFile():
             try:
                 brightnessOverride = float(workconfig.get(w, "brightnessOverride"))
             except Exception as e:
-                print(f" ==> brightnessOverride not defined {e} ")
+                pieceLogger(f" ==> brightnessOverride not defined {e} ")
                 brightnessOverride = None
 
             sequenceConfig.workList.append([work, minDuration, maxDuration, brightnessOverride])
 
-        print(f"{bcolors.WARNING}---------------------------------------------------------------------------------------")
-        print("WorkList:")
-        print(sequenceConfig.workList)
+        pieceLogger(f"---------------------------------------------------------------------------------------")
+        pieceLogger("WorkList:")
+        pieceLogger(sequenceConfig.workList)
 
         sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)
         sequenceConfig.mainAppWindow.setUp()
@@ -279,15 +274,12 @@ def loadSequenceFile():
         pieceToPlay = round(random.SystemRandom().uniform(0, len(sequenceConfig.workList) - 1))
         pieceToPlay = 0
         loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
-        print(f"{bcolors.ENDC}")
 
 
-def _loadSequencer_print_args(arg0, arg1):
-    print(bcolors.WARNING)
-    print("---------------------------------------------------------------------------------------")
-    print(arg0 + str(arg1))
-    # print("---------------------------------------------------------------------------------------")
-    print(bcolors.ENDC)
+def _loadSequencer_pieceLogger_args(arg0, arg1):
+    pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger(arg0 + str(arg1))
+    pieceLogger("---------------------------------------------------------------------------------------")
 
     # sequenceConfig.mainAppWindow.run()
 

@@ -256,26 +256,26 @@ class ArtWorkConfig:
 
     def __init__(self, args=None, _silent=False):
         if not _silent:
-            print("\n[configuration.py: ArtWorkConfig] ---------------------------------------------------------------------------------------")
-            print(f"[configuration.py: ArtWorkConfig] ** Config instance init {args}")
-            print("[configuration.py: ArtWorkConfig] ---------------------------------------------------------------------------------------")
+            print("\n---------------------------------------------------------------------------------------")
+            print(f"** Config instance init {args}")
+            print("---------------------------------------------------------------------------------------")
 
     def debugSelf(self):
         allArgs = self.__dict__
-        print("\n[configuration.py: ArtWorkConfig] ---------------------------------------------------------------------------------------\n")
+        print("\n---------------------------------------------------------------------------------------\n")
         for element in allArgs:
-            print(f"[configuration.py: ArtWorkConfig] {element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
-        print("[configuration.py: ArtWorkConfig] ---------------------------------------------------------------------------------------\n")
+            print(f"{element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
+        print("---------------------------------------------------------------------------------------\n")
 
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
-        print(f"[configuration.py: ArtWorkConfig] {method_list}")
-        print("[configuration.py: ArtWorkConfig] ---------------------------------------------------------------------------------------\n")
+        print(f"{method_list}")
+        print("---------------------------------------------------------------------------------------\n")
 
         # allFuncs = dir(self)
         # print(allFuncs)
 
     def spaceBarAction(self):
-        print("[configuration.py: ArtWorkConfig] >> SPACE BAR PRESSED")
+        print(">> SPACE BAR PRESSED")
 
     def __getattribute__(self, name):
         return super().__getattribute__(name)

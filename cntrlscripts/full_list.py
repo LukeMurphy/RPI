@@ -124,14 +124,7 @@ class ControlPanel(QWidget):
 
     def _buildUi(self):
         self.setWindowTitle("full_list (PyQt)")
-
-        pixmapi = getattr(QStyle.StandardPixmap, "SP_TitleBarMaxButton")
-        icon = self.style().standardIcon(pixmapi)
-        self.setWindowIcon(QIcon(icon))
-        # self.setWindowIcon(QIcon('chip_icon_normal.png'))
         
-
-
         # self.setStyleSheet("background-color: white;")
         self.setFont(QFont(self.font().family(), 12))
 
@@ -312,6 +305,9 @@ class ControlPanel(QWidget):
 def main():
     app = QApplication(sys.argv)
     # app.setWindowIcon(QIcon('chip_icon_normal.png'))
+    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), 'leddeliico/ledeliapp.png')
+    
+    app.setWindowIcon(QIcon(path))
     panel = ControlPanel()
     panel.show()
     sys.exit(app.exec())

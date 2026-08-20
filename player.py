@@ -51,7 +51,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-pieceLogger("[player] >> Inital Player Arguments: \n" + str(args),3)
+pieceLogger(" >> Inital Player Arguments: \n" + str(args),3)
 
 # Create a blank dummy object container for now
 # config = type('', (object,), {})()

@@ -59,7 +59,8 @@ def setUp(config):
     os.environ["SDL_VIDEO_WINDOW_POS"] = f"{x},{y}"
 
     pygame.init()
-    pygame.display.set_caption(getattr(config, "work", "player"))
+    # pygame.display.set_caption(getattr(config, "work", "player"))
+    pygame.display.set_caption((f"PyG - {config.work}: {config.fileNameRaw}"))
     pygame.mouse.set_visible(False)
 
     flags = pygame.NOFRAME if config.noWindowChrome else 0

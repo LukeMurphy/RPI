@@ -1,5 +1,6 @@
 import datetime
 import os
+import sys
 import random
 import threading
 import time
@@ -19,7 +20,7 @@ from PIL import (
     ImageChops,
 )
 
-from modules.configuration import pieceLogger
+from modules.configuration import ArtWorkConfig, pieceLogger
 from modules.filters import ditherFilter
 from modules.filters import pixelSort
 from modules.filters import colorSeparator
@@ -62,7 +63,7 @@ def key_handler(event):
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
-    pieceLogger("[render.py:setUp] >> ** Setting up the window and rendering\n", 3)
+    pieceLogger(" >> ** Setting up the window and rendering\n", 3)
     gc.enable()
 
     config.imageArrayForSaving = []
@@ -94,6 +95,13 @@ def setUp(config):
     root.overrideredirect(config.noWindowChrome)
     # for less chrome, no titlebar etc
     # root.overrideredirect(True)
+
+    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), '../../cntrlscripts/leddeliico/ledeli.png')
+    ico = Image.open(path)
+    photo = ImageTk.PhotoImage(ico)
+    root.wm_iconphoto(False, photo)
+    _config : ArtWorkConfig = config
+    root.title(f"{_config.work}: {_config.fileNameRaw}")
     
 
     try:

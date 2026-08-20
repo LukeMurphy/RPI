@@ -46,6 +46,8 @@ def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
     # mod2 = inspect.getmodule(parent_frame_info2.frame)
 
     fstr = bcolors.YELLOWONBLUE
+    if clr == 6:
+        fstr = bcolors.CYAN
     if clr == 5:
         fstr = bcolors.BASIC
     if clr == 4:
@@ -266,26 +268,26 @@ class ArtWorkConfig:
 
     def __init__(self, args=None, _silent=False):
         if not _silent:
-            print("\n---------------------------------------------------------------------------------------")
-            print(f"** Config instance init {args}")
-            print("---------------------------------------------------------------------------------------")
+            pieceLogger("---------------------------------------------------------------------------------------")
+            pieceLogger(f"** Config instance init {args}")
+            pieceLogger("---------------------------------------------------------------------------------------")
 
     def debugSelf(self):
         allArgs = self.__dict__
-        print("\n---------------------------------------------------------------------------------------\n")
+        pieceLogger("---------------------------------------------------------------------------------------\n")
         for element in allArgs:
-            print(f"{element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
-        print("---------------------------------------------------------------------------------------\n")
+            pieceLogger(f"{element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
+        pieceLogger("---------------------------------------------------------------------------------------\n")
 
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
-        print(f"{method_list}")
-        print("---------------------------------------------------------------------------------------\n")
+        pieceLogger(f"{method_list}")
+        pieceLogger("---------------------------------------------------------------------------------------\n")
 
         # allFuncs = dir(self)
-        # print(allFuncs)
+        # pieceLogger(allFuncs)
 
     def spaceBarAction(self):
-        print(">> SPACE BAR PRESSED")
+        pieceLogger(">> SPACE BAR PRESSED")
 
     def __getattribute__(self, name):
         return super().__getattribute__(name)

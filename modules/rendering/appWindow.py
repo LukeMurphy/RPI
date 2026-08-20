@@ -29,14 +29,12 @@ from PIL import (
 
 class AppWindow:
     '''[summary]
-    
     [description]
-    
     Variables:
         ) {[type]} -- [description]
     '''
     def __init__(self, masterConfig):
-        print("** App Window Initialized ** ")
+        pieceLogger("** App Window Initialized ** ")
         self.masterConfig = masterConfig
 
     def setUp(self):

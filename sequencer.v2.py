@@ -88,7 +88,7 @@ def _launch_next_player(sequenceConfig):
     arg4 = brightnessOverrideString
 
     pieceLogger("---------------------------------------------------------------------------------------")
-    pieceLogger("Sequencer is calling :\n" + commandString)
+    pieceLogger("Sequencer is calling : " + commandString)
     pieceLogger("---------------------------------------------------------------------------------------")
 
 
@@ -137,7 +137,6 @@ def _kill_old_players(sequenceConfig):
         pieceLogger(e)
 
         # end try
-
 
 
 def loadWorkConfig(work, sequenceConfig):
@@ -203,17 +202,15 @@ def loadConfigFile():
     return parser.parse_args()
 
 
-
-
 def loadSequenceFile():
-    pieceLogger(f"\n\n\n************************************************\n\n")
+    pieceLogger(f"************************************************")
     args = loadConfigFile()
 
     if args.cfg != None:
 
         workconfig = configparser.ConfigParser()
 
-        _loadSequencer_pieceLogger_args("Inital Sequencer Arguments: \n", args)
+        _loadSequencer_pieceLogger_args("Inital Sequencer Arguments:", args)
 
         # sequenceConfig = configuration.Config()
         sequenceConfig = configuration.ArtWorkConfig("SEQUENCER")
@@ -222,10 +219,10 @@ def loadSequenceFile():
         sequenceConfig.MID = args.mname
         sequenceConfig.path = args.path
 
-        pieceLogger("script: sys.argv[0] is", repr(sys.argv[0]))
-        pieceLogger("script: __file__ is", repr(__file__))
-        pieceLogger("script: cwd is", repr(os.getcwd()))
-        pieceLogger("config: path  is", repr(args.path))
+        pieceLogger(f"script: sys.argv[0] is {repr(sys.argv[0])}")
+        pieceLogger(f"script: __file__ is {repr(__file__)}")
+        pieceLogger(f"script: cwd is {repr(os.getcwd())}")
+        pieceLogger(f"config: path  is {repr(args.path)}")
 
         # Automating the config path a bit better
         # assumes that if no -path is specified, it defaults to ./ so
@@ -235,7 +232,7 @@ def loadSequenceFile():
 
         argument = f"{sequenceConfig.path}configs/{args.cfg}"
 
-        _loadSequencer_pieceLogger_args("-cfg sequencer argument: \n", argument)
+        _loadSequencer_pieceLogger_args("-cfg sequencer argument: ", argument)
         workconfig.read(argument)
 
         sequenceConfig.fileName = argument

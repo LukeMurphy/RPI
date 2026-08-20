@@ -397,7 +397,7 @@ def main(run=True):
     global config, workConfig, blocks, simulBlocks, bads, animMngr
     # gc.enable()
 
-    pieceLogger("SpriteSheet Player Piece Loaded\n",2,True)
+    pieceLogger("SpriteSheet Player Piece Loaded",2,True)
     # config.playSpeed = float(workConfig.get("base-parameters", "playSpeed"))
 
     # managing speed of animation and framerate
@@ -440,7 +440,7 @@ def main(run=True):
     if config.brightness < 1.0:
         delta = config.ditherFilterBrightness - config.brightness
         config.ditherFilterBrightness -= delta / 4
-        pieceLogger(config.ditherFilterBrightness)
+        # pieceLogger(config.ditherFilterBrightness)
 
     if run:
         runWork()
@@ -480,8 +480,8 @@ def glitchBox(
             imageRef.paste(cp1, (round(dx), round(dy)))
         # comment:
     except Exception as e:
-        pieceLogger(e,1)
-        pieceLogger(dx + sectionWidth, dy + sectionHeight)
+        pieceLogger(f"{e}",1)
+        pieceLogger(f"{dx + sectionWidth}, {dy + sectionHeight}",1)
     # end try
 
 

@@ -63,7 +63,7 @@ def key_handler(event):
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
-    pieceLogger(" >> ** Setting up the window and rendering\n", 3)
+    pieceLogger(" >> ** Setting up the window and rendering", 3)
     gc.enable()
 
     config.imageArrayForSaving = []

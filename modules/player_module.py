@@ -515,7 +515,7 @@ def _configureAnimationWindow(work, rendererModule):
     work.config.updateCanvas = renderer.updateCanvas
     work.main(False)
 
-    pieceLogger(f" >> ** Player setting up: doing reload? {str(work.config.doingReload)}\n", 3)
+    pieceLogger(f" >> ** Player setting up: doing reload? {str(work.config.doingReload)}", 3)
     if work.config.doingReload == False and work.config.standAlone == True:
         renderer.setUp(work.config)
 

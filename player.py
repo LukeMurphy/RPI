@@ -51,7 +51,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-pieceLogger(" >> Inital Player Arguments: \n" + str(args),3)
+pieceLogger(" >> Inital Player Arguments: " + str(args),3)
 
 # Create a blank dummy object container for now
 # config = type('', (object,), {})()
@@ -166,14 +166,14 @@ def _parseArgs(config, loadFromArguments):
     config.deltaWorkFile = int((config.startTime - f))
 
 
-    pieceLogger(f" >> {bcolors.OKBLUE}---------------------------------------------------------------------------------------")
-    pieceLogger (" >> script: sys.argv[0] is", repr(sys.argv[0]))
-    pieceLogger (" >> script: __file__ is", repr(__file__))
-    pieceLogger (" >> script: cwd is", repr(os.getcwd()))
-    pieceLogger (" >> config: path  is", repr(args.path))
-    pieceLogger (" >> config: path  is", args.path)
-    pieceLogger(" >> -cfg argument: is", argument)
-    pieceLogger(" >> Last Modified Delta: is", config.delta)
+    pieceLogger(f" >>---------------------------------------------------------------------------------------")
+    pieceLogger (f" >> script: sys.argv[0] is {repr(sys.argv[0])}")
+    pieceLogger (f" >> script: __file__ is {repr(__file__)}")
+    pieceLogger (f" >> script: cwd is {repr(os.getcwd())}")
+    pieceLogger (f" >> config: path  is {repr(args.path)}")
+    pieceLogger (f" >> config: path  is {args.path}")
+    pieceLogger(f" >> -cfg argument: is {argument}")
+    pieceLogger(" >> Last Modified Delta: is {config.delta}")
     pieceLogger(f" >> ---------------------------------------------------------------------------------------{bcolors.ENDC}")
 
 

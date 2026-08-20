@@ -4,7 +4,7 @@ import time
 from operator import sub
 
 from modules import colorutils
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
@@ -99,9 +99,7 @@ class PanelPathDrawing:
             else:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
-        print("")
-        print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
-        print("")
+        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
 
 
     def generateInformalGrid(self):
@@ -140,9 +138,9 @@ class PanelPathDrawing:
                 row += 1
                 col = 0
 
-        print("")
-        print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
-        print("")
+        pieceLogger("")
+        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
+        pieceLogger("")
 
     
     def generateLsys(self):
@@ -196,7 +194,7 @@ class PanelPathDrawing:
                     rTheta =  (random.uniform(-self.angleJiggle,self.angleJiggle))
                     x = math.cos((orientationAngle + rTheta) * math.pi/180) * hSpace + lastX
                     y = math.sin((orientationAngle + rTheta) * math.pi/180) * vSpace + lastY
-                    # print(orientationAngle+rTheta)
+                    # pieceLogger(orientationAngle+rTheta)
                     angle = -(orientationAngle + rTheta)
 
                     self.drawingPath.append([round(x), round(y), angle, 1])
@@ -213,14 +211,14 @@ class PanelPathDrawing:
                 
                 if dx != 0 :
                     angle = -math.atan2(dy,dx) * 180/math.pi
-                    # print(angle)
+                    # pieceLogger(angle)
                     # orientation is important for animation
                     # if dx < 0 : angle += 180
                     self.drawingPath[i][2] = angle 
 
-        print("")
-        print(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath)))
-        print("")
+        pieceLogger("")
+        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath)))
+        pieceLogger("")
 
 
     def render(self) :
@@ -344,26 +342,26 @@ def mockupBlock(config, workConfig) :
             informalGridRows = int(workConfig.get("mockup", "informalGridRows"))
             informalGridCols = int(workConfig.get("mockup", "informalGridCols"))
         except Exception as e:
-            print(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
             informalGridRows = gridRows
             informalGridCols = gridCols 
         
         try:
             angleJiggle = float(workConfig.get("mockup", "angleJiggle"))
         except Exception as e:
-            print(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
             angleJiggle = 0 
 
         try:
             bgColorVals = workConfig.get("mockup", "bgColor").split(",")
             fillColor = tuple(int(a) for a in bgColorVals)
         except Exception as e:
-            print(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
 
         try:
             lsys = workConfig.getboolean("mockup","lsys")
         except Exception as e:
-            print(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
             lsys = False
 
 
@@ -408,7 +406,7 @@ def mockupBlock(config, workConfig) :
             skipPanels = workConfig.get("mockup", "skipPanels").split(',')
             config.panelDrawing.skipPanels = list(int(a)-1 for a in skipPanels)
         except Exception as e:
-            print(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
 
 
         if programmedPath == "ellipse" :
@@ -427,7 +425,7 @@ def mockupBlock(config, workConfig) :
                 p = drawingPathPoints[i].split(",")
                 config.panelDrawing.drawingPath.append((int(p[0]) + xOffset, int(p[1]) + yOffset, int(p[2]), 1))
     except Exception as e:
-        print(f"[panelDrawing.py: mockupBlock] >> {e}")
+        pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
         config.useDrawingPoints = False
 
 

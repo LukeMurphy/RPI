@@ -58,7 +58,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-pieceLogger("[player_pygame] >> Inital Player Arguments: \n" + str(args), 3)
+pieceLogger("[player_pygame] >> Inital Player Arguments: " + str(args), 3)
 
 ##########################################################################
 #
@@ -167,14 +167,14 @@ def _parseArgs(config, loadFromArguments):
     config.delta = int((config.startTime - f))
     config.deltaWorkFile = int((config.startTime - f))
 
-    pieceLogger(f" >> {bcolors.OKBLUE}---------------------------------------------------------------------------------------")
-    pieceLogger(" >> script: sys.argv[0] is", repr(sys.argv[0]))
-    pieceLogger(" >> script: __file__ is", repr(__file__))
-    pieceLogger(" >> script: cwd is", repr(os.getcwd()))
-    pieceLogger(" >> config: path  is", repr(args.path))
-    pieceLogger(" >> config: path  is", args.path)
-    pieceLogger(" >> -cfg argument: is", argument)
-    pieceLogger(" >> Last Modified Delta: is", config.delta)
+    pieceLogger(f" >> ---------------------------------------------------------------------------------------", )
+    pieceLogger(f" >> script: sys.argv[0] is  {repr(sys.argv[0])}",6)
+    pieceLogger(f" >> script: __file__ is  {repr(__file__)}",6)
+    pieceLogger(f" >> script: cwd is  {repr(os.getcwd())}",6)
+    pieceLogger(f" >> config: path  is  {repr(args.path)}",6)
+    pieceLogger(f" >> config: path  is  {args.path}",6)
+    pieceLogger(f" >> -cfg argument: is  {argument}",6)
+    pieceLogger(f" >> Last Modified Delta: is  {config.delta}",6)
     pieceLogger(f" >> ---------------------------------------------------------------------------------------{bcolors.ENDC}")
 
 

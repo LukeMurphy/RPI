@@ -5,7 +5,7 @@ import sys
 import shlex
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColor, QFont
+from PyQt6.QtGui import QColor, QFont, QIcon
 from PyQt6.QtWidgets import (
     QApplication,
     QLineEdit,
@@ -13,6 +13,8 @@ from PyQt6.QtWidgets import (
     QListWidgetItem,
     QPushButton,
     QWidget,
+    QStyle,
+    QCheckBox
 )
 
 # PyQt6 port of cntrlscripts/full_list.py -- same behavior (list every
@@ -36,6 +38,7 @@ _devOnDeckClr = "#ccFF00"
 _screenGridClr = "#eeeeee"
 _reference = "#adc4fd"
 
+usePygamePlayer = False
 
 class bcolors:
     WARNING = "\033[93m"
@@ -112,9 +115,23 @@ class ControlPanel(QWidget):
 
     # -------------------------------- #
     # UI construction
+    def checkbox_state_changed(self, state):
+        global usePygamePlayer
+        if state == 2:  # Checked state
+            usePygamePlayer = True
+        else:
+            usePygamePlayer = False
 
     def _buildUi(self):
         self.setWindowTitle("full_list (PyQt)")
+
+        pixmapi = getattr(QStyle.StandardPixmap, "SP_TitleBarMaxButton")
+        icon = self.style().standardIcon(pixmapi)
+        self.setWindowIcon(QIcon(icon))
+        # self.setWindowIcon(QIcon('chip_icon_normal.png'))
+        
+
+
         # self.setStyleSheet("background-color: white;")
         self.setFont(QFont(self.font().family(), 12))
 
@@ -128,6 +145,12 @@ class ControlPanel(QWidget):
         self.searchField = QLineEdit(self)
         self.searchField.setGeometry(2, 2, 270, 26)
         # self.searchField.
+
+        self.windowingCheckbox = QCheckBox('Use PyGame', self)
+        self.windowingCheckbox.setChecked(False)  # Set checkbox to checked
+        self.windowingCheckbox.stateChanged.connect(self.checkbox_state_changed)
+        self.windowingCheckbox.setGeometry(440,2,100,26)
+
 
         leftBtnPlace = 725
         topBtnPlace = 8
@@ -186,7 +209,10 @@ class ControlPanel(QWidget):
                 cmd = ["python3", "-u", base + "sequencer.v2.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
                 log_message(" ".join(cmd))
             else:
-                cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
+                if usePygamePlayer:
+                    cmd = ["python3", "-u", base + "player_pygame.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
+                else :
+                    cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
 
             proc = subprocess.Popen(cmd, text=True, bufsize=1)
             self.running_procs[configToRun] = proc
@@ -285,6 +311,7 @@ class ControlPanel(QWidget):
 
 def main():
     app = QApplication(sys.argv)
+    # app.setWindowIcon(QIcon('chip_icon_normal.png'))
     panel = ControlPanel()
     panel.show()
     sys.exit(app.exec())

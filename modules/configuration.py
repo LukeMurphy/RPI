@@ -61,7 +61,9 @@ def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
 
     if showLine:
         print(f"\n{fstr}.......................................................................................{bcolors.ENDC}")
-    print(f"{fstr}{prefixTxt}[{_moduleName}.{_functionName}] {args}          {bcolors.ENDC}")
+
+    print(f"{prefixTxt}{bcolors.DARKGREY}{_moduleName}.[{bcolors.ENDC}{_functionName}{bcolors.DARKGREY}]{bcolors.ENDC} {fstr}{args}{bcolors.ENDC}")
+
     if showLine:
         print(f"{fstr}.......................................................................................{bcolors.ENDC}")
     # print("\n")
@@ -69,8 +71,6 @@ def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
 
 
 class bcolors:
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
     # YELLOWONBLUE = "\033[1;33;4;44m"
     # 0 norm
     # 1 bold
@@ -80,15 +80,25 @@ class bcolors:
     # ;1 bold
     # ; 4 undeline
 
-    YELLOWONBLUE = "\033[0;94;1;43m"
-    BASIC = "\033[90m"
-    OKGREEN = "\033[92m"
-    WARNING = "\033[93m"
-    FULLFAIL = "\033[91m"
-    FAIL = "\033[99m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
     ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    DARKGREY = '\033[2m'
+    UNDERLINE = "\033[4m"
+    DARKCYAN = '\033[36m'
+    BASIC = "\033[90m"
+    RED = '\033[91m'
+    FULLFAIL = "\033[91m"
+    OKGREEN = "\033[92m"
+    GREEN = '\033[92m'
+    WARNING = "\033[93m"
+    YELLOW = '\033[93m'
+    YELLOWONBLUE = "\033[0;94;1;43m"
+    BLUE = '\033[94m'
+    OKBLUE = "\033[94m"
+    HEADER = "\033[95m"
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    FAIL = "\033[99m"
 
 
 # print(bcolors.WARNING + "Warning: No active frommets remain. Continue?" + bcolors.ENDC)

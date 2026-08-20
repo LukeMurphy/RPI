@@ -75,7 +75,7 @@ class TransitionStates:
 
     def stepThru(self):
 
-        # print(self.count)
+        # pieceLogger(self.count)
         if self.count < self.countMax:
             _x = round(random.uniform(-self.chunckSize / 2, config.canvasWidth))
             _y = round(random.uniform(-self.chunckSize / 2, config.canvasHeight))
@@ -159,7 +159,7 @@ def changeDrawingMode():
         # config.startNewLineProb = 0.1
         config.changeTimeController.slotRate = round(random.uniform(33, 63))
 
-    # print(f" => New Drawing Mode: {config.drawingMode}")
+    # pieceLogger(f" => New Drawing Mode: {config.drawingMode}")
 
 
 def changePalettes():
@@ -171,8 +171,8 @@ def changePalettes():
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
     config.underLayerDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor))
     primeCanvas()
-    # print(f" New bg Color : {config.bgColor}")
-    # print(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
+    # pieceLogger(f" New bg Color : {config.bgColor}")
+    # pieceLogger(f"brightness calculated = {colorutils.brightness(config.bgColor[0],config.bgColor[1],config.bgColor[2])}")
     config.changeColorSetTimeToUse = round(random.uniform(config.changeColorSetTime, round(config.changeColorSetTime * config.changeColorSetTimeMaxMultiplier)))
     config.paletteController.slotRate = config.changeColorSetTimeToUse
     config.slownessFactor = config.activePalette.slownessFactor
@@ -186,7 +186,7 @@ def changePalettes():
 
 
 def initiateTransition():
-    # print("\n ITNITATE TRANSITION")
+    # pieceLogger("\n ITNITATE TRANSITION")
     config.transitionStateHandler.sourceImage = config.finalCompositeLayer
     config.transitionStateHandler.initiateTransition()
 
@@ -206,7 +206,7 @@ def startNewLine(_pen):
 
 
 def setPenProperties(pen):
-    # print(f"setting {pen} {pen.name}")
+    # pieceLogger(f"setting {pen} {pen.name}")
     setPenPropsByName(pen.name, pen)
     setPenColor(pen)
 
@@ -309,7 +309,7 @@ def setPenPropsByName(_name, pen):
 
         _penSpeedMax = max(1, math.ceil(5 / config.slownessFactor + 1))
         pen.speed = round(random.uniform(1, _penSpeedMax))
-    # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
+    # pieceLogger(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
     pen.drawingSize = [config.canvasWidth, config.canvasHeight]
     if pen.xOffsetRange is not None:
@@ -386,11 +386,11 @@ def setPenColor(_pen):
 
 def choosePenMark():
     _penName = random.choice(config.activePalette.pens)
-    # print(f"\nLooking for this pen mark: {_penName}\n")
+    # pieceLogger(f"\nLooking for this pen mark: {_penName}\n")
     for _pen in config.marksPalette:
-        # print(f"{_pen.name} {config.activePalette.pens}")
+        # pieceLogger(f"{_pen.name} {config.activePalette.pens}")
         if _pen.name == _penName:
-            # print(f"we chose {_pen.name}")
+            # pieceLogger(f"we chose {_pen.name}")
             return _pen
 
 
@@ -628,7 +628,7 @@ def get_curve_points(points, curve_drawn=True, resolution=50):
 def smoothLine(points, _pen):
     _lopOff = -round(_pen.lopOff)
 
-    # print(f"_lopOff {_pen.lopOff} {_lopOff}")
+    # pieceLogger(f"_lopOff {_pen.lopOff} {_lopOff}")
     points = np.array(points)
 
     # Fit a B-spline to the points
@@ -656,7 +656,7 @@ def smoothLine(points, _pen):
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
 
-    # print(f"line: {_mp} {_n} {noise_factor} ")
+    # pieceLogger(f"line: {_mp} {_n} {noise_factor} ")
 
     # # Draw the shape
     # color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -680,7 +680,7 @@ def pauseDrawing():
 
 
 def releaseDrawing():
-    # print("released")
+    # pieceLogger("released")
     config.stoppedAndWaitingToDraw = False
     config.canDraw = True
     # pieceLogger("Pen released")
@@ -701,8 +701,8 @@ def penLoopActions():
         drawLine(config.activePalette.activePen)
 
     # if not config.doingDrawing and config.canDraw and not config.stoppedAndWaitingToDraw:
-    #     print(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
-    #     print(f"config.canDraw {config.canDraw}")
+    #     pieceLogger(f"config.activePalette.activePen._p {config.activePalette.activePen._p}")
+    #     pieceLogger(f"config.canDraw {config.canDraw}")
     #     pauseDrawing()
 
 
@@ -787,7 +787,7 @@ def drawLinePolyEnvelope(_pen):
                     _orthoP4y = _pen.lastOrthoPoint[3]
 
             except Exception as e:
-                print(e)
+                pieceLogger(e)
 
             _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
@@ -967,7 +967,7 @@ def bgColorBlocksFilling(arg):
 
         cR = random.choice(config.activePalette.bgBoxColorSets)
         # cR = config.activePalette.bgBoxColorRange
-        # print(cR)
+        # pieceLogger(cR)
         config.bgBoxFill = colorutils.getRandomColorHSV(
             cR[0],
             cR[1],
@@ -1018,7 +1018,7 @@ def glitchBox(
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
     sectionHeight = round(random.uniform(2, apparentHeight - dy))
 
-    # print(f"jitter {sectionWidth} {sectionHeight} {dx} {dx}")
+    # pieceLogger(f"jitter {sectionWidth} {sectionHeight} {dx} {dx}")
 
     # 95% of the time they dance together as mirrors
     try:
@@ -1057,9 +1057,9 @@ def primeCanvas(_i=3):
 def chooseTexture():
     _textureName = config.activePalette.textureName
     for _t in config.textureSets:
-        # print(f"{_pen.name} {config.activePalette.pens}")
+        # pieceLogger(f"{_pen.name} {config.activePalette.pens}")
         if _t.name == _textureName:
-            # print(f"we chose {_pen.name}")
+            # pieceLogger(f"we chose {_pen.name}")
             return _t
 
 
@@ -1279,7 +1279,7 @@ def renderImage():
 
     if config.fadeThruToNew < 255:
         config.fadeThruToNew += 4
-        # print(f"config.fadeThruToNew  {config.fadeThruToNew }")
+        # pieceLogger(f"config.fadeThruToNew  {config.fadeThruToNew }")
         config.canvasDraw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(config.bgColor[0], config.bgColor[1], config.bgColor[2], config.fadeThruToNew))
     elif not config.fadeThruToNewDone:
         config.fadeThruToNewDone = True
@@ -1679,7 +1679,7 @@ def _load_pen_config(config):
     for _penConfigName in config.penNames:
         _mark = _load_single_pen(_penConfigName)
         config.marksPalette.append(_mark)
-    # print(config.marksPalette)
+    # pieceLogger(config.marksPalette)
 
 
 def _load_and_initialize_system(config):

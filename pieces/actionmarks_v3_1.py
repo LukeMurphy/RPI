@@ -193,11 +193,11 @@ class MarksManager:
             palette.dripSpeedMin = float(workConfig.get(_p, "dripSpeedMin", fallback=0.0))
             palette.dripSpeedMax = float(workConfig.get(_p, "dripSpeedMax", fallback=0.0))
 
-            pieceLogger(f"\n===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
+            pieceLogger(f"===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
             self.paletteSets.append(palette)
 
         self.activePalette = random.choice(self.paletteSets)
-        pieceLogger(f"\n ===> New Palette : {self.activePalette.name} Using enveloped line: {palette.drawLineAsEnvelope}", 2, True)
+        pieceLogger(f"===> New Palette : {self.activePalette.name} Using enveloped line:{palette.drawLineAsEnvelope}", 0, True)
 
         setBGColor()
 
@@ -326,7 +326,7 @@ class TransitionStates:
 
     def stepThru(self):
 
-        # print(self.count)
+        # pieceLogger(self.count)
         if self.count < self.countMax:
             _x = round(random.uniform(-self.chunckSize / 2, mrksMngr.pictureWidth))
             _y = round(random.uniform(-self.chunckSize / 2, mrksMngr.pictureHeight))
@@ -410,7 +410,7 @@ def changeDrawingMode():
         # mrksMngr.startNewLineProb = 0.1
         mrksMngr.changeTimeController.slotRate = round(random.uniform(33, 63))
 
-    print(f" => New Drawing Mode: {mrksMngr.drawingMode} slotRate{mrksMngr.changeTimeController.slotRate}")
+    pieceLogger(f" => New Drawing Mode: {mrksMngr.drawingMode} slotRate{mrksMngr.changeTimeController.slotRate}")
 
 
 def changePalettes():
@@ -422,8 +422,8 @@ def changePalettes():
     config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
     config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
     primeCanvas()
-    # print(f" New bg Color : {mrksMngr.bgColor}")
-    # print(f"brightness calculated = {colorutils.brightness(mrksMngr.bgColor[0],mrksMngr.bgColor[1],mrksMngr.bgColor[2])}")
+    # pieceLogger(f" New bg Color : {mrksMngr.bgColor}")
+    # pieceLogger(f"brightness calculated = {colorutils.brightness(mrksMngr.bgColor[0],mrksMngr.bgColor[1],mrksMngr.bgColor[2])}")
     mrksMngr.changeColorSetTimeToUse = round(random.uniform(mrksMngr.changeColorSetTime, round(mrksMngr.changeColorSetTime * mrksMngr.changeColorSetTimeMaxMultiplier)))
     mrksMngr.paletteController.slotRate = mrksMngr.changeColorSetTimeToUse
 
@@ -436,7 +436,7 @@ def changePalettes():
 
 
 def initiateTransition():
-    pieceLogger("\n ITNITATE TRANSITION", 3)
+    pieceLogger(" ITNITATE TRANSITION", 3)
     mrksMngr.transitionStateHandler.sourceImage = config.finalCompositeLayer
     mrksMngr.transitionStateHandler.initiateTransition()
 
@@ -458,7 +458,7 @@ def startNewLine(_pen):
 
 
 def setPenProperties(pen):
-    # print(f"setting {pen} {pen.name}")
+    # pieceLogger(f"setting {pen} {pen.name}")
     setPenPropsByName(pen.name, pen)
     setPenColor(pen)
 
@@ -573,7 +573,7 @@ def setPenPropsByName(_name, pen):
         pen.loopDirection = -1
         if random.random() < 0.5:
             pen.loopDirection = 1
-    # print(f"pen.speed {pen.speed} / {_penSpeedMax}")
+    # pieceLogger(f"pen.speed {pen.speed} / {_penSpeedMax}")
 
     pen.drawingSize = [mrksMngr.pictureWidth, mrksMngr.pictureHeight]
     if pen.xOffsetRange is not None:
@@ -651,11 +651,11 @@ def setPenColor(_pen):
 
 def choosePenMark():
     _penName = random.choice(mrksMngr.activePalette.pens)
-    # print(f"\nLooking for this pen mark: {_penName}\n")
+    # pieceLogger(f"\nLooking for this pen mark: {_penName}\n")
     for _pen in mrksMngr.marksPalette:
-        # print(f"{_pen.name} {mrksMngr.activePalette.pens}")
+        # pieceLogger(f"{_pen.name} {mrksMngr.activePalette.pens}")
         if _pen.name == _penName:
-            # print(f"we chose {_pen.name}")
+            # pieceLogger(f"we chose {_pen.name}")
             return _pen
 
 
@@ -891,7 +891,7 @@ def get_curve_points(points, curve_drawn=True, resolution=50):
 def smoothLine(points, _pen):
     _lopOff = -round(_pen.lopOff)
 
-    # print(f"_lopOff {_pen.lopOff} {_lopOff}")
+    # pieceLogger(f"_lopOff {_pen.lopOff} {_lopOff}")
     points = np.array(points)
 
     # Fit a B-spline to the points
@@ -919,7 +919,7 @@ def smoothLine(points, _pen):
     if random.random() < 0.5:
         _pen.smooth_points.reverse()
 
-    # print(f"line: {_mp} {_n} {noise_factor} ")
+    # pieceLogger(f"line: {_mp} {_n} {noise_factor} ")
 
     # # Draw the shape
     # color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
@@ -948,7 +948,7 @@ def pauseDrawing():
 def releaseDrawing():
     mrksMngr.stoppedAndWaitingToDraw = False
     mrksMngr.canDraw = True
-    pieceLogger("[releaseDrawing] Pen released", 2)
+    pieceLogger(" Pen released", 2)
 
 
 def penLoopActions():
@@ -1048,7 +1048,7 @@ def drawLinePolyEnvelope(_pen):
                     _orthoP4y = _pen.lastOrthoPoint[3]
 
             except Exception as e:
-                print(e)
+                pieceLogger(e)
 
             _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
@@ -1273,7 +1273,7 @@ def bgColorBlocksFilling(arg):
 
         cR = random.choice(mrksMngr.activePalette.bgBoxColorSets)
         # cR = mrksMngr.activePalette.bgBoxColorRange
-        # print(cR)
+        # pieceLogger(cR)
         mrksMngr.bgBoxFill = colorutils.getRandomColorHSV(
             cR[0],
             cR[1],
@@ -1325,7 +1325,7 @@ def glitchBox(
     sectionWidth = round(random.uniform(2, apparentWidth - dx))
     sectionHeight = round(random.uniform(2, apparentHeight - dy))
 
-    # print(f"jitter {sectionWidth} {sectionHeight} {dx} {dx}")
+    # pieceLogger(f"jitter {sectionWidth} {sectionHeight} {dx} {dx}")
 
     # 95% of the time they dance together as mirrors
     try:
@@ -1364,9 +1364,9 @@ def primeCanvas(_i=3):
 def chooseTexture():
     _textureName = mrksMngr.activePalette.textureName
     for _t in mrksMngr.textureSets:
-        # print(f"{_pen.name} {mrksMngr.activePalette.pens}")
+        # pieceLogger(f"{_pen.name} {mrksMngr.activePalette.pens}")
         if _t.name == _textureName:
-            # print(f"we chose {_pen.name}")
+            # pieceLogger(f"we chose {_pen.name}")
             return _t
 
 
@@ -1616,7 +1616,7 @@ def renderImage():
     # handling transition between drawings
     # if mrksMngr.fadeThruToNew < 255:
     #     mrksMngr.fadeThruToNew += 4
-    #     # print(f"mrksMngr.fadeThruToNew  {mrksMngr.fadeThruToNew }")
+    #     # pieceLogger(f"mrksMngr.fadeThruToNew  {mrksMngr.fadeThruToNew }")
     #     config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor[0], mrksMngr.bgColor[1], mrksMngr.bgColor[2], mrksMngr.fadeThruToNew))
 
     # elif not mrksMngr.fadeThruToNewDone:

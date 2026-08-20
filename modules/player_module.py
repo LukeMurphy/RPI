@@ -358,6 +358,8 @@ def _load_work_module(config, workconfig):
         renderUsingIDAFruitHat(work)
     elif config.rendering == "hub":
         renderAsAnimationWindow(work)
+    elif config.rendering == "pygame":
+        renderAsAnimationWindowPygame(work)
     elif config.rendering == "out":
         renderUsingFFMPEG(work)
 
@@ -405,8 +407,19 @@ def renderUsingIDAFruitHat(work):
 
 
 def renderAsAnimationWindow(work):
-
     from modules.rendering import render
+
+    _configureAnimationWindow(work, render)
+
+
+def renderAsAnimationWindowPygame(work):
+    from modules.rendering import renderpygame
+
+    _configureAnimationWindow(work, renderpygame)
+
+
+def _configureAnimationWindow(work, rendererModule):
+
     import threading
 
     work.config.useFilters = work.workConfig.getboolean("displayconfig", "useFilters")
@@ -480,7 +493,7 @@ def renderAsAnimationWindow(work):
     work.config.image = PIL.Image.new("RGBA", (work.config.canvasWidth, work.config.canvasHeight))
     work.config.draw = ImageDraw.Draw(work.config.image)
 
-    renderer = render
+    renderer = rendererModule
     renderer.config = work.config
     renderer.work = work
 

@@ -203,7 +203,6 @@ def loadConfigFile():
     return parser.parse_args()
 
 
-"""""" """""" """""" """""" """""" """""" """""" """""" """""" """""" ""
 
 
 def loadSequenceFile():

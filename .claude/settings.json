@@ -6,7 +6,20 @@
       "Bash(python3 -m pyflakes pieces/barblocks.py)",
       "Bash(python3 -m py_compile pieces/barblocks.py)",
       "Bash(python3 -m py_compile pieces/counterscroll.py)",
-      "Bash(python3 -m pyflakes pieces/counterscroll.py)"
+      "Bash(python3 -m pyflakes pieces/counterscroll.py)",
+      "Bash(python3 -c \"import pygame; print\\(pygame.version.ver\\)\")",
+      "Bash(python3 -m py_compile player_pygame.py modules/rendering/renderpygame.py modules/player_module.py)",
+      "Bash(timeout 6 python3 player_pygame.py -path ./ -cfg prod/p4-firepile-3.0/p4-firepile-particles_fire_algo-a.cfg)",
+      "Bash(echo \"EXIT:$?\")",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Bash(pkill -9 -f \"pygame\")",
+      "Bash(python3 -c \"import PyQt6; print\\('PyQt6', PyQt6.QtCore.QT_VERSION_STR if hasattr\\(PyQt6,'QtCore'\\) else ''\\)\")",
+      "Bash(python3 -c \"from PyQt6.QtCore import QT_VERSION_STR; print\\('PyQt6', QT_VERSION_STR\\)\")",
+      "Bash(python3 -c \"from PyQt5.QtCore import QT_VERSION_STR; print\\('PyQt5', QT_VERSION_STR\\)\")",
+      "Bash(pip3 show *)",
+      "Bash(python3 -c \"from PyQt6.QtWidgets import QApplication; print\\('ok'\\)\")",
+      "Bash(python3 -m py_compile cntrlscripts/full_list_pyqt.py)"
     ]
   }
 }

@@ -1,36 +1,28 @@
 import datetime
+import gc
 import os
 import random
-import threading
 import time
-import tkinter as tk
-import gc
-import PIL
-import PIL.Image
-import PIL.ImageTk
-import numpy
 
-from PIL import (
-    Image,
-    ImageDraw,
-    ImageEnhance,
-    ImageFilter,
-    ImageTk,
-    ImageChops,
-)
+import numpy
+import pygame
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 from modules.configuration import pieceLogger
-from modules.filters import ditherFilter
-from modules.filters import pixelSort
-from modules.filters import colorSeparator
+from modules.filters import colorSeparator, ditherFilter, pixelSort
 
-# from tkVideoPlayer import TkinterVideo
-# from Tkinter import *
-# import tkMessageBox
+# Pygame equivalent of modules/rendering/render.py -- same PIL-based effects
+# pipeline, but windowing/display goes through pygame instead of tkinter.
+#
+# The original tkinter render loop is (accidentally) single-threaded: it
+# calls work.runWork() synchronously from a root.after() callback, and it is
+# config.cnvs.update() -- called every frame from inside that call stack --
+# that actually pumps Tk's event loop. This module mirrors that structure so
+# all pygame calls happen on the same (main) thread, which pygame requires.
 
 # ----------------------------------------- #
 
-global root
+global screen
 global work, config
 memoryUsage = 0
 debug = False
@@ -44,124 +36,48 @@ buff = 8
 # ----------------------------------------- #
 
 
-def update_duration():
-    """updates the duration after finding the duration"""
-    # duration = config.videoplayer.video_info()["duration"]
-    loc = config.videoplayer.current_duration()
-    if loc > 40:
-        config.videoplayer.seek(0)
-
-
-def key_handler(event):
-    global config
-    # pieceLogger(event.char, event.keysym, event.keycode)
-    if event.keycode == 822083616:
-        config.spaceBarAction()
-        saveImageToFile()
-
-
 def setUp(config):
-    # global root, canvasOffsetX, canvasOffsetY, buff, config
-    pieceLogger("[render.py:setUp] >> ** Setting up the window and rendering\n", 3)
+    pieceLogger(" >> ** Setting up the pygame window and rendering\n", 3)
     gc.enable()
+
+    global screen
 
     config.imageArrayForSaving = []
     config.frameCount = 0
     config.frameCountLimit = 2
 
-    if config.MID == "studio-mac":
-        config.path = "./"
-        windowOffset = [1900, 20]
-        windowOffset = [2560, 24]
-        # windowOffset = [4,45]
-    else:
-        windowOffset = [-1, 13]
     windowOffset = [config.windowXOffset, config.windowYOffset]
-    # -----> this is somewhat arbitrary - just to get the things aligned
-    # after rotation
-    # if(config.rotation == 90) : canvasOffsetY = -25
-
-    # pieceLogger(buff)
-    root = tk.Tk()
     w = config.windowWidth + buff
     h = config.windowHeight + buff
-    x = windowOffset[0]
-    y = windowOffset[1]
+    x, y = windowOffset
 
     config.screenPositionX = x
     config.screenPositionY = y
 
-    root.overrideredirect(config.noWindowChrome)
-    # for less chrome, no titlebar etc
-    # root.overrideredirect(True)
-    
+    # pygame/SDL has no direct equivalent of Tk's geometry() call -- window
+    # position has to be requested before the display is created.
+    os.environ["SDL_VIDEO_WINDOW_POS"] = f"{x},{y}"
 
-    try:
-        # screen_width = root.winfo_screenwidth()
-        # screen_height = root.winfo_screenheight()
-        # root.geometry("%dx%d+%d+%d" % (600, round(.9*screen_height), round(3*screen_width/4), round(0*screen_height/3)))
-        root.geometry("%dx%d+%d+%d" % (w, h, x, y))
-    except Exception as e:
-        root.geometry("%dx%d+%d+%d" % (w, h, x, y))
-        pieceLogger(e)
+    pygame.init()
+    pygame.display.set_caption(getattr(config, "work", "player"))
+    pygame.mouse.set_visible(False)
 
-    # root.protocol("WM_DELETE_WINDOW", on_closing)
+    flags = pygame.NOFRAME if config.noWindowChrome else 0
+    screen = pygame.display.set_mode((w, h), flags)
+    screen.fill((0, 0, 0))
+    pygame.display.flip()
 
-    # Button(root, text="Quit", command=root.quit).pack(side="bottom")
-    root.lift()
-
-    config.root = root
-
-    cnvs = tk.Canvas(
-        root,
-        width=config.screenWidth + buff,
-        height=config.screenHeight + buff,
-        border=0,
-        cursor="none",
-    )
-    config.cnvs = cnvs
-    config.cnvs.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
-    # config.cnvs.pack()
-    config.cnvs.place(
-        bordermode="outside",
-        width=config.screenWidth + buff,
-        height=config.screenHeight + buff,
-    )
-
-    if config.saveToFile:
-        root.bind("<Key>", key_handler, config)
-
-    # cnvs2 = tk.Canvas(root, width=config.screenWidth + buff, height=config.screenHeight + buff, border=-4)
-    # config.cnvs2 = cnvs2
-    # config.cnvs2.create_rectangle(0, 0, config.screenWidth + buff, config.screenHeight + buff, fill="black")
-    # config.cnvs2.pack()
-    # config.cnvs2.place(bordermode='outside', width=config.screenWidth + buff, height=config.screenHeight + buff, x=config.screenWidth + 2)
-
-    # tempImage = PIL.ImageTk.PhotoImage(config.renderImageFull)
-    tempImage = ImageTk.PhotoImage(config.renderImageFull)
-    config.cnvs._image_id = config.cnvs.create_image(canvasOffsetX, canvasOffsetY, image=tempImage, anchor="nw", tag="mainer")
-
-    # config.cnvs.update()
-    # config.cnvs.update_idletasks()
-
+    config.screen = screen
     config.torqueAngle = 0
+    config.clock = pygame.time.Clock()
 
-    # videoplayer = TkinterVideo(master=root, scaled=True)
-    # videoplayer.load("/Users/lamshell/Desktop/Untitled.mov")
-    # videoplayer.place(bordermode="ignore", width=360, height=160,x=10,y=10)
-    # videoplayer.play()  # play the video
-    # config.videoplayer = videoplayer
-
-    root.after(100, startWork)
-    root.call("wm", "attributes", ".", "-topmost", "1")
-    root.mainloop()
+    startWork()
 
 
 # ----------------------------------------- #
 
 
 def on_closing():
-    global root
     return True
 
 
@@ -169,66 +85,54 @@ def on_closing():
 
 
 def writeImage(baseName, renderImage):
-    # baseName = "outputquad3/comp2_"
     fn = f"{baseName}.png"
     renderImage.save(fn)
 
 
 def startWork(*args):
-    # global config, work, root, counter
     global counter
-
-    # Putting the animation on its own thread
-    # Still throws and error when manually closed though...
-
     try:
-        t = threading.Thread.__init__(work.runWork())
-        t.start()
-    except tk.TclError as details:
-        pieceLogger(details)
-        exit()
-
-    # work.runWork()
+        work.runWork()
+    except Exception as e:
+        pieceLogger(str(e))
 
 
 # ----------------------------------------- #
 
 
+def _handleEvents():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            config.isRunning = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                config.isRunning = False
+            elif event.key == pygame.K_SPACE and config.saveToFile:
+                config.spaceBarAction()
+                saveImageToFile()
+
+
 def updateCanvas():
-    # global canvasOffsetX, canvasOffsetY, root, counter, buff
     global counter
-    # For testing ...
-    # draw1  = ImageDraw.Draw(config.renderImageFull)
-    # draw1.rectangle((xOffset+32,yOffset,xOffset + 32 + 32, yOffset +32), fill=(255,100,0))
     counter += 1
     if counter > 1000:
-        # pieceLogger(gc.get_count())
-        # I don't know if this really really helps
         gc.collect()
         counter = 0
 
-    # This significantly helped performance !!
-    config.cnvs.delete("main")
-    config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
-    config.cnvs._image_id = config.cnvs.create_image(
-        canvasOffsetX,
-        canvasOffsetY,
-        image=config.cnvs._image_tk,
-        anchor="nw",
-        tag="main",
-    )
-    config.cnvs.update()
+    _handleEvents()
 
-    # update_duration()
+    if not config.isRunning:
+        pygame.quit()
+        return
 
-    # config.cnvs2.delete("main")
-    # config.cnvs2._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
-    # config.cnvs2._image_id = config.cnvs2.create_image(canvasOffsetX -4, canvasOffsetY, image=config.cnvs2._image_tk, anchor='nw', tag="main")
-    # config.cnvs2.update()
-
-    # This *should* be more efficient
-    # config.cnvs.update_idletasks()
-    # root.update()
+    img = config.renderImageFull
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
+    surf = pygame.image.frombuffer(img.tobytes(), img.size, "RGBA")
+    screen.fill((0, 0, 0))
+    screen.blit(surf, (canvasOffsetX, canvasOffsetY))
+    pygame.display.flip()
+    config.clock.tick(60)
 
     ############################################################
     ######  Check if config file has changed and reload    #####
@@ -243,45 +147,34 @@ def relaunchOnChange(config):
     currentTime = time.time()
     configurationDirectory = os.path.dirname(config.fileName)
 
-    files = [f for f in os.listdir(f"{configurationDirectory}") 
+    files = [f for f in os.listdir(f"{configurationDirectory}")
              if os.path.isfile(os.path.join(f"{configurationDirectory}", f))
              ]
 
-    # f = os.path.getmtime(config.fileName)
     f2 = os.path.getmtime(f"{config.path}pieces/{config.work}.py")
 
-    fileHasChanged  = False
-    for f in files :
+    fileHasChanged = False
+    for f in files:
         fModTime = os.path.getmtime(f"{configurationDirectory}/{f}")
         _delta = currentTime - fModTime
-        if _delta <=1 : fileHasChanged = True
+        if _delta <= 1:
+            fileHasChanged = True
 
     config.delta = currentTime - f2
-    # config.delta2 = currentTime - f2
 
-    # if config.delta <= 1 or config.delta2 <= 1:
     if config.delta <= 1 or fileHasChanged:
         if not config.reloadConfig:
             pieceLogger(f" >> ** LAST MODIFIED DELTA: {str(config.delta)} **")
             pieceLogger(f" >> ** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
-            # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
             if config.doFullReloadOnChange:
                 os.system(config.path + "/cntrlscripts/restart_player_dev.sh" + " " + config.initialArgs + "&")
-            # commadStringPyth = ""
-            # os.system(commadStringPyth + config.initialArgs + "&")
             else:
                 config.doingReload = True
-                # NEED TO PASS BACK THIS CONFIG TO THE RELOAD ... otherwise loses reference
                 config.loadFromArguments(True, config)
         config.reloadConfig = True
     else:
         config.reloadConfig = False
-
-        # if config.delta2 <= 1:
-        #     commadStringPyth = "python3 /Users/lamshell/Documents/Dev/LEDELI/RPI/player.py -mname studio -cfg "
-        # os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
-        # os.system(commadStringPyth + config.fileNameRaw + "&")
 
 
 # ----------------------------------------- #
@@ -299,16 +192,6 @@ def _colorSep(xOffset=0, yOffset=0):
     crop = _tempImage.crop(_remapImageBlockSection)
     crop = crop.convert("RGBA")
     _f = crop.filter(ImageFilter.DETAIL)
-    # _f = crop.filter(ImageFilter.SMOOTH)
-    # _f = crop.filter(ImageFilter.SMOOTH_MORE)
-    # _f = crop.filter(ImageFilter.EMBOSS)
-    # _f = crop.filter(ImageFilter.EDGE_ENHANCE)
-
-    # _f = crop.filter(ImageFilter.CONTOUR)
-
-    # _f = ImageChops.add(crop,_f,2.5,0)
-    # _f = ImageChops.add(crop,_f,2.95,0)
-
     config.renderImageFull.paste(_f, _remapImageBlockDestination, _f)
 
 
@@ -401,13 +284,6 @@ def _doReMappingBlocks():
 def _blurringCall():
     if not config.useBlur:
         return
-    # config.renderImageFull = config.renderImageFull.filter(ImageFilter.GaussianBlur(radius=config.sectionBlurRadius))
-    # config.blurSection = (
-    #     config.blurXOffset,
-    #     config.blurYOffset,
-    #     config.blurXOffset + config.blurSectionWidth,
-    #     config.blurYOffset + config.blurSectionHeight,
-    # )
 
     config._render_crop = config.renderImageFull.crop(config.blurSection)
     config._render_destination = (config.blurXOffset, config.blurYOffset)
@@ -420,28 +296,21 @@ def _lastOverLay():
     try:
         if config.useLastOverlay:
             config.renderDrawOver.rectangle(config.lastOverlayBox, fill=config.lastOverlayFill, outline=None)
-            # config.renderDrawOver.rectangle(config.lastOverlayBox, fill=(255,0,0,255), outline=None)
             if config.lastOverlayBlur > 0:
                 config.renderImageFullOverlay = config.renderImageFullOverlay.filter(ImageFilter.GaussianBlur(radius=config.lastOverlayBlur))
             config.renderImageFull.paste(config.renderImageFullOverlay, (0, 0), config.renderImageFullOverlay)
     except Exception as e:
-        pieceLogger(f" >> {e}", 1)
+        pieceLogger(f"[renderpygame.py:_lastOverLay] >> {e}")
 
 
 def _overallResize():
     if not config.overallResize:
         return
-    # Testing a pseudo version of LED matrix display
-    # Sharpening kernel
-    # kernel = [-1, -1, -1, -1, 9, -1, -1, -1, -1]
-    # kernel_filter = ImageFilter.Kernel((3, 3), kernel, scale=1, offset=0)
 
     iTemp = config.renderImageFull.copy()
     factor = 3
     (width, height) = (iTemp.width * factor, iTemp.height * factor)
     iTemp = iTemp.resize((width, height))
-    # Sharpen the image
-    # iTemp = iTemp.filter(kernel_filter)
     iTemp = iTemp.filter(ImageFilter.SHARPEN)
     iTemp = iTemp.filter(ImageFilter.SHARPEN)
     config.renderImageFull.paste(iTemp, (0, 0))
@@ -457,8 +326,6 @@ def _saveToFileCall():
         if len(config.imageArrayForSaving) > 500:
             ts = time.time()
             st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d--%H-%M-%S")
-            # name = config.work + "_" + st + "_video.avi"
-            # /Users/lamshell/Documents/Dev/RPI/build/
             name = f"{st}.gif"
             config.imageArrayForSaving[0].save(
                 name,
@@ -507,33 +374,23 @@ def render(
     overlayBottom=False,
     updateCanvasCall=True,
 ):
-    # global memoryUsage
-    # global config, debug
-
     if config.remapImageBlockShift:
         config._imageToRender = imageToRender.copy()
 
-    # Adding this to account for some issues with pasting in RGB on RGBA ...
     if imageToRender.mode == "RGB":
         imageToRender = imageToRender.convert("RGBA")
-
-    # Render to canvas
-    # This needs to be optomized !!!!!!
 
     if config.forceBGSwap:
         imageToRender = _forceBlueGreenSwap(imageToRender)
 
     if config.rotation != 0:
         if config.fullRotation:
-            # This rotates the image that is painted i.e. after pasting-in the image sent
             config.renderImageFull = config.renderImageFull.rotate(-config.rotation, expand=False)
         else:
-            # This rotates the image sent to be rendered
             imageToRender = imageToRender.rotate(-config.rotation, expand=True)
 
     if config.remapImageBlockShift and config.rotation != 0:
         config._imageToRender = config._imageToRender.rotate(-config.rotation, expand=True)
-        # imageToRender = ImageChops.offset(imageToRender, -40, 40)
 
     try:
         if not config.remapImageBlockShift:
@@ -543,30 +400,10 @@ def render(
         pieceLogger(e)
         config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
-    # config.drawBeforeConversion()
-    # config.renderImageFull.paste(config.renderImageFull2)
-    # 2026-08-18 this was clearly a mistake made a long time ago .... but now all the pieces depend on it
-    # it affects how alpha is rendered - making any alpha a progressive add-to even if the base layer or 
-    # alpha is being set each frame -- see the hsl tester ... but helped in certain fading and transition
-    # effects - better smoothing sometimes
-    if config.convertRenderImageFullToRGB :
+    if config.convertRenderImageFullToRGB:
         config.renderImageFull = config.renderImageFull.convert("RGB")
     config.renderDraw = ImageDraw.Draw(config.renderImageFull)
 
-
-
-    # config.renderImageFull = ImageChops.offset(config.renderImageFull, 40, 40)
-    # For planes, only this works - has to do with transparency of repeated pasting of
-    # PNG's I think
-    # newimage = Image.new('RGBA', config.renderImageFull.size)
-    # newimage.paste(config.renderImageFull, (0, 0))
-    # config.renderImageFull =  newimage.convert("RGB")
-
-    # enhancer = ImageEnhance.Brightness(config.renderImageFull)
-    # config.renderImageFull = enhancer.enhance(.75)
-
-    # color separation filter - not really very interesting on led panels right now
-    # _applyColorSep(xOffset, yOffset)
     if config.applyDitherBeforeRemapping:
         _applyDitherFilter(xOffset, yOffset)
 
@@ -583,8 +420,6 @@ def render(
     # ---- Remap sections of image to accommodate odd panels ---- #
     _doReMappingBlocks()
 
-    # moving the dithering to after the remapping on account of the shift
-    # settings pasting over the dithered renderImageFull 02-27-2026
     if not config.applyDitherBeforeRemapping:
         _applyDitherFilter(xOffset, yOffset)
 
@@ -598,41 +433,8 @@ def render(
     if updateCanvasCall:
         updateCanvas()
 
-    # mem = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)/1024/1024
-    # if mem > memoryUsage and debug :
-    #     memoryUsage = mem
-    #     pieceLogger 'Memory usage: %s (mb)' % str(memoryUsage)
-
 
 # ----------------------------------------- #
-# Might be used at some point
-
-
-def remappingFunctionTemp():
-    # Map the one below to the next set of 4
-    pix = 16
-    colWidth = 128
-    for i in range(4):
-        row = i
-        cropRow = i * 2 + 1
-
-        remapImageBlockSection = (0, cropRow * pix, colWidth, cropRow * pix + pix)
-        remapImageBlockDestination = (colWidth, row * 16)
-        crop = config.renderImageFull.crop(remapImageBlockSection)
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, remapImageBlockDestination, crop)
-        # Move a row "up"
-
-        remapImageBlockSection = (
-            0,
-            (cropRow - 1) * pix,
-            colWidth,
-            (cropRow - 1) * pix + pix,
-        )
-        remapImageBlockDestination = (0, (row) * pix)
-        crop = config.renderImageFull.crop(remapImageBlockSection)
-        crop = crop.convert("RGBA")
-        config.renderImageFull.paste(crop, remapImageBlockDestination, crop)
 
 
 def drawBeforeConversion():

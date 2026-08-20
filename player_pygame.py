@@ -2,7 +2,19 @@
 #     args (TYPE): Description
 #     parser (TYPE): Description
 #     workconfig (TYPE): Description
-# """
+#
+# Pygame-windowed variant of player.py.
+#
+# Identical command-line interface and config loading to player.py -- the
+# only difference is that it forces `rendering = pygame` in the loaded
+# config, regardless of what the .cfg file specifies, so the piece is
+# displayed through modules/rendering/renderpygame.py (a pygame window)
+# instead of modules/rendering/render.py (a tkinter window).
+#
+# Pieces themselves (e.g. pieces/particles.py) don't need a separate
+# version to run under pygame -- they only draw into a PIL image and call
+# config.render(...), never touching the windowing toolkit directly. That
+# call is wired to the pygame renderer here instead of the tkinter one.
 
 import argparse
 import configparser
@@ -19,13 +31,11 @@ from modules.configuration import pieceLogger
 workconfig = configparser.ConfigParser()
 
 """
-Command line start of any piece:
+Command line start of any piece, windowed via pygame instead of tkinter:
 example:
 
-python player.py -cfg p4-6x5/stroop2
-python player.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
-
-python3 player.py -path ./ -cfg __in_progress/p8_particles_sparkles&
+python player_pygame.py -cfg p4-6x5/stroop2
+python player_pygame.py -mname daemon3 -path ./ -cfg p4-6x5/stroop2&
 """
 
 ##########################################################################
@@ -33,9 +43,6 @@ python3 player.py -path ./ -cfg __in_progress/p8_particles_sparkles&
 parser = argparse.ArgumentParser(description="Process")
 parser.add_argument("-mname", type=str, default="local", help="machine name (optional)")
 parser.add_argument("-path", type=str, default="./", help="directory (optional)")
-# parser.add_argument('-cfg', type=str, required=True,
-# help='Config File - just need sub-folder and name
-# - e.g. p4-6x5/repeater.cfg')
 parser.add_argument(
     "-cfg",
     type=str,
@@ -51,18 +58,20 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-pieceLogger("[player] >> Inital Player Arguments: \n" + str(args),3)
-
-# Create a blank dummy object container for now
-# config = type('', (object,), {})()
+pieceLogger("[player_pygame] >> Inital Player Arguments: \n" + str(args), 3)
 
 ##########################################################################
 #
 # -------   Reads configuration files and sets defaults
-# -------   Piece is initiated by command line: e.g.
-# sudo python /Users/lamshell/Documents/Dev/LED-MATRIX-RPI/RPI/player.py studio-mac ./ configs/fludd.cfg &
+# -------   Piece is initiated by command line, windowed via pygame
 #
 ##########################################################################
+
+
+def _forcePygameRendering(workconfig):
+    if not workconfig.has_section("displayconfig"):
+        workconfig.add_section("displayconfig")
+    workconfig.set("displayconfig", "rendering", "pygame")
 
 
 def loadFromArguments(reloading=False, config=None):
@@ -71,21 +80,18 @@ def loadFromArguments(reloading=False, config=None):
         reloading (bool, optional): Description
         config (None, optional): Description
     """
-    # global config, workconfig, path, tempImage, threads, thrd
-
     pieceLogger(f" >> ** RELOADING: {str(reloading)}", 3)
 
     if reloading is False:
         try:
             _initializeConfiguration(loadFromArguments)
         except getopt.GetoptError as err:
-            # pieceLogger help information and exit:
             pieceLogger(f" >> Error:{str(err)}")
     else:
         pieceLogger("\n >>** RELOADING NOW: " + config.fileName, 3)
         workconfig.read(config.fileName)
+        _forcePygameRendering(workconfig)
         player_module.configure(config, workconfig)
-
 
 
 def _initializeConfiguration(loadFromArguments):
@@ -95,16 +101,15 @@ def _initializeConfiguration(loadFromArguments):
     #       the local path
     # 		the config file to load
 
-    # args = sys.argv
-    # pieceLogger("Arguments passed to player.py:")
-    # pieceLogger(args)
-
     config = configuration.ArtWorkConfig("BASE PLAYER CONFIGS")
 
     if args.cfg is not None:
         _parseArgs(config, loadFromArguments)
     else:
         _pieceLoggerConfigsLoaded(config)
+
+    _forcePygameRendering(workconfig)
+
     # ****************************************** #
     # Sets off the piece based on loading the intitail configs #
     # ****************************************** #
@@ -119,7 +124,7 @@ def _pieceLoggerConfigsLoaded(config):
     config.WRKINID = defaultpiece.defaultPieceToRun
     # Default Local Path
     config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
-    pieceLogger(f" >> ** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n",3)
+    pieceLogger(f" >> ** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n", 3)
     workconfig.read(f"{config.path}configs/{config.WRKINID}.cfg")
     pieceLogger(f"{bcolors.OKBLUE}")
     for c in workconfig:
@@ -140,12 +145,10 @@ def _parseArgs(config, loadFromArguments):
     config.path = args.path
 
     # Automating the config path a bit better
-    # assumes that if no -path is specified, it defaults to ./ so 
+    # assumes that if no -path is specified, it defaults to ./ so
     # just to be sure get the abs path
-    if config.path == './' :
-        # config.path = os.getcwd() + "/"
-        config.path = __file__.replace('player.py','')+ "/"
-
+    if config.path == './':
+        config.path = __file__.replace('player_pygame.py', '') + "/"
 
     argument = f"{config.path}/configs/{args.cfg}"
     workconfig.read(argument)
@@ -153,7 +156,6 @@ def _parseArgs(config, loadFromArguments):
     config.loadFromArguments = loadFromArguments
     config.fileName = argument
     config.fileNameRaw = args.cfg
-
 
     # Optional 4th argument to override the brightness set in the
     # config
@@ -165,13 +167,12 @@ def _parseArgs(config, loadFromArguments):
     config.delta = int((config.startTime - f))
     config.deltaWorkFile = int((config.startTime - f))
 
-
     pieceLogger(f" >> {bcolors.OKBLUE}---------------------------------------------------------------------------------------")
-    pieceLogger (" >> script: sys.argv[0] is", repr(sys.argv[0]))
-    pieceLogger (" >> script: __file__ is", repr(__file__))
-    pieceLogger (" >> script: cwd is", repr(os.getcwd()))
-    pieceLogger (" >> config: path  is", repr(args.path))
-    pieceLogger (" >> config: path  is", args.path)
+    pieceLogger(" >> script: sys.argv[0] is", repr(sys.argv[0]))
+    pieceLogger(" >> script: __file__ is", repr(__file__))
+    pieceLogger(" >> script: cwd is", repr(os.getcwd()))
+    pieceLogger(" >> config: path  is", repr(args.path))
+    pieceLogger(" >> config: path  is", args.path)
     pieceLogger(" >> -cfg argument: is", argument)
     pieceLogger(" >> Last Modified Delta: is", config.delta)
     pieceLogger(f" >> ---------------------------------------------------------------------------------------{bcolors.ENDC}")
@@ -180,7 +181,7 @@ def _parseArgs(config, loadFromArguments):
 def _brightnessOverrideConfigs(config):
     brightnessOverride = args.brightnessOverride
     _brightnessOverride = float(brightnessOverride)
-    if _brightnessOverride > 2.0 :
+    if _brightnessOverride > 2.0:
         _brightnessOverride /= 100
     config.brightness = _brightnessOverride
     config.brightnessOverride = _brightnessOverride
@@ -189,14 +190,8 @@ def _brightnessOverrideConfigs(config):
 
 
 def main():
-
     loadFromArguments()
-    # """
-    # # Threading now handled by renderer - e.g. see modules/render.py
-    # thrd = threading.Thread(target=configure)
-    # threads.append(thrd)
-    # thrd.start()
-    # """
+
 
 # Kick off .......
 if __name__ == "__main__":

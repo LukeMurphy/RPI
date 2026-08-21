@@ -10,7 +10,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
 """""" """""" """""" """""" """""" """""" """""" """""" """""" """"""
 
 #### Need to add something like this at final render call  as well
-''' 
+""" 
     ########### RENDERING AS A MOCKUP OR AS REAL ###########
     if config.useDrawingPoints == True :
         config.panelDrawing.canvasToUse = config.renderImageFull
@@ -19,7 +19,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
         #config.render(config.canvasImage, 0, 0, config.canvasWidth, config.canvasHeight)
         #config.render(config.image, 0, 0)
         config.render(config.renderImageFull, 0, 0)
-'''
+"""
 
 
 class PanelPathDrawing:
@@ -38,9 +38,9 @@ class PanelPathDrawing:
         self.b = 120
         self.panels = 14
         self.xOffset = 0
-        self.yOffset = 0 
+        self.yOffset = 0
         self.orientation = 0
-        self.fillColor = (0,0,0,255)
+        self.fillColor = (0, 0, 0, 255)
 
         self.skipPanels = []
         self.recalculateAngles = False
@@ -51,63 +51,60 @@ class PanelPathDrawing:
 
         self.verticalOverlapCompensation = 32
 
-
     def generateSpiral(self):
 
         self.drawingPath = []
-        angle = 2 * math.pi/self.panels
+        angle = 2 * math.pi / self.panels
 
         orientationAngle = 90
-        if self.orientation == 1 :
+        if self.orientation == 1:
             orientationAngle = 0
 
-        r = 10#self.panelWidth
+        r = 10  # self.panelWidth
         theta = 0
 
-        for i in range(0,self.panels * 2) :
+        for i in range(0, self.panels * 2):
             theta = i * angle
-            r =  self.a + self.b/2 * theta
+            r = self.a + self.b / 2 * theta
             x = r * math.cos(theta) + self.xOffset
             y = r * math.sin(theta) + self.yOffset
-            rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5,5))
+            rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-5, 5))
             if i not in self.skipPanels:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 1))
             else:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 0))
-            #r += self.panelWidth/4
-
+            # r += self.panelWidth/4
 
     def generateOval(self):
 
         self.drawingPath = []
-        angle = 2 * math.pi/self.panels
+        angle = 2 * math.pi / self.panels
 
         orientationAngle = 90
-        if self.orientation == 1 :
+        if self.orientation == 1:
             orientationAngle = 0
 
-        for i in range(0,self.panels) :
+        for i in range(0, self.panels):
             theta = i * angle
             a1 = self.a * math.sin(theta)
             b1 = self.b * math.cos(theta)
-            r = self.a * self.b / math.sqrt(a1*a1 + b1*b1)
+            r = self.a * self.b / math.sqrt(a1 * a1 + b1 * b1)
             x = r * math.cos(theta) + self.xOffset
             y = r * math.sin(theta) + self.yOffset
-            rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-10,10))
+            rTheta = 180 - theta * 180 / math.pi + orientationAngle + (random.uniform(-10, 10))
             if i not in self.skipPanels:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 1))
             else:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
-        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
-
+        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " + str(len(self.drawingPath) - len(self.skipPanels)))
 
     def generateInformalGrid(self):
 
         self.drawingPath = []
 
         orientationAngle = 0
-        if self.orientation == 1 :
+        if self.orientation == 1:
             orientationAngle = 90
 
         rows = self.informalGridRows
@@ -115,18 +112,18 @@ class PanelPathDrawing:
         row = 0
         col = 0
 
-        for i in range(0,self.panels) :
+        for i in range(0, self.panels):
 
-            hSpace = self.panelWidth 
-            vSpace = self.panelHeight 
+            hSpace = self.panelWidth
+            vSpace = self.panelHeight
 
-            if self.orientation == 1 :
+            if self.orientation == 1:
                 vSpace = self.panelWidth
                 hSpace = self.panelHeight
 
-            x = col * hSpace + self.xOffset + col*2 + random.uniform(-self.hSpaceJiggle,self.hSpaceJiggle)
-            y = row * vSpace + self.yOffset + row*2 + random.uniform(-self.vSpaceJiggle,self.vSpaceJiggle)
-            rTheta = orientationAngle + (random.uniform(-self.angleJiggle,self.angleJiggle))
+            x = col * hSpace + self.xOffset + col * 2 + random.uniform(-self.hSpaceJiggle, self.hSpaceJiggle)
+            y = row * vSpace + self.yOffset + row * 2 + random.uniform(-self.vSpaceJiggle, self.vSpaceJiggle)
+            rTheta = orientationAngle + (random.uniform(-self.angleJiggle, self.angleJiggle))
 
             if i not in self.skipPanels:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 1))
@@ -134,15 +131,12 @@ class PanelPathDrawing:
                 self.drawingPath.append((round(x), round(y), round(rTheta), 0))
 
             col += 1
-            if col >= cols :
+            if col >= cols:
                 row += 1
                 col = 0
 
-        pieceLogger("")
-        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath) - len(self.skipPanels)))
-        pieceLogger("")
+        pieceLogger("=======> NUMBER OF PANELS: " + str(len(self.drawingPath) - len(self.skipPanels)))
 
-    
     def generateLsys(self):
 
         self.drawingPath = []
@@ -155,45 +149,44 @@ class PanelPathDrawing:
         orientationAngle = 0
         prevOrientation = 0
 
-        for l in self.lsysPointsArray :
+        for l in self.lsysPointsArray:
 
-            if l in ["+","-","/","|","<",">","˜","`"]:
+            if l in ["+", "-", "/", "|", "<", ">", "˜", "`"]:
                 prevOrientation = orientationAngle
-                
-                if l == "+" :
+
+                if l == "+":
                     orientationAngle += 90
-                elif l == "-" :
+                elif l == "-":
                     orientationAngle -= 90
-                elif l == "/" :
-                    orientationAngle += 45		
-                elif l == "|" :
+                elif l == "/":
+                    orientationAngle += 45
+                elif l == "|":
                     orientationAngle -= 45
-                elif l == ">" :
+                elif l == ">":
                     orientationAngle += 30
-                elif l == "<" :
+                elif l == "<":
                     orientationAngle -= 30
-                elif l == "˜" :
+                elif l == "˜":
                     orientationAngle -= 5
-                elif l == "`<`" :
+                elif l == "`<`":
                     orientationAngle += 5
 
-                if orientationAngle == 360 or orientationAngle == -360 :
+                if orientationAngle == 360 or orientationAngle == -360:
                     orientationAngle = 0
 
-            else :
-                for i in range(0,int(l)):
+            else:
+                for i in range(0, int(l)):
 
-                    if orientationAngle in (0,180,-180):
+                    if orientationAngle in (0, 180, -180):
                         hSpace = self.panelWidth
                         vSpace = self.panelHeight
-                    if orientationAngle in (90,-90,270, -270):
+                    if orientationAngle in (90, -90, 270, -270):
                         vSpace = self.panelWidth
                         hSpace = self.panelHeight
 
-
-                    rTheta =  (random.uniform(-self.angleJiggle,self.angleJiggle))
-                    x = math.cos((orientationAngle + rTheta) * math.pi/180) * hSpace + lastX
-                    y = math.sin((orientationAngle + rTheta) * math.pi/180) * vSpace + lastY
+                    rTheta = random.uniform(-self.angleJiggle, self.angleJiggle)
+                    x = math.cos((orientationAngle + rTheta) * math.pi / 180) * hSpace + lastX
+                    y = math.sin((orientationAngle + rTheta) * math.pi / 180) * vSpace + lastY
                     # pieceLogger(orientationAngle+rTheta)
                     angle = -(orientationAngle + rTheta)
 
@@ -201,29 +194,26 @@ class PanelPathDrawing:
                     lastX = x
                     lastY = y - self.verticalOverlapCompensation
 
-        if self.recalculateAngles == True :
+        if self.recalculateAngles == True:
             # re-calculate the angle based on the previous point AND next point
             # useful in some drawings
 
-            for i in range(1,len(self.drawingPath)-1) :
-                dx = self.drawingPath[i+1][0]  - self.drawingPath[i-1][0]
-                dy = self.drawingPath[i+1][1]  - self.drawingPath[i-1][1] 
-                
-                if dx != 0 :
-                    angle = -math.atan2(dy,dx) * 180/math.pi
+            for i in range(1, len(self.drawingPath) - 1):
+                dx = self.drawingPath[i + 1][0] - self.drawingPath[i - 1][0]
+                dy = self.drawingPath[i + 1][1] - self.drawingPath[i - 1][1]
+
+                if dx != 0:
+                    angle = -math.atan2(dy, dx) * 180 / math.pi
                     # pieceLogger(angle)
                     # orientation is important for animation
                     # if dx < 0 : angle += 180
-                    self.drawingPath[i][2] = angle 
+                    self.drawingPath[i][2] = angle
 
-        pieceLogger("")
-        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " +  str(len(self.drawingPath)))
-        pieceLogger("")
+        pieceLogger(bcolors.OKGREEN + "=======> NUMBER OF PANELS: " + str(len(self.drawingPath)))
 
+    def render(self):
 
-    def render(self) :
-
-        self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = self.fillColor)
+        self.canvasDraw.rectangle((0, 0, self.config.screenWidth, self.config.screenHeight), fill=self.fillColor)
         row = 0
         col = 0
         rowBuffer = 0
@@ -240,7 +230,6 @@ class PanelPathDrawing:
         nextxPos = self.xOffset
         nextyPos = self.yOffset
 
-
         for i in range(0, len(self.drawingPath)):
 
             x = col * self.panelWidth
@@ -248,78 +237,74 @@ class PanelPathDrawing:
 
             w = round(x + self.panelWidth)
             h = round(y + self.panelHeight)
-            section = self.canvasToUse.crop((x,y,w,h))
+            section = self.canvasToUse.crop((x, y, w, h))
             section = section.convert("RGBA")
-            sectionImage = Image.new("RGBA", (self.panelWidth+4, self.panelHeight+4), (0,0,0,255))
+            sectionImage = Image.new("RGBA", (self.panelWidth + 4, self.panelHeight + 4), (0, 0, 0, 255))
 
-            sectionImage.paste(section,(2,2),section)
+            sectionImage.paste(section, (2, 2), section)
             sectionDraw = ImageDraw.Draw(sectionImage)
-            #sectionDraw.rectangle((0,0,w+1,h+1), outline=(255,0,0,255))
-            #sectionDraw.rectangle((-1,-1,w+2,h+2), outline=(255,0,0,255))
+            # sectionDraw.rectangle((0,0,w+1,h+1), outline=(255,0,0,255))
+            # sectionDraw.rectangle((-1,-1,w+2,h+2), outline=(255,0,0,255))
 
-            #if x >=self.config.canvasWidth - self.panelWidth :
-            if col>=self.gridCols-1 :
+            # if x >=self.config.canvasWidth - self.panelWidth :
+            if col >= self.gridCols - 1:
                 row += 1
                 col = 0
-            else :
+            else:
                 col += 1
             xPos = round(self.drawingPath[i][0])
             yPos = round(self.drawingPath[i][1])
             angle = self.drawingPath[i][2]
 
-
-            if self.drawingPath[i][3] == 1 :
-                if self.lsys == False :
+            if self.drawingPath[i][3] == 1:
+                if self.lsys == False:
                     # seem to need to convert to RGBA before doing rotation
-                    sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
+                    sectionImage = sectionImage.rotate(angle, Image.NEAREST, 1)
                     sectionSize = sectionImage.size
-                    self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
+                    self.canvas.paste(sectionImage, (xPos + colOffset - round(sectionSize[0] / 2), yPos + rowOffset - round(sectionSize[1] / 2)), sectionImage)
                 else:
-                    if i != 0 :
-                        prevxPos = round(self.drawingPath[i-1][0])
-                        prevyPos = round(self.drawingPath[i-1][1])
+                    if i != 0:
+                        prevxPos = round(self.drawingPath[i - 1][0])
+                        prevyPos = round(self.drawingPath[i - 1][1])
 
                     # compensates for the panels blocks and keeps drawing integrity
                     if self.recalculateAngles == False:
-                        if prevyPos < yPos :
+                        if prevyPos < yPos:
                             yPos -= 32
-                        if prevyPos > yPos :
+                        if prevyPos > yPos:
                             yPos += 32
-                        if prevxPos < xPos :
+                        if prevxPos < xPos:
                             xPos -= 32
-                        if prevxPos > xPos :
+                        if prevxPos > xPos:
                             xPos += 32
-                    
 
                     # seem to need to convert to RGBA before doing rotation
-                    sectionImage = sectionImage.rotate(angle, Image.NEAREST , 1)
+                    sectionImage = sectionImage.rotate(angle, Image.NEAREST, 1)
                     sectionSize = sectionImage.size
-                    self.canvas.paste(sectionImage,(xPos + colOffset - round(sectionSize[0]/2),yPos + rowOffset - round(sectionSize[1]/2) ),sectionImage)
+                    self.canvas.paste(sectionImage, (xPos + colOffset - round(sectionSize[0] / 2), yPos + rowOffset - round(sectionSize[1] / 2)), sectionImage)
 
-                if self.drawMarkers ==True: 
-                    self.canvasDraw.rectangle((xPos,yPos,xPos+2,yPos+2), fill=(0,255,255))
+                if self.drawMarkers == True:
+                    self.canvasDraw.rectangle((xPos, yPos, xPos + 2, yPos + 2), fill=(0, 255, 255))
 
             prevX = xPos
             prevY = yPos
             panelCount += 1
 
-        self.canvasDraw.rectangle((0,0,self.config.screenWidth, self.config.screenHeight), fill = None, outline= self.fillColor)
+        self.canvasDraw.rectangle((0, 0, self.config.screenWidth, self.config.screenHeight), fill=None, outline=self.fillColor)
         self.finalRender()
-
 
     def finalRender(self):
         self.config.render(self.canvas, 0, 0)
 
-        if self.config.saveImages :    
-            if random.random() < .005 :   
+        if self.config.saveImages:
+            if random.random() < 0.005:
                 currentTime = time.time()
                 baseName = self.config.outPutPath + "mockup-" + str(currentTime)
                 fn = f"{baseName}.png"
                 self.canvas.save(fn)
 
 
-
-def mockupBlock(config, workConfig) :
+def mockupBlock(config, workConfig):
     ### THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     try:
         config.useDrawingPoints = workConfig.getboolean("mockup", "useDrawingPoints")
@@ -329,52 +314,50 @@ def mockupBlock(config, workConfig) :
         b = int(workConfig.get("mockup", "b"))
         orientation = int(workConfig.get("mockup", "orientation"))
         panels = int(workConfig.get("mockup", "panels"))
-        programmedPath = (workConfig.get("mockup", "programmedPath"))
+        programmedPath = workConfig.get("mockup", "programmedPath")
         drawMarkers = workConfig.getboolean("mockup", "drawMarkers")
         gridRows = int(workConfig.get("mockup", "gridRows"))
         gridCols = int(workConfig.get("mockup", "gridCols"))
         lsysPointsArray = []
         recalculateAngles = False
 
-        fillColor = (0,0,0,255)
+        fillColor = (0, 0, 0, 255)
 
         try:
             informalGridRows = int(workConfig.get("mockup", "informalGridRows"))
             informalGridCols = int(workConfig.get("mockup", "informalGridCols"))
         except Exception as e:
-            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f" >> {e}", 1)
             informalGridRows = gridRows
-            informalGridCols = gridCols 
-        
+            informalGridCols = gridCols
+
         try:
             angleJiggle = float(workConfig.get("mockup", "angleJiggle"))
         except Exception as e:
-            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
-            angleJiggle = 0 
+            pieceLogger(f">> {e}", 1)
+            angleJiggle = 0
 
         try:
             bgColorVals = workConfig.get("mockup", "bgColor").split(",")
             fillColor = tuple(int(a) for a in bgColorVals)
         except Exception as e:
-            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f" >> {e}", 1)
 
         try:
-            lsys = workConfig.getboolean("mockup","lsys")
+            lsys = workConfig.getboolean("mockup", "lsys")
         except Exception as e:
-            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f" >> {e}", 1)
             lsys = False
 
-
-        if lsys == True :
-            lsysDrawing = workConfig.get("mockup","lsysDrawing")
+        if lsys == True:
+            lsysDrawing = workConfig.get("mockup", "lsysDrawing")
             lsysPoints = workConfig.get(lsysDrawing, "lsysPoints")
             xOffset = int(workConfig.get(lsysDrawing, "xOffset"))
             yOffset = int(workConfig.get(lsysDrawing, "yOffset"))
-            recalculateAngles = workConfig.getboolean(lsysDrawing,"recalculateAngles")
+            recalculateAngles = workConfig.getboolean(lsysDrawing, "recalculateAngles")
 
-            for l in lsysPoints :
+            for l in lsysPoints:
                 lsysPointsArray.append(l)
-
 
         config.panelDrawing = PanelPathDrawing(config)
         config.panelDrawing.canvasToUse = config.image
@@ -395,39 +378,34 @@ def mockupBlock(config, workConfig) :
         config.panelDrawing.lsysPointsArray = lsysPointsArray
         config.panelDrawing.recalculateAngles = recalculateAngles
         config.panelDrawing.angleJiggle = angleJiggle
-        config.panelDrawing.hSpaceJiggle = float(workConfig.get("mockup", "hSpaceJiggle", fallback = 0))
-        config.panelDrawing.vSpaceJiggle = float(workConfig.get("mockup", "vSpaceJiggle", fallback = 0))
-        config.panelDrawing.verticalOverlapCompensation = float(workConfig.get("mockup", "verticalOverlapCompensation", fallback = 0))
+        config.panelDrawing.hSpaceJiggle = float(workConfig.get("mockup", "hSpaceJiggle", fallback=0))
+        config.panelDrawing.vSpaceJiggle = float(workConfig.get("mockup", "vSpaceJiggle", fallback=0))
+        config.panelDrawing.verticalOverlapCompensation = float(workConfig.get("mockup", "verticalOverlapCompensation", fallback=0))
 
         if lsys == True:
             programmedPath = "lsys"
 
-        try :
-            skipPanels = workConfig.get("mockup", "skipPanels").split(',')
-            config.panelDrawing.skipPanels = list(int(a)-1 for a in skipPanels)
+        try:
+            skipPanels = workConfig.get("mockup", "skipPanels").split(",")
+            config.panelDrawing.skipPanels = list(int(a) - 1 for a in skipPanels)
         except Exception as e:
-            pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
+            pieceLogger(f" >> {e}", 1)
 
-
-        if programmedPath == "ellipse" :
+        if programmedPath == "ellipse":
             config.panelDrawing.generateOval()
-        elif programmedPath == "informalGrid" :
+        elif programmedPath == "informalGrid":
             config.panelDrawing.generateInformalGrid()
-        elif programmedPath == "spiral" :
+        elif programmedPath == "spiral":
             config.panelDrawing.generateSpiral()
-        elif programmedPath == "lsys" :
+        elif programmedPath == "lsys":
             config.panelDrawing.generateLsys()
         else:
             drawingPathPoints = workConfig.get("mockup", "drawingPathPoints").split("|")
             config.panelDrawing.drawingPath = []
 
-            for i in range(0, len(drawingPathPoints)) :
+            for i in range(0, len(drawingPathPoints)):
                 p = drawingPathPoints[i].split(",")
                 config.panelDrawing.drawingPath.append((int(p[0]) + xOffset, int(p[1]) + yOffset, int(p[2]), 1))
     except Exception as e:
-        pieceLogger(f"[panelDrawing.py: mockupBlock] >> {e}")
+        pieceLogger(f" >> {e}", 1)
         config.useDrawingPoints = False
-
-
-
-

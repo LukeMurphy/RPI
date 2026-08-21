@@ -61,7 +61,7 @@ def glitchBox(
         # comment:
     except Exception as e:
         pieceLogger(e, 1)
-        pieceLogger(dx + sectionWidth, dy + sectionHeight)
+        pieceLogger(f"{dx + sectionWidth}, {dy + sectionHeight}", 1)
     # end try
 
 
@@ -76,6 +76,9 @@ def clearbgBox():
     imMngr.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(imMngr.bgBoxBox, fill=imMngr.bgBoxFill)
     imMngr.bgBoxColorRange = random.choice(imMngr.activePalette.bgBoxColorRanges)
+
+    # for _ in range(imMngr.initialRunsOfBgBlocks):
+    #     bgColorsFilling()
 
 
 def bgColorsFilling():
@@ -98,9 +101,9 @@ def bgColorsFilling():
         yPos + imMngr.tileSizeHeight,
     )
     cR = imMngr.bgBoxColorRange
-    # print(cR)
+    # pieceLogger(cR)
     bgBoxFill = colorutils.getRandomColorHSV(cR[0], cR[1], cR[2], cR[3], cR[4], cR[5], cR[6], cR[7])
-    # print(bgBoxFill)
+    # pieceLogger(bgBoxFill)
     imMngr.bgBoxFill = (
         round(config.brightness * bgBoxFill[0]),
         round(config.brightness * bgBoxFill[1]),
@@ -172,7 +175,7 @@ def setLineColor():
 def setBGColor():
 
     imMngr.activePalette = random.choice(imMngr.paletteSets)
-    pieceLogger(f"[setBGColor] NEW palette: {imMngr.activePalette.name}")
+    pieceLogger(f" NEW palette: {imMngr.activePalette.name}")
 
     imMngr.bg_alpha = round(random.uniform(imMngr.activePalette.bg_alpha_range[0], imMngr.activePalette.bg_alpha_range[1]))
     imMngr.bg_minHue = imMngr.activePalette.bg_minHue
@@ -341,14 +344,14 @@ def generateMark(col, row, _lastX, _lastY, _drawingHeight, _skipMark, _markType=
 
 
 def setLines():
-    pieceLogger(f"[setLines] New Lines:")
+    pieceLogger(f" New Lines:")
     # config.informalLineUnits = []
     generateMarksGrid()
     generateScribbleGrid()
 
 
 def generateScribbleGrid():
-    pieceLogger(f"[generateScribbleGrid] Making scribble marks")
+    pieceLogger(f" Making scribble marks")
     imMngr.line_alpha = randomRange(imMngr.activePalette.line_alpha_range[0], imMngr.activePalette.line_alpha_range[1], True)
     imMngr.bg_alpha_base = randomRange(imMngr.activePalette.bg_alpha_range[0], imMngr.activePalette.bg_alpha_range[1], True)
 
@@ -360,7 +363,7 @@ def generateScribbleGrid():
 
 
 def generateMarksGrid():
-    pieceLogger(f"[generateMarksGrid] Making Grid:  {imMngr.drawingWidth } {imMngr.drawingHeight }")
+    pieceLogger(f" >> Making Grid:  {imMngr.drawingWidth } {imMngr.drawingHeight }")
 
     imMngr.colInterval = random.randint(int(imMngr.colIntervalRange[0]), int(imMngr.colIntervalRange[1]))
     imMngr.rowInterval = random.randint(int(imMngr.rowIntervalRange[0]), int(imMngr.rowIntervalRange[1]))
@@ -427,9 +430,9 @@ def runWork():
     _config : ArtWorkConfig
     _config = config
 
-    print(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    print("Running informalMarksGrid.py")
-    print(bcolors.ENDC)
+    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
+    pieceLogger(" ==> Running", 6)
+    pieceLogger(bcolors.ENDC)
     # _config.debugSelf()
 
     while _config.isRunning == True:
@@ -446,7 +449,9 @@ def runWork():
 def reDraw():
 
     if random.random() < imMngr.useBgBoxProb and imMngr.useBgBox:
-        bgColorsFilling()
+        # bgColorsFilling()
+        for _ in range(imMngr.initialRunsOfBgBlocks):
+            bgColorsFilling()
 
     if imMngr.bg_alpha < imMngr.bg_alpha_base:
         imMngr.bg_alpha += imMngr.bg_alpha_returnrate
@@ -476,7 +481,10 @@ def reDraw():
         setBGColor()
         setLines()
         # doFrame()
-        pieceLogger(f"[reDraw] change ALL LINES  lightMode:{imMngr.lightMode} {imMngr.bg_alpha}")
+        if imMngr.useBgBox:
+            for _ in range(imMngr.initialRunsOfBgBlocks):
+                bgColorsFilling()
+        pieceLogger(f" >> change ALL LINES  lightMode:{imMngr.lightMode} {imMngr.bg_alpha}")
 
     if random.random() < imMngr.pauseProb:
         imMngr.noChange = True
@@ -484,8 +492,11 @@ def reDraw():
     if random.random() < imMngr.unpauseProb:
         imMngr.noChange = False
 
-    if random.random() < imMngr.clearbgBoxProb:
+    if random.random() < imMngr.clearbgBoxProb and imMngr.useBgBox:
         clearbgBox()
+        for _ in range(imMngr.initialRunsOfBgBlocks):
+            bgColorsFilling()
+
 
 
 def iterate():

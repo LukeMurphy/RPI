@@ -27,6 +27,7 @@ from copy import copy
 
 # --------------------- CLASSES     ---------------------
 
+
 class RepeatedPatterns:
     path = ""
     brightness = 1.0
@@ -222,9 +223,8 @@ class RepeatedPatterns:
     YPOSSpeed = 0.0
     useSubPixelSmoothing = True
 
-
     filterRemapping = True
-    filterRemappingProb = .0005
+    filterRemappingProb = 0.0005
     filterRemapMinHoriSize = 32
     filterRemapMinVertSize = 32
     filterRemapMaxHoriSize = 256
@@ -238,8 +238,12 @@ class RepeatedPatterns:
     tileSizeHeight = 0
 
     plusMarkDensity = 4
-    plusMarkLengthRatio = .55
-    plusMarkWidthRatio = .35     
+    plusMarkLengthRatio = [0.2, 0.55]
+    plusMarkWidthRatio = [0.2, 0.35]
+    plusMarksPosNeg = True
+    plusMarksArrows = True
+    plusMarksArrowsProb = 0.33
+    plusMarksPosNegProb = 0.33
 
     def __init__(self):
         pass
@@ -535,7 +539,6 @@ def loadClipPlayerConfigs():
     loadConfigValue(rpO, workConfig, "imageSequencePlayer", "clipYPos", 1, int)
     loadConfigValue(rpO, workConfig, "imageSequencePlayer", "clipRotate", 0, float)
     loadConfigValue(rpO, workConfig, "imageSequencePlayer", "steps", 1, int)
-
 
     try:
         rpO.clipMain = movieClip(rpO)
@@ -888,8 +891,6 @@ def loadAndSetupPatterns():
     loadConfigValue(rpO, workConfig, "movingpattern", "xIncrementer", 1, int)
     loadConfigValue(rpO, workConfig, "movingpattern", "yIncrementer", 1, int)
 
-
-
     config.altLineColoring = False
     stepsRange = workConfig.get("movingpattern", "stepsRange").split(",")
 
@@ -931,6 +932,20 @@ def loadAndSetCombinations():
         comboSet.borderLeakProb = float(workConfig.get(combinationSetName, "borderLeakProb", fallback=0.0))
         comboSet.randomInsertionMin = int(workConfig.get(combinationSetName, "randomInsertionMin", fallback="0"))
         comboSet.randomInsertionMax = int(workConfig.get(combinationSetName, "randomInsertionMax", fallback="0"))
+
+        try:
+            comboSet.plusMarkDensity = list(int(x) for x in workConfig.get(combinationSetName, "plusMarkDensity").split(","))
+            comboSet.plusMarkLengthRatio = list(float(x) for x in workConfig.get(combinationSetName, "plusMarkLengthRatio").split(","))
+            comboSet.plusMarkWidthRatio = list(float(x) for x in workConfig.get(combinationSetName, "plusMarkWidthRatio").split(","))
+        except Exception as e:
+            pieceLogger(e, 1)
+            comboSet.plusMarkDensity = rpO.plusMarkDensity
+            comboSet.plusMarkLengthRatio = rpO.plusMarkLengthRatio
+            comboSet.plusMarkWidthRatio = rpO.plusMarkWidthRatio
+
+        comboSet.plusMarksPosNegProb = float(workConfig.get(combinationSetName, "plusMarksPosNegProb", fallback=rpO.plusMarksPosNegProb))
+        comboSet.plusMarksArrowsProb = float(workConfig.get(combinationSetName, "plusMarksArrowsProb", fallback=rpO.plusMarksArrowsProb))
+
         config.randomInsertionCount = 0
         if comboSet.randomInsertionMin > 0:
             comboSet.randomInsertionProbabilitly = comboSet.randomInsertionInitialProbabilitly
@@ -942,9 +957,7 @@ def loadAndSetCombinations():
     rpO.numberOfRandomizersUsed = 0
     rpO.comboSetDirector = Director(config)
     rpO.comboSetDirector.slotRate = int(
-        random.uniform(
-            rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime
-        )
+        random.uniform(rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime)
     )
     pieceLogger(f" Initial combo set change wait time (slotRate) : {rpO.comboSetDirector.slotRate}")
 
@@ -988,9 +1001,7 @@ def handleChangeCurrentCominationSet():
         # config.rebuildIndividualSlotProb = .1
 
         rpO.comboSetDirector.slotRate = int(
-            random.uniform(
-                rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime
-            )
+            random.uniform(rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMinTime, rpO.combinationSets[rpO.currentCombinationsetIndex].combinationSetsMaxTime)
         )
         rpO.comboSetDirector.reset()
 
@@ -1028,9 +1039,10 @@ def resetPatternBlocks():
 def buildPatternSequence(_repeatedPatternsObj):
     pieceLogger(" >> called", 0)
 
-    rpO : RepeatedPatterns = _repeatedPatternsObj
+    rpO: RepeatedPatterns = _repeatedPatternsObj
     # rpO.patternSequence = []
     # rpO.usedPatterns = []
+    _ref = rpO.combinationSets[rpO.currentCombinationsetIndex]
 
     # during a partial rebuild, maybe don't change too much
     # in terms of the block size
@@ -1060,8 +1072,8 @@ def buildPatternSequence(_repeatedPatternsObj):
         rpO.totalSlots = rpO.patternBlockRows * rpO.patternBlockCols
         # pieceLogger(f"rpO.totalSlots {rpO.totalSlots}", 4, True)
 
-    rpO.altLineColoring = random.random() < rpO.combinationSets[rpO.currentCombinationsetIndex].altColoringProb
-    rpO.popRandomColorProb = random.random() < rpO.combinationSets[rpO.currentCombinationsetIndex].popRandomColorProb
+    rpO.altLineColoring = random.random() < _ref.altColoringProb
+    rpO.popRandomColorProb = random.random() < _ref.popRandomColorProb
 
     # print(rpO.altLineColoring)
     rpO.numConcentricBoxes = int(random.uniform(rpO.minnumConcentricBoxes, rpO.maxnumConcentricBoxes))
@@ -1073,9 +1085,12 @@ def buildPatternSequence(_repeatedPatternsObj):
     rpO.borderDrawn = False
     rpO.initPatternBuild = False
 
-    rpO.plusMarkDensity = random.choice([1,2,3,4])
-    rpO.plusMarkLengthRatio = .54 * random.random() + .2 
-    rpO.plusMarkWidthRatio= .3 * random.random() + .2 
+    # rpO.plusMarkDensity = random.choice([1,2,3,4])
+    rpO.plusMarkDensity = random.choice(_ref.plusMarkDensity)
+    rpO.plusMarkLengthRatio = _ref.plusMarkLengthRatio[1] * random.random() + _ref.plusMarkLengthRatio[0]
+    rpO.plusMarkWidthRatio = _ref.plusMarkWidthRatio[1] * random.random() + _ref.plusMarkWidthRatio[0]
+    rpO.plusMarksPosNeg = True if random.random() < _ref.plusMarksPosNegProb else False
+    rpO.plusMarksArrows = True if random.random() < _ref.plusMarksArrowsProb else False
 
 
 def chooseAPattern(limitRandomizers=False, forceDominant=False):
@@ -1601,7 +1616,7 @@ def renderComposite():
         global overlayControls
         if overlayControls.usingPanelOverlays:
             overlayControls.targetImageRef = config.destinationImage
-            
+
         if overlayControls.useBlanks:
             config.destinationImageDraw = ImageDraw.Draw(config.destinationImage)
             overlayControls.destinationImageDraw = config.destinationImageDraw
@@ -1643,7 +1658,7 @@ def showDebugCanvases(config):
 
 
 def shapeOverLayFunction(temp1):
-    _rpO : RepeatedPatterns = rpO
+    _rpO: RepeatedPatterns = rpO
     temp2 = Image.new("RGBA", (rpO.pictureWidth, rpO.pictureHeight))
     temp2Draw = ImageDraw.Draw(temp2)
 
@@ -1731,7 +1746,7 @@ def generateOverlayTiles():
             rpO.tileOverlayGrid.append(_v)
 
 
-def setupPolyOverlay(): 
+def setupPolyOverlay():
     rpO.usePolygonOverlay = False
     try:
         rpO.polyOverlay = ColorOverlay()
@@ -1842,7 +1857,7 @@ def main(run=True):
     config.debugPause = False
 
     rpO.path = config.path
-    rpO.brightness =  config.brightness
+    rpO.brightness = config.brightness
     rpO.config = config
     # for the overlay function when doing
     # strict panels
@@ -1908,7 +1923,6 @@ def main(run=True):
 
     # ---------------------------------------------------------------###
 
-
     loadConfigValue(rpO, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
 
     # --------------------- clip player instert ---------------------#########
@@ -1961,7 +1975,6 @@ def main(run=True):
     overlayControls.setPanelOverlays()
 
     # for filter remapping
-
 
     # THIS IS USED AS WAY TO MOCKUP A CONFIGURATION OF RECTANGULAR PANELS
     panelDrawing.mockupBlock(config, workConfig)

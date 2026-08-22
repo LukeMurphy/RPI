@@ -1913,17 +1913,18 @@ def pluses(refConfig, paletteObj=None):
 
     _alpha = int(random.uniform(200, 250))
 
-
     refConfig.blockDraw.rectangle((0, 0, refConfig.blockWidth, refConfig.blockHeight), fill=bgFill, outline=None)
     # refConfig.blockDraw.rectangle((0, 0, refConfig.blockWidth, refConfig.blockHeight), fill=bgFill, outline=clr3)
 
     boxWidth = refConfig.blockWidth
     outline = None
 
-    density = refConfig.plusMarkDensity # pluses per row/column; raise to pack more pluses into the block
+    density = refConfig.plusMarkDensity  # pluses per row/column; raise to pack more pluses into the block
     blockSize = boxWidth / density
     markLength = blockSize * refConfig.plusMarkLengthRatio
     markWidth = markLength * refConfig.plusMarkWidthRatio
+    plusMarksPosNeg = refConfig.plusMarksPosNeg
+    plusMarksArrows = refConfig.plusMarksArrows
 
     for row in range(density):
         for col in range(density):
@@ -1932,27 +1933,65 @@ def pluses(refConfig, paletteObj=None):
 
             # (xPos, yPos, width, height) for each dash/vert mark, relative to this cell
             marks = [
-                (blockSize / 2 - markLength / 2, 0 - markWidth / 2, markLength, markWidth, 0),  # TOP DASH
-                (blockSize / 2 - markWidth / 2, 0, markWidth, markLength / 2, 0),  # TOP CENTER VERT
-                (blockSize / 2 - markLength / 2, blockSize - markWidth / 2, markLength, markWidth, 0),  # BOTTOM DASH
-                (blockSize / 2 - markWidth / 2, blockSize - markLength / 2, markWidth, markLength / 2 + markWidth / 4, 0),  # BOTTOM CENTER VERT
-
-                (0, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1),  # LEFT DASH
-                (blockSize - markLength / 2, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1),  # RIGHT DASH
-                (0 - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1),  # LEFT VERT
-                (blockSize - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1),  # RIGHT VERT
+                (blockSize / 2 - markLength / 2, 0 - markWidth / 2, markLength, markWidth, 0, 1, 1),  # TOP DASH
+                (blockSize / 2 - markWidth / 2, 0, markWidth, markLength / 2, 0, 0, 1),  # TOP CENTER VERT
+                (blockSize / 2 - markLength / 2, blockSize - markWidth / 2, markLength, markWidth, 0, 1, 3),  # BOTTOM DASH
+                (blockSize / 2 - markWidth / 2, blockSize - markLength / 2, markWidth, markLength / 2 + markWidth / 4, 0, 0, 3),  # BOTTOM CENTER VERT
+                (0, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1, 1, 4),  # LEFT DASH
+                (blockSize - markLength / 2, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1, 1, 2),  # RIGHT DASH
+                (0 - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1, 0, 4),  # LEFT VERT
+                (blockSize - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1, 0, 2),  # RIGHT VERT
             ]
 
-            for xPos, yPos, w, h, p in marks:
+            for xPos, yPos, w, h, side, dash, rl in marks:
                 _c = clr2
-                if p == 0 :
+                if side == 0:
                     _c = clr3
-                refConfig.blockDraw.rectangle(
-                    (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
-                    outline=(outline),
-                    fill=_c,
-                )
 
+                if plusMarksArrows:
+                    if dash == 1:
+                        refConfig.blockDraw.rectangle(
+                            (offsetX + xPos, offsetY + yPos, offsetX + xPos + w/2, offsetY + yPos + h),
+                            outline=(outline),
+                            fill=_c,
+                        )
+                        if rl == 2 :
+                            refConfig.blockDraw.rectangle(
+                                (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
+                                outline=(outline),
+                                fill=_c,
+                            )
+
+                        if side == 0 or rl == 4:
+                            refConfig.blockDraw.polygon(
+                                (offsetX + xPos + w / 2, offsetY + yPos - h / 2 - markWidth/2, 
+                                offsetX + xPos + w , offsetY + yPos + markWidth/2, 
+                                offsetX + xPos + w / 2, offsetY + yPos + h + markWidth
+                                ),
+                                outline=(outline),
+                                fill=_c,
+                            )
+
+                elif plusMarksPosNeg:
+                    if dash == 1 and side == 0:
+                        refConfig.blockDraw.rectangle(
+                            (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
+                            outline=(outline),
+                            fill=_c,
+                        )
+
+                    if side == 1:
+                        refConfig.blockDraw.rectangle(
+                            (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
+                            outline=(outline),
+                            fill=_c,
+                        )
+                else:
+                    refConfig.blockDraw.rectangle(
+                        (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
+                        outline=(outline),
+                        fill=_c,
+                    )
 
 
 # ----------------------------------------------------#

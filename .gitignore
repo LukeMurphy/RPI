@@ -20,6 +20,8 @@ dist/
 *.spec
 *.sfdx
 /.sfdx
+*.claude
+/.claude
 
 
 # Playwright

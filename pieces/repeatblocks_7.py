@@ -237,6 +237,10 @@ class RepeatedPatterns:
     tileSizeWidth = 0
     tileSizeHeight = 0
 
+    plusMarkDensity = 4
+    plusMarkLengthRatio = .55
+    plusMarkWidthRatio = .35     
+
     def __init__(self):
         pass
 
@@ -884,6 +888,8 @@ def loadAndSetupPatterns():
     loadConfigValue(rpO, workConfig, "movingpattern", "xIncrementer", 1, int)
     loadConfigValue(rpO, workConfig, "movingpattern", "yIncrementer", 1, int)
 
+
+
     config.altLineColoring = False
     stepsRange = workConfig.get("movingpattern", "stepsRange").split(",")
 
@@ -1066,6 +1072,10 @@ def buildPatternSequence(_repeatedPatternsObj):
     # _print_pattern_sequence(rpO)
     rpO.borderDrawn = False
     rpO.initPatternBuild = False
+
+    rpO.plusMarkDensity = random.choice([1,2,3,4])
+    rpO.plusMarkLengthRatio = .54 * random.random() + .2 
+    rpO.plusMarkWidthRatio= .3 * random.random() + .2 
 
 
 def chooseAPattern(limitRandomizers=False, forceDominant=False):
@@ -1898,16 +1908,6 @@ def main(run=True):
 
     # ---------------------------------------------------------------###
 
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapping", False, bool)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemappingProb", 0.0, float)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinHoriSize", 1, int)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxHoriSize", 1, int)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMinVertSize", 1, int)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapMaxVertSize", 1, int)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeY", 1, int)
-    # loadConfigValue(rpO, workConfig, "movingpattern", "filterRemapRangeX", 1, int)
-
-    # ---------------------------------------------------------------###
 
     loadConfigValue(rpO, workConfig, "movingpattern", "resetOverlayProbability", 0.000, float)
 

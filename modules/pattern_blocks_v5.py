@@ -91,7 +91,9 @@ def fishscalepatternFunction(func):
         for r in range(numRows, -1, -1):
             yPos = -2 + r * boxWidth
             for i in range(3):
-                refConfig.blockDraw.ellipse((i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(patternOutLine), fill=patternFill)
+                refConfig.blockDraw.ellipse(
+                    (i * boxWidth - boxWidth / 2, yPos, i * boxWidth + boxWidth - boxWidth / 2, yPos + boxWidth), outline=(patternOutLine), fill=patternFill
+                )
 
             for i in range(2):
                 refConfig.blockDraw.ellipse((i * boxWidth, yPos - boxWidth / 2, i * boxWidth + boxWidth, yPos + boxWidth / 2), outline=(patternOutLine), fill=patternFill)
@@ -846,14 +848,18 @@ def chainLinks(refConfig, paletteObj=None):
         #                             y1 - _unitLength * 1),
         #                             fill=(outline), outline=(clr1))
         try:
-            # comment: 
-        # end try
+            # comment:
+            # end try
             refConfig.blockDraw.rounded_rectangle(
-                (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2 + 0, y1 - _unitLength * 1), fill=(outline), radius=4, outline=(clr1), corners=None
+                (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2 + 0, y1 - _unitLength * 1),
+                fill=(outline),
+                radius=4,
+                outline=(clr1),
+                corners=None,
             )
         except Exception as e:
             refConfig.blockDraw.rectangle(
-                (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2 + 0, y1 - _unitLength * 1), fill=(outline),  outline=(clr1)
+                (x0 + (x1 - x0) / 2 - _wd / 2 - 1, y0 - _unitLength * 3, x0 + (x1 - x0) / 2 + _wd / 2 + 0, y1 - _unitLength * 1), fill=(outline), outline=(clr1)
             )
             pieceLogger(e)
 
@@ -1718,7 +1724,9 @@ def grainLines(refConfig, paletteObj=None):
             _x2 = xPt * _w
             _y1 = _lastY
             _y2 = noise.pnoise2(rnd * _x2 / 120 + 0.2, rnd2 * yPt / 120) * 100
-            refConfig.blockDraw.line((_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0], patternFill[1], patternFill[2], round(255 * (_gradientCount / _gradientPeriod + 0.45))))
+            refConfig.blockDraw.line(
+                (_x1, _y1 + yPt, _x2, _y2 + yPt), fill=(patternFill[0], patternFill[1], patternFill[2], round(255 * (_gradientCount / _gradientPeriod + 0.45)))
+            )
             _lastX = _x2
             _lastY = _y2
         _gradientCount += 1
@@ -1806,7 +1814,7 @@ def TVTestPattern(refConfig, paletteObj=None):
 
     bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
 
-    _alpha = int(random.uniform(200,250))
+    _alpha = int(random.uniform(200, 250))
     # pieceLogger(_alpha)
 
     refConfig.blockDraw.rectangle((0, 0, refConfig.blockWidth, refConfig.blockHeight), fill=clr1, outline=None)
@@ -1891,7 +1899,63 @@ def TVTestPattern(refConfig, paletteObj=None):
         )
 
 
-# ----------------------------------------------------##----------------------------------------------------#
+# ----------------------------------------------------#
+
+
+def pluses(refConfig, paletteObj=None):
+
+    clr1 = tuple(int(a) for a in (paletteObj.c1.currentColor))
+    clr2 = tuple(int(a) for a in (paletteObj.c2.currentColor))
+    clr3 = tuple(int(a) for a in (paletteObj.c3.currentColor))
+    clr4 = tuple(int(a) for a in (paletteObj.c4.currentColor))
+
+    bgFill = tuple(int(a) for a in (paletteObj.c1.currentColor))
+
+    _alpha = int(random.uniform(200, 250))
+
+
+    refConfig.blockDraw.rectangle((0, 0, refConfig.blockWidth, refConfig.blockHeight), fill=bgFill, outline=None)
+    # refConfig.blockDraw.rectangle((0, 0, refConfig.blockWidth, refConfig.blockHeight), fill=bgFill, outline=clr3)
+
+    boxWidth = refConfig.blockWidth
+    outline = None
+
+    density = refConfig.plusMarkDensity # pluses per row/column; raise to pack more pluses into the block
+    blockSize = boxWidth / density
+    markLength = blockSize * refConfig.plusMarkLengthRatio
+    markWidth = markLength * refConfig.plusMarkWidthRatio
+
+    for row in range(density):
+        for col in range(density):
+            offsetX = col * blockSize
+            offsetY = row * blockSize
+
+            # (xPos, yPos, width, height) for each dash/vert mark, relative to this cell
+            marks = [
+                (blockSize / 2 - markLength / 2, 0 - markWidth / 2, markLength, markWidth, 0),  # TOP DASH
+                (blockSize / 2 - markWidth / 2, 0, markWidth, markLength / 2, 0),  # TOP CENTER VERT
+                (blockSize / 2 - markLength / 2, blockSize - markWidth / 2, markLength, markWidth, 0),  # BOTTOM DASH
+                (blockSize / 2 - markWidth / 2, blockSize - markLength / 2, markWidth, markLength / 2 + markWidth / 4, 0),  # BOTTOM CENTER VERT
+
+                (0, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1),  # LEFT DASH
+                (blockSize - markLength / 2, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1),  # RIGHT DASH
+                (0 - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1),  # LEFT VERT
+                (blockSize - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1),  # RIGHT VERT
+            ]
+
+            for xPos, yPos, w, h, p in marks:
+                _c = clr2
+                if p == 0 :
+                    _c = clr3
+                refConfig.blockDraw.rectangle(
+                    (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
+                    outline=(outline),
+                    fill=_c,
+                )
+
+
+
+# ----------------------------------------------------#
 
 
 def chaikins_corner_cutting(coords, refinements=5, ratio=0.75):
@@ -1918,53 +1982,53 @@ def floralConfig(refConfig):
     # match _choice:
 
     if _choice == 0:
-            refConfig.floral._petals = 9
-            refConfig.floral._w = refConfig.blockWidth * 0.51
-            refConfig.floral._lobe = refConfig.floral._w * 0.8
-            refConfig.floral._h = refConfig.blockWidth / 8
+        refConfig.floral._petals = 9
+        refConfig.floral._w = refConfig.blockWidth * 0.51
+        refConfig.floral._lobe = refConfig.floral._w * 0.8
+        refConfig.floral._h = refConfig.blockWidth / 8
 
     if _choice == 1:
-            refConfig.floral._petals = 7
-            refConfig.floral._w = refConfig.blockWidth * 0.51
-            refConfig.floral._lobe = refConfig.floral._w * 0.8
-            refConfig.floral._h = refConfig.blockWidth / 8
+        refConfig.floral._petals = 7
+        refConfig.floral._w = refConfig.blockWidth * 0.51
+        refConfig.floral._lobe = refConfig.floral._w * 0.8
+        refConfig.floral._h = refConfig.blockWidth / 8
 
     if _choice == 2:
-            refConfig.floral._petals = 4
-            refConfig.floral._w = refConfig.blockWidth * 0.51
-            refConfig.floral._lobe = refConfig.floral._w * 0.7
-            refConfig.floral._h = refConfig.blockWidth / 4
+        refConfig.floral._petals = 4
+        refConfig.floral._w = refConfig.blockWidth * 0.51
+        refConfig.floral._lobe = refConfig.floral._w * 0.7
+        refConfig.floral._h = refConfig.blockWidth / 4
 
     if _choice == 3:
-            refConfig.floral._petals = 5
-            refConfig.floral._w = refConfig.blockWidth * 0.51
-            refConfig.floral._lobe = refConfig.floral._w * 0.7
-            refConfig.floral._h = refConfig.blockWidth / 4
+        refConfig.floral._petals = 5
+        refConfig.floral._w = refConfig.blockWidth * 0.51
+        refConfig.floral._lobe = refConfig.floral._w * 0.7
+        refConfig.floral._h = refConfig.blockWidth / 4
 
     if _choice == 4:
-            refConfig.floral._petals = 3
-            refConfig.floral._w = refConfig.blockWidth * 0.51
-            refConfig.floral._lobe = refConfig.floral._w * 0.4
-            refConfig.floral._h = refConfig.blockWidth / 4
+        refConfig.floral._petals = 3
+        refConfig.floral._w = refConfig.blockWidth * 0.51
+        refConfig.floral._lobe = refConfig.floral._w * 0.4
+        refConfig.floral._h = refConfig.blockWidth / 4
 
     if _choice == 5:
-            refConfig.floral._petals = 4
-            refConfig.floral._w = refConfig.blockWidth * 0.6
-            refConfig.floral._lobe = refConfig.floral._w * 0.2
-            refConfig.floral._h = refConfig.blockWidth / 4
+        refConfig.floral._petals = 4
+        refConfig.floral._w = refConfig.blockWidth * 0.6
+        refConfig.floral._lobe = refConfig.floral._w * 0.2
+        refConfig.floral._h = refConfig.blockWidth / 4
 
     if _choice == 6:
-            refConfig.floral._petals = 5
-            refConfig.floral._w = refConfig.blockWidth * 0.6
-            refConfig.floral._lobe = refConfig.floral._w * 0.2
-            refConfig.floral._h = refConfig.blockWidth / 4
+        refConfig.floral._petals = 5
+        refConfig.floral._w = refConfig.blockWidth * 0.6
+        refConfig.floral._lobe = refConfig.floral._w * 0.2
+        refConfig.floral._h = refConfig.blockWidth / 4
 
     if _choice == 7:
-            refConfig.floral._lobe = round(random.uniform(4, refConfig.blockWidth * 0.7))
-            refConfig.floral._w = round(random.uniform(refConfig.floral._lobe, refConfig.blockWidth * 0.8))
-            refConfig.floral._h = round(random.uniform(4, refConfig.blockHeight / 8))
-            # refConfig.floral._extension = refConfig.blockWidth / 2
-            refConfig.floral._petals = round(random.uniform(4, 7))
+        refConfig.floral._lobe = round(random.uniform(4, refConfig.blockWidth * 0.7))
+        refConfig.floral._w = round(random.uniform(refConfig.floral._lobe, refConfig.blockWidth * 0.8))
+        refConfig.floral._h = round(random.uniform(4, refConfig.blockHeight / 8))
+        # refConfig.floral._extension = refConfig.blockWidth / 2
+        refConfig.floral._petals = round(random.uniform(4, 7))
     # refConfig.floral.debugSelf()
 
 

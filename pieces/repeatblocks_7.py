@@ -237,7 +237,7 @@ class RepeatedPatterns:
     tileSizeWidth = 0
     tileSizeHeight = 0
 
-    plusMarkDensity = 4
+    plusMarkDensity = [1,2,3,4]
     plusMarkLengthRatio = [0.2, 0.55]
     plusMarkWidthRatio = [0.2, 0.35]
     plusMarksPosNeg = True

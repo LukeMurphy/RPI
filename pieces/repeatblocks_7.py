@@ -566,7 +566,7 @@ def loadConfigValue(obj, workConfig, section, option, default, type_converter):
         else:
             setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        pieceLogger(f"\n >> Config value not loaded:{obj} {workConfig} {section} {option} ==> will be set to {default} \n  {e}", 1)
+        pieceLogger(f" >> Config value not loaded in{section}. {option} ==> will be set to {default} : {e}", 1)
         setattr(obj, option, default)
 
 
@@ -731,7 +731,7 @@ def setPalette(config, index=0):
     paletteObj = getPaletteObjectByName(rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index])
 
     pieceLogger(
-        f"\n >> currentCombinationsetIndex: {rpO.currentCombinationsetIndex} index: {index} rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]}"
+        f" >> currentCombinationsetIndex: {rpO.currentCombinationsetIndex} index: {index} rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]: {rpO.combinationSets[rpO.currentCombinationsetIndex].palettes[index]}"
     )
     pieceLogger(f" >> Setting a new palette:  {paletteObj.paletteName}")
     rpO.c1.bgColor = setCurrentColor(paletteObj.c1, 0, 0, round(random.uniform(rpO.bgColorAlpha[0], rpO.bgColorAlpha[1])))

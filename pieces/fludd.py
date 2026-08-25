@@ -1,8 +1,7 @@
-# ################################################### #
 import math
 import random
 import time
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
@@ -68,8 +67,8 @@ class Fludd:
     prisimBrightness = 0.5
     blackOpacity = 255
 
-    def __init__(self, config):
-        print("init PB")
+    def __init__(self, config, flddMngr):
+        pieceLogger("init PB")
 
         self.boxMax = config.canvasWidth - 1
         # self.boxMaxAlt = self.boxMax + int(random.uniform(10, 30) * config.canvasWidth)
@@ -80,7 +79,7 @@ class Fludd:
         draw = ImageDraw.Draw(tempImage)
         self.mainImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
 
-    def setUp(self, boxMax, boxHeight) :
+    def setUp(self, boxMax, boxHeight):
         self.boxMax = boxMax
         self.boxMaxAlt = self.boxMax + int(random.uniform(10, 30) * config.canvasWidth)
         self.boxHeight = boxHeight
@@ -90,7 +89,6 @@ class Fludd:
         draw = ImageDraw.Draw(tempImage)
         self.mainImage = Image.new("RGBA", (round(self.boxMax), round(self.boxHeight)))
         self.draw = ImageDraw.Draw(self.mainImage)
-
 
     def changeAction(self):
         return False
@@ -180,22 +178,77 @@ class Fludd:
 
     def changeColor(self):
         self.borderModel = "plenum" if self.borderModel == "prism" else "prism"
-        self.prisimBrightness = max(config.brightness * random.random(), .1)
-        # if(self.config.demoMode != 0) : print(self.varianceMode, self.borderModel)
+        self.prisimBrightness = max(config.brightness * random.random(), 0.1)
+        # if(self.config.demoMode != 0) : pieceLogger(self.varianceMode, self.borderModel)
 
     def done(self):
         return True
 
 
+# ----------------------------------------------------#
+class FluddManager:
+    def __init__(self, config):
+        self.config = config
+
+    def setUp(self, workConfig):
+        self.figureRows = 1
+        self.figureCols = 1
+        self.progressiveVar = 0
+        self.initialVar = 0
+        self.var = 0
+        self.varDelta = 0
+        self.varRepeatCountInitial = 0
+        self.varRepeatCount = 0
+        self.animationChangeRepeatCount = 0
+        self.animationChangeRepeatCountInitial = 0
+        self.progressiveRateVar = 0.0
+        self.animationRate = 0.0
+        self.initialAnimationRate = 0.0
+        self.animationRateDelta = 0.0
+        self.borderChangeProb = 1.0
+        self.bgOpacity = 0
+        self.figureChangeTime = 0
+        self.figureChangeOnlyColor = True
+        self.changeFigureControllerTime = 0
+
+        self._load_config_value(workConfig, "fludd", "figureRows", 1, int)
+        self._load_config_value(workConfig, "fludd", "figureCols", 1, int)
+        self._load_config_value(workConfig, "fludd", "progressiveVar", 0, float)
+        self._load_config_value(workConfig, "fludd", "initialVar", 0, int)
+        self._load_config_value(workConfig, "fludd", "var", 0, int)
+        self._load_config_value(workConfig, "fludd", "varDelta", 0, int)
+        self._load_config_value(workConfig, "fludd", "varRepeatCountInitial", 0, int)
+        self._load_config_value(workConfig, "fludd", "varRepeatCount", 0, int)
+        self._load_config_value(workConfig, "fludd", "animationChangeRepeatCount", 0, int)
+        self._load_config_value(workConfig, "fludd", "animationChangeRepeatCountInitial", 0, int)
+        self._load_config_value(workConfig, "fludd", "progressiveRateVar", 0.0, float)
+        self._load_config_value(workConfig, "fludd", "animationRate", 0.0, float)
+        self._load_config_value(workConfig, "fludd", "initialAnimationRate", 0.0, float)
+        self._load_config_value(workConfig, "fludd", "animationRateDelta", 0.0, float)
+        self._load_config_value(workConfig, "fludd", "borderChangeProb", 1.0, float)
+        self._load_config_value(workConfig, "fludd", "bgOpacity", 0, int)
+        self._load_config_value(workConfig, "fludd", "figureChangeTime", 0, int)
+        self._load_config_value(workConfig, "fludd", "figureChangeOnlyColor", True, bool)
+        self._load_config_value(workConfig, "fludd", "changeFigureControllerTime", self.figureChangeTime, int)
+
+    def _load_config_value(self, workConfig, section, option, default, type_converter):
+        try:
+            if type_converter == bool:
+                setattr(self, option, type_converter(workConfig.getboolean(section, option)))
+            else:
+                setattr(self, option, type_converter(workConfig.get(section, option)))
+        except Exception as e:
+            pieceLogger(f" ==> Config value not loaded: {option} ==> will be set to {default}  {e}")
+            setattr(self, option, default)
+
+
 def drawElement():
-    global config
     return True
 
 
 def redraw():
-    global config, fluddSquare
-    for f in config.figures :
-        if random.random() < config.borderChangeProb:
+    for f in flddMngr.figures:
+        if random.random() < flddMngr.borderChangeProb:
             f.reDraw()
 
 
@@ -208,14 +261,13 @@ def changeCall():
 
 
 def callBack():
-    global config
+    return True
 
 
 def runWork():
-    global config, fluddSquare
-    print(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
-    print("Running fludd.py")
-    print(bcolors.ENDC)
+    pieceLogger(f"{bcolors.OKGREEN}** {bcolors.BOLD}")
+    pieceLogger("Running fludd.py")
+    pieceLogger(bcolors.ENDC)
     while True:
         _runLoopFunctions(config)
 
@@ -229,62 +281,61 @@ def _runLoopFunctions(config):
     _renderFigure()
     time.sleep(config.refreshRate)
 
-def _refreshCanvas() :
-     config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight),fill=(0, 0, 0, config.bgOpacity))
+
+def _refreshCanvas():
+    config.draw.rectangle((0, 0, config.canvasWidth, config.canvasHeight), fill=(0, 0, 0, flddMngr.bgOpacity))
 
 
 def _handle_director_advance():
-    global config, fluddSquare
     config.directorController.checkTime()
     if config.directorController.advance:
         iterate()
 
 
 def _adjust_animation_rate():
-    global config
-    if config.progressiveRateVar != 0:
+    if flddMngr.progressiveRateVar != 0:
         config.rateController.checkTime()
         if config.rateController.advance:
             if config.directorController.slotRate != config.animationRate:
                 config.directorController.slotRate += config.animationRateDelta
 
-            if abs(config.directorController.slotRate - config.animationRate) <= 0.01:
-                config.directorController.slotRate = config.animationRate
+            if abs(config.directorController.slotRate - flddMngr.animationRate) <= 0.01:
+                config.directorController.slotRate = flddMngr.animationRate
 
-                if config.animationChangeRepeatCount >= config.animationChangeRepeatCountInitial and config.animationChangeRepeatCountInitial != -1:
-                    config.directorController.slotRate = config.initialAnimationRate
-                    config.animationChangeRepeatCount = 0
-                elif config.animationChangeRepeatCountInitial != -1:
-                    config.animationChangeRepeatCount += 1
+                if flddMngr.animationChangeRepeatCount >= flddMngr.animationChangeRepeatCountInitial and flddMngr.animationChangeRepeatCountInitial != -1:
+                    config.directorController.slotRate = flddMngr.initialAnimationRate
+                    flddMngr.animationChangeRepeatCount = 0
+                elif flddMngr.animationChangeRepeatCountInitial != -1:
+                    flddMngr.animationChangeRepeatCount += 1
 
 
 def _adjust_fludd_variance():
-    global config, fluddSquare
-    if config.figureChangeTime != 0:
+    if flddMngr.figureChangeTime != 0:
         config.changeFigureController.checkTime()
         if config.changeFigureController.advance:
             _changeTheFigure()
-    if config.progressiveVar != 0:
+    if flddMngr.progressiveVar != 0:
         config.varController.checkTime()
         if config.varController.advance:
-            if fluddSquare.var != config.finalVar:
-                fluddSquare.var += config.varDelta
+            if fluddSquare.var != flddMngr.finalVar:
+                fluddSquare.var += flddMngr.varDelta
             else:
-                if config.varRepeatCount >= config.varRepeatCountInitial and config.varRepeatCountInitial != -1:
-                    fluddSquare.var = config.initialVar
-                    config.varRepeatCount = 0
-                elif config.varRepeatCountInitial != -1:
-                    config.varRepeatCount += 1
+                if flddMngr.varRepeatCount >= flddMngr.varRepeatCountInitial and flddMngr.varRepeatCountInitial != -1:
+                    fluddSquare.var = flddMngr.initialVar
+                    flddMngr.varRepeatCount = 0
+                elif flddMngr.varRepeatCountInitial != -1:
+                    flddMngr.varRepeatCount += 1
 
-def _renderFigure() :
-    for f in config.figures :
+
+def _renderFigure():
+    for f in flddMngr.figures:
         config.image.paste(f.mainImage, (f.xPosition, f.yPosition), f.mainImage)
     config.render(config.image, 0, 0, config.canvasWidth, config.canvasHeight)
 
 
 def iterate():
-    global config, fluddSquare, lastRate, calibrated, cycleCount
     redraw()
+
 
 # deprecating for now
 def _calibrationTest(config):
@@ -297,7 +348,7 @@ def _calibrationTest(config):
     config.countMax = config.demoMode * config.calibrationCount / config.timeToComplete
     config.calibrated = True
 
-    print(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax )
+    pieceLogger(config.timeItShouldHaveTaken, config.timeToComplete, config.countMax)
 
     config.t1 = time.time()
     config.t2 = time.time()
@@ -307,11 +358,11 @@ def _changeTheFigure():
     config.count = 0
     config.t2 = time.time()
     config.timeToComplete = config.t2 - config.t1
-    # print (config.timeToComplete)
+    # pieceLogger (config.timeToComplete)
     config.t1 = time.time()
     config.t2 = time.time()
-    for f in config.figures :
-        if not config.figureChangeOnlyColor :
+    for f in flddMngr.figures:
+        if not flddMngr.figureChangeOnlyColor:
             f.change()
         f.changeColor()
 
@@ -320,38 +371,25 @@ def main(run=True):
     global config
     global workConfig
     global fluddSquare
+    global flddMngr
     config.image = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.draw = ImageDraw.Draw(config.image)
-    config.figures = []
 
-    _load_config_value(config, workConfig, "fludd", "figureRows", 1, int)
-    _load_config_value(config, workConfig, "fludd", "figureCols", 1, int)
-    _load_config_value(config, workConfig, "fludd", "progressiveVar", 0, float)
-    _load_config_value(config, workConfig, "fludd", "redrawSpeed", 0.03, float)
-    _load_config_value(config, workConfig, "fludd", "initialVar", 0, int)
-    _load_config_value(config, workConfig, "fludd", "var", 0, int)
-    _load_config_value(config, workConfig, "fludd", "varDelta", 0, int)
-    _load_config_value(config, workConfig, "fludd", "varRepeatCountInitial", 0, int)
-    _load_config_value(config, workConfig, "fludd", "varRepeatCount", 0, int)
-    _load_config_value(config, workConfig, "fludd", "animationChangeRepeatCount", 0, int)
-    _load_config_value(config, workConfig, "fludd", "animationChangeRepeatCountInitial", 0, int)
-    _load_config_value(config, workConfig, "fludd", "progressiveRateVar", 0.0, float)
-    _load_config_value(config, workConfig, "fludd", "refreshRate", 0.03, float)
-    _load_config_value(config, workConfig, "fludd", "animationRate", 0.0, float)
-    _load_config_value(config, workConfig, "fludd", "initialAnimationRate", 0.0, float)
-    _load_config_value(config, workConfig, "fludd", "animationRateDelta", 0.0, float)
-    _load_config_value(config, workConfig, "fludd", "borderChangeProb", 1.0, float)
-    _load_config_value(config, workConfig, "fludd", "bgOpacity", 0, int)
-    _load_config_value(config, workConfig, "fludd", "figureChangeTime", 0, int)
-    _load_config_value(config, workConfig, "fludd", "figureChangeOnlyColor", True, bool)
-    _load_config_value(config, workConfig, "fludd", "changeFigureControllerTime", config.figureChangeTime, int)
+    flddMngr = FluddManager(config)
+    flddMngr.setUp(workConfig)
 
-    _boxWidth = config.canvasWidth / config.figureCols
-    _boxHeight = config.canvasHeight / config.figureRows
+    flddMngr.figures = []
 
-    for c in range(config.figureCols):
-        for r in range(config.figureRows):
-            fluddSquare = Fludd(config)
+    # Timing and refresh are on the config variable, all the rest on the FluddManager flddMngr
+    config.refreshRate = float(workConfig.get("fludd", "refreshRate", fallback=0.03))
+
+
+    _boxWidth = config.canvasWidth / flddMngr.figureCols
+    _boxHeight = config.canvasHeight / flddMngr.figureRows
+
+    for c in range(flddMngr.figureCols):
+        for r in range(flddMngr.figureRows):
+            fluddSquare = Fludd(config, flddMngr)
             # Prism is all colors, Plenum is white
             fluddSquare.borderModel = workConfig.get("fludd", "borderModel")
             fluddSquare.nothing = workConfig.get("fludd", "nothing")
@@ -365,22 +403,20 @@ def main(run=True):
             fluddSquare.prisimBrightness = float(workConfig.get("displayconfig", "brightness"))
             fluddSquare.xPosition = round(_boxWidth * c)
             fluddSquare.yPosition = round(_boxHeight * r)
-            fluddSquare.setUp(_boxWidth,_boxHeight)
-            config.figures.append(fluddSquare)
-
-
+            fluddSquare.setUp(_boxWidth, _boxHeight)
+            flddMngr.figures.append(fluddSquare)
 
     config.directorController = Director(config)
-    config.directorController.slotRate = config.initialAnimationRate
+    config.directorController.slotRate = flddMngr.initialAnimationRate
 
     config.changeFigureController = Director(config)
-    config.changeFigureController.slotRate = config.changeFigureControllerTime
+    config.changeFigureController.slotRate = flddMngr.changeFigureControllerTime
 
     config.rateController = Director(config)
-    config.rateController.slotRate = config.progressiveRateVar
+    config.rateController.slotRate = flddMngr.progressiveRateVar
 
     config.varController = Director(config)
-    config.varController.slotRate = config.progressiveVar
+    config.varController.slotRate = flddMngr.progressiveVar
 
     config.cycleTiming = 1
     config.t1 = time.time()
@@ -412,12 +448,3 @@ def main(run=True):
         runWork()
 
 
-def _load_config_value(obj, workConfig, section, option, default, type_converter):
-    try:
-        if type_converter == bool:
-            setattr(obj, option, type_converter(workConfig.getboolean(section, option)))
-        else:
-            setattr(obj, option, type_converter(workConfig.get(section, option)))
-    except Exception as e:
-        print(f" ==> Config value not loaded: {option} ==> will be set to {default} \n  {e}\n")
-        setattr(obj, option, default)

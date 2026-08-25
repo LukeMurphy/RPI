@@ -171,6 +171,8 @@ class Shape:
 class CollageManager:
     def __init__(self, config):
         self.config = config
+        self.filterPatchProb = .01
+        self.filterRemappingProb = .01
 
     def setUp(self, workConfig):
         config = self.config

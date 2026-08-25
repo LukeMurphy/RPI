@@ -2,6 +2,8 @@ import math
 import random
 import threading
 import time
+
+from torch import fill
 from modules.configuration import bcolors
 from modules import colorutils
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps, ImageFilter
@@ -239,6 +241,8 @@ def iterate():
 	#for i in config.fadeArray:
 	#	i.fadeIn(config)
 
+
+	# config.draw.rectangle((0,0,50,100), fill=(100,0,0,100))
 	# Do the final rendering of the composited image
 	config.render(config.image, 0, 0, config.screenWidth, config.screenHeight)
 

@@ -255,21 +255,22 @@ class FluddManager:
         self._load_config_value(workConfig, "fludd", "bgOpacity", 0, int)
         self._load_config_value(workConfig, "fludd", "figureChangeTime", 0, int)
         self._load_config_value(workConfig, "fludd", "changeOnlyColor", True, bool)
+
         self._load_config_value(workConfig, "fludd", "figureChangeProbability", 1.0, float)
+        self._load_config_value(workConfig, "fludd", "blacknessChangeProbability", .0, float)
+        self._load_config_value(workConfig, "fludd", "nothingChangeProbability", .0, float)
+        self._load_config_value(workConfig, "fludd", "colorChangeProbability", .0, float)
 
         self._load_config_value(workConfig, "fludd", "borderModel", 1.0, str)
         self._load_config_value(workConfig, "fludd", "nothing", 1.0, str)
         self._load_config_value(workConfig, "fludd", "varianceMode", 1.0, str)
         self._load_config_value(workConfig, "fludd", "demoMode", .0, float)
         self._load_config_value(workConfig, "fludd", "blackOpacity", 20, int)
-        self._load_config_value(workConfig, "fludd", "blacknessChangeProbability", .0, float)
-        self._load_config_value(workConfig, "fludd", "nothingChangeProbability", .0, float)
-        self._load_config_value(workConfig, "fludd", "colorChangeProbability", .0, float)
+        
 
         self._load_config_value(workConfig, "fludd", "varianceRangeVals", f"{self.initialVar},{self.initialVar}", str)
         self.varianceRange = list(int(x) for x in self.varianceRangeVals.split(","))
 
-    
 
 
     def _load_config_value(self, workConfig, section, option, default, type_converter):
@@ -336,11 +337,14 @@ def _changeTheFigure():
     pieceLogger(f" Doing figure change")
     for f in flddMngr.figures:
         _fRef: Fludd = f
-        _fRef.change()
-
-        if not flddMngr.changeOnlyColor:
+        if flddMngr.changeOnlyColor:
             if random.random() < flddMngr.colorChangeProbability :
                 _fRef.changeColor()
+        else :
+            if random.random() < flddMngr.colorChangeProbability :
+                _fRef.changeColor()
+            _fRef.change()
+
 
 
 def _check_change_fludd_figure():

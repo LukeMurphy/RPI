@@ -297,7 +297,6 @@ class ParticleSystem:
             pDot.setUp(self, n)
             self.particles.append(pDot)
 
-
     def move(self):
         """Updates the position of the particle system and its particles."""
         self._update_system_position()
@@ -388,7 +387,7 @@ class ParticleSystem:
                         fill=tuple(self.particles[q].clr + [255]),
                     )
             except Exception as e:
-                pieceLogger(e,1)
+                pieceLogger(e, 1)
 
         if yDisplayPos > cpMngr.imageCanvasHeight or yDisplayPos < 0:
             ref.setUp(self, ref.id)
@@ -537,6 +536,7 @@ class ConcentricParticlesManager:
         self.numberOfCenters = workConfig.getint("particles", "numberOfCenters", fallback=1)
         self.pieceId = workConfig.getint("particles", "pieceId", fallback=0)
 
+
 ##########################################################################
 
 
@@ -614,13 +614,12 @@ def drawRadials(p):
 
 def changeACenter(cpMngr, PSArray):
     # cpMngr.backgroundAlpha = round(random.uniform(20,120))
-    i = round(random.uniform(0, cpMngr.numberOfCenters-1))
+    i = round(random.uniform(0, cpMngr.numberOfCenters - 1))
     _PS = PSArray[i]
     _PS.useFixedBandColors = random.SystemRandom().random() < cpMngr.useFixedBandColorsProb
     _PS.setCenter(i)
     _PS.setNewAttributes(i)
     _PS.setUp(i)
-
 
     # config.drawingImage.paste(config.particleLayer, (0,0), config.particleLayer)
     # config.image.paste(config.particleLayer, (0, 0), config.particleLayer)
@@ -708,14 +707,16 @@ def createLayers():
     config.finalComposite = Image.new("RGBA", (cpMngr.imageCanvasWidth, cpMngr.imageCanvasHeight))
     config.finalCompositeDraw = ImageDraw.Draw(config.finalComposite)
 
+
 # -------------------------------------------------------- #
 # -------------------------------------------------------- #
+
 
 def runWork():
     global redrawSpeed
     global PS
     redrawSpeed = 0.02
-    pieceLogger("concentric_particles_v4.py running", 2)
+    pieceLogger("concentric_particles_v4.py running", 2, True)
     while True:
         config.directorController.checkTime()
         if config.directorController.advance:
@@ -770,11 +771,10 @@ def iterate():
     # if random.SystemRandom().random() < cpMngr.totalResetProb:
     #     PS.setUp()
 
-    if cpMngr.backgroundAlpha < cpMngr.backgroundAlphaMin :
+    if cpMngr.backgroundAlpha < cpMngr.backgroundAlphaMin:
         cpMngr.backgroundAlphaDelta = cpMngr.backgroundAlphaDeltaSpeed
-    if cpMngr.backgroundAlpha > cpMngr.backgroundAlphaMax :
+    if cpMngr.backgroundAlpha > cpMngr.backgroundAlphaMax:
         cpMngr.backgroundAlphaDelta = -cpMngr.backgroundAlphaDeltaSpeed
-
 
     if random.SystemRandom().random() < cpMngr.totalResetProb:
         changeACenter(cpMngr, PSArray)
@@ -796,8 +796,7 @@ def iterate():
     #                 _PS.setNewAttributes(i)
     #                 _PS.setUp(i)
 
-
-    config.drawingImage.paste(config.particleLayer, (0,0), config.particleLayer)
+    config.drawingImage.paste(config.particleLayer, (0, 0), config.particleLayer)
     config.image.paste(config.drawingImage, (0, 0), config.drawingImage)
 
     # _temp = ImageChops.lighter(config.drawingImage, config.particleLayer)
@@ -814,7 +813,7 @@ def main(run=True):
     global PSArray
     global cpMngr
 
-    pieceLogger("concentric_particles_v4.py piece loading and running\n",2,True)
+    pieceLogger("concentric_particles_v4.py piece loading", 2, True)
 
     PSArray = []
 
@@ -833,7 +832,7 @@ def main(run=True):
         PSArray.append(_PS)
 
     # managing speed of animation and framerate
-    config.slotRate = float(workConfig.get("particles", "slotRate", fallback=.03))
+    config.slotRate = float(workConfig.get("particles", "slotRate", fallback=0.03))
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate
 

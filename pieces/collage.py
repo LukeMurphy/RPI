@@ -170,6 +170,7 @@ class Shape:
 
 class CollageManager:
     def __init__(self, config):
+        pieceLogger("CollageManager init")
         self.config = config
         self.filterPatchProb = .01
         self.filterRemappingProb = .01
@@ -185,7 +186,7 @@ class CollageManager:
             self.delay = float(workConfig.get("collageShapes", "delay"))
             config.directorController.slotRate = float(workConfig.get("collageShapes", "slotRate"))
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.delay = .03
             config.directorController.slotRate = .04
 
@@ -202,7 +203,7 @@ class CollageManager:
                 workConfig.get("displayconfig", "useLastOverlayProb")
             )
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             config.useLastOverlay = False
             self.useLastOverlayProb = 0.001
 
@@ -228,7 +229,7 @@ class CollageManager:
                 "collageShapes", "useTransitionCallbacks"
             )
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.useTransitionCallbacks = False
 
         try:
@@ -236,7 +237,7 @@ class CollageManager:
                 "collageShapes", "useTweenTriggers"
             )
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.useTweenTriggers = False
 
         try:
@@ -247,7 +248,7 @@ class CollageManager:
                 )
             )
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.triggers = []
 
         try:
@@ -259,12 +260,12 @@ class CollageManager:
             badpixels.setBlanksOnScreen()
             self.useBadPixels = True
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         try:
             self.filterPatchProb = float(workConfig.get("collageShapes", "filterPatchProb"))
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.filterPatchProb = 0.0
 
 
@@ -274,7 +275,7 @@ class CollageManager:
             # config.useFilters = True
             # config.usePixelSort = True
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.useVariableFilter = False
 
         try:
@@ -289,12 +290,12 @@ class CollageManager:
                     workConfig.get("collageShapes", "variablePixelProbOff")
                 )
             except Exception as e:
-                pieceLogger(e)
+                pieceLogger(e, 1)
                 self.variablePixelProbOff = self.variablePixelProb
             # config.useFilters = True
             # config.usePixelSort = True
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.useVariablePixelSort = False
 
 
@@ -307,7 +308,7 @@ class CollageManager:
         except Exception as e:
             self.timeBetweenSetChanges = 60.0
             self.probablilitySetChanges = 1.0
-            pieceLogger(e)
+            pieceLogger(e, 1)
             pieceLogger("Setting times to " + str(self.timeBetweenSetChanges) + " " + str(self.probablilitySetChanges ))
 
 
@@ -358,7 +359,7 @@ class CollageManager:
                     shape.minValue = float(workConfig.get(shapeDetails, "minValue"))
 
                 except Exception as e:
-                    pieceLogger(e)
+                    pieceLogger(e, 1)
                     shape.minHue = 0
                     shape.maxHue = 360
                     shape.maxSaturation = 1
@@ -425,13 +426,13 @@ class CollageManager:
             self.blurChangeProb = float(workConfig.get("collageShapes", "blurChangeProb"))
         except Exception as e:
             self.blurChangeProb = 0.0
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         try:
             config.lastOverlayBlur = float(workConfig.get("collageShapes", "lastOverlayBlur"))
         except Exception as e:
             config.lastOverlayBlur = 0.0
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
 #-----------------------------------------------#
 
@@ -587,8 +588,7 @@ def redraw():
 
 def runWork():
     global config, clgMngr
-    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    pieceLogger("RUNNING collage.py")
+    pieceLogger("RUNNING collage.py", 2, True)
     pieceLogger(bcolors.ENDC)
     while config.isRunning == True:
         config.directorController.checkTime()
@@ -689,6 +689,8 @@ def main(run=True):
     global shapeGroups
     global workConfig
     global clgMngr
+
+    pieceLogger("collage.py Loaded", 2, True)
 
     clgMngr = CollageManager(config)
     clgMngr.setUp(workConfig)

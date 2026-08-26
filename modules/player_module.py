@@ -203,8 +203,8 @@ def configure(config, workconfig):
     """Configures the player based on the provided configuration."""
     global path, tempImage, threads, thrd
     # gc.enable()
-    pieceLogger(">> .......................................................................................",3)
-    pieceLogger(f">> ** Setting PLAYER config values **", 3)
+
+    pieceLogger(f">> ** Setting PLAYER config values **", 3, True)
     _configure_base(config, workconfig)
     _configure_pixelsort(config, workconfig)
     _configure_ReMapping(config, workconfig)
@@ -217,7 +217,7 @@ def configure(config, workconfig):
     _configure_tiles(config, workconfig)
     _configure_saving(config, workconfig)
     _load_work_module(config, workconfig)
-    pieceLogger(f"{bcolors.ENDC}")
+
 
 
 def _configure_base(config, workconfig):
@@ -340,7 +340,7 @@ def _load_work_module(config, workconfig):
     config.rendering = workconfig.get("displayconfig", "rendering", fallback ="hub")
     config.overallResize = workconfig.getboolean("displayconfig", "overallResize", fallback=False)
 
-    pieceLogger(f" >> ** modules.player.py is Loading: {config.work}", 3)
+    pieceLogger(f" >> ** modules.player.py is Loading: {config.work}", 3, True)
 
     try:
         work = importlib.import_module(f"pieces.{config.work}")
@@ -515,7 +515,7 @@ def _configureAnimationWindow(work, rendererModule):
     work.config.updateCanvas = renderer.updateCanvas
     work.main(False)
 
-    pieceLogger(f" >> ** Player setting up: doing reload? {str(work.config.doingReload)}", 3)
+    pieceLogger(f" >> ** Player setting up: doing reload? {str(work.config.doingReload)}", 3, True)
     if work.config.doingReload == False and work.config.standAlone == True:
         renderer.setUp(work.config)
 

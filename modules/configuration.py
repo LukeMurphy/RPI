@@ -281,7 +281,7 @@ class ArtWorkConfig:
 
     def __init__(self, args=None, _silent=False):
         if not _silent:
-            pieceLogger(f"** Config instance init {args}", 2, True)
+            pieceLogger(f"** Config instance init {args}", 3, True)
 
     def debugSelf(self):
         allArgs = self.__dict__

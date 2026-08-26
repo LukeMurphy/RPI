@@ -63,7 +63,7 @@ def key_handler(event):
 
 def setUp(config):
     # global root, canvasOffsetX, canvasOffsetY, buff, config
-    pieceLogger(" >> ** Setting up the window and rendering", 3)
+    pieceLogger(" >> ** Setting up the window and rendering", 3, True)
     gc.enable()
 
     config.imageArrayForSaving = []
@@ -111,7 +111,7 @@ def setUp(config):
         root.geometry("%dx%d+%d+%d" % (w, h, x, y))
     except Exception as e:
         root.geometry("%dx%d+%d+%d" % (w, h, x, y))
-        pieceLogger(e)
+        pieceLogger(e, 1)
 
     # root.protocol("WM_DELETE_WINDOW", on_closing)
 
@@ -270,8 +270,8 @@ def relaunchOnChange(config):
     # if config.delta <= 1 or config.delta2 <= 1:
     if config.delta <= 1 or fileHasChanged:
         if not config.reloadConfig:
-            pieceLogger(f" >> ** LAST MODIFIED DELTA: {str(config.delta)} **")
-            pieceLogger(f" >> ** LAST MODIFIED DELTA: {str(config.initialArgs)} **")
+            pieceLogger(f" >> ** LAST MODIFIED DELTA: {str(config.delta)} **", 3)
+            pieceLogger(f" >> ** LAST MODIFIED DELTA: {str(config.initialArgs)} **", 3)
             # commadStringPyth = "python3 /Users/lamshell/Documents/Dev/RPI/player.py -path /Users/lamshell/Documents/Dev/RPI/ -mname studio -cfg "
 
             if config.doFullReloadOnChange:
@@ -491,7 +491,7 @@ def _forceBlueGreenSwap(imageToRender):
     try:
         im_rgb = data[:, :, [0, 2, 1, 3]]
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(e, 1)
         im_rgb = data[:, :, [0, 2, 1]]
 
     data2 = numpy.array(im_rgb)
@@ -548,7 +548,7 @@ def render(
             config.renderImageFull.paste(imageToRender, (xOffset, yOffset), imageToRender)
 
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(e, 1)
         config.renderImageFull.paste(imageToRender, (xOffset, yOffset))
 
     # config.drawBeforeConversion()
@@ -648,7 +648,7 @@ def drawBeforeConversion():
 
 
 def saveImageToFile():
-    pieceLogger(" >> Saving image to file")
+    pieceLogger(" >> Saving image to file", 3)
     currentTime = time.time()
     baseName = config.outPutPath + str(currentTime)
     _temp = config.renderImageFull.copy()

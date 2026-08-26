@@ -13,7 +13,7 @@ import textwrap
 import time
 from random import shuffle
 from subprocess import call
-from modules.configuration import bcolors
+from modules.configuration import bcolors, pieceLogger
 from modules.faderclass import FaderObj
 from modules import colorutils
 from modules.imagesprite import ImageSprite
@@ -62,7 +62,7 @@ class movieClip:
     clipRotate = 0
 
     def __init__(self, config):
-        print("\n[movieClip.py: movieClip] >> Initializing clip player")
+        pieceLogger("[movieClip.py: movieClip] >> Initializing clip player",3,True)
         self.config = config
         self.directorController = Director()
 
@@ -118,7 +118,7 @@ class movieClip:
 
     def setUp(self, workConfig):
 
-        print("[movieClip.py: setUp] >> Image Sequence Player Piece Loaded")
+        pieceLogger("[movieClip.py: setUp] >> Image Sequence Player Piece Loaded", 3)
         config = self.config
 
         self.videoWidth = int(workConfig.get("imageSequencePlayer", "videoWidth"))
@@ -220,4 +220,4 @@ class movieClip:
             self.imageLayer.paste(imgTemp, (0, 0), imgTemp)
 
         except Exception as e:
-            print(f"[movieClip.py] >> {e} {clrBlock.mode} {self.config.renderImageFull.mode}")
+            pieceLogger(f"[movieClip.py] >> {e} {clrBlock.mode} {self.config.renderImageFull.mode}", 1)

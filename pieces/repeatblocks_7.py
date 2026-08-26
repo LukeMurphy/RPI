@@ -251,10 +251,10 @@ class RepeatedPatterns:
     def debugSelf(self):
         allArgs = self.__dict__
         for element in allArgs:
-            print(f"{element} = {allArgs[element]}")
+            pieceLogger(f"{element} = {allArgs[element]}")
 
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
-        # print(f"[RepeatedPatterns] {method_list}")
+        # pieceLogger(f"[RepeatedPatterns] {method_list}")
 
 
 class Fader:
@@ -545,7 +545,7 @@ def loadClipPlayerConfigs():
         rpO.clipMain.clipRotate = rpO.clipRotate
         rpO.clipMain.setUp(workConfig)
     except Exception as e:
-        pieceLogger(f" >> {e} \n")
+        pieceLogger(f" >> {e}", 1)
         rpO.useClipPlayer = False
 
 
@@ -678,7 +678,7 @@ def loadPalette(palette):
     _paletteObj.c4 = c4
     _paletteObj.noGrays = _noGrays
 
-    # print(f"Palette Loaded: {palette}")
+    # pieceLogger(f"Palette Loaded: {palette}")
 
     rpO.allAvailablePalettesList.append(_paletteObj)
 
@@ -845,14 +845,14 @@ def loadAndSetupPatterns():
     #     config.borderPattern = workConfig.get("movingpattern", "borderPattern")
     #     config.useBorderPattern = workConfig.getboolean("movingpattern", "useBorderPattern")
     # except Exception as e:
-    #     print(e)
+    #     pieceLogger(e)
     #     config.borderPattern = config.patterns[0]
     #     config.useBorderPattern = False
     # end try
 
     rpO.waveScaleRings = round(random.uniform(rpO.ringsRange[0], rpO.ringsRange[1]))
     rpO.waveScaleSteps = round(random.uniform(rpO.stepsRange[0], rpO.stepsRange[1]))
-    # print(config.waveScaleRings, config.waveScaleSteps)
+    # pieceLogger(config.waveScaleRings, config.waveScaleSteps)
     # end try
 
     # for the randomizer
@@ -1067,7 +1067,7 @@ def buildPatternSequence(_repeatedPatternsObj):
         # considering making this be an option to fit exactly the width - i.e. choose the number of columns
         # rather than width or an alogrithm to do the fitting - the problem is that then you lose the
         # ragged edges which are a nice trace of the previous state
-        # print(f"rpO.blockWidth {rpO.blockWidth} rpO.patternBlockCols {rpO.patternBlockCols}")
+        # pieceLogger(f"rpO.blockWidth {rpO.blockWidth} rpO.patternBlockCols {rpO.patternBlockCols}")
 
         rpO.totalSlots = rpO.patternBlockRows * rpO.patternBlockCols
         # pieceLogger(f"rpO.totalSlots {rpO.totalSlots}", 4, True)
@@ -1075,7 +1075,7 @@ def buildPatternSequence(_repeatedPatternsObj):
     rpO.altLineColoring = random.random() < _ref.altColoringProb
     rpO.popRandomColorProb = random.random() < _ref.popRandomColorProb
 
-    # print(rpO.altLineColoring)
+    # pieceLogger(rpO.altLineColoring)
     rpO.numConcentricBoxes = int(random.uniform(rpO.minnumConcentricBoxes, rpO.maxnumConcentricBoxes))
 
     pattern_blocks_v5.floralConfig(rpO)
@@ -1259,13 +1259,13 @@ def getTempPalette(rpO):
 
 
 def _print_pattern_sequence(config):
-    print("----------------------------------------------")
-    print(("New sequence"))
-    print(f"config.totalSlots {config.totalSlots}")
+    pieceLogger("----------------------------------------------")
+    pieceLogger(("New sequence"))
+    pieceLogger(f"config.totalSlots {config.totalSlots}")
     for s in config.patternSequence:
-        print(f"{s[0]} {s[1]} {s[3].linecolOverlay.currentColor} {s[4]} ")
-    print(f"Using start pattern {config.patternModel}")
-    print("----------------------------------------------")
+        pieceLogger(f"{s[0]} {s[1]} {s[3].linecolOverlay.currentColor} {s[4]} ")
+    pieceLogger(f"Using start pattern {config.patternModel}")
+    pieceLogger("----------------------------------------------")
 
 
 def rebuildPatterns(arg=0):
@@ -1286,7 +1286,7 @@ def rebuildPatterns(arg=0):
 
 def resetCrossFader(_useConfigImage=True):
     # os.system('afplay /System/Library/Sounds/Sosumi.aiff')
-    # print(f"DOING NOW  {config.faderDoingRefreshCount}")
+    # pieceLogger(f"DOING NOW  {config.faderDoingRefreshCount}")
     # os.system('say "NOW" &')
     # pieceLogger(f"resetCrossFader called : {_useConfigImage}")
     rpO.repeatDrawingMode = 1
@@ -1492,7 +1492,7 @@ def handlePatternRebuild():
     disturbancesDone = not rpO.doSectionDisturbance or rpO.doneCount >= rpO.numberOfSections
     if rpO.fader.fadingDone and disturbancesDone:
         # rpO.doSectionDisturbance = False
-        # print("\nrebuildPatterns called after fading done 2")
+        # pieceLogger("\nrebuildPatterns called after fading done 2")
 
         # selectNewPalette(False)
         if random.random() < rpO.rebuildAllSlotsProb:
@@ -1729,7 +1729,7 @@ def shapeOverLayFunction(temp1):
 def loadPolyOverlaybaseValues():
     try:
         _polyBaseVals = workConfig.get("movingpattern", "polyBaseVals").split("|")
-        # print(_polyBaseVals)
+        # pieceLogger(_polyBaseVals)
         rpO.polyBase = []
         for _a in _polyBaseVals:
             _ps = list(map(lambda x: int(x), _a.split(",")))
@@ -1773,7 +1773,7 @@ def setupPolyOverlay():
 
         generateOverlayTiles()
         loadPolyOverlaybaseValues()
-        # print(config.polyBase)
+        # pieceLogger(config.polyBase)
 
     except Exception as e:
         pieceLogger(f" >> Not using custom polygon overlay {e}")
@@ -1852,7 +1852,7 @@ def main(run=True):
     global config
     global rpO
     rpO = RepeatedPatterns()
-    pieceLogger("[main] >> called")
+    pieceLogger("repeatblocks_7.py [main] >> called", 2, True)
 
     config.debugPause = False
 
@@ -2003,7 +2003,7 @@ def main(run=True):
 
 
 def runWork():
-    pieceLogger(" >> Running repeatblocks.py", 2)
+    pieceLogger(" >> Running repeatblocks.py", 2, True)
     _subSteps = getattr(config, "smoothingSteps", 0)
 
     while config.isRunning:

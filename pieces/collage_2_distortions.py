@@ -220,7 +220,7 @@ class CollageManager:
         try:
             self.variablePixelProbOff = float(workConfig.get("collageShapes", "variablePixelProbOff"))
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.variablePixelProbOff = self.variablePixelProb
 
 
@@ -237,14 +237,14 @@ class CollageManager:
             badpixels.setBlanksOnScreen()
             self.useBadPixels = True
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         #     config.timeBetweenSetChanges = float(workConfig.get("collageShapes", "timeBetweenSetChanges"))
         #     config.probablilitySetChanges = float(workConfig.get("collageShapes", "probablilitySetChanges"))
         # except Exception as e:
         #     config.timeBetweenSetChanges = 60.0
         #     config.probablilitySetChanges = .0
-        #     pieceLogger(e)
+        #     pieceLogger(e, 1)
         #     pieceLogger(f"Setting times to {config.timeBetweenSetChanges} {config.probablilitySetChanges}")
 
 
@@ -385,8 +385,7 @@ def _draw_last_overlay(config, clgMngr):
 
 def runWork():
     global config, clgMngr
-    pieceLogger(f"**", 2)
-    pieceLogger("RUNNING collage.py", 2)
+    pieceLogger("RUNNING collage_2_distortions.py", 2, True)
     while config.isRunning == True:
         config.directorController.checkTime()
         if config.directorController.advance == True:
@@ -488,7 +487,7 @@ def colorTransitionStarted(arg=None):
 
 def main(run=True):
     global config, shapeGroups, workConfig, clgMngr
-    pieceLogger(" Main Init:")
+    pieceLogger(" >> collage_2_distortions.py Main Init:", 2, True)
 
     clgMngr = CollageManager(config)
     clgMngr.setUp(workConfig)
@@ -551,7 +550,7 @@ def _initialize_shapes(config, clgMngr, workConfig):
             try:
                 shape.changeBoxProb = float(workConfig.get(shapeDetails, "changeBoxProb"))
             except Exception as e:
-                pieceLogger(e)
+                pieceLogger(e, 1)
                 shape.changeBoxProb = clgMngr.changeBoxProb
 
             shape.setUp()
@@ -576,13 +575,13 @@ def _initialize_overlay_settings(config, clgMngr, workConfig):
     try:
         clgMngr.lastOverLayColorRange = list(map(lambda x: float(x), workConfig.get("collageShapes", "lastOverLayColorRange").split(",")))
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(e, 1)
         clgMngr.lastOverLayColorRange = (0, 10, 0.5, 1.0, 0.5, 0.5)
 
     try:
         clgMngr.lastOverlayAlphaRange = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayAlphaRange").split(",")))
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(e, 1)
         clgMngr.lastOverlayAlphaRange = (5, 50)
 
     _load_config_value(clgMngr, workConfig, "collageShapes", "forceLastOverlay", False, bool)
@@ -594,7 +593,7 @@ def _initialize_overlay_settings(config, clgMngr, workConfig):
         config.renderDrawOver = ImageDraw.Draw(config.renderImageFullOverlay)
         config.lastOverlayFill = tuple(map(lambda x: int(x), workConfig.get("collageShapes", "lastOverlayFill").split(",")))
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(e, 1)
         config.lastOverlayBox = (0, 0, 64, 32)
         config.lastOverlayFill = (0, 0, 0, 0)
         config.useLastOverlay = False
@@ -607,5 +606,5 @@ def _load_config_value(obj, workConfig, section, option, default, type_converter
     try:
         setattr(obj, option, type_converter(workConfig.get(section, option)))
     except Exception as e:
-        pieceLogger(f"=> Failed to set {section}.{option} {e}")
+        pieceLogger(f"=> Failed to set {section}.{option} {e}", 1)
         setattr(obj, option, default)

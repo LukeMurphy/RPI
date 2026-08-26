@@ -4,6 +4,7 @@ import random
 import noise
 from PIL import Image
 from modules.holder_director import Holder
+from modules.configuration import pieceLogger
 
 
 class WaveDeformer:
@@ -69,7 +70,7 @@ def setUpDisturbanceConfigs(configSet, config, workConfig):
         # comment:
         config.diagonalMovement = workConfig.getboolean(configSet, "diagonalMovement")
     except Exception as e:
-        print(e)
+        pieceLogger(e, 1)
         config.diagonalMovement = False
     # end try
 
@@ -77,12 +78,12 @@ def setUpDisturbanceConfigs(configSet, config, workConfig):
         config.randomDiagonal = workConfig.getboolean(configSet, "randomDiagonal")
         config.diagonalFixedAngle = float(workConfig.get(configSet, "diagonalFixedAngle"))
     except Exception as e:
-        print(e)
+        pieceLogger(e, 1)
         config.randomDiagonal = True
 
 
 def setupStableSections(config):
-    # print("setupStableSections RUNNING NOW")
+    # pieceLogger("setupStableSections RUNNING NOW")
     config.stableSegments = []
     n = round(random.SystemRandom().uniform(config.stableSectionsMin, config.stableSectionsMax))
     minWidth = config.stableSectionsMinWidth
@@ -94,17 +95,17 @@ def setupStableSections(config):
         yPos2 = round(random.SystemRandom().uniform(yPos + minHeight, config.canvasHeight))
         config.stableSegments.append([xPos, yPos, xPos2, yPos2])
 
-    # print(config.stableSegments)
+    # pieceLogger(config.stableSegments)
 
 
 def rebuildSections(config):
     # global config
 
-    # print("REBUILDSECTIONS RUNNING NOW")
+    # pieceLogger("REBUILDSECTIONS RUNNING NOW")
     if random.SystemRandom().random() < config.changeDisturbanceSetProb:
         setNumber = math.floor(random.SystemRandom().uniform(0, len(config.disturbanceConfigSets)))
         setUpDisturbanceConfigs(config.disturbanceConfigSets[setNumber], config.distortionConfigRef, config.distortionworkConfigRef)
-        # print("REBUILDSECTIONS NEW RUNNING NOW: " + config.disturbanceConfigSets[setNumber])
+        # pieceLogger("REBUILDSECTIONS NEW RUNNING NOW: " + config.disturbanceConfigSets[setNumber])
 
     if random.SystemRandom().random() < 0.5:
         config.speedDeAcceleration = config.speedDeAccelerationUpperLimit
@@ -152,7 +153,7 @@ def rebuildSections(config):
         section.done = False
         section.stopProb = random.SystemRandom().uniform(0, config.stopProb)
 
-    config.drawingPrinted = False
+    config.drawingpieceLoggered = False
 
 
 def disturber(config):
@@ -164,7 +165,7 @@ def disturber(config):
 
         if sectionParams.actionCount < sectionParams.actionCountLimit:
 
-            # print("RUNNING disturb " + str(random.SystemRandom().random()))
+            # pieceLogger("RUNNING disturb " + str(random.SystemRandom().random()))
             config.doingSectionDisturbance = True
 
             xPos = round(sectionParams.sectionPlacementInit[0])
@@ -179,7 +180,7 @@ def disturber(config):
             # d = math.pow(delta, 8)
             d = 1
 
-            # print(sectionParams.sectionSpeed[0], sectionParams.sectionSpeed[1])
+            # pieceLogger(sectionParams.sectionSpeed[0], sectionParams.sectionSpeed[1])
 
             sectionParams.sectionPlacement[0] += sectionParams.sectionSpeed[0] * d
             sectionParams.sectionPlacement[1] += sectionParams.sectionSpeed[1] * d
@@ -203,7 +204,7 @@ def disturber(config):
 
             # if sectionParams.rotationSpeed == 0 and sectionParams.sectionSpeed[0] == 0 and sectionParams.sectionSpeed[1] == 0 :
             #     config.doSectionDisturbance = False
-            #     print("Turned off disturb - distrub done")
+            #     pieceLogger("Turned off disturb - distrub done")
         else:
             config.doingSectionDisturbance = False
 
@@ -219,7 +220,7 @@ def disturber(config):
             tempCanvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
             # tempCanvasImageDraw.rectangle((s[0], s[1], s[2], s[3]), outline=(2,255,0), fill=(100,0,0))
 
-        # print("Crossfadings: " +  str(config.doingRefresh))
+        # pieceLogger("Crossfadings: " +  str(config.doingRefresh))
         # new blend in over a couple steps
         crossFade = Image.blend(
             config.canvasImage,
@@ -230,7 +231,7 @@ def disturber(config):
         config.canvasImage.paste(crossFade, (0, 0), crossFade)
 
     else:
-        # print("pasting")
+        # pieceLogger("pasting")
         for s in config.stableSegments:
             tempCrop = config.image.crop((s[0], s[1], s[2], s[3]))
             # tempCanvasImageDraw = ImageDraw.Draw(tempCrop)
@@ -278,7 +279,7 @@ def distortionsConfigs(config, workConfig):
         config.doingRefresh = int(workConfig.get("distortionsConfigs", "doingRefresh"))
         config.doingRefreshCount = int(workConfig.get("distortionsConfigs", "doingRefreshCount"))
     except Exception as e:
-        print(e)
+        pieceLogger(e, 1)
         config.doingRefresh = 100
         config.doingRefreshCount = 100
     # end try
@@ -293,21 +294,21 @@ def distortionsConfigs(config, workConfig):
 
 def iterationFunction(config):
     if random.SystemRandom().random() < config.stableSectionsChangeProb:
-        # print("resetting stable sections IN ITERATE")
+        # pieceLogger("resetting stable sections IN ITERATE")
         rebuildSections(config)
         setupStableSections(config)
 
     # paste over a section of the image on to itself and rotate
     if config.doSectionDisturbance:
-        # print("Calling disturb " + str(random.SystemRandom().random()))
+        # pieceLogger("Calling disturb " + str(random.SystemRandom().random()))
         disturber(config)
     else:
         config.canvasImage.paste(config.image, (0, 0), config.image)
 
-    # print("quilts ",config.render, config.instanceNumber)
+    # pieceLogger("quilts ",config.render, config.instanceNumber)
     # Rebuild the main pattern, halt any disturbances
     if random.SystemRandom().random() < config.rebuildPatternProbability and config.doSectionDisturbance:
-        # print("Setting disturb to off")
+        # pieceLogger("Setting disturb to off")
         config.doSectionDisturbance = False
         rebuildSections(config)
 
@@ -316,7 +317,7 @@ def iterationFunction(config):
         config.doingSectionDisturbance = False
 
     if random.SystemRandom().random() < config.redoSectionDisturbance:
-        # print("rebuilding disturb sections, truning disturb on")
+        # pieceLogger("rebuilding disturb sections, truning disturb on")
         rebuildSections(config)
         config.doSectionDisturbance = True
 

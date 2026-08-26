@@ -63,7 +63,7 @@ class QuiltManager:
             )
 
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.saturationRangeFactorLeft = (1, 1)
             self.saturationRangeFactorRight = (1, 1)
 
@@ -104,7 +104,7 @@ class QuiltManager:
                 "quilt-informal", "opticalPatterns"
             ).split(",")
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.opticalPatterns = [
                 "Regular",
                 "Regular",
@@ -624,8 +624,7 @@ def transformImage(img):
 
 def main(run=True):
     global config, directionOrder, workConfig, qMngr
-    pieceLogger("---------------------")
-    pieceLogger("QUILT Loaded")
+    pieceLogger("quilt-informal-v2.py Loaded", 2, True)
 
     config.directorController = Director(config)
     config.redrawSpeed = float(workConfig.get("quilt-informal", "redrawSpeed"))
@@ -686,9 +685,7 @@ def main(run=True):
 
 
 def runWork():
-    global config
-    pieceLogger(f"**", 2)
-    pieceLogger("RUNNING quilt-informal.py", 2)
+    pieceLogger("RUNNING quilt-informal-v2.py", 2, True)
     while config.isRunning :
         config.directorController.checkTime()
         if config.directorController.advance :

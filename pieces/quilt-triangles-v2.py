@@ -42,7 +42,7 @@ class QuiltManager:
             # elements will change
             self.resetSizeProbability = float(workConfig.get("quilt-triangles", "resetSizeProbability"))
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.resetTrianglesProb = 0.001
             self.resetSizeProbability = 0.001
 
@@ -68,7 +68,7 @@ class QuiltManager:
             """
 
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.transformShape = False
 
         redRange = workConfig.get("quilt-triangles", "redRange").split(",")
@@ -81,7 +81,7 @@ class QuiltManager:
             self.blockSizeMax = int(workConfig.get("quilt-triangles", "blockSizeMax"))
             self.blockSize = round(random.SystemRandom().uniform(self.blockSizeMin, self.blockSizeMax))
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.blockSize = int(workConfig.get("quilt-triangles", "blockSize"))
 
         try:
@@ -92,7 +92,7 @@ class QuiltManager:
             self.blockCols = self.blockColsMax
             self.blockRows = self.blockRowsMax
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.blockCols = int(workConfig.get("quilt-triangles", "blockCols"))
             self.blockRows = int(workConfig.get("quilt-triangles", "blockRows"))
         # can adjust the quilt image offset
@@ -175,14 +175,14 @@ class QuiltManager:
         try:
             self.usePresets = workConfig.getboolean("quilt-triangles", "usePresets")
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.usePresets = True
 
         try:
             self.rotationRange = float(workConfig.get("quilt-triangles", "rotationRange"))
         except Exception as e:
             self.rotationRange = 0
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         try:
             drawBlockCoordsRaw = [
@@ -205,7 +205,7 @@ class QuiltManager:
             self.drawBlock = True
             self.drawBlockShape = lambda: self.canvasImageDraw.polygon(self.drawBlockCoords, fill=self.drawBlockFixedColor)
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.drawBlock = False
             self.drawBlockShape = lambda: True
 
@@ -368,8 +368,7 @@ def setInitialColors(refresh=False):
 
 def main(run=True):
     global config, directionOrder, workConfig, mrksMngr
-    pieceLogger("---------------------")
-    pieceLogger("QUILT TRIANGLES or STARS Loaded")
+    pieceLogger("QUILT TRIANGLES Loaded", 2, True)
 
     # ------------------------------------------------------------------ #
     # CREATE THE IMAGE HOLDERS
@@ -399,8 +398,7 @@ def main(run=True):
 
 def runWork():
     global config
-    pieceLogger(f"**", 2)
-    pieceLogger("RUNNING quilt-triangles.py", 2)
+    pieceLogger("RUNNING quilt-triangles-v2.py", 2, True)
     while config.isRunning == True:
         iterate()
         time.sleep(config.delay)

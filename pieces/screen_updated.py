@@ -267,15 +267,14 @@ def drawBlackOut():
 def main(run=True):
     global config, directionOrder
     global workConfig
-    pieceLogger("---------------------")
-    pieceLogger("Screen Loaded")
+    pieceLogger("screen_updated Loaded", 0, True)
 
     colorutils.brightness = config.brightness
 
     try:
         config.imageXOffset = int(workConfig.get("displayconfig", "imageXOffset"))
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         config.imageXOffset = 0
 
     config.outlineColorVals = (workConfig.get("screenproject", "outlineColor")).split(",")
@@ -329,7 +328,7 @@ def main(run=True):
         config.colOverlay.dropHueMin = float(workConfig.get("screenproject", "dropHueMin"))
         config.colOverlay.dropHueMax = float(workConfig.get("screenproject", "dropHueMax"))
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
 
     config.colOverlay.colorTransitionSetup()
 
@@ -343,13 +342,13 @@ def main(run=True):
     except Exception as e:
         config.probabilityMultiplierRange = 1.0
         config.probabilityMultiplier = 1.0
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
 
     try:
         config.probDrawVertLines = float(workConfig.get("screenproject", "probDrawVertLines"))
     except Exception as e:
         config.probDrawVertLines = 0.9
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
 
     try:
         config.pauseProb = float(workConfig.get("screenproject", "pauseProb"))
@@ -359,7 +358,7 @@ def main(run=True):
 
     except Exception as e:
         config.usePause = False
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
 
     try:
         arg = workConfig.get("screenproject", "bgImage")
@@ -370,7 +369,7 @@ def main(run=True):
             config.bgImage = config.bgImage.convert("RGBA")
         # imgHeight = config.bgImage.getbbox()[3]
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         config.bgImage = None
 
     # managing speed of animation and framerate
@@ -379,12 +378,12 @@ def main(run=True):
     try:
         config.delay = float(workConfig.get("screenproject", "delay"))
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         config.delay = 0.02
     try:
         config.directorController.slotRate = float(workConfig.get("screenproject", "slotRate"))
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         pieceLogger("SHOULD ADJUST TO USE slotRate AS FRAMERATE ")
         config.directorController.slotRate = 0.0
 
@@ -396,7 +395,7 @@ def main(run=True):
         config.filterRemapRangeX = int(workConfig.get("screenproject", "filterRemapRangeX"))
         config.filterRemapRangeY = int(workConfig.get("screenproject", "filterRemapRangeY"))
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         config.filterRemapping = False
         config.filterRemappingProb = 0.0
         config.filterRemapminHoriSize = 24
@@ -413,7 +412,7 @@ def main(run=True):
             config.pixelSortProbOff = 0
 
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         config.pixelSortProbOn = 0
         config.pixelSortProbOff = 0
 
@@ -426,7 +425,7 @@ def main(run=True):
         config.blackOutRectHeight = int(workConfig.get("screenproject", "blackOutBlock").split(",")[1])
         config.blackOutRect = (0, 0, config.blackOutRectWidth, config.blackOutRectHeight)
     except Exception as e:
-        pieceLogger(str(e))
+        pieceLogger(str(e), 1)
         config.blackOutProb = 0.0
         config.blackOutProbOff = 0.0
 
@@ -455,9 +454,7 @@ def setUp():
 
 def runWork():
     global config
-    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    pieceLogger("RUNNING Screen.py")
-    pieceLogger(bcolors.ENDC)
+    pieceLogger("RUNNING screen_updated.py", 2, True)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:

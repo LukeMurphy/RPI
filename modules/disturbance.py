@@ -59,21 +59,21 @@ class WaveDeformer:
 # loads the disturbance configs and calls the disturbance
 # setup functions
 def setupDisturbances():
-    print(f"Setting up disturbances {_config}")
+    pieceLogger(f"Setting up disturbances {_config}",3)
 
     try:
         _config.transformShape = _workConfig.getboolean("movingpattern", "transformShape")
         transformTuples = _workConfig.get("movingpattern", "transformTuples").split(",")
         _config.transformTuples = tuple(float(i) for i in transformTuples)
     except Exception as e:
-        print(f"Error: setupDisturbance: {e}")
+        pieceLogger(f"Error: setupDisturbance: {e}",1)
         _config.transformShape = False
     # end try
 
     try:
         setWaveDistortionParams()
     except Exception as e:
-        print(e)
+        pieceLogger(e,1)
         _config.useWaveDistortion = False
 
     _config.sectionDisturbance = _workConfig.getboolean("movingpattern", "sectionDisturbance")
@@ -145,7 +145,7 @@ def setUpDisturbanceConfigs(configSet):
 
 
 def setupStableSections():
-    # print("New stable sections")
+    # pieceLogger("New stable sections",3)
     _config.stableSegments = []
     n = round(random.uniform(_config.stableSectionsMin, _config.stableSectionsMax))
     minWidth = _config.stableSectionsMinWidth
@@ -186,7 +186,7 @@ def rebuildSections():
                 random.uniform(-baseSpeed, baseSpeed) * _config.disturbanceScaleY,
             ]
 
-    _config.drawingPrinted = False
+    _config.drawingpieceLoggered = Fals,3e
 
 
 # performs the disturbances
@@ -203,7 +203,7 @@ def disturber():
         # Paste stable sections onto the canvas
         for s in _config.stableSegments:
             tempCrop = _config.patternImage.crop((s[0], s[1], s[2], s[3]))
-            # pieceLogger(f"{_config.canvasImage} {_config.config.canvasImage}")
+            # pieceLogger(f"{_config.canvasImage} {_config.config.canvasImage}",3)
             _config.canvasImage.paste(tempCrop, (s[0], s[1]), tempCrop)
 
     # else:
@@ -215,7 +215,7 @@ def disturbSections():
     """Disturbs individual sections of the canvas image."""
     if _config.skipFramesCount >= _config.skipFrames:
         _config.skipFramesCount = 0
-        # pieceLogger(f"[disturbance.disturbSections] {_config.numberOfSections}")
+        # pieceLogger(f"[disturbance.disturbSections] {_config.numberOfSections}",3)
 
         for i in range(_config.numberOfSections):
             sectionParams = _config.movingSections[i]
@@ -249,7 +249,7 @@ def disturbSingleSection(sectionParams):
 
 def handleDisturbances():
     """Handles various image disturbances and effects."""
-    # pieceLogger(_config.ySpeed)
+    # pieceLogger(_config.ySpeed,3)
 
     if _config.randomizeSpeed:
         if random.random() < 0.03:

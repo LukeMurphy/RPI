@@ -2,7 +2,7 @@
 # import modules
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFont, ImageOps
-
+from modules.configuration import pieceLogger
 
 class ScrollObject:
 
@@ -23,7 +23,7 @@ class ScrollObject:
     xMaxSpeed = 2
 
     def __init__(self, direction="right-left"):
-        print("Scroller Initiated")
+        pieceLogger("Scroller Initiated", 3)
 
     def setUp(self):
         self.canvas = Image.new("RGBA", (self.canvasWidth, self.canvasHeight))

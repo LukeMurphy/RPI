@@ -110,20 +110,20 @@ class QuiltManager:
             self.rotationRange = float(workConfig.get("quilt-polys", "rotationRange"))
         except Exception as e:
             self.rotationRange = 0
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         try:
             self.refreshCount = float(workConfig.get("quilt-polys", "refreshCount"))
         except Exception as e:
             self.refreshCount = 100
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         try:
             self.config.randomness = int(workConfig.get("quilt-polys", "randomness"))
             self.randomnessBase = int(workConfig.get("quilt-polys", "randomness"))
         except Exception as e:
             self.config.randomness = 0
-            pieceLogger(e)
+            pieceLogger(e, 1)
 
         try:
             drawBlockCoordsRaw = [list((i).split(",")) for i in workConfig.get("drawBlock", "drawBlockCoords").split("|")]
@@ -141,7 +141,7 @@ class QuiltManager:
             self.drawBlockShape = lambda: self.config.canvasImageDraw.polygon(self.drawBlockCoords, fill=self.drawBlockFixedColor)
 
         except Exception as e:
-            pieceLogger(e)
+            pieceLogger(e, 1)
             self.drawBlock = False
             self.drawBlockShape = lambda: True
 
@@ -270,8 +270,7 @@ def setInitialColors(refresh=False):
 
 def main(run=True):
     global config, directionOrder, workConfig, mrksMngr
-    pieceLogger("---------------------")
-    pieceLogger("QUILT Loaded")
+    pieceLogger("QUILT POLY Loaded", 2, True)
 
     # ------------------------------------------------------------------ #
     # CREATE THE IMAGE HOLDERS
@@ -303,8 +302,7 @@ def main(run=True):
 
 def runWork():
     global config
-    pieceLogger(f"**", 2)
-    pieceLogger("RUNNING quilt-poly-v2.py", 2)
+    pieceLogger("RUNNING quilt-poly-v2.py", 2, True)
     while config.isRunning:
         config.directorController.checkTime()
         if config.directorController.advance:

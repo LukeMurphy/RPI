@@ -173,6 +173,7 @@ class CollageManager:
         pieceLogger("CollageManager init")
         self.config = config
         self.filterPatchProb = .01
+        self.filterRemapping = False
         self.filterRemappingProb = .01
 
     def setUp(self, workConfig):

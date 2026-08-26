@@ -51,7 +51,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-pieceLogger(" >> Inital Player Arguments: " + str(args),3)
+pieceLogger("player >> Inital Player Arguments: " + str(args), 6, True)
 
 # Create a blank dummy object container for now
 # config = type('', (object,), {})()
@@ -87,7 +87,6 @@ def loadFromArguments(reloading=False, config=None):
         player_module.configure(config, workconfig)
 
 
-
 def _initializeConfiguration(loadFromArguments):
     ###
     # Expects 3 arguments:
@@ -119,14 +118,13 @@ def _pieceLoggerConfigsLoaded(config):
     config.WRKINID = defaultpiece.defaultPieceToRun
     # Default Local Path
     config.path = "/Users/lamshell/Documents/Dev/LEDELI/RPI/"
-    pieceLogger(f" >> ** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n",3)
+    pieceLogger(f" >> ** Loading {config.path}configs/{config.WRKINID}.cfg to run. **\n", 6, True)
     workconfig.read(f"{config.path}configs/{config.WRKINID}.cfg")
-    pieceLogger(f"{bcolors.OKBLUE}")
     for c in workconfig:
-        pieceLogger(f" >> {c}")
+        pieceLogger(f" >> {c}", 6)
         for a in workconfig[c]:
-            pieceLogger(f" >> \t {a} : {workconfig.get(c, a)}")
-    pieceLogger(f"{bcolors.ENDC}")
+            pieceLogger(f" >> \t {a} : {workconfig.get(c, a)}", 6)
+
 
 
 def _parseArgs(config, loadFromArguments):
@@ -140,12 +138,11 @@ def _parseArgs(config, loadFromArguments):
     config.path = args.path
 
     # Automating the config path a bit better
-    # assumes that if no -path is specified, it defaults to ./ so 
+    # assumes that if no -path is specified, it defaults to ./ so
     # just to be sure get the abs path
-    if config.path == './' :
+    if config.path == "./":
         # config.path = os.getcwd() + "/"
-        config.path = __file__.replace('player.py','')+ "/"
-
+        config.path = __file__.replace("player.py", "") + "/"
 
     argument = f"{config.path}/configs/{args.cfg}"
     workconfig.read(argument)
@@ -153,7 +150,6 @@ def _parseArgs(config, loadFromArguments):
     config.loadFromArguments = loadFromArguments
     config.fileName = argument
     config.fileNameRaw = args.cfg
-
 
     # Optional 4th argument to override the brightness set in the
     # config
@@ -165,27 +161,25 @@ def _parseArgs(config, loadFromArguments):
     config.delta = int((config.startTime - f))
     config.deltaWorkFile = int((config.startTime - f))
 
-
-    pieceLogger(f" >>---------------------------------------------------------------------------------------")
-    pieceLogger (f" >> script: sys.argv[0] is {repr(sys.argv[0])}")
-    pieceLogger (f" >> script: __file__ is {repr(__file__)}")
-    pieceLogger (f" >> script: cwd is {repr(os.getcwd())}")
-    pieceLogger (f" >> config: path  is {repr(args.path)}")
-    pieceLogger (f" >> config: path  is {args.path}")
-    pieceLogger(f" >> -cfg argument: is {argument}")
-    pieceLogger(" >> Last Modified Delta: is {config.delta}")
-    pieceLogger(f" >> ---------------------------------------------------------------------------------------{bcolors.ENDC}")
+    pieceLogger(f" >> player: script: sys.argv[0] is {repr(sys.argv[0])}", 6, True)
+    pieceLogger(f" >> player: script: __file__ is {repr(__file__)}", 6)
+    pieceLogger(f" >> player: script: cwd is {repr(os.getcwd())}", 6)
+    pieceLogger(f" >> player: config: path  is {repr(args.path)}", 6)
+    pieceLogger(f" >> player: config: path  is {args.path}", 6)
+    pieceLogger(f" >> player: -cfg argument: is {argument}", 6)
+    pieceLogger(f" >> player: Last Modified Delta: is {config.delta}", 6)
+    pieceLogger(f"", 6, True)
 
 
 def _brightnessOverrideConfigs(config):
     brightnessOverride = args.brightnessOverride
     _brightnessOverride = float(brightnessOverride)
-    if _brightnessOverride > 2.0 :
+    if _brightnessOverride > 2.0:
         _brightnessOverride /= 100
     config.brightness = _brightnessOverride
     config.brightnessOverride = _brightnessOverride
     # y = 0.3215x2 + 0.0092x + 0.6742
-    config.ditherfilterbrightness = 0.3215 * config.brightness * config.brightness + .0092 * config.brightness + 0.6742
+    config.ditherfilterbrightness = 0.3215 * config.brightness * config.brightness + 0.0092 * config.brightness + 0.6742
 
 
 def main():
@@ -197,6 +191,7 @@ def main():
     # threads.append(thrd)
     # thrd.start()
     # """
+
 
 # Kick off .......
 if __name__ == "__main__":

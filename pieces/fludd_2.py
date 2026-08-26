@@ -66,7 +66,7 @@ class Fludd:
     varianceRange = [10,10]
 
     def __init__(self, config, flddMngr):
-        pieceLogger("init PB")
+        pieceLogger("init Fludd")
 
         self.boxMax = config.canvasWidth - 1
         # self.boxMaxAlt = self.boxMax + int(random.uniform(10, 30) * config.canvasWidth)
@@ -292,9 +292,7 @@ def callBack():
 
 
 def runWork():
-    pieceLogger(f"**************************", 2)
-    pieceLogger("Running fludd.py", 2)
-    pieceLogger(f"**************************", 2)
+    pieceLogger("Running fludd.py", 2, True)
 
     while True:
         # _refreshCanvas()

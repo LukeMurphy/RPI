@@ -429,10 +429,7 @@ def updateLines():
 def runWork():
     _config : ArtWorkConfig
     _config = config
-
-    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    pieceLogger(" ==> Running", 6)
-    pieceLogger(bcolors.ENDC)
+    pieceLogger(" ==> informal-marks running", 2, True)
     # _config.debugSelf()
 
     while _config.isRunning == True:

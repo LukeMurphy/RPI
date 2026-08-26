@@ -459,7 +459,7 @@ class InformalLine:
                     _orthoP4y = self.lastOrthoPoint[3]
 
             except Exception as e:
-                pieceLogger(e)
+                pieceLogger(e, 1)
 
             _poly = ((_orthoP1x, _orthoP1y), (_orthoP2x, _orthoP2y), (_orthoP3x, _orthoP3y), (_orthoP4x, _orthoP4y), (_orthoP1x, _orthoP1y))
 
@@ -552,7 +552,7 @@ def glitchBox(
         # comment:
     except Exception as e:
         pieceLogger(e, 1)
-        pieceLogger(dx + sectionWidth, dy + sectionHeight)
+        pieceLogger(f"{dx + sectionWidth}, {dy + sectionHeight}",1)
     # end try
 
 
@@ -833,9 +833,7 @@ def updateLines():
 
 def runWork():
     global config, hmLinesMngr
-    pieceLogger(bcolors.OKGREEN + "** " + bcolors.BOLD)
-    pieceLogger("Running hatchingmarks.py")
-    pieceLogger(bcolors.ENDC)
+    pieceLogger("Running hashing-v3.py", 2, True)
     # hmLinesMngr.debugSelf()
 
     while config.isRunning == True:

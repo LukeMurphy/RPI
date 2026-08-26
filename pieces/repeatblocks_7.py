@@ -1153,7 +1153,7 @@ def generatePatternSequence(rpO):
     _randomInsertionProb = _combo.randomInsertionProbabilitly
     _randomInsertionMax = _combo.randomInsertionMax
 
-    pieceLogger(f" >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}", 2, True)
+    pieceLogger(f" >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}", 4, True)
 
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount, _randomInserts, _randomInsertionProb, _randomInsertionMax

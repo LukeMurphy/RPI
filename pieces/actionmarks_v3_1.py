@@ -200,7 +200,7 @@ class MarksManager:
             self.paletteSets.append(palette)
 
         self.activePalette = random.choice(self.paletteSets)
-        pieceLogger(f"===> New Palette : {self.activePalette.name} Using enveloped line:{palette.drawLineAsEnvelope}", 0, True)
+        pieceLogger(f"===> New Palette : {self.activePalette.name} Using enveloped line:{palette.drawLineAsEnvelope}", 4, True)
 
         setBGColor()
 
@@ -407,7 +407,7 @@ def changeDrawingMode():
 
 def changePalettes():
     mrksMngr.activePalette = random.choice(mrksMngr.paletteSets)
-    pieceLogger(f"New Palette : {mrksMngr.activePalette.name}", 4, True)
+    pieceLogger(f"===> New Palette : {mrksMngr.activePalette.name}", 4, True)
     setBGColor()
     config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
     config.canvasDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=(mrksMngr.bgColor))
@@ -1186,7 +1186,7 @@ def progressiveJitter():
         mrksMngr.jitterIterations -= 1
         if mrksMngr.jitterIterations <= 0:
             mrksMngr.doingJitter = False
-            pieceLogger(f"==> Progressive jitter ended", 3)
+            pieceLogger(f"==> Progressive jitter ended")
             # config.directorController.slotRate *= .25
 
 
@@ -1196,9 +1196,9 @@ def doDrawingJitter():
 
         if random.random() < mrksMngr.doProgressiveJitterProb:
             mrksMngr.doingJitter = True
-            pieceLogger(f"==> Progressive jitters tarting: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}", 3)
+            pieceLogger(f"==> Progressive jitters tarting: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}")
         else:
-            pieceLogger(f"==> Single bulk jitter: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}", 3)
+            pieceLogger(f"==> Single bulk jitter: jitterIterations {mrksMngr.jitterIterations}/{mrksMngr.jitterIterationsMax}")
             """ The underLayer has both the blocks as well as the lines and the texture """
             for _ in range(mrksMngr.jitterIterations):
                 glitchBox(

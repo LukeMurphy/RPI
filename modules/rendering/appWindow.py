@@ -1,15 +1,7 @@
-import random
 import threading
-import time
 import tkinter as tk
-
-from modules.filters import *
-import gc
 import PIL
 import PIL.Image
-import PIL.ImageTk
-import numpy
-
 from PIL import (
     Image,
     ImageDraw,
@@ -17,6 +9,17 @@ from PIL import (
     ImageFilter,
     ImageTk,
 )
+from modules.filters import *
+from modules.configuration import pieceLogger
+
+
+# import time
+# import random
+# import gc
+# import PIL.ImageTk
+# import numpy
+
+
 
 # from Tkinter import *
 # import tkMessageBox
@@ -34,7 +37,7 @@ class AppWindow:
         ) {[type]} -- [description]
     '''
     def __init__(self, masterConfig):
-        pieceLogger("** App Window Initialized ** ")
+        pieceLogger(" >>> *******  App Window Initialized ********* ", 2, True)
         self.masterConfig = masterConfig
 
     def setUp(self):
@@ -124,7 +127,7 @@ class AppWindow:
         ### Putting the animation on its own thread
         ### Still throws and error when manually closed though...
 
-        print("Starting threads")
+        pieceLogger(">> Starting threads",3, True)
 
 
         '''
@@ -148,7 +151,7 @@ class AppWindow:
             t.join()
 
         except tk.TclError as details:
-            print(details)
+            pieceLogger(f">> details", 1)
             pass
             #exit()
 

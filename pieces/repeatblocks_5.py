@@ -1320,13 +1320,13 @@ def handlePatternRebuild():
 
         # selectNewPalette(False)
         if random.random() < config.rebuildAllSlotsProb:
-            pieceLogger("\nhandlePatternRebuild(): Rebuiding full")
+            pieceLogger("handlePatternRebuild(): Rebuiding full")
             config.settingUpPattern = True
             config.patternSequence = []
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger("\nhandlePatternRebuild(): Rebuiding parts")
+            pieceLogger("handlePatternRebuild(): Rebuiding parts")
             if random.random() < config.chanceRebuildPatternChoosesRandom:
                 config.slotsToChange = []
             else:
@@ -1674,7 +1674,7 @@ def createImageHolders():
 
 def main(run=True):
     global config
-    pieceLogger("\n main() called")
+    pieceLogger(" main() called")
 
     config.debugPause = False
 

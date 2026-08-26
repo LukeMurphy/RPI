@@ -77,7 +77,7 @@ def loadFromArguments(masterConfig, reloading=False):
 	for i in range(0, len(masterConfig.workSets)):
 		workDetails = masterConfig.workSets[i]
 
-		pieceLogger("\n>> CREATING Player: " + str(i),3)
+		pieceLogger(">> CREATING Player: " + str(i),3)
 		cfgToFetch = masterConfig.workConfigParser.get(workDetails, "cfg")
 		canvasOffsetX = int(
 			masterConfig.workConfigParser.get(workDetails, "canvasOffsetX")

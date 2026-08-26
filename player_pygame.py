@@ -88,7 +88,7 @@ def loadFromArguments(reloading=False, config=None):
         except getopt.GetoptError as err:
             pieceLogger(f" >> Error:{str(err)}")
     else:
-        pieceLogger("\n >>** RELOADING NOW: " + config.fileName, 3)
+        pieceLogger(" >>** RELOADING NOW: " + config.fileName, 3)
         workconfig.read(config.fileName)
         _forcePygameRendering(workconfig)
         player_module.configure(config, workconfig)

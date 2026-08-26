@@ -1394,7 +1394,7 @@ def createImageHolders():
 
 def main(run=True):
     global config
-    pieceLogger("\n main() called")
+    pieceLogger(" main() called")
 
     config.debugPause = False
 

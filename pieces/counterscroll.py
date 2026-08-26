@@ -63,7 +63,7 @@ class ScrollMessage:
         draw = ImageDraw.Draw(tempImage)
         self.pixLen = draw.textbbox((0,0),self.messageString, font=font)
         self.fontHeight = int(self.pixLen[1] * 2)
-        pieceLogger("\n\n***************************")
+        pieceLogger("\n***************************")
         pieceLogger(self.pixLen)
         pieceLogger(self.messageString)
         pieceLogger(self.fontHeight)

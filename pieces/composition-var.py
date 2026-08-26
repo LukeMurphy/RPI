@@ -326,7 +326,7 @@ def renderCompositions():
 
 
 def drawCompositions():
-    pieceLogger("\n**********************")
+    pieceLogger("**********************")
     pieceLogger("Drawing the figure")
     pieceLogger("**********************")
 

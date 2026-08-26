@@ -28,7 +28,6 @@ from modules.configuration import bcolors, pieceLogger
 import subprocess
 from subprocess import check_output
 
-
 """
 This file runs as a daemon to mange the sequence of players
 Mange is right
@@ -67,10 +66,7 @@ def _select_next_piece(sequenceConfig):
         pieceToPlay = random.randrange(len(sequenceConfig.workList))
 
     work = sequenceConfig.workList[pieceToPlay]
-    pieceLogger("---------------------------------------------------------------------------------------")
-    pieceLogger(f"Piece Playing is: {pieceToPlay}")
-    pieceLogger(work)
-    # pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger(f"Piece Playing is: {pieceToPlay} {work}", 6, True)
 
     sequenceConfig.currentPieceDuration = round(random.uniform(work[1], work[2]))
 
@@ -87,10 +83,7 @@ def _launch_next_player(sequenceConfig):
     arg2 = f"{work[0]}"
     arg4 = brightnessOverrideString
 
-    pieceLogger("---------------------------------------------------------------------------------------")
-    pieceLogger("Sequencer is calling : " + commandString)
-    pieceLogger("---------------------------------------------------------------------------------------")
-
+    pieceLogger("Sequencer is calling : " + commandString, 6, True)
 
     if arg4 != "":
         arg3 = "-brightnessOverride"
@@ -105,16 +98,12 @@ def _kill_old_players(sequenceConfig):
 
     try:
         listOfProcs = check_output("ps -ef | pgrep -f -a player", stdin=None, stderr=None, shell=True, universal_newlines=True).split("\n")
-        pieceLogger("---------------------------------------------------------------------------------------")
-        pieceLogger("Sequencer is killing off old window(s)")
-        pieceLogger(f"count play : {sequenceConfig.playCount}")
-        pieceLogger(f"Running player instances are : {len(str(sequenceConfig.currentPID))}")
-        pieceLogger(listOfProcs)
-        # pieceLogger("---------------------------------------------------------------------------------------")
+        pieceLogger("Sequencer is killing off old window(s)", 6, True)
+        pieceLogger(f"count play : {sequenceConfig.playCount}", 6, False)
+        pieceLogger(f"Running player instances are : {len(str(sequenceConfig.currentPID))}", 6, False)
+        pieceLogger(listOfProcs, 6, False)
         listToCheck = listOfProcs[:-2]
-        pieceLogger(listToCheck)
-        # pieceLogger(len(listToCheck))
-        pieceLogger("---------------------------------------------------------------------------------------")
+        pieceLogger(listToCheck, 6, False)
 
         if len(listToCheck) == 2:
             # just kill the first in the list (i.e. the oldest player running)
@@ -125,16 +114,15 @@ def _kill_old_players(sequenceConfig):
                 for p in listToCheck[:-1]:
                     if str(sequenceConfig.currentPID) not in p:
                         len(str(sequenceConfig.currentPID))
-                        pieceLogger("---------------------------------------------------------------------------------------")
-                        pieceLogger(f"{str(sequenceConfig.currentPID)} : Should be killing {p}")
+                        pieceLogger(f"{str(sequenceConfig.currentPID)} : Should be killing {p}", 6, False)
                         len(str(sequenceConfig.currentPID))
                         subprocess.run([f"kill {p}"], shell=True, check=True)
             except Exception as e:
-                pieceLogger(e)
-        # comment:
-        pieceLogger("---------------------------------------------------------------------------------------")
+                pieceLogger(e, 1)
     except Exception as e:
-        pieceLogger(e)
+        pieceLogger(e,1)
+
+    pieceLogger("", 6, True)
 
         # end try
 
@@ -159,21 +147,18 @@ def loadWorkConfig(work, sequenceConfig):
 
     config.MID = ""
     config.path = sequenceConfig.path
+    config.startingUp = True
 
     argument = f"{config.path}/configs/{work[0]}"
 
-    pieceLogger("---------------------------------------------------------------------------------------")
-    pieceLogger(f"Sequencer: first work cfg {work[0]}")
-    pieceLogger(f"Sequencer: loading {argument}")
-    pieceLogger("---------------------------------------------------------------------------------------")
+    pieceLogger(f"Sequencer: first work cfg {work[0]}", 6, True)
+    pieceLogger(f"Sequencer: loading {argument}", 6, False)
 
     workconfig.read(argument)
     config.fileName = argument
-
     sequenceConfig.currentPID = os.getpid()
-    pieceLogger("---------------------------------------------------------------------------------------")
-    pieceLogger(f"Sequence Player PID is: {sequenceConfig.currentPID}")
-    pieceLogger("---------------------------------------------------------------------------------------")
+
+    pieceLogger(f"Sequence Player PID is: {sequenceConfig.currentPID}",6, False)
 
     callBack(sequenceConfig, config)
 
@@ -203,14 +188,15 @@ def loadConfigFile():
 
 
 def loadSequenceFile():
-    pieceLogger(f"************************************************")
+    # pieceLogger(f"************************************************")
+    global sequenceConfig
     args = loadConfigFile()
 
     if args.cfg != None:
 
         workconfig = configparser.ConfigParser()
 
-        _loadSequencer_pieceLogger_args("Inital Sequencer Arguments:", args)
+        pieceLogger(f"Inital Sequencer Arguments: {args}", 6, False)
 
         # sequenceConfig = configuration.Config()
         sequenceConfig = configuration.ArtWorkConfig("SEQUENCER")
@@ -219,10 +205,10 @@ def loadSequenceFile():
         sequenceConfig.MID = args.mname
         sequenceConfig.path = args.path
 
-        pieceLogger(f"script: sys.argv[0] is {repr(sys.argv[0])}")
-        pieceLogger(f"script: __file__ is {repr(__file__)}")
-        pieceLogger(f"script: cwd is {repr(os.getcwd())}")
-        pieceLogger(f"config: path  is {repr(args.path)}")
+        pieceLogger(f"script: sys.argv[0] is {repr(sys.argv[0])}", 6, False)
+        pieceLogger(f"script: __file__ is {repr(__file__)}", 6, False)
+        pieceLogger(f"script: cwd is {repr(os.getcwd())}", 6, False)
+        pieceLogger(f"config: path  is {repr(args.path)}", 6, False)
 
         # Automating the config path a bit better
         # assumes that if no -path is specified, it defaults to ./ so
@@ -232,7 +218,7 @@ def loadSequenceFile():
 
         argument = f"{sequenceConfig.path}configs/{args.cfg}"
 
-        _loadSequencer_pieceLogger_args("-cfg sequencer argument: ", argument)
+        pieceLogger(f"-cfg sequencer argument: {argument}", 6, False)
         workconfig.read(argument)
 
         sequenceConfig.fileName = argument
@@ -254,14 +240,13 @@ def loadSequenceFile():
             try:
                 brightnessOverride = float(workconfig.get(w, "brightnessOverride"))
             except Exception as e:
-                pieceLogger(f" ==> brightnessOverride not defined {e} ")
+                pieceLogger(f" ==> brightnessOverride not defined {e} ", 1)
                 brightnessOverride = None
 
             sequenceConfig.workList.append([work, minDuration, maxDuration, brightnessOverride])
 
-        pieceLogger(f"---------------------------------------------------------------------------------------")
-        pieceLogger("WorkList:")
-        pieceLogger(sequenceConfig.workList)
+        pieceLogger("WorkList:", 6, True)
+        pieceLogger(sequenceConfig.workList, 6, False)
 
         sequenceConfig.mainAppWindow = appWindow.AppWindow(sequenceConfig)
         sequenceConfig.mainAppWindow.setUp()
@@ -272,16 +257,10 @@ def loadSequenceFile():
         loadWorkConfig(sequenceConfig.workList[pieceToPlay], sequenceConfig)
 
 
-def _loadSequencer_pieceLogger_args(arg0, arg1):
-    pieceLogger("---------------------------------------------------------------------------------------")
-    pieceLogger(arg0 + str(arg1))
-    pieceLogger("---------------------------------------------------------------------------------------")
-
-    # sequenceConfig.mainAppWindow.run()
 
 
 def main():
-    global config, threads
+    # global config, threads
 
     loadSequenceFile()
 

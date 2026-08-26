@@ -1,3 +1,4 @@
+from pydoc import doc
 import time
 import inspect
 import sys
@@ -27,7 +28,19 @@ def configuration():
     pass
 
 
-def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
+def pieceLogger(args=None, clr=0, showLine=False, prefixTxt=""):
+    """
+    0 - Fail |
+    1 - FullFail |
+    2 - OkGreen |
+    3 - OKBLUE |
+    4 - YELLOWONBLUE |
+    5 - BASIC |
+    6 - CYAN |
+
+    2nd param shows lines |
+    3 rd param adds a prefix text
+    """
 
     _moduleName = ""
     _functionName = ""
@@ -62,12 +75,13 @@ def pieceLogger(args, clr=0, showLine=False, prefixTxt=""):
         fstr = bcolors.WARNING
 
     if showLine:
-        print(f"\n{fstr}.......................................................................................{bcolors.ENDC}")
-
+        print(
+            f"{fstr}-------------------------------------------------------------------------------------------------------------------------------------------------{bcolors.ENDC}"
+        )
     print(f"{prefixTxt}{bcolors.DARKGREY}{_moduleName}.[{bcolors.ENDC}{_functionName}{bcolors.DARKGREY}]{bcolors.ENDC} {fstr}{args}{bcolors.ENDC}")
 
-    if showLine:
-        print(f"{fstr}.......................................................................................{bcolors.ENDC}")
+    # if showLine:
+    # print(f"{fstr}---------------------------------------------------------------------------------------{bcolors.ENDC}")
     # print("\n")
     # print(bcolors.ENDC)
 
@@ -84,22 +98,22 @@ class bcolors:
 
     ENDC = "\033[0m"
     BOLD = "\033[1m"
-    DARKGREY = '\033[2m'
+    DARKGREY = "\033[2m"
     UNDERLINE = "\033[4m"
-    DARKCYAN = '\033[36m'
+    DARKCYAN = "\033[36m"
     BASIC = "\033[90m"
-    RED = '\033[91m'
+    RED = "\033[91m"
     FULLFAIL = "\033[91m"
     OKGREEN = "\033[92m"
-    GREEN = '\033[92m'
+    GREEN = "\033[92m"
     WARNING = "\033[93m"
-    YELLOW = '\033[93m'
+    YELLOW = "\033[93m"
     YELLOWONBLUE = "\033[0;94;1;43m"
-    BLUE = '\033[94m'
+    BLUE = "\033[94m"
     OKBLUE = "\033[94m"
     HEADER = "\033[95m"
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
+    PURPLE = "\033[95m"
+    CYAN = "\033[96m"
     FAIL = "\033[99m"
 
 
@@ -256,7 +270,6 @@ class ArtWorkConfig:
     underLayer = None
     underLayerDraw = None
 
-
     # Rendering controls
     renderImageFull = None
     renderDraw = None
@@ -268,16 +281,14 @@ class ArtWorkConfig:
 
     def __init__(self, args=None, _silent=False):
         if not _silent:
-            pieceLogger("---------------------------------------------------------------------------------------")
-            pieceLogger(f"** Config instance init {args}")
-            pieceLogger("---------------------------------------------------------------------------------------")
+            pieceLogger(f"** Config instance init {args}", 2, True)
 
     def debugSelf(self):
         allArgs = self.__dict__
         pieceLogger("---------------------------------------------------------------------------------------\n")
         for element in allArgs:
             pieceLogger(f"{element}  : ({type(allArgs[element]).__name__}) {allArgs[element]}")
-        pieceLogger("---------------------------------------------------------------------------------------\n")
+        # pieceLogger("---------------------------------------------------------------------------------------\n")k
 
         method_list = [attribute for attribute in dir(self) if callable(getattr(self, attribute)) and attribute.startswith("__") is False]
         pieceLogger(f"{method_list}")

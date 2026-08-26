@@ -186,7 +186,7 @@ def changePalettes():
 
 
 def initiateTransition():
-    # pieceLogger("\n ITNITATE TRANSITION")
+    # pieceLogger(" ITNITATE TRANSITION")
     config.transitionStateHandler.sourceImage = config.finalCompositeLayer
     config.transitionStateHandler.initiateTransition()
 

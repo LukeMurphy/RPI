@@ -92,7 +92,7 @@ class Shape:
 
         # This will force the overlay color transition functions to use the
         # configs for HSV
-        # pieceLogger("\n--- New Colors --- ")
+        # pieceLogger("--- New Colors --- ")
         # pieceLogger(self.minHue,self.maxHue)
         self.colOverlay.maxBrightness = 1
         self.colOverlay.minHue = self.minHue
@@ -488,7 +488,7 @@ def colorTransitionStarted(arg=None):
 
 def main(run=True):
     global config, shapeGroups, workConfig, clgMngr
-    pieceLogger("\n Main Init:")
+    pieceLogger(" Main Init:")
 
     clgMngr = CollageManager(config)
     clgMngr.setUp(workConfig)

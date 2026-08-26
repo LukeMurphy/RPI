@@ -1016,7 +1016,7 @@ def handleChangeCurrentCominationSet():
         drawAndProcessPattern()
 
     else:
-        pieceLogger("\n >> No change")
+        pieceLogger(" >> No change")
 
 
 def resetPatternBlocks():
@@ -1852,7 +1852,7 @@ def main(run=True):
     global config
     global rpO
     rpO = RepeatedPatterns()
-    pieceLogger("\n[main] >> called")
+    pieceLogger("[main] >> called")
 
     config.debugPause = False
 

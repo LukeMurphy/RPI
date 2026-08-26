@@ -82,7 +82,7 @@ def loadFromArguments(reloading=False, config=None):
             # pieceLogger help information and exit:
             pieceLogger(f" >> Error:{str(err)}")
     else:
-        pieceLogger("\n >>** RELOADING NOW: " + config.fileName, 3)
+        pieceLogger(" >>** RELOADING NOW: " + config.fileName, 3)
         workconfig.read(config.fileName)
         player_module.configure(config, workconfig)
 

@@ -26,6 +26,7 @@ from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 class MarksManager:
     def __init__(self, config):
         self.config = config
+        self.activePalette = None
 
     def setUp(self, workConfig):
         # ---- bundle path ----
@@ -82,6 +83,7 @@ class MarksManager:
 
         self.noPenGrays = 0.0
         self.nobgGrays = 0.0
+        self.linesDrawnCountMinBase = workConfig.getint("drawingField", "linesDrawnCountMinBase", fallback=1)
 
         self.drawLineAsEnvelope = workConfig.getboolean("drawingField", "drawLineAsEnvelope", fallback=False)
 
@@ -151,7 +153,7 @@ class MarksManager:
             palette.doJitterEventPerCyleProb = float(workConfig.get(_p, "doJitterEventPerCyleProb", fallback=self.doJitterEventPerCyleProb))
             palette.doProgressiveJitterProb = float(workConfig.get(_p, "doProgressiveJitterProb", fallback=self.doProgressiveJitterProb))
             palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMaxAfterDraw)
-            palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=self.jitterIterationsMin)
+            palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=mrksMngr.jitterIterationsMin)
             palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax)
             palette.jitterDisplacementHorizontal = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal))
             palette.jitterDisplacementVertical = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical))
@@ -159,6 +161,7 @@ class MarksManager:
             palette.jitterIterationsMax_roughing = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax_roughing)
             palette.jitterDisplacementHorizontal_roughing = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal_roughing))
             palette.jitterDisplacementVertical_roughing = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical_roughing))
+            palette.linesDrawnCountMin = workConfig.getint(_p, "linesDrawnCountMin", fallback=mrksMngr.linesDrawnCountMinBase)
 
             palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
             palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
@@ -371,17 +374,6 @@ def R(a, b, rounded=False):
 
 
 # ----------------------------------------------------##----------------------------------------------------#
-
-
-# def filterRemapImage(config):
-#     config.useFilters = True
-#     config.remapImageBlock = False
-#     startX = round(random.uniform(0, mrksMngr.filterRemapRangeX))
-#     startY = round(random.uniform(0, mrksMngr.filterRemapRangeY))
-#     endX = round(random.uniform(mrksMngr.filterRemapMinHorzSize, mrksMngr.filterRemapMaxHorzSize))
-#     endY = round(random.uniform(mrksMngr.filterRemapMinVertSize, mrksMngr.filterRemapMaxVertSize))
-#     config.remapImageBlockSection = [startX, startY, startX + endX, startY + endY]
-#     config.remapImageBlockDestination = [startX, startY]
 
 
 def changeDrawing(args):
@@ -1167,7 +1159,7 @@ def drawLineStopped():
     # pieceLogger("Pen stopped")
     mrksMngr.doingDrawing = False
     mrksMngr.linesDrawnCount += 1
-    if mrksMngr.linesDrawnCount > 1:
+    if mrksMngr.linesDrawnCount > mrksMngr.linesDrawnCountMin:
         pauseDrawing()
     if random.random() < mrksMngr.doJitterWhenAddingBGUseProb:
         pieceLogger(f"Doing jitter after LINE has been drawn")
@@ -1442,8 +1434,6 @@ def initDrawings():
 
     createTextureLayer(chooseTexture())
     config.underLayerDraw.rectangle((0, 0, mrksMngr.pictureWidth, mrksMngr.pictureHeight), fill=mrksMngr.bgColor)
-    mrksMngr.linesDrawnCount = 0
-    mrksMngr.jitterIterations = 0
     primeCanvas()
 
     _pen = choosePenMark()
@@ -1466,6 +1456,9 @@ def initDrawings():
     mrksMngr.jitterIterationsMax_roughing = mrksMngr.activePalette.jitterIterationsMax_roughing
     mrksMngr.jitterDisplacementHorizontal_roughing = mrksMngr.activePalette.jitterDisplacementHorizontal_roughing
     mrksMngr.jitterDisplacementVertical_roughing = mrksMngr.activePalette.jitterDisplacementVertical_roughing
+    mrksMngr.jitterIterations = 0
+    mrksMngr.linesDrawnCountMin = mrksMngr.activePalette.linesDrawnCountMin
+    mrksMngr.linesDrawnCount = 0
 
     startNewLine(_pen)
 
@@ -1488,7 +1481,7 @@ def runWork():
 def iterate():
     global config
 
-    if random.random() < mrksMngr.justHitPauseProb and not mrksMngr.justHitPause:
+    if random.random() < mrksMngr.justHitPauseProb and not mrksMngr.justHitPause and mrksMngr.linesDrawnCount >= mrksMngr.activePalette.linesDrawnCountMin:
         mrksMngr.justHitPause = True
         pieceLogger(f"I am paused {mrksMngr.justHitPauseProb}", 1)
 

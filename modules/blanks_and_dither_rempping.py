@@ -76,6 +76,7 @@ panelOverlayAmount = .11
 
 
 class BlanksAndDitherRemapping:
+    ''' Sets up blanks (absent light sections) and dither sections that move around'''
     altColor = (0, 0, 0, 15)
     useBlanks = False
     filterRemapping = False

@@ -12,7 +12,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageChops
 # from scipy.spatial import Voronoi
 from scipy.interpolate import splprep, splev
 from modules.holder_director import Director
-from modules.configuration import pieceLogger
+from modules.configuration import ArtWorkConfig, pieceLogger
 from modules import colorutils
 from modules.rendering.render import saveImageToFile
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
@@ -24,11 +24,13 @@ from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 
 # ----------------------------------------------------#
 class MarksManager:
+    ''' Holds all the defaults and variables distinct from the main config'''
     def __init__(self, config):
         self.config = config
         self.activePalette = None
 
     def setUp(self, workConfig):
+        '''Loads the piece settings and all the palettes'''
         # ---- bundle path ----
         self.drawingBundle = workConfig.get("drawingField", "drawingBundle")
         self.assetPath = self.config.path
@@ -90,29 +92,41 @@ class MarksManager:
         self.paletteSets = []
         paletteSets = workConfig.get("drawingField", "paletteSets").split(",")
 
+        self.loadPalettesFromCfgFiles = workConfig.getboolean("drawingField", "loadPalettesFromCfgFiles", fallback=False)
+
         for _pRaw in paletteSets:
             palette = Palette()
+            _paletteCFGParser = workConfig
             _p = _pRaw.replace("\n", "")
+
+
+            if self.loadPalettesFromCfgFiles :
+                _paletteCFGParser = configparser.ConfigParser()
+                _cfgFile = f"{self.assetPath}palettes/{_p}.cfg"
+                pieceLogger(_cfgFile)
+                _paletteCFGParser.read(_cfgFile)
+
+
             palette.bgBoxAlphaRange = tuple(
                 map(
                     lambda x: int(x),
-                    workConfig.get(_p, "bgBoxAlphaRange").split(","),
+                    _paletteCFGParser.get(_p, "bgBoxAlphaRange").split(","),
                 )
             )
 
-            _bgColorSetsRaw = workConfig.get(_p, "bgColorSets")
+            _bgColorSetsRaw = _paletteCFGParser.get(_p, "bgColorSets")
             _bgColorSetsRaw = re.sub(r"[\(\)]", "", _bgColorSetsRaw)
             _bgColorSetsRaw = _bgColorSetsRaw.split("|")
             palette.bgColorSets = []
             palette.bgColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _bgColorSetsRaw)
 
-            _penColorSetsRaw = workConfig.get(_p, "penColorSets")
+            _penColorSetsRaw = _paletteCFGParser.get(_p, "penColorSets")
             _penColorSetsRaw = re.sub(r"[\(\)]", "", _penColorSetsRaw)
             _penColorSetsRaw = _penColorSetsRaw.split("|")
             palette.penColorSets = []
             palette.penColorSets.extend(tuple(map(lambda x: float(x), _set.split(","))) for _set in _penColorSetsRaw)
 
-            _bgBoxColorSetsRaw = workConfig.get(_p, "bgBoxColorSets")
+            _bgBoxColorSetsRaw = _paletteCFGParser.get(_p, "bgBoxColorSets")
             _bgBoxColorSetsRaw = re.sub(r"[\(\)]", "", _bgBoxColorSetsRaw)
             _bgBoxColorSetsRaw = _bgBoxColorSetsRaw.split("|")
             palette.bgBoxColorSets = []
@@ -121,21 +135,22 @@ class MarksManager:
             palette.bgBoxRange = list(
                 map(
                     lambda x: int(x),
-                    workConfig.get(_p, "bgBoxRange", fallback="0,0,0,0").split(","),
+                    _paletteCFGParser.get(_p, "bgBoxRange", fallback=f"0,0,0,0").split(","),
                 )
             )
 
             if palette.bgBoxRange == [0, 0, 0, 0]:
                 palette.bgBoxRange = [0, self.pictureWidth, 0, self.pictureHeight]
 
-            palette.noPenGrays = float(workConfig.get(_p, "noPenGrays", fallback=0))
+            palette.noPenGrays = float(_paletteCFGParser.get(_p, "noPenGrays", fallback=0))
 
-            palette.pens = workConfig.get(_p, "penNames").split(",")
+            palette.pens = _paletteCFGParser.get(_p, "penNames").split(",")
             palette.name = _p
-            palette.textureName = workConfig.get(_p, "texture")
-            palette.usebgBoxProb = float(workConfig.get(_p, "usebgBoxProb", fallback=".01"))
-            palette.blendLevelRateBase = float(workConfig.get(_p, "blendLevelRateBase", fallback=".01"))
-            palette.clearCurrentDrawingProb = float(workConfig.get(_p, "clearCurrentDrawingProb", fallback=".0001"))
+            palette.textureName = _paletteCFGParser.get(_p, "texture")
+
+            palette.usebgBoxProb = float(_paletteCFGParser.get(_p, "usebgBoxProb", fallback=".01"))
+            palette.blendLevelRateBase = float(_paletteCFGParser.get(_p, "blendLevelRateBase", fallback=".01"))
+            palette.clearCurrentDrawingProb = float(_paletteCFGParser.get(_p, "clearCurrentDrawingProb", fallback=".0001"))
 
             # when set to 1.0 and startNewLineDelayRange is set
             # then the new line starts as soon as the random delay
@@ -143,58 +158,58 @@ class MarksManager:
             # attention of the viewer, controlling when it happens
             # is probably better left to timing than just cycle-based
             # probability
-            palette.startNewLineProb = float(workConfig.get(_p, "startNewLineProb", fallback=".01"))
-            palette.startNewLineDelayRange = list(map(lambda x: float(x), workConfig.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
+            palette.startNewLineProb = float(_paletteCFGParser.get(_p, "startNewLineProb", fallback=".01"))
+            palette.startNewLineDelayRange = list(map(lambda x: float(x), _paletteCFGParser.get(_p, "startNewLineDelayRange", fallback="1,10").split(",")))
 
             # jitter and roughing palette overrides
-            palette.doJitterProb = float(workConfig.get(_p, "doJitterProb", fallback=self.doJitterProb))
-            palette.doJitterAfterLineUseProb = float(workConfig.get(_p, "doJitterAfterLineUseProb", fallback=self.doJitterAfterLineUseProb))
-            palette.doJitterWhenAddingBGUseProb = float(workConfig.get(_p, "doJitterWhenAddingBGUseProb", fallback=self.doJitterWhenAddingBGUseProb))
-            palette.doJitterEventPerCyleProb = float(workConfig.get(_p, "doJitterEventPerCyleProb", fallback=self.doJitterEventPerCyleProb))
-            palette.doProgressiveJitterProb = float(workConfig.get(_p, "doProgressiveJitterProb", fallback=self.doProgressiveJitterProb))
-            palette.jitterIterationsMaxAfterDraw = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMaxAfterDraw)
-            palette.jitterIterationsMin = workConfig.getint(_p, "jitterIterationsMin", fallback=mrksMngr.jitterIterationsMin)
-            palette.jitterIterationsMax = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax)
-            palette.jitterDisplacementHorizontal = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal))
-            palette.jitterDisplacementVertical = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical))
-            palette.jitterIterationsMin_roughing = workConfig.getint(_p, "jitterIterationsMin", fallback=self.jitterIterationsMin_roughing)
-            palette.jitterIterationsMax_roughing = workConfig.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax_roughing)
-            palette.jitterDisplacementHorizontal_roughing = float(workConfig.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal_roughing))
-            palette.jitterDisplacementVertical_roughing = float(workConfig.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical_roughing))
-            palette.linesDrawnCountMin = workConfig.getint(_p, "linesDrawnCountMin", fallback=mrksMngr.linesDrawnCountMinBase)
+            palette.doJitterProb = float(_paletteCFGParser.get(_p, "doJitterProb", fallback=self.doJitterProb))
+            palette.doJitterAfterLineUseProb = float(_paletteCFGParser.get(_p, "doJitterAfterLineUseProb", fallback=self.doJitterAfterLineUseProb))
+            palette.doJitterWhenAddingBGUseProb = float(_paletteCFGParser.get(_p, "doJitterWhenAddingBGUseProb", fallback=self.doJitterWhenAddingBGUseProb))
+            palette.doJitterEventPerCyleProb = float(_paletteCFGParser.get(_p, "doJitterEventPerCyleProb", fallback=self.doJitterEventPerCyleProb))
+            palette.doProgressiveJitterProb = float(_paletteCFGParser.get(_p, "doProgressiveJitterProb", fallback=self.doProgressiveJitterProb))
+            palette.jitterIterationsMaxAfterDraw = _paletteCFGParser.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMaxAfterDraw)
+            palette.jitterIterationsMin = _paletteCFGParser.getint(_p, "jitterIterationsMin", fallback=mrksMngr.jitterIterationsMin)
+            palette.jitterIterationsMax = _paletteCFGParser.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax)
+            palette.jitterDisplacementHorizontal = float(_paletteCFGParser.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal))
+            palette.jitterDisplacementVertical = float(_paletteCFGParser.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical))
+            palette.jitterIterationsMin_roughing = _paletteCFGParser.getint(_p, "jitterIterationsMin", fallback=self.jitterIterationsMin_roughing)
+            palette.jitterIterationsMax_roughing = _paletteCFGParser.getint(_p, "jitterIterationsMax", fallback=self.jitterIterationsMax_roughing)
+            palette.jitterDisplacementHorizontal_roughing = float(_paletteCFGParser.get(_p, "jitterDisplacementHorizontal", fallback=self.jitterDisplacementHorizontal_roughing))
+            palette.jitterDisplacementVertical_roughing = float(_paletteCFGParser.get(_p, "jitterDisplacementVertical", fallback=self.jitterDisplacementVertical_roughing))
+            palette.linesDrawnCountMin = _paletteCFGParser.getint(_p, "linesDrawnCountMin", fallback=mrksMngr.linesDrawnCountMinBase)
 
-            palette.penSpeedMinVal = float(workConfig.get(_p, "penSpeedMinVal", fallback=1))
-            palette.penSpeedMaxVal = float(workConfig.get(_p, "penSpeedMaxVal", fallback=8))
+            palette.penSpeedMinVal = float(_paletteCFGParser.get(_p, "penSpeedMinVal", fallback=1))
+            palette.penSpeedMaxVal = float(_paletteCFGParser.get(_p, "penSpeedMaxVal", fallback=8))
 
             palette.xOffsetRange = list(
                 map(
                     lambda x: float(x),
-                    workConfig.get(_p, "xOffsetRange", fallback=f"0,{self.pictureWidth}").split(","),
+                    _paletteCFGParser.get(_p, "xOffsetRange", fallback=f"0,{self.pictureWidth}").split(","),
                 )
             )
             palette.yOffsetRange = list(
                 map(
                     lambda x: float(x),
-                    workConfig.get(_p, "yOffsetRange", fallback=f"0,{self.pictureHeight}").split(","),
+                    _paletteCFGParser.get(_p, "yOffsetRange", fallback=f"0,{self.pictureHeight}").split(","),
                 )
             )
             palette.penAlphaRange = list(
                 map(
                     lambda x: float(x),
-                    workConfig.get(_p, "penAlphaRange", fallback=f"{self.penAlpha},{self.penAlpha}").split(","),
+                    _paletteCFGParser.get(_p, "penAlphaRange", fallback=f"{self.penAlpha},{self.penAlpha}").split(","),
                 )
             )
 
-            palette.changePenColorWhileDrawingProb = float(workConfig.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
-            palette.drawLineAsEnvelope = workConfig.getboolean(_p, "drawLineAsEnvelope", fallback=self.drawLineAsEnvelope)
-            palette.outlineStroke = workConfig.getboolean(_p, "outlineStroke", fallback=False)
-            palette.outlineStrokeColor = tuple(map(lambda x: int(x), workConfig.get(_p, "outlineStrokeColor", fallback="0,0,0,200").split(",")))
+            palette.changePenColorWhileDrawingProb = float(_paletteCFGParser.get(_p, "changePenColorWhileDrawingProb", fallback=0.01))
+            palette.drawLineAsEnvelope = _paletteCFGParser.getboolean(_p, "drawLineAsEnvelope", fallback=self.drawLineAsEnvelope)
+            palette.outlineStroke = _paletteCFGParser.getboolean(_p, "outlineStroke", fallback=False)
+            palette.outlineStrokeColor = tuple(map(lambda x: int(x), _paletteCFGParser.get(_p, "outlineStrokeColor", fallback="0,0,0,200").split(",")))
 
-            palette.dripWidthMax = float(workConfig.get(_p, "dripWidthMax", fallback=0.0))
-            palette.dripLengthMax = float(workConfig.get(_p, "dripLengthMax", fallback=0.0))
-            palette.dripProbablility = float(workConfig.get(_p, "dripProbablility", fallback=0.0))
-            palette.dripSpeedMin = float(workConfig.get(_p, "dripSpeedMin", fallback=0.0))
-            palette.dripSpeedMax = float(workConfig.get(_p, "dripSpeedMax", fallback=0.0))
+            palette.dripWidthMax = float(_paletteCFGParser.get(_p, "dripWidthMax", fallback=0.0))
+            palette.dripLengthMax = float(_paletteCFGParser.get(_p, "dripLengthMax", fallback=0.0))
+            palette.dripProbablility = float(_paletteCFGParser.get(_p, "dripProbablility", fallback=0.0))
+            palette.dripSpeedMin = float(_paletteCFGParser.get(_p, "dripSpeedMin", fallback=0.0))
+            palette.dripSpeedMax = float(_paletteCFGParser.get(_p, "dripSpeedMax", fallback=0.0))
 
             pieceLogger(f"===> Loading palette: {palette.name}  Using enveloped line: {palette.drawLineAsEnvelope}")
             self.paletteSets.append(palette)
@@ -279,16 +294,71 @@ class MarksManager:
 
 
 class Palette:
+    ''' The colors, jitter, speed, outline, drip characteristics of the drawing painting'''
+    bgBoxAlphaRange = ()
+    bgColorSets = []
+    penColorSets = []
+    bgBoxColorSets = []
+    bgBoxRange = []
+    noPenGrays = 0
+    pens = []
+    name = ""
+    textureName = ""
+
+    usebgBoxProb = .01
+    blendLevelRateBase = .01
+    clearCurrentDrawingProb = .0001
+    startNewLineProb = .01
+    startNewLineDelayRange = [1,10]
+
+    # jitter and roughing palette overrides
+    doJitterProb = 0.0
+    doJitterAfterLineUseProb = 0.0
+    doJitterWhenAddingBGUseProb = 0.0
+    doJitterEventPerCyleProb = 0.0
+    doProgressiveJitterProb = 0.0
+    jitterIterationsMaxAfterDraw = 0
+    jitterIterationsMin = 1
+    jitterIterationsMax = 1
+    jitterDisplacementHorizontal = 0.0
+    jitterDisplacementVertical = 0.0
+    jitterIterationsMin_roughing = 1
+    jitterIterationsMax_roughing = 1
+    jitterDisplacementHorizontal_roughing = 0.0
+    jitterDisplacementVertical_roughing = 0.0
+    linesDrawnCountMin = 1
+
+    penSpeedMinVal = 1.0
+    penSpeedMaxVal = 8.0
+
+    xOffsetRange = [0,0]
+    yOffsetRange = [0,0]
+    penAlphaRange = [100,200]
+
+    changePenColorWhileDrawingProb = 0.01
+    drawLineAsEnvelope = True
+    outlineStroke = False
+    outlineStrokeColor = (0,0,0,200)
+
+    dripWidthMax = 0.0
+    dripLengthMax = 0.0
+    dripProbablility =0.0
+    dripSpeedMin =0.0
+    dripSpeedMax =0.0
+
+
     def __init__(self):
         pass
 
 
 class Pen:
+    ''' The active drawing pen or brush or stylus'''
     def __init__(self):
         pass
 
 
 class Mark:
+    ''' The shape or character that the pen will draw or paint'''
     lastAngle = 0
     angleDiffMax = 70
 

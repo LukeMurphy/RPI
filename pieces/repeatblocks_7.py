@@ -2002,7 +2002,7 @@ def main(run=True):
 
 
 def runWork():
-    pieceLogger(" >> Running repeatblocks.py", 2, True)
+    pieceLogger(" >> Running repeatblocks_7.py", 2, True)
     _subSteps = getattr(config, "smoothingSteps", 0)
 
     while config.isRunning:

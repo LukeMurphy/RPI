@@ -1,4 +1,3 @@
-# ------------------------------------------##### #
 import math
 import random
 import time
@@ -1496,13 +1495,13 @@ def handlePatternRebuild():
 
         # selectNewPalette(False)
         if random.random() < rpO.rebuildAllSlotsProb:
-            pieceLogger(f"\n >> Rebuiding full : {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
+            pieceLogger(f" >> Rebuiding full : {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
             rpO.settingUpPattern = True
             rpO.patternSequence = []
             # selectNewPalette(True)
             # selectNewPalette()
         else:
-            pieceLogger(f"\n >> Rebuiding parts: {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
+            pieceLogger(f" >> Rebuiding parts: {rpO.combinationSets[rpO.currentCombinationsetIndex].name}")
             if random.random() < rpO.chanceRebuildPatternChoosesRandom:
                 rpO.slotsToChange = []
             else:

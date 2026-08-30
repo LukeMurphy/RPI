@@ -825,6 +825,7 @@ def loadAndSetupPatterns():
     loadConfigValue(rpO, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuildingBase", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
@@ -951,6 +952,7 @@ def loadAndSetCombinations():
         comboSet.randomInsertionMin = int(_cfg.get(combinationSetName, "randomInsertionMin", fallback="0"))
         comboSet.randomInsertionMax = int(_cfg.get(combinationSetName, "randomInsertionMax", fallback="0"))
 
+        comboSet.patternChangeWhenBuilding = float(_cfg.get(combinationSetName, "patternChangeWhenBuilding", fallback=rpO.patternChangeWhenBuildingBase))
         try:
             comboSet.plusMarkDensity = list(int(x) for x in _cfg.get(combinationSetName, "plusMarkDensity").split(","))
             comboSet.plusMarkLengthRatio = list(float(x) for x in _cfg.get(combinationSetName, "plusMarkLengthRatio").split(","))
@@ -1148,7 +1150,6 @@ def generatePatternSequence(rpO):
 
     # config.patternSequence = []
     rpO.usedPatterns = []
-    _baseProb = rpO.patternChangeWhenBuilding * rpO.totalSlots / 100
     _patternSelected = chooseAPattern()
     rpO.lastPatternSelected = _patternSelected
     _tempPalette = getTempPalette(rpO)
@@ -1158,6 +1159,7 @@ def generatePatternSequence(rpO):
     rpO.consecutivePatternChoiceCount = 0
 
     _combo = rpO.combinationSets[rpO.currentCombinationsetIndex]
+    _baseProb = _combo.patternChangeWhenBuilding * rpO.totalSlots / 100
     rpO.useBorderPattern = _combo.useBorderPattern
     rpO.borderPattern = _combo.borderPattern
     rpO.usePolygonOverlay = _combo.usePolygonOverlay

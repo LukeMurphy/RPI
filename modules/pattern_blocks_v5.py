@@ -1932,15 +1932,31 @@ def pluses(refConfig, paletteObj=None):
             offsetY = row * blockSize
 
             # (xPos, yPos, width, height) for each dash/vert mark, relative to this cell
+
             marks = [
+                (blockSize / 2 - markWidth / 2, blockSize / 2 - markWidth / 2, markWidth, markWidth, 1, 4, 4),  # middle
+                # -
+                (0, 0, markWidth / 2, markWidth / 2, 1, 4, 4),  # corners # corners u left
+                (0, blockSize - markWidth / 2, markWidth / 2, markWidth / 2, 1, 4, 4),  # corners b left
+                # -
+                (blockSize - markWidth / 2, 0, markWidth / 2, markWidth / 2, 1, 4, 4),  # corners u right
+                (blockSize - markWidth / 2, blockSize - markWidth / 2, markWidth / 2, markWidth / 2, 1, 4, 4),  # corners b right
+                # -
                 (blockSize / 2 - markLength / 2, 0 - markWidth / 2, markLength, markWidth, 0, 1, 1),  # TOP DASH
                 (blockSize / 2 - markWidth / 2, 0, markWidth, markLength / 2, 0, 0, 1),  # TOP CENTER VERT
+                (blockSize / 2 - markWidth / 1, 0, markWidth * 2, markWidth / 1, 0, 0, 1),  # TOP CENTER center sqr
+                # -
                 (blockSize / 2 - markLength / 2, blockSize - markWidth / 2, markLength, markWidth, 0, 1, 3),  # BOTTOM DASH
                 (blockSize / 2 - markWidth / 2, blockSize - markLength / 2, markWidth, markLength / 2 + markWidth / 4, 0, 0, 3),  # BOTTOM CENTER VERT
+                (blockSize / 2 - markWidth / 1, blockSize - markWidth / 1, markWidth * 2, markWidth / 1 + markWidth / 1, 0, 0, 3),  # BOTTOM CENTER VERT
+                # -
                 (0, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1, 1, 4),  # LEFT DASH
-                (blockSize - markLength / 2, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1, 1, 2),  # RIGHT DASH
                 (0 - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1, 0, 4),  # LEFT VERT
+                (0, blockSize / 2 - markWidth / 1, markWidth, markWidth * 2, 2, 0, 4),  # LEFT VERT cntr sqr
+                # -
+                (blockSize - markLength / 2, blockSize / 2 - markWidth / 2, markLength / 2, markWidth, 1, 1, 2),  # RIGHT DASH
                 (blockSize - markWidth / 2, blockSize / 2 - markLength / 2, markWidth, markLength, 1, 0, 2),  # RIGHT VERT
+                (blockSize - markWidth * 1, blockSize / 2 - markWidth / 1, markWidth * 2, markWidth * 2, 2, 0, 2),  # RIGHT VERT
             ]
 
             for xPos, yPos, w, h, side, dash, rl in marks:
@@ -1951,11 +1967,11 @@ def pluses(refConfig, paletteObj=None):
                 if plusMarksArrows:
                     if dash == 1:
                         refConfig.blockDraw.rectangle(
-                            (offsetX + xPos, offsetY + yPos, offsetX + xPos + w/2, offsetY + yPos + h),
+                            (offsetX + xPos, offsetY + yPos, offsetX + xPos + w / 2, offsetY + yPos + h),
                             outline=(outline),
                             fill=_c,
                         )
-                        if rl == 2 :
+                        if rl == 2:
                             refConfig.blockDraw.rectangle(
                                 (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
                                 outline=(outline),
@@ -1964,9 +1980,13 @@ def pluses(refConfig, paletteObj=None):
 
                         if side == 0 or rl == 4:
                             refConfig.blockDraw.polygon(
-                                (offsetX + xPos + w / 2, offsetY + yPos - h / 2 - markWidth/2, 
-                                offsetX + xPos + w , offsetY + yPos + markWidth/2, 
-                                offsetX + xPos + w / 2, offsetY + yPos + h + markWidth
+                                (
+                                    offsetX + xPos + w / 2,
+                                    offsetY + yPos - h / 2 - markWidth / 2,
+                                    offsetX + xPos + w,
+                                    offsetY + yPos + markWidth / 2,
+                                    offsetX + xPos + w / 2,
+                                    offsetY + yPos + h + markWidth,
                                 ),
                                 outline=(outline),
                                 fill=_c,
@@ -1987,6 +2007,11 @@ def pluses(refConfig, paletteObj=None):
                             fill=_c,
                         )
                 else:
+                    refConfig.blockDraw.rectangle(
+                        (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
+                        outline=(outline),
+                        fill=_c,
+                    )
                     refConfig.blockDraw.rectangle(
                         (offsetX + xPos, offsetY + yPos, offsetX + xPos + w, offsetY + yPos + h),
                         outline=(outline),

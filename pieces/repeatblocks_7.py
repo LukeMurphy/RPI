@@ -3,7 +3,7 @@ import random
 import time
 import configparser
 
-from modules.configuration import pieceLogger
+from modules.configuration import ArtWorkConfig, pieceLogger
 from modules.blanks_and_dither_rempping import BlanksAndDitherRemapping
 from modules.movieClip import movieClip
 from modules import colorutils, panelDrawing, pattern_blocks_v5, disturbance
@@ -246,6 +246,18 @@ class RepeatedPatterns:
 
     def __init__(self):
         pass
+
+    def setUp(self, workConfig):
+        # ---- bundle path ----
+        self.drawingBundle = workConfig.get("movingpattern", "drawingBundle")
+        self.loadCombSetsFromCfgFiles = workConfig.get("movingpattern", "loadCombSetsFromCfgFiles", fallback=False)
+        # self.assetPath = self.config.path
+        # if self.assetPath[-1] != "/":
+        #     self.assetPath = f"{self.config.path}/"
+        self.assetPath = f"configs/{self.drawingBundle}"
+        # if self.assetPath[-1] != "/":
+        #     self.assetPath = f"{self.assetPath}/"
+
 
     def debugSelf(self):
         allArgs = self.__dict__
@@ -900,50 +912,57 @@ def loadAndSetCombinations():
     rpO.combinationSets = []
     combinationSets = workConfig.get("movingpattern", "combinationSets").replace("\n", "").split(",")
     rpO.changeCombinationAnytimeProb = float(workConfig.get("movingpattern", "changeCombinationAnytimeProb", fallback=0))
+    _cfg = workConfig
+
     for combinationSetName in combinationSets:
+        if rpO.loadCombSetsFromCfgFiles :
+                _cfg = configparser.ConfigParser()
+                _cfgFile = f"{rpO.assetPath}combSets/{combinationSetName}.cfg"
+                pieceLogger(_cfgFile)
+                _cfg.read(_cfgFile)
         comboSet = CombinationSet(combinationSetName)
-        comboSet.patterns = workConfig.get(combinationSetName, "patterns").replace("\n", "").split(",")
-        comboSet.palettes = workConfig.get(combinationSetName, "palettes").replace("\n", "").split(",")
-        comboSet.dominantPatterns = workConfig.get(combinationSetName, "dominantPatterns", fallback="").replace("\n", "").split(",")
-        comboSet.dominantPatternProb = float(workConfig.get(combinationSetName, "dominantPatternProb", fallback=0))
-        comboSet.borderPattern = workConfig.get(combinationSetName, "borderPattern", fallback="")
-        comboSet.useBorderPattern = workConfig.getboolean(combinationSetName, "useBorderPattern", fallback=False)
-        comboSet.altColoringProb = float(workConfig.get(combinationSetName, "altColoringProb", fallback=rpO.altColoringProb))
-        comboSet.popRandomColorProb = float(workConfig.get(combinationSetName, "popRandomColorProb", fallback=rpO.popRandomColorProb))
+        comboSet.patterns = _cfg.get(combinationSetName, "patterns").replace("\n", "").split(",")
+        comboSet.palettes = _cfg.get(combinationSetName, "palettes").replace("\n", "").split(",")
+        comboSet.dominantPatterns = _cfg.get(combinationSetName, "dominantPatterns", fallback="").replace("\n", "").split(",")
+        comboSet.dominantPatternProb = float(_cfg.get(combinationSetName, "dominantPatternProb", fallback=0))
+        comboSet.borderPattern = _cfg.get(combinationSetName, "borderPattern", fallback="")
+        comboSet.useBorderPattern = _cfg.getboolean(combinationSetName, "useBorderPattern", fallback=False)
+        comboSet.altColoringProb = float(_cfg.get(combinationSetName, "altColoringProb", fallback=rpO.altColoringProb))
+        comboSet.popRandomColorProb = float(_cfg.get(combinationSetName, "popRandomColorProb", fallback=rpO.popRandomColorProb))
 
-        comboSet.usePolygonOverlay = workConfig.getboolean(combinationSetName, "usePolygonOverlay", fallback=rpO.usePolygonOverlay)
-        comboSet.tileOverlayGridProb = float(workConfig.get(combinationSetName, "tileOverlayGridProb", fallback=rpO.tileOverlayGridProb))
-        comboSet.polyOverlayMode = workConfig.get(combinationSetName, "polyOverlayMode", fallback=rpO.polyOverlayMode)
+        comboSet.usePolygonOverlay = _cfg.getboolean(combinationSetName, "usePolygonOverlay", fallback=rpO.usePolygonOverlay)
+        comboSet.tileOverlayGridProb = float(_cfg.get(combinationSetName, "tileOverlayGridProb", fallback=rpO.tileOverlayGridProb))
+        comboSet.polyOverlayMode = _cfg.get(combinationSetName, "polyOverlayMode", fallback=rpO.polyOverlayMode)
 
-        comboSet.patternsInBands = workConfig.getboolean(combinationSetName, "patternsInBands", fallback=False)
-        comboSet.altBlockRotation = workConfig.getboolean(combinationSetName, "altBlockRotation", fallback=True)
+        comboSet.patternsInBands = _cfg.getboolean(combinationSetName, "patternsInBands", fallback=False)
+        comboSet.altBlockRotation = _cfg.getboolean(combinationSetName, "altBlockRotation", fallback=True)
 
-        comboSet.combinationSetsMinTime = float(workConfig.get(combinationSetName, "combinationSetsMinTime", fallback=30))
-        comboSet.combinationSetsMaxTime = float(workConfig.get(combinationSetName, "combinationSetsMaxTime", fallback=60))
+        comboSet.combinationSetsMinTime = float(_cfg.get(combinationSetName, "combinationSetsMinTime", fallback=30))
+        comboSet.combinationSetsMaxTime = float(_cfg.get(combinationSetName, "combinationSetsMaxTime", fallback=60))
 
-        comboSet.maxNumberOfRandomizers = int(workConfig.get(combinationSetName, "maxNumberOfRandomizers", fallback=3))
-        comboSet.minNumberOfPatternVariations = int(workConfig.get(combinationSetName, "minNumberOfPatternVariations", fallback=0))
+        comboSet.maxNumberOfRandomizers = int(_cfg.get(combinationSetName, "maxNumberOfRandomizers", fallback=3))
+        comboSet.minNumberOfPatternVariations = int(_cfg.get(combinationSetName, "minNumberOfPatternVariations", fallback=0))
 
-        comboSet.randomInsertions = workConfig.get(combinationSetName, "randomInsertions", fallback="0,0").split(",")
-        comboSet.randomInsertionInitialProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionInitialProbabilitly", fallback=0.0))
-        comboSet.randomInsertionProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
-        comboSet.randomInsertionBaseProbabilitly = float(workConfig.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
-        comboSet.borderLeakProb = float(workConfig.get(combinationSetName, "borderLeakProb", fallback=0.0))
-        comboSet.randomInsertionMin = int(workConfig.get(combinationSetName, "randomInsertionMin", fallback="0"))
-        comboSet.randomInsertionMax = int(workConfig.get(combinationSetName, "randomInsertionMax", fallback="0"))
+        comboSet.randomInsertions = _cfg.get(combinationSetName, "randomInsertions", fallback="0,0").split(",")
+        comboSet.randomInsertionInitialProbabilitly = float(_cfg.get(combinationSetName, "randomInsertionInitialProbabilitly", fallback=0.0))
+        comboSet.randomInsertionProbabilitly = float(_cfg.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
+        comboSet.randomInsertionBaseProbabilitly = float(_cfg.get(combinationSetName, "randomInsertionProbabilitly", fallback=0.0))
+        comboSet.borderLeakProb = float(_cfg.get(combinationSetName, "borderLeakProb", fallback=0.0))
+        comboSet.randomInsertionMin = int(_cfg.get(combinationSetName, "randomInsertionMin", fallback="0"))
+        comboSet.randomInsertionMax = int(_cfg.get(combinationSetName, "randomInsertionMax", fallback="0"))
 
         try:
-            comboSet.plusMarkDensity = list(int(x) for x in workConfig.get(combinationSetName, "plusMarkDensity").split(","))
-            comboSet.plusMarkLengthRatio = list(float(x) for x in workConfig.get(combinationSetName, "plusMarkLengthRatio").split(","))
-            comboSet.plusMarkWidthRatio = list(float(x) for x in workConfig.get(combinationSetName, "plusMarkWidthRatio").split(","))
+            comboSet.plusMarkDensity = list(int(x) for x in _cfg.get(combinationSetName, "plusMarkDensity").split(","))
+            comboSet.plusMarkLengthRatio = list(float(x) for x in _cfg.get(combinationSetName, "plusMarkLengthRatio").split(","))
+            comboSet.plusMarkWidthRatio = list(float(x) for x in _cfg.get(combinationSetName, "plusMarkWidthRatio").split(","))
         except Exception as e:
             pieceLogger(e, 1)
             comboSet.plusMarkDensity = rpO.plusMarkDensity
             comboSet.plusMarkLengthRatio = rpO.plusMarkLengthRatio
             comboSet.plusMarkWidthRatio = rpO.plusMarkWidthRatio
 
-        comboSet.plusMarksPosNegProb = float(workConfig.get(combinationSetName, "plusMarksPosNegProb", fallback=rpO.plusMarksPosNegProb))
-        comboSet.plusMarksArrowsProb = float(workConfig.get(combinationSetName, "plusMarksArrowsProb", fallback=rpO.plusMarksArrowsProb))
+        comboSet.plusMarksPosNegProb = float(_cfg.get(combinationSetName, "plusMarksPosNegProb", fallback=rpO.plusMarksPosNegProb))
+        comboSet.plusMarksArrowsProb = float(_cfg.get(combinationSetName, "plusMarksArrowsProb", fallback=rpO.plusMarksArrowsProb))
 
         config.randomInsertionCount = 0
         if comboSet.randomInsertionMin > 0:
@@ -1851,6 +1870,7 @@ def main(run=True):
     global config
     global rpO
     rpO = RepeatedPatterns()
+    rpO.setUp(workConfig)
     pieceLogger("repeatblocks_7.py [main] >> called", 2, True)
 
     config.debugPause = False

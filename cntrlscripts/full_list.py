@@ -6,16 +6,7 @@ import shlex
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QFont, QIcon
-from PyQt6.QtWidgets import (
-    QApplication,
-    QLineEdit,
-    QListWidget,
-    QListWidgetItem,
-    QPushButton,
-    QWidget,
-    QStyle,
-    QCheckBox
-)
+from PyQt6.QtWidgets import QApplication, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QWidget, QStyle, QCheckBox
 
 # PyQt6 port of cntrlscripts/full_list.py -- same behavior (list every
 # config under configs/, color-code it by folder, filter/sort it, launch it
@@ -39,6 +30,7 @@ _screenGridClr = "#eeeeee"
 _reference = "#adc4fd"
 
 usePygamePlayer = False
+
 
 class bcolors:
     WARNING = "\033[93m"
@@ -71,12 +63,24 @@ def _rowColor(key):
 def _get_config_files(configPath, filterText):
     fullList = []
     filterResults = len(filterText) > 1
+
     for root, dirs, files in os.walk(configPath, topdown=False):
         for name in files:
             fullPath = os.path.join(root, name)
             if name.endswith(".cfg") and not name.endswith(".py") and name != ".DS_Store":
                 res = os.stat(fullPath)
-                if "asset_configs" not in fullPath and "/marks" not in fullPath and "/textures" not in fullPath and "/colors" not in fullPath and "/disturbances" not in fullPath and "/palettes" not in fullPath and "/combsets" not in fullPath:
+                if (
+                    "asset_configs" not in fullPath
+                    and "/marks" not in fullPath
+                    and "/textures" not in fullPath
+                    and "/colors" not in fullPath
+                    and "/disturbances" not in fullPath
+                    and "/palettes" not in fullPath
+                    and "/_colorsets" not in fullPath
+                    and "/combsets" not in fullPath
+                    and "/combsets" not in fullPath
+                    and "_assets" not in fullPath
+                ):
                     if not filterResults and "non_working" not in fullPath:
                         fullList.append((fullPath, res.st_mtime, name))
                     elif name.find(filterText) > 0 or fullPath.find(filterText) > 0:
@@ -124,7 +128,7 @@ class ControlPanel(QWidget):
 
     def _buildUi(self):
         self.setWindowTitle("full_list (PyQt)")
-        
+
         # self.setStyleSheet("background-color: white;")
         self.setFont(QFont(self.font().family(), 12))
 
@@ -139,11 +143,10 @@ class ControlPanel(QWidget):
         self.searchField.setGeometry(2, 2, 270, 26)
         # self.searchField.
 
-        self.windowingCheckbox = QCheckBox('Use PyGame', self)
+        self.windowingCheckbox = QCheckBox("Use PyGame", self)
         self.windowingCheckbox.setChecked(False)  # Set checkbox to checked
         self.windowingCheckbox.stateChanged.connect(self.checkbox_state_changed)
-        self.windowingCheckbox.setGeometry(440,2,100,26)
-
+        self.windowingCheckbox.setGeometry(440, 2, 100, 26)
 
         leftBtnPlace = 725
         topBtnPlace = 8
@@ -204,7 +207,7 @@ class ControlPanel(QWidget):
             else:
                 if usePygamePlayer:
                     cmd = ["python3", "-u", base + "player_pygame.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
-                else :
+                else:
                     cmd = ["python3", "-u", base + "player.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]
 
             proc = subprocess.Popen(cmd, text=True, bufsize=1)
@@ -305,8 +308,8 @@ class ControlPanel(QWidget):
 def main():
     app = QApplication(sys.argv)
     # app.setWindowIcon(QIcon('chip_icon_normal.png'))
-    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), 'leddeliico/ledeliapp.png')
-    
+    path = os.path.join(os.path.dirname(sys.modules[__name__].__file__), "leddeliico/ledeliapp.png")
+
     app.setWindowIcon(QIcon(path))
     panel = ControlPanel()
     panel.show()

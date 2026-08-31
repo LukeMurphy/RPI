@@ -249,12 +249,13 @@ class RepeatedPatterns:
 
     def setUp(self, workConfig):
         # ---- bundle path ----
-        self.drawingBundle = workConfig.get("movingpattern", "drawingBundle")
+        self.drawingBundle = workConfig.get("movingpattern", "drawingBundle", fallback="")
         self.loadCombSetsFromCfgFiles = workConfig.get("movingpattern", "loadCombSetsFromCfgFiles", fallback=False)
         # self.assetPath = self.config.path
         # if self.assetPath[-1] != "/":
         #     self.assetPath = f"{self.config.path}/"
         self.assetPath = f"configs/{self.drawingBundle}"
+        pieceLogger(self.assetPath)
         # if self.assetPath[-1] != "/":
         #     self.assetPath = f"{self.assetPath}/"
 
@@ -918,7 +919,7 @@ def loadAndSetCombinations():
     for combinationSetName in combinationSets:
         if rpO.loadCombSetsFromCfgFiles :
                 _cfg = configparser.ConfigParser()
-                _cfgFile = f"{rpO.assetPath}combSets/{combinationSetName}.cfg"
+                _cfgFile = f"{rpO.assetPath}{combinationSetName}.cfg"
                 pieceLogger(_cfgFile)
                 _cfg.read(_cfgFile)
         comboSet = CombinationSet(combinationSetName)

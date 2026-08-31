@@ -102,7 +102,7 @@ class RepeatedPatterns:
     rebuildPatternProbability = 0.0004
     probPatternsRebuildAfterNewPalette = 0.99
     changePaletteWhenRebuildProb = 0.25
-    patternChangeWhenBuilding = 0.05
+    patternChangeWhenBuilding = 0.99
     changeFullPaletteWhenChangingPatternProb = 0.5
     changeEachblockWhenChangingPatternProb = 0.95
     changePaletteWhenChangingPatternProb = 0.0
@@ -826,7 +826,7 @@ def loadAndSetupPatterns():
     loadConfigValue(rpO, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
-    loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuildingBase", 0.0, float)
+    loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuildingBase", rpO.patternChangeWhenBuilding, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changeFullPaletteWhenChangingPatternProb", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changeEachblockWhenChangingPatternProb", 1.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenChangingPatternProb", 0.0, float)
@@ -1174,7 +1174,7 @@ def generatePatternSequence(rpO):
     _randomInsertionProb = _combo.randomInsertionProbabilitly
     _randomInsertionMax = _combo.randomInsertionMax
 
-    pieceLogger(f" >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName}", 4, True)
+    pieceLogger(f" >> COMBINATION SET: {_combo.name} using colors _tempPalette: {_tempPalette.paletteName} {_baseProb}" , 4, True)
 
     def add_pattern_block(c, r):
         nonlocal _patternSelected, _tempPalette, _iterCount, _randomInserts, _randomInsertionProb, _randomInsertionMax

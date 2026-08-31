@@ -720,7 +720,7 @@ class InformalMarksManager:
         self.scribbleAltColorProb = float(workConfig.get("informalMarksGrid", "scribbleAltColorProb", fallback=0.04))
         self.changeLinesProb = float(workConfig.get("informalMarksGrid", "changeLinesProb", fallback=0.01))
         self.changeAllLinesProb = float(workConfig.get("informalMarksGrid", "changeAllLinesProb", fallback=0.01))
-        self.clearLinesProb = float(workConfig.get("informalMarksGrid", "clearLinesProb", fallback=0.9))
+        self.clearLinesProb = float(workConfig.get("informalMarksGrid", "clearLinesProb", fallback=0.2))
 
         # probablility background changes
         self.changeBGProb = float(workConfig.get("informalMarksGrid", "changeBGProb", fallback=0.001))

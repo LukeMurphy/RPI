@@ -919,8 +919,8 @@ def loadAndSetCombinations():
     for combinationSetName in combinationSets:
         if rpO.loadCombSetsFromCfgFiles :
                 _cfg = configparser.ConfigParser()
-                _cfgFile = f"{rpO.assetPath}{combinationSetName}.cfg"
-                pieceLogger(_cfgFile)
+                _cfgFile = f"{rpO.path}/{rpO.assetPath}{combinationSetName}.cfg"
+                pieceLogger(f"Loading combo: {_cfgFile}")
                 _cfg.read(_cfgFile)
         comboSet = CombinationSet(combinationSetName)
         comboSet.patterns = _cfg.get(combinationSetName, "patterns").replace("\n", "").split(",")

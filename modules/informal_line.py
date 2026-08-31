@@ -221,6 +221,7 @@ class InformalLine:
 
         self.smooth_points = []
         self.curvedPoints = []
+        
         res = self.chaikins_corner_cutting(points, 2).tolist()
         self.smooth_points.extend((pt[0] + self.xOffset, pt[1] + self.yOffset) for pt in res)
         self.curvedPoints.extend((pt[0] + self.xOffset, pt[1] + self.yOffset) for pt in res)
@@ -385,6 +386,7 @@ class InformalLine:
     # ---------------------------------------------- #
 
     def drawTheLineComplete(self):
+
         pointsToDraw = self.curvedPoints
         fillClr = self.lineColor
         _ptCount = 0

@@ -75,8 +75,13 @@ def clearbgBox():
     )
     imMngr.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(imMngr.bgBoxBox, fill=imMngr.bgBoxFill)
+    for _informalLineUnitIndex in range(0, len(imMngr.informalLineUnits)):
+        _lineUnit: InformalLine
+        _lineUnit = imMngr.informalLineUnits[_informalLineUnitIndex]
+        _lineUnit.curvedPoints = []
+    imMngr.informalLineUnits = []
+    imMngr.numberOfinformalLines = 0
     imMngr.bgBoxColorRange = random.choice(imMngr.activePalette.bgBoxColorRanges)
-
     # for _ in range(imMngr.initialRunsOfBgBlocks):
     #     bgColorsFilling()
 

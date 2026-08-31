@@ -75,12 +75,14 @@ def clearbgBox():
     )
     imMngr.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(imMngr.bgBoxBox, fill=imMngr.bgBoxFill)
-    for _informalLineUnitIndex in range(0, len(imMngr.informalLineUnits)):
-        _lineUnit: InformalLine
-        _lineUnit = imMngr.informalLineUnits[_informalLineUnitIndex]
-        _lineUnit.curvedPoints = []
-    imMngr.informalLineUnits = []
-    imMngr.numberOfinformalLines = 0
+
+    if random.random() < imMngr.clearLinesProb :
+        for _informalLineUnitIndex in range(0, len(imMngr.informalLineUnits)):
+            _lineUnit: InformalLine
+            _lineUnit = imMngr.informalLineUnits[_informalLineUnitIndex]
+            _lineUnit.curvedPoints = []
+        imMngr.informalLineUnits = []
+        imMngr.numberOfinformalLines = 0
     imMngr.bgBoxColorRange = random.choice(imMngr.activePalette.bgBoxColorRanges)
     # for _ in range(imMngr.initialRunsOfBgBlocks):
     #     bgColorsFilling()
@@ -500,7 +502,6 @@ def reDraw():
             bgColorsFilling()
 
 
-
 def iterate():
     reDraw()
 
@@ -719,6 +720,8 @@ class InformalMarksManager:
         self.scribbleAltColorProb = float(workConfig.get("informalMarksGrid", "scribbleAltColorProb", fallback=0.04))
         self.changeLinesProb = float(workConfig.get("informalMarksGrid", "changeLinesProb", fallback=0.01))
         self.changeAllLinesProb = float(workConfig.get("informalMarksGrid", "changeAllLinesProb", fallback=0.01))
+        self.clearLinesProb = float(workConfig.get("informalMarksGrid", "clearLinesProb", fallback=0.9))
+
         # probablility background changes
         self.changeBGProb = float(workConfig.get("informalMarksGrid", "changeBGProb", fallback=0.001))
         self.pauseProb = float(workConfig.get("informalMarksGrid", "pauseProb", fallback=0.0001))

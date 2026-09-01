@@ -221,16 +221,17 @@ class ControlPanel(QWidget):
         print(f"---------------------------------------------------------------------------------------\n\n\n{bcolors.ENDC}")
 
     def action(self):
-        ok, configSelected = self.verify()
-        if ok:
+        vaildRowSelection, configSelected = self.verify()
+        if vaildRowSelection:
             configToRun = configSelected[list(configSelected.keys())[0]]
             self.execute(configToRun)
 
     def action2(self):
-        ok, configSelected = self.verify()
-        if ok:
+        vaildRowSelection, configSelected = self.verify()
+        if vaildRowSelection:
             os.system("ps -ef | pgrep -f player | xargs sudo kill -9;")
             os.system("ps -ef | pgrep -f Player | xargs sudo kill -9;")
+            os.system("ps -ef | pgrep -f sequencer | xargs sudo kill -9;")
             # cmd = "ps -ef | pgrep -f player | xargs sudo kill -9;"
             # args = shlex.split(cmd)
 
@@ -247,8 +248,8 @@ class ControlPanel(QWidget):
             self.execute(configToRun)
 
     def openFile(self):
-        ok, configSelected = self.verify()
-        if ok:
+        vaildRowSelection, configSelected = self.verify()
+        if vaildRowSelection:
             # os.system(f"open {configSelected[list(configSelected.keys())[0]]}")
             cmd = f"open {configSelected[list(configSelected.keys())[0]]}"
             args = shlex.split(cmd)

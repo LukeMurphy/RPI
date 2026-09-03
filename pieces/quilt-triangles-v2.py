@@ -321,17 +321,16 @@ def _resize_and_refresh_pieces():
     if random.SystemRandom().random() >= mrksMngr.resetSizeProbability:
         return
     if mrksMngr.quiltPattern == "stars":
-        _extracted_from__resize_and_refresh_pieces_4(11, createstarpieces)
+        _block_size_mngr(11, createstarpieces)
     else:
-        _extracted_from__resize_and_refresh_pieces_4(16, createtrianglepieces)
+        _block_size_mngr(16, createtrianglepieces)
     config.blockLength = mrksMngr.blockSize
     config.blockHeight = mrksMngr.blockSize
     mrksMngr.doingRefresh = 0
     mrksMngr.doingRefreshCount = 100
 
 
-# TODO Rename this here and in `_resize_and_refresh_pieces`
-def _extracted_from__resize_and_refresh_pieces_4(arg0, arg1):
+def _block_size_mngr(arg0, arg1):
     mrksMngr.blockSize = round(random.SystemRandom().uniform(mrksMngr.blockSizeMin, mrksMngr.blockSizeMax))
     large = mrksMngr.blockSize >= arg0
     config.blockCols = mrksMngr.blockColsMin if large else mrksMngr.blockColsMax

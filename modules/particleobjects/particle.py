@@ -8,6 +8,7 @@ import noise
 from noise import *
 
 from modules import colorutils
+
 # from modules.configuration import pieceLogger
 from PIL import (
     Image,
@@ -56,7 +57,13 @@ class Particle(object):
     outlineColorRawValues = (0, 0, 0, 0)
     extraOutlineColor = None
 
-    aliasBuffer = 2
+    aliasBuffer = 4
+
+    arc1 = random.random() * 90 + 20
+    arc2 = random.random() * 90 + 20
+
+    arc1Width = random.choice([4, 5, 6])
+    arc2Width = random.choice([ 4, 5, 6])
 
     # gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
 
@@ -93,6 +100,12 @@ class Particle(object):
         # if(random.random() < .2) : self.fillColor = (100,10,0)
 
     def setUpParticle(self):
+
+        self.arc1 = random.random() * 90 + 30
+        self.arc2 = random.random() * 90 + 30
+
+        self.arc1Width = random.choice([4, 5, 6])
+        self.arc2Width = random.choice([ 4, 5, 6])
 
         rndSize = random.uniform(self.ps.rndSizeFactorMin, self.ps.rndSizeFactorMax)
 
@@ -151,9 +164,7 @@ class Particle(object):
     def createParticleImage(self):
 
         # adding some buffer around size of particle
-        self.image = Image.new(
-            "RGBA", (round(self.objWidth) + 2 * self.aliasBuffer, round(self.objHeight) + 2 * self.aliasBuffer)
-        )
+        self.image = Image.new("RGBA", (round(self.objWidth) + 2 * self.aliasBuffer, round(self.objHeight) + 2 * self.aliasBuffer))
         self.draw = ImageDraw.Draw(self.image)
         self.imageDrawn = True
 
@@ -204,21 +215,12 @@ class Particle(object):
             self.dx = self.v * math.cos(self.direction)
             # self.dx = self.v * math.cos(self.direction)
 
-            self.dy = (
-                self.meanderFactor
-                * noise.pnoise1(
-                    self.ps.config.canvasWidth - self.xPos / self.meanderFactor2, 1
-                )
-                + self.xWind
-            )
+            self.dy = self.meanderFactor * noise.pnoise1(self.ps.config.canvasWidth - self.xPos / self.meanderFactor2, 1) + self.xWind
         else:
             self.dy = self.v * math.sin(self.direction)
             # self.dx = self.v * math.cos(self.direction)
 
-            self.dx = (
-                self.meanderFactor * noise.pnoise1(self.yPos / self.meanderFactor2, 1)
-                + self.xWind
-            )
+            self.dx = self.meanderFactor * noise.pnoise1(self.yPos / self.meanderFactor2, 1) + self.xWind
 
         vy = self.v * math.sin(self.direction)
         vx = self.v * math.cos(self.direction)
@@ -245,7 +247,6 @@ class Particle(object):
             self._handle_border_collisions()
         else:
             self._handle_border_wrap()
-
 
     def _handle_border_collisions(self):
         """Handles collisions with canvas borders by changing particle direction and color."""
@@ -277,7 +278,6 @@ class Particle(object):
             else:
                 self.yPosR = self.yPos = 0
 
-
     def _handle_border_wrap(self):
         """Handles wrapping of particles around canvas borders."""
         if self.xPosR > self.ps.config.canvasWidth:
@@ -293,13 +293,11 @@ class Particle(object):
             self.yPosR = self.yPos = self.ps.config.canvasHeight
             self.changeColor()
 
-
     def _reverse_horizontal_direction(self):
         """Reverses the horizontal direction of the particle and changes its color."""
         self.v *= self.ps.collisionDamping
         self.changeColor()
         self.direction = self.direction - math.pi if self.ps.useFlocking else math.pi - self.direction
-
 
     def _reverse_vertical_direction(self):
         """Reverses the vertical direction of the particle and changes its color."""
@@ -370,8 +368,8 @@ class Particle(object):
         self.createParticleImage()
 
         if self.pixelsGoGray == True:
+            self._setOutlineAndFillColors()
 
-            self._extracted_from_render_10()
         if self.ps.objType == "poly":
             xPos = int(self.xPosR - self.image.size[0] / 1.5)
             yPos = int(self.yPosR - self.image.size[1] / 2)
@@ -396,16 +394,12 @@ class Particle(object):
             imageToPaste = self.image.rotate(angle, expand=True)
 
         if self.ps.unitBlur > 0:
-            imageToPaste = imageToPaste.filter(
-                ImageFilter.GaussianBlur(radius=round(self.unitBlur))
-            )
+            imageToPaste = imageToPaste.filter(ImageFilter.GaussianBlur(radius=round(self.unitBlur)))
             # This should be optional
             # self.unitBlur += 1
 
-
         # self.ps.config.image.paste(imageToPaste, (xPos, yPos), imageToPaste)
         # ### This produces trails
-
 
         if self.ps.objTrails == True:
             self.ps.config.image.paste(imageToPaste, (xPos, yPos, xPos + imageToPaste.size[0], yPos + imageToPaste.size[1]))
@@ -413,32 +407,32 @@ class Particle(object):
             self.ps.config.image.paste(imageToPaste, (xPos, yPos), imageToPaste)
 
     # TODO Rename this here and in `render`
-    def _extracted_from_render_10(self):
+    def _setOutlineAndFillColors(self):
         """
-                # REALLY this should be outlineColorRawValues being changed
-                # but it seems to look better like this
+        # REALLY this should be outlineColorRawValues being changed
+        # but it seems to look better like this
 
-                self.OutlineR += self.outlineGreyRate[0]
-                self.OutlineG += self.outlineGreyRate[1]
-                self.OutlineB += self.outlineGreyRate[2]
+        self.OutlineR += self.outlineGreyRate[0]
+        self.OutlineG += self.outlineGreyRate[1]
+        self.OutlineB += self.outlineGreyRate[2]
 
-                #outlineColorRawValues = (r, g, b, self.fillColor[3])
+        #outlineColorRawValues = (r, g, b, self.fillColor[3])
 
-                self.outlineColor = (
-                        round(self.OutlineR),
-                        round(self.OutlineG),
-                        round(self.OutlineB),
-                        self.outlineColor[3],
-                )
+        self.outlineColor = (
+                round(self.OutlineR),
+                round(self.OutlineG),
+                round(self.OutlineB),
+                self.outlineColor[3],
+        )
 
-                self.FillR += self.fillGreyRate[0]
-                self.FillG += self.fillGreyRate[1]
-                self.FillB += self.fillGreyRate[2]
+        self.FillR += self.fillGreyRate[0]
+        self.FillG += self.fillGreyRate[1]
+        self.FillB += self.fillGreyRate[2]
 
-                #fillColorRawValues = (r, g, b, self.fillColor[3])
+        #fillColorRawValues = (r, g, b, self.fillColor[3])
 
-                self.fillColor = (round(self.FillR), round(self.FillG), round(self.FillB), self.fillColor[3])
-                """
+        self.fillColor = (round(self.FillR), round(self.FillG), round(self.FillB), self.fillColor[3])
+        """
 
         # REALLY this should be outlineColorRawValues being changed
         # but it seems to look better like this
@@ -452,17 +446,11 @@ class Particle(object):
         rb_o = round(b_o)
         rg_o = round(g_o)
 
-        if self.isBetween(
-            rr_o, gr_o, gr_o, abs(round(self.outlineGreyRate[0]))
-        ):
+        if self.isBetween(rr_o, gr_o, gr_o, abs(round(self.outlineGreyRate[0]))):
             self.outlineGreyRate[0] = 0
-        if self.isBetween(
-            rg_o, gr_o, gr_o, abs(round(self.outlineGreyRate[1]))
-        ):
+        if self.isBetween(rg_o, gr_o, gr_o, abs(round(self.outlineGreyRate[1]))):
             self.outlineGreyRate[1] = 0
-        if self.isBetween(
-            rb_o, gr_o, gr_o, abs(round(self.outlineGreyRate[2]))
-        ):
+        if self.isBetween(rb_o, gr_o, gr_o, abs(round(self.outlineGreyRate[2]))):
             self.outlineGreyRate[2] = 0
 
         gr = round(self.fillGrey)
@@ -537,16 +525,16 @@ class Particle(object):
         # self.draw.ellipse((0, 0, round(self.objWidth/2) ,round(self.objHeight/2)),
         #     fill=self.fillColor, outline=self.outlineColor)
         box = [(0, 0), (self.objWidth / 2 + 1, self.objHeight / 2 + 1)]
-        self.draw.chord(box, 0, 360, fill=self.fillColor, outline=self.outlineColor)
+        self.draw.ellipse(box, fill=self.fillColor, outline=None)
+        self.draw.arc(box, 0, self.arc1, fill=self.outlineColor, width=self.arc1Width)
+        self.draw.arc(box, -self.arc2, 0, fill=self.outlineColor, width=self.arc2Width)
 
     def drawRectangle(self):
         self.draw.rectangle(
-            (0, 0, round(self.objWidth)+4, round(self.objHeight)),
-            fill=(self.fillColor[0],self.fillColor[1],self.fillColor[2],self.fillColor[3]),
-            outline=(self.outlineColor[0], self.outlineColor[1], self.outlineColor[2], self.outlineColor[3])
+            (0, 0, round(self.objWidth) + 4, round(self.objHeight)),
+            fill=(self.fillColor[0], self.fillColor[1], self.fillColor[2], self.fillColor[3]),
+            outline=(self.outlineColor[0], self.outlineColor[1], self.outlineColor[2], self.outlineColor[3]),
         )
-
-
 
         # self.draw.rectangle(
         #     (2, 0, round(self.objWidth), round(self.objHeight)),
@@ -599,9 +587,7 @@ class Particle(object):
                     directionTotal += pal.direction * distianceProportion
                 ## Get your pals average direction but back off
                 if distance < ps.cohesionDistance and distance < ps.repelDistance:
-                    directionTotal -= (
-                        pal.direction * distianceProportion * ps.repelFactor
-                    )
+                    directionTotal -= pal.direction * distianceProportion * ps.repelFactor
 
         if count > 1:
             directionTotal = directionTotal / count

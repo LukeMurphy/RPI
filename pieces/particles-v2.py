@@ -482,10 +482,14 @@ def emitParticle(i=None):
 
     p.setUpParticle()
 
+    p.greyRate = random.uniform(3 * paletteRef.greyRate / 4, paletteRef.greyRate)
+
     p.xPosR = config.canvasWidth / 2 - ps.centerRangeXMin + round(random.random() * ps.centerRangeXMax) - p.objWidth
     p.yPosR = config.canvasHeight / 2 - ps.centerRangeYMin + round(random.random() * ps.centerRangeYMax) - p.objHeight
 
     if ps.movement == "fire":
+        if p.objWidth/p.objHeight > .65 :
+            p.objHeight *= .4
         p.direction = random.uniform(0, 180) * math.pi / 180
         if ps.oneDirection:
             p.direction = 0
@@ -619,7 +623,7 @@ def linearMotionAction(config, p, ps):
 # -----------------------------------------------------------
 def makePixGoGray(pMngr, p):
     paletteRef = pMngr.palettes[pMngr.paletteIndex]
-    p.greyRate = random.uniform(paletteRef.greyRate / 4, paletteRef.greyRate)
+    # p.greyRate = random.uniform(paletteRef.greyRate / 4, paletteRef.greyRate)
     # p.greyRate = pMngr.greyRate
 
     """
@@ -638,9 +642,9 @@ def makePixGoGray(pMngr, p):
 
     if paletteRef.pixelsGoGrayModel == 2:
         # Luminosity
-        rRatio = 0.21
-        gRatio = 0.72
-        bRatio = 0.07
+        rRatio = 0.250
+        gRatio = 0.950
+        bRatio = 0.550
     elif paletteRef.pixelsGoGrayModel == 3:
         # BT.601
         rRatio = 0.2989
@@ -658,6 +662,8 @@ def makePixGoGray(pMngr, p):
         (p.outlineGrey - p.outlineColor[1]) / p.greyRate,
         (p.outlineGrey - p.outlineColor[2]) / p.greyRate,
     ]
+
+    # pieceLogger(f"{p.outlineGreyRate}")
 
     p.fillGrey = rRatio * p.fillColor[0] + gRatio * p.fillColor[1] + bRatio * p.fillColor[2]
 

@@ -62,8 +62,8 @@ class Particle(object):
     arc1 = random.random() * 90 + 20
     arc2 = random.random() * 90 + 20
 
-    arc1Width = random.choice([4, 5, 6])
-    arc2Width = random.choice([ 4, 5, 6])
+    arc1Width = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,12,14,16])
+    arc2Width = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,12,14,16])
 
     # gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
 
@@ -104,8 +104,8 @@ class Particle(object):
         self.arc1 = random.random() * 90 + 30
         self.arc2 = random.random() * 90 + 30
 
-        self.arc1Width = random.choice([4, 5, 6])
-        self.arc2Width = random.choice([ 4, 5, 6])
+        self.arc1Width = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,12,14,16])
+        self.arc2Width = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,12,14,16])
 
         rndSize = random.uniform(self.ps.rndSizeFactorMin, self.ps.rndSizeFactorMax)
 
@@ -352,6 +352,13 @@ class Particle(object):
                 self.objHeight = 0
                 self.objWidth = 0
                 self.remove = True
+
+            if random.random() < 0.01:
+                self.arc1 = random.random() * 90 + 30
+                self.arc2 = random.random() * 90 + 30
+
+                self.arc1Width = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,12,14,16])
+                self.arc2Width = random.choice([1, 2, 3, 4, 5, 6, 7, 8, 9, 10,12,14,16])
 
         if self.ps.useFlocking == True:
             self.checkMyBuddies()

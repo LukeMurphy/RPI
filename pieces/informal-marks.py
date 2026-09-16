@@ -76,7 +76,7 @@ def clearbgBox():
     imMngr.bgBoxFill = (0, 0, 0, 0)
     config.underLayerDraw.rectangle(imMngr.bgBoxBox, fill=imMngr.bgBoxFill)
 
-    if random.random() < imMngr.clearLinesProb :
+    if random.random() < imMngr.clearLinesProb or len(imMngr.informalLineUnits) > imMngr.maxInformalLineUnits:
         for _informalLineUnitIndex in range(0, len(imMngr.informalLineUnits)):
             _lineUnit: InformalLine
             _lineUnit = imMngr.informalLineUnits[_informalLineUnitIndex]
@@ -721,6 +721,7 @@ class InformalMarksManager:
         self.changeLinesProb = float(workConfig.get("informalMarksGrid", "changeLinesProb", fallback=0.01))
         self.changeAllLinesProb = float(workConfig.get("informalMarksGrid", "changeAllLinesProb", fallback=0.01))
         self.clearLinesProb = float(workConfig.get("informalMarksGrid", "clearLinesProb", fallback=0.2))
+        self.maxInformalLineUnits = int(workConfig.get("informalMarksGrid", "maxInformalLineUnits", fallback=5000))
 
         # probablility background changes
         self.changeBGProb = float(workConfig.get("informalMarksGrid", "changeBGProb", fallback=0.001))

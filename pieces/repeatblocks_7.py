@@ -99,7 +99,7 @@ class RepeatedPatterns:
     rebuildSlotSkipRate = 0.1
     rebuildSlotStartSkipRate = 0.05
     patternModel = None
-    rebuildPatternProbability = 0.0004
+    # rebuildPatternProbability = 0.0004
     probPatternsRebuildAfterNewPalette = 0.99
     changePaletteWhenRebuildProb = 0.25
     patternChangeWhenBuilding = 0.99
@@ -822,7 +822,7 @@ def loadAndSetupPatterns():
     # e.g. .2 is 20% chance each new block will change to a
     # new pattern
 
-    loadConfigValue(rpO, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
+    # loadConfigValue(rpO, workConfig, "movingpattern", "rebuildPatternProbability", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "probPatternsRebuildAfterNewPalette", 1.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "changePaletteWhenRebuildProb", 0.0, float)
     loadConfigValue(rpO, workConfig, "movingpattern", "patternChangeWhenBuilding", 0.0, float)
@@ -1027,7 +1027,7 @@ def handleChangeCurrentCominationSet():
         rpO.comboSetDirector.reset()
 
         rpO.settingUpPattern = True
-        rpO.rebuildPatternProbability = 1.0
+        # rpO.rebuildPatternProbability = 1.0
         rpO.rebuildAllSlotsProb = 1.0
         rpO.fader.setUp(rpO)
         # rebuildPatterns()
@@ -1258,6 +1258,7 @@ def generatePatternSequence(rpO):
         # pieceLogger(f"[generatePatternSequence][add_pattern_block] >> _patternBlock.pattern: column:{c} row:{r} rpO.randomInsertionCount {rpO.randomInsertionCount}/{_randomInsertionMax} {_iterCount}: {_patternBlock.pattern}")
         _iterCount += 1
 
+    pieceLogger(f"patternsInBands: {rpO.patternsInBands}")
     if rpO.patternsInBands:
         for r in range(rpO.patternBlockRows):
             for c in range(rpO.patternBlockCols):
@@ -1513,7 +1514,7 @@ def handlePatternRebuild():
     disturbancesDone = not rpO.doSectionDisturbance or rpO.doneCount >= rpO.numberOfSections
     if rpO.fader.fadingDone and disturbancesDone:
         # rpO.doSectionDisturbance = False
-        # pieceLogger("\nrebuildPatterns called after fading done 2")
+        pieceLogger(f" >> rebuildPatterns called after fading done rebuildAllSlotsProb:{rpO.rebuildAllSlotsProb}")
 
         # selectNewPalette(False)
         if random.random() < rpO.rebuildAllSlotsProb:

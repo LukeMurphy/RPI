@@ -2,7 +2,6 @@ import datetime
 import os
 import sys
 import random
-import threading
 import time
 import tkinter as tk
 import gc
@@ -186,17 +185,18 @@ def startWork(*args):
     # global config, work, root, counter
     global counter
 
-    # Putting the animation on its own thread
-    # Still throws and error when manually closed though...
-
+    # NOTE: runWork()'s loop calls directly into Tkinter (config.cnvs,
+    # PIL.ImageTk) on every iteration via config.render/updateCanvas, so this
+    # must stay on the main thread. root.after(100, startWork) already gives
+    # Tk one event-loop tick before this synchronous loop takes over; it
+    # self-pumps the event queue via config.cnvs.update() inside
+    # updateCanvas(). See modules/rendering/multiplayer.py for the (much
+    # larger) refactor needed to safely run this on a background thread.
     try:
-        t = threading.Thread.__init__(work.runWork())
-        t.start()
+        work.runWork()
     except tk.TclError as details:
         pieceLogger(details)
         exit()
-
-    # work.runWork()
 
 
 # ----------------------------------------- #

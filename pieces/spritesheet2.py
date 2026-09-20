@@ -416,7 +416,7 @@ def main(run=True):
     '''
 
 
-    config.debugSelf()
+    # config.debugSelf()
 
     # print(config.__dict__)
     if run:

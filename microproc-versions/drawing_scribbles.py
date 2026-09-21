@@ -4,7 +4,7 @@ import math
 import gc
 import drawing_scribbles_classes
 import drawing_scribbles_setpalette
-
+import machine
 
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
@@ -500,7 +500,14 @@ while True:
     #     display.set_pen(BLANKSCREEN)
     #     display.clear()
 
-        
+    if random.random() < .002:
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
+
     # Update the display
     i75.update()
     time.sleep(INTERVAL)

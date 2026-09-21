@@ -1,5 +1,7 @@
 import random
 
+
+
 _c = random.choice([0,3,4,5,5])
 #_c = 4
 if _c == 0 :
@@ -15,3 +17,4 @@ elif _c == 5 :
 
 # elif _c == 1 :
 #     import abstraction
+

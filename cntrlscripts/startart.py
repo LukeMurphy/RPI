@@ -14,6 +14,8 @@ def runScript(arg="startup"):
     try:
         if arg == "cron":
             os.system("ps -ef | pgrep -f player.py | xargs kill -9")
+            os.system("ps -ef | pgrep -f cron.py | xargs kill -9")
+            os.system("ps -ef | pgrep -f sequencer.v2.py | xargs kill -9")
         execCmd = f"{initPath}"
         print(execCmd)
         os.system(execCmd)

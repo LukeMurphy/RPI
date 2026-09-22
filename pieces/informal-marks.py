@@ -12,6 +12,9 @@ from pieces.screen import Holder
 
 # -------- Util Functions   -------------- #
 
+timerDirector : Director
+
+
 
 def randomRange(a, b, rounded=False):
     if not rounded:
@@ -463,8 +466,8 @@ def reDraw():
     if imMngr.bg_alpha > imMngr.bg_alpha_base:
         imMngr.bg_alpha = imMngr.bg_alpha_base
 
-    drawTheBG()
-    updateLines()
+    # drawTheBG()
+    # updateLines()
 
     # in-place refresh of mark
     for _u in range(imMngr.numberOfinformalLines):
@@ -488,7 +491,8 @@ def reDraw():
         if imMngr.useBgBox:
             for _ in range(imMngr.initialRunsOfBgBlocks):
                 bgColorsFilling()
-        pieceLogger(f" >> change ALL LINES  lightMode:{imMngr.lightMode} {imMngr.bg_alpha}")
+        pieceLogger(f" >> change ALL LINES  lightMode:{imMngr.lightMode} alpha:{imMngr.bg_alpha}")
+        pieceLogger(f" >> Lines:{imMngr.numberOfinformalLines} / max:{imMngr.maxInformalLineUnits}")
 
     if random.random() < imMngr.pauseProb:
         imMngr.noChange = True
@@ -500,6 +504,13 @@ def reDraw():
         clearbgBox()
         for _ in range(imMngr.initialRunsOfBgBlocks):
             bgColorsFilling()
+        pieceLogger(f" >> clearbgBoxProb called :{imMngr.numberOfinformalLines} / max:{imMngr.maxInformalLineUnits}")
+        pieceLogger("blanks ???")
+        setLines()
+        pieceLogger(f" >> numberOfinformalLines :{imMngr.numberOfinformalLines} / max:{imMngr.maxInformalLineUnits}")
+
+    drawTheBG()
+    updateLines()
 
 
 def iterate():

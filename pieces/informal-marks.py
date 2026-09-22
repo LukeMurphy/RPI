@@ -14,7 +14,10 @@ from pieces.screen import Holder
 
 timerDirector : Director
 
-
+t1 = time.time()
+t2 = time.time()
+timeDiffCount = 0
+timeDiffTotal = 0
 
 def randomRange(a, b, rounded=False):
     if not rounded:
@@ -454,8 +457,11 @@ def runWork():
 
 
 def reDraw():
-
-    if random.random() < imMngr.useBgBoxProb and imMngr.useBgBox:
+    global t1,t2,timeDiffCount,timeDiffTotal
+    # if random.random() < imMngr.useBgBoxProb and imMngr.useBgBox:
+    imMngr.useBgBoxDir.checkTime()
+    if imMngr.useBgBoxDir.advance and not imMngr.useBgBox:
+        imMngr.useBgBoxDir.setSlotTimeRange()
         # bgColorsFilling()
         for _ in range(imMngr.initialRunsOfBgBlocks):
             bgColorsFilling()
@@ -466,8 +472,8 @@ def reDraw():
     if imMngr.bg_alpha > imMngr.bg_alpha_base:
         imMngr.bg_alpha = imMngr.bg_alpha_base
 
-    # drawTheBG()
-    # updateLines()
+    drawTheBG()
+    updateLines()
 
     # in-place refresh of mark
     for _u in range(imMngr.numberOfinformalLines):
@@ -481,7 +487,11 @@ def reDraw():
                 _informalLine.generateScribble()
 
     # all marks changed
-    if random.random() < imMngr.changeAllLinesProb and not imMngr.noChange:
+    # if random.random() < imMngr.changeAllLinesProb and not imMngr.noChange:
+    imMngr.changeAllLinesDir.checkTime()
+    if imMngr.changeAllLinesDir.advance and not imMngr.noChange:
+        imMngr.changeAllLinesDir.setSlotTimeRange()
+        
         imMngr.lightMode = False if random.random() > imMngr.lightModeProb else True
         imMngr.bg_alpha = 0
         clearbgBox()
@@ -493,14 +503,28 @@ def reDraw():
                 bgColorsFilling()
         pieceLogger(f" >> change ALL LINES  lightMode:{imMngr.lightMode} alpha:{imMngr.bg_alpha}")
         pieceLogger(f" >> Lines:{imMngr.numberOfinformalLines} / max:{imMngr.maxInformalLineUnits}")
+        # t2 = time.time()
+        # _delta = t2-t1
+        # timeDiffTotal += _delta
+        # timeDiffCount += 1
+        # pieceLogger(f" >> time diff:{_delta} avg: {round(timeDiffTotal/timeDiffCount, 2)} new slotrate {imMngr.changeAllLinesDir.slotRate}")
+        # t1 = time.time()
 
-    if random.random() < imMngr.pauseProb:
+
+    # if random.random() < imMngr.pauseProb:
+    imMngr.pauseProbDir.checkTime()
+    if imMngr.pauseProbDir.advance :
+        imMngr.pauseProbDir.setSlotTimeRange()
         imMngr.noChange = True
 
-    if random.random() < imMngr.unpauseProb:
-        imMngr.noChange = False
+    if imMngr.noChange :
+        if random.random() < imMngr.unpauseProb:
+            imMngr.noChange = False
 
-    if random.random() < imMngr.clearbgBoxProb and imMngr.useBgBox:
+    # if random.random() < imMngr.clearbgBoxProb and imMngr.useBgBox:
+    imMngr.clearbgBoxDir.checkTime()
+    if imMngr.clearbgBoxDir.advance and not imMngr.useBgBox:
+        imMngr.clearbgBoxDir.setSlotTimeRange()
         clearbgBox()
         for _ in range(imMngr.initialRunsOfBgBlocks):
             bgColorsFilling()
@@ -509,8 +533,10 @@ def reDraw():
         setLines()
         pieceLogger(f" >> numberOfinformalLines :{imMngr.numberOfinformalLines} / max:{imMngr.maxInformalLineUnits}")
 
-    drawTheBG()
-    updateLines()
+        if imMngr.numberOfinformalLines < 10 :
+            setLines()
+
+
 
 
 def iterate():
@@ -729,14 +755,32 @@ class InformalMarksManager:
 
         self.marksAltColorProb = float(workConfig.get("informalMarksGrid", "marksAltColorProb", fallback=0.04))
         self.scribbleAltColorProb = float(workConfig.get("informalMarksGrid", "scribbleAltColorProb", fallback=0.04))
+
         self.changeLinesProb = float(workConfig.get("informalMarksGrid", "changeLinesProb", fallback=0.01))
         self.changeAllLinesProb = float(workConfig.get("informalMarksGrid", "changeAllLinesProb", fallback=0.01))
+
+        self.timingVariability = float(workConfig.get("informalMarksGrid", "timingVariability", fallback=0.25))
+
+        # self.changeAllLinesRate = 1.0 / (1.0 / config.slotRate * self.changeAllLinesProb)
+        changeAllLinesRate = config.slotRate / self.changeAllLinesProb
+        self.changeAllLinesDir = Director(self)
+        self.changeAllLinesDir.slotRate = changeAllLinesRate
+        self.changeAllLinesDir.setSlotTimeRange(True)
+        pieceLogger(f"seconds to get one occurance changeAllLinesProb = {changeAllLinesRate} next occurance {self.changeAllLinesDir.slotRate}")
+
         self.clearLinesProb = float(workConfig.get("informalMarksGrid", "clearLinesProb", fallback=0.2))
         self.maxInformalLineUnits = int(workConfig.get("informalMarksGrid", "maxInformalLineUnits", fallback=5000))
 
         # probablility background changes
         self.changeBGProb = float(workConfig.get("informalMarksGrid", "changeBGProb", fallback=0.001))
+
         self.pauseProb = float(workConfig.get("informalMarksGrid", "pauseProb", fallback=0.0001))
+        pauseProbRate = config.slotRate / self.pauseProb
+        self.pauseProbDir = Director(self)
+        self.pauseProbDir.slotRate = pauseProbRate
+        self.pauseProbDir.setSlotTimeRange(True)
+        pieceLogger(f"seconds to get one occurance pauseProb = {pauseProbRate} next occurance {self.pauseProbDir.slotRate}")
+
         self.unpauseProb = float(workConfig.get("informalMarksGrid", "unpauseProb", fallback=0.0001))
         self.noChange = False
 
@@ -758,24 +802,36 @@ class InformalMarksManager:
         self.rebuildingVerticals = False
 
         self.useBgBox = workConfig.getboolean("informalMarksGrid", "forcebgBox")
-        self.useBgBoxProb = float(workConfig.get("informalMarksGrid", "useBgBoxProb"))
         self.bgBoxBox = tuple(map(lambda x: int(x), workConfig.get("informalMarksGrid", "bgBoxBox").split(",")))
         self.renderImageFullOverlay = Image.new("RGBA", (self.config.canvasWidth, self.config.canvasHeight))
         self.renderDrawOver = ImageDraw.Draw(self.renderImageFullOverlay)
         self.bgBoxFill = (100, 0, 80, 100)
+
+        self.useBgBoxProb = float(workConfig.get("informalMarksGrid", "useBgBoxProb"))
+        useBgBoxRate = config.slotRate / self.useBgBoxProb
+        self.useBgBoxDir = Director(self)
+        self.useBgBoxDir.slotRate = useBgBoxRate
+        self.useBgBoxDir.setSlotTimeRange(True)
+        pieceLogger(f"seconds to get one occurance useBgBoxRate = {useBgBoxRate} next occurance {self.useBgBoxDir.slotRate}")
+
+        self.clearbgBoxProb = float(workConfig.get("informalMarksGrid", "clearbgBoxProb"))  
+        clearbgBoxRate = config.slotRate / self.clearbgBoxProb
+        self.clearbgBoxDir = Director(self)
+        self.clearbgBoxDir.slotRate = clearbgBoxRate
+        self.clearbgBoxDir.setSlotTimeRange(True)
+        pieceLogger(f"seconds to get one occurance clearbgBoxRate = {clearbgBoxRate} next occurance {self.clearbgBoxDir.slotRate}")
+
 
         self.bgTileSizeWidthMin = float(workConfig.get("informalMarksGrid", "bgTileSizeWidthMin"))
         self.bgTileSizeWidthMax = float(workConfig.get("informalMarksGrid", "bgTileSizeWidthMax"))
         self.bgTileSizeHeightMin = float(workConfig.get("informalMarksGrid", "bgTileSizeHeightMin"))
         self.bgTileSizeHeightMax = float(workConfig.get("informalMarksGrid", "bgTileSizeHeightMax"))
 
-        self.clearbgBoxProb = float(workConfig.get("informalMarksGrid", "clearbgBoxProb"))
         self.bgGlitchCyclesMin = float(workConfig.get("informalMarksGrid", "bgGlitchCyclesMin"))
         self.bgGlitchCyclesMax = float(workConfig.get("informalMarksGrid", "bgGlitchCyclesMax"))
         self.bgGlitchDisplacementHorizontal = float(workConfig.get("informalMarksGrid", "bgGlitchDisplacementHorizontal"))
         self.bgGlitchDisplacementVertical = float(workConfig.get("informalMarksGrid", "bgGlitchDisplacementVertical"))
 
-        self.pauseProb = float(workConfig.get("informalMarksGrid", "pauseProb", fallback=".001"))
         # config.backgroundColorChangeProb = float(workConfig.get("informalMarksGrid", "backgroundColorChangeProb", fallback=".001"))
 
         self.initialRunsOfBgBlocks = int(workConfig.get("informalMarksGrid", "initialRunsOfBgBlocks", fallback=0))
@@ -839,7 +895,7 @@ def main(run=True):
     """
 
     # managing speed of animation and framerate
-    config.redrawSpeed = float(workConfig.get("informalMarksGrid", "redrawSpeed", fallback=0.02))
+    config.redrawSpeed = float(workConfig.get("informalMarksGrid", "redrawSpeed", fallback=0.01))
     config.slotRate = float(workConfig.get("informalMarksGrid", "slotRate", fallback=0.03))
     config.directorController = Director(config)
     config.directorController.slotRate = config.slotRate

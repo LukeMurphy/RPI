@@ -892,7 +892,7 @@ def reDraw():
 def iterate():
     global config, overlayControls, hmLinesMngr
     if random.SystemRandom().random() < hmLinesMngr.useBgBoxProb and hmLinesMngr.useBgBox:
-        _bgColorsFilling(hmLinesMngr)
+        _bgColorsFilling()
 
     reDraw()
 
@@ -1092,7 +1092,7 @@ def main(run=True):
 
     if hmLinesMngr.useBgBox:
         for _ in range(hmLinesMngr.initialRunsOfBgBlocks):
-            _bgColorsFilling(hmLinesMngr)
+            _bgColorsFilling()
 
     # these need to be set for BlanksAndDitherRemapping
     hmLinesMngr.canvasWidth = _config.canvasWidth

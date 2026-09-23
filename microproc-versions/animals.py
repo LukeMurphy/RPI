@@ -5,7 +5,8 @@ from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 import pngdec
 import os
 import random
-
+import play_timer
+import machine
 
 class ColorObj:
     def __init__(self):
@@ -353,6 +354,18 @@ while True:
         bgClr.news = random.uniform(0.1, .50)
         bgClr.newv = random.uniform(0.01, 0.20)
         bgClr.change()
+        
+    play_timer.playT2 = time.time()
+    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
+
+    #if random.random() < .002:
+    if deltaTimeToPlay > play_timer.timeToPlay :
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
 
     # Update the display
     i75.update()

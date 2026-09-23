@@ -5,6 +5,7 @@ import gc
 import drawing_scribbles_classes
 import drawing_scribbles_setpalette
 import machine
+import play_timer
 
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
@@ -499,8 +500,11 @@ while True:
     #     display.reset_pen(BLANKSCREEN)
     #     display.set_pen(BLANKSCREEN)
     #     display.clear()
+    play_timer.playT2 = time.time()
+    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
 
-    if random.random() < .002:
+    #if random.random() < .002:
+    if deltaTimeToPlay > play_timer.timeToPlay :
         display.clear()
         display.reset_pen(BLANKSCREEN)
         display.set_pen(BLANKSCREEN)

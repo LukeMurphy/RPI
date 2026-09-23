@@ -2,6 +2,8 @@ import time
 import os
 import random
 import gc
+import play_timer
+import machine
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
 
@@ -323,7 +325,8 @@ display.clear()
 
 resetLines()
 pause = False
-print(config.bgClr.intransition)
+#print(config.bgClr.intransition)
+
 
 while True:
 
@@ -349,12 +352,17 @@ while True:
         if not config.bgClr.intransition : setBGColor()
         if not config.fgClr.intransition : setLineColor()
         
-    # _on  = checkTime()
-    # if not _on:
-    #     display.clear()
-    #     display.reset_pen(BLANKSCREEN)
-    #     display.set_pen(BLANKSCREEN)
-    #     display.clear()
+    play_timer.playT2 = time.time()
+    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
+
+    #if random.random() < .002:
+    if deltaTimeToPlay > play_timer.timeToPlay :
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
         
     i75.update()
     time.sleep(config.interval)

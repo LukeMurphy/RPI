@@ -4,7 +4,8 @@ import pngdec
 import os
 import random
 import gc
-
+import play_timer
+import machine
 
 class Point:
 
@@ -355,13 +356,17 @@ while True:
 
         shp.update()
         
-    # _on  = checkTime()
-    
-    # if not _on:
-    #     display.clear()
-    #     display.reset_pen(BLANKSCREEN)
-    #     display.set_pen(BLANKSCREEN)
-    #     display.clear()
+    play_timer.playT2 = time.time()
+    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
+
+    #if random.random() < .002:
+    if deltaTimeToPlay > play_timer.timeToPlay :
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
 
     i75.update()
     time.sleep(INTERVAL)

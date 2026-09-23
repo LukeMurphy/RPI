@@ -1,9 +1,10 @@
+import time
 import random
+import math
 
-
-
-_c = random.choice([0,3,4,5,5])
+_c = random.choice([0,3,4,5,0])
 #_c = 4
+
 if _c == 0 :
     import drawing_scribbles
 elif _c == 2 :

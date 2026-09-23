@@ -3,7 +3,8 @@ import os
 import random
 import gc
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
-
+import play_timer
+import machine
 
 class Config:
     def __init__(self):
@@ -358,12 +359,17 @@ while True:
         if random.random() < drawInsetProb :
             shp.drawInset = True
             
-    # _on  = checkTime()
-    # if not _on:
-    #     display.clear()
-    #     display.reset_pen(BLANKSCREEN)
-    #     display.set_pen(BLANKSCREEN)
-    #     display.clear()
+    play_timer.playT2 = time.time()
+    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
+
+    #if random.random() < .002:
+    if deltaTimeToPlay > play_timer.timeToPlay :
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
 
     i75.update()
     time.sleep(config.interval)

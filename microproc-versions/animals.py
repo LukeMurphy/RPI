@@ -5,8 +5,46 @@ from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 import pngdec
 import os
 import random
-import play_timer
 import machine
+
+import settings_pieces as psets
+if psets.MODES[psets.MODE] == "random_w_restart":
+    import timer_play
+
+if psets.MODES[psets.MODE] == "remote":
+    import timer_coord
+
+def checkForNewPiece():
+    
+    def machineRestart():
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
+
+
+    if psets.MODES[psets.MODE] == "random_w_restart":
+        timer_play.playT2 = time.time()
+        deltaTimeToPlay =  timer_play.playT2 - timer_play.playT1
+        if deltaTimeToPlay > timer_play.timeToPlay :
+                machineRestart()
+
+    if psets.MODES[psets.MODE] == "remote":
+        timer_coord.playT2 = time.time()
+        deltaTimeToPlay =  timer_coord.playT2 - timer_coord.playT1
+        if deltaTimeToPlay > timer_coord.timeToPlay :
+            timer_coord.getPieceToPlay()
+            if timer_coord.pieceToPlay != PIECENAME:
+                machineRestart()
+
+class Config:
+    def __init__(self):
+        """
+        Purpose: holds state
+        """
+
 
 class ColorObj:
     def __init__(self):
@@ -137,15 +175,18 @@ class AbsShape:
             self.p4.change()
 
 
+config = Config()
+config.pieceName = "animals"
+
 # Time to pause between frames
 INTERVAL = .03
-
 # Setup for the display
 i75 = Interstate75(display=DISPLAY_INTERSTATE75_64X64)
 display = i75.display
 
 WIDTH = i75.width
 HEIGHT = i75.height
+BLANKSCREEN = display.create_pen_hsv(0,0,0)
 
 x = 10
 y = 10
@@ -354,18 +395,8 @@ while True:
         bgClr.news = random.uniform(0.1, .50)
         bgClr.newv = random.uniform(0.01, 0.20)
         bgClr.change()
-        
-    play_timer.playT2 = time.time()
-    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
 
-    #if random.random() < .002:
-    if deltaTimeToPlay > play_timer.timeToPlay :
-        display.clear()
-        display.reset_pen(BLANKSCREEN)
-        display.set_pen(BLANKSCREEN)
-        display.clear()
-        i75.update()
-        machine.soft_reset()
+    checkForNewPiece()
 
     # Update the display
     i75.update()

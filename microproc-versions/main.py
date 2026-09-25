@@ -1,21 +1,12 @@
-import time
 import random
-import math
+import settings_pieces as psets
 
-_c = random.choice([0,3,4,5,0])
-#_c = 4
-
-if _c == 0 :
-    import drawing_scribbles
-elif _c == 2 :
-    import animals
-elif _c == 3 :
-    import anim
-elif _c == 4 :
-    import fludd_v1b
-elif _c == 5 :
-    import hashlines
-
-# elif _c == 1 :
-#     import abstraction
-
+if psets.MODES[psets.MODE] == "fixed" :
+    __import__(psets.PIECES[psets.PIECE])
+if psets.MODES[psets.MODE] == "random" or "random_w_restart":
+    _c = random.choice(psets.PIECES)
+    __import__(_c)
+if psets.MODES[psets.MODE] == "remote" :
+    import timer_coord
+    timer_coord.getPieceToPlay()
+    __import__(timer_coord.pieceToPlay)

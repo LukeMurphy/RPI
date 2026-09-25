@@ -1,0 +1,3 @@
+#wifi
+WIFI_SSID="NETGEAR72"
+WIFI_PASSWORD="freestar179"

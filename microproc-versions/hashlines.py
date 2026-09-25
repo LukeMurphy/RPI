@@ -1,12 +1,41 @@
 import time
-import os
 import random
 import gc
-import play_timer
 import machine
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
+import settings_pieces as psets
+if psets.MODES[psets.MODE] == "random_w_restart":
+    import timer_play
 
+if psets.MODES[psets.MODE] == "remote":
+    import timer_coord
+
+def checkForNewPiece():
+    
+    def machineRestart():
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
+
+
+    if psets.MODES[psets.MODE] == "random_w_restart":
+        timer_play.playT2 = time.time()
+        deltaTimeToPlay =  timer_play.playT2 - timer_play.playT1
+        if deltaTimeToPlay > timer_play.timeToPlay :
+                machineRestart()
+
+    if psets.MODES[psets.MODE] == "remote":
+        timer_coord.playT2 = time.time()
+        deltaTimeToPlay =  timer_coord.playT2 - timer_coord.playT1
+        if deltaTimeToPlay > timer_coord.timeToPlay :
+            timer_coord.getPieceToPlay()
+            if timer_coord.pieceToPlay != PIECENAME:
+                machineRestart()
+                
 class Config:
     def __init__(self):
         """
@@ -263,8 +292,10 @@ def checkTime():
     
 BLANKSCREEN = display.create_pen_hsv(0,0,0)
 
-
 # ---------------------------------#
+
+PIECENAME = "hashlines"
+
 # Framerate
 config.interval = 0.03
 
@@ -328,7 +359,7 @@ pause = False
 #print(config.bgClr.intransition)
 
 
-while True:
+while not pause:
 
     config.bgClr.clrStep()
     Bg = display.create_pen_hsv(config.bgClr.h, config.bgClr.s, config.bgClr.v)
@@ -345,26 +376,31 @@ while True:
     if random.random() < config.changeBGProb:
         if not config.bgClr.intransition : setBGColor()
         if not config.fgClr.intransition : setLineColor()
+        checkForNewPiece()
 
     if random.random() < config.changeLinesProb:
         config.lightMode = False if random.random() > config.lightModeProb else True
         resetLines()
         if not config.bgClr.intransition : setBGColor()
         if not config.fgClr.intransition : setLineColor()
+        checkForNewPiece()
         
-    play_timer.playT2 = time.time()
-    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
 
-    #if random.random() < .002:
-    if deltaTimeToPlay > play_timer.timeToPlay :
-        display.clear()
-        display.reset_pen(BLANKSCREEN)
-        display.set_pen(BLANKSCREEN)
-        display.clear()
-        i75.update()
-        machine.soft_reset()
+
+    # play_timer.playT2 = time.time()
+    # deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
+
+    # #if random.random() < .002:
+    # if deltaTimeToPlay > play_timer.timeToPlay :
+    #     display.clear()
+    #     display.reset_pen(BLANKSCREEN)
+    #     display.set_pen(BLANKSCREEN)
+    #     display.clear()
+    #     i75.update()
+    #     machine.soft_reset()
         
     i75.update()
     time.sleep(config.interval)
 
 
+ 

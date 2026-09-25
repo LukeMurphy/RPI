@@ -3,8 +3,39 @@ import os
 import random
 import gc
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
-import play_timer
 import machine
+
+import settings_pieces as psets
+if psets.MODES[psets.MODE] == "random_w_restart":
+    import timer_play
+
+if psets.MODES[psets.MODE] == "remote":
+    import timer_coord
+
+def checkForNewPiece():
+    
+    def machineRestart():
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
+
+
+    if psets.MODES[psets.MODE] == "random_w_restart":
+        timer_play.playT2 = time.time()
+        deltaTimeToPlay =  timer_play.playT2 - timer_play.playT1
+        if deltaTimeToPlay > timer_play.timeToPlay :
+                machineRestart()
+
+    if psets.MODES[psets.MODE] == "remote":
+        timer_coord.playT2 = time.time()
+        deltaTimeToPlay =  timer_coord.playT2 - timer_coord.playT1
+        if deltaTimeToPlay > timer_coord.timeToPlay :
+            timer_coord.getPieceToPlay()
+            if timer_coord.pieceToPlay != PIECENAME:
+                machineRestart()
 
 class Config:
     def __init__(self):
@@ -247,10 +278,11 @@ def checkTime():
         
 
 BLANKSCREEN = display.create_pen_hsv(0,0,0)
-
+PIECENAME = "fludd_v1b"
 
 config = Config()
 
+config.pieceName = "fludd_v1b"
 config.interval = 0.03
 
 shapeChangeProb = 0.002
@@ -291,8 +323,6 @@ changeColor(fgClr, 350 / 360, 260 / 360, 0.90, 1.0, 0.0, 0.0, True)
 ForeG = display.create_pen_hsv(fgClr.h, fgClr.s, fgClr.v)
 
 display.clear()
-
-
 pause = False
 
 
@@ -354,22 +384,13 @@ while True:
         print("reset")
         if gc.mem_free() < 3000:
             gc.collect()
+        checkForNewPiece()
+            
         shp.update(True)
         shp.drawInset = False
         if random.random() < drawInsetProb :
             shp.drawInset = True
             
-    play_timer.playT2 = time.time()
-    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
-
-    #if random.random() < .002:
-    if deltaTimeToPlay > play_timer.timeToPlay :
-        display.clear()
-        display.reset_pen(BLANKSCREEN)
-        display.set_pen(BLANKSCREEN)
-        display.clear()
-        i75.update()
-        machine.soft_reset()
 
     i75.update()
     time.sleep(config.interval)

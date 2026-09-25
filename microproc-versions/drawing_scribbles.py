@@ -5,10 +5,47 @@ import gc
 import drawing_scribbles_classes
 import drawing_scribbles_setpalette
 import machine
-import play_timer
-
 from interstate75 import Interstate75, DISPLAY_INTERSTATE75_64X64
 
+import settings_pieces as psets
+if psets.MODES[psets.MODE] == "random_w_restart":
+    import timer_play
+
+if psets.MODES[psets.MODE] == "remote":
+    import timer_coord
+
+def checkForNewPiece():
+    
+    def machineRestart():
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
+
+
+    if psets.MODES[psets.MODE] == "random_w_restart":
+        timer_play.playT2 = time.time()
+        deltaTimeToPlay =  timer_play.playT2 - timer_play.playT1
+        if deltaTimeToPlay > timer_play.timeToPlay :
+                machineRestart()
+
+    if psets.MODES[psets.MODE] == "remote":
+        timer_coord.playT2 = time.time()
+        deltaTimeToPlay =  timer_coord.playT2 - timer_coord.playT1
+        if deltaTimeToPlay > timer_coord.timeToPlay :
+            timer_coord.getPieceToPlay()
+            if timer_coord.pieceToPlay != PIECENAME:
+                machineRestart()
+
+
+class Config:
+    pieceName = ""
+    def __init__(self):
+        """
+        Purpose: holds state
+        """
 
 
 def R(a, b, rounded=False):
@@ -351,8 +388,10 @@ def checkTime():
 
     
 BLANKSCREEN = display.create_pen_hsv(0,0,0)
+config = Config()
+config.pieceName = "drawing_scribbles"
 
-
+PIECENAME = "drawing_scribbles"
 # -------------------------------------------  -SETTINGS ---------------------------------------------------#
 
 INTERVAL = 0.02
@@ -438,18 +477,19 @@ display.clear()
 generateScribble(penMark)
 drawBGPanelBlocks()
 
-
 while True:
 
     if penMark.drawingDone and random.random() < startNewLineProb and penMark.linesDrawn < penMark.linesToDraw:
         # print(penMark.linesDrawn, penMark.linesToDraw)
         if gc.mem_free() < 3000:
             gc.collect()
+        checkForNewPiece()
         startUpNewLine()
 
     if random.random() < eraseProb and panelBGBlockCount == 0 and penMark.linesDrawn >= penMark.linesToDraw:
         if gc.mem_free() < 3000:
             gc.collect()
+        checkForNewPiece()
 
         if random.random() < changePaletteProb:
             arg = math.floor(random.uniform(0, numPalettes))
@@ -500,17 +540,7 @@ while True:
     #     display.reset_pen(BLANKSCREEN)
     #     display.set_pen(BLANKSCREEN)
     #     display.clear()
-    play_timer.playT2 = time.time()
-    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
 
-    #if random.random() < .002:
-    if deltaTimeToPlay > play_timer.timeToPlay :
-        display.clear()
-        display.reset_pen(BLANKSCREEN)
-        display.set_pen(BLANKSCREEN)
-        display.clear()
-        i75.update()
-        machine.soft_reset()
 
     # Update the display
     i75.update()

@@ -4,8 +4,45 @@ import pngdec
 import os
 import random
 import gc
-import play_timer
 import machine
+
+import settings_pieces as psets
+if psets.MODES[psets.MODE] == "random_w_restart":
+    import timer_play
+
+if psets.MODES[psets.MODE] == "remote":
+    import timer_coord
+
+def checkForNewPiece():
+    
+    def machineRestart():
+        display.clear()
+        display.reset_pen(BLANKSCREEN)
+        display.set_pen(BLANKSCREEN)
+        display.clear()
+        i75.update()
+        machine.soft_reset()
+
+
+    if psets.MODES[psets.MODE] == "random_w_restart":
+        timer_play.playT2 = time.time()
+        deltaTimeToPlay =  timer_play.playT2 - timer_play.playT1
+        if deltaTimeToPlay > timer_play.timeToPlay :
+                machineRestart()
+
+    if psets.MODES[psets.MODE] == "remote":
+        timer_coord.playT2 = time.time()
+        deltaTimeToPlay =  timer_coord.playT2 - timer_coord.playT1
+        if deltaTimeToPlay > timer_coord.timeToPlay :
+            timer_coord.getPieceToPlay()
+            if timer_coord.pieceToPlay != PIECENAME:
+                machineRestart()
+
+class Config:
+    def __init__(self):
+        """
+        Purpose: holds state
+        """
 
 class Point:
 
@@ -211,6 +248,12 @@ dy = 6
 XMAXDRIFT = 4
 YMAXDRIFT = 4
 
+PIECENAME = "anim"
+
+config = Config()
+config.pieceName = "anim"
+
+
 animConfigs = [
     {"dir": "imagesets/pensive-left", "nopauseFrames": [9, 10, 11, 12], "offsets": [-1, 2], "pauseProb": 0.05, "unpauseProb": 0.02},
     {"dir": "imagesets/bbear-2", "nopauseFrames": [4, 5, 6, 7, 8], "offsets": [2, 0], "pauseProb": 0.05, "unpauseProb": 0.02},
@@ -283,6 +326,7 @@ while True:
 
         if random.random() < pauseProb and count not in animConfigs[activeAnim]["nopauseFrames"]:
             pause = True
+            checkForNewPiece()
             # sometimes just goes back
             if random.random() < 0.5:
                 incr *= -1
@@ -332,6 +376,7 @@ while True:
 
     if random.random() < shapeChangeProb:
         shp.update()
+        checkForNewPiece()
 
     if random.random() < changeAnimProb and (count < 1 or count > 12):
         # activeAnim += 1
@@ -339,6 +384,8 @@ while True:
         #     activeAnim = 0
         if gc.mem_free() < 3000:
             gc.collect()
+            
+        checkForNewPiece()
 
         activeAnim = round(random.uniform(0, len(anims) - 1))
         count = 0
@@ -356,17 +403,7 @@ while True:
 
         shp.update()
         
-    play_timer.playT2 = time.time()
-    deltaTimeToPlay =  play_timer.playT2 - play_timer.playT1
 
-    #if random.random() < .002:
-    if deltaTimeToPlay > play_timer.timeToPlay :
-        display.clear()
-        display.reset_pen(BLANKSCREEN)
-        display.set_pen(BLANKSCREEN)
-        display.clear()
-        i75.update()
-        machine.soft_reset()
 
     i75.update()
     time.sleep(INTERVAL)

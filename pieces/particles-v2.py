@@ -612,6 +612,10 @@ def linearMotionAction(config, p, ps):
     if ps.oneDirection :
         dirVal = 0
 
+    # to do add banding ....
+    # if p.yPosR > 32 :
+    #     dirVal = 1
+
     if ps.linearMotionAlsoHorizontal:
         dirVal = round(random.uniform(0, 3))
 

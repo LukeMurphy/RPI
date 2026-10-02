@@ -198,7 +198,16 @@ class ControlPanel(QWidget):
 
         cfg_rel = configToRun.split(configPath)[1]
 
-        if ".cfg" in configToRun:
+        if "electron--" in configToRun:
+                fh = open(configToRun, "r")
+                cmd = (fh.read())
+                os.system(f"ps -ef | pgrep -f electron | xargs sudo kill -9;")
+                os.system(cmd)
+                # proc = subprocess.Popen(cmd, text=True, bufsize=1)
+                # self.running_procs[configToRun] = proc
+                # log_message(f"[started] {cfg_rel}")
+
+        elif ".cfg" in configToRun:
             if "multi" in configToRun:
                 log_message("MULTIPLAYER STARTING >>>\n")
                 cmd = ["python3", "-u", base + "multiplayer.py", "-path", base, "-mname", "studio", "-cfg", cfg_rel]

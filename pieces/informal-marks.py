@@ -537,8 +537,6 @@ def reDraw():
             setLines()
 
 
-
-
 def iterate():
     reDraw()
 
@@ -835,7 +833,8 @@ class InformalMarksManager:
         # config.backgroundColorChangeProb = float(workConfig.get("informalMarksGrid", "backgroundColorChangeProb", fallback=".001"))
 
         self.initialRunsOfBgBlocks = int(workConfig.get("informalMarksGrid", "initialRunsOfBgBlocks", fallback=0))
-        
+        self.markRotation  = 90
+
 
 def main(run=True):
     global config 

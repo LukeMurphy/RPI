@@ -79,9 +79,6 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             runScript=0
             echo "==>restarting <=="
             echo admin000 | sudo -S shutdown -r now
-            # todo for remote script execution
-            # echo "x" > $controlPath"localWorkValue.cfg"
-            # echo "50" > $controlPath"localBrightnessValue.cfg"
         fi
         if [ $workToPlay != 'update' ] && [ $workToPlay != "RemoteFix" ]; then
             echo "==> NOT THE SAME or STARTING UP"

@@ -164,7 +164,10 @@ def displayTest():
 
     tm = datetime.datetime.now()
     tm = time.ctime()
+    config.draw.text((11, 37), tm, (0,0,0), font=config.font)
     config.draw.text((10, 36), tm, config.fontColor, font=config.font)
+    config.draw.text((11, 51), f"b: {config.brightness}", (0,0,0), font=config.font)
+    config.draw.text((10, 50), f"b: {config.brightness}", config.fontColor, font=config.font)
 
     config.render(config.image, 0, 0)
 
@@ -438,6 +441,14 @@ def main(run=True):
     pieceLogger("** ---------------------")
     pieceLogger("** Diag Loaded **")
 
+    try:
+        config.brightness = float(workConfig.get("diag", "brightness"))
+        pieceLogger(f"Brightness override: {config.brightness}")
+    except Exception as e:
+        pieceLogger(e)
+        # config.rowsToShow = 0
+
+
     colorutils.brightness = config.brightness
     # config.canvasImageWidth = config.screenWidth
     # config.canvasImageHeight = config.screenHeight
@@ -624,12 +635,12 @@ def iterate():
     #     config.screenPositionX = config.cnvs.winfo_rootx()
     #     config.screenPositionY = config.cnvs.winfo_rooty() - 22
 
-    if config.TVPalette == True:
+    if config.showGrid == True:
+        showGrid()
+    elif config.TVPalette == True:
         drawTVPalette()
     elif config.colorPalette == True:
         drawPalette()
-    elif config.showGrid == True:
-        showGrid()
     else:
         displayTest()
 

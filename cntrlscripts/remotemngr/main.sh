@@ -32,12 +32,9 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
     echo "Remote brightness:" $workBrightnessControl
     configToUse=$localWorkValue
     brightnessConfig=$localBrightnessValue
-
     if [ $brightnessConfig = '' ]; then
         brightnessConfig = 1
     fi
-
-
     sub="--manifest.cfg"
     if [ $1 = 'startup' ]; then
         runScript=1
@@ -51,8 +48,6 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         esac
         execString="${path}${player} -mname ${machine} -path ${path} -cfg ${configToUse} -brightnessOverride ${brightnessConfig}"
     fi
-
-
     if [ $workToPlay != $localWorkValue ] || [ $workBrightnessControl != $localBrightnessValue ]; then
         if [ $workToPlay = 'Shutdown' ]; then
             echo "==>shutting down <=="
@@ -68,6 +63,17 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             echo "==> RUN UPDATE <=="
             ps -ef | pgrep -f player.py | xargs kill -9
             git -C $path pull
+            # echo "x" > $controlPath"localWorkValue.cfg"
+            # echo "50" > $controlPath"localBrightnessValue.cfg"
+        fi
+        if [ $workToPlay = 'RemoteFix' ]; then
+            echo "==> RUN REMOTEFIX <=="
+            ps -ef | pgrep -f player.py | xargs kill -9
+            remoteFixFile=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}remotefix.txt")
+            echo $remoteFixFile >$controlPath"remotefix.py"
+            python3 $remoteFixFile &
+            # todo for remote script execution
+            
             # echo "x" > $controlPath"localWorkValue.cfg"
             # echo "50" > $controlPath"localBrightnessValue.cfg"
         fi

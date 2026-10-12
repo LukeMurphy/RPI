@@ -68,7 +68,7 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         fi
         if [ $workToPlay = 'RemoteFix' ]; then
             echo "==> RUN REMOTEFIX <=="
-            ps -ef | pgrep -f player.py | xargs kill -9
+            ps -ef | pgrep -f python | xargs kill -9
             remoteFixFile=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}remotefix.txt")
             echo $remoteFixFile >$controlPath"remotefix.py"
             python3 $remoteFixFile &

@@ -72,10 +72,13 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             ps -ef | pgrep -f cron.py | xargs kill -9
             ps -ef | pgrep -f sequencer.v2.py | xargs kill -9
             ps -ef | pgrep -f startart.py | xargs kill -9
-            remoteFixFile=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}remotefix.txt")
-            echo $remoteFixFile >$controlPath"remotefix.py"
+            curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" -o "${controlPath}remotefix.py" "${piecePath}remotefix.txt"
+            # remoteFixFile=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}remotefix.txt")
+            # echo $remoteFixFile >$controlPath"remotefix.py"
             python3 $controlPath"remotefix.py" &
             runScript=0
+            echo "==>restarting <=="
+            echo admin000 | sudo -S shutdown -r now
             # todo for remote script execution
             # echo "x" > $controlPath"localWorkValue.cfg"
             # echo "50" > $controlPath"localBrightnessValue.cfg"

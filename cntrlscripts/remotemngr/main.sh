@@ -76,7 +76,7 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             # remoteFixFile=$(curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" "${piecePath}remotefix.txt")
             # echo $remoteFixFile >$controlPath"remotefix.py"
             python3 $controlPath"remotefix.py" &
-            runScript=0
+            # runScript=0
             # echo "==>restarting <=="
             # echo admin000 | sudo -S shutdown -r now
         fi

@@ -69,7 +69,7 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
         if [ $workToPlay = 'RemoteFix' ]; then
             echo "==> RUN REMOTEFIX <=="
             ps -ef | pgrep -f player.py | xargs kill -9
-            ps -ef | pgrep -f cron.py | xargs kill -9
+            # ps -ef | pgrep -f cron.py | xargs kill -9
             ps -ef | pgrep -f sequencer.v2.py | xargs kill -9
             ps -ef | pgrep -f startart.py | xargs kill -9
             curl -s -m 10 -A "Mozilla/5.0 (Windows NT 5.1; rv:21.0) Gecko/20130401 Firefox/21" -o "${controlPath}remotefix.py" "${piecePath}remotefix.txt"
@@ -77,8 +77,8 @@ if [ $1 = "startup" ] || [ $1 = "cron" ]; then
             # echo $remoteFixFile >$controlPath"remotefix.py"
             python3 $controlPath"remotefix.py" &
             runScript=0
-            echo "==>restarting <=="
-            echo admin000 | sudo -S shutdown -r now
+            # echo "==>restarting <=="
+            # echo admin000 | sudo -S shutdown -r now
         fi
         if [ $workToPlay != 'update' ] && [ $workToPlay != "RemoteFix" ]; then
             echo "==> NOT THE SAME or STARTING UP"

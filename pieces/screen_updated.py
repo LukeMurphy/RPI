@@ -133,7 +133,7 @@ def showGrid():
     config.colOverlay.stepTransition()
 
     ## Force sets the alpha
-    config.colOverlay.currentColor[3] = 30
+    config.colOverlay.currentColor[3] = config.bgColorAlpha
 
     config.bgColor = tuple(int(a * config.brightness) for a in (config.colOverlay.currentColor))
 
@@ -263,6 +263,18 @@ def drawBlackOut():
     config.render(config.image, 0, 0)
     config.inBlackOut = True
 
+def cb() :
+    if config.bgColorAlphaMin != config.bgColorAlphaMax :
+        config.bgColorAlpha = config.bgColorAlphaMin + random.random() * (config.bgColorAlphaMax - config.bgColorAlphaMin)
+    else :
+        config.bgColorAlpha = config.bgColorAlphaMin
+
+    if random.random() < .5  :
+        bgColor = tuple(int(a * config.brightness) for a in (config.colOverlay.currentColor))
+        config.canvasDraw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = ( bgColor[0],bgColor[1],bgColor[2],255))
+        config.draw.rectangle((0,0,config.canvasWidth, config.canvasHeight), fill = ( bgColor[0],bgColor[1],bgColor[2],255))
+
+    pieceLogger(f"New config.bgColorAlpha: {config.bgColorAlpha}")
 
 def main(run=True):
     global config, directionOrder
@@ -281,6 +293,9 @@ def main(run=True):
     config.outlineColor = tuple(map(lambda x: int(int(x) * config.brightness), config.outlineColorVals))
     config.bgColorVals = (workConfig.get("screenproject", "bgColor")).split(",")
     config.bgColor = tuple(map(lambda x: int(int(x) * config.brightness), config.bgColorVals))
+    config.bgColorAlpha = 30
+    config.bgColorAlphaMin = float(workConfig.get("screenproject", "bgColorAlphaMin", fallback=30))
+    config.bgColorAlphaMax = float(workConfig.get("screenproject", "bgColorAlphaMax", fallback=30))
     config.crackColorVals = (workConfig.get("screenproject", "crackColor")).split(",")
     config.crackColor = tuple(map(lambda x: int(int(x) * config.brightness), config.crackColorVals))
 
@@ -310,7 +325,7 @@ def main(run=True):
     config.canvasImage = Image.new("RGBA", (config.canvasWidth, config.canvasHeight))
     config.canvasDraw = ImageDraw.Draw(config.canvasImage)
 
-    config.colOverlay = coloroverlay.ColorOverlay()
+    config.colOverlay  = coloroverlay.ColorOverlay()
     config.colOverlay.randomSteps = False
     config.colOverlay.timeTrigger = True
     config.colOverlay.tLimitBase = config.tLimitBase
@@ -323,6 +338,7 @@ def main(run=True):
     config.colOverlay.minValue = float(workConfig.get("screenproject", "minValue"))
     config.colOverlay.maxBrightness = float(workConfig.get("screenproject", "maxBrightness"))
     config.colOverlay.maxValue = float(workConfig.get("screenproject", "maxValue"))
+    config.colOverlay.callBackDoneMethod = cb
 
     try:
         config.colOverlay.dropHueMin = float(workConfig.get("screenproject", "dropHueMin"))

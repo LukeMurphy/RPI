@@ -1097,7 +1097,9 @@ def main(run=True):
     # these need to be set for BlanksAndDitherRemapping
     hmLinesMngr.canvasWidth = _config.canvasWidth
     hmLinesMngr.canvasHeight = _config.canvasHeight
-    overlayControls = BlanksAndDitherRemapping(hmLinesMngr, workConfig, "hatchingmarks")
+    overlayControls = BlanksAndDitherRemapping(config, workConfig, "hatchingmarks")
+
+    overlayControls.filterRemapping = True
 
     # for blanks
     overlayControls.destinationImageDraw = _config.destinationImageDraw

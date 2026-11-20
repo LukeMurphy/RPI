@@ -217,7 +217,12 @@ def updateCanvas():
 
     # This significantly helped performance !!
     config.cnvs.delete("main")
-    config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
+    if config.doRotationLast :
+        _temp = config.renderImageFull
+        _temp = _temp.rotate(config.rotation)
+        config.cnvs._image_tk = PIL.ImageTk.PhotoImage(_temp)
+    else :
+        config.cnvs._image_tk = PIL.ImageTk.PhotoImage(config.renderImageFull)
     config.cnvs._image_id = config.cnvs.create_image(
         canvasOffsetX,
         canvasOffsetY,
@@ -531,17 +536,19 @@ def render(
     if config.forceBGSwap:
         imageToRender = _forceBlueGreenSwap(imageToRender)
 
-    if config.rotation != 0:
-        if config.fullRotation:
-            # This rotates the image that is painted i.e. after pasting-in the image sent
-            config.renderImageFull = config.renderImageFull.rotate(-config.rotation, expand=False)
-        else:
-            # This rotates the image sent to be rendered
-            imageToRender = imageToRender.rotate(-config.rotation, expand=True)
+    if not config.doRotationLast :
+        if config.rotation != 0:
+            if config.fullRotation:
+                # This rotates the image that is painted i.e. after pasting-in the image sent
+                config.renderImageFull = config.renderImageFull.rotate(-config.rotation, expand=False)
+            else:
+                # This rotates the image sent to be rendered
+                imageToRender = imageToRender.rotate(-config.rotation, expand=True)
 
-    if config.remapImageBlockShift and config.rotation != 0:
-        config._imageToRender = config._imageToRender.rotate(-config.rotation, expand=True)
-        # imageToRender = ImageChops.offset(imageToRender, -40, 40)
+    if not config.doRotationLast :
+        if config.remapImageBlockShift and config.rotation != 0:
+            config._imageToRender = config._imageToRender.rotate(-config.rotation, expand=True)
+            # imageToRender = ImageChops.offset(imageToRender, -40, 40)
 
     try:
         if not config.remapImageBlockShift:
@@ -581,8 +588,9 @@ def render(
     if config.usePixelSort and config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:
         config.renderImageFull = pixelSort(config.renderImageFull, config)
 
-    if config.rotation != 0 and (config.rotationTrailing or config.fullRotation):
-        config.renderImageFull = config.renderImageFull.rotate(config.rotation)
+    if not config.doRotationLast :
+        if config.rotation != 0 and (config.rotationTrailing or config.fullRotation):
+            config.renderImageFull = config.renderImageFull.rotate(config.rotation)
 
     # ---- Pixel Sort Type Effect ---- #
     if config.usePixelSort and not config.pixelSortRotatesWithImage and random.SystemRandom().random() < config.pixelSortAppearanceProb:

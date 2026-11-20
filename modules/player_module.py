@@ -382,6 +382,7 @@ def renderUsingIDAFruitHat(work):
     work.config.canvasWidth = int(work.workConfig.get("displayconfig", "canvasWidth"))
     work.config.canvasHeight = int(work.workConfig.get("displayconfig", "canvasHeight"))
     work.config.rotation = float(work.workConfig.get("displayconfig", "rotation"))
+    work.config.doRotationLast = work.workConfig.getboolean("displayconfig", "doRotationLast", fallback=False)
     work.config.rotationTrailing = work.workConfig.getboolean("displayconfig", "rotationTrailing")
     work.config.fullRotation = work.workConfig.getboolean("displayconfig", "fullRotation")
     work.config.useFilters = work.workConfig.getboolean("displayconfig", "useFilters")
@@ -423,6 +424,7 @@ def _configureAnimationWindow(work, rendererModule):
 
     work.config.useFilters = work.workConfig.getboolean("displayconfig", "useFilters")
     work.config.rotation = float(work.workConfig.get("displayconfig", "rotation"))
+    work.config.doRotationLast = work.workConfig.getboolean("displayconfig", "doRotationLast", fallback=False)
     work.config.rotationTrailing = work.workConfig.getboolean("displayconfig", "rotationTrailing", fallback=True)
     work.config.fullRotation = work.workConfig.getboolean("displayconfig", "fullRotation", fallback=True)
     work.config.canvasWidth = int(work.workConfig.get("displayconfig", "canvasWidth"))
@@ -526,6 +528,7 @@ def renderUsingFFMPEG(work):
 
     work.config.useFilters = work.workConfig.getboolean("displayconfig", "useFilters")
     work.config.rotation = float(work.workConfig.get("displayconfig", "rotation"))
+    work.config.doRotationLast = work.workConfig.getboolean("displayconfig", "doRotationLast", fallback=False)
     work.config.rotationTrailing = work.workConfig.getboolean("displayconfig", "rotationTrailing")
     work.config.fullRotation = work.workConfig.getboolean("displayconfig", "fullRotation")
     # work.config.matrixTiles = int(work.workConfig.get("displayconfig", "matrixTiles"))
